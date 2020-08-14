@@ -19,12 +19,31 @@ if(EXISTS "${HPX_DIR}")
 
   if("${SETUP_TYPE}" STREQUAL "TARGETS")
     target_link_libraries(
-      hello_world_component PUBLIC HPX::hpx HPX::wrap_main
-                                   HPX::iostreams_component
+      hello_world_component PUBLIC HPX::hpx HPX::iostreams_component
     )
     target_link_libraries(hello_world_component PRIVATE HPX::component)
 
-    target_link_libraries(hello_world_client PRIVATE hello_world_component)
+    target_link_libraries(
+      hello_world_client PRIVATE hello_world_component HPX::wrap_main
+    )
+
+    # We still support not linking to HPX::wrap_main when
+    # HPX_WITH_DYNAMIC_HPX_MAIN=OFF for legacy use. This can only be done using
+    # an installed HPX. It is strongly recommended to always link to
+    # HPX::wrap_main when implicitly using main as the runtime entry point.
+    if(USING_INSTALL_DIR AND NOT HPX_WITH_DYNAMIC_HPX_MAIN)
+      add_executable(hello_world_client_only_hpx_init hello_world_client.cpp)
+      target_include_directories(
+        hello_world_client_only_hpx_init PRIVATE ${test_SOURCE_DIR}
+      )
+      target_include_directories(
+        hello_world_client_only_hpx_init PRIVATE HPX_DEBUG
+      )
+
+      target_link_libraries(
+        hello_world_client_only_hpx_init PRIVATE hello_world_component
+      )
+    endif()
   elseif("${SETUP_TYPE}" STREQUAL "MACROS")
     hpx_setup_target(
       hello_world_component

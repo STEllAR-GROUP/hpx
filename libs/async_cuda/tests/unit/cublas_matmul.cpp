@@ -133,8 +133,8 @@ void matrixMultiply(hpx::cuda::experimental::cublas_executor& cublas,
 
     // Fill A and B with random numbers
     auto randfunc = [](T& x) { x = gen() / (T) RAND_MAX; };
-    hpx::parallel::for_each(par, h_A.begin(), h_A.end(), randfunc);
-    hpx::parallel::for_each(par, h_B.begin(), h_B.end(), randfunc);
+    hpx::for_each(par, h_A.begin(), h_A.end(), randfunc);
+    hpx::for_each(par, h_B.begin(), h_B.end(), randfunc);
 
     // create a cublas executor we'll use to futurize cuda events
     using namespace hpx::cuda::experimental;

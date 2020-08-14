@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/type_support/always_void.hpp>
+#include <hpx/type_support/equality.hpp>
 
 #include <boost/iterator/iterator_categories.hpp>
 
@@ -69,34 +70,6 @@ namespace hpx { namespace traits {
             typename util::always_void<decltype(*(std::declval<T&>()))>::type>
         {
             using type = decltype(*(std::declval<T&>()));
-        };
-
-        template <typename T, typename U, typename Enable = void>
-        struct equality_result
-        {
-        };
-
-        template <typename T, typename U>
-        struct equality_result<T, U,
-            typename util::always_void<decltype(
-                std::declval<const T&>() == std::declval<const U&>())>::type>
-        {
-            using type =
-                decltype(std::declval<const T&>() == std::declval<const U&>());
-        };
-
-        template <typename T, typename U, typename Enable = void>
-        struct inequality_result
-        {
-        };
-
-        template <typename T, typename U>
-        struct inequality_result<T, U,
-            typename util::always_void<decltype(
-                std::declval<const T&>() != std::declval<const U&>())>::type>
-        {
-            using type =
-                decltype(std::declval<const T&>() != std::declval<const U&>());
         };
 
         template <typename T, typename U, typename Enable = void>

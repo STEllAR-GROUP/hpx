@@ -15,8 +15,8 @@
 // computation. This example is still fully local but demonstrates nice
 // scalability on SMP machines.
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 
 #include <hpx/algorithm.hpp>
 #include <boost/range/irange.hpp>
@@ -32,16 +32,16 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables
-bool header = true; // print csv heading
-double k = 0.5;     // heat transfer coefficient
-double dt = 1.;     // time step
-double dx = 1.;     // grid spacing
+bool header = true;    // print csv heading
+double k = 0.5;        // heat transfer coefficient
+double dt = 1.;        // time step
+double dx = 1.;        // grid spacing
 
 inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 {
-    if(i == 0 && dir == -1)
-        return size-1;
-    if(i == size-1 && dir == +1)
+    if (i == 0 && dir == -1)
+        return size - 1;
+    if (i == size - 1 && dir == +1)
         return 0;
 
     HPX_ASSERT((i + dir) < size);
@@ -55,27 +55,39 @@ struct partition_data
 {
 public:
     explicit partition_data(std::size_t size)
-      : data_(new double[size]), size_(size)
-    {}
+      : data_(new double[size])
+      , size_(size)
+    {
+    }
 
     partition_data(std::size_t size, double initial_value)
-      : data_(new double[size]),
-        size_(size)
+      : data_(new double[size])
+      , size_(size)
     {
         double base_value = double(initial_value * size);
         for (std::size_t i = 0; i != size; ++i)
             data_[i] = base_value + double(i);
     }
 
-    partition_data(partition_data && other) noexcept
+    partition_data(partition_data&& other) noexcept
       : data_(std::move(other.data_))
       , size_(other.size_)
-    {}
+    {
+    }
 
-    double& operator[](std::size_t idx) { return data_[idx]; }
-    double operator[](std::size_t idx) const { return data_[idx]; }
+    double& operator[](std::size_t idx)
+    {
+        return data_[idx];
+    }
+    double operator[](std::size_t idx) const
+    {
+        return data_[idx];
+    }
 
-    std::size_t size() const { return size_; }
+    std::size_t size() const
+    {
+        return size_;
+    }
 
 private:
     std::unique_ptr<double[]> data_;
@@ -105,7 +117,7 @@ struct stepper
     // Our operator
     static double heat(double left, double middle, double right)
     {
-        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
+        return middle + (k * dt / (dx * dx)) * (left - 2 * middle + right);
     }
 
     // The partitioned operator, it invokes the heat operator above on all
@@ -116,41 +128,38 @@ struct stepper
         std::size_t size = middle.size();
         partition_data next(size);
 
-        next[0] = heat(left[size-1], middle[0], middle[1]);
+        next[0] = heat(left[size - 1], middle[0], middle[1]);
 
-        for(std::size_t i = 1; i != size-1; ++i)
+        for (std::size_t i = 1; i != size - 1; ++i)
         {
-            next[i] = heat(middle[i-1], middle[i], middle[i+1]);
+            next[i] = heat(middle[i - 1], middle[i], middle[i + 1]);
         }
 
-        next[size-1] = heat(middle[size-2], middle[size-1], right[0]);
+        next[size - 1] = heat(middle[size - 2], middle[size - 1], right[0]);
 
         return next;
     }
 
     // do all the work on 'np' partitions, 'nx' data points each, for 'nt'
     // time steps, limit depth of dependency tree to 'nd'
-    hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt,
-        std::uint64_t nd)
+    hpx::future<space> do_work(
+        std::size_t np, std::size_t nx, std::size_t nt, std::uint64_t nd)
     {
         using hpx::dataflow;
         using hpx::util::unwrapping;
 
         // U[t][i] is the state of position i at time t.
         std::vector<space> U(2);
-        for (space& s: U)
+        for (space& s : U)
             s.resize(np);
 
         // Initial conditions: f(0, i) = i
         std::size_t b = 0;
         auto range = boost::irange(b, np);
         using hpx::parallel::execution::par;
-        hpx::parallel::for_each(par, std::begin(range), std::end(range),
-            [&U, nx](std::size_t i)
-            {
-                U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
-            }
-        );
+        hpx::ranges::for_each(par, range, [&U, nx](std::size_t i) {
+            U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
+        });
 
         // limit depth of dependency tree
         hpx::lcos::local::sliding_semaphore sem(nd);
@@ -165,23 +174,19 @@ struct stepper
 
             for (std::size_t i = 0; i != np; ++i)
             {
-                next[i] = dataflow(
-                        hpx::launch::async, Op,
-                        current[idx(i, -1, np)], current[i], current[idx(i, +1, np)]
-                    );
-
+                next[i] =
+                    dataflow(hpx::launch::async, Op, current[idx(i, -1, np)],
+                        current[i], current[idx(i, +1, np)]);
             }
 
             // every nd time steps, attach additional continuation which will
             // trigger the semaphore once computation has reached this point
             if ((t % nd) == 0)
             {
-                next[0].then(
-                    [&sem, t](partition &&)
-                    {
-                        // inform semaphore about new lower limit
-                        sem.signal(t);
-                    });
+                next[0].then([&sem, t](partition&&) {
+                    // inform semaphore about new lower limit
+                    sem.signal(t);
+                });
             }
 
             // suspend if the tree has become too deep, the continuation above
@@ -197,14 +202,15 @@ struct stepper
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    std::uint64_t np = vm["np"].as<std::uint64_t>();   // Number of partitions.
-    std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
-    std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
-    std::uint64_t nd = vm["nd"].as<std::uint64_t>();   // Max depth of dep tree.
+    std::uint64_t np = vm["np"].as<std::uint64_t>();    // Number of partitions.
+    std::uint64_t nx =
+        vm["nx"].as<std::uint64_t>();    // Number of grid points.
+    std::uint64_t nt = vm["nt"].as<std::uint64_t>();    // Number of steps.
+    std::uint64_t nd =
+        vm["nd"].as<std::uint64_t>();    // Max depth of dep tree.
 
     if (vm.count("no-header"))
         header = false;
-
 
     // Create the stepper object
     stepper step;
@@ -240,6 +246,7 @@ int main(int argc, char* argv[])
     // Configure application-specific options.
     options_description desc_commandline;
 
+    // clang-format off
     desc_commandline.add_options()
         ("results", "print generated results (default: false)")
         ("nx", value<std::uint64_t>()->default_value(10),
@@ -258,6 +265,7 @@ int main(int argc, char* argv[])
          "Local x dimension")
         ( "no-header", "do not print out the csv header row")
     ;
+    // clang-format on
 
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);

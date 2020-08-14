@@ -75,9 +75,19 @@ struct user_defined_type
         return this->name == t.name && this->val == t.val;
     }
 
+    bool operator!=(user_defined_type const& t) const
+    {
+        return this->name != t.name || this->val != t.val;
+    }
+
     bool operator==(int rand_no) const
     {
         return this->val == rand_no;
+    }
+
+    bool operator!=(int rand_no) const
+    {
+        return this->val != rand_no;
     }
 
     static const std::vector<std::string> name_list;

@@ -20,8 +20,8 @@ int hpx_main()
     auto zip_it_begin = hpx::util::make_zip_iterator(large.begin());
     auto zip_it_end = hpx::util::make_zip_iterator(large.end());
 
-    hpx::parallel::for_each(hpx::parallel::execution::datapar, zip_it_begin,
-        zip_it_end, [](auto& t) -> void { hpx::util::get<0>(t) = 10.0; });
+    hpx::for_each(hpx::parallel::execution::datapar, zip_it_begin, zip_it_end,
+        [](auto& t) -> void { hpx::util::get<0>(t) = 10.0; });
 
     HPX_TEST_EQ(std::count(large.begin(), large.end(), 10.0),
         std::ptrdiff_t(large.size()));

@@ -23,8 +23,28 @@ unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 std::uniform_int_distribution<> dis(2, 101);
 
+template <typename IteratorTag>
+void test_find_if_not(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    //fill vector with random values about 1
+    std::fill(std::begin(c), std::end(c), dis(gen));
+    c.at(c.size() / 2) = 1;
+
+    iterator index =
+        hpx::find_if_not(iterator(std::begin(c)), iterator(std::end(c)),
+            [](std::size_t v) { return v != std::size_t(1); });
+
+    base_iterator test_index = std::begin(c) + c.size() / 2;
+
+    HPX_TEST(index == iterator(test_index));
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_find_if_not(ExPolicy policy, IteratorTag)
+void test_find_if_not(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -38,9 +58,9 @@ void test_find_if_not(ExPolicy policy, IteratorTag)
     std::fill(std::begin(c), std::end(c), dis(gen));
     c.at(c.size() / 2) = 1;
 
-    iterator index = hpx::parallel::find_if_not(policy, iterator(std::begin(c)),
-        iterator(std::end(c)),
-        [](std::size_t v) { return v != std::size_t(1); });
+    iterator index =
+        hpx::find_if_not(policy, iterator(std::begin(c)), iterator(std::end(c)),
+            [](std::size_t v) { return v != std::size_t(1); });
 
     base_iterator test_index = std::begin(c) + c.size() / 2;
 
@@ -48,7 +68,7 @@ void test_find_if_not(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_if_not_async(ExPolicy p, IteratorTag)
+void test_find_if_not_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -58,9 +78,9 @@ void test_find_if_not_async(ExPolicy p, IteratorTag)
     std::fill(std::begin(c), std::end(c), dis(gen));
     c.at(c.size() / 2) = 1;
 
-    hpx::future<iterator> f = hpx::parallel::find_if_not(p,
-        iterator(std::begin(c)), iterator(std::end(c)),
-        [](std::size_t v) { return v != std::size_t(1); });
+    hpx::future<iterator> f =
+        hpx::find_if_not(p, iterator(std::begin(c)), iterator(std::end(c)),
+            [](std::size_t v) { return v != std::size_t(1); });
     f.wait();
 
     //create iterator at position of value to be found
@@ -73,6 +93,9 @@ template <typename IteratorTag>
 void test_find_if_not()
 {
     using namespace hpx::parallel;
+
+    test_find_if_not(IteratorTag());
+
     test_find_if_not(execution::seq, IteratorTag());
     test_find_if_not(execution::par, IteratorTag());
     test_find_if_not(execution::par_unseq, IteratorTag());

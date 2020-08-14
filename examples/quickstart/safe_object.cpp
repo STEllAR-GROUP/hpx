@@ -4,9 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/algorithm.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/algorithm.hpp>
 
 #include <cstddef>
 #include <cstdlib>
@@ -25,11 +25,12 @@ public:
     {
     }
 
-    safe_object(safe_object && rhs)
+    safe_object(safe_object&& rhs)
       : data_(std::move(rhs.data_))
-    {}
+    {
+    }
 
-    safe_object& operator=(safe_object && rhs)
+    safe_object& operator=(safe_object&& rhs)
     {
         if (this != &rhs)
             data_ = std::move(rhs.data_);
@@ -51,7 +52,7 @@ public:
     }
 
     template <typename F>
-    void reduce (F const& f) const
+    void reduce(F const& f) const
     {
         for (T const& d : data_)
         {
@@ -78,35 +79,32 @@ inline bool satisfies_criteria(int d)
 
 int hpx_main(int argc, char* argv[])
 {
-    using hpx::parallel::for_each;
     using hpx::parallel::execution::par;
+    using hpx::ranges::for_each;
 
     // initialize data
     std::vector<int> data = random_fill(1000);
 
     // run a parallel loop to demonstrate thread safety of safe-object
-    safe_object<std::vector<int> > ho;
-    for_each(par, std::begin(data), std::end(data),
-        [&ho](int d)
-        {
-            if (satisfies_criteria(d))
-                ho.get().push_back(d);
-        });
+    safe_object<std::vector<int>> ho;
+    for_each(par, data, [&ho](int d) {
+        if (satisfies_criteria(d))
+            ho.get().push_back(d);
+    });
 
     // invoke the given reduce operation on the safe-object
     std::vector<int> result;
-    ho.reduce(
-        [&result](std::vector<int> const& chunk)
-        {
-            result.insert(result.end(), chunk.begin(), chunk.end());
-        });
+    ho.reduce([&result](std::vector<int> const& chunk) {
+        result.insert(result.end(), chunk.begin(), chunk.end());
+    });
 
     // make sure all numbers conform to criteria
     for (int i : result)
     {
         if (!satisfies_criteria(i))
         {
-            std::cout << "Number does not satisfy given criteria: " << i << "\n";
+            std::cout << "Number does not satisfy given criteria: " << i
+                      << "\n";
         }
     }
 

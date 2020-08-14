@@ -21,6 +21,7 @@
 #include <cuda_runtime.h>
 //
 #include <cstddef>
+#include <exception>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -163,6 +164,7 @@ namespace hpx { namespace cuda { namespace experimental {
         hpx::future<void> async(R (*cuda_kernel)(Params...), Args&&... args)
         {
             hpx::future<void> result;
+            std::exception_ptr p;
             try
             {
                 // make sure we run on the correct device
@@ -170,13 +172,19 @@ namespace hpx { namespace cuda { namespace experimental {
                 // insert the stream handle in the arg list and call the cuda function
                 detail::dispatch_helper<R, Params...> helper{};
                 helper(cuda_kernel, std::forward<Args>(args)..., stream_);
-                result = get_future();
+                return get_future();
             }
             catch (const hpx::exception& e)
             {
-                auto state = traits::detail::get_shared_state(result);
-                state->set_exception(std::current_exception());
+                p = std::current_exception();
             }
+
+            // The exception is set outside the catch block since
+            // set_exception may yield. Ending the catch block on a
+            // different worker thread than where it was started may lead
+            // to segfaults.
+            auto state = traits::detail::get_shared_state(result);
+            state->set_exception(std::move(p));
             return result;
         }
     };

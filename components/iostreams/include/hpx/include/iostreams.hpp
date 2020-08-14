@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/iostream.hpp>
 
-#if defined(HPX_HAVE_DEPRECATION_WARNINGS)
+#if (HPX_HAVE_DEPRECATION_WARNINGS != 0)
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/include/iostreams.hpp is deprecated, \
     please include hpx/iostream.hpp instead")

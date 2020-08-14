@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2014-2017 Hartmut Kaiser                                       -->
+<!-- Copyright (c) 2014-2020 Hartmut Kaiser                                       -->
 <!--                                                                              -->
 <!-- SPDX-License-Identifier: BSL-1.0                                             -->
 <!-- Distributed under the Boost Software License, Version 1.0. (See accompanying -->
@@ -11,6 +11,11 @@ Great to have you here. There are a few ways you can help make HPX better!
 
 This page describes how you can get yourself involved with the development of
 HPX. Here are some easy things to do.
+
+All of the HPX development and the related discussions happen through the
+[Github ticket system](https://github.com/STEllAR-GROUP/hpx/issues). We are
+looking forward to contributions submitted through the usual Github process,
+i.e. pull requests.
 
 The easiest ways to get in contact with us are listed here:
 
@@ -129,6 +134,12 @@ A few additional ones:
 
 Community is an important part of all we do.
 
+* The HPX project is a meritocratic, consensus-based community project. Anyone
+  with an interest in the project can join the community, contribute to the
+  project design and participate in the decision making process.
+  `This document <http://hpx.stellar-group.org/documents/governance/>`_ describes
+  how that participation takes place and how to set about earning merit within
+  the project community.
 * You can help us answer questions our users have by being around on IRC
   (#ste||ar on irc.freenode.net) or by chiming in on the
   [users mailing list](email:hpx-users@stellar.cct.lsu.edu)

@@ -10,7 +10,7 @@
 #include <hpx/components_base/config/defines.hpp>
 #include <hpx/components_base/traits/component_pin_support.hpp>
 
-#if defined(HPX_COMPONENTS_BASE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_COMPONENTS_BASE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/traits/component_pin_support.hpp is deprecated, \

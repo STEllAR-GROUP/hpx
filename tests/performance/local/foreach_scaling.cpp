@@ -4,12 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/chrono.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/iostream.hpp>
-#include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
-#include <hpx/modules/timing.hpp>
+#include <hpx/iostream.hpp>
 
 #include <hpx/executors/parallel_executor_aggregated.hpp>
 
@@ -37,7 +37,7 @@ std::mt19937 gen(seed);
 struct disable_stealing_parameter
 {
     template <typename Executor>
-    void mark_begin_execution(Executor &&)
+    void mark_begin_execution(Executor&&)
     {
         hpx::threads::add_remove_scheduler_mode(
             hpx::threads::policies::enable_stealing,
@@ -45,14 +45,14 @@ struct disable_stealing_parameter
     }
 
     template <typename Executor>
-    void mark_end_of_scheduling(Executor &&)
+    void mark_end_of_scheduling(Executor&&)
     {
         hpx::threads::remove_scheduler_mode(
             hpx::threads::policies::enable_stealing);
     }
 
     template <typename Executor>
-    void mark_end_execution(Executor &&)
+    void mark_end_execution(Executor&&)
     {
         hpx::threads::add_remove_scheduler_mode(
             hpx::threads::policies::enable_idle_backoff,
@@ -60,13 +60,12 @@ struct disable_stealing_parameter
     }
 };
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     template <>
-    struct is_executor_parameters<disable_stealing_parameter>
-      : std::true_type
-    {};
-}}}
+    struct is_executor_parameters<disable_stealing_parameter> : std::true_type
+    {
+    };
+}}}    // namespace hpx::parallel::execution
 
 ///////////////////////////////////////////////////////////////////////////////
 void measure_sequential_foreach(
@@ -78,24 +77,14 @@ void measure_sequential_foreach(
         disable_stealing_parameter dsp;
 
         // invoke sequential for_each
-        hpx::parallel::for_each(hpx::parallel::execution::seq.with(dsp),
-            std::begin(data_representation),
-            std::end(data_representation),
-            [](std::size_t)
-            {
-                worker_timed(delay);
-            });
+        hpx::ranges::for_each(hpx::parallel::execution::seq.with(dsp),
+            data_representation, [](std::size_t) { worker_timed(delay); });
     }
     else
     {
         // invoke sequential for_each
-        hpx::parallel::for_each(hpx::parallel::execution::seq,
-            std::begin(data_representation),
-            std::end(data_representation),
-            [](std::size_t)
-            {
-                worker_timed(delay);
-            });
+        hpx::ranges::for_each(hpx::parallel::execution::seq,
+            data_representation, [](std::size_t) { worker_timed(delay); });
     }
 }
 
@@ -112,26 +101,15 @@ void measure_parallel_foreach(
         disable_stealing_parameter dsp;
 
         // invoke parallel for_each
-        hpx::parallel::for_each(
+        hpx::ranges::for_each(
             hpx::parallel::execution::par.with(cs, dsp).on(exec),
-            std::begin(data_representation),
-            std::end(data_representation),
-            [](std::size_t)
-            {
-                worker_timed(delay);
-            });
+            data_representation, [](std::size_t) { worker_timed(delay); });
     }
     else
     {
         // invoke parallel for_each
-        hpx::parallel::for_each(
-            hpx::parallel::execution::par.with(cs).on(exec),
-            std::begin(data_representation),
-            std::end(data_representation),
-            [](std::size_t)
-            {
-                worker_timed(delay);
-            });
+        hpx::ranges::for_each(hpx::parallel::execution::par.with(cs).on(exec),
+            data_representation, [](std::size_t) { worker_timed(delay); });
     }
 }
 
@@ -149,29 +127,21 @@ hpx::future<void> measure_task_foreach(
         disable_stealing_parameter dsp;
 
         // invoke parallel for_each
-        return hpx::parallel::for_each(
+        return hpx::ranges::for_each(
             hpx::parallel::execution::par(hpx::parallel::execution::task)
-                .with(cs, dsp).on(exec),
-            std::begin(*data_representation),
-            std::end(*data_representation),
-            [](std::size_t)
-            {
-                worker_timed(delay);
-            })
+                .with(cs, dsp)
+                .on(exec),
+            *data_representation, [](std::size_t) { worker_timed(delay); })
             .then([data_representation](hpx::future<void>) {});
     }
     else
     {
         // invoke parallel for_each
-        return hpx::parallel::for_each(
+        return hpx::ranges::for_each(
             hpx::parallel::execution::par(hpx::parallel::execution::task)
-                .with(cs).on(exec),
-            std::begin(*data_representation),
-            std::end(*data_representation),
-            [](std::size_t)
-            {
-                worker_timed(delay);
-            })
+                .with(cs)
+                .on(exec),
+            *data_representation, [](std::size_t) { worker_timed(delay); })
             .then([data_representation](hpx::future<void>) {});
     }
 }
@@ -188,24 +158,16 @@ void measure_sequential_forloop(
         disable_stealing_parameter dsp;
 
         // invoke sequential for_loop
-        hpx::parallel::for_loop(hpx::parallel::execution::seq.with(dsp),
-            std::begin(data_representation),
-            std::end(data_representation),
-            [](iterator)
-            {
-                worker_timed(delay);
-            });
+        hpx::for_loop(hpx::parallel::execution::seq.with(dsp),
+            std::begin(data_representation), std::end(data_representation),
+            [](iterator) { worker_timed(delay); });
     }
     else
     {
         // invoke sequential for_loop
-        hpx::parallel::for_loop(hpx::parallel::execution::seq,
-            std::begin(data_representation),
-            std::end(data_representation),
-            [](iterator)
-            {
-                worker_timed(delay);
-            });
+        hpx::for_loop(hpx::parallel::execution::seq,
+            std::begin(data_representation), std::end(data_representation),
+            [](iterator) { worker_timed(delay); });
     }
 }
 
@@ -224,25 +186,16 @@ void measure_parallel_forloop(
         disable_stealing_parameter dsp;
 
         // invoke parallel for_loop
-        hpx::parallel::for_loop(
-            hpx::parallel::execution::par.with(cs, dsp).on(exec),
-            std::begin(data_representation),
-            std::end(data_representation),
-            [](iterator)
-            {
-                worker_timed(delay);
-            });
+        hpx::for_loop(hpx::parallel::execution::par.with(cs, dsp).on(exec),
+            std::begin(data_representation), std::end(data_representation),
+            [](iterator) { worker_timed(delay); });
     }
     else
     {
         // invoke parallel for_loop
-        hpx::parallel::for_loop(hpx::parallel::execution::par.with(cs).on(exec),
-            std::begin(data_representation),
-            std::end(data_representation),
-            [](iterator)
-            {
-                worker_timed(delay);
-            });
+        hpx::for_loop(hpx::parallel::execution::par.with(cs).on(exec),
+            std::begin(data_representation), std::end(data_representation),
+            [](iterator) { worker_timed(delay); });
     }
 }
 
@@ -262,29 +215,23 @@ hpx::future<void> measure_task_forloop(
         disable_stealing_parameter dsp;
 
         // invoke parallel for_looph
-        return hpx::parallel::for_loop(
+        return hpx::for_loop(
             hpx::parallel::execution::par(hpx::parallel::execution::task)
-                .with(cs, dsp).on(exec),
-            std::begin(*data_representation),
-            std::end(*data_representation),
-            [](iterator)
-            {
-                worker_timed(delay);
-            })
+                .with(cs, dsp)
+                .on(exec),
+            std::begin(*data_representation), std::end(*data_representation),
+            [](iterator) { worker_timed(delay); })
             .then([data_representation](hpx::future<void>) {});
     }
     else
     {
         // invoke parallel for_looph
-        return hpx::parallel::for_loop(
+        return hpx::for_loop(
             hpx::parallel::execution::par(hpx::parallel::execution::task)
-                .with(cs).on(exec),
-            std::begin(*data_representation),
-            std::end(*data_representation),
-            [](iterator)
-            {
-                worker_timed(delay);
-            })
+                .with(cs)
+                .on(exec),
+            std::begin(*data_representation), std::end(*data_representation),
+            [](iterator) { worker_timed(delay); })
             .then([data_representation](hpx::future<void>) {});
     }
 }
@@ -295,48 +242,48 @@ std::uint64_t averageout_parallel_foreach(
     std::size_t vector_size, Executor&& exec)
 {
     std::vector<std::size_t> data_representation(vector_size);
-    std::iota(std::begin(data_representation),
-        std::end(data_representation),
-        gen());
+    std::iota(
+        std::begin(data_representation), std::end(data_representation), gen());
 
     std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
-    for(auto i = 0; i < test_count; i++)
+    for (auto i = 0; i < test_count; i++)
         measure_parallel_foreach(data_representation, exec);
 
     return (hpx::util::high_resolution_clock::now() - start) / test_count;
 }
 
 template <typename Executor>
-std::uint64_t averageout_task_foreach(std::size_t vector_size, Executor && exec)
+std::uint64_t averageout_task_foreach(std::size_t vector_size, Executor&& exec)
 {
-    std::shared_ptr<std::vector<std::size_t> > data_representation(
-        std::make_shared<std::vector<std::size_t> >(vector_size));
+    std::shared_ptr<std::vector<std::size_t>> data_representation(
+        std::make_shared<std::vector<std::size_t>>(vector_size));
 
-    std::iota(std::begin(*data_representation),
-        std::end(*data_representation), gen());
+    std::iota(std::begin(*data_representation), std::end(*data_representation),
+        gen());
 
     if (num_overlapping_loops <= 0)
     {
         std::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for(auto i = 0; i < test_count; i++)
+        for (auto i = 0; i < test_count; i++)
             measure_task_foreach(data_representation, exec).wait();
 
         return (hpx::util::high_resolution_clock::now() - start) / test_count;
     }
 
-    std::vector<hpx::shared_future<void> > tests;
+    std::vector<hpx::shared_future<void>> tests;
     tests.resize(num_overlapping_loops);
 
     std::uint64_t start = hpx::util::high_resolution_clock::now();
 
-    for(auto i = 0; i < test_count; i++)
+    for (auto i = 0; i < test_count; i++)
     {
-        hpx::future<void> curr = measure_task_foreach(data_representation, exec);
+        hpx::future<void> curr =
+            measure_task_foreach(data_representation, exec);
         if (i >= num_overlapping_loops)
-            tests[(i-num_overlapping_loops) % tests.size()].wait();
+            tests[(i - num_overlapping_loops) % tests.size()].wait();
         tests[i % tests.size()] = curr.share();
     }
 
@@ -347,14 +294,13 @@ std::uint64_t averageout_task_foreach(std::size_t vector_size, Executor && exec)
 std::uint64_t averageout_sequential_foreach(std::size_t vector_size)
 {
     std::vector<std::size_t> data_representation(vector_size);
-    std::iota(std::begin(data_representation),
-        std::end(data_representation),
-        gen());
+    std::iota(
+        std::begin(data_representation), std::end(data_representation), gen());
 
     std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
-   for(auto i = 0; i < test_count; i++)
+    for (auto i = 0; i < test_count; i++)
         measure_sequential_foreach(data_representation);
 
     return (hpx::util::high_resolution_clock::now() - start) / test_count;
@@ -366,49 +312,48 @@ std::uint64_t averageout_parallel_forloop(
     std::size_t vector_size, Executor&& exec)
 {
     std::vector<std::size_t> data_representation(vector_size);
-    std::iota(std::begin(data_representation),
-        std::end(data_representation),
-        gen());
+    std::iota(
+        std::begin(data_representation), std::end(data_representation), gen());
 
     std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
-    for(auto i = 0; i < test_count; i++)
+    for (auto i = 0; i < test_count; i++)
         measure_parallel_forloop(data_representation, exec);
 
     return (hpx::util::high_resolution_clock::now() - start) / test_count;
 }
 
 template <typename Executor>
-std::uint64_t averageout_task_forloop(std::size_t vector_size, Executor && exec)
+std::uint64_t averageout_task_forloop(std::size_t vector_size, Executor&& exec)
 {
-    std::shared_ptr<std::vector<std::size_t> > data_representation(
-        std::make_shared<std::vector<std::size_t> >(vector_size));
+    std::shared_ptr<std::vector<std::size_t>> data_representation(
+        std::make_shared<std::vector<std::size_t>>(vector_size));
 
-    std::iota(std::begin(*data_representation),
-        std::end(*data_representation), gen());
+    std::iota(std::begin(*data_representation), std::end(*data_representation),
+        gen());
 
     if (num_overlapping_loops <= 0)
     {
         std::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for(auto i = 0; i < test_count; i++)
+        for (auto i = 0; i < test_count; i++)
             measure_task_forloop(data_representation, exec).wait();
 
         return (hpx::util::high_resolution_clock::now() - start) / test_count;
     }
 
-    std::vector<hpx::shared_future<void> > tests;
+    std::vector<hpx::shared_future<void>> tests;
     tests.resize(num_overlapping_loops);
 
     std::uint64_t start = hpx::util::high_resolution_clock::now();
 
-    for(auto i = 0; i < test_count; i++)
+    for (auto i = 0; i < test_count; i++)
     {
         hpx::future<void> curr =
             measure_task_forloop(data_representation, exec);
         if (i >= num_overlapping_loops)
-            tests[(i-num_overlapping_loops) % tests.size()].wait();
+            tests[(i - num_overlapping_loops) % tests.size()].wait();
         tests[i % tests.size()] = curr.share();
     }
 
@@ -419,14 +364,13 @@ std::uint64_t averageout_task_forloop(std::size_t vector_size, Executor && exec)
 std::uint64_t averageout_sequential_forloop(std::size_t vector_size)
 {
     std::vector<std::size_t> data_representation(vector_size);
-    std::iota(std::begin(data_representation),
-        std::end(data_representation),
-        gen());
+    std::iota(
+        std::begin(data_representation), std::end(data_representation), gen());
 
     std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
-    for(auto i = 0; i < test_count; i++)
+    for (auto i = 0; i < test_count; i++)
         measure_sequential_forloop(data_representation);
 
     return (hpx::util::high_resolution_clock::now() - start) / test_count;
@@ -437,7 +381,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 {
     // pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
-    bool csvoutput = vm["csv_output"].as<int>() ?true : false;
+    bool csvoutput = vm["csv_output"].as<int>() ? true : false;
     delay = vm["work_delay"].as<int>();
     test_count = vm["test_count"].as<int>();
     chunk_size = vm["chunk_size"].as<int>();
@@ -586,13 +530,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     //initialize program
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     hpx::program_options::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     cmdline.add_options()
         ( "vector_size"
         , hpx::program_options::value<std::size_t>()->default_value(1000)
@@ -627,7 +570,7 @@ int main(int argc, char* argv[])
         ("fast_idle_mode"
         ,"enable fast idle mode")
         ;
+    // clang-format on
 
     return hpx::init(cmdline, argc, argv, cfg);
 }
-

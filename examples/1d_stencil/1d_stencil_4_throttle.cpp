@@ -15,16 +15,16 @@
 // computation. This example is still fully local but demonstrates nice
 // scalability on SMP machines.
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 
 #include <hpx/algorithm.hpp>
 #include <boost/range/irange.hpp>
 
-#include "print_time_results.hpp"
-#include <hpx/include/performance_counters.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/include/performance_counters.hpp>
 #include <hpx/include/util.hpp>
+#include "print_time_results.hpp"
 
 #include <cstddef>
 #include <cstdint>
@@ -37,13 +37,13 @@
 #include <apex_api.hpp>
 
 using hpx::naming::id_type;
+using hpx::performance_counters::counter_value;
 using hpx::performance_counters::get_counter;
 using hpx::performance_counters::performance_counter;
-using hpx::performance_counters::counter_value;
 using hpx::performance_counters::status_is_valid;
 static bool counters_initialized = false;
-static const char * counter_name = "/threadqueue{{locality#{}/total}}/length";
-apex_policy_handle * periodic_policy_handle;
+static const char* counter_name = "/threadqueue{{locality#{}/total}}/length";
+apex_policy_handle* periodic_policy_handle;
 
 performance_counter get_counter()
 {
@@ -52,8 +52,10 @@ performance_counter get_counter()
     return performance_counter(hpx::util::format(counter_name, prefix));
 }
 
-void setup_counters() {
-    try {
+void setup_counters()
+{
+    try
+    {
         performance_counter counter(get_counter());
         // We need to explicitly start all counters before we can use them. For
         // certain counters this could be a no-op, in which case start will return
@@ -63,7 +65,8 @@ void setup_counters() {
         counter_value value = counter.get_counter_value(hpx::launch::sync);
         std::cout << "Active threads " << value.get_value<int>() << std::endl;
     }
-    catch(hpx::exception const& e) {
+    catch (hpx::exception const& e)
+    {
         std::cerr
             << "apex_policy_engine_active_thread_count: caught exception: "
             << e.what() << std::endl;
@@ -71,9 +74,12 @@ void setup_counters() {
     counters_initialized = true;
 }
 
-bool test_function(apex_context const& context) {
-    if (!counters_initialized) return false;
-    try {
+bool test_function(apex_context const& context)
+{
+    if (!counters_initialized)
+        return false;
+    try
+    {
         performance_counter counter(get_counter());
         counter_value value1 = counter.get_counter_value(hpx::launch::sync);
         apex::sample_value("thread_queue_length", value1.get_value<int>());
@@ -81,7 +87,8 @@ bool test_function(apex_context const& context) {
                   << std::endl;
         return APEX_NOERROR;
     }
-    catch(hpx::exception const& e) {
+    catch (hpx::exception const& e)
+    {
         std::cerr
             << "apex_policy_engine_active_thread_count: caught exception: "
             << e.what() << std::endl;
@@ -89,8 +96,10 @@ bool test_function(apex_context const& context) {
     }
 }
 
-void register_policies() {
-    periodic_policy_handle = apex::register_periodic_policy(100000, test_function);
+void register_policies()
+{
+    periodic_policy_handle =
+        apex::register_periodic_policy(100000, test_function);
 
     apex::setup_timer_throttling(std::string("thread_queue_length"),
         APEX_MINIMIZE_ACCUMULATED, APEX_ACTIVE_HARMONY, 200000);
@@ -100,16 +109,16 @@ void register_policies() {
 }
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables
-bool header = true; // print csv heading
-double k = 0.5;     // heat transfer coefficient
-double dt = 1.;     // time step
-double dx = 1.;     // grid spacing
+bool header = true;    // print csv heading
+double k = 0.5;        // heat transfer coefficient
+double dt = 1.;        // time step
+double dx = 1.;        // grid spacing
 
 inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 {
-    if(i == 0 && dir == -1)
-        return size-1;
-    if(i == size-1 && dir == +1)
+    if (i == 0 && dir == -1)
+        return size - 1;
+    if (i == size - 1 && dir == +1)
         return 0;
 
     HPX_ASSERT((i + dir) < size);
@@ -123,27 +132,39 @@ struct partition_data
 {
 public:
     explicit partition_data(std::size_t size)
-      : data_(new double[size]), size_(size)
-    {}
+      : data_(new double[size])
+      , size_(size)
+    {
+    }
 
     partition_data(std::size_t size, double initial_value)
-      : data_(new double[size]),
-        size_(size)
+      : data_(new double[size])
+      , size_(size)
     {
         double base_value = double(initial_value * size);
         for (std::size_t i = 0; i != size; ++i)
             data_[i] = base_value + double(i);
     }
 
-    partition_data(partition_data && other) noexcept
+    partition_data(partition_data&& other) noexcept
       : data_(std::move(other.data_))
       , size_(other.size_)
-    {}
+    {
+    }
 
-    double& operator[](std::size_t idx) { return data_[idx]; }
-    double operator[](std::size_t idx) const { return data_[idx]; }
+    double& operator[](std::size_t idx)
+    {
+        return data_[idx];
+    }
+    double operator[](std::size_t idx) const
+    {
+        return data_[idx];
+    }
 
-    std::size_t size() const { return size_; }
+    std::size_t size() const
+    {
+        return size_;
+    }
 
 private:
     std::unique_ptr<double[]> data_;
@@ -173,7 +194,7 @@ struct stepper
     // Our operator
     static double heat(double left, double middle, double right)
     {
-        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
+        return middle + (k * dt / (dx * dx)) * (left - 2 * middle + right);
     }
 
     // The partitioned operator, it invokes the heat operator above on all
@@ -184,41 +205,38 @@ struct stepper
         std::size_t size = middle.size();
         partition_data next(size);
 
-        next[0] = heat(left[size-1], middle[0], middle[1]);
+        next[0] = heat(left[size - 1], middle[0], middle[1]);
 
-        for(std::size_t i = 1; i != size-1; ++i)
+        for (std::size_t i = 1; i != size - 1; ++i)
         {
-            next[i] = heat(middle[i-1], middle[i], middle[i+1]);
+            next[i] = heat(middle[i - 1], middle[i], middle[i + 1]);
         }
 
-        next[size-1] = heat(middle[size-2], middle[size-1], right[0]);
+        next[size - 1] = heat(middle[size - 2], middle[size - 1], right[0]);
 
         return next;
     }
 
     // do all the work on 'np' partitions, 'nx' data points each, for 'nt'
     // time steps, limit depth of dependency tree to 'nd'
-    hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt,
-        std::uint64_t nd)
+    hpx::future<space> do_work(
+        std::size_t np, std::size_t nx, std::size_t nt, std::uint64_t nd)
     {
         using hpx::dataflow;
         using hpx::util::unwrapping;
 
         // U[t][i] is the state of position i at time t.
         std::vector<space> U(2);
-        for (space& s: U)
+        for (space& s : U)
             s.resize(np);
 
         // Initial conditions: f(0, i) = i
         std::size_t b = 0;
         auto range = boost::irange(b, np);
         using hpx::parallel::execution::par;
-        hpx::parallel::for_each(par, std::begin(range), std::end(range),
-            [&U, nx](std::size_t i)
-            {
-                U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
-            }
-        );
+        hpx::ranges::for_each(par, range, [&U, nx](std::size_t i) {
+            U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
+        });
 
         // limit depth of dependency tree
         hpx::lcos::local::sliding_semaphore sem(nd);
@@ -233,23 +251,19 @@ struct stepper
 
             for (std::size_t i = 0; i != np; ++i)
             {
-                next[i] = dataflow(
-                        hpx::launch::async, Op,
-                        current[idx(i, -1, np)], current[i], current[idx(i, +1, np)]
-                    );
-
+                next[i] =
+                    dataflow(hpx::launch::async, Op, current[idx(i, -1, np)],
+                        current[i], current[idx(i, +1, np)]);
             }
 
             // every nd time steps, attach additional continuation which will
             // trigger the semaphore once computation has reached this point
             if ((t % nd) == 0)
             {
-                next[0].then(
-                    [&sem, t](partition &&)
-                    {
-                        // inform semaphore about new lower limit
-                        sem.signal(t);
-                    });
+                next[0].then([&sem, t](partition&&) {
+                    // inform semaphore about new lower limit
+                    sem.signal(t);
+                });
             }
 
             // suspend if the tree has become too deep, the continuation above
@@ -265,14 +279,15 @@ struct stepper
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    std::uint64_t np = vm["np"].as<std::uint64_t>();   // Number of partitions.
-    std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
-    std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
-    std::uint64_t nd = vm["nd"].as<std::uint64_t>();   // Max depth of dep tree.
+    std::uint64_t np = vm["np"].as<std::uint64_t>();    // Number of partitions.
+    std::uint64_t nx =
+        vm["nx"].as<std::uint64_t>();    // Number of grid points.
+    std::uint64_t nt = vm["nt"].as<std::uint64_t>();    // Number of steps.
+    std::uint64_t nd =
+        vm["nd"].as<std::uint64_t>();    // Max depth of dep tree.
 
     if (vm.count("no-header"))
         header = false;
-
 
     // Create the stepper object
     stepper step;
@@ -312,6 +327,7 @@ int main(int argc, char* argv[])
     // Configure application-specific options.
     options_description desc_commandline;
 
+    // clang-format off
     desc_commandline.add_options()
         ("results", "print generated results (default: false)")
         ("nx", value<std::uint64_t>()->default_value(100),
@@ -330,6 +346,7 @@ int main(int argc, char* argv[])
          "Local x dimension")
         ( "no-header", "do not print out the csv header row")
     ;
+    // clang-format on
 
     hpx::register_startup_function(&setup_counters);
     hpx::register_startup_function(&register_policies);

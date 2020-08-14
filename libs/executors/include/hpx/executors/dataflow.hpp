@@ -179,17 +179,26 @@ namespace hpx { namespace lcos { namespace detail {
         HPX_FORCEINLINE
         void execute(std::false_type, Futures&& futures)
         {
+            std::exception_ptr p;
+
             try
             {
                 Func func = std::move(func_);
 
                 this->set_data(
                     util::invoke_fused(std::move(func), std::move(futures)));
+                return;
             }
             catch (...)
             {
-                this->set_exception(std::current_exception());
+                p = std::current_exception();
             }
+
+            // The exception is set outside the catch block since
+            // set_exception may yield. Ending the catch block on a
+            // different worker thread than where it was started may lead
+            // to segfaults.
+            this->set_exception(std::move(p));
         }
 
         /// Passes the futures into the evaluation function and
@@ -197,6 +206,8 @@ namespace hpx { namespace lcos { namespace detail {
         HPX_FORCEINLINE
         void execute(std::true_type, Futures&& futures)
         {
+            std::exception_ptr p;
+
             try
             {
                 Func func = std::move(func_);
@@ -204,11 +215,18 @@ namespace hpx { namespace lcos { namespace detail {
                 util::invoke_fused(std::move(func), std::move(futures));
 
                 this->set_data(util::unused_type());
+                return;
             }
             catch (...)
             {
-                this->set_exception(std::current_exception());
+                p = std::current_exception();
             }
+
+            // The exception is set outside the catch block since
+            // set_exception may yield. Ending the catch block on a
+            // different worker thread than where it was started may lead
+            // to segfaults.
+            this->set_exception(std::move(p));
         }
 
         ///////////////////////////////////////////////////////////////////////

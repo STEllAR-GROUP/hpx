@@ -10,7 +10,7 @@
 #include <hpx/lcos_local/config/defines.hpp>
 #include <hpx/modules/lcos_local.hpp>
 
-#if defined(HPX_LCOS_LOCAL_HAVE_DEPRECATION_WARNINGS)
+#if HPX_LCOS_LOCAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/lcos_local.hpp is deprecated, \
     please include hpx/modules/lcos_local.hpp instead")

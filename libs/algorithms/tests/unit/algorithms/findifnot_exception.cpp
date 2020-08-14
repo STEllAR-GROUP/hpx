@@ -23,8 +23,40 @@
 unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
+template <typename IteratorTag>
+void test_find_if_not_exception(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), gen() + 1);
+    c[c.size() / 2] = 0;
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::find_if_not(decorated_iterator(std::begin(c),
+                             []() { throw std::runtime_error("test"); }),
+            decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<hpx::parallel::execution::sequenced_policy,
+            IteratorTag>::call(hpx::parallel::execution::seq, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_find_if_not_exception(ExPolicy policy, IteratorTag)
+void test_find_if_not_exception(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -40,7 +72,7 @@ void test_find_if_not_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::find_if_not(policy,
+        hpx::find_if_not(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
@@ -60,7 +92,7 @@ void test_find_if_not_exception(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_if_not_exception_async(ExPolicy p, IteratorTag)
+void test_find_if_not_exception_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -74,7 +106,7 @@ void test_find_if_not_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<decorated_iterator> f = hpx::parallel::find_if_not(p,
+        hpx::future<decorated_iterator> f = hpx::find_if_not(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
@@ -101,6 +133,8 @@ template <typename IteratorTag>
 void test_find_if_not_exception()
 {
     using namespace hpx::parallel;
+
+    test_find_if_not_exception(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions

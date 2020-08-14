@@ -24,7 +24,7 @@ unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_if_not_bad_alloc(ExPolicy policy, IteratorTag)
+void test_find_if_not_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -41,7 +41,7 @@ void test_find_if_not_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::find_if_not(policy,
+        hpx::find_if_not(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
         HPX_TEST(false);
@@ -59,7 +59,7 @@ void test_find_if_not_bad_alloc(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_if_not_bad_alloc_async(ExPolicy p, IteratorTag)
+void test_find_if_not_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -73,7 +73,7 @@ void test_find_if_not_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<decorated_iterator> f = hpx::parallel::find_if_not(p,
+        hpx::future<decorated_iterator> f = hpx::find_if_not(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
         returned_from_algorithm = true;

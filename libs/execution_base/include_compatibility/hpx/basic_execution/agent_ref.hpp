@@ -10,7 +10,7 @@
 #include <hpx/execution_base/config/defines.hpp>
 #include <hpx/modules/execution_base.hpp>
 
-#if defined(HPX_EXECUTION_BASE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_EXECUTION_BASE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/basic_execution/agent_ref.hpp is deprecated, \
     please include hpx/modules/execution_base.hpp instead")

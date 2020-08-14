@@ -64,8 +64,7 @@ template <typename ExPolicy, typename T, typename Func>
 void test_any(ExPolicy&& policy, hpx::partitioned_vector<T>& xvalues, Func&& f,
     bool expected_result)
 {
-    bool result =
-        hpx::parallel::any_of(policy, xvalues.begin(), xvalues.end(), f);
+    bool result = hpx::any_of(policy, xvalues.begin(), xvalues.end(), f);
     HPX_TEST_EQ(result, expected_result);
 }
 
@@ -73,8 +72,7 @@ template <typename ExPolicy, typename T, typename Func>
 void test_any_async(ExPolicy&& policy, hpx::partitioned_vector<T>& xvalues,
     Func&& f, bool expected_result)
 {
-    bool result =
-        hpx::parallel::any_of(policy, xvalues.begin(), xvalues.end(), f).get();
+    bool result = hpx::any_of(policy, xvalues.begin(), xvalues.end(), f).get();
     HPX_TEST_EQ(result, expected_result);
 }
 

@@ -22,6 +22,7 @@
 #include <cublas_v2.h>
 //
 #include <cstddef>
+#include <exception>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -204,7 +205,7 @@ namespace hpx { namespace cuda { namespace experimental {
 
         // -------------------------------------------------------------------------
         // launch a cuBlas function and return a future that will become ready
-        // when the task completes, this allows integregration of GPU kernels with
+        // when the task completes, this allows integration of GPU kernels with
         // hpx::futures and the tasking DAG.
         template <typename R, typename... Params, typename... Args>
         hpx::future<typename std::enable_if<
@@ -212,6 +213,7 @@ namespace hpx { namespace cuda { namespace experimental {
         async(R (*cublas_function)(Params...), Args&&... args)
         {
             hpx::future<void> result;
+            std::exception_ptr p;
             try
             {
                 // make sue we run on the correct device
@@ -222,13 +224,19 @@ namespace hpx { namespace cuda { namespace experimental {
                 detail::dispatch_helper<R, Params...> helper;
                 helper(cublas_function, handle_.get(),
                     std::forward<Args>(args)...);
-                result = get_future();
+                return get_future();
             }
             catch (const hpx::exception& e)
             {
-                auto state = traits::detail::get_shared_state(result);
-                state->set_exception(std::current_exception());
+                p = std::current_exception();
             }
+
+            // The exception is set outside the catch block since
+            // set_exception may yield. Ending the catch block on a
+            // different worker thread than where it was started may lead
+            // to segfaults.
+            auto state = traits::detail::get_shared_state(result);
+            state->set_exception(std::move(p));
             return result;
         }
 

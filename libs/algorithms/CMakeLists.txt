@@ -19,8 +19,11 @@ set(algorithms_headers
     hpx/parallel/algorithms/count.hpp
     hpx/parallel/algorithms/destroy.hpp
     hpx/parallel/algorithms/detail/accumulate.hpp
+    hpx/parallel/algorithms/detail/advance_to_sentinel.hpp
     hpx/parallel/algorithms/detail/dispatch.hpp
     hpx/parallel/algorithms/detail/distance.hpp
+    hpx/parallel/algorithms/detail/fill.hpp
+    hpx/parallel/algorithms/detail/find.hpp
     hpx/parallel/algorithms/detail/insertion_sort.hpp
     hpx/parallel/algorithms/detail/is_sorted.hpp
     hpx/parallel/algorithms/detail/parallel_stable_sort.hpp
@@ -78,6 +81,8 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/all_any_none.hpp
     hpx/parallel/container_algorithms/copy.hpp
     hpx/parallel/container_algorithms/count.hpp
+    hpx/parallel/container_algorithms/destroy.hpp
+    hpx/parallel/container_algorithms/equal.hpp
     hpx/parallel/container_algorithms/fill.hpp
     hpx/parallel/container_algorithms/find.hpp
     hpx/parallel/container_algorithms/for_each.hpp
@@ -86,6 +91,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/is_heap.hpp
     hpx/parallel/container_algorithms/merge.hpp
     hpx/parallel/container_algorithms/minmax.hpp
+    hpx/parallel/container_algorithms/mismatch.hpp
     hpx/parallel/container_algorithms/move.hpp
     hpx/parallel/container_algorithms/partition.hpp
     hpx/parallel/container_algorithms/reduce.hpp
@@ -99,6 +105,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/stable_sort.hpp
     hpx/parallel/container_algorithms/transform.hpp
     hpx/parallel/container_algorithms/unique.hpp
+    hpx/parallel/container_memory.hpp
     hpx/parallel/container_numeric.hpp
     hpx/parallel/datapar.hpp
     hpx/parallel/datapar/iterator_helpers.hpp

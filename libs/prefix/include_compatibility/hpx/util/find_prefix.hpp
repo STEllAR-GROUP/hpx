@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/runtime_configuration/config/defines.hpp>
+#include <hpx/prefix/config/defines.hpp>
 #include <hpx/modules/prefix.hpp>
 
 #if HPX_RUNTIME_CONFIGURATION_HAVE_DEPRECATION_WARNINGS

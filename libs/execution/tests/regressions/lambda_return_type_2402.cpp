@@ -20,8 +20,8 @@ int hpx_main()
     auto zip_it_begin = hpx::util::make_zip_iterator(large.begin());
     auto zip_it_end = hpx::util::make_zip_iterator(large.end());
 
-    hpx::parallel::for_each(hpx::parallel::execution::datapar, zip_it_begin,
-        zip_it_end, [](auto t) {
+    hpx::for_each(hpx::parallel::execution::datapar, zip_it_begin, zip_it_end,
+        [](auto t) {
             using comp_type =
                 typename hpx::util::tuple_element<0, decltype(t)>::type;
             using var_type = typename hpx::util::decay<comp_type>::type;

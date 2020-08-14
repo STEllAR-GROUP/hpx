@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2020 Hartmut Kaiser
 //                2017 Bruno Pitrus
 
 //  SPDX-License-Identifier: BSL-1.0
@@ -20,9 +20,33 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag,
+    typename Proj = hpx::parallel::util::projection_identity>
+void test_all_of_seq(IteratorTag, Proj proj = Proj())
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::size_t iseq[] = {0, 23, 10007};
+    for (std::size_t i : iseq)
+    {
+        std::vector<std::size_t> c =
+            test::fill_all_any_none(10007, i);    //-V106
+
+        bool result = hpx::ranges::all_of(
+            c, [](std::size_t v) { return v != 0; }, proj);
+
+        // verify values
+        bool expected = std::all_of(std::begin(c), std::end(c),
+            [proj](std::size_t v) { return proj(v) != 0; });
+
+        HPX_TEST_EQ(result, expected);
+    }
+}
+
 template <typename ExPolicy, typename IteratorTag,
     typename Proj = hpx::parallel::util::projection_identity>
-void test_all_of(ExPolicy policy, IteratorTag, Proj proj = Proj())
+void test_all_of(ExPolicy&& policy, IteratorTag, Proj proj = Proj())
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -37,7 +61,7 @@ void test_all_of(ExPolicy policy, IteratorTag, Proj proj = Proj())
         std::vector<std::size_t> c =
             test::fill_all_any_none(10007, i);    //-V106
 
-        bool result = hpx::parallel::all_of(
+        bool result = hpx::ranges::all_of(
             policy, c, [](std::size_t v) { return v != 0; }, proj);
 
         // verify values
@@ -61,7 +85,7 @@ void test_all_of_async(ExPolicy p, IteratorTag, Proj proj = Proj())
         std::vector<std::size_t> c =
             test::fill_all_any_none(10007, i);    //-V106
 
-        hpx::future<bool> f = hpx::parallel::all_of(
+        hpx::future<bool> f = hpx::ranges::all_of(
             p, c, [](std::size_t v) { return v != 0; }, proj);
         f.wait();
 
@@ -86,6 +110,9 @@ void test_all_of()
         }
     };
     using namespace hpx::parallel;
+
+    test_all_of_seq(IteratorTag());
+    test_all_of_seq(IteratorTag(), proj());
 
     test_all_of(execution::seq, IteratorTag());
     test_all_of(execution::par, IteratorTag());
@@ -133,8 +160,45 @@ void all_of_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_all_of_exception(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::size_t iseq[] = {0, 23, 10007};
+    for (std::size_t i : iseq)
+    {
+        std::vector<std::size_t> c =
+            test::fill_all_any_none(10007, i);    //-V106
+
+        bool caught_exception = false;
+        try
+        {
+            hpx::ranges::all_of(c, [](std::size_t v) {
+                return throw std::runtime_error("test"), v != 0;
+            });
+
+            HPX_TEST(false);
+        }
+        catch (hpx::exception_list const& e)
+        {
+            caught_exception = true;
+            test::test_num_exceptions<
+                hpx::parallel::execution::sequenced_policy,
+                IteratorTag>::call(hpx::parallel::execution::seq, e);
+        }
+        catch (...)
+        {
+            HPX_TEST(false);
+        }
+
+        HPX_TEST(caught_exception);
+    }
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_all_of_exception(ExPolicy policy, IteratorTag)
+void test_all_of_exception(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -152,7 +216,7 @@ void test_all_of_exception(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::parallel::all_of(policy, c, [](std::size_t v) {
+            hpx::ranges::all_of(policy, c, [](std::size_t v) {
                 return throw std::runtime_error("test"), v != 0;
             });
 
@@ -188,10 +252,9 @@ void test_all_of_exception_async(ExPolicy p, IteratorTag)
         bool returned_from_algorithm = false;
         try
         {
-            hpx::future<void> f =
-                hpx::parallel::all_of(p, c, [](std::size_t v) {
-                    return throw std::runtime_error("test"), v != 0;
-                });
+            hpx::future<void> f = hpx::ranges::all_of(p, c, [](std::size_t v) {
+                return throw std::runtime_error("test"), v != 0;
+            });
             returned_from_algorithm = true;
             f.get();
 
@@ -217,6 +280,8 @@ void test_all_of_exception()
 {
     using namespace hpx::parallel;
 
+    test_all_of_exception(IteratorTag());
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
@@ -235,7 +300,7 @@ void all_of_exception_test()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_all_of_bad_alloc(ExPolicy policy, IteratorTag)
+void test_all_of_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -253,7 +318,7 @@ void test_all_of_bad_alloc(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::parallel::all_of(policy, c,
+            hpx::ranges::all_of(policy, c,
                 [](std::size_t v) { return throw std::bad_alloc(), v != 0; });
 
             HPX_TEST(false);
@@ -287,7 +352,7 @@ void test_all_of_bad_alloc_async(ExPolicy p, IteratorTag)
         bool returned_from_algorithm = false;
         try
         {
-            hpx::future<void> f = hpx::parallel::all_of(p, c,
+            hpx::future<void> f = hpx::ranges::all_of(p, c,
                 [](std::size_t v) { return throw std::bad_alloc(), v != 0; });
             returned_from_algorithm = true;
             f.get();

@@ -215,6 +215,7 @@ jobs:
                 -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=On \
                 -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
                 -DHPX_WITH_DOCUMENTATION=On \
+                -DHPX_WITH_LIBCDS=ON=On \
                 -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="${DOCUMENTATION_OUTPUT_FORMATS}"
       - persist_to_workspace:
           root: /hpx

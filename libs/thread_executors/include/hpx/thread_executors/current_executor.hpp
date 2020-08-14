@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-#include <hpx/execution/executors/thread_pool_executor.hpp>
 #include <hpx/executors/current_executor.hpp>
+#include <hpx/executors/thread_pool_executor.hpp>
 
 namespace hpx { namespace threads { namespace executors {
     using current_executor = parallel::execution::thread_pool_executor;

@@ -10,7 +10,7 @@
 #include <hpx/components_base/config/defines.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 
-#if defined(HPX_COMPONENTS_BASE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_COMPONENTS_BASE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/traits/is_component.hpp is deprecated, \
     please include hpx/components_base/traits/is_component.hpp instead")

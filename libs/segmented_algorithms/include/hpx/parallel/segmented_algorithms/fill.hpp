@@ -53,7 +53,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
         template <typename ExPolicy, typename InIter, typename T>
-        static typename util::detail::algorithm_result<ExPolicy, void>::type
+        static typename util::detail::algorithm_result<ExPolicy, InIter>::type
         fill_(ExPolicy&& policy, InIter first, InIter last, T const& value,
             std::true_type)
         {
@@ -62,15 +62,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef
                 typename std::iterator_traits<InIter>::value_type value_type;
 
-            return hpx::util::void_guard<result_type>(),
-                   hpx::parallel::for_each(std::forward<ExPolicy>(policy),
-                       first, last, fill_function<value_type>(value));
+            return for_each_(std::forward<ExPolicy>(policy), first, last,
+                fill_function<value_type>(value), util::projection_identity(),
+                std::true_type());
         }
 
         // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename T>
-        static typename util::detail::algorithm_result<ExPolicy, void>::type
-        fill_(ExPolicy&& policy, InIter first, InIter last, T const& value,
+        template <typename ExPolicy, typename InIter, typename Sent, typename T>
+        static typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        fill_(ExPolicy&& policy, InIter first, Sent last, T const& value,
             std::false_type);
     }    // namespace detail
          /// \endcond

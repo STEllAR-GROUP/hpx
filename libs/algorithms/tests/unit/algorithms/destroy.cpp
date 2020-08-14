@@ -18,6 +18,9 @@ template <typename IteratorTag>
 void test_destroy()
 {
     using namespace hpx::parallel;
+
+    test_destroy(IteratorTag());
+
     test_destroy(execution::seq, IteratorTag());
     test_destroy(execution::par, IteratorTag());
     test_destroy(execution::par_unseq, IteratorTag());
@@ -37,6 +40,8 @@ template <typename IteratorTag>
 void test_destroy_exception()
 {
     using namespace hpx::parallel;
+
+    test_destroy_exception(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions

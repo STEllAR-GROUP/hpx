@@ -527,17 +527,26 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename T>
         void set_data(T&& result)
         {
+            std::exception_ptr p;
+
             // set the received result, reset error status
             try
             {
                 // store the value
                 set_value(std::forward<T>(result));
+                return;
             }
             catch (...)
             {
                 // store the error instead
-                return set_exception(std::current_exception());
+                p = std::current_exception();
             }
+
+            // The exception is set outside the catch block since
+            // set_exception may yield. Ending the catch block on a
+            // different worker thread than where it was started may lead
+            // to segfaults.
+            set_exception(std::move(p));
         }
 
         // helper functions for setting data (if successful) or the error (if
@@ -545,6 +554,8 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename T>
         void set_remote_data(T&& result)
         {
+            std::exception_ptr p;
+
             // set the received result, reset error status
             try
             {
@@ -556,17 +567,26 @@ namespace hpx { namespace lcos { namespace detail {
                 // store the value
                 set_value(std::move(
                     get_remote_result_type::call(std::forward<T>(result))));
+                return;
             }
             catch (...)
             {
                 // store the error instead
-                return set_exception(std::current_exception());
+                p = std::current_exception();
             }
+
+            // The exception is set outside the catch block since
+            // set_exception may yield. Ending the catch block on a
+            // different worker thread than where it was started may lead
+            // to segfaults.
+            set_exception(std::move(p));
         }
 
         // trigger the future with the given error condition
         void set_error(error e, char const* f, char const* msg)
         {
+            std::exception_ptr p;
+
             try
             {
                 HPX_THROW_EXCEPTION(e, f, msg);
@@ -574,8 +594,14 @@ namespace hpx { namespace lcos { namespace detail {
             catch (...)
             {
                 // store the error code
-                set_exception(std::current_exception());
+                p = std::current_exception();
             }
+
+            // The exception is set outside the catch block since
+            // set_exception may yield. Ending the catch block on a
+            // different worker thread than where it was started may lead
+            // to segfaults.
+            set_exception(std::move(p));
         }
 
         /// Reset the promise to allow to restart an asynchronous
@@ -978,6 +1004,7 @@ namespace hpx { namespace lcos { namespace detail {
         void cancel()
         {
             std::unique_lock<mutex_type> l(this->mtx_);
+            std::exception_ptr p;
             try
             {
                 if (!this->started_)
@@ -1005,13 +1032,20 @@ namespace hpx { namespace lcos { namespace detail {
                         "task_base<Result>::cancel",
                         "future can't be canceled at this time");
                 }
+                return;
             }
             catch (...)
             {
                 this->started_ = true;
-                this->set_exception(std::current_exception());
-                throw;
+                p = std::current_exception();
             }
+
+            // The exception is set outside the catch block since
+            // set_exception may yield. Ending the catch block on a
+            // different worker thread than where it was started may lead
+            // to segfaults.
+            this->set_exception(p);
+            std::rethrow_exception(std::move(p));
         }
 
     protected:

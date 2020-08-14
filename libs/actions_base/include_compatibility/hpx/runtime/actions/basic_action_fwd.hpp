@@ -12,7 +12,7 @@
 
 // different versions of clang-format do different things
 // clang-format off
-#if defined(HPX_ACTIONS_BASE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ACTIONS_BASE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/actions/basic_action_fwd.hpp is deprecated, \

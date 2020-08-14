@@ -10,7 +10,7 @@
 #include <hpx/components_base/config/defines.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
 
-#if defined(HPX_COMPONENTS_BASE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_COMPONENTS_BASE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/components/pinned_ptr.hpp is deprecated, \

@@ -117,6 +117,10 @@ namespace hpx { namespace runtime_local { namespace detail {
             if (auxinfo_)
                 throw_auxinfo_ = *auxinfo_;
         }
+        catch (...)
+        {
+            // do nothing
+        }
 
         // figure out concrete underlying exception type
         try
@@ -216,7 +220,7 @@ namespace hpx { namespace runtime_local { namespace detail {
         else if (hpx::util::boost_system_error == type)
         {
             // clang-format off
-            ar & err_value& err_message;
+            ar & err_value & err_message;
             // clang-format on
         }
     }
@@ -262,7 +266,7 @@ namespace hpx { namespace runtime_local { namespace detail {
         else if (hpx::util::boost_system_error == type)
         {
             // clang-format off
-            ar & err_value& err_message;
+            ar & err_value & err_message;
             // clang-format on
         }
 

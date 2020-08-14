@@ -22,6 +22,7 @@
 #include <hpx/config/constexpr.hpp>
 #include <hpx/config/debug.hpp>
 #include <hpx/config/defines.hpp>
+#include <hpx/config/deprecation.hpp>
 #include <hpx/config/emulate_deleted.hpp>
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/config/forceinline.hpp>

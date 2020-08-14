@@ -81,8 +81,8 @@ void matrixMultiply(
 
     // Fill A and B with zeroes
     auto zerofunc = [](T& x) { x = 0; };
-    hpx::parallel::for_each(par, h_A.begin(), h_A.end(), zerofunc);
-    hpx::parallel::for_each(par, h_B.begin(), h_B.end(), zerofunc);
+    hpx::for_each(par, h_A.begin(), h_A.end(), zerofunc);
+    hpx::for_each(par, h_B.begin(), h_B.end(), zerofunc);
 
     // create a cublas executor we'll use to futurize cuda events
     hpx::cuda::experimental::cublas_executor cublas(device,

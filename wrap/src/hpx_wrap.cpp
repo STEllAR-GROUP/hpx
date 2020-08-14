@@ -1,11 +1,10 @@
-//  Copyright (c) 2018 Nikunj Gupta
+//  Copyright (c) 2018-2020 Nikunj Gupta
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/wrap/config/defines.hpp>
 
 // The following implementation has been divided for Linux and Mac OSX
 #if defined(HPX_HAVE_DYNAMIC_HPX_MAIN) && \
@@ -27,6 +26,12 @@ namespace hpx_start
     HPX_SYMBOL_EXPORT bool include_libhpx_wrap __attribute__((weak)) = false;
     HPX_SYMBOL_EXPORT extern std::string app_name_libhpx_wrap;
     HPX_SYMBOL_EXPORT std::string app_name_libhpx_wrap __attribute__((weak));
+
+    // Provide a definition of is_linked variable defined weak in hpx_main.hpp
+    // header. This variable is solely to trigger a different exception when
+    // trying to register thread when not linked to libhpx_wrap and using
+    // hpx_main.hpp functionality.
+    HPX_SYMBOL_EXPORT bool is_linked = true;
 }
 
 #include <hpx/hpx_finalize.hpp>

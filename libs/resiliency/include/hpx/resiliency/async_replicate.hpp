@@ -36,7 +36,7 @@ namespace hpx { namespace resiliency { namespace experimental {
         struct replicate_voter
         {
             template <typename T>
-            T operator()(std::vector<T>&& vect) const
+            constexpr T operator()(std::vector<T>&& vect) const
             {
                 return std::move(vect.at(0));
             }
@@ -45,7 +45,7 @@ namespace hpx { namespace resiliency { namespace experimental {
         struct replicate_validator
         {
             template <typename T>
-            bool operator()(T&& result) const
+            constexpr bool operator()(T&&) const
             {
                 return true;
             }
@@ -94,8 +94,8 @@ namespace hpx { namespace resiliency { namespace experimental {
             // wait for all threads to finish executing and return the first result
             // that passes the predicate, properly handle exceptions
             return hpx::dataflow(
-                hpx::launch::
-                    sync,    // do not schedule new thread for the lambda
+                // do not schedule new thread for the lambda
+                hpx::launch::sync,
                 [pred = std::forward<Pred>(pred),
                     vote = std::forward<Vote>(vote),
                     n](std::vector<hpx::future<result_type>>&& results) mutable

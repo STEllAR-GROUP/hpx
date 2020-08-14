@@ -1,4 +1,5 @@
-//  copyright (c) 2018 Christopher Ogle
+//  Copyright (c) 2018 Christopher Ogle
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,6 +20,24 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_fill(IteratorTag)
+{
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    hpx::ranges::fill(c, 10);
+
+    // verify values
+    std::size_t count = 0;
+    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
+        HPX_TEST_EQ(v, std::size_t(10));
+        ++count;
+    });
+
+    HPX_TEST_EQ(count, c.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_fill(ExPolicy policy, IteratorTag)
 {
@@ -29,7 +48,7 @@ void test_fill(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    hpx::parallel::fill(policy, c, 10);
+    hpx::ranges::fill(policy, c, 10);
 
     // verify values
     std::size_t count = 0;
@@ -47,7 +66,7 @@ void test_fill_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    hpx::future<void> f = hpx::parallel::fill(p, c, 10);
+    hpx::future<void> f = hpx::ranges::fill(p, c, 10);
     f.wait();
 
     std::size_t count = 0;
@@ -63,6 +82,9 @@ template <typename IteratorTag>
 void test_fill()
 {
     using namespace hpx::parallel;
+
+    test_fill(IteratorTag());
+
     test_fill(execution::seq, IteratorTag());
     test_fill(execution::par, IteratorTag());
     test_fill(execution::par_unseq, IteratorTag());

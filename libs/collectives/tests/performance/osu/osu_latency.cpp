@@ -7,8 +7,8 @@
 
 // Bidirectional network bandwidth test
 
+#include <hpx/algorithm.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/modules/program_options.hpp>
 
@@ -80,13 +80,13 @@ double receive_double(
         if (i == skip)
             t.restart();
 
-        using hpx::parallel::for_each;
         using hpx::parallel::execution::par;
+        using hpx::ranges::for_each;
 
         std::size_t const start = 0;
 
         auto range = boost::irange(start, window_size);
-        for_each(par, std::begin(range), std::end(range), [&](std::uint64_t j) {
+        for_each(par, range, [&](std::uint64_t j) {
             double d = 0.0;
             msg(dest, d);
         });

@@ -102,17 +102,26 @@ namespace hpx { namespace lcos {
                 typename traits::detail::shared_state_ptr_for<T>::type const&
                     state)
             {
+                std::exception_ptr p;
+
                 try
                 {
                     typedef typename traits::future_traits<T>::type result_type;
                     result_type* result = state->get_result();
                     this->base_type::set_value(
                         std::move(hpx::util::get<I>(*result)));
+                    return;
                 }
                 catch (...)
                 {
-                    this->base_type::set_exception(std::current_exception());
+                    p = std::current_exception();
                 }
+
+                // The exception is set outside the catch block since
+                // set_exception may yield. Ending the catch block on a
+                // different worker thread than where it was started may lead
+                // to segfaults.
+                this->base_type::set_exception(std::move(p));
             }
 
         public:
@@ -224,6 +233,8 @@ namespace hpx { namespace lcos {
                 typename traits::detail::shared_state_ptr_for<T>::type const&
                     state)
             {
+                std::exception_ptr p;
+
                 try
                 {
                     typedef typename traits::future_traits<T>::type result_type;
@@ -235,11 +246,18 @@ namespace hpx { namespace lcos {
                             "index out of bounds");
                     }
                     this->base_type::set_value(std::move((*result)[i]));
+                    return;
                 }
                 catch (...)
                 {
-                    this->base_type::set_exception(std::current_exception());
+                    p = std::current_exception();
                 }
+
+                // The exception is set outside the catch block since
+                // set_exception may yield. Ending the catch block on a
+                // different worker thread than where it was started may lead
+                // to segfaults.
+                this->base_type::set_exception(std::move(p));
             }
 
         public:

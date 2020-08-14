@@ -65,7 +65,7 @@ namespace hpx
     template <typename Result,
         typename RemoteResult =
             typename traits::promise_remote_result<Result>::type>
-    using promise HPX_DEPRECATED(
+    using promise HPX_DEPRECATED_V(1, 5,
         "The alias hpx::promise to hpx::lcos::promise is deprecated. Please "
         "use hpx::lcos::promise directly instead. "
         "hpx::promise will refer to the local-only promise in the future.") =

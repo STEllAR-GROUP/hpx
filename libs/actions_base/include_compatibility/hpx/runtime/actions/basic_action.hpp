@@ -10,7 +10,7 @@
 #include <hpx/actions_base/config/defines.hpp>
 #include <hpx/actions_base/basic_action.hpp>
 
-#if defined(HPX_ACTIONS_BASE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ACTIONS_BASE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/actions/basic_action.hpp is deprecated, \

@@ -26,13 +26,9 @@ std::mt19937 gen(seed);
 std::uniform_int_distribution<> dis(3, 102);
 std::uniform_int_distribution<> dist(7, 106);
 
-template <typename ExPolicy, typename IteratorTag>
-void test_find_end1(ExPolicy policy, IteratorTag)
+template <typename IteratorTag>
+void test_find_end1(IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
@@ -45,7 +41,7 @@ void test_find_end1(ExPolicy policy, IteratorTag)
 
     std::size_t h[] = {1, 2};
 
-    iterator index = hpx::parallel::find_end(policy, iterator(std::begin(c)),
+    iterator index = hpx::find_end(iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
 
     base_iterator test_index = std::begin(c) + c.size() / 2;
@@ -54,7 +50,7 @@ void test_find_end1(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_end1_proj(ExPolicy policy, IteratorTag)
+void test_find_end1(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -67,21 +63,21 @@ void test_find_end1_proj(ExPolicy policy, IteratorTag)
     // fill vector with random values above 2
     std::fill(std::begin(c), std::end(c), dis(gen));
     // create subsequence in middle of vector
-    c[c.size() / 2] = 1 + 65536;
-    c[c.size() / 2 + 1] = 2 + 65536;
+    c[c.size() / 2] = 1;
+    c[c.size() / 2 + 1] = 2;
 
     std::size_t h[] = {1, 2};
 
-    iterator index = hpx::parallel::find_end(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), std::begin(h), std::end(h),
-        std::equal_to<std::size_t>(), [](std::size_t x) { return x % 65536; });
+    iterator index = hpx::find_end(policy, iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
 
     base_iterator test_index = std::begin(c) + c.size() / 2;
 
     HPX_TEST(index == iterator(test_index));
 }
+
 template <typename ExPolicy, typename IteratorTag>
-void test_find_end1_async(ExPolicy p, IteratorTag)
+void test_find_end1_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -95,9 +91,8 @@ void test_find_end1_async(ExPolicy p, IteratorTag)
 
     std::size_t h[] = {1, 2};
 
-    hpx::future<iterator> f =
-        hpx::parallel::find_end(p, iterator(std::begin(c)),
-            iterator(std::end(c)), std::begin(h), std::end(h));
+    hpx::future<iterator> f = hpx::find_end(p, iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
     f.wait();
 
     // create iterator at position of value to be found
@@ -106,47 +101,19 @@ void test_find_end1_async(ExPolicy p, IteratorTag)
     HPX_TEST(f.get() == iterator(test_index));
 }
 
-template <typename ExPolicy, typename IteratorTag>
-void test_find_end1_async_proj(ExPolicy p, IteratorTag)
-{
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c(10007);
-    // fill vector with random values above 2
-    std::fill(std::begin(c), std::end(c), dis(gen));
-    // create subsequence in middle of vector
-    c[c.size() / 2] = 1 + 65536;
-    c[c.size() / 2 + 1] = 2 + 65536;
-
-    std::size_t h[] = {1, 2};
-
-    hpx::future<iterator> f = hpx::parallel::find_end(p,
-        iterator(std::begin(c)), iterator(std::end(c)), std::begin(h),
-        std::end(h), std::equal_to<std::size_t>(),
-        [](std::size_t x) { return x % 65536; });
-    f.wait();
-
-    // create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() / 2;
-
-    HPX_TEST(f.get() == iterator(test_index));
-}
 template <typename IteratorTag>
 void test_find_end1()
 {
     using namespace hpx::parallel;
+
+    test_find_end1(IteratorTag());
+
     test_find_end1(execution::seq, IteratorTag());
     test_find_end1(execution::par, IteratorTag());
     test_find_end1(execution::par_unseq, IteratorTag());
-    test_find_end1_proj(execution::seq, IteratorTag());
-    test_find_end1_proj(execution::par, IteratorTag());
-    test_find_end1_proj(execution::par_unseq, IteratorTag());
 
     test_find_end1_async(execution::seq(execution::task), IteratorTag());
     test_find_end1_async(execution::par(execution::task), IteratorTag());
-    test_find_end1_async_proj(execution::seq(execution::task), IteratorTag());
-    test_find_end1_async_proj(execution::par(execution::task), IteratorTag());
 }
 
 void find_end_test1()
@@ -155,13 +122,9 @@ void find_end_test1()
     test_find_end1<std::forward_iterator_tag>();
 }
 
-template <typename ExPolicy, typename IteratorTag>
-void test_find_end2(ExPolicy policy, IteratorTag)
+template <typename IteratorTag>
+void test_find_end2(IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
@@ -176,15 +139,16 @@ void test_find_end2(ExPolicy policy, IteratorTag)
 
     std::size_t h[] = {1, 2};
 
-    iterator index = hpx::parallel::find_end(policy, iterator(std::begin(c)),
+    iterator index = hpx::find_end(iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
 
     base_iterator test_index = std::begin(c) + c.size() - 2;
 
     HPX_TEST(index == iterator(test_index));
 }
+
 template <typename ExPolicy, typename IteratorTag>
-void test_find_end2_proj(ExPolicy policy, IteratorTag)
+void test_find_end2(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -202,11 +166,10 @@ void test_find_end2_proj(ExPolicy policy, IteratorTag)
     c[c.size() - 1] = 2;
     c[c.size() - 2] = 1;
 
-    std::size_t h[] = {1 + 65536, 2 + 65536};
+    std::size_t h[] = {1, 2};
 
-    iterator index = hpx::parallel::find_end(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), std::begin(h), std::end(h),
-        std::equal_to<std::size_t>(), [](std::size_t x) { return x % 65536; });
+    iterator index = hpx::find_end(policy, iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
 
     base_iterator test_index = std::begin(c) + c.size() - 2;
 
@@ -214,7 +177,7 @@ void test_find_end2_proj(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_end2_async(ExPolicy p, IteratorTag)
+void test_find_end2_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -231,40 +194,8 @@ void test_find_end2_async(ExPolicy p, IteratorTag)
 
     std::size_t h[] = {1, 2};
 
-    hpx::future<iterator> f =
-        hpx::parallel::find_end(p, iterator(std::begin(c)),
-            iterator(std::end(c)), std::begin(h), std::end(h));
-    f.wait();
-
-    // create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() - 2;
-
-    HPX_TEST(f.get() == iterator(test_index));
-}
-
-template <typename ExPolicy, typename IteratorTag>
-void test_find_end2_async_proj(ExPolicy p, IteratorTag)
-{
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    // fill vector with random values above 2
-    std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), dis(gen));
-
-    // create subsequence at start and end
-    c[0] = 1;
-    c[1] = 2;
-    c[c.size() - 1] = 2;
-    c[c.size() - 2] = 1;
-
-    std::size_t h[] = {1 + 65536, 2 + 65536};
-
-    hpx::future<iterator> f = hpx::parallel::find_end(p,
-        iterator(std::begin(c)), iterator(std::end(c)), std::begin(h),
-        std::end(h), std::equal_to<std::size_t>(),
-        [](std::size_t x) { return x % 65536; });
-
+    hpx::future<iterator> f = hpx::find_end(p, iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
     f.wait();
 
     // create iterator at position of value to be found
@@ -277,17 +208,15 @@ template <typename IteratorTag>
 void test_find_end2()
 {
     using namespace hpx::parallel;
+
+    test_find_end2(IteratorTag());
+
     test_find_end2(execution::seq, IteratorTag());
     test_find_end2(execution::par, IteratorTag());
     test_find_end2(execution::par_unseq, IteratorTag());
-    test_find_end2_proj(execution::seq, IteratorTag());
-    test_find_end2_proj(execution::par, IteratorTag());
-    test_find_end2_proj(execution::par_unseq, IteratorTag());
 
     test_find_end2_async(execution::seq(execution::task), IteratorTag());
     test_find_end2_async(execution::par(execution::task), IteratorTag());
-    test_find_end2_async_proj(execution::seq(execution::task), IteratorTag());
-    test_find_end2_async_proj(execution::par(execution::task), IteratorTag());
 }
 
 void find_end_test2()
@@ -296,13 +225,9 @@ void find_end_test2()
     test_find_end2<std::forward_iterator_tag>();
 }
 
-template <typename ExPolicy, typename IteratorTag>
-void test_find_end3(ExPolicy policy, IteratorTag)
+template <typename IteratorTag>
+void test_find_end3(IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
@@ -317,7 +242,7 @@ void test_find_end3(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> h(sub_size);
     std::iota(std::begin(h), std::end(h), 1);
 
-    iterator index = hpx::parallel::find_end(policy, iterator(std::begin(c)),
+    iterator index = hpx::find_end(iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
 
     base_iterator test_index = std::begin(c);
@@ -326,7 +251,7 @@ void test_find_end3(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_end3_proj(ExPolicy policy, IteratorTag)
+void test_find_end3(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -344,18 +269,18 @@ void test_find_end3_proj(ExPolicy policy, IteratorTag)
     std::size_t sub_size = c.size() / 16 + 1;
 
     std::vector<std::size_t> h(sub_size);
-    std::iota(std::begin(h), std::end(h), 1 + 65536);
+    std::iota(std::begin(h), std::end(h), 1);
 
-    iterator index = hpx::parallel::find_end(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), std::begin(h), std::end(h),
-        std::equal_to<std::size_t>(), [](std::size_t x) { return x % 65536; });
+    iterator index = hpx::find_end(policy, iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
 
     base_iterator test_index = std::begin(c);
 
     HPX_TEST(index == iterator(test_index));
 }
+
 template <typename ExPolicy, typename IteratorTag>
-void test_find_end3_async(ExPolicy p, IteratorTag)
+void test_find_end3_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -373,9 +298,8 @@ void test_find_end3_async(ExPolicy p, IteratorTag)
 
     // create only two partitions, splitting the desired sub sequence into
     // separate partitions.
-    hpx::future<iterator> f =
-        hpx::parallel::find_end(p, iterator(std::begin(c)),
-            iterator(std::end(c)), std::begin(h), std::end(h));
+    hpx::future<iterator> f = hpx::find_end(p, iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
     f.wait();
 
     //create iterator at position of value to be found
@@ -384,52 +308,19 @@ void test_find_end3_async(ExPolicy p, IteratorTag)
     HPX_TEST(f.get() == iterator(test_index));
 }
 
-template <typename ExPolicy, typename IteratorTag>
-void test_find_end3_async_proj(ExPolicy p, IteratorTag)
-{
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    // fill vector with random values above 6
-    std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), dist(gen));
-
-    // create subsequence large enough to always be split into multiple partitions
-    std::iota(std::begin(c), std::begin(c) + c.size() / 16 + 1, 1);
-    std::size_t sub_size = c.size() / 16 + 1;
-
-    std::vector<std::size_t> h(sub_size);
-    std::iota(std::begin(h), std::end(h), 1 + 65536);
-
-    // create only two partitions, splitting the desired sub sequence into
-    // separate partitions.
-    hpx::future<iterator> f = hpx::parallel::find_end(p,
-        iterator(std::begin(c)), iterator(std::end(c)), std::begin(h),
-        std::end(h), std::equal_to<std::size_t>(),
-        [](std::size_t x) { return x % 65536; });
-
-    f.wait();
-
-    //create iterator at position of value to be found
-    base_iterator test_index = std::begin(c);
-
-    HPX_TEST(f.get() == iterator(test_index));
-}
 template <typename IteratorTag>
 void test_find_end3()
 {
     using namespace hpx::parallel;
+
+    test_find_end3(IteratorTag());
+
     test_find_end3(execution::seq, IteratorTag());
     test_find_end3(execution::par, IteratorTag());
     test_find_end3(execution::par_unseq, IteratorTag());
-    test_find_end3_proj(execution::seq, IteratorTag());
-    test_find_end3_proj(execution::par, IteratorTag());
-    test_find_end3_proj(execution::par_unseq, IteratorTag());
 
     test_find_end3_async(execution::seq(execution::task), IteratorTag());
     test_find_end3_async(execution::par(execution::task), IteratorTag());
-    test_find_end3_async_proj(execution::seq(execution::task), IteratorTag());
-    test_find_end3_async_proj(execution::par(execution::task), IteratorTag());
 }
 
 void find_end_test3()
@@ -438,26 +329,23 @@ void find_end_test3()
     test_find_end3<std::forward_iterator_tag>();
 }
 
-template <typename ExPolicy, typename IteratorTag>
-void test_find_end4(ExPolicy policy, IteratorTag)
+template <typename IteratorTag>
+void test_find_end4(IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
     // fill vector with random values above 2
     std::fill(std::begin(c), std::end(c), dis(gen));
+
     // create subsequence in middle of vector
     c[c.size() / 2] = 1;
     c[c.size() / 2 + 1] = 2;
 
     std::size_t h[] = {1, 2};
 
-    iterator index = hpx::parallel::find_end(policy, iterator(std::begin(c)),
+    iterator index = hpx::find_end(iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h),
         [](std::size_t v1, std::size_t v2) { return !(v1 != v2); });
 
@@ -467,7 +355,7 @@ void test_find_end4(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_end4_proj(ExPolicy policy, IteratorTag)
+void test_find_end4(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -483,12 +371,11 @@ void test_find_end4_proj(ExPolicy policy, IteratorTag)
     c[c.size() / 2] = 1;
     c[c.size() / 2 + 1] = 2;
 
-    std::size_t h[] = {1 + 65536, 2 + 65536};
+    std::size_t h[] = {1, 2};
 
-    iterator index = hpx::parallel::find_end(
-        policy, iterator(std::begin(c)), iterator(std::end(c)), std::begin(h),
-        std::end(h), [](std::size_t v1, std::size_t v2) { return !(v1 != v2); },
-        [](std::size_t x) { return x % 65536; });
+    iterator index = hpx::find_end(policy, iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h),
+        [](std::size_t v1, std::size_t v2) { return !(v1 != v2); });
 
     base_iterator test_index = std::begin(c) + c.size() / 2;
 
@@ -496,7 +383,7 @@ void test_find_end4_proj(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_end4_async(ExPolicy p, IteratorTag)
+void test_find_end4_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -511,39 +398,9 @@ void test_find_end4_async(ExPolicy p, IteratorTag)
 
     std::size_t h[] = {1, 2};
 
-    hpx::future<iterator> f =
-        hpx::parallel::find_end(p, iterator(std::begin(c)),
-            iterator(std::end(c)), std::begin(h), std::end(h),
-            [](std::size_t v1, std::size_t v2) { return !(v1 != v2); });
-    f.wait();
-
-    //create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() / 2;
-
-    HPX_TEST(f.get() == iterator(test_index));
-}
-
-template <typename ExPolicy, typename IteratorTag>
-void test_find_end4_async_proj(ExPolicy p, IteratorTag)
-{
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    // fill vector with random values above 2
-    std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), dis(gen));
-
-    // create subsequence in middle of vector
-    c[c.size() / 2] = 1;
-    c[c.size() / 2 + 1] = 2;
-
-    std::size_t h[] = {1 + 65536, 2 + 65536};
-
-    hpx::future<iterator> f = hpx::parallel::find_end(
-        p, iterator(std::begin(c)), iterator(std::end(c)), std::begin(h),
-        std::end(h), [](std::size_t v1, std::size_t v2) { return !(v1 != v2); },
-        [](std::size_t v) { return v % 65536; });
-
+    hpx::future<iterator> f = hpx::find_end(p, iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h),
+        [](std::size_t v1, std::size_t v2) { return !(v1 != v2); });
     f.wait();
 
     //create iterator at position of value to be found
@@ -556,17 +413,15 @@ template <typename IteratorTag>
 void test_find_end4()
 {
     using namespace hpx::parallel;
+
+    test_find_end4(IteratorTag());
+
     test_find_end4(execution::seq, IteratorTag());
     test_find_end4(execution::par, IteratorTag());
     test_find_end4(execution::par_unseq, IteratorTag());
-    test_find_end4_proj(execution::seq, IteratorTag());
-    test_find_end4_proj(execution::par, IteratorTag());
-    test_find_end4_proj(execution::par_unseq, IteratorTag());
 
     test_find_end4_async(execution::seq(execution::task), IteratorTag());
     test_find_end4_async(execution::par(execution::task), IteratorTag());
-    test_find_end4_async_proj(execution::seq(execution::task), IteratorTag());
-    test_find_end4_async_proj(execution::par(execution::task), IteratorTag());
 }
 
 void find_end_test4()
@@ -577,7 +432,7 @@ void find_end_test4()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_find_end_exception(ExPolicy policy, IteratorTag)
+void test_find_end_exception(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -598,7 +453,7 @@ void test_find_end_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::find_end(policy,
+        hpx::find_end(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(
@@ -619,8 +474,48 @@ void test_find_end_exception(ExPolicy policy, IteratorTag)
     HPX_TEST(caught_exception);
 }
 
+template <typename IteratorTag>
+void test_find_end_exception(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), gen() + 1);
+    c[c.size() / 2] = 1;
+    c[c.size() / 2 + 1] = 2;
+
+    std::vector<std::size_t> h;
+    h.push_back(1);
+    h.push_back(2);
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::find_end(decorated_iterator(std::begin(c),
+                          []() { throw std::runtime_error("test"); }),
+            decorated_iterator(
+                std::end(c), []() { throw std::runtime_error("test"); }),
+            std::begin(h), std::end(h));
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<hpx::parallel::execution::sequenced_policy,
+            IteratorTag>::call(hpx::parallel::execution::seq, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_find_end_exception_async(ExPolicy p, IteratorTag)
+void test_find_end_exception_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -637,7 +532,7 @@ void test_find_end_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<decorated_iterator> f = hpx::parallel::find_end(p,
+        hpx::future<decorated_iterator> f = hpx::find_end(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(
@@ -667,6 +562,8 @@ void test_find_end_exception()
 {
     using namespace hpx::parallel;
 
+    test_find_end_exception(IteratorTag());
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
@@ -687,7 +584,7 @@ void find_end_exception_test()
 
 //////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_find_end_bad_alloc(ExPolicy policy, IteratorTag)
+void test_find_end_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -706,7 +603,7 @@ void test_find_end_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::find_end(policy,
+        hpx::find_end(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c), []() { throw std::bad_alloc(); }),
             std::begin(h), std::end(h));
@@ -725,7 +622,7 @@ void test_find_end_bad_alloc(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_end_bad_alloc_async(ExPolicy p, IteratorTag)
+void test_find_end_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -741,7 +638,7 @@ void test_find_end_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<decorated_iterator> f = hpx::parallel::find_end(p,
+        hpx::future<decorated_iterator> f = hpx::find_end(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c), []() { throw std::bad_alloc(); }),
             std::begin(h), std::end(h));

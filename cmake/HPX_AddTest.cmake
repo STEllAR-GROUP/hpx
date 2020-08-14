@@ -66,7 +66,8 @@ function(add_hpx_test category name)
 
   if(${HPX_WITH_PARALLEL_TESTS_BIND_NONE}
      AND NOT run_serial
-     AND ${name}_LOCALITIES STREQUAL "1"
+     AND NOT "${name}_RUNWRAPPER"
+     AND (${name}_LOCALITIES STREQUAL "1" OR NOT ${HPX_WITH_NETWORKING})
   )
     set(args ${args} "--hpx:bind=none")
   endif()

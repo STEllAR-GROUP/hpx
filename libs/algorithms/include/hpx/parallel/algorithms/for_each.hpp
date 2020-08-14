@@ -8,23 +8,242 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/invoke.hpp>
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#include <hpx/functional/traits/get_function_address.hpp>
-#include <hpx/functional/traits/get_function_annotation.hpp>
-#endif
-#include <hpx/algorithms/traits/is_value_proxy.hpp>
-#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/type_support/identity.hpp>
+#if defined(DOXYGEN)
+namespace hpx {
+    /// Applies \a f to the result of dereferencing every iterator in the
+    /// range [first, last).
+    ///
+    /// \note   Complexity: Applies \a f exactly \a last - \a first times.
+    ///
+    /// If \a f returns a result, the result is ignored.
+    ///
+    /// If the type of \a first satisfies the requirements of a mutable
+    /// iterator, \a f may apply non-constant functions through the
+    /// dereferenced iterator.
+    ///
+    /// \tparam InIter      The type of the source begin and end iterator used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an input iterator.
+    /// \tparam F           The type of the function/function object to use
+    ///                     (deduced). F must meet requirements of
+    ///                     \a MoveConstructible.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param f            Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).
+    ///                     The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     <ignored> pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&. The
+    ///                     type \a Type must be such that an object of
+    ///                     type \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// \returns            \a f.
+    template <typename InIter, typename F>
+    F for_each(InIter first, InIter last, F&& f);
 
+    /// Applies \a f to the result of dereferencing every iterator in the
+    /// range [first, last).
+    ///
+    /// \note   Complexity: Applies \a f exactly \a last - \a first times.
+    ///
+    /// If \a f returns a result, the result is ignored.
+    ///
+    /// If the type of \a first satisfies the requirements of a mutable
+    /// iterator, \a f may apply non-constant functions through the
+    /// dereferenced iterator.
+    ///
+    /// Unlike its sequential form, the parallel overload of
+    /// \a for_each does not return a copy of its \a Function parameter,
+    /// since parallelization may not permit efficient state
+    /// accumulation.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it applies user-provided function objects.
+    /// \tparam FwdIte      The type of the source begin and end iterator used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an forward iterator.
+    /// \tparam F           The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a for_each requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param f            Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).
+    ///                     The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     <ignored> pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&. The
+    ///                     type \a Type must be such that an object of
+    ///                     type \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// The application of function objects in parallel algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequenced_policy execute in sequential order in the
+    /// calling thread.
+    ///
+    /// The application of function objects in parallel algorithm
+    /// invoked with an execution policy object of type
+    /// \a parallel_policy or \a parallel_task_policy are
+    /// permitted to execute in an unordered fashion in unspecified
+    /// threads, and indeterminately sequenced within each thread.
+    ///
+    /// \returns  The \a for_each algorithm returns a
+    ///           \a hpx::future<void> if the execution policy is of
+    ///           type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns void otherwise.
+    template <typename ExPolicy, typename FwdIter, typename F>
+    typename util::detail::algorithm_result<ExPolicy, void>::type for_each(
+        ExPolicy&& policy, FwdIter first, FwdIter last, F&& f);
+
+    /// Applies \a f to the result of dereferencing every iterator in the range
+    /// [first, first + count), starting from first and proceeding to
+    /// first + count - 1.
+    ///
+    /// \note   Complexity: Applies \a f exactly \a count times.
+    ///
+    /// If \a f returns a result, the result is ignored.
+    ///
+    /// If the type of \a first satisfies the requirements of a mutable
+    /// iterator, \a f may apply non-constant functions through the
+    /// dereferenced iterator.
+    ///
+    /// \tparam InIter      The type of the source begin and end iterator used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an input iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     elements to apply \a f to.
+    /// \tparam F           The type of the function/function object to use
+    ///                     (deduced). F must meet requirements of
+    ///                     \a MoveConstructible.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param count        Refers to the number of elements starting at
+    ///                     \a first the algorithm will be applied to.
+    /// \param f            Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).
+    ///                     The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     <ignored> pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&. The
+    ///                     type \a Type must be such that an object of
+    ///                     type \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// \returns            \a first + \a count for non-negative values of
+    ///                     \a count and \a first for negative values.
+    template <typename InIter, typename Size, typename F>
+    InIter for_each_n(InIter first, Size count, F&& f);
+
+    /// Applies \a f to the result of dereferencing every iterator in the range
+    /// [first, first + count), starting from first and proceeding to
+    /// first + count - 1.
+    ///
+    /// \note   Complexity: Applies \a f exactly \a count times.
+    ///
+    /// If \a f returns a result, the result is ignored.
+    ///
+    /// If the type of \a first satisfies the requirements of a mutable
+    /// iterator, \a f may apply non-constant functions through the
+    /// dereferenced iterator.
+    ///
+    /// Unlike its sequential form, the parallel overload of
+    /// \a for_each does not return a copy of its \a Function parameter,
+    /// since parallelization may not permit efficient state
+    /// accumulation.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it applies user-provided function objects.
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     elements to apply \a f to.
+    /// \tparam F           The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a for_each requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param count        Refers to the number of elements starting at
+    ///                     \a first the algorithm will be applied to.
+    /// \param f            Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).
+    ///                     The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     <ignored> pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&. The
+    ///                     type \a Type must be such that an object of
+    ///                     type \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// The application of function objects in parallel algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequenced_policy execute in sequential order in the
+    /// calling thread.
+    ///
+    /// The application of function objects in parallel algorithm
+    /// invoked with an execution policy object of type
+    /// \a parallel_policy or \a parallel_task_policy are
+    /// permitted to execute in an unordered fashion in unspecified
+    /// threads, and indeterminately sequenced within each thread.
+    ///
+    /// \returns  The \a for_each_n algorithm returns a
+    ///           \a hpx::future<FwdIter> if the execution policy is of
+    ///           type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns \a FwdIter
+    ///           otherwise.
+    ///           It returns \a first + \a count for non-negative values of
+    ///           \a count and \a first for negative values.
+    template <typename ExPolicy, typename FwdIter, typename Size, typename F>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type for_each_n(
+        ExPolicy&& policy, FwdIter first, Size count, F&& f);
+
+}    // namespace hpx
+
+#else
+
+#include <hpx/config.hpp>
+#include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/execution/algorithms/detail/is_negative.hpp>
-#include <hpx/executors/execution_policy.hpp>
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -114,10 +333,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename F, typename Proj>
         struct for_each_iteration
         {
-            typedef
-                typename hpx::util::decay<ExPolicy>::type execution_policy_type;
-            typedef typename hpx::util::decay<F>::type fun_type;
-            typedef typename hpx::util::decay<Proj>::type proj_type;
+            using execution_policy_type =
+                typename hpx::util::decay<ExPolicy>::type;
+            using fun_type = typename hpx::util::decay<F>::type;
+            using proj_type = typename hpx::util::decay<Proj>::type;
 
             fun_type f_;
             proj_type proj_;
@@ -211,10 +430,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename F, typename Proj>
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         for_each_n_(ExPolicy&& policy, FwdIter first, Size count, F&& f,
-            std::false_type, Proj&& proj)
+            Proj&& proj, std::false_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            using is_seq =
+                parallel::execution::is_sequenced_execution_policy<ExPolicy>;
 
             return detail::for_each_n<FwdIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first,
@@ -233,7 +452,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename F, typename Proj>
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         for_each_n_(ExPolicy&& policy, FwdIter first, Size count, F&& f,
-            std::true_type, Proj&& proj)
+            Proj&& proj, std::true_type)
         {
             auto last = first;
             detail::advance(last, std::size_t(count));
@@ -243,97 +462,22 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Applies \a f to the result of dereferencing every iterator in the range
-    /// [first, first + count), starting from first and proceeding to
-    /// first + count - 1.
-    ///
-    /// \note   Complexity: Applies \a f exactly \a count times.
-    ///
-    /// If \a f returns a result, the result is ignored.
-    ///
-    /// If the type of \a first satisfies the requirements of a mutable
-    /// iterator, \a f may apply non-constant functions through the
-    /// dereferenced iterator.
-    ///
-    /// Unlike its sequential form, the parallel overload of
-    /// \a for_each does not return a copy of its \a Function parameter,
-    /// since parallelization may not permit efficient state
-    /// accumulation.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it applies user-provided function objects.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam Size        The type of the argument specifying the number of
-    ///                     elements to apply \a f to.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a for_each requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param count        Refers to the number of elements starting at
-    ///                     \a first the algorithm will be applied to.
-    /// \param f            Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last).
-    ///                     The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     <ignored> pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&. The
-    ///                     type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
-    ///                     implicitly converted to Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a f is invoked.
-    ///
-    /// The application of function objects in parallel algorithm
-    /// invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
-    ///
-    /// The application of function objects in parallel algorithm
-    /// invoked with an execution policy object of type
-    /// \a parallel_policy or \a parallel_task_policy are
-    /// permitted to execute in an unordered fashion in unspecified
-    /// threads, and indeterminately sequenced within each thread.
-    ///
-    /// \returns  The \a for_each_n algorithm returns a
-    ///           \a hpx::future<FwdIter> if the execution policy is of
-    ///           type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a FwdIter
-    ///           otherwise.
-    ///           It returns \a first + \a count for non-negative values of
-    ///           \a count and \a first for negative values.
-    ///
-    //
     // clang-format off
     template <typename ExPolicy, typename FwdIter, typename Size, typename F,
         typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIter>::value &&
-            parallel::traits::is_projected<Proj, FwdIter>::value &&
-            parallel::traits::is_indirect_callable<ExPolicy, F,
-                traits::projected<Proj, FwdIter>>::value
+            hpx::parallel::traits::is_projected<Proj, FwdIter>::value &&
+            hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
+                hpx::parallel::traits::projected<Proj, FwdIter>>::value
         )>
     // clang-format on
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type for_each_n(
-        ExPolicy&& policy, FwdIter first, Size count, F&& f,
-        Proj&& proj = Proj())
+    HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::for_each_n is deprecated, use hpx::for_each_n instead")
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        for_each_n(ExPolicy&& policy, FwdIter first, Size count, F&& f,
+            Proj&& proj = Proj())
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
@@ -345,10 +489,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::move(first));
         }
 
-        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+        using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
 
         return detail::for_each_n_(std::forward<ExPolicy>(policy), first, count,
-            std::forward<F>(f), is_segmented(), std::forward<Proj>(proj));
+            std::forward<F>(f), std::forward<Proj>(proj), is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -419,13 +563,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
         for_each_(ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,
             Proj&& proj, std::false_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            using is_seq =
+                parallel::execution::is_sequenced_execution_policy<ExPolicy>;
 
             if (first == last)
             {
-                typedef util::detail::algorithm_result<ExPolicy, FwdIterB>
-                    result;
+                using result =
+                    util::detail::algorithm_result<ExPolicy, FwdIterB>;
                 return result::get(std::move(first));
             }
 
@@ -436,114 +580,132 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Applies \a f to the result of dereferencing every iterator in the
-    /// range [first, last).
-    ///
-    /// \note   Complexity: Applies \a f exactly \a last - \a first times.
-    ///
-    /// If \a f returns a result, the result is ignored.
-    ///
-    /// If the type of \a first satisfies the requirements of a mutable
-    /// iterator, \a f may apply non-constant functions through the
-    /// dereferenced iterator.
-    ///
-    /// Unlike its sequential form, the parallel overload of
-    /// \a for_each does not return a copy of its \a Function parameter,
-    /// since parallelization may not permit efficient state
-    /// accumulation.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it applies user-provided function objects.
-    /// \tparam FwdIterB    The type of the source begin iterator used (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
-    /// \tparam FwdIterE    The type of the source end iterator used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a for_each requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param f            Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last).
-    ///                     The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     <ignored> pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&. The
-    ///                     type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
-    ///                     implicitly converted to Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a f is invoked.
-    ///
-    /// The application of function objects in parallel algorithm
-    /// invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
-    ///
-    /// The application of function objects in parallel algorithm
-    /// invoked with an execution policy object of type
-    /// \a parallel_policy or \a parallel_task_policy are
-    /// permitted to execute in an unordered fashion in unspecified
-    /// threads, and indeterminately sequenced within each thread.
-    ///
-    /// \returns  The \a for_each algorithm returns a
-    ///           \a hpx::future<FwdIter> if the execution policy is of
-    ///           type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a FwdIter
-    ///           otherwise.
-    ///           It returns \a last.
-    ///
-
-    // FIXME : is_indirect_callable does not work properly when compiling
-    //         Cuda host code
-
     // clang-format off
     template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
         typename F, typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIterB>::value &&
             hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value &&
-            parallel::traits::is_projected<Proj, FwdIterB>::value
+            hpx::parallel::traits::is_projected<Proj, FwdIterB>::value
         )
 #if (!defined(__NVCC__) && !defined(__CUDACC__)) || defined(__CUDA_ARCH__)
             ,
-        HPX_CONCEPT_REQUIRES_(parallel::traits::is_indirect_callable<ExPolicy,
+        HPX_CONCEPT_REQUIRES_(hpx::parallel::traits::is_indirect_callable<ExPolicy,
             F, traits::projected<Proj, FwdIterB>>::value)
 #endif
         >
     // clang-format on
-    typename util::detail::algorithm_result<ExPolicy, FwdIterB>::type for_each(
-        ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,
-        Proj&& proj = Proj())
+    HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::for_each is deprecated, use hpx::for_each instead")
+        typename util::detail::algorithm_result<ExPolicy, FwdIterB>::type
+        for_each(ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,
+            Proj&& proj = Proj())
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIterB>::value),
             "Requires at least forward iterator.");
 
-        typedef hpx::traits::is_segmented_iterator<FwdIterB> is_segmented;
+        using is_segmented = hpx::traits::is_segmented_iterator<FwdIterB>;
 
         return detail::for_each_(std::forward<ExPolicy>(policy), first, last,
             std::forward<F>(f), std::forward<Proj>(proj), is_segmented());
     }
 }}}    // namespace hpx::parallel::v1
+
+namespace hpx {
+    HPX_INLINE_CONSTEXPR_VARIABLE struct for_each_t final
+      : hpx::functional::tag<for_each_t>
+    {
+    private:
+        // clang-format off
+        template <typename InIter,
+            typename F,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_input_iterator<InIter>::value
+            )>
+        // clang-format on
+        friend F tag_invoke(hpx::for_each_t, InIter first, InIter last, F&& f)
+        {
+            parallel::v1::detail::for_each_(parallel::execution::seq, first,
+                last, f, parallel::util::projection_identity(),
+                std::false_type());
+            return std::forward<F>(f);
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter,
+            typename F,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_forward_iterator<FwdIter>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            void>::type
+        tag_invoke(hpx::for_each_t, ExPolicy&& policy, FwdIter first,
+            FwdIter last, F&& f)
+        {
+            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
+
+            return parallel::util::detail::algorithm_result<ExPolicy>::get(
+                parallel::v1::detail::for_each_(std::forward<ExPolicy>(policy),
+                    first, last, std::forward<F>(f),
+                    parallel::util::projection_identity(), is_segmented()));
+        }
+    } for_each{};
+
+    HPX_INLINE_CONSTEXPR_VARIABLE struct for_each_n_t final
+      : hpx::functional::tag<for_each_n_t>
+    {
+    private:
+        // clang-format off
+        template <typename InIter, typename Size, typename F,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_input_iterator<InIter>::value
+            )>
+        // clang-format on
+        friend InIter tag_invoke(
+            hpx::for_each_n_t, InIter first, Size count, F&& f)
+        {
+            // if count is representing a negative value, we do nothing
+            if (parallel::v1::detail::is_negative(count))
+            {
+                return first;
+            }
+
+            return parallel::v1::detail::for_each_n_(parallel::execution::seq,
+                first, count, std::forward<F>(f),
+                parallel::util::projection_identity(), std::false_type());
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter, typename Size, typename F,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_forward_iterator<FwdIter>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter>::type
+        tag_invoke(hpx::for_each_n_t, ExPolicy&& policy, FwdIter first,
+            Size count, F&& f)
+        {
+            // if count is representing a negative value, we do nothing
+            if (parallel::v1::detail::is_negative(count))
+            {
+                return parallel::util::detail::algorithm_result<ExPolicy,
+                    FwdIter>::get(std::move(first));
+            }
+
+            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
+
+            return parallel::v1::detail::for_each_n_(
+                std::forward<ExPolicy>(policy), first, count,
+                std::forward<F>(f), parallel::util::projection_identity(),
+                is_segmented());
+        }
+    } for_each_n{};
+}    // namespace hpx
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 namespace hpx { namespace traits {
@@ -588,4 +750,5 @@ namespace hpx { namespace traits {
     };
 #endif
 }}    // namespace hpx::traits
+#endif
 #endif

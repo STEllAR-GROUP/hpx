@@ -13,12 +13,45 @@
 #include <atomic>
 #include <cstddef>
 #include <iterator>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
+template <typename Proj>
+struct counter
+{
+    Proj proj;
+    std::size_t count = 0;
+    void operator()(std::size_t v)
+    {
+        HPX_TEST_EQ(v, proj(std::size_t(42)));
+        ++count;
+    }
+};
+
+template <typename IteratorTag, typename Proj>
+void test_for_each_seq(IteratorTag, Proj&& proj)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::fill(std::begin(c), std::end(c), std::size_t(42));
+
+    counter<typename std::decay<Proj>::type> f{proj};
+    auto res = hpx::ranges::for_each(
+        hpx::util::make_iterator_range(
+            iterator(std::begin(c)), iterator(std::end(c))),
+        f, proj);
+
+    HPX_TEST(res.in == iterator(std::end(c)));
+    HPX_TEST_EQ(res.fun.count, c.size());
+    HPX_TEST_EQ(f.count, c.size());
+}
+
 template <typename ExPolicy, typename IteratorTag, typename Proj>
 void test_for_each(ExPolicy&& policy, IteratorTag, Proj&& proj)
 {
@@ -33,7 +66,7 @@ void test_for_each(ExPolicy&& policy, IteratorTag, Proj&& proj)
 
     std::atomic<std::size_t> count(0);
 
-    iterator result = hpx::parallel::for_each(
+    iterator result = hpx::ranges::for_each(
         std::forward<ExPolicy>(policy),
         hpx::util::make_iterator_range(
             iterator(std::begin(c)), iterator(std::end(c))),
@@ -58,7 +91,7 @@ void test_for_each_async(ExPolicy&& p, IteratorTag, Proj&& proj)
 
     std::atomic<std::size_t> count(0);
 
-    hpx::future<iterator> f = hpx::parallel::for_each(
+    hpx::future<iterator> f = hpx::ranges::for_each(
         std::forward<ExPolicy>(p),
         hpx::util::make_iterator_range(
             iterator(std::begin(c)), iterator(std::end(c))),
@@ -74,6 +107,49 @@ void test_for_each_async(ExPolicy&& p, IteratorTag, Proj&& proj)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+struct counter_exception
+{
+    std::size_t count = 0;
+    void operator()(std::size_t v)
+    {
+        ++count;
+        throw std::runtime_error("test");
+    }
+};
+
+template <typename IteratorTag, typename Proj>
+void test_for_each_exception_seq(IteratorTag, Proj&& proj)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::fill(std::begin(c), std::end(c), std::size_t(42));
+
+    bool caught_exception = false;
+    counter_exception f;
+    try
+    {
+        hpx::ranges::for_each(
+            hpx::util::make_iterator_range(
+                iterator(std::begin(c)), iterator(std::end(c))),
+            f, proj);
+
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+    HPX_TEST_EQ(f.count, std::size_t(1));
+}
+
 template <typename ExPolicy, typename IteratorTag, typename Proj>
 void test_for_each_exception(ExPolicy policy, IteratorTag, Proj&& proj)
 {
@@ -89,7 +165,7 @@ void test_for_each_exception(ExPolicy policy, IteratorTag, Proj&& proj)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::for_each(
+        hpx::ranges::for_each(
             policy,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
@@ -123,7 +199,7 @@ void test_for_each_exception_async(ExPolicy p, IteratorTag, Proj&& proj)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::for_each(
+        hpx::future<iterator> f = hpx::ranges::for_each(
             p,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
@@ -148,6 +224,49 @@ void test_for_each_exception_async(ExPolicy p, IteratorTag, Proj&& proj)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+struct counter_bad_alloc
+{
+    std::size_t count = 0;
+    void operator()(std::size_t v)
+    {
+        ++count;
+        throw std::bad_alloc();
+    }
+};
+
+template <typename IteratorTag, typename Proj>
+void test_for_each_bad_alloc_seq(IteratorTag, Proj&& proj)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::fill(std::begin(c), std::end(c), std::size_t(42));
+
+    bool caught_exception = false;
+    counter_bad_alloc f;
+    try
+    {
+        hpx::ranges::for_each(
+            hpx::util::make_iterator_range(
+                iterator(std::begin(c)), iterator(std::end(c))),
+            f, proj);
+
+        HPX_TEST(false);
+    }
+    catch (std::bad_alloc const&)
+    {
+        caught_exception = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+    HPX_TEST_EQ(f.count, std::size_t(1));
+}
+
 template <typename ExPolicy, typename IteratorTag, typename Proj>
 void test_for_each_bad_alloc(ExPolicy policy, IteratorTag, Proj&& proj)
 {
@@ -163,7 +282,7 @@ void test_for_each_bad_alloc(ExPolicy policy, IteratorTag, Proj&& proj)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::for_each(
+        hpx::ranges::for_each(
             policy,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
@@ -196,7 +315,7 @@ void test_for_each_bad_alloc_async(ExPolicy p, IteratorTag, Proj&& proj)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::for_each(
+        hpx::future<iterator> f = hpx::ranges::for_each(
             p,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),

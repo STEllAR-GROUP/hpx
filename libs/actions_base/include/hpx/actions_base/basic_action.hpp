@@ -673,8 +673,9 @@ namespace hpx { namespace actions {
 // This macro is deprecated. It expands to an inline function which will emit a
 // warning.
 #define HPX_ACTION_DOES_NOT_SUSPEND(action)                                    \
-    HPX_DEPRECATED("HPX_ACTION_DOES_NOT_SUSPEND is deprecated and will be "    \
-                   "removed in the next release")                              \
+    HPX_DEPRECATED_V(1, 4,                                                     \
+        "HPX_ACTION_DOES_NOT_SUSPEND is deprecated and will be "               \
+        "removed in the future")                                               \
     static inline void HPX_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)();     \
     void HPX_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)()                    \
     {                                                                          \

@@ -197,10 +197,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 is_seq());
         }
 
-        template <typename ExPolicy, typename FwdIter, typename F,
-            typename Proj>
+        template <typename ExPolicy, typename FwdIter, typename Sent,
+            typename F, typename Proj>
         typename util::detail::algorithm_result<ExPolicy, bool>::type none_of_(
-            ExPolicy&& policy, FwdIter first, FwdIter last, F&& f, Proj&& proj,
+            ExPolicy&& policy, FwdIter first, Sent last, F&& f, Proj&& proj,
             std::false_type);
 
         ///////////////////////////////////////////////////////////////////////
@@ -370,10 +370,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 is_seq());
         }
 
-        template <typename ExPolicy, typename FwdIter, typename F,
-            typename Proj>
+        template <typename ExPolicy, typename FwdIter, typename Sent,
+            typename F, typename Proj>
         typename util::detail::algorithm_result<ExPolicy, bool>::type any_of_(
-            ExPolicy&& policy, FwdIter first, FwdIter last, F&& f, Proj&& proj,
+            ExPolicy&& policy, FwdIter first, Sent last, F&& f, Proj&& proj,
             std::false_type);
 
         ///////////////////////////////////////////////////////////////////////
@@ -543,10 +543,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 is_seq());
         }
 
-        template <typename ExPolicy, typename FwdIter, typename F,
-            typename Proj>
+        template <typename ExPolicy, typename FwdIter, typename Sent,
+            typename F, typename Proj>
         typename util::detail::algorithm_result<ExPolicy, bool>::type all_of_(
-            ExPolicy&& policy, FwdIter first, FwdIter last, F&& f, Proj&& proj,
+            ExPolicy&& policy, FwdIter first, Sent last, F&& f, Proj&& proj,
             std::false_type);
 
         /// \endcond

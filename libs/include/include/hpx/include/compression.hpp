@@ -14,7 +14,7 @@
 #include <hpx/plugins/binary_filter/zlib_serialization_filter.hpp>
 #endif
 
-#if defined(HPX_HAVE_DEPRECATION_WARNINGS)
+#if (HPX_HAVE_DEPRECATION_WARNINGS != 0)
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/include/compression.hpp is deprecated, \
     please include directly the corresponding header \

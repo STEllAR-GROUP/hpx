@@ -19,6 +19,7 @@ int main()
 {
     hpx::lcos::local::promise<hpx::future<int>> promise;
     hpx::future<hpx::future<int>> future = promise.get_future();
+    std::exception_ptr p;
     try
     {
         //promise.set_value(42);
@@ -26,8 +27,10 @@ int main()
     }
     catch (...)
     {
-        promise.set_exception(std::current_exception());
+        p = std::current_exception();
     }
+    HPX_TEST(p);
+    promise.set_exception(std::move(p));
     HPX_TEST(future.has_exception());
 
     hpx::future<int> inner(std::move(future));

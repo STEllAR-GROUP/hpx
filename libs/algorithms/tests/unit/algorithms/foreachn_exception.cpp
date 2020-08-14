@@ -23,6 +23,35 @@
 int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
+template <typename IteratorTag>
+void test_for_each_n_exception_seq(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), gen());
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::for_each_n(iterator(std::begin(c)), c.size(),
+            [](std::size_t& v) { throw std::runtime_error("test"); });
+
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_for_each_n_exception(ExPolicy policy, IteratorTag)
 {
@@ -39,7 +68,7 @@ void test_for_each_n_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::for_each_n(policy, iterator(std::begin(c)), c.size(),
+        hpx::for_each_n(policy, iterator(std::begin(c)), c.size(),
             [](std::size_t& v) { throw std::runtime_error("test"); });
 
         HPX_TEST(false);
@@ -70,9 +99,8 @@ void test_for_each_n_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<iterator> f =
-            hpx::parallel::for_each_n(p, iterator(std::begin(c)), c.size(),
-                [](std::size_t& v) { throw std::runtime_error("test"); });
+        hpx::future<iterator> f = hpx::for_each_n(p, iterator(std::begin(c)),
+            c.size(), [](std::size_t& v) { throw std::runtime_error("test"); });
         returned_from_algorithm = true;
         f.get();    // rethrow exception
 
@@ -100,6 +128,8 @@ void test_for_each_n_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_for_each_n_exception_seq(IteratorTag());
+
     test_for_each_n_exception(execution::seq, IteratorTag());
     test_for_each_n_exception(execution::par, IteratorTag());
 

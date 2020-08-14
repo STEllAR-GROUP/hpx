@@ -9,16 +9,16 @@
 #include <hpx/config.hpp>
 #include <hpx/plugins/binary_filter/bzip2_serialization_filter.hpp>
 
-#if defined(HPX_HAVE_DEPRECATION_WARNINGS)
-  #if defined(HPX_MSVC)
+#if (HPX_HAVE_DEPRECATION_WARNINGS != 0)
+#if defined(HPX_MSVC)
   #pragma message("The header hpx/include/compression_bzip2.hpp is deprecated, \
     please include \
     hpx/plugins/binary_filter/bzip2_serialization_filter.hpp instead")
-  #else
+#else
   #warning "The header hpx/include/compression_bzip2.hpp is deprecated, \
     please include \
    hpx/plugins/binary_filter/bzip2_serialization_filter.hpp instead"
-  #endif
+#endif
 #endif
 
 

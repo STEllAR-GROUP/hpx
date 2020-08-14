@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/execution/executors/thread_pool_executor.hpp>
+#include <hpx/executors/thread_pool_executor.hpp>
 
 namespace hpx { namespace parallel { namespace execution {
     using current_executor = parallel::execution::thread_pool_executor;

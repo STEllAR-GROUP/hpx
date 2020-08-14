@@ -194,8 +194,10 @@ hpx_option(
   HPX_WITH_DEPRECATION_WARNINGS BOOL
   "Enable warnings for deprecated facilities. (default: ON)" ON ADVANCED
 )
+
 if(HPX_WITH_DEPRECATION_WARNINGS)
-  hpx_add_config_define(HPX_HAVE_DEPRECATION_WARNINGS)
+  # enable deprecation warnings globally
+  hpx_add_config_cond_define(HPX_HAVE_DEPRECATION_WARNINGS 1)
 endif()
 
 # Generic build options
@@ -340,6 +342,31 @@ hpx_option(
 )
 if(HPX_WITH_UNITY_BUILD AND (CMAKE_VERSION VERSION_LESS "3.16"))
   hpx_error("HPX_WITH_UNITY_BUILD=ON but this requires CMake 3.16 or newer.")
+endif()
+
+# ##############################################################################
+# Dynamic hpx_main
+# ##############################################################################
+
+set(HPX_WITH_DYNAMIC_HPX_MAIN_DEFAULT OFF)
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" OR APPLE)
+  set(HPX_WITH_DYNAMIC_HPX_MAIN_DEFAULT ON)
+endif()
+
+hpx_option(
+  HPX_WITH_DYNAMIC_HPX_MAIN
+  BOOL
+  "Enable dynamic overload of system ``main()`` (Linux and Apple only, default: ON)"
+  ${HPX_WITH_DYNAMIC_HPX_MAIN_DEFAULT}
+  ADVANCED
+)
+if(HPX_WITH_DYNAMIC_HPX_MAIN)
+  if(NOT HPX_WITH_DYNAMIC_HPX_MAIN_DEFAULT)
+    hpx_error(
+      "HPX_WITH_DYNAMIC_HPX_MAIN was set to ON, but the option is only available on Linux and Apple (this is \"${CMAKE_SYSTEM_NAME}\")."
+    )
+  endif()
+  hpx_add_config_define(HPX_HAVE_DYNAMIC_HPX_MAIN)
 endif()
 
 # ##############################################################################
@@ -943,8 +970,8 @@ if(HPX_WITH_LIBCDS)
     https://github.com/STEllAR-GROUP/libcds CATEGORY "Thread Manager" ADVANCED
   )
   hpx_option(
-    HPX_WITH_LIBCDS_GIT_TAG STRING "Define the LibCDS git tag to use."
-    hpx-thread CATEGORY "Thread Manager" ADVANCED
+    HPX_WITH_LIBCDS_GIT_TAG STRING "Define the LibCDS git tag to use." hpx-1.5
+    CATEGORY "Thread Manager" ADVANCED
   )
   include(HPX_SetupLibCDS)
   if(NOT libcds_POPULATED)

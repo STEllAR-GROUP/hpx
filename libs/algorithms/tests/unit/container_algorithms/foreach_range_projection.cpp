@@ -19,6 +19,8 @@ void test_for_each()
 {
     using namespace hpx::parallel;
 
+    test_for_each_seq(IteratorTag(), Proj());
+
     test_for_each(execution::seq, IteratorTag(), Proj());
     test_for_each(execution::par, IteratorTag(), Proj());
     test_for_each(execution::par_unseq, IteratorTag(), Proj());
@@ -43,6 +45,8 @@ void test_for_each_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_for_each_exception_seq(IteratorTag(), Proj());
+
     test_for_each_exception(execution::seq, IteratorTag(), Proj());
     test_for_each_exception(execution::par, IteratorTag(), Proj());
 
@@ -68,6 +72,8 @@ void test_for_each_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_for_each_bad_alloc_seq(IteratorTag(), Proj());
+
     test_for_each_bad_alloc(execution::seq, IteratorTag(), Proj());
     test_for_each_bad_alloc(execution::par, IteratorTag(), Proj());
 
