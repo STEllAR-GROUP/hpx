@@ -279,7 +279,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typedef typename zip_iterator::reference reference;
 
                 util::cancellation_token<> tok;
-                auto f1 = [f, proj1, proj2, tok](zip_iterator it,
+                auto f1 = [tok, f = std::forward<F>(f),
+                              proj1 = std::forward<Proj1>(proj1),
+                              proj2 = std::forward<Proj2>(proj2)](
+                              zip_iterator it,
                               std::size_t part_count) mutable -> bool {
                     util::loop_n<ExPolicy>(it, part_count, tok,
                         [&f, &proj1, &proj2, &tok](zip_iterator const& curr) {
