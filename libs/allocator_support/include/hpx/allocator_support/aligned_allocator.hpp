@@ -9,12 +9,19 @@
 #include <hpx/config.hpp>
 
 #include <cstddef>
+#include <cstdlib>
 #include <limits>
 #include <memory>
 #include <type_traits>
 #include <utility>
 
 #include <hpx/preprocessor/cat.hpp>
+
+#if defined(HPX_HAVE_JEMALLOC_PREFIX)
+// this is currently used only for jemalloc and if a special API prefix is
+// used for its APIs
+#include <jemalloc/jemalloc.h>
+#endif
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -60,13 +67,23 @@ namespace hpx { namespace util {
 
         pointer allocate(size_type n, void const* hint = nullptr)
         {
+#if !defined(HPX_HAVE_JEMALLOC_PREFIX)
             return reinterpret_cast<pointer>(
                 aligned_alloc(alignof(T), n * sizeof(T)));
+#else
+            return reinterpret_cast<pointer>(
+                HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, aligned_alloc)(
+                    alignof(T), n * sizeof(T)));
+#endif
         }
 
         void deallocate(pointer p, size_type n)
         {
+#if !defined(HPX_HAVE_JEMALLOC_PREFIX)
             free(p);
+#else
+            HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, free)(p);
+#endif
         }
 
         size_type max_size() const noexcept
