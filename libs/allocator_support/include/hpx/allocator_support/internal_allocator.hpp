@@ -16,7 +16,7 @@
 
 #include <hpx/preprocessor/cat.hpp>
 
-#if defined(HPX_HAVE_INTERNAL_ALLOCATOR)
+#if defined(HPX_HAVE_JEMALLOC_PREFIX)
 // this is currently used only for jemalloc and if a special API prefix is
 // used for its APIs
 #include <jemalloc/jemalloc.h>
@@ -25,7 +25,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace util {
-#if defined(HPX_HAVE_INTERNAL_ALLOCATOR)
+#if defined(HPX_HAVE_JEMALLOC_PREFIX)
     ///////////////////////////////////////////////////////////////////////////
     template <typename T = int>
     struct internal_allocator
