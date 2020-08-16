@@ -56,7 +56,8 @@ private:
     std::size_t connected;
 
     using thunk_type = util::unique_function_nonser<void()>*;
-    boost::lockfree::queue<thunk_type, hpx::util::aligned_allocator<thunk_type>> thunks;
+    boost::lockfree::queue<thunk_type, hpx::util::aligned_allocator<thunk_type>>
+        thunks;
 
     std::vector<parcelset::endpoints_type> localities;
 
