@@ -8,8 +8,8 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/barrier.hpp>
-#include <hpx/iostream.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/iostream.hpp>
 
 #include <boost/lockfree/queue.hpp>
 
@@ -19,17 +19,17 @@
 #include <map>
 
 template <typename T>
-using queue = boost::lockfree::queue<T, hpx::util::aligned_allocator<std::size_t>>;
+using queue =
+    boost::lockfree::queue<T, hpx::util::aligned_allocator<std::size_t>>;
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 using hpx::lcos::local::barrier;
 
 using hpx::threads::register_work;
 using hpx::threads::thread_init_data;
-using hpx::threads::make_thread_function_nullary;
 
 using hpx::cout;
 using hpx::flush;
@@ -56,12 +56,10 @@ void get_os_thread_num(barrier& barr, queue<std::size_t>& os_threads)
     barr.wait();
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-typedef std::map<std::size_t, std::size_t>
-    result_map;
+typedef std::map<std::size_t, std::size_t> result_map;
 
-typedef std::multimap<std::size_t, std::size_t, std::greater<std::size_t> >
+typedef std::multimap<std::size_t, std::size_t, std::greater<std::size_t>>
     sorter;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -85,7 +83,7 @@ int hpx_main(variables_map& vm)
             for (std::size_t j = 0; j < pxthreads; ++j)
             {
                 thread_init_data data(
-                    make_thread_function_nullary(
+                    hpx::threads::make_thread_function_nullary(
                         hpx::util::bind(&get_os_thread_num, std::ref(barr),
                             std::ref(os_threads))),
                     "get_os_thread_num", hpx::threads::thread_priority::normal,
@@ -93,7 +91,7 @@ int hpx_main(variables_map& vm)
                 register_work(data);
             }
 
-            barr.wait(); // wait for all PX threads to enter the barrier
+            barr.wait();    // wait for all PX threads to enter the barrier
 
             std::size_t shepherd = 0;
 
@@ -111,15 +109,13 @@ int hpx_main(variables_map& vm)
         for (sorter::value_type const& result : sort)
         {
             if (csv)
-                hpx::util::format_to(cout,
-                    "{1},{2}\n",
-                    result.second,
-                    result.first) << flush;
+                hpx::util::format_to(
+                    cout, "{1},{2}\n", result.second, result.first)
+                    << flush;
             else
-                hpx::util::format_to(cout,
-                    "OS-thread {1} ran {2} PX-threads\n",
-                    result.second,
-                    result.first) << flush;
+                hpx::util::format_to(cout, "OS-thread {1} ran {2} PX-threads\n",
+                    result.second, result.first)
+                    << flush;
         }
     }
 
@@ -132,21 +128,15 @@ int hpx_main(variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    options_description
-       cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
+    options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    cmdline.add_options()
-        ( "pxthreads"
-        , value<std::size_t>()->default_value(128)
-        , "number of PX-threads to invoke")
+    cmdline.add_options()("pxthreads", value<std::size_t>()->default_value(128),
+        "number of PX-threads to invoke")
 
-        ( "delay-iterations"
-        , value<std::uint64_t>()->default_value(65536)
-        , "number of iterations in the delay loop")
+        ("delay-iterations", value<std::uint64_t>()->default_value(65536),
+            "number of iterations in the delay loop")
 
-        ( "csv"
-        , "output results as csv (format: OS-thread,PX-threads)")
-        ;
+            ("csv", "output results as csv (format: OS-thread,PX-threads)");
 
     // Initialize and run HPX
     hpx::init_params init_args;
