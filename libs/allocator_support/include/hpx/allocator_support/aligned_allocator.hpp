@@ -21,6 +21,46 @@
 // this is currently used only for jemalloc and if a special API prefix is
 // used for its APIs
 #include <jemalloc/jemalloc.h>
+
+#elif !defined(HPX_HAVE_C11_ALIGNED_ALLOC)
+// provide our own (simple) implementation of aligned_alloc
+inline void* aligned_alloc(std::size_t size, std::size_t alignment) noexcept
+{
+    if (alignment < alignof(void*))
+    {
+        alignment = alignof(void*);
+    }
+
+    std::size_t space = size + alignment - 1;
+    void* allocated_mem = malloc(space + sizeof(void*));
+    if (allocated_mem == nullptr)
+    {
+        return nullptr;
+    }
+
+    void* aligned_mem =
+        static_cast<void*>(static_cast<char*>(allocated_mem) + sizeof(void*));
+
+    std::align(alignment, size, aligned_mem, space);
+    *(static_cast<void**>(aligned_mem) - 1) = allocated_mem;
+
+    return aligned_mem;
+}
+
+inline void aligned_free(void* p) noexcept
+{
+    if (nullptr != p)
+    {
+        free(*(static_cast<void**>(p) - 1));
+    }
+}
+#else
+
+// this is just to simplify the code below
+inline void aligned_free(void* p) noexcept
+{
+    free(p);
+}
 #endif
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -80,7 +120,7 @@ namespace hpx { namespace util {
         void deallocate(pointer p, size_type n)
         {
 #if !defined(HPX_HAVE_JEMALLOC_PREFIX)
-            free(p);
+            aligned_free(p);
 #else
             HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, free)(p);
 #endif
