@@ -4,14 +4,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// test for availability of aligned_alloc (C11)
+// test for availability of std::aligned_alloc (C++17)
 
-#include <stdlib.h>
+#include <cstdlib>
 
 int main()
 {
-    char* s = aligned_alloc(1024, 1024 * sizeof(char));
+    char* s = std::aligned_alloc(1024, 1024 * sizeof(char));
 
-    free(s);
+    std::free(s);
     return 0;
 }

@@ -11,6 +11,7 @@
 #include <cstddef>
 #include <limits>
 #include <memory>
+#include <new>
 #include <type_traits>
 #include <utility>
 
@@ -64,10 +65,20 @@ namespace hpx { namespace util {
             return &x;
         }
 
-        pointer allocate(size_type n, void const* hint = nullptr)
+        HPX_NODISCARD pointer allocate(size_type n, void const* hint = nullptr)
         {
-            return reinterpret_cast<pointer>(
+            if (max_size() < n)
+            {
+                throw std::bad_array_new_length();
+            }
+
+            pointer p = reinterpret_cast<pointer>(
                 HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, malloc)(n * sizeof(T)));
+            if (p == nullptr)
+            {
+                throw std::bad_alloc();
+            }
+            return p;
         }
 
         void deallocate(pointer p, size_type n)

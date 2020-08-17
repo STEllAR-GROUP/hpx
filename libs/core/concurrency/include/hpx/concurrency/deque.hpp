@@ -27,6 +27,7 @@
 #include <atomic>
 #include <cstddef>
 #include <memory>
+#include <new>
 #include <type_traits>
 
 namespace boost { namespace lockfree {
@@ -227,14 +228,21 @@ namespace boost { namespace lockfree {
             node* lptr, node* rptr, T const& v, tag_t ltag = 0, tag_t rtag = 0)
         {
             node* chunk = pool_.allocate();
+            if (chunk == nullptr)
+            {
+                throw std::bad_alloc();
+            }
             new (chunk) node(lptr, rptr, v, ltag, rtag);
             return chunk;
         }
 
         void dealloc_node(node* n)
         {
-            n->~node();
-            pool_.deallocate(n);
+            if (n != nullptr)
+            {
+                n->~node();
+                pool_.deallocate(n);
+            }
         }
 
         void stabilize_left(anchor_pair& lrs)
