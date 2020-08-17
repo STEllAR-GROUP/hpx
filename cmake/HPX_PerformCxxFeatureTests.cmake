@@ -29,6 +29,10 @@ function(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_c11_aligned_alloc(DEFINITIONS HPX_HAVE_C11_ALIGNED_ALLOC)
 
+  hpx_check_for_cxx17_std_aligned_alloc(
+    DEFINITIONS HPX_HAVE_CXX17_STD_ALIGNED_ALLOC
+  )
+
   hpx_check_for_cxx17_filesystem(DEFINITIONS HPX_HAVE_CXX17_FILESYSTEM)
 
   hpx_check_for_cxx17_fold_expressions(

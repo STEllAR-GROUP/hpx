@@ -25,8 +25,8 @@ namespace hpx_start
     // to change the program's entry point or not.
     HPX_SYMBOL_EXPORT extern bool include_libhpx_wrap;
     HPX_SYMBOL_EXPORT bool include_libhpx_wrap = true;
-    HPX_SYMBOL_EXPORT extern std::string app_name_libhpx_wrap;
-    HPX_SYMBOL_EXPORT std::string app_name_libhpx_wrap = HPX_APPLICATION_STRING;
+    HPX_SYMBOL_EXPORT extern const char* app_name_libhpx_wrap;
+    HPX_SYMBOL_EXPORT const char* app_name_libhpx_wrap = HPX_APPLICATION_STRING;
 
     // This variable declaration is added solely for the purpose to trigger
     // a different runtime error when a user forgets to add HPX::wrap_main in

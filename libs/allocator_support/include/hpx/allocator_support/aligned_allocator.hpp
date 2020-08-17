@@ -9,9 +9,9 @@
 #include <hpx/config.hpp>
 
 #include <cstddef>
-#include <cstdlib>
 #include <limits>
 #include <memory>
+#include <new>
 #include <type_traits>
 #include <utility>
 
@@ -22,9 +22,50 @@
 // used for its APIs
 #include <jemalloc/jemalloc.h>
 
-#elif !defined(HPX_HAVE_C11_ALIGNED_ALLOC)
+inline void* __aligned_alloc(std::size_t alignment, std::size_t size) noexcept
+{
+    return HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, aligned_alloc)(alignment, size);
+}
+
+inline void __aligned_free(void* p) noexcept
+{
+    return HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, free)(p);
+}
+
+#elif defined(HPX_HAVE_CXX17_STD_ALIGNED_ALLOC)
+
+#include <cstdlib>
+
+inline void* __aligned_alloc(std::size_t alignment, std::size_t size) noexcept
+{
+    return std::aligned_alloc(alignment, size);
+}
+
+inline void __aligned_free(void* p) noexcept
+{
+    std::free(p);
+}
+
+#elif defined(HPX_HAVE_C11_ALIGNED_ALLOC)
+
+#include <stdlib.h>
+
+inline void* __aligned_alloc(std::size_t alignment, std::size_t size) noexcept
+{
+    return aligned_alloc(alignment, size);
+}
+
+inline void __aligned_free(void* p) noexcept
+{
+    free(p);
+}
+
+#else    // !HPX_HAVE_CXX17_STD_ALIGNED_ALLOC && !HPX_HAVE_C11_ALIGNED_ALLOC
+
+#include <cstdlib>
+
 // provide our own (simple) implementation of aligned_alloc
-inline void* aligned_alloc(std::size_t size, std::size_t alignment) noexcept
+inline void* __aligned_alloc(std::size_t alignment, std::size_t size) noexcept
 {
     if (alignment < alignof(void*))
     {
@@ -32,7 +73,7 @@ inline void* aligned_alloc(std::size_t size, std::size_t alignment) noexcept
     }
 
     std::size_t space = size + alignment - 1;
-    void* allocated_mem = malloc(space + sizeof(void*));
+    void* allocated_mem = std::malloc(space + sizeof(void*));
     if (allocated_mem == nullptr)
     {
         return nullptr;
@@ -47,20 +88,14 @@ inline void* aligned_alloc(std::size_t size, std::size_t alignment) noexcept
     return aligned_mem;
 }
 
-inline void aligned_free(void* p) noexcept
+inline void __aligned_free(void* p) noexcept
 {
     if (nullptr != p)
     {
-        free(*(static_cast<void**>(p) - 1));
+        std::free(*(static_cast<void**>(p) - 1));
     }
 }
-#else
 
-// this is just to simplify the code below
-inline void aligned_free(void* p) noexcept
-{
-    free(p);
-}
 #endif
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -105,25 +140,27 @@ namespace hpx { namespace util {
             return &x;
         }
 
-        pointer allocate(size_type n, void const* hint = nullptr)
+        HPX_NODISCARD pointer allocate(size_type n, void const* hint = nullptr)
         {
-#if !defined(HPX_HAVE_JEMALLOC_PREFIX)
-            return reinterpret_cast<pointer>(
-                aligned_alloc(alignof(T), n * sizeof(T)));
-#else
-            return reinterpret_cast<pointer>(
-                HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, aligned_alloc)(
-                    alignof(T), n * sizeof(T)));
-#endif
+            if (max_size() < n)
+            {
+                throw std::bad_array_new_length();
+            }
+
+            pointer p = reinterpret_cast<pointer>(
+                __aligned_alloc(alignof(T), n * sizeof(T)));
+
+            if (p == nullptr)
+            {
+                throw std::bad_alloc();
+            }
+
+            return p;
         }
 
         void deallocate(pointer p, size_type n)
         {
-#if !defined(HPX_HAVE_JEMALLOC_PREFIX)
-            aligned_free(p);
-#else
-            HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, free)(p);
-#endif
+            __aligned_free(p);
         }
 
         size_type max_size() const noexcept
