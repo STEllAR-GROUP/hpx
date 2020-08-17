@@ -368,10 +368,15 @@ namespace hpx { namespace detail {
 
         std::sort(env.begin(), env.end());
 
+        static constexpr char const* ignored_env_patterns[] = {
+            "DOCKER", "GITHUB_TOKEN"};
         std::string retval = hpx::util::format("{} entries:\n", env.size());
         for (std::string const& s : env)
         {
-            if (s.find("DOCKER") == std::string::npos)
+            if (std::all_of(std::begin(ignored_env_patterns),
+                    std::end(ignored_env_patterns), [&s](auto const e) {
+                        return s.find(e) == std::string::npos;
+                    }))
             {
                 retval += "  " + s + "\n";
             }
