@@ -51,8 +51,8 @@ and many bug fixes.
   experimental ``HPX_WITH_DISTRIBUTED_RUNTIME`` |cmake| option (see below) . An
   significant amount of headers have been deprecated. We adapted the namespaces
   and headers we could to be closer to the standard ones (:ref:`api
-  <_public_api>`). Depending code should stil compile, however warnings are now
-  generated instructing to change the ``#include``s accordingly.
+  <_public_api>`). Depending code should still compile, however warnings are now
+  generated instructing to change the include statements accordingly.
 * It is now possible to have a basic CUDA support including a helper function to
   get a future from a CUDA stream and target handling. They are available under
   the ``hpx::cuda::experimental`` namespace and they can be enabled with the
@@ -90,9 +90,7 @@ and many bug fixes.
   on to avoid cache misses from moving from one thread to the other. This
   behavior doesn't prevent the thread from being stolen, however.
 * We have added a new configuration option ``hpx.exception_verbosity`` to allow
-  to control the level of verbosity of the exceptions (3 levels available). The
-  default output generated in case of exceptions is greatly reduced, please use
-  the new option to see the full output as before.
+  to control the level of verbosity of the exceptions (3 levels available).
 * ``broadcast_to``, ``broadcast_from``, ``scatter_to`` and ``scatter_from`` have
   been added to the collectives, modernization of ``gather_here`` and
   ``gather_there`` with futures taken by rvalue references. See the breaking
@@ -129,10 +127,7 @@ and many bug fixes.
   (``quickstart/disable_thread_stealing_executor.cpp``)
 * We now require for our |cmake| build system configuration files to be
   formatted using cmake-format.
-* We have removed more dependencies on various Boost libraries. If compiled
-  in C++17 mode (``-DCMAKE_CXX_STANDARD=17``), HPX now does not require linking
-  with any Boost libraries anymore. The library still depends on a number of
-  header-only Boost libraries.
+* We have removed more dependencies on various Boost libraries.
 * We have added an experimental option enabling unity builds of HPX using the
   ``-DHPX_WITH_UNITY_BUILD=On`` |cmake| option.
 * Many bug fixes.
