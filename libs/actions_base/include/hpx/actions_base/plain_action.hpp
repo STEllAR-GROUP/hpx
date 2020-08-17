@@ -79,7 +79,7 @@ namespace hpx { namespace actions {
 
         template <typename... Ts>
         static R invoke(naming::address::address_type /*lva*/,
-            naming::address::component_type comptype, Ts&&... vs)
+            naming::address::component_type /*comptype*/, Ts&&... vs)
         {
             basic_action<detail::plain_function, R(Ps...),
                 derived_type>::increment_invocation_count();

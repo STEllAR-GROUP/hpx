@@ -886,7 +886,7 @@ namespace hpx { namespace util {
         {
             template <typename TTuple, typename UTuple>
             static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE bool call(
-                TTuple const& t, UTuple const& u)
+                TTuple const&, UTuple const&)
             {
                 return true;
             }

@@ -299,25 +299,23 @@ namespace hpx { namespace util {
         {
         };
 
-        inline std::shared_ptr<task_wrapper> new_task(
-            thread_description const& description,
-            std::uint32_t parent_locality_id,
-            threads::thread_id_type const& parent_task)
+        inline std::shared_ptr<task_wrapper> new_task(thread_description const&,
+            std::uint32_t, threads::thread_id_type const&)
         {
             return nullptr;
         }
 
         inline std::shared_ptr<task_wrapper> update_task(
-            std::shared_ptr<task_wrapper> wrapper,
-            thread_description const& description)
+            std::shared_ptr<task_wrapper>, thread_description const&)
         {
             return nullptr;
         }
 
         struct scoped_timer
         {
-            explicit scoped_timer(std::shared_ptr<task_wrapper> data_ptr) {}
-            ~scoped_timer() {}
+            explicit scoped_timer(std::shared_ptr<task_wrapper>) {}
+            ~scoped_timer() = default;
+
             void stop(void) {}
             void yield(void) {}
         };

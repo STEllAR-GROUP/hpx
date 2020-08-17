@@ -289,7 +289,7 @@ namespace hpx { namespace serialization {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Archive>
-        void save(Archive& ar, unsigned int const version) const
+        void save(Archive& ar, unsigned int const) const
         {
             ar << size_ << alloc_;
             // -V128
@@ -302,7 +302,7 @@ namespace hpx { namespace serialization {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Archive>
-        void load(Archive& ar, unsigned int const version)
+        void load(Archive& ar, unsigned int const)
         {
             ar >> size_ >> alloc_;
             // -V128

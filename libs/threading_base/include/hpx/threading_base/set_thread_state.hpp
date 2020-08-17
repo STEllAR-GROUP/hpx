@@ -295,8 +295,8 @@ namespace hpx { namespace threads { namespace detail {
     /// This thread function is used by the at_timer thread below to trigger
     /// the required action.
     inline thread_result_type wake_timer_thread(thread_id_type const& thrd,
-        thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-        thread_priority priority, thread_id_type const& timer_id,
+        thread_state_enum /*newstate*/, thread_state_ex_enum /*newstate_ex*/,
+        thread_priority /*priority*/, thread_id_type const& timer_id,
         std::shared_ptr<std::atomic<bool>> const& triggered,
         bool retry_on_active, thread_state_ex_enum my_statex)
     {

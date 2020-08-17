@@ -118,7 +118,7 @@ namespace hpx {
     /// function. It will set up the HPX runtime environment and schedule the
     /// function given by \p f as a HPX thread.
     inline int init(
-        std::nullptr_t f, int argc, char** argv, init_params const& params)
+        std::nullptr_t, int argc, char** argv, init_params const& params)
     {
         util::function_nonser<int(hpx::program_options::variables_map&)> main_f;
         if (argc == 0 || argv == nullptr)
@@ -411,7 +411,7 @@ namespace hpx {
     }
 
     inline int init(
-        std::nullptr_t f, int argc, char** argv, hpx::runtime_mode mode)
+        std::nullptr_t, int argc, char** argv, hpx::runtime_mode mode)
     {
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
