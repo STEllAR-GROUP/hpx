@@ -159,8 +159,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         // fill the vector with random numbers
         partitioned_vector_view<int> view(v);
-        hpx::parallel::generate(hpx::parallel::execution::par, view.begin(),
-            view.end(), [&]() { return dist(gen); });
+        hpx::generate(hpx::parallel::execution::par, view.begin(), view.end(),
+            [&]() { return dist(gen); });
 
         // square all numbers in the array
         hpx::ranges::for_each(

@@ -5,15 +5,16 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/iostream.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/include/parallel_sort.hpp>
+#include <hpx/iostream.hpp>
 
 #include <random>
 #include <vector>
 
-void final_task(hpx::future<hpx::util::tuple<hpx::future<double>, hpx::future<void>>>)
+void final_task(
+    hpx::future<hpx::util::tuple<hpx::future<double>, hpx::future<void>>>)
 {
     hpx::cout << "in final_task" << hpx::endl;
 }
@@ -42,12 +43,11 @@ int main(int, char**)
 
     // Tasks can be chained using the then method. The continuation takes the
     // future as an argument.
-    hpx::future<double> result = g.then([](hpx::future<double>&& gg)
-        {
-            // This function will be called once g is ready. gg is g moved
-            // into the continuation.
-            return gg.get() * 42.0 * 42.0;
-        });
+    hpx::future<double> result = g.then([](hpx::future<double>&& gg) {
+        // This function will be called once g is ready. gg is g moved
+        // into the continuation.
+        return gg.get() * 42.0 * 42.0;
+    });
 
     // You can check if a future is ready with the is_ready method.
     hpx::cout << "Result is ready? " << result.is_ready() << hpx::endl;
@@ -56,16 +56,14 @@ int main(int, char**)
     std::vector<int> v(1000000);
 
     // We fill the vector synchronously and sequentially.
-    hpx::parallel::generate(hpx::parallel::execution::seq,
-                  std::begin(v), std::end(v), &rand_wrapper);
+    hpx::generate(hpx::parallel::execution::seq, std::begin(v), std::end(v),
+        &rand_wrapper);
 
     // We can launch the sort in parallel and asynchronously.
-    hpx::future<void> done_sorting =
-        hpx::parallel::sort(
-            hpx::parallel::execution::par( // In parallel.
-                hpx::parallel::execution::task), // Asynchronously.
-            std::begin(v),
-            std::end(v));
+    hpx::future<void> done_sorting = hpx::parallel::sort(
+        hpx::parallel::execution::par(          // In parallel.
+            hpx::parallel::execution::task),    // Asynchronously.
+        std::begin(v), std::end(v));
 
     // We launch the final task when the vector has been sorted and result is
     // ready using when_all.
@@ -75,8 +73,8 @@ int main(int, char**)
     all.wait();
 
     // all must be ready at this point because we waited for it to be ready.
-    hpx::cout <<
-        (all.is_ready() ? "all is ready!" : "all is not ready...") << hpx::endl;
+    hpx::cout << (all.is_ready() ? "all is ready!" : "all is not ready...")
+              << hpx::endl;
 
     return hpx::finalize();
 }

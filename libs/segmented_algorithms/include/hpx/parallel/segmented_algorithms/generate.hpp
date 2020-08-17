@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -203,10 +203,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
 
         // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename FwdIter, typename F>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        generate_(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-            std::false_type);
+        template <typename ExPolicy, typename Iter, typename Sent, typename F>
+        typename util::detail::algorithm_result<ExPolicy, Iter>::type generate_(
+            ExPolicy&& policy, Iter first, Sent last, F&& f, std::false_type);
 
         /// \endcond
     }    // namespace detail
