@@ -21,7 +21,7 @@
 #include <vector>
 
 using queue = boost::lockfree::queue<std::uint64_t,
-      hpx::util::aligned_allocator<std::uint64_t>>; 
+    hpx::util::aligned_allocator<std::uint64_t>>;
 
 std::vector<queue*> queues;
 std::vector<std::uint64_t> stolen;

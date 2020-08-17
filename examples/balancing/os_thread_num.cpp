@@ -10,6 +10,7 @@
 #include <hpx/barrier.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/iostream.hpp>
+#include <hpx/modules/allocator_support.hpp>
 
 #include <boost/lockfree/queue.hpp>
 
