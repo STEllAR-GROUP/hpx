@@ -1,5 +1,5 @@
 ..
-    Copyright (C) 2020 Mikael Simberg
+    Copyright (C) 2020 ETH Zurich
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,25 +32,25 @@ Functions
 ---------
 
 - :cpp:func:`hpx::parallel::v1::adjacent_find`
-- :cpp:func:`hpx::parallel::v1::all_of`
-- :cpp:func:`hpx::parallel::v1::any_of`
+- :cpp:func:`hpx::all_of`
+- :cpp:func:`hpx::any_of`
 - :cpp:func:`hpx::copy`
 - :cpp:func:`hpx::copy_if`
 - :cpp:func:`hpx::copy_n`
-- :cpp:func:`hpx::parallel::v1::count`
-- :cpp:func:`hpx::parallel::v1::count_if`
-- :cpp:func:`hpx::parallel::v1::equal`
-- :cpp:func:`hpx::parallel::v1::fill`
-- :cpp:func:`hpx::parallel::v1::fill_n`
-- :cpp:func:`hpx::parallel::v1::find`
-- :cpp:func:`hpx::parallel::v1::find_end`
-- :cpp:func:`hpx::parallel::v1::find_first_of`
-- :cpp:func:`hpx::parallel::v1::find_if`
-- :cpp:func:`hpx::parallel::v1::find_if_not`
-- :cpp:func:`hpx::parallel::v1::for_each`
-- :cpp:func:`hpx::parallel::v1::for_each_n`
-- :cpp:func:`hpx::parallel::v1::generate`
-- :cpp:func:`hpx::parallel::v1::generate_n`
+- :cpp:func:`hpx::count`
+- :cpp:func:`hpx::count_if`
+- :cpp:func:`hpx::equal`
+- :cpp:func:`hpx::fill`
+- :cpp:func:`hpx::fill_n`
+- :cpp:func:`hpx::find`
+- :cpp:func:`hpx::find_end`
+- :cpp:func:`hpx::find_first_of`
+- :cpp:func:`hpx::find_if`
+- :cpp:func:`hpx::find_if_not`
+- :cpp:func:`hpx::for_each`
+- :cpp:func:`hpx::for_each_n`
+- :cpp:func:`hpx::generate`
+- :cpp:func:`hpx::generate_n`
 - :cpp:func:`hpx::parallel::v1::includes`
 - :cpp:func:`hpx::parallel::v1::inplace_merge`
 - :cpp:func:`hpx::parallel::v1::is_heap`
@@ -64,8 +64,8 @@ Functions
 - :cpp:func:`hpx::parallel::v1::min_element`
 - :cpp:func:`hpx::parallel::v1::minmax_element`
 - :cpp:func:`hpx::parallel::v1::mismatch`
-- :cpp:func:`hpx::parallel::v1::move`
-- :cpp:func:`hpx::parallel::v1::none_of`
+- :cpp:func:`hpx::move`
+- :cpp:func:`hpx::none_of`
 - :cpp:func:`hpx::parallel::v1::partition`
 - :cpp:func:`hpx::parallel::v1::partition_copy`
 - :cpp:func:`hpx::parallel::v1::remove`
@@ -97,9 +97,27 @@ Functions
 - :cpp:func:`hpx::parallel::v2::for_loop_n`
 - :cpp:func:`hpx::parallel::v2::for_loop_n_strided`
 
+- :cpp:func:`hpx::ranges::all_of`
+- :cpp:func:`hpx::ranges::any_of`
 - :cpp:func:`hpx::ranges::copy`
 - :cpp:func:`hpx::ranges::copy_if`
 - :cpp:func:`hpx::ranges::copy_n`
+- :cpp:func:`hpx::ranges::count`
+- :cpp:func:`hpx::ranges::count_if`
+- :cpp:func:`hpx::ranges::equal`
+- :cpp:func:`hpx::ranges::fill`
+- :cpp:func:`hpx::ranges::fill_n`
+- :cpp:func:`hpx::ranges::find`
+- :cpp:func:`hpx::ranges::find_end`
+- :cpp:func:`hpx::ranges::find_first_of`
+- :cpp:func:`hpx::ranges::find_if`
+- :cpp:func:`hpx::ranges::find_if_not`
+- :cpp:func:`hpx::ranges::for_each`
+- :cpp:func:`hpx::ranges::for_each_n`
+- :cpp:func:`hpx::ranges::generate`
+- :cpp:func:`hpx::ranges::generate_n`
+- :cpp:func:`hpx::ranges::move`
+- :cpp:func:`hpx::ranges::none_of`
 
 Header ``hpx/any.hpp``
 ======================
