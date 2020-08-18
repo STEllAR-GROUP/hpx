@@ -153,6 +153,35 @@ namespace hpx { namespace parallel { namespace util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename I1, typename I2, typename O>
+    struct in_in_out_result
+    {
+        HPX_NO_UNIQUE_ADDRESS I1 in1;
+        HPX_NO_UNIQUE_ADDRESS I2 in2;
+        HPX_NO_UNIQUE_ADDRESS O out;
+
+        template <typename II1, typename II2, typename OO,
+            typename Enable = typename std::enable_if<
+                std::is_convertible<I1 const&, II1&>::value &&
+                std::is_convertible<I2 const&, II2&>::value &&
+                std::is_convertible<O const&, OO&>::value>::type>
+        constexpr operator in_in_out_result<II1, II2, OO>() const&
+        {
+            return {in1, in2, out};
+        }
+
+        template <typename II1, typename II2, typename OO,
+            typename Enable =
+                typename std::enable_if<std::is_convertible<I1, II1>::value &&
+                    std::is_convertible<I2, II2>::value &&
+                    std::is_convertible<O, OO>::value>::type>
+        constexpr operator in_in_out_result<II1, II2, OO>() &&
+        {
+            return {std::move(in1), std::move(in2), std::move(out)};
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename I, typename F>
     struct in_fun_result
     {
