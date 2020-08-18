@@ -14,7 +14,6 @@ module switch PrgEnv-cray PrgEnv-gnu
 module load cudatoolkit
 module load Boost
 module load hwloc/.2.0.3
-module load jemalloc/.5.1.0-CrayGNU-19.10
 spack load cmake
 spack load ninja
 
@@ -28,3 +27,4 @@ configure_extra_options+=" -DHPX_WITH_CUDA=ON"
 configure_extra_options+=" -DHPX_WITH_DEPRECATION_WARNINGS=OFF"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
+configure_extra_options+=" -DHWLOC_ROOT=${EBROOTHWLOC}"
