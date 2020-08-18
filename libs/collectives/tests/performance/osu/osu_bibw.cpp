@@ -7,9 +7,10 @@
 
 // Bidirectional network bandwidth test
 
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/parallel_for_loop.hpp>
-#include <hpx/include/serialization.hpp>
+#include <hpx/serialization.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -49,9 +50,9 @@ hpx::future<void> send_async(
 {
     using buffer_type = hpx::serialization::serialize_buffer<char>;
 
-    using hpx::parallel::for_loop;
-    using hpx::parallel::execution::par;
-    using hpx::parallel::execution::task;
+    using hpx::for_loop;
+    using hpx::execution::par;
+    using hpx::execution::task;
 
     return for_loop(par(task), 0, window_size, [dest, size](std::uint64_t j) {
         // Note: The original benchmark uses MPI_Isend which does not
@@ -74,8 +75,8 @@ void recv_async(hpx::id_type dest, std::size_t size, std::size_t window_size)
 {
     using buffer_type = hpx::serialization::serialize_buffer<char>;
 
-    using hpx::parallel::for_loop;
-    using hpx::parallel::execution::par;
+    using hpx::for_loop;
+    using hpx::execution::par;
 
     for_loop(par, 0, window_size, [dest, size](std::uint64_t j) {
         irecv_action recv;

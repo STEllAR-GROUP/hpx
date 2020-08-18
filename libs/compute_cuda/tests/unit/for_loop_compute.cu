@@ -8,8 +8,7 @@
 
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/include/compute.hpp>
-#include <hpx/include/parallel_for_loop.hpp>
-#include <hpx/include/parallel_copy.hpp>
+#include <hpx/algorithm.hpp>
 
 #include <hpx/modules/testing.hpp>
 
@@ -35,7 +34,7 @@ void test_for_loop(executor_type& exec,
     //         result_of<> (used inside for_each()) to get the return
     //         type
 
-    hpx::parallel::for_loop_n(
+    hpx::for_loop_n(
         hpx::parallel::execution::par.on(exec),
         d_A.data(), d_A.size(),
         hpx::parallel::induction(d_B.data()),
