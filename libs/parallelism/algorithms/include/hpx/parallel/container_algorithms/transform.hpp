@@ -214,9 +214,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 traits::projected_range<Proj1, Rng>,
                                 traits::projected<Proj2, InIter2>>::value)>
     typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_tuple<
-            tag::in1(typename hpx::traits::range_iterator<Rng>::type),
-            tag::in2(InIter2), tag::out(OutIter)>>::type
+        util::in_in_out_result<typename hpx::traits::range_iterator<Rng>::type,
+            InIter2, OutIter>>::type
     transform(ExPolicy&& policy, Rng&& rng, InIter2 first2, OutIter dest, F&& f,
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
@@ -328,10 +327,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 traits::projected_range<Proj1, Rng1>,
                                 traits::projected_range<Proj2, Rng2>>::value)>
     typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_tuple<
-            tag::in1(typename hpx::traits::range_iterator<Rng1>::type),
-            tag::in2(typename hpx::traits::range_iterator<Rng2>::type),
-            tag::out(OutIter)>>::type
+        util::in_in_out_result<typename hpx::traits::range_iterator<Rng1>::type,
+            typename hpx::traits::range_iterator<Rng2>::type, OutIter>>::type
     transform(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, OutIter dest, F&& f,
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
@@ -353,9 +350,10 @@ namespace hpx { namespace ranges {
       : hpx::functional::tag<transform_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename F, typename Proj = hpx::parallel::util::projection_identity,
+            typename FwdIter2, typename F,
+            typename Proj = hpx::parallel::util::projection_identity,
+            // clang-format off
             HPX_CONCEPT_REQUIRES_(
                 hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
@@ -401,9 +399,10 @@ namespace hpx { namespace ranges {
                 std::forward<Proj>(proj), is_segmented());
         }
 
-        // clang-format off
-        template <typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename F, typename Proj = hpx::parallel::util::projection_identity,
+        template <typename FwdIter1, typename Sent1, typename FwdIter2,
+            typename F,
+            typename Proj = hpx::parallel::util::projection_identity,
+            // clang-format off
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_sentinel_for<Sent1, FwdIter1>::value &&

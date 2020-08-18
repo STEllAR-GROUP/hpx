@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2016 Hartmut Kaiser
+//  Copyright (c) 2020 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -66,9 +67,9 @@ void test_transform_binary(ExPolicy policy, IteratorTag)
     auto result = hpx::parallel::transform(policy, iterator(std::begin(c1)),
         iterator(std::end(c1)), std::begin(c2), std::begin(d1), add());
 
-    HPX_TEST(hpx::get<0>(result) == iterator(std::end(c1)));
-    HPX_TEST(hpx::get<1>(result) == std::end(c2));
-    HPX_TEST(hpx::get<2>(result) == std::end(d1));
+    HPX_TEST(result.in1 == iterator(std::end(c1)));
+    HPX_TEST(result.in2 == std::end(c2));
+    HPX_TEST(result.out == std::end(d1));
 
     // verify values
     std::vector<int> d2(c1.size());
@@ -103,10 +104,10 @@ void test_transform_binary_async(ExPolicy p, IteratorTag)
         iterator(std::end(c1)), std::begin(c2), std::begin(d1), add());
     f.wait();
 
-    hpx::tuple<iterator, base_iterator, base_iterator> result = f.get();
-    HPX_TEST(hpx::get<0>(result) == iterator(std::end(c1)));
-    HPX_TEST(hpx::get<1>(result) == std::end(c2));
-    HPX_TEST(hpx::get<2>(result) == std::end(d1));
+    auto result = f.get();
+    HPX_TEST(result.in1 == iterator(std::end(c1)));
+    HPX_TEST(result.in2 == std::end(c2));
+    HPX_TEST(result.out == std::end(d1));
 
     // verify values
     std::vector<int> d2(c1.size());

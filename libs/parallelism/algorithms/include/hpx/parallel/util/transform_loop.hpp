@@ -56,26 +56,26 @@ namespace hpx { namespace parallel { namespace util {
         {
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE
-                HPX_FORCEINLINE static hpx::tuple<InIter1, InIter2, OutIter>
-                call(InIter1 first1, InIter1 last1, InIter2 first2,
-                    OutIter dest, F&& f)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static util::in_in_out_result<
+                InIter1, InIter2, OutIter>
+            call(InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest,
+                F&& f)
             {
                 for (/* */; first1 != last1; (void) ++first1, ++first2, ++dest)
                 {
                     *dest =
                         hpx::util::invoke(std::forward<F>(f), first1, first2);
                 }
-                return hpx::make_tuple(
-                    std::move(first1), std::move(first2), std::move(dest));
+                return util::in_in_out_result<InIter1, InIter2, OutIter>{
+                    std::move(first1), std::move(first2), std::move(dest)};
             }
 
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE
-                HPX_FORCEINLINE static hpx::tuple<InIter1, InIter2, OutIter>
-                call(InIter1 first1, InIter1 last1, InIter2 first2,
-                    InIter2 last2, OutIter dest, F&& f)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static util::in_in_out_result<
+                InIter1, InIter2, OutIter>
+            call(InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
+                OutIter dest, F&& f)
             {
                 for (/* */; first1 != last1 && first2 != last2;
                      (void) ++first1, ++first2, ++dest)
@@ -83,7 +83,8 @@ namespace hpx { namespace parallel { namespace util {
                     *dest =
                         hpx::util::invoke(std::forward<F>(f), first1, first2);
                 }
-                return hpx::make_tuple(first1, first2, dest);
+                return util::in_in_out_result<InIter1, InIter2, OutIter>{
+                    first1, first2, dest};
             }
         };
     }    // namespace detail
@@ -91,8 +92,8 @@ namespace hpx { namespace parallel { namespace util {
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
-        !hpx::is_vectorpack_execution_policy<ExPolicy>::value,
-        hpx::tuple<InIter1, InIter2, OutIter>>::type
+        !execution::is_vectorpack_execution_policy<ExPolicy>::value,
+        util::in_in_out_result<InIter1, InIter2, OutIter>>::type
     transform_binary_loop(
         InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest, F&& f)
     {
@@ -103,8 +104,8 @@ namespace hpx { namespace parallel { namespace util {
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
-        !hpx::is_vectorpack_execution_policy<ExPolicy>::value,
-        hpx::tuple<InIter1, InIter2, OutIter>>::type
+        !execution::is_vectorpack_execution_policy<ExPolicy>::value,
+        util::in_in_out_result<InIter1, InIter2, OutIter>>::type
     transform_binary_loop(InIter1 first1, InIter1 last1, InIter2 first2,
         InIter2 last2, OutIter dest, F&& f)
     {

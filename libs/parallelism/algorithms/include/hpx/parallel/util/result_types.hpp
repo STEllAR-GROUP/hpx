@@ -179,6 +179,14 @@ namespace hpx { namespace parallel { namespace util {
         {
             return {std::move(in1), std::move(in2), std::move(out)};
         }
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned)
+        {
+            // clang-format off
+            ar & in1 & in2 & out;
+            // clang-format on
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -254,6 +262,52 @@ namespace hpx { namespace parallel { namespace util {
                 });
         }
 
+        template <typename ZipIter>
+        in_in_out_result<typename hpx::util::tuple_element<0,
+                             typename ZipIter::iterator_tuple_type>::type,
+            typename hpx::util::tuple_element<1,
+                typename ZipIter::iterator_tuple_type>::type,
+            typename hpx::util::tuple_element<2,
+                typename ZipIter::iterator_tuple_type>::type>
+        get_in_in_out_result(ZipIter&& zipiter)
+        {
+            using iterator_tuple_type = typename ZipIter::iterator_tuple_type;
+
+            using result_type = in_in_out_result<
+                typename hpx::util::tuple_element<0, iterator_tuple_type>::type,
+                typename hpx::util::tuple_element<1, iterator_tuple_type>::type,
+                typename hpx::util::tuple_element<2,
+                    iterator_tuple_type>::type>;
+
+            iterator_tuple_type t = zipiter.get_iterator_tuple();
+            return result_type{hpx::util::get<0>(t), hpx::util::get<1>(t),
+                hpx::util::get<2>(t)};
+        }
+
+        template <typename ZipIter>
+        hpx::future<
+            in_in_out_result<typename hpx::util::tuple_element<0,
+                                 typename ZipIter::iterator_tuple_type>::type,
+                typename hpx::util::tuple_element<1,
+                    typename ZipIter::iterator_tuple_type>::type,
+                typename hpx::util::tuple_element<2,
+                    typename ZipIter::iterator_tuple_type>::type>>
+        get_in_in_out_result(hpx::future<ZipIter>&& zipiter)
+        {
+            using iterator_tuple_type = typename ZipIter::iterator_tuple_type;
+
+            using result_type = in_in_out_result<
+                typename hpx::util::tuple_element<0, iterator_tuple_type>::type,
+                typename hpx::util::tuple_element<1, iterator_tuple_type>::type,
+                typename hpx::util::tuple_element<2,
+                    iterator_tuple_type>::type>;
+
+            return lcos::make_future<result_type>(
+                std::move(zipiter), [](ZipIter zipiter) {
+                    return get_in_in_out_result(std::move(zipiter));
+                });
+        }
+
         ///////////////////////////////////////////////////////////////////////
         template <typename I, typename O>
         O get_second_element(util::in_out_result<I, O>&& p)
@@ -265,8 +319,8 @@ namespace hpx { namespace parallel { namespace util {
         hpx::future<O> get_second_element(
             hpx::future<util::in_out_result<I, O>>&& f)
         {
-            return lcos::make_future<O>(
-                std::move(f), [](util::in_out_result<I, O>&& p) { return p.out; });
+            return lcos::make_future<O>(std::move(f),
+                [](util::in_out_result<I, O>&& p) { return p.out; });
         }
     }    // namespace detail
 }}}      // namespace hpx::parallel::util
