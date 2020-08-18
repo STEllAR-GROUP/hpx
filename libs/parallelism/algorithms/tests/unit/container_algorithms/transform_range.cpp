@@ -21,6 +21,35 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_transform(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
+
+    test_vector c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    auto result = hpx::ranges::transform(
+        c, std::begin(d), [](std::size_t v) { return v + 1; });
+
+    HPX_TEST(result.in == std::end(c));
+    HPX_TEST(result.out == std::end(d));
+
+    // verify values
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1 + 1, v2);
+            ++count;
+            return v1 + 1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_transform(ExPolicy policy, IteratorTag)
 {
@@ -105,6 +134,41 @@ void transform_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_transform_exception(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::ranges::transform(
+            hpx::util::make_iterator_range(
+                iterator(std::begin(c)), iterator(std::end(c))),
+            std::begin(d),
+            [](std::size_t v) { return throw std::runtime_error("test"), v; });
+
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<hpx::execution::sequenced_policy,
+            IteratorTag>::call(hpx::execution::seq, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_transform_exception(ExPolicy policy, IteratorTag)
 {

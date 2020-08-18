@@ -47,6 +47,31 @@ struct throw_bad_alloc
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_transform(IteratorTag)
+{
+    typedef std::vector<int>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<int> c(10007);
+    std::vector<int> d(c.size());
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    auto result = hpx::transform(iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(d), add_one());
+    HPX_TEST(result == std::end(d));
+
+    // verify values
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1 + 1, v2);
+            ++count;
+            return v1 + 1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_transform(ExPolicy policy, IteratorTag)
 {
@@ -105,6 +130,38 @@ void test_transform_async(ExPolicy p, IteratorTag)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_transform_exception(IteratorTag)
+{
+    typedef std::vector<int>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<int> c(10007);
+    std::vector<int> d(c.size());
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::transform(iterator(std::begin(c)), iterator(std::end(c)),
+            std::begin(d), throw_always());
+
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<hpx::parallel::execution::sequenced_policy,
+            IteratorTag>::call(hpx::parallel::execution::seq, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_transform_exception(ExPolicy policy, IteratorTag)
 {
