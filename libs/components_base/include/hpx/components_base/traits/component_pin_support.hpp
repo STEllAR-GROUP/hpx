@@ -19,7 +19,7 @@ namespace hpx { namespace traits {
         struct pin_helper
         {
             template <typename Component>
-            static constexpr void call(wrap_int, Component* p)
+            static constexpr void call(wrap_int, Component*)
             {
             }
 
@@ -34,7 +34,7 @@ namespace hpx { namespace traits {
         struct unpin_helper
         {
             template <typename Component>
-            static constexpr bool call(wrap_int, Component* p)
+            static constexpr bool call(wrap_int, Component*)
             {
                 return false;
             }
@@ -51,7 +51,7 @@ namespace hpx { namespace traits {
         struct pin_count_helper
         {
             template <typename Component>
-            static constexpr std::uint32_t call(wrap_int, Component* p)
+            static constexpr std::uint32_t call(wrap_int, Component*)
             {
                 return 0;
             }

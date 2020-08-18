@@ -30,7 +30,7 @@ namespace hpx { namespace detail {
     {
         template <typename... Ts>
         HPX_FORCEINLINE static Result call(
-            naming::id_type const& id, naming::address&& addr, Ts&&... vs)
+            naming::id_type const& /*id*/, naming::address&& addr, Ts&&... vs)
         {
             typedef typename Action::remote_result_type remote_result_type;
 
@@ -47,7 +47,7 @@ namespace hpx { namespace detail {
     {
         template <typename... Ts>
         HPX_FORCEINLINE static void call(
-            naming::id_type const& id, naming::address&& addr, Ts&&... vs)
+            naming::id_type const& /*id*/, naming::address&& addr, Ts&&... vs)
         {
             Action::execute_function(
                 addr.address_, addr.type_, std::forward<Ts>(vs)...);

@@ -24,7 +24,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     struct post_policy_dispatch
     {
         template <typename F, typename... Ts>
-        static void call(Policy const& policy,
+        static void call(Policy const&,
             hpx::util::thread_description const& desc,
             threads::thread_pool_base* pool, threads::thread_priority priority,
             threads::thread_stacksize stacksize,
@@ -38,7 +38,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         }
 
         template <typename F, typename... Ts>
-        static void call(Policy const& policy,
+        static void call(Policy const&,
             hpx::util::thread_description const& desc,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize,
@@ -68,7 +68,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     struct post_policy_dispatch<launch::fork_policy>
     {
         template <typename F, typename... Ts>
-        static void call(launch::fork_policy const& policy,
+        static void call(launch::fork_policy const&,
             hpx::util::thread_description const& desc,
             threads::thread_pool_base* pool, threads::thread_priority priority,
             threads::thread_stacksize stacksize,

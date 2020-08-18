@@ -225,7 +225,7 @@ namespace hpx { namespace threads {
     inline threads::thread_id_type register_thread_plain(
         threads::thread_pool_base* pool, threads::thread_init_data& data,
         threads::thread_state_enum initial_state = threads::pending,
-        bool run_now = true, error_code& ec = throws)
+        bool /*run_now*/ = true, error_code& ec = throws)
     {
         HPX_ASSERT(pool);
         threads::thread_id_type id = threads::invalid_thread_id;

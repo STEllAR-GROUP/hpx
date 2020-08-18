@@ -480,7 +480,7 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename Spawner, typename Policy>
         void attach(Future const& future,
             typename std::remove_reference<Spawner>::type& spawner,
-            Policy&& policy, error_code& ec = throws)
+            Policy&& policy, error_code& /*ec*/ = throws)
         {
             typedef typename traits::detail::shared_state_ptr_for<Future>::type
                 shared_state_ptr;
@@ -516,7 +516,7 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename Spawner, typename Policy>
         void attach(Future const& future,
             typename std::remove_reference<Spawner>::type&& spawner,
-            Policy&& policy, error_code& ec = throws)
+            Policy&& policy, error_code& /*ec*/ = throws)
         {
             typedef typename traits::detail::shared_state_ptr_for<Future>::type
                 shared_state_ptr;
@@ -553,7 +553,7 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename Spawner, typename Policy>
         void attach_nounwrap(Future const& future,
             typename std::remove_reference<Spawner>::type& spawner,
-            Policy&& policy, error_code& ec = throws)
+            Policy&& policy, error_code& /*ec*/ = throws)
         {
             typedef typename traits::detail::shared_state_ptr_for<Future>::type
                 shared_state_ptr;
@@ -589,7 +589,7 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename Spawner, typename Policy>
         void attach_nounwrap(Future const& future,
             typename std::remove_reference<Spawner>::type&& spawner,
-            Policy&& policy, error_code& ec = throws)
+            Policy&& policy, error_code& /*ec*/ = throws)
         {
             typedef typename traits::detail::shared_state_ptr_for<Future>::type
                 shared_state_ptr;
