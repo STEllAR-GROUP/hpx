@@ -608,11 +608,6 @@ target_compile_definitions(
 set(hpx_targets hpx wrap_main plugin component)
 set(hpx_internal_targets hpx_core hpx_interface hpx_interface_wrap_main)
 
-# Temporary for compatibility with projects like gridtools
-add_library(hpx_no_wrap_main INTERFACE)
-target_link_libraries(hpx_no_wrap_main INTERFACE hpx)
-list(APPEND hpx_targets hpx_no_wrap_main)
-
 install(
   TARGETS ${hpx_targets}
   EXPORT HPXTargets
