@@ -518,6 +518,23 @@ Functions
 - :cpp:func:`hpx::parallel::v1::uninitialized_value_construct`
 - :cpp:func:`hpx::parallel::v1::uninitialized_value_construct_n`
 
+Header ``hpx/numeric.hpp``
+==========================
+
+Corresponds to the C++ standard library header :cppreference-header:`numeric`.
+See :ref:`parallel_algorithms` for more information about the parallel
+algorithms.
+
+Functions
+---------
+
+- :cpp:func:`hpx::parallel::v1::adjacent_difference`
+- :cpp:func:`hpx::parallel::v1::exclusive_scan`
+- :cpp:func:`hpx::parallel::v1::inclusive_scan`
+- :cpp:func:`hpx::parallel::v1::transform_exclusive_scan`
+- :cpp:func:`hpx::parallel::v1::transform_inclusive_scan`
+- :cpp:func:`hpx::parallel::v1::transform_reduce`
+
 Header ``hpx/optional.hpp``
 ===========================
 
