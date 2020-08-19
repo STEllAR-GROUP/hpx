@@ -12,5 +12,5 @@ namespace hpx {
     namespace threads {
         namespace executors {
             namespace experimental {
-    using hpx::parallel::execution::experimental::limiting_executor;
+    using hpx::execution::experimental::limiting_executor;
 }}}}    // namespace hpx::threads::executors::experimental

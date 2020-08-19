@@ -100,7 +100,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         // mpi chokes if we put too many messages into the system at once
         // we will use a limiting executor with N 'in flight' at once
-        hpx::parallel::execution::experimental::limiting_executor<
+        hpx::execution::experimental::limiting_executor<
             hpx::mpi::experimental::executor>
             limexec(exec, 32, 64, true);
 

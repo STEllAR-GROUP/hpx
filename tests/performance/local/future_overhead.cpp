@@ -13,20 +13,19 @@
 #endif
 #include <hpx/async_combinators/wait_each.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/executors/limiting_executor.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
-
-#include <hpx/include/parallel_execution.hpp>
-#include <hpx/modules/synchronization.hpp>
-#include <hpx/thread_executors/limiting_executor.hpp>
 
 #include <array>
 #include <atomic>
@@ -282,8 +281,8 @@ void measure_function_futures_limiting_executor(
     // start the clock
     high_resolution_timer walltime;
     {
-        hpx::threads::executors::experimental::limiting_executor<Executor>
-            signal_exec(exec, tasks, tasks + 1000);
+        hpx::execution::experimental::limiting_executor<Executor> signal_exec(
+            exec, tasks, tasks + 1000);
         hpx::parallel::for_loop(hpx::parallel::execution::par.with(fixed), 0,
             count, [&](std::uint64_t) {
                 hpx::apply(signal_exec, [&]() {
