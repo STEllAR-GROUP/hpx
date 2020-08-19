@@ -165,34 +165,6 @@ namespace hpx { namespace parallel { namespace execution {
                 F f_;
             };
 
-            /*
-        template <typename Executor, typename Enable = void>
-        struct block_if_full {
-            bool exceeds_upper(Executor &exec, limiting_executor *this_) {
-                return (++this_->count_ > this_->upper_threshold_);
-            }
-            bool exceeds_lower(Executor &exec, limiting_executor *this_) {
-                return (this_->count_ > this_->lower_threshold_);
-            }
-        };
-
-        template <typename Executor>
-        struct block_if_full<Executor,
-            typename std::enable_if<
-                detail::has_block_execution_upper<Executor>::value &&
-                detail::has_block_execution_lower<Executor>::value
-                >::type>
-        {
-            bool exceeds_upper(Executor &exec, limiting_executor *this_) {
-                auto temp = exec.in_flight_estimate();
-                return (temp > this_->upper_threshold_);
-            }
-            bool exceeds_lower(Executor &exec, limiting_executor *this_) {
-                auto temp = exec.in_flight_estimate();
-                return (temp > this_->lower_threshold_);
-            }
-        };
-*/
         public:
             using execution_category =
                 typename BaseExecutor::execution_category;

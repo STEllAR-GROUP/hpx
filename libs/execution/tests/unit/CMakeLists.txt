@@ -11,7 +11,6 @@ set(tests
     executor_parameters_dispatching
     executor_parameters_timer_hooks
     future_then_executor
-    limiting_executor
     minimal_async_executor
     minimal_sync_executor
     parallel_executor
