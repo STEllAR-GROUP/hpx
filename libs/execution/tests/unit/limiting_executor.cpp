@@ -5,11 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/async.hpp>
+#include <hpx/executors/limiting_executor.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/thread_executors/limiting_executor.hpp>
 
 #include <chrono>
 #include <cstdlib>
@@ -63,9 +63,11 @@ void test_limit()
     //
     const bool block_on_exit = true;
     std::vector<hpx::future<void>> futures;
+    // scope block for executor lifetime (block on destruction)
     {
-        hpx::parallel::execution::limiting_executor<decltype(exec1)> lexec1(
-            exec1, max1 / 2, max1, block_on_exit);
+        hpx::parallel::execution::experimental::limiting_executor<decltype(
+            exec1)>
+            lexec1(exec1, max1 / 2, max1, block_on_exit);
 
         // run this loop for N seconds and launch as many tasks as we can
         // then check that there were never more than N on a given executor
