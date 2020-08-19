@@ -350,7 +350,7 @@ namespace hpx {
             hpx::parallel::v1::detail::fill_(hpx::parallel::execution::seq,
                 first, last, value, std::false_type{});
         }
-    } fill;
+    } fill{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::fill_n
@@ -411,7 +411,7 @@ namespace hpx {
                 hpx::parallel::execution::seq, std::true_type{}, first,
                 std::size_t(count), value);
         }
-    } fill_n;
+    } fill_n{};
 
 }    // namespace hpx
 

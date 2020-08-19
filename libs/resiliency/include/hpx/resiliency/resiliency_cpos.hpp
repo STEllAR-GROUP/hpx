@@ -40,7 +40,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     HPX_INLINE_CONSTEXPR_VARIABLE struct async_replay_validate_t final
       : hpx::functional::tag<async_replay_validate_t>
     {
-    } async_replay_validate;
+    } async_replay_validate{};
 
     /// Customization point for asynchronously launching given function \a f
     /// repeatedly. Repeat launching on error exactly \a n times (except if
@@ -48,7 +48,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     HPX_INLINE_CONSTEXPR_VARIABLE struct async_replay_t final
       : hpx::functional::tag<async_replay_t>
     {
-    } async_replay;
+    } async_replay{};
 
     /// Customization point for asynchronously launching the given function \a f.
     /// repeatedly. Verify the result of those invocations using the given
@@ -60,7 +60,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replay_validate_t final
       : tag_deferred<dataflow_replay_validate_t, async_replay_validate_t>
     {
-    } dataflow_replay_validate;
+    } dataflow_replay_validate{};
 
     /// Customization point for asynchronously launching the given function \a f.
     /// repeatedly.
@@ -71,7 +71,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replay_t final
       : tag_deferred<dataflow_replay_t, async_replay_t>
     {
-    } dataflow_replay;
+    } dataflow_replay{};
 
     ///////////////////////////////////////////////////////////////////////////
     // Replicate customization points
@@ -84,7 +84,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     HPX_INLINE_CONSTEXPR_VARIABLE struct async_replicate_vote_validate_t final
       : hpx::functional::tag<async_replicate_vote_validate_t>
     {
-    } async_replicate_vote_validate;
+    } async_replicate_vote_validate{};
 
     ///////////////////////////////////////////////////////////////////////////
     /// Customization point for asynchronously launching the given function \a f
@@ -95,7 +95,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     HPX_INLINE_CONSTEXPR_VARIABLE struct async_replicate_vote_t final
       : hpx::functional::tag<async_replicate_vote_t>
     {
-    } async_replicate_vote;
+    } async_replicate_vote{};
 
     ///////////////////////////////////////////////////////////////////////////
     /// Customization point for asynchronously launching the given function \a f
@@ -105,7 +105,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     HPX_INLINE_CONSTEXPR_VARIABLE struct async_replicate_validate_t final
       : hpx::functional::tag<async_replicate_validate_t>
     {
-    } async_replicate_validate;
+    } async_replicate_validate{};
 
     ///////////////////////////////////////////////////////////////////////////
     /// Customization point for asynchronously launching the given function \a f
@@ -115,7 +115,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     HPX_INLINE_CONSTEXPR_VARIABLE struct async_replicate_t final
       : hpx::functional::tag<async_replicate_t>
     {
-    } async_replicate;
+    } async_replicate{};
 
     /// Customization point for asynchronously launching the given function \a f
     /// exactly \a n times concurrently. Run all the valid results against a
@@ -129,7 +129,7 @@ namespace hpx { namespace resiliency { namespace experimental {
       : tag_deferred<dataflow_replicate_vote_validate_t,
             async_replicate_vote_validate_t>
     {
-    } dataflow_replicate_vote_validate;
+    } dataflow_replicate_vote_validate{};
 
     /// Customization point for asynchronously launching the given function \a f
     /// exactly \a n times concurrently. Run all the valid results against a
@@ -141,7 +141,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replicate_vote_t final
       : tag_deferred<dataflow_replicate_vote_t, async_replicate_vote_t>
     {
-    } dataflow_replicate_vote;
+    } dataflow_replicate_vote{};
 
     /// Customization point for asynchronously launching the given function \a f
     /// exactly \a n times concurrently. Verify the result of those invocations
@@ -152,7 +152,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replicate_validate_t final
       : tag_deferred<dataflow_replicate_validate_t, async_replicate_validate_t>
     {
-    } dataflow_replicate_validate;
+    } dataflow_replicate_validate{};
 
     /// Customization point for asynchronously launching the given function \a f
     /// exactly \a n times concurrently. Return the first valid result.
@@ -162,5 +162,5 @@ namespace hpx { namespace resiliency { namespace experimental {
     HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replicate_t final
       : tag_deferred<dataflow_replicate_t, async_replicate_t>
     {
-    } dataflow_replicate;
+    } dataflow_replicate{};
 }}}    // namespace hpx::resiliency::experimental

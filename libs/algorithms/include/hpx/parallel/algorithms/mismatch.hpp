@@ -721,7 +721,7 @@ namespace hpx {
                     last1, first2, hpx::parallel::v1::detail::equal_to{});
         }
 
-    } mismatch;
+    } mismatch{};
 }    // namespace hpx
 
 #endif    // DOXYGEN

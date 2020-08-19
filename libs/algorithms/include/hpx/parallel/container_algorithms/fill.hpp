@@ -250,7 +250,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::execution::seq, first, last, value,
                 is_segmented{});
         }
-    } fill;
+    } fill{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::fill_n
@@ -373,7 +373,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::execution::seq, std::true_type{}, first,
                 std::size_t(count), value);
         }
-    } fill_n;
+    } fill_n{};
 
 }}    // namespace hpx::ranges
 

@@ -625,7 +625,7 @@ namespace hpx {
                 hpx::parallel::execution::seq, first, last, std::forward<F>(f),
                 hpx::parallel::util::projection_identity{}, std::false_type{});
         }
-    } none_of;
+    } none_of{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::any_of
@@ -663,7 +663,7 @@ namespace hpx {
                 hpx::parallel::execution::seq, first, last, std::forward<F>(f),
                 hpx::parallel::util::projection_identity{}, std::false_type{});
         }
-    } any_of;
+    } any_of{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::all_of
@@ -701,7 +701,7 @@ namespace hpx {
                 hpx::parallel::execution::seq, first, last, std::forward<F>(f),
                 hpx::parallel::util::projection_identity{}, std::false_type{});
         }
-    } all_of;
+    } all_of{};
 
 }    // namespace hpx
 

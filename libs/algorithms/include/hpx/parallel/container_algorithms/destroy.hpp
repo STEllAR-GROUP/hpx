@@ -218,7 +218,7 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::destroy<Iter>().call(
                 hpx::parallel::execution::seq, std::false_type{}, first, last);
         }
-    } destroy;
+    } destroy{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::destroy_n
@@ -277,7 +277,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::execution::seq, std::false_type{}, first,
                 std::size_t(count));
         }
-    } destroy_n;
+    } destroy_n{};
 }}    // namespace hpx::ranges
 
 #endif    // DOXYGEN
