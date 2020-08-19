@@ -153,11 +153,11 @@ namespace test
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-#if !defined( BOOST_SP_HAS_SYNC )
+#if defined(BOOST_SP_HAS_SYNC_INTRINSICS) || defined(BOOST_SP_HAS_SYNC)
+            std::uint64_t r = __sync_lock_test_and_set(&v_, 1);
+#else
             std::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
             HPX_COMPILER_FENCE;
-#else
-            std::uint64_t r = __sync_lock_test_and_set(&v_, 1);
 #endif
 
             if (r == 0) {
@@ -174,11 +174,11 @@ namespace test
         {
             HPX_ITT_SYNC_RELEASING(this);
 
-#if !defined( BOOST_SP_HAS_SYNC )
+#if defined(BOOST_SP_HAS_SYNC_INTRINSICS) || defined(BOOST_SP_HAS_SYNC)
+            __sync_lock_release(&v_);
+#else
             HPX_COMPILER_FENCE;
             *const_cast<std::uint64_t volatile*>(&v_) = 0;
-#else
-            __sync_lock_release(&v_);
 #endif
 
             HPX_ITT_SYNC_RELEASED(this);
