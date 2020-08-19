@@ -666,7 +666,7 @@ namespace hpx {
                 hpx::parallel::execution::seq, std::true_type{}, first1, last1,
                 first2, hpx::parallel::v1::detail::equal_to{});
         }
-    } equal;
+    } equal{};
 }    // namespace hpx
 
 #endif    // DOXYGEN

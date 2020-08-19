@@ -226,7 +226,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::execution::seq, hpx::util::begin(rng),
                 hpx::util::end(rng), dest);
         }
-    } move;
+    } move{};
 
 }}    // namespace hpx::ranges
 

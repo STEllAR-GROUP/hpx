@@ -320,7 +320,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::execution::seq, first, last, std::forward<F>(f),
                 is_segmented());
         }
-    } generate;
+    } generate{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::generate_n
@@ -379,6 +379,6 @@ namespace hpx { namespace ranges {
                 hpx::parallel::execution::seq, std::true_type(), first,
                 std::size_t(count), std::forward<F>(f));
         }
-    } generate_n;
+    } generate_n{};
 }}    // namespace hpx::ranges
 #endif    // DOXYGEN

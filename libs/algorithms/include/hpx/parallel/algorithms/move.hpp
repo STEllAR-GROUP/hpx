@@ -224,7 +224,7 @@ namespace hpx {
         {
             return std::move(first, last, dest);
         }
-    } move;
+    } move{};
 }    // namespace hpx
 
 #endif    // DOXYGEN

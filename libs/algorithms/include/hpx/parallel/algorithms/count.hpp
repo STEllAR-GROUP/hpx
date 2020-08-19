@@ -518,7 +518,7 @@ namespace hpx {
                 hpx::parallel::execution::seq, first, last, value,
                 hpx::parallel::util::projection_identity{}, std::false_type{});
         }
-    } count;
+    } count{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::count_if
@@ -570,7 +570,7 @@ namespace hpx {
                 hpx::parallel::execution::seq, first, last, std::forward<F>(f),
                 hpx::parallel::util::projection_identity{}, std::false_type{});
         }
-    } count_if;
+    } count_if{};
 
 }    // namespace hpx
 

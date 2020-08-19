@@ -349,7 +349,7 @@ namespace hpx {
                 hpx::parallel::execution::seq, first, last, std::forward<F>(f),
                 std::false_type());
         }
-    } generate;
+    } generate{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::generate_n
@@ -408,6 +408,6 @@ namespace hpx {
                 hpx::parallel::execution::seq, std::true_type(), first,
                 std::size_t(count), std::forward<F>(f));
         }
-    } generate_n;
+    } generate_n{};
 }    // namespace hpx
 #endif    // DOXYGEN

@@ -1188,7 +1188,7 @@ namespace hpx {
                 hpx::parallel::util::projection_identity(), std::false_type());
         }
 
-    } find;
+    } find{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::find_if
@@ -1234,7 +1234,7 @@ namespace hpx {
                 hpx::parallel::util::projection_identity(), std::false_type());
         }
 
-    } find_if;
+    } find_if{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::find_if_not
@@ -1281,7 +1281,7 @@ namespace hpx {
                 hpx::parallel::util::projection_identity(), std::false_type());
         }
 
-    } find_if_not;
+    } find_if_not{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::find_end
@@ -1400,7 +1400,7 @@ namespace hpx {
                 hpx::parallel::util::projection_identity(),
                 hpx::parallel::util::projection_identity());
         }
-    } find_end;
+    } find_end{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::find_first_of
@@ -1518,7 +1518,7 @@ namespace hpx {
                 hpx::parallel::util::projection_identity(),
                 hpx::parallel::util::projection_identity());
         }
-    } find_first_of;
+    } find_first_of{};
 }    // namespace hpx
 
 #endif    // DOXYGEN
