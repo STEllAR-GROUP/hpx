@@ -63,12 +63,16 @@ namespace hpx { namespace parallel { namespace execution {
         // --------------------------------------------------------------------
         // this is the default wrapper struct that invokes count up / down
         // and uses the limiting executor counter to control throttling
+        //
+        // Note that we have to add a dummy template parameter B (same as BaseName)
+        // to inner struct, to allow template deduction to SFINAE properly
+        // and not give us an incomplete type on the 'in flight' specialization
         // --------------------------------------------------------------------
-        template <typename F, typename Enable = void>
+        template <typename F, typename B = BaseExecutor, typename Enable = void>
         struct throttling_wrapper
         {
             throttling_wrapper(
-                limiting_executor const& lim, BaseExecutor const& base, F&& f)
+                limiting_executor& lim, BaseExecutor const& base, F&& f)
               : limiting_(lim)
               , f_(std::forward<F>(f))
             {
@@ -101,17 +105,21 @@ namespace hpx { namespace parallel { namespace execution {
                 return (limiting_.count_ > limiting_.lower_threshold_);
             }
 
-            limiting_executor const& limiting_;
+            limiting_executor& limiting_;
             F f_;
         };
 
         // this is a specialized wrapper struct that skips count up / down
         // and uses the underlying executor to get a count of tasks
-        // 'in flight' for the throttling
-        template <typename F>
-        struct throttling_wrapper<F,
+        // 'in flight' for the throttling.
+        // The dummy B template param must match BaseExecutor and helps
+        // deduction rules complete this type so that the default implementaiton
+        // (above) still works
+        template <typename F, typename B>
+        struct throttling_wrapper<F, B,
             typename std::enable_if<
-                detail::has_in_flight_estimate<BaseExecutor>::value>::type>
+                detail::has_in_flight_estimate<BaseExecutor>::value &&
+                std::is_same<B, BaseExecutor>::value>::type>
         {
             throttling_wrapper(
                 limiting_executor const& lim, BaseExecutor const& base, F&& f)
