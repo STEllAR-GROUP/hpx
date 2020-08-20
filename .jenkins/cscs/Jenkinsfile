@@ -40,7 +40,7 @@ pipeline {
                 axes {
                     axis {
                         name 'configuration_name'
-                        values 'gcc-newest', 'gcc-oldest', 'gcc-cuda', 'clang-newest', 'clang-oldest', 'clang-cuda', 'clang-apex', 'icc'
+                        values 'gcc-newest', 'gcc-oldest', 'gcc-cuda', 'clang-newest', 'clang-oldest', 'clang-cuda', 'clang-apex', 'clang-sanitizers', 'icc'
                     }
                 }
                 stages {
