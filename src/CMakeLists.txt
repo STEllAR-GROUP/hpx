@@ -545,12 +545,7 @@ target_link_libraries(hpx INTERFACE hpx_core)
 # pkgconfig file generation.
 add_library(hpx_interface INTERFACE)
 target_link_libraries(
-  hpx_interface
-  INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_init>>
-)
-target_link_libraries(
-  hpx_interface
-  INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPXInternal::hpx_init>>
+  hpx_interface INTERFACE $<${_is_executable}:HPXInternal::hpx_init>
 )
 target_compile_definitions(
   hpx_interface
@@ -570,12 +565,7 @@ target_compile_definitions(
 
 add_library(hpx_interface_wrap_main INTERFACE)
 target_link_libraries(
-  hpx_interface_wrap_main
-  INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_wrap>>
-)
-target_link_libraries(
-  hpx_interface_wrap_main
-  INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPXInternal::hpx_wrap>>
+  hpx_interface_wrap_main INTERFACE $<${_is_executable}:HPXInternal::hpx_wrap>
 )
 
 target_link_libraries(wrap_main INTERFACE hpx_interface_wrap_main)
