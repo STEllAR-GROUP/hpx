@@ -10,8 +10,8 @@
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
-namespace hpx {
+namespace hpx { namespace chrono {
     using hpx::util::high_resolution_clock;
     using hpx::util::high_resolution_timer;
     using hpx::util::steady_time_point;
-}    // namespace hpx
+}}    // namespace hpx::chrono
