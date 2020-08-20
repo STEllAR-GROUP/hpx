@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions/action_support.hpp>
+#include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
 namespace hpx { namespace detail {

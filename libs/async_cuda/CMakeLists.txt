@@ -38,8 +38,8 @@ set(async_cuda_compat_headers hpx/compute/cuda/get_targets.hpp
 set(async_cuda_sources cuda_future.cpp cuda_target.cpp get_targets.cpp)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(async_cuda_extra_module_dependencies hpx_async_distributed
-                                           hpx_performance_counters
+  set(async_cuda_extra_module_dependencies
+      hpx_actions_base hpx_async_distributed hpx_performance_counters
   )
 endif()
 
@@ -53,7 +53,6 @@ add_hpx_module(
   HEADERS ${async_cuda_headers}
   COMPAT_HEADERS ${async_cuda_compat_headers}
   DEPENDENCIES
-    hpx_actions_base
     hpx_affinity
     hpx_allocator_support
     hpx_async_local

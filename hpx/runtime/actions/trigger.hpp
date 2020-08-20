@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions_base/continuation_fwd.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/runtime/actions/continuation_fwd.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <exception>

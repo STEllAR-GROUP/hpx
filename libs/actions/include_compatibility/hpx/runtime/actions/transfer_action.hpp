@@ -7,16 +7,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions_base/config/defines.hpp>
-#include <hpx/actions_base/actions_base_support.hpp>
+#include <hpx/actions/config/defines.hpp>
+#include <hpx/actions/transfer_action.hpp>
 
 #if HPX_ACTIONS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
-    "The header hpx/runtime/actions/action_support.hpp is deprecated, \
-    please include hpx/actions_base/actions_base_support.hpp instead")
+    "The header hpx/runtime/actions/transfer_action.hpp is deprecated, \
+    please include hpx/actions/transfer_action.hpp instead")
 #else
-#warning "The header hpx/runtime/actions/action_support.hpp is deprecated, \
-    please include hpx/actions_base/actions_base_support.hpp instead"
+#warning "The header hpx/runtime/actions/transfer_action.hpp is deprecated, \
+    please include hpx/actions/transfer_action.hpp instead"
 #endif
 #endif

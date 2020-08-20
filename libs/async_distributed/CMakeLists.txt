@@ -92,7 +92,6 @@ add_hpx_module(
   COMPAT_HEADERS ${async_compat_headers}
   DEPENDENCIES
     hpx_actions_base
-    hpx_actions
     hpx_allocator_support
     hpx_assertion
     hpx_config

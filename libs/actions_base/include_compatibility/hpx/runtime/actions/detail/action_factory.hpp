@@ -8,15 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/config/defines.hpp>
-#include <hpx/actions_base/actions_base_support.hpp>
+#include <hpx/actions_base/detail/action_factory.hpp>
 
 #if HPX_ACTIONS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
-    "The header hpx/runtime/actions/action_support.hpp is deprecated, \
-    please include hpx/actions_base/actions_base_support.hpp instead")
+    "The header hpx/runtime/actions/detail/action_factory.hpp is deprecated, \
+    please include hpx/actions_base/detail/action_factory.hpp instead")
 #else
-#warning "The header hpx/runtime/actions/action_support.hpp is deprecated, \
-    please include hpx/actions_base/actions_base_support.hpp instead"
+#warning                                                                       \
+    "The header hpx/runtime/actions/detail/action_factory.hpp is deprecated, \
+    please include hpx/actions_base/detail/action_factory.hpp instead"
 #endif
 #endif

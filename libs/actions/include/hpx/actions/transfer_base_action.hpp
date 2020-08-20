@@ -13,9 +13,10 @@
 #include <hpx/config/defines.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/actions/action_support.hpp>
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/actions/base_action.hpp>
+#include <hpx/actions/register_action.hpp>
+#include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/action_stacksize.hpp>
 #include <hpx/assert.hpp>

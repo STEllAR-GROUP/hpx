@@ -12,12 +12,12 @@
 
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/actions/base_action.hpp>
+#include <hpx/actions/transfer_action.hpp>
+#include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
-#include <hpx/runtime/actions/transfer_action.hpp>
-#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>

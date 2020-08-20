@@ -17,13 +17,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/base_action.hpp>
+#include <hpx/actions/transfer_action.hpp>
+#include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime/actions/transfer_action.hpp>
-#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>

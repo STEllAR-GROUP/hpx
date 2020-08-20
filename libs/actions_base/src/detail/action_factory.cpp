@@ -7,8 +7,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/actions_base/detail/action_factory.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/runtime/actions/detail/action_factory.hpp>
 #include <hpx/modules/errors.hpp>
 
 #include <cstddef>
@@ -18,13 +18,15 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace actions { namespace detail
-{
+namespace hpx { namespace actions { namespace detail {
+
     action_registry::action_registry()
       : max_id_(0)
-    {}
+    {
+    }
 
-    void action_registry::register_factory(std::string const& type_name, ctor_t ctor)
+    void action_registry::register_factory(
+        std::string const& type_name, ctor_t ctor)
     {
         HPX_ASSERT(ctor != nullptr);
 
@@ -33,7 +35,9 @@ namespace hpx { namespace actions { namespace detail
         // populate cache
         typename_to_id_t::const_iterator it = typename_to_id_.find(type_name);
         if (it != typename_to_id_.end())
+        {
             cache_id(it->second, ctor);
+        }
     }
 
     void action_registry::register_typename(
@@ -49,16 +53,21 @@ namespace hpx { namespace actions { namespace detail
             HPX_THROW_EXCEPTION(invalid_status,
                 "action_registry::register_typename",
                 "failed to insert " + type_name +
-                " into typename to id registry.");
+                    " into typename to id registry.");
         }
 
         // populate cache
         typename_to_ctor_t::const_iterator it =
             typename_to_ctor_.find(type_name);
         if (it != typename_to_ctor_.end())
+        {
             cache_id(id, it->second);
+        }
 
-        if (id > max_id_) max_id_ = id;
+        if (id > max_id_)
+        {
+            max_id_ = id;
+        }
     }
 
     // This makes sure that the registries are consistent.
@@ -66,11 +75,13 @@ namespace hpx { namespace actions { namespace detail
     {
         // Register all type-names and ssign missing ids
         for (std::string const& str : get_unassigned_typenames())
+        {
             register_typename(str, ++max_id_);
+        }
 
         // Go over all registered mappings from type-names to ids and
         // fill in missing id to constructor mappings.
-        for (auto const& d: typename_to_id_)
+        for (auto const& d : typename_to_id_)
         {
             typename_to_ctor_t::const_iterator it =
                 typename_to_ctor_.find(d.first);
@@ -80,21 +91,22 @@ namespace hpx { namespace actions { namespace detail
 
         // Go over all registered mappings from type-names to ctors and
         // fill in missing id to constructor mappings.
-        for (auto const& d: typename_to_ctor_)
+        for (auto const& d : typename_to_ctor_)
         {
-            typename_to_id_t::const_iterator it =
-                typename_to_id_.find(d.first);
+            typename_to_id_t::const_iterator it = typename_to_id_.find(d.first);
             HPX_ASSERT(it != typename_to_id_.end());
             cache_id(it->second, d.second);
         }
     }
 
-    std::uint32_t action_registry::try_get_id(std::string const& type_name) const
+    std::uint32_t action_registry::try_get_id(
+        std::string const& type_name) const
     {
-        typename_to_id_t::const_iterator it =
-            typename_to_id_.find(type_name);
+        typename_to_id_t::const_iterator it = typename_to_id_.find(type_name);
         if (it == typename_to_id_.end())
+        {
             return invalid_id;
+        }
 
         return it->second;
     }
@@ -105,9 +117,13 @@ namespace hpx { namespace actions { namespace detail
 
         std::vector<std::string> result;
 
-        for (const value_type& v: typename_to_ctor_)
+        for (const value_type& v : typename_to_ctor_)
+        {
             if (!typename_to_id_.count(v.first))
+            {
                 result.push_back(v.first);
+            }
+        }
 
         return result;
     }
@@ -118,10 +134,9 @@ namespace hpx { namespace actions { namespace detail
 
         if (id == invalid_id)
         {
-            HPX_THROW_EXCEPTION(serialization_error,
-                "action_registry::get_id",
+            HPX_THROW_EXCEPTION(serialization_error, "action_registry::get_id",
                 "Unknown typename: " + type_name + "\n" +
-                instance().collect_registered_typenames());
+                    instance().collect_registered_typenames());
         }
 
         return id;
@@ -142,13 +157,13 @@ namespace hpx { namespace actions { namespace detail
             }
             msg += this_.collect_registered_typenames();
 #endif
-            HPX_THROW_EXCEPTION(serialization_error,
-                "action_registry::create", msg);
+            HPX_THROW_EXCEPTION(
+                serialization_error, "action_registry::create", msg);
             return nullptr;
         }
 
         ctor_t ctor = this_.cache_[id];
-        if (ctor == nullptr)   // -V108
+        if (ctor == nullptr)    // -V108
         {
             std::string msg("Unknown type descriptor " + std::to_string(id));
 #if defined(HPX_DEBUG)
@@ -158,8 +173,8 @@ namespace hpx { namespace actions { namespace detail
             }
             msg += this_.collect_registered_typenames();
 #endif
-            HPX_THROW_EXCEPTION(serialization_error,
-                "action_registry::create", msg);
+            HPX_THROW_EXCEPTION(
+                serialization_error, "action_registry::create", msg);
             return nullptr;
         }
         return ctor(with_continuation);
@@ -171,7 +186,8 @@ namespace hpx { namespace actions { namespace detail
         return this_;
     }
 
-    void action_registry::cache_id(std::uint32_t id, action_registry::ctor_t ctor)
+    void action_registry::cache_id(
+        std::uint32_t id, action_registry::ctor_t ctor)
     {
         std::size_t id_ = std::size_t(id);
         if (id_ >= cache_.size())
@@ -215,6 +231,6 @@ namespace hpx { namespace actions { namespace detail
         using hpx::actions::detail::action_registry;
         return action_registry::get_id(action_name);
     }
-}}}
+}}}    // namespace hpx::actions::detail
 
 #endif

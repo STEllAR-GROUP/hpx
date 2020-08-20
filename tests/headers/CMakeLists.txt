@@ -9,9 +9,7 @@ set(exclude_from_all_headers)
 
 # These files are either known to expose incomplete types or are known to
 # require special handling to avoid circular #include dependencies.
-set(exclude_from_headers
-    "${PROJECT_SOURCE_DIR}/hpx/lcos/local/futures_factory.hpp"
-)
+set(exclude_from_headers)
 
 if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
   set(test_deps Mpi::mpi)

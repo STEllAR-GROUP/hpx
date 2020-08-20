@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -13,14 +13,14 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/actions/action_support.hpp>
 #include <hpx/actions/transfer_base_action.hpp>
+#include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/async_distributed/applier/apply_helper.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/traits/needs_automatic_registration.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/type_support/pack.hpp>
@@ -31,8 +31,8 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace actions
-{
+namespace hpx { namespace actions {
+
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
@@ -51,13 +51,13 @@ namespace hpx { namespace actions
         transfer_continuation_action() = default;
 
         // construct an action from its arguments
-        template <typename ...Ts>
-        explicit transfer_continuation_action(continuation_type&& cont, Ts&&... vs);
+        template <typename... Ts>
+        explicit transfer_continuation_action(
+            continuation_type&& cont, Ts&&... vs);
 
-        template <typename ...Ts>
-        transfer_continuation_action(
-            threads::thread_priority priority, continuation_type&& cont,
-            Ts&&... vs);
+        template <typename... Ts>
+        transfer_continuation_action(threads::thread_priority priority,
+            continuation_type&& cont, Ts&&... vs);
 
         bool has_continuation() const override;
 
@@ -74,15 +74,14 @@ namespace hpx { namespace actions
         /// \note This \a get_thread_function will be invoked to retrieve the
         ///       thread function for an action which has to be invoked without
         ///       continuations.
-        template <std::size_t ...Is>
-        threads::thread_function_type
-        get_thread_function(util::index_pack<Is...>,
-            naming::id_type&& target, naming::address::address_type lva,
+        template <std::size_t... Is>
+        threads::thread_function_type get_thread_function(
+            util::index_pack<Is...>, naming::id_type&& target,
+            naming::address::address_type lva,
             naming::address::component_type comptype);
 
-        threads::thread_function_type
-        get_thread_function(naming::id_type&& target,
-            naming::address::address_type lva,
+        threads::thread_function_type get_thread_function(
+            naming::id_type&& target, naming::address::address_type lva,
             naming::address::component_type comptype) override;
 
         template <std::size_t... Is>
@@ -99,10 +98,10 @@ namespace hpx { namespace actions
 
         // serialization support
         // loading ...
-        void load(hpx::serialization::input_archive & ar) override;
+        void load(hpx::serialization::input_archive& ar) override;
 
         // saving ...
-        void save(hpx::serialization::output_archive & ar) override;
+        void save(hpx::serialization::output_archive& ar) override;
 
         void load_schedule(serialization::input_archive& ar,
             naming::gid_type&& target, naming::address_type lva,
@@ -115,20 +114,22 @@ namespace hpx { namespace actions
     /// \endcond
 
     template <typename Action>
-    template <typename ...Ts>
+    template <typename... Ts>
     transfer_continuation_action<Action>::transfer_continuation_action(
         continuation_type&& cont, Ts&&... vs)
       : base_type(std::forward<Ts>(vs)...)
       , cont_(std::move(cont))
-    {}
+    {
+    }
 
     template <typename Action>
-    template <typename ...Ts>
+    template <typename... Ts>
     transfer_continuation_action<Action>::transfer_continuation_action(
         threads::thread_priority priority, continuation_type&& cont, Ts&&... vs)
       : base_type(priority, std::forward<Ts>(vs)...)
       , cont_(std::move(cont))
-    {}
+    {
+    }
 
     template <typename Action>
     bool transfer_continuation_action<Action>::has_continuation() const
@@ -137,11 +138,11 @@ namespace hpx { namespace actions
     }
 
     template <typename Action>
-    template <std::size_t ...Is>
+    template <std::size_t... Is>
     threads::thread_function_type
     transfer_continuation_action<Action>::get_thread_function(
-        util::index_pack<Is...>,
-        naming::id_type&& target, naming::address::address_type lva,
+        util::index_pack<Is...>, naming::id_type&& target,
+        naming::address::address_type lva,
         naming::address::component_type comptype)
     {
         return base_type::derived_type::construct_thread_function(
@@ -161,11 +162,9 @@ namespace hpx { namespace actions
     }
 
     template <typename Action>
-    template <std::size_t ...Is>
-    void
-    transfer_continuation_action<Action>::schedule_thread(
-        util::index_pack<Is...>,
-        naming::gid_type const& target_gid,
+    template <std::size_t... Is>
+    void transfer_continuation_action<Action>::schedule_thread(
+        util::index_pack<Is...>, naming::gid_type const& target_gid,
         naming::address::address_type lva,
         naming::address::component_type comptype, std::size_t /*num_thread*/)
     {
@@ -194,12 +193,10 @@ namespace hpx { namespace actions
 
     template <typename Action>
     void transfer_continuation_action<Action>::schedule_thread(
-        naming::gid_type const& target_gid,
-        naming::address::address_type lva,
+        naming::gid_type const& target_gid, naming::address::address_type lva,
         naming::address::component_type comptype, std::size_t num_thread)
     {
-        schedule_thread(
-            typename util::make_index_pack<Action::arity>::type(),
+        schedule_thread(typename util::make_index_pack<Action::arity>::type(),
             target_gid, lva, comptype, num_thread);
 
         // keep track of number of invocations
@@ -208,7 +205,7 @@ namespace hpx { namespace actions
 
     template <typename Action>
     void transfer_continuation_action<Action>::load(
-        hpx::serialization::input_archive & ar)
+        hpx::serialization::input_archive& ar)
     {
         this->load_base(ar);
         ar >> cont_;
@@ -216,7 +213,7 @@ namespace hpx { namespace actions
 
     template <typename Action>
     void transfer_continuation_action<Action>::save(
-        hpx::serialization::output_archive & ar)
+        hpx::serialization::output_archive& ar)
     {
         this->save_base(ar);
         ar << cont_;
@@ -224,10 +221,9 @@ namespace hpx { namespace actions
 
     template <typename Action>
     void transfer_continuation_action<Action>::load_schedule(
-        serialization::input_archive& ar,
-        naming::gid_type&& target, naming::address_type lva,
-        naming::component_type comptype, std::size_t num_thread,
-        bool& deferred_schedule)
+        serialization::input_archive& ar, naming::gid_type&& target,
+        naming::address_type lva, naming::component_type comptype,
+        std::size_t num_thread, bool& deferred_schedule)
     {
         // First, serialize, then schedule
         load(ar);
@@ -236,9 +232,12 @@ namespace hpx { namespace actions
         {
             // If this is a direct action and deferred schedule was requested,
             // that is we are not the last parcel, return immediately
-            if (base_type::direct_execution::value) {
+            if (base_type::direct_execution::value)
+            {
                 return;
-            } else {
+            }
+            else
+            {
                 // If this is not a direct action, we can safely set deferred_schedule
                 // to false
                 deferred_schedule = false;
@@ -247,18 +246,18 @@ namespace hpx { namespace actions
 
         schedule_thread(std::move(target), lva, comptype, num_thread);
     }
-}}
+}}    // namespace hpx::actions
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     /// \cond NOINTERNAL
     template <typename Action>
     struct needs_automatic_registration<
-        hpx::actions::transfer_continuation_action<Action> >
+        hpx::actions::transfer_continuation_action<Action>>
       : needs_automatic_registration<Action>
-    {};
+    {
+    };
     /// \endcond
-}}
+}}    // namespace hpx::traits
 
 #include <hpx/config/warnings_suffix.hpp>
 

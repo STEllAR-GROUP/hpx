@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -6,14 +6,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file hpx/runtime/actions/preassigned_action_id.hpp
+/// \file hpx/actions_base/preassigned_action_id.hpp
 
 #pragma once
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace actions
-{
+namespace hpx { namespace actions {
+
     /// \cond NOINTERNAL
 
     enum preassigned_action_id
@@ -186,5 +186,4 @@ namespace hpx { namespace actions
     };
 
     /// \endcond
-}}
-
+}}    // namespace hpx::actions

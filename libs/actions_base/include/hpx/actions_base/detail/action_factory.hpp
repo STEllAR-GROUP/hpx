@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/actions/action_support.hpp>
-#include <hpx/actions/actions_fwd.hpp>
+#include <hpx/actions_base/actions_base_fwd.hpp>
+#include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 
 #include <cstdint>
@@ -57,47 +57,6 @@ namespace hpx { namespace actions { namespace detail {
         cache_t cache_;
     };
 
-    template <typename Action>
-    struct register_action
-    {
-    public:
-        HPX_NON_COPYABLE(register_action);
-
-    public:
-        register_action();
-
-        static base_action* create(bool);
-
-        register_action& instantiate();
-
-        static register_action instance;
-    };
-
-    template <typename Action>
-    register_action<Action> register_action<Action>::instance;
-
-    template <typename Action>
-    register_action<Action>::register_action()
-    {
-        action_registry::instance().register_factory(
-            hpx::actions::detail::get_action_name<Action>(), &create);
-    }
-
-    template <typename Action>
-    base_action* register_action<Action>::create(bool has_continuation)
-    {
-        if (has_continuation)
-            return new transfer_continuation_action<Action>{};
-
-        return new transfer_action<Action>{};
-    }
-
-    template <typename Action>
-    register_action<Action>& register_action<Action>::instantiate()
-    {
-        return *this;
-    }
-
     template <std::uint32_t Id>
     HPX_ALWAYS_EXPORT std::string get_action_name_id();
 
@@ -125,14 +84,16 @@ namespace hpx { namespace actions { namespace detail {
 
 #define HPX_REGISTER_ACTION_FACTORY_ID(Name, Id)                               \
     namespace hpx { namespace actions { namespace detail {                     \
-        template <>                                                            \
-        HPX_ALWAYS_EXPORT std::string get_action_name_id<Id>()                 \
-        {                                                                      \
-            return HPX_PP_STRINGIZE(Name);                                     \
+                template <>                                                    \
+                HPX_ALWAYS_EXPORT std::string get_action_name_id<Id>()         \
+                {                                                              \
+                    return HPX_PP_STRINGIZE(Name);                             \
+                }                                                              \
+                template add_constant_entry<Id>                                \
+                    add_constant_entry<Id>::instance;                          \
+            }                                                                  \
         }                                                                      \
-        template add_constant_entry<Id>                                        \
-            add_constant_entry<Id>::instance;                                  \
-    }}}                                                                        \
+    }                                                                          \
     /**/
 
 #else
