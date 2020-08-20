@@ -15,6 +15,7 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
@@ -141,7 +142,7 @@ namespace hpx { namespace parallel { namespace util {
             // handle sequences of non-futures
             template <typename Iter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
-                Iter it, std::size_t num, F&& f)
+                Iter it, std::size_t num, F&& f, std::false_type)
             {
                 std::size_t count(num & std::size_t(-4));    // -V112
                 for (std::size_t i = 0; i < count;
@@ -159,9 +160,48 @@ namespace hpx { namespace parallel { namespace util {
                 return it;
             }
 
-            template <typename Iter, typename CancelToken, typename F>
+            template <typename Iter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
-                Iter it, std::size_t num, CancelToken& tok, F&& f)
+                Iter it, std::size_t num, F&& f, std::true_type)
+            {
+                while (num >= 4)
+                {
+                    f(it);
+                    f(it + 1);
+                    f(it + 2);
+                    f(it + 3);
+
+                    it += 4;
+                    num -= 4;
+                }
+
+                switch (num)
+                {
+                case 3:
+                    f(it);
+                    f(it + 1);
+                    f(it + 2);
+                    break;
+
+                case 2:
+                    f(it);
+                    f(it + 1);
+                    break;
+
+                case 1:
+                    f(it);
+                    break;
+
+                default:
+                    break;
+                }
+
+                return it + num;
+            }
+
+            template <typename Iter, typename CancelToken, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(Iter it,
+                std::size_t num, CancelToken& tok, F&& f, std::false_type)
             {
                 std::size_t count(num & std::size_t(-4));    // -V112
                 for (std::size_t i = 0; i < count;
@@ -181,6 +221,48 @@ namespace hpx { namespace parallel { namespace util {
                     f(it);
                 }
                 return it;
+            }
+
+            template <typename Iter, typename CancelToken, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(Iter it,
+                std::size_t num, CancelToken& tok, F&& f, std::true_type)
+            {
+                while (num >= 4)
+                {
+                    if (tok.was_cancelled())
+                        return it;
+
+                    f(it);
+                    f(it + 1);
+                    f(it + 2);
+                    f(it + 3);
+
+                    it += 4;
+                    num -= 4;
+                }
+
+                switch (num)
+                {
+                case 3:
+                    f(it);
+                    f(it + 1);
+                    f(it + 2);
+                    break;
+
+                case 2:
+                    f(it);
+                    f(it + 1);
+                    break;
+
+                case 1:
+                    f(it);
+                    break;
+
+                default:
+                    break;
+                }
+
+                return it + num;
             }
         };
 
@@ -219,7 +301,12 @@ namespace hpx { namespace parallel { namespace util {
         !execution::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
     loop_n(Iter it, std::size_t count, F&& f)
     {
-        return detail::loop_n<Iter>::call(it, count, std::forward<F>(f));
+        using pred = std::integral_constant<bool,
+            hpx::traits::is_random_access_iterator<Iter>::value ||
+                std::is_integral<Iter>::value>;
+
+        return detail::loop_n<Iter>::call(
+            it, count, std::forward<F>(f), pred());
     }
 
     template <typename ExPolicy, typename Iter, typename CancelToken,
@@ -228,7 +315,12 @@ namespace hpx { namespace parallel { namespace util {
         !execution::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
     loop_n(Iter it, std::size_t count, CancelToken& tok, F&& f)
     {
-        return detail::loop_n<Iter>::call(it, count, tok, std::forward<F>(f));
+        using pred = std::integral_constant<bool,
+            hpx::traits::is_random_access_iterator<Iter>::value ||
+                std::is_integral<Iter>::value>;
+
+        return detail::loop_n<Iter>::call(
+            it, count, tok, std::forward<F>(f), pred());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -480,10 +572,20 @@ namespace hpx { namespace parallel { namespace util {
             ///////////////////////////////////////////////////////////////////
             // handle sequences of non-futures
             template <typename Iter, typename F>
-            static constexpr Iter call(
-                std::size_t base_idx, Iter it, std::size_t count, F&& f)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
+                std::size_t base_idx, Iter it, std::size_t num, F&& f)
             {
-                for (/**/; count != 0; (void) --count, ++it, ++base_idx)
+                std::size_t count(num & std::size_t(-4));    // -V112
+
+                for (std::size_t i = 0; i < count;
+                     (void) ++it, i += 4)    // -V112
+                {
+                    f(*it, base_idx++);
+                    f(*++it, base_idx++);
+                    f(*++it, base_idx++);
+                    f(*++it, base_idx++);
+                }
+                for (/**/; count < num; (void) ++count, ++it, ++base_idx)
                 {
                     f(*it, base_idx);
                 }
@@ -491,8 +593,9 @@ namespace hpx { namespace parallel { namespace util {
             }
 
             template <typename Iter, typename CancelToken, typename F>
-            static constexpr Iter call(std::size_t base_idx, Iter it,
-                std::size_t count, CancelToken& tok, F&& f)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
+                std::size_t base_idx, Iter it, std::size_t count,
+                CancelToken& tok, F&& f)
             {
                 for (/**/; count != 0; (void) --count, ++it, ++base_idx)
                 {
@@ -503,6 +606,94 @@ namespace hpx { namespace parallel { namespace util {
                     f(*it, base_idx);
                 }
                 return it;
+            }
+        };
+
+        template <>
+        struct loop_idx_n<std::random_access_iterator_tag>
+        {
+            ///////////////////////////////////////////////////////////////////
+            // handle sequences of non-futures
+            template <typename Iter, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
+                std::size_t base_idx, Iter it, std::size_t num, F&& f)
+            {
+                while (num >= 4)
+                {
+                    f(it[0], base_idx++);
+                    f(it[1], base_idx++);
+                    f(it[2], base_idx++);
+                    f(it[3], base_idx++);
+
+                    it += 4;
+                    num -= 4;
+                }
+
+                switch (num)
+                {
+                case 3:
+                    f(it[0], base_idx++);
+                    f(it[1], base_idx++);
+                    f(it[2], base_idx);
+                    break;
+
+                case 2:
+                    f(it[0], base_idx++);
+                    f(it[1], base_idx);
+                    break;
+
+                case 1:
+                    f(it[0], base_idx);
+                    break;
+
+                default:
+                    break;
+                }
+
+                return it + num;
+            }
+
+            template <typename Iter, typename CancelToken, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
+                std::size_t base_idx, Iter it, std::size_t num,
+                CancelToken& tok, F&& f)
+            {
+                while (num >= 4)
+                {
+                    if (tok.was_cancelled(base_idx))
+                        return it;
+
+                    f(it[0], base_idx++);
+                    f(it[1], base_idx++);
+                    f(it[2], base_idx++);
+                    f(it[3], base_idx++);
+
+                    it += 4;
+                    num -= 4;
+                }
+
+                switch (num)
+                {
+                case 3:
+                    f(it[0], base_idx++);
+                    f(it[1], base_idx++);
+                    f(it[2], base_idx);
+                    break;
+
+                case 2:
+                    f(it[0], base_idx++);
+                    f(it[1], base_idx);
+                    break;
+
+                case 1:
+                    f(it[0], base_idx);
+                    break;
+
+                default:
+                    break;
+                }
+
+                return it + num;
             }
         };
     }    // namespace detail
