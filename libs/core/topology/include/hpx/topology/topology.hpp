@@ -14,7 +14,6 @@
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/topology/cpu_mask.hpp>
-#include <hpx/type_support/static.hpp>
 
 #include <cstddef>
 #include <iosfwd>
@@ -28,6 +27,8 @@
 #if defined(HPX_NATIVE_MIC) && HWLOC_API_VERSION < 0x00010600
 #error On Intel Xeon/Phi coprocessors HPX cannot be use with a HWLOC version earlier than V1.6.
 #endif
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace threads {
 
@@ -405,18 +406,8 @@ namespace hpx { namespace threads {
         std::vector<mask_type> thread_affinity_masks_;
     };
 
-#include <hpx/config/warnings_suffix.hpp>
-
     ///////////////////////////////////////////////////////////////////////////
-    struct topology_tag
-    {
-    };
-
-    inline topology& create_topology()
-    {
-        util::static_<topology, topology_tag> topo;
-        return topo.get();
-    }
+    HPX_EXPORT topology& create_topology();
 
     HPX_NODISCARD HPX_CORE_EXPORT unsigned int hardware_concurrency();
 
@@ -428,3 +419,5 @@ namespace hpx { namespace threads {
         return hpx::threads::topology::memory_page_size_;
     }
 }}    // namespace hpx::threads
+
+#include <hpx/config/warnings_suffix.hpp>
