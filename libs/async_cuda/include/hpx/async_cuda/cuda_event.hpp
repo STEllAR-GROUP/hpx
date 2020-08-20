@@ -19,7 +19,6 @@ namespace hpx { namespace cuda { namespace experimental {
     // Since allocation of a cuda event passes into the cuda runtime
     // it might be an expensive operation, so we pre-allocate a pool
     // of them at startup.
-    // For now - Assume a maximum of 64 outstanding events is enough
     struct cuda_event_pool
     {
         static constexpr int initial_events_in_pool = 128;
@@ -31,7 +30,8 @@ namespace hpx { namespace cuda { namespace experimental {
         }
 
         // create a bunch of events on initialization
-        cuda_event_pool() : free_list_(initial_events_in_pool)
+        cuda_event_pool()
+          : free_list_(initial_events_in_pool)
         {
             for (int i = 0; i < initial_events_in_pool; ++i)
             {
@@ -44,9 +44,11 @@ namespace hpx { namespace cuda { namespace experimental {
         {
             cudaEvent_t event;
             bool ok = true;
-            while (ok) {
+            while (ok)
+            {
                 ok = free_list_.pop(event);
-                if (ok) check_cuda_error(cudaEventDestroy(event));
+                if (ok)
+                    check_cuda_error(cudaEventDestroy(event));
             }
         }
 
@@ -66,7 +68,6 @@ namespace hpx { namespace cuda { namespace experimental {
         }
 
     private:
-
         void add_event_to_pool()
         {
             cudaEvent_t event;
@@ -79,10 +80,8 @@ namespace hpx { namespace cuda { namespace experimental {
             free_list_.push(event);
         }
 
-        // using a fixed capacity stack means no allocations are
-        // needed , throws an exception if the capacity is exceeded
-        boost::lockfree::stack<cudaEvent_t,
-            boost::lockfree::fixed_sized<false>>
+        // pool is dynamically sized and can grow if needed
+        boost::lockfree::stack<cudaEvent_t, boost::lockfree::fixed_sized<false>>
             free_list_;
     };
 }}}    // namespace hpx::cuda::experimental
