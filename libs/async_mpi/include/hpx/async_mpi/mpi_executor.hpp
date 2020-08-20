@@ -13,6 +13,7 @@
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/modules/mpi_base.hpp>
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 
