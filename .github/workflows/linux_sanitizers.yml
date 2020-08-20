@@ -38,6 +38,7 @@ jobs:
     - name: Test
       shell: bash
       run: |
+          export ASAN_OPTIONS=fast_unwind_on_malloc=0
           cd build
           ctest \
             --output-on-failure \
