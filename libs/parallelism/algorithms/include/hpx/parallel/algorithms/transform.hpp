@@ -918,5 +918,52 @@ namespace hpx {
                     is_segmented()));
         }
 
+        // clang-format off
+        template <typename FwdIter1, typename FwdIter2, typename FwdIter3,
+            typename F, HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::traits::is_iterator<FwdIter3>::value
+            )>
+        // clang-format on
+        friend FwdIter3 tag_invoke(hpx::transform_t, FwdIter1 first1,
+            FwdIter1 last1, FwdIter2 first2, FwdIter3 dest, F&& f)
+        {
+            using proj_id = hpx::parallel::util::projection_identity;
+
+            return parallel::util::detail::get_third_element(
+                parallel::v1::detail::transform_(hpx::parallel::execution::seq,
+                    first1, last1, first2, dest, std::forward<F>(f),
+                    hpx::parallel::util::projection_identity(),
+                    hpx::parallel::util::projection_identity(),
+                    std::false_type{}));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter1,
+            typename FwdIter2, typename FwdIter3,
+            typename F, HPX_CONCEPT_REQUIRES_(
+                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::traits::is_iterator<FwdIter3>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter3>::type
+        tag_invoke(hpx::transform_t, ExPolicy&& policy, FwdIter1 first1,
+            FwdIter1 last1, FwdIter2 first2, FwdIter3 dest, F&& f)
+        {
+            typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
+            using proj_id = hpx::parallel::util::projection_identity;
+
+            return parallel::util::detail::get_third_element(
+                parallel::v1::detail::transform_(std::forward<ExPolicy>(policy),
+                    first1, last1, first2, dest, std::forward<F>(f),
+                    hpx::parallel::util::projection_identity(),
+                    hpx::parallel::util::projection_identity(),
+                    is_segmented()));
+        }
+
     } transform{};
 }    // namespace hpx

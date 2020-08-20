@@ -322,6 +322,21 @@ namespace hpx { namespace parallel { namespace util {
             return lcos::make_future<O>(std::move(f),
                 [](util::in_out_result<I, O>&& p) { return p.out; });
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename I1, typename I2, typename O>
+        O get_third_element(util::in_in_out_result<I1, I2, O>&& p)
+        {
+            return p.out;
+        }
+
+        template <typename I1, typename I2, typename O>
+        hpx::future<O> get_third_element(
+            hpx::future<util::in_in_out_result<I1, I2, O>>&& f)
+        {
+            return lcos::make_future<O>(std::move(f),
+                [](util::in_in_out_result<I1, I2, O>&& p) { return p.out; });
+        }
     }    // namespace detail
 }}}      // namespace hpx::parallel::util
 
