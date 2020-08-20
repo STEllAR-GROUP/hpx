@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2006 Joao Abecasis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,6 +12,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/static_reinit/static_reinit.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <memory>    // for placement new
 #include <mutex>
@@ -54,21 +55,33 @@ namespace hpx { namespace util {
     private:
         static void default_construct()
         {
-            for (std::size_t i = 0; i < N; ++i)
-                new (get_address(i)) value_type();
+            bool expected = false;
+            if (needs_destruction().compare_exchange_strong(expected, true))
+            {
+                for (std::size_t i = 0; i < N; ++i)
+                    new (get_address(i)) value_type();
+            }
         }
 
         template <typename U>
         static void value_construct(U const& v)
         {
-            for (std::size_t i = 0; i < N; ++i)
-                new (get_address(i)) value_type(v);
+            bool expected = false;
+            if (needs_destruction().compare_exchange_strong(expected, true))
+            {
+                for (std::size_t i = 0; i < N; ++i)
+                    new (get_address(i)) value_type(v);
+            }
         }
 
         static void destruct()
         {
-            for (std::size_t i = 0; i < N; ++i)
-                get_address(i)->~value_type();
+            bool expected = true;
+            if (needs_destruction().compare_exchange_strong(expected, false))
+            {
+                for (std::size_t i = 0; i < N; ++i)
+                    get_address(i)->~value_type();
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -96,9 +109,7 @@ namespace hpx { namespace util {
         reinitializable_static()
         {
 #if !defined(__CUDACC__)
-            // do not rely on ADL to find the proper call_once
-            std::call_once(
-                constructed_, &reinitializable_static::default_constructor);
+            reinitializable_static::default_constructor();
 #endif
         }
 
@@ -106,11 +117,7 @@ namespace hpx { namespace util {
         reinitializable_static(U const& val)
         {
 #if !defined(__CUDACC__)
-            // do not rely on ADL to find the proper call_once
-            std::call_once(constructed_,
-                util::bind_front(
-                    &reinitializable_static::template value_constructor<U>,
-                    const_cast<U const*>(std::addressof(val))));
+            reinitializable_static::value_constructor(std::addressof(val));
 #endif
         }
 
@@ -147,15 +154,17 @@ namespace hpx { namespace util {
             std::alignment_of<value_type>::value>::type storage_type;
 
         static storage_type data_[N];
-        static std::once_flag constructed_;
+
+        static std::atomic<bool>& needs_destruction()
+        {
+            static std::atomic<bool> needs_destruction(false);
+            return needs_destruction;
+        }
     };
 
     template <typename T, typename Tag, std::size_t N>
     typename reinitializable_static<T, Tag, N>::storage_type
         reinitializable_static<T, Tag, N>::data_[N];
-
-    template <typename T, typename Tag, std::size_t N>
-    std::once_flag reinitializable_static<T, Tag, N>::constructed_;
 }}    // namespace hpx::util
 
 #undef HPX_EXPORT_REINITIALIZABLE_STATIC

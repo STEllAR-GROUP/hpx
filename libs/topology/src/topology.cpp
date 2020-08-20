@@ -10,8 +10,10 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
+#include <hpx/type_support/static.hpp>
 #include <hpx/util/ios_flags_saver.hpp>
 
 #include <cstddef>
@@ -139,6 +141,18 @@ std::size_t hpx::threads::topology::memory_page_size_ =
     hpx::threads::detail::get_memory_page_size_impl();
 
 namespace hpx { namespace threads {
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct topology_tag
+    {
+    };
+
+    topology& create_topology()
+    {
+        util::reinitializable_static<topology, topology_tag> topo;
+        return topo.get();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     std::ostream& operator<<(
         std::ostream& os, hpx_hwloc_bitmap_wrapper const* bmp)
