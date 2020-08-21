@@ -40,11 +40,8 @@ namespace hpx { namespace util {
     //  In addition this type registers global construction and destruction
     //  functions used by the HPX runtime system to reinitialize the held data
     //  structures.
-    template <typename T, typename Tag = T, std::size_t N = 1>
-    struct HPX_EXPORT_REINITIALIZABLE_STATIC reinitializable_static;
 
-    //////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Tag, std::size_t N>
+    template <typename T, typename Tag = T>
     struct HPX_EXPORT_REINITIALIZABLE_STATIC reinitializable_static
     {
     public:
@@ -54,25 +51,27 @@ namespace hpx { namespace util {
         typedef T value_type;
 
     private:
-        static void default_construct()
+        static bool default_construct()
         {
             bool expected = false;
             if (needs_destruction().compare_exchange_strong(expected, true))
             {
-                for (std::size_t i = 0; i < N; ++i)
-                    new (get_address(i)) value_type();
+                new (get_address()) value_type();
+                return true;
             }
+            return false;
         }
 
         template <typename U>
-        static void value_construct(U const& v)
+        static bool value_construct(U const& v)
         {
             bool expected = false;
             if (needs_destruction().compare_exchange_strong(expected, true))
             {
-                for (std::size_t i = 0; i < N; ++i)
-                    new (get_address(i)) value_type(v);
+                new (get_address()) value_type(v);
+                return true;
             }
+            return false;
         }
 
         static void destruct()
@@ -80,27 +79,31 @@ namespace hpx { namespace util {
             bool expected = true;
             if (needs_destruction().compare_exchange_strong(expected, false))
             {
-                for (std::size_t i = 0; i < N; ++i)
-                    get_address(i)->~value_type();
+                get_address()->~value_type();
             }
         }
 
         ///////////////////////////////////////////////////////////////////////
         static void default_constructor()
         {
-            default_construct();
-            reinit_register(&reinitializable_static::default_construct,
-                &reinitializable_static::destruct);
+            if (default_construct())
+            {
+                reinit_register(&reinitializable_static::default_construct,
+                    &reinitializable_static::destruct);
+            }
         }
 
         template <typename U>
         static void value_constructor(U const* pv)
         {
-            value_construct(*pv);
-            reinit_register(
-                util::bind_front(
-                    &reinitializable_static::template value_construct<U>, *pv),
-                &reinitializable_static::destruct);
+            if (value_construct(*pv))
+            {
+                reinit_register(
+                    util::bind_front(
+                        &reinitializable_static::template value_construct<U>,
+                        *pv),
+                    &reinitializable_static::destruct);
+            }
         }
 
     public:
@@ -134,29 +137,28 @@ namespace hpx { namespace util {
             return this->get();
         }
 
-        reference get(std::size_t item = 0)
+        reference get()
         {
-            return *this->get_address(item);
+            return *this->get_address();
         }
 
-        const_reference get(std::size_t item = 0) const
+        const_reference get() const
         {
-            return *this->get_address(item);
+            return *this->get_address();
         }
 
     private:
         typedef typename std::add_pointer<value_type>::type pointer;
 
-        static pointer get_address(std::size_t item)
+        static pointer get_address()
         {
-            HPX_ASSERT(item < N);
-            return reinterpret_cast<pointer>(data_ + item);
+            return reinterpret_cast<pointer>(&data_);
         }
 
         typedef typename std::aligned_storage<sizeof(value_type),
             std::alignment_of<value_type>::value>::type storage_type;
 
-        static storage_type data_[N];
+        static storage_type data_;
 
         static std::atomic<bool>& needs_destruction()
         {
@@ -165,9 +167,10 @@ namespace hpx { namespace util {
         }
     };
 
-    template <typename T, typename Tag, std::size_t N>
-    typename reinitializable_static<T, Tag, N>::storage_type
-        reinitializable_static<T, Tag, N>::data_[N];
+    template <typename T, typename Tag>
+    typename reinitializable_static<T, Tag>::storage_type
+        reinitializable_static<T, Tag>::data_;
+
 }}    // namespace hpx::util
 
 #undef HPX_EXPORT_REINITIALIZABLE_STATIC
