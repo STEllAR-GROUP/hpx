@@ -958,6 +958,7 @@ if(HPX_WITH_APEX)
   )
 endif()
 
+# cmake-format: off
 # LibCDS option
 # NOTE: The libcds option is disabled for the 1.5.0 release as it is not ready
 # for public consumption yet.
@@ -981,6 +982,7 @@ endif()
 #   endif()
 #   hpx_add_config_define(HPX_HAVE_LIBCDS) # tell HPX that we use LibCDS
 # endif()
+# cmake-format: on
 
 hpx_option(
   HPX_WITH_PAPI BOOL "Enable the PAPI based performance counter." OFF
