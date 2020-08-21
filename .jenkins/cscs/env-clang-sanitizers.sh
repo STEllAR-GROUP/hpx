@@ -6,6 +6,8 @@
 
 source $SPACK_ROOT/share/spack/setup-env.sh
 
+src_dir="$(pwd)"
+
 export CRAYPE_LINK_TYPE=dynamic
 export APPS_ROOT="/apps/daint/SSL/HPX/packages"
 export CLANG_VER="10.0.0"
@@ -21,6 +23,7 @@ export CXX="${CLANG_ROOT}/bin/clang++"
 export CC="${CLANG_ROOT}/bin/clang"
 export CPP="${CLANG_ROOT}/bin/clang -E"
 export ASAN_OPTIONS=fast_unwind_on_malloc=0
+export LSAN_OPTIONS=suppressions=${src_dir}/tools/asan.supp
 export UBSAN_OPTIONS=print_stacktrace=1
 export PATH=$CLANG_ROOT/bin:$PATH
 
