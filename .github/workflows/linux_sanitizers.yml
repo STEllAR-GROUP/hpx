@@ -39,6 +39,7 @@ jobs:
       shell: bash
       run: |
           export ASAN_OPTIONS=fast_unwind_on_malloc=0
+          export UBSAN_OPTIONS=print_stacktrace=1
           cd build
           ctest \
             --output-on-failure \
