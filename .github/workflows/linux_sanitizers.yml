@@ -39,6 +39,7 @@ jobs:
       shell: bash
       run: |
           export ASAN_OPTIONS=fast_unwind_on_malloc=0
+          export LSAN_OPTIONS=suppressions=$PWD/tools/asan.supp
           export UBSAN_OPTIONS=print_stacktrace=1
           cd build
           ctest \
