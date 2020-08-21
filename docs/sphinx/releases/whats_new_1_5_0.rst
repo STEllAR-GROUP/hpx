@@ -33,13 +33,13 @@ and many bug fixes.
 * We have adapted existing sychronization primitives to be fully conformant
   C++20: ``hpx::barrier``, ``hpx::latch``, ``hpx::counting_semaphore``, and
   ``hpx::binary_semaphore``.
-* We have started using customization point objects (CPOs) to make the corresponding
-  algorithms fully conformant to C++20 as well as to make algorithm extension
-  easier for the user. ``all_of``/``any_of``/``none_of``, ``copy``, ``count``,
-  ``destroy``, ``equal``, ``fill``, ``mismatch``, ``move``, ``reduce`` are using
-  those CPOs (all in namespace ``hpx``).  We also have adapted their
-  corresponding ``hpx::ranges`` versions to be conforming to C++20 in this
-  release.
+* We have started using customization point objects (CPOs) to make the
+  corresponding algorithms fully conformant to C++20 as well as to make
+  algorithm extension easier for the user. ``all_of``/``any_of``/``none_of``,
+  ``copy``, ``count``, ``destroy``, ``equal``, ``fill``, ``find``, ``for_each``,
+  ``generate``, ``mismatch``, ``move``, ``reduce`` are using those CPOs (all in
+  namespace ``hpx``).  We also have adapted their corresponding ``hpx::ranges``
+  versions to be conforming to C++20 in this release.
 * We have adapted support for ``co_await`` to C++20, in addition to
   ``hpx::future`` it now also supports ``hpx::shared_future``. We have also
   added allocator support for futures returned by ``co_return``. It is no longer
@@ -154,6 +154,8 @@ Breaking changes
 Closed issues
 =============
 
+* :hpx-issue:`4900` - Adding JOSS status badge to README
+* :hpx-issue:`4897` - Compiler warning, deprecated header used by HPX itself
 * :hpx-issue:`4886` - A future bound to an action executing on a different locality doesn't capture exception state
 * :hpx-issue:`4877` - hpx_main might not able to start hpx runtime properly
 * :hpx-issue:`4850` - Issues creating templated component
@@ -237,6 +239,24 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`4920` - Disable libcds release
+* :hpx-pr:`4917` - Move chrono functionality to hpx::chrono namespace
+* :hpx-pr:`4914` - Add alias targets with namespaces used for exporting
+* :hpx-pr:`4912` - Aggregate initialize CPOs
+* :hpx-pr:`4910` - Explicitly specify hwloc root on Jenkins CSCS builds
+* :hpx-pr:`4908` - Fix algorithms documentation
+* :hpx-pr:`4907` - Remove HPX::hpx_no_wrap_main target
+* :hpx-pr:`4906` - Fixing unused variable warning
+* :hpx-pr:`4905` - Adding specializations for simple for_loops
+* :hpx-pr:`4904` - Update boost to 1.74.0 for the newest jenkins configs
+* :hpx-pr:`4903` - Hide GITHUB_TOKEN environment variables from environment variable output
+* :hpx-pr:`4902` - Cancel previous pull requests builds before starting a new one with Jenkins
+* :hpx-pr:`4901` - Update public API list with updated algorithms
+* :hpx-pr:`4899` - Suggested changes for HPX V1.5 release notes
+* :hpx-pr:`4898` - Minor tweak to hpx::equal implementation
+* :hpx-pr:`4896` - Making generate() and generate_n conforming to C++20
+* :hpx-pr:`4895` - Update apex tag
+* :hpx-pr:`4894` - Fix exception handling for tasks
 * :hpx-pr:`4893` - Remove last use of std::result_of, removed in C++20
 * :hpx-pr:`4887` - Making sure remotely thrown (non-hpx) exceptions are properly marshaled back to invocation site
 * :hpx-pr:`4884` - Adapting mismatch to C++20
