@@ -222,13 +222,15 @@ Header ``hpx/chrono.hpp``
 
 Corresponds to the C++ standard library header :cppreference-header:`chrono`.
 The following replacements and extensions are provided compared to
-:cppreference-header:`chrono`:
+:cppreference-header:`chrono`. The classes below are also available in the
+``hpx::chrono`` namespace, not in the top-level ``hpx`` namespace.
 
 Classes
 -------
 
 - :cpp:class:`hpx::util::high_resolution_clock`
 - :cpp:class:`hpx::util::high_resolution_timer`
+- :cpp:class:`hpx::util::steady_time_point`
 
 Header ``hpx/condition_variable.hpp``
 =====================================
@@ -444,7 +446,7 @@ Functions
 - :cpp:func:`hpx::resume`
 
 Header ``hpx/latch.hpp``
-==========================
+========================
 
 This header includes :ref:`public_api_header_hpx_local_latch` and
 ref:`public_api_header_hpx_distributed_latch`.
@@ -452,7 +454,7 @@ ref:`public_api_header_hpx_distributed_latch`.
 .. _public_api_header_hpx_local_latch:
 
 Header ``hpx/local/latch.hpp``
-================================
+==============================
 
 Corresponds to the C++ standard library header :cppreference-header:`latch`.
 
@@ -464,7 +466,7 @@ Classes
 .. _public_api_header_hpx_distributed_latch:
 
 Header ``hpx/distributed/latch.hpp``
-======================================
+====================================
 
 Contains a distributed latch implementation. This functionality is also exposed
 through the ``hpx::distributed`` namespace. The name in ``hpx::distributed``
