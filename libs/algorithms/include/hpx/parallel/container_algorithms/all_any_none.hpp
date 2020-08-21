@@ -419,7 +419,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::execution::seq, first, last, std::forward<F>(f),
                 std::forward<Proj>(proj), is_segmented{});
         }
-    } none_of;
+    } none_of{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::any_of
@@ -527,7 +527,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::execution::seq, first, last, std::forward<F>(f),
                 std::forward<Proj>(proj), is_segmented{});
         }
-    } any_of;
+    } any_of{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::all_of
@@ -635,7 +635,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::execution::seq, first, last, std::forward<F>(f),
                 std::forward<Proj>(proj), is_segmented{});
         }
-    } all_of;
+    } all_of{};
 
 }}    // namespace hpx::ranges
 

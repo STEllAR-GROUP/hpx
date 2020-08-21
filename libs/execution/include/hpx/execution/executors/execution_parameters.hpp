@@ -134,7 +134,7 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename AnyParameters, typename Executor>
             HPX_FORCEINLINE static std::size_t call_param(
                 hpx::traits::detail::wrap_int, AnyParameters&&, Executor&&,
-                std::size_t cores, std::size_t num_tasks)
+                std::size_t, std::size_t)
             {
                 // return zero chunks which will tell the implementation to
                 // calculate the number of chunks either based on a
@@ -211,8 +211,7 @@ namespace hpx { namespace parallel { namespace execution {
             // Check whether the parameter object implements this function
             template <typename AnyParameters, typename Executor>
             HPX_FORCEINLINE static void call_param(
-                hpx::traits::detail::wrap_int, AnyParameters&& params,
-                Executor&& exec)
+                hpx::traits::detail::wrap_int, AnyParameters&&, Executor&&)
             {
             }
 
@@ -278,8 +277,7 @@ namespace hpx { namespace parallel { namespace execution {
             // Check whether the parameter object implements this function
             template <typename AnyParameters, typename Executor>
             HPX_FORCEINLINE static std::size_t call_param(
-                hpx::traits::detail::wrap_int, AnyParameters&& params,
-                Executor&& exec)
+                hpx::traits::detail::wrap_int, AnyParameters&&, Executor&&)
             {
                 return get_os_thread_count();
             }

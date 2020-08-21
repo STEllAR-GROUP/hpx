@@ -126,7 +126,7 @@ namespace hpx {
     /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
     inline bool start(
-        std::nullptr_t f, int argc, char** argv, init_params const& params)
+        std::nullptr_t, int argc, char** argv, init_params const& params)
     {
         util::function_nonser<int(hpx::program_options::variables_map&)> main_f;
         if (argc == 0 || argv == nullptr)

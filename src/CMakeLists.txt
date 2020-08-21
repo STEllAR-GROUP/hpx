@@ -545,12 +545,7 @@ target_link_libraries(hpx INTERFACE hpx_core)
 # pkgconfig file generation.
 add_library(hpx_interface INTERFACE)
 target_link_libraries(
-  hpx_interface
-  INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_init>>
-)
-target_link_libraries(
-  hpx_interface
-  INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPXInternal::hpx_init>>
+  hpx_interface INTERFACE $<${_is_executable}:HPXInternal::hpx_init>
 )
 target_compile_definitions(
   hpx_interface
@@ -570,12 +565,7 @@ target_compile_definitions(
 
 add_library(hpx_interface_wrap_main INTERFACE)
 target_link_libraries(
-  hpx_interface_wrap_main
-  INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_wrap>>
-)
-target_link_libraries(
-  hpx_interface_wrap_main
-  INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPXInternal::hpx_wrap>>
+  hpx_interface_wrap_main INTERFACE $<${_is_executable}:HPXInternal::hpx_wrap>
 )
 
 target_link_libraries(wrap_main INTERFACE hpx_interface_wrap_main)
@@ -607,11 +597,6 @@ target_compile_definitions(
 
 set(hpx_targets hpx wrap_main plugin component)
 set(hpx_internal_targets hpx_core hpx_interface hpx_interface_wrap_main)
-
-# Temporary for compatibility with projects like gridtools
-add_library(hpx_no_wrap_main INTERFACE)
-target_link_libraries(hpx_no_wrap_main INTERFACE hpx)
-list(APPEND hpx_targets hpx_no_wrap_main)
 
 install(
   TARGETS ${hpx_targets}

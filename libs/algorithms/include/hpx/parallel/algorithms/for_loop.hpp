@@ -108,7 +108,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
             }
 
             template <typename B>
-            HPX_HOST_DEVICE void execute(
+            HPX_HOST_DEVICE constexpr void execute(
                 B part_begin, std::size_t part_steps, std::size_t part_index)
             {
                 auto pack =
@@ -139,6 +139,61 @@ namespace hpx { namespace parallel { inline namespace v2 {
             {
                 hpx::util::annotate_function annotate(f_);
                 execute(part_begin, part_steps, part_index);
+            }
+        };
+
+        template <typename F, typename S>
+        struct part_iterations<F, S, hpx::util::tuple<>>
+        {
+            typedef typename hpx::util::decay<F>::type fun_type;
+
+            fun_type f_;
+            S stride_;
+
+            template <typename F_, typename S_, typename Args>
+            part_iterations(F_&& f, S_&& stride, Args&&)
+              : f_(std::forward<F_>(f))
+              , stride_(std::forward<S_>(stride))
+            {
+            }
+
+            template <typename B>
+            HPX_HOST_DEVICE constexpr void execute(
+                B part_begin, std::size_t part_steps)
+            {
+                while (part_steps != 0)
+                {
+                    hpx::util::invoke(f_, part_begin);
+
+                    // NVCC seems to have a bug with std::min...
+                    std::size_t chunk =
+                        S(part_steps) < stride_ ? part_steps : stride_;
+
+                    // modifies 'chunk'
+                    part_begin = parallel::v1::detail::next(
+                        part_begin, part_steps, chunk);
+                    part_steps -= chunk;
+                }
+            }
+
+            template <typename B>
+            HPX_HOST_DEVICE void operator()(
+                B part_begin, std::size_t part_steps, std::size_t)
+            {
+                hpx::util::annotate_function annotate(f_);
+                if (stride_ == 1)
+                {
+                    using pred = std::integral_constant<bool,
+                        hpx::traits::is_random_access_iterator<B>::value ||
+                            std::is_integral<B>::value>;
+
+                    parallel::util::detail::loop_n<B>::call(
+                        part_begin, part_steps, f_, pred());
+                }
+                else
+                {
+                    execute(part_begin, part_steps);
+                }
             }
         };
 

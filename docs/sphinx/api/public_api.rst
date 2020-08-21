@@ -1,5 +1,5 @@
 ..
-    Copyright (C) 2020 Mikael Simberg
+    Copyright (C) 2020 ETH Zurich
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,25 +32,25 @@ Functions
 ---------
 
 - :cpp:func:`hpx::parallel::v1::adjacent_find`
-- :cpp:func:`hpx::parallel::v1::all_of`
-- :cpp:func:`hpx::parallel::v1::any_of`
+- :cpp:func:`hpx::all_of`
+- :cpp:func:`hpx::any_of`
 - :cpp:func:`hpx::copy`
 - :cpp:func:`hpx::copy_if`
 - :cpp:func:`hpx::copy_n`
-- :cpp:func:`hpx::parallel::v1::count`
-- :cpp:func:`hpx::parallel::v1::count_if`
-- :cpp:func:`hpx::parallel::v1::equal`
-- :cpp:func:`hpx::parallel::v1::fill`
-- :cpp:func:`hpx::parallel::v1::fill_n`
-- :cpp:func:`hpx::parallel::v1::find`
-- :cpp:func:`hpx::parallel::v1::find_end`
-- :cpp:func:`hpx::parallel::v1::find_first_of`
-- :cpp:func:`hpx::parallel::v1::find_if`
-- :cpp:func:`hpx::parallel::v1::find_if_not`
-- :cpp:func:`hpx::parallel::v1::for_each`
-- :cpp:func:`hpx::parallel::v1::for_each_n`
-- :cpp:func:`hpx::parallel::v1::generate`
-- :cpp:func:`hpx::parallel::v1::generate_n`
+- :cpp:func:`hpx::count`
+- :cpp:func:`hpx::count_if`
+- :cpp:func:`hpx::equal`
+- :cpp:func:`hpx::fill`
+- :cpp:func:`hpx::fill_n`
+- :cpp:func:`hpx::find`
+- :cpp:func:`hpx::find_end`
+- :cpp:func:`hpx::find_first_of`
+- :cpp:func:`hpx::find_if`
+- :cpp:func:`hpx::find_if_not`
+- :cpp:func:`hpx::for_each`
+- :cpp:func:`hpx::for_each_n`
+- :cpp:func:`hpx::generate`
+- :cpp:func:`hpx::generate_n`
 - :cpp:func:`hpx::parallel::v1::includes`
 - :cpp:func:`hpx::parallel::v1::inplace_merge`
 - :cpp:func:`hpx::parallel::v1::is_heap`
@@ -64,8 +64,8 @@ Functions
 - :cpp:func:`hpx::parallel::v1::min_element`
 - :cpp:func:`hpx::parallel::v1::minmax_element`
 - :cpp:func:`hpx::parallel::v1::mismatch`
-- :cpp:func:`hpx::parallel::v1::move`
-- :cpp:func:`hpx::parallel::v1::none_of`
+- :cpp:func:`hpx::move`
+- :cpp:func:`hpx::none_of`
 - :cpp:func:`hpx::parallel::v1::partition`
 - :cpp:func:`hpx::parallel::v1::partition_copy`
 - :cpp:func:`hpx::parallel::v1::remove`
@@ -97,9 +97,27 @@ Functions
 - :cpp:func:`hpx::parallel::v2::for_loop_n`
 - :cpp:func:`hpx::parallel::v2::for_loop_n_strided`
 
+- :cpp:func:`hpx::ranges::all_of`
+- :cpp:func:`hpx::ranges::any_of`
 - :cpp:func:`hpx::ranges::copy`
 - :cpp:func:`hpx::ranges::copy_if`
 - :cpp:func:`hpx::ranges::copy_n`
+- :cpp:func:`hpx::ranges::count`
+- :cpp:func:`hpx::ranges::count_if`
+- :cpp:func:`hpx::ranges::equal`
+- :cpp:func:`hpx::ranges::fill`
+- :cpp:func:`hpx::ranges::fill_n`
+- :cpp:func:`hpx::ranges::find`
+- :cpp:func:`hpx::ranges::find_end`
+- :cpp:func:`hpx::ranges::find_first_of`
+- :cpp:func:`hpx::ranges::find_if`
+- :cpp:func:`hpx::ranges::find_if_not`
+- :cpp:func:`hpx::ranges::for_each`
+- :cpp:func:`hpx::ranges::for_each_n`
+- :cpp:func:`hpx::ranges::generate`
+- :cpp:func:`hpx::ranges::generate_n`
+- :cpp:func:`hpx::ranges::move`
+- :cpp:func:`hpx::ranges::none_of`
 
 Header ``hpx/any.hpp``
 ======================
@@ -204,13 +222,15 @@ Header ``hpx/chrono.hpp``
 
 Corresponds to the C++ standard library header :cppreference-header:`chrono`.
 The following replacements and extensions are provided compared to
-:cppreference-header:`chrono`:
+:cppreference-header:`chrono`. The classes below are also available in the
+``hpx::chrono`` namespace, not in the top-level ``hpx`` namespace.
 
 Classes
 -------
 
 - :cpp:class:`hpx::util::high_resolution_clock`
 - :cpp:class:`hpx::util::high_resolution_timer`
+- :cpp:class:`hpx::util::steady_time_point`
 
 Header ``hpx/condition_variable.hpp``
 =====================================
@@ -426,7 +446,7 @@ Functions
 - :cpp:func:`hpx::resume`
 
 Header ``hpx/latch.hpp``
-==========================
+========================
 
 This header includes :ref:`public_api_header_hpx_local_latch` and
 ref:`public_api_header_hpx_distributed_latch`.
@@ -434,7 +454,7 @@ ref:`public_api_header_hpx_distributed_latch`.
 .. _public_api_header_hpx_local_latch:
 
 Header ``hpx/local/latch.hpp``
-================================
+==============================
 
 Corresponds to the C++ standard library header :cppreference-header:`latch`.
 
@@ -446,7 +466,7 @@ Classes
 .. _public_api_header_hpx_distributed_latch:
 
 Header ``hpx/distributed/latch.hpp``
-======================================
+====================================
 
 Contains a distributed latch implementation. This functionality is also exposed
 through the ``hpx::distributed`` namespace. The name in ``hpx::distributed``
@@ -499,6 +519,23 @@ Functions
 - :cpp:func:`hpx::parallel::v1::uninitialized_move_n`
 - :cpp:func:`hpx::parallel::v1::uninitialized_value_construct`
 - :cpp:func:`hpx::parallel::v1::uninitialized_value_construct_n`
+
+Header ``hpx/numeric.hpp``
+==========================
+
+Corresponds to the C++ standard library header :cppreference-header:`numeric`.
+See :ref:`parallel_algorithms` for more information about the parallel
+algorithms.
+
+Functions
+---------
+
+- :cpp:func:`hpx::parallel::v1::adjacent_difference`
+- :cpp:func:`hpx::parallel::v1::exclusive_scan`
+- :cpp:func:`hpx::parallel::v1::inclusive_scan`
+- :cpp:func:`hpx::parallel::v1::transform_exclusive_scan`
+- :cpp:func:`hpx::parallel::v1::transform_inclusive_scan`
+- :cpp:func:`hpx::parallel::v1::transform_reduce`
 
 Header ``hpx/optional.hpp``
 ===========================

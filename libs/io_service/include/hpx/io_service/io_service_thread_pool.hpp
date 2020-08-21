@@ -30,7 +30,7 @@ namespace hpx { namespace threads { namespace detail {
         explicit io_service_thread_pool(
             threads::thread_pool_init_parameters const& init);
 
-        void print_pool(std::ostream& os) {}
+        void print_pool(std::ostream&) {}
 
         ///////////////////////////////////////////////////////////////////////
         hpx::state get_state() const;

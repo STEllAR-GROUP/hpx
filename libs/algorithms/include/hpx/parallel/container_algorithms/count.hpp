@@ -336,7 +336,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::execution::seq, first, last, value,
                 std::forward<Proj>(proj), is_segmented{});
         }
-    } count;
+    } count{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::count_if
@@ -461,7 +461,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::execution::seq, first, last, std::forward<F>(f),
                 std::forward<Proj>(proj), is_segmented{});
         }
-    } count_if;
+    } count_if{};
 
 }}    // namespace hpx::ranges
 #endif    // DOXYGEN

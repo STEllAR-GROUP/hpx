@@ -348,7 +348,7 @@ namespace hpx { namespace actions {
         ///////////////////////////////////////////////////////////////////////
         template <typename IdOrPolicy, typename Policy, typename... Ts>
         HPX_FORCEINLINE static result_type sync_invoke(Policy const& policy,
-            IdOrPolicy const& id_or_policy, error_code& ec, Ts&&... vs)
+            IdOrPolicy const& id_or_policy, error_code&, Ts&&... vs)
         {
             return hpx::sync<basic_action>(
                 policy, id_or_policy, std::forward<Ts>(vs)...);

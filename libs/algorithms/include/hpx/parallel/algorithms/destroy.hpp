@@ -341,7 +341,7 @@ namespace hpx {
             hpx::parallel::v1::detail::destroy<FwdIter>().call(
                 hpx::parallel::execution::seq, std::false_type{}, first, last);
         }
-    } destroy;
+    } destroy{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::destroy_n
@@ -400,7 +400,7 @@ namespace hpx {
                 hpx::parallel::execution::seq, std::false_type{}, first,
                 std::size_t(count));
         }
-    } destroy_n;
+    } destroy_n{};
 }    // namespace hpx
 
 #endif    // DOXYGEN

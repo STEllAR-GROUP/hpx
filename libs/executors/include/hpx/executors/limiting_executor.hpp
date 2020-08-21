@@ -7,13 +7,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/futures/futures_factory.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/threading_base/print.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -28,29 +28,147 @@
 // --------------------------------------------------------------------
 //
 // --------------------------------------------------------------------
-namespace hpx { namespace parallel { namespace execution {
-    template <typename Executor>
+namespace hpx { namespace execution { namespace experimental {
+
+    // by convention the title is 7 chars (for alignment)
+    using print_on = hpx::debug::enable_print<false>;
+    static constexpr print_on lim_debug("LIMEXEC");
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail {
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(in_flight_estimate)
+    }    // namespace detail
+
+    template <typename BaseExecutor>
     struct limiting_executor
     {
         // --------------------------------------------------------------------
-        // For C++11 compatibility
-        template <bool B, typename T = void>
-        using enable_if_t = typename std::enable_if<B, T>::type;
-
+        // RAII wrapper for counting task completions (count_down)
+        // count_up is done in the executor when the task is first scheduled
+        // This object is destructed when the task has completed
         // --------------------------------------------------------------------
-        //
-        // --------------------------------------------------------------------
-        limiting_executor(std::size_t lower, std::size_t upper,
-            bool block_on_destruction = true)
-          : executor_(Executor())
-          , count_(0)
-          , lower_threshold_(lower)
-          , upper_threshold_(upper)
-          , block_(block_on_destruction)
+        struct on_exit
         {
-        }
+            on_exit(limiting_executor const& this_e)
+              : executor_(this_e)
+            {
+            }
+            ~on_exit()
+            {
+                lim_debug.debug(hpx::debug::str<>("Count Down"));
+                executor_.count_down();
+            }
+            limiting_executor const& executor_;
+        };
 
-        limiting_executor(const Executor& ex, std::size_t lower,
+        // --------------------------------------------------------------------
+        // this is the default wrapper struct that invokes count up / down
+        // and uses the limiting executor counter to control throttling
+        //
+        // Note that we have to add a dummy template parameter B (same as BaseName)
+        // to inner struct, to allow template deduction to SFINAE properly
+        // and not give us an incomplete type on the 'in flight' specialization
+        // --------------------------------------------------------------------
+        template <typename F, typename B = BaseExecutor, typename Enable = void>
+        struct throttling_wrapper
+        {
+            throttling_wrapper(
+                limiting_executor& lim, BaseExecutor const& base, F&& f)
+              : limiting_(lim)
+              , f_(std::forward<F>(f))
+            {
+                limiting_.count_up();
+                if (exceeds_upper())
+                {
+                    lim_debug.debug(hpx::debug::str<>("Exceeds_upper"));
+                    hpx::util::yield_while([&]() { return exceeds_lower(); });
+                    lim_debug.debug(hpx::debug::str<>("Below_lower"));
+                }
+            }
+
+            // when task completes, on_exit destructor calls count_down
+            template <typename... Ts>
+            decltype(auto) operator()(Ts&&... ts)
+            {
+                on_exit _{limiting_};
+                return hpx::util::invoke(f_, std::forward<Ts>(ts)...);
+            }
+
+            // returns true if too many tasks would be in flight
+            // NB. we use ">" because we count up right before testing
+            bool exceeds_upper()
+            {
+                return (limiting_.count_ > limiting_.upper_threshold_);
+            }
+            // returns true if we have not yet reached the lower threshold
+            bool exceeds_lower()
+            {
+                return (limiting_.count_ > limiting_.lower_threshold_);
+            }
+
+            limiting_executor& limiting_;
+            F f_;
+        };
+
+        // this is a specialized wrapper struct that skips count up / down
+        // and uses the underlying executor to get a count of tasks
+        // 'in flight' for the throttling.
+        // The dummy B template param must match BaseExecutor and helps
+        // deduction rules complete this type so that the default implementaiton
+        // (above) still works
+        template <typename F, typename B>
+        struct throttling_wrapper<F, B,
+            typename std::enable_if<
+                detail::has_in_flight_estimate<BaseExecutor>::value &&
+                std::is_same<B, BaseExecutor>::value>::type>
+        {
+            throttling_wrapper(
+                limiting_executor const& lim, BaseExecutor const& base, F&& f)
+              : limiting_(lim)
+              , f_(std::forward<F>(f))
+            {
+                if (exceeds_upper(base))
+                {
+                    lim_debug.debug(hpx::debug::str<>("Exceeds_upper"),
+                        "in_flight",
+                        hpx::debug::dec<4>(base.in_flight_estimate()));
+                    hpx::util::yield_while(
+                        [&]() { return exceeds_lower(base); });
+                    lim_debug.debug(hpx::debug::str<>("Below_lower"),
+                        "in_flight",
+                        hpx::debug::dec<4>(base.in_flight_estimate()));
+                }
+            }
+
+            template <typename... Ts>
+            decltype(auto) operator()(Ts&&... ts)
+            {
+                return hpx::util::invoke(f_, std::forward<Ts>(ts)...);
+            }
+
+            // NB. use ">=" because counting is external
+            // (after invocation probably)
+            bool exceeds_upper(BaseExecutor const& base) const
+            {
+                return (
+                    base.in_flight_estimate() >= limiting_.upper_threshold_);
+            }
+            bool exceeds_lower(BaseExecutor const& base) const
+            {
+                return (base.in_flight_estimate() > limiting_.lower_threshold_);
+            }
+
+            limiting_executor const& limiting_;
+            F f_;
+        };
+
+    public:
+        using execution_category = typename BaseExecutor::execution_category;
+        using executor_parameters_type =
+            typename BaseExecutor::executor_parameters_type;
+
+        // --------------------------------------------------------------------
+        limiting_executor(BaseExecutor& ex, std::size_t lower,
             std::size_t upper, bool block_on_destruction = true)
           : executor_(ex)
           , count_(0)
@@ -60,6 +178,17 @@ namespace hpx { namespace parallel { namespace execution {
         {
         }
 
+        limiting_executor(std::size_t lower, std::size_t upper,
+            bool block_on_destruction = true)
+          : executor_(BaseExecutor{})
+          , count_(0)
+          , lower_threshold_(lower)
+          , upper_threshold_(upper)
+          , block_(block_on_destruction)
+        {
+        }
+
+        // --------------------------------------------------------------------
         ~limiting_executor()
         {
             if (block_)
@@ -68,96 +197,86 @@ namespace hpx { namespace parallel { namespace execution {
             }
         }
 
-        void count_up()
+        // --------------------------------------------------------------------
+        limiting_executor const& context() const noexcept
         {
-            if (++count_ > upper_threshold_)
-            {
-                hpx::util::yield_while(
-                    [&]() { return (count_ > lower_threshold_); });
-            }
+            return *this;
         }
 
-        void count_down()
+        // --------------------------------------------------------------------
+        // OneWayExecutor interface
+        template <typename F, typename... Ts>
+        decltype(auto) sync_execute(F&& f, Ts&&... ts) const
         {
-            --count_;
+            return hpx::parallel::execution::sync_execute(executor_,
+                throttling_wrapper<F>(*this, executor_, std::forward<F>(f)),
+                std::forward<Ts>(ts)...);
+        }
+
+        // --------------------------------------------------------------------
+        // TwoWayExecutor interface
+        template <typename F, typename... Ts>
+        decltype(auto) async_execute(F&& f, Ts&&... ts)
+        {
+            return hpx::parallel::execution::async_execute(executor_,
+                throttling_wrapper<F>(*this, executor_, std::forward<F>(f)),
+                std::forward<Ts>(ts)...);
+        }
+
+        template <typename F, typename Future, typename... Ts>
+        decltype(auto) then_execute(F&& f, Future&& predecessor, Ts&&... ts)
+        {
+            return hpx::parallel::execution::then_execute(executor_,
+                throttling_wrapper<F>(*this, executor_, std::forward<F>(f)),
+                std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
         }
 
         // --------------------------------------------------------------------
         // post : for general apply()
+        // NonBlockingOneWayExecutor (adapted) interface
         // --------------------------------------------------------------------
         template <typename F, typename... Ts>
         void post(F&& f, Ts&&... ts)
         {
-            count_up();
-            auto&& args = hpx::util::make_tuple(std::forward<Ts>(ts)...);
-            parallel::execution::post(executor_,
-                [this, f = std::forward<F>(f),
-                    args = std::forward<decltype(args)>(args)]() mutable {
-                    hpx::util::invoke_fused(std::move(f), std::move(args));
-                    count_down();
-                });
+            hpx::parallel::execution::post(executor_,
+                throttling_wrapper<F>(*this, executor_, std::forward<F>(f)),
+                std::forward<Ts>(ts)...);
         }
 
         // --------------------------------------------------------------------
-        // async execute specialized for simple arguments typical
-        // of a normal async call with arbitrary arguments
-        // --------------------------------------------------------------------
-        template <typename F, typename... Ts>
-        future<typename hpx::util::invoke_result<F, Ts...>::type> async_execute(
-            F&& f, Ts&&... ts)
+        // BulkTwoWayExecutor interface
+        template <typename F, typename S, typename... Ts>
+        decltype(auto) bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
         {
-            typedef typename hpx::util::detail::invoke_deferred_result<F,
-                Ts...>::type result_type;
-
-            count_up();
-            auto&& args = hpx::util::make_tuple(std::forward<Ts>(ts)...);
-            lcos::local::futures_factory<result_type()> p(executor_,
-                [this, f = std::forward<F>(f),
-                    args = std::forward<decltype(args)>(args)]() mutable {
-                    hpx::util::invoke_fused(std::move(f), std::move(args));
-                    count_down();
-                });
-
-            p.apply(launch::async, threads::thread_priority_default,
-                threads::thread_stacksize_default);
-
-            return p.get_future();
+            return hpx::parallel::execution::bulk_async_execute(executor_,
+                throttling_wrapper<F>(*this, executor_, std::forward<F>(f)),
+                std::forward<Ts>(ts)...);
         }
 
         // --------------------------------------------------------------------
-        // .then() execute specialized for a future<P> predecessor argument
-        // note that future<> and shared_future<> are both supported
-        // --------------------------------------------------------------------
-        template <typename F, typename Future, typename... Ts,
-            typename = enable_if_t<hpx::traits::is_future<
-                typename std::remove_reference<Future>::type>::value>>
-        auto then_execute(F&& f, Ts&&... ts)
-            -> future<typename hpx::util::detail::invoke_deferred_result<F,
-                Future, Ts...>::type>
+        template <typename F, typename S, typename Future, typename... Ts>
+        decltype(auto) bulk_then_execute(
+            F&& f, S const& shape, Future&& predecessor, Ts&&... ts)
         {
-            typedef typename hpx::util::detail::invoke_deferred_result<F,
-                Future, Ts...>::type result_type;
-
-            count_up();
-
-            auto&& args = hpx::util::make_tuple(std::forward<Ts>(ts)...);
-            lcos::local::futures_factory<result_type()> p(executor_,
-                [this, f = std::forward<F>(f),
-                    args = std::forward<decltype(args)>(args)]() mutable {
-                    hpx::util::invoke_fused(std::move(f), std::move(args));
-                    count_down();
-                });
-
-            p.apply(launch::async, threads::thread_priority_default,
-                threads::thread_stacksize_default);
-
-            return p.get_future();
+            return hpx::parallel::execution::bulk_then_execute(executor_,
+                throttling_wrapper<F>(*this, executor_, std::forward<F>(f)),
+                std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
         }
 
-        void set_and_wait(std::size_t lower, std::size_t upper)
+        // --------------------------------------------------------------------
+        // wait (suspend) until the number of tasks 'in flight' on this executor
+        // drops to the lower threshold
+        void wait()
         {
-            set_threshold(lower, upper);
-            wait();
+            hpx::util::yield_while(
+                [&]() { return (count_ > lower_threshold_); });
+        }
+
+        // --------------------------------------------------------------------
+        // wait (suspend) until all tasks launched on this executor have completed
+        void wait_all()
+        {
+            hpx::util::yield_while([&]() { return (count_ > 0); });
         }
 
         void set_threshold(std::size_t lower, std::size_t upper)
@@ -166,29 +285,71 @@ namespace hpx { namespace parallel { namespace execution {
             upper_threshold_ = upper;
         }
 
-        void wait()
+    private:
+        void count_up()
         {
-            hpx::util::yield_while(
-                [&]() { return (count_ > lower_threshold_); });
+            ++count_;
+        }
+
+        void count_down() const
+        {
+            --count_;
+        }
+
+        void set_and_wait(std::size_t lower, std::size_t upper)
+        {
+            set_threshold(lower, upper);
+            wait();
         }
 
     private:
         // --------------------------------------------------------------------
-        Executor executor_;
-        std::atomic<std::int64_t> count_;
-        std::int64_t lower_threshold_;
-        std::int64_t upper_threshold_;
+        BaseExecutor executor_;
+        mutable std::atomic<std::size_t> count_;
+        mutable std::size_t lower_threshold_;
+        mutable std::size_t upper_threshold_;
         bool block_;
     };
+}}}    // namespace hpx::execution::experimental
 
-    template <typename Executor>
-    struct executor_execution_category<limiting_executor<Executor>>
+namespace hpx { namespace parallel { namespace execution {
+
+    // --------------------------------------------------------------------
+    // simple forwarding implementations of executor traits
+    // --------------------------------------------------------------------
+    template <typename BaseExecutor>
+    struct is_one_way_executor<
+        hpx::execution::experimental::limiting_executor<BaseExecutor>>
+      : is_one_way_executor<typename std::decay<BaseExecutor>::type>
     {
-        typedef parallel_execution_tag type;
     };
 
-    template <typename Executor>
-    struct is_two_way_executor<limiting_executor<Executor>> : std::true_type
+    template <typename BaseExecutor>
+    struct is_never_blocking_one_way_executor<
+        hpx::execution::experimental::limiting_executor<BaseExecutor>>
+      : is_never_blocking_one_way_executor<
+            typename std::decay<BaseExecutor>::type>
+    {
+    };
+
+    template <typename BaseExecutor>
+    struct is_two_way_executor<
+        hpx::execution::experimental::limiting_executor<BaseExecutor>>
+      : is_two_way_executor<typename std::decay<BaseExecutor>::type>
+    {
+    };
+
+    template <typename BaseExecutor>
+    struct is_bulk_one_way_executor<
+        hpx::execution::experimental::limiting_executor<BaseExecutor>>
+      : is_bulk_one_way_executor<typename std::decay<BaseExecutor>::type>
+    {
+    };
+
+    template <typename BaseExecutor>
+    struct is_bulk_two_way_executor<
+        hpx::execution::experimental::limiting_executor<BaseExecutor>>
+      : is_bulk_two_way_executor<typename std::decay<BaseExecutor>::type>
     {
     };
 }}}    // namespace hpx::parallel::execution

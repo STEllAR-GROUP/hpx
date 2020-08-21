@@ -34,7 +34,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         {
         }
 
-        arg_type yield_impl(result_type arg) override
+        arg_type yield_impl(result_type) override
         {
             // stackless coroutines don't support suspension
             HPX_ASSERT(false);

@@ -13,21 +13,19 @@
 #endif
 #include <hpx/async_combinators/wait_each.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/executors/limiting_executor.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/execution_base/this_thread.hpp>
-
-#include <hpx/include/parallel_execution.hpp>
-#include <hpx/thread_executors/limiting_executor.hpp>
-#include <hpx/modules/synchronization.hpp>
 
 #include <array>
 #include <atomic>
@@ -241,7 +239,8 @@ void measure_function_futures_thread_count(
 
     if (sanity_check != 0)
     {
-        auto count = this_pool->get_thread_count_unknown(std::size_t(-1), false);
+        auto count =
+            this_pool->get_thread_count_unknown(std::size_t(-1), false);
         throw std::runtime_error(
             "This test is faulty " + std::to_string(count));
     }
@@ -282,7 +281,7 @@ void measure_function_futures_limiting_executor(
     // start the clock
     high_resolution_timer walltime;
     {
-        hpx::threads::executors::limiting_executor<Executor> signal_exec(
+        hpx::execution::experimental::limiting_executor<Executor> signal_exec(
             exec, tasks, tasks + 1000);
         hpx::parallel::for_loop(hpx::parallel::execution::par.with(fixed), 0,
             count, [&](std::uint64_t) {
@@ -374,7 +373,8 @@ void measure_function_futures_register_work(std::uint64_t count, bool csv)
             hpx::threads::make_thread_function_nullary([&l]() {
                 null_function();
                 l.count_down(1);
-            }), "null_function");
+            }),
+            "null_function");
         hpx::threads::register_work(data);
     }
     l.wait();
@@ -465,8 +465,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
                 hpx::threads::thread_init_data init(
                     hpx::threads::thread_function_type(thread_func), desc, prio,
                     hint, stack_size, hpx::threads::pending, false, sched);
-                sched->create_thread(
-                    init, nullptr, ec);
+                sched->create_thread(init, nullptr, ec);
             }
         };
         auto const thread_spawn_func =

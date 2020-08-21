@@ -1,4 +1,5 @@
-//  copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,8 +19,29 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_generate_n(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+
+    auto gen = []() { return std::size_t(10); };
+
+    hpx::generate_n(iterator(std::begin(c)), c.size(), gen);
+
+    // verify values
+    std::size_t count = 0;
+    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
+        HPX_TEST_EQ(v, std::size_t(10));
+        ++count;
+    });
+    HPX_TEST_EQ(count, c.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_generate_n(ExPolicy policy, IteratorTag)
+void test_generate_n(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -32,7 +54,7 @@ void test_generate_n(ExPolicy policy, IteratorTag)
 
     auto gen = []() { return std::size_t(10); };
 
-    hpx::parallel::generate_n(policy, iterator(std::begin(c)), c.size(), gen);
+    hpx::generate_n(policy, iterator(std::begin(c)), c.size(), gen);
 
     // verify values
     std::size_t count = 0;
@@ -44,7 +66,7 @@ void test_generate_n(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_generate_n_async(ExPolicy p, IteratorTag)
+void test_generate_n_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -54,7 +76,7 @@ void test_generate_n_async(ExPolicy p, IteratorTag)
     auto gen = []() { return std::size_t(10); };
 
     hpx::future<iterator> f =
-        hpx::parallel::generate_n(p, iterator(std::begin(c)), c.size(), gen);
+        hpx::generate_n(p, iterator(std::begin(c)), c.size(), gen);
     f.wait();
 
     std::size_t count = 0;
@@ -69,6 +91,9 @@ template <typename IteratorTag>
 void test_generate_n()
 {
     using namespace hpx::parallel;
+
+    test_generate_n(IteratorTag());
+
     test_generate_n(execution::seq, IteratorTag());
     test_generate_n(execution::par, IteratorTag());
     test_generate_n(execution::par_unseq, IteratorTag());
@@ -84,8 +109,40 @@ void generate_n_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_generate_n_exception(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+    std::vector<std::size_t> c(10007);
+
+    auto gen = []() { return std::size_t(10); };
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::generate_n(decorated_iterator(std::begin(c),
+                            []() { throw std::runtime_error("test"); }),
+            c.size(), gen);
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<hpx::parallel::execution::sequenced_policy,
+            IteratorTag>::call(hpx::parallel::execution::seq, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_generate_n_exception(ExPolicy policy, IteratorTag)
+void test_generate_n_exception(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -101,7 +158,7 @@ void test_generate_n_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::generate_n(policy,
+        hpx::generate_n(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             c.size(), gen);
@@ -121,7 +178,7 @@ void test_generate_n_exception(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_generate_n_exception_async(ExPolicy p, IteratorTag)
+void test_generate_n_exception_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -135,7 +192,7 @@ void test_generate_n_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<decorated_iterator> f = hpx::parallel::generate_n(p,
+        hpx::future<decorated_iterator> f = hpx::generate_n(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             c.size(), gen);
@@ -163,6 +220,8 @@ void test_generate_n_exception()
 {
     using namespace hpx::parallel;
 
+    test_generate_n_exception(IteratorTag());
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
@@ -183,7 +242,7 @@ void generate_n_exception_test()
 
 //////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_generate_n_bad_alloc(ExPolicy policy, IteratorTag)
+void test_generate_n_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -200,7 +259,7 @@ void test_generate_n_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::generate_n(policy,
+        hpx::generate_n(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             c.size(), gen);
         HPX_TEST(false);
@@ -218,7 +277,7 @@ void test_generate_n_bad_alloc(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_generate_n_bad_alloc_async(ExPolicy p, IteratorTag)
+void test_generate_n_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -232,7 +291,7 @@ void test_generate_n_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<decorated_iterator> f = hpx::parallel::generate_n(p,
+        hpx::future<decorated_iterator> f = hpx::generate_n(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             c.size(), gen);
         returned_from_algorithm = true;

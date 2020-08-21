@@ -399,7 +399,7 @@ namespace hpx { namespace ranges {
                     std::forward<Proj2>(proj2));
         }
 
-    } mismatch;
+    } mismatch{};
 }}    // namespace hpx::ranges
 
 #endif    // DOXYGEN

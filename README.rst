@@ -5,7 +5,7 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-|circleci_status| |zenodo_doi| |codacy| |coveralls|
+|circleci_status| |zenodo_doi| |codacy| |coveralls| |JOSS|
 
 Documentation: `latest
 <https://hpx-docs.stellar-group.org/latest/html/index.html>`_,
@@ -206,3 +206,8 @@ HPX is has been funded by:
 .. |coveralls| image:: https://coveralls.io/repos/github/STEllAR-GROUP/hpx/badge.svg
      :target: https://coveralls.io/github/STEllAR-GROUP/hpx
      :alt: HPX coverage report
+
+.. |JOSS| image:: https://joss.theoj.org/papers/022e5917b95517dff20cd3742ab95eca/status.svg
+    :target: https://joss.theoj.org/papers/022e5917b95517dff20cd3742ab95eca
+    :alt: JOSS Paper about HPX
+    

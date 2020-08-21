@@ -713,7 +713,7 @@ namespace hpx { namespace ranges {
                 hpx::util::end(rng), val, std::forward<Proj>(proj),
                 std::false_type());
         }
-    } find;
+    } find{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find_if
@@ -815,7 +815,7 @@ namespace hpx { namespace ranges {
                 hpx::util::end(rng), std::forward<Pred>(pred),
                 std::forward<Proj>(proj), std::false_type());
         }
-    } find_if;
+    } find_if{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find_if_not
@@ -917,7 +917,7 @@ namespace hpx { namespace ranges {
                 hpx::util::end(rng), std::forward<Pred>(pred),
                 std::forward<Proj>(proj), std::false_type());
         }
-    } find_if_not;
+    } find_if_not{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find_end
@@ -1071,7 +1071,7 @@ namespace hpx { namespace ranges {
                 first2, last2, std::forward<Pred>(op),
                 std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
-    } find_end;
+    } find_end{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find_first_of
@@ -1226,7 +1226,7 @@ namespace hpx { namespace ranges {
                 std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
 
-    } find_first_of;
+    } find_first_of{};
 }}    // namespace hpx::ranges
 
 #endif    // DOXYGEN
