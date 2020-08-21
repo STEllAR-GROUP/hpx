@@ -36,13 +36,13 @@ namespace hpx { namespace mpi { namespace experimental {
             return err_buff.get();
         }
 
-        // mutex needed to protect mpi request list, note that the
+        // mutex needed to protect mpi request vector, note that the
         // mpi poll function takes place inside the main scheduling loop
         // of hpx and not on an hpx worker thread, so we must use std:mutex
-        mutex_type& get_list_mtx()
+        mutex_type& get_vector_mtx()
         {
-            static mutex_type list_mtx;
-            return list_mtx;
+            static mutex_type vector_mtx;
+            return vector_mtx;
         }
 
         // an MPI error handling type that we can use to intercept
@@ -103,9 +103,9 @@ namespace hpx { namespace mpi { namespace experimental {
                 debug::dec<3>(get_active_futures().size()));
         }
 
-        // used internally to add a request to the main polling vector/list
+        // used internally to add a request to the main polling vector
         // that is passed to MPI_Testany
-        void add_to_request_list(future_data_ptr data)
+        void add_to_request_vector(future_data_ptr data)
         {
             // this will make a copy and increment the ref count
             get_active_futures().push_back(data);
@@ -115,9 +115,23 @@ namespace hpx { namespace mpi { namespace experimental {
                 "req_ptr", debug::ptr(get_active_requests().data()));
 
             mpi_debug.debug(debug::str<>("add request"), get_mpi_info(),
-                "request", debug::hex<8>(data->request_), "list size",
-                debug::dec<3>(get_active_futures().size()));
+                "request", debug::hex<8>(data->request_), "vector size",
+                debug::dec<3>(get_active_futures().size()), "non null",
+                debug::dec<3>(get_number_of_active_requests()));
         }
+
+        std::size_t get_number_of_enqueued_requests()
+        {
+            return get_request_queue().size_approx();
+        }
+
+        std::size_t get_number_of_active_requests()
+        {
+            return std::count_if(detail::get_active_requests().begin(),
+                detail::get_active_requests().end(),
+                [](MPI_Request r) { return r != MPI_REQUEST_NULL; });
+        }
+
     }    // namespace detail
 
     // return a future object from a user supplied MPI_Request
@@ -156,7 +170,7 @@ namespace hpx { namespace mpi { namespace experimental {
     void poll()
     {
         std::unique_lock<detail::mutex_type> lk(
-            detail::get_list_mtx(), std::try_to_lock);
+            detail::get_vector_mtx(), std::try_to_lock);
         if (!lk.owns_lock())
         {
             if (mpi_debug.is_enabled())
@@ -189,7 +203,7 @@ namespace hpx { namespace mpi { namespace experimental {
         detail::future_data_ptr val;
         while (detail::get_request_queue().try_dequeue(val))
         {
-            add_to_request_list(std::move(val));
+            add_to_request_vector(std::move(val));
         }
 
         bool keep_trying = !detail::get_active_requests().empty();
@@ -232,14 +246,16 @@ namespace hpx { namespace mpi { namespace experimental {
 
                     mpi_debug.debug(debug::str<>("MPI_Testany(set)"),
                         detail::get_mpi_info(), "request", debug::hex<8>(req),
-                        "list size",
-                        debug::dec<3>(detail::get_active_futures().size()));
+                        "vector size",
+                        debug::dec<3>(detail::get_active_futures().size()),
+                        "non null",
+                        debug::dec<3>(detail::get_number_of_active_requests()));
 
                     // mark the future as ready by setting the shared_state
                     detail::get_active_futures()[std::size_t(index)]->set_data(
                         MPI_SUCCESS);
 
-                    // remove the request from our list to prevent retesting
+                    // remove the request from our vector to prevent retesting
                     detail::get_active_requests()[std::size_t(index)] =
                         MPI_REQUEST_NULL;
 
@@ -267,7 +283,7 @@ namespace hpx { namespace mpi { namespace experimental {
             }
         }
 
-        // if there are more than 25% NULL request handles in our lists,
+        // if there are more than 25% NULL request handles in our vector,
         // compact them
         if (!detail::get_active_futures().empty())
         {
@@ -284,7 +300,7 @@ namespace hpx { namespace mpi { namespace experimental {
                 detail::get_active_requests().resize(
                     std::distance(detail::get_active_requests().begin(), end1));
 
-                // compact away any null pointers in futures list
+                // compact away any null pointers in futures vector
                 auto end2 = std::remove(detail::get_active_futures().begin(),
                     detail::get_active_futures().end(), nullptr);
                 detail::get_active_futures().resize(
@@ -299,7 +315,7 @@ namespace hpx { namespace mpi { namespace experimental {
                 }
 
                 mpi_debug.debug(debug::str<>("MPI_REQUEST_NULL"),
-                    detail::get_mpi_info(), "list size",
+                    detail::get_mpi_info(), "vector size",
                     debug::dec<3>(detail::get_active_futures().size()),
                     "nulls ", debug::dec<>(nulls));
             }

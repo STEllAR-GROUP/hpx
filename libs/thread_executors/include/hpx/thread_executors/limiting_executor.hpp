@@ -8,6 +8,9 @@
 
 #include <hpx/executors/limiting_executor.hpp>
 
-namespace hpx { namespace threads { namespace executors {
-    using hpx::parallel::execution::limiting_executor;
-}}}    // namespace hpx::threads::executors
+namespace hpx {
+    namespace threads {
+        namespace executors {
+            namespace experimental {
+    using hpx::execution::experimental::limiting_executor;
+}}}}    // namespace hpx::threads::executors::experimental

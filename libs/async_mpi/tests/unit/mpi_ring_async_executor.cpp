@@ -11,6 +11,7 @@
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/async_mpi.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -98,74 +99,63 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::mpi::experimental::executor exec(MPI_COMM_WORLD);
 
         // mpi chokes if we put too many messages into the system at once
-        // so do iterations in batches of 1000
-        // using an inner and outer loop
-        const std::uint64_t max_tokens = 1000;
-        std::uint64_t subloops = 1 + iterations / max_tokens;
-        std::uint64_t remainder = iterations;
+        // we will use a limiting executor with N 'in flight' at once
+        hpx::execution::experimental::limiting_executor<
+            hpx::mpi::experimental::executor>
+            limexec(exec, 32, 64, true);
 
-        std::vector<int> tokens(max_tokens, -1);
+        std::vector<int> tokens(iterations, -1);
 
         hpx::util::high_resolution_timer t;
 
-        for (std::uint64_t j = 0; (j != subloops) && (remainder > 0); ++j)
+        std::atomic<std::uint64_t> counter(iterations);
+        for (std::uint64_t i = 0; (i != iterations); ++i)
         {
-            std::atomic<int> counter(
-                (std::min)(std::uint64_t(max_tokens), remainder));
-            for (std::uint64_t i = 0; (i != max_tokens) && (remainder > 0); ++i)
-            {
-                tokens[i] = (rank == 0) ? 1 : -1;
-                int rank_from = (size + rank - 1) % size;
-                int rank_to = (rank + 1) % size;
+            tokens[i] = (rank == 0) ? 1 : -1;
+            int rank_from = (size + rank - 1) % size;
+            int rank_to = (rank + 1) % size;
 
-                // all ranks pre-post a receive
-                hpx::future<int> f_recv = hpx::async(
-                    exec, MPI_Irecv, &tokens[i], 1, MPI_INT, rank_from, i);
+            // all ranks pre-post a receive
+            hpx::future<int> f_recv = hpx::async(
+                limexec, MPI_Irecv, &tokens[i], 1, MPI_INT, rank_from, i);
 
-                // when the recv completes,
-                f_recv.then([=, &tokens, &counter](auto&&) {
-                    msg_recv(rank, size, rank_to, rank_from, tokens[i], i);
-                    if (rank > 0)
-                    {
-                        // send the incremented token to the next rank
-                        ++tokens[i];
-                        hpx::future<int> f_send = hpx::async(exec, MPI_Isend,
-                            &tokens[i], 1, MPI_INT, rank_to, i);
-                        // when the send completes
-                        f_send.then([=, &tokens, &counter](auto&&) {
-                            msg_send(
-                                rank, size, rank_to, rank_from, tokens[i], i);
-                            // ranks > 0 are done when they have sent their token
-                            --counter;
-                        });
-                    }
-                    else
-                    {
-                        // rank 0 is done when it receives its token
-                        --counter;
-                    }
-                });
-
-                // rank 0 starts the process with a send
-                if (rank == 0)
+            // when the recv completes,
+            f_recv.then([=, &exec, &tokens, &counter](auto&&) {
+                msg_recv(rank, size, rank_to, rank_from, tokens[i], i);
+                if (rank > 0)
                 {
-                    auto f_send = hpx::async(
+                    // send the incremented token to the next rank
+                    ++tokens[i];
+                    hpx::future<int> f_send = hpx::async(
                         exec, MPI_Isend, &tokens[i], 1, MPI_INT, rank_to, i);
-                    f_send.then([=, &tokens](auto&&) {
+                    // when the send completes
+                    f_send.then([=, &tokens, &counter](auto&&) {
                         msg_send(rank, size, rank_to, rank_from, tokens[i], i);
+                        // ranks > 0 are done when they have sent their token
+                        --counter;
                     });
                 }
-                --remainder;
-            }
+                else
+                {
+                    // rank 0 is done when it receives its token
+                    --counter;
+                }
+            });
 
-            // Our simple counter should reach zero when all send/recv pairs are done
-            hpx::mpi::experimental::wait([&]() { return counter != 0; });
-            if (rank == 0 && output)
+            // rank 0 starts the process with a send
+            if (rank == 0)
             {
-                std::cout << "remainder " << remainder << " j " << j
-                          << std::endl;
+                auto f_send = hpx::async(
+                    limexec, MPI_Isend, &tokens[i], 1, MPI_INT, rank_to, i);
+                f_send.then([=, &tokens](auto&&) {
+                    msg_send(rank, size, rank_to, rank_from, tokens[i], i);
+                });
             }
         }
+
+        std::cout << "Reached end of test " << counter << std::endl;
+        // Our simple counter should reach zero when all send/recv pairs are done
+        hpx::mpi::experimental::wait([&]() { return counter != 0; });
 
         if (rank == 0)
         {

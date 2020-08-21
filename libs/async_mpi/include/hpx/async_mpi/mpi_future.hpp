@@ -23,6 +23,7 @@
 
 namespace hpx { namespace mpi { namespace experimental {
 
+    // by convention the title is 7 chars (for alignment)
     using print_on = debug::enable_print<false>;
     static constexpr print_on mpi_debug("MPI_FUT");
 
@@ -33,10 +34,10 @@ namespace hpx { namespace mpi { namespace experimental {
         // extract MPI error message
         HPX_EXPORT std::string error_message(int code);
 
-        // mutex needed to protect mpi request list, note that the
+        // mutex needed to protect mpi request vector, note that the
         // mpi poll function takes place inside the main scheduling loop
         // of hpx and not on an hpx worker thread, so we must use std:mutex
-        HPX_EXPORT mutex_type& get_list_mtx();
+        HPX_EXPORT mutex_type& get_vector_mtx();
 
         // -----------------------------------------------------------------
         // An implementation of future_data for MPI
@@ -101,7 +102,7 @@ namespace hpx { namespace mpi { namespace experimental {
         // we have the request stored in the future data already
         // the reason for this is because we can use MPI_Testany
         // with a vector of requests to save overheads compared
-        // to testing one by one every item using a list
+        // to testing one by one every item (using a list)
         HPX_EXPORT std::vector<MPI_Request>& get_active_requests();
         HPX_EXPORT std::vector<future_data_ptr>& get_active_futures();
 
@@ -120,9 +121,24 @@ namespace hpx { namespace mpi { namespace experimental {
         HPX_EXPORT void add_to_request_queue(future_data_ptr data);
 
         // -----------------------------------------------------------------
-        // used internally to add a request to the main polling vector/list
+        // used internally to query how many requests are 'in flight'
+        // the limiting executor can use this to throttle back a task if
+        // too many mpi requests are being spawned at once
+        // unfortunately, the lock-free queue can only return an estimate
+        // of the queue size, so this is not guaranteed to be precise
+        HPX_EXPORT std::size_t get_number_of_enqueued_requests();
+
+        // -----------------------------------------------------------------
+        // used internally to add a request to the main polling vector
         // that is passed to MPI_Testany
-        HPX_EXPORT void add_to_request_list(future_data_ptr data);
+        HPX_EXPORT void add_to_request_vector(future_data_ptr data);
+
+        // -----------------------------------------------------------------
+        // used internally to query how many requests are 'in flight'
+        // these are requests that are being polled for actively
+        // and not the same as the requests enqueued
+        HPX_EXPORT std::size_t get_number_of_active_requests();
+
     }    // namespace detail
 
     // -----------------------------------------------------------------
@@ -149,7 +165,7 @@ namespace hpx { namespace mpi { namespace experimental {
             int result = f(std::forward<Ts>(ts)..., &data->request_);
             (void) result;    // silence unused var warning
 
-            // queue the future state internally for processing
+            // enqueue the future state internally for processing
             detail::add_to_request_queue(data);
 
             // return a future bound to the shared state
@@ -165,14 +181,14 @@ namespace hpx { namespace mpi { namespace experimental {
     HPX_EXPORT void poll();
 
     // -----------------------------------------------------------------
-    // This is not completely safe as it will return when the request list is
+    // This is not completely safe as it will return when the request vector is
     // empty, but cannot guarantee that other communications are not about
     // to be launched in outstanding continuations etc.
     inline void wait()
     {
         hpx::util::yield_while([]() {
             std::unique_lock<detail::mutex_type> lk(
-                detail::get_list_mtx(), std::try_to_lock);
+                detail::get_vector_mtx(), std::try_to_lock);
             if (!lk.owns_lock())
             {
                 return true;
@@ -186,7 +202,7 @@ namespace hpx { namespace mpi { namespace experimental {
     {
         hpx::util::yield_while([&]() {
             std::unique_lock<detail::mutex_type> lk(
-                detail::get_list_mtx(), std::try_to_lock);
+                detail::get_vector_mtx(), std::try_to_lock);
             if (!lk.owns_lock())
             {
                 return true;

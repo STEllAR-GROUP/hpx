@@ -8,10 +8,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_mpi/mpi_future.hpp>
+#include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/modules/mpi_base.hpp>
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 
@@ -22,6 +24,10 @@ namespace hpx { namespace mpi { namespace experimental {
         // Associate the parallel_execution_tag executor tag type as a default
         // with this executor.
         using execution_category = parallel::execution::parallel_execution_tag;
+
+        // default params type as we dont do anything special
+        using executor_parameters_type =
+            hpx::parallel::execution::static_chunk_size;
 
         constexpr executor(MPI_Comm communicator = MPI_COMM_WORLD)
           : communicator_(communicator)
@@ -51,6 +57,12 @@ namespace hpx { namespace mpi { namespace experimental {
         {
             return hpx::mpi::experimental::detail::async(
                 std::forward<F>(f), std::forward<Ts>(ts)..., communicator_);
+        }
+
+        std::size_t in_flight_estimate() const
+        {
+            return detail::get_number_of_enqueued_requests() +
+                detail::get_number_of_active_requests();
         }
 
     private:
