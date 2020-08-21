@@ -21,6 +21,8 @@ export CXX="${CLANG_ROOT}/bin/clang++"
 export CC="${CLANG_ROOT}/bin/clang"
 export CPP="${CLANG_ROOT}/bin/clang -E"
 export ASAN_OPTIONS=fast_unwind_on_malloc=0
+export UBSAN_OPTIONS=print_stacktrace=1
+export PATH=$CLANG_ROOT/bin:$PATH
 
 module load daint-mc
 spack load cmake
