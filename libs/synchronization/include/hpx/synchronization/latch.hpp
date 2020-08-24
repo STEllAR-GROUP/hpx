@@ -88,13 +88,12 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ASSERT(update >= 0);
 
-            std::unique_lock<mutex_type> l(mtx_.data_);
-
             std::ptrdiff_t new_count = (counter_ -= update);
             HPX_ASSERT(new_count >= 0);
 
             if (new_count == 0)
             {
+                std::unique_lock<mutex_type> l(mtx_.data_);
                 notified_ = true;
                 cond_.data_.notify_all(std::move(l));    // release the threads
             }
