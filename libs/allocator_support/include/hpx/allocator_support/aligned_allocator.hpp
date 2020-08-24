@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/util/noexcept_cast.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -15,21 +16,24 @@
 #include <type_traits>
 #include <utility>
 
-#include <hpx/preprocessor/cat.hpp>
-
-#if defined(HPX_HAVE_JEMALLOC_PREFIX)
+#if defined(HPX_HAVE_JEMALLOC_PREFIX1)
 // this is currently used only for jemalloc and if a special API prefix is
 // used for its APIs
+
+#include <hpx/preprocessor/cat.hpp>
+
 #include <jemalloc/jemalloc.h>
 
 inline void* __aligned_alloc(std::size_t alignment, std::size_t size) noexcept
 {
-    return HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, aligned_alloc)(alignment, size);
+    return hpx::util::noexcept_cast(
+        HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, aligned_alloc))(alignment, size);
 }
 
 inline void __aligned_free(void* p) noexcept
 {
-    return HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, free)(p);
+    return hpx::util::noexcept_cast(HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, free))(
+        p);
 }
 
 #elif defined(HPX_HAVE_CXX17_STD_ALIGNED_ALLOC)
@@ -38,12 +42,12 @@ inline void __aligned_free(void* p) noexcept
 
 inline void* __aligned_alloc(std::size_t alignment, std::size_t size) noexcept
 {
-    return std::aligned_alloc(alignment, size);
+    return hpx::util::noexcept_cast(std::aligned_alloc)(alignment, size);
 }
 
 inline void __aligned_free(void* p) noexcept
 {
-    std::free(p);
+    hpx::util::noexcept_cast(std::free)(p);
 }
 
 #elif defined(HPX_HAVE_C11_ALIGNED_ALLOC)
@@ -52,12 +56,12 @@ inline void __aligned_free(void* p) noexcept
 
 inline void* __aligned_alloc(std::size_t alignment, std::size_t size) noexcept
 {
-    return aligned_alloc(alignment, size);
+    return hpx::util::noexcept_cast(aligned_alloc)(alignment, size);
 }
 
 inline void __aligned_free(void* p) noexcept
 {
-    free(p);
+    hpx::util::noexcept_cast(free)(p);
 }
 
 #else    // !HPX_HAVE_CXX17_STD_ALIGNED_ALLOC && !HPX_HAVE_C11_ALIGNED_ALLOC
@@ -73,7 +77,8 @@ inline void* __aligned_alloc(std::size_t alignment, std::size_t size) noexcept
     }
 
     std::size_t space = size + alignment - 1;
-    void* allocated_mem = std::malloc(space + sizeof(void*));
+    void* allocated_mem =
+        hpx::util::noexcept_cast(std::malloc)(space + sizeof(void*));
     if (allocated_mem == nullptr)
     {
         return nullptr;
@@ -92,7 +97,7 @@ inline void __aligned_free(void* p) noexcept
 {
     if (nullptr != p)
     {
-        std::free(*(static_cast<void**>(p) - 1));
+        hpx::util::noexcept_cast(std::free)(*(static_cast<void**>(p) - 1));
     }
 }
 

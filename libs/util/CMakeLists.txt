@@ -14,6 +14,7 @@ set(util_headers
     hpx/util/insert_checked.hpp
     hpx/util/ios_flags_saver.hpp
     hpx/util/manage_config.hpp
+    hpx/util/noexcept_cast.hpp
     hpx/util/regex_from_pattern.hpp
     hpx/util/sed_transform.hpp
     hpx/util/traits/await_traits.hpp
