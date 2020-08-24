@@ -8,9 +8,9 @@ module purge
 module load cmake
 module load gcc/9
 module load boost/1.73.0-${build_type,,}
-module load hwloc/2
+module load hwloc
 module load cuda/11
-module load mpich
+module load openmpi
 
 configure_extra_options="-DCMAKE_BUILD_TYPE=${build_type}"
 configure_extra_options+=" -DHPX_WITH_MALLOC=system"
