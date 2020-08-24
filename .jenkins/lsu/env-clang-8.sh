@@ -8,8 +8,8 @@ module purge
 module load cmake
 module load clang/8
 module load boost/1.69.0-${build_type,,}
-module load hwloc/2
-module load mpich
+module load hwloc
+module load openmpi
 
 export HPXRUN_RUNWRAPPER=srun
 
