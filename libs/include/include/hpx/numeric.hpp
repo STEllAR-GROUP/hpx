@@ -16,5 +16,4 @@ namespace hpx {
     using hpx::parallel::inclusive_scan;
     using hpx::parallel::transform_exclusive_scan;
     using hpx::parallel::transform_inclusive_scan;
-    using hpx::parallel::transform_reduce;
 }    // namespace hpx

@@ -681,7 +681,7 @@ Parallel algorithms
        ``values={9,5,30,10}``.
      * ``<hpx/numeric.hpp>``
      *
-   * * :cpp:func:`hpx::parallel::v1::transform_reduce`
+   * * :cpp:func:`hpx::transform_reduce`
      * Sums up a range of elements after applying a function. Also, accumulates the inner products of two input ranges.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`transform_reduce`
@@ -700,11 +700,11 @@ Parallel algorithms
      * Description
      * In header
      * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::parallel::v1::destroy`
+   * * :cpp:func:`hpx::destroy`
      * Destroys a range of objects.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`destroy`
-   * * :cpp:func:`hpx::parallel::v1::destroy_n`
+   * * :cpp:func:`hpx::destroy_n`
      * Destroys a range of objects.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`destroy_n`

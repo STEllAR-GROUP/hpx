@@ -104,6 +104,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/sort.hpp
     hpx/parallel/container_algorithms/stable_sort.hpp
     hpx/parallel/container_algorithms/transform.hpp
+    hpx/parallel/container_algorithms/transform_reduce.hpp
     hpx/parallel/container_algorithms/unique.hpp
     hpx/parallel/container_memory.hpp
     hpx/parallel/container_numeric.hpp

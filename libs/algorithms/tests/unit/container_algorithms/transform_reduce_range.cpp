@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -44,7 +45,7 @@ void test_transform_reduce(IteratorTag)
 
     result_type const init = make_tuple(std::size_t(1), std::size_t(1));
 
-    result_type r1 = hpx::transform_reduce(iterator(std::begin(c)),
+    result_type r1 = hpx::ranges::transform_reduce(iterator(std::begin(c)),
         iterator(std::end(c)), init, reduce_op, convert_op);
 
     // verify values
@@ -85,8 +86,9 @@ void test_transform_reduce(ExPolicy&& policy, IteratorTag)
 
     result_type const init = make_tuple(std::size_t(1), std::size_t(1));
 
-    result_type r1 = hpx::transform_reduce(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), init, reduce_op, convert_op);
+    result_type r1 =
+        hpx::ranges::transform_reduce(policy, iterator(std::begin(c)),
+            iterator(std::end(c)), init, reduce_op, convert_op);
 
     // verify values
     result_type r2 = std::accumulate(std::begin(c), std::end(c), init,
@@ -111,8 +113,8 @@ void test_transform_reduce_async(ExPolicy&& p, IteratorTag)
     auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2 + val; };
 
     hpx::future<std::size_t> f =
-        hpx::transform_reduce(p, iterator(std::begin(c)), iterator(std::end(c)),
-            val, op, [](std::size_t v) { return v; });
+        hpx::ranges::transform_reduce(p, iterator(std::begin(c)),
+            iterator(std::end(c)), val, op, [](std::size_t v) { return v; });
     f.wait();
 
     // verify values
@@ -154,7 +156,7 @@ void test_transform_reduce_exception(IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::transform_reduce(
+        hpx::ranges::transform_reduce(
             iterator(std::begin(c)), iterator(std::end(c)), std::size_t(42),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), v1 + v2;
@@ -193,7 +195,7 @@ void test_transform_reduce_exception(ExPolicy&& policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::transform_reduce(
+        hpx::ranges::transform_reduce(
             policy, iterator(std::begin(c)), iterator(std::end(c)),
             std::size_t(42),
             [](std::size_t v1, std::size_t v2) {
@@ -229,7 +231,7 @@ void test_transform_reduce_exception_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::transform_reduce(
+        hpx::future<void> f = hpx::ranges::transform_reduce(
             p, iterator(std::begin(c)), iterator(std::end(c)), std::size_t(42),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), v1 + v2;
@@ -292,7 +294,7 @@ void test_transform_reduce_bad_alloc(IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::transform_reduce(
+        hpx::ranges::transform_reduce(
             iterator(std::begin(c)), iterator(std::end(c)), std::size_t(42),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), v1 + v2;
@@ -329,7 +331,7 @@ void test_transform_reduce_bad_alloc(ExPolicy&& policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::transform_reduce(
+        hpx::ranges::transform_reduce(
             policy, iterator(std::begin(c)), iterator(std::end(c)),
             std::size_t(42),
             [](std::size_t v1, std::size_t v2) {
@@ -364,7 +366,7 @@ void test_transform_reduce_bad_alloc_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::transform_reduce(
+        hpx::future<void> f = hpx::ranges::transform_reduce(
             p, iterator(std::begin(c)), iterator(std::end(c)), std::size_t(42),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), v1 + v2;

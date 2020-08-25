@@ -10,3 +10,4 @@
 #include <hpx/parallel/numeric.hpp>
 
 #include <hpx/parallel/container_algorithms/reduce.hpp>
+#include <hpx/parallel/container_algorithms/transform_reduce.hpp>

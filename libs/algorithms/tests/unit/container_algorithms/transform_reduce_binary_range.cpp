@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#include "transform_reduce_binary_tests.hpp"
+#include "transform_reduce_binary_tests_range.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>

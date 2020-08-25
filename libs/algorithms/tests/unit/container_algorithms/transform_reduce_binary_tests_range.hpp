@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,7 +31,7 @@ void test_transform_reduce_binary(IteratorTag)
     std::vector<int> d = test::random_iota<int>(1007);
     int init = std::rand() % 1007;    //-V101
 
-    int r = hpx::transform_reduce(
+    int r = hpx::ranges::transform_reduce(
         iterator(std::begin(c)), iterator(std::end(c)), std::begin(d), init);
 
     HPX_TEST_EQ(
@@ -52,7 +52,7 @@ void test_transform_reduce_binary(ExPolicy&& policy, IteratorTag)
     std::vector<int> d = test::random_iota<int>(1007);
     int init = std::rand() % 1007;    //-V101
 
-    int r = hpx::transform_reduce(policy, iterator(std::begin(c)),
+    int r = hpx::ranges::transform_reduce(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(d), init);
 
     HPX_TEST_EQ(
@@ -73,7 +73,7 @@ void test_transform_reduce_binary_async(ExPolicy&& p, IteratorTag)
     std::vector<int> d = test::random_iota<int>(1007);
     int init = std::rand() % 1007;    //-V101
 
-    hpx::future<int> fut_r = hpx::transform_reduce(
+    hpx::future<int> fut_r = hpx::ranges::transform_reduce(
         p, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d), init);
 
     fut_r.wait();

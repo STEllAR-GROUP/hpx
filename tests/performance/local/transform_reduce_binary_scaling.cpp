@@ -42,7 +42,7 @@ float measure_inner_product(ExPolicy && policy,
     std::vector<float> const& data1, std::vector<float> const& data2)
 {
     return
-        hpx::parallel::transform_reduce(
+        hpx::transform_reduce(
             policy,
             std::begin(data1),
             std::end(data1),

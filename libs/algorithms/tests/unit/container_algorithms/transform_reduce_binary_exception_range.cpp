@@ -34,8 +34,9 @@ void test_transform_reduce_binary_exception(IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::transform_reduce(decorated_iterator(std::begin(c),
-                                  []() { throw std::runtime_error("test"); }),
+        hpx::ranges::transform_reduce(
+            decorated_iterator(
+                std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), std::begin(d), init);
         HPX_TEST(false);
     }
@@ -70,7 +71,7 @@ void test_transform_reduce_binary_exception(ExPolicy&& policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::transform_reduce(policy,
+        hpx::ranges::transform_reduce(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), std::begin(d), init);
@@ -104,7 +105,7 @@ void test_transform_reduce_binary_exception_async(ExPolicy&& p, IteratorTag)
 
     try
     {
-        hpx::future<std::size_t> f = hpx::transform_reduce(p,
+        hpx::future<std::size_t> f = hpx::ranges::transform_reduce(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), std::begin(d), init);

@@ -169,8 +169,8 @@ int main(int argc, char* argv[])
 
 double test_results(std::uint64_t order, std::vector<double> const& trans)
 {
-    using hpx::parallel::transform_reduce;
-    using hpx::parallel::execution::par;
+    using hpx::transform_reduce;
+    using hpx::execution::par;
 
     const std::uint64_t start = 0;
 

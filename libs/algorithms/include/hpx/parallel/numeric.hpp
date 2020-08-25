@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2015 Daniel Bourgeois
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,4 +19,3 @@
 #include <hpx/parallel/algorithms/transform_exclusive_scan.hpp>
 #include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
 #include <hpx/parallel/algorithms/transform_reduce.hpp>
-#include <hpx/parallel/algorithms/transform_reduce_binary.hpp>

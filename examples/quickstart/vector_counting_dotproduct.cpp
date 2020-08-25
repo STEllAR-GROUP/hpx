@@ -26,7 +26,7 @@ int hpx_main()
     std::fill(std::begin(yvalues), std::end(yvalues), 1.0);
 
     double result =
-        hpx::parallel::transform_reduce(
+        hpx::transform_reduce(
             hpx::parallel::execution::par,
             hpx::util::counting_iterator<size_t>(0),
             hpx::util::counting_iterator<size_t>(10007),

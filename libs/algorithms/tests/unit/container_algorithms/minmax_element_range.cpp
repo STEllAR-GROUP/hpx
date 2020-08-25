@@ -34,7 +34,7 @@ void test_minmax_element(ExPolicy policy, IteratorTag)
     typedef test::test_container<std::vector<std::size_t>, IteratorTag>
         test_vector;
 
-    test_vector c = test::random_iota<test_vector>(10007);
+    test_vector c = test::random_iota(10007);
 
     base_iterator ref_end(std::end(c.base()));
 
@@ -67,7 +67,7 @@ void test_minmax_element_async(ExPolicy p, IteratorTag)
     typedef test::test_container<std::vector<std::size_t>, IteratorTag>
         test_vector;
 
-    test_vector c = test::random_iota<test_vector>(10007);
+    test_vector c = test::random_iota(10007);
 
     base_iterator ref_end(std::end(c.base()));
 
