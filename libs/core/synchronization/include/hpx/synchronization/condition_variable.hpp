@@ -12,7 +12,7 @@
 #include <hpx/execution_base/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/synchronization/condition_variable.hpp>
+#include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/synchronization/stop_token.hpp>

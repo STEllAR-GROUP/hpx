@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2019 Hartmut Kaiser
+//  Copyright (c) 2015-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,13 +10,14 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/synchronization/condition_variable.hpp>
+#include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <mutex>
 #include <utility>
 
@@ -72,7 +73,7 @@ namespace hpx { namespace lcos { namespace local {
         ///                 supports.
         static constexpr std::ptrdiff_t(max)() noexcept
         {
-            return PTRDIFF_MAX;
+            return (std::numeric_limits<std::ptrdiff_t>::max)();
         }
 
         /// Decrements counter_ by n. Does not block.
@@ -93,9 +94,14 @@ namespace hpx { namespace lcos { namespace local {
 
             if (new_count == 0)
             {
-                std::unique_lock<mutex_type> l(mtx_.data_);
-                notified_ = true;
-                cond_.data_.notify_all(std::move(l));    // release the threads
+                bool expected = false;
+                if (notified_.compare_exchange_strong(
+                        expected, true, std::memory_order_acq_rel))
+                {
+                    // release the threads
+                    std::unique_lock<mutex_type> l(mtx_.data_);
+                    cond_.data_.notify_all(std::move(l));
+                }
             }
         }
 
@@ -114,10 +120,18 @@ namespace hpx { namespace lcos { namespace local {
         ///
         void wait() const
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
-            if (counter_.load(std::memory_order_relaxed) > 0 || !notified_)
+            if (counter_.load(std::memory_order_relaxed) > 0)
             {
+                std::unique_lock<mutex_type> l(mtx_.data_);
                 cond_.data_.wait(l, "hpx::local::cpp20_latch::wait");
+            }
+            else if (!notified_.load(std::memory_order_relaxed))
+            {
+                std::unique_lock<mutex_type> l(mtx_.data_);
+                if (!notified_.load(std::memory_order_acquire))
+                {
+                    cond_.data_.wait(l, "hpx::local::cpp20_latch::wait");
+                }
             }
         }
 
@@ -128,20 +142,28 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ASSERT(update >= 0);
 
-            std::unique_lock<mutex_type> l(mtx_.data_);
-
             std::ptrdiff_t new_count = (counter_ -= update);
             HPX_ASSERT(new_count >= 0);
 
             if (new_count == 0)
             {
-                notified_ = true;
-                cond_.data_.notify_all(std::move(l));    // release the threads
+                bool expected = false;
+                if (notified_.compare_exchange_strong(
+                        expected, true, std::memory_order_acq_rel))
+                {
+                    // release the threads
+                    std::unique_lock<mutex_type> l(mtx_.data_);
+                    cond_.data_.notify_all(std::move(l));
+                }
             }
-            else
+            else if (!notified_.load(std::memory_order_relaxed))
             {
-                cond_.data_.wait(
-                    l, "hpx::local::cpp20_latch::count_down_and_wait");
+                std::unique_lock<mutex_type> l(mtx_.data_);
+                if (!notified_.load(std::memory_order_acquire))
+                {
+                    cond_.data_.wait(
+                        l, "hpx::local::cpp20_latch::count_down_and_wait");
+                }
             }
         }
 
@@ -149,7 +171,7 @@ namespace hpx { namespace lcos { namespace local {
         mutable util::cache_line_data<mutex_type> mtx_;
         mutable util::cache_line_data<local::detail::condition_variable> cond_;
         std::atomic<std::ptrdiff_t> counter_;
-        bool notified_;
+        std::atomic<bool> notified_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -257,9 +279,11 @@ namespace hpx { namespace lcos { namespace local {
             HPX_ASSERT(old_count == 0);
             HPX_UNUSED(old_count);
 
-            std::unique_lock<mutex_type> l(mtx_.data_);
-            HPX_ASSERT(notified_);
-            notified_ = false;
+            bool old_notified =
+                notified_.exchange(false, std::memory_order_acq_rel);
+
+            HPX_ASSERT(old_notified);
+            HPX_UNUSED(old_notified);
         }
     };
 }}}    // namespace hpx::lcos::local
