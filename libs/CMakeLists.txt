@@ -41,11 +41,11 @@ set(HPX_CANDIDATE_LIBS
     coroutines
     datastructures
     debugging
-    distributed_executors
     errors
     execution
     execution_base
     executors
+    executors_distributed
     filesystem
     format
     functional

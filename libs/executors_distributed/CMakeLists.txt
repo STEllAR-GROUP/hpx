@@ -12,22 +12,22 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(distributed_executors_headers
-    hpx/distributed_executors/distribution_policy_executor.hpp
+set(executors_distributed_headers
+    hpx/executors_distributed/distribution_policy_executor.hpp
 )
 
-set(distributed_executors_compat_headers
+set(executors_distributed_compat_headers
     hpx/parallel/executors/distribution_policy_executor.hpp
 )
 
 include(HPX_AddModule)
 add_hpx_module(
-  distributed_executors
+  executors_distributed
   COMPATIBILITY_HEADERS ON
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
-  HEADERS ${distributed_executors_headers}
-  COMPAT_HEADERS ${distributed_executors_compat_headers}
+  HEADERS ${executors_distributed_headers}
+  COMPAT_HEADERS ${executors_distributed_compat_headers}
   DEPENDENCIES hpx_async_distributed hpx_config hpx_execution hpx_functional
                hpx_type_support
   CMAKE_SUBDIRS examples tests

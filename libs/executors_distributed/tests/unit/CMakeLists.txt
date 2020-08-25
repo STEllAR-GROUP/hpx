@@ -12,7 +12,7 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  set(folder_name "Tests/Unit/Modules/DistributedExecutors")
+  set(folder_name "Tests/Unit/Modules/ExecutorsDistributed")
 
   add_hpx_executable(
     ${test}_test INTERNAL_FLAGS
@@ -22,6 +22,6 @@ foreach(test ${tests})
   )
 
   add_hpx_unit_test(
-    "modules.distributed_executors" ${test} ${${test}_PARAMETERS}
+    "modules.executors_distributed" ${test} ${${test}_PARAMETERS}
   )
 endforeach()

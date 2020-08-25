@@ -7,10 +7,10 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 =====================
-distributed_executors
+executors_distributed
 =====================
 
 This library is part of HPX.
 
 Documentation can be found `here
-<https://hpx-docs.stellar-group.org/latest/html/libs/distributed_executors/docs/index.html>`__.
+<https://hpx-docs.stellar-group.org/latest/html/libs/executors_distributed/docs/index.html>`__.
