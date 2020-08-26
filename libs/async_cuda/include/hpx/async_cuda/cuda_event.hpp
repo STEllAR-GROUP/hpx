@@ -19,10 +19,9 @@ namespace hpx { namespace cuda { namespace experimental {
     // Since allocation of a cuda event passes into the cuda runtime
     // it might be an expensive operation, so we pre-allocate a pool
     // of them at startup.
-    // For now - Assume a maximum of 64 outstanding events is enough
     struct cuda_event_pool
     {
-        static constexpr int max_events_in_pool = 64;
+        static constexpr int initial_events_in_pool = 128;
 
         static cuda_event_pool& get_event_pool()
         {
@@ -32,17 +31,11 @@ namespace hpx { namespace cuda { namespace experimental {
 
         // create a bunch of events on initialization
         cuda_event_pool()
+          : free_list_(initial_events_in_pool)
         {
-            for (int i = 0; i < max_events_in_pool; ++i)
+            for (int i = 0; i < initial_events_in_pool; ++i)
             {
-                cudaEvent_t event;
-                // Create an cuda_event to query a CUDA/CUBLAS kernel for completion.
-                // Timing is disabled for performance. [1]
-                //
-                // [1]: CUDA Runtime API, section 5.5 cuda_event Management
-                check_cuda_error(
-                    cudaEventCreateWithFlags(&event, cudaEventDisableTiming));
-                free_list_.push(event);
+                add_event_to_pool();
             }
         }
 
@@ -50,16 +43,23 @@ namespace hpx { namespace cuda { namespace experimental {
         ~cuda_event_pool()
         {
             cudaEvent_t event;
-            for (int i = 0; i < max_events_in_pool; ++i)
+            bool ok = true;
+            while (ok)
             {
-                free_list_.pop(event);
-                check_cuda_error(cudaEventDestroy(event));
+                ok = free_list_.pop(event);
+                if (ok)
+                    check_cuda_error(cudaEventDestroy(event));
             }
         }
 
         inline bool pop(cudaEvent_t& event)
         {
-            return free_list_.pop(event);
+            // pop an event off the pool, if that fails, create a new one
+            while (!free_list_.pop(event))
+            {
+                add_event_to_pool();
+            }
+            return true;
         }
 
         inline bool push(cudaEvent_t event)
@@ -68,10 +68,20 @@ namespace hpx { namespace cuda { namespace experimental {
         }
 
     private:
-        // using a fixed capacity stack means no allocations are
-        // needed , throws an exception if the capacity is exceeded
-        boost::lockfree::stack<cudaEvent_t,
-            boost::lockfree::capacity<max_events_in_pool>>
+        void add_event_to_pool()
+        {
+            cudaEvent_t event;
+            // Create an cuda_event to query a CUDA/CUBLAS kernel for completion.
+            // Timing is disabled for performance. [1]
+            //
+            // [1]: CUDA Runtime API, section 5.5 cuda_event Management
+            check_cuda_error(
+                cudaEventCreateWithFlags(&event, cudaEventDisableTiming));
+            free_list_.push(event);
+        }
+
+        // pool is dynamically sized and can grow if needed
+        boost::lockfree::stack<cudaEvent_t, boost::lockfree::fixed_sized<false>>
             free_list_;
     };
 }}}    // namespace hpx::cuda::experimental
