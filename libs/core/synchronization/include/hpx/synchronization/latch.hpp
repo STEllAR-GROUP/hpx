@@ -94,14 +94,14 @@ namespace hpx { namespace lcos { namespace local {
 
             if (new_count == 0)
             {
-                bool expected = false;
-                if (notified_.compare_exchange_strong(
-                        expected, true, std::memory_order_acq_rel))
-                {
-                    // release the threads
-                    std::unique_lock<mutex_type> l(mtx_.data_);
-                    cond_.data_.notify_all(std::move(l));
-                }
+                bool old_notified =
+                    notified_.exchange(true, std::memory_order_acq_rel);
+                HPX_ASSERT(!old_notified);
+                HPX_UNUSED(old_notified);
+
+                // release the threads
+                std::unique_lock<mutex_type> l(mtx_.data_);
+                cond_.data_.notify_all(std::move(l));
             }
         }
 
@@ -120,15 +120,18 @@ namespace hpx { namespace lcos { namespace local {
         ///
         void wait() const
         {
-            if (counter_.load(std::memory_order_relaxed) > 0)
+            if (counter_.load(std::memory_order_acquire) > 0)
             {
                 std::unique_lock<mutex_type> l(mtx_.data_);
-                cond_.data_.wait(l, "hpx::local::cpp20_latch::wait");
+                if (counter_.load(std::memory_order_relaxed) > 0)
+                {
+                    cond_.data_.wait(l, "hpx::local::cpp20_latch::wait");
+                }
             }
-            else if (!notified_.load(std::memory_order_relaxed))
+            else if (!notified_.load(std::memory_order_acquire))
             {
                 std::unique_lock<mutex_type> l(mtx_.data_);
-                if (!notified_.load(std::memory_order_acquire))
+                if (!notified_.load(std::memory_order_relaxed))
                 {
                     cond_.data_.wait(l, "hpx::local::cpp20_latch::wait");
                 }
@@ -147,22 +150,22 @@ namespace hpx { namespace lcos { namespace local {
 
             if (new_count == 0)
             {
-                bool expected = false;
-                if (notified_.compare_exchange_strong(
-                        expected, true, std::memory_order_acq_rel))
-                {
-                    // release the threads
-                    std::unique_lock<mutex_type> l(mtx_.data_);
-                    cond_.data_.notify_all(std::move(l));
-                }
+                bool old_notified =
+                    notified_.exchange(true, std::memory_order_acq_rel);
+                HPX_ASSERT(!old_notified);
+                HPX_UNUSED(old_notified);
+
+                // release the threads
+                std::unique_lock<mutex_type> l(mtx_.data_);
+                cond_.data_.notify_all(std::move(l));
             }
-            else if (!notified_.load(std::memory_order_relaxed))
+            else if (!notified_.load(std::memory_order_acquire))
             {
                 std::unique_lock<mutex_type> l(mtx_.data_);
-                if (!notified_.load(std::memory_order_acquire))
+                if (!notified_.load(std::memory_order_relaxed))
                 {
                     cond_.data_.wait(
-                        l, "hpx::local::cpp20_latch::count_down_and_wait");
+                        l, "hpx::local::cpp20_latch::arrive_and_wait");
                 }
             }
         }
