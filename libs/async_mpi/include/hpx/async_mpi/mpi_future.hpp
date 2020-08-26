@@ -230,7 +230,7 @@ namespace hpx { namespace mpi { namespace experimental {
     // -----------------------------------------------------------------
     // This RAII helper class assumes that MPI initialization/finalization is
     // handled elsewhere
-    struct enable_user_polling
+    struct HPX_NODISCARD enable_user_polling
     {
         enable_user_polling(std::string const& pool_name = "")
           : pool_name_(pool_name)
