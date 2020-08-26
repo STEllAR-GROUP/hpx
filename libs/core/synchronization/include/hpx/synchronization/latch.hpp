@@ -94,14 +94,14 @@ namespace hpx { namespace lcos { namespace local {
 
             if (new_count == 0)
             {
-                bool old_notified =
-                    notified_.exchange(true, std::memory_order_acq_rel);
-                HPX_ASSERT(!old_notified);
-                HPX_UNUSED(old_notified);
-
-                // release the threads
-                std::unique_lock<mutex_type> l(mtx_.data_);
-                cond_.data_.notify_all(std::move(l));
+                bool expected = false;
+                if (notified_.compare_exchange_strong(
+                        expected, true, std::memory_order_acq_rel))
+                {
+                    // release the threads
+                    std::unique_lock<mutex_type> l(mtx_.data_);
+                    cond_.data_.notify_all(std::move(l));
+                }
             }
         }
 
@@ -150,14 +150,14 @@ namespace hpx { namespace lcos { namespace local {
 
             if (new_count == 0)
             {
-                bool old_notified =
-                    notified_.exchange(true, std::memory_order_acq_rel);
-                HPX_ASSERT(!old_notified);
-                HPX_UNUSED(old_notified);
-
-                // release the threads
-                std::unique_lock<mutex_type> l(mtx_.data_);
-                cond_.data_.notify_all(std::move(l));
+                bool expected = false;
+                if (notified_.compare_exchange_strong(
+                        expected, true, std::memory_order_acq_rel))
+                {
+                    // release the threads
+                    std::unique_lock<mutex_type> l(mtx_.data_);
+                    cond_.data_.notify_all(std::move(l));
+                }
             }
             else if (!notified_.load(std::memory_order_acquire))
             {
