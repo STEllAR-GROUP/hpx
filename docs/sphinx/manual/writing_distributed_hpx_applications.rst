@@ -1316,7 +1316,7 @@ owned by the current image::
         // Instantiate the local view from the view
         auto local_vv = hpx::local_view(vv);
 
-        for ( auto i = localvv.begin(); i != localvv.end(); i++ )
+        for ( auto i = local_vv.begin(); i != local_vv.end(); i++ )
         {
             std::vector<float> & segment = *i;
 
