@@ -34,6 +34,7 @@ add_hpx_module(
   HEADERS ${lcos_distributed_headers}
   COMPAT_HEADERS ${lcos_distributed_compat_headers}
   DEPENDENCIES
+    hpx_actions
     hpx_assertion
     hpx_async_distributed
     hpx_config

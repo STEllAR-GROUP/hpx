@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/runtime/actions/continuation_fwd.hpp>
-#include <hpx/traits/action_continuation.hpp>
+#include <hpx/actions_base/continuation_fwd.hpp>
+#include <hpx/actions_base/traits/action_continuation.hpp>
 
 namespace hpx { namespace traits
 {

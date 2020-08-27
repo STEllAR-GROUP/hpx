@@ -26,6 +26,7 @@
 
 #include <hpx/algorithm.hpp>
 #include <hpx/modules/checkpoint.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <boost/range/irange.hpp>
 

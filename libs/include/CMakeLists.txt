@@ -122,7 +122,6 @@ add_hpx_module(
   GLOBAL_HEADER_GEN OFF
   HEADERS ${include_headers}
   DEPENDENCIES
-    hpx_actions_base
     hpx_algorithms
     hpx_assertion
     hpx_async_base
@@ -153,6 +152,8 @@ add_hpx_module(
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   # cmake-format: off
   target_link_libraries(hpx_include PUBLIC
+    hpx_actions
+    hpx_actions_base
     hpx_async_distributed
     hpx_lcos_distributed
     hpx_performance_counters

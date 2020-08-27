@@ -6,22 +6,34 @@
 
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/actions/include
 set(actions_headers
-    hpx/actions/actions_fwd.hpp hpx/actions/action_support.hpp
-    hpx/actions/base_action.hpp hpx/actions/transfer_base_action.hpp
+    hpx/actions/action_support.hpp
+    hpx/actions/actions_fwd.hpp
+    hpx/actions/base_action.hpp
+    hpx/actions/register_action.hpp
+    hpx/actions/transfer_base_action.hpp
+    hpx/actions/transfer_action.hpp
+    hpx/actions/transfer_continuation_action.hpp
 )
 
 # Default location is $HPX_ROOT/libs/actions/include_compatibility
 set(actions_compat_headers
-    hpx/runtime/actions_fwd.hpp hpx/runtime/actions/action_support.hpp
+    hpx/runtime/actions_fwd.hpp
+    hpx/runtime/actions/action_support.hpp
     hpx/runtime/actions/base_action.hpp
     hpx/runtime/actions/transfer_base_action.hpp
+    hpx/runtime/actions/transfer_action.hpp
+    hpx/runtime/actions/transfer_continuation_action.hpp
 )
 
-set(actions_sources)
+set(actions_sources base_action.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
@@ -35,12 +47,14 @@ add_hpx_module(
   DEPENDENCIES
     hpx_actions_base
     hpx_assertion
+    hpx_async_distributed
     hpx_config
     hpx_concurrency
     hpx_coroutines
     hpx_datastructures
     hpx_debugging
     hpx_itt_notify
+    hpx_runtime_local
     hpx_serialization
   CMAKE_SUBDIRS examples tests
 )

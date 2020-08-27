@@ -74,8 +74,10 @@ namespace hpx { namespace lcos {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/actions/action_support.hpp>
 #include <hpx/actions/base_action.hpp>
+#include <hpx/actions/transfer_action.hpp>
+#include <hpx/actions/transfer_continuation_action.hpp>
+#include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_combinators/when_all.hpp>
@@ -86,8 +88,6 @@ namespace hpx { namespace lcos {
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime/actions/transfer_action.hpp>
-#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/type_support/decay.hpp>

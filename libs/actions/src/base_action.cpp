@@ -9,16 +9,16 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions/base_action.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions { namespace detail
-{
+namespace hpx { namespace actions { namespace detail {
+
     ///////////////////////////////////////////////////////////////////////////
     struct action_serialization_data
     {
@@ -28,19 +28,20 @@ namespace hpx { namespace actions { namespace detail
           , parent_phase_(0)
           , priority_(static_cast<threads::thread_priority>(0))
           , stacksize_(static_cast<threads::thread_stacksize>(0))
-        {}
+        {
+        }
 
         action_serialization_data(std::uint32_t parent_locality,
-                threads::thread_id_type parent_id,
-                std::uint64_t parent_phase,
-                threads::thread_priority priority,
-                threads::thread_stacksize stacksize)
+            threads::thread_id_type parent_id, std::uint64_t parent_phase,
+            threads::thread_priority priority,
+            threads::thread_stacksize stacksize)
           : parent_locality_(parent_locality)
           , parent_id_(reinterpret_cast<std::uint64_t>(parent_id.get()))
           , parent_phase_(parent_phase)
           , priority_(priority)
           , stacksize_(stacksize)
-        {}
+        {
+        }
 
         std::uint32_t parent_locality_;
         std::uint64_t parent_id_;
@@ -51,25 +52,22 @@ namespace hpx { namespace actions { namespace detail
         template <typename Archive>
         void serialize(Archive& ar, unsigned)
         {
-            ar & parent_id_ & parent_phase_ & parent_locality_
-               & priority_ & stacksize_;
+            ar& parent_id_& parent_phase_& parent_locality_& priority_&
+                stacksize_;
         }
     };
-}}}
+}}}    // namespace hpx::actions::detail
 
 HPX_IS_BITWISE_SERIALIZABLE(hpx::actions::detail::action_serialization_data)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions
-{
+namespace hpx { namespace actions {
     ///////////////////////////////////////////////////////////////////////////
-    base_action::~base_action()
-    {
-    }
+    base_action::~base_action() {}
 
     ///////////////////////////////////////////////////////////////////////////
-    base_action_data::base_action_data(threads::thread_priority priority,
-            threads::thread_stacksize stacksize)
+    base_action_data::base_action_data(
+        threads::thread_priority priority, threads::thread_stacksize stacksize)
       : priority_(priority)
       , stacksize_(stacksize)
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
@@ -82,7 +80,7 @@ namespace hpx { namespace actions
 
     // serialization support
     // loading ...
-    void base_action_data::load_base(hpx::serialization::input_archive & ar)
+    void base_action_data::load_base(hpx::serialization::input_archive& ar)
     {
         // Always serialize the parent information to maintain binary
         // compatibility on the wire.
@@ -101,7 +99,7 @@ namespace hpx { namespace actions
     }
 
     // saving ...
-    void base_action_data::save_base(hpx::serialization::output_archive & ar)
+    void base_action_data::save_base(hpx::serialization::output_archive& ar)
     {
         // Always serialize the parent information to maintain binary
         // compatibility on the wire.
@@ -111,15 +109,15 @@ namespace hpx { namespace actions
         threads::thread_id_type parent_id_;
         std::uint64_t parent_phase_ = 0;
 #endif
-        detail::action_serialization_data data(parent_locality_,
-            parent_id_, parent_phase_, priority_, stacksize_);
+        detail::action_serialization_data data(
+            parent_locality_, parent_id_, parent_phase_, priority_, stacksize_);
         ar << data;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     std::uint32_t base_action_data::get_locality_id()
     {
-        error_code ec(lightweight);      // ignore any errors
+        error_code ec(lightweight);    // ignore any errors
         return hpx::get_locality_id(ec);
     }
 
@@ -173,6 +171,6 @@ namespace hpx { namespace actions
     {
         return stacksize_;
     }
-}}
+}}    // namespace hpx::actions
 
 #endif

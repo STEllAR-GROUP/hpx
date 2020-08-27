@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,13 +10,13 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/action_priority.hpp>
 #include <hpx/actions_base/basic_action_fwd.hpp>
+#include <hpx/actions_base/continuation_fwd.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
 #include <hpx/functional/serialization/serializable_unique_function.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/runtime/actions/continuation_fwd.hpp>
 #include <hpx/runtime/actions/trigger.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/naming/id_type.hpp>

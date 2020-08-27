@@ -11,9 +11,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions_base/action_base_support.hpp>
 #include <hpx/actions_base/actions_base_fwd.hpp>
+#include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/basic_action_fwd.hpp>
+#include <hpx/actions_base/detail/action_factory.hpp>
+#include <hpx/actions_base/preassigned_action_id.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
 #include <hpx/actions_base/traits/action_stacksize.hpp>
@@ -32,9 +34,7 @@
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/detail/action_factory.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
-#include <hpx/runtime/actions/preassigned_action_id.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>

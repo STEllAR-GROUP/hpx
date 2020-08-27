@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/actions/action_support.hpp>
+#include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/async_distributed/applier/apply_continue.hpp>
 #include <hpx/async_distributed/applier/detail/apply_colocated_fwd.hpp>
 #include <hpx/async_distributed/applier/register_apply_colocated.hpp>

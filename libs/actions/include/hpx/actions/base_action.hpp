@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -16,13 +16,15 @@
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 
-#include <hpx/actions/action_support.hpp>
+#include <hpx/actions_base/actions_base_fwd.hpp>
+#include <hpx/actions_base/actions_base_support.hpp>
+#include <hpx/actions_base/detail/action_factory.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/runtime/actions/detail/action_factory.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/serialization/traits/needs_automatic_registration.hpp>
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
 #include <hpx/serialization/tuple.hpp>
 
@@ -41,10 +43,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions {
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a base_action class is an abstract class used as the base class
-    /// for all action types. It's main purpose is to allow polymorphic
-    /// serialization of action instances through a unique_ptr.
-    struct HPX_EXPORT base_action
+    // The \a base_action class is an abstract class used as the base class
+    // for all action types. It's main purpose is to allow polymorphic
+    // serialization of action instances through a unique_ptr.
+    struct base_action
     {
         /// Destructor
         virtual ~base_action();

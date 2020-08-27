@@ -8,7 +8,6 @@
 #include <hpx/config.hpp>
 #include <hpx/async_distributed/apply.hpp>
 #include <hpx/modules/async_distributed.hpp>
-#include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/async_distributed/applier/detail/apply_colocated.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>

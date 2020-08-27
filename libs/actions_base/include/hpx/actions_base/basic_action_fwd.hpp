@@ -9,12 +9,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions_base/preassigned_action_id.hpp>
+#include <hpx/functional/traits/get_action_name.hpp>
+
 #if defined(HPX_HAVE_NETWORKING) &&                                            \
     (HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX))
 #include <hpx/modules/itt_notify.hpp>
 #endif
-#include <hpx/functional/traits/get_action_name.hpp>
-#include <hpx/runtime/actions/preassigned_action_id.hpp>
 
 namespace hpx { namespace actions {
 

@@ -47,7 +47,6 @@ add_hpx_module(
   HEADERS ${compute_headers}
   COMPAT_HEADERS ${compute_compat_headers}
   DEPENDENCIES
-    hpx_actions_base
     hpx_affinity
     hpx_algorithms
     hpx_assertion
@@ -76,7 +75,8 @@ add_hpx_module(
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   target_link_libraries(
-    hpx_compute PUBLIC hpx_performance_counters hpx_async_distributed
+    hpx_compute PUBLIC hpx_actions_base hpx_performance_counters
+                       hpx_async_distributed
   )
 endif()
 
