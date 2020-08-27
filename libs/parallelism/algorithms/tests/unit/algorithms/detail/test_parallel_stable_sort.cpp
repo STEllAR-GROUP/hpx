@@ -48,7 +48,7 @@ void test3()
     constexpr std::uint32_t NMAX = NUMELEMS;
 
     std::vector<xk> V1, V2;
-    V1.reserve(NMAX);
+    V1.reserve(NMAX << 3);
     for (std::uint32_t i = 0; i < 8; ++i)
     {
         for (std::uint32_t k = 0; k < NMAX; ++k)
