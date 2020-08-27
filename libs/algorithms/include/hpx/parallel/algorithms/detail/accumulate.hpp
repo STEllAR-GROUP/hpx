@@ -1,4 +1,4 @@
-//  Copyright (c) 2019 Hartmut Kaiser
+//  Copyright (c) 2019-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,10 +12,10 @@
 #include <functional>
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+
     // provide implementation of std::accumulate supporting iterators/sentinels
-    template <typename InIterB, typename InIterE, typename T, typename F>
-    inline constexpr T accumulate(
-        InIterB first, InIterE last, T value, F reduce_op)
+    template <typename Iter, typename Sent, typename T, typename F>
+    inline constexpr T accumulate(Iter first, Sent last, T value, F&& reduce_op)
     {
         for (/**/; first != last; ++first)
         {
@@ -24,8 +24,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         return value;
     }
 
-    template <typename InIterB, typename InIterE, typename T>
-    inline constexpr T accumulate(InIterB first, InIterE last, T value)
+    template <typename Iter, typename Sent, typename T>
+    inline constexpr T accumulate(Iter first, Sent last, T value)
     {
         return accumulate(first, last, value, std::plus<T>());
     }

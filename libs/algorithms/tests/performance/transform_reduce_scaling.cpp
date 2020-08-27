@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -36,10 +37,9 @@ void measure_transform_reduce(std::size_t size)
         size, Point{double(gen()), double(gen())});
 
     // invoke transform_reduce
-    double result =
-        hpx::parallel::transform_reduce(hpx::parallel::execution::par,
-            std::begin(data_representation), std::end(data_representation), 0.0,
-            std::plus<double>(), [](Point r) { return r.x * r.y; });
+    double result = hpx::transform_reduce(hpx::parallel::execution::par,
+        std::begin(data_representation), std::end(data_representation), 0.0,
+        std::plus<double>(), [](Point r) { return r.x * r.y; });
     HPX_UNUSED(result);
 }
 

@@ -643,8 +643,8 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
     std::vector<block>& trans, std::uint64_t blocks_start,
     std::uint64_t blocks_end, std::uint64_t domain)
 {
-    using hpx::parallel::transform_reduce;
-    using hpx::parallel::execution::par;
+    using hpx::transform_reduce;
+    using hpx::execution::par;
 
     // Fill the original matrix, set transpose to known garbage value.
     auto range = boost::irange(blocks_start, blocks_end);

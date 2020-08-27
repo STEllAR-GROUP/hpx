@@ -213,8 +213,8 @@ void transpose(sub_block A, sub_block B, std::uint64_t block_order,
 double test_results(std::uint64_t order, std::uint64_t block_order,
     std::vector<block> const& trans)
 {
-    using hpx::parallel::transform_reduce;
-    using hpx::parallel::execution::par;
+    using hpx::transform_reduce;
+    using hpx::execution::par;
 
     const std::uint64_t start = 0;
     const std::uint64_t end = trans.size();

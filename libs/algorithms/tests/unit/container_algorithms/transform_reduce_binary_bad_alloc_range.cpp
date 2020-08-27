@@ -10,7 +10,6 @@
 #include <hpx/include/parallel_transform_reduce.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <algorithm>
 #include <cstddef>
 #include <ctime>
 #include <iostream>
@@ -21,7 +20,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_transform_reduce_binary_exception(IteratorTag)
+void test_transform_reduce_binary_bad_alloc(IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -34,16 +33,15 @@ void test_transform_reduce_binary_exception(IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::transform_reduce(decorated_iterator(std::begin(c),
-                                  []() { throw std::runtime_error("test"); }),
+        hpx::ranges::transform_reduce(
+            decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::begin(d), init);
+
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (std::bad_alloc const&)
     {
         caught_exception = true;
-        test::test_num_exceptions<hpx::execution::sequenced_policy,
-            IteratorTag>::call(hpx::execution::seq, e);
     }
     catch (...)
     {
@@ -53,7 +51,7 @@ void test_transform_reduce_binary_exception(IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_reduce_binary_exception(ExPolicy&& policy, IteratorTag)
+void test_transform_reduce_binary_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -70,16 +68,15 @@ void test_transform_reduce_binary_exception(ExPolicy&& policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::transform_reduce(policy,
-            decorated_iterator(
-                std::begin(c), []() { throw std::runtime_error("test"); }),
+        hpx::ranges::transform_reduce(policy,
+            decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::begin(d), init);
+
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (std::bad_alloc const&)
     {
         caught_exception = true;
-        test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
     catch (...)
     {
@@ -89,7 +86,7 @@ void test_transform_reduce_binary_exception(ExPolicy&& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_reduce_binary_exception_async(ExPolicy&& p, IteratorTag)
+void test_transform_reduce_binary_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -104,18 +101,19 @@ void test_transform_reduce_binary_exception_async(ExPolicy&& p, IteratorTag)
 
     try
     {
-        hpx::future<std::size_t> f = hpx::transform_reduce(p,
-            decorated_iterator(
-                std::begin(c), []() { throw std::runtime_error("test"); }),
+        hpx::future<std::size_t> f = hpx::ranges::transform_reduce(p,
+            decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::begin(d), init);
+
         returned_from_algorithm = true;
+
         f.get();
+
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (std::bad_alloc const&)
     {
         caught_exception = true;
-        test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
     catch (...)
     {
@@ -127,26 +125,28 @@ void test_transform_reduce_binary_exception_async(ExPolicy&& p, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_transform_reduce_binary_exception()
+void test_transform_reduce_binary_bad_alloc()
 {
     using namespace hpx::parallel;
 
-    test_transform_reduce_binary_exception(IteratorTag());
+    test_transform_reduce_binary_bad_alloc(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_transform_reduce_binary_exception(execution::seq, IteratorTag());
-    test_transform_reduce_binary_exception(execution::par, IteratorTag());
+    test_transform_reduce_binary_bad_alloc(execution::seq, IteratorTag());
+    test_transform_reduce_binary_bad_alloc(execution::par, IteratorTag());
 
-    test_transform_reduce_binary_exception_async(
+    test_transform_reduce_binary_bad_alloc_async(
+        execution::seq(execution::task), IteratorTag());
+    test_transform_reduce_binary_bad_alloc_async(
         execution::par(execution::task), IteratorTag());
 }
 
-void transform_reduce_binary_exception_test()
+void transform_reduce_binary_bad_alloc_test()
 {
-    test_transform_reduce_binary_exception<std::random_access_iterator_tag>();
-    test_transform_reduce_binary_exception<std::forward_iterator_tag>();
+    test_transform_reduce_binary_bad_alloc<std::random_access_iterator_tag>();
+    test_transform_reduce_binary_bad_alloc<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -159,7 +159,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    transform_reduce_binary_exception_test();
+    transform_reduce_binary_bad_alloc_test();
 
     return hpx::finalize();
 }

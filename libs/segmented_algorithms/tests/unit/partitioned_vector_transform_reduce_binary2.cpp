@@ -35,18 +35,16 @@ T test_transform_reduce_binary(ExPolicy&& policy,
     hpx::partitioned_vector<T> const& xvalues,
     hpx::partitioned_vector<T> const& yvalues)
 {
-    return hpx::parallel::transform_reduce(policy, xvalues.begin(),
-        xvalues.end(), yvalues.begin(), T(1), std::plus<T>(),
-        std::multiplies<T>());
+    return hpx::transform_reduce(policy, xvalues.begin(), xvalues.end(),
+        yvalues.begin(), T(1), std::plus<T>(), std::multiplies<T>());
 }
 
 template <typename ExPolicy, typename T>
 hpx::future<T> test_transform_reduce_binary_async(ExPolicy&& policy,
     hpx::partitioned_vector<T>& xvalues, hpx::partitioned_vector<T>& yvalues)
 {
-    return hpx::parallel::transform_reduce(policy, xvalues.begin(),
-        xvalues.end(), yvalues.begin(), T(1), std::plus<T>(),
-        std::multiplies<T>());
+    return hpx::transform_reduce(policy, xvalues.begin(), xvalues.end(),
+        yvalues.begin(), T(1), std::plus<T>(), std::multiplies<T>());
 }
 
 template <typename T>

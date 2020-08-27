@@ -37,7 +37,7 @@ T test_transform_reduce(ExPolicy&& policy,
     hpx::partitioned_vector<T> const& yvalues)
 {
     using hpx::util::make_zip_iterator;
-    return hpx::parallel::transform_reduce(policy,
+    return hpx::transform_reduce(policy,
         make_zip_iterator(std::begin(xvalues), std::begin(yvalues)),
         make_zip_iterator(std::end(xvalues), std::end(yvalues)), T(1),
         std::plus<T>(), multiply());
@@ -49,7 +49,7 @@ hpx::future<T> test_transform_reduce_async(ExPolicy&& policy,
     hpx::partitioned_vector<T> const& yvalues)
 {
     using hpx::util::make_zip_iterator;
-    return hpx::parallel::transform_reduce(policy,
+    return hpx::transform_reduce(policy,
         make_zip_iterator(std::begin(xvalues), std::begin(yvalues)),
         make_zip_iterator(std::end(xvalues), std::end(yvalues)), T(1),
         std::plus<T>(), multiply());

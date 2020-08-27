@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Daniel Bourgeois
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,13 +19,9 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag>
-void test_transform_reduce_binary_bad_alloc(ExPolicy policy, IteratorTag)
+template <typename IteratorTag>
+void test_transform_reduce_binary_bad_alloc(IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
@@ -36,7 +33,7 @@ void test_transform_reduce_binary_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::transform_reduce(policy,
+        hpx::transform_reduce(
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::begin(d), init);
 
@@ -54,7 +51,42 @@ void test_transform_reduce_binary_bad_alloc(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_reduce_binary_bad_alloc_async(ExPolicy p, IteratorTag)
+void test_transform_reduce_binary_bad_alloc(ExPolicy&& policy, IteratorTag)
+{
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c = test::random_iota(10007);
+    std::vector<std::size_t> d = test::random_iota(10007);
+    std::size_t init = std::rand() % 1007;    //-V101
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::transform_reduce(policy,
+            decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
+            decorated_iterator(std::end(c)), std::begin(d), init);
+
+        HPX_TEST(false);
+    }
+    catch (std::bad_alloc const&)
+    {
+        caught_exception = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+    HPX_TEST(caught_exception);
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_transform_reduce_binary_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -69,7 +101,7 @@ void test_transform_reduce_binary_bad_alloc_async(ExPolicy p, IteratorTag)
 
     try
     {
-        hpx::future<std::size_t> f = hpx::parallel::transform_reduce(p,
+        hpx::future<std::size_t> f = hpx::transform_reduce(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::begin(d), init);
 
@@ -96,6 +128,8 @@ template <typename IteratorTag>
 void test_transform_reduce_binary_bad_alloc()
 {
     using namespace hpx::parallel;
+
+    test_transform_reduce_binary_bad_alloc(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
