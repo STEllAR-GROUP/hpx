@@ -14,6 +14,7 @@
 #if defined(HPX_HAVE_APEX)
 #include <hpx/threading_base/external_timer.hpp>
 #endif
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -129,6 +130,7 @@ namespace hpx { namespace threads {
           , run_now(run_now_)
           , scheduler_base(scheduler_base_)
         {
+            HPX_UNUSED(desc);
         }
 
         threads::thread_function_type func;

@@ -268,7 +268,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::forward<FwdIter>(first));
             }
 
-            typedef typename std::iterator_traits<FwdIter>::value_type type;
             typedef hpx::traits::segmented_iterator_traits<FwdIter>
                 iterator_traits;
             return segmented_find(
@@ -298,7 +297,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::forward<FwdIter>(first));
             }
 
-            typedef typename std::iterator_traits<FwdIter>::value_type type;
             typedef hpx::traits::segmented_iterator_traits<FwdIter>
                 iterator_traits;
             return segmented_find(

@@ -26,6 +26,7 @@
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
+#include <hpx/threadmanager/threadmanager_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -149,7 +150,6 @@ namespace hpx {
     HPX_EXPORT std::uint64_t get_system_uptime();
 
     namespace threads {
-        class HPX_EXPORT threadmanager;
 
         /// \cond NOINTERNAL
         // The function get_thread_manager returns a reference to the

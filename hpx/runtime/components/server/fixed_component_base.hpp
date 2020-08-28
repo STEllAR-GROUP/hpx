@@ -192,11 +192,11 @@ namespace detail
     struct fixed_heap
     {
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-        static constexpr void* alloc(std::size_t count)
+        static constexpr void* alloc(std::size_t /*count*/)
         {
             return nullptr;
         }
-        static constexpr void free(void* p, std::size_t count)
+        static constexpr void free(void* /*p*/, std::size_t /*count*/)
         {
         }
 #else

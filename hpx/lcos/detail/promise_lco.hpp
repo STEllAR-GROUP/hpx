@@ -139,6 +139,7 @@ namespace lcos {
             void set_back_ptr(components::managed_component<promise_lco>* bp)
             {
                 HPX_ASSERT(bp);
+                HPX_UNUSED(bp);
             }
         };
 
@@ -175,6 +176,7 @@ namespace lcos {
             void set_back_ptr(components::managed_component<promise_lco>* bp)
             {
                 HPX_ASSERT(bp);
+                HPX_UNUSED(bp);
             }
         };
     }

@@ -92,8 +92,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef std::pair<FwdIter, FwdIter> partition_result_type;
             typedef
                 typename std::iterator_traits<FwdIter>::value_type value_type;
-            typedef typename util::detail::algorithm_result<ExPolicy>::type
-                result_type;
 
             util::cancellation_token<util::detail::no_data> tok;
             return util::partitioner_with_cleanup<ExPolicy, FwdIter,
