@@ -7,9 +7,9 @@
 
 .. _libs_mpi:
 
-===
+=========
 async_mpi
-===
+=========
 
 The MPI library is intended to simplify the process of integrating MPI based
 codes with the |hpx| runtime. Any MPI function that is asynchronous and uses an

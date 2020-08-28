@@ -157,7 +157,7 @@ Header ``hpx/barrier.hpp``
 ==========================
 
 This header includes :ref:`public_api_header_hpx_local_barrier` and
-ref:`public_api_header_hpx_distributed_barrier`.
+:ref:`public_api_header_hpx_distributed_barrier`.
 
 .. _public_api_header_hpx_local_barrier:
 
@@ -189,7 +189,7 @@ Header ``hpx/channel.hpp``
 ==========================
 
 This header includes :ref:`public_api_header_hpx_local_channel` and
-ref:`public_api_header_hpx_distributed_channel`.
+:ref:`public_api_header_hpx_distributed_channel`.
 
 .. _public_api_header_hpx_local_channel:
 
@@ -340,7 +340,7 @@ Header ``hpx/future.hpp``
 =========================
 
 This header includes :ref:`public_api_header_hpx_local_future` and
-ref:`public_api_header_hpx_distributed_future`.
+:ref:`public_api_header_hpx_distributed_future`.
 
 .. _public_api_header_hpx_local_future:
 
@@ -449,7 +449,7 @@ Header ``hpx/latch.hpp``
 ========================
 
 This header includes :ref:`public_api_header_hpx_local_latch` and
-ref:`public_api_header_hpx_distributed_latch`.
+:ref:`public_api_header_hpx_distributed_latch`.
 
 .. _public_api_header_hpx_local_latch:
 
@@ -533,6 +533,7 @@ Functions
 - :cpp:func:`hpx::parallel::v1::adjacent_difference`
 - :cpp:func:`hpx::parallel::v1::exclusive_scan`
 - :cpp:func:`hpx::parallel::v1::inclusive_scan`
+- :cpp:func:`hpx::reduce`
 - :cpp:func:`hpx::parallel::v1::transform_exclusive_scan`
 - :cpp:func:`hpx::parallel::v1::transform_inclusive_scan`
 - :cpp:func:`hpx::parallel::v1::transform_reduce`
@@ -564,7 +565,7 @@ Header ``hpx/runtime.hpp``
 ==========================
 
 This header includes :ref:`public_api_header_hpx_local_runtime` and
-ref:`public_api_header_hpx_distributed_runtime`.
+:ref:`public_api_header_hpx_distributed_runtime`.
 
 .. _public_api_header_hpx_local_runtime:
 
