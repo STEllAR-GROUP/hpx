@@ -50,9 +50,9 @@ and many bug fixes.
 * We continued with the modularization, making it easier for us to add the new
   experimental ``HPX_WITH_DISTRIBUTED_RUNTIME`` |cmake| option (see below) . An
   significant amount of headers have been deprecated. We adapted the namespaces
-  and headers we could to be closer to the standard ones (:ref:`api
-  <_public_api>`). Depending code should still compile, however warnings are now
-  generated instructing to change the include statements accordingly.
+  and headers we could to be closer to the standard ones (:ref:`public_api`).
+  Depending code should still compile, however warnings are now generated
+  instructing to change the include statements accordingly.
 * It is now possible to have a basic CUDA support including a helper function to
   get a future from a CUDA stream and target handling. They are available under
   the ``hpx::cuda::experimental`` namespace and they can be enabled with the
@@ -115,7 +115,7 @@ and many bug fixes.
   make ``hpx::shared_mutex`` (and similar) usable in more flexible ways.
 * We have changed the |cmake| targets exposed to the user, it now includes
   ``HPX::hpx``, ``HPX::wrap_main`` (``int main`` as the first |hpx| thread of
-  the application, see :ref:`starting HPX runtime <_starting_hpx>`),
+  the application, see :ref:`starting_hpx`),
   ``HPX::plugin``, ``HPX::component``.  The |cmake| variables
   ``HPX_INCLUDE_DIRS`` and ``HPX_LIBRARIES`` are deprecated and will be removed
   in a future release, you should now link directly to the ``HPX::hpx`` |cmake|
@@ -145,7 +145,7 @@ Breaking changes
   later. Other compilers might still work but have not been tested thoroughly.
 * We have added a ``hpx::init_params`` struct to pass parameters for |hpx|
   initialization e.g. the resource partitioner callback to initialize thread
-  pools (:ref:`using the resource partitioner <_using_resource_partitioner>`).
+  pools (:ref:`using_resource_partitioner`).
 * The ``all_to_all`` algorithm is renamed to ``all_gather``, and the new
   ``all_to_all`` algorithm is not compatible with the old one.
 * We have moved all of the existing APIs related to resiliency into the

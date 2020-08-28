@@ -415,7 +415,7 @@ Parallel algorithms
      * Finds the first position where two ranges differ.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`mismatch`
-   * * :cpp:func:`hpx:::none_of`
+   * * :cpp:func:`hpx::none_of`
      * Checks if a predicate is ``true`` for none of the elements in a range.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`all_any_none_of`
@@ -665,7 +665,7 @@ Parallel algorithms
      * Does an exclusive parallel scan over a range of elements.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`exclusive_scan`
-   * * :cpp:func:`hpx::parallel::v1::reduce`
+   * * :cpp:func:`hpx::reduce`
      * Sums up a range of elements.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`reduce`
