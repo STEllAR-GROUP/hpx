@@ -17,6 +17,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -185,6 +186,7 @@ namespace hpx { namespace components
             naming::gid_type const& assign_gid = naming::invalid_gid) const
         {
             HPX_ASSERT(!assign_gid);        // migration is not supported here
+            HPX_UNUSED(assign_gid);
             return this->detail::base_component::get_base_gid(
                 static_cast<Component const&>(*this).get_current_address());
         }

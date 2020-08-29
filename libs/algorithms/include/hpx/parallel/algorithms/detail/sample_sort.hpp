@@ -310,7 +310,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
 
         typedef less_ptr_no_null<Iter, Compare> compare_ptr;
-        typedef typename std::vector<Iter>::iterator it_to_it;
         spin_sort(vsample.begin(), vsample.end(), compare_ptr(comp));
 
         // Create the final milestone vector

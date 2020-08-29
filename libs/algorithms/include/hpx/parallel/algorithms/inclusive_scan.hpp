@@ -451,7 +451,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef typename std::iterator_traits<FwdIter1>::value_type value_type;
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
 
         return detail::inclusive_scan_(std::forward<ExPolicy>(policy), first,

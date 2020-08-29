@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <climits>
 #include <cstddef>
@@ -78,6 +79,7 @@ namespace hpx { namespace threads {
     inline void resize(mask_type& /*mask*/, std::size_t s)
     {
         HPX_ASSERT(s <= CHAR_BIT * sizeof(mask_type));
+        HPX_UNUSED(s);
     }
 
     inline std::size_t find_first(mask_cref_type mask)

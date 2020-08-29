@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2007-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c)      2017 Shoshana Jakobovits
@@ -20,6 +20,7 @@
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/threadmanager/threadmanager_fwd.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 
 #include <atomic>
@@ -42,7 +43,7 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a thread-manager class is the central instance of management for
     /// all (non-depleted) threads
-    class HPX_EXPORT threadmanager
+    class threadmanager
     {
     private:
         // we use a simple mutex to protect the data members of the

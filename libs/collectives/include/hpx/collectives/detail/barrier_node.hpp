@@ -21,6 +21,7 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <string>
@@ -85,6 +86,7 @@ namespace hpx { namespace lcos { namespace detail {
         void set_back_ptr(components::managed_component<barrier_node>* bp)
         {
             HPX_ASSERT(bp);
+            HPX_UNUSED(bp);
         }
 
         // intrusive reference counting

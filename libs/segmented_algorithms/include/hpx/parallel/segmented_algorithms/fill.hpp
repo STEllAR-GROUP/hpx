@@ -57,8 +57,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         fill_(ExPolicy&& policy, InIter first, InIter last, T const& value,
             std::true_type)
         {
-            typedef typename util::detail::algorithm_result<ExPolicy>::type
-                result_type;
             typedef
                 typename std::iterator_traits<InIter>::value_type value_type;
 

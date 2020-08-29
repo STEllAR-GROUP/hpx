@@ -130,8 +130,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         static T sequential(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, Reduce&& r, Convert&& conv)
         {
-            typedef
-                typename std::iterator_traits<FwdIter1>::reference reference;
             return util::accumulate<T>(first1, last1, first2,
                 std::forward<Reduce>(r), std::forward<Convert>(conv));
         }
@@ -142,8 +140,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         parallel(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, Reduce&& r, Convert&& conv)
         {
-            typedef
-                typename std::iterator_traits<FwdIter1>::reference reference;
             typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
             using hpx::util::make_zip_iterator;
             return util::partitioner<ExPolicy, T>::call(

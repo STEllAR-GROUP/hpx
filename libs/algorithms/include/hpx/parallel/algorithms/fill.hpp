@@ -178,9 +178,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 parallel(
                     ExPolicy&& policy, FwdIter first, Sent last, T const& val)
             {
-                typedef typename util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::type result_type;
-
                 if (first == last)
                 {
                     return util::detail::algorithm_result<ExPolicy,

@@ -189,9 +189,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
                 is_seq;
 
-            typedef hpx::traits::segmented_iterator_traits<FwdIter>
-                iterator_traits;
-
             return segmented_none_of(none_of(), std::forward<ExPolicy>(policy),
                 first, last, std::forward<F>(f), std::forward<Proj>(proj),
                 is_seq());
@@ -362,9 +359,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
                 is_seq;
 
-            typedef hpx::traits::segmented_iterator_traits<FwdIter>
-                iterator_traits;
-
             return segmented_any_of(any_of(), std::forward<ExPolicy>(policy),
                 first, last, std::forward<F>(f), std::forward<Proj>(proj),
                 is_seq());
@@ -534,9 +528,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
                 is_seq;
-
-            typedef hpx::traits::segmented_iterator_traits<FwdIter>
-                iterator_traits;
 
             return segmented_all_of(all_of(), std::forward<ExPolicy>(policy),
                 first, last, std::forward<F>(f), std::forward<Proj>(proj),
