@@ -984,7 +984,7 @@ local segment (by providing a per-segment iterator as a parameter)::
     // Iterate over segments
     for (auto seg_it = seg_begin; seg_it != seg_end; ++seg_it)
     {
-        auto loc_begin = traits::begin(seg_it)
+        auto loc_begin = traits::begin(seg_it);
         auto loc_end   = traits::end(seg_it);
 
         // Iterate over elements inside segments
