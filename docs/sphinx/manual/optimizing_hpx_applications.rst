@@ -140,7 +140,7 @@ registration database, which can be used to retrieve the meta data related
 to a counter type and to create counter instances based on a given counter
 instance name.
 
-.. _instances:
+.. _performance_counter_instances:
 
 Performance counter instances
 -----------------------------
@@ -375,7 +375,7 @@ the actual counter value and an optional unit of measure for the counter value.
 
 .. note::
 
-   The command line option ``--hpx:print-counter-types` will append a seventh
+   The command line option ``--hpx:print-counter-types`` will append a seventh
    field to the generated output. This field will hold an abbreviated counter
    type.
 
@@ -563,7 +563,8 @@ functions of the created client component instance should be called::
         "/threads{locality#0/total}/count/cumulative");
     hpx::cout << count.get_value<int>().get() << hpx::endl;
 
-For more information about the client component type, see |:cpp:class:`hpx::performance_counters::performance_counter` 
+For more information about the client component type, see
+:cpp:class:`hpx::performance_counters::performance_counter`
 
 .. note::
 

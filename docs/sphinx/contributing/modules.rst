@@ -123,13 +123,14 @@ running the |cppdependencies|_ tool manually can be helpful. It can give you
 detailed information on exactly which files are causing the circular dependency.
 If you do not have the ``cpp-dependencies`` tool already installed, one way of
 obtaining it is by using our docker image. This way you will have exactly the
-same environment as on the CI. See :ref:`docker` for details on how to use the
-docker image.
+same environment as on the CI. See :ref:`using_docker` for details on how to use
+the docker image.
 
 To produce the graph produced by CI run the following command (``HPX_SOURCE`` is
 assumed to hold the path to the |hpx| source directory):
 
 .. code-block:: sh
+
    cpp-dependencies --dir $HPX_SOURCE/libs --graph-cycles circular_dependencies.dot
 
 This will produce a ``dot`` file in the current directory. You can inspect this
@@ -137,6 +138,7 @@ manually with a text editor. You can also convert this to an image if you have
 ``graphviz`` installed:
 
 .. code-block:: sh
+
    dot circular_dependencies.dot -Tsvg -o circular_dependencies.svg
 
 This produces an ``svg`` file in the current directory which shows the circular
@@ -145,6 +147,7 @@ dependencies. Note that if there are no cycles the image will be empty.
 You can use ``cpp-dependencies`` to print the include paths between two modules.
 
 .. code-block:: sh
+
    cpp-dependencies --dir $HPX_SOURCE/libs --shortest <from> <to>
 
 prints all possible paths from the module ``<from>`` to the module ``<to>``. For
@@ -152,9 +155,11 @@ example, as most modules depend on ``config``, the following should give you a
 long list of paths from ``algorithms`` to ``config``:
 
 .. code-block:: sh
+
    cpp-dependencies --dir $HPX_SOURCE/libs --shortest algorithms config
 
 The following should report that it can't find a path between the two modules:
 
 .. code-block:: sh
+
    cpp-dependencies --dir $HPX_SOURCE/libs --shortest config algorithms

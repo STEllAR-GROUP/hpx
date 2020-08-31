@@ -389,7 +389,7 @@ Functions
 Examples
 --------
 
-.. literalinclude:: ../libs/include/tests/unit/api_future.hpp
+.. literalinclude:: ../../libs/include/tests/unit/api_future.cpp
    :language: c++
    :lines: 7-
 

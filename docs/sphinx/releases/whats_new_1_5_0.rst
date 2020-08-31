@@ -60,7 +60,7 @@ and many bug fixes.
 * We added a new ``hpx::mpi::experimental`` namespace for getting futures from
   an asynchronous MPI call and a new minimal MPI executor
   ``hpx::mpi::experimental::executor``. These can be enabled with the
-  ``-DHPX_WITH_ASYNC_MPI=On` |cmake| option.
+  ``-DHPX_WITH_ASYNC_MPI=On`` |cmake| option.
 * A polymorphic executor has been implemented to reduce compile times as a
   function accepting executors can potentially be instantiated only once instead
   of multiple times with different executors. It accepts the function signature
