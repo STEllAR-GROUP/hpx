@@ -37,9 +37,10 @@ and many bug fixes.
   corresponding algorithms fully conformant to C++20 as well as to make
   algorithm extension easier for the user. ``all_of``/``any_of``/``none_of``,
   ``copy``, ``count``, ``destroy``, ``equal``, ``fill``, ``find``, ``for_each``,
-  ``generate``, ``mismatch``, ``move``, ``reduce`` are using those CPOs (all in
-  namespace ``hpx``).  We also have adapted their corresponding ``hpx::ranges``
-  versions to be conforming to C++20 in this release.
+  ``generate``, ``mismatch``, ``move``, ``reduce``, ``transform_reduce`` are
+  using those CPOs (all in namespace ``hpx``).  We also have adapted their
+  corresponding ``hpx::ranges`` versions to be conforming to C++20 in this
+  release.
 * We have adapted support for ``co_await`` to C++20, in addition to
   ``hpx::future`` it now also supports ``hpx::shared_future``. We have also
   added allocator support for futures returned by ``co_return``. It is no longer
@@ -154,15 +155,19 @@ Breaking changes
 Closed issues
 =============
 
+* :hpx-issue:`4918` - Rename distributed_executors module
 * :hpx-issue:`4900` - Adding JOSS status badge to README
 * :hpx-issue:`4897` - Compiler warning, deprecated header used by HPX itself
 * :hpx-issue:`4886` - A future bound to an action executing on a different locality doesn't capture exception state
+* :hpx-issue:`4880` - Undefined reference to main build error when HPX_WITH_DYNAMIC_HPX_MAIN=OFF
 * :hpx-issue:`4877` - hpx_main might not able to start hpx runtime properly
 * :hpx-issue:`4850` - Issues creating templated component
+* :hpx-issue:`4829` - Spack package & HPX_WITH_GENERIC_CONTEXT_COROUTINES
 * :hpx-issue:`4820` - PAPI counters don't work
 * :hpx-issue:`4818` - HPX can't be used with IO pool turned off
 * :hpx-issue:`4816` - Build of HPX fails when find_package(Boost) is called before FetchContent_MakeAvailable(hpx)
 * :hpx-issue:`4813` - HPX MPI Future failed
+* :hpx-issue:`4811` - Remove HPX::hpx_no_wrap_main target before 1.5.0 release
 * :hpx-issue:`4810` - In hpx::for_each::invoke_projected the hpx::util::decay is misguided
 * :hpx-issue:`4787` - `transform_inclusive_scan` gives incorrect results for non-commutative operator
 * :hpx-issue:`4786` - transform_inclusive_scan tries to implicitly convert between types, instead of using the provided `conv` function
@@ -172,11 +177,13 @@ Closed issues
 * :hpx-issue:`4758` - CMake profiling results
 * :hpx-issue:`4755` - Building HPX with support for PAPI fails
 * :hpx-issue:`4754` - CMake cache creation breaks when using HPX with mimalloc
+* :hpx-issue:`4752` - HPX MPI Future build failed
 * :hpx-issue:`4746` - Memory leak when using dataflow icw components
 * :hpx-issue:`4731` - Bug in stencil example, calculation of locality IDs
 * :hpx-issue:`4723` - Build fail with NETWORKING OFF
 * :hpx-issue:`4720` - Add compatibility headers for modules that had their module headers implicitly generated in 1.4.1
 * :hpx-issue:`4719` - Undeprecate some module headers
+* :hpx-issue:`4712` - Rename HPX_MPI_WITH_FUTURES option
 * :hpx-issue:`4709` - Make deprecation warnings overridable in dependent projects
 * :hpx-issue:`4691` - Suggestion to fix and enhance the thread_mapper API
 * :hpx-issue:`4686` - Fix tutorials examples
@@ -207,6 +214,7 @@ Closed issues
 * :hpx-issue:`4523` - Build of PR #4311 (git tag 9955e8e) fails
 * :hpx-issue:`4519` - Documentation problem
 * :hpx-issue:`4513` - HPXConfig.cmake contains ill-formed paths when library paths use backslashes
+* :hpx-issue:`4507` - User-polling introduced by MPI futures module should be more generally usable
 * :hpx-issue:`4506` - Make sure force_linking.hpp is not included in main module header
 * :hpx-issue:`4501` - Fix compilation of PAPI tests
 * :hpx-issue:`4497` - Add modules CI checks
@@ -231,6 +239,7 @@ Closed issues
 * :hpx-issue:`4323` - Const-correctness error in assignment operator of compute::vector
 * :hpx-issue:`4318` - ASIO breaks with C++2a concepts
 * :hpx-issue:`4317` - Application runs even if `--hpx:help` is specified
+* :hpx-issue:`4063` - Document hpxcxx compiler wrapper
 * :hpx-issue:`3983` - Implement the C++20 Synchronization Library
 * :hpx-issue:`3696` - C++11 `constexpr` support is now required
 * :hpx-issue:`3623` - Modular HPX branch and an alternative project layout
@@ -239,8 +248,23 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`4936` - Minor documentation fixes part 2
+* :hpx-pr:`4935` - Add copyright and license to joss paper file
+* :hpx-pr:`4934` - Adding Semicolon in Documentation
+* :hpx-pr:`4932` - Fixing compiler warnings
+* :hpx-pr:`4931` - Small documentation formatting fixes
+* :hpx-pr:`4930` - Documentation Distributed HPX applications localvv with local_vv
+* :hpx-pr:`4929` - Add final version of the JOSS paper
+* :hpx-pr:`4928` - Add HPX_NODISCARD to enable_user_polling structs
+* :hpx-pr:`4926` - Rename distributed_executors module to executors_distributed
+* :hpx-pr:`4925` - Making transform_reduce conforming to C++20
+* :hpx-pr:`4923` - Don't acquire lock if not needed
+* :hpx-pr:`4921` - Update the release notes for the release candidate 3
 * :hpx-pr:`4920` - Disable libcds release
+* :hpx-pr:`4919` - Make cuda event pool dynamic instead of fixed size
 * :hpx-pr:`4917` - Move chrono functionality to hpx::chrono namespace
+* :hpx-pr:`4916` - HPX_HAVE_DEPRECATION_WARNINGS needs to be set even when disabled
+* :hpx-pr:`4915` - Moving more action related files to actions modules
 * :hpx-pr:`4914` - Add alias targets with namespaces used for exporting
 * :hpx-pr:`4912` - Aggregate initialize CPOs
 * :hpx-pr:`4910` - Explicitly specify hwloc root on Jenkins CSCS builds
@@ -258,7 +282,10 @@ Closed pull requests
 * :hpx-pr:`4895` - Update apex tag
 * :hpx-pr:`4894` - Fix exception handling for tasks
 * :hpx-pr:`4893` - Remove last use of std::result_of, removed in C++20
+* :hpx-pr:`4892` - Adding replay_executor and replicate_executor
+* :hpx-pr:`4889` - Restore old behaviour of not requiring linking to hpx_wrap when HPX_WITH_DYNAMIC_HPX_MAIN=OFF
 * :hpx-pr:`4887` - Making sure remotely thrown (non-hpx) exceptions are properly marshaled back to invocation site
+* :hpx-pr:`4885` - Adapting hpx::find and friends to C++20
 * :hpx-pr:`4884` - Adapting mismatch to C++20
 * :hpx-pr:`4883` - Adapting hpx::equal to be conforming to C++20
 * :hpx-pr:`4882` - Fixing exception handling for hpx::copy and adding missing tests
@@ -266,11 +293,16 @@ Closed pull requests
 * :hpx-pr:`4876` - Adding example demonstrating how to disable thread stealing during the execution of parallel algorithms
 * :hpx-pr:`4874` - Adding non-policy tests to all_of, any_of, and none_of
 * :hpx-pr:`4873` - Set CUDA compute capability on rostam Jenkins builds
+* :hpx-pr:`4872` - Force partitioned vector scan tests to run serially
 * :hpx-pr:`4870` - Making move conforming with C++20
 * :hpx-pr:`4869` - Making destroy and destroy_n conforming to C++20
+* :hpx-pr:`4868` - Fix miscellaneous header problems
+* :hpx-pr:`4867` - Add CPOs for for_each
 * :hpx-pr:`4865` - Adapting count and count_if to be conforming to C++20
+* :hpx-pr:`4864` - Release notes 1.5.0
 * :hpx-pr:`4863` - adding libcds-hpx tag to prepare for hpx1.5 release
 * :hpx-pr:`4862` - Adding version specific deprecation options
+* :hpx-pr:`4861` - Limiting executor improvements
 * :hpx-pr:`4860` - Making fill and fill_n compatible with C++20
 * :hpx-pr:`4859` - Adapting all_of, any_of, and none_of to C++20
 * :hpx-pr:`4857` - Improve libCDS integration
