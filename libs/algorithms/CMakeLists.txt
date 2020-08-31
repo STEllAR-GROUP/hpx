@@ -190,6 +190,7 @@ add_hpx_module(
     hpx_program_options
     hpx_statistics
     hpx_synchronization
+    hpx_threading_base
     hpx_timing
     hpx_type_support
   CMAKE_SUBDIRS examples tests

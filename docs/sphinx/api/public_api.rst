@@ -92,10 +92,10 @@ Functions
 - :cpp:func:`hpx::parallel::v1::swap_ranges`
 - :cpp:func:`hpx::parallel::v1::unique`
 - :cpp:func:`hpx::parallel::v1::unique_copy`
-- :cpp:func:`hpx::parallel::v2::for_loop`
-- :cpp:func:`hpx::parallel::v2::for_loop_strided`
-- :cpp:func:`hpx::parallel::v2::for_loop_n`
-- :cpp:func:`hpx::parallel::v2::for_loop_n_strided`
+- :cpp:func:`hpx::for_loop`
+- :cpp:func:`hpx::for_loop_strided`
+- :cpp:func:`hpx::for_loop_n`
+- :cpp:func:`hpx::for_loop_n_strided`
 
 - :cpp:func:`hpx::ranges::all_of`
 - :cpp:func:`hpx::ranges::any_of`

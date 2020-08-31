@@ -4,11 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/algorithm.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
-
-#include <hpx/include/parallel_for_loop.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -39,9 +38,9 @@ void test_for_loop_induction(ExPolicy&& policy, IteratorTag)
     std::vector<std::size_t> d(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    hpx::parallel::for_loop(std::forward<ExPolicy>(policy),
-        iterator(std::begin(c)), iterator(std::end(c)),
-        hpx::parallel::induction(0), [&d](iterator it, std::size_t i) {
+    hpx::for_loop(std::forward<ExPolicy>(policy), iterator(std::begin(c)),
+        iterator(std::end(c)), hpx::parallel::induction(0),
+        [&d](iterator it, std::size_t i) {
             *it = 42;
             d[i] = 42;
         });
@@ -71,9 +70,9 @@ void test_for_loop_induction_stride(ExPolicy&& policy, IteratorTag)
     std::vector<std::size_t> d(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    hpx::parallel::for_loop(std::forward<ExPolicy>(policy),
-        iterator(std::begin(c)), iterator(std::end(c)),
-        hpx::parallel::induction(0), hpx::parallel::induction(0, 2),
+    hpx::for_loop(std::forward<ExPolicy>(policy), iterator(std::begin(c)),
+        iterator(std::end(c)), hpx::parallel::induction(0),
+        hpx::parallel::induction(0, 2),
         [&d](iterator it, std::size_t i, std::size_t j) {
             *it = 42;
             d[i] = 42;
@@ -107,9 +106,9 @@ void test_for_loop_induction_life_out(ExPolicy&& policy, IteratorTag)
 
     std::size_t curr = 0;
 
-    hpx::parallel::for_loop(std::forward<ExPolicy>(policy),
-        iterator(std::begin(c)), iterator(std::end(c)),
-        hpx::parallel::induction(curr), [&d](iterator it, std::size_t i) {
+    hpx::for_loop(std::forward<ExPolicy>(policy), iterator(std::begin(c)),
+        iterator(std::end(c)), hpx::parallel::induction(curr),
+        [&d](iterator it, std::size_t i) {
             *it = 42;
             d[i] = 42;
         });
@@ -143,9 +142,9 @@ void test_for_loop_induction_stride_life_out(ExPolicy&& policy, IteratorTag)
     std::size_t curr1 = 0;
     std::size_t curr2 = 0;
 
-    hpx::parallel::for_loop(std::forward<ExPolicy>(policy),
-        iterator(std::begin(c)), iterator(std::end(c)),
-        hpx::parallel::induction(curr1), hpx::parallel::induction(curr2, 2),
+    hpx::for_loop(std::forward<ExPolicy>(policy), iterator(std::begin(c)),
+        iterator(std::end(c)), hpx::parallel::induction(curr1),
+        hpx::parallel::induction(curr2, 2),
         [&d](iterator it, std::size_t i, std::size_t j) {
             *it = 42;
             d[i] = 42;
@@ -206,7 +205,7 @@ void test_for_loop_induction_idx(ExPolicy&& policy)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    hpx::parallel::for_loop(std::forward<ExPolicy>(policy), 0, c.size(),
+    hpx::for_loop(std::forward<ExPolicy>(policy), 0, c.size(),
         hpx::parallel::induction(0), [&c](std::size_t i, std::size_t j) {
             c[i] = 42;
             HPX_TEST_EQ(i, j);
@@ -231,7 +230,7 @@ void test_for_loop_induction_stride_idx(ExPolicy&& policy)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    hpx::parallel::for_loop(std::forward<ExPolicy>(policy), 0, c.size(),
+    hpx::for_loop(std::forward<ExPolicy>(policy), 0, c.size(),
         hpx::parallel::induction(0), hpx::parallel::induction(0, 2),
         [&c](std::size_t i, std::size_t j, std::size_t k) {
             c[i] = 42;

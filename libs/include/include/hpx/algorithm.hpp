@@ -15,10 +15,6 @@
 
 namespace hpx {
     using hpx::parallel::adjacent_find;
-    using hpx::parallel::for_loop;
-    using hpx::parallel::for_loop_n;
-    using hpx::parallel::for_loop_n_strided;
-    using hpx::parallel::for_loop_strided;
     using hpx::parallel::includes;
     using hpx::parallel::inplace_merge;
     using hpx::parallel::is_heap;
