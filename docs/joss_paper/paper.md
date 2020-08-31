@@ -1,4 +1,11 @@
-﻿---
+﻿<!-- Copyright (c) 2020 Patrick Diehl                                        -->
+<!--                                                                         -->
+<!-- SPDX-License-Identifier: BSL-1.0                                        -->
+<!-- Distributed under the Boost Software License, Version 1.0. (See         -->
+<!-- accompanying file LICENSE_1_0.txt or copy at                            -->
+<!-- http://www.boost.org/LICENSE_1_0.txt)                                   -->
+
+---
 title: 'HPX - The C++ Standard Library for Parallelism and Concurrency'
 tags:
  - concurrency
@@ -267,7 +274,7 @@ HPX is utilized in a diverse set of applications:
    [@hahner2020dca], a high-performance research software framework to solve 
    quantum many-body problems with cutting edge quantum cluster algorithms. 
 
-- Libaries
+- Libraries
    * [hpxMP](https://github.com/STEllAR-GROUP/hpxMP)
    [@zhang2019introduction; @zhang2020supporting] a modern OpenMP implementation
    leveraging HPX that supports shared memory multithread programming. 
