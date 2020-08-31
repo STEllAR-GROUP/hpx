@@ -274,7 +274,7 @@ HPX is utilized in a diverse set of applications:
    [@hahner2020dca], a high-performance research software framework to solve 
    quantum many-body problems with cutting edge quantum cluster algorithms. 
 
-- Libaries
+- Libraries
    * [hpxMP](https://github.com/STEllAR-GROUP/hpxMP)
    [@zhang2019introduction; @zhang2020supporting] a modern OpenMP implementation
    leveraging HPX that supports shared memory multithread programming. 
