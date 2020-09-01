@@ -413,6 +413,7 @@ namespace hpx {
 
 namespace hpx { namespace parallel { inline namespace v1 {
 
+    // clang format-off
     template <typename ExPolicy, typename Rng, typename OutIter, typename F,
         typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
@@ -420,10 +421,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     OutIter>::value&& traits::is_projected_range<Proj,
                     Rng>::value&& traits::is_indirect_callable<ExPolicy, F,
                     traits::projected_range<Proj, Rng>>::value)>
+    // clang format-on
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::transform is deprecated, use hpx::ranges::transform "
-        "instead")
-    typename util::detail::algorithm_result<ExPolicy,
+        "instead") typename util::detail::algorithm_result<ExPolicy,
         util::in_out_result<typename hpx::traits::range_iterator<Rng>::type,
             OutIter>>::type transform(ExPolicy&& policy, Rng&& rng,
         OutIter dest, F&& f, Proj&& proj = Proj())
@@ -433,22 +434,25 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Proj>(proj));
     }
 
+    // clang-format off
     template <typename ExPolicy, typename Rng, typename InIter2,
         typename OutIter, typename F,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
-                    InIter2>::value&& hpx::traits::is_iterator<OutIter>::value&&
-                    traits::is_projected_range<Proj1, Rng>::value&&
-                        traits::is_projected<Proj2, InIter2>::value&&
-                            traits::is_indirect_callable<ExPolicy, F,
-                                traits::projected_range<Proj1, Rng>,
-                                traits::projected<Proj2, InIter2>>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value&&
+            hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
+                InIter2>::value&& 
+            hpx::traits::is_iterator<OutIter>::value&&
+            traits::is_projected_range<Proj1, Rng>::value&&
+            traits::is_projected<Proj2, InIter2>::value&&
+            traits::is_indirect_callable<ExPolicy, F,
+                traits::projected_range<Proj1, Rng>,
+                traits::projected<Proj2, InIter2>>::value)>
+    // clang-format on
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::transform is deprecated, use hpx::ranges::transform "
-        "instead")
-    typename util::detail::algorithm_result<ExPolicy,
+        "instead") typename util::detail::algorithm_result<ExPolicy,
         util::in_in_out_result<typename hpx::traits::range_iterator<Rng>::type,
             InIter2, OutIter>>::type
         transform(ExPolicy&& policy, Rng&& rng, InIter2 first2, OutIter dest,
@@ -460,21 +464,24 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Proj2>(proj2));
     }
 
+    // clang-format off
     template <typename ExPolicy, typename Rng1, typename Rng2, typename OutIter,
         typename F, typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_range<Rng1>::value&& hpx::traits::is_range<
-                    Rng2>::value&& hpx::traits::is_iterator<OutIter>::value&&
-                    traits::is_projected_range<Proj1, Rng1>::value&&
-                        traits::is_projected_range<Proj2, Rng2>::value&&
-                            traits::is_indirect_callable<ExPolicy, F,
-                                traits::projected_range<Proj1, Rng1>,
-                                traits::projected_range<Proj2, Rng2>>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value&&
+            hpx::traits::is_range<Rng1>::value&& 
+            hpx::traits::is_range<Rng2>::value&& 
+            hpx::traits::is_iterator<OutIter>::value&&
+            traits::is_projected_range<Proj1, Rng1>::value&&
+            traits::is_projected_range<Proj2, Rng2>::value&&
+                traits::is_indirect_callable<ExPolicy, F,
+                traits::projected_range<Proj1, Rng1>,
+                traits::projected_range<Proj2, Rng2>>::value)>
+    // clang-format on
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::transform is deprecated, use hpx::ranges::transform "
-        "instead")
-    typename util::detail::algorithm_result<ExPolicy,
+        "instead") typename util::detail::algorithm_result<ExPolicy,
         util::in_in_out_result<typename hpx::traits::range_iterator<Rng1>::type,
             typename hpx::traits::range_iterator<Rng2>::type, OutIter>>::type
         transform(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, OutIter dest,
