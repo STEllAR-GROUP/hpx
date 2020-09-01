@@ -41,7 +41,7 @@ bool validate(int ans)
 int hpx_main()
 {
     {
-        hpx::parallel::execution::parallel_executor exec;
+        hpx::execution::parallel_executor exec;
 
         hpx::future<int> f =
             hpx::resiliency::experimental::async_replicate_vote(
@@ -52,7 +52,7 @@ int hpx_main()
     }
 
     {
-        hpx::parallel::execution::parallel_executor exec;
+        hpx::execution::parallel_executor exec;
 
         hpx::future<int> f =
             hpx::resiliency::experimental::async_replicate_vote_validate(

@@ -38,11 +38,11 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     public:
         /// Associate the parallel_execution_tag executor tag type as a default
         /// with this executor.
-        using execution_category = sequenced_execution_tag;
+        using execution_category = hpx::execution::sequenced_execution_tag;
 
         /// Associate the static_chunk_size executor parameters type as a default
         /// with this executor.
-        typedef static_chunk_size executor_parameters_type;
+        using executor_parameters_type = hpx::execution::static_chunk_size;
 
         service_executor(hpx::util::io_service_pool* pool)
           : pool_(pool)

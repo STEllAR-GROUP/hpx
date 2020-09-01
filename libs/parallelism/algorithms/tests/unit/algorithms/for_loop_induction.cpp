@@ -168,24 +168,23 @@ void test_for_loop_induction_stride_life_out(ExPolicy&& policy, IteratorTag)
 template <typename IteratorTag>
 void test_for_loop_induction()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_for_loop_induction(execution::seq, IteratorTag());
-    test_for_loop_induction(execution::par, IteratorTag());
-    test_for_loop_induction(execution::par_unseq, IteratorTag());
+    test_for_loop_induction(seq, IteratorTag());
+    test_for_loop_induction(par, IteratorTag());
+    test_for_loop_induction(par_unseq, IteratorTag());
 
-    test_for_loop_induction_stride(execution::seq, IteratorTag());
-    test_for_loop_induction_stride(execution::par, IteratorTag());
-    test_for_loop_induction_stride(execution::par_unseq, IteratorTag());
+    test_for_loop_induction_stride(seq, IteratorTag());
+    test_for_loop_induction_stride(par, IteratorTag());
+    test_for_loop_induction_stride(par_unseq, IteratorTag());
 
-    test_for_loop_induction_life_out(execution::seq, IteratorTag());
-    test_for_loop_induction_life_out(execution::par, IteratorTag());
-    test_for_loop_induction_life_out(execution::par_unseq, IteratorTag());
+    test_for_loop_induction_life_out(seq, IteratorTag());
+    test_for_loop_induction_life_out(par, IteratorTag());
+    test_for_loop_induction_life_out(par_unseq, IteratorTag());
 
-    test_for_loop_induction_stride_life_out(execution::seq, IteratorTag());
-    test_for_loop_induction_stride_life_out(execution::par, IteratorTag());
-    test_for_loop_induction_stride_life_out(
-        execution::par_unseq, IteratorTag());
+    test_for_loop_induction_stride_life_out(seq, IteratorTag());
+    test_for_loop_induction_stride_life_out(par, IteratorTag());
+    test_for_loop_induction_stride_life_out(par_unseq, IteratorTag());
 }
 
 void for_loop_induction_test()
@@ -249,15 +248,15 @@ void test_for_loop_induction_stride_idx(ExPolicy&& policy)
 
 void for_loop_induction_test_idx()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_for_loop_induction_idx(execution::seq);
-    test_for_loop_induction_idx(execution::par);
-    test_for_loop_induction_idx(execution::par_unseq);
+    test_for_loop_induction_idx(seq);
+    test_for_loop_induction_idx(par);
+    test_for_loop_induction_idx(par_unseq);
 
-    test_for_loop_induction_stride_idx(execution::seq);
-    test_for_loop_induction_stride_idx(execution::par);
-    test_for_loop_induction_stride_idx(execution::par_unseq);
+    test_for_loop_induction_stride_idx(seq);
+    test_for_loop_induction_stride_idx(par);
+    test_for_loop_induction_stride_idx(par_unseq);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

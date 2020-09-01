@@ -27,7 +27,7 @@
 #endif
 
 using namespace hpx::parallel::v1::detail;
-using hpx::parallel::execution::parallel_executor;
+using hpx::execution::parallel_executor;
 using hpx::parallel::util::range;
 
 struct xk

@@ -15,10 +15,10 @@
 
 void search_zero_dist_test()
 {
+    using hpx::execution::par;
+    using hpx::execution::seq;
+    using hpx::execution::task;
     using hpx::parallel::search;
-    using hpx::parallel::execution::par;
-    using hpx::parallel::execution::seq;
-    using hpx::parallel::execution::task;
 
     typedef std::vector<int>::iterator iterator;
 

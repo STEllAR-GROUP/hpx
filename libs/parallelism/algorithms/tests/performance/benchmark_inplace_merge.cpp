@@ -60,7 +60,7 @@ double run_inplace_merge_benchmark_std(int test_count, OrgIter org_first,
     for (int i = 0; i < test_count; ++i)
     {
         // Restore [first, last) with original data.
-        hpx::copy(hpx::parallel::execution::par, org_first, org_last, first);
+        hpx::copy(hpx::execution::par, org_first, org_last, first);
 
         std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
         std::inplace_merge(first, middle, last);
@@ -81,7 +81,7 @@ double run_inplace_merge_benchmark_hpx(int test_count, ExPolicy policy,
     for (int i = 0; i < test_count; ++i)
     {
         // Restore [first, last) with original data.
-        hpx::copy(hpx::parallel::execution::par, org_first, org_last, first);
+        hpx::copy(hpx::execution::par, org_first, org_last, first);
 
         std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
         hpx::parallel::inplace_merge(policy, first, middle, last);
@@ -110,11 +110,11 @@ void run_benchmark(std::size_t vector_left_size, std::size_t vector_right_size,
     auto last = std::end(c);
 
     // initialize data
-    using namespace hpx::parallel;
-    generate(execution::par, first, middle, random_fill(random_range));
-    generate(execution::par, middle, last, random_fill(random_range));
-    sort(execution::par, first, middle);
-    sort(execution::par, middle, last);
+    using namespace hpx::execution;
+    hpx::parallel::generate(par, first, middle, random_fill(random_range));
+    hpx::parallel::generate(par, middle, last, random_fill(random_range));
+    hpx::parallel::sort(par, first, middle);
+    hpx::parallel::sort(par, middle, last);
     org_c = c;
 
     auto org_first = std::begin(org_c);
@@ -127,15 +127,15 @@ void run_benchmark(std::size_t vector_left_size, std::size_t vector_right_size,
 
     std::cout << "--- run_inplace_merge_benchmark_seq ---" << std::endl;
     double time_seq = run_inplace_merge_benchmark_hpx(
-        test_count, execution::seq, org_first, org_last, first, middle, last);
+        test_count, seq, org_first, org_last, first, middle, last);
 
     std::cout << "--- run_inplace_merge_benchmark_par ---" << std::endl;
     double time_par = run_inplace_merge_benchmark_hpx(
-        test_count, execution::par, org_first, org_last, first, middle, last);
+        test_count, par, org_first, org_last, first, middle, last);
 
     std::cout << "--- run_inplace_merge_benchmark_par_unseq ---" << std::endl;
-    double time_par_unseq = run_inplace_merge_benchmark_hpx(test_count,
-        execution::par_unseq, org_first, org_last, first, middle, last);
+    double time_par_unseq = run_inplace_merge_benchmark_hpx(
+        test_count, par_unseq, org_first, org_last, first, middle, last);
 
     std::cout << "\n-------------- Benchmark Result --------------"
               << std::endl;

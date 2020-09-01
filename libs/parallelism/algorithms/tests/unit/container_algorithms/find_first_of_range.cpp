@@ -169,24 +169,22 @@ void test_find_first_of_async_proj(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_find_first_of()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_find_first_of(IteratorTag());
-    test_find_first_of(execution::seq, IteratorTag());
-    test_find_first_of(execution::par, IteratorTag());
-    test_find_first_of(execution::par_unseq, IteratorTag());
+    test_find_first_of(seq, IteratorTag());
+    test_find_first_of(par, IteratorTag());
+    test_find_first_of(par_unseq, IteratorTag());
 
     test_find_first_of_proj(IteratorTag());
-    test_find_first_of_proj(execution::seq, IteratorTag());
-    test_find_first_of_proj(execution::par, IteratorTag());
-    test_find_first_of_proj(execution::par_unseq, IteratorTag());
+    test_find_first_of_proj(seq, IteratorTag());
+    test_find_first_of_proj(par, IteratorTag());
+    test_find_first_of_proj(par_unseq, IteratorTag());
 
-    test_find_first_of_async(execution::seq(execution::task), IteratorTag());
-    test_find_first_of_async(execution::par(execution::task), IteratorTag());
-    test_find_first_of_async_proj(
-        execution::seq(execution::task), IteratorTag());
-    test_find_first_of_async_proj(
-        execution::par(execution::task), IteratorTag());
+    test_find_first_of_async(seq(task), IteratorTag());
+    test_find_first_of_async(par(task), IteratorTag());
+    test_find_first_of_async_proj(seq(task), IteratorTag());
+    test_find_first_of_async_proj(par(task), IteratorTag());
 }
 
 void find_first_of_test()

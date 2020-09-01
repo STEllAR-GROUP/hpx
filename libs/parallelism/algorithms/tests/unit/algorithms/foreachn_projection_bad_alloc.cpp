@@ -94,18 +94,16 @@ void test_for_each_n_bad_alloc_async(ExPolicy p, IteratorTag, Proj&& proj)
 template <typename IteratorTag, typename Proj>
 void test_for_each_n_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_for_each_n_bad_alloc(execution::seq, IteratorTag(), Proj());
-    test_for_each_n_bad_alloc(execution::par, IteratorTag(), Proj());
+    test_for_each_n_bad_alloc(seq, IteratorTag(), Proj());
+    test_for_each_n_bad_alloc(par, IteratorTag(), Proj());
 
-    test_for_each_n_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag(), Proj());
-    test_for_each_n_bad_alloc_async(
-        execution::par(execution::task), IteratorTag(), Proj());
+    test_for_each_n_bad_alloc_async(seq(task), IteratorTag(), Proj());
+    test_for_each_n_bad_alloc_async(par(task), IteratorTag(), Proj());
 }
 
 template <typename Proj>

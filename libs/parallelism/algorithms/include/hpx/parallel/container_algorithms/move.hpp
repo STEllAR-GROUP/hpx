@@ -204,7 +204,7 @@ namespace hpx { namespace ranges {
         {
             return hpx::parallel::v1::detail::transfer<
                 hpx::parallel::v1::detail::move<Iter1, Iter2>>(
-                hpx::parallel::execution::seq, first, last, dest);
+                hpx::execution::seq, first, last, dest);
         }
 
         // clang-format off
@@ -223,8 +223,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::transfer<
                 hpx::parallel::v1::detail::move<iterator_type, Iter2>>(
-                hpx::parallel::execution::seq, hpx::util::begin(rng),
-                hpx::util::end(rng), dest);
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                dest);
         }
     } move{};
 

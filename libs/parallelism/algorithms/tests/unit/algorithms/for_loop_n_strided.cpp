@@ -107,16 +107,14 @@ void test_for_loop_n_strided_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_for_loop_n_strided()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_for_loop_n_strided(execution::seq, IteratorTag());
-    test_for_loop_n_strided(execution::par, IteratorTag());
-    test_for_loop_n_strided(execution::par_unseq, IteratorTag());
+    test_for_loop_n_strided(seq, IteratorTag());
+    test_for_loop_n_strided(par, IteratorTag());
+    test_for_loop_n_strided(par_unseq, IteratorTag());
 
-    test_for_loop_n_strided_async(
-        execution::seq(execution::task), IteratorTag());
-    test_for_loop_n_strided_async(
-        execution::par(execution::task), IteratorTag());
+    test_for_loop_n_strided_async(seq(task), IteratorTag());
+    test_for_loop_n_strided_async(par(task), IteratorTag());
 }
 
 void for_loop_n_strided_test()
@@ -201,14 +199,14 @@ void test_for_loop_n_strided_idx_async(ExPolicy&& p)
 
 void for_loop_n_strided_test_idx()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_for_loop_n_strided_idx(execution::seq);
-    test_for_loop_n_strided_idx(execution::par);
-    test_for_loop_n_strided_idx(execution::par_unseq);
+    test_for_loop_n_strided_idx(seq);
+    test_for_loop_n_strided_idx(par);
+    test_for_loop_n_strided_idx(par_unseq);
 
-    test_for_loop_n_strided_idx_async(execution::seq(execution::task));
-    test_for_loop_n_strided_idx_async(execution::par(execution::task));
+    test_for_loop_n_strided_idx_async(seq(task));
+    test_for_loop_n_strided_idx_async(par(task));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

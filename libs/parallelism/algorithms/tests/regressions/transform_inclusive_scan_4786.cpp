@@ -37,8 +37,7 @@ int main(int argc, char* argv[])
     std::vector<Integer> output(test.size());
 
     hpx::parallel::transform_inclusive_scan(
-        hpx::parallel::execution::par, test.cbegin(), test.cend(),
-        output.begin(),
+        hpx::execution::par, test.cbegin(), test.cend(), output.begin(),
         [](Integer acc, Integer xs) -> Integer {
             return Integer{acc.integer + xs.integer};
         },

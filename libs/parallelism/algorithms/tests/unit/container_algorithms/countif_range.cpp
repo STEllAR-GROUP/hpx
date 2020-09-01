@@ -115,22 +115,16 @@ void test_count_async(ExPolicy&& policy, IteratorTag, DataType)
 template <typename IteratorTag, typename DataType>
 void test_count()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_count(IteratorTag(), DataType());
-
-    auto seq = execution::seq;
-    auto par = execution::par;
-    auto par_unseq = execution::par_unseq;
 
     test_count(seq, IteratorTag(), DataType());
     test_count(par, IteratorTag(), DataType());
     test_count(par_unseq, IteratorTag(), DataType());
 
-    test_count_async(
-        execution::seq(execution::task), IteratorTag(), DataType());
-    test_count_async(
-        execution::par(execution::task), IteratorTag(), DataType());
+    test_count_async(seq(task), IteratorTag(), DataType());
+    test_count_async(par(task), IteratorTag(), DataType());
 }
 
 void count_test()

@@ -506,36 +506,36 @@ void test_inplace_merge_stable(
 template <typename IteratorTag>
 void test_inplace_merge()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     int rand_base = _gen();
 
     ////////// Test cases for 'int' type.
     test_inplace_merge(
-        execution::seq, IteratorTag(), int(),
+        seq, IteratorTag(), int(),
         [](const int a, const int b) -> bool { return a < b; }, rand_base);
     test_inplace_merge(
-        execution::par, IteratorTag(), int(),
+        par, IteratorTag(), int(),
         [](const int a, const int b) -> bool { return a < b; }, rand_base);
     test_inplace_merge(
-        execution::par_unseq, IteratorTag(), int(),
+        par_unseq, IteratorTag(), int(),
         [](const int a, const int b) -> bool { return a > b; }, rand_base);
 
     ////////// Test cases for user defined type.
     test_inplace_merge(
-        execution::seq, IteratorTag(), user_defined_type(),
+        seq, IteratorTag(), user_defined_type(),
         [](user_defined_type const& a, user_defined_type const& b) -> bool {
             return a < b;
         },
         rand_base);
     test_inplace_merge(
-        execution::par, IteratorTag(), user_defined_type(),
+        par, IteratorTag(), user_defined_type(),
         [](user_defined_type const& a, user_defined_type const& b) -> bool {
             return a > b;
         },
         rand_base);
     test_inplace_merge(
-        execution::par_unseq, IteratorTag(), user_defined_type(),
+        par_unseq, IteratorTag(), user_defined_type(),
         [](user_defined_type const& a, user_defined_type const& b) -> bool {
             return a < b;
         },
@@ -543,79 +543,72 @@ void test_inplace_merge()
 
     ////////// Asynchronous test cases for 'int' type.
     test_inplace_merge_async(
-        execution::seq(execution::task), IteratorTag(), int(),
+        seq(task), IteratorTag(), int(),
         [](const int a, const int b) -> bool { return a > b; }, rand_base);
     test_inplace_merge_async(
-        execution::par(execution::task), IteratorTag(), int(),
+        par(task), IteratorTag(), int(),
         [](const int a, const int b) -> bool { return a > b; }, rand_base);
 
     ////////// Asynchronous test cases for user defined type.
     test_inplace_merge_async(
-        execution::seq(execution::task), IteratorTag(), user_defined_type(),
+        seq(task), IteratorTag(), user_defined_type(),
         [](user_defined_type const& a, user_defined_type const& b) -> bool {
             return a < b;
         },
         rand_base);
     test_inplace_merge_async(
-        execution::par(execution::task), IteratorTag(), user_defined_type(),
+        par(task), IteratorTag(), user_defined_type(),
         [](user_defined_type const& a, user_defined_type const& b) -> bool {
             return a < b;
         },
         rand_base);
 
     ////////// Another test cases for justifying the implementation.
+    test_inplace_merge_etc(seq, IteratorTag(), user_defined_type(), rand_base);
+    test_inplace_merge_etc(par, IteratorTag(), user_defined_type(), rand_base);
     test_inplace_merge_etc(
-        execution::seq, IteratorTag(), user_defined_type(), rand_base);
-    test_inplace_merge_etc(
-        execution::par, IteratorTag(), user_defined_type(), rand_base);
-    test_inplace_merge_etc(
-        execution::par_unseq, IteratorTag(), user_defined_type(), rand_base);
+        par_unseq, IteratorTag(), user_defined_type(), rand_base);
 
     ////////// Test cases for checking whether the algorithm is stable.
-    test_inplace_merge_stable(execution::seq, IteratorTag(), int(), rand_base);
-    test_inplace_merge_stable(execution::par, IteratorTag(), int(), rand_base);
+    test_inplace_merge_stable(seq, IteratorTag(), int(), rand_base);
+    test_inplace_merge_stable(par, IteratorTag(), int(), rand_base);
+    test_inplace_merge_stable(par_unseq, IteratorTag(), int(), rand_base);
     test_inplace_merge_stable(
-        execution::par_unseq, IteratorTag(), int(), rand_base);
+        seq, IteratorTag(), user_defined_type(), rand_base);
     test_inplace_merge_stable(
-        execution::seq, IteratorTag(), user_defined_type(), rand_base);
+        par, IteratorTag(), user_defined_type(), rand_base);
     test_inplace_merge_stable(
-        execution::par, IteratorTag(), user_defined_type(), rand_base);
-    test_inplace_merge_stable(
-        execution::par_unseq, IteratorTag(), user_defined_type(), rand_base);
+        par_unseq, IteratorTag(), user_defined_type(), rand_base);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_inplace_merge_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_inplace_merge_exception(execution::seq, IteratorTag());
-    test_inplace_merge_exception(execution::par, IteratorTag());
+    test_inplace_merge_exception(seq, IteratorTag());
+    test_inplace_merge_exception(par, IteratorTag());
 
-    test_inplace_merge_exception_async(
-        execution::seq(execution::task), IteratorTag());
-    test_inplace_merge_exception_async(
-        execution::par(execution::task), IteratorTag());
+    test_inplace_merge_exception_async(seq(task), IteratorTag());
+    test_inplace_merge_exception_async(par(task), IteratorTag());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_inplace_merge_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_inplace_merge_bad_alloc(execution::seq, IteratorTag());
-    test_inplace_merge_bad_alloc(execution::par, IteratorTag());
+    test_inplace_merge_bad_alloc(seq, IteratorTag());
+    test_inplace_merge_bad_alloc(par, IteratorTag());
 
-    test_inplace_merge_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag());
-    test_inplace_merge_bad_alloc_async(
-        execution::par(execution::task), IteratorTag());
+    test_inplace_merge_bad_alloc_async(seq(task), IteratorTag());
+    test_inplace_merge_bad_alloc_async(par(task), IteratorTag());
 }

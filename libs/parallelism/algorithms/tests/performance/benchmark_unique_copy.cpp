@@ -97,9 +97,9 @@ void run_benchmark(std::size_t vector_size, int test_count,
     auto dest = std::begin(result);
 
     // initialize data
-    using namespace hpx::parallel;
-    generate(
-        execution::par, std::begin(v), std::end(v), random_fill(random_range));
+    using namespace hpx::execution;
+    hpx::parallel::generate(
+        par, std::begin(v), std::end(v), random_fill(random_range));
 
     auto dest_dist =
         std::distance(std::begin(result), std::unique_copy(first, last, dest));
@@ -114,16 +114,16 @@ void run_benchmark(std::size_t vector_size, int test_count,
         run_unique_copy_benchmark_std(test_count, first, last, dest);
 
     std::cout << "--- run_unique_copy_benchmark_seq ---" << std::endl;
-    double time_seq = run_unique_copy_benchmark_hpx(
-        test_count, execution::seq, first, last, dest);
+    double time_seq =
+        run_unique_copy_benchmark_hpx(test_count, seq, first, last, dest);
 
     std::cout << "--- run_unique_copy_benchmark_par ---" << std::endl;
-    double time_par = run_unique_copy_benchmark_hpx(
-        test_count, execution::par, first, last, dest);
+    double time_par =
+        run_unique_copy_benchmark_hpx(test_count, par, first, last, dest);
 
     std::cout << "--- run_unique_copy_benchmark_par_unseq ---" << std::endl;
-    double time_par_unseq = run_unique_copy_benchmark_hpx(
-        test_count, execution::par_unseq, first, last, dest);
+    double time_par_unseq =
+        run_unique_copy_benchmark_hpx(test_count, par_unseq, first, last, dest);
 
     std::cout << "\n-------------- Benchmark Result --------------"
               << std::endl;

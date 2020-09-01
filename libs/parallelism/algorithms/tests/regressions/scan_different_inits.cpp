@@ -23,7 +23,7 @@ void test_zero()
     typedef std::vector<int>::iterator Iter;
     std::vector<int> a;
     std::vector<int> b, c, d, e, f, g;
-    auto policy = hpx::parallel::execution::par;
+    auto policy = hpx::execution::par;
 
     Iter i_inc_add = hpx::parallel::inclusive_scan(
         policy, a.begin(), a.end(), b.begin(),
@@ -57,7 +57,7 @@ void test_async_zero()
     typedef hpx::future<Iter> Fut_Iter;
     std::vector<int> a;
     std::vector<int> b, c, d, e, f, g;
-    auto policy = hpx::parallel::execution::par(hpx::parallel::execution::task);
+    auto policy = hpx::execution::par(hpx::execution::task);
 
     Fut_Iter f_inc_add = hpx::parallel::inclusive_scan(
         policy, a.begin(), a.end(), b.begin(),
@@ -97,7 +97,7 @@ void test_one(std::vector<int> a)
     auto fun_add = [](int bar, int baz) { return bar + baz + 1; };
     auto fun_mult = [](int bar, int baz) { return 2 * bar * baz; };
     auto fun_conv = [](int foo) { return foo - 3; };
-    auto policy = hpx::parallel::execution::par;
+    auto policy = hpx::execution::par;
 
     Iter f_inc_add = hpx::parallel::inclusive_scan(
         policy, a.begin(), a.end(), b.begin(), fun_add, 10);
@@ -142,7 +142,7 @@ void test_one(std::vector<int> a)
 
 void test_async_one(std::vector<int> a)
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
     typedef std::vector<int>::iterator Iter;
     typedef hpx::future<Iter> Fut_Iter;
     std::size_t n = a.size();
@@ -154,7 +154,7 @@ void test_async_one(std::vector<int> a)
     auto fun_add = [](int bar, int baz) { return bar + baz + 1; };
     auto fun_mult = [](int bar, int baz) { return 2 * bar * baz; };
     auto fun_conv = [](int foo) { return foo - 3; };
-    auto policy = hpx::parallel::execution::par(hpx::parallel::execution::task);
+    auto policy = hpx::execution::par(hpx::execution::task);
 
     Fut_Iter f_inc_add = hpx::parallel::inclusive_scan(
         policy, a.begin(), a.end(), b.begin(), fun_add, 10);

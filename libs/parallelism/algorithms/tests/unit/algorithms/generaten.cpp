@@ -90,16 +90,16 @@ void test_generate_n_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_generate_n()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_generate_n(IteratorTag());
 
-    test_generate_n(execution::seq, IteratorTag());
-    test_generate_n(execution::par, IteratorTag());
-    test_generate_n(execution::par_unseq, IteratorTag());
+    test_generate_n(seq, IteratorTag());
+    test_generate_n(par, IteratorTag());
+    test_generate_n(par_unseq, IteratorTag());
 
-    test_generate_n_async(execution::seq(execution::task), IteratorTag());
-    test_generate_n_async(execution::par(execution::task), IteratorTag());
+    test_generate_n_async(seq(task), IteratorTag());
+    test_generate_n_async(par(task), IteratorTag());
 }
 
 void generate_n_test()
@@ -130,8 +130,8 @@ void test_generate_n_exception(IteratorTag)
     catch (hpx::exception_list const& e)
     {
         caught_exception = true;
-        test::test_num_exceptions<hpx::parallel::execution::sequenced_policy,
-            IteratorTag>::call(hpx::parallel::execution::seq, e);
+        test::test_num_exceptions<hpx::execution::sequenced_policy,
+            IteratorTag>::call(hpx::execution::seq, e);
     }
     catch (...)
     {
@@ -218,20 +218,18 @@ void test_generate_n_exception_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_generate_n_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_generate_n_exception(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_generate_n_exception(execution::seq, IteratorTag());
-    test_generate_n_exception(execution::par, IteratorTag());
+    test_generate_n_exception(seq, IteratorTag());
+    test_generate_n_exception(par, IteratorTag());
 
-    test_generate_n_exception_async(
-        execution::seq(execution::task), IteratorTag());
-    test_generate_n_exception_async(
-        execution::par(execution::task), IteratorTag());
+    test_generate_n_exception_async(seq(task), IteratorTag());
+    test_generate_n_exception_async(par(task), IteratorTag());
 }
 
 void generate_n_exception_test()
@@ -315,18 +313,16 @@ void test_generate_n_bad_alloc_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_generate_n_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_generate_n_bad_alloc(execution::seq, IteratorTag());
-    test_generate_n_bad_alloc(execution::par, IteratorTag());
+    test_generate_n_bad_alloc(seq, IteratorTag());
+    test_generate_n_bad_alloc(par, IteratorTag());
 
-    test_generate_n_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag());
-    test_generate_n_bad_alloc_async(
-        execution::par(execution::task), IteratorTag());
+    test_generate_n_bad_alloc_async(seq(task), IteratorTag());
+    test_generate_n_bad_alloc_async(par(task), IteratorTag());
 }
 
 void generate_n_bad_alloc_test()

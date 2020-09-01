@@ -643,8 +643,8 @@ namespace hpx {
             return hpx::parallel::v1::detail::get_pair(
                 hpx::parallel::v1::detail::mismatch_binary<
                     hpx::parallel::util::in_in_result<FwdIter1, FwdIter2>>()
-                    .call(hpx::parallel::execution::seq, std::true_type{},
-                        first1, last1, first2, last2, std::forward<Pred>(op),
+                    .call(hpx::execution::seq, std::true_type{}, first1, last1,
+                        first2, last2, std::forward<Pred>(op),
                         hpx::parallel::util::projection_identity{},
                         hpx::parallel::util::projection_identity{}));
         }
@@ -667,9 +667,8 @@ namespace hpx {
             return hpx::parallel::v1::detail::get_pair(
                 hpx::parallel::v1::detail::mismatch_binary<
                     hpx::parallel::util::in_in_result<FwdIter1, FwdIter2>>()
-                    .call(hpx::parallel::execution::seq, std::true_type{},
-                        first1, last1, first2, last2,
-                        hpx::parallel::v1::detail::equal_to{},
+                    .call(hpx::execution::seq, std::true_type{}, first1, last1,
+                        first2, last2, hpx::parallel::v1::detail::equal_to{},
                         hpx::parallel::util::projection_identity{},
                         hpx::parallel::util::projection_identity{}));
         }
@@ -696,8 +695,8 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::mismatch<
                 std::pair<FwdIter1, FwdIter2>>()
-                .call(hpx::parallel::execution::seq, std::true_type{}, first1,
-                    last1, first2, std::forward<Pred>(op));
+                .call(hpx::execution::seq, std::true_type{}, first1, last1,
+                    first2, std::forward<Pred>(op));
         }
 
         // clang-format off
@@ -717,8 +716,8 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::mismatch<
                 std::pair<FwdIter1, FwdIter2>>()
-                .call(hpx::parallel::execution::seq, std::true_type{}, first1,
-                    last1, first2, hpx::parallel::v1::detail::equal_to{});
+                .call(hpx::execution::seq, std::true_type{}, first1, last1,
+                    first2, hpx::parallel::v1::detail::equal_to{});
         }
 
     } mismatch{};

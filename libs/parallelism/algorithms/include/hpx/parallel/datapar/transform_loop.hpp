@@ -79,8 +79,7 @@ namespace hpx { namespace parallel { namespace util {
                 std::pair<InIter, OutIter>>::type
             call(InIter first, std::size_t count, OutIter dest, F&& f)
             {
-                return util::transform_loop_n<
-                    parallel::execution::sequenced_policy>(
+                return util::transform_loop_n<sequenced_policy>(
                     first, count, dest, std::forward<F>(f));
             }
         };
@@ -117,8 +116,8 @@ namespace hpx { namespace parallel { namespace util {
                 std::pair<InIter, OutIter>>::type
             call(InIter first, InIter last, OutIter dest, F&& f)
             {
-                return util::transform_loop(parallel::execution::seq, first,
-                    last, dest, std::forward<F>(f));
+                return util::transform_loop(
+                    seq, first, last, dest, std::forward<F>(f));
             }
         };
 
@@ -181,8 +180,7 @@ namespace hpx { namespace parallel { namespace util {
             call(InIter1 first1, std::size_t count, InIter2 first2,
                 OutIter dest, F&& f)
             {
-                return util::transform_binary_loop_n<
-                    parallel::execution::sequenced_policy>(
+                return util::transform_binary_loop_n<sequenced_policy>(
                     first1, count, first2, dest, std::forward<F>(f));
             }
         };
@@ -235,8 +233,7 @@ namespace hpx { namespace parallel { namespace util {
             call(InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest,
                 F&& f)
             {
-                return util::transform_binary_loop<
-                    parallel::execution::sequenced_policy>(
+                return util::transform_binary_loop<sequenced_policy>(
                     first1, last1, first2, dest, std::forward<F>(f));
             }
 
@@ -272,8 +269,7 @@ namespace hpx { namespace parallel { namespace util {
             call(InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
                 OutIter dest, F&& f)
             {
-                return util::transform_binary_loop<
-                    parallel::execution::sequenced_policy>(
+                return util::transform_binary_loop<sequenced_policy>(
                     first1, last1, first2, last2, dest, std::forward<F>(f));
             }
         };

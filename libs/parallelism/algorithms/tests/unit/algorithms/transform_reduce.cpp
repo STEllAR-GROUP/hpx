@@ -123,16 +123,16 @@ void test_transform_reduce_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_transform_reduce()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_transform_reduce(IteratorTag());
 
-    test_transform_reduce(execution::seq, IteratorTag());
-    test_transform_reduce(execution::par, IteratorTag());
-    test_transform_reduce(execution::par_unseq, IteratorTag());
+    test_transform_reduce(seq, IteratorTag());
+    test_transform_reduce(par, IteratorTag());
+    test_transform_reduce(par_unseq, IteratorTag());
 
-    test_transform_reduce_async(execution::seq(execution::task), IteratorTag());
-    test_transform_reduce_async(execution::par(execution::task), IteratorTag());
+    test_transform_reduce_async(seq(task), IteratorTag());
+    test_transform_reduce_async(par(task), IteratorTag());
 }
 
 void transform_reduce_test()
@@ -257,20 +257,18 @@ void test_transform_reduce_exception_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_transform_reduce_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_transform_reduce_exception(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_transform_reduce_exception(execution::seq, IteratorTag());
-    test_transform_reduce_exception(execution::par, IteratorTag());
+    test_transform_reduce_exception(seq, IteratorTag());
+    test_transform_reduce_exception(par, IteratorTag());
 
-    test_transform_reduce_exception_async(
-        execution::seq(execution::task), IteratorTag());
-    test_transform_reduce_exception_async(
-        execution::par(execution::task), IteratorTag());
+    test_transform_reduce_exception_async(seq(task), IteratorTag());
+    test_transform_reduce_exception_async(par(task), IteratorTag());
 }
 
 void transform_reduce_exception_test()
@@ -391,20 +389,18 @@ void test_transform_reduce_bad_alloc_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_transform_reduce_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_transform_reduce_bad_alloc(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_transform_reduce_bad_alloc(execution::seq, IteratorTag());
-    test_transform_reduce_bad_alloc(execution::par, IteratorTag());
+    test_transform_reduce_bad_alloc(seq, IteratorTag());
+    test_transform_reduce_bad_alloc(par, IteratorTag());
 
-    test_transform_reduce_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag());
-    test_transform_reduce_bad_alloc_async(
-        execution::par(execution::task), IteratorTag());
+    test_transform_reduce_bad_alloc_async(seq(task), IteratorTag());
+    test_transform_reduce_bad_alloc_async(par(task), IteratorTag());
 }
 
 void transform_reduce_bad_alloc_test()

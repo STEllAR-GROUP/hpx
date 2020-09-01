@@ -39,20 +39,16 @@ hpx::future<T> test_reduce_async(
 template <typename T>
 void reduce_tests(std::size_t num, hpx::partitioned_vector<T> const& xvalues)
 {
-    HPX_TEST_EQ(
-        test_reduce(hpx::parallel::execution::seq, xvalues), T(num + 1));
-    HPX_TEST_EQ(
-        test_reduce(hpx::parallel::execution::par, xvalues), T(num + 1));
+    HPX_TEST_EQ(test_reduce(hpx::execution::seq, xvalues), T(num + 1));
+    HPX_TEST_EQ(test_reduce(hpx::execution::par, xvalues), T(num + 1));
 
-    HPX_TEST_EQ(test_reduce_async(hpx::parallel::execution::seq(
-                                      hpx::parallel::execution::task),
-                    xvalues)
-                    .get(),
+    HPX_TEST_EQ(
+        test_reduce_async(hpx::execution::seq(hpx::execution::task), xvalues)
+            .get(),
         T(num + 1));
-    HPX_TEST_EQ(test_reduce_async(hpx::parallel::execution::par(
-                                      hpx::parallel::execution::task),
-                    xvalues)
-                    .get(),
+    HPX_TEST_EQ(
+        test_reduce_async(hpx::execution::par(hpx::execution::task), xvalues)
+            .get(),
         T(num + 1));
 }
 

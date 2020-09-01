@@ -18,11 +18,10 @@ int hpx_main(int argc, char* argv[])
     std::vector<int> v(100);
 
     {
-        hpx::parallel::execution::static_chunk_size block(1);
-        hpx::parallel::execution::parallel_executor exec;
+        hpx::execution::static_chunk_size block(1);
+        hpx::execution::parallel_executor exec;
         hpx::ranges::for_each(
-            hpx::parallel::execution::par.on(exec).with(block), v,
-            [](int i) {});
+            hpx::execution::par.on(exec).with(block), v, [](int i) {});
     }
 
     return hpx::finalize();

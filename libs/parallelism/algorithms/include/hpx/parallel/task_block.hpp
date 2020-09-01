@@ -113,7 +113,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
     /// \tparam ExPolicy The execution policy an instance of a \a task_block
     ///         was created with. This defaults to \a parallel_policy.
     ///
-    template <typename ExPolicy = parallel::execution::parallel_policy>
+    template <typename ExPolicy = hpx::execution::parallel_policy>
     class task_block
     {
     private:
@@ -449,7 +449,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
     template <typename F>
     void define_task_block(F&& f)
     {
-        define_task_block(parallel::execution::par, std::forward<F>(f));
+        define_task_block(hpx::execution::par, std::forward<F>(f));
     }
 
     /// Constructs a \a task_block, tr, and invokes the expression
@@ -517,7 +517,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
         // By design we always return on the same (HPX-) thread as we started
         // executing define_task_block_restore_thread.
         define_task_block_restore_thread(
-            parallel::execution::par, std::forward<F>(f));
+            hpx::execution::par, std::forward<F>(f));
     }
 }}}    // namespace hpx::parallel::v2
 

@@ -166,14 +166,14 @@ void test_remove_copy_if_outiter_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_remove_copy_if()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_remove_copy_if(execution::seq, IteratorTag());
-    test_remove_copy_if(execution::par, IteratorTag());
-    test_remove_copy_if(execution::par_unseq, IteratorTag());
+    test_remove_copy_if(seq, IteratorTag());
+    test_remove_copy_if(par, IteratorTag());
+    test_remove_copy_if(par_unseq, IteratorTag());
 
-    test_remove_copy_if_async(execution::seq(execution::task), IteratorTag());
-    test_remove_copy_if_async(execution::par(execution::task), IteratorTag());
+    test_remove_copy_if_async(seq(task), IteratorTag());
+    test_remove_copy_if_async(par(task), IteratorTag());
 }
 
 void remove_copy_if_test()
@@ -264,18 +264,16 @@ void test_remove_copy_if_exception_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_remove_copy_if_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_remove_copy_if_exception(execution::seq, IteratorTag());
-    test_remove_copy_if_exception(execution::par, IteratorTag());
+    test_remove_copy_if_exception(seq, IteratorTag());
+    test_remove_copy_if_exception(par, IteratorTag());
 
-    test_remove_copy_if_exception_async(
-        execution::seq(execution::task), IteratorTag());
-    test_remove_copy_if_exception_async(
-        execution::par(execution::task), IteratorTag());
+    test_remove_copy_if_exception_async(seq(task), IteratorTag());
+    test_remove_copy_if_exception_async(par(task), IteratorTag());
 }
 
 void remove_copy_if_exception_test()
@@ -361,18 +359,16 @@ void test_remove_copy_if_bad_alloc_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_remove_copy_if_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_remove_copy_if_bad_alloc(execution::seq, IteratorTag());
-    test_remove_copy_if_bad_alloc(execution::par, IteratorTag());
+    test_remove_copy_if_bad_alloc(seq, IteratorTag());
+    test_remove_copy_if_bad_alloc(par, IteratorTag());
 
-    test_remove_copy_if_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag());
-    test_remove_copy_if_bad_alloc_async(
-        execution::par(execution::task), IteratorTag());
+    test_remove_copy_if_bad_alloc_async(seq(task), IteratorTag());
+    test_remove_copy_if_bad_alloc_async(par(task), IteratorTag());
 }
 
 void remove_copy_if_bad_alloc_test()

@@ -91,8 +91,8 @@ void bulk_test_function(
 
 int main()
 {
-    using hpx::parallel::execution::par;
-    using hpx::parallel::execution::task;
+    using hpx::execution::par;
+    using hpx::execution::task;
 
     auto bulk_test = [](hpx::parallel::spmd_block block,
                          std::atomic<std::size_t>* c) {

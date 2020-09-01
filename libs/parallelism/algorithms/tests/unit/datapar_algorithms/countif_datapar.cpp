@@ -18,13 +18,13 @@
 template <typename IteratorTag>
 void test_count_if()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_count_if(execution::dataseq, IteratorTag());
     test_count_if(execution::datapar, IteratorTag());
 
-    test_count_if_async(execution::dataseq(execution::task), IteratorTag());
-    test_count_if_async(execution::datapar(execution::task), IteratorTag());
+    test_count_if_async(execution::dataseq(task), IteratorTag());
+    test_count_if_async(execution::datapar(task), IteratorTag());
 }
 
 void count_if_test()
@@ -37,15 +37,13 @@ void count_if_test()
 template <typename IteratorTag>
 void test_count_if_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_count_if_exception(execution::dataseq, IteratorTag());
     test_count_if_exception(execution::datapar, IteratorTag());
 
-    test_count_if_exception_async(
-        execution::dataseq(execution::task), IteratorTag());
-    test_count_if_exception_async(
-        execution::datapar(execution::task), IteratorTag());
+    test_count_if_exception_async(execution::dataseq(task), IteratorTag());
+    test_count_if_exception_async(execution::datapar(task), IteratorTag());
 }
 
 void count_if_exception_test()
@@ -58,15 +56,13 @@ void count_if_exception_test()
 template <typename IteratorTag>
 void test_count_if_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_count_if_bad_alloc(execution::dataseq, IteratorTag());
     test_count_if_bad_alloc(execution::datapar, IteratorTag());
 
-    test_count_if_bad_alloc_async(
-        execution::dataseq(execution::task), IteratorTag());
-    test_count_if_bad_alloc_async(
-        execution::datapar(execution::task), IteratorTag());
+    test_count_if_bad_alloc_async(execution::dataseq(task), IteratorTag());
+    test_count_if_bad_alloc_async(execution::datapar(task), IteratorTag());
 }
 
 void count_if_bad_alloc_test()

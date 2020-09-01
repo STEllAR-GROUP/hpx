@@ -121,14 +121,14 @@ void test_unique_copy_async(ExPolicy policy, DataType)
 template <typename DataType>
 void test_unique_copy()
 {
-    using namespace hpx::parallel;
+    test_unique_copy(hpx::execution::seq, DataType());
+    test_unique_copy(hpx::execution::par, DataType());
+    test_unique_copy(hpx::execution::par_unseq, DataType());
 
-    test_unique_copy(execution::seq, DataType());
-    test_unique_copy(execution::par, DataType());
-    test_unique_copy(execution::par_unseq, DataType());
-
-    test_unique_copy_async(execution::seq(execution::task), DataType());
-    test_unique_copy_async(execution::par(execution::task), DataType());
+    test_unique_copy_async(
+        hpx::execution::seq(hpx::execution::task), DataType());
+    test_unique_copy_async(
+        hpx::execution::par(hpx::execution::task), DataType());
 }
 
 void test_unique_copy()

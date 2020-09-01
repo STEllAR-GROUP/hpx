@@ -388,111 +388,110 @@ void test_unique_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
 template <typename IteratorTag>
 void test_unique()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     int rand_base = std::rand();
 
     ////////// Test cases for 'int' type.
     test_unique(
-        execution::seq, IteratorTag(), int(),
+        seq, IteratorTag(), int(),
         [](const int a, const int b) -> bool { return a == b; }, rand_base);
     test_unique(
-        execution::par, IteratorTag(), int(),
+        par, IteratorTag(), int(),
         [rand_base](const int a, const int b) -> bool {
             return a == b && b == rand_base;
         },
         rand_base);
     test_unique(
-        execution::par_unseq, IteratorTag(), int(),
+        par_unseq, IteratorTag(), int(),
         [](const int a, const int b) -> bool { return a == b; }, rand_base);
 
     ////////// Test cases for user defined type.
     test_unique(
-        execution::seq, IteratorTag(), user_defined_type(),
+        seq, IteratorTag(), user_defined_type(),
         [](user_defined_type const& a, user_defined_type const& b) -> bool {
             return a == b;
         },
         rand_base);
     test_unique(
-        execution::par, IteratorTag(), user_defined_type(),
+        par, IteratorTag(), user_defined_type(),
         [](user_defined_type const& a, user_defined_type const& b) -> bool {
             return a == b;
         },
         rand_base);
     test_unique(
-        execution::par_unseq, IteratorTag(), user_defined_type(),
+        par_unseq, IteratorTag(), user_defined_type(),
         [rand_base](user_defined_type const& a, user_defined_type const& b)
             -> bool { return a == b && b == rand_base; },
         rand_base);
 
     ////////// Asynchronous test cases for 'int' type.
     test_unique_async(
-        execution::seq(execution::task), IteratorTag(), int(),
+        seq(task), IteratorTag(), int(),
         [rand_base](const int a, const int b) -> bool {
             return a == b && b == rand_base;
         },
         rand_base);
     test_unique_async(
-        execution::par(execution::task), IteratorTag(), int(),
+        par(task), IteratorTag(), int(),
         [](const int a, const int b) -> bool { return a == b; }, rand_base);
 
     ////////// Asynchronous test cases for user defined type.
     test_unique_async(
-        execution::seq(execution::task), IteratorTag(), user_defined_type(),
+        seq(task), IteratorTag(), user_defined_type(),
         [](user_defined_type const& a, user_defined_type const& b) -> bool {
             return a == b;
         },
         rand_base);
     test_unique_async(
-        execution::par(execution::task), IteratorTag(), user_defined_type(),
+        par(task), IteratorTag(), user_defined_type(),
         [rand_base](user_defined_type const& a, user_defined_type const& b)
             -> bool { return a == rand_base && b == rand_base; },
         rand_base);
 
     ////////// Corner test cases.
     test_unique(
-        execution::par, IteratorTag(), int(),
+        par, IteratorTag(), int(),
         [](const int, const int) -> bool { return true; }, rand_base);
     test_unique(
-        execution::par_unseq, IteratorTag(), user_defined_type(),
+        par_unseq, IteratorTag(), user_defined_type(),
         [](user_defined_type const&, user_defined_type const&) -> bool {
             return false;
         },
         rand_base);
 
     ////////// Another test cases for justifying the implementation.
-    test_unique_etc(
-        execution::seq, IteratorTag(), user_defined_type(), rand_base);
+    test_unique_etc(seq, IteratorTag(), user_defined_type(), rand_base);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_unique_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_unique_exception(execution::seq, IteratorTag());
-    test_unique_exception(execution::par, IteratorTag());
+    test_unique_exception(seq, IteratorTag());
+    test_unique_exception(par, IteratorTag());
 
-    test_unique_exception_async(execution::seq(execution::task), IteratorTag());
-    test_unique_exception_async(execution::par(execution::task), IteratorTag());
+    test_unique_exception_async(seq(task), IteratorTag());
+    test_unique_exception_async(par(task), IteratorTag());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_unique_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_unique_bad_alloc(execution::seq, IteratorTag());
-    test_unique_bad_alloc(execution::par, IteratorTag());
+    test_unique_bad_alloc(seq, IteratorTag());
+    test_unique_bad_alloc(par, IteratorTag());
 
-    test_unique_bad_alloc_async(execution::seq(execution::task), IteratorTag());
-    test_unique_bad_alloc_async(execution::par(execution::task), IteratorTag());
+    test_unique_bad_alloc_async(seq(task), IteratorTag());
+    test_unique_bad_alloc_async(par(task), IteratorTag());
 }

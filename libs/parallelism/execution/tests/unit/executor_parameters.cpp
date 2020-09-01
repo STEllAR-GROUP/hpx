@@ -27,26 +27,28 @@
 template <typename... Parameters>
 void parameters_test_impl(Parameters&&... params)
 {
-    using namespace hpx::parallel;
-
     typedef std::random_access_iterator_tag iterator_tag;
-    test_for_each(execution::seq.with(params...), iterator_tag());
-    test_for_each(execution::par.with(params...), iterator_tag());
+    test_for_each(hpx::execution::seq.with(params...), iterator_tag());
+    test_for_each(hpx::execution::par.with(params...), iterator_tag());
     test_for_each_async(
-        execution::seq(execution::task).with(params...), iterator_tag());
+        hpx::execution::seq(hpx::execution::task).with(params...),
+        iterator_tag());
     test_for_each_async(
-        execution::par(execution::task).with(params...), iterator_tag());
-
-    execution::sequenced_executor seq_exec;
-    test_for_each(execution::seq.on(seq_exec).with(params...), iterator_tag());
-    test_for_each_async(
-        execution::seq(execution::task).on(seq_exec).with(params...),
+        hpx::execution::par(hpx::execution::task).with(params...),
         iterator_tag());
 
-    execution::parallel_executor par_exec;
-    test_for_each(execution::par.on(par_exec).with(params...), iterator_tag());
+    hpx::execution::sequenced_executor seq_exec;
+    test_for_each(
+        hpx::execution::seq.on(seq_exec).with(params...), iterator_tag());
     test_for_each_async(
-        execution::par(execution::task).on(par_exec).with(params...),
+        hpx::execution::seq(hpx::execution::task).on(seq_exec).with(params...),
+        iterator_tag());
+
+    hpx::execution::parallel_executor par_exec;
+    test_for_each(
+        hpx::execution::par.on(par_exec).with(params...), iterator_tag());
+    test_for_each_async(
+        hpx::execution::par(hpx::execution::task).on(par_exec).with(params...),
         iterator_tag());
 }
 
@@ -60,12 +62,12 @@ void parameters_test(Parameters&&... params)
 void test_dynamic_chunk_size()
 {
     {
-        hpx::parallel::execution::dynamic_chunk_size dcs;
+        hpx::execution::dynamic_chunk_size dcs;
         parameters_test(dcs);
     }
 
     {
-        hpx::parallel::execution::dynamic_chunk_size dcs(100);
+        hpx::execution::dynamic_chunk_size dcs(100);
         parameters_test(dcs);
     }
 }
@@ -73,12 +75,12 @@ void test_dynamic_chunk_size()
 void test_static_chunk_size()
 {
     {
-        hpx::parallel::execution::static_chunk_size scs;
+        hpx::execution::static_chunk_size scs;
         parameters_test(scs);
     }
 
     {
-        hpx::parallel::execution::static_chunk_size scs(100);
+        hpx::execution::static_chunk_size scs(100);
         parameters_test(scs);
     }
 }
@@ -86,12 +88,12 @@ void test_static_chunk_size()
 void test_guided_chunk_size()
 {
     {
-        hpx::parallel::execution::guided_chunk_size gcs;
+        hpx::execution::guided_chunk_size gcs;
         parameters_test(gcs);
     }
 
     {
-        hpx::parallel::execution::guided_chunk_size gcs(100);
+        hpx::execution::guided_chunk_size gcs(100);
         parameters_test(gcs);
     }
 }
@@ -99,13 +101,12 @@ void test_guided_chunk_size()
 void test_auto_chunk_size()
 {
     {
-        hpx::parallel::execution::auto_chunk_size acs;
+        hpx::execution::auto_chunk_size acs;
         parameters_test(acs);
     }
 
     {
-        hpx::parallel::execution::auto_chunk_size acs(
-            std::chrono::milliseconds(1));
+        hpx::execution::auto_chunk_size acs(std::chrono::milliseconds(1));
         parameters_test(acs);
     }
 }
@@ -113,18 +114,18 @@ void test_auto_chunk_size()
 void test_persistent_auto_chunk_size()
 {
     {
-        hpx::parallel::execution::persistent_auto_chunk_size pacs;
+        hpx::execution::persistent_auto_chunk_size pacs;
         parameters_test(pacs);
     }
 
     {
-        hpx::parallel::execution::persistent_auto_chunk_size pacs(
+        hpx::execution::persistent_auto_chunk_size pacs(
             std::chrono::milliseconds(0), std::chrono::milliseconds(1));
         parameters_test(pacs);
     }
 
     {
-        hpx::parallel::execution::persistent_auto_chunk_size pacs(
+        hpx::execution::persistent_auto_chunk_size pacs(
             std::chrono::milliseconds(0));
         parameters_test(pacs);
     }
@@ -166,7 +167,7 @@ namespace hpx { namespace parallel { namespace execution {
 void test_combined_hooks()
 {
     timer_hooks_parameters pacs("time_hooks");
-    hpx::parallel::execution::auto_chunk_size acs;
+    hpx::execution::auto_chunk_size acs;
 
     parameters_test(acs, pacs);
     parameters_test(pacs, acs);

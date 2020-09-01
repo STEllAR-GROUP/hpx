@@ -88,7 +88,8 @@ namespace hpx { namespace parallel { namespace execution {
                         .get())
             {
                 auto predecessor = make_ready_future_at(abs_time);
-                return execution::then_execute(sequenced_executor(),
+                return execution::then_execute(
+                    hpx::execution::sequenced_executor(),
                     make_then_execute_helper<sync_execute_at_helper>(
                         std::forward<Executor>(exec),
                         hpx::util::deferred_call(
@@ -177,7 +178,8 @@ namespace hpx { namespace parallel { namespace execution {
                         std::forward<F>(f), std::forward<Ts>(ts)...))
             {
                 auto predecessor = make_ready_future_at(abs_time);
-                return execution::then_execute(sequenced_executor(),
+                return execution::then_execute(
+                    hpx::execution::sequenced_executor(),
                     make_then_execute_helper<async_execute_at_helper>(
                         std::forward<Executor>(exec),
                         hpx::util::deferred_call(
@@ -259,7 +261,7 @@ namespace hpx { namespace parallel { namespace execution {
                 Ts&&... ts)
             {
                 auto predecessor = make_ready_future_at(abs_time);
-                execution::then_execute(sequenced_executor(),
+                execution::then_execute(hpx::execution::sequenced_executor(),
                     make_then_execute_helper<post_at_helper>(
                         std::forward<Executor>(exec),
                         hpx::util::deferred_call(
@@ -407,10 +409,10 @@ namespace hpx { namespace parallel { namespace execution {
 
     ///////////////////////////////////////////////////////////////////////////
     using sequenced_timed_executor =
-        timed_executor<execution::sequenced_executor>;
+        timed_executor<hpx::execution::sequenced_executor>;
 
     using parallel_timed_executor =
-        timed_executor<execution::parallel_executor>;
+        timed_executor<hpx::execution::parallel_executor>;
 }}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace parallel { namespace execution {

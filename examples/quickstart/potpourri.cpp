@@ -56,13 +56,13 @@ int main(int, char**)
     std::vector<int> v(1000000);
 
     // We fill the vector synchronously and sequentially.
-    hpx::generate(hpx::parallel::execution::seq, std::begin(v), std::end(v),
+    hpx::generate(hpx::execution::seq, std::begin(v), std::end(v),
         &rand_wrapper);
 
     // We can launch the sort in parallel and asynchronously.
     hpx::future<void> done_sorting = hpx::parallel::sort(
-        hpx::parallel::execution::par(          // In parallel.
-            hpx::parallel::execution::task),    // Asynchronously.
+        hpx::execution::par(          // In parallel.
+            hpx::execution::task),    // Asynchronously.
         std::begin(v), std::end(v));
 
     // We launch the final task when the vector has been sorted and result is

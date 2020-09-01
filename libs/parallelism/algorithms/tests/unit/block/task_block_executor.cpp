@@ -16,15 +16,15 @@
 #include <string>
 #include <vector>
 
+using hpx::execution::par;
+using hpx::execution::parallel_policy;
+using hpx::execution::parallel_policy_shim;
+using hpx::execution::parallel_task_policy;
+using hpx::execution::parallel_task_policy_shim;
+using hpx::execution::static_chunk_size;
+using hpx::execution::task;
 using hpx::parallel::define_task_block;
 using hpx::parallel::task_block;
-using hpx::parallel::execution::par;
-using hpx::parallel::execution::parallel_policy;
-using hpx::parallel::execution::parallel_policy_shim;
-using hpx::parallel::execution::parallel_task_policy;
-using hpx::parallel::execution::parallel_task_policy_shim;
-using hpx::parallel::execution::static_chunk_size;
-using hpx::parallel::execution::task;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Executor>
@@ -399,12 +399,12 @@ void test_executor_task_block(Executor& exec)
 int hpx_main()
 {
     {
-        hpx::parallel::execution::sequenced_executor exec;
+        hpx::execution::sequenced_executor exec;
         test_executor_task_block(exec);
     }
 
     {
-        hpx::parallel::execution::parallel_executor exec;
+        hpx::execution::parallel_executor exec;
         test_executor_task_block(exec);
 
         define_task_block_exceptions_test3(exec);

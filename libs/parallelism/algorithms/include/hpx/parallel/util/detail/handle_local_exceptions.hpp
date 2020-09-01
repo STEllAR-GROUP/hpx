@@ -161,7 +161,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     };
 
     template <>
-    struct handle_local_exceptions<execution::parallel_unsequenced_policy>
+    struct handle_local_exceptions<hpx::execution::parallel_unsequenced_policy>
     {
         ///////////////////////////////////////////////////////////////////////
 #if defined(HPX_COMPUTE_DEVICE_CODE)

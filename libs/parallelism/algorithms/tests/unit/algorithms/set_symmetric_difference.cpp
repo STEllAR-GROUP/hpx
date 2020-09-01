@@ -75,16 +75,14 @@ void test_set_symmetric_difference1_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_set_symmetric_difference1()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_set_symmetric_difference1(execution::seq, IteratorTag());
-    test_set_symmetric_difference1(execution::par, IteratorTag());
-    test_set_symmetric_difference1(execution::par_unseq, IteratorTag());
+    test_set_symmetric_difference1(seq, IteratorTag());
+    test_set_symmetric_difference1(par, IteratorTag());
+    test_set_symmetric_difference1(par_unseq, IteratorTag());
 
-    test_set_symmetric_difference1_async(
-        execution::seq(execution::task), IteratorTag());
-    test_set_symmetric_difference1_async(
-        execution::par(execution::task), IteratorTag());
+    test_set_symmetric_difference1_async(seq(task), IteratorTag());
+    test_set_symmetric_difference1_async(par(task), IteratorTag());
 }
 
 void set_symmetric_difference_test1()
@@ -160,16 +158,14 @@ void test_set_symmetric_difference2_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_set_symmetric_difference2()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_set_symmetric_difference2(execution::seq, IteratorTag());
-    test_set_symmetric_difference2(execution::par, IteratorTag());
-    test_set_symmetric_difference2(execution::par_unseq, IteratorTag());
+    test_set_symmetric_difference2(seq, IteratorTag());
+    test_set_symmetric_difference2(par, IteratorTag());
+    test_set_symmetric_difference2(par_unseq, IteratorTag());
 
-    test_set_symmetric_difference2_async(
-        execution::seq(execution::task), IteratorTag());
-    test_set_symmetric_difference2_async(
-        execution::par(execution::task), IteratorTag());
+    test_set_symmetric_difference2_async(seq(task), IteratorTag());
+    test_set_symmetric_difference2_async(par(task), IteratorTag());
 }
 
 void set_symmetric_difference_test2()
@@ -273,18 +269,16 @@ void test_set_symmetric_difference_exception_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_set_symmetric_difference_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_set_symmetric_difference_exception(execution::seq, IteratorTag());
-    test_set_symmetric_difference_exception(execution::par, IteratorTag());
+    test_set_symmetric_difference_exception(seq, IteratorTag());
+    test_set_symmetric_difference_exception(par, IteratorTag());
 
-    test_set_symmetric_difference_exception_async(
-        execution::seq(execution::task), IteratorTag());
-    test_set_symmetric_difference_exception_async(
-        execution::par(execution::task), IteratorTag());
+    test_set_symmetric_difference_exception_async(seq(task), IteratorTag());
+    test_set_symmetric_difference_exception_async(par(task), IteratorTag());
 }
 
 void set_symmetric_difference_exception_test()
@@ -386,18 +380,16 @@ void test_set_symmetric_difference_bad_alloc_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_set_symmetric_difference_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_set_symmetric_difference_bad_alloc(execution::seq, IteratorTag());
-    test_set_symmetric_difference_bad_alloc(execution::par, IteratorTag());
+    test_set_symmetric_difference_bad_alloc(seq, IteratorTag());
+    test_set_symmetric_difference_bad_alloc(par, IteratorTag());
 
-    test_set_symmetric_difference_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag());
-    test_set_symmetric_difference_bad_alloc_async(
-        execution::par(execution::task), IteratorTag());
+    test_set_symmetric_difference_bad_alloc_async(seq(task), IteratorTag());
+    test_set_symmetric_difference_bad_alloc_async(par(task), IteratorTag());
 }
 
 void set_symmetric_difference_bad_alloc_test()

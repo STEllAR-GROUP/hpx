@@ -72,16 +72,14 @@ void test_for_each_n_async(ExPolicy p, IteratorTag, Proj&& proj)
 template <typename IteratorTag, typename Proj>
 void test_for_each_n()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_for_each_n(execution::seq, IteratorTag(), Proj());
-    test_for_each_n(execution::par, IteratorTag(), Proj());
-    test_for_each_n(execution::par_unseq, IteratorTag(), Proj());
+    test_for_each_n(seq, IteratorTag(), Proj());
+    test_for_each_n(par, IteratorTag(), Proj());
+    test_for_each_n(par_unseq, IteratorTag(), Proj());
 
-    test_for_each_n_async(
-        execution::seq(execution::task), IteratorTag(), Proj());
-    test_for_each_n_async(
-        execution::par(execution::task), IteratorTag(), Proj());
+    test_for_each_n_async(seq(task), IteratorTag(), Proj());
+    test_for_each_n_async(par(task), IteratorTag(), Proj());
 }
 
 template <typename Proj>

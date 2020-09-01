@@ -85,13 +85,13 @@ void test_search_n1_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_search_n1()
 {
-    using namespace hpx::parallel;
-    test_search_n1(execution::seq, IteratorTag());
-    test_search_n1(execution::par, IteratorTag());
-    test_search_n1(execution::par_unseq, IteratorTag());
+    using namespace hpx::execution;
+    test_search_n1(seq, IteratorTag());
+    test_search_n1(par, IteratorTag());
+    test_search_n1(par_unseq, IteratorTag());
 
-    test_search_n1_async(execution::seq(execution::task), IteratorTag());
-    test_search_n1_async(execution::par(execution::task), IteratorTag());
+    test_search_n1_async(seq(task), IteratorTag());
+    test_search_n1_async(par(task), IteratorTag());
 }
 
 void search_test_n1()
@@ -155,13 +155,13 @@ void test_search_n2_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_search_n2()
 {
-    using namespace hpx::parallel;
-    test_search_n2(execution::seq, IteratorTag());
-    test_search_n2(execution::par, IteratorTag());
-    test_search_n2(execution::par_unseq, IteratorTag());
+    using namespace hpx::execution;
+    test_search_n2(seq, IteratorTag());
+    test_search_n2(par, IteratorTag());
+    test_search_n2(par_unseq, IteratorTag());
 
-    test_search_n2_async(execution::seq(execution::task), IteratorTag());
-    test_search_n2_async(execution::par(execution::task), IteratorTag());
+    test_search_n2_async(seq(task), IteratorTag());
+    test_search_n2_async(par(task), IteratorTag());
 }
 
 void search_test_n2()
@@ -219,13 +219,13 @@ void test_search_n3_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_search_n3()
 {
-    using namespace hpx::parallel;
-    test_search_n3(execution::seq, IteratorTag());
-    test_search_n3(execution::par, IteratorTag());
-    test_search_n3(execution::par_unseq, IteratorTag());
+    using namespace hpx::execution;
+    test_search_n3(seq, IteratorTag());
+    test_search_n3(par, IteratorTag());
+    test_search_n3(par_unseq, IteratorTag());
 
-    test_search_n3_async(execution::seq(execution::task), IteratorTag());
-    test_search_n3_async(execution::par(execution::task), IteratorTag());
+    test_search_n3_async(seq(task), IteratorTag());
+    test_search_n3_async(par(task), IteratorTag());
 }
 
 void search_test_n3()
@@ -286,13 +286,13 @@ void test_search_n4_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_search_n4()
 {
-    using namespace hpx::parallel;
-    test_search_n4(execution::seq, IteratorTag());
-    test_search_n4(execution::par, IteratorTag());
-    test_search_n4(execution::par_unseq, IteratorTag());
+    using namespace hpx::execution;
+    test_search_n4(seq, IteratorTag());
+    test_search_n4(par, IteratorTag());
+    test_search_n4(par_unseq, IteratorTag());
 
-    test_search_n4_async(execution::seq(execution::task), IteratorTag());
-    test_search_n4_async(execution::par(execution::task), IteratorTag());
+    test_search_n4_async(seq(task), IteratorTag());
+    test_search_n4_async(par(task), IteratorTag());
 }
 
 void search_test_n4()
@@ -367,13 +367,13 @@ void test_search_n5_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_search_n5()
 {
-    using namespace hpx::parallel;
-    test_search_n5(execution::seq, IteratorTag());
-    test_search_n5(execution::par, IteratorTag());
-    test_search_n5(execution::par_unseq, IteratorTag());
+    using namespace hpx::execution;
+    test_search_n5(seq, IteratorTag());
+    test_search_n5(par, IteratorTag());
+    test_search_n5(par_unseq, IteratorTag());
 
-    test_search_n5_async(execution::seq(execution::task), IteratorTag());
-    test_search_n5_async(execution::par(execution::task), IteratorTag());
+    test_search_n5_async(seq(task), IteratorTag());
+    test_search_n5_async(par(task), IteratorTag());
 }
 
 void search_test_n5()

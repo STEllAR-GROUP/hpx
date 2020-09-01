@@ -93,16 +93,16 @@ void test_find_if_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_find_if()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_find_if(IteratorTag());
 
-    test_find_if(execution::seq, IteratorTag());
-    test_find_if(execution::par, IteratorTag());
-    test_find_if(execution::par_unseq, IteratorTag());
+    test_find_if(seq, IteratorTag());
+    test_find_if(par, IteratorTag());
+    test_find_if(par_unseq, IteratorTag());
 
-    test_find_if_async(execution::seq(execution::task), IteratorTag());
-    test_find_if_async(execution::par(execution::task), IteratorTag());
+    test_find_if_async(seq(task), IteratorTag());
+    test_find_if_async(par(task), IteratorTag());
 }
 
 void find_if_test()
@@ -133,8 +133,8 @@ void test_find_if_exception(IteratorTag)
     catch (hpx::exception_list const& e)
     {
         caught_exception = true;
-        test::test_num_exceptions<hpx::parallel::execution::sequenced_policy,
-            IteratorTag>::call(hpx::parallel::execution::seq, e);
+        test::test_num_exceptions<hpx::execution::sequenced_policy,
+            IteratorTag>::call(hpx::execution::seq, e);
     }
     catch (...)
     {
@@ -221,20 +221,18 @@ void test_find_if_exception_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_find_if_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_find_if_exception(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_find_if_exception(execution::seq, IteratorTag());
-    test_find_if_exception(execution::par, IteratorTag());
+    test_find_if_exception(seq, IteratorTag());
+    test_find_if_exception(par, IteratorTag());
 
-    test_find_if_exception_async(
-        execution::seq(execution::task), IteratorTag());
-    test_find_if_exception_async(
-        execution::par(execution::task), IteratorTag());
+    test_find_if_exception_async(seq(task), IteratorTag());
+    test_find_if_exception_async(par(task), IteratorTag());
 }
 
 void find_if_exception_test()
@@ -318,18 +316,16 @@ void test_find_if_bad_alloc_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_find_if_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_find_if_bad_alloc(execution::seq, IteratorTag());
-    test_find_if_bad_alloc(execution::par, IteratorTag());
+    test_find_if_bad_alloc(seq, IteratorTag());
+    test_find_if_bad_alloc(par, IteratorTag());
 
-    test_find_if_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag());
-    test_find_if_bad_alloc_async(
-        execution::par(execution::task), IteratorTag());
+    test_find_if_bad_alloc_async(seq(task), IteratorTag());
+    test_find_if_bad_alloc_async(par(task), IteratorTag());
 }
 
 void find_if_bad_alloc_test()

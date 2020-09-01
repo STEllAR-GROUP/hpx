@@ -137,43 +137,43 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
-        struct handle_exception_impl<execution::sequenced_task_policy, Result>
-          : handle_exception_task_impl<Result>
+        struct handle_exception_impl<hpx::execution::sequenced_task_policy,
+            Result> : handle_exception_task_impl<Result>
         {
         };
 
         template <typename Executor, typename Parameters, typename Result>
         struct handle_exception_impl<
-            execution::sequenced_task_policy_shim<Executor, Parameters>, Result>
-          : handle_exception_task_impl<Result>
+            hpx::execution::sequenced_task_policy_shim<Executor, Parameters>,
+            Result> : handle_exception_task_impl<Result>
         {
         };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
-        struct handle_exception_impl<execution::parallel_task_policy, Result>
-          : handle_exception_task_impl<Result>
+        struct handle_exception_impl<hpx::execution::parallel_task_policy,
+            Result> : handle_exception_task_impl<Result>
         {
         };
 
         template <typename Executor, typename Parameters, typename Result>
         struct handle_exception_impl<
-            execution::parallel_task_policy_shim<Executor, Parameters>, Result>
-          : handle_exception_task_impl<Result>
+            hpx::execution::parallel_task_policy_shim<Executor, Parameters>,
+            Result> : handle_exception_task_impl<Result>
         {
         };
 
 #if defined(HPX_HAVE_DATAPAR)
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
-        struct handle_exception_impl<execution::dataseq_task_policy, Result>
-          : handle_exception_task_impl<Result>
+        struct handle_exception_impl<hpx::execution::dataseq_task_policy,
+            Result> : handle_exception_task_impl<Result>
         {
         };
 
         template <typename Result>
-        struct handle_exception_impl<execution::datapar_task_policy, Result>
-          : handle_exception_task_impl<Result>
+        struct handle_exception_impl<hpx::execution::datapar_task_policy,
+            Result> : handle_exception_task_impl<Result>
         {
         };
 #endif
@@ -187,8 +187,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
-        struct handle_exception_impl<execution::parallel_unsequenced_policy,
-            Result>
+        struct handle_exception_impl<
+            hpx::execution::parallel_unsequenced_policy, Result>
         {
             typedef Result type;
 

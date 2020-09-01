@@ -87,12 +87,12 @@ void test_count()
     auto stdResult = std::count(Iter{0}, Iter{33}, std::int64_t{1});
 
     auto result = hpx::ranges::count(
-        hpx::parallel::execution::seq, Iter{0}, Sent{33}, std::int64_t{1});
+        hpx::execution::seq, Iter{0}, Sent{33}, std::int64_t{1});
 
     HPX_TEST_EQ(result, stdResult);
 
     result = hpx::ranges::count(
-        hpx::parallel::execution::par, Iter{0}, Sent{33}, std::int64_t{1});
+        hpx::execution::par, Iter{0}, Sent{33}, std::int64_t{1});
 
     HPX_TEST_EQ(result, stdResult);
 }
@@ -106,12 +106,12 @@ void test_count_if()
     auto stdResult = std::count_if(Iter{0}, Iter{33}, predicate);
 
     Iter::difference_type result = hpx::ranges::count_if(
-        hpx::parallel::execution::seq, Iter{0}, Sent{33}, predicate);
+        hpx::execution::seq, Iter{0}, Sent{33}, predicate);
 
     HPX_TEST_EQ(result, stdResult);
 
     result = hpx::ranges::count_if(
-        hpx::parallel::execution::par, Iter{0}, Sent{33}, predicate);
+        hpx::execution::par, Iter{0}, Sent{33}, predicate);
 
     HPX_TEST_EQ(result, stdResult);
 }

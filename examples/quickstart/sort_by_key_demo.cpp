@@ -47,7 +47,7 @@ int hpx_main()
         print_sequence(keys, values);
 
         hpx::parallel::sort_by_key(
-            hpx::parallel::execution::par,
+            hpx::execution::par,
             keys.begin(),
             keys.end(),
             values.begin());

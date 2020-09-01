@@ -66,7 +66,7 @@ namespace hpx { namespace detail {
             typename util::detail::invoke_deferred_result<F, Ts...>::type>::type
         call(F&& f, Ts&&... ts)
         {
-            parallel::execution::parallel_executor exec;
+            execution::parallel_executor exec;
             return parallel::execution::sync_execute(
                 exec, std::forward<F>(f), std::forward<Ts>(ts)...);
         }

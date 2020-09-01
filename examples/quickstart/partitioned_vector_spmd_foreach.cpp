@@ -159,12 +159,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         // fill the vector with random numbers
         partitioned_vector_view<int> view(v);
-        hpx::generate(hpx::parallel::execution::par, view.begin(), view.end(),
+        hpx::generate(hpx::execution::par, view.begin(), view.end(),
             [&]() { return dist(gen); });
 
         // square all numbers in the array
         hpx::ranges::for_each(
-            hpx::parallel::execution::par, view, [](int& val) { val *= val; });
+            hpx::execution::par, view, [](int& val) { val *= val; });
 
         // do the same using a plain loop
         std::size_t maxnum = view.size();

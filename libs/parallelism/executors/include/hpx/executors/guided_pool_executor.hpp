@@ -584,7 +584,7 @@ namespace hpx { namespace parallel { namespace execution {
     template <typename Hint>
     struct executor_execution_category<guided_pool_executor<Hint>>
     {
-        typedef parallel::execution::parallel_execution_tag type;
+        typedef hpx::execution::parallel_execution_tag type;
     };
 
     template <typename Hint>
@@ -596,7 +596,7 @@ namespace hpx { namespace parallel { namespace execution {
     template <typename Hint>
     struct executor_execution_category<guided_pool_executor_shim<Hint>>
     {
-        typedef parallel::execution::parallel_execution_tag type;
+        typedef hpx::execution::parallel_execution_tag type;
     };
 
     template <typename Hint>

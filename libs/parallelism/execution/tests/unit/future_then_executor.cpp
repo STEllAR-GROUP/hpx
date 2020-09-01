@@ -177,12 +177,12 @@ using hpx::program_options::variables_map;
 int hpx_main(variables_map&)
 {
     {
-        hpx::parallel::execution::sequenced_executor exec;
+        hpx::execution::sequenced_executor exec;
         test_then(exec);
     }
 
     {
-        hpx::parallel::execution::parallel_executor exec;
+        hpx::execution::parallel_executor exec;
         test_then(exec);
     }
 

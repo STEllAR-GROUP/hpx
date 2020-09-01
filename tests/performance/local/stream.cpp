@@ -95,11 +95,11 @@ void check_results(std::size_t iterations, Vector const& a_res,
     std::vector<STREAM_TYPE> c(c_res.size());
 
     hpx::copy(
-        hpx::parallel::execution::par, a_res.begin(), a_res.end(), a.begin());
+        hpx::execution::par, a_res.begin(), a_res.end(), a.begin());
     hpx::copy(
-        hpx::parallel::execution::par, b_res.begin(), b_res.end(), b.begin());
+        hpx::execution::par, b_res.begin(), b_res.end(), b.begin());
     hpx::copy(
-        hpx::parallel::execution::par, c_res.begin(), c_res.end(), c.begin());
+        hpx::execution::par, c_res.begin(), c_res.end(), c.begin());
 
     STREAM_TYPE aj, bj, cj, scalar;
     STREAM_TYPE aSumErr, bSumErr, cSumErr;
@@ -460,7 +460,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         allocator_type alloc(target);
         executor_type exec(target, host_targets);
-        auto policy = hpx::parallel::execution::par.on(exec);
+        auto policy = hpx::execution::par.on(exec);
 
 #else
 #error "The STREAM benchmark currently requires CUDA to run on an accelerator"
@@ -477,7 +477,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         {
             // Default parallel policy with serial allocator.
             timing = run_benchmark<>(iterations, vector_size,
-                std::allocator<STREAM_TYPE>{}, hpx::parallel::execution::par);
+                std::allocator<STREAM_TYPE>{}, hpx::execution::par);
         }
         else if (executor == 1)
         {
@@ -489,7 +489,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             auto numa_nodes = hpx::compute::host::numa_domains();
             allocator_type alloc(numa_nodes);
             executor_type exec(numa_nodes);
-            auto policy = hpx::parallel::execution::par.on(exec);
+            auto policy = hpx::execution::par.on(exec);
 
             timing = run_benchmark<>(
                 iterations, vector_size, std::move(alloc), std::move(policy));
@@ -497,7 +497,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         else if (executor == 2)
         {
             // Default parallel policy and allocator with default parallel policy.
-            auto policy = hpx::parallel::execution::par;
+            auto policy = hpx::execution::par;
             hpx::compute::host::detail::policy_allocator<STREAM_TYPE,
                 decltype(policy)>
                 alloc(policy);
@@ -511,7 +511,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             using executor_type =
                 hpx::parallel::execution::thread_pool_executor;
 
-            auto policy = hpx::parallel::execution::par.on(executor_type());
+            auto policy = hpx::execution::par.on(executor_type());
             hpx::compute::host::detail::policy_allocator<STREAM_TYPE,
                 decltype(policy)>
                 alloc(policy);

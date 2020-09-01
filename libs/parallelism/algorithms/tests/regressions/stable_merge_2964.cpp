@@ -128,9 +128,8 @@ int hpx_main(int argc, char** argv)
 
     // I expect a stable merge to order {3, 'a'} and {3, 'b'} before {3, 'c'}
     // because they come from the first sequence
-    hpx::parallel::merge(hpx::parallel::execution::par, a1.begin(), a1.end(),
-        a2.begin(), a2.end(), result.begin(),
-        [](ElemType const& a, ElemType const& b) {
+    hpx::parallel::merge(hpx::execution::par, a1.begin(), a1.end(), a2.begin(),
+        a2.end(), result.begin(), [](ElemType const& a, ElemType const& b) {
             return std::get<0>(a) < std::get<0>(b);
         });
     std::merge(a1.begin(), a1.end(), a2.begin(), a2.end(), solution.begin(),
@@ -141,9 +140,8 @@ int hpx_main(int argc, char** argv)
     HPX_TEST(result == solution);
 
     // Expect {3, 'c'}, {3, 'a'}, {3, 'b'} in order.
-    hpx::parallel::merge(hpx::parallel::execution::par, a2.begin(), a2.end(),
-        a1.begin(), a1.end(), result.begin(),
-        [](ElemType const& a, ElemType const& b) {
+    hpx::parallel::merge(hpx::execution::par, a2.begin(), a2.end(), a1.begin(),
+        a1.end(), result.begin(), [](ElemType const& a, ElemType const& b) {
             return std::get<0>(a) < std::get<0>(b);
         });
     std::merge(a2.begin(), a2.end(), a1.begin(), a1.end(), solution.begin(),
@@ -157,11 +155,11 @@ int hpx_main(int argc, char** argv)
     std::uniform_int_distribution<> dis(0, 9999);
     int rand_base = dis(_rand);
 
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_merge_stable(execution::seq, int(), rand_base);
-    test_merge_stable(execution::par, int(), rand_base);
-    test_merge_stable(execution::par_unseq, int(), rand_base);
+    test_merge_stable(seq, int(), rand_base);
+    test_merge_stable(par, int(), rand_base);
+    test_merge_stable(par_unseq, int(), rand_base);
 
     return hpx::finalize();
 }

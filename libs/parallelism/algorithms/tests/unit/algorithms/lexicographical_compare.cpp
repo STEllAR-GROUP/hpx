@@ -74,15 +74,13 @@ void test_lexicographical_compare1_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_lexicographical_compare1()
 {
-    using namespace hpx::parallel;
-    test_lexicographical_compare1(execution::seq, IteratorTag());
-    test_lexicographical_compare1(execution::par, IteratorTag());
-    test_lexicographical_compare1(execution::par_unseq, IteratorTag());
+    using namespace hpx::execution;
+    test_lexicographical_compare1(seq, IteratorTag());
+    test_lexicographical_compare1(par, IteratorTag());
+    test_lexicographical_compare1(par_unseq, IteratorTag());
 
-    test_lexicographical_compare1_async(
-        execution::seq(execution::task), IteratorTag());
-    test_lexicographical_compare1_async(
-        execution::par(execution::task), IteratorTag());
+    test_lexicographical_compare1_async(seq(task), IteratorTag());
+    test_lexicographical_compare1_async(par(task), IteratorTag());
 }
 
 void lexicographical_compare_test1()
@@ -141,15 +139,13 @@ void test_lexicographical_compare2_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_lexicographical_compare2()
 {
-    using namespace hpx::parallel;
-    test_lexicographical_compare2(execution::seq, IteratorTag());
-    test_lexicographical_compare2(execution::par, IteratorTag());
-    test_lexicographical_compare2(execution::par_unseq, IteratorTag());
+    using namespace hpx::execution;
+    test_lexicographical_compare2(seq, IteratorTag());
+    test_lexicographical_compare2(par, IteratorTag());
+    test_lexicographical_compare2(par_unseq, IteratorTag());
 
-    test_lexicographical_compare2_async(
-        execution::seq(execution::task), IteratorTag());
-    test_lexicographical_compare2_async(
-        execution::par(execution::task), IteratorTag());
+    test_lexicographical_compare2_async(seq(task), IteratorTag());
+    test_lexicographical_compare2_async(par(task), IteratorTag());
 }
 
 void lexicographical_compare_test2()
@@ -212,15 +208,13 @@ void test_lexicographical_compare3_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_lexicographical_compare3()
 {
-    using namespace hpx::parallel;
-    test_lexicographical_compare3(execution::seq, IteratorTag());
-    test_lexicographical_compare3(execution::par, IteratorTag());
-    test_lexicographical_compare3(execution::par_unseq, IteratorTag());
+    using namespace hpx::execution;
+    test_lexicographical_compare3(seq, IteratorTag());
+    test_lexicographical_compare3(par, IteratorTag());
+    test_lexicographical_compare3(par_unseq, IteratorTag());
 
-    test_lexicographical_compare3_async(
-        execution::seq(execution::task), IteratorTag());
-    test_lexicographical_compare3_async(
-        execution::par(execution::task), IteratorTag());
+    test_lexicographical_compare3_async(seq(task), IteratorTag());
+    test_lexicographical_compare3_async(par(task), IteratorTag());
 }
 
 void lexicographical_compare_test3()
@@ -316,17 +310,15 @@ void test_lexicographical_compare_async_exception(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_lexicographical_compare_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
     //If the execution policy object is of type vector_execution_policy,
     //  std::terminate shall be called. therefore we do not test exceptions
     //  with a vector execution policy
-    test_lexicographical_compare_exception(execution::seq, IteratorTag());
-    test_lexicographical_compare_exception(execution::par, IteratorTag());
+    test_lexicographical_compare_exception(seq, IteratorTag());
+    test_lexicographical_compare_exception(par, IteratorTag());
 
-    test_lexicographical_compare_async_exception(
-        execution::seq(execution::task), IteratorTag());
-    test_lexicographical_compare_async_exception(
-        execution::par(execution::task), IteratorTag());
+    test_lexicographical_compare_async_exception(seq(task), IteratorTag());
+    test_lexicographical_compare_async_exception(par(task), IteratorTag());
 }
 
 void lexicographical_compare_exception_test()
@@ -417,18 +409,16 @@ void test_lexicographical_compare_async_bad_alloc(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_lexicographical_compare_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_lexicographical_compare_bad_alloc(execution::par, IteratorTag());
-    test_lexicographical_compare_bad_alloc(execution::seq, IteratorTag());
+    test_lexicographical_compare_bad_alloc(par, IteratorTag());
+    test_lexicographical_compare_bad_alloc(seq, IteratorTag());
 
-    test_lexicographical_compare_async_bad_alloc(
-        execution::seq(execution::task), IteratorTag());
-    test_lexicographical_compare_async_bad_alloc(
-        execution::par(execution::task), IteratorTag());
+    test_lexicographical_compare_async_bad_alloc(seq(task), IteratorTag());
+    test_lexicographical_compare_async_bad_alloc(par(task), IteratorTag());
 }
 
 void lexicographical_compare_bad_alloc_test()

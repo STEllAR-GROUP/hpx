@@ -90,7 +90,7 @@ void copy_algo_tests_with_policy_async(std::size_t size, std::size_t localities,
     hpx::partitioned_vector<T> v1(size, policy);
     fill_vector(v1, T(43));
 
-    using hpx::parallel::execution::task;
+    using hpx::execution::task;
 
     hpx::partitioned_vector<T> v2(size, policy);
     auto f =
@@ -119,7 +119,7 @@ void copy_tests_with_policy(
     fill_vector(v3, T(43));
     compare_vectors(v1, v3, false);
 
-    using namespace hpx::parallel::execution;
+    using namespace hpx::execution;
 
     copy_algo_tests_with_policy<T>(size, localities, policy, seq);
     copy_algo_tests_with_policy<T>(size, localities, policy, par);

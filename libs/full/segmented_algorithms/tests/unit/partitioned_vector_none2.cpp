@@ -83,32 +83,26 @@ void none_tests(std::vector<hpx::id_type>& localities)
         SIZE, T(0), hpx::container_layout(localities));
     initialize(xvalues);
 
-    test_none(hpx::parallel::execution::seq, xvalues, op8(), true);
-    test_none(hpx::parallel::execution::par, xvalues, op8(), true);
+    test_none(hpx::execution::seq, xvalues, op8(), true);
+    test_none(hpx::execution::par, xvalues, op8(), true);
     test_none_async(
-        hpx::parallel::execution::seq(hpx::parallel::execution::task), xvalues,
-        op8(), true);
+        hpx::execution::seq(hpx::execution::task), xvalues, op8(), true);
     test_none_async(
-        hpx::parallel::execution::par(hpx::parallel::execution::task), xvalues,
-        op8(), true);
+        hpx::execution::par(hpx::execution::task), xvalues, op8(), true);
 
-    test_none(hpx::parallel::execution::seq, xvalues, op5(), false);
-    test_none(hpx::parallel::execution::par, xvalues, op5(), false);
+    test_none(hpx::execution::seq, xvalues, op5(), false);
+    test_none(hpx::execution::par, xvalues, op5(), false);
     test_none_async(
-        hpx::parallel::execution::seq(hpx::parallel::execution::task), xvalues,
-        op5(), false);
+        hpx::execution::seq(hpx::execution::task), xvalues, op5(), false);
     test_none_async(
-        hpx::parallel::execution::par(hpx::parallel::execution::task), xvalues,
-        op5(), false);
+        hpx::execution::par(hpx::execution::task), xvalues, op5(), false);
 
-    test_none(hpx::parallel::execution::seq, xvalues, op0(), false);
-    test_none(hpx::parallel::execution::par, xvalues, op0(), false);
+    test_none(hpx::execution::seq, xvalues, op0(), false);
+    test_none(hpx::execution::par, xvalues, op0(), false);
     test_none_async(
-        hpx::parallel::execution::seq(hpx::parallel::execution::task), xvalues,
-        op0(), false);
+        hpx::execution::seq(hpx::execution::task), xvalues, op0(), false);
     test_none_async(
-        hpx::parallel::execution::par(hpx::parallel::execution::task), xvalues,
-        op0(), false);
+        hpx::execution::par(hpx::execution::task), xvalues, op0(), false);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

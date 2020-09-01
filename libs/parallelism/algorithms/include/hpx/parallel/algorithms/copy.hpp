@@ -667,7 +667,7 @@ namespace hpx {
             return parallel::v1::detail::get_second_element(
                 parallel::v1::detail::transfer<
                     parallel::v1::detail::copy_iter<FwdIter1, FwdIter2>>(
-                    hpx::parallel::execution::seq, first, last, dest));
+                    hpx::execution::seq, first, last, dest));
         }
     } copy{};
 
@@ -733,15 +733,15 @@ namespace hpx {
             if (hpx::parallel::v1::detail::is_negative(count))
             {
                 return hpx::parallel::util::detail::algorithm_result<
-                    hpx::parallel::execution::sequenced_policy,
+                    hpx::execution::sequenced_policy,
                     FwdIter2>::get(std::move(dest));
             }
 
             return hpx::parallel::v1::detail::get_second_element(
                 hpx::parallel::v1::detail::copy_n<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(hpx::parallel::execution::seq, std::true_type{},
-                        first, std::size_t(count), dest));
+                    .call(hpx::execution::seq, std::true_type{}, first,
+                        std::size_t(count), dest));
         }
     } copy_n{};
 
@@ -806,8 +806,8 @@ namespace hpx {
             return hpx::parallel::v1::detail::get_second_element(
                 hpx::parallel::v1::detail::copy_if<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(hpx::parallel::execution::seq, std::true_type{},
-                        first, last, dest, std::forward<Pred>(pred),
+                    .call(hpx::execution::seq, std::true_type{}, first, last,
+                        dest, std::forward<Pred>(pred),
                         hpx::parallel::util::projection_identity{}));
         }
     } copy_if{};

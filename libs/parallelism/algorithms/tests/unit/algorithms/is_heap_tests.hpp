@@ -368,69 +368,61 @@ void test_is_heap_bad_alloc_async(
 template <typename IteratorTag>
 void test_is_heap(bool test_for_is_heap = true)
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_is_heap(execution::seq, IteratorTag(), int(), test_for_is_heap);
-    test_is_heap(execution::par, IteratorTag(), int(), test_for_is_heap);
-    test_is_heap(execution::par_unseq, IteratorTag(), int(), test_for_is_heap);
+    test_is_heap(seq, IteratorTag(), int(), test_for_is_heap);
+    test_is_heap(par, IteratorTag(), int(), test_for_is_heap);
+    test_is_heap(par_unseq, IteratorTag(), int(), test_for_is_heap);
 
+    test_is_heap(seq, IteratorTag(), user_defined_type(), test_for_is_heap);
+    test_is_heap(par, IteratorTag(), user_defined_type(), test_for_is_heap);
     test_is_heap(
-        execution::seq, IteratorTag(), user_defined_type(), test_for_is_heap);
-    test_is_heap(
-        execution::par, IteratorTag(), user_defined_type(), test_for_is_heap);
-    test_is_heap(execution::par_unseq, IteratorTag(), user_defined_type(),
-        test_for_is_heap);
+        par_unseq, IteratorTag(), user_defined_type(), test_for_is_heap);
 
-    test_is_heap_with_pred(execution::seq, IteratorTag(), int(),
-        std::greater<int>(), test_for_is_heap);
-    test_is_heap_with_pred(execution::par, IteratorTag(), int(),
-        std::less<int>(), test_for_is_heap);
-    test_is_heap_with_pred(execution::par_unseq, IteratorTag(), int(),
+    test_is_heap_with_pred(
+        seq, IteratorTag(), int(), std::greater<int>(), test_for_is_heap);
+    test_is_heap_with_pred(
+        par, IteratorTag(), int(), std::less<int>(), test_for_is_heap);
+    test_is_heap_with_pred(par_unseq, IteratorTag(), int(),
         std::greater_equal<int>(), test_for_is_heap);
 
-    test_is_heap_async(execution::seq(execution::task), IteratorTag(), int(),
-        test_for_is_heap);
-    test_is_heap_async(execution::par(execution::task), IteratorTag(), int(),
-        test_for_is_heap);
+    test_is_heap_async(seq(task), IteratorTag(), int(), test_for_is_heap);
+    test_is_heap_async(par(task), IteratorTag(), int(), test_for_is_heap);
 
-    test_is_heap_async(execution::seq(execution::task), IteratorTag(),
-        user_defined_type(), test_for_is_heap);
-    test_is_heap_async(execution::par(execution::task), IteratorTag(),
-        user_defined_type(), test_for_is_heap);
+    test_is_heap_async(
+        seq(task), IteratorTag(), user_defined_type(), test_for_is_heap);
+    test_is_heap_async(
+        par(task), IteratorTag(), user_defined_type(), test_for_is_heap);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_is_heap_exception(bool test_for_is_heap = true)
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_is_heap_exception(execution::seq, IteratorTag(), test_for_is_heap);
-    test_is_heap_exception(execution::par, IteratorTag(), test_for_is_heap);
+    test_is_heap_exception(seq, IteratorTag(), test_for_is_heap);
+    test_is_heap_exception(par, IteratorTag(), test_for_is_heap);
 
-    test_is_heap_exception_async(
-        execution::seq(execution::task), IteratorTag(), test_for_is_heap);
-    test_is_heap_exception_async(
-        execution::par(execution::task), IteratorTag(), test_for_is_heap);
+    test_is_heap_exception_async(seq(task), IteratorTag(), test_for_is_heap);
+    test_is_heap_exception_async(par(task), IteratorTag(), test_for_is_heap);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_is_heap_bad_alloc(bool test_for_is_heap = true)
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_is_heap_bad_alloc(execution::seq, IteratorTag(), test_for_is_heap);
-    test_is_heap_bad_alloc(execution::par, IteratorTag(), test_for_is_heap);
+    test_is_heap_bad_alloc(seq, IteratorTag(), test_for_is_heap);
+    test_is_heap_bad_alloc(par, IteratorTag(), test_for_is_heap);
 
-    test_is_heap_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag(), test_for_is_heap);
-    test_is_heap_bad_alloc_async(
-        execution::par(execution::task), IteratorTag(), test_for_is_heap);
+    test_is_heap_bad_alloc_async(seq(task), IteratorTag(), test_for_is_heap);
+    test_is_heap_bad_alloc_async(par(task), IteratorTag(), test_for_is_heap);
 }

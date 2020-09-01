@@ -298,9 +298,9 @@ namespace hpx { namespace ranges {
             using is_segmented =
                 hpx::traits::is_segmented_iterator<iterator_type>;
 
-            return hpx::parallel::v1::detail::generate_(
-                hpx::parallel::execution::seq, hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<F>(f), is_segmented());
+            return hpx::parallel::v1::detail::generate_(hpx::execution::seq,
+                hpx::util::begin(rng), hpx::util::end(rng), std::forward<F>(f),
+                is_segmented());
         }
 
         // clang-format off
@@ -316,9 +316,8 @@ namespace hpx { namespace ranges {
 
             using is_segmented = hpx::traits::is_segmented_iterator<Iter>;
 
-            return hpx::parallel::v1::detail::generate_(
-                hpx::parallel::execution::seq, first, last, std::forward<F>(f),
-                is_segmented());
+            return hpx::parallel::v1::detail::generate_(hpx::execution::seq,
+                first, last, std::forward<F>(f), is_segmented());
         }
     } generate{};
 
@@ -376,7 +375,7 @@ namespace hpx { namespace ranges {
             }
 
             return hpx::parallel::v1::detail::generate_n<FwdIter>().call(
-                hpx::parallel::execution::seq, std::true_type(), first,
+                hpx::execution::seq, std::true_type(), first,
                 std::size_t(count), std::forward<F>(f));
         }
     } generate_n{};

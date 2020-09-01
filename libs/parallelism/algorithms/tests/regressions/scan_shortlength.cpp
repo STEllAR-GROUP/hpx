@@ -20,17 +20,17 @@
 #if !(defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION == 1500)
 void test_zero()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
     typedef std::vector<int>::iterator Iter;
     std::vector<int> a;
     std::vector<int> b, c, d;
 
-    auto p_copy_if = hpx::ranges::copy_if(execution::par, a.begin(), a.end(),
-        b.begin(), [](int bar) { return bar % 2 == 1; });
-    auto p_remove_copy_if = remove_copy_if(execution::par, a.begin(), a.end(),
-        c.begin(), [](int bar) { return bar % 2 != 1; });
+    auto p_copy_if = hpx::ranges::copy_if(par, a.begin(), a.end(), b.begin(),
+        [](int bar) { return bar % 2 == 1; });
+    auto p_remove_copy_if = hpx::parallel::remove_copy_if(par, a.begin(),
+        a.end(), c.begin(), [](int bar) { return bar % 2 != 1; });
     auto p_remove_copy =
-        remove_copy(execution::par, a.begin(), a.end(), d.begin(), 0);
+        hpx::parallel::remove_copy(par, a.begin(), a.end(), d.begin(), 0);
 
     Iter ans_copy_if = std::copy_if(
         a.begin(), a.end(), b.begin(), [](int bar) { return bar % 2 == 1; });
@@ -45,18 +45,18 @@ void test_zero()
 
 void test_async_zero()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
     typedef std::vector<int>::iterator Iter;
     typedef hpx::future<std::pair<Iter, Iter>> Fut_Iter;
     std::vector<int> a;
     std::vector<int> b, c, d;
 
-    auto f_copy_if = hpx::ranges::copy_if(execution::par(execution::task),
-        a.begin(), a.end(), b.begin(), [](int bar) { return bar % 2 == 1; });
-    auto f_remove_copy_if = remove_copy_if(execution::par(execution::task),
-        a.begin(), a.end(), c.begin(), [](int bar) { return bar % 2 != 1; });
-    auto f_remove_copy = remove_copy(
-        execution::par(execution::task), a.begin(), a.end(), d.begin(), 0);
+    auto f_copy_if = hpx::ranges::copy_if(par(task), a.begin(), a.end(),
+        b.begin(), [](int bar) { return bar % 2 == 1; });
+    auto f_remove_copy_if = hpx::parallel::remove_copy_if(par(task), a.begin(),
+        a.end(), c.begin(), [](int bar) { return bar % 2 != 1; });
+    auto f_remove_copy =
+        hpx::parallel::remove_copy(par(task), a.begin(), a.end(), d.begin(), 0);
 
     Iter ans_copy_if = std::copy_if(
         a.begin(), a.end(), b.begin(), [](int bar) { return bar % 2 == 1; });
@@ -71,18 +71,18 @@ void test_async_zero()
 
 void test_one(std::vector<int> a)
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
     typedef std::vector<int>::iterator Iter;
     std::size_t n = a.size();
     std::vector<int> b(n), c(n), d(n);
     std::vector<int> b_ans(n), c_ans(n), d_ans(n);
 
-    auto p_copy_if = hpx::ranges::copy_if(execution::par, a.begin(), a.end(),
-        b.begin(), [](int bar) { return bar % 2 == 1; });
-    auto p_remove_copy_if = remove_copy_if(execution::par, a.begin(), a.end(),
-        c.begin(), [](int bar) { return bar % 2 != 1; });
+    auto p_copy_if = hpx::ranges::copy_if(par, a.begin(), a.end(), b.begin(),
+        [](int bar) { return bar % 2 == 1; });
+    auto p_remove_copy_if = hpx::parallel::remove_copy_if(par, a.begin(),
+        a.end(), c.begin(), [](int bar) { return bar % 2 != 1; });
     auto p_remove_copy =
-        remove_copy(execution::par, a.begin(), a.end(), d.begin(), 0);
+        hpx::parallel::remove_copy(par, a.begin(), a.end(), d.begin(), 0);
 
     HPX_UNUSED(p_copy_if);
     HPX_UNUSED(p_remove_copy_if);
@@ -109,19 +109,19 @@ void print(std::vector<int> const& result, std::vector<int> const& correct)
 
 void test_async_one(std::vector<int> a)
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
     typedef std::vector<int>::iterator Iter;
     typedef hpx::future<std::pair<Iter, Iter>> Fut_Iter;
     std::size_t n = a.size();
     std::vector<int> b(n), c(n), d(n);
     std::vector<int> b_ans(n), c_ans(n), d_ans(n);
 
-    auto f_copy_if = hpx::ranges::copy_if(execution::par(execution::task),
-        a.begin(), a.end(), b.begin(), [](int bar) { return bar % 2 == 1; });
-    auto f_remove_copy_if = remove_copy_if(execution::par(execution::task),
-        a.begin(), a.end(), c.begin(), [](int bar) { return bar % 2 != 1; });
-    auto f_remove_copy = remove_copy(
-        execution::par(execution::task), a.begin(), a.end(), d.begin(), 0);
+    auto f_copy_if = hpx::ranges::copy_if(par(task), a.begin(), a.end(),
+        b.begin(), [](int bar) { return bar % 2 == 1; });
+    auto f_remove_copy_if = hpx::parallel::remove_copy_if(par(task), a.begin(),
+        a.end(), c.begin(), [](int bar) { return bar % 2 != 1; });
+    auto f_remove_copy =
+        hpx::parallel::remove_copy(par(task), a.begin(), a.end(), d.begin(), 0);
 
     std::copy_if(a.begin(), a.end(), b_ans.begin(),
         [](int bar) { return bar % 2 == 1; });

@@ -342,7 +342,7 @@ namespace hpx { namespace ranges {
             using is_segmented = hpx::traits::is_segmented_iterator<Iter>;
 
             return hpx::parallel::v1::detail::transform_reduce_(
-                hpx::parallel::execution::seq, first, last, std::move(init),
+                hpx::execution::seq, first, last, std::move(init),
                 std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
                 is_segmented());
         }
@@ -382,8 +382,8 @@ namespace hpx { namespace ranges {
             using is_segmented = hpx::traits::is_segmented_iterator<Iter>;
 
             return hpx::parallel::v1::detail::transform_reduce_(
-                hpx::parallel::execution::seq, first, last, first2,
-                std::move(init), hpx::parallel::v1::detail::plus(),
+                hpx::execution::seq, first, last, first2, std::move(init),
+                hpx::parallel::v1::detail::plus(),
                 hpx::parallel::v1::detail::multiplies(), is_segmented());
         }
 
@@ -451,9 +451,9 @@ namespace hpx { namespace ranges {
             using is_segmented = hpx::traits::is_segmented_iterator<Iter>;
 
             return hpx::parallel::v1::detail::transform_reduce_(
-                hpx::parallel::execution::seq, first, last, first2,
-                std::move(init), std::forward<Reduce>(red_op),
-                std::forward<Convert>(conv_op), is_segmented());
+                hpx::execution::seq, first, last, first2, std::move(init),
+                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
+                is_segmented());
         }
 
         // range based versions
@@ -528,10 +528,9 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_segmented_iterator<iterator_type>;
 
             return hpx::parallel::v1::detail::transform_reduce_(
-                hpx::parallel::execution::seq, hpx::util::begin(rng),
-                hpx::util::end(rng), std::move(init),
-                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
-                is_segmented());
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                std::move(init), std::forward<Reduce>(red_op),
+                std::forward<Convert>(conv_op), is_segmented());
         }
 
         // clang-format off
@@ -574,9 +573,8 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_segmented_iterator<iterator_type>;
 
             return hpx::parallel::v1::detail::transform_reduce_(
-                hpx::parallel::execution::seq, hpx::util::begin(rng),
-                hpx::util::end(rng), first2, std::move(init),
-                hpx::parallel::v1::detail::plus(),
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                first2, std::move(init), hpx::parallel::v1::detail::plus(),
                 hpx::parallel::v1::detail::multiplies(), is_segmented());
         }
 
@@ -651,10 +649,9 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_segmented_iterator<iterator_type>;
 
             return hpx::parallel::v1::detail::transform_reduce_(
-                hpx::parallel::execution::seq, hpx::util::begin(rng),
-                hpx::util::end(rng), first2, std::move(init),
-                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
-                is_segmented());
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                first2, std::move(init), std::forward<Reduce>(red_op),
+                std::forward<Convert>(conv_op), is_segmented());
         }
     } transform_reduce{};
 }}    // namespace hpx::ranges

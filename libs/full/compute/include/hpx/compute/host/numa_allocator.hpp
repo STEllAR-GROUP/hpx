@@ -101,10 +101,9 @@ namespace hpx { namespace parallel { namespace util {
                 pointer begin = p + i * part_size;
                 pointer end = begin + part_size;
                 first_touch.push_back(hpx::for_each(
-                    hpx::parallel::execution::par(
-                        hpx::parallel::execution::task)
+                    hpx::execution::par(hpx::execution::task)
                         .on(executors_[i])
-                        .with(hpx::parallel::execution::static_chunk_size()),
+                        .with(hpx::execution::static_chunk_size()),
                     begin, end,
 #if defined(HPX_DEBUG)
                     [this, i]

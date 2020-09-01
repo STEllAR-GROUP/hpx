@@ -122,7 +122,7 @@ void test_executor(std::array<std::size_t, 5> expected)
     typedef typename hpx::traits::executor_execution_category<Executor>::type
         execution_category;
 
-    HPX_TEST((std::is_same<hpx::parallel::execution::parallel_execution_tag,
+    HPX_TEST((std::is_same<hpx::execution::parallel_execution_tag,
         execution_category>::value));
 
     count_apply.store(0);
@@ -149,7 +149,7 @@ void test_executor(std::array<std::size_t, 5> expected)
 ///////////////////////////////////////////////////////////////////////////////
 struct test_async_executor1
 {
-    typedef hpx::parallel::execution::parallel_execution_tag execution_category;
+    typedef hpx::execution::parallel_execution_tag execution_category;
 
     template <typename F, typename... Ts>
     static hpx::future<typename hpx::util::invoke_result<F, Ts...>::type>
@@ -170,7 +170,7 @@ namespace hpx { namespace parallel { namespace execution {
 
 struct test_async_executor2 : test_async_executor1
 {
-    typedef hpx::parallel::execution::parallel_execution_tag execution_category;
+    typedef hpx::execution::parallel_execution_tag execution_category;
 
     template <typename F, typename... Ts>
     static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
@@ -192,7 +192,7 @@ namespace hpx { namespace parallel { namespace execution {
 
 struct test_async_executor3 : test_async_executor1
 {
-    typedef hpx::parallel::execution::parallel_execution_tag execution_category;
+    typedef hpx::execution::parallel_execution_tag execution_category;
 
     template <typename F, typename Shape, typename... Ts>
     static void bulk_sync_execute(F f, Shape const& shape, Ts&&... ts)
@@ -216,7 +216,7 @@ namespace hpx { namespace parallel { namespace execution {
 
 struct test_async_executor4 : test_async_executor1
 {
-    typedef hpx::parallel::execution::parallel_execution_tag execution_category;
+    typedef hpx::execution::parallel_execution_tag execution_category;
 
     template <typename F, typename Shape, typename... Ts>
     static std::vector<hpx::future<void>> bulk_async_execute(
@@ -246,7 +246,7 @@ namespace hpx { namespace parallel { namespace execution {
 
 struct test_async_executor5 : test_async_executor1
 {
-    typedef hpx::parallel::execution::parallel_execution_tag execution_category;
+    typedef hpx::execution::parallel_execution_tag execution_category;
 
     template <typename F, typename... Ts>
     static void post(F&& f, Ts&&... ts)

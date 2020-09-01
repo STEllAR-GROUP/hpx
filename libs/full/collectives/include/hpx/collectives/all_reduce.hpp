@@ -158,8 +158,8 @@ namespace hpx { namespace traits {
                 auto& data = communicator.template access_data<arg_type>(l);
 
                 auto it = data.begin();
-                return hpx::reduce(hpx::parallel::execution::par, ++it,
-                    data.end(), *data.begin(), op);
+                return hpx::reduce(
+                    hpx::execution::par, ++it, data.end(), *data.begin(), op);
             };
 
             lock_type l(communicator_.mtx_);

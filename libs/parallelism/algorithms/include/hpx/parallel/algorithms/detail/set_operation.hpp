@@ -186,10 +186,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             }
 
             // finally, copy data to destination
-            parallel::util::foreach_partitioner<
-                hpx::parallel::execution::parallel_policy>::
-                call(
-                    execution::par, chunks.get(), cores,
+            parallel::util::
+                foreach_partitioner<hpx::execution::parallel_policy>::call(
+                    hpx::execution::par, chunks.get(), cores,
                     [buffer, dest](
                         set_chunk_data* chunk, std::size_t, std::size_t) {
                         if (chunk->start == (size_t)(-1) ||

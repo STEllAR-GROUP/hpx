@@ -80,8 +80,8 @@ double run_is_heap_benchmark_seq(int test_count, std::vector<int> const& v)
 
     for (int i = 0; i < test_count; ++i)
     {
-        using namespace hpx::parallel;
-        result = is_heap(execution::seq, std::begin(v), std::end(v));
+        using namespace hpx::execution;
+        result = hpx::parallel::is_heap(seq, std::begin(v), std::end(v));
     }
 
     time = hpx::util::high_resolution_clock::now() - time;
@@ -100,8 +100,8 @@ double run_is_heap_benchmark_par(int test_count, std::vector<int> const& v)
 
     for (int i = 0; i < test_count; ++i)
     {
-        using namespace hpx::parallel;
-        result = is_heap(execution::par, std::begin(v), std::end(v));
+        using namespace hpx::execution;
+        result = hpx::parallel::is_heap(par, std::begin(v), std::end(v));
     }
 
     time = hpx::util::high_resolution_clock::now() - time;
@@ -121,8 +121,8 @@ double run_is_heap_benchmark_par_unseq(
 
     for (int i = 0; i < test_count; ++i)
     {
-        using namespace hpx::parallel;
-        result = is_heap(execution::par_unseq, std::begin(v), std::end(v));
+        using namespace hpx::execution;
+        result = hpx::parallel::is_heap(par_unseq, std::begin(v), std::end(v));
     }
 
     time = hpx::util::high_resolution_clock::now() - time;
@@ -164,8 +164,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::vector<int> v(vector_size);
 
     // initialize data
-    using namespace hpx::parallel;
-    generate(execution::par, std::begin(v), std::end(v), random_fill());
+    using namespace hpx::execution;
+    hpx::parallel::generate(par, std::begin(v), std::end(v), random_fill());
     std::make_heap(std::begin(v), std::next(std::begin(v), break_pos));
     if (break_pos < vector_size)
         v[break_pos] =

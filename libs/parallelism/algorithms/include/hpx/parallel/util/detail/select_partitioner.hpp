@@ -24,34 +24,36 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     template <template <typename...> class Partitioner,
         template <typename...> class TaskPartitioner>
-    struct select_partitioner<execution::parallel_task_policy, Partitioner,
+    struct select_partitioner<hpx::execution::parallel_task_policy, Partitioner,
         TaskPartitioner>
     {
         template <typename... Args>
-        using apply = TaskPartitioner<execution::parallel_task_policy, Args...>;
+        using apply =
+            TaskPartitioner<hpx::execution::parallel_task_policy, Args...>;
     };
 
     template <typename Executor, typename Parameters,
         template <typename...> class Partitioner,
         template <typename...> class TaskPartitioner>
     struct select_partitioner<
-        execution::parallel_task_policy_shim<Executor, Parameters>, Partitioner,
-        TaskPartitioner>
+        hpx::execution::parallel_task_policy_shim<Executor, Parameters>,
+        Partitioner, TaskPartitioner>
     {
         template <typename... Args>
         using apply = TaskPartitioner<
-            execution::parallel_task_policy_shim<Executor, Parameters>,
+            hpx::execution::parallel_task_policy_shim<Executor, Parameters>,
             Args...>;
     };
 
 #if defined(HPX_HAVE_DATAPAR)
     template <template <typename...> class Partitioner,
         template <typename...> class TaskPartitioner>
-    struct select_partitioner<execution::datapar_task_policy, Partitioner,
+    struct select_partitioner<hpx::execution::datapar_task_policy, Partitioner,
         TaskPartitioner>
     {
         template <typename... Args>
-        using apply = TaskPartitioner<execution::datapar_task_policy, Args...>;
+        using apply =
+            TaskPartitioner<hpx::execution::datapar_task_policy, Args...>;
     };
 #endif
 }}}}    // namespace hpx::parallel::util::detail

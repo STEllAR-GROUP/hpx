@@ -74,13 +74,13 @@ void test_search1_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_search1()
 {
-    using namespace hpx::parallel;
-    test_search1(execution::seq, IteratorTag());
-    test_search1(execution::par, IteratorTag());
-    test_search1(execution::par_unseq, IteratorTag());
+    using namespace hpx::execution;
+    test_search1(seq, IteratorTag());
+    test_search1(par, IteratorTag());
+    test_search1(par_unseq, IteratorTag());
 
-    test_search1_async(execution::seq(execution::task), IteratorTag());
-    test_search1_async(execution::par(execution::task), IteratorTag());
+    test_search1_async(seq(task), IteratorTag());
+    test_search1_async(par(task), IteratorTag());
 }
 
 void search_test1()
@@ -148,13 +148,13 @@ void test_search2_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_search2()
 {
-    using namespace hpx::parallel;
-    test_search2(execution::seq, IteratorTag());
-    test_search2(execution::par, IteratorTag());
-    test_search2(execution::par_unseq, IteratorTag());
+    using namespace hpx::execution;
+    test_search2(seq, IteratorTag());
+    test_search2(par, IteratorTag());
+    test_search2(par_unseq, IteratorTag());
 
-    test_search2_async(execution::seq(execution::task), IteratorTag());
-    test_search2_async(execution::par(execution::task), IteratorTag());
+    test_search2_async(seq(task), IteratorTag());
+    test_search2_async(par(task), IteratorTag());
 }
 
 void search_test2()
@@ -220,13 +220,13 @@ void test_search3_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_search3()
 {
-    using namespace hpx::parallel;
-    test_search3(execution::seq, IteratorTag());
-    test_search3(execution::par, IteratorTag());
-    test_search3(execution::par_unseq, IteratorTag());
+    using namespace hpx::execution;
+    test_search3(seq, IteratorTag());
+    test_search3(par, IteratorTag());
+    test_search3(par_unseq, IteratorTag());
 
-    test_search3_async(execution::seq(execution::task), IteratorTag());
-    test_search3_async(execution::par(execution::task), IteratorTag());
+    test_search3_async(seq(task), IteratorTag());
+    test_search3_async(par(task), IteratorTag());
 }
 
 void search_test3()
@@ -295,13 +295,13 @@ void test_search4_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_search4()
 {
-    using namespace hpx::parallel;
-    test_search4(execution::seq, IteratorTag());
-    test_search4(execution::par, IteratorTag());
-    test_search4(execution::par_unseq, IteratorTag());
+    using namespace hpx::execution;
+    test_search4(seq, IteratorTag());
+    test_search4(par, IteratorTag());
+    test_search4(par_unseq, IteratorTag());
 
-    test_search4_async(execution::seq(execution::task), IteratorTag());
-    test_search4_async(execution::par(execution::task), IteratorTag());
+    test_search4_async(seq(task), IteratorTag());
+    test_search4_async(par(task), IteratorTag());
 }
 
 void search_test4()
@@ -397,15 +397,15 @@ void test_search_async_exception(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_search_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
     //If the execution policy object is of type vector_execution_policy,
     //  std::terminate shall be called. therefore we do not test exceptions
     //  with a vector execution policy
-    test_search_exception(execution::seq, IteratorTag());
-    test_search_exception(execution::par, IteratorTag());
+    test_search_exception(seq, IteratorTag());
+    test_search_exception(par, IteratorTag());
 
-    test_search_async_exception(execution::seq(execution::task), IteratorTag());
-    test_search_async_exception(execution::par(execution::task), IteratorTag());
+    test_search_async_exception(seq(task), IteratorTag());
+    test_search_async_exception(par(task), IteratorTag());
 }
 
 void search_exception_test()
@@ -493,16 +493,16 @@ void test_search_async_bad_alloc(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_search_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_search_bad_alloc(execution::par, IteratorTag());
-    test_search_bad_alloc(execution::seq, IteratorTag());
+    test_search_bad_alloc(par, IteratorTag());
+    test_search_bad_alloc(seq, IteratorTag());
 
-    test_search_async_bad_alloc(execution::seq(execution::task), IteratorTag());
-    test_search_async_bad_alloc(execution::par(execution::task), IteratorTag());
+    test_search_async_bad_alloc(seq(task), IteratorTag());
+    test_search_async_bad_alloc(par(task), IteratorTag());
 }
 
 void search_bad_alloc_test()

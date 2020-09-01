@@ -152,10 +152,9 @@ namespace test {
     };
 
     template <typename IteratorTag>
-    struct test_num_exceptions<hpx::parallel::execution::sequenced_policy,
-        IteratorTag>
+    struct test_num_exceptions<hpx::execution::sequenced_policy, IteratorTag>
     {
-        static void call(hpx::parallel::execution::sequenced_policy const&,
+        static void call(hpx::execution::sequenced_policy const&,
             hpx::exception_list const& e)
         {
             HPX_TEST_EQ(e.size(), 1u);
@@ -172,10 +171,10 @@ namespace test {
     };
 
     template <>
-    struct test_num_exceptions<hpx::parallel::execution::sequenced_policy,
+    struct test_num_exceptions<hpx::execution::sequenced_policy,
         std::input_iterator_tag>
     {
-        static void call(hpx::parallel::execution::sequenced_policy const&,
+        static void call(hpx::execution::sequenced_policy const&,
             hpx::exception_list const& e)
         {
             HPX_TEST_EQ(e.size(), 1u);

@@ -17,7 +17,7 @@ namespace hpx {
     /// when and if to dereference the iterator.
     ///
     /// The execution of for_loop without specifying an execution policy is
-    /// equivalent to specifying \a parallel::execution::seq as the execution
+    /// equivalent to specifying \a seq as the execution
     /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
@@ -188,7 +188,7 @@ namespace hpx {
     /// programmer when and if to dereference the iterator.
     ///
     /// The execution of for_loop without specifying an execution policy is
-    /// equivalent to specifying \a parallel::execution::seq as the execution
+    /// equivalent to specifying \a seq as the execution
     /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
@@ -372,7 +372,7 @@ namespace hpx {
     /// when and if to dereference the iterator.
     ///
     /// The execution of for_loop without specifying an execution policy is
-    /// equivalent to specifying \a parallel::execution::seq as the execution
+    /// equivalent to specifying \a seq as the execution
     /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
@@ -546,7 +546,7 @@ namespace hpx {
     /// programmer when and if to dereference the iterator.
     ///
     /// The execution of for_loop without specifying an execution policy is
-    /// equivalent to specifying \a parallel::execution::seq as the execution
+    /// equivalent to specifying \a seq as the execution
     /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
@@ -1104,8 +1104,8 @@ namespace hpx {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop must be called with at least a function object");
 
-            return for_loop(parallel::execution::seq, first, last,
-                std::forward<Args>(args)...);
+            return for_loop(
+                hpx::execution::seq, first, last, std::forward<Args>(args)...);
         }
 
         template <typename ExPolicy, typename I, typename S, typename... Args,
@@ -1144,8 +1144,8 @@ namespace hpx {
                 "for_loop_strided must be called with at least a function "
                 "object");
 
-            return for_loop_strided(parallel::execution::seq, first, last,
-                stride, std::forward<Args>(args)...);
+            return for_loop_strided(hpx::execution::seq, first, last, stride,
+                std::forward<Args>(args)...);
         }
 
         template <typename ExPolicy, typename I, typename Size,
@@ -1180,8 +1180,8 @@ namespace hpx {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_n must be called with at least a function object");
 
-            return for_loop_n(parallel::execution::seq, first, size,
-                std::forward<Args>(args)...);
+            return for_loop_n(
+                hpx::execution::seq, first, size, std::forward<Args>(args)...);
         }
 
         template <typename ExPolicy, typename I, typename Size, typename S,
@@ -1220,8 +1220,8 @@ namespace hpx {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_n_strided must be called with at least a function "
                 "object");
-            return for_loop_strided_n(parallel::execution::seq, first, size,
-                stride, std::forward<Args>(args)...);
+            return for_loop_strided_n(hpx::execution::seq, first, size, stride,
+                std::forward<Args>(args)...);
         }
     }}    // namespace parallel::v2
 
@@ -1264,8 +1264,8 @@ namespace hpx {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop must be called with at least a function object");
 
-            return for_loop(parallel::execution::seq, first, last,
-                std::forward<Args>(args)...);
+            return for_loop(
+                hpx::execution::seq, first, last, std::forward<Args>(args)...);
         }
     } for_loop{};
 
@@ -1314,8 +1314,8 @@ namespace hpx {
                 "for_loop_strided must be called with at least a function "
                 "object");
 
-            return for_loop_strided(parallel::execution::seq, first, last,
-                stride, std::forward<Args>(args)...);
+            return for_loop_strided(hpx::execution::seq, first, last, stride,
+                std::forward<Args>(args)...);
         }
     } for_loop_strided{};
 
@@ -1361,8 +1361,8 @@ namespace hpx {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_n must be called with at least a function object");
 
-            return for_loop_n(parallel::execution::seq, first, size,
-                std::forward<Args>(args)...);
+            return for_loop_n(
+                hpx::execution::seq, first, size, std::forward<Args>(args)...);
         }
     } for_loop_n{};
 
@@ -1411,8 +1411,8 @@ namespace hpx {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_n_strided must be called with at least a function "
                 "object");
-            return for_loop_strided_n(parallel::execution::seq, first, size,
-                stride, std::forward<Args>(args)...);
+            return for_loop_strided_n(hpx::execution::seq, first, size, stride,
+                std::forward<Args>(args)...);
         }
     } for_loop_n_strided{};
 

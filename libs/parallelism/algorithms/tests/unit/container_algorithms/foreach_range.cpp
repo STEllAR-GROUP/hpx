@@ -17,16 +17,16 @@
 template <typename IteratorTag>
 void test_for_each()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_for_each_seq(IteratorTag());
 
-    test_for_each(execution::seq, IteratorTag());
-    test_for_each(execution::par, IteratorTag());
-    test_for_each(execution::par_unseq, IteratorTag());
+    test_for_each(seq, IteratorTag());
+    test_for_each(par, IteratorTag());
+    test_for_each(par_unseq, IteratorTag());
 
-    test_for_each_async(execution::seq(execution::task), IteratorTag());
-    test_for_each_async(execution::par(execution::task), IteratorTag());
+    test_for_each_async(seq(task), IteratorTag());
+    test_for_each_async(par(task), IteratorTag());
 }
 
 void for_each_test()
@@ -39,20 +39,18 @@ void for_each_test()
 template <typename IteratorTag>
 void test_for_each_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
     test_for_each_exception_seq(IteratorTag());
 
-    test_for_each_exception(execution::seq, IteratorTag());
-    test_for_each_exception(execution::par, IteratorTag());
+    test_for_each_exception(seq, IteratorTag());
+    test_for_each_exception(par, IteratorTag());
 
-    test_for_each_exception_async(
-        execution::seq(execution::task), IteratorTag());
-    test_for_each_exception_async(
-        execution::par(execution::task), IteratorTag());
+    test_for_each_exception_async(seq(task), IteratorTag());
+    test_for_each_exception_async(par(task), IteratorTag());
 }
 
 void for_each_exception_test()
@@ -65,20 +63,18 @@ void for_each_exception_test()
 template <typename IteratorTag>
 void test_for_each_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
     test_for_each_bad_alloc_seq(IteratorTag());
 
-    test_for_each_bad_alloc(execution::seq, IteratorTag());
-    test_for_each_bad_alloc(execution::par, IteratorTag());
+    test_for_each_bad_alloc(seq, IteratorTag());
+    test_for_each_bad_alloc(par, IteratorTag());
 
-    test_for_each_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag());
-    test_for_each_bad_alloc_async(
-        execution::par(execution::task), IteratorTag());
+    test_for_each_bad_alloc_async(seq(task), IteratorTag());
+    test_for_each_bad_alloc_async(par(task), IteratorTag());
 }
 
 void for_each_bad_alloc_test()

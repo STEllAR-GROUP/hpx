@@ -83,8 +83,9 @@ double run_partition_copy_benchmark_hpx(int test_count, ExPolicy policy,
 
     for (int i = 0; i < test_count; ++i)
     {
-        using namespace hpx::parallel;
-        partition_copy(policy, first, last, dest_true, dest_false, pred);
+        using namespace hpx::execution;
+        hpx::parallel::partition_copy(
+            policy, first, last, dest_true, dest_false, pred);
     }
 
     time = hpx::util::high_resolution_clock::now() - time;
@@ -111,8 +112,8 @@ void run_benchmark(std::size_t vector_size, int test_count, IteratorTag)
     auto dest_false = std::begin(result_false);
 
     // initialize data
-    using namespace hpx::parallel;
-    generate(execution::par, std::begin(v), std::end(v), random_fill());
+    using namespace hpx::execution;
+    hpx::parallel::generate(par, std::begin(v), std::end(v), random_fill());
 
     std::cout << "* Running Benchmark..." << std::endl;
 
@@ -126,15 +127,15 @@ void run_benchmark(std::size_t vector_size, int test_count, IteratorTag)
 
     std::cout << "--- run_partition_copy_benchmark_seq ---" << std::endl;
     double time_seq = run_partition_copy_benchmark_hpx(
-        test_count, execution::seq, first, last, dest_true, dest_false, pred);
+        test_count, seq, first, last, dest_true, dest_false, pred);
 
     std::cout << "--- run_partition_copy_benchmark_par ---" << std::endl;
     double time_par = run_partition_copy_benchmark_hpx(
-        test_count, execution::par, first, last, dest_true, dest_false, pred);
+        test_count, par, first, last, dest_true, dest_false, pred);
 
     std::cout << "--- run_partition_copy_benchmark_par_unseq ---" << std::endl;
-    double time_par_unseq = run_partition_copy_benchmark_hpx(test_count,
-        execution::par_unseq, first, last, dest_true, dest_false, pred);
+    double time_par_unseq = run_partition_copy_benchmark_hpx(
+        test_count, par_unseq, first, last, dest_true, dest_false, pred);
 
     std::cout << "\n-------------- Benchmark Result --------------"
               << std::endl;

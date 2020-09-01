@@ -51,24 +51,20 @@ template <typename T>
 void transform_reduce_binary_tests(std::size_t num,
     hpx::partitioned_vector<T>& xvalues, hpx::partitioned_vector<T>& yvalues)
 {
-    HPX_TEST_EQ(test_transform_reduce_binary(
-                    hpx::parallel::execution::seq, xvalues, yvalues),
+    HPX_TEST_EQ(
+        test_transform_reduce_binary(hpx::execution::seq, xvalues, yvalues),
         T(num + 1));
-    HPX_TEST_EQ(test_transform_reduce_binary(
-                    hpx::parallel::execution::par, xvalues, yvalues),
+    HPX_TEST_EQ(
+        test_transform_reduce_binary(hpx::execution::par, xvalues, yvalues),
         T(num + 1));
 
-    HPX_TEST_EQ(
-        test_transform_reduce_binary_async(
-            hpx::parallel::execution::seq(hpx::parallel::execution::task),
-            xvalues, yvalues)
-            .get(),
+    HPX_TEST_EQ(test_transform_reduce_binary_async(
+                    hpx::execution::seq(hpx::execution::task), xvalues, yvalues)
+                    .get(),
         T(num + 1));
-    HPX_TEST_EQ(
-        test_transform_reduce_binary_async(
-            hpx::parallel::execution::par(hpx::parallel::execution::task),
-            xvalues, yvalues)
-            .get(),
+    HPX_TEST_EQ(test_transform_reduce_binary_async(
+                    hpx::execution::par(hpx::execution::task), xvalues, yvalues)
+                    .get(),
         T(num + 1));
 }
 

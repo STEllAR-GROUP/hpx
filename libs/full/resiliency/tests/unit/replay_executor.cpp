@@ -4,11 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/modules/algorithms.hpp>
-#include <hpx/modules/execution.hpp>
-#include <hpx/modules/executors.hpp>
-#include <hpx/modules/futures.hpp>
 #include <hpx/modules/resiliency.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -25,7 +24,7 @@ int hpx_main(int argc, char* argv[])
 {
     try
     {
-        hpx::parallel::execution::parallel_executor base_exec;
+        hpx::execution::parallel_executor base_exec;
         auto exec =
             hpx::resiliency::experimental::make_replay_executor(base_exec, 3);
 
@@ -33,8 +32,8 @@ int hpx_main(int argc, char* argv[])
         std::iota(data.begin(), data.end(), 0);
 
         std::atomic<std::size_t> count(0);
-        hpx::parallel::for_each(hpx::parallel::execution::par.on(exec),
-            data.begin(), data.end(), [&](std::size_t i) {
+        hpx::for_each(hpx::execution::par.on(exec), data.begin(), data.end(),
+            [&](std::size_t i) {
                 if (++count == 42)
                 {
                     throw vogon_exception();
@@ -48,7 +47,7 @@ int hpx_main(int argc, char* argv[])
 
     try
     {
-        hpx::parallel::execution::parallel_executor base_exec;
+        hpx::execution::parallel_executor base_exec;
         auto exec =
             hpx::resiliency::experimental::make_replay_executor(base_exec, 3);
 
@@ -58,8 +57,8 @@ int hpx_main(int argc, char* argv[])
         std::vector<std::size_t> dest(100);
 
         std::atomic<std::size_t> count(0);
-        hpx::parallel::transform(hpx::parallel::execution::par.on(exec),
-            data.begin(), data.end(), dest.begin(), [&](std::size_t i) {
+        hpx::transform(hpx::execution::par.on(exec), data.begin(), data.end(),
+            dest.begin(), [&](std::size_t i) {
                 if (++count == 42)
                 {
                     throw vogon_exception();

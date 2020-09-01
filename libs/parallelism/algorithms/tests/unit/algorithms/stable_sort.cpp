@@ -27,7 +27,7 @@ void sort_benchmark()
 {
     try
     {
-        using namespace hpx::parallel;
+        using namespace hpx::execution;
         // Fill vector with random values
         std::vector<double> c(HPX_SORT_TEST_SIZE << 4);
         rnd_fill<double>(c, (std::numeric_limits<double>::min)(),
@@ -35,7 +35,7 @@ void sort_benchmark()
 
         hpx::util::high_resolution_timer t;
         // sort, blocking when seq, par, par_vec
-        hpx::parallel::stable_sort(execution::par, c.begin(), c.end());
+        hpx::parallel::stable_sort(par, c.begin(), c.end());
         auto elapsed = static_cast<std::uint64_t>(t.elapsed_nanoseconds());
 
         bool is_sorted = (verify_(c, std::less<double>(), elapsed, true) != 0);
@@ -55,109 +55,93 @@ void sort_benchmark()
 ////////////////////////////////////////////////////////////////////////////////
 void test_stable_sort1()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // default comparison operator (std::less)
-    test_stable_sort1(execution::seq, int());
-    test_stable_sort1(execution::par, int());
-    test_stable_sort1(execution::par_unseq, int());
+    test_stable_sort1(seq, int());
+    test_stable_sort1(par, int());
+    test_stable_sort1(par_unseq, int());
 
     // default comparison operator (std::less)
-    test_stable_sort1(execution::seq, double());
-    test_stable_sort1(execution::par, double());
-    test_stable_sort1(execution::par_unseq, double());
+    test_stable_sort1(seq, double());
+    test_stable_sort1(par, double());
+    test_stable_sort1(par_unseq, double());
 
     // default comparison operator (std::less)
-    test_stable_sort1(execution::seq, std::string());
-    test_stable_sort1(execution::par, std::string());
-    test_stable_sort1(execution::par_unseq, std::string());
+    test_stable_sort1(seq, std::string());
+    test_stable_sort1(par, std::string());
+    test_stable_sort1(par_unseq, std::string());
 
     // user supplied comparison operator (std::less)
-    test_stable_sort1_comp(execution::seq, int(), std::less<std::size_t>());
-    test_stable_sort1_comp(execution::par, int(), std::less<std::size_t>());
-    test_stable_sort1_comp(
-        execution::par_unseq, int(), std::less<std::size_t>());
+    test_stable_sort1_comp(seq, int(), std::less<std::size_t>());
+    test_stable_sort1_comp(par, int(), std::less<std::size_t>());
+    test_stable_sort1_comp(par_unseq, int(), std::less<std::size_t>());
 
     // user supplied comparison operator (std::greater)
-    test_stable_sort1_comp(execution::seq, double(), std::greater<double>());
-    test_stable_sort1_comp(execution::par, double(), std::greater<double>());
-    test_stable_sort1_comp(
-        execution::par_unseq, double(), std::greater<double>());
+    test_stable_sort1_comp(seq, double(), std::greater<double>());
+    test_stable_sort1_comp(par, double(), std::greater<double>());
+    test_stable_sort1_comp(par_unseq, double(), std::greater<double>());
 
     // default comparison operator (std::less)
+    test_stable_sort1_comp(seq, std::string(), std::greater<std::string>());
+    test_stable_sort1_comp(par, std::string(), std::greater<std::string>());
     test_stable_sort1_comp(
-        execution::seq, std::string(), std::greater<std::string>());
-    test_stable_sort1_comp(
-        execution::par, std::string(), std::greater<std::string>());
-    test_stable_sort1_comp(
-        execution::par_unseq, std::string(), std::greater<std::string>());
+        par_unseq, std::string(), std::greater<std::string>());
 
     // Async execution, default comparison operator
-    test_stable_sort1_async(execution::seq(execution::task), int());
-    test_stable_sort1_async(execution::par(execution::task), char());
-    test_stable_sort1_async(execution::seq(execution::task), double());
-    test_stable_sort1_async(execution::par(execution::task), float());
-    test_stable_sort1_async_str(execution::seq(execution::task));
-    test_stable_sort1_async_str(execution::par(execution::task));
+    test_stable_sort1_async(seq(task), int());
+    test_stable_sort1_async(par(task), char());
+    test_stable_sort1_async(seq(task), double());
+    test_stable_sort1_async(par(task), float());
+    test_stable_sort1_async_str(seq(task));
+    test_stable_sort1_async_str(par(task));
 
     // Async execution, user comparison operator
-    test_stable_sort1_async(
-        execution::seq(execution::task), int(), std::less<unsigned int>());
-    test_stable_sort1_async(
-        execution::par(execution::task), char(), std::less<char>());
+    test_stable_sort1_async(seq(task), int(), std::less<unsigned int>());
+    test_stable_sort1_async(par(task), char(), std::less<char>());
     //
-    test_stable_sort1_async(
-        execution::seq(execution::task), double(), std::greater<double>());
-    test_stable_sort1_async(
-        execution::par(execution::task), float(), std::greater<float>());
+    test_stable_sort1_async(seq(task), double(), std::greater<double>());
+    test_stable_sort1_async(par(task), float(), std::greater<float>());
     //
-    test_stable_sort1_async_str(
-        execution::seq(execution::task), std::greater<std::string>());
-    test_stable_sort1_async_str(
-        execution::par(execution::task), std::greater<std::string>());
+    test_stable_sort1_async_str(seq(task), std::greater<std::string>());
+    test_stable_sort1_async_str(par(task), std::greater<std::string>());
 }
 
 void test_stable_sort2()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
     // default comparison operator (std::less)
-    test_stable_sort2(execution::seq, int());
-    test_stable_sort2(execution::par, int());
-    test_stable_sort2(execution::par_unseq, int());
+    test_stable_sort2(seq, int());
+    test_stable_sort2(par, int());
+    test_stable_sort2(par_unseq, int());
 
     // default comparison operator (std::less)
-    test_stable_sort2(execution::seq, double());
-    test_stable_sort2(execution::par, double());
-    test_stable_sort2(execution::par_unseq, double());
+    test_stable_sort2(seq, double());
+    test_stable_sort2(par, double());
+    test_stable_sort2(par_unseq, double());
 
     // user supplied comparison operator (std::less)
-    test_stable_sort2_comp(execution::seq, int(), std::less<std::size_t>());
-    test_stable_sort2_comp(execution::par, int(), std::less<std::size_t>());
-    test_stable_sort2_comp(
-        execution::par_unseq, int(), std::less<std::size_t>());
+    test_stable_sort2_comp(seq, int(), std::less<std::size_t>());
+    test_stable_sort2_comp(par, int(), std::less<std::size_t>());
+    test_stable_sort2_comp(par_unseq, int(), std::less<std::size_t>());
 
     // user supplied comparison operator (std::greater)
-    test_stable_sort2_comp(execution::seq, double(), std::greater<double>());
-    test_stable_sort2_comp(execution::par, double(), std::greater<double>());
-    test_stable_sort2_comp(
-        execution::par_unseq, double(), std::greater<double>());
+    test_stable_sort2_comp(seq, double(), std::greater<double>());
+    test_stable_sort2_comp(par, double(), std::greater<double>());
+    test_stable_sort2_comp(par_unseq, double(), std::greater<double>());
 
     // Async execution, default comparison operator
-    test_stable_sort2_async(execution::seq(execution::task), int());
-    test_stable_sort2_async(execution::par(execution::task), char());
-    test_stable_sort2_async(execution::seq(execution::task), double());
-    test_stable_sort2_async(execution::par(execution::task), float());
+    test_stable_sort2_async(seq(task), int());
+    test_stable_sort2_async(par(task), char());
+    test_stable_sort2_async(seq(task), double());
+    test_stable_sort2_async(par(task), float());
 
     // Async execution, user comparison operator
-    test_stable_sort2_async(
-        execution::seq(execution::task), int(), std::less<unsigned int>());
-    test_stable_sort2_async(
-        execution::par(execution::task), char(), std::less<char>());
+    test_stable_sort2_async(seq(task), int(), std::less<unsigned int>());
+    test_stable_sort2_async(par(task), char(), std::less<char>());
     //
-    test_stable_sort2_async(
-        execution::seq(execution::task), double(), std::greater<double>());
-    test_stable_sort2_async(
-        execution::par(execution::task), float(), std::greater<float>());
+    test_stable_sort2_async(seq(task), double(), std::greater<double>());
+    test_stable_sort2_async(par(task), float(), std::greater<float>());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

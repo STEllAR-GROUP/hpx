@@ -8,8 +8,9 @@
 
 #include <hpx/config.hpp>
 
+// TODO: Should this be experimental?
 #if defined(HPX_HAVE_DATAPAR)
-namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
+namespace hpx { namespace execution { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     struct dataseq_policy;
 
@@ -31,6 +32,6 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
 
     template <typename Executor, typename Parameters>
     struct datapar_task_policy_shim;
-}}}}    // namespace hpx::parallel::execution::v1
+}}}    // namespace hpx::execution::v1
 
 #endif

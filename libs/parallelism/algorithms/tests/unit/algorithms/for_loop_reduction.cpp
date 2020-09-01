@@ -103,19 +103,19 @@ void test_for_loop_reduction_min(ExPolicy&& policy, IteratorTag)
 template <typename IteratorTag>
 void test_for_loop_reduction()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_for_loop_reduction_plus(execution::seq, IteratorTag());
-    test_for_loop_reduction_plus(execution::par, IteratorTag());
-    test_for_loop_reduction_plus(execution::par_unseq, IteratorTag());
+    test_for_loop_reduction_plus(seq, IteratorTag());
+    test_for_loop_reduction_plus(par, IteratorTag());
+    test_for_loop_reduction_plus(par_unseq, IteratorTag());
 
-    test_for_loop_reduction_multiplies(execution::seq, IteratorTag());
-    test_for_loop_reduction_multiplies(execution::par, IteratorTag());
-    test_for_loop_reduction_multiplies(execution::par_unseq, IteratorTag());
+    test_for_loop_reduction_multiplies(seq, IteratorTag());
+    test_for_loop_reduction_multiplies(par, IteratorTag());
+    test_for_loop_reduction_multiplies(par_unseq, IteratorTag());
 
-    test_for_loop_reduction_min(execution::seq, IteratorTag());
-    test_for_loop_reduction_min(execution::par, IteratorTag());
-    test_for_loop_reduction_min(execution::par_unseq, IteratorTag());
+    test_for_loop_reduction_min(seq, IteratorTag());
+    test_for_loop_reduction_min(par, IteratorTag());
+    test_for_loop_reduction_min(par_unseq, IteratorTag());
 }
 
 void for_loop_reduction_test()
@@ -169,15 +169,15 @@ void test_for_loop_reduction_bit_or_idx(ExPolicy&& policy)
 
 void for_loop_reduction_test_idx()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_for_loop_reduction_bit_and_idx(execution::seq);
-    test_for_loop_reduction_bit_and_idx(execution::par);
-    test_for_loop_reduction_bit_and_idx(execution::par_unseq);
+    test_for_loop_reduction_bit_and_idx(seq);
+    test_for_loop_reduction_bit_and_idx(par);
+    test_for_loop_reduction_bit_and_idx(par_unseq);
 
-    test_for_loop_reduction_bit_or_idx(execution::seq);
-    test_for_loop_reduction_bit_or_idx(execution::par);
-    test_for_loop_reduction_bit_or_idx(execution::par_unseq);
+    test_for_loop_reduction_bit_or_idx(seq);
+    test_for_loop_reduction_bit_or_idx(par);
+    test_for_loop_reduction_bit_or_idx(par_unseq);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -21,7 +21,7 @@ int hpx_main()
     std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), std::random_device{}());
 
-    hpx::ranges::for_each(hpx::parallel::execution::par, c,
+    hpx::ranges::for_each(hpx::execution::par, c,
         hpx::util::annotated_function(
             [](int i) -> void {
                 hpx::util::thread_description desc(

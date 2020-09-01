@@ -156,14 +156,14 @@ void test_partition_copy_async(ExPolicy policy, DataType)
 template <typename DataType>
 void test_partition_copy()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_partition_copy(execution::seq, DataType());
-    test_partition_copy(execution::par, DataType());
-    test_partition_copy(execution::par_unseq, DataType());
+    test_partition_copy(seq, DataType());
+    test_partition_copy(par, DataType());
+    test_partition_copy(par_unseq, DataType());
 
-    test_partition_copy_async(execution::seq(execution::task), DataType());
-    test_partition_copy_async(execution::par(execution::task), DataType());
+    test_partition_copy_async(seq(task), DataType());
+    test_partition_copy_async(par(task), DataType());
 }
 
 void test_partition_copy()

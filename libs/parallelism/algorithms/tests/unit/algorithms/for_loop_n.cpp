@@ -74,14 +74,14 @@ void test_for_loop_n_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_for_loop_n()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_for_loop_n(execution::seq, IteratorTag());
-    test_for_loop_n(execution::par, IteratorTag());
-    test_for_loop_n(execution::par_unseq, IteratorTag());
+    test_for_loop_n(seq, IteratorTag());
+    test_for_loop_n(par, IteratorTag());
+    test_for_loop_n(par_unseq, IteratorTag());
 
-    test_for_loop_n_async(execution::seq(execution::task), IteratorTag());
-    test_for_loop_n_async(execution::par(execution::task), IteratorTag());
+    test_for_loop_n_async(seq(task), IteratorTag());
+    test_for_loop_n_async(par(task), IteratorTag());
 }
 
 void for_loop_n_test()
@@ -136,14 +136,14 @@ void test_for_loop_n_idx_async(ExPolicy&& p)
 
 void for_loop_n_test_idx()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_for_loop_n_idx(execution::seq);
-    test_for_loop_n_idx(execution::par);
-    test_for_loop_n_idx(execution::par_unseq);
+    test_for_loop_n_idx(seq);
+    test_for_loop_n_idx(par);
+    test_for_loop_n_idx(par_unseq);
 
-    test_for_loop_n_idx_async(execution::seq(execution::task));
-    test_for_loop_n_idx_async(execution::par(execution::task));
+    test_for_loop_n_idx_async(seq(task));
+    test_for_loop_n_idx_async(par(task));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

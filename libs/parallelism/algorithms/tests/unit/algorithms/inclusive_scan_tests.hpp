@@ -39,8 +39,8 @@ void inclusive_scan_benchmark()
         auto op = [](double v1, double v2) { return v1 + v2; };
 
         hpx::util::high_resolution_timer t;
-        hpx::parallel::inclusive_scan(hpx::parallel::execution::par,
-            std::begin(c), std::end(c), std::begin(d), op, val);
+        hpx::parallel::inclusive_scan(hpx::execution::par, std::begin(c),
+            std::end(c), std::begin(d), op, val);
         double elapsed = t.elapsed();
 
         // verify values
@@ -433,7 +433,7 @@ template <typename ExPolicy>
 void test_inclusive_scan_validate(
     ExPolicy p, std::vector<int>& a, std::vector<int>& b)
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
     typedef std::vector<int>::iterator Iter;
 
     // test 1, fill array with numbers counting from 0, then run scan algorithm

@@ -100,18 +100,16 @@ void test_adjacent_difference_exception_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_adjacent_difference_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_adjacent_difference_exception(execution::seq, IteratorTag());
-    test_adjacent_difference_exception(execution::par, IteratorTag());
+    test_adjacent_difference_exception(seq, IteratorTag());
+    test_adjacent_difference_exception(par, IteratorTag());
 
-    test_adjacent_difference_exception_async(
-        execution::seq(execution::task), IteratorTag());
-    test_adjacent_difference_exception_async(
-        execution::par(execution::task), IteratorTag());
+    test_adjacent_difference_exception_async(seq(task), IteratorTag());
+    test_adjacent_difference_exception_async(par(task), IteratorTag());
 }
 
 void adjacent_difference_exception_test()

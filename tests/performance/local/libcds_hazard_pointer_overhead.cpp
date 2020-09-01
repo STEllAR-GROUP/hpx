@@ -90,7 +90,7 @@ void print_stats(const char* title, const char* wait, const char* exec,
     //hpx::util::print_cdash_timing(title, duration);
 }
 
-const char* exec_name(hpx::parallel::execution::parallel_executor const& exec)
+const char* exec_name(hpx::execution::parallel_executor const& exec)
 {
     return "parallel_executor";
 }
@@ -311,7 +311,7 @@ int hpx_main(variables_map& vm)
 
         cds::gc::HP hpGC;
 
-        hpx::parallel::execution::parallel_executor par;
+        hpx::execution::parallel_executor par;
         hpx::parallel::execution::parallel_executor_aggregated par_agg;
         hpx::parallel::execution::thread_pool_executor tpe;
 

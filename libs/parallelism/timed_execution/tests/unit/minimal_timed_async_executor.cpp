@@ -131,7 +131,7 @@ void test_timed_executor(std::array<std::size_t, 6> expected)
     typedef typename hpx::traits::executor_execution_category<Executor>::type
         execution_category;
 
-    HPX_TEST((std::is_same<hpx::parallel::execution::parallel_execution_tag,
+    HPX_TEST((std::is_same<hpx::execution::parallel_execution_tag,
         execution_category>::value));
 
     count_sync.store(0);
@@ -158,7 +158,7 @@ void test_timed_executor(std::array<std::size_t, 6> expected)
 ///////////////////////////////////////////////////////////////////////////////
 struct test_async_executor1
 {
-    typedef hpx::parallel::execution::parallel_execution_tag execution_category;
+    typedef hpx::execution::parallel_execution_tag execution_category;
 
     template <typename F, typename... Ts>
     static hpx::future<

@@ -123,16 +123,16 @@ void test_destroy_n_async(ExPolicy&& policy, IteratorTag)
 template <typename IteratorTag>
 void test_destroy_n()
 {
-    using namespace hpx::parallel;
-
     test_destroy_n(IteratorTag());
 
-    test_destroy_n(execution::seq, IteratorTag());
-    test_destroy_n(execution::par, IteratorTag());
-    test_destroy_n(execution::par_unseq, IteratorTag());
+    test_destroy_n(hpx::execution::seq, IteratorTag());
+    test_destroy_n(hpx::execution::par, IteratorTag());
+    test_destroy_n(hpx::execution::par_unseq, IteratorTag());
 
-    test_destroy_n_async(execution::seq(execution::task), IteratorTag());
-    test_destroy_n_async(execution::par(execution::task), IteratorTag());
+    test_destroy_n_async(
+        hpx::execution::seq(hpx::execution::task), IteratorTag());
+    test_destroy_n_async(
+        hpx::execution::par(hpx::execution::task), IteratorTag());
 }
 
 void destroy_n_test()
@@ -180,8 +180,8 @@ void test_destroy_n_exception(IteratorTag)
     catch (hpx::exception_list const& e)
     {
         caught_exception = true;
-        test::test_num_exceptions<hpx::parallel::execution::sequenced_policy,
-            IteratorTag>::call(hpx::parallel::execution::seq, e);
+        test::test_num_exceptions<hpx::execution::sequenced_policy,
+            IteratorTag>::call(hpx::execution::seq, e);
     }
     catch (...)
     {
@@ -314,20 +314,18 @@ void test_destroy_n_exception_async(ExPolicy&& policy, IteratorTag)
 template <typename IteratorTag>
 void test_destroy_n_exception()
 {
-    using namespace hpx::parallel;
-
     test_destroy_n_exception(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_destroy_n_exception(execution::seq, IteratorTag());
-    test_destroy_n_exception(execution::par, IteratorTag());
+    test_destroy_n_exception(hpx::execution::seq, IteratorTag());
+    test_destroy_n_exception(hpx::execution::par, IteratorTag());
 
     test_destroy_n_exception_async(
-        execution::seq(execution::task), IteratorTag());
+        hpx::execution::seq(hpx::execution::task), IteratorTag());
     test_destroy_n_exception_async(
-        execution::par(execution::task), IteratorTag());
+        hpx::execution::par(hpx::execution::task), IteratorTag());
 }
 
 void destroy_n_exception_test()
@@ -455,18 +453,16 @@ void test_destroy_n_bad_alloc_async(ExPolicy&& policy, IteratorTag)
 template <typename IteratorTag>
 void test_destroy_n_bad_alloc()
 {
-    using namespace hpx::parallel;
-
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_destroy_n_bad_alloc(execution::seq, IteratorTag());
-    test_destroy_n_bad_alloc(execution::par, IteratorTag());
+    test_destroy_n_bad_alloc(hpx::execution::seq, IteratorTag());
+    test_destroy_n_bad_alloc(hpx::execution::par, IteratorTag());
 
     test_destroy_n_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag());
+        hpx::execution::seq(hpx::execution::task), IteratorTag());
     test_destroy_n_bad_alloc_async(
-        execution::par(execution::task), IteratorTag());
+        hpx::execution::par(hpx::execution::task), IteratorTag());
 }
 
 void destroy_n_bad_alloc_test()

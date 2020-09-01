@@ -44,8 +44,7 @@ std::size_t bulk_test(
 
     local_count.store(0);
 
-    hpx::parallel::execution::bulk_sync_execute(
-        hpx::parallel::execution::par.executor(),
+    hpx::parallel::execution::bulk_sync_execute(hpx::execution::par.executor(),
         spmd_block_helper{name, num_images},
         boost::irange(offset, offset + images_per_locality));
 

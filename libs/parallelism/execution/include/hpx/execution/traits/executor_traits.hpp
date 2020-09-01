@@ -22,7 +22,7 @@ namespace hpx { namespace lcos {
     class future;
 }}    // namespace hpx::lcos
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     struct static_chunk_size;
 
@@ -30,7 +30,9 @@ namespace hpx { namespace parallel { namespace execution {
     struct sequenced_execution_tag;
     struct parallel_execution_tag;
     struct unsequenced_execution_tag;
+}}    // namespace hpx::execution
 
+namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(post)
@@ -135,8 +137,9 @@ namespace hpx { namespace parallel { namespace execution {
         using execution_category = typename T::execution_category;
 
     public:
-        using type = hpx::util::detected_or_t<unsequenced_execution_tag,
-            execution_category, Executor>;
+        using type =
+            hpx::util::detected_or_t<hpx::execution::unsequenced_execution_tag,
+                execution_category, Executor>;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -176,9 +179,8 @@ namespace hpx { namespace parallel { namespace execution {
         using parameters_type = typename T::parameters_type;
 
     public:
-        using type =
-            hpx::util::detected_or_t<parallel::execution::static_chunk_size,
-                parameters_type, Executor>;
+        using type = hpx::util::detected_or_t<hpx::execution::static_chunk_size,
+            parameters_type, Executor>;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -390,7 +392,7 @@ namespace hpx { namespace traits {
     struct executor_execution_category<Executor,
         typename std::enable_if<is_threads_executor<Executor>::value>::type>
     {
-        using type = parallel::execution::parallel_execution_tag;
+        using type = hpx::execution::parallel_execution_tag;
     };
 }}    // namespace hpx::traits
 #endif

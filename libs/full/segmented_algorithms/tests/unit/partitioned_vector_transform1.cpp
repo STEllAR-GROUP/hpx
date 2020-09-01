@@ -135,16 +135,14 @@ void transform_tests(std::vector<hpx::id_type>& localities)
     {
         hpx::partitioned_vector<T> v;
         hpx::partitioned_vector<U> w;
-        hpx::parallel::transform(hpx::parallel::execution::seq, v.begin(),
-            v.end(), w.begin(), pfo<U>());
-        hpx::parallel::transform(hpx::parallel::execution::par, v.begin(),
-            v.end(), w.begin(), pfo<U>());
         hpx::parallel::transform(
-            hpx::parallel::execution::seq(hpx::parallel::execution::task),
+            hpx::execution::seq, v.begin(), v.end(), w.begin(), pfo<U>());
+        hpx::parallel::transform(
+            hpx::execution::par, v.begin(), v.end(), w.begin(), pfo<U>());
+        hpx::parallel::transform(hpx::execution::seq(hpx::execution::task),
             v.begin(), v.end(), w.begin(), pfo<U>())
             .get();
-        hpx::parallel::transform(
-            hpx::parallel::execution::par(hpx::parallel::execution::task),
+        hpx::parallel::transform(hpx::execution::par(hpx::execution::task),
             v.begin(), v.end(), w.begin(), pfo<U>())
             .get();
     }
@@ -153,14 +151,12 @@ void transform_tests(std::vector<hpx::id_type>& localities)
         hpx::partitioned_vector<T> v(
             length, T(1), hpx::container_layout(localities));
         hpx::partitioned_vector<U> w(length, hpx::container_layout(localities));
-        test_transform(hpx::parallel::execution::seq, v, w, U(1));
-        test_transform(hpx::parallel::execution::par, v, w, U(1));
+        test_transform(hpx::execution::seq, v, w, U(1));
+        test_transform(hpx::execution::par, v, w, U(1));
         test_transform_async(
-            hpx::parallel::execution::seq(hpx::parallel::execution::task), v, w,
-            U(1));
+            hpx::execution::seq(hpx::execution::task), v, w, U(1));
         test_transform_async(
-            hpx::parallel::execution::par(hpx::parallel::execution::task), v, w,
-            U(1));
+            hpx::execution::par(hpx::execution::task), v, w, U(1));
     }
 }
 

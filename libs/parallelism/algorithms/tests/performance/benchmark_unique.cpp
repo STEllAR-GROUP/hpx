@@ -106,7 +106,7 @@ double run_unique_benchmark_std(int test_count, OrgIter org_first,
     for (int i = 0; i < test_count; ++i)
     {
         // Restore [first, last) with original data.
-        hpx::copy(hpx::parallel::execution::par, org_first, org_last, first);
+        hpx::copy(hpx::execution::par, org_first, org_last, first);
 
         std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
         (void) std::unique(first, last);
@@ -126,7 +126,7 @@ double run_unique_benchmark_hpx(int test_count, ExPolicy policy,
     for (int i = 0; i < test_count; ++i)
     {
         // Restore [first, last) with original data.
-        hpx::copy(hpx::parallel::execution::par, org_first, org_last, first);
+        hpx::copy(hpx::execution::par, org_first, org_last, first);
 
         std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
         hpx::parallel::unique(policy, first, last);
@@ -153,9 +153,9 @@ void run_benchmark(std::size_t vector_size, int test_count,
     auto last = std::end(v);
 
     // initialize data
-    using namespace hpx::parallel;
-    generate(
-        execution::par, std::begin(v), std::end(v), random_fill(random_range));
+    using namespace hpx::execution;
+    hpx::parallel::generate(
+        par, std::begin(v), std::end(v), random_fill(random_range));
     org_v = v;
 
     auto dest_dist = std::distance(first, std::unique(first, last));
@@ -174,15 +174,15 @@ void run_benchmark(std::size_t vector_size, int test_count,
 
     std::cout << "--- run_unique_benchmark_seq ---" << std::endl;
     double time_seq = run_unique_benchmark_hpx(
-        test_count, execution::seq, org_first, org_last, first, last);
+        test_count, seq, org_first, org_last, first, last);
 
     std::cout << "--- run_unique_benchmark_par ---" << std::endl;
     double time_par = run_unique_benchmark_hpx(
-        test_count, execution::par, org_first, org_last, first, last);
+        test_count, par, org_first, org_last, first, last);
 
     std::cout << "--- run_unique_benchmark_par_unseq ---" << std::endl;
     double time_par_unseq = run_unique_benchmark_hpx(
-        test_count, execution::par_unseq, org_first, org_last, first, last);
+        test_count, par_unseq, org_first, org_last, first, last);
 
     std::cout << "\n-------------- Benchmark Result --------------"
               << std::endl;

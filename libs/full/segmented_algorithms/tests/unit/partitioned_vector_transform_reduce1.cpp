@@ -60,21 +60,17 @@ void transform_reduce_tests(std::size_t num,
     hpx::partitioned_vector<T> const& xvalues,
     hpx::partitioned_vector<T> const& yvalues)
 {
-    HPX_TEST_EQ(
-        test_transform_reduce(hpx::parallel::execution::seq, xvalues, yvalues),
+    HPX_TEST_EQ(test_transform_reduce(hpx::execution::seq, xvalues, yvalues),
         T(num + 1));
-    HPX_TEST_EQ(
-        test_transform_reduce(hpx::parallel::execution::par, xvalues, yvalues),
+    HPX_TEST_EQ(test_transform_reduce(hpx::execution::par, xvalues, yvalues),
         T(num + 1));
 
-    HPX_TEST_EQ(test_transform_reduce_async(hpx::parallel::execution::seq(
-                                                hpx::parallel::execution::task),
-                    xvalues, yvalues)
+    HPX_TEST_EQ(test_transform_reduce_async(
+                    hpx::execution::seq(hpx::execution::task), xvalues, yvalues)
                     .get(),
         T(num + 1));
-    HPX_TEST_EQ(test_transform_reduce_async(hpx::parallel::execution::par(
-                                                hpx::parallel::execution::task),
-                    xvalues, yvalues)
+    HPX_TEST_EQ(test_transform_reduce_async(
+                    hpx::execution::par(hpx::execution::task), xvalues, yvalues)
                     .get(),
         T(num + 1));
 }

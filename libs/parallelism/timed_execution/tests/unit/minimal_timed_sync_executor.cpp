@@ -128,7 +128,7 @@ void test_timed_executor(std::array<std::size_t, 4> expected)
     typedef typename hpx::traits::executor_execution_category<Executor>::type
         execution_category;
 
-    HPX_TEST((std::is_same<hpx::parallel::execution::sequenced_execution_tag,
+    HPX_TEST((std::is_same<hpx::execution::sequenced_execution_tag,
         execution_category>::value));
 
     count_sync.store(0);
@@ -151,8 +151,7 @@ void test_timed_executor(std::array<std::size_t, 4> expected)
 ///////////////////////////////////////////////////////////////////////////////
 struct test_sync_executor1
 {
-    typedef hpx::parallel::execution::sequenced_execution_tag
-        execution_category;
+    typedef hpx::execution::sequenced_execution_tag execution_category;
 
     template <typename F, typename... Ts>
     typename hpx::util::detail::invoke_deferred_result<F,
@@ -165,8 +164,7 @@ struct test_sync_executor1
 
 struct test_timed_sync_executor1 : test_sync_executor1
 {
-    typedef hpx::parallel::execution::sequenced_execution_tag
-        execution_category;
+    typedef hpx::execution::sequenced_execution_tag execution_category;
 
     template <typename F, typename... Ts>
     typename hpx::util::detail::invoke_deferred_result<F,
@@ -194,8 +192,7 @@ namespace hpx { namespace parallel { namespace execution {
 
 struct test_sync_executor2 : test_sync_executor1
 {
-    typedef hpx::parallel::execution::sequenced_execution_tag
-        execution_category;
+    typedef hpx::execution::sequenced_execution_tag execution_category;
 
     template <typename F, typename... Ts>
     static void post(F&& f, Ts&&... ts)

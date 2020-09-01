@@ -595,8 +595,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::equal_binary().call(
-                hpx::parallel::execution::seq, std::true_type{}, first1, last1,
-                first2, last2, std::forward<Pred>(op),
+                hpx::execution::seq, std::true_type{}, first1, last1, first2,
+                last2, std::forward<Pred>(op),
                 hpx::parallel::util::projection_identity{},
                 hpx::parallel::util::projection_identity{});
         }
@@ -617,8 +617,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::equal_binary().call(
-                hpx::parallel::execution::seq, std::true_type{}, first1, last1,
-                first2, last2, hpx::parallel::v1::detail::equal_to{},
+                hpx::execution::seq, std::true_type{}, first1, last1, first2,
+                last2, hpx::parallel::v1::detail::equal_to{},
                 hpx::parallel::util::projection_identity{},
                 hpx::parallel::util::projection_identity{});
         }
@@ -642,9 +642,9 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::equal().call(
-                hpx::parallel::execution::seq, std::true_type{}, first1, last1,
-                first2, std::forward<Pred>(op));
+            return hpx::parallel::v1::detail::equal().call(hpx::execution::seq,
+                std::true_type{}, first1, last1, first2,
+                std::forward<Pred>(op));
         }
 
         // clang-format off
@@ -662,9 +662,9 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::equal().call(
-                hpx::parallel::execution::seq, std::true_type{}, first1, last1,
-                first2, hpx::parallel::v1::detail::equal_to{});
+            return hpx::parallel::v1::detail::equal().call(hpx::execution::seq,
+                std::true_type{}, first1, last1, first2,
+                hpx::parallel::v1::detail::equal_to{});
         }
     } equal{};
 }    // namespace hpx

@@ -145,7 +145,7 @@ namespace hpx { namespace parallel { namespace execution {
         /// \endcond
 
         /// \cond NOINTERNAL
-        typedef parallel_execution_tag execution_category;
+        using execution_category = hpx::execution::parallel_execution_tag;
 
         template <typename F, typename... Ts>
         void post(F&& f, Ts&&... ts) const

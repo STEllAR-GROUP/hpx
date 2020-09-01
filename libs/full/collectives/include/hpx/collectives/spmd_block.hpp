@@ -270,8 +270,7 @@ namespace hpx { namespace lcos {
             static void call(std::string name, std::size_t images_per_locality,
                 std::size_t num_images, Args... args)
             {
-                using executor_type =
-                    hpx::parallel::execution::parallel_executor;
+                using executor_type = hpx::execution::parallel_executor;
 
                 executor_type exec;
                 std::size_t offset =

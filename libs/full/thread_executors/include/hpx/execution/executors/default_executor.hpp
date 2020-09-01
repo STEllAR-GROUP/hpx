@@ -12,5 +12,5 @@
 #include <hpx/executors/parallel_executor.hpp>
 
 namespace hpx { namespace parallel { namespace execution {
-    using default_executor = parallel_executor;
+    using default_executor = hpx::execution::parallel_executor;
 }}}    // namespace hpx::parallel::execution

@@ -71,7 +71,7 @@ namespace hpx { namespace detail {
                 Ts...>::type>>::type
         call(F&& f, Ts&&... ts)
         {
-            parallel::execution::parallel_executor exec;
+            execution::parallel_executor exec;
             return exec.async_execute(
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }

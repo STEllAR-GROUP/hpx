@@ -27,7 +27,7 @@ hpx::thread::id test(int passed_through)
 
 void test_timed_sync()
 {
-    typedef hpx::parallel::execution::parallel_executor executor;
+    typedef hpx::execution::parallel_executor executor;
 
     executor exec;
     HPX_TEST(hpx::parallel::execution::sync_execute_after(exec, milliseconds(1),
@@ -40,7 +40,7 @@ void test_timed_sync()
 
 void test_timed_async()
 {
-    typedef hpx::parallel::execution::parallel_executor executor;
+    typedef hpx::execution::parallel_executor executor;
 
     executor exec;
     HPX_TEST(hpx::parallel::execution::async_execute_after(
@@ -53,7 +53,7 @@ void test_timed_async()
 
 void test_timed_apply()
 {
-    typedef hpx::parallel::execution::parallel_executor executor;
+    typedef hpx::execution::parallel_executor executor;
 
     executor exec;
     hpx::parallel::execution::post_after(exec, milliseconds(1), &test, 42);

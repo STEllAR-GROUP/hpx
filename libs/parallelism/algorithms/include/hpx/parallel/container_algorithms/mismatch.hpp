@@ -333,7 +333,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent1, Iter1>::value &&
                 hpx::traits::is_sentinel_for<Sent2, Iter2>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                    hpx::parallel::execution::sequenced_policy, Pred,
+                    hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected<Proj1, Iter1>,
                     hpx::parallel::traits::projected<Proj2, Iter2>
                 >::value
@@ -351,8 +351,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::mismatch_binary<
                 mismatch_result<Iter1, Iter2>>()
-                .call(hpx::parallel::execution::seq, std::true_type{}, first1,
-                    last1, first2, last2, std::forward<Pred>(op),
+                .call(hpx::execution::seq, std::true_type{}, first1, last1,
+                    first2, last2, std::forward<Pred>(op),
                     std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
 
@@ -364,7 +364,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
                 hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                    hpx::parallel::execution::sequenced_policy, Pred,
+                    hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected<Proj1,
                         typename hpx::traits::range_traits<Rng1>::iterator_type>,
                     hpx::parallel::traits::projected<Proj2,
@@ -392,7 +392,7 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_traits<Rng2>::iterator_type>;
 
             return hpx::parallel::v1::detail::mismatch_binary<result_type>()
-                .call(hpx::parallel::execution::seq, std::true_type{},
+                .call(hpx::execution::seq, std::true_type{},
                     hpx::util::begin(rng1), hpx::util::end(rng1),
                     hpx::util::begin(rng2), hpx::util::end(rng2),
                     std::forward<Pred>(op), std::forward<Proj1>(proj1),

@@ -71,7 +71,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             typedef std::false_type non_seq;
 
-            auto p = execution::parallel_task_policy()
+            auto p = hpx::execution::parallel_task_policy()
                          .on(policy.executor())
                          .with(policy.parameters());
 
@@ -216,7 +216,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             typedef std::false_type non_seq;
 
-            auto p = execution::parallel_task_policy()
+            auto p = hpx::execution::parallel_task_policy()
                          .on(policy.executor())
                          .with(policy.parameters());
 

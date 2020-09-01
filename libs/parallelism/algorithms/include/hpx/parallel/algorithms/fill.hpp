@@ -344,8 +344,8 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least forward iterator.");
 
-            hpx::parallel::v1::detail::fill_(hpx::parallel::execution::seq,
-                first, last, value, std::false_type{});
+            hpx::parallel::v1::detail::fill_(
+                hpx::execution::seq, first, last, value, std::false_type{});
         }
     } fill{};
 
@@ -405,7 +405,7 @@ namespace hpx {
             }
 
             return hpx::parallel::v1::detail::fill_n<FwdIter>().call(
-                hpx::parallel::execution::seq, std::true_type{}, first,
+                hpx::execution::seq, std::true_type{}, first,
                 std::size_t(count), value);
         }
     } fill_n{};

@@ -51,7 +51,7 @@ int deep_thought()
 int hpx_main()
 {
     {
-        hpx::parallel::execution::parallel_executor exec;
+        hpx::execution::parallel_executor exec;
 
         // successful replay
         hpx::future<int> f = hpx::resiliency::experimental::dataflow_replay(

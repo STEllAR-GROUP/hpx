@@ -92,16 +92,16 @@ void test_find_if_not_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_find_if_not()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_find_if_not(IteratorTag());
 
-    test_find_if_not(execution::seq, IteratorTag());
-    test_find_if_not(execution::par, IteratorTag());
-    test_find_if_not(execution::par_unseq, IteratorTag());
+    test_find_if_not(seq, IteratorTag());
+    test_find_if_not(par, IteratorTag());
+    test_find_if_not(par_unseq, IteratorTag());
 
-    test_find_if_not_async(execution::seq(execution::task), IteratorTag());
-    test_find_if_not_async(execution::par(execution::task), IteratorTag());
+    test_find_if_not_async(seq(task), IteratorTag());
+    test_find_if_not_async(par(task), IteratorTag());
 }
 
 void find_if_not_test()

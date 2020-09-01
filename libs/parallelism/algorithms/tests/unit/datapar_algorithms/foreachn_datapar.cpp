@@ -19,13 +19,13 @@
 template <typename IteratorTag>
 void test_for_each_n()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_for_each_n(execution::dataseq, IteratorTag());
     test_for_each_n(execution::datapar, IteratorTag());
 
-    test_for_each_n_async(execution::dataseq(execution::task), IteratorTag());
-    test_for_each_n_async(execution::datapar(execution::task), IteratorTag());
+    test_for_each_n_async(execution::dataseq(task), IteratorTag());
+    test_for_each_n_async(execution::datapar(task), IteratorTag());
 }
 
 void for_each_n_test()

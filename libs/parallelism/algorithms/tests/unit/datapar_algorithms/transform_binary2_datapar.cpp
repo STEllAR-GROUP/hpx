@@ -18,15 +18,13 @@
 template <typename IteratorTag>
 void test_transform_binary2()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_transform_binary2(execution::dataseq, IteratorTag());
     test_transform_binary2(execution::datapar, IteratorTag());
 
-    test_transform_binary2_async(
-        execution::dataseq(execution::task), IteratorTag());
-    test_transform_binary2_async(
-        execution::datapar(execution::task), IteratorTag());
+    test_transform_binary2_async(execution::dataseq(task), IteratorTag());
+    test_transform_binary2_async(execution::datapar(task), IteratorTag());
 }
 
 void transform_binary2_test()
@@ -39,15 +37,15 @@ void transform_binary2_test()
 template <typename IteratorTag>
 void test_transform_binary2_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_transform_binary2_exception(execution::dataseq, IteratorTag());
     test_transform_binary2_exception(execution::datapar, IteratorTag());
 
     test_transform_binary2_exception_async(
-        execution::dataseq(execution::task), IteratorTag());
+        execution::dataseq(task), IteratorTag());
     test_transform_binary2_exception_async(
-        execution::datapar(execution::task), IteratorTag());
+        execution::datapar(task), IteratorTag());
 }
 
 void transform_binary2_exception_test()
@@ -60,15 +58,15 @@ void transform_binary2_exception_test()
 template <typename IteratorTag>
 void test_transform_binary2_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_transform_binary2_bad_alloc(execution::dataseq, IteratorTag());
     test_transform_binary2_bad_alloc(execution::datapar, IteratorTag());
 
     test_transform_binary2_bad_alloc_async(
-        execution::dataseq(execution::task), IteratorTag());
+        execution::dataseq(task), IteratorTag());
     test_transform_binary2_bad_alloc_async(
-        execution::datapar(execution::task), IteratorTag());
+        execution::datapar(task), IteratorTag());
 }
 
 void transform_binary2_bad_alloc_test()
