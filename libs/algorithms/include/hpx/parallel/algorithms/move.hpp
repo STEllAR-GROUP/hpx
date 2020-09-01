@@ -122,7 +122,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
                     zip_iterator;
-                typedef typename zip_iterator::reference reference;
 
                 return util::detail::get_in_out_result(
                     util::foreach_partitioner<ExPolicy>::call(

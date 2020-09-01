@@ -5,13 +5,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
+
 #include <hpx/include/actions.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/runtime/actions/transfer_action.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/serialization/array.hpp>
 #include <hpx/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/serialize.hpp>

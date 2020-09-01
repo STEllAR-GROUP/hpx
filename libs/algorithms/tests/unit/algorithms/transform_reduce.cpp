@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,8 +20,45 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_transform_reduce(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    typedef hpx::util::tuple<std::size_t, std::size_t> result_type;
+
+    using hpx::util::get;
+    using hpx::util::make_tuple;
+
+    auto reduce_op = [](result_type v1, result_type v2) -> result_type {
+        return make_tuple(get<0>(v1) * get<0>(v2), get<1>(v1) * get<1>(v2));
+    };
+
+    auto convert_op = [](std::size_t val) -> result_type {
+        return make_tuple(val, val);
+    };
+
+    result_type const init = make_tuple(std::size_t(1), std::size_t(1));
+
+    result_type r1 = hpx::transform_reduce(iterator(std::begin(c)),
+        iterator(std::end(c)), init, reduce_op, convert_op);
+
+    // verify values
+    result_type r2 = std::accumulate(std::begin(c), std::end(c), init,
+        [&reduce_op, &convert_op](result_type res, std::size_t val) {
+            return reduce_op(res, convert_op(val));
+        });
+
+    HPX_TEST_EQ(get<0>(r1), get<0>(r2));
+    HPX_TEST_EQ(get<1>(r1), get<1>(r2));
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_reduce(ExPolicy policy, IteratorTag)
+void test_transform_reduce(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -48,9 +85,8 @@ void test_transform_reduce(ExPolicy policy, IteratorTag)
 
     result_type const init = make_tuple(std::size_t(1), std::size_t(1));
 
-    result_type r1 =
-        hpx::parallel::transform_reduce(policy, iterator(std::begin(c)),
-            iterator(std::end(c)), init, reduce_op, convert_op);
+    result_type r1 = hpx::transform_reduce(policy, iterator(std::begin(c)),
+        iterator(std::end(c)), init, reduce_op, convert_op);
 
     // verify values
     result_type r2 = std::accumulate(std::begin(c), std::end(c), init,
@@ -63,7 +99,7 @@ void test_transform_reduce(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_reduce_async(ExPolicy p, IteratorTag)
+void test_transform_reduce_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -75,8 +111,8 @@ void test_transform_reduce_async(ExPolicy p, IteratorTag)
     auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2 + val; };
 
     hpx::future<std::size_t> f =
-        hpx::parallel::transform_reduce(p, iterator(std::begin(c)),
-            iterator(std::end(c)), val, op, [](std::size_t v) { return v; });
+        hpx::transform_reduce(p, iterator(std::begin(c)), iterator(std::end(c)),
+            val, op, [](std::size_t v) { return v; });
     f.wait();
 
     // verify values
@@ -88,6 +124,8 @@ template <typename IteratorTag>
 void test_transform_reduce()
 {
     using namespace hpx::parallel;
+
+    test_transform_reduce(IteratorTag());
 
     test_transform_reduce(execution::seq, IteratorTag());
     test_transform_reduce(execution::par, IteratorTag());
@@ -104,8 +142,43 @@ void transform_reduce_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_transform_reduce_exception(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::transform_reduce(
+            iterator(std::begin(c)), iterator(std::end(c)), std::size_t(42),
+            [](std::size_t v1, std::size_t v2) {
+                return throw std::runtime_error("test"), v1 + v2;
+            },
+            [](std::size_t v) { return v; });
+
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<hpx::execution::sequenced_policy,
+            IteratorTag>::call(hpx::execution::seq, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_reduce_exception(ExPolicy policy, IteratorTag)
+void test_transform_reduce_exception(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -120,7 +193,7 @@ void test_transform_reduce_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::transform_reduce(
+        hpx::transform_reduce(
             policy, iterator(std::begin(c)), iterator(std::end(c)),
             std::size_t(42),
             [](std::size_t v1, std::size_t v2) {
@@ -144,7 +217,7 @@ void test_transform_reduce_exception(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_reduce_exception_async(ExPolicy p, IteratorTag)
+void test_transform_reduce_exception_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -156,7 +229,7 @@ void test_transform_reduce_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::transform_reduce(
+        hpx::future<void> f = hpx::transform_reduce(
             p, iterator(std::begin(c)), iterator(std::end(c)), std::size_t(42),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), v1 + v2;
@@ -186,6 +259,8 @@ void test_transform_reduce_exception()
 {
     using namespace hpx::parallel;
 
+    test_transform_reduce_exception(IteratorTag());
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
@@ -205,8 +280,41 @@ void transform_reduce_exception_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_transform_reduce_bad_alloc(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::transform_reduce(
+            iterator(std::begin(c)), iterator(std::end(c)), std::size_t(42),
+            [](std::size_t v1, std::size_t v2) {
+                return throw std::bad_alloc(), v1 + v2;
+            },
+            [](std::size_t v) { return v; });
+
+        HPX_TEST(false);
+    }
+    catch (std::bad_alloc const&)
+    {
+        caught_exception = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_reduce_bad_alloc(ExPolicy policy, IteratorTag)
+void test_transform_reduce_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -221,7 +329,7 @@ void test_transform_reduce_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::transform_reduce(
+        hpx::transform_reduce(
             policy, iterator(std::begin(c)), iterator(std::end(c)),
             std::size_t(42),
             [](std::size_t v1, std::size_t v2) {
@@ -244,7 +352,7 @@ void test_transform_reduce_bad_alloc(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_reduce_bad_alloc_async(ExPolicy p, IteratorTag)
+void test_transform_reduce_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -256,7 +364,7 @@ void test_transform_reduce_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::transform_reduce(
+        hpx::future<void> f = hpx::transform_reduce(
             p, iterator(std::begin(c)), iterator(std::end(c)), std::size_t(42),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), v1 + v2;
@@ -284,6 +392,8 @@ template <typename IteratorTag>
 void test_transform_reduce_bad_alloc()
 {
     using namespace hpx::parallel;
+
+    test_transform_reduce_bad_alloc(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions

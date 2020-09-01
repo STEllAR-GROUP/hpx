@@ -681,7 +681,7 @@ Parallel algorithms
        ``values={9,5,30,10}``.
      * ``<hpx/numeric.hpp>``
      *
-   * * :cpp:func:`hpx::parallel::v1::transform_reduce`
+   * * :cpp:func:`hpx::transform_reduce`
      * Sums up a range of elements after applying a function. Also, accumulates the inner products of two input ranges.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`transform_reduce`
@@ -700,11 +700,11 @@ Parallel algorithms
      * Description
      * In header
      * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::parallel::v1::destroy`
+   * * :cpp:func:`hpx::destroy`
      * Destroys a range of objects.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`destroy`
-   * * :cpp:func:`hpx::parallel::v1::destroy_n`
+   * * :cpp:func:`hpx::destroy_n`
      * Destroys a range of objects.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`destroy_n`
@@ -749,23 +749,23 @@ Parallel algorithms
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_value_construct_n`
 
-.. list-table:: Index-based for-loops (In Header: `<hpx/include/parallel_algorithm.hpp>`)
+.. list-table:: Index-based for-loops (In Header: `<hpx/algorithm.hpp>`)
 
    * * Name
      * Description
      * In header
-   * * :cpp:func:`hpx::parallel::v2::for_loop`
+   * * :cpp:func:`hpx::for_loop`
      * Implements loop functionality over a range specified by integral or iterator bounds.
-     * ``<hpx/include/parallel_for_loop.hpp>``
-   * * :cpp:func:`hpx::parallel::v2::for_loop_strided`
+     * ``<hpx/algorithm.hpp>``
+   * * :cpp:func:`hpx::for_loop_strided`
      * Implements loop functionality over a range specified by integral or iterator bounds.
-     * ``<hpx/include/parallel_for_loop.hpp>``
-   * * :cpp:func:`hpx::parallel::v2::for_loop_n`
+     * ``<hpx/algorithm.hpp>``
+   * * :cpp:func:`hpx::for_loop_n`
      * Implements loop functionality over a range specified by integral or iterator bounds.
-     * ``<hpx/include/parallel_for_loop.hpp>``
-   * * :cpp:func:`hpx::parallel::v2::for_loop_n_strided`
+     * ``<hpx/algorithm.hpp>``
+   * * :cpp:func:`hpx::for_loop_n_strided`
      * Implements loop functionality over a range specified by integral or iterator bounds.
-     * ``<hpx/include/parallel_for_loop.hpp>``
+     * ``<hpx/algorithm.hpp>``
 
 .. _executor_parameters:
 

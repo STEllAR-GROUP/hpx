@@ -63,6 +63,10 @@ set(tests
     transform_range
     transform_range_binary
     transform_range_binary2
+    transform_reduce_binary_bad_alloc_range
+    transform_reduce_binary_exception_range
+    transform_reduce_binary_range
+    transform_reduce_range
     unique_range
     unique_copy_range
 )

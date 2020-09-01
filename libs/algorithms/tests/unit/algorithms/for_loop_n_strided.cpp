@@ -4,11 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/algorithm.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
-
-#include <hpx/include/parallel_for_loop.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -46,7 +45,7 @@ void test_for_loop_n_strided(ExPolicy&& policy, IteratorTag)
 
     int stride = dis(gen);    //-V103
 
-    hpx::parallel::for_loop_n_strided(std::forward<ExPolicy>(policy),
+    hpx::for_loop_n_strided(std::forward<ExPolicy>(policy),
         iterator(std::begin(c)), c.size(), stride,
         [](iterator it) { *it = 42; });
 
@@ -83,7 +82,7 @@ void test_for_loop_n_strided_async(ExPolicy&& p, IteratorTag)
 
     int stride = dis(gen);    //-V103
 
-    auto f = hpx::parallel::for_loop_n_strided(std::forward<ExPolicy>(p),
+    auto f = hpx::for_loop_n_strided(std::forward<ExPolicy>(p),
         iterator(std::begin(c)), c.size(), stride,
         [](iterator it) { *it = 42; });
     f.wait();
@@ -144,8 +143,8 @@ void test_for_loop_n_strided_idx(ExPolicy&& policy)
 
     int stride = dis(gen);    //-V103
 
-    hpx::parallel::for_loop_n_strided(std::forward<ExPolicy>(policy), 0,
-        c.size(), stride, [&c](std::size_t i) { c[i] = 42; });
+    hpx::for_loop_n_strided(std::forward<ExPolicy>(policy), 0, c.size(), stride,
+        [&c](std::size_t i) { c[i] = 42; });
 
     // verify values
     std::size_t count = 0;
@@ -179,8 +178,8 @@ void test_for_loop_n_strided_idx_async(ExPolicy&& p)
 
     int stride = dis(gen);    //-V103
 
-    auto f = hpx::parallel::for_loop_n_strided(std::forward<ExPolicy>(p), 0,
-        c.size(), stride, [&c](std::size_t i) { c[i] = 42; });
+    auto f = hpx::for_loop_n_strided(std::forward<ExPolicy>(p), 0, c.size(),
+        stride, [&c](std::size_t i) { c[i] = 42; });
     f.wait();
 
     // verify values

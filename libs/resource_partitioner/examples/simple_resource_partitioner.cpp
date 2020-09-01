@@ -8,16 +8,15 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 //
-#include <hpx/execution/execution.hpp>
-#include <hpx/parallel/algorithms/for_loop.hpp>
-//
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>
-#include <hpx/topology/cpu_mask.hpp>
-//
-#include <hpx/include/runtime.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/iostream.hpp>
+#include <hpx/runtime.hpp>
+//
+#include <hpx/modules/resource_partitioner.hpp>
+#include <hpx/modules/thread_pools.hpp>
+#include <hpx/modules/topology.hpp>
+//
 //
 #include <cmath>
 #include <cstddef>
@@ -146,7 +145,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     // test a parallel algorithm on custom pool with high priority
     hpx::parallel::execution::static_chunk_size fixed(1);
-    hpx::parallel::for_loop_strided(
+    hpx::for_loop_strided(
         hpx::parallel::execution::par.with(fixed).on(high_priority_executor), 0,
         loop_count, 1, [&](std::size_t i) {
             std::lock_guard<hpx::lcos::local::mutex> lock(m);
@@ -162,7 +161,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     thread_set.clear();
 
     // test a parallel algorithm on custom pool with normal priority
-    hpx::parallel::for_loop_strided(
+    hpx::for_loop_strided(
         hpx::parallel::execution::par.with(fixed).on(normal_priority_executor),
         0, loop_count, 1, [&](std::size_t i) {
             std::lock_guard<hpx::lcos::local::mutex> lock(m);
@@ -179,7 +178,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     thread_set.clear();
 
     // test a parallel algorithm on mpi_executor
-    hpx::parallel::for_loop_strided(
+    hpx::for_loop_strided(
         hpx::parallel::execution::par.with(fixed).on(mpi_executor), 0,
         loop_count, 1, [&](std::size_t i) {
             std::lock_guard<hpx::lcos::local::mutex> lock(m);
@@ -199,10 +198,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     //     auto normal_priority_async_policy = hpx::launch::async_policy();
 
     // test a parallel algorithm on custom pool with high priority
-    hpx::parallel::for_loop_strided(
-        hpx::parallel::execution::par
-            .with(fixed /*, high_priority_async_policy*/)
-            .on(mpi_executor),
+    hpx::for_loop_strided(hpx::parallel::execution::par
+                              .with(fixed /*, high_priority_async_policy*/)
+                              .on(mpi_executor),
         0, loop_count, 1, [&](std::size_t i) {
             std::lock_guard<hpx::lcos::local::mutex> lock(m);
             if (thread_set.insert(std::this_thread::get_id()).second)

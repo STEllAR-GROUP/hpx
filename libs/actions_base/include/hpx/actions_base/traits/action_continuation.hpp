@@ -8,16 +8,14 @@
 
 #include <hpx/actions_base/traits/extract_action.hpp>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
+
     ///////////////////////////////////////////////////////////////////////////
     // Trait to determine the continuation type for an action
     template <typename Action, typename Enable = void>
     struct action_continuation
     {
-        typedef
-            typename hpx::traits::extract_action<Action>::type::continuation_type
-            type;
+        typedef typename hpx::traits::extract_action<
+            Action>::type::continuation_type type;
     };
-}}
-
+}}    // namespace hpx::traits

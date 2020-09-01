@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Daniel Bourgeois
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,6 +19,8 @@ template <typename IteratorTag>
 void test_transform_reduce_binary()
 {
     using namespace hpx::parallel;
+
+    test_transform_reduce_binary(IteratorTag());
 
     test_transform_reduce_binary(execution::seq, IteratorTag());
     test_transform_reduce_binary(execution::par, IteratorTag());

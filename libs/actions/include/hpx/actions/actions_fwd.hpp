@@ -8,9 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/actions_base_fwd.hpp>
-#include <hpx/runtime/actions/continuation_fwd.hpp>
-
-#include <cstdint>
+#include <hpx/actions_base/continuation_fwd.hpp>
 
 namespace hpx { namespace actions {
 
@@ -25,12 +23,6 @@ namespace hpx { namespace actions {
     template <typename Action>
     struct transfer_continuation_action;
 #endif
-
-    namespace detail {
-
-        HPX_EXPORT std::uint32_t get_action_id_from_name(
-            char const* action_name);
-    }    // namespace detail
 
     /// \endcond
 }}    // namespace hpx::actions

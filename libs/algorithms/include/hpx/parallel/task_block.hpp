@@ -251,8 +251,6 @@ namespace hpx { namespace parallel { inline namespace v2 {
                     "the task_block is not active");
             }
 
-            typedef typename ExPolicy::executor_type executor_type;
-
             hpx::future<void> result =
                 execution::async_execute(policy_.executor(), std::forward<F>(f),
                     std::forward<Ts>(ts)...);
@@ -304,8 +302,6 @@ namespace hpx { namespace parallel { inline namespace v2 {
                 HPX_THROW_EXCEPTION(task_block_not_active, "task_block::run",
                     "the task_block is not active");
             }
-
-            typedef typename ExPolicy::executor_type executor_type;
 
             hpx::future<void> result = execution::async_execute(
                 exec, std::forward<F>(f), std::forward<Ts>(ts)...);

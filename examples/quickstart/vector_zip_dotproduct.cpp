@@ -28,7 +28,7 @@ int hpx_main()
     using hpx::util::get;
 
     double result =
-        hpx::parallel::transform_reduce(
+        hpx::transform_reduce(
             hpx::parallel::execution::par,
             make_zip_iterator(std::begin(xvalues), std::begin(yvalues)),
             make_zip_iterator(std::end(xvalues), std::end(yvalues)),

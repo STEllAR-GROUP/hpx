@@ -252,14 +252,14 @@ namespace test {
         return c;
     }
 
-    template <typename Vector>
-    inline Vector random_iota(std::size_t size)
+    template <typename T>
+    inline std::vector<T> random_iota(std::size_t size)
     {
-        Vector c(size);
-        std::iota(std::begin(c.base()), std::end(c.base()), 0);
+        std::vector<T> c(size);
+        std::iota(std::begin(c), std::end(c), 0);
         std::random_device rd;
         std::mt19937 g(rd());
-        std::shuffle(std::begin(c.base()), std::end(c.base()), g);
+        std::shuffle(std::begin(c), std::end(c), g);
         return c;
     }
 

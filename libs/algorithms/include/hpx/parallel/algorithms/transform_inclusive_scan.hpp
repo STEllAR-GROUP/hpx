@@ -510,8 +510,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     transform_inclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest, Op&& op, Conv&& conv)
     {
-        typedef typename std::iterator_traits<FwdIter1>::value_type value_type;
-
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
         return detail::transform_inclusive_scan_(std::forward<ExPolicy>(policy),
             first, last, dest, std::forward<Conv>(conv), std::forward<Op>(op),

@@ -11,9 +11,9 @@
 
 #include <hpx/hpx_main.hpp>
 
+#include <hpx/algorithm.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution.hpp>
-#include <hpx/modules/algorithms.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -120,10 +120,10 @@ int main()
 
     // The following for_loop will be executed while thread stealing is disabled
     auto exec = executor_example::make_disable_thread_stealing_executor(
-        hpx::parallel::execution::par.executor());
+        hpx::execution::par.executor());
 
-    hpx::parallel::for_loop(hpx::parallel::execution::par.on(exec), 0, v.size(),
-        [](std::size_t i) {});
+    hpx::for_loop(
+        hpx::execution::par.on(exec), 0, v.size(), [](std::size_t i) {});
 
     return 0;
 }

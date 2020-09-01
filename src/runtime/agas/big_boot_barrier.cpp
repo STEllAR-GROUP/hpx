@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/actions/action_support.hpp>
+#include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/this_thread.hpp>

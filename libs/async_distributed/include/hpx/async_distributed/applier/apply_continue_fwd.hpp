@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/actions/actions_fwd.hpp>
+#include <hpx/actions_base/actions_base_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -12,12 +12,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/base_action.hpp>
+#include <hpx/actions/transfer_action.hpp>
+#include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/runtime/actions/transfer_action.hpp>
-#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>

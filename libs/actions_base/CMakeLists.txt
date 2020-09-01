@@ -6,17 +6,25 @@
 
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/actions_base/include
 set(actions_base_headers
     hpx/actions_base/actions_base_fwd.hpp
-    hpx/actions_base/action_base_support.hpp
+    hpx/actions_base/actions_base_support.hpp
     hpx/actions_base/action_priority.hpp
     hpx/actions_base/basic_action.hpp
     hpx/actions_base/basic_action_fwd.hpp
     hpx/actions_base/component_action.hpp
+    hpx/actions_base/continuation_fwd.hpp
+    hpx/actions_base/detail/action_factory.hpp
     hpx/actions_base/plain_action.hpp
+    hpx/actions_base/preassigned_action_id.hpp
+    hpx/actions_base/traits/action_continuation.hpp
     hpx/actions_base/traits/action_priority.hpp
     hpx/actions_base/traits/action_select_direct_execution.hpp
     hpx/actions_base/traits/action_stacksize.hpp
@@ -28,18 +36,23 @@ set(actions_base_headers
 set(actions_base_compat_headers
     hpx/runtime/actions_base_fwd.hpp
     hpx/runtime/actions/action_priority.hpp
+    hpx/runtime/actions/action_support.hpp
     hpx/runtime/actions/basic_action.hpp
     hpx/runtime/actions/basic_action_fwd.hpp
     hpx/runtime/actions/component_action.hpp
+    hpx/runtime/actions/continuation_fwd.hpp
+    hpx/runtime/actions/detail/action_factory.hpp
     hpx/runtime/actions/plain_action.hpp
+    hpx/runtime/actions/preassigned_action_id.hpp
+    hpx/traits/action_continuation.hpp
     hpx/traits/action_priority.hpp
-    hpx/traits/extract_action.hpp
     hpx/traits/action_select_direct_execution.hpp
     hpx/traits/action_remote_result.hpp
     hpx/traits/action_stacksize.hpp
+    hpx/traits/extract_action.hpp
 )
 
-set(actions_base_sources)
+set(actions_base_sources detail/action_factory.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
@@ -51,6 +64,7 @@ add_hpx_module(
   HEADERS ${actions_base_headers}
   COMPAT_HEADERS ${actions_base_compat_headers}
   DEPENDENCIES
+    hpx_assertion
     hpx_async_base
     hpx_components_base
     hpx_concurrency

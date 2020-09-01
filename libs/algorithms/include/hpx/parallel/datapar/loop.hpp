@@ -27,8 +27,10 @@
 #include <utility>
 
 namespace hpx { namespace parallel { namespace util {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Vector>
         HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
@@ -82,8 +84,9 @@ namespace hpx { namespace parallel { namespace util {
         template <typename Iter, typename Enable = void>
         struct loop_optimization
         {
-            template <typename Iter1>
-            static bool call(Iter1 const& first1, Iter1 const& last1)
+            template <typename Iter1, typename Sent1>
+            HPX_FORCEINLINE static constexpr bool call(
+                Iter1 const&, Sent1 const&)
             {
                 return false;
             }
@@ -95,14 +98,14 @@ namespace hpx { namespace parallel { namespace util {
                 iterator_datapar_compatible<Iter>::value>::type>
         {
             template <typename Iter_>
-            static bool call(Iter_ const& first, Iter_ const& last)
+            static bool call(Iter_ const& first, Sent_ const& last)
             {
                 typedef
                     typename std::iterator_traits<Iter_>::value_type value_type;
                 typedef typename traits::vector_pack_type<value_type>::type V;
 
                 return traits::vector_pack_size<V>::value <=
-                    (std::size_t) std::distance(first, last);
+                    (std::size_t) detail::distance(first, last);
             }
         };
 
@@ -305,10 +308,10 @@ namespace hpx { namespace parallel { namespace util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename Iter>
+    template <typename ExPolicy, typename Iter, typename Sent>
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         execution::is_vectorpack_execution_policy<ExPolicy>::value, bool>::type
-    loop_optimization(Iter const& first1, Iter const& last1)
+    loop_optimization(Iter first1, Sent last1)
     {
         return detail::loop_optimization<Iter>::call(first1, last1);
     }

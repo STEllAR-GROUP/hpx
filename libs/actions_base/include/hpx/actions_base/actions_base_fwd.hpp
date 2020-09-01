@@ -8,6 +8,8 @@
 
 #include <hpx/config.hpp>
 
+#include <cstdint>
+
 namespace hpx { namespace actions {
 
     /// \cond NOINTERNAL
@@ -24,6 +26,17 @@ namespace hpx { namespace actions {
         ///< thread
         direct_action = 1    ///< The action needs to be executed directly
     };
+
+    /// The \a base_action class is an abstract class used as the base class
+    /// for all action types. It's main purpose is to allow polymorphic
+    /// serialization of action instances through a unique_ptr.
+    struct HPX_EXPORT base_action;
+
+    namespace detail {
+
+        HPX_EXPORT std::uint32_t get_action_id_from_name(
+            char const* action_name);
+    }    // namespace detail
 
     /// \endcond
 }}    // namespace hpx::actions

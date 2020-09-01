@@ -8,19 +8,20 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/base_action.hpp>
+#include <hpx/actions/transfer_action.hpp>
+#include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos_local/promise.hpp>
-#include <hpx/runtime/actions/transfer_action.hpp>
-#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/synchronization/barrier.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <string>
@@ -85,6 +86,7 @@ namespace hpx { namespace lcos { namespace detail {
         void set_back_ptr(components::managed_component<barrier_node>* bp)
         {
             HPX_ASSERT(bp);
+            HPX_UNUSED(bp);
         }
 
         // intrusive reference counting

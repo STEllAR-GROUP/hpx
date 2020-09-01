@@ -4,9 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/parallel_for_loop.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -21,7 +22,7 @@ int hpx_main()
     hpx::lcos::local::spinlock mtx;
     std::set<hpx::thread::id> thread_ids;
 
-    hpx::parallel::for_loop(hpx::parallel::execution::par, 0, 100, [&](int i) {
+    hpx::for_loop(hpx::parallel::execution::par, 0, 100, [&](int i) {
         std::lock_guard<hpx::lcos::local::spinlock> l(mtx);
         thread_ids.insert(hpx::this_thread::get_id());
     });
@@ -30,11 +31,10 @@ int hpx_main()
 
     thread_ids.clear();
 
-    hpx::parallel::for_loop_n(
-        hpx::parallel::execution::par, 0, 100, [&](int i) {
-            std::lock_guard<hpx::lcos::local::spinlock> l(mtx);
-            thread_ids.insert(hpx::this_thread::get_id());
-        });
+    hpx::for_loop_n(hpx::parallel::execution::par, 0, 100, [&](int i) {
+        std::lock_guard<hpx::lcos::local::spinlock> l(mtx);
+        thread_ids.insert(hpx::this_thread::get_id());
+    });
 
     HPX_TEST_LT(std::size_t(1), thread_ids.size());
 

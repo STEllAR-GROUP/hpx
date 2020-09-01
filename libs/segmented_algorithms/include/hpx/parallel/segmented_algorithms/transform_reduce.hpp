@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,9 +28,11 @@
 #include <vector>
 
 namespace hpx { namespace parallel { inline namespace v1 {
+
     ///////////////////////////////////////////////////////////////////////////
     // segmented_transform_reduce
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         /// \cond NOINTERNAL
 
@@ -214,12 +216,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
 
         // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename T,
+        template <typename ExPolicy, typename Iter, typename Sent, typename T,
             typename Reduce, typename Convert>
         typename util::detail::algorithm_result<ExPolicy,
             typename hpx::util::decay<T>::type>::type
-        transform_reduce_(ExPolicy&& policy, InIter first, InIter last,
-            T&& init, Reduce&& red_op, Convert&& conv_op, std::false_type);
+        transform_reduce_(ExPolicy&& policy, Iter first, Sent last, T&& init,
+            Reduce&& red_op, Convert&& conv_op, std::false_type);
 
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename FwdIter1,
@@ -428,11 +430,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::forward<Convert>(conv_op), is_seq());
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T, typename Reduce, typename Convert>
+        template <typename ExPolicy, typename Iter, typename Sent,
+            typename Iter2, typename T, typename Reduce, typename Convert>
         typename util::detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce_(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, T init, Reduce&& red_op, Convert&& conv_op,
+        transform_reduce_(ExPolicy&& policy, Iter first1, Sent last1,
+            Iter2 first2, T init, Reduce&& red_op, Convert&& conv_op,
             std::false_type);
         /// \endcond
     }    // namespace detail

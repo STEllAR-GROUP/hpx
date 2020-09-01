@@ -193,7 +193,7 @@ namespace hpx { namespace util {
     }
 
     constexpr inline void set_held_locks_data(
-        std::unique_ptr<held_locks_data>&& data)
+        std::unique_ptr<held_locks_data>&& /*data*/)
     {
     }
 

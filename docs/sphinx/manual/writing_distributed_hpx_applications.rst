@@ -984,7 +984,7 @@ local segment (by providing a per-segment iterator as a parameter)::
     // Iterate over segments
     for (auto seg_it = seg_begin; seg_it != seg_end; ++seg_it)
     {
-        auto loc_begin = traits::begin(seg_it)
+        auto loc_begin = traits::begin(seg_it);
         auto loc_end   = traits::end(seg_it);
 
         // Iterate over elements inside segments
@@ -1316,7 +1316,7 @@ owned by the current image::
         // Instantiate the local view from the view
         auto local_vv = hpx::local_view(vv);
 
-        for ( auto i = localvv.begin(); i != localvv.end(); i++ )
+        for ( auto i = local_vv.begin(); i != local_vv.end(); i++ )
         {
             std::vector<float> & segment = *i;
 

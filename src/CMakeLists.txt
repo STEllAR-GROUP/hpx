@@ -24,9 +24,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     lcos/base_lco_with_value_3.cpp
     lcos/base_lco_with_value.cpp
     lcos/promise.cpp
-    runtime/actions/base_action.cpp
     runtime/actions/continuation.cpp
-    runtime/actions/detail/action_factory.cpp
     runtime/actions/detail/invocation_count_registry.cpp
     runtime/agas/addressing_service.cpp
     runtime/agas/big_boot_barrier.cpp
@@ -187,18 +185,12 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/plugins/unique_plugin_name.hpp
     hpx/runtime_fwd.hpp
     hpx/runtime/actions/continuation2_impl.hpp
-    hpx/runtime/actions/continuation_fwd.hpp
     hpx/runtime/actions/continuation.hpp
     hpx/runtime/actions/continuation_impl.hpp
-    hpx/runtime/actions/detail/action_factory.hpp
     hpx/runtime/actions/detail/invocation_count_registry.hpp
     hpx/runtime/actions/lambda_to_action.hpp
     hpx/runtime/actions/make_continuation.hpp
-    hpx/runtime/actions/manage_object_action.hpp
-    hpx/runtime/actions/preassigned_action_id.hpp
     hpx/runtime/actions/set_lco_value_continuation.hpp
-    hpx/runtime/actions/transfer_action.hpp
-    hpx/runtime/actions/transfer_continuation_action.hpp
     hpx/runtime/actions/trigger.hpp
     hpx/runtime/agas/addressing_service.hpp
     hpx/runtime/agas/big_boot_barrier.hpp
@@ -307,7 +299,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/threads/threadmanager_counters.hpp
     hpx/runtime/trigger_lco.hpp
     hpx/state.hpp
-    hpx/traits/action_continuation.hpp
     hpx/traits/action_decorate_continuation.hpp
     hpx/traits/action_decorate_function.hpp
     hpx/traits/action_does_termination_detection.hpp

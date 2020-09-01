@@ -170,9 +170,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     }
                     else
                     {
-                        using parameters_type = typename hpx::util::decay<
-                            ExPolicy>::type::executor_parameters_type;
-
                         std::size_t const cores =
                             execution::processing_units_count(
                                 policy.parameters(), policy.executor());
@@ -854,9 +851,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static FwdIter call(ExPolicy&& policy, FwdIter first, FwdIter last,
                 Pred&& pred, Proj&& proj)
             {
-                using parameters_type = typename hpx::util::decay<
-                    ExPolicy>::type::executor_parameters_type;
-
                 if (first == last)
                     return first;
 
