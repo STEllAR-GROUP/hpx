@@ -135,10 +135,13 @@ are completed to avoid confusion.
    script automatically tag the with the corresponding release number. The
    script requires that you have the |stellar| Group signing key.
 
-#. Update the websites (`stellar-group.org <https://stellar-group.org>`_ and
-   `stellar.cct.lsu.edu <https://stellar.cct.lsu.edu>`_) with the following:
+#. Update the websites (`hpx.stellar-group.org <https://hpx.stellar-group.org>`_,
+   `stellar-group.org <https://stellar-group.org>`_ and
+   `stellar.cct.lsu.edu <https://stellar.cct.lsu.edu>`_). You can login on
+   wordpress through `this page <https://hpx.stellar-group.org/wp-login.php>`.
+   You can update the pages with the following:
 
-   * Download links on the downloads pages. Link to the release on GitHub.
+   * Update links on the downloads page. Link to the release on GitHub.
    * Documentation links on the docs page (link to generated documentation on
      GitHub Pages). Follow the style of previous releases.
    * A new blog post announcing the release, which links to downloads and the
@@ -154,10 +157,18 @@ are completed to avoid confusion.
 
    #. Change ``HPX_VERSION_TAG`` in ``CMakeLists.txt`` back to ``-trunk``.
 
-#. Update Vcpkg (``https://github.com/Microsoft/vcpkg``) to pull from latest release.
+   #. Increment ``HPX_VERSION_MINOR`` in ``CMakeLists.txt``.
+
+#. Update Vcpkg (``https://github.com/Microsoft/vcpkg``) to pull from latest
+   release.
 
    * Update version number in CONTROL
    * Update tag and SHA512 to that of the new release
+
+#. Update spack (``https://github.com/spack/spack``) with the latest HPX package.
+
+   * Update version number in ``hpx/package.py`` and SHA256 to that of the new
+     release
 
 #. Announce the release on hpx-users@stellar.cct.lsu.edu, stellar@cct.lsu.edu,
    allcct@cct.lsu.edu, faculty@csc.lsu.edu, faculty@ece.lsu.edu,
