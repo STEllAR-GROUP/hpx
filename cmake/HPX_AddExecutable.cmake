@@ -184,7 +184,7 @@ function(add_hpx_executable name)
   endif()
 
   # Manage files with .cu extension in case When Cuda Clang is used
-  if(HPX_WITH_CUDA_CLANG)
+  if(HPX_WITH_CUDA_CLANG OR HPX_WITH_HIP)
     foreach(source ${${name}_SOURCES})
       get_filename_component(extension ${source} EXT)
       if(${extension} STREQUAL ".cu")
@@ -194,7 +194,10 @@ function(add_hpx_executable name)
     endforeach()
   endif()
 
-  if((HPX_WITH_CUDA_COMPUTE OR HPX_WITH_ASYNC_CUDA) AND NOT HPX_WITH_CUDA_CLANG)
+  if(HPX_WITH_CUDA
+     AND (HPX_WITH_CUDA_COMPUTE OR HPX_WITH_ASYNC_CUDA)
+     AND NOT HPX_WITH_CUDA_CLANG
+  )
     cuda_add_executable(
       ${name} ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY}
     )

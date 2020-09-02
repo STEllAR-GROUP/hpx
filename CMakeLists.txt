@@ -520,22 +520,32 @@ hpx_option(
 # HPX CUDA Compute configuration
 # ##############################################################################
 # To avoid writing these strings out in multiple places, use vars to hold them
-set(CUDA_OPTION_STRING "Enable HPX_WITH_ASYNC_CUDA (CUDA futures) and\
- HPX_WITH_CUDA_COMPUTE (CUDA enabled parallel algorithms) (default: OFF)"
+set(CUDA_OPTION_STRING "Enable HPX_WITH_ASYNC_CUDA (CUDA or HIP futures) and\
+ HPX_WITH_CUDA_COMPUTE (CUDA/HIP enabled parallel algorithms) (default: OFF)"
 )
 set(CUDA_COMPUTE_STRING
-    "Enable HPX CUDA compute capability (parallel algorithms) module (default: OFF) -\
- note: enabling this also enables CUDA futures via HPX_WITH_ASYNC_CUDA"
+    "Enable HPX CUDA/HIP compute capability (parallel algorithms) module (default: OFF) -\
+ note: enabling this also enables CUDA/HIP futures via HPX_WITH_ASYNC_CUDA"
 )
 set(ASYNC_CUDA_STRING
-    "Enable HPX CUDA compute capability (parallel algorithms) module (default: OFF) -\
- note: CUDA futures may be used without CUDA Compute"
+    "Enable HPX CUDA/HIP compute capability (parallel algorithms) module (default: OFF) -\
+ note: CUDA/HIP futures may be used without CUDA/HIP Compute"
 )
+set(HIP_OPTION_STRING "Enable compilation with HIPCC (default: OFF)")
 hpx_option(HPX_WITH_CUDA BOOL "${CUDA_OPTION_STRING}" OFF ADVANCED)
+# Those two will be renamed replacing CUDA with GPU
 hpx_option(HPX_WITH_CUDA_COMPUTE BOOL "${CUDA_COMPUTE_STRING}" OFF ADVANCED)
 hpx_option(HPX_WITH_ASYNC_CUDA BOOL "${ASYNC_CUDA_STRING}" OFF ADVANCED)
+# No need for the user to specify the option explicitly
+hpx_option(HPX_WITH_HIP BOOL "${HIP_OPTION_STRING}" OFF ADVANCED)
+if("${CMAKE_CXX_COMPILER}" MATCHES "hipcc$")
+  set(HPX_WITH_HIP
+      ON
+      CACHE BOOL "${HIP_OPTION_STRING}" FORCE
+  )
+endif()
 # if HPX_WITH_CUDA is ON, then enable both (sub) options
-if(HPX_WITH_CUDA)
+if(HPX_WITH_CUDA OR HPX_WITH_HIP)
   set(HPX_WITH_CUDA_COMPUTE
       ON
       CACHE BOOL "${CUDA_COMPUTE_STRING}" FORCE
@@ -2236,6 +2246,7 @@ add_hpx_library_headers_noglob(hpx_external)
 include(HPX_SetupMPI) # must come before APEX
 
 # Setup packages and subprojects
+include(HPX_SetupHIP)
 include(HPX_SetupCUDA) # CUDA needs to come before Apex, to have
                        # cuda_add_library available
 include(HPX_SetupApex)
@@ -2243,6 +2254,9 @@ include(HPX_SetupPapi)
 include(HPX_SetupHpxmp)
 include(HPX_SetupGooglePerfTools)
 include(HPX_SetupValgrind)
+if(HPX_WITH_CUDA OR HPX_WITH_HIP)
+  hpx_add_config_define(HPX_HAVE_GPU_SUPPORT)
+endif()
 
 if(HPX_WITH_SANITIZERS)
   hpx_add_config_define(HPX_HAVE_SANITIZERS)

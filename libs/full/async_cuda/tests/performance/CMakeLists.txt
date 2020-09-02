@@ -7,9 +7,6 @@
 set(benchmarks cuda_executor_throughput)
 
 set(cuda_executor_throughput_PARAMETERS THREADS_PER_LOCALITY 1)
-set(cuda_executor_throughput_FLAGS DEPENDENCIES Cuda::cuda
-                                   ${CUDA_CUBLAS_LIBRARIES}
-)
 
 foreach(benchmark ${benchmarks})
 

@@ -13,8 +13,6 @@ set(tests cublas_matmul cuda_future)
 set(cublas_matmul_PARAMETERS THREADS_PER_LOCALITY 4)
 set(cuda_future_PARAMETERS THREADS_PER_LOCALITY 4)
 
-set(cublas_matmul_FLAGS DEPENDENCIES Cuda::cuda ${CUDA_CUBLAS_LIBRARIES})
-
 set(cuda_future_CUDA_SOURCE saxpy trivial_demo)
 
 foreach(test ${tests})
