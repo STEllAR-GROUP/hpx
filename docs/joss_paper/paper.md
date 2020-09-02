@@ -84,31 +84,31 @@ bibliography: paper.bib
 
 # Summary
 
-The new challenges presented by Exascale system architectures have resulted in
-difficulty achieving a desired scalability using traditional distributed-memory
+The new challenges presented by exascale system architectures have resulted in
+difficulty achieving the desired scalability using traditional distributed-memory
 runtimes. Asynchronous many-task systems (AMT) are based on a new paradigm
-showing promising solutions in addressing these challenges, providing application
+showing promise in addressing these challenges, providing application
 developers with a productive and performant approach to programming on next
 generation systems.
 
-HPX is a C++ Library for Concurrency and Parallelism that is
+HPX is a C++ Library for concurrency and parallelism that is
 developed by The STE||AR Group, an international group of collaborators working
 in the field of distributed and parallel programming
 [@heller2017hpx;@hpx_github;@tabbal2011preliminary]. It is a runtime system
 written using modern C++ techniques that are linked as part of an application.
 HPX exposes extended services and functionalities supporting the implementation
 of parallel, concurrent, and distributed capabilities for applications in any
-domain - it has been used in scientific computing, gaming, finances, data
+domain; it has been used in scientific computing, gaming, finances, data
 mining, and other fields.
 
 The HPX AMT runtime system attempts to solve some problems the community
 is facing when it comes to creating scalable parallel applications that expose
 excellent parallel efficiency and a high resource utilization. First, it exposes
-a C++ Standards conforming API that unifies syntax and semantics for local and
+a C++ standards conforming API that unifies syntax and semantics for local and
 remote operations. This significantly simplifies writing codes that strive to
 effectively utilize different types of available parallelism in today's machines
-in a coordinated way (i.e. on-node, off-node, and accelerator-based parallelism).
-Second, HPX implements an Asynchronous C++ Standard Programming Model that has the
+in a coordinated way (i.e., on-node, off-node, and accelerator-based parallelism).
+Second, HPX implements an asynchronous C++ standard programming model that has the
 emergent property of semi-automatic parallelization of the user's code. The
 provided API (especially when used in conjunction with the new C++20 `co_await`
 keyword [@standard2020programming]) enables intrinsic overlap of computation and
@@ -118,7 +118,7 @@ fine-grained parallelization and minimal-overhead synchronization and context
 switching. This programming model natively ensures high-system utilization and
 perfect scalability.
 
-A detailed comparison of HPX with various other AMT's is given in [@thoman2018taxonomy].
+A detailed comparison of HPX with various other AMTs is given in [@thoman2018taxonomy].
 Some notable AMT solutions are: Uintah [@germain2000uintah], Chapel [@chamberlain2007parallel],
 Charm++ [@kale1993charm], Kokkos [@edwards2014kokkos], Legion [@bauer2012legion],
 and PaRSEC [@bosilca2013parsec]. Note that we only refer to distributed memory solutions,
@@ -134,7 +134,7 @@ _Futures_ intrinsically enables overlap of computation and communication and
 constraint-based synchronization. HPX is able to maintain a balanced load among
 all the available resources resulting in significantly reducing processor
 starvation and effective latencies while controlling overheads. HPX fully
-conforms to the C++ ISO Standards and implements the standardized concurrency
+conforms to the C++ ISO standards and implements the standardized concurrency
 mechanisms and parallelism facilities. Further, HPX extends those facilities to
 distributed use cases, thus enabling syntactic and semantic equivalence of local
 and remote operations on the API level. HPX uses the concept of C++ _Futures_ to
@@ -149,17 +149,17 @@ standardization process.
 ![Sketch of HPX's architecture with all the components and their interactions.\label{fig:architecture}](hpx_architecture.pdf)
 
 
-\autoref{fig:architecture} sketches HPX's architectures. The components of HPX
+\autoref{fig:architecture} sketches HPX's architecture. The components of HPX
 and their references are listed below:
 
 **Threading Subsystem** [@kaiser2009parallex] The thread manager manages the
  light-weight user level threads created by HPX. These light-weight threads
- have extremely short context switching times resulting in reduced latencies
+ have extremely short context switching times, resulting in reduced latencies
  even for very short operations. This also ensures reduced synchronization
  overheads for coordinating execution between different threads. HPX provides
  a set of scheduling policies that enable the user to flexibly customize the
  execution of HPX threads. Work-stealing and work-sharing policies ensure
- automatic local load balancing of tasks which is important for achieving high
+ automatic local load balancing of tasks, which is important for achieving high
  system utilization and good scalability of the user's code.
 
 **Active Global Address Space (AGAS)** [@kaiser2014hpx;@amini2019agas]
@@ -181,7 +181,7 @@ and their references are listed below:
  Additionally, its asynchronous protocol enables the
  parcelport to implicitly overlap communication and computation.
  The parcelport is modular to support multiple communication library
- backends. By default, HPX supports TCP/IP, Message passing Interface (MPI),
+ backends. By default, HPX supports TCP/IP, Message Passing Interface (MPI),
  and libfabric [@daiss2019piz].
 
 **Performance counters** [@grubel2016dynamic]
@@ -208,7 +208,7 @@ and their references are listed below:
 **Accelerator Support**
  HPX has support for several methods of integration with GPUs:
  HPXCL [@diehl2018integration; @martin_stumpf_2018_1409043] and HPX.Compute
- [@copik2017using]
+ [@copik2017using].
  HPXCL provides users the ability to manage GPU kernels through a
  global object. This enables HPX to coordinate the launching and
  synchronization of CPU and GPU code.
@@ -218,7 +218,7 @@ and their references are listed below:
  as dictated by the current state of the system. Support for integrating
  HPX with Kokkos [@edwards2014kokkos] is currently being developed. This
  integration already has added HPX as an asynchronous backend to Kokkos and
- will expose Kokkos accelerator functionalities through HPX's asynchronous APIs
+ will expose Kokkos' accelerator functionalities through HPX's asynchronous APIs
  in a C++ standards-conforming way.
 
 **Local Control Objects (synchronization support facilities)**
@@ -226,7 +226,7 @@ and their references are listed below:
  `hpx::barrier`, and `hpx::counting_semaphore` to synchronize the execution of
  different threads allowing overlapping computation and communication. These
  facilities fully conform to the C++20 standard [@standard2020programming].
- For asynchronous computing HPX provides `hpx::async` and `hpx::future`, see
+ For asynchronous computing HPX provides `hpx::async` and `hpx::future`; see
  the second example in the next section.
 
 **Software Resilience**
@@ -242,11 +242,11 @@ and their references are listed below:
 **C++ Standards conforming API**
  HPX implements all the C++17 parallel algorithms [@standard2017programming]
  and extends those with asynchronous versions. Here, HPX provides the
- `hpx::execution::seq`, `hpx::execution::par` execution policies, and (as an
+ `hpx::execution::seq` and `hpx::execution::par` execution policies, and (as an
  extension) their asynchronous equivalents
  `hpx::execution::seq(hpx::execution::task)` and
  `hpx::execution::par(hpx::execution::task)` (see the first code example
- in the next section). HPX also implements the C++20
+ below). HPX also implements the C++20
  concurrency facilities and APIs [@standard2020programming], such as
  `hpx::jthread`, `hpx::latch`, `hpx::barrier`, etc.
 
@@ -284,7 +284,7 @@ corresponding [HPX website](https://hpx.stellar-group.org/hpx-users/).
 
 The following is an example of HPX's parallel algorithms API using execution
 policies as defined in
-the C++17 Standard [@standard2017programming]. HPX implements all the
+the C++17 standard [@standard2017programming]. HPX implements all the
 parallel algorithms defined therein. The parallel algorithms extend the classic
 STL algorithms by adding a first argument (called execution policy).
 The `hpx::execution::seq` implies sequential execution while `hpx::execution::par`
