@@ -129,7 +129,7 @@ Please find the project's gpg key, which is used to sign HPX releases
 Citing
 ======
 
-In publications, please use our publication in The Journal of Open Source
+In publications, please use our paper in The Journal of Open Source
 Software as the main citation for HPX: |JOSS|. For referring
 to the latest release of HPX please use: |zenodo_doi|.
 
