@@ -5,7 +5,7 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-|circleci_status| |zenodo_doi| |codacy| |coveralls| |JOSS|
+|circleci_status| |codacy| |coveralls| |JOSS| |zenodo_doi|
 
 Documentation: `latest
 <https://hpx-docs.stellar-group.org/latest/html/index.html>`_,
@@ -98,7 +98,7 @@ continuous integration service additionally tracks the current build status for
 the master branch: |circleci_status|.
 
 We use `Codacy <https://www.codacy.com/>`_ to assess the code quality of this
-project: |codacy|. For our coverage analysis we rely on 
+project: |codacy|. For our coverage analysis we rely on
 `Coveralls <https://coveralls.io/>`_ to present the results: |coveralls|.
 
 If you can't find what you are looking for in the documentation or you suspect
@@ -129,7 +129,9 @@ Please find the project's gpg key, which is used to sign HPX releases
 Citing
 ======
 
-In publications the latest release of HPX can be cited as: |zenodo_doi|.
+In publications, please use our paper in The Journal of Open Source
+Software as the main citation for HPX: |JOSS|. For referring
+to the latest release of HPX please use: |zenodo_doi|.
 
 Acknowledgements
 ================
@@ -198,6 +200,7 @@ HPX is has been funded by:
 
 .. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.598202.svg
      :target: https://doi.org/10.5281/zenodo.598202
+     :alt: Latest software release of HPX
 
 .. |codacy| image:: https://api.codacy.com/project/badge/Grade/0b8cd5a874914edaba67ce3bb711e688
      :target: https://www.codacy.com/gh/STEllAR-GROUP/hpx
@@ -210,4 +213,3 @@ HPX is has been funded by:
 .. |JOSS| image:: https://joss.theoj.org/papers/022e5917b95517dff20cd3742ab95eca/status.svg
     :target: https://joss.theoj.org/papers/022e5917b95517dff20cd3742ab95eca
     :alt: JOSS Paper about HPX
-    
