@@ -1570,6 +1570,18 @@ namespace hpx { namespace util {
             rtcfg_.reconfigure(cfg);
         }
 
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
+    defined(HPX_HAVE_MODULE_MPI_BASE)
+        // getting localities from MPI environment (support mpirun)
+        if (util::mpi_environment::check_mpi_environment(rtcfg_))
+        {
+            util::mpi_environment::init(&argc, &argv, rtcfg_);
+            num_localities_ =
+                static_cast<std::size_t>(util::mpi_environment::size());
+            node_ = static_cast<std::size_t>(util::mpi_environment::rank());
+        }
+#endif
+
         // load plugin modules (after first pass of command line handling,
         // so that settings given on command line could propagate to modules)
         std::vector<std::shared_ptr<plugins::plugin_registry_base>>
