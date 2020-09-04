@@ -19,7 +19,7 @@ a given container.
 This module exposes the ``hpx::util::save_checkpoint_data``,
 ``hpx::util::restore_checkpoint_data``, and ``hpx::util::prepare_checkpoint_data``
 APIs. These functions encapsulate the basic serialization functionalities
-necessary to save/resore a variadic list of arguments to/from a given data
+necessary to save/restore a variadic list of arguments to/from a given data
 container.
 
 See the :ref:`API reference <libs_checkpoint_base_api>` of this module for more

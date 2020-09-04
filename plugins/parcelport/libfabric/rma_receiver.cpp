@@ -278,7 +278,7 @@ namespace libfabric
 
                 // overwrite the serialization chunk data pointer because the chunk
                 // info sent contains the pointer to the remote data and when we
-                // deocde the parcel we want the chunk to point to the local copy of it
+                // decode the parcel we want the chunk to point to the local copy of it
                 const void *remoteAddr = c.data_.cpos_;
                 c.data_.cpos_ = get_region->get_address();
                 // call the rma read function for the chunk
