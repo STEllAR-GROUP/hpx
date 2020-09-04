@@ -192,8 +192,8 @@ namespace test {
     using count_instances = count_instances_v<std::size_t>;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename IteratorTag>
-    struct test_num_exceptions
+    template <typename ExPolicy>
+    struct test_num_exceptions_base
     {
         static void call(ExPolicy, hpx::exception_list const& e)
         {
@@ -203,31 +203,25 @@ namespace test {
         }
     };
 
-    template <typename IteratorTag>
-    struct test_num_exceptions<hpx::execution::sequenced_policy, IteratorTag>
+    template <>
+    struct test_num_exceptions_base<hpx::execution::sequenced_policy>
     {
         static void call(hpx::execution::sequenced_policy const&,
             hpx::exception_list const& e)
         {
             HPX_TEST_EQ(e.size(), 1u);
         }
+    };
+
+    template <typename ExPolicy, typename IteratorTag>
+    struct test_num_exceptions : test_num_exceptions_base<ExPolicy>
+    {
     };
 
     template <typename ExPolicy>
     struct test_num_exceptions<ExPolicy, std::input_iterator_tag>
     {
         static void call(ExPolicy, hpx::exception_list const& e)
-        {
-            HPX_TEST_EQ(e.size(), 1u);
-        }
-    };
-
-    template <>
-    struct test_num_exceptions<hpx::execution::sequenced_policy,
-        std::input_iterator_tag>
-    {
-        static void call(hpx::execution::sequenced_policy const&,
-            hpx::exception_list const& e)
         {
             HPX_TEST_EQ(e.size(), 1u);
         }

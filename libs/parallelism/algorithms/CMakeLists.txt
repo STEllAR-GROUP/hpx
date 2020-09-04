@@ -90,6 +90,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/fill.hpp
     hpx/parallel/container_algorithms/find.hpp
     hpx/parallel/container_algorithms/for_each.hpp
+    hpx/parallel/container_algorithms/for_loop.hpp
     hpx/parallel/container_algorithms/generate.hpp
     hpx/parallel/container_algorithms.hpp
     hpx/parallel/container_algorithms/includes.hpp
