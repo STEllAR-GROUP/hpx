@@ -161,33 +161,33 @@ namespace hpx { namespace resource { namespace detail {
     void init_pool_data::assign_pu(std::size_t virt_core)
     {
         HPX_ASSERT(virt_core <= assigned_pu_nums_.size());
-        HPX_ASSERT(!util::get<2>(assigned_pu_nums_[virt_core]));
+        HPX_ASSERT(!hpx::get<2>(assigned_pu_nums_[virt_core]));
 
-        util::get<2>(assigned_pu_nums_[virt_core]) = true;    // -V601
+        hpx::get<2>(assigned_pu_nums_[virt_core]) = true;    // -V601
     }
 
     void init_pool_data::unassign_pu(std::size_t virt_core)
     {
         HPX_ASSERT(virt_core <= assigned_pu_nums_.size());
-        HPX_ASSERT(util::get<2>(assigned_pu_nums_[virt_core]));
+        HPX_ASSERT(hpx::get<2>(assigned_pu_nums_[virt_core]));
 
-        util::get<2>(assigned_pu_nums_[virt_core]) = false;    // -V601
+        hpx::get<2>(assigned_pu_nums_[virt_core]) = false;    // -V601
     }
 
     bool init_pool_data::pu_is_exclusive(std::size_t virt_core) const
     {
         HPX_ASSERT(virt_core <= assigned_pu_nums_.size());
-        HPX_ASSERT(util::get<2>(assigned_pu_nums_[virt_core]));
+        HPX_ASSERT(hpx::get<2>(assigned_pu_nums_[virt_core]));
 
-        return util::get<1>(assigned_pu_nums_[virt_core]);
+        return hpx::get<1>(assigned_pu_nums_[virt_core]);
     }
 
     bool init_pool_data::pu_is_assigned(std::size_t virt_core) const
     {
         HPX_ASSERT(virt_core <= assigned_pu_nums_.size());
-        HPX_ASSERT(util::get<2>(assigned_pu_nums_[virt_core]));
+        HPX_ASSERT(hpx::get<2>(assigned_pu_nums_[virt_core]));
 
-        return util::get<2>(assigned_pu_nums_[virt_core]);
+        return hpx::get<2>(assigned_pu_nums_[virt_core]);
     }
 
     // 'shift' all thread assignments up by the first_core offset
@@ -195,7 +195,7 @@ namespace hpx { namespace resource { namespace detail {
     {
         for (std::size_t i = 0; i != num_threads_; ++i)
         {
-            std::size_t& pu_num = util::get<0>(assigned_pu_nums_[i]);
+            std::size_t& pu_num = hpx::get<0>(assigned_pu_nums_[i]);
             pu_num = (pu_num + first_core) % threads::hardware_concurrency();
 
             threads::reset(assigned_pus_[i]);
@@ -520,7 +520,7 @@ namespace hpx { namespace resource { namespace detail {
                 }
                 for (auto const& pu_num : itp.assigned_pu_nums_)
                 {
-                    new_pu_nums.push_back(util::get<0>(pu_num));
+                    new_pu_nums.push_back(hpx::get<0>(pu_num));
                 }
             }
         }

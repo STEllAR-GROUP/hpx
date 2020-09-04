@@ -48,10 +48,9 @@ namespace hpx { namespace resiliency { namespace experimental {
                         result_type>::type;
 
                 // launch given function n times
-                auto func =
-                    [f = std::forward<F>(f),
-                        t = hpx::util::make_tuple(std::forward<Ts>(ts)...)](
-                        std::size_t) mutable -> result_type {
+                auto func = [f = std::forward<F>(f),
+                                t = hpx::make_tuple(std::forward<Ts>(ts)...)](
+                                std::size_t) mutable -> result_type {
                     // ignore argument (invocation count of bulk_execute)
                     return hpx::util::invoke_fused(f, t);
                 };
@@ -126,8 +125,8 @@ namespace hpx { namespace resiliency { namespace experimental {
 
                 // launch given function n times
                 auto func = [f = std::forward<F>(f),
-                                t = hpx::util::make_tuple(std::forward<Ts>(
-                                    ts)...)](std::size_t) mutable {
+                                t = hpx::make_tuple(std::forward<Ts>(ts)...)](
+                                std::size_t) mutable {
                     // ignore argument (invocation count of bulk_execute)
                     hpx::util::invoke_fused(f, t);
                 };

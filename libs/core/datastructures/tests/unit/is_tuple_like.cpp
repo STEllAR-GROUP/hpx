@@ -17,7 +17,7 @@ void tuple_like_true()
 {
     using hpx::traits::is_tuple_like;
 
-    HPX_TEST_EQ((is_tuple_like<hpx::util::tuple<int, int, int>>::value), true);
+    HPX_TEST_EQ((is_tuple_like<hpx::tuple<int, int, int>>::value), true);
     HPX_TEST_EQ((is_tuple_like<std::pair<int, int>>::value), true);
     HPX_TEST_EQ((is_tuple_like<std::array<int, 4>>::value), true);
 }

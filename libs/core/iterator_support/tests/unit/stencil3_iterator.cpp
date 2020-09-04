@@ -39,8 +39,7 @@ namespace test {
             {
                 typedef typename std::iterator_traits<Iterator>::reference
                     element_type;
-                typedef hpx::util::tuple<element_type, element_type,
-                    element_type>
+                typedef hpx::tuple<element_type, element_type, element_type>
                     type;
             };
 
@@ -124,7 +123,7 @@ void test_stencil3_iterator()
     std::ostringstream str;
 
     std::for_each(r.first, r.second, [&str](reference val) {
-        using hpx::util::get;
+        using hpx::get;
         str << get<0>(val) << get<1>(val) << get<2>(val) << " ";
     });
 
@@ -144,7 +143,7 @@ namespace test {
             typedef typename hpx::util::invoke_result<F, element_type>::type
                 value_type;
 
-            typedef hpx::util::tuple<value_type, element_type, value_type> type;
+            typedef hpx::tuple<value_type, element_type, value_type> type;
         };
 
         custom_stencil_transformer(F f)
@@ -187,7 +186,7 @@ void test_stencil3_iterator_custom()
     std::ostringstream str;
 
     std::for_each(r.first, r.second, [&str](reference val) {
-        using hpx::util::get;
+        using hpx::get;
         str << get<0>(val) << get<1>(val) << get<2>(val) << " ";
     });
 

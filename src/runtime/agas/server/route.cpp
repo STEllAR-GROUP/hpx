@@ -72,7 +72,7 @@ namespace hpx { namespace agas { namespace server
 
             cache_address = resolve_gid_locked(l, gid, ec);
 
-            if (ec || hpx::util::get<0>(cache_address) == naming::invalid_gid)
+            if (ec || hpx::get<0>(cache_address) == naming::invalid_gid)
             {
                 l.unlock();
 
@@ -89,11 +89,11 @@ namespace hpx { namespace agas { namespace server
             if (!naming::detail::store_in_cache(gid))
             {
                 naming::detail::set_dont_store_in_cache(
-                    hpx::util::get<0>(cache_address));
+                    hpx::get<0>(cache_address));
             }
 
-            gva const g = hpx::util::get<1>(cache_address).resolve(
-                gid, hpx::util::get<0>(cache_address));
+            gva const g = hpx::get<1>(cache_address).resolve(
+                gid, hpx::get<0>(cache_address));
 
             addr.locality_ = g.prefix;
             addr.type_ = g.type;
@@ -118,10 +118,10 @@ namespace hpx { namespace agas { namespace server
         {
             // asynchronously update cache on source locality
             // update remote cache if the id is not flagged otherwise
-            naming::gid_type const& id = hpx::util::get<0>(cache_address);
+            naming::gid_type const& id = hpx::get<0>(cache_address);
             if (id && naming::detail::store_in_cache(id))
             {
-                gva const& g = hpx::util::get<1>(cache_address);
+                gva const& g = hpx::get<1>(cache_address);
                 naming::address addr(g.prefix, g.type, g.lva());
 
                 HPX_ASSERT(naming::is_locality(source));

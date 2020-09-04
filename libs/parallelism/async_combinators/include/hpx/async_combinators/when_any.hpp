@@ -277,12 +277,12 @@ namespace hpx { namespace lcos {
                 Tuple& tuple, util::index_pack<Is...>) const
             {
                 int const _sequencer[] = {
-                    (((*this)(util::get<Is>(tuple))), 0)...};
+                    (((*this)(hpx::get<Is>(tuple))), 0)...};
                 (void) _sequencer;
             }
 
             template <typename... Ts>
-            HPX_FORCEINLINE void apply(util::tuple<Ts...>& sequence) const
+            HPX_FORCEINLINE void apply(hpx::tuple<Ts...>& sequence) const
             {
                 apply(sequence,
                     typename util::make_index_pack<sizeof...(Ts)>::type());
@@ -414,10 +414,10 @@ namespace hpx { namespace lcos {
         return lcos::when_any(std::move(lazy_values_));
     }
 
-    inline lcos::future<when_any_result<util::tuple<>>>    //-V524
+    inline lcos::future<when_any_result<hpx::tuple<>>>    //-V524
     when_any()
     {
-        typedef when_any_result<util::tuple<>> result_type;
+        typedef when_any_result<hpx::tuple<>> result_type;
 
         return lcos::make_ready_future(result_type());
     }
@@ -443,12 +443,12 @@ namespace hpx { namespace lcos {
     template <typename T, typename... Ts>
     typename std::enable_if<!(traits::is_future_range<T>::value &&
                                 sizeof...(Ts) == 0),
-        lcos::future<when_any_result<
-            util::tuple<typename traits::acquire_future<T>::type,
+        lcos::future<
+            when_any_result<hpx::tuple<typename traits::acquire_future<T>::type,
                 typename traits::acquire_future<Ts>::type...>>>>::type
     when_any(T&& t, Ts&&... ts)
     {
-        typedef util::tuple<typename traits::acquire_future<T>::type,
+        typedef hpx::tuple<typename traits::acquire_future<T>::type,
             typename traits::acquire_future<Ts>::type...>
             result_type;
 

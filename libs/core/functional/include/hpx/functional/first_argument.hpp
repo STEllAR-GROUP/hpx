@@ -18,13 +18,13 @@ namespace hpx { namespace util {
         struct tuple_first_argument;
 
         template <>
-        struct tuple_first_argument<hpx::util::tuple<>>
+        struct tuple_first_argument<hpx::tuple<>>
         {
             using type = std::false_type;
         };
 
         template <typename Arg0, typename... Args>
-        struct tuple_first_argument<hpx::util::tuple<Arg0, Args...>>
+        struct tuple_first_argument<hpx::tuple<Arg0, Args...>>
         {
             using type = typename std::decay<Arg0>::type;
         };

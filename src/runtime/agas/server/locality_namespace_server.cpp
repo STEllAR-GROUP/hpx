@@ -188,7 +188,7 @@ std::uint32_t locality_namespace::allocate(
     );
     counter_data_.increment_allocate_count();
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::unique_lock<mutex_type> l(mutex_);
 
@@ -292,7 +292,7 @@ parcelset::endpoints_type locality_namespace::resolve_locality(
     );
     counter_data_.increment_resolve_locality_count();
 
-    using hpx::util::get;
+    using hpx::get;
     std::uint32_t prefix = naming::get_locality_id_from_gid(locality);
 
     std::lock_guard<mutex_type> l(mutex_);
@@ -314,7 +314,7 @@ void locality_namespace::free(naming::gid_type const& locality)
     );
     counter_data_.increment_free_count();
 
-    using hpx::util::get;
+    using hpx::get;
 
     // parameters
     std::uint32_t prefix = naming::get_locality_id_from_gid(locality);
@@ -433,7 +433,7 @@ std::vector<std::uint32_t> locality_namespace::get_num_threads()
     for (partition_table_type::iterator it = partitions_.begin();
          it != end; ++it)
     {
-        using hpx::util::get;
+        using hpx::get;
         num_threads.push_back(get<1>(it->second));
     }
 
@@ -454,7 +454,7 @@ std::uint32_t locality_namespace::get_num_overall_threads()
     for (partition_table_type::iterator it = partitions_.begin();
          it != end; ++it)
     {
-        using hpx::util::get;
+        using hpx::get;
         num_threads += get<1>(it->second);
     }
 

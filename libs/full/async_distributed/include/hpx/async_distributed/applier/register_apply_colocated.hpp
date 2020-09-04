@@ -21,7 +21,7 @@ namespace hpx { namespace detail {
     struct apply_colocated_bound_action;
 
     template <typename Action, typename... Ts>
-    struct apply_colocated_bound_action<Action, hpx::util::tuple<Ts...>>
+    struct apply_colocated_bound_action<Action, hpx::tuple<Ts...>>
     {
         typedef hpx::util::detail::bound_action<Action,
             hpx::util::make_index_pack<1 + sizeof...(Ts)>,

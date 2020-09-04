@@ -59,7 +59,7 @@ void test_is_heap_until(ExPolicy policy, DataType)
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size);
@@ -81,7 +81,7 @@ void test_is_heap_until_async(ExPolicy policy, DataType)
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size);

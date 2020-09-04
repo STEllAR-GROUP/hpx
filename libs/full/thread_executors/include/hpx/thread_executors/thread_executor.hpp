@@ -16,7 +16,6 @@
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/timing/steady_clock.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
 
@@ -229,7 +228,8 @@ namespace hpx { namespace threads {
             // Schedule given function for execution in this executor no sooner
             // than time abs_time. This call never blocks, and may violate
             // bounds on the executor's queue size.
-            virtual void add_at(util::steady_clock::time_point const& abs_time,
+            virtual void add_at(
+                std::chrono::steady_clock::time_point const& abs_time,
                 closure_type&& f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
@@ -244,7 +244,8 @@ namespace hpx { namespace threads {
             // Schedule given function for execution in this executor no sooner
             // than time rel_time from now. This call never blocks, and may
             // violate bounds on the executor's queue size.
-            virtual void add_after(util::steady_clock::duration const& rel_time,
+            virtual void add_after(
+                std::chrono::steady_clock::duration const& rel_time,
                 closure_type&& f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
@@ -375,9 +376,9 @@ namespace hpx { namespace threads {
     //      class scheduled_executor : public executor
     //      {
     //      public:
-    //          virtual void add_at(chrono::steady_clock::time_point abs_time,
+    //          virtual void add_at(chstd::chrono::steady_clock::time_point abs_time,
     //              function<void()> closure) = 0;
-    //          virtual void add_after(chrono::steady_clock::duration rel_time,
+    //          virtual void add_after(chstd::chrono::steady_clock::duration rel_time,
     //              function<void()> closure) = 0;
     //      };
     //
@@ -407,7 +408,7 @@ namespace hpx { namespace threads {
         /// variables.
         /// Error conditions: If invoking closure throws an exception, the
         /// executor shall call terminate.
-        void add_at(util::steady_clock::time_point const& abs_time,
+        void add_at(std::chrono::steady_clock::time_point const& abs_time,
             closure_type f, char const* desc = "",
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize_default,
@@ -435,7 +436,7 @@ namespace hpx { namespace threads {
         /// variables.
         /// Error conditions: If invoking closure throws an exception, the
         /// executor shall call terminate.
-        void add_after(util::steady_clock::duration const& rel_time,
+        void add_after(std::chrono::steady_clock::duration const& rel_time,
             closure_type f, char const* desc = "",
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize_default,

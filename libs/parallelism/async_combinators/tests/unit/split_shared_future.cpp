@@ -15,85 +15,81 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::util::tuple<> make_tuple0_slowly()
+hpx::tuple<> make_tuple0_slowly()
 {
     hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
-    return hpx::util::make_tuple();
+    return hpx::make_tuple();
 }
 
 void test_split_future0()
 {
-    hpx::lcos::local::futures_factory<hpx::util::tuple<>()> pt(
-        make_tuple0_slowly);
+    hpx::lcos::local::futures_factory<hpx::tuple<>()> pt(make_tuple0_slowly);
     pt.apply();
 
-    hpx::util::tuple<hpx::future<void>> result = hpx::split_future(
-        hpx::shared_future<hpx::util::tuple<>>(pt.get_future()));
+    hpx::tuple<hpx::future<void>> result =
+        hpx::split_future(hpx::shared_future<hpx::tuple<>>(pt.get_future()));
 
-    hpx::util::get<0>(result).get();
+    hpx::get<0>(result).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::util::tuple<int> make_tuple1_slowly()
+hpx::tuple<int> make_tuple1_slowly()
 {
     hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
-    return hpx::util::make_tuple(42);
+    return hpx::make_tuple(42);
 }
 
 void test_split_future1()
 {
-    hpx::lcos::local::futures_factory<hpx::util::tuple<int>()> pt(
-        make_tuple1_slowly);
+    hpx::lcos::local::futures_factory<hpx::tuple<int>()> pt(make_tuple1_slowly);
     pt.apply();
 
-    hpx::util::tuple<hpx::future<int>> result = hpx::split_future(
-        hpx::shared_future<hpx::util::tuple<int>>(pt.get_future()));
+    hpx::tuple<hpx::future<int>> result =
+        hpx::split_future(hpx::shared_future<hpx::tuple<int>>(pt.get_future()));
 
-    HPX_TEST_EQ(hpx::util::get<0>(result).get(), 42);
+    HPX_TEST_EQ(hpx::get<0>(result).get(), 42);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::util::tuple<int, int> make_tuple2_slowly()
+hpx::tuple<int, int> make_tuple2_slowly()
 {
     hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
-    return hpx::util::make_tuple(42, 43);
+    return hpx::make_tuple(42, 43);
 }
 
 void test_split_future2()
 {
-    hpx::lcos::local::futures_factory<hpx::util::tuple<int, int>()> pt(
+    hpx::lcos::local::futures_factory<hpx::tuple<int, int>()> pt(
         make_tuple2_slowly);
     pt.apply();
 
-    hpx::util::tuple<hpx::future<int>, hpx::future<int>> result =
-        hpx::split_future(
-            hpx::shared_future<hpx::util::tuple<int, int>>(pt.get_future()));
+    hpx::tuple<hpx::future<int>, hpx::future<int>> result = hpx::split_future(
+        hpx::shared_future<hpx::tuple<int, int>>(pt.get_future()));
 
-    HPX_TEST_EQ(hpx::util::get<0>(result).get(), 42);
-    HPX_TEST_EQ(hpx::util::get<1>(result).get(), 43);
+    HPX_TEST_EQ(hpx::get<0>(result).get(), 42);
+    HPX_TEST_EQ(hpx::get<1>(result).get(), 43);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::util::tuple<int, int, int> make_tuple3_slowly()
+hpx::tuple<int, int, int> make_tuple3_slowly()
 {
     hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
-    return hpx::util::make_tuple(42, 43, 44);
+    return hpx::make_tuple(42, 43, 44);
 }
 
 void test_split_future3()
 {
-    hpx::lcos::local::futures_factory<hpx::util::tuple<int, int, int>()> pt(
+    hpx::lcos::local::futures_factory<hpx::tuple<int, int, int>()> pt(
         make_tuple3_slowly);
     pt.apply();
 
-    hpx::util::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>>
-        result = hpx::split_future(
-            hpx::shared_future<hpx::util::tuple<int, int, int>>(
-                pt.get_future()));
+    hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>> result =
+        hpx::split_future(
+            hpx::shared_future<hpx::tuple<int, int, int>>(pt.get_future()));
 
-    HPX_TEST_EQ(hpx::util::get<0>(result).get(), 42);
-    HPX_TEST_EQ(hpx::util::get<1>(result).get(), 43);
-    HPX_TEST_EQ(hpx::util::get<2>(result).get(), 44);
+    HPX_TEST_EQ(hpx::get<0>(result).get(), 42);
+    HPX_TEST_EQ(hpx::get<1>(result).get(), 43);
+    HPX_TEST_EQ(hpx::get<2>(result).get(), 44);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

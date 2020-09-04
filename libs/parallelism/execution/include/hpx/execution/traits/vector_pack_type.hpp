@@ -22,10 +22,9 @@ namespace hpx { namespace parallel { namespace traits {
 
     // handle tuple<> transformations
     template <typename... T, std::size_t N, typename Abi>
-    struct vector_pack_type<hpx::util::tuple<T...>, N, Abi>
+    struct vector_pack_type<hpx::tuple<T...>, N, Abi>
     {
-        typedef hpx::util::tuple<typename vector_pack_type<T, N, Abi>::type...>
-            type;
+        typedef hpx::tuple<typename vector_pack_type<T, N, Abi>::type...> type;
     };
 
     ///////////////////////////////////////////////////////////////////////////

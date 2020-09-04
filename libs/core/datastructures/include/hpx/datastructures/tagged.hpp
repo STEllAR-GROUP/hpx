@@ -179,18 +179,21 @@ namespace hpx { namespace util {
             x.swap(y);
         }
     };
+}}    // namespace hpx::util
 
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Base, typename... Tags>
-    struct tuple_size<tagged<Base, Tags...>> : tuple_size<Base>
+    struct tuple_size<util::tagged<Base, Tags...>> : tuple_size<Base>
     {
     };
 
     template <size_t N, typename Base, typename... Tags>
-    struct tuple_element<N, tagged<Base, Tags...>> : tuple_element<N, Base>
+    struct tuple_element<N, util::tagged<Base, Tags...>>
+      : tuple_element<N, Base>
     {
     };
-}}    // namespace hpx::util
+}    // namespace hpx
 
 // A tagged getter is an empty trivial class type that has a named member
 // function that returns a reference to a member of a tuple-like object that is
@@ -224,12 +227,11 @@ namespace hpx { namespace util {
             {                                                                  \
                 HPX_FORCEINLINE Type& NAME()                                   \
                 {                                                              \
-                    return hpx::util::get<I>(static_cast<Derived&>(*this));    \
+                    return hpx::get<I>(static_cast<Derived&>(*this));          \
                 }                                                              \
                 constexpr HPX_FORCEINLINE Type const& NAME() const             \
                 {                                                              \
-                    return hpx::util::get<I>(                                  \
-                        static_cast<Derived const&>(*this));                   \
+                    return hpx::get<I>(static_cast<Derived const&>(*this));    \
                 }                                                              \
                                                                                \
             private:                                                           \

@@ -66,7 +66,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             first, destination_iterator(last)),
                         std::distance(first, last) / 2,
                         [](reference t) -> void {
-                            using hpx::util::get;
+                            using hpx::get;
                             std::swap(get<0>(t), get<1>(t));
                         },
                         util::projection_identity()),

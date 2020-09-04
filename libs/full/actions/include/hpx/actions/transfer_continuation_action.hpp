@@ -16,6 +16,7 @@
 #include <hpx/actions/transfer_base_action.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/async_distributed/applier/apply_helper.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
@@ -147,7 +148,7 @@ namespace hpx { namespace actions {
     {
         return base_type::derived_type::construct_thread_function(
             std::move(target), std::move(cont_), lva, comptype,
-            util::get<Is>(std::move(this->arguments_))...);
+            hpx::get<Is>(std::move(this->arguments_))...);
     }
 
     template <typename Action>
@@ -188,7 +189,7 @@ namespace hpx { namespace actions {
 #endif
         applier::detail::apply_helper<typename base_type::derived_type>::call(
             std::move(data), std::move(cont_), target, lva, comptype,
-            this->priority_, std::move(util::get<Is>(this->arguments_))...);
+            this->priority_, std::move(hpx::get<Is>(this->arguments_))...);
     }
 
     template <typename Action>

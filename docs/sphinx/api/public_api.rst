@@ -707,29 +707,28 @@ Header ``hpx/tuple.hpp``
 ========================
 
 Corresponds to the C++ standard library header :cppreference-header:`tuple`.
-:cpp:class:`hpx::util::tuple` can be used in CUDA device code, unlike
-``std::tuple``.
+:cpp:class:`hpx::tuple` can be used in CUDA device code, unlike ``std::tuple``.
 
 Constants
 ---------
 
-- :cpp:var:`hpx::util::ignore`
+- :cpp:var:`hpx::ignore`
 
 Classes
 -------
 
-- :cpp:struct:`hpx::util::tuple`
-- :cpp:struct:`hpx::util::tuple_size`
-- :cpp:struct:`hpx::util::tuple_element`
+- :cpp:struct:`hpx::tuple`
+- :cpp:struct:`hpx::tuple_size`
+- :cpp:struct:`hpx::tuple_element`
 
 Functions
 ---------
 
-- :cpp:func:`hpx::util::make_tuple`
-- :cpp:func:`hpx::util::tie`
-- :cpp:func:`hpx::util::forward_as_tuple`
-- :cpp:func:`hpx::util::tuple_cat`
-- :cpp:func:`hpx::util::get`
+- :cpp:func:`hpx::make_tuple`
+- :cpp:func:`hpx::tie`
+- :cpp:func:`hpx::forward_as_tuple`
+- :cpp:func:`hpx::tuple_cat`
+- :cpp:func:`hpx::get`
 
 Header ``hpx/type_traits.hpp``
 ==============================

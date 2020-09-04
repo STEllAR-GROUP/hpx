@@ -30,7 +30,7 @@ namespace hpx { namespace util {
     ///    map_pack([](int value) {
     ///        return float(value);
     ///    },
-    ///    1, hpx::util::make_tuple(2, std::vector<int>{3, 4}), 5);
+    ///    1, hpx::make_tuple(2, std::vector<int>{3, 4}), 5);
     ///    ```
     ///
     /// \throws       std::exception like objects which are thrown by an

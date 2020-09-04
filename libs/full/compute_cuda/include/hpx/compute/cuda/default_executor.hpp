@@ -84,7 +84,7 @@ namespace hpx { namespace cuda { namespace experimental {
         // specialization used by partitioner implementations
         template <typename Iterator>
         struct bulk_launch_helper<
-            hpx::util::tuple<Iterator, std::size_t, std::size_t>,
+            hpx::tuple<Iterator, std::size_t, std::size_t>,
             typename std::enable_if<
                 hpx::traits::is_iterator<Iterator>::value>::type>
         {
@@ -98,8 +98,8 @@ namespace hpx { namespace cuda { namespace experimental {
 
                 for (auto const& s : shape)
                 {
-                    auto begin = hpx::util::get<0>(s);
-                    std::size_t chunk_size = hpx::util::get<1>(s);
+                    auto begin = hpx::get<0>(s);
+                    std::size_t chunk_size = hpx::get<1>(s);
 
                     // FIXME: make the 1024 to be configurable...
                     int threads_per_block =

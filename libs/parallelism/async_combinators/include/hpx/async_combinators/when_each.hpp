@@ -185,8 +185,7 @@ namespace hpx { namespace lcos {
 
             template <std::size_t I>
             struct is_end
-              : std::integral_constant<bool,
-                    util::tuple_size<Tuple>::value == I>
+              : std::integral_constant<bool, hpx::tuple_size<Tuple>::value == I>
             {
             };
 
@@ -263,8 +262,8 @@ namespace hpx { namespace lcos {
             template <std::size_t I>
             HPX_FORCEINLINE void await_next(std::false_type, std::true_type)
             {
-                await_range<I>(util::begin(util::unwrap_ref(util::get<I>(t_))),
-                    util::end(util::unwrap_ref(util::get<I>(t_))));
+                await_range<I>(util::begin(util::unwrap_ref(hpx::get<I>(t_))),
+                    util::end(util::unwrap_ref(hpx::get<I>(t_))));
             }
 
             // Current element is a simple future
@@ -272,13 +271,13 @@ namespace hpx { namespace lcos {
             HPX_FORCEINLINE void await_next(std::true_type, std::false_type)
             {
                 typedef
-                    typename util::decay_unwrap<typename util::tuple_element<I,
+                    typename util::decay_unwrap<typename hpx::tuple_element<I,
                         Tuple>::type>::type future_type;
 
                 typedef typename traits::future_traits<future_type>::type
                     future_result_type;
 
-                future_type& fut = util::get<I>(t_);
+                future_type& fut = hpx::get<I>(t_);
 
                 typename traits::detail::shared_state_ptr<
                     future_result_type>::type next_future_data =
@@ -322,7 +321,7 @@ namespace hpx { namespace lcos {
             HPX_FORCEINLINE void do_await(std::false_type)
             {
                 typedef
-                    typename util::decay_unwrap<typename util::tuple_element<I,
+                    typename util::decay_unwrap<typename hpx::tuple_element<I,
                         Tuple>::type>::type future_type;
 
                 typedef util::any_of<traits::is_future<future_type>,
@@ -357,7 +356,7 @@ namespace hpx { namespace lcos {
         static_assert(
             traits::is_future<Future>::value, "invalid use of when_each");
 
-        typedef util::tuple<std::vector<Future>> argument_type;
+        typedef hpx::tuple<std::vector<Future>> argument_type;
         typedef typename std::decay<F>::type func_type;
         typedef detail::when_each_frame<argument_type, func_type> frame_type;
 
@@ -440,7 +439,7 @@ namespace hpx { namespace lcos {
         lcos::future<void>>::type
     when_each(F&& f, Ts&&... ts)
     {
-        typedef util::tuple<typename traits::acquire_future<Ts>::type...>
+        typedef hpx::tuple<typename traits::acquire_future<Ts>::type...>
             argument_type;
 
         typedef typename std::decay<F>::type func_type;

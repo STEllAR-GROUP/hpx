@@ -130,7 +130,7 @@ void test_unique_copy(
     typedef typename std::vector<DataType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size), dest_res(size), dest_sol(size);
@@ -159,7 +159,7 @@ void test_unique_copy_async(
     typedef typename std::vector<DataType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size), dest_res(size), dest_sol(size);
@@ -332,7 +332,7 @@ void test_unique_copy_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
 
     typedef typename std::vector<DataType>::iterator base_iterator;
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size), dest_res(size), dest_sol(size);

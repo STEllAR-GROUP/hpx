@@ -62,14 +62,14 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         std::size_t... Is, typename... Ts>
     HPX_FORCEINLINE auto fused_bulk_sync_execute(Executor&& exec, F&& f,
         Shape const& shape, Future&& predecessor, hpx::util::index_pack<Is...>,
-        hpx::util::tuple<Ts...> const& args)
+        hpx::tuple<Ts...> const& args)
         -> decltype(execution::bulk_sync_execute(std::forward<Executor>(exec),
             std::forward<F>(f), shape, std::forward<Future>(predecessor),
-            hpx::util::get<Is>(args)...))
+            hpx::get<Is>(args)...))
     {
         return execution::bulk_sync_execute(std::forward<Executor>(exec),
             std::forward<F>(f), shape, std::forward<Future>(predecessor),
-            hpx::util::get<Is>(args)...);
+            hpx::get<Is>(args)...);
     }
 
     template <typename Result, typename Executor, typename F, typename Shape,
@@ -79,12 +79,12 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     template <typename Result, typename Executor, typename F, typename Shape,
         typename... Ts>
     struct fused_bulk_sync_execute_helper<Result, Executor, F, Shape,
-        hpx::util::tuple<Ts...>>
+        hpx::tuple<Ts...>>
     {
         Executor exec_;
         F f_;
         Shape shape_;
-        hpx::util::tuple<Ts...> args_;
+        hpx::tuple<Ts...> args_;
 
         template <typename Future>
         Result operator()(Future&& predecessor)
@@ -115,14 +115,14 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         std::size_t... Is, typename... Ts>
     HPX_FORCEINLINE auto fused_bulk_async_execute(Executor&& exec, F&& f,
         Shape const& shape, Future&& predecessor, hpx::util::index_pack<Is...>,
-        hpx::util::tuple<Ts...> const& args)
+        hpx::tuple<Ts...> const& args)
         -> decltype(execution::bulk_async_execute(std::forward<Executor>(exec),
             std::forward<F>(f), shape, std::forward<Future>(predecessor),
-            hpx::util::get<Is>(args)...))
+            hpx::get<Is>(args)...))
     {
         return execution::bulk_async_execute(std::forward<Executor>(exec),
             std::forward<F>(f), shape, std::forward<Future>(predecessor),
-            hpx::util::get<Is>(args)...);
+            hpx::get<Is>(args)...);
     }
 
     template <typename Result, typename Executor, typename F, typename Shape,
@@ -132,12 +132,12 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     template <typename Result, typename Executor, typename F, typename Shape,
         typename... Ts>
     struct fused_bulk_async_execute_helper<Result, Executor, F, Shape,
-        hpx::util::tuple<Ts...>>
+        hpx::tuple<Ts...>>
     {
         Executor exec_;
         F f_;
         Shape shape_;
-        hpx::util::tuple<Ts...> args_;
+        hpx::tuple<Ts...> args_;
 
         template <typename Future>
         Result operator()(Future&& predecessor)

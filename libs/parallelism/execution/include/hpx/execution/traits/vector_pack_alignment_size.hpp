@@ -41,12 +41,12 @@ namespace hpx { namespace parallel { namespace traits {
     struct vector_pack_alignment;
 
     template <typename... Vector>
-    struct vector_pack_alignment<hpx::util::tuple<Vector...>,
+    struct vector_pack_alignment<hpx::tuple<Vector...>,
         typename std::enable_if<
             hpx::util::all_of<is_vector_pack<Vector>...>::value>::type>
     {
-        typedef typename hpx::util::tuple_element<0,
-            hpx::util::tuple<Vector...>>::type pack_type;
+        typedef typename hpx::tuple_element<0, hpx::tuple<Vector...>>::type
+            pack_type;
 
         static std::size_t const value =
             vector_pack_alignment<pack_type>::value;
@@ -57,12 +57,12 @@ namespace hpx { namespace parallel { namespace traits {
     struct vector_pack_size;
 
     template <typename... Vector>
-    struct vector_pack_size<hpx::util::tuple<Vector...>,
+    struct vector_pack_size<hpx::tuple<Vector...>,
         typename std::enable_if<
             hpx::util::all_of<is_vector_pack<Vector>...>::value>::type>
     {
-        typedef typename hpx::util::tuple_element<0,
-            hpx::util::tuple<Vector...>>::type pack_type;
+        typedef typename hpx::tuple_element<0, hpx::tuple<Vector...>>::type
+            pack_type;
 
         static std::size_t const value = vector_pack_size<pack_type>::value;
     };

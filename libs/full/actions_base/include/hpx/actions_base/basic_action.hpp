@@ -250,7 +250,7 @@ namespace hpx { namespace actions {
         static constexpr std::size_t arity = sizeof...(Args);
 
         using internal_result_type = R;
-        using arguments_type = util::tuple<typename std::decay<Args>::type...>;
+        using arguments_type = hpx::tuple<typename std::decay<Args>::type...>;
 
         using action_tag = void;
 

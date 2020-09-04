@@ -86,7 +86,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               std::size_t base_idx) mutable -> void {
                     util::loop_idx_n(base_idx, it, part_count, tok,
                         [&pred, &tok](reference t, std::size_t i) -> void {
-                            using hpx::util::get;
+                            using hpx::get;
                             using hpx::util::invoke;
                             if (invoke(pred, get<0>(t), get<1>(t)) ||
                                 invoke(pred, get<1>(t), get<0>(t)))

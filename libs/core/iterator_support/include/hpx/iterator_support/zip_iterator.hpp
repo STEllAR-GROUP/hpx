@@ -213,7 +213,7 @@ namespace hpx { namespace util {
                 typename zip_iterator_reference<tuple<Ts...>>::type
                 call(util::index_pack<Is...>, tuple<Ts...> const& iterators)
             {
-                return util::forward_as_tuple(*util::get<Is>(iterators)...);
+                return util::forward_as_tuple(*hpx::get<Is>(iterators)...);
             }
         };
 
@@ -299,7 +299,7 @@ namespace hpx { namespace util {
             {
                 return dereference_iterator<IteratorTuple>::call(
                     typename util::make_index_pack<
-                        util::tuple_size<IteratorTuple>::value>::type(),
+                        hpx::tuple_size<IteratorTuple>::value>::type(),
                     iterators_);
             }
 
@@ -321,8 +321,7 @@ namespace hpx { namespace util {
             HPX_HOST_DEVICE
             std::ptrdiff_t distance_to(zip_iterator_base const& other) const
             {
-                return util::get<0>(other.iterators_) -
-                    util::get<0>(iterators_);
+                return hpx::get<0>(other.iterators_) - hpx::get<0>(iterators_);
             }
 
         private:
@@ -330,7 +329,7 @@ namespace hpx { namespace util {
             HPX_HOST_DEVICE void apply(F&& f, util::index_pack<Is...>)
             {
                 int const _sequencer[] = {
-                    ((f(util::get<Is>(iterators_))), 0)...};
+                    ((f(hpx::get<Is>(iterators_))), 0)...};
                 (void) _sequencer;
             }
 
@@ -339,7 +338,7 @@ namespace hpx { namespace util {
             {
                 return apply(std::forward<F>(f),
                     util::make_index_pack<
-                        util::tuple_size<IteratorTuple>::value>());
+                        hpx::tuple_size<IteratorTuple>::value>());
             }
 
         private:
@@ -534,16 +533,16 @@ namespace hpx { namespace traits {
         {
             typedef typename util::zip_iterator<Ts...>::iterator_tuple_type
                 tuple_type;
-            typedef util::tuple<typename element_result_of<
+            typedef hpx::tuple<typename element_result_of<
                 typename F::template apply<Ts>, Ts>::type...>
                 result_type;
 
             template <std::size_t... Is, typename... Ts_>
             static result_type call(
-                util::index_pack<Is...>, util::tuple<Ts_...> const& t)
+                util::index_pack<Is...>, hpx::tuple<Ts_...> const& t)
             {
                 return util::make_tuple(
-                    typename F::template apply<Ts>()(util::get<Is>(t))...);
+                    typename F::template apply<Ts>()(hpx::get<Is>(t))...);
             }
 
             template <typename... Ts_>

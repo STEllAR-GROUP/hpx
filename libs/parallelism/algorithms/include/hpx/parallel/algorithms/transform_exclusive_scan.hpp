@@ -119,7 +119,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // results for each partition and the second produces the
                 // overall result
 
-                using hpx::util::get;
+                using hpx::get;
                 using hpx::util::make_zip_iterator;
 
                 auto f3 = [op](zip_iterator part_begin, std::size_t part_size,

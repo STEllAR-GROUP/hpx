@@ -346,14 +346,13 @@ namespace hpx { namespace parallel { namespace execution {
             typename... InnerFutures, typename... Ts,
             typename =
                 detail::enable_if_t<detail::is_future_of_tuple_of_futures<
-                    OuterFuture<hpx::util::tuple<InnerFutures...>>>::value>,
+                    OuterFuture<hpx::tuple<InnerFutures...>>>::value>,
             typename = detail::enable_if_t<hpx::traits::is_future_tuple<
-                hpx::util::tuple<InnerFutures...>>::value>>
+                hpx::tuple<InnerFutures...>>::value>>
         auto then_execute(F&& f,
-            OuterFuture<hpx::util::tuple<InnerFutures...>>&& predecessor,
-            Ts&&... ts)
+            OuterFuture<hpx::tuple<InnerFutures...>>&& predecessor, Ts&&... ts)
             -> future<typename hpx::util::detail::invoke_deferred_result<F,
-                OuterFuture<hpx::util::tuple<InnerFutures...>>, Ts...>::type>
+                OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>::type>
         {
 #ifdef GUIDED_EXECUTOR_DEBUG
             // get the tuple of futures from the predecessor future <tuple of futures>
@@ -365,13 +364,13 @@ namespace hpx { namespace parallel { namespace execution {
                 detail::future_extract_value{}, predecessor_value);
 
             typedef typename hpx::util::detail::invoke_deferred_result<F,
-                OuterFuture<hpx::util::tuple<InnerFutures...>>, Ts...>::type
+                OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>::type
                 result_type;
 
             // clang-format off
             gpx_deb.debug(debug::str<>("when_all(fut) : Predecessor")
                 , hpx::util::debug::print_type<
-                       OuterFuture<hpx::util::tuple<InnerFutures...>>>()
+                       OuterFuture<hpx::tuple<InnerFutures...>>>()
                 , "\n"
                 , "when_all(fut) : unwrapped   : "
                 , hpx::util::debug::print_type<decltype(unwrapped_futures_tuple)>(
@@ -389,8 +388,7 @@ namespace hpx { namespace parallel { namespace execution {
             return dataflow(
                 launch::sync,
                 [f = std::forward<F>(f), this](
-                    OuterFuture<hpx::util::tuple<InnerFutures...>>&&
-                        predecessor,
+                    OuterFuture<hpx::tuple<InnerFutures...>>&& predecessor,
                     Ts&&... ts) {
                     detail::pre_execution_then_domain_schedule<
                         typename std::decay<typename std::remove_pointer<
@@ -399,11 +397,10 @@ namespace hpx { namespace parallel { namespace execution {
                         pre_exec{*this, hint_, hp_sync_};
 
                     return pre_exec(std::move(f),
-                        std::forward<
-                            OuterFuture<hpx::util::tuple<InnerFutures...>>>(
+                        std::forward<OuterFuture<hpx::tuple<InnerFutures...>>>(
                             predecessor));
                 },
-                std::forward<OuterFuture<hpx::util::tuple<InnerFutures...>>>(
+                std::forward<OuterFuture<hpx::tuple<InnerFutures...>>>(
                     predecessor),
                 std::forward<Ts>(ts)...);
         }
@@ -415,14 +412,13 @@ namespace hpx { namespace parallel { namespace execution {
         // --------------------------------------------------------------------
         template <typename F, typename... InnerFutures,
             typename = detail::enable_if_t<hpx::traits::is_future_tuple<
-                hpx::util::tuple<InnerFutures...>>::value>>
-        auto async_execute(
-            F&& f, hpx::util::tuple<InnerFutures...>&& predecessor)
+                hpx::tuple<InnerFutures...>>::value>>
+        auto async_execute(F&& f, hpx::tuple<InnerFutures...>&& predecessor)
             -> future<typename hpx::util::detail::invoke_deferred_result<F,
-                hpx::util::tuple<InnerFutures...>>::type>
+                hpx::tuple<InnerFutures...>>::type>
         {
             typedef typename hpx::util::detail::invoke_deferred_result<F,
-                hpx::util::tuple<InnerFutures...>>::type result_type;
+                hpx::tuple<InnerFutures...>>::type result_type;
 
             // invoke the hint function with the unwrapped tuple futures
 #ifdef GUIDED_POOL_EXECUTOR_FAKE_NOOP
@@ -438,7 +434,7 @@ namespace hpx { namespace parallel { namespace execution {
 #ifndef GUIDED_EXECUTOR_DEBUG
             // clang-format off
             gpx_deb.debug(debug::str<>("dataflow      : Predecessor")
-                      , hpx::util::debug::print_type<hpx::util::tuple<InnerFutures...>>()
+                      , hpx::util::debug::print_type<hpx::tuple<InnerFutures...>>()
                       , "\n"
                       , "dataflow      : unwrapped   : "
                       , hpx::util::debug::print_type<
@@ -456,8 +452,7 @@ namespace hpx { namespace parallel { namespace execution {
             // forward the task execution on to the real internal executor
             lcos::local::futures_factory<result_type()> p(
                 hpx::util::deferred_call(std::forward<F>(f),
-                    std::forward<hpx::util::tuple<InnerFutures...>>(
-                        predecessor)));
+                    std::forward<hpx::tuple<InnerFutures...>>(predecessor)));
 
             if (hp_sync_ && priority_ == hpx::threads::thread_priority_high)
             {

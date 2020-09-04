@@ -13,7 +13,6 @@
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/timing/steady_clock.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/util/pool_timer.hpp>
@@ -59,7 +58,7 @@ namespace hpx { namespace util { namespace detail
 
     private:
         typedef boost::asio::basic_waitable_timer<
-            util::steady_clock> deadline_timer;
+            std::chrono::steady_clock> deadline_timer;
 
         mutable mutex_type mtx_;
         util::function_nonser<bool()> f_; ///< function to call

@@ -138,12 +138,12 @@ namespace hpx { namespace traits {
         // iterator.
         static naming::id_type get_id(segment_iterator const& iter)
         {
-            typedef typename util::tuple_element<0,
+            typedef typename hpx::tuple_element<0,
                 typename iterator::iterator_tuple_type>::type
                 first_base_iterator;
             typedef segmented_iterator_traits<first_base_iterator> traits;
 
-            return traits::get_id(util::get<0>(iter.get_iterator_tuple()));
+            return traits::get_id(hpx::get<0>(iter.get_iterator_tuple()));
         }
     };
 

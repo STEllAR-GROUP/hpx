@@ -280,7 +280,7 @@ namespace hpx { namespace execution {
             auto&& func = parallel::execution::detail::
                 make_fused_bulk_async_execute_helper<result_type>(*this,
                     std::forward<F>(f), shape,
-                    hpx::util::make_tuple(std::forward<Ts>(ts)...));
+                    hpx::make_tuple(std::forward<Ts>(ts)...));
 
             // void or std::vector<func_result_type>
             using vector_result_type =

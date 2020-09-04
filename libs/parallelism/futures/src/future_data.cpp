@@ -289,7 +289,7 @@ namespace hpx { namespace lcos { namespace detail {
 
     future_status
     future_data_base<traits::detail::future_data_void>::wait_until(
-        util::steady_clock::time_point const& abs_time, error_code& ec)
+        std::chrono::steady_clock::time_point const& abs_time, error_code& ec)
     {
         // block if this entry is empty
         if (state_.load(std::memory_order_acquire) == empty)

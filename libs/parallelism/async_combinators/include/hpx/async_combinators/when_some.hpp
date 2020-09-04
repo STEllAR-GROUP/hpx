@@ -376,12 +376,12 @@ namespace hpx { namespace lcos {
                 Tuple& tuple, util::index_pack<Is...>) const
             {
                 int const _sequencer[] = {
-                    (((*this)(util::get<Is>(tuple))), 0)...};
+                    (((*this)(hpx::get<Is>(tuple))), 0)...};
                 (void) _sequencer;
             }
 
             template <typename... Ts>
-            HPX_FORCEINLINE void apply(util::tuple<Ts...>& sequence) const
+            HPX_FORCEINLINE void apply(hpx::tuple<Ts...>& sequence) const
             {
                 apply(sequence,
                     typename util::make_index_pack<sizeof...(Ts)>::type());
@@ -556,10 +556,10 @@ namespace hpx { namespace lcos {
         return lcos::when_some(n, lazy_values_, ec);
     }
 
-    inline lcos::future<when_some_result<util::tuple<>>> when_some(
+    inline lcos::future<when_some_result<hpx::tuple<>>> when_some(
         std::size_t n, error_code& ec = throws)
     {
-        typedef util::tuple<> result_type;
+        typedef hpx::tuple<> result_type;
 
         result_type lazy_values;
 
@@ -579,11 +579,11 @@ namespace hpx { namespace lcos {
     typename std::enable_if<!(traits::is_future_range<T>::value &&
                                 sizeof...(Ts) == 0),
         lcos::future<when_some_result<
-            util::tuple<typename traits::acquire_future<T>::type,
+            hpx::tuple<typename traits::acquire_future<T>::type,
                 typename traits::acquire_future<Ts>::type...>>>>::type
     when_some(std::size_t n, T&& t, Ts&&... ts)
     {
-        typedef util::tuple<typename traits::acquire_future<T>::type,
+        typedef hpx::tuple<typename traits::acquire_future<T>::type,
             typename traits::acquire_future<Ts>::type...>
             result_type;
 
@@ -621,11 +621,11 @@ namespace hpx { namespace lcos {
     typename std::enable_if<!(traits::is_future_range<T>::value &&
                                 sizeof...(Ts) == 0),
         lcos::future<when_some_result<
-            util::tuple<typename traits::acquire_future<T>::type,
+            hpx::tuple<typename traits::acquire_future<T>::type,
                 typename traits::acquire_future<Ts>::type...>>>>::type
     when_some(std::size_t n, error_code& ec, T&& t, Ts&&... ts)
     {
-        typedef util::tuple<typename traits::acquire_future<T>::type,
+        typedef hpx::tuple<typename traits::acquire_future<T>::type,
             typename traits::acquire_future<Ts>::type...>
             result_type;
 

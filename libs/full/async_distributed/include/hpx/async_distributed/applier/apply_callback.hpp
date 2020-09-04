@@ -366,7 +366,7 @@ namespace hpx {
         struct apply_c_p_cb_impl
         {
         public:
-            typedef util::tuple<Ts...> tuple_type;
+            typedef hpx::tuple<Ts...> tuple_type;
 
             template <typename... Ts_>
             apply_c_p_cb_impl(naming::id_type const& contid,
@@ -416,12 +416,12 @@ namespace hpx {
                 {
                     hpx::apply_c_p_cb<Action>(contid_, std::move(addr_), id_,
                         p_, std::move(cb_),
-                        util::get<Is>(std::forward<tuple_type>(args_))...);
+                        hpx::get<Is>(std::forward<tuple_type>(args_))...);
                 }
                 else
                 {
                     hpx::apply_c_p_cb<Action>(contid_, id_, p_, std::move(cb_),
-                        util::get<Is>(std::forward<tuple_type>(args_))...);
+                        hpx::get<Is>(std::forward<tuple_type>(args_))...);
                 }
             }
 

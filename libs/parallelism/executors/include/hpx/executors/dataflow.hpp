@@ -358,7 +358,7 @@ namespace hpx { namespace lcos { namespace detail {
     template <typename Policy, typename Func, typename... Ts,
         typename Frame = dataflow_frame<typename std::decay<Policy>::type,
             typename std::decay<Func>::type,
-            util::tuple<typename std::decay<Ts>::type...>>>
+            hpx::tuple<typename std::decay<Ts>::type...>>>
     typename Frame::type create_dataflow(
         Policy&& policy, Func&& func, Ts&&... ts)
     {
@@ -381,7 +381,7 @@ namespace hpx { namespace lcos { namespace detail {
         typename... Ts,
         typename Frame = dataflow_frame<typename std::decay<Policy>::type,
             typename std::decay<Func>::type,
-            util::tuple<typename std::decay<Ts>::type...>>>
+            hpx::tuple<typename std::decay<Ts>::type...>>>
     typename Frame::type create_dataflow_alloc(
         Allocator const& alloc, Policy&& policy, Func&& func, Ts&&... ts)
     {
@@ -414,7 +414,7 @@ namespace hpx { namespace lcos { namespace detail {
             !traits::is_action<typename std::decay<F>::type>::value,
             lcos::future<
                 typename detail::dataflow_return<typename std::decay<F>::type,
-                    util::tuple<typename traits::acquire_future<Ts>::type...>>::
+                    hpx::tuple<typename traits::acquire_future<Ts>::type...>>::
                     type>>::type
         call(Allocator const& alloc, Policy_&& policy, F&& f, Ts&&... ts)
         {
@@ -469,7 +469,7 @@ namespace hpx { namespace lcos { namespace detail {
             !traits::is_action<typename std::decay<F>::type>::value,
             lcos::future<
                 typename detail::dataflow_return<typename std::decay<F>::type,
-                    util::tuple<typename traits::acquire_future<Ts>::type...>>::
+                    hpx::tuple<typename traits::acquire_future<Ts>::type...>>::
                     type>>::type
         call(Allocator const& alloc, Executor_&& exec, F&& f, Ts&&... ts)
         {

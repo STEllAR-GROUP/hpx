@@ -198,10 +198,10 @@ namespace hpx { namespace util { namespace detail {
         template <typename C, typename... T>
         constexpr auto apply_spread_impl(std::true_type, C&& callable,
             T&&... args) -> decltype(invoke_fused(std::forward<C>(callable),
-            util::tuple_cat(undecorate(std::forward<T>(args))...)))
+            hpx::tuple_cat(undecorate(std::forward<T>(args))...)))
         {
             return invoke_fused(std::forward<C>(callable),
-                util::tuple_cat(undecorate(std::forward<T>(args))...));
+                hpx::tuple_cat(undecorate(std::forward<T>(args))...));
         }
 
         /// Use the linear instantiation for variadic packs which don't

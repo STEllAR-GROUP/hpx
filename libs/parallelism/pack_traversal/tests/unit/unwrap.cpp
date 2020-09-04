@@ -23,9 +23,9 @@
 #include <utility>
 #include <vector>
 
-using hpx::util::get;
-using hpx::util::make_tuple;
-using hpx::util::tuple;
+using hpx::get;
+using hpx::make_tuple;
+using hpx::tuple;
 using hpx::util::unwrap;
 using hpx::util::unwrap_all;
 using hpx::util::unwrap_n;

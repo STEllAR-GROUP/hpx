@@ -148,8 +148,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 [&r, &conv](
                     zip_iterator part_begin, std::size_t part_size) -> T {
                     auto iters = part_begin.get_iterator_tuple();
-                    FwdIter1 it1 = hpx::util::get<0>(iters);
-                    FwdIter2 it2 = hpx::util::get<1>(iters);
+                    FwdIter1 it1 = hpx::get<0>(iters);
+                    FwdIter2 it2 = hpx::get<1>(iters);
                     FwdIter1 last1 = it1;
                     std::advance(last1, part_size);
                     return util::accumulate<T>(it1, last1, it2,

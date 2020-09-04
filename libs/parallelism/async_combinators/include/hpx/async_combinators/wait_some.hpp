@@ -260,12 +260,12 @@ namespace hpx { namespace lcos {
                 Tuple& tuple, util::index_pack<Is...>) const
             {
                 int const _sequencer[] = {
-                    (((*this)(util::get<Is>(tuple))), 0)...};
+                    (((*this)(hpx::get<Is>(tuple))), 0)...};
                 (void) _sequencer;
             }
 
             template <typename... Ts>
-            HPX_FORCEINLINE void apply(util::tuple<Ts...>& sequence) const
+            HPX_FORCEINLINE void apply(hpx::tuple<Ts...>& sequence) const
             {
                 apply(sequence,
                     typename util::make_index_pack<sizeof...(Ts)>::type());
@@ -543,7 +543,7 @@ namespace hpx { namespace lcos {
     template <typename... Ts>
     void wait_some(std::size_t n, error_code& ec, Ts&&... ts)
     {
-        typedef util::tuple<
+        typedef hpx::tuple<
             typename traits::detail::shared_state_ptr_for<Ts>::type...>
             result_type;
 
@@ -572,7 +572,7 @@ namespace hpx { namespace lcos {
     template <typename... Ts>
     void wait_some(std::size_t n, Ts&&... ts)
     {
-        typedef util::tuple<
+        typedef hpx::tuple<
             typename traits::detail::shared_state_ptr_for<Ts>::type...>
             result_type;
 

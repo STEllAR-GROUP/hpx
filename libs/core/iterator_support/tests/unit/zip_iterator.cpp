@@ -32,7 +32,7 @@ void category_test()
     std::list<int> rng1;
     std::string rng2;
 
-    hpx::util::make_zip_iterator(hpx::util::make_tuple(
+    hpx::util::make_zip_iterator(hpx::make_tuple(
         // BidirectionalInput
         hpx::util::make_transform_iterator(rng1.begin(), &to_value),
         rng2.begin()    // RandomAccess
@@ -43,8 +43,7 @@ void category_test()
 /// Deduces to the result of tuple_cat when it's invoked with the given
 /// parameters Ts.
 template <typename... Ts>
-using tuple_cat_result_of_t =
-    decltype(hpx::util::tuple_cat(std::declval<Ts>()...));
+using tuple_cat_result_of_t = decltype(hpx::tuple_cat(std::declval<Ts>()...));
 
 int main(void)
 {
@@ -75,22 +74,21 @@ int main(void)
         zit_mixed;
 
     zit_mixed zip_it_mixed =
-        zit_mixed(hpx::util::make_tuple(intset.begin(), vect1.begin()));
+        zit_mixed(hpx::make_tuple(intset.begin(), vect1.begin()));
 
-    hpx::util::tuple<int, double> val_tuple(*zip_it_mixed);
+    hpx::tuple<int, double> val_tuple(*zip_it_mixed);
 
-    hpx::util::tuple<const int&, double&> ref_tuple(*zip_it_mixed);
+    hpx::tuple<const int&, double&> ref_tuple(*zip_it_mixed);
 
-    double dblOldVal = hpx::util::get<1>(ref_tuple);
-    hpx::util::get<1>(ref_tuple) -= 41.;
+    double dblOldVal = hpx::get<1>(ref_tuple);
+    hpx::get<1>(ref_tuple) -= 41.;
 
-    HPX_TEST(52 == hpx::util::get<0>(val_tuple) &&
-        42. == hpx::util::get<1>(val_tuple) &&
-        52 == hpx::util::get<0>(ref_tuple) &&
-        1. == hpx::util::get<1>(ref_tuple) && 1. == *vect1.begin());
+    HPX_TEST(52 == hpx::get<0>(val_tuple) && 42. == hpx::get<1>(val_tuple) &&
+        52 == hpx::get<0>(ref_tuple) && 1. == hpx::get<1>(ref_tuple) &&
+        1. == *vect1.begin());
 
     // Undo change to vect1
-    hpx::util::get<1>(ref_tuple) = dblOldVal;
+    hpx::get<1>(ref_tuple) = dblOldVal;
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -129,27 +127,26 @@ int main(void)
     ve4.push_back(12);
 
     // typedefs for cons lists of iterators.
-    typedef tuple_cat_result_of_t<hpx::util::tuple<std::set<int>::iterator>,
-        hpx::util::tuple<std::vector<int>::iterator, std::list<int>::iterator,
+    typedef tuple_cat_result_of_t<hpx::tuple<std::set<int>::iterator>,
+        hpx::tuple<std::vector<int>::iterator, std::list<int>::iterator,
             std::set<int>::iterator, std::vector<int>::iterator,
             std::list<int>::iterator, std::set<int>::iterator,
             std::vector<int>::iterator, std::list<int>::iterator,
             std::set<int>::iterator, std::vector<int>::const_iterator>>
         cons_11_its_type;
     //
-    typedef tuple_cat_result_of_t<
-        hpx::util::tuple<std::list<int>::const_iterator>, cons_11_its_type>
+    typedef tuple_cat_result_of_t<hpx::tuple<std::list<int>::const_iterator>,
+        cons_11_its_type>
         cons_12_its_type;
 
     // typedefs for cons lists for dereferencing the zip iterator
     // made from the cons list above.
-    typedef tuple_cat_result_of_t<hpx::util::tuple<const int&>,
-        hpx::util::tuple<int&, int&, const int&, int&, int&, const int&, int&,
-            int&, const int&, const int&>>
+    typedef tuple_cat_result_of_t<hpx::tuple<const int&>,
+        hpx::tuple<int&, int&, const int&, int&, int&, const int&, int&, int&,
+            const int&, const int&>>
         cons_11_refs_type;
     //
-    typedef tuple_cat_result_of_t<hpx::util::tuple<const int&>,
-        cons_11_refs_type>
+    typedef tuple_cat_result_of_t<hpx::tuple<const int&>, cons_11_refs_type>
         cons_12_refs_type;
 
     // typedef for zip iterator with 12 elements
@@ -162,18 +159,16 @@ int main(void)
 
     // Dereference, mess with the result a little.
     cons_12_refs_type zip_it_12_dereferenced(*zip_it_12);
-    hpx::util::get<9>(zip_it_12_dereferenced) = 42;
+    hpx::get<9>(zip_it_12_dereferenced) = 42;
 
     // Make a copy and move it a little to force some instantiations.
     zip_it_12_type zip_it_12_copy(zip_it_12);
     ++zip_it_12_copy;
 
-    HPX_TEST(
-        hpx::util::get<11>(zip_it_12.get_iterator_tuple()) == ve4.begin() &&
-        hpx::util::get<11>(zip_it_12_copy.get_iterator_tuple()) == ve4.end() &&
-        1 == hpx::util::get<0>(zip_it_12_dereferenced) &&
-        12 == hpx::util::get<11>(zip_it_12_dereferenced) &&
-        42 == *(li4.begin()));
+    HPX_TEST(hpx::get<11>(zip_it_12.get_iterator_tuple()) == ve4.begin() &&
+        hpx::get<11>(zip_it_12_copy.get_iterator_tuple()) == ve4.end() &&
+        1 == hpx::get<0>(zip_it_12_dereferenced) &&
+        12 == hpx::get<11>(zip_it_12_dereferenced) && 42 == *(li4.begin()));
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -186,28 +181,24 @@ int main(void)
     vect2[1] = 3.3;
     vect2[2] = 4.4;
 
-    hpx::util::zip_iterator<
-        hpx::util::tuple<std::vector<double>::const_iterator,
-            std::vector<double>::const_iterator>>
-        zip_it_begin(hpx::util::make_tuple(vect1.begin(), vect2.begin()));
+    hpx::util::zip_iterator<hpx::tuple<std::vector<double>::const_iterator,
+        std::vector<double>::const_iterator>>
+        zip_it_begin(hpx::make_tuple(vect1.begin(), vect2.begin()));
 
-    hpx::util::zip_iterator<
-        hpx::util::tuple<std::vector<double>::const_iterator,
-            std::vector<double>::const_iterator>>
-        zip_it_run(hpx::util::make_tuple(vect1.begin(), vect2.begin()));
+    hpx::util::zip_iterator<hpx::tuple<std::vector<double>::const_iterator,
+        std::vector<double>::const_iterator>>
+        zip_it_run(hpx::make_tuple(vect1.begin(), vect2.begin()));
 
-    hpx::util::zip_iterator<
-        hpx::util::tuple<std::vector<double>::const_iterator,
-            std::vector<double>::const_iterator>>
-        zip_it_end(hpx::util::make_tuple(vect1.end(), vect2.end()));
+    hpx::util::zip_iterator<hpx::tuple<std::vector<double>::const_iterator,
+        std::vector<double>::const_iterator>>
+        zip_it_end(hpx::make_tuple(vect1.end(), vect2.end()));
 
-    HPX_TEST(zip_it_run == zip_it_begin &&
-        42. == hpx::util::get<0>(*zip_it_run) &&
-        2.2 == hpx::util::get<1>(*zip_it_run) &&
-        43. == hpx::util::get<0>(*(++zip_it_run)) &&
-        3.3 == hpx::util::get<1>(*zip_it_run) &&
-        44. == hpx::util::get<0>(*(++zip_it_run)) &&
-        4.4 == hpx::util::get<1>(*zip_it_run) && zip_it_end == ++zip_it_run);
+    HPX_TEST(zip_it_run == zip_it_begin && 42. == hpx::get<0>(*zip_it_run) &&
+        2.2 == hpx::get<1>(*zip_it_run) &&
+        43. == hpx::get<0>(*(++zip_it_run)) &&
+        3.3 == hpx::get<1>(*zip_it_run) &&
+        44. == hpx::get<0>(*(++zip_it_run)) &&
+        4.4 == hpx::get<1>(*zip_it_run) && zip_it_end == ++zip_it_run);
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -216,12 +207,11 @@ int main(void)
     /////////////////////////////////////////////////////////////////////////////
 
     HPX_TEST(zip_it_run == zip_it_end && zip_it_end == zip_it_run-- &&
-        44. == hpx::util::get<0>(*zip_it_run) &&
-        4.4 == hpx::util::get<1>(*zip_it_run) &&
-        43. == hpx::util::get<0>(*(--zip_it_run)) &&
-        3.3 == hpx::util::get<1>(*zip_it_run) &&
-        42. == hpx::util::get<0>(*(--zip_it_run)) &&
-        2.2 == hpx::util::get<1>(*zip_it_run) && zip_it_begin == zip_it_run);
+        44. == hpx::get<0>(*zip_it_run) && 4.4 == hpx::get<1>(*zip_it_run) &&
+        43. == hpx::get<0>(*(--zip_it_run)) &&
+        3.3 == hpx::get<1>(*zip_it_run) &&
+        42. == hpx::get<0>(*(--zip_it_run)) &&
+        2.2 == hpx::get<1>(*zip_it_run) && zip_it_begin == zip_it_run);
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -229,9 +219,8 @@ int main(void)
     //
     /////////////////////////////////////////////////////////////////////////////
 
-    hpx::util::zip_iterator<
-        hpx::util::tuple<std::vector<double>::const_iterator,
-            std::vector<double>::const_iterator>>
+    hpx::util::zip_iterator<hpx::tuple<std::vector<double>::const_iterator,
+        std::vector<double>::const_iterator>>
         zip_it_run_copy(zip_it_run);
 
     HPX_TEST(zip_it_run == zip_it_run && zip_it_run == zip_it_run_copy);
@@ -353,10 +342,9 @@ int main(void)
     // Note: zip_it_run and zip_it_run_copy are both at
     // begin plus one.
     //
-    HPX_TEST(hpx::util::get<0>(zip_it_run.get_iterator_tuple()) ==
-            vect1.begin() + 1 &&
-        hpx::util::get<1>(zip_it_run.get_iterator_tuple()) ==
-            vect2.begin() + 1);
+    HPX_TEST(
+        hpx::get<0>(zip_it_run.get_iterator_tuple()) == vect1.begin() + 1 &&
+        hpx::get<1>(zip_it_run.get_iterator_tuple()) == vect2.begin() + 1);
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -364,20 +352,19 @@ int main(void)
     //
     /////////////////////////////////////////////////////////////////////////////
 
-    std::vector<hpx::util::tuple<double, double>> vect_of_tuples(3);
+    std::vector<hpx::tuple<double, double>> vect_of_tuples(3);
 
     std::copy(hpx::util::make_zip_iterator(
-                  hpx::util::make_tuple(vect1.begin(), vect2.begin())),
-        hpx::util::make_zip_iterator(
-            hpx::util::make_tuple(vect1.end(), vect2.end())),
+                  hpx::make_tuple(vect1.begin(), vect2.begin())),
+        hpx::util::make_zip_iterator(hpx::make_tuple(vect1.end(), vect2.end())),
         vect_of_tuples.begin());
 
-    HPX_TEST(42. == hpx::util::get<0>(*vect_of_tuples.begin()) &&
-        2.2 == hpx::util::get<1>(*vect_of_tuples.begin()) &&
-        43. == hpx::util::get<0>(*(vect_of_tuples.begin() + 1)) &&
-        3.3 == hpx::util::get<1>(*(vect_of_tuples.begin() + 1)) &&
-        44. == hpx::util::get<0>(*(vect_of_tuples.begin() + 2)) &&
-        4.4 == hpx::util::get<1>(*(vect_of_tuples.begin() + 2)));
+    HPX_TEST(42. == hpx::get<0>(*vect_of_tuples.begin()) &&
+        2.2 == hpx::get<1>(*vect_of_tuples.begin()) &&
+        43. == hpx::get<0>(*(vect_of_tuples.begin() + 1)) &&
+        3.3 == hpx::get<1>(*(vect_of_tuples.begin() + 1)) &&
+        44. == hpx::get<0>(*(vect_of_tuples.begin() + 2)) &&
+        4.4 == hpx::get<1>(*(vect_of_tuples.begin() + 2)));
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -385,17 +372,17 @@ int main(void)
     //
     /////////////////////////////////////////////////////////////////////////////
 
-    hpx::util::zip_iterator<hpx::util::tuple<std::set<int>::const_iterator,
+    hpx::util::zip_iterator<hpx::tuple<std::set<int>::const_iterator,
         std::vector<double>::const_iterator>>
-        zip_it_const(hpx::util::make_tuple(intset.begin(), vect2.begin()));
+        zip_it_const(hpx::make_tuple(intset.begin(), vect2.begin()));
     //
-    hpx::util::zip_iterator<hpx::util::tuple<std::set<int>::iterator,
+    hpx::util::zip_iterator<hpx::tuple<std::set<int>::iterator,
         std::vector<double>::const_iterator>>
-        zip_it_half_const(hpx::util::make_tuple(intset.begin(), vect2.begin()));
+        zip_it_half_const(hpx::make_tuple(intset.begin(), vect2.begin()));
     //
-    hpx::util::zip_iterator<hpx::util::tuple<std::set<int>::iterator,
-        std::vector<double>::iterator>>
-        zip_it_non_const(hpx::util::make_tuple(intset.begin(), vect2.begin()));
+    hpx::util::zip_iterator<
+        hpx::tuple<std::set<int>::iterator, std::vector<double>::iterator>>
+        zip_it_non_const(hpx::make_tuple(intset.begin(), vect2.begin()));
 
     zip_it_half_const = ++zip_it_non_const;
     zip_it_const = zip_it_half_const;
@@ -404,10 +391,10 @@ int main(void)
     // Error: can't convert from const to non-const
     //  zip_it_non_const = ++zip_it_const;
 
-    HPX_TEST(54 == hpx::util::get<0>(*zip_it_const) &&
-        4.4 == hpx::util::get<1>(*zip_it_const) &&
-        53 == hpx::util::get<0>(*zip_it_half_const) &&
-        3.3 == hpx::util::get<1>(*zip_it_half_const));
+    HPX_TEST(54 == hpx::get<0>(*zip_it_const) &&
+        4.4 == hpx::get<1>(*zip_it_const) &&
+        53 == hpx::get<0>(*zip_it_half_const) &&
+        3.3 == hpx::get<1>(*zip_it_half_const));
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -429,7 +416,7 @@ int main(void)
     // traversal.
     //
     typedef hpx::util::zip_iterator<
-        hpx::util::tuple<std::vector<double>::const_iterator,
+        hpx::tuple<std::vector<double>::const_iterator,
             std::vector<double>::const_iterator>>
         all_vects_type;
 

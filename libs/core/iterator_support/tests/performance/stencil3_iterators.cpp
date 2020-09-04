@@ -163,7 +163,7 @@ namespace hpx { namespace experimental {
                 right_iterator;
 
             typedef util::detail::zip_iterator_base<
-                util::tuple<left_iterator, Iterator, right_iterator>,
+                hpx::tuple<left_iterator, Iterator, right_iterator>,
                 stencil3_iterator_full<Iterator, IterBegin, IterValueBegin,
                     IterEnd, IterValueEnd>>
                 type;
@@ -222,8 +222,8 @@ namespace hpx { namespace experimental {
 
         bool equal(stencil3_iterator_full const& other) const
         {
-            return util::get<1>(this->get_iterator_tuple()) ==
-                util::get<1>(other.get_iterator_tuple());
+            return hpx::get<1>(this->get_iterator_tuple()) ==
+                hpx::get<1>(other.get_iterator_tuple());
         }
     };
 
@@ -276,7 +276,7 @@ std::uint64_t bench_stencil3_iterator_full()
     int result = 0;
 
     std::for_each(r.first, r.second, [&result](reference val) {
-        using hpx::util::get;
+        using hpx::get;
         result += get<0>(val) + get<1>(val) + get<2>(val);
     });
 
@@ -289,12 +289,12 @@ namespace hpx { namespace experimental {
     template <typename Iterator>
     class stencil3_iterator_v1
       : public util::detail::zip_iterator_base<
-            util::tuple<Iterator, Iterator, Iterator>,
+            hpx::tuple<Iterator, Iterator, Iterator>,
             stencil3_iterator_v1<Iterator>>
     {
     private:
         typedef util::detail::zip_iterator_base<
-            util::tuple<Iterator, Iterator, Iterator>,
+            hpx::tuple<Iterator, Iterator, Iterator>,
             stencil3_iterator_v1<Iterator>>
             base_type;
 
@@ -312,8 +312,8 @@ namespace hpx { namespace experimental {
 
         bool equal(stencil3_iterator_v1 const& other) const
         {
-            return util::get<1>(this->get_iterator_tuple()) ==
-                util::get<1>(other.get_iterator_tuple());
+            return hpx::get<1>(this->get_iterator_tuple()) ==
+                hpx::get<1>(other.get_iterator_tuple());
         }
     };
 
@@ -350,7 +350,7 @@ std::uint64_t bench_stencil3_iterator_v1()
     int result = values.back() + values.front() + values[1];
 
     std::for_each(r.first, r.second, [&result](reference val) {
-        using hpx::util::get;
+        using hpx::get;
         result += get<0>(val) + get<1>(val) + get<2>(val);
     });
 
@@ -371,8 +371,7 @@ namespace hpx { namespace experimental {
             {
                 typedef typename std::iterator_traits<Iterator>::reference
                     element_type;
-                typedef hpx::util::tuple<element_type, element_type,
-                    element_type>
+                typedef hpx::tuple<element_type, element_type, element_type>
                     type;
             };
 
@@ -460,7 +459,7 @@ std::uint64_t bench_stencil3_iterator_v2()
     int result = values.back() + values.front() + values[1];
 
     std::for_each(r.first, r.second, [&result](reference val) {
-        using hpx::util::get;
+        using hpx::get;
         result += get<0>(val) + get<1>(val) + get<2>(val);
     });
 

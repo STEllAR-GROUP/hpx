@@ -110,19 +110,21 @@ namespace hpx { namespace util {
 
         return result_type(std::forward<T1>(t1), std::forward<T2>(t2));
     }
+}}    // namespace hpx::util
 
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Tag1, typename Tag2>
-    struct tuple_size<tagged_pair<Tag1, Tag2>>
+    struct tuple_size<util::tagged_pair<Tag1, Tag2>>
       : std::integral_constant<std::size_t, 2>
     {
     };
 
     template <std::size_t N, typename Tag1, typename Tag2>
-    struct tuple_element<N, tagged_pair<Tag1, Tag2>>
+    struct tuple_element<N, util::tagged_pair<Tag1, Tag2>>
       : tuple_element<N,
-            std::pair<typename detail::tag_elem<Tag1>::type,
-                typename detail::tag_elem<Tag2>::type>>
+            std::pair<typename util::detail::tag_elem<Tag1>::type,
+                typename util::detail::tag_elem<Tag2>::type>>
     {
     };
-}}    // namespace hpx::util
+}    // namespace hpx

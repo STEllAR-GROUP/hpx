@@ -126,7 +126,7 @@ void test_merge(
     typedef typename std::vector<DataType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
@@ -161,7 +161,7 @@ void test_merge_async(
     typedef typename std::vector<DataType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
@@ -361,7 +361,7 @@ void test_merge_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
 
     typedef typename std::vector<DataType>::iterator base_iterator;
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
@@ -452,7 +452,7 @@ void test_merge_stable(ExPolicy policy, IteratorTag, DataType, int rand_base)
     typedef typename std::vector<ElemType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<ElemType> src1(size1), src2(size2), dest(size1 + size2);

@@ -51,7 +51,7 @@ namespace hpx { namespace util {
     ///          arbitrary future or non future type.
     ///
     /// \returns Depending on the count of arguments this function returns
-    ///          a hpx::util::tuple containing the unwrapped arguments
+    ///          a hpx::tuple containing the unwrapped arguments
     ///          if multiple arguments are given.
     ///          In case the function is called with a single argument,
     ///          the argument is unwrapped and returned.

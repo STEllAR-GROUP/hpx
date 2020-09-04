@@ -128,8 +128,8 @@ namespace hpx { namespace parallel { namespace util {
                     // partition to the left is ready.
                     for (auto const& elem : shape)
                     {
-                        FwdIter it = hpx::util::get<0>(elem);
-                        std::size_t size = hpx::util::get<1>(elem);
+                        FwdIter it = hpx::get<0>(elem);
+                        std::size_t size = hpx::get<1>(elem);
 
                         hpx::shared_future<Result1> prev = workitems.back();
                         auto curr = execution::async_execute(
@@ -217,8 +217,8 @@ namespace hpx { namespace parallel { namespace util {
                     // partition to the left is ready.
                     for (auto const& elem : shape)
                     {
-                        FwdIter it = hpx::util::get<0>(elem);
-                        std::size_t size = hpx::util::get<1>(elem);
+                        FwdIter it = hpx::get<0>(elem);
+                        std::size_t size = hpx::get<1>(elem);
 
                         hpx::shared_future<Result1> prev = workitems.back();
                         auto curr = execution::async_execute(
@@ -244,8 +244,8 @@ namespace hpx { namespace parallel { namespace util {
                     else
                     {
                         auto elem = *shape_iter++;
-                        FwdIter it = hpx::util::get<0>(elem);
-                        std::size_t size = hpx::util::get<1>(elem);
+                        FwdIter it = hpx::get<0>(elem);
+                        std::size_t size = hpx::get<1>(elem);
 
                         finalitems.push_back(dataflow(hpx::launch::sync, f3, it,
                             size, workitems[0], workitems[1]));
@@ -259,8 +259,8 @@ namespace hpx { namespace parallel { namespace util {
                          ++shape_iter, ++widx)
                     {
                         auto elem = *shape_iter;
-                        FwdIter it = hpx::util::get<0>(elem);
-                        std::size_t size = hpx::util::get<1>(elem);
+                        FwdIter it = hpx::get<0>(elem);
+                        std::size_t size = hpx::get<1>(elem);
 
                         // Wait the completion of f3 on previous partition.
                         finalitems.back().wait();

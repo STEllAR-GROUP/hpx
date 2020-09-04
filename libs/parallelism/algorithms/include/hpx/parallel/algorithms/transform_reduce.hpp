@@ -526,8 +526,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               zip_iterator part_begin,
                               std::size_t part_size) mutable -> T {
                     auto iters = part_begin.get_iterator_tuple();
-                    Iter it1 = hpx::util::get<0>(iters);
-                    Iter2 it2 = hpx::util::get<1>(iters);
+                    Iter it1 = hpx::get<0>(iters);
+                    Iter2 it2 = hpx::get<1>(iters);
 
                     Iter last1 = it1;
                     std::advance(last1, part_size);

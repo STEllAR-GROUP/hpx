@@ -258,7 +258,7 @@ namespace hpx { namespace lcos {
                 typedef typename util::decay<FoldOp>::type fold_op_type;
 
                 typedef detail::fold_invoker<Action, fold_op_type,
-                    typename util::tuple_element<Is,
+                    typename hpx::tuple_element<Is,
                         typename Action::arguments_type>::type...>
                     fold_invoker_type;
 

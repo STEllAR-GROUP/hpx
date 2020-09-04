@@ -51,7 +51,7 @@ struct A
 void test()
 {
     {
-        hpx::util::tuple<int, double, std::string, A<int>> ot{
+        hpx::tuple<int, double, std::string, A<int>> ot{
             42, 42.0, "42.0", A<int>{0}};
 
         std::vector<char> buffer;
@@ -61,12 +61,12 @@ void test()
         std::size_t size = oarchive.bytes_written();
 
         hpx::serialization::input_archive iarchive(buffer, size, &chunks);
-        hpx::util::tuple<int, double, std::string, A<int>> it;
+        hpx::tuple<int, double, std::string, A<int>> it;
         iarchive >> it;
         HPX_TEST(ot == it);
     }
     {
-        hpx::util::tuple<> ot{};
+        hpx::tuple<> ot{};
 
         std::vector<char> buffer;
         std::vector<hpx::serialization::serialization_chunk> chunks;
@@ -75,7 +75,7 @@ void test()
         std::size_t size = oarchive.bytes_written();
 
         hpx::serialization::input_archive iarchive(buffer, size, &chunks);
-        hpx::util::tuple<> it;
+        hpx::tuple<> it;
         iarchive >> it;
         HPX_TEST(ot == it);
     }

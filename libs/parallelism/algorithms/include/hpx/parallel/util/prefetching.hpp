@@ -47,7 +47,7 @@ namespace hpx { namespace parallel { namespace util {
             typedef value_type& reference;
 
         private:
-            typedef hpx::util::tuple<std::reference_wrapper<Ts>...> ranges_type;
+            typedef hpx::tuple<std::reference_wrapper<Ts>...> ranges_type;
 
             ranges_type rngs_;
             base_iterator base_;
@@ -213,7 +213,7 @@ namespace hpx { namespace parallel { namespace util {
         struct prefetcher_context
         {
         private:
-            typedef hpx::util::tuple<std::reference_wrapper<Ts>...> ranges_type;
+            typedef hpx::tuple<std::reference_wrapper<Ts>...> ranges_type;
 
             Itr it_begin_;
             Itr it_end_;
@@ -221,8 +221,8 @@ namespace hpx { namespace parallel { namespace util {
             std::size_t chunk_size_;
             std::size_t range_size_;
 
-            static constexpr std::size_t sizeof_first_value_type = sizeof(
-                typename hpx::util::tuple_element<0, ranges_type>::type::type);
+            static constexpr std::size_t sizeof_first_value_type =
+                sizeof(typename hpx::tuple_element<0, ranges_type>::type::type);
 
         public:
             prefetcher_context(Itr begin, Itr end, ranges_type const& rngs,
@@ -263,20 +263,17 @@ namespace hpx { namespace parallel { namespace util {
         }
 
         template <typename... Ts, std::size_t... Is>
-        HPX_FORCEINLINE void prefetch_containers(
-            hpx::util::tuple<Ts...> const& t, hpx::util::index_pack<Is...>,
-            std::size_t idx)
+        HPX_FORCEINLINE void prefetch_containers(hpx::tuple<Ts...> const& t,
+            hpx::util::index_pack<Is...>, std::size_t idx)
         {
-            prefetch_addresses((hpx::util::get<Is>(t).get())[idx]...);
+            prefetch_addresses((hpx::get<Is>(t).get())[idx]...);
         }
 #else
         template <typename... Ts, std::size_t... Is>
-        HPX_FORCEINLINE void prefetch_containers(
-            hpx::util::tuple<Ts...> const& t, hpx::util::index_pack<Is...>,
-            std::size_t idx)
+        HPX_FORCEINLINE void prefetch_containers(hpx::tuple<Ts...> const& t,
+            hpx::util::index_pack<Is...>, std::size_t idx)
         {
-            int const sequencer[] = {
-                (hpx::util::get<Is>(t).get()[idx], 0)..., 0};
+            int const sequencer[] = {(hpx::get<Is>(t).get()[idx], 0)..., 0};
             (void) sequencer;
         }
 #endif
@@ -402,8 +399,7 @@ namespace hpx { namespace parallel { namespace util {
         static_assert(hpx::util::all_of<hpx::traits::is_range<Ts>...>::value,
             "All variadic parameters have to represent ranges");
 
-        typedef hpx::util::tuple<std::reference_wrapper<Ts const>...>
-            ranges_type;
+        typedef hpx::tuple<std::reference_wrapper<Ts const>...> ranges_type;
 
         auto&& ranges = ranges_type(std::cref(rngs)...);
         return detail::prefetcher_context<Itr, Ts const...>(

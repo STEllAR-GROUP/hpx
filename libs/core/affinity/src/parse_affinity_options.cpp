@@ -289,15 +289,15 @@ namespace hpx { namespace threads { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     //                  index,       mask
-    typedef util::tuple<std::size_t, mask_type> mask_info;
+    typedef hpx::tuple<std::size_t, mask_type> mask_info;
 
     inline std::size_t get_index(mask_info const& smi)
     {
-        return util::get<0>(smi);
+        return hpx::get<0>(smi);
     }
     inline mask_cref_type get_mask(mask_info const& smi)
     {
-        return util::get<1>(smi);
+        return hpx::get<1>(smi);
     }
 
     ///////////////////////////////////////////////////////////////////////////

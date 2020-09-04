@@ -109,7 +109,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     hpx::util::make_zip_iterator(first, dest), count,
                     [tok](zip_iterator t, std::size_t part_size) mutable
                     -> partition_result_type {
-                        using hpx::util::get;
+                        using hpx::get;
                         auto iters = t.get_iterator_tuple();
                         FwdIter2 dest = get<1>(iters);
                         return std::make_pair(dest,

@@ -167,14 +167,14 @@ namespace hpx { namespace lcos {
         };
 
         template <typename T>
-        struct when_all_result<util::tuple<T>,
+        struct when_all_result<hpx::tuple<T>,
             typename std::enable_if<traits::is_future_range<T>::value>::type>
         {
             typedef T type;
 
-            static type call(util::tuple<T>&& t)
+            static type call(hpx::tuple<T>&& t)
             {
-                return std::move(util::get<0>(t));
+                return std::move(hpx::get<0>(t));
             }
         };
 
@@ -220,10 +220,10 @@ namespace hpx { namespace lcos {
 
         template <typename... T>
         typename detail::async_when_all_frame<
-            util::tuple<typename traits::acquire_future<T>::type...>>::type
+            hpx::tuple<typename traits::acquire_future<T>::type...>>::type
         when_all_impl(T&&... args)
         {
-            typedef util::tuple<typename traits::acquire_future<T>::type...>
+            typedef hpx::tuple<typename traits::acquire_future<T>::type...>
                 result_type;
             typedef detail::async_when_all_frame<result_type> frame_type;
 
@@ -259,10 +259,10 @@ namespace hpx { namespace lcos {
             detail::acquire_future_iterators<Iterator, Container>(begin, end));
     }
 
-    inline lcos::future<util::tuple<>>    //-V524
+    inline lcos::future<hpx::tuple<>>    //-V524
     when_all()
     {
-        typedef util::tuple<> result_type;
+        typedef hpx::tuple<> result_type;
         return lcos::make_ready_future(result_type());
     }
 

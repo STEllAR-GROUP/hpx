@@ -1136,7 +1136,7 @@ bool addressing_service::resolve_full_local(
     try {
         auto rep = primary_ns_.resolve_gid(id);
 
-        using hpx::util::get;
+        using hpx::get;
 
         if (get<0>(rep) == naming::invalid_gid || get<2>(rep) == naming::invalid_gid)
             return false;
@@ -1322,7 +1322,7 @@ naming::address addressing_service::resolve_full_postproc(
     naming::gid_type const& id, future<primary_namespace::resolved_type> f
     )
 {
-    using hpx::util::get;
+    using hpx::get;
 
     naming::address addr;
 
@@ -1399,7 +1399,7 @@ bool addressing_service::resolve_full_local(
     locals.resize(count);
 
     try {
-        using hpx::util::get;
+        using hpx::get;
 
         // special cases
         for (std::size_t i = 0; i != count; ++i)
@@ -2613,7 +2613,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
             std::map<
                 naming::id_type,
                 std::vector<
-                    hpx::util::tuple<std::int64_t, naming::gid_type, naming::gid_type>
+                    hpx::tuple<std::int64_t, naming::gid_type, naming::gid_type>
                 >
             >
             requests_type;
@@ -2629,7 +2629,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
                 primary_namespace::get_service_instance(raw)
               , naming::id_type::unmanaged);
 
-            requests[target].push_back(hpx::util::make_tuple(e.second, raw, raw));
+            requests[target].push_back(hpx::make_tuple(e.second, raw, raw));
         }
 
         // send requests to all locality
@@ -2686,7 +2686,7 @@ addressing_service::send_refcnt_requests_async(
         std::map<
             naming::id_type,
             std::vector<
-                hpx::util::tuple<std::int64_t, naming::gid_type, naming::gid_type>
+                hpx::tuple<std::int64_t, naming::gid_type, naming::gid_type>
             >
         >
         requests_type;
@@ -2703,7 +2703,7 @@ addressing_service::send_refcnt_requests_async(
             primary_namespace::get_service_instance(raw)
           , naming::id_type::unmanaged);
 
-        requests[target].push_back(hpx::util::make_tuple(e.second, raw, raw));
+        requests[target].push_back(hpx::make_tuple(e.second, raw, raw));
     }
 
     // send requests to all locality

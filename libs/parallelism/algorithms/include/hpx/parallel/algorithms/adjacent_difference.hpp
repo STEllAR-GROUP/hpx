@@ -80,7 +80,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto f1 = [op = std::forward<Op>(op)](zip_iterator part_begin,
                               std::size_t part_size) mutable {
                     // VS2015RC bails out when op is captured by ref
-                    using hpx::util::get;
+                    using hpx::get;
                     util::loop_n<ExPolicy>(
                         part_begin, part_size, [op](zip_iterator it) {
                             get<2>(*it) =

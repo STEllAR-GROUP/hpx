@@ -11,7 +11,7 @@
 
 #include <cstdint>
 
-namespace hpx { namespace util {
+namespace hpx { namespace chrono {
     ///////////////////////////////////////////////////////////////////////////
     //
     //  high_resolution_timer
@@ -75,4 +75,11 @@ namespace hpx { namespace util {
     private:
         std::uint64_t start_time_;
     };
+}}    // namespace hpx::chrono
+
+namespace hpx { namespace util {
+    using high_resolution_timer HPX_DEPRECATED_V(1, 6,
+        "hpx::util::high_resolution_timer is deprecated. Use "
+        "hpx::chrono::high_resolution_timer instead.") =
+        hpx::chrono::high_resolution_timer;
 }}    // namespace hpx::util

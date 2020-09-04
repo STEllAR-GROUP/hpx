@@ -28,7 +28,7 @@ namespace hpx { namespace agas
 
 struct HPX_EXPORT primary_namespace
 {
-    typedef hpx::util::tuple<naming::gid_type, gva, naming::gid_type>
+    typedef hpx::tuple<naming::gid_type, gva, naming::gid_type>
         resolved_type;
 
     static naming::gid_type get_service_instance(std::uint32_t service_locality_id);

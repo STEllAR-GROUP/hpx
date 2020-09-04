@@ -244,7 +244,7 @@ primary_namespace::begin_migration(naming::gid_type id)
         counter_data_.begin_migration_.enabled_
     );
     counter_data_.increment_begin_migration_count();
-    using hpx::util::get;
+    using hpx::get;
 
     std::unique_lock<mutex_type> l(mutex_);
 
@@ -272,15 +272,15 @@ primary_namespace::begin_migration(naming::gid_type id)
     }
     else
     {
-        HPX_ASSERT(hpx::util::get<0>(it->second) == false);
+        HPX_ASSERT(hpx::get<0>(it->second) == false);
     }
 
     // flag this id as being migrated
-    hpx::util::get<0>(it->second) = true; //-V601
+    hpx::get<0>(it->second) = true; //-V601
 
-    gva const& g(hpx::util::get<1>(r));
+    gva const& g(hpx::get<1>(r));
     naming::address addr(g.prefix, g.type, g.lva());
-    naming::id_type loc(hpx::util::get<2>(r), id_type::unmanaged);
+    naming::id_type loc(hpx::get<2>(r), id_type::unmanaged);
     return std::make_pair(loc, addr);
 }
 
@@ -295,7 +295,7 @@ bool primary_namespace::end_migration(naming::gid_type const& id)
 
     std::unique_lock<mutex_type> l(mutex_);
 
-    using hpx::util::get;
+    using hpx::get;
 
     migration_table_type::iterator it = migrating_objects_.find(id);
     if (it != migrating_objects_.end())
@@ -321,7 +321,7 @@ void primary_namespace::wait_for_migration_locked(
 {
     HPX_ASSERT_OWNS_LOCK(l);
 
-    using hpx::util::get;
+    using hpx::get;
 
     migration_table_type::iterator it = migrating_objects_.find(id);
     if (it != migrating_objects_.end())
@@ -356,7 +356,7 @@ bool primary_namespace::bind_gid(
         counter_data_.bind_gid_.enabled_
     );
     counter_data_.increment_bind_gid_count();
-    using hpx::util::get;
+    using hpx::get;
 
     naming::gid_type gid = id;
     naming::detail::strip_internal_bits_from_gid(id);
@@ -541,7 +541,7 @@ primary_namespace::resolved_type primary_namespace::resolve_gid(
         counter_data_.resolve_gid_.enabled_
     );
     counter_data_.increment_resolve_gid_count();
-    using hpx::util::get;
+    using hpx::get;
 
     resolved_type r;
 
@@ -578,7 +578,7 @@ primary_namespace::resolved_type primary_namespace::resolve_gid(
 naming::id_type primary_namespace::colocate(naming::gid_type const& id)
 {
     return naming::id_type(
-        hpx::util::get<2>(resolve_gid(id)), naming::id_type::unmanaged);
+        hpx::get<2>(resolve_gid(id)), naming::id_type::unmanaged);
 }
 
 naming::address primary_namespace::unbind_gid(
@@ -685,7 +685,7 @@ std::int64_t primary_namespace::increment_credit(
 }
 
 std::vector<std::int64_t> primary_namespace::decrement_credit(
-    std::vector<hpx::util::tuple<std::int64_t, naming::gid_type,
+    std::vector<hpx::tuple<std::int64_t, naming::gid_type,
         naming::gid_type>> const& requests)
 { // decrement_credit implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
@@ -699,9 +699,9 @@ std::vector<std::int64_t> primary_namespace::decrement_credit(
 
     for(auto& req: requests)
     {
-        std::int64_t credits = hpx::util::get<0>(req);
-        naming::gid_type lower = hpx::util::get<1>(req);
-        naming::gid_type upper = hpx::util::get<1>(req);
+        std::int64_t credits = hpx::get<0>(req);
+        naming::gid_type lower = hpx::get<1>(req);
+        naming::gid_type upper = hpx::get<1>(req);
 
         naming::detail::strip_internal_bits_from_gid(lower);
         naming::detail::strip_internal_bits_from_gid(upper);
@@ -923,7 +923,7 @@ void primary_namespace::resolve_free_list(
 {
     HPX_ASSERT_OWNS_LOCK(l);
 
-    using hpx::util::get;
+    using hpx::get;
 
     typedef refcnt_table_type::iterator iterator;
 
@@ -1136,7 +1136,7 @@ void primary_namespace::free_components_sync(
   , error_code& ec
     )
 { // {{{ free_components_sync implementation
-    using hpx::util::get;
+    using hpx::get;
 
     ///////////////////////////////////////////////////////////////////////////
     // Delete the objects on the free list.

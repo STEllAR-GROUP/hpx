@@ -14,7 +14,7 @@
 
 #include <chrono>
 
-namespace hpx { namespace util {
+namespace hpx { namespace chrono {
     using std::chrono::steady_clock;
 
     class steady_time_point
@@ -75,4 +75,14 @@ namespace hpx { namespace util {
     private:
         value_type _rel_time;
     };
+}}    // namespace hpx::chrono
+
+namespace hpx { namespace util {
+    using steady_time_point HPX_DEPRECATED_V(1, 6,
+        "hpx::util::steady_time_point is deprecated. Use "
+        "hpx::chrono::steady_time_point instead.") =
+        hpx::chrono::steady_time_point;
+    using steady_duration HPX_DEPRECATED_V(1, 6,
+        "hpx::util::steady_duration is deprecated. Use "
+        "hpx::chrono::steady_duration instead.") = hpx::chrono::steady_duration;
 }}    // namespace hpx::util
