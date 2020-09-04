@@ -1441,14 +1441,15 @@ namespace hpx {
 
         notification_policy_type notifier;
 
-        notifier.add_on_start_thread_callback(
-            util::bind(&runtime_distributed::init_tss_helper, This(), prefix,
-                type, _1, _2, _3, _4, false));
-        notifier.add_on_stop_thread_callback(util::bind(
-            &runtime_distributed::deinit_tss_helper, This(), prefix, _1));
+        notifier.add_on_start_thread_callback(util::bind(
+            &runtime_distributed::init_tss_helper, runtime_distributed::This(),
+            prefix, type, _1, _2, _3, _4, false));
+        notifier.add_on_stop_thread_callback(
+            util::bind(&runtime_distributed::deinit_tss_helper,
+                runtime_distributed::This(), prefix, _1));
         notifier.set_on_error_callback(util::bind(
             static_cast<report_error_t>(&runtime_distributed::report_error),
-            This(), _1, _2, true));
+            runtime_distributed::This(), _1, _2, true));
 
         return notifier;
     }
