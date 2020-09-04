@@ -19,7 +19,7 @@ if(HPX_WITH_PARCEL_COALESCING)
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcel/coalescing_message_handler.hpp"
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcel/coalescing_counter_registry.hpp"
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcel/message_buffer.hpp"
-    FOLDER "Core/Plugins/MessageHandler"
+    FOLDER "Core/Plugins/MessageHandler" ${HPX_WITH_UNITY_BUILD_OPTION}
   )
 
   if(TARGET APEX::apex)

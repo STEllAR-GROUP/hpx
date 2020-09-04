@@ -35,7 +35,7 @@ if(HPX_WITH_COMPRESSION_BZIP2)
       "${HEADER_ROOT}/hpx/plugins/binary_filter/bzip2_serialization_filter.hpp"
       "${HEADER_ROOT}/hpx/plugins/binary_filter/bzip2_serialization_filter_registration.hpp"
     FOLDER "Core/Plugins/Compression"
-    DEPENDENCIES ${BZIP2_LIBRARIES}
+    DEPENDENCIES ${BZIP2_LIBRARIES} ${HPX_WITH_UNITY_BUILD_OPTION}
   )
 
   if(NOT MSVC)

@@ -8,7 +8,7 @@
 function(add_hpx_executable name)
   # retrieve arguments
   set(options EXCLUDE_FROM_ALL EXCLUDE_FROM_DEFAULT_BUILD AUTOGLOB
-              INTERNAL_FLAGS NOLIBS NOHPX_INIT
+              INTERNAL_FLAGS NOLIBS NOHPX_INIT UNITY_BUILD
   )
   set(one_value_args
       INI
@@ -238,6 +238,10 @@ function(add_hpx_executable name)
 
   if(${name}_INTERNAL_FLAGS)
     set(_target_flags ${_target_flags} INTERNAL_FLAGS)
+  endif()
+
+  if(${name}_UNITY_BUILD)
+    set(_target_flags ${_target_flags} UNITY_BUILD)
   endif()
 
   hpx_setup_target(

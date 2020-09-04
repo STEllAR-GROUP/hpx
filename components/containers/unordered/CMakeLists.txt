@@ -35,6 +35,7 @@ add_hpx_component(
   PREPEND_SOURCE_ROOT
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
   SOURCES ${unordered_sources} ${_exclude_from_all_flag}
+          ${HPX_WITH_UNITY_BUILD_OPTION}
 )
 
 add_hpx_pseudo_dependencies(components.containers.unordered unordered_component)

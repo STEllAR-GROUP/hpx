@@ -42,6 +42,7 @@ add_hpx_component(
   SOURCE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src
   SOURCES ${component_storage_sources}
   DEPENDENCIES unordered_component ${_exclude_from_all_flag}
+               ${HPX_WITH_UNITY_BUILD_OPTION}
 )
 
 target_compile_definitions(

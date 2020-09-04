@@ -17,6 +17,7 @@ function(add_hpx_component name)
       PLUGIN
       PREPEND_SOURCE_ROOT
       PREPEND_HEADER_ROOT
+      UNITY_BUILD
   )
   set(one_value_args
       INI
@@ -223,6 +224,10 @@ function(add_hpx_component name)
 
   if(NOT ${${name}_NOEXPORT})
     set(_target_flags ${_target_flags} EXPORT)
+  endif()
+
+  if(${name}_UNITY_BUILD)
+    set(_target_flags ${_target_flags} UNITY_BUILD)
   endif()
 
   if(${${name}_STATIC})
