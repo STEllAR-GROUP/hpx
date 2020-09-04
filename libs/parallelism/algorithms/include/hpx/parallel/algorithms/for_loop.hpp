@@ -17,7 +17,7 @@ namespace hpx {
     /// when and if to dereference the iterator.
     ///
     /// The execution of for_loop without specifying an execution policy is
-    /// equivalent to specifying \a seq as the execution
+    /// equivalent to specifying \a hpx::execution::seq as the execution
     /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
@@ -173,8 +173,8 @@ namespace hpx {
     /// \returns  The \a for_loop algorithm returns a
     ///           \a hpx::future<void> if the execution policy is of
     ///           type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a void
+    ///           \a hpx::execution::sequenced_task_policy or
+    ///           \a hpx::execution::parallel_task_policy and returns \a void
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename... Args>
@@ -188,7 +188,7 @@ namespace hpx {
     /// programmer when and if to dereference the iterator.
     ///
     /// The execution of for_loop without specifying an execution policy is
-    /// equivalent to specifying \a seq as the execution
+    /// equivalent to specifying \a hpx::execution::seq as the execution
     /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
@@ -357,8 +357,8 @@ namespace hpx {
     /// \returns  The \a for_loop_strided algorithm returns a
     ///           \a hpx::future<void> if the execution policy is of
     ///           type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a void
+    ///           \a hpx::execution::sequenced_task_policy or
+    ///           \a hpx::execution::parallel_task_policy and returns \a void
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename S, typename... Args>
@@ -372,7 +372,7 @@ namespace hpx {
     /// when and if to dereference the iterator.
     ///
     /// The execution of for_loop without specifying an execution policy is
-    /// equivalent to specifying \a seq as the execution
+    /// equivalent to specifying \a hpx::execution::seq as the execution
     /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
@@ -532,8 +532,8 @@ namespace hpx {
     /// \returns  The \a for_loop_n algorithm returns a
     ///           \a hpx::future<void> if the execution policy is of
     ///           type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a void
+    ///           \a hpx::execution::sequenced_task_policy or
+    ///           \a hpx::execution::parallel_task_policy and returns \a void
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename Size, typename... Args>
@@ -546,7 +546,7 @@ namespace hpx {
     /// programmer when and if to dereference the iterator.
     ///
     /// The execution of for_loop without specifying an execution policy is
-    /// equivalent to specifying \a seq as the execution
+    /// equivalent to specifying \a hpx::execution::seq as the execution
     /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
@@ -718,8 +718,8 @@ namespace hpx {
     /// \returns  The \a for_loop_n_strided algorithm returns a
     ///           \a hpx::future<void> if the execution policy is of
     ///           type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a void
+    ///           \a hpx::execution::sequenced_task_policy or
+    ///           \a hpx::execution::parallel_task_policy and returns \a void
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename Size, typename S,

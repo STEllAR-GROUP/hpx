@@ -272,30 +272,30 @@ for more information about execution policies and executor parameters.
 
 .. note::
 
-   These names are also available in the ``hpx::execution`` namespace, but not
-   in the top-level ``hpx`` namespace.
+   These names are only available in the ``hpx::execution`` namespace, not in
+   the top-level ``hpx`` namespace.
 
 Constants
 ---------
 
-- :cpp:var:`hpx::parallel::execution::seq`
-- :cpp:var:`hpx::parallel::execution::par`
-- :cpp:var:`hpx::parallel::execution::par_unseq`
-- :cpp:var:`hpx::parallel::execution::task`
+- :cpp:var:`hpx::execution::seq`
+- :cpp:var:`hpx::execution::par`
+- :cpp:var:`hpx::execution::par_unseq`
+- :cpp:var:`hpx::execution::task`
 
 Classes
 -------
 
-- :cpp:class:`hpx::parallel::execution::sequenced_policy`
-- :cpp:class:`hpx::parallel::execution::parallel_policy`
-- :cpp:class:`hpx::parallel::execution::parallel_unsequenced_policy`
-- :cpp:class:`hpx::parallel::execution::sequenced_task_policy`
-- :cpp:class:`hpx::parallel::execution::parallel_task_policy`
-- :cpp:class:`hpx::parallel::execution::auto_chunk_size`
-- :cpp:class:`hpx::parallel::execution::dynamic_chunk_size`
-- :cpp:class:`hpx::parallel::execution::guided_chunk_size`
-- :cpp:class:`hpx::parallel::execution::persistent_auto_chunk_size`
-- :cpp:class:`hpx::parallel::execution::static_chunk_size`
+- :cpp:class:`hpx::execution::sequenced_policy`
+- :cpp:class:`hpx::execution::parallel_policy`
+- :cpp:class:`hpx::execution::parallel_unsequenced_policy`
+- :cpp:class:`hpx::execution::sequenced_task_policy`
+- :cpp:class:`hpx::execution::parallel_task_policy`
+- :cpp:class:`hpx::execution::auto_chunk_size`
+- :cpp:class:`hpx::execution::dynamic_chunk_size`
+- :cpp:class:`hpx::execution::guided_chunk_size`
+- :cpp:class:`hpx::execution::persistent_auto_chunk_size`
+- :cpp:class:`hpx::execution::static_chunk_size`
 
 Header ``hpx/functional.hpp``
 =============================
