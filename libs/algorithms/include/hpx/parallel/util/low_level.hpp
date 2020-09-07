@@ -73,7 +73,7 @@ namespace hpx { namespace parallel { namespace util {
         (::new (static_cast<void*>(ptr)) Value(std::forward<Args>(args)...));
     }
 
-    /// \brief Move objets
+    /// \brief Move objects
     /// \tparam Iter : iterator to the elements
     /// \tparam Value : typename of the object to create
     /// \param [in] itdest : iterator to the final place of the objects
@@ -88,7 +88,7 @@ namespace hpx { namespace parallel { namespace util {
         return it_dest;
     }
 
-    /// \brief Move objets to uninitialized memory
+    /// \brief Move objects to uninitialized memory
     /// \tparam Iter : iterator to the elements
     /// \tparam Value : typename of the object to construct
     /// \param [in] ptr : pointer to the memory where to create the object

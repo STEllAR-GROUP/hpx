@@ -80,7 +80,7 @@ namespace hpx { namespace util
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "connection_cache::connection_cache",
                     "the maximum number of connections per locality cannot "
-                    "excede the overall maximum number of connections");
+                    "exceed the overall maximum number of connections");
             }
         }
 

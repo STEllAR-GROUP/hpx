@@ -255,7 +255,7 @@ namespace hpx { namespace debug {
     };
 
     // ------------------------------------------------------------------
-    // helper fuction for printing CRC32
+    // helper function for printing CRC32
     // ------------------------------------------------------------------
     inline uint32_t crc32(const void* /*address*/, size_t /*length*/)
     {
@@ -266,7 +266,7 @@ namespace hpx { namespace debug {
     }
 
     // ------------------------------------------------------------------
-    // helper fuction for printing short memory dump and crc32
+    // helper function for printing short memory dump and crc32
     // useful for debugging corruptions in buffers during
     // rma or other transfers
     // ------------------------------------------------------------------
