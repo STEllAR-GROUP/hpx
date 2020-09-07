@@ -216,8 +216,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     typename std::iterator_traits<Iter2>::difference_type;
 
                 using result_type = util::in_in_out_result<Iter1, Iter2, Iter3>;
-                using result =
-                    util::detail::algorithm_result<ExPolicy, result_type>;
 
                 if (first1 == last1)
                 {

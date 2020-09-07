@@ -198,7 +198,7 @@ namespace hpx { namespace serialization {
             access_traits::reset(cont_);
         }
 
-        void set_filter(binary_filter* filter) override
+        void set_filter(binary_filter* /* filter */) override
         {
             HPX_ASSERT(chunker_.get_num_chunks() == 1 &&
                 chunker_.get_chunk_size() == 0);

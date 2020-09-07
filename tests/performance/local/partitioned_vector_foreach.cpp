@@ -47,8 +47,6 @@ struct wait_op
 template <typename Policy, typename Vector>
 std::uint64_t foreach_vector(Policy&& policy, Vector const& v)
 {
-    typedef typename Vector::value_type value_type;
-
     std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i != test_count; ++i)

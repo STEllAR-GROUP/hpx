@@ -513,25 +513,22 @@ namespace hpx { namespace debug {
         }
 
         template <typename T>
-        constexpr void array(
-            std::string const& name, std::vector<T> const&) const
+        constexpr void array(std::string const&, std::vector<T> const&) const
         {
         }
 
         template <typename T, std::size_t N>
-        constexpr void array(
-            std::string const& name, std::array<T, N> const&) const
+        constexpr void array(std::string const&, std::array<T, N> const&) const
         {
         }
 
         template <typename T>
-        constexpr void array(
-            std::string const& name, T const* data, std::size_t size) const
+        constexpr void array(std::string const&, T const*, std::size_t) const
         {
         }
 
         template <typename... Args>
-        constexpr bool scope(Args const&... args)
+        constexpr bool scope(Args const&...)
         {
             return true;
         }
@@ -543,7 +540,7 @@ namespace hpx { namespace debug {
         }
 
         template <typename T, typename V>
-        constexpr void set(T& var, V const& val)
+        constexpr void set(T&, V const&)
         {
         }
 

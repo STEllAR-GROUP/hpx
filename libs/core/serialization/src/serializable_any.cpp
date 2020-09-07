@@ -37,25 +37,26 @@ namespace hpx { namespace util {
             }
 
             // compression API
-            void set_max_length(std::size_t size) {}
+            void set_max_length(std::size_t /* size */) {}
             void save(void const* src, std::size_t src_count)
             {
                 char const* data = static_cast<char const*>(src);
                 boost::hash_range(hash, data, data + src_count);
             }
-            bool flush(void* dst, std::size_t dst_count, std::size_t& written)
+            bool flush(
+                void* /* dst */, std::size_t dst_count, std::size_t& written)
             {
                 written = dst_count;
                 return true;
             }
 
             // decompression API
-            std::size_t init_data(
-                char const* buffer, std::size_t size, std::size_t buffer_size)
+            std::size_t init_data(char const* /* buffer */,
+                std::size_t /* size */, std::size_t /* buffer_size */)
             {
                 return 0;
             }
-            void load(void* dst, std::size_t dst_count) {}
+            void load(void* /* dst */, std::size_t /* dst_count */) {}
 
             template <class T>
             void serialize(T&, unsigned)

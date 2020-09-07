@@ -189,7 +189,7 @@ namespace hpx { namespace threads {
     }
 
     void execution_agent::do_resume(
-        const char* desc, hpx::threads::thread_state_ex_enum statex)
+        const char* /* desc */, hpx::threads::thread_state_ex_enum statex)
     {
         thread_id_type id = self_.get_thread_id();
 

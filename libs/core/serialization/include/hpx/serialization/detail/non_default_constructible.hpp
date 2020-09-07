@@ -21,7 +21,7 @@ namespace hpx { namespace serialization { namespace detail {
 
     // by default fall back to in-place default construction
     template <typename Archive, typename T>
-    void load_construct_data(Archive& ar, T* t, unsigned)
+    void load_construct_data(Archive&, T* t, unsigned)
     {
         ::new (t) T;
     }

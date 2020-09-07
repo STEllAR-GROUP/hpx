@@ -133,7 +133,6 @@ void test_move_exception(ExPolicy policy, IteratorTag)
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
@@ -167,7 +166,6 @@ template <typename ExPolicy, typename IteratorTag>
 void test_move_exception_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
@@ -231,7 +229,6 @@ void test_move_bad_alloc(ExPolicy policy, IteratorTag)
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
@@ -263,7 +260,6 @@ template <typename ExPolicy, typename IteratorTag>
 void test_move_bad_alloc_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 

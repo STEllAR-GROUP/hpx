@@ -43,9 +43,6 @@ struct xk
 
 void test3()
 {
-    typedef typename std::vector<xk>::iterator iter_t;
-    typedef std::less<xk> compare;
-
     std::mt19937_64 my_rand(std::rand());
 
     constexpr std::uint32_t NMAX = NUMELEMS;
@@ -76,9 +73,6 @@ void test3()
 
 void test4()
 {
-    typedef typename std::vector<std::uint64_t>::iterator iter_t;
-    typedef std::less<std::uint64_t> compare;
-
     constexpr std::uint32_t NElem = NUMELEMS;
 
     std::vector<std::uint64_t> V1;
@@ -126,9 +120,6 @@ void test4()
 
 void test5()
 {
-    typedef typename std::vector<std::uint64_t>::iterator iter_t;
-    typedef std::less<std::uint64_t> compare;
-
     constexpr std::uint32_t NELEM = NUMELEMS;
     std::mt19937_64 my_rand(std::rand());
 
@@ -153,9 +144,6 @@ void test5()
 
 void test6(void)
 {
-    typedef typename std::vector<std::uint64_t>::iterator iter_t;
-    typedef std::less<std::uint64_t> compare;
-
     constexpr std::uint32_t NELEM = NUMELEMS;
     std::vector<std::uint64_t> A;
     A.reserve(NELEM);

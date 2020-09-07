@@ -114,8 +114,6 @@ void test_for_loop_idx(ExPolicy&& policy)
 template <typename ExPolicy>
 void test_for_loop_idx_async(ExPolicy&& p)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 

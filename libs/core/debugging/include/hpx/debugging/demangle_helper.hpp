@@ -100,7 +100,7 @@ namespace hpx { namespace util { namespace debug {
     // separator is appended if the number of types > 1
     // --------------------------------------------------------------------
     template <typename T = void>
-    inline std::string print_type(const char* delim = "")
+    inline std::string print_type(const char* = "")
     {
         return std::string(cxx_type_id<T>::typeid_.type_id());
     }

@@ -27,7 +27,7 @@ namespace hpx { namespace execution_base {
         impl_->yield(desc);
     }
 
-    void agent_ref::yield_k(std::size_t k, const char* desc)
+    void agent_ref::yield_k(std::size_t /* k */, const char* desc)
     {
         HPX_ASSERT(*this == hpx::execution_base::this_thread::agent());
         // verify that there are no more registered locks for this OS-thread

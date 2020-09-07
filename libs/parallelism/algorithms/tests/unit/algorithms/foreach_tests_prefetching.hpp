@@ -51,10 +51,6 @@ void test_for_each_prefetching(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_for_each_prefetching_async(ExPolicy&& p, IteratorTag)
 {
-    typedef typename hpx::parallel::util::detail::prefetching_iterator<
-        std::vector<double>::iterator, double>
-        iterator;
-
     std::size_t prefetch_distance_factor = 2;
     std::vector<double> c(10007, 1.0);
 
@@ -83,10 +79,6 @@ void test_for_each_prefetching_exception(ExPolicy policy, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
-
-    typedef typename hpx::parallel::util::detail::prefetching_iterator<
-        std::vector<double>::iterator, double>
-        iterator;
 
     std::size_t prefetch_distance_factor = 2;
     std::vector<double> c(10007, 1.0);
@@ -121,10 +113,6 @@ void test_for_each_prefetching_exception(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_for_each_prefetching_exception_async(ExPolicy p, IteratorTag)
 {
-    typedef typename hpx::parallel::util::detail::prefetching_iterator<
-        std::vector<double>::iterator, double>
-        iterator;
-
     std::size_t prefetch_distance_factor = 2;
     std::vector<double> c(10007, 1.0);
 
@@ -166,10 +154,6 @@ void test_for_each_prefetching_bad_alloc(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef typename hpx::parallel::util::detail::prefetching_iterator<
-        std::vector<double>::iterator, double>
-        iterator;
-
     std::size_t prefetch_distance_factor = 2;
     std::vector<double> c(10007, 1.0);
 
@@ -202,10 +186,6 @@ void test_for_each_prefetching_bad_alloc(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_for_each_prefetching_bad_alloc_async(ExPolicy p, IteratorTag)
 {
-    typedef typename hpx::parallel::util::detail::prefetching_iterator<
-        std::vector<double>::iterator, double>
-        iterator;
-
     std::size_t prefetch_distance_factor = 2;
     std::vector<double> c(10007, 1.0);
 

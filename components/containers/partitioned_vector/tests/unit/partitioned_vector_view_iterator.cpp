@@ -34,10 +34,6 @@ void bulk_test( hpx::lcos::spmd_block block,
         = hpx::partitioned_vector<double>;
     using view_type
         = hpx::partitioned_vector_view<double,3>;
-    using view_type_iterator
-        = typename view_type::iterator;
-    using const_view_type_iterator
-        = typename view_type::const_iterator;
 
     vector_type my_vector;
     my_vector.connect_to(hpx::launch::sync, vec_name);

@@ -180,6 +180,8 @@ namespace hpx { namespace threads {
     {
 #  if defined(HPX_HAVE_MAX_CPU_COUNT)
         HPX_ASSERT(s <= mask.size());
+        HPX_UNUSED(mask);
+        HPX_UNUSED(s);
 #  else
         return mask.resize(s);
 #  endif

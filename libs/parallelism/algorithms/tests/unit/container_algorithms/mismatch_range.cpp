@@ -29,9 +29,7 @@ template <typename IteratorTag>
 void test_mismatch1(IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -75,9 +73,7 @@ void test_mismatch1(ExPolicy&& policy, IteratorTag)
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -118,9 +114,7 @@ template <typename ExPolicy, typename IteratorTag>
 void test_mismatch1_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -187,9 +181,7 @@ template <typename IteratorTag>
 void test_mismatch2(IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -233,9 +225,7 @@ void test_mismatch2(ExPolicy&& policy, IteratorTag)
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -276,9 +266,7 @@ template <typename ExPolicy, typename IteratorTag>
 void test_mismatch2_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -345,9 +333,7 @@ template <typename IteratorTag>
 void test_mismatch_exception(IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -387,9 +373,7 @@ void test_mismatch_exception(ExPolicy&& policy, IteratorTag)
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -426,9 +410,7 @@ template <typename ExPolicy, typename IteratorTag>
 void test_mismatch_exception_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -494,9 +476,7 @@ void test_mismatch_bad_alloc(ExPolicy&& policy, IteratorTag)
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -532,9 +512,7 @@ template <typename ExPolicy, typename IteratorTag>
 void test_mismatch_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());

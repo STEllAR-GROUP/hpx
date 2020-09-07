@@ -8,6 +8,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_description.hpp>
+#include <hpx/type_support/unused.hpp>
 #include <hpx/util/to_string.hpp>
 
 #include <iostream>
@@ -28,6 +29,7 @@ namespace hpx { namespace util {
             os << d.get_address();    //-V128
         }
 #else
+        HPX_UNUSED(d);
         os << "<unknown>";
 #endif
         return os;
@@ -44,6 +46,7 @@ namespace hpx { namespace util {
              << util::to_string(desc.get_address());
         return strm.str();
 #else
+        HPX_UNUSED(desc);
         return "<unknown>";
 #endif
     }
@@ -82,6 +85,8 @@ namespace hpx { namespace util {
             type_ = data_type_description;
             data_.desc_ = "<unknown>";
         }
+#else
+        HPX_UNUSED(altname);
 #endif
     }
 }}    // namespace hpx::util

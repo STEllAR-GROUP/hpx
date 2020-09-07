@@ -126,9 +126,6 @@ void test_search2(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_search2_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     std::vector<std::size_t> c(10007);
     // fill vector with random values above 2
     std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);

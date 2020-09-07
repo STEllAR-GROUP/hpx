@@ -369,8 +369,6 @@ namespace hpx { namespace lcos {
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
         }
 
-        using arg_type = typename util::decay<T>::type;
-
         auto broadcast_data_direct =
             [this_site](hpx::future<hpx::id_type>&& fid) -> hpx::future<T> {
             using action_type = typename detail::communicator_server::

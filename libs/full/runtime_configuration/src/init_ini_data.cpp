@@ -408,9 +408,6 @@ namespace hpx { namespace util {
     {
         namespace fs = filesystem;
 
-        typedef std::vector<std::pair<fs::path, std::string>>::iterator
-            iterator_type;
-
         typedef std::vector<std::shared_ptr<plugins::plugin_registry_base>>
             plugin_list_type;
 

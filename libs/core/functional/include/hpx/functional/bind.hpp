@@ -310,7 +310,7 @@ namespace hpx { namespace serialization {
 
     // serialization of placeholders is trivial, just provide empty functions
     template <typename Archive, std::size_t I>
-    void serialize(Archive& ar,
+    void serialize(Archive& /* ar */,
         ::hpx::util::detail::placeholder<I>& /*placeholder*/
         ,
         unsigned int const /*version*/ = 0)

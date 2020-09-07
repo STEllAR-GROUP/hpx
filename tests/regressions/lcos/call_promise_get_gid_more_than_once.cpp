@@ -16,9 +16,6 @@ void dummy() {}
 int hpx_main()
 {
     {
-        typedef hpx::lcos::promise<void> promise_type;
-        typedef hpx::lcos::detail::promise_data<void> shared_state_type;
-
         hpx::lcos::promise<void> promise;
         hpx::future<void> future = promise.get_future();
 

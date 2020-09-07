@@ -33,7 +33,7 @@ namespace hpx { namespace detail {
     }
 
     std::exception_ptr get_exception(error errcode, std::string const& msg,
-        throwmode mode, std::string const& func, std::string const& file,
+        throwmode mode, std::string const& /* func */, std::string const& file,
         long line, std::string const& auxinfo)
     {
         filesystem::path p(file);
@@ -42,8 +42,9 @@ namespace hpx { namespace detail {
     }
 
     std::exception_ptr get_exception(boost::system::error_code const& ec,
-        std::string const& msg, throwmode mode, std::string const& func,
-        std::string const& file, long line, std::string const& auxinfo)
+        std::string const& /* msg */, throwmode /* mode */,
+        std::string const& func, std::string const& file, long line,
+        std::string const& auxinfo)
     {
         return hpx::detail::get_exception(
             hpx::exception(ec), func, file, line, auxinfo);

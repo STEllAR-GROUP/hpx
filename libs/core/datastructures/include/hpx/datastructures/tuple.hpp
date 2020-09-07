@@ -11,9 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/config/defines.hpp>
 #include <hpx/datastructures/member_pack.hpp>
-#include <hpx/type_support/always_void.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
 #include <array>
@@ -162,7 +160,7 @@ namespace hpx {
         struct ignore_type
         {
             template <typename T>
-            void operator=(T&& t) const
+            void operator=(T&&) const
             {
             }
         };
@@ -935,7 +933,7 @@ namespace hpx {
         {
             template <typename TTuple, typename UTuple>
             static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE bool call(
-                TTuple const& t, UTuple const& u)
+                TTuple const&, UTuple const&)
             {
                 return false;
             }
