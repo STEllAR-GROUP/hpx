@@ -19,7 +19,7 @@
 
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 
-#if defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 350
+#if __CUDA_ARCH__ >= 350
 #include <cstring>
 #endif
 #include <string>
