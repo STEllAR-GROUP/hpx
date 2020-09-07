@@ -7,7 +7,7 @@
 # This cmake-format configuration file is a suggested configuration file for
 # formatting CMake files for the HPX project.
 
-# PLEASE NOTE: This file has been created and tested withs cmake-format V0.6.10
+# PLEASE NOTE: This file has been created and tested with cmake-format V0.6.10
 
 # -----------------------------
 # Options affecting formatting.
@@ -77,7 +77,7 @@ with section("format"):
   max_rows_cmdline = 2
 
   # By default, if cmake-format cannot successfully fit everything into the
-  # desired linewidth it will apply the last, most agressive attempt that it
+  # desired linewidth it will apply the last, most aggressive attempt that it
   # made.  If this flag is True, however, cmake-format will print error, exit
   # with non-zero status code, and write-out nothing
   require_valid_layout = False
@@ -116,7 +116,7 @@ with section("markup"):
   canonicalize_hashrulers = True
 
   # If a comment line matches starts with this pattern then it is explicitly a
-  # trailing comment for the preceeding argument.  Default is '#<'
+  # trailing comment for the preceding argument.  Default is '#<'
   explicit_trailing_pattern = u'#<'
 
   # If comment markup is enabled, don't reflow the first comment block in each

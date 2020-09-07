@@ -261,7 +261,7 @@ namespace hpx { namespace util {
                     current = current->add_section_if_new(
                         sec_key.substr(pos, dot_pos - pos));
                 }
-                // if we don't have section qualifiers, restor current...
+                // if we don't have section qualifiers, restore current...
                 if (current == this)
                 {
                     current = s;

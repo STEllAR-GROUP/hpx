@@ -114,7 +114,7 @@ namespace hpx { namespace execution { namespace experimental {
         // and uses the underlying executor to get a count of tasks
         // 'in flight' for the throttling.
         // The dummy B template param must match BaseExecutor and helps
-        // deduction rules complete this type so that the default implementaiton
+        // deduction rules complete this type so that the default implementation
         // (above) still works
         template <typename F, typename B>
         struct throttling_wrapper<F, B,

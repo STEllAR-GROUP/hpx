@@ -84,7 +84,7 @@ struct data
     }
 
     // Copy constructor: data d1; data d2(d1);
-    // We can't copy the mutex, because mutexs are noncopyable.
+    // We can't copy the mutex, because mutexes are noncopyable.
     data(data const& other)
       : mtx()
       , u_value(other.u_value)

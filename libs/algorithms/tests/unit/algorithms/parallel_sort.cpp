@@ -357,7 +357,7 @@ void test6()
         }
         else
         {
-            throw std::ios_base::failure("Insuficient lenght of the vector\n");
+            throw std::ios_base::failure("Insufficient length of the vector\n");
         }
     }
 

@@ -299,7 +299,7 @@ int main(
 
     if (iterations % blocksize)
         throw std::invalid_argument(
-            "iterations must be cleanly divisable by blocksize\n");
+            "iterations must be cleanly divisible by blocksize\n");
 
     if (vm.count("no-header"))
         header = false;

@@ -17,7 +17,7 @@ roughly 140 tickets (bugs, feature requests, etc.).
 General changes
 ===============
 
-The major new fetures in this release are:
+The major new features in this release are:
 
 * We further consolidated the API exposed by |hpx|. We aligned our APIs as much
   as possible with the existing |cpp11|_ and related proposals to the C++

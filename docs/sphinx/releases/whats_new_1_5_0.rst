@@ -30,7 +30,7 @@ and many bug fixes.
   ``hpx::stop_token``.
 * We have added ``hpx::stable_sort`` based on Francisco Tapia's
   implementation.
-* We have adapted existing sychronization primitives to be fully conformant
+* We have adapted existing synchronization primitives to be fully conformant
   C++20: ``hpx::barrier``, ``hpx::latch``, ``hpx::counting_semaphore``, and
   ``hpx::binary_semaphore``.
 * We have started using customization point objects (CPOs) to make the
