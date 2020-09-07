@@ -53,6 +53,7 @@ namespace boost
    {
      register_signature( ".c" );
      register_signature( ".cpp" );
+     register_signature( ".cu" );
      register_signature( ".cxx" );
      register_signature( ".h" );
      register_signature( ".hpp" );

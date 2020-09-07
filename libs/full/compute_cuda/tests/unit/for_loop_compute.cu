@@ -2,6 +2,7 @@
 //  Copyright (c) 2016 Thomas Heller
 //  Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
@@ -14,12 +15,14 @@
 
 #include <hpx/hpx_init.hpp>
 
+#include <cstddef>
 #include <iostream>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 typedef hpx::cuda::experimental::default_executor executor_type;
 typedef hpx::cuda::experimental::allocator<int> target_allocator;
