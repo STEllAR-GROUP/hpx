@@ -35,7 +35,8 @@ configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
 configure_extra_options+=" -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=ON"
 configure_extra_options+=" -DHPX_UNITY_BUILD=ON"
 
-# enable extra counter to verify everything compiles
+# enable extra counters to verify everything compiles
+configure_extra_options+=" -DHPX_WITH_BACKGROUD_THREAD_COUNTERS=ON"
 configure_extra_options+=" -DHPX_WITH_COROUTINE_COUNTERS=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_ACTION_COUNTERS=ON"
 configure_extra_options+=" -DHPX_WITH_THREAD_IDLE_RATES=ON"
