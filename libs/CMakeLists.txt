@@ -69,6 +69,12 @@ foreach(lib ${HPX_LIBS})
 
     set_target_properties(hpx_${lib} PROPERTIES FOLDER "Core")
 
+    if((${lib} STREQUAL "core") AND MSVC)
+      if(HPX_WITH_SWAP_CONTEXT_EMULATION)
+        target_link_options(hpx_${lib} PRIVATE "/EXPORT:switch_to_fiber")
+      endif()
+    endif()
+
     install(
       TARGETS hpx_${lib}
       EXPORT HPXInternalTargets

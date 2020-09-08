@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -55,7 +55,7 @@ if(MSVC)
         "${CMAKE_CURRENT_SOURCE_DIR}/src/switch_to_fiber.asm"
     )
     set(switch_to_fiber_object
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/switch_to_fiber.asm"
+        "${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj"
     )
     add_custom_command(
       OUTPUT "${switch_to_fiber_object}"
@@ -80,9 +80,3 @@ add_hpx_module(
                       hpx_functional hpx_util
   CMAKE_SUBDIRS examples tests
 )
-
-if(MSVC)
-  if(HPX_WITH_SWAP_CONTEXT_EMULATION)
-    target_link_options(hpx_coroutines PRIVATE "/EXPORT:switch_to_fiber")
-  endif()
-endif()
