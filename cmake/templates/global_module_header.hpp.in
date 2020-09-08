@@ -10,6 +10,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_LIB_@name_upper@)
+#if defined(HPX_HAVE_MODULE_@modulename_upper@)
 @module_headers@
 #endif

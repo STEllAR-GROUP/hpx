@@ -26,29 +26,15 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/tag_provider.hpp"
     DEPENDENCIES
       hpx_actions
-      hpx_asio
-      hpx_allocator_support
-      hpx_cache
       hpx_command_line_handling
-      hpx_config
-      hpx_concurrency
-      hpx_coroutines
-      hpx_execution
-      hpx_filesystem
-      hpx_hardware
-      hpx_memory
       hpx_mpi_base
       hpx_performance_counters
-      hpx_plugin
       hpx_program_options
       hpx_runtime_configuration
       hpx_runtime_local
-      hpx_serialization
-      hpx_threading
       hpx_threadmanager
-      hpx_timing
-      hpx_topology
-      hpx_util
+      hpx_parallelism
+      hpx_core
       hpx_dependencies_boost
       Mpi::mpi
     INCLUDE_DIRS ${PROJECT_SOURCE_DIR}

@@ -155,7 +155,7 @@ utilities to users. The following section documents those facilies.
 Checkpoint
 ----------
 
-See :ref:`libs_checkpoint`.
+See :ref:`modules_checkpoint`.
 
 .. _iostreams:
 

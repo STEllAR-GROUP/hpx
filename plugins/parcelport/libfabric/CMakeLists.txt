@@ -71,26 +71,12 @@ if(HPX_WITH_PARCELPORT_LIBFABRIC)
     # do we need to declare any headers? HEADERS FIXME : Could this be private
     DEPENDENCIES
       ${_libfabric_libraries}
-      hpx_allocator_support
-      hpx_asio
-      hpx_assertion
-      hpx_cache
-      hpx_concurrency
-      hpx_config
-      hpx_coroutines
-      hpx_errors
-      hpx_execution
-      hpx_hardware
-      hpx_memory
       hpx_performance_counters
-      hpx_plugin
       hpx_program_options
       hpx_runtime_local
-      hpx_serialization
-      hpx_threading
       hpx_threadmanager
-      hpx_timing
-      hpx_topology
+      hpx_parallelism
+      hpx_core
     INCLUDE_DIRS ${_libfabric_include_dirs} ${PROJECT_SOURCE_DIR}
                  ${PROJECT_BINARY_DIR}
     FOLDER "Core/Plugins/Parcelport/libfabric"

@@ -9,19 +9,19 @@
 #include <hpx/runtime/naming/name.hpp>
 
 #include <hpx/assert.hpp>
+#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/lcos_local/detail/preprocess_future.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/memory/serialization/intrusive_ptr.hpp>
 #include <hpx/modules/checkpoint_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
-#include <hpx/functional/bind.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/modules/memory.hpp>
-#include <hpx/memory/serialization/intrusive_ptr.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
-#include <hpx/runtime/serialization/detail/preprocess_futures.hpp>
 #include <hpx/runtime/serialization/detail/preprocess_gid_types.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>

@@ -9,10 +9,11 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/serialization/detail/extra_archive_data.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <cstddef>
 #include <map>
@@ -122,4 +123,8 @@ namespace hpx { namespace serialization { namespace detail {
         mutable mutex_type mtx_;
         split_gids_map split_gids_;
     };
+
+    // This is explicitly instantiated to ensure that the id is stable across
+    // shared libraries.
+    extern template struct extra_archive_data_id_helper<preprocess_gid_types>;
 }}}    // namespace hpx::serialization::detail

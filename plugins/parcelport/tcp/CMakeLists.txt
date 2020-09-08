@@ -20,28 +20,12 @@ if(HPX_WITH_PARCELPORT_TCP)
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/tcp/sender.hpp"
     DEPENDENCIES
       hpx_actions
-      hpx_allocator_support
-      hpx_asio
-      hpx_assertion
-      hpx_cache
-      hpx_concurrency
-      hpx_config
-      hpx_coroutines
-      hpx_errors
-      hpx_execution
-      hpx_functional
-      hpx_hardware
-      hpx_memory
       hpx_performance_counters
-      hpx_plugin
       hpx_program_options
       hpx_runtime_local
-      hpx_serialization
-      hpx_threading
       hpx_threadmanager
-      hpx_timing
-      hpx_topology
-      hpx_util
+      hpx_parallelism
+      hpx_core
     INCLUDE_DIRS "${PROJECT_SOURCE_DIR}"
     FOLDER "Core/Plugins/Parcelport/Tcp"
   )

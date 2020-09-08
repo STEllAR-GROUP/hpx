@@ -16,7 +16,7 @@ General changes
 
 * We have added the collectives ``all_to_all`` and ``all_reduce``.
 * We have added APIs for resiliency, which allows replication and replay for
-  failed tasks. See the :ref:`documentation <libs_resiliency>` for more details.
+  failed tasks. See the :ref:`documentation <modules_resiliency>` for more details.
 * Components can now be checkpointed.
 * Performance improvements to schedulers and coroutines. A significant change is
   the addition of stackless coroutines. These are to be used for tasks that do

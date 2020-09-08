@@ -355,6 +355,7 @@ with section("parse"):
                                     'EXCLUDE_FROM_GLOBAL_HEADER': '+',
                                     'GLOBAL_HEADER_GEN': 1,
                                     'HEADERS': '+',
+                                    'MODULE_DEPENDENCIES': '+',
                                     'SOURCES': '+'},
                         'pargs': { 'flags': ['DEPRECATION_WARNINGS',
                                               'FORCE_LINKING_GEN',

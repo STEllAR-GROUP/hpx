@@ -10,4 +10,3 @@
    :maxdepth: 2
 
    /libs/overview.rst
-   /libs/all_modules.rst
