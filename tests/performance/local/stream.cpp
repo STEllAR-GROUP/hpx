@@ -96,12 +96,9 @@ void check_results(std::size_t iterations, Vector const& a_res,
     std::vector<STREAM_TYPE> b(b_res.size());
     std::vector<STREAM_TYPE> c(c_res.size());
 
-    hpx::copy(
-        hpx::execution::par, a_res.begin(), a_res.end(), a.begin());
-    hpx::copy(
-        hpx::execution::par, b_res.begin(), b_res.end(), b.begin());
-    hpx::copy(
-        hpx::execution::par, c_res.begin(), c_res.end(), c.begin());
+    hpx::copy(hpx::execution::par, a_res.begin(), a_res.end(), a.begin());
+    hpx::copy(hpx::execution::par, b_res.begin(), b_res.end(), b.begin());
+    hpx::copy(hpx::execution::par, c_res.begin(), c_res.end(), c.begin());
 
     STREAM_TYPE aj, bj, cj, scalar;
     STREAM_TYPE aSumErr, bSumErr, cSumErr;
@@ -540,7 +537,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 hpx::execution::experimental::fork_join_executor;
 
             executor_type exec;
-            auto policy = hpx::parallel::execution::par.on(exec);
+            auto policy = hpx::execution::par.on(exec);
             hpx::compute::host::detail::policy_allocator<STREAM_TYPE,
                 decltype(policy)>
                 alloc(policy);
