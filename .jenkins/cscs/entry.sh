@@ -9,8 +9,8 @@
 # Make undefined variables errors, print each command
 set -eux
 
-# Clean up directory
-rm -f jenkins-hpx*
+# Clean up old artifacts
+rm -f ./jenkins-hpx* ./*-Testing
 
 source .jenkins/cscs/slurm-constraint-${configuration_name}.sh
 

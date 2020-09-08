@@ -8,6 +8,16 @@
 
 pipeline {
     agent any
+    options {
+        buildDiscarder(
+            logRotator(
+                daysToKeepStr: "14",
+                numToKeepStr: "50",
+                artifactDaysToKeepStr: "14",
+                artifactNumToKeepStr: "50"
+            )
+        )
+    }
     environment {
         GITHUB_TOKEN = credentials('GITHUB_TOKEN')
     }
