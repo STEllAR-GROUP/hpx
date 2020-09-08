@@ -17,6 +17,7 @@ set(executors_headers
     hpx/executors/apply.hpp
     hpx/executors/async.hpp
     hpx/executors/dataflow.hpp
+    hpx/executors/detail/hierarchical_spawning.hpp
     hpx/executors/exception_list.hpp
     hpx/executors/execution_policy_fwd.hpp
     hpx/executors/execution_policy.hpp
