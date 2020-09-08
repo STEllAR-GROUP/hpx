@@ -362,6 +362,10 @@ add_library(
            ${hpx_external_OBJECTS} ${hpx_HEADERS}
 )
 
+if(HPX_WITH_UNITY_BUILD)
+  set_target_properties(hpx_full PROPERTIES UNITY_BUILD ON)
+endif()
+
 target_link_libraries(
   hpx_full
   PUBLIC hpx_public_flags
