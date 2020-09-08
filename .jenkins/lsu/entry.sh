@@ -9,8 +9,8 @@
 # Make undefined variables errors, print each command
 set -eux
 
-# Clean up directory
-rm -f jenkins-hpx*
+# Clean up old artifacts
+rm -f ./jenkins-hpx* ./*-Testing
 
 export configuration_name_with_build_type="${configuration_name}-${build_type,,}"
 

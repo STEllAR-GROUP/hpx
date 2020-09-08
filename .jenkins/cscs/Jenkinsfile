@@ -12,6 +12,16 @@ pipeline {
             label 'ssl_daintvm1'
         }
     }
+    options {
+        buildDiscarder(
+            logRotator(
+                daysToKeepStr: "14",
+                numToKeepStr: "50",
+                artifactDaysToKeepStr: "14",
+                artifactNumToKeepStr: "50"
+            )
+        )
+    }
     environment {
         SPACK_ROOT = '/apps/daint/SSL/HPX/spack'
         GITHUB_TOKEN = credentials('97b30156-2f6f-47fc-94eb-68044d95ec50')
