@@ -187,6 +187,5 @@ namespace hpx { namespace serialization { namespace detail {
 
     // This is explicitly instantiated to ensure that the id is stable across
     // shared libraries.
-    extern template struct HPX_PARALLELISM_EXPORT
-        extra_archive_data_id_helper<preprocess_futures>;
+    extern template struct extra_archive_data_id_helper<preprocess_futures>;
 }}}    // namespace hpx::serialization::detail

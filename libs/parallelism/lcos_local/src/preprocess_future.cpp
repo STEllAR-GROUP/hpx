@@ -22,5 +22,6 @@ namespace hpx { namespace lcos { namespace detail {
 }}}    // namespace hpx::lcos::detail
 
 namespace hpx { namespace serialization { namespace detail {
-    template struct extra_archive_data_id_helper<preprocess_futures>;
+    template struct HPX_PARALLELISM_EXPORT
+        extra_archive_data_id_helper<preprocess_futures>;
 }}}    // namespace hpx::serialization::detail

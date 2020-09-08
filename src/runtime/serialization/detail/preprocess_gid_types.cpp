@@ -9,5 +9,6 @@
 #include <hpx/serialization/detail/extra_archive_data.hpp>
 
 namespace hpx { namespace serialization { namespace detail {
-    template struct extra_archive_data_id_helper<preprocess_gid_types>;
+    template struct HPX_EXPORT extra_archive_data_id_helper<
+        preprocess_gid_types>;
 }}}    // namespace hpx::serialization::detail

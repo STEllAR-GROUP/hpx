@@ -9,5 +9,6 @@
 #include <hpx/serialization/detail/extra_archive_data.hpp>
 
 namespace hpx { namespace serialization { namespace detail {
-    template struct extra_archive_data_id_helper<hpx::util::checkpointing_tag>;
+    template struct HPX_EXPORT
+        extra_archive_data_id_helper<hpx::util::checkpointing_tag>;
 }}}    // namespace hpx::serialization::detail

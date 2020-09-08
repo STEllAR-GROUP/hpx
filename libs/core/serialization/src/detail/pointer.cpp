@@ -18,8 +18,10 @@
 
 namespace hpx { namespace serialization {
     namespace detail {
-        template struct extra_archive_data_id_helper<input_pointer_tracker>;
-        template struct extra_archive_data_id_helper<output_pointer_tracker>;
+        template struct HPX_CORE_EXPORT
+            extra_archive_data_id_helper<input_pointer_tracker>;
+        template struct HPX_CORE_EXPORT
+            extra_archive_data_id_helper<output_pointer_tracker>;
     }    // namespace detail
 
     void register_pointer(
