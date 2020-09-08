@@ -40,7 +40,7 @@ hpx::thread::id test(int passed_through)
 template <typename Executor>
 void test_sync(Executor& exec)
 {
-    HPX_TEST(hpx::parallel::execution::sync_execute(exec, &test, 42) !=
+    HPX_TEST(hpx::parallel::execution::sync_execute(exec, &test, 42) ==
         hpx::this_thread::get_id());
 }
 

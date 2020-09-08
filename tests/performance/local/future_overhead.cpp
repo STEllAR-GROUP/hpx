@@ -96,12 +96,6 @@ const char* exec_name(
     return "parallel_executor_aggregated";
 }
 
-const char* exec_name(
-    hpx::parallel::execution::thread_pool_executor const& exec)
-{
-    return "thread_pool_executor";
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
 double global_scratch = 0;

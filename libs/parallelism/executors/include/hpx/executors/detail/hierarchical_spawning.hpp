@@ -142,15 +142,15 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         using future_type = typename std::decay<Future>::type;
 
         // vector<future<func_result_type>> -> vector<func_result_type>
-        shared_state_type p =
-            hpx::lcos::detail::make_continuation_exec<vector_result_type>(
-                std::forward<Future>(predecessor), executor,
-                [func = std::move(func)](
-                    future_type&& predecessor) mutable -> vector_result_type {
-                    // use unwrap directly (instead of lazily) to avoid
-                    // having to pull in dataflow
-                    return hpx::util::unwrap(func(std::move(predecessor)));
-                });
+        shared_state_type p = hpx::lcos::detail::make_continuation_exec_policy<
+            vector_result_type>(std::forward<Future>(predecessor), executor,
+            policy,
+            [func = std::move(func)](
+                future_type&& predecessor) mutable -> vector_result_type {
+                // use unwrap directly (instead of lazily) to avoid
+                // having to pull in dataflow
+                return hpx::util::unwrap(func(std::move(predecessor)));
+            });
 
         return hpx::traits::future_access<result_future_type>::create(
             std::move(p));
