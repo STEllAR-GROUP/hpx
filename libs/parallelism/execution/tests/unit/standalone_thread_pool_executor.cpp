@@ -5,19 +5,18 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// The thread_pool_executor takes a thread_pool_base as an argument and
-// executes all its work on that thread pool. This checks that the usual
-// functions of an executor work with this executor when used *without the HPX
-// runtime*. This test fails if thread pools, schedulers etc. assume that the
-// global runtime (configuration, thread manager, etc.) always exists.
+// The parallel_executor has a constructor that takes a thread_pool_base as an
+// argument and executes all its work on that thread pool. This checks that the
+// usual functions of an executor work with this executor when used *without the
+// HPX runtime*. This test fails if thread pools, schedulers etc. assume that
+// the global runtime (configuration, thread manager, etc.) always exists.
 
-#include <hpx/execution_base/this_thread.hpp>
-#include <hpx/include/apply.hpp>
-#include <hpx/include/async.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/parallel_executors.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/thread_pools.hpp>
+#include <hpx/thread.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -149,8 +148,7 @@ void test_bulk_then(Executor& exec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_thread_pool_os_executor(
-    hpx::parallel::execution::thread_pool_executor exec)
+void test_thread_pool_os_executor(hpx::execution::parallel_executor exec)
 {
     test_sync(exec);
     test_async(exec);
@@ -188,7 +186,7 @@ int main(int argc, char* argv[])
         std::unique_ptr<sched_type> scheduler{new sched_type(scheduler_init)};
         hpx::threads::detail::scheduled_thread_pool<sched_type> pool{
             std::move(scheduler), thread_pool_init};
-        hpx::parallel::execution::thread_pool_executor exec{&pool};
+        hpx::execution::parallel_executor exec{&pool};
 
         // Run the pool.
         std::mutex m;

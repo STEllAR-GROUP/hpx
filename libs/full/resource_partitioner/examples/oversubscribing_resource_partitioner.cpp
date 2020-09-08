@@ -85,16 +85,16 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::size_t async_count = num_threads * 1;
 
     // create an executor with high priority for important tasks
-    hpx::parallel::execution::thread_pool_executor high_priority_executor(
+    hpx::execution::parallel_executor high_priority_executor(
         hpx::this_thread::get_pool(), hpx::threads::thread_priority_critical);
-    hpx::parallel::execution::thread_pool_executor normal_priority_executor;
+    hpx::execution::parallel_executor normal_priority_executor;
 
-    hpx::parallel::execution::thread_pool_executor mpi_executor;
+    hpx::execution::parallel_executor mpi_executor;
     // create an executor on the mpi pool
     if (use_pools)
     {
         // get executors
-        mpi_executor = hpx::parallel::execution::thread_pool_executor(
+        mpi_executor = hpx::execution::parallel_executor(
             &hpx::resource::get_thread_pool("mpi"));
         hpx::cout << "\n[hpx_main] got mpi executor " << std::endl;
     }

@@ -101,12 +101,6 @@ const char* exec_name(
     return "parallel_executor_aggregated";
 }
 
-const char* exec_name(
-    hpx::parallel::execution::thread_pool_executor const& exec)
-{
-    return "thread_pool_executor";
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
 double global_scratch = 0;
@@ -313,7 +307,6 @@ int hpx_main(variables_map& vm)
 
         hpx::execution::parallel_executor par;
         hpx::parallel::execution::parallel_executor_aggregated par_agg;
-        hpx::parallel::execution::thread_pool_executor tpe;
 
         for (int i = 0; i < repetitions; i++)
         {
@@ -325,8 +318,6 @@ int hpx_main(variables_map& vm)
                     count, csv, par, bool(cds));
                 measure_function_futures_thread_count(
                     count, csv, par_agg, bool(cds));
-                measure_function_futures_thread_count(
-                    count, csv, tpe, bool(cds));
             }
         }
     }

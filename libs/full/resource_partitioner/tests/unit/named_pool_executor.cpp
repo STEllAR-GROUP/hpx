@@ -16,6 +16,7 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -57,16 +58,17 @@ int hpx_main(int argc, char* argv[])
     }
 
     // Make sure default construction works
-    hpx::parallel::execution::thread_pool_executor exec_default;
+    hpx::execution::parallel_executor exec_default;
+    HPX_UNUSED(exec_default);
 
     // setup executors for different task priorities on the pools
     // segfaults or exceptions in any of the following will cause
     // the test to fail
-    hpx::parallel::execution::thread_pool_executor exec_0_hp(
+    hpx::execution::parallel_executor exec_0_hp(
         &hpx::resource::get_thread_pool("default"),
         hpx::threads::thread_priority_high);
 
-    hpx::parallel::execution::thread_pool_executor exec_0(
+    hpx::execution::parallel_executor exec_0(
         &hpx::resource::get_thread_pool("default"),
         hpx::threads::thread_priority_default);
 
@@ -79,16 +81,16 @@ int hpx_main(int argc, char* argv[])
     lotsa_futures.push_back(
         hpx::async(exec_0, &dummy_task, 3, "Normal default"));
 
-    std::vector<hpx::parallel::execution::thread_pool_executor> execs;
-    std::vector<hpx::parallel::execution::thread_pool_executor> execs_hp;
+    std::vector<hpx::execution::parallel_executor> execs;
+    std::vector<hpx::execution::parallel_executor> execs_hp;
     //
     for (int i = 0; i < max_threads; ++i)
     {
         std::string pool_name = "pool-" + std::to_string(i);
-        execs.push_back(hpx::parallel::execution::thread_pool_executor(
+        execs.push_back(hpx::execution::parallel_executor(
             &hpx::resource::get_thread_pool(pool_name),
             hpx::threads::thread_priority_default));
-        execs_hp.push_back(hpx::parallel::execution::thread_pool_executor(
+        execs_hp.push_back(hpx::execution::parallel_executor(
             &hpx::resource::get_thread_pool(pool_name),
             hpx::threads::thread_priority_high));
     }

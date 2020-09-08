@@ -546,8 +546,7 @@ int hpx_main(variables_map& vm)
 
         hpx::execution::parallel_executor par;
         hpx::parallel::execution::parallel_executor_aggregated par_agg;
-        hpx::parallel::execution::thread_pool_executor tpe;
-        hpx::parallel::execution::thread_pool_executor tpe_nostack(
+        hpx::parallel::execution::parallel_executor par_nostack(
             hpx::threads::thread_priority_default,
             hpx::threads::thread_stacksize_nostack);
 
@@ -558,24 +557,19 @@ int hpx_main(variables_map& vm)
                 count, csv);
             if (test_all)
             {
-                measure_function_futures_limiting_executor(count, csv, tpe);
+                measure_function_futures_limiting_executor(count, csv, par);
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
                 measure_action_futures_wait_each(count, csv);
                 measure_action_futures_wait_all(count, csv);
 #endif
                 measure_function_futures_wait_each(count, csv, par);
-                measure_function_futures_wait_each(count, csv, tpe);
                 measure_function_futures_wait_all(count, csv, par);
-                measure_function_futures_wait_all(count, csv, tpe);
                 measure_function_futures_thread_count(count, csv, par);
-                measure_function_futures_thread_count(count, csv, tpe);
                 measure_function_futures_sliding_semaphore(count, csv, par);
-                measure_function_futures_sliding_semaphore(count, csv, tpe);
                 measure_function_futures_for_loop(count, csv, par);
                 measure_function_futures_for_loop(count, csv, par_agg);
-                measure_function_futures_for_loop(count, csv, tpe);
                 measure_function_futures_for_loop(
-                    count, csv, tpe_nostack, "thread_pool_executor_nostack");
+                    count, csv, par_nostack, "parallel_executor_nostack");
                 measure_function_futures_register_work(count, csv);
                 measure_function_futures_create_thread(count, csv);
                 measure_function_futures_apply_hierarchical_placement(

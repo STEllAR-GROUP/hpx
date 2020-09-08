@@ -83,8 +83,8 @@ int hpx_main(int argc, char* /*argv*/[])
     }
 
     // setup executors for different task priorities on the pools
-    std::vector<hpx::parallel::execution::thread_pool_executor> HP_executors;
-    std::vector<hpx::parallel::execution::thread_pool_executor> NP_executors;
+    std::vector<hpx::execution::parallel_executor> HP_executors;
+    std::vector<hpx::execution::parallel_executor> NP_executors;
     for (std::size_t i = 0; i < num_pools; ++i)
     {
         std::string pool_name = "pool-" + std::to_string(i);
