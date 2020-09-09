@@ -33,6 +33,7 @@
 #include <winnt.h>
 
 #include <hpx/config.hpp>
+#include <hpx/coroutines/config/defines.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/coroutines/detail/swap_context.hpp>
@@ -46,7 +47,7 @@
 #include <cstddef>
 #include <cstdint>
 
-#if defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
+#if defined(HPX_COROUTINES_HAVE_SWAP_CONTEXT_EMULATION)
 extern "C" void switch_to_fiber(void* lpFiber) noexcept;
 #endif
 
@@ -138,7 +139,7 @@ namespace hpx { namespace threads { namespace coroutines {
                     from.m_ctx = ConvertThreadToFiber(nullptr);
                     HPX_ASSERT(from.m_ctx != nullptr);
 
-#if defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
+#if defined(HPX_COROUTINES_HAVE_SWAP_CONTEXT_EMULATION)
                     switch_to_fiber(to.m_ctx);
 #else
                     SwitchToFiber(to.m_ctx);
@@ -153,7 +154,7 @@ namespace hpx { namespace threads { namespace coroutines {
                     bool call_from_main = from.m_ctx == nullptr;
                     if (call_from_main)
                         from.m_ctx = GetCurrentFiber();
-#if defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
+#if defined(HPX_COROUTINES_HAVE_SWAP_CONTEXT_EMULATION)
                     switch_to_fiber(to.m_ctx);
 #else
                     SwitchToFiber(to.m_ctx);

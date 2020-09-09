@@ -8,6 +8,14 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+hpx_option(
+  HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION BOOL
+  "Emulate SwapContext API for coroutines (Windows only, default: OFF)" OFF
+  CATEGORY "Thread Manager"
+  ADVANCED
+  MODULE COROUTINES
+)
+
 set(coroutines_headers
     hpx/coroutines/coroutine.hpp
     hpx/coroutines/coroutine_fwd.hpp
@@ -49,8 +57,24 @@ set(coroutines_sources
 )
 
 if(MSVC)
-  if(HPX_WITH_SWAP_CONTEXT_EMULATION)
-    enable_language(ASM)
+  if(HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
+    # ##########################################################################
+    # Emulation of SwapContext on Windows
+    # ##########################################################################
+    enable_language(ASM_MASM)
+    if(NOT CMAKE_ASM_MASM_COMPILER)
+      hpx_error(
+        "SwitchToFiber emulation can not be enabled. The masm compiler \
+         could not be found. Try setting the ASM_MASM environment variable to the \
+         assembler executable (ml.exe/ml64.exe) or disable the emulation by setting \
+         HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION to Off"
+      )
+    endif()
+
+    hpx_add_config_define_namespace(
+      DEFINE HPX_COROUTINES_HAVE_SWAP_CONTEXT_EMULATION NAMESPACE COROUTINES
+    )
+
     set(switch_to_fiber_source
         "${CMAKE_CURRENT_SOURCE_DIR}/src/switch_to_fiber.asm"
     )
@@ -65,6 +89,11 @@ if(MSVC)
       VERBATIM
     )
   endif()
+elseif(HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
+  hpx_error(
+    "The option HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION is not supported on "
+    "this platform, please disable the emulation by setting it to Off"
+  )
 endif()
 
 include(HPX_AddModule)
@@ -80,3 +109,9 @@ add_hpx_module(
                       hpx_functional hpx_util
   CMAKE_SUBDIRS examples tests
 )
+
+if(MSVC AND HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
+  hpx_info(
+    "    SwitchToFiber emulation is enabled, using compiler: '${CMAKE_ASM_MASM_COMPILER}'"
+  )
+endif()
