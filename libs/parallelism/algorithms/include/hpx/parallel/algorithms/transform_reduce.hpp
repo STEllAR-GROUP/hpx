@@ -755,7 +755,7 @@ namespace hpx {
             using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
 
             return hpx::parallel::v1::detail::transform_reduce_(
-                hpx::parallel::execution::seq, first, last, std::move(init),
+                hpx::execution::seq, first, last, std::move(init),
                 std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
                 is_segmented());
         }
@@ -795,8 +795,8 @@ namespace hpx {
             using is_segmented = hpx::traits::is_segmented_iterator<FwdIter1>;
 
             return hpx::parallel::v1::detail::transform_reduce_(
-                hpx::parallel::execution::seq, first1, last1, first2,
-                std::move(init), hpx::parallel::v1::detail::plus(),
+                hpx::execution::seq, first1, last1, first2, std::move(init),
+                hpx::parallel::v1::detail::plus(),
                 hpx::parallel::v1::detail::multiplies(), is_segmented());
         }
 
@@ -865,9 +865,9 @@ namespace hpx {
             using is_segmented = hpx::traits::is_segmented_iterator<FwdIter1>;
 
             return hpx::parallel::v1::detail::transform_reduce_(
-                hpx::parallel::execution::seq, first1, last1, first2,
-                std::move(init), std::forward<Reduce>(red_op),
-                std::forward<Convert>(conv_op), is_segmented());
+                hpx::execution::seq, first1, last1, first2, std::move(init),
+                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
+                is_segmented());
         }
     } transform_reduce{};
 }    // namespace hpx

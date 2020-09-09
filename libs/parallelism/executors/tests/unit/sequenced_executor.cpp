@@ -25,14 +25,14 @@ hpx::thread::id test(int passed_through)
 
 void test_sync()
 {
-    hpx::parallel::execution::sequenced_executor exec;
+    hpx::execution::sequenced_executor exec;
     HPX_TEST(hpx::parallel::execution::sync_execute(exec, &test, 42) ==
         hpx::this_thread::get_id());
 }
 
 void test_async()
 {
-    typedef hpx::parallel::execution::parallel_executor executor;
+    typedef hpx::execution::parallel_executor executor;
 
     executor exec(hpx::launch::fork);
     HPX_TEST(hpx::parallel::execution::async_execute(exec, &test, 42).get() !=
@@ -52,7 +52,7 @@ hpx::thread::id test_f(hpx::future<void> f, int passed_through)
 
 void test_then()
 {
-    typedef hpx::parallel::execution::sequenced_executor executor;
+    typedef hpx::execution::sequenced_executor executor;
 
     hpx::future<void> f = hpx::make_ready_future();
 
@@ -79,7 +79,7 @@ void test_bulk_sync()
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
-    hpx::parallel::execution::sequenced_executor exec;
+    hpx::execution::sequenced_executor exec;
     hpx::parallel::execution::bulk_sync_execute(
         exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
     hpx::parallel::execution::bulk_sync_execute(exec, &bulk_test, v, tid, 42);
@@ -99,7 +99,7 @@ void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
 
 void test_bulk_then()
 {
-    typedef hpx::parallel::execution::sequenced_executor executor;
+    typedef hpx::execution::sequenced_executor executor;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
@@ -123,7 +123,7 @@ void test_bulk_then()
 
 void test_bulk_async()
 {
-    typedef hpx::parallel::execution::sequenced_executor executor;
+    typedef hpx::execution::sequenced_executor executor;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
@@ -145,7 +145,7 @@ void test_bulk_async()
 void static_check_executor()
 {
     using namespace hpx::traits;
-    using executor = hpx::parallel::execution::sequenced_executor;
+    using executor = hpx::execution::sequenced_executor;
 
     static_assert(has_sync_execute_member<executor>::value,
         "has_sync_execute_member<executor>::value");

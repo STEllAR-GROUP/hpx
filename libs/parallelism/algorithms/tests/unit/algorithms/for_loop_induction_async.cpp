@@ -172,25 +172,19 @@ void test_for_loop_induction_stride_life_out(ExPolicy&& policy, IteratorTag)
 template <typename IteratorTag>
 void test_for_loop_induction()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_for_loop_induction(execution::seq(execution::task), IteratorTag());
-    test_for_loop_induction(execution::par(execution::task), IteratorTag());
+    test_for_loop_induction(seq(task), IteratorTag());
+    test_for_loop_induction(par(task), IteratorTag());
 
-    test_for_loop_induction_stride(
-        execution::seq(execution::task), IteratorTag());
-    test_for_loop_induction_stride(
-        execution::par(execution::task), IteratorTag());
+    test_for_loop_induction_stride(seq(task), IteratorTag());
+    test_for_loop_induction_stride(par(task), IteratorTag());
 
-    test_for_loop_induction_life_out(
-        execution::seq(execution::task), IteratorTag());
-    test_for_loop_induction_life_out(
-        execution::par(execution::task), IteratorTag());
+    test_for_loop_induction_life_out(seq(task), IteratorTag());
+    test_for_loop_induction_life_out(par(task), IteratorTag());
 
-    test_for_loop_induction_stride_life_out(
-        execution::seq(execution::task), IteratorTag());
-    test_for_loop_induction_stride_life_out(
-        execution::par(execution::task), IteratorTag());
+    test_for_loop_induction_stride_life_out(seq(task), IteratorTag());
+    test_for_loop_induction_stride_life_out(par(task), IteratorTag());
 }
 
 void for_loop_induction_test()
@@ -256,13 +250,13 @@ void test_for_loop_induction_stride_idx(ExPolicy&& policy)
 
 void for_loop_induction_test_idx()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_for_loop_induction_idx(execution::seq(execution::task));
-    test_for_loop_induction_idx(execution::par(execution::task));
+    test_for_loop_induction_idx(seq(task));
+    test_for_loop_induction_idx(par(task));
 
-    test_for_loop_induction_stride_idx(execution::seq(execution::task));
-    test_for_loop_induction_stride_idx(execution::par(execution::task));
+    test_for_loop_induction_stride_idx(seq(task));
+    test_for_loop_induction_stride_idx(par(task));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

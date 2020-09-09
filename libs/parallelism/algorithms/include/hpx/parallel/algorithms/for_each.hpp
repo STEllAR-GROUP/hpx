@@ -626,9 +626,8 @@ namespace hpx {
         // clang-format on
         friend F tag_invoke(hpx::for_each_t, InIter first, InIter last, F&& f)
         {
-            parallel::v1::detail::for_each_(parallel::execution::seq, first,
-                last, f, parallel::util::projection_identity(),
-                std::false_type());
+            parallel::v1::detail::for_each_(hpx::execution::seq, first, last, f,
+                parallel::util::projection_identity(), std::false_type());
             return std::forward<F>(f);
         }
 
@@ -673,8 +672,8 @@ namespace hpx {
                 return first;
             }
 
-            return parallel::v1::detail::for_each_n_(parallel::execution::seq,
-                first, count, std::forward<F>(f),
+            return parallel::v1::detail::for_each_n_(hpx::execution::seq, first,
+                count, std::forward<F>(f),
                 parallel::util::projection_identity(), std::false_type());
         }
 

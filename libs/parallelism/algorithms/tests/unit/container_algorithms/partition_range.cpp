@@ -166,14 +166,14 @@ void test_partition_async(ExPolicy policy, DataType)
 template <typename DataType>
 void test_partition()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_partition(execution::seq, DataType());
-    test_partition(execution::par, DataType());
-    test_partition(execution::par_unseq, DataType());
+    test_partition(seq, DataType());
+    test_partition(par, DataType());
+    test_partition(par_unseq, DataType());
 
-    test_partition_async(execution::seq(execution::task), DataType());
-    test_partition_async(execution::par(execution::task), DataType());
+    test_partition_async(seq(task), DataType());
+    test_partition_async(par(task), DataType());
 }
 
 void test_partition()

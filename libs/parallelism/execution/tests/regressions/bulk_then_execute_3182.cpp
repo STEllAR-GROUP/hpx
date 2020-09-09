@@ -68,7 +68,7 @@ int hpx_main(int argc, char* argv[])
         void_count.store(0);
         int_count.store(0);
 
-        hpx::parallel::execution::parallel_executor exec;
+        hpx::execution::parallel_executor exec;
         test_bulk_then_execute(exec);
     }
 

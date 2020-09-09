@@ -26,11 +26,10 @@ std::atomic<std::size_t> exec_count(0);
 ///////////////////////////////////////////////////////////////////////////////
 // get_chunks_size
 
-struct test_executor_get_chunk_size
-  : hpx::parallel::execution::parallel_executor
+struct test_executor_get_chunk_size : hpx::execution::parallel_executor
 {
     test_executor_get_chunk_size()
-      : hpx::parallel::execution::parallel_executor()
+      : hpx::execution::parallel_executor()
     {
     }
 
@@ -78,7 +77,7 @@ void test_get_chunk_size()
         exec_count = 0;
 
         hpx::parallel::execution::get_chunk_size(
-            test_chunk_size{}, hpx::parallel::execution::par.executor(),
+            test_chunk_size{}, hpx::execution::par.executor(),
             [](std::size_t) { return 0; }, 1, 1);
 
         HPX_TEST_EQ(params_count, std::size_t(1));
@@ -102,10 +101,10 @@ void test_get_chunk_size()
 // maximal_number_of_chunks
 
 struct test_executor_maximal_number_of_chunks
-  : hpx::parallel::execution::parallel_executor
+  : hpx::execution::parallel_executor
 {
     test_executor_maximal_number_of_chunks()
-      : hpx::parallel::execution::parallel_executor()
+      : hpx::execution::parallel_executor()
     {
     }
 
@@ -152,8 +151,7 @@ void test_maximal_number_of_chunks()
         exec_count = 0;
 
         hpx::parallel::execution::maximal_number_of_chunks(
-            test_number_of_chunks{}, hpx::parallel::execution::par.executor(),
-            1, 1);
+            test_number_of_chunks{}, hpx::execution::par.executor(), 1, 1);
 
         HPX_TEST_EQ(params_count, std::size_t(1));
         HPX_TEST_EQ(exec_count, std::size_t(0));
@@ -176,10 +174,10 @@ void test_maximal_number_of_chunks()
 // reset_thread_distribution
 
 struct test_executor_reset_thread_distribution
-  : hpx::parallel::execution::parallel_executor
+  : hpx::execution::parallel_executor
 {
     test_executor_reset_thread_distribution()
-      : hpx::parallel::execution::parallel_executor()
+      : hpx::execution::parallel_executor()
     {
     }
 
@@ -221,8 +219,7 @@ void test_reset_thread_distribution()
         exec_count = 0;
 
         hpx::parallel::execution::reset_thread_distribution(
-            test_thread_distribution{},
-            hpx::parallel::execution::par.executor());
+            test_thread_distribution{}, hpx::execution::par.executor());
 
         HPX_TEST_EQ(params_count, std::size_t(1));
         HPX_TEST_EQ(exec_count, std::size_t(0));
@@ -244,11 +241,10 @@ void test_reset_thread_distribution()
 ///////////////////////////////////////////////////////////////////////////////
 // processing_units_count
 
-struct test_executor_processing_units_count
-  : hpx::parallel::execution::parallel_executor
+struct test_executor_processing_units_count : hpx::execution::parallel_executor
 {
     test_executor_processing_units_count()
-      : hpx::parallel::execution::parallel_executor()
+      : hpx::execution::parallel_executor()
     {
     }
 
@@ -292,7 +288,7 @@ void test_processing_units_count()
         exec_count = 0;
 
         hpx::parallel::execution::processing_units_count(
-            test_processing_units{}, hpx::parallel::execution::par.executor());
+            test_processing_units{}, hpx::execution::par.executor());
 
         HPX_TEST_EQ(params_count, std::size_t(1));
         HPX_TEST_EQ(exec_count, std::size_t(0));
@@ -313,10 +309,10 @@ void test_processing_units_count()
 ///////////////////////////////////////////////////////////////////////////////
 // mark_begin_execution, mark_end_of_scheduling, mark_end_execution
 
-struct test_executor_begin_end : hpx::parallel::execution::parallel_executor
+struct test_executor_begin_end : hpx::execution::parallel_executor
 {
     test_executor_begin_end()
-      : hpx::parallel::execution::parallel_executor()
+      : hpx::execution::parallel_executor()
     {
     }
 
@@ -382,7 +378,7 @@ void test_mark_begin_execution()
         exec_count = 0;
 
         hpx::parallel::execution::mark_begin_execution(
-            test_begin_end{}, hpx::parallel::execution::par.executor());
+            test_begin_end{}, hpx::execution::par.executor());
 
         HPX_TEST_EQ(params_count, std::size_t(1));
         HPX_TEST_EQ(exec_count, std::size_t(0));
@@ -407,7 +403,7 @@ void test_mark_end_of_scheduling()
         exec_count = 0;
 
         hpx::parallel::execution::mark_end_of_scheduling(
-            test_begin_end{}, hpx::parallel::execution::par.executor());
+            test_begin_end{}, hpx::execution::par.executor());
 
         HPX_TEST_EQ(params_count, std::size_t(1));
         HPX_TEST_EQ(exec_count, std::size_t(0));
@@ -432,7 +428,7 @@ void test_mark_end_execution()
         exec_count = 0;
 
         hpx::parallel::execution::mark_end_execution(
-            test_begin_end{}, hpx::parallel::execution::par.executor());
+            test_begin_end{}, hpx::execution::par.executor());
 
         HPX_TEST_EQ(params_count, std::size_t(1));
         HPX_TEST_EQ(exec_count, std::size_t(0));

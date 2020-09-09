@@ -19,12 +19,11 @@
 template <typename IteratorTag>
 void test_for_each_prefetching()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_for_each_prefetching(execution::par, IteratorTag());
-    test_for_each_prefetching(execution::par_unseq, IteratorTag());
-    test_for_each_prefetching_async(
-        execution::par(execution::task), IteratorTag());
+    test_for_each_prefetching(par, IteratorTag());
+    test_for_each_prefetching(par_unseq, IteratorTag());
+    test_for_each_prefetching_async(par(task), IteratorTag());
 }
 
 void for_each_prefetching_test()
@@ -36,14 +35,13 @@ void for_each_prefetching_test()
 template <typename IteratorTag>
 void test_for_each_prefetching_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_for_each_prefetching_exception(execution::par, IteratorTag());
-    test_for_each_prefetching_exception_async(
-        execution::par(execution::task), IteratorTag());
+    test_for_each_prefetching_exception(par, IteratorTag());
+    test_for_each_prefetching_exception_async(par(task), IteratorTag());
 }
 
 void for_each_prefetching_exception_test()
@@ -55,14 +53,13 @@ void for_each_prefetching_exception_test()
 template <typename IteratorTag>
 void test_for_each_prefetching_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_for_each_prefetching_bad_alloc(execution::par, IteratorTag());
-    test_for_each_prefetching_bad_alloc_async(
-        execution::par(execution::task), IteratorTag());
+    test_for_each_prefetching_bad_alloc(par, IteratorTag());
+    test_for_each_prefetching_bad_alloc_async(par(task), IteratorTag());
 }
 
 void for_each_prefetching_bad_alloc_test()

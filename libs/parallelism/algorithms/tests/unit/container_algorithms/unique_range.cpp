@@ -115,14 +115,14 @@ void test_unique_async(ExPolicy policy, DataType)
 template <typename DataType>
 void test_unique()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_unique(execution::seq, DataType());
-    test_unique(execution::par, DataType());
-    test_unique(execution::par_unseq, DataType());
+    test_unique(seq, DataType());
+    test_unique(par, DataType());
+    test_unique(par_unseq, DataType());
 
-    test_unique_async(execution::seq(execution::task), DataType());
-    test_unique_async(execution::par(execution::task), DataType());
+    test_unique_async(seq(task), DataType());
+    test_unique_async(par(task), DataType());
 }
 
 void test_unique()

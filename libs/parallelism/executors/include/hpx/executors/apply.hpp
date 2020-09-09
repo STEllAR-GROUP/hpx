@@ -31,7 +31,7 @@ namespace hpx { namespace detail {
             traits::detail::is_deferred_invocable<F, Ts...>::value, bool>::type
         call(F&& f, Ts&&... ts)
         {
-            parallel::execution::parallel_executor exec;
+            execution::parallel_executor exec;
             exec.post(std::forward<F>(f), std::forward<Ts>(ts)...);
             return false;
         }

@@ -45,8 +45,8 @@ void test_copy_if_exception(IteratorTag)
     catch (hpx::exception_list const& e)
     {
         caught_exception = true;
-        test::test_num_exceptions<hpx::parallel::execution::sequenced_policy,
-            IteratorTag>::call(hpx::parallel::execution::seq, e);
+        test::test_num_exceptions<hpx::execution::sequenced_policy,
+            IteratorTag>::call(hpx::execution::seq, e);
     }
     catch (...)
     {
@@ -133,20 +133,18 @@ void test_copy_if_exception_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_copy_if_exception()
 {
-    using namespace hpx::parallel;
-
     test_copy_if_exception(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_copy_if_exception(execution::seq, IteratorTag());
-    test_copy_if_exception(execution::par, IteratorTag());
+    test_copy_if_exception(hpx::execution::seq, IteratorTag());
+    test_copy_if_exception(hpx::execution::par, IteratorTag());
 
     test_copy_if_exception_async(
-        execution::seq(execution::task), IteratorTag());
+        hpx::execution::seq(hpx::execution::task), IteratorTag());
     test_copy_if_exception_async(
-        execution::par(execution::task), IteratorTag());
+        hpx::execution::par(hpx::execution::task), IteratorTag());
 }
 
 void copy_if_exception_test()

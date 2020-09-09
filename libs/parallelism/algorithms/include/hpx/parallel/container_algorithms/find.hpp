@@ -692,9 +692,8 @@ namespace hpx { namespace ranges {
         friend Iter tag_invoke(
             find_t, Iter first, Sent last, T const& val, Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::find_(
-                hpx::parallel::execution::seq, first, last, val,
-                std::forward<Proj>(proj), std::false_type());
+            return hpx::parallel::v1::detail::find_(hpx::execution::seq, first,
+                last, val, std::forward<Proj>(proj), std::false_type());
         }
 
         // clang-format off
@@ -708,10 +707,9 @@ namespace hpx { namespace ranges {
         friend typename hpx::traits::range_iterator<Rng>::type tag_invoke(
             find_t, Rng&& rng, T const& val, Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::find_(
-                hpx::parallel::execution::seq, hpx::util::begin(rng),
-                hpx::util::end(rng), val, std::forward<Proj>(proj),
-                std::false_type());
+            return hpx::parallel::v1::detail::find_(hpx::execution::seq,
+                hpx::util::begin(rng), hpx::util::end(rng), val,
+                std::forward<Proj>(proj), std::false_type());
         }
     } find{};
 
@@ -788,9 +786,8 @@ namespace hpx { namespace ranges {
         friend Iter tag_invoke(
             find_if_t, Iter first, Sent last, Pred&& pred, Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::find_if_(
-                hpx::parallel::execution::seq, first, last,
-                std::forward<Pred>(pred), std::forward<Proj>(proj),
+            return hpx::parallel::v1::detail::find_if_(hpx::execution::seq,
+                first, last, std::forward<Pred>(pred), std::forward<Proj>(proj),
                 std::false_type());
         }
 
@@ -810,10 +807,10 @@ namespace hpx { namespace ranges {
         friend typename hpx::traits::range_iterator<Rng>::type tag_invoke(
             find_if_t, Rng&& rng, Pred&& pred, Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::find_if_(
-                hpx::parallel::execution::seq, hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<Pred>(pred),
-                std::forward<Proj>(proj), std::false_type());
+            return hpx::parallel::v1::detail::find_if_(hpx::execution::seq,
+                hpx::util::begin(rng), hpx::util::end(rng),
+                std::forward<Pred>(pred), std::forward<Proj>(proj),
+                std::false_type());
         }
     } find_if{};
 
@@ -890,9 +887,8 @@ namespace hpx { namespace ranges {
         friend Iter tag_invoke(find_if_not_t, Iter first, Sent last,
             Pred&& pred, Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::find_if_not_(
-                hpx::parallel::execution::seq, first, last,
-                std::forward<Pred>(pred), std::forward<Proj>(proj),
+            return hpx::parallel::v1::detail::find_if_not_(hpx::execution::seq,
+                first, last, std::forward<Pred>(pred), std::forward<Proj>(proj),
                 std::false_type());
         }
 
@@ -912,10 +908,10 @@ namespace hpx { namespace ranges {
         friend typename hpx::traits::range_iterator<Rng>::type tag_invoke(
             find_if_not_t, Rng&& rng, Pred&& pred, Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::find_if_not_(
-                hpx::parallel::execution::seq, hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<Pred>(pred),
-                std::forward<Proj>(proj), std::false_type());
+            return hpx::parallel::v1::detail::find_if_not_(hpx::execution::seq,
+                hpx::util::begin(rng), hpx::util::end(rng),
+                std::forward<Pred>(pred), std::forward<Proj>(proj),
+                std::false_type());
         }
     } find_if_not{};
 
@@ -1013,7 +1009,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
                 hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                    hpx::parallel::execution::sequenced_policy, Pred,
+                    hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
                     hpx::parallel::traits::projected_range<Proj2, Rng2>
                 >::value
@@ -1035,11 +1031,10 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_end<iterator_type>().call(
-                hpx::parallel::execution::seq, std::true_type(),
-                hpx::util::begin(rng1), hpx::util::end(rng1),
-                hpx::util::begin(rng2), hpx::util::end(rng2),
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                hpx::execution::seq, std::true_type(), hpx::util::begin(rng1),
+                hpx::util::end(rng1), hpx::util::begin(rng2),
+                hpx::util::end(rng2), std::forward<Pred>(op),
+                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
 
         // clang-format off
@@ -1051,7 +1046,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent1, Iter1>::value &&
                 hpx::traits::is_sentinel_for<Sent2, Iter2>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                    hpx::parallel::execution::sequenced_policy, Pred,
+                    hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected<Proj1, Iter1>,
                     hpx::parallel::traits::projected<Proj2, Iter2>
                 >::value
@@ -1067,9 +1062,9 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_end<Iter1>().call(
-                hpx::parallel::execution::seq, std::true_type(), first1, last1,
-                first2, last2, std::forward<Pred>(op),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                hpx::execution::seq, std::true_type(), first1, last1, first2,
+                last2, std::forward<Pred>(op), std::forward<Proj1>(proj1),
+                std::forward<Proj2>(proj2));
         }
     } find_end{};
 
@@ -1167,7 +1162,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
                 hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                    hpx::parallel::execution::sequenced_policy, Pred,
+                    hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
                     hpx::parallel::traits::projected_range<Proj2, Rng2>
                 >::value
@@ -1189,7 +1184,7 @@ namespace hpx { namespace ranges {
                 "Subsequence requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_first_of<iterator_type>()
-                .call(hpx::parallel::execution::seq, std::true_type(),
+                .call(hpx::execution::seq, std::true_type(),
                     hpx::util::begin(rng1), hpx::util::end(rng1),
                     hpx::util::begin(rng2), hpx::util::end(rng2),
                     std::forward<Pred>(op), std::forward<Proj1>(proj1),
@@ -1205,7 +1200,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent1, Iter1>::value &&
                 hpx::traits::is_sentinel_for<Sent2, Iter2>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                hpx::parallel::execution::sequenced_policy, Pred,
+                hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected<Proj1, Iter1>,
                     hpx::parallel::traits::projected<Proj2, Iter2>
                 >::value
@@ -1221,9 +1216,9 @@ namespace hpx { namespace ranges {
                 "Subsequence requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_first_of<Iter1>().call(
-                hpx::parallel::execution::seq, std::true_type(), first1, last1,
-                first2, last2, std::forward<Pred>(op),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                hpx::execution::seq, std::true_type(), first1, last1, first2,
+                last2, std::forward<Pred>(op), std::forward<Proj1>(proj1),
+                std::forward<Proj2>(proj2));
         }
 
     } find_first_of{};

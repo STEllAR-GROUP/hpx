@@ -473,97 +473,94 @@ void test_remove_etc(ExPolicy policy, IteratorTag, DataType, int rand_base,
 template <typename IteratorTag>
 void test_remove(IteratorTag, int rand_base)
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     ////////// Test cases for 'int' type.
-    test_remove(
-        execution::seq, IteratorTag(), int(), int(rand_base + 1), rand_base);
-    test_remove(
-        execution::par, IteratorTag(), int(), int(rand_base), rand_base);
-    test_remove(execution::par_unseq, IteratorTag(), int(), int(rand_base - 1),
-        rand_base);
+    test_remove(seq, IteratorTag(), int(), int(rand_base + 1), rand_base);
+    test_remove(par, IteratorTag(), int(), int(rand_base), rand_base);
+    test_remove(par_unseq, IteratorTag(), int(), int(rand_base - 1), rand_base);
 
     ////////// Test cases for user defined type.
-    test_remove(execution::seq, IteratorTag(), user_defined_type(),
+    test_remove(seq, IteratorTag(), user_defined_type(),
         user_defined_type(rand_base), rand_base);
-    test_remove(execution::par, IteratorTag(), user_defined_type(),
+    test_remove(par, IteratorTag(), user_defined_type(),
         user_defined_type(rand_base + 1), rand_base);
 
     ////////// Asynchronous test cases for 'int' type.
-    test_remove_async(execution::seq(execution::task), IteratorTag(), int(),
-        int(rand_base), rand_base);
-    test_remove_async(execution::par(execution::task), IteratorTag(), int(),
-        int(rand_base - 1), rand_base);
+    test_remove_async(
+        seq(task), IteratorTag(), int(), int(rand_base), rand_base);
+    test_remove_async(
+        par(task), IteratorTag(), int(), int(rand_base - 1), rand_base);
 
     ////////// Asynchronous test cases for user defined type.
-    test_remove_async(execution::seq(execution::task), IteratorTag(),
-        user_defined_type(), user_defined_type(rand_base - 1), rand_base);
-    test_remove_async(execution::par(execution::task), IteratorTag(),
-        user_defined_type(), user_defined_type(rand_base), rand_base);
+    test_remove_async(seq(task), IteratorTag(), user_defined_type(),
+        user_defined_type(rand_base - 1), rand_base);
+    test_remove_async(par(task), IteratorTag(), user_defined_type(),
+        user_defined_type(rand_base), rand_base);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_remove_if(IteratorTag, int rand_base)
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     ////////// Test cases for 'int' type.
     test_remove_if(
-        execution::seq, IteratorTag(), int(),
+        seq, IteratorTag(), int(),
         [rand_base](const int a) -> bool { return a == rand_base; }, rand_base);
     test_remove_if(
-        execution::par, IteratorTag(), int(),
+        par, IteratorTag(), int(),
         [rand_base](const int a) -> bool { return !(a == rand_base); },
         rand_base);
     test_remove_if(
-        execution::par_unseq, IteratorTag(), int(),
+        par_unseq, IteratorTag(), int(),
         [rand_base](const int a) -> bool { return a == rand_base; }, rand_base);
 
     ////////// Test cases for user defined type.
     test_remove_if(
-        execution::seq, IteratorTag(), user_defined_type(),
+        seq, IteratorTag(), user_defined_type(),
         [rand_base](
             user_defined_type const& a) -> bool { return !(a == rand_base); },
         rand_base);
     test_remove_if(
-        execution::par, IteratorTag(), user_defined_type(),
+        par, IteratorTag(), user_defined_type(),
         [rand_base](
             user_defined_type const& a) -> bool { return a == rand_base; },
         rand_base);
     test_remove_if(
-        execution::par_unseq, IteratorTag(), user_defined_type(),
+        par_unseq, IteratorTag(), user_defined_type(),
         [rand_base](
             user_defined_type const& a) -> bool { return !(a == rand_base); },
         rand_base);
 
     ////////// Asynchronous test cases for 'int' type.
     test_remove_if_async(
-        execution::seq(execution::task), IteratorTag(), int(),
+        seq(task), IteratorTag(), int(),
         [rand_base](const int a) -> bool { return !(a == rand_base); },
         rand_base);
     test_remove_if_async(
-        execution::par(execution::task), IteratorTag(), int(),
+        par(task), IteratorTag(), int(),
         [rand_base](const int a) -> bool { return a == rand_base; }, rand_base);
 
     ////////// Asynchronous test cases for user defined type.
     test_remove_if_async(
-        execution::seq(execution::task), IteratorTag(), user_defined_type(),
+        seq(task), IteratorTag(), user_defined_type(),
         [rand_base](
             user_defined_type const& a) -> bool { return a == rand_base; },
         rand_base);
     test_remove_if_async(
-        execution::par(execution::task), IteratorTag(), user_defined_type(),
+        par(task), IteratorTag(), user_defined_type(),
         [rand_base](
             user_defined_type const& a) -> bool { return !(a == rand_base); },
         rand_base);
 
     ////////// Corner test cases.
     test_remove_if(
-        execution::par, IteratorTag(), int(),
-        [](const int) -> bool { return true; }, rand_base);
+        par, IteratorTag(), int(), [](const int) -> bool { return true; },
+        rand_base);
     test_remove_if(
-        execution::par_unseq, IteratorTag(), user_defined_type(),
+        par_unseq, IteratorTag(), user_defined_type(),
         [](user_defined_type const&) -> bool { return false; }, rand_base);
 }
 
@@ -583,42 +580,38 @@ void test_remove(bool test_for_remove_if = false)
     }
 
     ////////// Another test cases for justifying the implementation.
-    test_remove_etc(hpx::parallel::execution::seq, IteratorTag(),
-        user_defined_type(), rand_base, test_for_remove_if);
+    test_remove_etc(hpx::execution::seq, IteratorTag(), user_defined_type(),
+        rand_base, test_for_remove_if);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_remove_exception(bool test_for_remove_if = false)
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_remove_exception(execution::seq, IteratorTag(), test_for_remove_if);
-    test_remove_exception(execution::par, IteratorTag(), test_for_remove_if);
+    test_remove_exception(seq, IteratorTag(), test_for_remove_if);
+    test_remove_exception(par, IteratorTag(), test_for_remove_if);
 
-    test_remove_exception_async(
-        execution::seq(execution::task), IteratorTag(), test_for_remove_if);
-    test_remove_exception_async(
-        execution::par(execution::task), IteratorTag(), test_for_remove_if);
+    test_remove_exception_async(seq(task), IteratorTag(), test_for_remove_if);
+    test_remove_exception_async(par(task), IteratorTag(), test_for_remove_if);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_remove_bad_alloc(bool test_for_remove_if = false)
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_remove_bad_alloc(execution::seq, IteratorTag(), test_for_remove_if);
-    test_remove_bad_alloc(execution::par, IteratorTag(), test_for_remove_if);
+    test_remove_bad_alloc(seq, IteratorTag(), test_for_remove_if);
+    test_remove_bad_alloc(par, IteratorTag(), test_for_remove_if);
 
-    test_remove_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag(), test_for_remove_if);
-    test_remove_bad_alloc_async(
-        execution::par(execution::task), IteratorTag(), test_for_remove_if);
+    test_remove_bad_alloc_async(seq(task), IteratorTag(), test_for_remove_if);
+    test_remove_bad_alloc_async(par(task), IteratorTag(), test_for_remove_if);
 }

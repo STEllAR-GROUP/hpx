@@ -97,18 +97,16 @@ void test_find_if_not_bad_alloc_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_find_if_not_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_find_if_not_bad_alloc(execution::seq, IteratorTag());
-    test_find_if_not_bad_alloc(execution::par, IteratorTag());
+    test_find_if_not_bad_alloc(seq, IteratorTag());
+    test_find_if_not_bad_alloc(par, IteratorTag());
 
-    test_find_if_not_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag());
-    test_find_if_not_bad_alloc_async(
-        execution::par(execution::task), IteratorTag());
+    test_find_if_not_bad_alloc_async(seq(task), IteratorTag());
+    test_find_if_not_bad_alloc_async(par(task), IteratorTag());
 }
 
 void find_if_not_bad_alloc_test()

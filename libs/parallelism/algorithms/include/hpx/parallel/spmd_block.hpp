@@ -245,8 +245,8 @@ namespace hpx { namespace lcos { namespace local {
     template <typename F, typename... Args>
     void define_spmd_block(std::size_t num_images, F&& f, Args&&... args)
     {
-        define_spmd_block(parallel::execution::par, num_images,
-            std::forward<F>(f), std::forward<Args>(args)...);
+        define_spmd_block(hpx::execution::par, num_images, std::forward<F>(f),
+            std::forward<Args>(args)...);
     }
 }}}    // namespace hpx::lcos::local
 
@@ -289,7 +289,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
     template <typename F, typename... Args>
     void define_spmd_block(std::size_t num_images, F&& f, Args&&... args)
     {
-        hpx::lcos::local::define_spmd_block(parallel::execution::par,
-            num_images, std::forward<F>(f), std::forward<Args>(args)...);
+        hpx::lcos::local::define_spmd_block(hpx::execution::par, num_images,
+            std::forward<F>(f), std::forward<Args>(args)...);
     }
 }}}    // namespace hpx::parallel::v2

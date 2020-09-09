@@ -89,10 +89,10 @@ void for_each_zipiter_test(ExPolicy&& policy, IteratorTag)
 template <typename IteratorTag>
 void for_each_zipiter_test()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     for_each_zipiter_test(execution::datapar, IteratorTag());
-    //     test_for_each_async(execution::datapar(execution::task), IteratorTag());
+    //     test_for_each_async(execution::datapar(task), IteratorTag());
 }
 
 void for_each_zipiter_test()

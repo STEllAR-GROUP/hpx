@@ -127,16 +127,16 @@ void test_copy_if_async(ExPolicy&& p)
 
 void test_copy_if()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_copy_if_seq();
 
-    test_copy_if(execution::seq);
-    test_copy_if(execution::par);
-    test_copy_if(execution::par_unseq);
+    test_copy_if(seq);
+    test_copy_if(par);
+    test_copy_if(par_unseq);
 
-    test_copy_if_async(execution::seq(execution::task));
-    test_copy_if_async(execution::par(execution::task));
+    test_copy_if_async(seq(task));
+    test_copy_if_async(par(task));
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

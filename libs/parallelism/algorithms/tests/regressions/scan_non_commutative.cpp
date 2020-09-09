@@ -25,8 +25,7 @@ void test_scan_non_commutative()
     {
         std::vector<std::string> rs(vs.size());
         hpx::parallel::inclusive_scan(
-            hpx::parallel::execution::par.with(
-                hpx::parallel::execution::static_chunk_size(i)),
+            hpx::execution::par.with(hpx::execution::static_chunk_size(i)),
             vs.cbegin(), vs.cend(), rs.begin());
         std::cout << rs.back() << "\n";
         bool is_equal =
@@ -38,8 +37,7 @@ void test_scan_non_commutative()
     {
         std::vector<std::string> rs(vs.size());
         hpx::parallel::exclusive_scan(
-            hpx::parallel::execution::par.with(
-                hpx::parallel::execution::static_chunk_size(i)),
+            hpx::execution::par.with(hpx::execution::static_chunk_size(i)),
             vs.cbegin(), vs.cend(), rs.begin(), std::string("0"));
         std::cout << rs.back() << "\n";
         bool is_equal =

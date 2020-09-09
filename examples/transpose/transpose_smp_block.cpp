@@ -60,8 +60,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::cout << "Untiled\n";
     std::cout << "Number of iterations  = " << iterations << "\n";
 
-    using hpx::parallel::execution::par;
-    using hpx::parallel::execution::task;
+    using hpx::execution::par;
+    using hpx::execution::task;
     using hpx::ranges::for_each;
 
     const std::uint64_t start = 0;

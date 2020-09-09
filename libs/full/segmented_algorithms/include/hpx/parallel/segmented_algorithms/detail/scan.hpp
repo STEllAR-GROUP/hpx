@@ -635,14 +635,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // wait for 1. step of current partition to prevent race condition
                 // when used in place
                 finalitems.push_back(hpx::dataflow(policy.executor(),
-                    hpx::util::unwrapping(
-                        [=, &op, &conv](T last_value, T) -> void {
-                            dispatch(traits_out::get_id(out_it),
-                                segmented_scan_void<Algo>(),
-                                hpx::parallel::execution::seq, std::true_type(),
-                                get<0>(in_tuple), get<1>(in_tuple), out, conv,
-                                last_value, op);
-                        }),
+                    hpx::util::unwrapping([=, &op, &conv](
+                                              T last_value, T) -> void {
+                        dispatch(traits_out::get_id(out_it),
+                            segmented_scan_void<Algo>(), hpx::execution::seq,
+                            std::true_type(), get<0>(in_tuple),
+                            get<1>(in_tuple), out, conv, last_value, op);
+                    }),
                     workitems.back(), res));
 
                 // 3. Step: compute new init value for the next segment

@@ -80,7 +80,7 @@ double receive_double(
         if (i == skip)
             t.restart();
 
-        using hpx::parallel::execution::par;
+        using hpx::execution::par;
         using hpx::ranges::for_each;
 
         std::size_t const start = 0;
@@ -112,8 +112,8 @@ double receive(hpx::naming::id_type dest, char* send_buffer, std::size_t size,
         if (i == skip)
             t.restart();
 
+        using hpx::execution::par;
         using hpx::parallel::for_each;
-        using hpx::parallel::execution::par;
 
         std::size_t const start = 0;
 

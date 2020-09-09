@@ -17,16 +17,14 @@
 template <typename IteratorTag>
 void test_transform_binary2()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_transform_binary2(execution::seq, IteratorTag());
-    test_transform_binary2(execution::par, IteratorTag());
-    test_transform_binary2(execution::par_unseq, IteratorTag());
+    test_transform_binary2(seq, IteratorTag());
+    test_transform_binary2(par, IteratorTag());
+    test_transform_binary2(par_unseq, IteratorTag());
 
-    test_transform_binary2_async(
-        execution::seq(execution::task), IteratorTag());
-    test_transform_binary2_async(
-        execution::par(execution::task), IteratorTag());
+    test_transform_binary2_async(seq(task), IteratorTag());
+    test_transform_binary2_async(par(task), IteratorTag());
 }
 
 void transform_binary2_test()
@@ -39,18 +37,16 @@ void transform_binary2_test()
 template <typename IteratorTag>
 void test_transform_binary2_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_transform_binary2_exception(execution::seq, IteratorTag());
-    test_transform_binary2_exception(execution::par, IteratorTag());
+    test_transform_binary2_exception(seq, IteratorTag());
+    test_transform_binary2_exception(par, IteratorTag());
 
-    test_transform_binary2_exception_async(
-        execution::seq(execution::task), IteratorTag());
-    test_transform_binary2_exception_async(
-        execution::par(execution::task), IteratorTag());
+    test_transform_binary2_exception_async(seq(task), IteratorTag());
+    test_transform_binary2_exception_async(par(task), IteratorTag());
 }
 
 void transform_binary2_exception_test()
@@ -63,18 +59,16 @@ void transform_binary2_exception_test()
 template <typename IteratorTag>
 void test_transform_binary2_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_transform_binary2_bad_alloc(execution::seq, IteratorTag());
-    test_transform_binary2_bad_alloc(execution::par, IteratorTag());
+    test_transform_binary2_bad_alloc(seq, IteratorTag());
+    test_transform_binary2_bad_alloc(par, IteratorTag());
 
-    test_transform_binary2_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag());
-    test_transform_binary2_bad_alloc_async(
-        execution::par(execution::task), IteratorTag());
+    test_transform_binary2_bad_alloc_async(seq(task), IteratorTag());
+    test_transform_binary2_bad_alloc_async(par(task), IteratorTag());
 }
 
 void transform_binary2_bad_alloc_test()

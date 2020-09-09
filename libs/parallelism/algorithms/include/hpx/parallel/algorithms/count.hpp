@@ -514,9 +514,9 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::count_(
-                hpx::parallel::execution::seq, first, last, value,
-                hpx::parallel::util::projection_identity{}, std::false_type{});
+            return hpx::parallel::v1::detail::count_(hpx::execution::seq, first,
+                last, value, hpx::parallel::util::projection_identity{},
+                std::false_type{});
         }
     } count{};
 
@@ -566,8 +566,8 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::count_if_(
-                hpx::parallel::execution::seq, first, last, std::forward<F>(f),
+            return hpx::parallel::v1::detail::count_if_(hpx::execution::seq,
+                first, last, std::forward<F>(f),
                 hpx::parallel::util::projection_identity{}, std::false_type{});
         }
     } count_if{};

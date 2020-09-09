@@ -371,70 +371,70 @@ void test_partition_heavy(
 template <typename IteratorTag>
 void test_partition()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     int rand_base = _gen();
 
     ////////// Test cases for 'int' type.
     test_partition(
-        execution::seq, IteratorTag(), int(),
+        seq, IteratorTag(), int(),
         [rand_base](const int n) -> bool { return n < rand_base; }, rand_base);
     test_partition(
-        execution::par, IteratorTag(), int(),
+        par, IteratorTag(), int(),
         [rand_base](const int n) -> bool { return n <= rand_base; }, rand_base);
     test_partition(
-        execution::par_unseq, IteratorTag(), int(),
+        par_unseq, IteratorTag(), int(),
         [rand_base](const int n) -> bool { return n > rand_base; }, rand_base);
 
     ////////// Test cases for user defined type.
     test_partition(
-        execution::seq, IteratorTag(), user_defined_type(),
+        seq, IteratorTag(), user_defined_type(),
         [rand_base](
             user_defined_type const& t) -> bool { return t < rand_base; },
         rand_base);
     test_partition(
-        execution::par, IteratorTag(), user_defined_type(),
+        par, IteratorTag(), user_defined_type(),
         [rand_base](
             user_defined_type const& t) -> bool { return !(t < rand_base); },
         rand_base);
     test_partition(
-        execution::par_unseq, IteratorTag(), user_defined_type(),
+        par_unseq, IteratorTag(), user_defined_type(),
         [rand_base](
             user_defined_type const& t) -> bool { return t < rand_base; },
         rand_base);
 
     ////////// Asynchronous test cases for 'int' type.
     test_partition_async(
-        execution::seq(execution::task), IteratorTag(), int(),
+        seq(task), IteratorTag(), int(),
         [rand_base](const int n) -> bool { return n >= rand_base; }, rand_base);
     test_partition_async(
-        execution::par(execution::task), IteratorTag(), int(),
+        par(task), IteratorTag(), int(),
         [rand_base](const int n) -> bool { return n < rand_base; }, rand_base);
 
     ////////// Asynchronous test cases for user defined type.
     test_partition_async(
-        execution::seq(execution::task), IteratorTag(), user_defined_type(),
+        seq(task), IteratorTag(), user_defined_type(),
         [rand_base](
             user_defined_type const& t) -> bool { return !(t < rand_base); },
         rand_base);
     test_partition_async(
-        execution::par(execution::task), IteratorTag(), user_defined_type(),
+        par(task), IteratorTag(), user_defined_type(),
         [rand_base](
             user_defined_type const& t) -> bool { return t < rand_base; },
         rand_base);
 
     ////////// Corner test cases.
     test_partition(
-        execution::par, IteratorTag(), int(),
-        [](const int n) -> bool { return true; }, rand_base);
+        par, IteratorTag(), int(), [](const int n) -> bool { return true; },
+        rand_base);
     test_partition(
-        execution::par_unseq, IteratorTag(), user_defined_type(),
+        par_unseq, IteratorTag(), user_defined_type(),
         [](user_defined_type const& t) -> bool { return false; }, rand_base);
 
     ////////// Many test cases for meticulous tests.
 #if !defined(HPX_DEBUG) && !defined(HPX_HAVE_SANITIZERS)
     test_partition_heavy(
-        execution::par, IteratorTag(), int(),
+        par, IteratorTag(), int(),
         [rand_base](const int n) -> bool { return n < rand_base; }, rand_base);
 #endif
 }
@@ -443,34 +443,30 @@ void test_partition()
 template <typename IteratorTag>
 void test_partition_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_partition_exception(execution::seq, IteratorTag());
-    test_partition_exception(execution::par, IteratorTag());
+    test_partition_exception(seq, IteratorTag());
+    test_partition_exception(par, IteratorTag());
 
-    test_partition_exception_async(
-        execution::seq(execution::task), IteratorTag());
-    test_partition_exception_async(
-        execution::par(execution::task), IteratorTag());
+    test_partition_exception_async(seq(task), IteratorTag());
+    test_partition_exception_async(par(task), IteratorTag());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_partition_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_partition_bad_alloc(execution::seq, IteratorTag());
-    test_partition_bad_alloc(execution::par, IteratorTag());
+    test_partition_bad_alloc(seq, IteratorTag());
+    test_partition_bad_alloc(par, IteratorTag());
 
-    test_partition_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag());
-    test_partition_bad_alloc_async(
-        execution::par(execution::task), IteratorTag());
+    test_partition_bad_alloc_async(seq(task), IteratorTag());
+    test_partition_bad_alloc_async(par(task), IteratorTag());
 }

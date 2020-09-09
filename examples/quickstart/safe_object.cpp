@@ -79,7 +79,7 @@ inline bool satisfies_criteria(int d)
 
 int hpx_main(int argc, char* argv[])
 {
-    using hpx::parallel::execution::par;
+    using hpx::execution::par;
     using hpx::ranges::for_each;
 
     // initialize data

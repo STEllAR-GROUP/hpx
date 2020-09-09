@@ -359,7 +359,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::cout << "Number of iterations  = " << iterations << "\n";
         }
 
-        using hpx::parallel::execution::par;
+        using hpx::execution::par;
         using hpx::ranges::for_each;
 
         // Fill the original matrix, set transpose to known garbage value.

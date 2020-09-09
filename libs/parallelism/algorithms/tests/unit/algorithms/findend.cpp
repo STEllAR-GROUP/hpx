@@ -104,16 +104,16 @@ void test_find_end1_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_find_end1()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_find_end1(IteratorTag());
 
-    test_find_end1(execution::seq, IteratorTag());
-    test_find_end1(execution::par, IteratorTag());
-    test_find_end1(execution::par_unseq, IteratorTag());
+    test_find_end1(seq, IteratorTag());
+    test_find_end1(par, IteratorTag());
+    test_find_end1(par_unseq, IteratorTag());
 
-    test_find_end1_async(execution::seq(execution::task), IteratorTag());
-    test_find_end1_async(execution::par(execution::task), IteratorTag());
+    test_find_end1_async(seq(task), IteratorTag());
+    test_find_end1_async(par(task), IteratorTag());
 }
 
 void find_end_test1()
@@ -207,16 +207,16 @@ void test_find_end2_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_find_end2()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_find_end2(IteratorTag());
 
-    test_find_end2(execution::seq, IteratorTag());
-    test_find_end2(execution::par, IteratorTag());
-    test_find_end2(execution::par_unseq, IteratorTag());
+    test_find_end2(seq, IteratorTag());
+    test_find_end2(par, IteratorTag());
+    test_find_end2(par_unseq, IteratorTag());
 
-    test_find_end2_async(execution::seq(execution::task), IteratorTag());
-    test_find_end2_async(execution::par(execution::task), IteratorTag());
+    test_find_end2_async(seq(task), IteratorTag());
+    test_find_end2_async(par(task), IteratorTag());
 }
 
 void find_end_test2()
@@ -311,16 +311,16 @@ void test_find_end3_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_find_end3()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_find_end3(IteratorTag());
 
-    test_find_end3(execution::seq, IteratorTag());
-    test_find_end3(execution::par, IteratorTag());
-    test_find_end3(execution::par_unseq, IteratorTag());
+    test_find_end3(seq, IteratorTag());
+    test_find_end3(par, IteratorTag());
+    test_find_end3(par_unseq, IteratorTag());
 
-    test_find_end3_async(execution::seq(execution::task), IteratorTag());
-    test_find_end3_async(execution::par(execution::task), IteratorTag());
+    test_find_end3_async(seq(task), IteratorTag());
+    test_find_end3_async(par(task), IteratorTag());
 }
 
 void find_end_test3()
@@ -412,16 +412,16 @@ void test_find_end4_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_find_end4()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_find_end4(IteratorTag());
 
-    test_find_end4(execution::seq, IteratorTag());
-    test_find_end4(execution::par, IteratorTag());
-    test_find_end4(execution::par_unseq, IteratorTag());
+    test_find_end4(seq, IteratorTag());
+    test_find_end4(par, IteratorTag());
+    test_find_end4(par_unseq, IteratorTag());
 
-    test_find_end4_async(execution::seq(execution::task), IteratorTag());
-    test_find_end4_async(execution::par(execution::task), IteratorTag());
+    test_find_end4_async(seq(task), IteratorTag());
+    test_find_end4_async(par(task), IteratorTag());
 }
 
 void find_end_test4()
@@ -503,8 +503,8 @@ void test_find_end_exception(IteratorTag)
     catch (hpx::exception_list const& e)
     {
         caught_exception = true;
-        test::test_num_exceptions<hpx::parallel::execution::sequenced_policy,
-            IteratorTag>::call(hpx::parallel::execution::seq, e);
+        test::test_num_exceptions<hpx::execution::sequenced_policy,
+            IteratorTag>::call(hpx::execution::seq, e);
     }
     catch (...)
     {
@@ -560,20 +560,18 @@ void test_find_end_exception_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_find_end_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_find_end_exception(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_find_end_exception(execution::seq, IteratorTag());
-    test_find_end_exception(execution::par, IteratorTag());
+    test_find_end_exception(seq, IteratorTag());
+    test_find_end_exception(par, IteratorTag());
 
-    test_find_end_exception_async(
-        execution::seq(execution::task), IteratorTag());
-    test_find_end_exception_async(
-        execution::par(execution::task), IteratorTag());
+    test_find_end_exception_async(seq(task), IteratorTag());
+    test_find_end_exception_async(par(task), IteratorTag());
 }
 
 void find_end_exception_test()
@@ -663,18 +661,16 @@ void test_find_end_bad_alloc_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_find_end_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_find_end_bad_alloc(execution::seq, IteratorTag());
-    test_find_end_bad_alloc(execution::par, IteratorTag());
+    test_find_end_bad_alloc(seq, IteratorTag());
+    test_find_end_bad_alloc(par, IteratorTag());
 
-    test_find_end_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag());
-    test_find_end_bad_alloc_async(
-        execution::par(execution::task), IteratorTag());
+    test_find_end_bad_alloc_async(seq(task), IteratorTag());
+    test_find_end_bad_alloc_async(par(task), IteratorTag());
 }
 
 void find_end_bad_alloc_test()

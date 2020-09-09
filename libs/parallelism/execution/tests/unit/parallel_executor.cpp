@@ -25,7 +25,7 @@ hpx::thread::id test(int passed_through)
 
 void test_sync()
 {
-    typedef hpx::parallel::execution::parallel_executor executor;
+    typedef hpx::execution::parallel_executor executor;
 
     executor exec;
     HPX_TEST(hpx::parallel::execution::sync_execute(exec, &test, 42) ==
@@ -34,7 +34,7 @@ void test_sync()
 
 void test_async()
 {
-    typedef hpx::parallel::execution::parallel_executor executor;
+    typedef hpx::execution::parallel_executor executor;
 
     executor exec;
     HPX_TEST(hpx::parallel::execution::async_execute(exec, &test, 42).get() !=
@@ -54,7 +54,7 @@ hpx::thread::id test_f(hpx::future<void> f, int passed_through)
 
 void test_then()
 {
-    typedef hpx::parallel::execution::parallel_executor executor;
+    typedef hpx::execution::parallel_executor executor;
 
     hpx::future<void> f = hpx::make_ready_future();
 
@@ -73,7 +73,7 @@ void bulk_test(int value, hpx::thread::id tid, int passed_through)    //-V813
 
 void test_bulk_sync()
 {
-    typedef hpx::parallel::execution::parallel_executor executor;
+    typedef hpx::execution::parallel_executor executor;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
@@ -92,7 +92,7 @@ void test_bulk_sync()
 ///////////////////////////////////////////////////////////////////////////////
 void test_bulk_async()
 {
-    typedef hpx::parallel::execution::parallel_executor executor;
+    typedef hpx::execution::parallel_executor executor;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
@@ -125,7 +125,7 @@ void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
 
 void test_bulk_then()
 {
-    typedef hpx::parallel::execution::parallel_executor executor;
+    typedef hpx::execution::parallel_executor executor;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
@@ -150,7 +150,7 @@ void test_bulk_then()
 void static_check_executor()
 {
     using namespace hpx::traits;
-    using executor = hpx::parallel::execution::parallel_executor;
+    using executor = hpx::execution::parallel_executor;
 
     static_assert(has_sync_execute_member<executor>::value,
         "has_sync_execute_member<executor>::value");

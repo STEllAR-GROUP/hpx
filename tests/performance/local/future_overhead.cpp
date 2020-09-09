@@ -85,7 +85,7 @@ void print_stats(const char* title, const char* wait, const char* exec,
     //hpx::util::print_cdash_timing(title, duration);
 }
 
-const char* exec_name(hpx::parallel::execution::parallel_executor const& exec)
+const char* exec_name(hpx::execution::parallel_executor const& exec)
 {
     return "parallel_executor";
 }
@@ -252,7 +252,6 @@ template <typename Executor>
 void measure_function_futures_limiting_executor(
     std::uint64_t count, bool csv, Executor exec)
 {
-    using namespace hpx::parallel::execution;
     std::uint64_t const num_threads = hpx::get_num_worker_threads();
     std::uint64_t const tasks = num_threads * 2000;
     std::atomic<std::uint64_t> sanity_check(count);
@@ -276,14 +275,14 @@ void measure_function_futures_limiting_executor(
 
     // test a parallel algorithm on custom pool with high priority
     auto const chunk_size = count / (num_threads * 2);
-    hpx::parallel::execution::static_chunk_size fixed(chunk_size);
+    hpx::execution::static_chunk_size fixed(chunk_size);
 
     // start the clock
     high_resolution_timer walltime;
     {
         hpx::execution::experimental::limiting_executor<Executor> signal_exec(
             exec, tasks, tasks + 1000);
-        hpx::for_loop(hpx::parallel::execution::par.with(fixed), 0, count,
+        hpx::for_loop(hpx::execution::par.with(fixed), 0, count,
             [&](std::uint64_t) {
                 hpx::apply(signal_exec, [&]() {
                     null_function();
@@ -350,8 +349,8 @@ void measure_function_futures_for_loop(std::uint64_t count, bool csv,
 {
     // start the clock
     high_resolution_timer walltime;
-    hpx::for_loop(hpx::parallel::execution::par.on(exec).with(
-                      hpx::parallel::execution::static_chunk_size(1),
+    hpx::for_loop(hpx::execution::par.on(exec).with(
+                      hpx::execution::static_chunk_size(1),
                       unlimited_number_of_chunks()),
         0, count, [](std::uint64_t) { null_function(); });
 
@@ -503,7 +502,7 @@ void measure_function_futures_apply_hierarchical_placement(
         auto const hint =
             hpx::threads::thread_schedule_hint(static_cast<std::int16_t>(t));
         auto spawn_func = [&func, hint, t, count, num_threads]() {
-            auto exec = hpx::parallel::execution::parallel_executor(hint);
+            auto exec = hpx::execution::parallel_executor(hint);
             std::uint64_t const count_start = t * count / num_threads;
             std::uint64_t const count_end = (t + 1) * count / num_threads;
 
@@ -513,7 +512,7 @@ void measure_function_futures_apply_hierarchical_placement(
             }
         };
 
-        auto exec = hpx::parallel::execution::parallel_executor(hint);
+        auto exec = hpx::execution::parallel_executor(hint);
         hpx::apply(exec, spawn_func);
     }
     l.wait();
@@ -551,7 +550,7 @@ int hpx_main(variables_map& vm)
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
 
-        hpx::parallel::execution::parallel_executor par;
+        hpx::execution::parallel_executor par;
         hpx::parallel::execution::parallel_executor_aggregated par_agg;
         hpx::parallel::execution::thread_pool_executor tpe;
         hpx::parallel::execution::thread_pool_executor tpe_nostack(

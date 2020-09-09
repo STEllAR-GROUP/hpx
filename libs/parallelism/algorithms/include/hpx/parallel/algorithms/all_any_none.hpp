@@ -621,8 +621,8 @@ namespace hpx {
         // clang-format on
         friend bool tag_invoke(none_of_t, FwdIter first, FwdIter last, F&& f)
         {
-            return hpx::parallel::v1::detail::none_of_(
-                hpx::parallel::execution::seq, first, last, std::forward<F>(f),
+            return hpx::parallel::v1::detail::none_of_(hpx::execution::seq,
+                first, last, std::forward<F>(f),
                 hpx::parallel::util::projection_identity{}, std::false_type{});
         }
     } none_of{};
@@ -659,8 +659,8 @@ namespace hpx {
         // clang-format on
         friend bool tag_invoke(any_of_t, FwdIter first, FwdIter last, F&& f)
         {
-            return hpx::parallel::v1::detail::any_of_(
-                hpx::parallel::execution::seq, first, last, std::forward<F>(f),
+            return hpx::parallel::v1::detail::any_of_(hpx::execution::seq,
+                first, last, std::forward<F>(f),
                 hpx::parallel::util::projection_identity{}, std::false_type{});
         }
     } any_of{};
@@ -697,8 +697,8 @@ namespace hpx {
         // clang-format on
         friend bool tag_invoke(all_of_t, FwdIter first, FwdIter last, F&& f)
         {
-            return hpx::parallel::v1::detail::all_of_(
-                hpx::parallel::execution::seq, first, last, std::forward<F>(f),
+            return hpx::parallel::v1::detail::all_of_(hpx::execution::seq,
+                first, last, std::forward<F>(f),
                 hpx::parallel::util::projection_identity{}, std::false_type{});
         }
     } all_of{};

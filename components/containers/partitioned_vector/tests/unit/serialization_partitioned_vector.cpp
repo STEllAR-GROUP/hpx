@@ -39,7 +39,7 @@ void test(T minval, T maxval)
         hpx::partitioned_vector<T> os(sz);
         os.register_as("test_vector");
         hpx::fill(
-            hpx::parallel::execution::par, std::begin(os), std::end(os), 42);
+            hpx::execution::par, std::begin(os), std::end(os), 42);
 
         oarchive << os;
 
@@ -47,7 +47,7 @@ void test(T minval, T maxval)
 
         hpx::partitioned_vector<T> is(os.size());
         hpx::fill(
-            hpx::parallel::execution::par, std::begin(is), std::end(is), 0);
+            hpx::execution::par, std::begin(is), std::end(is), 0);
 
         iarchive >> is;
 

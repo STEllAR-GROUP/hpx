@@ -93,8 +93,8 @@ void sort_by_key_benchmark()
         o_values = values;
 
         hpx::util::high_resolution_timer t;
-        hpx::parallel::sort_by_key(hpx::parallel::execution::par, keys.begin(),
-            keys.end(), values.begin());
+        hpx::parallel::sort_by_key(
+            hpx::execution::par, keys.begin(), keys.end(), values.begin());
         auto elapsed = static_cast<std::uint64_t>(t.elapsed_nanoseconds());
 
         // after sorting by key, the values should be equal to the original keys
@@ -224,7 +224,7 @@ void test_sort_by_key_async(
 ////////////////////////////////////////////////////////////////////////////////
 void test_sort_by_key1()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
     //
     // run many tests in a loop for N seconds just to play safe
     //
@@ -234,34 +234,34 @@ void test_sort_by_key1()
     do
     {
         //
-        test_sort_by_key1(execution::seq, int(), int(), std::equal_to<int>(),
+        test_sort_by_key1(seq, int(), int(), std::equal_to<int>(),
             [](int key) { return key; });
-        test_sort_by_key1(execution::par, int(), int(), std::equal_to<int>(),
+        test_sort_by_key1(par, int(), int(), std::equal_to<int>(),
             [](int key) { return key; });
-        test_sort_by_key1(execution::par_unseq, int(), int(),
-            std::equal_to<int>(), [](int key) { return key; });
+        test_sort_by_key1(par_unseq, int(), int(), std::equal_to<int>(),
+            [](int key) { return key; });
         //
-        test_sort_by_key1(execution::seq, int(), double(),
-            std::equal_to<double>(), [](int key) { return key; });
-        test_sort_by_key1(execution::par, int(), double(),
-            std::equal_to<double>(), [](int key) { return key; });
-        test_sort_by_key1(execution::par_unseq, int(), double(),
-            std::equal_to<double>(), [](int key) { return key; });
+        test_sort_by_key1(seq, int(), double(), std::equal_to<double>(),
+            [](int key) { return key; });
+        test_sort_by_key1(par, int(), double(), std::equal_to<double>(),
+            [](int key) { return key; });
+        test_sort_by_key1(par_unseq, int(), double(), std::equal_to<double>(),
+            [](int key) { return key; });
         // custom compare
         test_sort_by_key1(
-            execution::seq, double(), double(),
+            seq, double(), double(),
             [](double a, double b) {
                 return std::floor(a) == std::floor(b);
             },    //-V550
             [](double a) { return std::floor(a); });
         test_sort_by_key1(
-            execution::par, double(), double(),
+            par, double(), double(),
             [](double a, double b) {
                 return std::floor(a) == std::floor(b);
             },    //-V550
             [](double a) { return std::floor(a); });
         test_sort_by_key1(
-            execution::par_unseq, double(), double(),
+            par_unseq, double(), double(),
             [](double a, double b) {
                 return std::floor(a) == std::floor(b);
             },    //-V550
@@ -271,14 +271,14 @@ void test_sort_by_key1()
     hpx::util::high_resolution_timer t2;
     do
     {
-        test_sort_by_key_async(execution::seq(execution::task), int(), int(),
-            std::equal_to<int>(), [](int key) { return key; });
-        test_sort_by_key_async(execution::par(execution::task), int(), int(),
-            std::equal_to<int>(), [](int key) { return key; });
+        test_sort_by_key_async(seq(task), int(), int(), std::equal_to<int>(),
+            [](int key) { return key; });
+        test_sort_by_key_async(par(task), int(), int(), std::equal_to<int>(),
+            [](int key) { return key; });
         //
-        test_sort_by_key_async(execution::seq(execution::task), int(), double(),
+        test_sort_by_key_async(seq(task), int(), double(),
             std::equal_to<double>(), [](int key) { return key; });
-        test_sort_by_key_async(execution::par(execution::task), int(), double(),
+        test_sort_by_key_async(par(task), int(), double(),
             std::equal_to<double>(), [](int key) { return key; });
     } while (t2.elapsed() < seconds);
 }

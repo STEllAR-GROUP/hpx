@@ -94,13 +94,13 @@ void test_swap_ranges_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_swap_ranges()
 {
-    using namespace hpx::parallel;
-    test_swap_ranges(execution::seq, IteratorTag());
-    test_swap_ranges(execution::par, IteratorTag());
-    test_swap_ranges(execution::par_unseq, IteratorTag());
+    using namespace hpx::execution;
+    test_swap_ranges(seq, IteratorTag());
+    test_swap_ranges(par, IteratorTag());
+    test_swap_ranges(par_unseq, IteratorTag());
 
-    test_swap_ranges_async(execution::seq(execution::task), IteratorTag());
-    test_swap_ranges_async(execution::par(execution::task), IteratorTag());
+    test_swap_ranges_async(seq(task), IteratorTag());
+    test_swap_ranges_async(par(task), IteratorTag());
 }
 
 void swap_ranges_test()
@@ -190,18 +190,16 @@ void test_swap_ranges_exception_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_swap_ranges_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_swap_ranges_exception(execution::seq, IteratorTag());
-    test_swap_ranges_exception(execution::par, IteratorTag());
+    test_swap_ranges_exception(seq, IteratorTag());
+    test_swap_ranges_exception(par, IteratorTag());
 
-    test_swap_ranges_exception_async(
-        execution::seq(execution::task), IteratorTag());
-    test_swap_ranges_exception_async(
-        execution::par(execution::task), IteratorTag());
+    test_swap_ranges_exception_async(seq(task), IteratorTag());
+    test_swap_ranges_exception_async(par(task), IteratorTag());
 }
 
 void swap_ranges_exception_test()
@@ -287,18 +285,16 @@ void test_swap_ranges_bad_alloc_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_swap_ranges_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_swap_ranges_bad_alloc(execution::seq, IteratorTag());
-    test_swap_ranges_bad_alloc(execution::par, IteratorTag());
+    test_swap_ranges_bad_alloc(seq, IteratorTag());
+    test_swap_ranges_bad_alloc(par, IteratorTag());
 
-    test_swap_ranges_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag());
-    test_swap_ranges_bad_alloc_async(
-        execution::par(execution::task), IteratorTag());
+    test_swap_ranges_bad_alloc_async(seq(task), IteratorTag());
+    test_swap_ranges_bad_alloc_async(par(task), IteratorTag());
 }
 
 void swap_ranges_bad_alloc_test()

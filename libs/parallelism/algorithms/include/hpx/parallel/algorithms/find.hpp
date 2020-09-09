@@ -1183,9 +1183,9 @@ namespace hpx {
         friend FwdIter tag_invoke(
             find_t, FwdIter first, FwdIter last, T const& val)
         {
-            return hpx::parallel::v1::detail::find_(
-                hpx::parallel::execution::seq, first, last, val,
-                hpx::parallel::util::projection_identity(), std::false_type());
+            return hpx::parallel::v1::detail::find_(hpx::execution::seq, first,
+                last, val, hpx::parallel::util::projection_identity(),
+                std::false_type());
         }
 
     } find{};
@@ -1229,8 +1229,8 @@ namespace hpx {
         // clang-format on
         friend FwdIter tag_invoke(find_if_t, FwdIter first, FwdIter last, F&& f)
         {
-            return hpx::parallel::v1::detail::find_if_(
-                hpx::parallel::execution::seq, first, last, std::forward<F>(f),
+            return hpx::parallel::v1::detail::find_if_(hpx::execution::seq,
+                first, last, std::forward<F>(f),
                 hpx::parallel::util::projection_identity(), std::false_type());
         }
 
@@ -1276,8 +1276,8 @@ namespace hpx {
         friend FwdIter tag_invoke(
             find_if_not_t, FwdIter first, FwdIter last, F&& f)
         {
-            return hpx::parallel::v1::detail::find_if_not_(
-                hpx::parallel::execution::seq, first, last, std::forward<F>(f),
+            return hpx::parallel::v1::detail::find_if_not_(hpx::execution::seq,
+                first, last, std::forward<F>(f),
                 hpx::parallel::util::projection_identity(), std::false_type());
         }
 
@@ -1373,8 +1373,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_end<FwdIter1>().call(
-                hpx::parallel::execution::seq, std::true_type(), first1, last1,
-                first2, last2, std::forward<Pred>(op),
+                hpx::execution::seq, std::true_type(), first1, last1, first2,
+                last2, std::forward<Pred>(op),
                 hpx::parallel::util::projection_identity(),
                 hpx::parallel::util::projection_identity());
         }
@@ -1395,8 +1395,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_end<FwdIter1>().call(
-                hpx::parallel::execution::seq, std::true_type(), first1, last1,
-                first2, last2, hpx::parallel::v1::detail::equal_to{},
+                hpx::execution::seq, std::true_type(), first1, last1, first2,
+                last2, hpx::parallel::v1::detail::equal_to{},
                 hpx::parallel::util::projection_identity(),
                 hpx::parallel::util::projection_identity());
         }
@@ -1491,8 +1491,8 @@ namespace hpx {
                 "Subsequence requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_first_of<FwdIter1>().call(
-                hpx::parallel::execution::seq, std::true_type(), first, last,
-                s_first, s_last, std::forward<Pred>(op),
+                hpx::execution::seq, std::true_type(), first, last, s_first,
+                s_last, std::forward<Pred>(op),
                 hpx::parallel::util::projection_identity(),
                 hpx::parallel::util::projection_identity());
         }
@@ -1513,8 +1513,8 @@ namespace hpx {
                 "Subsequence requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_first_of<FwdIter1>().call(
-                hpx::parallel::execution::seq, std::true_type(), first, last,
-                s_first, s_last, hpx::parallel::v1::detail::equal_to{},
+                hpx::execution::seq, std::true_type(), first, last, s_first,
+                s_last, hpx::parallel::v1::detail::equal_to{},
                 hpx::parallel::util::projection_identity(),
                 hpx::parallel::util::projection_identity());
         }

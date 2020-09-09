@@ -213,26 +213,22 @@ void test_for_loop_bad_alloc_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_for_loop_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_for_loop_exception(execution::seq, IteratorTag());
-    test_for_loop_exception(execution::par, IteratorTag());
+    test_for_loop_exception(seq, IteratorTag());
+    test_for_loop_exception(par, IteratorTag());
 
-    test_for_loop_bad_alloc(execution::seq, IteratorTag());
-    test_for_loop_bad_alloc(execution::par, IteratorTag());
+    test_for_loop_bad_alloc(seq, IteratorTag());
+    test_for_loop_bad_alloc(par, IteratorTag());
 
-    test_for_loop_exception_async(
-        execution::seq(execution::task), IteratorTag());
-    test_for_loop_exception_async(
-        execution::par(execution::task), IteratorTag());
+    test_for_loop_exception_async(seq(task), IteratorTag());
+    test_for_loop_exception_async(par(task), IteratorTag());
 
-    test_for_loop_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag());
-    test_for_loop_bad_alloc_async(
-        execution::par(execution::task), IteratorTag());
+    test_for_loop_bad_alloc_async(seq(task), IteratorTag());
+    test_for_loop_bad_alloc_async(par(task), IteratorTag());
 }
 
 void for_loop_exception_test()
@@ -380,21 +376,19 @@ void test_for_loop_idx_bad_alloc_async(ExPolicy&& p)
 template <typename IteratorTag>
 void test_for_loop_exception_idx()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_for_loop_idx_exception(execution::seq, IteratorTag());
-    test_for_loop_idx_exception(execution::par, IteratorTag());
+    test_for_loop_idx_exception(seq, IteratorTag());
+    test_for_loop_idx_exception(par, IteratorTag());
 
-    test_for_loop_idx_bad_alloc(execution::seq);
-    test_for_loop_idx_bad_alloc(execution::par);
+    test_for_loop_idx_bad_alloc(seq);
+    test_for_loop_idx_bad_alloc(par);
 
-    test_for_loop_idx_exception_async(
-        execution::seq(execution::task), IteratorTag());
-    test_for_loop_idx_exception_async(
-        execution::par(execution::task), IteratorTag());
+    test_for_loop_idx_exception_async(seq(task), IteratorTag());
+    test_for_loop_idx_exception_async(par(task), IteratorTag());
 
-    test_for_loop_idx_bad_alloc_async(execution::seq(execution::task));
-    test_for_loop_idx_bad_alloc_async(execution::par(execution::task));
+    test_for_loop_idx_bad_alloc_async(seq(task));
+    test_for_loop_idx_bad_alloc_async(par(task));
 }
 
 void for_loop_exception_test_idx()

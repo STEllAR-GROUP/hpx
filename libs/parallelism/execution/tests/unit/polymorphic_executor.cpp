@@ -182,10 +182,10 @@ int hpx_main(int argc, char* argv[])
 {
     static_check_executor();
 
-    hpx::parallel::execution::parallel_executor par_exec;
+    hpx::execution::parallel_executor par_exec;
     test_executor(executor(par_exec));
 
-    hpx::parallel::execution::sequenced_executor seq_exec;
+    hpx::execution::sequenced_executor seq_exec;
     test_executor(executor(seq_exec));
 
     return hpx::finalize();

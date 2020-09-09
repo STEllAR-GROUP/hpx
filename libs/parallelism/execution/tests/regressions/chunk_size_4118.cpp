@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
     return hpx::util::report_errors();
 }
 
-struct test_async_executor : hpx::parallel::execution::parallel_executor
+struct test_async_executor : hpx::execution::parallel_executor
 {
     template <typename F, typename T>
     hpx::future<typename hpx::util::invoke_result<F, T, std::size_t>::type>
@@ -32,7 +32,7 @@ struct test_async_executor : hpx::parallel::execution::parallel_executor
         // make sure the chunk_size is equal to what was specified below
         HPX_TEST_EQ(chunk_size, std::size_t(50000));
 
-        using base_type = hpx::parallel::execution::parallel_executor;
+        using base_type = hpx::execution::parallel_executor;
         return this->base_type::async_execute(
             std::forward<F>(f), std::forward<T>(t), chunk_size);
     }
@@ -47,17 +47,16 @@ namespace hpx { namespace parallel { namespace execution {
 
 int hpx_main(int argc, char** argv)
 {
-    using namespace hpx::parallel;
     using namespace hpx::util;
 
     // create a fixed chunk size to be used in the algorithm
-    execution::static_chunk_size fixed(50000);
+    hpx::execution::static_chunk_size fixed(50000);
 
     // helper-executor to verify the used chunk-size
     test_async_executor exec;
 
     // this does not seem to be obeyed!
-    auto ex = execution::par.on(exec).with(fixed);
+    auto ex = hpx::execution::par.on(exec).with(fixed);
 
     // create and fill random vector of desired size
     std::random_device rnd_device;
@@ -72,7 +71,7 @@ int hpx_main(int argc, char** argv)
 
     std::vector<int> result(sz + 1);
 
-    exclusive_scan(ex, data.begin(), data.end(), result.begin(), 0);
+    hpx::exclusive_scan(ex, data.begin(), data.end(), result.begin(), 0);
 
     return hpx::finalize();
 }

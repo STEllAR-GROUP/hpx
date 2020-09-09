@@ -80,16 +80,16 @@ void test_fill_n_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_fill_n()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_fill_n(IteratorTag());
 
-    test_fill_n(execution::seq, IteratorTag());
-    test_fill_n(execution::par, IteratorTag());
-    test_fill_n(execution::par_unseq, IteratorTag());
+    test_fill_n(seq, IteratorTag());
+    test_fill_n(par, IteratorTag());
+    test_fill_n(par_unseq, IteratorTag());
 
-    test_fill_n_async(execution::seq(execution::task), IteratorTag());
-    test_fill_n_async(execution::par(execution::task), IteratorTag());
+    test_fill_n_async(seq(task), IteratorTag());
+    test_fill_n_async(par(task), IteratorTag());
 }
 
 void fill_test()

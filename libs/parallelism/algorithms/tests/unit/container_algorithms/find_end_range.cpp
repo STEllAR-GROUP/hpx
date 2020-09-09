@@ -178,22 +178,22 @@ void test_find_end1_async_proj(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_find_end1()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_find_end1(IteratorTag());
-    test_find_end1(execution::seq, IteratorTag());
-    test_find_end1(execution::par, IteratorTag());
-    test_find_end1(execution::par_unseq, IteratorTag());
+    test_find_end1(seq, IteratorTag());
+    test_find_end1(par, IteratorTag());
+    test_find_end1(par_unseq, IteratorTag());
 
     test_find_end1_proj(IteratorTag());
-    test_find_end1_proj(execution::seq, IteratorTag());
-    test_find_end1_proj(execution::par, IteratorTag());
-    test_find_end1_proj(execution::par_unseq, IteratorTag());
+    test_find_end1_proj(seq, IteratorTag());
+    test_find_end1_proj(par, IteratorTag());
+    test_find_end1_proj(par_unseq, IteratorTag());
 
-    test_find_end1_async(execution::seq(execution::task), IteratorTag());
-    test_find_end1_async(execution::par(execution::task), IteratorTag());
-    test_find_end1_async_proj(execution::seq(execution::task), IteratorTag());
-    test_find_end1_async_proj(execution::par(execution::task), IteratorTag());
+    test_find_end1_async(seq(task), IteratorTag());
+    test_find_end1_async(par(task), IteratorTag());
+    test_find_end1_async_proj(seq(task), IteratorTag());
+    test_find_end1_async_proj(par(task), IteratorTag());
 }
 
 void find_end_test1()
@@ -371,22 +371,22 @@ void test_find_end2_async_proj(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_find_end2()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_find_end2(IteratorTag());
-    test_find_end2(execution::seq, IteratorTag());
-    test_find_end2(execution::par, IteratorTag());
-    test_find_end2(execution::par_unseq, IteratorTag());
+    test_find_end2(seq, IteratorTag());
+    test_find_end2(par, IteratorTag());
+    test_find_end2(par_unseq, IteratorTag());
 
     test_find_end2_proj(IteratorTag());
-    test_find_end2_proj(execution::seq, IteratorTag());
-    test_find_end2_proj(execution::par, IteratorTag());
-    test_find_end2_proj(execution::par_unseq, IteratorTag());
+    test_find_end2_proj(seq, IteratorTag());
+    test_find_end2_proj(par, IteratorTag());
+    test_find_end2_proj(par_unseq, IteratorTag());
 
-    test_find_end2_async(execution::seq(execution::task), IteratorTag());
-    test_find_end2_async(execution::par(execution::task), IteratorTag());
-    test_find_end2_async_proj(execution::seq(execution::task), IteratorTag());
-    test_find_end2_async_proj(execution::par(execution::task), IteratorTag());
+    test_find_end2_async(seq(task), IteratorTag());
+    test_find_end2_async(par(task), IteratorTag());
+    test_find_end2_async_proj(seq(task), IteratorTag());
+    test_find_end2_async_proj(par(task), IteratorTag());
 }
 
 void find_end_test2()
@@ -561,22 +561,22 @@ void test_find_end3_async_proj(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_find_end3()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_find_end3(IteratorTag());
-    test_find_end3(execution::seq, IteratorTag());
-    test_find_end3(execution::par, IteratorTag());
-    test_find_end3(execution::par_unseq, IteratorTag());
+    test_find_end3(seq, IteratorTag());
+    test_find_end3(par, IteratorTag());
+    test_find_end3(par_unseq, IteratorTag());
 
     test_find_end3_proj(IteratorTag());
-    test_find_end3_proj(execution::seq, IteratorTag());
-    test_find_end3_proj(execution::par, IteratorTag());
-    test_find_end3_proj(execution::par_unseq, IteratorTag());
+    test_find_end3_proj(seq, IteratorTag());
+    test_find_end3_proj(par, IteratorTag());
+    test_find_end3_proj(par_unseq, IteratorTag());
 
-    test_find_end3_async(execution::seq(execution::task), IteratorTag());
-    test_find_end3_async(execution::par(execution::task), IteratorTag());
-    test_find_end3_async_proj(execution::seq(execution::task), IteratorTag());
-    test_find_end3_async_proj(execution::par(execution::task), IteratorTag());
+    test_find_end3_async(seq(task), IteratorTag());
+    test_find_end3_async(par(task), IteratorTag());
+    test_find_end3_async_proj(seq(task), IteratorTag());
+    test_find_end3_async_proj(par(task), IteratorTag());
 }
 
 void find_end_test3()
@@ -748,22 +748,22 @@ void test_find_end4_async_proj(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_find_end4()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_find_end4(IteratorTag());
-    test_find_end4(execution::seq, IteratorTag());
-    test_find_end4(execution::par, IteratorTag());
-    test_find_end4(execution::par_unseq, IteratorTag());
+    test_find_end4(seq, IteratorTag());
+    test_find_end4(par, IteratorTag());
+    test_find_end4(par_unseq, IteratorTag());
 
     test_find_end4_proj(IteratorTag());
-    test_find_end4_proj(execution::seq, IteratorTag());
-    test_find_end4_proj(execution::par, IteratorTag());
-    test_find_end4_proj(execution::par_unseq, IteratorTag());
+    test_find_end4_proj(seq, IteratorTag());
+    test_find_end4_proj(par, IteratorTag());
+    test_find_end4_proj(par_unseq, IteratorTag());
 
-    test_find_end4_async(execution::seq(execution::task), IteratorTag());
-    test_find_end4_async(execution::par(execution::task), IteratorTag());
-    test_find_end4_async_proj(execution::seq(execution::task), IteratorTag());
-    test_find_end4_async_proj(execution::par(execution::task), IteratorTag());
+    test_find_end4_async(seq(task), IteratorTag());
+    test_find_end4_async(par(task), IteratorTag());
+    test_find_end4_async_proj(seq(task), IteratorTag());
+    test_find_end4_async_proj(par(task), IteratorTag());
 }
 
 void find_end_test4()

@@ -105,13 +105,13 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     auto dest = std::begin(result);
 
     // initialize data
-    using namespace hpx::parallel;
-    generate(execution::par, std::begin(src1), std::end(src1),
-        random_fill(random_range));
-    generate(execution::par, std::begin(src2), std::end(src2),
-        random_fill(random_range));
-    sort(execution::par, std::begin(src1), std::end(src1));
-    sort(execution::par, std::begin(src2), std::end(src2));
+    using namespace hpx::execution;
+    hpx::parallel::generate(
+        par, std::begin(src1), std::end(src1), random_fill(random_range));
+    hpx::parallel::generate(
+        par, std::begin(src2), std::end(src2), random_fill(random_range));
+    hpx::parallel::sort(par, std::begin(src1), std::end(src1));
+    hpx::parallel::sort(par, std::begin(src2), std::end(src2));
 
     std::cout << "* Running Benchmark..." << std::endl;
     std::cout << "--- run_merge_benchmark_std ---" << std::endl;
@@ -120,15 +120,15 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
 
     std::cout << "--- run_merge_benchmark_seq ---" << std::endl;
     double time_seq = run_merge_benchmark_hpx(
-        test_count, execution::seq, first1, last1, first2, last2, dest);
+        test_count, seq, first1, last1, first2, last2, dest);
 
     std::cout << "--- run_merge_benchmark_par ---" << std::endl;
     double time_par = run_merge_benchmark_hpx(
-        test_count, execution::par, first1, last1, first2, last2, dest);
+        test_count, par, first1, last1, first2, last2, dest);
 
     std::cout << "--- run_merge_benchmark_par_unseq ---" << std::endl;
     double time_par_unseq = run_merge_benchmark_hpx(
-        test_count, execution::par_unseq, first1, last1, first2, last2, dest);
+        test_count, par_unseq, first1, last1, first2, last2, dest);
 
     std::cout << "\n-------------- Benchmark Result --------------"
               << std::endl;

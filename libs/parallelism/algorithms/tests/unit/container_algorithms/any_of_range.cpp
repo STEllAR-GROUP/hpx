@@ -109,34 +109,34 @@ void test_any_of()
             return !static_cast<bool>(x);
         }
     };
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_any_of_seq(IteratorTag());
     test_any_of_seq(IteratorTag(), proj());
 
-    test_any_of(execution::seq, IteratorTag());
-    test_any_of(execution::par, IteratorTag());
-    test_any_of(execution::par_unseq, IteratorTag());
+    test_any_of(seq, IteratorTag());
+    test_any_of(par, IteratorTag());
+    test_any_of(par_unseq, IteratorTag());
 
-    test_any_of(execution::seq, IteratorTag(), proj());
-    test_any_of(execution::par, IteratorTag(), proj());
-    test_any_of(execution::par_unseq, IteratorTag(), proj());
+    test_any_of(seq, IteratorTag(), proj());
+    test_any_of(par, IteratorTag(), proj());
+    test_any_of(par_unseq, IteratorTag(), proj());
 
-    test_any_of_async(execution::seq(execution::task), IteratorTag());
-    test_any_of_async(execution::par(execution::task), IteratorTag());
+    test_any_of_async(seq(task), IteratorTag());
+    test_any_of_async(par(task), IteratorTag());
 
-    test_any_of_async(execution::seq(execution::task), IteratorTag(), proj());
-    test_any_of_async(execution::par(execution::task), IteratorTag(), proj());
+    test_any_of_async(seq(task), IteratorTag(), proj());
+    test_any_of_async(par(task), IteratorTag(), proj());
 }
 
 // template <typename IteratorTag>
 // void test_any_of_exec()
 // {
-//     using namespace hpx::parallel;
+//     using namespace hpx::execution;
 //
 //     {
 //         hpx::threads::executors::local_priority_queue_executor exec;
-//         test_any_of(execution::par(exec), IteratorTag());
+//         test_any_of(par(exec), IteratorTag());
 //     }
 //     {
 //         hpx::threads::executors::local_priority_queue_executor exec;
@@ -145,7 +145,7 @@ void test_any_of()
 //
 //     {
 //         hpx::threads::executors::local_priority_queue_executor exec;
-//         test_any_of(execution_policy(execution::par(exec)), IteratorTag());
+//         test_any_of(execution_policy(par(exec)), IteratorTag());
 //     }
 //     {
 //         hpx::threads::executors::local_priority_queue_executor exec;
@@ -184,9 +184,8 @@ void test_any_of_exception(IteratorTag)
         catch (hpx::exception_list const& e)
         {
             caught_exception = true;
-            test::test_num_exceptions<
-                hpx::parallel::execution::sequenced_policy,
-                IteratorTag>::call(hpx::parallel::execution::seq, e);
+            test::test_num_exceptions<hpx::execution::sequenced_policy,
+                IteratorTag>::call(hpx::execution::seq, e);
         }
         catch (...)
         {
@@ -278,18 +277,18 @@ void test_any_of_exception_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_any_of_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_any_of_exception(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_any_of_exception(execution::seq, IteratorTag());
-    test_any_of_exception(execution::par, IteratorTag());
+    test_any_of_exception(seq, IteratorTag());
+    test_any_of_exception(par, IteratorTag());
 
-    test_any_of_exception_async(execution::seq(execution::task), IteratorTag());
-    test_any_of_exception_async(execution::par(execution::task), IteratorTag());
+    test_any_of_exception_async(seq(task), IteratorTag());
+    test_any_of_exception_async(par(task), IteratorTag());
 }
 
 void any_of_exception_test()
@@ -376,16 +375,16 @@ void test_any_of_bad_alloc_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_any_of_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_any_of_bad_alloc(execution::seq, IteratorTag());
-    test_any_of_bad_alloc(execution::par, IteratorTag());
+    test_any_of_bad_alloc(seq, IteratorTag());
+    test_any_of_bad_alloc(par, IteratorTag());
 
-    test_any_of_bad_alloc_async(execution::seq(execution::task), IteratorTag());
-    test_any_of_bad_alloc_async(execution::par(execution::task), IteratorTag());
+    test_any_of_bad_alloc_async(seq(task), IteratorTag());
+    test_any_of_bad_alloc_async(par(task), IteratorTag());
 }
 
 void any_of_bad_alloc_test()

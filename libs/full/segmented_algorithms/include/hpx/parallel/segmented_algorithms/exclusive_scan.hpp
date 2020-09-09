@@ -108,9 +108,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return result::get(dataflow(
                     [=](vector_type r) {
                         exclusive_scan<typename vector_type::iterator>()
-                            .parallel(hpx::parallel::execution::par, first + 1,
-                                last, r.begin() + 1,
-                                std::forward<value_type>(*first), op);
+                            .parallel(hpx::execution::par, first + 1, last,
+                                r.begin() + 1, std::forward<value_type>(*first),
+                                op);
                         r[0] = op(r.back(), *(last - 1));
                         return r;
                     },

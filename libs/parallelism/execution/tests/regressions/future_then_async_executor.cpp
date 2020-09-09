@@ -15,7 +15,7 @@
 
 struct test_async_executor
 {
-    using execution_category = hpx::parallel::execution::parallel_execution_tag;
+    using execution_category = hpx::execution::parallel_execution_tag;
 
     template <typename F, typename... Ts>
     static hpx::future<typename hpx::util::invoke_result<F, Ts...>::type>

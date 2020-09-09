@@ -16,7 +16,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     /// Iterations are dynamically assigned to threads in blocks as threads
     /// request them until no blocks remain to be assigned. Similar to
@@ -82,12 +82,19 @@ namespace hpx { namespace parallel { namespace execution {
         std::size_t min_chunk_size_;
         /// \endcond
     };
+}}    // namespace hpx::execution
+
+namespace hpx { namespace parallel { namespace execution {
+    using guided_chunk_size HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::execution::guided_chunk_size is deprecated. Use "
+        "hpx::execution::guided_chunk_size instead.") =
+        hpx::execution::guided_chunk_size;
 }}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
     template <>
-    struct is_executor_parameters<parallel::execution::guided_chunk_size>
+    struct is_executor_parameters<hpx::execution::guided_chunk_size>
       : std::true_type
     {
     };

@@ -70,30 +70,26 @@ template <typename T>
 void transform_scan_tests(std::size_t num, hpx::partitioned_vector<T>& xvalues,
     hpx::partitioned_vector<T>& out)
 {
-    test_transform_inclusive_scan(hpx::parallel::execution::seq, xvalues, out);
+    test_transform_inclusive_scan(hpx::execution::seq, xvalues, out);
     HPX_TEST_EQ((out[num - 1]), T(2 * num));
-    test_transform_inclusive_scan(hpx::parallel::execution::par, xvalues, out);
-    HPX_TEST_EQ((out[num - 1]), T(2 * num));
-    test_transform_inclusive_scan_async(
-        hpx::parallel::execution::seq(hpx::parallel::execution::task), xvalues,
-        out);
+    test_transform_inclusive_scan(hpx::execution::par, xvalues, out);
     HPX_TEST_EQ((out[num - 1]), T(2 * num));
     test_transform_inclusive_scan_async(
-        hpx::parallel::execution::par(hpx::parallel::execution::task), xvalues,
-        out);
+        hpx::execution::seq(hpx::execution::task), xvalues, out);
+    HPX_TEST_EQ((out[num - 1]), T(2 * num));
+    test_transform_inclusive_scan_async(
+        hpx::execution::par(hpx::execution::task), xvalues, out);
     HPX_TEST_EQ((out[num - 1]), T(2 * num));
 
-    test_transform_exclusive_scan(hpx::parallel::execution::seq, xvalues, out);
+    test_transform_exclusive_scan(hpx::execution::seq, xvalues, out);
     HPX_TEST_EQ((out[num - 1]), T(2 * (num - 1)));
-    test_transform_exclusive_scan(hpx::parallel::execution::par, xvalues, out);
-    HPX_TEST_EQ((out[num - 1]), T(2 * (num - 1)));
-    test_transform_exclusive_scan_async(
-        hpx::parallel::execution::seq(hpx::parallel::execution::task), xvalues,
-        out);
+    test_transform_exclusive_scan(hpx::execution::par, xvalues, out);
     HPX_TEST_EQ((out[num - 1]), T(2 * (num - 1)));
     test_transform_exclusive_scan_async(
-        hpx::parallel::execution::par(hpx::parallel::execution::task), xvalues,
-        out);
+        hpx::execution::seq(hpx::execution::task), xvalues, out);
+    HPX_TEST_EQ((out[num - 1]), T(2 * (num - 1)));
+    test_transform_exclusive_scan_async(
+        hpx::execution::par(hpx::execution::task), xvalues, out);
     HPX_TEST_EQ((out[num - 1]), T(2 * (num - 1)));
 }
 

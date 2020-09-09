@@ -237,7 +237,7 @@ template <typename T, typename DistPolicy>
 void exclusive_scan_tests_with_policy(
     std::size_t size, DistPolicy const& policy)
 {
-    using namespace hpx::parallel::execution;
+    using namespace hpx::execution;
 
     // setup partitioned vector to test
     hpx::partitioned_vector<T> in(size, policy);
@@ -265,7 +265,7 @@ template <typename T, typename DistPolicy>
 void exclusive_scan_tests_segmented_out_with_policy(
     std::size_t size, DistPolicy const& in_policy, DistPolicy const& out_policy)
 {
-    using namespace hpx::parallel::execution;
+    using namespace hpx::execution;
 
     // setup partitioned vector to test
     hpx::partitioned_vector<T> in(size, in_policy);
@@ -297,7 +297,7 @@ template <typename T, typename DistPolicy>
 void exclusive_scan_tests_inplace_with_policy(
     std::size_t size, DistPolicy const& policy)
 {
-    using namespace hpx::parallel::execution;
+    using namespace hpx::execution;
 
     // setup verification vector
     std::vector<T> ver(size);

@@ -146,26 +146,21 @@ void test_uninitialized_default_construct_n_async2(ExPolicy policy, IteratorTag)
 template <typename IteratorTag>
 void test_uninitialized_default_construct_n()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_uninitialized_default_construct_n(execution::seq, IteratorTag());
-    test_uninitialized_default_construct_n(execution::par, IteratorTag());
-    test_uninitialized_default_construct_n(execution::par_unseq, IteratorTag());
+    test_uninitialized_default_construct_n(seq, IteratorTag());
+    test_uninitialized_default_construct_n(par, IteratorTag());
+    test_uninitialized_default_construct_n(par_unseq, IteratorTag());
 
-    test_uninitialized_default_construct_n_async(
-        execution::seq(execution::task), IteratorTag());
-    test_uninitialized_default_construct_n_async(
-        execution::par(execution::task), IteratorTag());
+    test_uninitialized_default_construct_n_async(seq(task), IteratorTag());
+    test_uninitialized_default_construct_n_async(par(task), IteratorTag());
 
-    test_uninitialized_default_construct_n2(execution::seq, IteratorTag());
-    test_uninitialized_default_construct_n2(execution::par, IteratorTag());
-    test_uninitialized_default_construct_n2(
-        execution::par_unseq, IteratorTag());
+    test_uninitialized_default_construct_n2(seq, IteratorTag());
+    test_uninitialized_default_construct_n2(par, IteratorTag());
+    test_uninitialized_default_construct_n2(par_unseq, IteratorTag());
 
-    test_uninitialized_default_construct_n_async(
-        execution::seq(execution::task), IteratorTag());
-    test_uninitialized_default_construct_n_async2(
-        execution::par(execution::task), IteratorTag());
+    test_uninitialized_default_construct_n_async(seq(task), IteratorTag());
+    test_uninitialized_default_construct_n_async2(par(task), IteratorTag());
 }
 
 void uninitialized_default_construct_n_test()
@@ -282,20 +277,18 @@ void test_uninitialized_default_construct_n_exception_async(
 template <typename IteratorTag>
 void test_uninitialized_default_construct_n_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_uninitialized_default_construct_n_exception(
-        execution::seq, IteratorTag());
-    test_uninitialized_default_construct_n_exception(
-        execution::par, IteratorTag());
+    test_uninitialized_default_construct_n_exception(seq, IteratorTag());
+    test_uninitialized_default_construct_n_exception(par, IteratorTag());
 
     test_uninitialized_default_construct_n_exception_async(
-        execution::seq(execution::task), IteratorTag());
+        seq(task), IteratorTag());
     test_uninitialized_default_construct_n_exception_async(
-        execution::par(execution::task), IteratorTag());
+        par(task), IteratorTag());
 }
 
 void uninitialized_default_construct_n_exception_test()
@@ -413,20 +406,18 @@ void test_uninitialized_default_construct_n_bad_alloc_async(
 template <typename IteratorTag>
 void test_uninitialized_default_construct_n_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_uninitialized_default_construct_n_bad_alloc(
-        execution::seq, IteratorTag());
-    test_uninitialized_default_construct_n_bad_alloc(
-        execution::par, IteratorTag());
+    test_uninitialized_default_construct_n_bad_alloc(seq, IteratorTag());
+    test_uninitialized_default_construct_n_bad_alloc(par, IteratorTag());
 
     test_uninitialized_default_construct_n_bad_alloc_async(
-        execution::seq(execution::task), IteratorTag());
+        seq(task), IteratorTag());
     test_uninitialized_default_construct_n_bad_alloc_async(
-        execution::par(execution::task), IteratorTag());
+        par(task), IteratorTag());
 }
 
 void uninitialized_default_construct_n_bad_alloc_test()

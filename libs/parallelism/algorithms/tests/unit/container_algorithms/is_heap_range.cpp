@@ -100,14 +100,14 @@ void test_is_heap_async(ExPolicy policy, DataType)
 template <typename DataType>
 void test_is_heap()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_is_heap(execution::seq, DataType());
-    test_is_heap(execution::par, DataType());
-    test_is_heap(execution::par_unseq, DataType());
+    test_is_heap(seq, DataType());
+    test_is_heap(par, DataType());
+    test_is_heap(par_unseq, DataType());
 
-    test_is_heap_async(execution::seq(execution::task), DataType());
-    test_is_heap_async(execution::par(execution::task), DataType());
+    test_is_heap_async(seq(task), DataType());
+    test_is_heap_async(par(task), DataType());
 }
 
 void test_is_heap()

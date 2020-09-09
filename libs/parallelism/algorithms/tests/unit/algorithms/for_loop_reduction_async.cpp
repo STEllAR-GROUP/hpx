@@ -109,20 +109,16 @@ void test_for_loop_reduction_min(ExPolicy&& policy, IteratorTag)
 template <typename IteratorTag>
 void test_for_loop_reduction()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_for_loop_reduction_plus(
-        execution::seq(execution::task), IteratorTag());
-    test_for_loop_reduction_plus(
-        execution::par(execution::task), IteratorTag());
+    test_for_loop_reduction_plus(seq(task), IteratorTag());
+    test_for_loop_reduction_plus(par(task), IteratorTag());
 
-    test_for_loop_reduction_multiplies(
-        execution::seq(execution::task), IteratorTag());
-    test_for_loop_reduction_multiplies(
-        execution::par(execution::task), IteratorTag());
+    test_for_loop_reduction_multiplies(seq(task), IteratorTag());
+    test_for_loop_reduction_multiplies(par(task), IteratorTag());
 
-    test_for_loop_reduction_min(execution::seq(execution::task), IteratorTag());
-    test_for_loop_reduction_min(execution::par(execution::task), IteratorTag());
+    test_for_loop_reduction_min(seq(task), IteratorTag());
+    test_for_loop_reduction_min(par(task), IteratorTag());
 }
 
 void for_loop_reduction_test()
@@ -178,13 +174,13 @@ void test_for_loop_reduction_bit_or_idx(ExPolicy&& policy)
 
 void for_loop_reduction_test_idx()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_for_loop_reduction_bit_and_idx(execution::seq(execution::task));
-    test_for_loop_reduction_bit_and_idx(execution::par(execution::task));
+    test_for_loop_reduction_bit_and_idx(seq(task));
+    test_for_loop_reduction_bit_and_idx(par(task));
 
-    test_for_loop_reduction_bit_or_idx(execution::seq(execution::task));
-    test_for_loop_reduction_bit_or_idx(execution::par(execution::task));
+    test_for_loop_reduction_bit_or_idx(seq(task));
+    test_for_loop_reduction_bit_or_idx(par(task));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

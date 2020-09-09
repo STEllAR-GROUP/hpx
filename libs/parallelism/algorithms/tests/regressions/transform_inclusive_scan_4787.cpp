@@ -31,8 +31,7 @@ int main(int argc, char* argv[])
     std::vector<Elem> output(test.size());
 
     hpx::parallel::transform_inclusive_scan(
-        hpx::parallel::execution::par, test.cbegin(), test.cend(),
-        output.begin(),
+        hpx::execution::par, test.cbegin(), test.cend(), output.begin(),
         [](Elem left, Elem right) -> Elem {
             if (right.begin)
             {

@@ -442,7 +442,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::v1::detail::copy_iter<FwdIter1, FwdIter>;
 
             return hpx::parallel::v1::detail::transfer<copy_iter_t>(
-                hpx::parallel::execution::seq, iter, sent, dest);
+                hpx::execution::seq, iter, sent, dest);
         }
 
         // clang-format off
@@ -461,8 +461,8 @@ namespace hpx { namespace ranges {
                 FwdIter>;
 
             return hpx::parallel::v1::detail::transfer<copy_iter_t>(
-                hpx::parallel::execution::seq, hpx::util::begin(rng),
-                hpx::util::end(rng), dest);
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                dest);
         }
     } copy{};
 
@@ -532,7 +532,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::copy_n<
                 ranges::copy_n_result<FwdIter1, FwdIter2>>()
-                .call(hpx::parallel::execution::seq, std::true_type{}, first,
+                .call(hpx::execution::seq, std::true_type{}, first,
                     std::size_t(count), dest);
         }
     } copy_n{};
@@ -626,7 +626,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::traits::is_projected<Proj, FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                    hpx::parallel::execution::sequenced_policy, Pred,
+                    hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected<Proj, FwdIter1>
                 >::value
             )>
@@ -643,9 +643,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::copy_if<
                 hpx::parallel::util::in_out_result<FwdIter1, FwdIter>>()
-                .call(hpx::parallel::execution::seq, std::true_type{}, iter,
-                    sent, dest, std::forward<Pred>(pred),
-                    std::forward<Proj>(proj));
+                .call(hpx::execution::seq, std::true_type{}, iter, sent, dest,
+                    std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -656,7 +655,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::traits::is_iterator<FwdIter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                    hpx::parallel::execution::sequenced_policy, Pred,
+                    hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >::value
             )>
@@ -673,7 +672,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::util::in_out_result<
                     typename hpx::traits::range_traits<Rng>::iterator_type,
                     FwdIter>>()
-                .call(hpx::parallel::execution::seq, std::true_type{},
+                .call(hpx::execution::seq, std::true_type{},
                     hpx::util::begin(rng), hpx::util::end(rng), dest,
                     std::forward<Pred>(pred), std::forward<Proj>(proj));
         }

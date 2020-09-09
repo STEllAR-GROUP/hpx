@@ -26,7 +26,7 @@ hpx::thread::id test(int passed_through)
 template <typename Policy>
 void test_sync()
 {
-    typedef hpx::parallel::execution::parallel_policy_executor<Policy> executor;
+    typedef hpx::execution::parallel_policy_executor<Policy> executor;
 
     executor exec;
     HPX_TEST(hpx::parallel::execution::sync_execute(exec, &test, 42) ==
@@ -36,7 +36,7 @@ void test_sync()
 template <typename Policy>
 void test_async(bool sync)
 {
-    typedef hpx::parallel::execution::parallel_policy_executor<Policy> executor;
+    typedef hpx::execution::parallel_policy_executor<Policy> executor;
 
     executor exec;
     bool result =
@@ -60,7 +60,7 @@ hpx::thread::id test_f(hpx::future<void> f, int passed_through)
 template <typename Policy>
 void test_then(bool sync)
 {
-    typedef hpx::parallel::execution::parallel_policy_executor<Policy> executor;
+    typedef hpx::execution::parallel_policy_executor<Policy> executor;
 
     hpx::future<void> f = hpx::make_ready_future();
 
@@ -88,7 +88,7 @@ void bulk_test_a(int value, hpx::thread::id tid, int passed_through)    //-V813
 template <typename Policy>
 void test_bulk_sync(bool sync)
 {
-    typedef hpx::parallel::execution::parallel_policy_executor<Policy> executor;
+    typedef hpx::execution::parallel_policy_executor<Policy> executor;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
@@ -110,7 +110,7 @@ void test_bulk_sync(bool sync)
 template <typename Policy>
 void test_bulk_async(bool sync)
 {
-    typedef hpx::parallel::execution::parallel_policy_executor<Policy> executor;
+    typedef hpx::execution::parallel_policy_executor<Policy> executor;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
@@ -157,7 +157,7 @@ void bulk_test_f_a(int value, hpx::shared_future<void> f, hpx::thread::id tid,
 template <typename Policy>
 void test_bulk_then(bool sync)
 {
-    typedef hpx::parallel::execution::parallel_policy_executor<Policy> executor;
+    typedef hpx::execution::parallel_policy_executor<Policy> executor;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
@@ -185,7 +185,7 @@ template <typename Policy>
 void static_check_executor()
 {
     using namespace hpx::traits;
-    using executor = hpx::parallel::execution::parallel_policy_executor<Policy>;
+    using executor = hpx::execution::parallel_policy_executor<Policy>;
 
     static_assert(has_sync_execute_member<executor>::value,
         "has_sync_execute_member<executor>::value");

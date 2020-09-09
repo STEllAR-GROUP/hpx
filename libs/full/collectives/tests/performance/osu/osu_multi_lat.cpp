@@ -93,7 +93,7 @@ double ireceive(
 
         typedef hpx::serialization::serialize_buffer<char> buffer_type;
 
-        using hpx::parallel::execution::par;
+        using hpx::execution::par;
         using hpx::ranges::for_each;
 
         std::size_t const start = 0;

@@ -51,8 +51,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         // initialize data
         // segmented version of algorithm used
-        using namespace  hpx::parallel;
-        generate(execution::par, v.begin(), v.end(), random_fill());
+        hpx::generate(hpx::execution::par, v.begin(), v.end(), random_fill());
 
         return hpx::finalize();
     }

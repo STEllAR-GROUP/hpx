@@ -140,16 +140,14 @@ void transform_binary2_tests(std::vector<hpx::id_type>& localities)
         hpx::partitioned_vector<T> v;
         hpx::partitioned_vector<U> w;
         hpx::partitioned_vector<V> x;
-        hpx::parallel::transform(hpx::parallel::execution::seq, v.begin(),
-            v.end(), w.begin(), w.end(), x.begin(), add<V>());
-        hpx::parallel::transform(hpx::parallel::execution::par, v.begin(),
-            v.end(), w.begin(), w.end(), x.begin(), add<V>());
-        hpx::parallel::transform(
-            hpx::parallel::execution::seq(hpx::parallel::execution::task),
+        hpx::parallel::transform(hpx::execution::seq, v.begin(), v.end(),
+            w.begin(), w.end(), x.begin(), add<V>());
+        hpx::parallel::transform(hpx::execution::par, v.begin(), v.end(),
+            w.begin(), w.end(), x.begin(), add<V>());
+        hpx::parallel::transform(hpx::execution::seq(hpx::execution::task),
             v.begin(), v.end(), w.begin(), w.end(), x.begin(), add<V>())
             .get();
-        hpx::parallel::transform(
-            hpx::parallel::execution::par(hpx::parallel::execution::task),
+        hpx::parallel::transform(hpx::execution::par(hpx::execution::task),
             v.begin(), v.end(), w.begin(), w.end(), x.begin(), add<V>())
             .get();
     }
@@ -160,13 +158,11 @@ void transform_binary2_tests(std::vector<hpx::id_type>& localities)
         hpx::partitioned_vector<U> w(
             length, U(1), hpx::container_layout(localities));
         hpx::partitioned_vector<V> x(length, hpx::container_layout(localities));
-        test_transform_binary2(hpx::parallel::execution::seq, v, w, x, V(1));
-        test_transform_binary2(hpx::parallel::execution::par, v, w, x, V(1));
+        test_transform_binary2(hpx::execution::seq, v, w, x, V(1));
+        test_transform_binary2(hpx::execution::par, v, w, x, V(1));
         test_transform_binary2_async(
-            hpx::parallel::execution::seq(hpx::parallel::execution::task), v, w,
-            x, V(1));
+            hpx::execution::seq(hpx::execution::task), v, w, x, V(1));
         test_transform_binary2_async(
-            hpx::parallel::execution::par(hpx::parallel::execution::task), v, w,
-            x, V(1));
+            hpx::execution::par(hpx::execution::task), v, w, x, V(1));
     }
 }

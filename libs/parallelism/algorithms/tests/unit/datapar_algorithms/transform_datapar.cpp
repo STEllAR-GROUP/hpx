@@ -18,13 +18,13 @@
 template <typename IteratorTag>
 void test_transform()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_transform(execution::dataseq, IteratorTag());
     test_transform(execution::datapar, IteratorTag());
 
-    test_transform_async(execution::dataseq(execution::task), IteratorTag());
-    test_transform_async(execution::datapar(execution::task), IteratorTag());
+    test_transform_async(execution::dataseq(task), IteratorTag());
+    test_transform_async(execution::datapar(task), IteratorTag());
 }
 
 void transform_test()
@@ -36,15 +36,13 @@ void transform_test()
 template <typename IteratorTag>
 void test_transform_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_transform_exception(execution::dataseq, IteratorTag());
     test_transform_exception(execution::datapar, IteratorTag());
 
-    test_transform_exception_async(
-        execution::dataseq(execution::task), IteratorTag());
-    test_transform_exception_async(
-        execution::datapar(execution::task), IteratorTag());
+    test_transform_exception_async(execution::dataseq(task), IteratorTag());
+    test_transform_exception_async(execution::datapar(task), IteratorTag());
 }
 
 void transform_exception_test()
@@ -57,15 +55,13 @@ void transform_exception_test()
 template <typename IteratorTag>
 void test_transform_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_transform_bad_alloc(execution::dataseq, IteratorTag());
     test_transform_bad_alloc(execution::datapar, IteratorTag());
 
-    test_transform_bad_alloc_async(
-        execution::dataseq(execution::task), IteratorTag());
-    test_transform_bad_alloc_async(
-        execution::datapar(execution::task), IteratorTag());
+    test_transform_bad_alloc_async(execution::dataseq(task), IteratorTag());
+    test_transform_bad_alloc_async(execution::datapar(task), IteratorTag());
 }
 
 void transform_bad_alloc_test()

@@ -79,13 +79,13 @@ void test_adjacent_find_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_adjacent_find()
 {
-    using namespace hpx::parallel;
-    test_adjacent_find(execution::seq, IteratorTag());
-    test_adjacent_find(execution::par, IteratorTag());
-    test_adjacent_find(execution::par_unseq, IteratorTag());
+    using namespace hpx::execution;
+    test_adjacent_find(seq, IteratorTag());
+    test_adjacent_find(par, IteratorTag());
+    test_adjacent_find(par_unseq, IteratorTag());
 
-    test_adjacent_find_async(execution::seq(execution::task), IteratorTag());
-    test_adjacent_find_async(execution::par(execution::task), IteratorTag());
+    test_adjacent_find_async(seq(task), IteratorTag());
+    test_adjacent_find_async(par(task), IteratorTag());
 }
 
 void adjacent_find_test()

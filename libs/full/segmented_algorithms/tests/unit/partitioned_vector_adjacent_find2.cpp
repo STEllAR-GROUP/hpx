@@ -72,12 +72,12 @@ void adjacent_find_tests(std::vector<hpx::id_type>& localities)
         SIZE, T(0), hpx::container_layout(localities));
     initialize(xvalues);
 
-    test_adjacent_find(hpx::parallel::execution::seq, xvalues);
-    test_adjacent_find(hpx::parallel::execution::par, xvalues);
+    test_adjacent_find(hpx::execution::seq, xvalues);
+    test_adjacent_find(hpx::execution::par, xvalues);
     test_adjacent_find_async(
-        hpx::parallel::execution::seq(hpx::parallel::execution::task), xvalues);
+        hpx::execution::seq(hpx::execution::task), xvalues);
     test_adjacent_find_async(
-        hpx::parallel::execution::par(hpx::parallel::execution::task), xvalues);
+        hpx::execution::par(hpx::execution::task), xvalues);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

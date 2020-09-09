@@ -18,15 +18,13 @@
 template <typename IteratorTag>
 void test_transform_binary()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_transform_binary(execution::dataseq, IteratorTag());
     test_transform_binary(execution::datapar, IteratorTag());
 
-    test_transform_binary_async(
-        execution::dataseq(execution::task), IteratorTag());
-    test_transform_binary_async(
-        execution::datapar(execution::task), IteratorTag());
+    test_transform_binary_async(execution::dataseq(task), IteratorTag());
+    test_transform_binary_async(execution::datapar(task), IteratorTag());
 }
 
 void transform_binary_test()
@@ -39,15 +37,15 @@ void transform_binary_test()
 template <typename IteratorTag>
 void test_transform_binary_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_transform_binary_exception(execution::dataseq, IteratorTag());
     test_transform_binary_exception(execution::datapar, IteratorTag());
 
     test_transform_binary_exception_async(
-        execution::dataseq(execution::task), IteratorTag());
+        execution::dataseq(task), IteratorTag());
     test_transform_binary_exception_async(
-        execution::datapar(execution::task), IteratorTag());
+        execution::datapar(task), IteratorTag());
 }
 
 void transform_binary_exception_test()
@@ -60,15 +58,15 @@ void transform_binary_exception_test()
 template <typename IteratorTag>
 void test_transform_binary_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_transform_binary_bad_alloc(execution::dataseq, IteratorTag());
     test_transform_binary_bad_alloc(execution::datapar, IteratorTag());
 
     test_transform_binary_bad_alloc_async(
-        execution::dataseq(execution::task), IteratorTag());
+        execution::dataseq(task), IteratorTag());
     test_transform_binary_bad_alloc_async(
-        execution::datapar(execution::task), IteratorTag());
+        execution::datapar(task), IteratorTag());
 }
 
 void transform_binary_bad_alloc_test()

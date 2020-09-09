@@ -119,14 +119,14 @@ void test_remove_if_async(ExPolicy policy, DataType)
 template <typename DataType>
 void test_remove_if()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_remove_if(execution::seq, DataType());
-    test_remove_if(execution::par, DataType());
-    test_remove_if(execution::par_unseq, DataType());
+    test_remove_if(seq, DataType());
+    test_remove_if(par, DataType());
+    test_remove_if(par_unseq, DataType());
 
-    test_remove_if_async(execution::seq(execution::task), DataType());
-    test_remove_if_async(execution::par(execution::task), DataType());
+    test_remove_if_async(seq(task), DataType());
+    test_remove_if_async(par(task), DataType());
 }
 
 void test_remove_if()

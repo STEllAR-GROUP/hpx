@@ -14,7 +14,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-struct my_executor : hpx::parallel::execution::parallel_executor
+struct my_executor : hpx::execution::parallel_executor
 {
 };
 
@@ -38,14 +38,11 @@ namespace hpx { namespace parallel { namespace execution {
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
-    using hpx::parallel::execution::par;
-    using hpx::ranges::for_each;
-
     my_executor exec;
 
     std::vector<int> v(100);
 
-    for_each(par.on(exec), v, [](int x) {});
+    hpx::ranges::for_each(hpx::execution::par.on(exec), v, [](int x) {});
 
     return hpx::finalize();
 }

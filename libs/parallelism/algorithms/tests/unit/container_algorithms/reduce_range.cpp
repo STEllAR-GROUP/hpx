@@ -69,14 +69,14 @@ void test_reduce1_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_reduce1()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_reduce1(execution::seq, IteratorTag());
-    test_reduce1(execution::par, IteratorTag());
-    test_reduce1(execution::par_unseq, IteratorTag());
+    test_reduce1(seq, IteratorTag());
+    test_reduce1(par, IteratorTag());
+    test_reduce1(par_unseq, IteratorTag());
 
-    test_reduce1_async(execution::seq(execution::task), IteratorTag());
-    test_reduce1_async(execution::par(execution::task), IteratorTag());
+    test_reduce1_async(seq(task), IteratorTag());
+    test_reduce1_async(par(task), IteratorTag());
 }
 
 void reduce_test1()
@@ -128,14 +128,14 @@ void test_reduce2_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_reduce2()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_reduce2(execution::seq, IteratorTag());
-    test_reduce2(execution::par, IteratorTag());
-    test_reduce2(execution::par_unseq, IteratorTag());
+    test_reduce2(seq, IteratorTag());
+    test_reduce2(par, IteratorTag());
+    test_reduce2(par_unseq, IteratorTag());
 
-    test_reduce2_async(execution::seq(execution::task), IteratorTag());
-    test_reduce2_async(execution::par(execution::task), IteratorTag());
+    test_reduce2_async(seq(task), IteratorTag());
+    test_reduce2_async(par(task), IteratorTag());
 }
 
 void reduce_test2()
@@ -187,14 +187,14 @@ void test_reduce3_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_reduce3()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_reduce3(execution::seq, IteratorTag());
-    test_reduce3(execution::par, IteratorTag());
-    test_reduce3(execution::par_unseq, IteratorTag());
+    test_reduce3(seq, IteratorTag());
+    test_reduce3(par, IteratorTag());
+    test_reduce3(par_unseq, IteratorTag());
 
-    test_reduce3_async(execution::seq(execution::task), IteratorTag());
-    test_reduce3_async(execution::par(execution::task), IteratorTag());
+    test_reduce3_async(seq(task), IteratorTag());
+    test_reduce3_async(par(task), IteratorTag());
 }
 
 void reduce_test3()
@@ -279,16 +279,16 @@ void test_reduce_exception_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_reduce_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_reduce_exception(execution::seq, IteratorTag());
-    test_reduce_exception(execution::par, IteratorTag());
+    test_reduce_exception(seq, IteratorTag());
+    test_reduce_exception(par, IteratorTag());
 
-    test_reduce_exception_async(execution::seq(execution::task), IteratorTag());
-    test_reduce_exception_async(execution::par(execution::task), IteratorTag());
+    test_reduce_exception_async(seq(task), IteratorTag());
+    test_reduce_exception_async(par(task), IteratorTag());
 }
 
 void reduce_exception_test()
@@ -371,16 +371,16 @@ void test_reduce_bad_alloc_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_reduce_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_reduce_bad_alloc(execution::seq, IteratorTag());
-    test_reduce_bad_alloc(execution::par, IteratorTag());
+    test_reduce_bad_alloc(seq, IteratorTag());
+    test_reduce_bad_alloc(par, IteratorTag());
 
-    test_reduce_bad_alloc_async(execution::seq(execution::task), IteratorTag());
-    test_reduce_bad_alloc_async(execution::par(execution::task), IteratorTag());
+    test_reduce_bad_alloc_async(seq(task), IteratorTag());
+    test_reduce_bad_alloc_async(par(task), IteratorTag());
 }
 
 void reduce_bad_alloc_test()

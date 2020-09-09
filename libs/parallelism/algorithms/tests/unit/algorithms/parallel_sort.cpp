@@ -39,8 +39,7 @@ void test1()
         V1.push_back(my_rand() % NElem);
     V2 = V1;
 
-    hpx::parallel::sort(
-        hpx::parallel::execution::par, V1.begin(), V1.end(), comp);
+    hpx::parallel::sort(hpx::execution::par, V1.begin(), V1.end(), comp);
 
     for (unsigned i = 1; i < NElem; i++)
     {
@@ -57,8 +56,7 @@ void test1()
     for (std::uint32_t i = 0; i < NElem; ++i)
         V1.push_back(i);
 
-    hpx::parallel::sort(
-        hpx::parallel::execution::par, V1.begin(), V1.end(), comp);
+    hpx::parallel::sort(hpx::execution::par, V1.begin(), V1.end(), comp);
 
     for (unsigned i = 1; i < NElem; i++)
     {
@@ -69,8 +67,7 @@ void test1()
     for (std::uint32_t i = 0; i < NElem; ++i)
         V1.push_back(NElem - i);
 
-    hpx::parallel::sort(
-        hpx::parallel::execution::par, V1.begin(), V1.end(), comp);
+    hpx::parallel::sort(hpx::execution::par, V1.begin(), V1.end(), comp);
     for (unsigned i = 1; i < NElem; i++)
     {
         HPX_TEST(V1[i] == (i + 1));
@@ -80,8 +77,7 @@ void test1()
     for (std::uint32_t i = 0; i < NElem; ++i)
         V1.push_back(1000);
 
-    hpx::parallel::sort(
-        hpx::parallel::execution::par, V1.begin(), V1.end(), comp);
+    hpx::parallel::sort(hpx::execution::par, V1.begin(), V1.end(), comp);
     for (unsigned i = 1; i < NElem; i++)
     {
         HPX_TEST(V1[i] == 1000);
@@ -108,7 +104,7 @@ void test2()
     for (std::uint32_t i = 0; i < 1000; ++i)
         A.push_back(0);
 
-    hpx::parallel::sort(hpx::parallel::execution::par, A.begin() + 1000,
+    hpx::parallel::sort(hpx::execution::par, A.begin() + 1000,
         A.begin() + (1000 + NELEM), comp);
     for (iter_t it = A.begin() + 1000; it != A.begin() + (1000 + NELEM); ++it)
     {
@@ -126,7 +122,7 @@ void test2()
     for (std::uint32_t i = 0; i < 1000; ++i)
         A.push_back(999999999);
 
-    hpx::parallel::sort(hpx::parallel::execution::par, A.begin() + 1000,
+    hpx::parallel::sort(hpx::execution::par, A.begin() + 1000,
         A.begin() + (1000 + NELEM), comp);
 
     for (iter_t it = A.begin() + 1001; it != A.begin() + (1000 + NELEM); ++it)
@@ -152,8 +148,7 @@ void test3()
 
     std::sort(V2.begin(), V2.end());
 
-    hpx::parallel::sort(
-        hpx::parallel::execution::par, V1.begin(), V1.end(), compare());
+    hpx::parallel::sort(hpx::execution::par, V1.begin(), V1.end(), compare());
 
     for (unsigned i = 0; i < V1.size(); i++)
     {
@@ -211,8 +206,7 @@ void test4()
 
     // 64 bits elements
     std::uint64_t* p64_1 = &V1[0];
-    hpx::parallel::sort(
-        hpx::parallel::execution::par, p64_1, p64_1 + NELEM, cmp64);
+    hpx::parallel::sort(hpx::execution::par, p64_1, p64_1 + NELEM, cmp64);
 
     for (unsigned i = 1; i < NELEM; i++)
     {
@@ -230,7 +224,7 @@ void test4()
     V1 = V2 = V3;
     std::uint32_t* p32_1 = reinterpret_cast<std::uint32_t*>(&V1[0]);
     hpx::parallel::sort(
-        hpx::parallel::execution::par, p32_1, p32_1 + (NELEM << 1), cmp32);
+        hpx::execution::par, p32_1, p32_1 + (NELEM << 1), cmp32);
 
     for (unsigned i = 1; i < (NELEM << 1); i++)
     {
@@ -248,7 +242,7 @@ void test4()
     V1 = V2 = V3;
     std::uint16_t* p16_1 = reinterpret_cast<std::uint16_t*>(&V1[0]);
     hpx::parallel::sort(
-        hpx::parallel::execution::par, p16_1, p16_1 + (NELEM << 2), cmp16);
+        hpx::execution::par, p16_1, p16_1 + (NELEM << 2), cmp16);
     for (unsigned i = 1; i < (NELEM << 2); i++)
     {
         HPX_TEST(p16_1[i - 1] <= p16_1[i]);
@@ -264,8 +258,7 @@ void test4()
     // 8 bits elements
     V1 = V2 = V3;
     std::uint8_t* p8_1 = reinterpret_cast<std::uint8_t*>(&V1[0]);
-    hpx::parallel::sort(
-        hpx::parallel::execution::par, p8_1, p8_1 + (NELEM << 3), cmp8);
+    hpx::parallel::sort(hpx::execution::par, p8_1, p8_1 + (NELEM << 3), cmp8);
     for (unsigned i = 1; i < (NELEM << 3); i++)
     {
         HPX_TEST(p8_1[i - 1] <= p8_1[i]);
@@ -290,8 +283,7 @@ void test_int_array(std::uint32_t NELEM)
     for (std::uint32_t i = 0; i < NELEM; ++i)
         V1.emplace_back(my_rand());
     V2 = V1;
-    hpx::parallel::sort(
-        hpx::parallel::execution::par, V1.begin(), V1.end(), compare());
+    hpx::parallel::sort(hpx::execution::par, V1.begin(), V1.end(), compare());
     for (unsigned i = 1; i < NELEM; i++)
     {
         HPX_TEST(!(V1[i] < V1[i - 1]));
@@ -363,8 +355,7 @@ void test6()
 
     VAux = V;
     typedef std::less<std::string> compare;
-    hpx::parallel::sort(
-        hpx::parallel::execution::par, V.begin(), V.end(), compare());
+    hpx::parallel::sort(hpx::execution::par, V.begin(), V.end(), compare());
 
     for (unsigned i = 1; i < NString; i++)
     {

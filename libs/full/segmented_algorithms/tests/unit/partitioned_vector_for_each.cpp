@@ -151,29 +151,23 @@ void for_each_tests(std::vector<hpx::id_type>& localities)
 
     {
         hpx::partitioned_vector<T> v;
-        hpx::for_each(hpx::parallel::execution::seq, v.begin(), v.end(), pfo());
-        hpx::for_each(hpx::parallel::execution::par, v.begin(), v.end(), pfo());
-        hpx::for_each(
-            hpx::parallel::execution::seq(hpx::parallel::execution::task),
-            v.begin(), v.end(), pfo())
+        hpx::for_each(hpx::execution::seq, v.begin(), v.end(), pfo());
+        hpx::for_each(hpx::execution::par, v.begin(), v.end(), pfo());
+        hpx::for_each(hpx::execution::seq(hpx::execution::task), v.begin(),
+            v.end(), pfo())
             .get();
-        hpx::for_each(
-            hpx::parallel::execution::par(hpx::parallel::execution::task),
-            v.begin(), v.end(), pfo())
+        hpx::for_each(hpx::execution::par(hpx::execution::task), v.begin(),
+            v.end(), pfo())
             .get();
     }
 
     {
         hpx::partitioned_vector<T> v(
             length, T(0), hpx::container_layout(localities));
-        test_for_each(hpx::parallel::execution::seq, v, T(0));
-        test_for_each(hpx::parallel::execution::par, v, T(1));
-        test_for_each_async(
-            hpx::parallel::execution::seq(hpx::parallel::execution::task), v,
-            T(2));
-        test_for_each_async(
-            hpx::parallel::execution::par(hpx::parallel::execution::task), v,
-            T(3));
+        test_for_each(hpx::execution::seq, v, T(0));
+        test_for_each(hpx::execution::par, v, T(1));
+        test_for_each_async(hpx::execution::seq(hpx::execution::task), v, T(2));
+        test_for_each_async(hpx::execution::par(hpx::execution::task), v, T(3));
     }
 }
 
@@ -187,43 +181,37 @@ void for_each_n_tests(std::vector<hpx::id_type>& localities)
 
     {
         hpx::partitioned_vector<T> v;
-        hpx::for_each_n(hpx::parallel::execution::seq, v.begin(), 0, pfo());
-        hpx::for_each_n(hpx::parallel::execution::par, v.begin(), 0, pfo());
+        hpx::for_each_n(hpx::execution::seq, v.begin(), 0, pfo());
+        hpx::for_each_n(hpx::execution::par, v.begin(), 0, pfo());
         hpx::for_each_n(
-            hpx::parallel::execution::seq(hpx::parallel::execution::task),
-            v.begin(), 0, pfo())
+            hpx::execution::seq(hpx::execution::task), v.begin(), 0, pfo())
             .get();
         hpx::for_each_n(
-            hpx::parallel::execution::par(hpx::parallel::execution::task),
-            v.begin(), 0, pfo())
+            hpx::execution::par(hpx::execution::task), v.begin(), 0, pfo())
             .get();
     }
 
     {
         hpx::partitioned_vector<T> v;
-        hpx::for_each_n(hpx::parallel::execution::seq, v.begin(), -1, pfo());
-        hpx::for_each_n(hpx::parallel::execution::par, v.begin(), -1, pfo());
+        hpx::for_each_n(hpx::execution::seq, v.begin(), -1, pfo());
+        hpx::for_each_n(hpx::execution::par, v.begin(), -1, pfo());
         hpx::for_each_n(
-            hpx::parallel::execution::seq(hpx::parallel::execution::task),
-            v.begin(), -1, pfo())
+            hpx::execution::seq(hpx::execution::task), v.begin(), -1, pfo())
             .get();
         hpx::for_each_n(
-            hpx::parallel::execution::par(hpx::parallel::execution::task),
-            v.begin(), -1, pfo())
+            hpx::execution::par(hpx::execution::task), v.begin(), -1, pfo())
             .get();
     }
 
     {
         hpx::partitioned_vector<T> v(
             length, T(0), hpx::container_layout(localities));
-        test_for_each_n(hpx::parallel::execution::seq, v, T(0));
-        test_for_each_n(hpx::parallel::execution::par, v, T(1));
+        test_for_each_n(hpx::execution::seq, v, T(0));
+        test_for_each_n(hpx::execution::par, v, T(1));
         test_for_each_n_async(
-            hpx::parallel::execution::seq(hpx::parallel::execution::task), v,
-            T(2));
+            hpx::execution::seq(hpx::execution::task), v, T(2));
         test_for_each_n_async(
-            hpx::parallel::execution::par(hpx::parallel::execution::task), v,
-            T(3));
+            hpx::execution::par(hpx::execution::task), v, T(3));
     }
 }
 

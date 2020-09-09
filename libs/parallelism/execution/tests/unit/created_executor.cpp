@@ -28,9 +28,9 @@ typedef std::vector<int>::iterator iter;
 ////////////////////////////////////////////////////////////////////////////////
 // A parallel executor that returns void for bulk_execute and hpx::future<void>
 // for bulk_async_execute
-struct void_parallel_executor : hpx::parallel::execution::parallel_executor
+struct void_parallel_executor : hpx::execution::parallel_executor
 {
-    using base_type = hpx::parallel::execution::parallel_executor;
+    using base_type = hpx::execution::parallel_executor;
 
     template <typename F, typename Shape, typename... Ts>
     std::vector<hpx::future<void>> bulk_async_execute(
@@ -136,7 +136,7 @@ std::vector<hpx::util::iterator_range<iter>> split(
 // parallel sum using hpx's parallel executor
 int parallel_sum(iter first, iter last, int num_parts)
 {
-    hpx::parallel::execution::parallel_executor exec;
+    hpx::execution::parallel_executor exec;
 
     std::vector<hpx::util::iterator_range<iter>> input =
         split(first, last, num_parts);
@@ -192,7 +192,7 @@ void sum_test()
     int num_parts = std::rand() % 5 + 3;
 
     // Return futures holding results of parallel_sum and void_parallel_sum
-    hpx::parallel::execution::parallel_executor exec;
+    hpx::execution::parallel_executor exec;
 
     hpx::future<int> f_par = hpx::parallel::execution::async_execute(
         exec, &parallel_sum, std::begin(vec), std::end(vec), num_parts);

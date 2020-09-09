@@ -59,8 +59,8 @@ double run_min_element_benchmark(
     for (int i = 0; i != test_count; ++i)
     {
         // invoke minmax
-        using namespace hpx::parallel;
-        /*auto iters = */ min_element(execution::par, v.begin(), v.end());
+        /*auto iters = */ hpx::min_element(
+            hpx::execution::par, v.begin(), v.end());
     }
 
     time = hpx::util::high_resolution_clock::now() - time;
@@ -77,8 +77,8 @@ double run_max_element_benchmark(
     for (int i = 0; i != test_count; ++i)
     {
         // invoke minmax
-        using namespace hpx::parallel;
-        /*auto iters = */ max_element(execution::par, v.begin(), v.end());
+        /*auto iters = */ hpx::max_element(
+            hpx::execution::par, v.begin(), v.end());
     }
 
     time = hpx::util::high_resolution_clock::now() - time;
@@ -95,8 +95,8 @@ double run_minmax_element_benchmark(
     for (int i = 0; i != test_count; ++i)
     {
         // invoke minmax
-        using namespace hpx::parallel;
-        /*auto iters = */ minmax_element(execution::par, v.begin(), v.end());
+        /*auto iters = */ hpx::minmax_element(
+            hpx::execution::par, v.begin(), v.end());
     }
 
     time = hpx::util::high_resolution_clock::now() - time;
@@ -119,8 +119,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             size, hpx::container_layout(hpx::find_all_localities()));
 
         // initialize data
-        using namespace hpx::parallel;
-        generate(execution::par, v.begin(), v.end(), random_fill());
+        hpx::generate(hpx::execution::par, v.begin(), v.end(), random_fill());
 
         // run benchmark
         double time_minmax = run_minmax_element_benchmark(test_count, v);

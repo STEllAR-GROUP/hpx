@@ -83,23 +83,19 @@ void any_of_tests(std::vector<hpx::id_type>& localities)
         SIZE, T(0), hpx::container_layout(localities));
     initialize(xvalues);
 
-    test_any(hpx::parallel::execution::seq, xvalues, op5(), true);
-    test_any(hpx::parallel::execution::par, xvalues, op5(), true);
+    test_any(hpx::execution::seq, xvalues, op5(), true);
+    test_any(hpx::execution::par, xvalues, op5(), true);
     test_any_async(
-        hpx::parallel::execution::seq(hpx::parallel::execution::task), xvalues,
-        op5(), true);
+        hpx::execution::seq(hpx::execution::task), xvalues, op5(), true);
     test_any_async(
-        hpx::parallel::execution::par(hpx::parallel::execution::task), xvalues,
-        op5(), true);
+        hpx::execution::par(hpx::execution::task), xvalues, op5(), true);
 
-    test_any(hpx::parallel::execution::seq, xvalues, op8(), false);
-    test_any(hpx::parallel::execution::par, xvalues, op8(), false);
+    test_any(hpx::execution::seq, xvalues, op8(), false);
+    test_any(hpx::execution::par, xvalues, op8(), false);
     test_any_async(
-        hpx::parallel::execution::seq(hpx::parallel::execution::task), xvalues,
-        op8(), false);
+        hpx::execution::seq(hpx::execution::task), xvalues, op8(), false);
     test_any_async(
-        hpx::parallel::execution::par(hpx::parallel::execution::task), xvalues,
-        op8(), false);
+        hpx::execution::par(hpx::execution::task), xvalues, op8(), false);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

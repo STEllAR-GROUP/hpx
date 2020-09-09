@@ -15,11 +15,11 @@
 #include <string>
 #include <vector>
 
+using hpx::execution::par;
+using hpx::execution::parallel_task_policy;
+using hpx::execution::task;
 using hpx::parallel::define_task_block;
 using hpx::parallel::task_block;
-using hpx::parallel::execution::par;
-using hpx::parallel::execution::parallel_task_policy;
-using hpx::parallel::execution::task;
 
 ///////////////////////////////////////////////////////////////////////////////
 void define_task_block_test1()

@@ -29,11 +29,11 @@ namespace hpx { namespace parallel { namespace execution {
     public:
         /// Associate the parallel_execution_tag executor tag type as a default
         /// with this executor.
-        typedef parallel_execution_tag execution_category;
+        typedef hpx::execution::parallel_execution_tag execution_category;
 
         /// Associate the static_chunk_size executor parameters type as a default
         /// with this executor.
-        typedef static_chunk_size executor_parameters_type;
+        typedef hpx::execution::static_chunk_size executor_parameters_type;
 
         /// Create a new parallel executor
         restricted_thread_pool_executor(std::size_t first_thread = 0,

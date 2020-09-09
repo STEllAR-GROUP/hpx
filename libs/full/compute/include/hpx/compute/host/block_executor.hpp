@@ -40,8 +40,7 @@ namespace hpx { namespace compute { namespace host {
     struct block_executor
     {
     public:
-        typedef hpx::parallel::execution::static_chunk_size
-            executor_parameters_type;
+        using executor_parameters_type = hpx::execution::static_chunk_size;
 
         block_executor(std::vector<host::target> const& targets,
             threads::thread_priority priority = threads::thread_priority_high,
@@ -263,7 +262,7 @@ namespace hpx { namespace parallel { namespace execution {
     template <typename Executor>
     struct executor_execution_category<compute::host::block_executor<Executor>>
     {
-        typedef parallel::execution::parallel_execution_tag type;
+        typedef hpx::execution::parallel_execution_tag type;
     };
 
     template <typename Executor>

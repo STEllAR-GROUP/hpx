@@ -406,41 +406,41 @@ void test_reduce_by_key_async(
 ////////////////////////////////////////////////////////////////////////////////
 void test_reduce_by_key1()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
     //
     hpx::util::high_resolution_timer t;
     do
     {
-        test_reduce_by_key1(execution::seq, int(), int(), false,
-            std::equal_to<int>(), [](int key) { return key; });
-        test_reduce_by_key1(execution::par, int(), int(), false,
-            std::equal_to<int>(), [](int key) { return key; });
-        test_reduce_by_key1(execution::par_unseq, int(), int(), false,
+        test_reduce_by_key1(seq, int(), int(), false, std::equal_to<int>(),
+            [](int key) { return key; });
+        test_reduce_by_key1(par, int(), int(), false, std::equal_to<int>(),
+            [](int key) { return key; });
+        test_reduce_by_key1(par_unseq, int(), int(), false,
             std::equal_to<int>(), [](int key) { return key; });
         //
         // default comparison operator (std::equal_to)
-        test_reduce_by_key1(execution::seq, int(), double(), false,
-            almost_equal(), [](int key) { return key; });
-        test_reduce_by_key1(execution::par, int(), double(), false,
-            almost_equal(), [](int key) { return key; });
-        test_reduce_by_key1(execution::par_unseq, int(), double(), false,
-            almost_equal(), [](int key) { return key; });
+        test_reduce_by_key1(seq, int(), double(), false, almost_equal(),
+            [](int key) { return key; });
+        test_reduce_by_key1(par, int(), double(), false, almost_equal(),
+            [](int key) { return key; });
+        test_reduce_by_key1(par_unseq, int(), double(), false, almost_equal(),
+            [](int key) { return key; });
         //
         //
         test_reduce_by_key1(
-            execution::seq, double(), double(), false,
+            seq, double(), double(), false,
             [](double a, double b) {
                 return std::abs(std::floor(a) - std::floor(b)) < 1e-15;
             },    //-V550
             [](double a) { return std::floor(a); });
         test_reduce_by_key1(
-            execution::par, double(), double(), false,
+            par, double(), double(), false,
             [](double a, double b) {
                 return std::abs(std::floor(a) - std::floor(b)) < 1e-15;
             },    //-V550
             [](double a) { return std::floor(a); });
         test_reduce_by_key1(
-            execution::par_unseq, double(), double(), false,
+            par_unseq, double(), double(), false,
             [](double a, double b) {
                 return std::abs(std::floor(a) - std::floor(b)) < 1e-15;
             },    //-V550
@@ -450,15 +450,15 @@ void test_reduce_by_key1()
     hpx::util::high_resolution_timer t3;
     do
     {
-        test_reduce_by_key_const(execution::seq, int(), int(), false,
-            std::equal_to<int>(), [](int key) { return key; });
+        test_reduce_by_key_const(seq, int(), int(), false, std::equal_to<int>(),
+            [](int key) { return key; });
         //
         // default comparison operator (std::equal_to)
-        test_reduce_by_key_const(execution::seq, int(), double(), false,
-            almost_equal(), [](int key) { return key; });
+        test_reduce_by_key_const(seq, int(), double(), false, almost_equal(),
+            [](int key) { return key; });
         //
         test_reduce_by_key_const(
-            execution::seq, double(), double(), false,
+            seq, double(), double(), false,
             [](double a, double b) {
                 return std::abs(std::floor(a) - std::floor(b)) < 1e-15;
             },    //-V550
@@ -468,20 +468,20 @@ void test_reduce_by_key1()
     hpx::util::high_resolution_timer t2;
     do
     {
-        test_reduce_by_key_async(execution::seq(execution::task), int(), int(),
-            std::equal_to<int>(), [](int key) { return key; });
-        test_reduce_by_key_async(execution::par(execution::task), int(), int(),
-            std::equal_to<int>(), [](int key) { return key; });
+        test_reduce_by_key_async(seq(task), int(), int(), std::equal_to<int>(),
+            [](int key) { return key; });
+        test_reduce_by_key_async(par(task), int(), int(), std::equal_to<int>(),
+            [](int key) { return key; });
         //
-        test_reduce_by_key_async(execution::seq(execution::task), int(),
-            double(), almost_equal(), [](int key) { return key; });
-        test_reduce_by_key_async(execution::par(execution::task), int(),
-            double(), almost_equal(), [](int key) { return key; });
+        test_reduce_by_key_async(seq(task), int(), double(), almost_equal(),
+            [](int key) { return key; });
+        test_reduce_by_key_async(par(task), int(), double(), almost_equal(),
+            [](int key) { return key; });
     } while (t2.elapsed() < 2);
 
     // one last test with timing output enabled
     test_reduce_by_key1(
-        execution::par, double(), double(), true,
+        par, double(), double(), true,
         [](double a, double b) {
             return std::abs(std::floor(a) - std::floor(b)) < 1e-15;
         },    //-V550

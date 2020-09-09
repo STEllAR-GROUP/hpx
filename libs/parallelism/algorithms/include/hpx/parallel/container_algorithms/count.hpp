@@ -310,10 +310,9 @@ namespace hpx { namespace ranges {
             using is_segmented =
                 hpx::traits::is_segmented_iterator<iterator_type>;
 
-            return hpx::parallel::v1::detail::count_(
-                hpx::parallel::execution::seq, hpx::util::begin(rng),
-                hpx::util::end(rng), value, std::forward<Proj>(proj),
-                is_segmented{});
+            return hpx::parallel::v1::detail::count_(hpx::execution::seq,
+                hpx::util::begin(rng), hpx::util::end(rng), value,
+                std::forward<Proj>(proj), is_segmented{});
         }
 
         // clang-format off
@@ -332,9 +331,8 @@ namespace hpx { namespace ranges {
 
             using is_segmented = hpx::traits::is_segmented_iterator<Iter>;
 
-            return hpx::parallel::v1::detail::count_(
-                hpx::parallel::execution::seq, first, last, value,
-                std::forward<Proj>(proj), is_segmented{});
+            return hpx::parallel::v1::detail::count_(hpx::execution::seq, first,
+                last, value, std::forward<Proj>(proj), is_segmented{});
         }
     } count{};
 
@@ -412,7 +410,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                    hpx::parallel::execution::sequenced_policy, F,
+                    hpx::execution::sequenced_policy, F,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >::value
             )>
@@ -431,9 +429,8 @@ namespace hpx { namespace ranges {
             using is_segmented =
                 hpx::traits::is_segmented_iterator<iterator_type>;
 
-            return hpx::parallel::v1::detail::count_if_(
-                hpx::parallel::execution::seq, hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<F>(f),
+            return hpx::parallel::v1::detail::count_if_(hpx::execution::seq,
+                hpx::util::begin(rng), hpx::util::end(rng), std::forward<F>(f),
                 std::forward<Proj>(proj), is_segmented{});
         }
 
@@ -444,7 +441,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                    hpx::parallel::execution::sequenced_policy, F,
+                    hpx::execution::sequenced_policy, F,
                     hpx::parallel::traits::projected<Proj, Iter>
                 >::value
             )>
@@ -457,9 +454,9 @@ namespace hpx { namespace ranges {
 
             using is_segmented = hpx::traits::is_segmented_iterator<Iter>;
 
-            return hpx::parallel::v1::detail::count_if_(
-                hpx::parallel::execution::seq, first, last, std::forward<F>(f),
-                std::forward<Proj>(proj), is_segmented{});
+            return hpx::parallel::v1::detail::count_if_(hpx::execution::seq,
+                first, last, std::forward<F>(f), std::forward<Proj>(proj),
+                is_segmented{});
         }
     } count_if{};
 

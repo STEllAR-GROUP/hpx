@@ -88,7 +88,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     auto range = boost::irange(static_cast<std::size_t>(0), nlp);
 
     executor_type executor(numa_domains);
-    auto policy = hpx::parallel::execution::par.on(executor);
+    auto policy = hpx::execution::par.on(executor);
 
     hpx::util::high_resolution_timer t;
     for (std::size_t t = 0; t < steps; ++t)

@@ -453,9 +453,9 @@ namespace hpx {
         {
             using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
 
-            return hpx::parallel::v1::detail::reduce_(
-                hpx::parallel::execution::seq, first, last, std::move(init),
-                std::forward<F>(f), is_segmented{});
+            return hpx::parallel::v1::detail::reduce_(hpx::execution::seq,
+                first, last, std::move(init), std::forward<F>(f),
+                is_segmented{});
         }
 
         // clang-format off
@@ -468,9 +468,8 @@ namespace hpx {
         {
             using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
 
-            return hpx::parallel::v1::detail::reduce_(
-                hpx::parallel::execution::seq, first, last, std::move(init),
-                std::plus<T>{}, is_segmented{});
+            return hpx::parallel::v1::detail::reduce_(hpx::execution::seq,
+                first, last, std::move(init), std::plus<T>{}, is_segmented{});
         }
 
         // clang-format off
@@ -487,9 +486,9 @@ namespace hpx {
 
             using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
 
-            return hpx::parallel::v1::detail::reduce_(
-                hpx::parallel::execution::seq, first, last, value_type{},
-                std::plus<value_type>(), is_segmented{});
+            return hpx::parallel::v1::detail::reduce_(hpx::execution::seq,
+                first, last, value_type{}, std::plus<value_type>(),
+                is_segmented{});
         }
     } reduce{};
 }    // namespace hpx

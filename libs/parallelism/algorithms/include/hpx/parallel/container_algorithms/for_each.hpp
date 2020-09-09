@@ -431,7 +431,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, InIter>::value &&
                 hpx::parallel::traits::is_projected<Proj, InIter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                    hpx::parallel::execution::sequenced_policy, F,
+                    hpx::execution::sequenced_policy, F,
                     hpx::parallel::traits::projected<Proj, InIter>>::value)>
         // clang-format on
         friend for_each_result<InIter, F> tag_invoke(hpx::ranges::for_each_t,
@@ -439,9 +439,8 @@ namespace hpx { namespace ranges {
         {
             using is_segmented = hpx::traits::is_segmented_iterator<InIter>;
 
-            auto it =
-                parallel::v1::detail::for_each_(hpx::parallel::execution::seq,
-                    first, last, f, std::forward<Proj>(proj), is_segmented());
+            auto it = parallel::v1::detail::for_each_(hpx::execution::seq,
+                first, last, f, std::forward<Proj>(proj), is_segmented());
             return {std::move(it), std::forward<F>(f)};
         }
 
@@ -452,7 +451,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                    hpx::parallel::execution::sequenced_policy, F,
+                    hpx::execution::sequenced_policy, F,
                     hpx::parallel::traits::projected_range<Proj, Rng>>::value)>
         // clang-format on
         friend for_each_result<typename hpx::traits::range_iterator<Rng>::type,
@@ -465,10 +464,9 @@ namespace hpx { namespace ranges {
             using is_segmented =
                 hpx::traits::is_segmented_iterator<iterator_type>;
 
-            auto it =
-                parallel::v1::detail::for_each_(hpx::parallel::execution::seq,
-                    hpx::util::begin(rng), hpx::util::end(rng), f,
-                    std::forward<Proj>(proj), is_segmented());
+            auto it = parallel::v1::detail::for_each_(hpx::execution::seq,
+                hpx::util::begin(rng), hpx::util::end(rng), f,
+                std::forward<Proj>(proj), is_segmented());
             return {std::move(it), std::forward<F>(f)};
         }
 
@@ -534,7 +532,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_input_iterator<InIter>::value &&
                 hpx::parallel::traits::is_projected<Proj, InIter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                    hpx::parallel::execution::sequenced_policy, F,
+                    hpx::execution::sequenced_policy, F,
                     hpx::parallel::traits::projected<Proj, InIter>>::value)>
         // clang-format on
         friend for_each_n_result<InIter, F> tag_invoke(
@@ -547,8 +545,8 @@ namespace hpx { namespace ranges {
                 return {std::move(first), std::forward<F>(f)};
             }
 
-            auto it = for_each_n(hpx::parallel::execution::seq, first, count, f,
-                std::forward<Proj>(proj));
+            auto it = for_each_n(
+                hpx::execution::seq, first, count, f, std::forward<Proj>(proj));
             return {std::move(it), std::forward<F>(f)};
         }
 

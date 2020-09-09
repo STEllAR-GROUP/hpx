@@ -47,11 +47,11 @@ namespace hpx { namespace parallel { namespace execution {
     {
         /// Associate the parallel_execution_tag executor tag type as a default
         /// with this executor.
-        using execution_category = parallel_execution_tag;
+        using execution_category = hpx::execution::parallel_execution_tag;
 
         /// Associate the static_chunk_size executor parameters type as a default
         /// with this executor.
-        using executor_parameters_type = static_chunk_size;
+        using executor_parameters_type = hpx::execution::static_chunk_size;
 
         /// Create a new parallel executor
         constexpr explicit parallel_policy_executor_aggregated(
@@ -257,11 +257,11 @@ namespace hpx { namespace parallel { namespace execution {
     {
         /// Associate the parallel_execution_tag executor tag type as a default
         /// with this executor.
-        using execution_category = parallel_execution_tag;
+        using execution_category = hpx::execution::parallel_execution_tag;
 
         /// Associate the static_chunk_size executor parameters type as a default
         /// with this executor.
-        using executor_parameters_type = static_chunk_size;
+        using executor_parameters_type = hpx::execution::static_chunk_size;
 
         /// Create a new parallel executor
         constexpr explicit parallel_policy_executor_aggregated(

@@ -22,8 +22,8 @@
 
 void test(hpx::threads::thread_stacksize stacksize)
 {
-    hpx::parallel::execution::parallel_executor exec(stacksize);
-    hpx::parallel::execution::parallel_executor exec_current(
+    hpx::execution::parallel_executor exec(stacksize);
+    hpx::execution::parallel_executor exec_current(
         hpx::threads::thread_stacksize_current);
 
     hpx::async(exec, [&exec_current, stacksize]() {

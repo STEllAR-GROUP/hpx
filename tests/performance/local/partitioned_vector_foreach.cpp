@@ -81,26 +81,26 @@ int hpx_main(hpx::program_options::variables_map& vm)
     else
     {
         // create executor parameters object
-        hpx::parallel::execution::static_chunk_size cs(chunk_size);
+        hpx::execution::static_chunk_size cs(chunk_size);
 
         // retrieve reference time
         std::vector<int> ref(vector_size);
         std::uint64_t seq_ref =
-            foreach_vector(hpx::parallel::execution::seq, ref);
+            foreach_vector(hpx::execution::seq, ref);
         std::uint64_t par_ref = foreach_vector(
-            hpx::parallel::execution::par.with(cs), ref);    //-V106
+            hpx::execution::par.with(cs), ref);    //-V106
 
         // sequential hpx::partitioned_vector iteration
         {
             hpx::partitioned_vector<int> v(vector_size);
 
             hpx::cout << "hpx::partitioned_vector<int>(execution::seq): "
-                      << foreach_vector(hpx::parallel::execution::seq, v) /
+                      << foreach_vector(hpx::execution::seq, v) /
                     double(seq_ref)
                       << "\n";
             hpx::cout << "hpx::partitioned_vector<int>(execution::par): "
                       << foreach_vector(
-                             hpx::parallel::execution::par.with(cs), v) /
+                             hpx::execution::par.with(cs), v) /
                     double(par_ref)    //-V106
                       << "\n";
         }
@@ -111,13 +111,13 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
             hpx::cout << "hpx::partitioned_vector<int>(execution::seq, "
                          "container_layout(2)): "
-                      << foreach_vector(hpx::parallel::execution::seq, v) /
+                      << foreach_vector(hpx::execution::seq, v) /
                     double(seq_ref)
                       << "\n";
             hpx::cout << "hpx::partitioned_vector<int>(execution::par, "
                          "container_layout(2)): "
                       << foreach_vector(
-                             hpx::parallel::execution::par.with(cs), v) /
+                             hpx::execution::par.with(cs), v) /
                     double(par_ref)    //-V106
                       << "\n";
         }
@@ -128,13 +128,13 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
             hpx::cout << "hpx::partitioned_vector<int>(execution::seq, "
                          "container_layout(10)): "
-                      << foreach_vector(hpx::parallel::execution::seq, v) /
+                      << foreach_vector(hpx::execution::seq, v) /
                     double(seq_ref)
                       << "\n";
             hpx::cout << "hpx::partitioned_vector<int>(execution::par, "
                          "container_layout(10)): "
                       << foreach_vector(
-                             hpx::parallel::execution::par.with(cs), v) /
+                             hpx::execution::par.with(cs), v) /
                     double(par_ref)    //-V106
                       << "\n";
         }

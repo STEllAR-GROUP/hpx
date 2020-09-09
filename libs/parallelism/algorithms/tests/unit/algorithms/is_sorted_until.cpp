@@ -70,16 +70,16 @@ void test_sorted_until1_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_sorted_until1()
 {
-    using namespace hpx::parallel;
-    test_sorted_until1(execution::seq, IteratorTag());
+    using namespace hpx::execution;
+    test_sorted_until1(seq, IteratorTag());
     //calls sequential and gets iter
-    test_sorted_until1(execution::par, IteratorTag());
+    test_sorted_until1(par, IteratorTag());
     //calls parallel and gets iter
-    test_sorted_until1(execution::par_unseq, IteratorTag());
+    test_sorted_until1(par_unseq, IteratorTag());
     //calls parallel and gets iter
-    test_sorted_until1_async(execution::seq(execution::task), IteratorTag());
+    test_sorted_until1_async(seq(task), IteratorTag());
     //calls sequential and gets future
-    test_sorted_until1_async(execution::par(execution::task), IteratorTag());
+    test_sorted_until1_async(par(task), IteratorTag());
     //calls parallel and gets future
 }
 
@@ -153,13 +153,13 @@ void test_sorted_until2_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_sorted_until2()
 {
-    using namespace hpx::parallel;
-    test_sorted_until2(execution::seq, IteratorTag());
-    test_sorted_until2(execution::par, IteratorTag());
-    test_sorted_until2(execution::par_unseq, IteratorTag());
+    using namespace hpx::execution;
+    test_sorted_until2(seq, IteratorTag());
+    test_sorted_until2(par, IteratorTag());
+    test_sorted_until2(par_unseq, IteratorTag());
 
-    test_sorted_until2_async(execution::seq(execution::task), IteratorTag());
-    test_sorted_until2_async(execution::par(execution::task), IteratorTag());
+    test_sorted_until2_async(seq(task), IteratorTag());
+    test_sorted_until2_async(par(task), IteratorTag());
 }
 
 void sorted_until_test2()
@@ -242,13 +242,13 @@ void test_sorted_until3_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_sorted_until3()
 {
-    using namespace hpx::parallel;
-    test_sorted_until3(execution::seq, IteratorTag());
-    test_sorted_until3(execution::par, IteratorTag());
-    test_sorted_until3(execution::par_unseq, IteratorTag());
+    using namespace hpx::execution;
+    test_sorted_until3(seq, IteratorTag());
+    test_sorted_until3(par, IteratorTag());
+    test_sorted_until3(par_unseq, IteratorTag());
 
-    test_sorted_until3_async(execution::seq(execution::task), IteratorTag());
-    test_sorted_until3_async(execution::par(execution::task), IteratorTag());
+    test_sorted_until3_async(seq(task), IteratorTag());
+    test_sorted_until3_async(par(task), IteratorTag());
 }
 
 void sorted_until_test3()
@@ -334,17 +334,15 @@ void test_sorted_until_async_exception(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_sorted_until_exception()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
     //If the execution policy object is of type vector_execution_policy,
     //  std::terminate shall be called. Therefore we do not test exceptions
     //  with a vector execution policy
-    test_sorted_until_exception(execution::seq, IteratorTag());
-    test_sorted_until_exception(execution::par, IteratorTag());
+    test_sorted_until_exception(seq, IteratorTag());
+    test_sorted_until_exception(par, IteratorTag());
 
-    test_sorted_until_async_exception(
-        execution::seq(execution::task), IteratorTag());
-    test_sorted_until_async_exception(
-        execution::par(execution::task), IteratorTag());
+    test_sorted_until_async_exception(seq(task), IteratorTag());
+    test_sorted_until_async_exception(par(task), IteratorTag());
 }
 
 void sorted_until_exception_test()
@@ -429,18 +427,16 @@ void test_sorted_until_async_bad_alloc(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_sorted_until_bad_alloc()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_sorted_until_bad_alloc(execution::par, IteratorTag());
-    test_sorted_until_bad_alloc(execution::seq, IteratorTag());
+    test_sorted_until_bad_alloc(par, IteratorTag());
+    test_sorted_until_bad_alloc(seq, IteratorTag());
 
-    test_sorted_until_async_bad_alloc(
-        execution::seq(execution::task), IteratorTag());
-    test_sorted_until_async_bad_alloc(
-        execution::par(execution::task), IteratorTag());
+    test_sorted_until_async_bad_alloc(seq(task), IteratorTag());
+    test_sorted_until_async_bad_alloc(par(task), IteratorTag());
 }
 
 void sorted_until_bad_alloc_test()

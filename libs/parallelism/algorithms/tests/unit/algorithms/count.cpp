@@ -18,16 +18,14 @@
 template <typename IteratorTag>
 void test_count()
 {
-    using namespace hpx::parallel;
-
     test_count(IteratorTag());
 
-    test_count(execution::seq, IteratorTag());
-    test_count(execution::par, IteratorTag());
-    test_count(execution::par_unseq, IteratorTag());
+    test_count(hpx::execution::seq, IteratorTag());
+    test_count(hpx::execution::par, IteratorTag());
+    test_count(hpx::execution::par_unseq, IteratorTag());
 
-    test_count_async(execution::seq(execution::task), IteratorTag());
-    test_count_async(execution::par(execution::task), IteratorTag());
+    test_count_async(hpx::execution::seq(hpx::execution::task), IteratorTag());
+    test_count_async(hpx::execution::par(hpx::execution::task), IteratorTag());
 }
 
 void count_test()
@@ -40,18 +38,18 @@ void count_test()
 template <typename IteratorTag>
 void test_count_exception()
 {
-    using namespace hpx::parallel;
-
     test_count_exception(IteratorTag());
 
     // If the execution policy object is of type parallel_unsequenced_policy,
     // std::terminate shall be called. Therefore we do not test exceptions
     // with a vector execution policy.
-    test_count_exception(execution::seq, IteratorTag());
-    test_count_exception(execution::par, IteratorTag());
+    test_count_exception(hpx::execution::seq, IteratorTag());
+    test_count_exception(hpx::execution::par, IteratorTag());
 
-    test_count_exception_async(execution::seq(execution::task), IteratorTag());
-    test_count_exception_async(execution::par(execution::task), IteratorTag());
+    test_count_exception_async(
+        hpx::execution::seq(hpx::execution::task), IteratorTag());
+    test_count_exception_async(
+        hpx::execution::par(hpx::execution::task), IteratorTag());
 }
 
 void count_exception_test()
@@ -64,16 +62,16 @@ void count_exception_test()
 template <typename IteratorTag>
 void test_count_bad_alloc()
 {
-    using namespace hpx::parallel;
-
     // If the execution policy object is of type parallel_unsequenced_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_count_bad_alloc(execution::seq, IteratorTag());
-    test_count_bad_alloc(execution::par, IteratorTag());
+    test_count_bad_alloc(hpx::execution::seq, IteratorTag());
+    test_count_bad_alloc(hpx::execution::par, IteratorTag());
 
-    test_count_bad_alloc_async(execution::seq(execution::task), IteratorTag());
-    test_count_bad_alloc_async(execution::par(execution::task), IteratorTag());
+    test_count_bad_alloc_async(
+        hpx::execution::seq(hpx::execution::task), IteratorTag());
+    test_count_bad_alloc_async(
+        hpx::execution::par(hpx::execution::task), IteratorTag());
 }
 
 void count_bad_alloc_test()

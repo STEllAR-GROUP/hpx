@@ -35,8 +35,8 @@ void exclusive_scan_benchmark()
         auto op = [](double v1, double v2) { return v1 + v2; };
 
         hpx::util::high_resolution_timer t;
-        hpx::parallel::exclusive_scan(hpx::parallel::execution::par,
-            std::begin(c), std::end(c), std::begin(d), val, op);
+        hpx::parallel::exclusive_scan(hpx::execution::par, std::begin(c),
+            std::end(c), std::begin(d), val, op);
         double elapsed = t.elapsed();
 
         // verify values
@@ -127,14 +127,14 @@ void test_exclusive_scan1_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_exclusive_scan1()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_exclusive_scan1(execution::seq, IteratorTag());
-    test_exclusive_scan1(execution::par, IteratorTag());
-    test_exclusive_scan1(execution::par_unseq, IteratorTag());
+    test_exclusive_scan1(seq, IteratorTag());
+    test_exclusive_scan1(par, IteratorTag());
+    test_exclusive_scan1(par_unseq, IteratorTag());
 
-    test_exclusive_scan1_async(execution::seq(execution::task), IteratorTag());
-    test_exclusive_scan1_async(execution::par(execution::task), IteratorTag());
+    test_exclusive_scan1_async(seq(task), IteratorTag());
+    test_exclusive_scan1_async(par(task), IteratorTag());
 }
 
 void exclusive_scan_test1()

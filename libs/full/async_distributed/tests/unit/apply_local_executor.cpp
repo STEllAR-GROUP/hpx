@@ -131,12 +131,12 @@ void test_apply_with_executor(Executor& exec)
 int hpx_main()
 {
     {
-        hpx::parallel::execution::sequenced_executor exec;
+        hpx::execution::sequenced_executor exec;
         test_apply_with_executor(exec);
     }
 
     {
-        hpx::parallel::execution::parallel_executor exec;
+        hpx::execution::parallel_executor exec;
         test_apply_with_executor(exec);
     }
 

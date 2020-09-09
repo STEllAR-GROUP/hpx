@@ -18,7 +18,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     /// Loop iterations are divided into pieces and then assigned to threads.
     /// The number of loop iterations combined is determined based on
@@ -140,13 +140,20 @@ namespace hpx { namespace parallel { namespace execution {
         std::uint64_t num_iters_for_timing_;
         /// \endcond
     };
+}}    // namespace hpx::execution
+
+namespace hpx { namespace parallel { namespace execution {
+    using persistent_auto_chunk_size HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::execution::persistent_auto_chunk_size is deprecated. "
+        "Use hpx::execution::persistent_auto_chunk_size instead.") =
+        hpx::execution::persistent_auto_chunk_size;
 }}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
     template <>
-    struct is_executor_parameters<
-        parallel::execution::persistent_auto_chunk_size> : std::true_type
+    struct is_executor_parameters<hpx::execution::persistent_auto_chunk_size>
+      : std::true_type
     {
     };
     /// \endcond

@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     /// A \a sequential_executor creates groups of sequential execution agents
     /// which execute in the calling thread. The sequential order is given by
@@ -84,12 +84,13 @@ namespace hpx { namespace parallel { namespace execution {
 
         // BulkTwoWayExecutor interface
         template <typename F, typename S, typename... Ts>
-        static std::vector<hpx::future<
-            typename detail::bulk_function_result<F, S, Ts...>::type>>
+        static std::vector<hpx::future<typename parallel::execution::detail::
+                bulk_function_result<F, S, Ts...>::type>>
         bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
         {
-            typedef typename detail::bulk_function_result<F, S, Ts...>::type
-                result_type;
+            typedef
+                typename parallel::execution::detail::bulk_function_result<F, S,
+                    Ts...>::type result_type;
             std::vector<hpx::future<result_type>> results;
 
             try
@@ -112,7 +113,8 @@ namespace hpx { namespace parallel { namespace execution {
         }
 
         template <typename F, typename S, typename... Ts>
-        static typename detail::bulk_execute_result<F, S, Ts...>::type
+        static typename parallel::execution::detail::bulk_execute_result<F, S,
+            Ts...>::type
         bulk_sync_execute(F&& f, S const& shape, Ts&&... ts)
         {
             return hpx::util::unwrap(bulk_async_execute(
@@ -133,30 +135,37 @@ namespace hpx { namespace parallel { namespace execution {
         }
         /// \endcond
     };
+}}    // namespace hpx::execution
+
+namespace hpx { namespace parallel { namespace execution {
+    using sequenced_executor HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::execution::sequenced_executor is deprecated. Use "
+        "hpx::execution::sequenced_executor instead.") =
+        hpx::execution::sequenced_executor;
 }}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
     template <>
-    struct is_one_way_executor<parallel::execution::sequenced_executor>
+    struct is_one_way_executor<hpx::execution::sequenced_executor>
       : std::true_type
     {
     };
 
     template <>
-    struct is_bulk_one_way_executor<parallel::execution::sequenced_executor>
+    struct is_bulk_one_way_executor<hpx::execution::sequenced_executor>
       : std::true_type
     {
     };
 
     template <>
-    struct is_two_way_executor<parallel::execution::sequenced_executor>
+    struct is_two_way_executor<hpx::execution::sequenced_executor>
       : std::true_type
     {
     };
 
     template <>
-    struct is_bulk_two_way_executor<parallel::execution::sequenced_executor>
+    struct is_bulk_two_way_executor<hpx::execution::sequenced_executor>
       : std::true_type
     {
     };

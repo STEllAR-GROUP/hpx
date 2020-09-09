@@ -157,14 +157,14 @@ void test_merge_async(ExPolicy policy, DataType)
 template <typename DataType>
 void test_merge()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
-    test_merge(execution::seq, DataType());
-    test_merge(execution::par, DataType());
-    test_merge(execution::par_unseq, DataType());
+    test_merge(seq, DataType());
+    test_merge(par, DataType());
+    test_merge(par_unseq, DataType());
 
-    test_merge_async(execution::seq(execution::task), DataType());
-    test_merge_async(execution::par(execution::task), DataType());
+    test_merge_async(seq(task), DataType());
+    test_merge_async(par(task), DataType());
 }
 
 void test_merge()

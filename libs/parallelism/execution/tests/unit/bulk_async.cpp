@@ -67,13 +67,11 @@ void test_bulk_async(Executor& exec)
 ////////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
-    using namespace hpx::parallel;
-
-    execution::sequenced_executor seq_exec;
+    hpx::execution::sequenced_executor seq_exec;
     test_bulk_sync(seq_exec);
 
-    execution::parallel_executor par_exec;
-    execution::parallel_executor par_fork_exec(hpx::launch::fork);
+    hpx::execution::parallel_executor par_exec;
+    hpx::execution::parallel_executor par_fork_exec(hpx::launch::fork);
     test_bulk_async(par_exec);
     test_bulk_async(par_fork_exec);
 

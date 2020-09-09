@@ -18,15 +18,13 @@
 template <typename IteratorTag>
 void test_transform_reduce_binary()
 {
-    using namespace hpx::parallel;
+    using namespace hpx::execution;
 
     test_transform_reduce_binary(execution::dataseq, IteratorTag());
     test_transform_reduce_binary(execution::datapar, IteratorTag());
 
-    test_transform_reduce_binary_async(
-        execution::dataseq(execution::task), IteratorTag());
-    test_transform_reduce_binary_async(
-        execution::datapar(execution::task), IteratorTag());
+    test_transform_reduce_binary_async(execution::dataseq(task), IteratorTag());
+    test_transform_reduce_binary_async(execution::datapar(task), IteratorTag());
 }
 
 void transform_reduce_binary_test()

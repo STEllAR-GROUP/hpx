@@ -64,13 +64,13 @@ void test_adjacent_difference_async(ExPolicy p)
 
 void adjacent_difference_test()
 {
-    using namespace hpx::parallel;
-    test_adjacent_difference(execution::seq);
-    test_adjacent_difference(execution::par);
-    test_adjacent_difference(execution::par_unseq);
+    using namespace hpx::execution;
+    test_adjacent_difference(seq);
+    test_adjacent_difference(par);
+    test_adjacent_difference(par_unseq);
 
-    test_adjacent_difference_async(execution::seq(execution::task));
-    test_adjacent_difference_async(execution::par(execution::task));
+    test_adjacent_difference_async(seq(task));
+    test_adjacent_difference_async(par(task));
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
