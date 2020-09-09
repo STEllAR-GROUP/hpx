@@ -57,8 +57,20 @@ void enumerate_threads(std::size_t num_custom_threads)
 #endif
 
 #ifdef HPX_HAVE_NETWORKING
-    std::size_t num_parcel_threads = hpx::util::from_string<std::size_t>(
-        hpx::get_config_entry("hpx.threadpools.parcel_pool_size", "0"));
+    std::size_t num_parcel_threads = 0;
+    std::vector<std::string> const parcelport_names = {
+        "tcp", "mpi", "verbs", "libfabric"};
+    for (auto parcelport_name : parcelport_names)
+    {
+        if (hpx::get_config_entry(
+                "hpx.parcel." + parcelport_name + ".enable", "0") != "0")
+        {
+            num_parcel_threads +=
+                hpx::util::from_string<std::size_t>(hpx::get_config_entry(
+                    "hpx.parcel." + parcelport_name + ".parcel_pool_size",
+                    "0"));
+        }
+    }
     HPX_TEST_EQ(counts[std::size_t(hpx::os_thread_type::parcel_thread)],
         num_parcel_threads);
 #endif
