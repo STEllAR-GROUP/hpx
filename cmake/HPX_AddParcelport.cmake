@@ -55,6 +55,10 @@ function(add_parcelport name)
                POSITION_INDEPENDENT_CODE ON
   )
 
+  if(HPX_WITH_UNITY_BUILD)
+    set_target_properties(hpx_${name} PROPERTIES UNITY_BUILD ON)
+  endif()
+
   if(${name}_EXPORT)
     get_target_property(
       _link_libraries ${parcelport_name} INTERFACE_LINK_LIBRARIES

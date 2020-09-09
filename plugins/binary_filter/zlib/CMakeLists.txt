@@ -37,7 +37,7 @@ if(HPX_WITH_COMPRESSION_ZLIB)
       "${HEADER_ROOT}/hpx/plugins/binary_filter/zlib_serialization_filter.hpp"
       "${HEADER_ROOT}/hpx/plugins/binary_filter/zlib_serialization_filter_registration.hpp"
     FOLDER "Core/Plugins/Compression"
-    DEPENDENCIES ${ZLIB_LIBRARIES}
+    DEPENDENCIES ${ZLIB_LIBRARIES} ${HPX_WITH_UNITY_BUILD_OPTION}
   )
 
   if(NOT MSVC)

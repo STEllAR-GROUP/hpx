@@ -122,6 +122,7 @@ add_hpx_component(
   PREPEND_SOURCE_ROOT
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
   SOURCES ${process_sources} ${_exclude_from_all_flag}
+          ${HPX_WITH_UNITY_BUILD_OPTION}
 )
 
 target_compile_definitions(process_component PRIVATE HPX_PROCESS_EXPORTS)

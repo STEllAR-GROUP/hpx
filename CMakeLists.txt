@@ -341,8 +341,11 @@ hpx_option(
   OFF
   ADVANCED
 )
-if(HPX_WITH_UNITY_BUILD AND (CMAKE_VERSION VERSION_LESS "3.16"))
-  hpx_error("HPX_WITH_UNITY_BUILD=ON but this requires CMake 3.16 or newer.")
+if(HPX_WITH_UNITY_BUILD)
+  if(CMAKE_VERSION VERSION_LESS "3.16")
+    hpx_error("HPX_WITH_UNITY_BUILD=ON but this requires CMake 3.16 or newer.")
+  endif()
+  set(HPX_WITH_UNITY_BUILD_OPTION UNITY_BUILD)
 endif()
 
 # ##############################################################################

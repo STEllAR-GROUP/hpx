@@ -16,6 +16,7 @@ function(add_hpx_library name)
       STATIC
       PLUGIN
       NONAMEPREFIX
+      UNITY_BUILD
   )
   set(one_value_args
       FOLDER
@@ -278,6 +279,10 @@ function(add_hpx_library name)
 
   if(${name}_INTERNAL_FLAGS)
     set(_target_flags ${_target_flags} INTERNAL_FLAGS)
+  endif()
+
+  if(${name}_UNITY_BUILD)
+    set(_target_flags ${_target_flags} UNITY_BUILD)
   endif()
 
   hpx_setup_target(

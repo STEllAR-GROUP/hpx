@@ -26,7 +26,7 @@ if(HPX_WITH_COMPRESSION_SNAPPY)
       "${HEADER_ROOT}/hpx/plugins/binary_filter/snappy_serialization_filter.hpp"
       "${HEADER_ROOT}/hpx/plugins/binary_filter/snappy_serialization_filter_registration.hpp"
     FOLDER "Core/Plugins/Compression"
-    DEPENDENCIES ${SNAPPY_LIBRARY}
+    DEPENDENCIES ${SNAPPY_LIBRARY} ${HPX_WITH_UNITY_BUILD_OPTION}
   )
 
   target_include_directories(

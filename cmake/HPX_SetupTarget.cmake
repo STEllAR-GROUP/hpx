@@ -19,9 +19,10 @@ function(hpx_setup_target target)
       INSTALL_HEADERS
       INTERNAL_FLAGS
       NOLIBS
-      PLUGIN
       NONAMEPREFIX
       NOTLLKEYWORD
+      PLUGIN
+      UNITY_BUILD
   )
   set(one_value_args
       TYPE
@@ -181,6 +182,10 @@ function(hpx_setup_target target)
 
   if(target_INTERNAL_FLAGS AND TARGET hpx_private_flags)
     target_link_libraries(${target} ${__tll_private} hpx_private_flags)
+  endif()
+
+  if(target_UNITY_BUILD)
+    set_target_properties(${target} PROPERTIES UNITY_BUILD ON)
   endif()
 
   get_target_property(target_EXCLUDE_FROM_ALL ${target} EXCLUDE_FROM_ALL)
