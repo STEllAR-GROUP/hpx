@@ -98,19 +98,6 @@ configure_file(
   @ONLY
 )
 
-# FIXME : temporary add public dependencies to the boost libraries which are
-# only linked in the modules (which are themselves privately linked to hpx), it
-# should be removed when we make the modules object libraries that we publicly
-# link to hpx
-target_link_libraries(hpx_core PUBLIC hpx_dependencies_boost)
-target_link_libraries(hpx_core PUBLIC hpx_dependencies_allocator)
-target_link_libraries(hpx_core PUBLIC Hwloc::hwloc)
-target_link_libraries(hpx_core PUBLIC ASIO::standalone_asio)
-
-if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
-  target_link_libraries(hpx_core PUBLIC Boost::filesystem)
-endif()
-
 if(MSVC AND HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
   target_link_options(hpx_core PRIVATE "/EXPORT:switch_to_fiber")
 endif()

@@ -197,23 +197,6 @@ target_include_directories(
          $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}> $<INSTALL_INTERFACE:include>
 )
 
-# FIXME : temporary add public dependencies to the boost libraries which are
-# only linked in the modules (which are themselves privately linked to hpx), it
-# should be removed when we make the modules object libraries that we publicly
-# link to hpx
-if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-  target_link_libraries(hpx_full PUBLIC Boost::program_options)
-endif()
-
-# Enable SIMD via VC if it is available
-if(TARGET Vc::vc)
-  target_link_libraries(hpx_full PUBLIC Vc::vc)
-endif()
-
-if(TARGET Amplifier::amplifier)
-  target_link_libraries(hpx_full PRIVATE Amplifier::amplifier)
-endif()
-
 if(TARGET APEX::apex)
   # APEX won't get explicitly pulled into libhpx.so any more.  HOWEVER, we do
   # want to add the APEX link commands to all executables, so we use the
