@@ -7,8 +7,14 @@
 
 function(add_hpx_executable name)
   # retrieve arguments
-  set(options EXCLUDE_FROM_ALL EXCLUDE_FROM_DEFAULT_BUILD AUTOGLOB
-              INTERNAL_FLAGS NOLIBS NOHPX_INIT UNITY_BUILD
+  set(options
+      EXCLUDE_FROM_ALL
+      EXCLUDE_FROM_DEFAULT_BUILD
+      AUTOGLOB
+      INTERNAL_FLAGS
+      NOLIBS
+      NOHPX_INIT
+      UNITY_BUILD
   )
   set(one_value_args
       INI
