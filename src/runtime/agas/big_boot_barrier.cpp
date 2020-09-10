@@ -9,6 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions_base/actions_base_support.hpp>
@@ -900,4 +901,5 @@ big_boot_barrier& get_big_boot_barrier()
 
 }}
 
+#endif
 #endif

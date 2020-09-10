@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/components_base/traits/component_heap_type.hpp>
@@ -74,4 +75,4 @@ namespace hpx { namespace components
         {}
     };
 }}
-
+#endif

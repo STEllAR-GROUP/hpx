@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS) && defined(HPX_HAVE_NETWORKING)
 #include <hpx/functional/function.hpp>
@@ -104,4 +105,5 @@ namespace hpx { namespace actions { namespace detail {
 
 #define HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(Action)
 
+#endif
 #endif

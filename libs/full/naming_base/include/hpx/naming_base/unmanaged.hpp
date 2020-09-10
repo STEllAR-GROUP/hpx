@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/naming_base/id_type.hpp>
 
 namespace hpx { namespace naming {
@@ -37,3 +38,4 @@ namespace hpx { namespace naming {
 namespace hpx {
     using naming::unmanaged;
 }
+#endif

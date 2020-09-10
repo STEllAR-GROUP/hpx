@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/unique_function.hpp>
@@ -57,3 +58,4 @@ namespace hpx { namespace detail {
     );                                                                        \
     */
 /**/
+#endif

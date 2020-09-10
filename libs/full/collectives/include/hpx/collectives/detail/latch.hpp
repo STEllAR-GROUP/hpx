@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions/base_action.hpp>
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
@@ -145,3 +146,4 @@ HPX_REGISTER_ACTION_DECLARATION(
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     bool, std::ptrdiff_t, bool_std_ptrdiff)
+#endif

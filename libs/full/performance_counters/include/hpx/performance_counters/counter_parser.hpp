@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <string>
 
@@ -37,3 +38,4 @@ namespace hpx { namespace performance_counters {
     HPX_EXPORT bool parse_counter_name(
         std::string const& name, path_elements& elements);
 }}    // namespace hpx::performance_counters
+#endif

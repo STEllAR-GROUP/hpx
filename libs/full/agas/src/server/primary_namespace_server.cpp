@@ -9,6 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/agas/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
@@ -1361,3 +1362,4 @@ namespace hpx { namespace agas { namespace server {
     }
 
 }}}    // namespace hpx::agas::server
+#endif

@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 namespace hpx { namespace actions {
 
@@ -20,3 +21,4 @@ namespace hpx { namespace actions {
     void trigger(
         typed_continuation<Result, RemoteResult>&& cont, F&& f, Ts&&... vs);
 }}    // namespace hpx::actions
+#endif

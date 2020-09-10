@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
@@ -359,4 +360,4 @@ namespace hpx { namespace components { namespace server
     {};
 }}}
 
-
+#endif

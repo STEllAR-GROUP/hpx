@@ -10,6 +10,6 @@
 #include <hpx/config.hpp>
 #include <hpx/parallel/algorithms/adjacent_find.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/parallel/segmented_algorithms/adjacent_find.hpp>
 #endif

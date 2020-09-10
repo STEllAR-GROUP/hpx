@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
@@ -272,3 +273,4 @@ namespace hpx {
             std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 }    // namespace hpx
+#endif

@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_local/sync_fwd.hpp>
@@ -18,3 +19,4 @@ namespace hpx { namespace detail {
     typename hpx::traits::extract_action<Action>::type::local_result_type
     sync_impl(Launch&& policy, hpx::id_type const& id, Ts&&... vs);
 }}    // namespace hpx::detail
+#endif

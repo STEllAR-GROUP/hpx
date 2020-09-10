@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/collectives/detail/latch.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
@@ -129,3 +130,4 @@ namespace hpx { namespace lcos {
         /// \endcond
     };
 }}    // namespace hpx::lcos
+#endif

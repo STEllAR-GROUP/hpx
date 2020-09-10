@@ -7,6 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/assert.hpp>
 #include <hpx/agas/agas_fwd.hpp>
@@ -160,3 +161,4 @@ namespace hpx { namespace applier {
         return &hpx::get_runtime_distributed().get_applier();
     }
 }}    // namespace hpx::applier
+#endif

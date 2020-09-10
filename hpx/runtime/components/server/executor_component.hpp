@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/components_base/get_lva.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
@@ -97,4 +98,4 @@ namespace hpx { namespace components
     };
 }}
 
-
+#endif

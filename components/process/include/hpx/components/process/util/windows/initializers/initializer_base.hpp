@@ -12,6 +12,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_WINDOWS)
 
@@ -35,4 +36,5 @@ struct initializer_base
 
 }}}}
 
+#endif
 #endif

@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/traits/component_config_data.hpp>
 #include <hpx/preprocessor/cat.hpp>
@@ -161,3 +162,4 @@ namespace hpx { namespace components
     template struct hpx::components::component_registry<                      \
         ComponentType, state>;                                                \
 /**/
+#endif

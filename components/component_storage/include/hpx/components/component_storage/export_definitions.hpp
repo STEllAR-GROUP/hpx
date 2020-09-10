@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config/export_definitions.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_MIGRATE_TO_STORAGE_MODULE_EXPORTS)
 # define HPX_MIGRATE_TO_STORAGE_EXPORT HPX_SYMBOL_EXPORT
@@ -15,4 +16,4 @@
 #endif
 
 
-
+#endif

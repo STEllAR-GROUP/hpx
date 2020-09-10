@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/modules/plugin.hpp>
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
@@ -75,4 +76,4 @@ namespace hpx { namespace util { namespace plugin
     HPX_REGISTER_PLUGIN_REGISTRY_MODULE_DYNAMIC()                             \
 /**/
 
-
+#endif

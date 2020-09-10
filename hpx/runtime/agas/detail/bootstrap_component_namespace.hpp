@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/future.hpp>
@@ -66,4 +67,4 @@ namespace hpx { namespace agas { namespace detail
 
 }}}
 
-
+#endif

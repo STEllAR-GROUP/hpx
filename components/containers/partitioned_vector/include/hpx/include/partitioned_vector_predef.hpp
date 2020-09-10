@@ -6,7 +6,9 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_predef.hpp>
-
+#endif
 
 

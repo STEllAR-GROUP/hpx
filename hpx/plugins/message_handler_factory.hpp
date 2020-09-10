@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/plugin_registry.hpp>
 #include <hpx/plugins/unique_plugin_name.hpp>
@@ -98,4 +99,4 @@ namespace hpx { namespace plugins
     HPX_REGISTER_PLUGIN_REGISTRY_2(MessageHandler, pluginname)                \
 /**/
 
-
+#endif

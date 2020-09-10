@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/coroutines/thread_enums.hpp>
 
 namespace hpx { namespace traits {
@@ -19,3 +21,4 @@ namespace hpx { namespace traits {
             threads::thread_stacksize_default;
     };
 }}    // namespace hpx::traits
+#endif

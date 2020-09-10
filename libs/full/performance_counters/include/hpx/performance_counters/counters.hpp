@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
@@ -411,3 +412,4 @@ namespace hpx { namespace performance_counters {
         return f.get(ec);
     }
 }}    // namespace hpx::performance_counters
+#endif

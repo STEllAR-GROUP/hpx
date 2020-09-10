@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/basic_action.hpp>
 // This is needed to get rid of an undefined reference to
 // hpx::actions::detail::register_remote_action_invocation_count
@@ -39,4 +40,4 @@ HPX_REGISTER_ACTION_ID(
     hpx::components::server::console_error_sink_action,
     console_error_sink_action,
     hpx::actions::console_error_sink_action_id)
-
+#endif

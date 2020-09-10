@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 
@@ -37,4 +38,4 @@ namespace hpx { namespace util
         virtual std::size_t free_size() const = 0;
     };
 }}
-
+#endif

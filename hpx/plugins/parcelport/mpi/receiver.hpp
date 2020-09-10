@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
 
@@ -164,4 +165,4 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 }}}}
 
 #endif
-
+#endif

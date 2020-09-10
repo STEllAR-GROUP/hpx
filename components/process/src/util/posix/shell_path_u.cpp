@@ -10,6 +10,7 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/shell_path.hpp>
@@ -30,4 +31,5 @@ namespace hpx { namespace components { namespace process { namespace posix
     }
 }}}}
 
+#endif
 #endif

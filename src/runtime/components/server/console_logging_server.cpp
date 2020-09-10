@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 // This is needed to get rid of an undefined reference to
 // hpx::actions::detail::register_remote_action_invocation_count
 #include <hpx/actions/transfer_action.hpp>
@@ -92,4 +93,4 @@ namespace hpx { namespace components { namespace server
         }
     }
 }}}
-
+#endif

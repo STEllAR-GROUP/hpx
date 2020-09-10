@@ -11,6 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assert.hpp>
@@ -964,4 +965,5 @@ namespace hpx { namespace parcelset
     };
 }}
 
+#endif
 #endif

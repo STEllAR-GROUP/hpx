@@ -11,6 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 namespace hpx {
     /// \namespace applier
@@ -32,3 +33,4 @@ namespace hpx {
         HPX_EXPORT applier* get_applier_ptr();
     }    // namespace applier
 }    // namespace hpx
+#endif

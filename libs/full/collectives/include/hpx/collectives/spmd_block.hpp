@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/collectives/barrier.hpp>
@@ -312,3 +314,4 @@ namespace hpx { namespace lcos {
             std::forward<Args>(args)...);
     }
 }}    // namespace hpx::lcos
+#endif

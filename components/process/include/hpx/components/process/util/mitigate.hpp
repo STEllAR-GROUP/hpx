@@ -10,7 +10,8 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
-
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if defined(HPX_WINDOWS)
 #include <boost/asio/windows/stream_handle.hpp>
 #else
@@ -44,4 +45,4 @@ inline const char *null_device()
 }
 
 }}}}
-
+#endif

@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_distributed/async_continue_fwd.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
@@ -63,3 +65,4 @@ namespace hpx {
         Cont&& cont, DistPolicy const& policy, Callback&& cb, Ts&&... vs);
 #endif
 }    // namespace hpx
+#endif

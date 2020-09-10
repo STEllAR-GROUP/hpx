@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions/apply_helper.hpp>
 #include <hpx/actions_base/action_priority.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
@@ -679,3 +680,4 @@ namespace hpx {
             gid, actions::action_priority<Derived>(), std::forward<Ts>(vs)...);
     }
 }    // namespace hpx
+#endif

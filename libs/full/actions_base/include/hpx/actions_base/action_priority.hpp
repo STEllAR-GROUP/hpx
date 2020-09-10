@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
@@ -27,3 +29,4 @@ namespace hpx { namespace actions {
         return priority;
     }
 }}    // namespace hpx::actions
+#endif

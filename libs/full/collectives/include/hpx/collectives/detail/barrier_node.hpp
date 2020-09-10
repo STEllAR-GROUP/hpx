@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions/base_action.hpp>
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
@@ -109,3 +110,4 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::detail::barrier_node::gather_action, barrier_node_gather_action);
 
 #include <hpx/config/warnings_suffix.hpp>
+#endif

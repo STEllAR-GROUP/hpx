@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <cstdint>
 
@@ -40,3 +41,4 @@ namespace hpx { namespace actions {
 
     /// \endcond
 }}    // namespace hpx::actions
+#endif

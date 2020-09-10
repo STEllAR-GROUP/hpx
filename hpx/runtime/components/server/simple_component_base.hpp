@@ -7,10 +7,12 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 
 // This file is being kept around for legacy purposes. We should not include
 // an obsoletion warning just yet.
-
+#endif

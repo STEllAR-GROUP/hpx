@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/is_future.hpp>
@@ -333,3 +334,4 @@ namespace hpx { namespace actions {
 #endif
 
 #include <hpx/config/warnings_suffix.hpp>
+#endif

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/async_distributed/apply.hpp>
 #include <hpx/modules/async_distributed.hpp>
@@ -368,4 +369,4 @@ namespace hpx { namespace util {
     }
 }}
 
-
+#endif

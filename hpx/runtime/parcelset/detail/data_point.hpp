@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <cstddef>
 #include <cstdint>
 
@@ -43,3 +45,4 @@ namespace hpx { namespace performance_counters { namespace parcels {
             buffer_allocate_time_;    ///< The time spent for allocating buffers
     };
 }}}    // namespace hpx::performance_counters::parcels
+#endif
