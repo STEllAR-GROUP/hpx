@@ -25,12 +25,7 @@ else()
   return()
 endif()
 
-set(example_programs data_copy)
-
-if(NOT HPX_WITH_CUDA_CLANG)
-  # This example does not compile with the Cray clang compiler
-  set(example_programs ${example_programs} hello_compute)
-endif()
+set(example_programs data_copy hello_compute)
 
 set(data_copy_PARAMETERS THREADS_PER_LOCALITY 4)
 set(hello_compute_PARAMETERS THREADS_PER_LOCALITY 4)
