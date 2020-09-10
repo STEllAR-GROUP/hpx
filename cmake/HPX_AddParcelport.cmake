@@ -56,7 +56,7 @@ function(add_parcelport name)
   )
 
   if(HPX_WITH_UNITY_BUILD)
-    set_target_properties(hpx_${name} PROPERTIES UNITY_BUILD ON)
+    set_target_properties(${parcelport_name} PROPERTIES UNITY_BUILD ON)
   endif()
 
   if(${name}_EXPORT)
