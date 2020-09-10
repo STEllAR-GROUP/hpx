@@ -109,3 +109,7 @@ target_link_libraries(hpx_core PUBLIC Hwloc::hwloc)
 if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
   target_link_libraries(hpx_core PUBLIC Boost::filesystem)
 endif()
+
+if(MSVC AND HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
+  target_link_options(hpx_core PRIVATE "/EXPORT:switch_to_fiber")
+endif()

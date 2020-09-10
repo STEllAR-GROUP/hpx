@@ -22,5 +22,14 @@ namespace hpx { namespace lcos { namespace detail {
 }}}    // namespace hpx::lcos::detail
 
 namespace hpx { namespace serialization { namespace detail {
+
+    // This is explicitly instantiated to ensure that the id is stable across
+    // shared libraries. MSVC and gcc/clang require different handling of
+    // exported explicitly instantiated templates.
+#if defined(HPX_MSVC)
+    template struct HPX_PARALLELISM_EXPORT
+        extra_archive_data_id_helper<preprocess_futures>;
+#else
     template struct extra_archive_data_id_helper<preprocess_futures>;
+#endif
 }}}    // namespace hpx::serialization::detail

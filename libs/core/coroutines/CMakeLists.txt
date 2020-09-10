@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,14 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+hpx_option(
+  HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION BOOL
+  "Emulate SwapContext API for coroutines (Windows only, default: OFF)" OFF
+  CATEGORY "Thread Manager"
+  ADVANCED
+  MODULE COROUTINES
+)
 
 set(coroutines_headers
     hpx/coroutines/coroutine.hpp
@@ -49,13 +57,29 @@ set(coroutines_sources
 )
 
 if(MSVC)
-  if(HPX_WITH_SWAP_CONTEXT_EMULATION)
-    enable_language(ASM)
+  if(HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
+    # ##########################################################################
+    # Emulation of SwapContext on Windows
+    # ##########################################################################
+    enable_language(ASM_MASM)
+    if(NOT CMAKE_ASM_MASM_COMPILER)
+      hpx_error(
+        "SwitchToFiber emulation can not be enabled. The masm compiler \
+         could not be found. Try setting the ASM_MASM environment variable to the \
+         assembler executable (ml.exe/ml64.exe) or disable the emulation by setting \
+         HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION to Off"
+      )
+    endif()
+
+    hpx_add_config_define_namespace(
+      DEFINE HPX_COROUTINES_HAVE_SWAP_CONTEXT_EMULATION NAMESPACE COROUTINES
+    )
+
     set(switch_to_fiber_source
         "${CMAKE_CURRENT_SOURCE_DIR}/src/switch_to_fiber.asm"
     )
     set(switch_to_fiber_object
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/switch_to_fiber.asm"
+        "${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj"
     )
     add_custom_command(
       OUTPUT "${switch_to_fiber_object}"
@@ -65,6 +89,11 @@ if(MSVC)
       VERBATIM
     )
   endif()
+elseif(HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
+  hpx_error(
+    "The option HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION is not supported on "
+    "this platform, please disable the emulation by setting it to Off"
+  )
 endif()
 
 include(HPX_AddModule)
@@ -81,8 +110,8 @@ add_hpx_module(
   CMAKE_SUBDIRS examples tests
 )
 
-if(MSVC)
-  if(HPX_WITH_SWAP_CONTEXT_EMULATION)
-    target_link_options(hpx_coroutines PRIVATE "/EXPORT:switch_to_fiber")
-  endif()
+if(MSVC AND HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
+  hpx_info(
+    "    SwitchToFiber emulation is enabled, using compiler: '${CMAKE_ASM_MASM_COMPILER}'"
+  )
 endif()

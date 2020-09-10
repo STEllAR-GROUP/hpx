@@ -930,12 +930,6 @@ if(HPX_SCHEDULER_MAX_TERMINATED_THREADS GREATER 0)
 endif()
 
 hpx_option(
-  HPX_WITH_SWAP_CONTEXT_EMULATION BOOL
-  "Emulate SwapContext API for coroutines (default: OFF)" OFF
-  CATEGORY "Thread Manager" ADVANCED
-)
-
-hpx_option(
   HPX_WITH_SPINLOCK_DEADLOCK_DETECTION BOOL
   "Enable spinlock deadlock detection (default: OFF)" OFF
   CATEGORY "Thread Manager" ADVANCED
@@ -2276,27 +2270,6 @@ if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
     )
   endif()
   hpx_add_config_define(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
-endif()
-
-# ##############################################################################
-# Emulation of SwapContext on Windows
-# ##############################################################################
-if(WIN32)
-  if(HPX_WITH_SWAP_CONTEXT_EMULATION)
-    if(NOT CMAKE_ASM_MASM_COMPILER)
-      hpx_error(
-        "SwitchToFiber emulation can not be enabled. The masm compiler \
-      could not be found. Try setting the ASM_MASM environment variable to the \
-      assembler executable (ml.exe/ml64.exe) or disable the emulation by setting \
-      HPX_WITH_SWAP_CONTEXT_EMULATION to Off"
-      )
-    else()
-      hpx_info(
-        "SwitchToFiber emulation is enabled, using compiler: '${CMAKE_ASM_MASM_COMPILER}'"
-      )
-      hpx_add_config_define(HPX_HAVE_SWAP_CONTEXT_EMULATION)
-    endif()
-  endif()
 endif()
 
 # ##############################################################################
