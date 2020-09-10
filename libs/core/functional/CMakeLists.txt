@@ -91,7 +91,6 @@ add_hpx_module(
   COMPAT_HEADERS ${functional_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion
-    hpx_concurrency
     hpx_config
     hpx_datastructures
     hpx_debugging

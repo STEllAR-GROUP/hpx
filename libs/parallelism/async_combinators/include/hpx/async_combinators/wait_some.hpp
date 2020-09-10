@@ -184,7 +184,6 @@ namespace hpx {
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/threading.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/pack.hpp>
