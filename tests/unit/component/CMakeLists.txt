@@ -71,7 +71,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(new_colocated_PARAMETERS LOCALITIES 2)
 endif()
 
-if(HPX_WITH_NETWORKING)
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_TCP)
   set(tests ${tests} launch_process)
 
   # add executable needed for launch_process_test
@@ -87,8 +87,12 @@ if(HPX_WITH_NETWORKING)
   set(launch_process_FLAGS DEPENDENCIES iostreams_component process_component
                            launch_process_test_server_component
   )
-  set(launch_process_PARAMETERS --launch=$<TARGET_FILE:launched_process_test>
-                                --hpx:expect-connecting-localities
+  set(launch_process_PARAMETERS
+      --launch=$<TARGET_FILE:launched_process_test>
+      --hpx:expect-connecting-localities
+      # Force use of the TCP parcelport
+      --hpx:ini=hpx.parcel.tcp.priority=1000
+      --hpx:ini=hpx.parcel.bootstrap=tcp
   )
 endif()
 
@@ -111,7 +115,7 @@ foreach(test ${tests})
 
 endforeach()
 
-if(HPX_WITH_NETWORKING)
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_TCP)
   add_hpx_pseudo_dependencies(
     tests.unit.component.launch_process launched_process_test
   )

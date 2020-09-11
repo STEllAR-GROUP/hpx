@@ -8,9 +8,9 @@ module purge
 module load cmake
 module load gcc/9
 module load boost/1.73.0-${build_type,,}
-module load hwloc/2
+module load hwloc
 module load cuda/11
-module load mpich
+module load openmpi
 
 configure_extra_options="-DCMAKE_BUILD_TYPE=${build_type}"
 configure_extra_options+=" -DHPX_WITH_MALLOC=system"
@@ -22,4 +22,4 @@ configure_extra_options+=" -DHPX_WITH_NETWORKING=OFF"
 configure_extra_options+=" -DHPX_WITH_DISTRIBUTED_RUNTIME=OFF"
 configure_extra_options+=" -DHPX_WITH_LOGGING=OFF"
 configure_extra_options+=" -DHPX_WITH_ASYNC_MPI=ON"
-configure_extra_options+=" -DNVCC_FLAGS=-arch=sm_35"
+configure_extra_options+=" -DCUDA_NVCC_FLAGS=-arch=sm_35"

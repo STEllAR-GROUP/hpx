@@ -51,20 +51,20 @@ namespace hpx { namespace util {
         util::runtime_configuration const& cfg)
     {
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
-        if (get_entry_as(cfg, "hpx.parcel.mpi.enable", 1) == 0)
-            return false;
-
-        // We disable the MPI parcelport if the application is not run using
-        // mpirun and the tcp/ip parcelport is not explicitly disabled
+        // We disable the MPI parcelport if any of these hold:
         //
-        // The bottom line is that we use the MPI parcelport either when the
-        // application was executed using mpirun or if the tcp/ip parcelport
-        // was disabled.
-        if (!detail::detect_mpi_environment(cfg, HPX_HAVE_PARCELPORT_MPI_ENV) &&
-            get_entry_as(cfg, "hpx.parcel.tcp.enable", 1))
+        // - The parcelport is explicitly disabled
+        // - The application is not run in an MPI environment
+        // - The TCP parcelport is enabled and has higher priority
+        if (get_entry_as(cfg, "hpx.parcel.mpi.enable", 1) == 0 ||
+            !detail::detect_mpi_environment(cfg, HPX_HAVE_PARCELPORT_MPI_ENV) ||
+            (get_entry_as(cfg, "hpx.parcel.tcp.enable", 1) &&
+                (get_entry_as(cfg, "hpx.parcel.tcp.priority", 1) >
+                    get_entry_as(cfg, "hpx.parcel.mpi.priority", 0))))
         {
             return false;
         }
+
         return true;
 #elif defined(HPX_HAVE_MODULE_MPI_BASE)
         // if MPI futures are enabled while networking is off we need to

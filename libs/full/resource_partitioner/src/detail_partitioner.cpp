@@ -10,9 +10,6 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
-#ifdef HPX_HAVE_MODULE_MPI_BASE
-#include <hpx/modules/mpi_base.hpp>
-#endif
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
@@ -895,18 +892,6 @@ namespace hpx { namespace resource { namespace detail {
         cfg_.ini_config_ = std::move(ini_config);
         cfg_.hpx_main_f_ = f;
 
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
-    defined(HPX_HAVE_MODULE_MPI_BASE)
-        // getting localities from MPI environment (support mpirun)
-        if (util::mpi_environment::check_mpi_environment(cfg_.rtcfg_))
-        {
-            util::mpi_environment::init(&argc, &argv, cfg_.rtcfg_);
-            cfg_.num_localities_ =
-                static_cast<std::size_t>(util::mpi_environment::size());
-            cfg_.node_ =
-                static_cast<std::size_t>(util::mpi_environment::rank());
-        }
-#endif
         // parse command line and set options
         // terminate set if program options contain --hpx:help or --hpx:version ...
         cfg_.parse_result_ =

@@ -76,6 +76,9 @@ int hpx_main(hpx::program_options::variables_map &vm)
     args.push_back("--set_message=accessed");
     args.push_back("--hpx:ignore-batch-env");
     args.push_back("--hpx:threads=1");
+    // Force use of the TCP parcelport
+    args.push_back("--hpx:ini=hpx.parcel.tcp.priority=1000");
+    args.push_back("--hpx:ini=hpx.parcel.bootstrap=tcp");
 
     // set up environment for launched executable
     std::vector<std::string> env = get_environment();   // current environment
