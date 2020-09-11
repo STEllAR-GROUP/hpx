@@ -24,7 +24,7 @@ foreach(test ${tests})
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL NOLIBS
-    DEPENDENCIES hpx_memory hpx_testing
+    DEPENDENCIES hpx_core
     FOLDER "Tests/Unit/Modules/Core/Memory"
   )
 

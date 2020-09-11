@@ -42,7 +42,7 @@ if(HPX_WITH_TESTS)
       HEADERS ${string_util_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
       NOLIBS
-      DEPENDENCIES hpx_string_util
+      DEPENDENCIES hpx_core
     )
   endif()
 endif()

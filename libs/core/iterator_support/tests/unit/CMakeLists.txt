@@ -26,10 +26,10 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
 endif()
 
 set(is_range_FLAGS NOLIBS)
-set(is_range_LIBS DEPENDENCIES hpx_config hpx_iterator_support hpx_testing)
+set(is_range_LIBS DEPENDENCIES hpx_core)
 
 set(range_FLAGS NOLIBS)
-set(range_LIBS DEPENDENCIES hpx_config hpx_iterator_support hpx_testing)
+set(range_LIBS DEPENDENCIES hpx_core)
 
 # Add the tests
 foreach(test ${tests})

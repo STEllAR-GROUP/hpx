@@ -12,7 +12,7 @@ foreach(test ${tests})
   source_group("Source Files" FILES ${sources})
 
   add_executable(${test}_test EXCLUDE_FROM_ALL ${sources})
-  target_link_libraries(${test}_test hpx_format hpx_testing)
+  target_link_libraries(${test}_test PRIVATE hpx_core)
   set_target_properties(
     ${test}_test PROPERTIES FOLDER "Tests/Unit/Modules/Core/Format"
   )

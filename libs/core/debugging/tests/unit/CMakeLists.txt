@@ -19,6 +19,8 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS} ${${test}_LIBS}
     EXCLUDE_FROM_ALL
     FOLDER ${folder_name}
+    NOLIBS
+    DEPENDENCIES hpx_core
   )
 
   add_hpx_unit_test("modules.debugging" ${test} ${${test}_PARAMETERS})
