@@ -38,7 +38,6 @@ sbatch \
     --output="jenkins-hpx-${configuration_name_with_build_type}.out" \
     --error="jenkins-hpx-${configuration_name_with_build_type}.err" \
     --wait .jenkins/lsu/batch.sh
-set -e
 
 # Print slurm logs
 echo "= stdout =================================================="
