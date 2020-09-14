@@ -11,7 +11,8 @@ set -eux
 src_dir="$(pwd)"
 build_dir="${src_dir}/build/${configuration_name_with_build_type}"
 
-mkdir -p "${build_dir}"
+rm -rf "${build_dir}"
+mkdir "${build_dir}"
 
 source ${src_dir}/.jenkins/lsu/env-${configuration_name}.sh
 
