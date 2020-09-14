@@ -50,7 +50,7 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  set(folder_name "Tests/Unit/Modules/Serialization")
+  set(folder_name "Tests/Unit/Modules/Core/Serialization")
 
   # add example executable
   add_hpx_executable(
@@ -72,7 +72,7 @@ foreach(test ${full_tests})
 
   source_group("Source Files" FILES ${sources})
 
-  set(folder_name "Tests/Unit/Modules/Serialization")
+  set(folder_name "Tests/Unit/Modules/Core/Serialization")
 
   # add example executable
   add_hpx_executable(
@@ -106,7 +106,7 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
     add_hpx_unit_compile_test(
       "modules.serialization" ${compile_test}
       SOURCES ${sources} ${${compile_test}_FLAGS}
-      FOLDER "Tests/Unit/Modules/Serialization/CompileOnly"
+      FOLDER "Tests/Unit/Modules/Core/Serialization/CompileOnly"
     )
 
   endforeach()

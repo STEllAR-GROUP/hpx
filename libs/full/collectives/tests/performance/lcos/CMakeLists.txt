@@ -17,7 +17,7 @@ foreach(benchmark ${benchmarks})
     ${benchmark}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${benchmark}_FLAGS}
     EXCLUDE_FROM_ALL
-    FOLDER "Benchmarks/Modules/Collectives/LCOs"
+    FOLDER "Benchmarks/Modules/Full/Collectives/LCOs"
   )
 
   add_hpx_performance_test(

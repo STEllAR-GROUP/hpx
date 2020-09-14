@@ -19,7 +19,7 @@ foreach(test ${tests})
     DEPENDENCIES hpx_execution_base hpx_testing
                  ${BOOST_UNDERLYING_THREAD_LIBRARY}
     EXCLUDE_FROM_ALL
-    FOLDER "Tests/Unit/Modules/BasicExecution"
+    FOLDER "Tests/Unit/Modules/Core/ExecutionBase"
   )
 
   add_hpx_unit_test("modules.execution_base" ${test} ${${test}_PARAMETERS})

@@ -63,7 +63,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Unit/Modules/Synchronization"
+    FOLDER "Tests/Unit/Modules/Core/Synchronization"
   )
 
   add_hpx_unit_test("modules.synchronization" ${test} ${${test}_PARAMETERS})
@@ -91,7 +91,7 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
     add_hpx_unit_compile_test(
       "modules.synchronization" ${compile_test}
       SOURCES ${sources} ${${compile_test}_FLAGS}
-      FOLDER "Tests/Unit/Modules/Synchronization/CompileOnly"
+      FOLDER "Tests/Unit/Modules/Core/Synchronization/CompileOnly"
     )
 
   endforeach()

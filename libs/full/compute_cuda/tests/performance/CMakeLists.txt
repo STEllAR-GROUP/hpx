@@ -24,7 +24,7 @@ foreach(benchmark ${benchmarks})
     SOURCES ${sources} ${${benchmark}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Benchmarks/Modules/Compute/Cuda"
+    FOLDER "Benchmarks/Modules/Full/Compute/Cuda"
   )
 
   add_hpx_performance_test(

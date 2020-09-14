@@ -50,7 +50,7 @@ foreach(test ${function_tests})
     NOLIBS
     DEPENDENCIES hpx_functional hpx_testing
     EXCLUDE_FROM_ALL
-    FOLDER "Tests/Unit/Modules/Functional"
+    FOLDER "Tests/Unit/Modules/Core/Functional"
   )
 
   add_hpx_unit_test("modules.functional" ${test})

@@ -17,7 +17,7 @@ foreach(benchmark ${benchmarks})
 
   source_group("Source Files" FILES ${sources})
 
-  set(folder_name "Benchmarks/Modules/Serialization")
+  set(folder_name "Benchmarks/Modules/Core/Serialization")
 
   # add example executable
   add_hpx_executable(

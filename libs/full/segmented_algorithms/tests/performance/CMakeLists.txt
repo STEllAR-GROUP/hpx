@@ -18,7 +18,7 @@ foreach(benchmark ${benchmarks})
     DEPENDENCIES iostreams_component partitioned_vector_component
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Benchmarks/Modules/SegmentedAlgorithms"
+    FOLDER "Benchmarks/Modules/Full/SegmentedAlgorithms"
   )
 
   add_hpx_performance_test(

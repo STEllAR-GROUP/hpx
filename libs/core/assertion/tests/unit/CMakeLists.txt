@@ -17,7 +17,7 @@ foreach(test ${tests})
     NOLIBS
     DEPENDENCIES hpx_assertion
     EXCLUDE_FROM_ALL
-    FOLDER "Tests/Unit/Modules/Assertion/"
+    FOLDER "Tests/Unit/Modules/Core/Assertion/"
   )
 
   add_hpx_unit_test("modules.assertion" ${test} ${${test}_PARAMETERS})

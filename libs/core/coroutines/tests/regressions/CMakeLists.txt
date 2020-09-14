@@ -17,7 +17,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Modules/Coroutines"
+    FOLDER "Tests/Regressions/Modules/Core/Coroutines"
   )
 
   add_hpx_regression_test("modules.coroutines" ${test} ${${test}_PARAMETERS})
