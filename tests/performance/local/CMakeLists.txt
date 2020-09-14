@@ -120,9 +120,11 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       sizeof
       spinlock_overhead1
       spinlock_overhead2
-      stream
       wait_all_timings
   )
+  if(NOT HPX_WITH_CUDA_COMPUTE OR HPX_WITH_CUDA_CLANG)
+    set(benchmarks ${benchmarks} stream)
+  endif()
 endif()
 
 set(delay_baseline_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies}
