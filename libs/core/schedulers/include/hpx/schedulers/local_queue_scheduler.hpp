@@ -137,7 +137,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-        std::uint64_t get_creation_time(bool reset)
+        std::uint64_t get_creation_time(bool reset) override
         {
             std::uint64_t time = 0;
 
@@ -147,7 +147,7 @@ namespace hpx { namespace threads { namespace policies {
             return time;
         }
 
-        std::uint64_t get_cleanup_time(bool reset)
+        std::uint64_t get_cleanup_time(bool reset) override
         {
             std::uint64_t time = 0;
 
