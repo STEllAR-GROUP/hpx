@@ -12,7 +12,6 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution_base/agent_ref.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/timing/steady_clock.hpp>

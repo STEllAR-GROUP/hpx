@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2019 Hartmut Kaiser
+//  Copyright (c) 2015-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,13 +10,14 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/synchronization/condition_variable.hpp>
+#include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <mutex>
 #include <utility>
 
@@ -72,7 +73,7 @@ namespace hpx { namespace lcos { namespace local {
         ///                 supports.
         static constexpr std::ptrdiff_t(max)() noexcept
         {
-            return PTRDIFF_MAX;
+            return (std::numeric_limits<std::ptrdiff_t>::max)();
         }
 
         /// Decrements counter_ by n. Does not block.

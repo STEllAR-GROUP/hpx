@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -60,8 +60,9 @@ set(synchronization_compat_headers
     hpx/synchronization.hpp
 )
 
-set(synchronization_sources detail/condition_variable.cpp local_barrier.cpp
-                            mutex.cpp stop_token.cpp
+set(synchronization_sources
+    detail/condition_variable.cpp detail/counting_semaphore.cpp
+    detail/sliding_semaphore.cpp local_barrier.cpp mutex.cpp stop_token.cpp
 )
 
 include(HPX_AddModule)
