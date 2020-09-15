@@ -77,7 +77,7 @@ namespace hpx { namespace program_options {
           : m_defaulted(false)
         {
         }
-        variable_value(const hpx::util::any_nonser& xv, bool xdefaulted)
+        variable_value(const hpx::any_nonser& xv, bool xdefaulted)
           : v(xv)
           , m_defaulted(xdefaulted)
         {
@@ -88,13 +88,13 @@ namespace hpx { namespace program_options {
         template <class T>
         const T& as() const
         {
-            return hpx::util::any_cast<const T&>(v);
+            return hpx::any_cast<const T&>(v);
         }
         /** @overload */
         template <class T>
         T& as()
         {
-            return hpx::util::any_cast<T&>(v);
+            return hpx::any_cast<T&>(v);
         }
 
         /// Returns true if no value is stored.
@@ -103,13 +103,13 @@ namespace hpx { namespace program_options {
             given, but has default value. */
         bool defaulted() const;
         /** Returns the contained value. */
-        const hpx::util::any_nonser& value() const;
+        const hpx::any_nonser& value() const;
 
         /** Returns the contained value. */
-        hpx::util::any_nonser& value();
+        hpx::any_nonser& value();
 
     private:
-        hpx::util::any_nonser v;
+        hpx::any_nonser v;
         bool m_defaulted;
         // Internal reference to value semantic. We need to run
         // notifications when *final* values of options are known, and
@@ -219,12 +219,12 @@ namespace hpx { namespace program_options {
         return m_defaulted;
     }
 
-    inline const hpx::util::any_nonser& variable_value::value() const
+    inline const hpx::any_nonser& variable_value::value() const
     {
         return v;
     }
 
-    inline hpx::util::any_nonser& variable_value::value()
+    inline hpx::any_nonser& variable_value::value()
     {
         return v;
     }

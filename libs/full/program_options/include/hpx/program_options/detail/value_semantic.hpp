@@ -73,10 +73,9 @@ namespace hpx { namespace program_options {
     }
 
     template <class T, class Char>
-    void typed_value<T, Char>::notify(
-        const hpx::util::any_nonser& value_store) const
+    void typed_value<T, Char>::notify(const hpx::any_nonser& value_store) const
     {
-        const T* value = hpx::util::any_cast<T>(&value_store);
+        const T* value = hpx::any_cast<T>(&value_store);
         if (m_store_to)
         {
             *m_store_to = *value;
@@ -112,8 +111,7 @@ namespace hpx { namespace program_options {
         }
 
         /* Throws multiple_occurrences if 'value' is not empty. */
-        HPX_EXPORT void check_first_occurrence(
-            const hpx::util::any_nonser& value);
+        HPX_EXPORT void check_first_occurrence(const hpx::any_nonser& value);
     }    // namespace validators
 
     using namespace validators;
@@ -126,14 +124,14 @@ namespace hpx { namespace program_options {
         partial template ordering, just like the last 'long/int' parameter.
     */
     template <class T, class Char>
-    void validate(hpx::util::any_nonser& v,
+    void validate(hpx::any_nonser& v,
         const std::vector<std::basic_string<Char>>& xs, T*, long)
     {
         validators::check_first_occurrence(v);
         std::basic_string<Char> s(validators::get_single_string(xs));
         try
         {
-            v = hpx::util::any_nonser(hpx::util::from_string<T>(s));
+            v = hpx::any_nonser(hpx::util::from_string<T>(s));
         }
         catch (const hpx::util::bad_lexical_cast&)
         {
@@ -141,31 +139,31 @@ namespace hpx { namespace program_options {
         }
     }
 
-    HPX_EXPORT void validate(hpx::util::any_nonser& v,
-        const std::vector<std::string>& xs, bool*, int);
+    HPX_EXPORT void validate(
+        hpx::any_nonser& v, const std::vector<std::string>& xs, bool*, int);
 
-    HPX_EXPORT void validate(hpx::util::any_nonser& v,
-        const std::vector<std::wstring>& xs, bool*, int);
+    HPX_EXPORT void validate(
+        hpx::any_nonser& v, const std::vector<std::wstring>& xs, bool*, int);
 
     // For some reason, this declaration, which is require by the standard,
     // cause msvc 7.1 to not generate code to specialization defined in
     // value_semantic.cpp
-    HPX_EXPORT void validate(hpx::util::any_nonser& v,
+    HPX_EXPORT void validate(hpx::any_nonser& v,
         const std::vector<std::string>& xs, std::string*, int);
-    HPX_EXPORT void validate(hpx::util::any_nonser& v,
+    HPX_EXPORT void validate(hpx::any_nonser& v,
         const std::vector<std::wstring>& xs, std::string*, int);
 
     /** Validates sequences. Allows multiple values per option occurrence
        and multiple occurrences. */
     template <class T, class Char>
-    void validate(hpx::util::any_nonser& v,
+    void validate(hpx::any_nonser& v,
         const std::vector<std::basic_string<Char>>& s, std::vector<T>*, int)
     {
         if (!v.has_value())
         {
-            v = hpx::util::any_nonser(std::vector<T>());
+            v = hpx::any_nonser(std::vector<T>());
         }
-        std::vector<T>* tv = hpx::util::any_cast<std::vector<T>>(&v);
+        std::vector<T>* tv = hpx::any_cast<std::vector<T>>(&v);
         HPX_ASSERT(nullptr != tv);
         for (std::size_t i = 0; i < s.size(); ++i)
         {
@@ -174,11 +172,11 @@ namespace hpx { namespace program_options {
                 /* We call validate so that if user provided
                    a validator for class T, we use it even
                    when parsing vector<T>.  */
-                hpx::util::any_nonser a;
+                hpx::any_nonser a;
                 std::vector<std::basic_string<Char>> cv;
                 cv.push_back(s[i]);
                 validate(a, cv, (T*) nullptr, 0);
-                tv->push_back(hpx::util::any_cast<T>(a));
+                tv->push_back(hpx::any_cast<T>(a));
             }
             catch (const hpx::util::bad_lexical_cast& /*e*/)
             {
@@ -189,20 +187,19 @@ namespace hpx { namespace program_options {
 
     /** Validates optional arguments. */
     template <class T, class Char>
-    void validate(hpx::util::any_nonser& v,
+    void validate(hpx::any_nonser& v,
         const std::vector<std::basic_string<Char>>& s, hpx::util::optional<T>*,
         int)
     {
         validators::check_first_occurrence(v);
         validators::get_single_string(s);
-        hpx::util::any_nonser a;
+        hpx::any_nonser a;
         validate(a, s, (T*) nullptr, 0);
-        v = hpx::util::any_nonser(
-            hpx::util::optional<T>(hpx::util::any_cast<T>(a)));
+        v = hpx::any_nonser(hpx::util::optional<T>(hpx::any_cast<T>(a)));
     }
 
     template <class T, class Char>
-    void typed_value<T, Char>::xparse(hpx::util::any_nonser& value_store,
+    void typed_value<T, Char>::xparse(hpx::any_nonser& value_store,
         const std::vector<std::basic_string<Char>>& new_tokens) const
     {
         // If no tokens were given, and the option accepts an implicit

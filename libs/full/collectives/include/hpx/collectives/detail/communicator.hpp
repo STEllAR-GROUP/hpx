@@ -131,7 +131,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             HPX_ASSERT_OWNS_LOCK(l);
             reinitialize_data<T>(l);
-            return hpx::util::any_cast<std::vector<T>&>(data_);
+            return hpx::any_cast<std::vector<T>&>(data_);
         }
 
         template <typename Lock>
@@ -151,7 +151,7 @@ namespace hpx { namespace lcos { namespace detail {
 
     private:
         mutex_type mtx_;
-        hpx::util::unique_any_nonser data_;
+        hpx::unique_any_nonser data_;
         lcos::local::and_gate gate_;
         std::string name_;
         std::size_t const num_values_;

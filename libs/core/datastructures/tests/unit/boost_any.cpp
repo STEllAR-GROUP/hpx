@@ -105,16 +105,13 @@ namespace std {
 
 namespace any_tests    // test definitions
 {
-    using hpx::util::any_cast;
-    using hpx::util::any_nonser;
-
     void test_default_ctor()
     {
-        const any_nonser value;
+        const hpx::any_nonser value;
 
         HPX_TEST_MSG(!value.has_value(), "empty");
-        HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), any_cast<int>(&value),
-            "any_cast<int>");
+        HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), hpx::any_cast<int>(&value),
+            "hpx::any_cast<int>");
         HPX_TEST_EQ_MSG(
             value.type(), typeid(hpx::util::detail::any::empty), "type");
     }
@@ -122,52 +119,53 @@ namespace any_tests    // test definitions
     void test_converting_ctor()
     {
         std::string text = "test message";
-        any_nonser value = any_nonser(text);
+        hpx::any_nonser value = hpx::any_nonser(text);
 
         HPX_TEST_EQ_MSG(true, value.has_value(), "empty");
         HPX_TEST_EQ_MSG(value.type(), typeid(std::string), "type");
-        HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), any_cast<int>(&value),
-            "any_cast<int>");
+        HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), hpx::any_cast<int>(&value),
+            "hpx::any_cast<int>");
         HPX_TEST_NEQ_MSG(static_cast<void*>(nullptr),
-            any_cast<std::string>(&value), "any_cast<std::string>");
-        HPX_TEST_EQ_MSG(any_cast<std::string>(value), text,
+            hpx::any_cast<std::string>(&value), "hpx::any_cast<std::string>");
+        HPX_TEST_EQ_MSG(hpx::any_cast<std::string>(value), text,
             "comparing cast copy against original text");
-        HPX_TEST_NEQ_MSG(any_cast<std::string>(&value), &text,
+        HPX_TEST_NEQ_MSG(hpx::any_cast<std::string>(&value), &text,
             "comparing address in copy against original text");
     }
 
     void test_copy_ctor()
     {
         std::string text = "test message";
-        any_nonser original = any_nonser(text), copy = any_nonser(original);
+        hpx::any_nonser original = hpx::any_nonser(text),
+                        copy = hpx::any_nonser(original);
 
         HPX_TEST_EQ_MSG(true, copy.has_value(), "empty");
         HPX_TEST_EQ_MSG(original.type(), copy.type(), "type");
-        HPX_TEST_EQ_MSG(any_cast<std::string>(original),
-            any_cast<std::string>(copy),
+        HPX_TEST_EQ_MSG(hpx::any_cast<std::string>(original),
+            hpx::any_cast<std::string>(copy),
             "comparing cast copy against original");
-        HPX_TEST_EQ_MSG(text, any_cast<std::string>(copy),
+        HPX_TEST_EQ_MSG(text, hpx::any_cast<std::string>(copy),
             "comparing cast copy against original text");
-        HPX_TEST_NEQ_MSG(any_cast<std::string>(&original),
-            any_cast<std::string>(&copy),
+        HPX_TEST_NEQ_MSG(hpx::any_cast<std::string>(&original),
+            hpx::any_cast<std::string>(&copy),
             "comparing address in copy against original");
     }
 
     void test_copy_assign()
     {
         std::string text = "test message";
-        any_nonser original = any_nonser(text), copy;
-        any_nonser* assign_result = &(copy = original);
+        hpx::any_nonser original = hpx::any_nonser(text), copy;
+        hpx::any_nonser* assign_result = &(copy = original);
 
         HPX_TEST_EQ_MSG(true, copy.has_value(), "empty");
         HPX_TEST_EQ_MSG(original.type(), copy.type(), "type");
-        HPX_TEST_EQ_MSG(any_cast<std::string>(original),
-            any_cast<std::string>(copy),
+        HPX_TEST_EQ_MSG(hpx::any_cast<std::string>(original),
+            hpx::any_cast<std::string>(copy),
             "comparing cast copy against cast original");
-        HPX_TEST_EQ_MSG(text, any_cast<std::string>(copy),
+        HPX_TEST_EQ_MSG(text, hpx::any_cast<std::string>(copy),
             "comparing cast copy against original text");
-        HPX_TEST_NEQ_MSG(any_cast<std::string>(&original),
-            any_cast<std::string>(&copy),
+        HPX_TEST_NEQ_MSG(hpx::any_cast<std::string>(&original),
+            hpx::any_cast<std::string>(&copy),
             "comparing address in copy against original");
         HPX_TEST_EQ_MSG(assign_result, &copy, "address of assignment result");
     }
@@ -175,18 +173,18 @@ namespace any_tests    // test definitions
     void test_converting_assign()
     {
         std::string text = "test message";
-        any_nonser value;
-        any_nonser* assign_result = &(value = text);
+        hpx::any_nonser value;
+        hpx::any_nonser* assign_result = &(value = text);
 
         HPX_TEST_EQ_MSG(true, value.has_value(), "type");
         HPX_TEST_EQ_MSG(value.type(), typeid(std::string), "type");
-        HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), any_cast<int>(&value),
-            "any_cast<int>");
+        HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), hpx::any_cast<int>(&value),
+            "hpx::any_cast<int>");
         HPX_TEST_NEQ_MSG(static_cast<void*>(nullptr),
-            any_cast<std::string>(&value), "any_cast<std::string>");
-        HPX_TEST_EQ_MSG(any_cast<std::string>(value), text,
+            hpx::any_cast<std::string>(&value), "hpx::any_cast<std::string>");
+        HPX_TEST_EQ_MSG(hpx::any_cast<std::string>(value), text,
             "comparing cast copy against original text");
-        HPX_TEST_NEQ_MSG(any_cast<std::string>(&value), &text,
+        HPX_TEST_NEQ_MSG(hpx::any_cast<std::string>(&value), &text,
             "comparing address in copy against original text");
         HPX_TEST_EQ_MSG(assign_result, &value, "address of assignment result");
     }
@@ -194,15 +192,15 @@ namespace any_tests    // test definitions
     void test_bad_cast()
     {
         std::string text = "test message";
-        any_nonser value = any_nonser(text);
+        hpx::any_nonser value = hpx::any_nonser(text);
 
         {
             bool caught_exception = false;
             try
             {
-                any_cast<const char*>(value);
+                hpx::any_cast<const char*>(value);
             }
-            catch (hpx::util::bad_any_cast const&)
+            catch (hpx::bad_any_cast const&)
             {
                 caught_exception = true;
             }
@@ -222,27 +220,27 @@ namespace any_tests    // test definitions
             std::cout << "object is large\n";
 
         small_object text = 17;
-        any_nonser original = any_nonser(text), swapped;
-        small_object* original_ptr = any_cast<small_object>(&original);
-        any_nonser* swap_result = &original.swap(swapped);
+        hpx::any_nonser original = hpx::any_nonser(text), swapped;
+        small_object* original_ptr = hpx::any_cast<small_object>(&original);
+        hpx::any_nonser* swap_result = &original.swap(swapped);
 
         HPX_TEST_MSG(!original.has_value(), "empty on original");
         HPX_TEST_EQ_MSG(true, swapped.has_value(), "empty on swapped");
         HPX_TEST_EQ_MSG(swapped.type(), typeid(small_object), "type");
-        HPX_TEST_EQ_MSG(text, any_cast<small_object>(swapped),
+        HPX_TEST_EQ_MSG(text, hpx::any_cast<small_object>(swapped),
             "comparing swapped copy against original text");
         HPX_TEST_NEQ_MSG(static_cast<void*>(nullptr), original_ptr,
             "address in pre-swapped original");
-        HPX_TEST_NEQ_MSG(original_ptr, any_cast<small_object>(&swapped),
+        HPX_TEST_NEQ_MSG(original_ptr, hpx::any_cast<small_object>(&swapped),
             "comparing address in swapped against original");
         HPX_TEST_EQ_MSG(swap_result, &original, "address of swap result");
 
-        any_nonser copy1 = any_nonser(copy_counter());
-        any_nonser copy2 = any_nonser(copy_counter());
+        hpx::any_nonser copy1 = hpx::any_nonser(copy_counter());
+        hpx::any_nonser copy2 = hpx::any_nonser(copy_counter());
         int count = copy_counter::get_count();
         swap(copy1, copy2);
         HPX_TEST_EQ_MSG(count, copy_counter::get_count(),
-            "checking that free swap doesn't make any_nonser copies.");
+            "checking that free swap doesn't make hpx::any_nonser copies.");
     }
 
     void test_swap_big()
@@ -253,33 +251,33 @@ namespace any_tests    // test definitions
             std::cout << "object is large\n";
 
         big_object text(5, 12);
-        any_nonser original = any_nonser(text), swapped;
-        big_object* original_ptr = any_cast<big_object>(&original);
-        any_nonser* swap_result = &original.swap(swapped);
+        hpx::any_nonser original = hpx::any_nonser(text), swapped;
+        big_object* original_ptr = hpx::any_cast<big_object>(&original);
+        hpx::any_nonser* swap_result = &original.swap(swapped);
 
         HPX_TEST_MSG(!original.has_value(), "empty on original");
         HPX_TEST_EQ_MSG(true, swapped.has_value(), "empty on swapped");
         HPX_TEST_EQ_MSG(swapped.type(), typeid(big_object), "type");
-        HPX_TEST_EQ_MSG(text, any_cast<big_object>(swapped),
+        HPX_TEST_EQ_MSG(text, hpx::any_cast<big_object>(swapped),
             "comparing swapped copy against original text");
         HPX_TEST_NEQ_MSG(static_cast<void*>(nullptr), original_ptr,
             "address in pre-swapped original");
-        HPX_TEST_EQ_MSG(original_ptr, any_cast<big_object>(&swapped),
+        HPX_TEST_EQ_MSG(original_ptr, hpx::any_cast<big_object>(&swapped),
             "comparing address in swapped against original");
         HPX_TEST_EQ_MSG(swap_result, &original, "address of swap result");
 
-        any_nonser copy1 = any_nonser(copy_counter());
-        any_nonser copy2 = any_nonser(copy_counter());
+        hpx::any_nonser copy1 = hpx::any_nonser(copy_counter());
+        hpx::any_nonser copy2 = hpx::any_nonser(copy_counter());
         int count = copy_counter::get_count();
         swap(copy1, copy2);
         HPX_TEST_EQ_MSG(count, copy_counter::get_count(),
-            "checking that free swap doesn't make any_nonser copies.");
+            "checking that free swap doesn't make hpx::any_nonser copies.");
     }
 
     void test_null_copying()
     {
-        const any_nonser null;
-        any_nonser copied = null, assigned;
+        const hpx::any_nonser null;
+        hpx::any_nonser copied = null, assigned;
         assigned = null;
 
         HPX_TEST_MSG(!null.has_value(), "empty on null");
@@ -289,25 +287,25 @@ namespace any_tests    // test definitions
 
     void test_cast_to_reference()
     {
-        any_nonser a(137);
-        const any_nonser b(a);
+        hpx::any_nonser a(137);
+        const hpx::any_nonser b(a);
 
-        int& ra = any_cast<int&>(a);
-        int const& ra_c = any_cast<int const&>(a);
-        int volatile& ra_v = any_cast<int volatile&>(a);
-        int const volatile& ra_cv = any_cast<int const volatile&>(a);
+        int& ra = hpx::any_cast<int&>(a);
+        int const& ra_c = hpx::any_cast<int const&>(a);
+        int volatile& ra_v = hpx::any_cast<int volatile&>(a);
+        int const volatile& ra_cv = hpx::any_cast<int const volatile&>(a);
 
         HPX_TEST_MSG(&ra == &ra_c && &ra == &ra_v && &ra == &ra_cv,
             "cv references to same obj");
 
-        int const& rb_c = any_cast<int const&>(b);
-        int const volatile& rb_cv = any_cast<int const volatile&>(b);
+        int const& rb_c = hpx::any_cast<int const&>(b);
+        int const volatile& rb_cv = hpx::any_cast<int const volatile&>(b);
 
         HPX_TEST_MSG(&rb_c == &rb_cv, "cv references to copied const obj");
         HPX_TEST_MSG(&ra != &rb_c, "copies hold different objects");
 
         ++ra;
-        int incremented = any_cast<int>(a);
+        int incremented = hpx::any_cast<int>(a);
         HPX_TEST_MSG(
             incremented == 138, "increment by reference changes value");
 
@@ -315,9 +313,9 @@ namespace any_tests    // test definitions
             bool caught_exception = false;
             try
             {
-                any_cast<char&>(a);
+                hpx::any_cast<char&>(a);
             }
-            catch (hpx::util::bad_any_cast const&)
+            catch (hpx::bad_any_cast const&)
             {
                 caught_exception = true;
             }
@@ -332,9 +330,9 @@ namespace any_tests    // test definitions
             bool caught_exception = false;
             try
             {
-                any_cast<const char&>(b);
+                hpx::any_cast<const char&>(b);
             }
-            catch (hpx::util::bad_any_cast const&)
+            catch (hpx::bad_any_cast const&)
             {
                 caught_exception = true;
             }

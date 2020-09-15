@@ -91,9 +91,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_PLUGIN_EXPORT_(                                                    \
     prefix, name, BaseType, ActualType, actualname, classname)                 \
-    extern "C" HPX_PLUGIN_EXPORT_API std::map<std::string,                     \
-        hpx::util::any_nonser>* HPX_PLUGIN_API HPX_PLUGIN_LIST_NAME_(prefix,   \
-        name, classname)();                                                    \
+    extern "C" HPX_PLUGIN_EXPORT_API std::map<std::string, hpx::any_nonser>*   \
+        HPX_PLUGIN_API HPX_PLUGIN_LIST_NAME_(prefix, name, classname)();       \
                                                                                \
     namespace {                                                                \
         struct HPX_PLUGIN_EXPORTER_NAME_(prefix, name, actualname, classname)  \
@@ -108,7 +107,7 @@
                 std::transform(actname.begin(), actname.end(),                 \
                     actname.begin(), [](char c) { return std::tolower(c); });  \
                 HPX_PLUGIN_LIST_NAME_(prefix, name, classname)                 \
-                ()->insert(std::make_pair(actname, hpx::util::any_nonser(w))); \
+                ()->insert(std::make_pair(actname, hpx::any_nonser(w)));       \
             }                                                                  \
         } HPX_PLUGIN_EXPORTER_INSTANCE_NAME_(                                  \
             prefix, name, actualname, classname);                              \
@@ -128,11 +127,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_PLUGIN_EXPORT_LIST_(prefix, name, classname)                       \
-    extern "C" HPX_PLUGIN_EXPORT_API std::map<std::string,                     \
-        hpx::util::any_nonser>* HPX_PLUGIN_API HPX_PLUGIN_LIST_NAME_(prefix,   \
-        name, classname)()                                                     \
+    extern "C" HPX_PLUGIN_EXPORT_API std::map<std::string, hpx::any_nonser>*   \
+        HPX_PLUGIN_API HPX_PLUGIN_LIST_NAME_(prefix, name, classname)()        \
     {                                                                          \
-        static std::map<std::string, hpx::util::any_nonser> r;                 \
+        static std::map<std::string, hpx::any_nonser> r;                       \
         return &r;                                                             \
     }                                                                          \
     extern "C" HPX_PLUGIN_EXPORT_API void HPX_PLUGIN_FORCE_LOAD_NAME_(         \

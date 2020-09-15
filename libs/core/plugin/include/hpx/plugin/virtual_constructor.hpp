@@ -19,7 +19,7 @@
 namespace hpx { namespace util { namespace plugin {
 
     ///////////////////////////////////////////////////////////////////////////
-    using exported_plugins_type = std::map<std::string, hpx::util::any_nonser>;
+    using exported_plugins_type = std::map<std::string, hpx::any_nonser>;
     typedef exported_plugins_type*(HPX_PLUGIN_API* get_plugins_list_type)();
     typedef exported_plugins_type*(HPX_PLUGIN_API get_plugins_list_np)();
     using dll_handle = shared_ptr<get_plugins_list_np>;
