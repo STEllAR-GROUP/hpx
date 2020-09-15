@@ -22,7 +22,7 @@ foreach(benchmark ${benchmarks})
     SOURCES ${sources}
     EXCLUDE_FROM_ALL ${${benchmark}_FLAGS}
     DEPENDENCIES iostreams_component hpx_iterator_support hpx_timing
-    FOLDER "Benchmarks/Modules/IteratorSupport"
+    FOLDER "Benchmarks/Modules/Core/IteratorSupport"
   )
 
   add_hpx_performance_test(

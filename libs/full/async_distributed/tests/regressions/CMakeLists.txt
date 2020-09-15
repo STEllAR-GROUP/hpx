@@ -40,7 +40,7 @@ foreach(test ${tests})
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
-    FOLDER "Tests/Regressions/Modules/Async"
+    FOLDER "Tests/Regressions/Modules/Full/AsyncDistributed"
   )
 
   add_hpx_regression_test(
@@ -60,7 +60,7 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
     add_hpx_regression_compile_test(
       "modules.async_distributed" ${compile_test}
       SOURCES ${sources} ${${compile_test}_FLAGS}
-      FOLDER "Tests/Regressions/Modules/Async/CompileOnly"
+      FOLDER "Tests/Regressions/Modules/Full/AsyncDistributed/CompileOnly"
     )
   endforeach()
 endif()

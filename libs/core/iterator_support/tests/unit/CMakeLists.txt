@@ -41,7 +41,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS} ${${test}_LIBS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Unit/Modules/IteratorSupport"
+    FOLDER "Tests/Unit/Modules/Core/IteratorSupport"
   )
 
   add_hpx_unit_test("modules.iterator_support" ${test} ${${test}_PARAMETERS})

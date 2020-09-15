@@ -53,7 +53,7 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  set(folder_name "Tests/Unit/Modules/Async")
+  set(folder_name "Tests/Unit/Modules/Full/AsyncDistributed")
 
   add_hpx_executable(
     ${test}_test INTERNAL_FLAGS

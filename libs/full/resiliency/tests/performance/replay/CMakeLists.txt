@@ -29,7 +29,7 @@ foreach(benchmark ${benchmarks})
     ${benchmark}_test INTERNAL_FLAGS
     SOURCES ${sources}
     EXCLUDE_FROM_ALL ${${benchmark}_FLAGS}
-    FOLDER "Benchmarks/Modules/Resiliency/Replay"
+    FOLDER "Benchmarks/Modules/Full/Resiliency/Replay"
   )
 
   # add a custom target for this benchmark

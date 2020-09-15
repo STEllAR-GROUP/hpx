@@ -37,7 +37,7 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  set(folder_name "Tests/Unit/Modules/ThreadExecutors")
+  set(folder_name "Tests/Unit/Modules/Full/ThreadExecutors")
 
   # add example executable
   add_hpx_executable(

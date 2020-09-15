@@ -40,7 +40,7 @@ if(HPX_WITH_EXAMPLES)
 
     source_group("Source Files" FILES ${sources})
 
-    set(folder_name "Examples/Modules/ProgramOptions")
+    set(folder_name "Examples/Modules/Full/ProgramOptions")
 
     # add example executable
     add_hpx_executable(

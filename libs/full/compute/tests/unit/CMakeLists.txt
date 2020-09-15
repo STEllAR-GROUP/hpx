@@ -37,7 +37,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Unit/Modules/Compute/Host"
+    FOLDER "Tests/Unit/Modules/Full/Compute/Host"
   )
 
   target_include_directories(${test}_test SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})

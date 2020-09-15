@@ -65,7 +65,7 @@ foreach(test ${threading_tests})
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources}
     EXCLUDE_FROM_ALL
-    FOLDER "Tests/Unit/Modules/Threading"
+    FOLDER "Tests/Unit/Modules/Parallelism/Threading"
   )
 
   add_hpx_unit_test("modules.threading" ${test})

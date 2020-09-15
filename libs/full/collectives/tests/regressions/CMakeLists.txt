@@ -27,7 +27,7 @@ if(HPX_WITH_NETWORKING)
       SOURCES ${sources} ${${test}_FLAGS}
       EXCLUDE_FROM_ALL
       HPX_PREFIX ${HPX_BUILD_PREFIX}
-      FOLDER "Tests/Regressions/Modules/Collectives"
+      FOLDER "Tests/Regressions/Modules/Full/Collectives"
     )
 
     add_hpx_regression_test("modules.collectives" ${test} ${${test}_PARAMETERS})

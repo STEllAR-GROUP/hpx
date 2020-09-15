@@ -17,7 +17,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Modules/ResourcePartitioner/"
+    FOLDER "Tests/Regressions/Modules/Full/ResourcePartitioner/"
   )
 
   add_hpx_regression_test(

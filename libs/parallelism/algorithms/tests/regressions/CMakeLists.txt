@@ -33,7 +33,7 @@ foreach(test ${tests})
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources}
     EXCLUDE_FROM_ALL ${${test}_FLAGS}
-    FOLDER "Tests/Regressions/Modules/Algorithms/"
+    FOLDER "Tests/Regressions/Modules/Parallelism/Algorithms/"
   )
 
   add_hpx_regression_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
