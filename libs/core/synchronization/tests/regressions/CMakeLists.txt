@@ -22,7 +22,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Modules/Synchronization"
+    FOLDER "Tests/Regressions/Modules/Core/Synchronization"
   )
 
   target_link_libraries(${test}_test PRIVATE ${${test}_LIBRARIES})

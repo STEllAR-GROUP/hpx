@@ -35,7 +35,7 @@ foreach(example_program ${example_programs})
   add_hpx_executable(
     ${example_program} INTERNAL_FLAGS
     SOURCES ${sources} ${${example_program}_FLAGS}
-    FOLDER "Examples/Modules/Checkpoint"
+    FOLDER "Examples/Modules/Full/Checkpoint"
   )
 
   add_hpx_example_target_dependencies("modules.checkpoint" ${example_program})

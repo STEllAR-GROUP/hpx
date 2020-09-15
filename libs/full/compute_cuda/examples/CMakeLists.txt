@@ -25,12 +25,7 @@ else()
   return()
 endif()
 
-set(example_programs data_copy)
-
-if(NOT HPX_WITH_CUDA_CLANG)
-  # This example does not compile with the Cray clang compiler
-  set(example_programs ${example_programs} hello_compute)
-endif()
+set(example_programs data_copy hello_compute)
 
 set(data_copy_PARAMETERS THREADS_PER_LOCALITY 4)
 set(hello_compute_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -65,7 +60,7 @@ foreach(example_program ${example_programs})
   add_hpx_executable(
     ${example_program} INTERNAL_FLAGS
     SOURCES ${sources} ${${example_program}_FLAGS}
-    FOLDER "Examples/Modules/Compute/CUDA"
+    FOLDER "Examples/Modules/Full/Compute/CUDA"
   )
 
   add_hpx_example_target_dependencies("modules.compute_cuda" ${example_program})

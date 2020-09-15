@@ -18,7 +18,7 @@ foreach(benchmark ${benchmarks})
     ${benchmark}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${benchmark}_FLAGS}
     EXCLUDE_FROM_ALL
-    FOLDER "Benchmarks/Modules/Collectives/OSU"
+    FOLDER "Benchmarks/Modules/Full/Collectives/OSU"
   )
 
   add_hpx_performance_test(
@@ -39,7 +39,7 @@ foreach(benchmark ${coll_benchmarks})
   add_hpx_executable(
     ${benchmark}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${benchmark}_FLAGS} EXCLUDE_FROM_ALL
-    FOLDER "Benchmarks/Modules/Collectives/OSU"
+    FOLDER "Benchmarks/Modules/Full/Collectives/OSU"
   )
 
   add_hpx_performance_test(

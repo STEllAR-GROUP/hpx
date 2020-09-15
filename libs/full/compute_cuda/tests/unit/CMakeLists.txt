@@ -6,13 +6,13 @@
 
 set(tests)
 
-set(tests ${tests} default_executor for_each_compute)
+set(tests ${tests} default_executor for_each_compute for_loop_compute)
 set(default_executor_CUDA On)
 set(for_each_compute_CUDA On)
+set(for_loop_compute_CUDA On)
 
 if(HPX_WITH_CUDA_CLANG)
-  set(tests ${tests} for_loop_compute transform_compute)
-  set(for_loop_compute_CUDA On)
+  set(tests ${tests} transform_compute)
   set(transform_compute_CUDA On)
 endif()
 
@@ -31,7 +31,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Unit/Modules/Compute/CUDA"
+    FOLDER "Tests/Unit/Modules/Full/Compute/CUDA"
   )
 
   add_hpx_unit_test(
