@@ -13,6 +13,11 @@ if(HPX_WITH_HIP AND NOT TARGET roc::hipblas)
     )
   endif(HPX_WITH_CUDA)
 
+  # Needed on rostam
+  list(APPEND CMAKE_PREFIX_PATH $ENV{HIP_PATH}/lib/cmake/hip)
+  list(APPEND CMAKE_PREFIX_PATH $ENV{DEVICE_LIB_PATH}/cmake/AMDDeviceLibs)
+  list(APPEND CMAKE_PREFIX_PATH $ENV{DEVICE_LIB_PATH}/cmake/amd_comgr)
+  list(APPEND CMAKE_PREFIX_PATH $ENV{DEVICE_LIB_PATH}/cmake/hsa-runtime64)
   # Setup hipblas (creates roc::hipblas)
   find_package(hipblas HINTS $ENV{HIPBLAS_ROOT} CONFIG)
   if(NOT hipblas_FOUND)
