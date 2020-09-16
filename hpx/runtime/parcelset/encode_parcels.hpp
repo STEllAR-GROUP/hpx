@@ -26,6 +26,9 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#include <hpx/actions/base_action.hpp>
+#endif
 
 #if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
 #include <boost/exception/exception.hpp>
