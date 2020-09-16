@@ -805,31 +805,11 @@ namespace hpx {
 
     int runtime_distributed::suspend()
     {
-#if defined(HPX_HAVE_NETWORKING)
-        std::uint32_t initial_num_localities = get_initial_num_localities();
-        if (initial_num_localities > 1)
-        {
-            HPX_THROW_EXCEPTION(invalid_status, "runtime_distributed::suspend",
-                "Can only suspend runtime when number of localities is 1");
-            return -1;
-        }
-#endif
-
         return runtime::suspend();
     }
 
     int runtime_distributed::resume()
     {
-#if defined(HPX_HAVE_NETWORKING)
-        std::uint32_t initial_num_localities = get_initial_num_localities();
-        if (initial_num_localities > 1)
-        {
-            HPX_THROW_EXCEPTION(invalid_status, "runtime_distributed::resume",
-                "Can only suspend runtime when number of localities is 1");
-            return -1;
-        }
-#endif
-
         return runtime::resume();
     }
 

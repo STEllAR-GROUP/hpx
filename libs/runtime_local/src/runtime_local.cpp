@@ -1592,14 +1592,6 @@ namespace hpx {
 
     int runtime::resume()
     {
-        std::uint32_t initial_num_localities = get_initial_num_localities();
-        if (initial_num_localities > 1)
-        {
-            HPX_THROW_EXCEPTION(invalid_status, "runtime::resume",
-                "Can only suspend runtime when number of localities is 1");
-            return -1;
-        }
-
         LRT_(info) << "runtime_local: about to resume runtime";
 
         if (state_.load() == state_running)
