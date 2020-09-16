@@ -336,7 +336,7 @@ namespace hpx { namespace parcelset
         hpx::applier::applier *applier_;
 
         /// The cache for pending parcels
-        typedef util::tuple<
+        typedef hpx::tuple<
             std::vector<parcel>
           , std::vector<write_handler_type>
         > map_second_type;

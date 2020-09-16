@@ -39,7 +39,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         {
             auto const& t = it.get_iterator_tuple();
             bool const sequencer[] = {
-                false, is_data_aligned(hpx::util::get<Is>(t))...};
+                false, is_data_aligned(hpx::get<Is>(t))...};
             return std::any_of(&sequencer[1], &sequencer[sizeof...(Is) + 1],
                 [](bool val) { return val; });
         }
@@ -70,10 +70,10 @@ namespace hpx { namespace parallel { namespace traits {
             hpx::util::index_pack<Is...>)
         {
             auto const& t = iter.get_iterator_tuple();
-            return hpx::util::make_tuple(vector_pack_load<
-                typename hpx::util::tuple_element<Is, Tuple>::type,
-                typename std::iterator_traits<Iter>::value_type>::
-                    aligned(hpx::util::get<Is>(t))...);
+            return hpx::make_tuple(
+                vector_pack_load<typename hpx::tuple_element<Is, Tuple>::type,
+                    typename std::iterator_traits<Iter>::value_type>::
+                    aligned(hpx::get<Is>(t))...);
         }
 
         template <typename Tuple, typename... Iter, std::size_t... Is>
@@ -81,17 +81,17 @@ namespace hpx { namespace parallel { namespace traits {
             hpx::util::index_pack<Is...>)
         {
             auto const& t = iter.get_iterator_tuple();
-            return hpx::util::make_tuple(vector_pack_load<
-                typename hpx::util::tuple_element<Is, Tuple>::type,
-                typename std::iterator_traits<Iter>::value_type>::
-                    unaligned(hpx::util::get<Is>(t))...);
+            return hpx::make_tuple(
+                vector_pack_load<typename hpx::tuple_element<Is, Tuple>::type,
+                    typename std::iterator_traits<Iter>::value_type>::
+                    unaligned(hpx::get<Is>(t))...);
         }
     }    // namespace detail
 
     template <typename... Vector, typename ValueType>
-    struct vector_pack_load<hpx::util::tuple<Vector...>, ValueType>
+    struct vector_pack_load<hpx::tuple<Vector...>, ValueType>
     {
-        typedef hpx::util::tuple<Vector...> value_type;
+        typedef hpx::tuple<Vector...> value_type;
 
         template <typename... Iter>
         static value_type aligned(hpx::util::zip_iterator<Iter...> const& iter)
@@ -118,11 +118,9 @@ namespace hpx { namespace parallel { namespace traits {
         {
             auto const& t = iter.get_iterator_tuple();
             int const sequencer[] = {0,
-                (vector_pack_store<
-                     typename hpx::util::tuple_element<Is, Tuple>::type,
+                (vector_pack_store<typename hpx::tuple_element<Is, Tuple>::type,
                      typename std::iterator_traits<Iter>::value_type>::
-                        aligned(
-                            hpx::util::get<Is>(value), hpx::util::get<Is>(t)),
+                        aligned(hpx::get<Is>(value), hpx::get<Is>(t)),
                     0)...};
             (void) sequencer;
         }
@@ -134,18 +132,16 @@ namespace hpx { namespace parallel { namespace traits {
         {
             auto const& t = iter.get_iterator_tuple();
             int const sequencer[] = {0,
-                (vector_pack_store<
-                     typename hpx::util::tuple_element<Is, Tuple>::type,
+                (vector_pack_store<typename hpx::tuple_element<Is, Tuple>::type,
                      typename std::iterator_traits<Iter>::value_type>::
-                        unaligned(
-                            hpx::util::get<Is>(value), hpx::util::get<Is>(t)),
+                        unaligned(hpx::get<Is>(value), hpx::get<Is>(t)),
                     0)...};
             (void) sequencer;
         }
     }    // namespace detail
 
     template <typename... Vector, typename ValueType>
-    struct vector_pack_store<hpx::util::tuple<Vector...>, ValueType>
+    struct vector_pack_store<hpx::tuple<Vector...>, ValueType>
     {
         template <typename V, typename... Iter>
         static void aligned(

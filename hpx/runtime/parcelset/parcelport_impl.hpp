@@ -628,8 +628,8 @@ namespace hpx { namespace parcelset
             > il(&l);
 
             mapped_type& e = pending_parcels_[locality_id];
-            util::get<0>(e).push_back(std::move(p));
-            util::get<1>(e).push_back(std::move(f));
+            hpx::get<0>(e).push_back(std::move(p));
+            hpx::get<1>(e).push_back(std::move(f));
 
             parcel_destinations_.insert(locality_id);
             ++num_parcel_destinations_;
@@ -652,23 +652,23 @@ namespace hpx { namespace parcelset
             HPX_ASSERT(parcels.size() == handlers.size());
 
             mapped_type& e = pending_parcels_[locality_id];
-            if (util::get<0>(e).empty())
+            if (hpx::get<0>(e).empty())
             {
-                HPX_ASSERT(util::get<1>(e).empty());
-                std::swap(util::get<0>(e), parcels);
-                std::swap(util::get<1>(e), handlers);
+                HPX_ASSERT(hpx::get<1>(e).empty());
+                std::swap(hpx::get<0>(e), parcels);
+                std::swap(hpx::get<1>(e), handlers);
             }
             else
             {
-                HPX_ASSERT(util::get<0>(e).size() == util::get<1>(e).size());
-                std::size_t new_size = util::get<0>(e).size() + parcels.size();
-                util::get<0>(e).reserve(new_size);
+                HPX_ASSERT(hpx::get<0>(e).size() == hpx::get<1>(e).size());
+                std::size_t new_size = hpx::get<0>(e).size() + parcels.size();
+                hpx::get<0>(e).reserve(new_size);
 
                 std::move(parcels.begin(), parcels.end(),
-                    std::back_inserter(util::get<0>(e)));
-                util::get<1>(e).reserve(new_size);
+                    std::back_inserter(hpx::get<0>(e)));
+                hpx::get<1>(e).reserve(new_size);
                 std::move(handlers.begin(), handlers.end(),
-                    std::back_inserter(util::get<1>(e)));
+                    std::back_inserter(hpx::get<1>(e)));
             }
 
             parcel_destinations_.insert(locality_id);
@@ -690,21 +690,21 @@ namespace hpx { namespace parcelset
 
                 // do nothing if parcels have already been picked up by
                 // another thread
-                if (it != pending_parcels_.end() && !util::get<0>(it->second).empty())
+                if (it != pending_parcels_.end() && !hpx::get<0>(it->second).empty())
                 {
                     HPX_ASSERT(it->first == locality_id);
                     HPX_ASSERT(handlers.size() == 0);
                     HPX_ASSERT(handlers.size() == parcels.size());
-                    std::swap(parcels, util::get<0>(it->second));
-                    HPX_ASSERT(util::get<0>(it->second).size() == 0);
-                    std::swap(handlers, util::get<1>(it->second));
+                    std::swap(parcels, hpx::get<0>(it->second));
+                    HPX_ASSERT(hpx::get<0>(it->second).size() == 0);
+                    std::swap(handlers, hpx::get<1>(it->second));
                     HPX_ASSERT(handlers.size() == parcels.size());
 
                     HPX_ASSERT(!handlers.empty());
                 }
                 else
                 {
-                    HPX_ASSERT(util::get<1>(it->second).empty());
+                    HPX_ASSERT(hpx::get<1>(it->second).empty());
                     return false;
                 }
 
@@ -727,10 +727,10 @@ namespace hpx { namespace parcelset
 
                 for (auto &pending: pending_parcels_)
                 {
-                    auto &parcels = util::get<0>(pending.second);
+                    auto &parcels = hpx::get<0>(pending.second);
                     if (!parcels.empty())
                     {
-                        auto& handlers = util::get<1>(pending.second);
+                        auto& handlers = hpx::get<1>(pending.second);
                         dest = pending.first;
                         p = std::move(parcels.back());
                         parcels.pop_back();
@@ -864,7 +864,7 @@ namespace hpx { namespace parcelset
 
 //                HPX_ASSERT(locality_id == sender_connection->destination());
                 pending_parcels_map::iterator it = pending_parcels_.find(locality_id);
-                if (it == pending_parcels_.end() || util::get<0>(it->second).empty())
+                if (it == pending_parcels_.end() || hpx::get<0>(it->second).empty())
                     return;
             }
 

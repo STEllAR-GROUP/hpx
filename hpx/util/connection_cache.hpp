@@ -51,7 +51,7 @@ namespace hpx { namespace util
         typedef std::deque<connection_type> value_type;
         typedef Key key_type;
         typedef std::list<key_type> key_tracker_type;
-        typedef util::tuple<
+        typedef hpx::tuple<
             value_type,                 // cached (available) connections
             std::size_t,                // number of existing connections
             std::size_t,                // max number of cached connections
@@ -93,45 +93,45 @@ namespace hpx { namespace util
         static value_type&
         cached_connections(cache_value_type& entry)
         {
-            return util::get<0>(entry);
+            return hpx::get<0>(entry);
         }
         static value_type const&
         cached_connections(cache_value_type const& entry)
         {
-            return util::get<0>(entry);
+            return hpx::get<0>(entry);
         }
 
         static std::size_t&
         num_existing_connections(cache_value_type& entry)
         {
-            return util::get<1>(entry);
+            return hpx::get<1>(entry);
         }
         static std::size_t const&
         num_existing_connections(cache_value_type const& entry)
         {
-            return util::get<1>(entry);
+            return hpx::get<1>(entry);
         }
 
         static std::size_t&
         max_num_connections(cache_value_type& entry)
         {
-            return util::get<2>(entry);
+            return hpx::get<2>(entry);
         }
         static std::size_t const&
         max_num_connections(cache_value_type const& entry)
         {
-            return util::get<2>(entry);
+            return hpx::get<2>(entry);
         }
 
         static typename key_tracker_type::iterator&
         lru_reference(cache_value_type& entry)
         {
-            return util::get<3>(entry);
+            return hpx::get<3>(entry);
         }
         static typename key_tracker_type::iterator const&
         lru_reference(cache_value_type const& entry)
         {
-            return util::get<3>(entry);
+            return hpx::get<3>(entry);
         }
 
         ///////////////////////////////////////////////////////////////////////

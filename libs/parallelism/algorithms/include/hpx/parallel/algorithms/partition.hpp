@@ -1081,7 +1081,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         // sequential partition_copy with projection function
         template <typename InIter, typename OutIter1, typename OutIter2,
             typename Pred, typename Proj>
-        hpx::util::tuple<InIter, OutIter1, OutIter2> sequential_partition_copy(
+        hpx::tuple<InIter, OutIter1, OutIter2> sequential_partition_copy(
             InIter first, InIter last, OutIter1 dest_true, OutIter2 dest_false,
             Pred&& pred, Proj&& proj)
         {
@@ -1093,7 +1093,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     *dest_false++ = *first;
                 first++;
             }
-            return hpx::util::make_tuple(
+            return hpx::make_tuple(
                 std::move(last), std::move(dest_true), std::move(dest_false));
         }
 
@@ -1109,8 +1109,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename InIter, typename OutIter1,
                 typename OutIter2, typename Pred,
                 typename Proj = util::projection_identity>
-            static hpx::util::tuple<InIter, OutIter1, OutIter2> sequential(
-                ExPolicy, InIter first, InIter last, OutIter1 dest_true,
+            static hpx::tuple<InIter, OutIter1, OutIter2> sequential(ExPolicy,
+                InIter first, InIter last, OutIter1 dest_true,
                 OutIter2 dest_false, Pred&& pred, Proj&& proj)
             {
                 return sequential_partition_copy(first, last, dest_true,
@@ -1122,14 +1122,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typename FwdIter3, typename Pred,
                 typename Proj = util::projection_identity>
             static typename util::detail::algorithm_result<ExPolicy,
-                hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3>>::type
+                hpx::tuple<FwdIter1, FwdIter2, FwdIter3>>::type
             parallel(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
                 FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
                 Proj&& proj)
             {
                 using zip_iterator = hpx::util::zip_iterator<FwdIter1, bool*>;
                 using result = util::detail::algorithm_result<ExPolicy,
-                    hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3>>;
+                    hpx::tuple<FwdIter1, FwdIter2, FwdIter3>>;
                 using difference_type =
                     typename std::iterator_traits<FwdIter1>::difference_type;
                 using output_iterator_offset =
@@ -1137,7 +1137,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 if (first == last)
                     return result::get(
-                        hpx::util::make_tuple(last, dest_true, dest_false));
+                        hpx::make_tuple(last, dest_true, dest_false));
 
                 difference_type count = std::distance(first, last);
 
@@ -1148,10 +1148,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
                 output_iterator_offset init = {0, 0};
 
-                using hpx::util::get;
+                using hpx::get;
                 using hpx::util::make_zip_iterator;
                 using scan_partitioner_type = util::scan_partitioner<ExPolicy,
-                    hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3>,
+                    hpx::tuple<FwdIter1, FwdIter2, FwdIter3>,
                     output_iterator_offset>;
 
                 auto f1 = [pred = std::forward<Pred>(pred),
@@ -1212,7 +1212,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         std::vector<
                             hpx::shared_future<output_iterator_offset>>&& items,
                         std::vector<hpx::future<void>>&&) mutable
-                    -> hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3> {
+                    -> hpx::tuple<FwdIter1, FwdIter2, FwdIter3> {
                     HPX_UNUSED(flags);
 
                     output_iterator_offset count_pair = items.back().get();
@@ -1221,7 +1221,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::advance(dest_true, count_true);
                     std::advance(dest_false, count_false);
 
-                    return hpx::util::make_tuple(last, dest_true, dest_false);
+                    return hpx::make_tuple(last, dest_true, dest_false);
                 };
 
                 return scan_partitioner_type::call(
@@ -1350,7 +1350,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least forward iterator.");
 
         using is_seq = execution::is_sequenced_execution_policy<ExPolicy>;
-        using result_type = hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3>;
+        using result_type = hpx::tuple<FwdIter1, FwdIter2, FwdIter3>;
 
         return hpx::util::make_tagged_tuple<tag::in, tag::out1, tag::out2>(
             detail::partition_copy<result_type>().call(

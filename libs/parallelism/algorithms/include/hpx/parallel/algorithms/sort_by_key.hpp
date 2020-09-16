@@ -29,9 +29,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             template <typename Tuple>
             auto operator()(Tuple&& t) const
-                -> decltype(hpx::util::get<0>(std::forward<Tuple>(t)))
+                -> decltype(hpx::get<0>(std::forward<Tuple>(t)))
             {
-                return hpx::util::get<0>(std::forward<Tuple>(t));
+                return hpx::get<0>(std::forward<Tuple>(t));
             }
         };
         /// \endcond

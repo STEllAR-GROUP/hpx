@@ -31,7 +31,7 @@ namespace hpx { namespace serialization {
         hpx::traits::detail::size<1>)
     {
         auto& [p1] = t;
-        auto&& data = hpx::util::forward_as_tuple(p1);
+        auto&& data = hpx::forward_as_tuple(p1);
         serialize(archive, data, version);
     }
 
@@ -40,7 +40,7 @@ namespace hpx { namespace serialization {
         hpx::traits::detail::size<2>)
     {
         auto& [p1, p2] = t;
-        auto&& data = hpx::util::forward_as_tuple(p1, p2);
+        auto&& data = hpx::forward_as_tuple(p1, p2);
         serialize(archive, data, version);
     }
 
@@ -49,7 +49,7 @@ namespace hpx { namespace serialization {
         hpx::traits::detail::size<3>)
     {
         auto& [p1, p2, p3] = t;
-        auto&& data = hpx::util::forward_as_tuple(p1, p2, p3);
+        auto&& data = hpx::forward_as_tuple(p1, p2, p3);
         serialize(archive, data, version);
     }
 
@@ -58,7 +58,7 @@ namespace hpx { namespace serialization {
         hpx::traits::detail::size<4>)
     {
         auto& [p1, p2, p3, p4] = t;
-        auto&& data = hpx::util::forward_as_tuple(p1, p2, p3, p4);
+        auto&& data = hpx::forward_as_tuple(p1, p2, p3, p4);
         serialize(archive, data, version);
     }
 
@@ -67,7 +67,7 @@ namespace hpx { namespace serialization {
         hpx::traits::detail::size<5>)
     {
         auto& [p1, p2, p3, p4, p5] = t;
-        auto&& data = hpx::util::forward_as_tuple(p1, p2, p3, p4, p5);
+        auto&& data = hpx::forward_as_tuple(p1, p2, p3, p4, p5);
         serialize(archive, data, version);
     }
 
@@ -76,7 +76,7 @@ namespace hpx { namespace serialization {
         hpx::traits::detail::size<6>)
     {
         auto& [p1, p2, p3, p4, p5, p6] = t;
-        auto&& data = hpx::util::forward_as_tuple(p1, p2, p3, p4, p5, p6);
+        auto&& data = hpx::forward_as_tuple(p1, p2, p3, p4, p5, p6);
         serialize(archive, data, version);
     }
 
@@ -85,7 +85,7 @@ namespace hpx { namespace serialization {
         hpx::traits::detail::size<7>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7] = t;
-        auto&& data = hpx::util::forward_as_tuple(p1, p2, p3, p4, p5, p6, p7);
+        auto&& data = hpx::forward_as_tuple(p1, p2, p3, p4, p5, p6, p7);
         serialize(archive, data, version);
     }
 
@@ -94,8 +94,7 @@ namespace hpx { namespace serialization {
         hpx::traits::detail::size<8>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7, p8] = t;
-        auto&& data =
-            hpx::util::forward_as_tuple(p1, p2, p3, p4, p5, p6, p7, p8);
+        auto&& data = hpx::forward_as_tuple(p1, p2, p3, p4, p5, p6, p7, p8);
         serialize(archive, data, version);
     }
 
@@ -104,8 +103,7 @@ namespace hpx { namespace serialization {
         hpx::traits::detail::size<9>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7, p8, p9] = t;
-        auto&& data =
-            hpx::util::forward_as_tuple(p1, p2, p3, p4, p5, p6, p7, p8, p9);
+        auto&& data = hpx::forward_as_tuple(p1, p2, p3, p4, p5, p6, p7, p8, p9);
         serialize(archive, data, version);
     }
 
@@ -114,8 +112,8 @@ namespace hpx { namespace serialization {
         hpx::traits::detail::size<10>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10] = t;
-        auto&& data = hpx::util::forward_as_tuple(
-            p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
+        auto&& data =
+            hpx::forward_as_tuple(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
         serialize(archive, data, version);
     }
 
@@ -124,8 +122,8 @@ namespace hpx { namespace serialization {
         hpx::traits::detail::size<11>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11] = t;
-        auto&& data = hpx::util::forward_as_tuple(
-            p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
+        auto&& data =
+            hpx::forward_as_tuple(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
         serialize(archive, data, version);
     }
 
@@ -134,7 +132,7 @@ namespace hpx { namespace serialization {
         hpx::traits::detail::size<12>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12] = t;
-        auto&& data = hpx::util::forward_as_tuple(
+        auto&& data = hpx::forward_as_tuple(
             p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
         serialize(archive, data, version);
     }
@@ -144,7 +142,7 @@ namespace hpx { namespace serialization {
         hpx::traits::detail::size<13>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13] = t;
-        auto&& data = hpx::util::forward_as_tuple(
+        auto&& data = hpx::forward_as_tuple(
             p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13);
         serialize(archive, data, version);
     }
@@ -154,7 +152,7 @@ namespace hpx { namespace serialization {
         hpx::traits::detail::size<14>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14] = t;
-        auto&& data = hpx::util::forward_as_tuple(
+        auto&& data = hpx::forward_as_tuple(
             p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
         serialize(archive, data, version);
     }
@@ -165,7 +163,7 @@ namespace hpx { namespace serialization {
     {
         auto& [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14,
             p15] = t;
-        auto&& data = hpx::util::forward_as_tuple(
+        auto&& data = hpx::forward_as_tuple(
             p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15);
         serialize(archive, data, version);
     }

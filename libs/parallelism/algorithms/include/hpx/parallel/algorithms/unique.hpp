@@ -102,7 +102,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 flags[0] = false;
 
-                using hpx::util::get;
+                using hpx::get;
                 using hpx::util::make_zip_iterator;
                 typedef util::scan_partitioner<ExPolicy, FwdIter, std::size_t,
                     void, util::scan_partitioner_sequential_f3_tag>
@@ -411,7 +411,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
                 std::size_t init = 0;
 
-                using hpx::util::get;
+                using hpx::get;
                 using hpx::util::make_zip_iterator;
                 typedef util::scan_partitioner<ExPolicy,
                     std::pair<FwdIter1, FwdIter2>, std::size_t>

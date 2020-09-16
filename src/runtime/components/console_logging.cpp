@@ -29,7 +29,7 @@ namespace hpx { namespace components
     void fallback_console_logging_locked(messages_type const& msgs,
         std::string fail_msg = "")
     {
-        using hpx::util::get;
+        using hpx::get;
 
         if (!fail_msg.empty())
             fail_msg = "Logging failed due to: " + fail_msg + "\n";

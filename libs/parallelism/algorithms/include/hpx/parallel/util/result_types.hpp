@@ -122,37 +122,35 @@ namespace hpx { namespace parallel { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         template <typename ZipIter>
-        in_out_result<typename hpx::util::tuple_element<0,
+        in_out_result<typename hpx::tuple_element<0,
                           typename ZipIter::iterator_tuple_type>::type,
-            typename hpx::util::tuple_element<1,
+            typename hpx::tuple_element<1,
                 typename ZipIter::iterator_tuple_type>::type>
         get_in_out_result(ZipIter&& zipiter)
         {
             using iterator_tuple_type = typename ZipIter::iterator_tuple_type;
 
             using result_type = in_out_result<
-                typename hpx::util::tuple_element<0, iterator_tuple_type>::type,
-                typename hpx::util::tuple_element<1,
-                    iterator_tuple_type>::type>;
+                typename hpx::tuple_element<0, iterator_tuple_type>::type,
+                typename hpx::tuple_element<1, iterator_tuple_type>::type>;
 
             iterator_tuple_type t = zipiter.get_iterator_tuple();
-            return result_type{hpx::util::get<0>(t), hpx::util::get<1>(t)};
+            return result_type{hpx::get<0>(t), hpx::get<1>(t)};
         }
 
         template <typename ZipIter>
         hpx::future<
-            in_out_result<typename hpx::util::tuple_element<0,
+            in_out_result<typename hpx::tuple_element<0,
                               typename ZipIter::iterator_tuple_type>::type,
-                typename hpx::util::tuple_element<1,
+                typename hpx::tuple_element<1,
                     typename ZipIter::iterator_tuple_type>::type>>
         get_in_out_result(hpx::future<ZipIter>&& zipiter)
         {
             using iterator_tuple_type = typename ZipIter::iterator_tuple_type;
 
             using result_type = in_out_result<
-                typename hpx::util::tuple_element<0, iterator_tuple_type>::type,
-                typename hpx::util::tuple_element<1,
-                    iterator_tuple_type>::type>;
+                typename hpx::tuple_element<0, iterator_tuple_type>::type,
+                typename hpx::tuple_element<1, iterator_tuple_type>::type>;
 
             return lcos::make_future<result_type>(
                 std::move(zipiter), [](ZipIter zipiter) {

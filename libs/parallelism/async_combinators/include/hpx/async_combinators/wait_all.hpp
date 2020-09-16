@@ -196,8 +196,7 @@ namespace hpx { namespace lcos {
 
             template <std::size_t I>
             struct is_end
-              : std::integral_constant<bool,
-                    util::tuple_size<Tuple>::value == I>
+              : std::integral_constant<bool, hpx::tuple_size<Tuple>::value == I>
             {
             };
 
@@ -268,8 +267,8 @@ namespace hpx { namespace lcos {
             template <std::size_t I>
             HPX_FORCEINLINE void await_next(std::false_type, std::true_type)
             {
-                await_range<I>(util::begin(util::unwrap_ref(util::get<I>(t_))),
-                    util::end(util::unwrap_ref(util::get<I>(t_))));
+                await_range<I>(util::begin(util::unwrap_ref(hpx::get<I>(t_))),
+                    util::end(util::unwrap_ref(hpx::get<I>(t_))));
             }
 
             // Current element is a simple future
@@ -277,7 +276,7 @@ namespace hpx { namespace lcos {
             HPX_FORCEINLINE void await_next(std::true_type, std::false_type)
             {
                 typedef
-                    typename util::decay_unwrap<typename util::tuple_element<I,
+                    typename util::decay_unwrap<typename hpx::tuple_element<I,
                         Tuple>::type>::type future_type;
 
                 typedef typename detail::future_or_shared_state_result<
@@ -285,7 +284,7 @@ namespace hpx { namespace lcos {
 
                 typename traits::detail::shared_state_ptr<
                     future_result_type>::type next_future_data =
-                    traits::detail::get_shared_state(util::get<I>(t_));
+                    traits::detail::get_shared_state(hpx::get<I>(t_));
 
                 if (next_future_data.get() != nullptr &&
                     !next_future_data->is_ready())
@@ -314,7 +313,7 @@ namespace hpx { namespace lcos {
             HPX_FORCEINLINE void do_await(std::false_type)
             {
                 typedef
-                    typename util::decay_unwrap<typename util::tuple_element<I,
+                    typename util::decay_unwrap<typename hpx::tuple_element<I,
                         Tuple>::type>::type future_type;
 
                 typedef typename detail::is_future_or_shared_state<
@@ -345,7 +344,7 @@ namespace hpx { namespace lcos {
     template <typename Future>
     void wait_all(std::vector<Future> const& values)
     {
-        typedef util::tuple<std::vector<Future> const&> result_type;
+        typedef hpx::tuple<std::vector<Future> const&> result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
         typedef typename frame_type::init_no_addref init_no_addref;
 
@@ -370,7 +369,7 @@ namespace hpx { namespace lcos {
     template <typename Future, std::size_t N>
     void wait_all(std::array<Future, N> const& values)
     {
-        typedef util::tuple<std::array<Future, N> const&> result_type;
+        typedef hpx::tuple<std::array<Future, N> const&> result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
         typedef typename frame_type::init_no_addref init_no_addref;
 
@@ -437,7 +436,7 @@ namespace hpx { namespace lcos {
     template <typename... Ts>
     void wait_all(Ts&&... ts)
     {
-        typedef util::tuple<
+        typedef hpx::tuple<
             typename traits::detail::shared_state_ptr_for<Ts>::type...>
             result_type;
         typedef detail::wait_all_frame<result_type> frame_type;

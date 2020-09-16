@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // This test verifies that issue #803 is resolved (Create proper serialization
-// support functions for util::tuple).
+// support functions for hpx::tuple).
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
@@ -16,38 +16,38 @@
 
 #include <string>
 
-typedef hpx::util::tuple<int, double, std::string> tuple_type;
-typedef hpx::util::tuple<int, double, std::string> tuple_base_type;
+typedef hpx::tuple<int, double, std::string> tuple_type;
+typedef hpx::tuple<int, double, std::string> tuple_base_type;
 
 void worker1(tuple_type t)
 {
-    HPX_TEST_EQ(hpx::util::get<0>(t), 42);
-    HPX_TEST_EQ(hpx::util::get<1>(t), 3.14);
-    HPX_TEST_EQ(hpx::util::get<2>(t), "test");
+    HPX_TEST_EQ(hpx::get<0>(t), 42);
+    HPX_TEST_EQ(hpx::get<1>(t), 3.14);
+    HPX_TEST_EQ(hpx::get<2>(t), "test");
 }
 HPX_PLAIN_ACTION(worker1);
 
 void worker2(tuple_base_type t)
 {
-    HPX_TEST_EQ(hpx::util::get<0>(t), 42);
-    HPX_TEST_EQ(hpx::util::get<1>(t), 3.14);
-    HPX_TEST_EQ(hpx::util::get<2>(t), "test");
+    HPX_TEST_EQ(hpx::get<0>(t), 42);
+    HPX_TEST_EQ(hpx::get<1>(t), 3.14);
+    HPX_TEST_EQ(hpx::get<2>(t), "test");
 }
 HPX_PLAIN_ACTION(worker2);
 
 void worker1_ref(tuple_type const& t)
 {
-    HPX_TEST_EQ(hpx::util::get<0>(t), 42);
-    HPX_TEST_EQ(hpx::util::get<1>(t), 3.14);
-    HPX_TEST_EQ(hpx::util::get<2>(t), "test");
+    HPX_TEST_EQ(hpx::get<0>(t), 42);
+    HPX_TEST_EQ(hpx::get<1>(t), 3.14);
+    HPX_TEST_EQ(hpx::get<2>(t), "test");
 }
 HPX_PLAIN_ACTION(worker1_ref);
 
 void worker2_ref(tuple_base_type const& t)
 {
-    HPX_TEST_EQ(hpx::util::get<0>(t), 42);
-    HPX_TEST_EQ(hpx::util::get<1>(t), 3.14);
-    HPX_TEST_EQ(hpx::util::get<2>(t), "test");
+    HPX_TEST_EQ(hpx::get<0>(t), 42);
+    HPX_TEST_EQ(hpx::get<1>(t), 3.14);
+    HPX_TEST_EQ(hpx::get<2>(t), "test");
 }
 HPX_PLAIN_ACTION(worker2_ref);
 

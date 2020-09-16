@@ -22,12 +22,12 @@
 #include <utility>
 #include <vector>
 
+using hpx::make_tuple;
+using hpx::tuple;
 using hpx::util::async_traverse_complete_tag;
 using hpx::util::async_traverse_detach_tag;
 using hpx::util::async_traverse_visit_tag;
-using hpx::util::make_tuple;
 using hpx::util::traverse_pack_async;
-using hpx::util::tuple;
 
 /// A tag which isn't accepted by any mapper
 struct not_accepted_tag
@@ -303,11 +303,10 @@ static void test_async_mixed_traversal()
     using container_t = std::vector<std::size_t>;
 
     // Test hierarchies where container and tuple like types are mixed
-    test_async_traversal_base<4U>(
-        0U, hpx::util::make_tuple(container_t{1U, 2U}), 3U);
+    test_async_traversal_base<4U>(0U, hpx::make_tuple(container_t{1U, 2U}), 3U);
 
     test_async_traversal_base<4U>(
-        hpx::util::make_tuple(
+        hpx::make_tuple(
             0U, vector_of(not_accepted_tag{}), vector_of(vector_of(1U))),
         make_tuple(2U, 3U));
 

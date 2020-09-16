@@ -118,8 +118,8 @@ namespace hpx { namespace parallel { namespace util {
             typename std::vector<std::size_t>::const_iterator chunk_size_it =
                 hpx::util::begin(chunk_sizes);
 
-            typedef typename hpx::util::tuple<typename data_type::value_type,
-                FwdIter, std::size_t>
+            typedef typename hpx::tuple<typename data_type::value_type, FwdIter,
+                std::size_t>
                 tuple_type;
 
             // schedule every chunk on a separate thread
@@ -131,7 +131,7 @@ namespace hpx { namespace parallel { namespace util {
                 std::size_t chunk = (std::min)(count, *chunk_size_it);
                 HPX_ASSERT(chunk != 0);
 
-                shape.push_back(hpx::util::make_tuple(*data_it, first, chunk));
+                shape.push_back(hpx::make_tuple(*data_it, first, chunk));
 
                 count -= chunk;
                 std::advance(first, chunk);

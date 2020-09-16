@@ -288,7 +288,7 @@ namespace hpx { namespace lcos {
 
             typedef detail::broadcast_invoker<Action,
                 typename std::is_void<action_result>::type,
-                typename util::tuple_element<Is,
+                typename hpx::tuple_element<Is,
                     typename Action::arguments_type>::type...>
                 broadcast_invoker_type;
 
@@ -320,7 +320,7 @@ namespace hpx { namespace lcos {
                 typename broadcast_result<Action>::action_result action_result;
 
             typedef detail::broadcast_apply_invoker<Action,
-                typename util::tuple_element<Is,
+                typename hpx::tuple_element<Is,
                     typename Action::arguments_type>::type...>
                 broadcast_invoker_type;
 

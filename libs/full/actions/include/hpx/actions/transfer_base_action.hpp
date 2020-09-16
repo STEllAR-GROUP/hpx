@@ -100,41 +100,41 @@ namespace hpx { namespace actions {
     }    // namespace detail
 }}       // namespace hpx::actions
 
-namespace hpx { namespace util {
+namespace hpx {
     template <std::size_t I, typename Args>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename util::tuple_element<I, Args>::type&
+        typename hpx::tuple_element<I, Args>::type&
         get(hpx::actions::detail::argument_holder<Args>& t)
     {
-        return util::tuple_element<I, Args>::get(t.data());
+        return hpx::tuple_element<I, Args>::get(t.data());
     }
 
     template <std::size_t I, typename Args>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename util::tuple_element<I, Args>::type const&
+        typename hpx::tuple_element<I, Args>::type const&
         get(hpx::actions::detail::argument_holder<Args> const& t)
     {
-        return util::tuple_element<I, Args>::get(t.data());
+        return hpx::tuple_element<I, Args>::get(t.data());
     }
 
     template <std::size_t I, typename Args>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename util::tuple_element<I, Args>::type&&
+        typename hpx::tuple_element<I, Args>::type&&
         get(hpx::actions::detail::argument_holder<Args>&& t)
     {
-        return std::forward<typename util::tuple_element<I, Args>::type>(
-            util::get<I>(t.data()));
+        return std::forward<typename hpx::tuple_element<I, Args>::type>(
+            hpx::get<I>(t.data()));
     }
 
     template <std::size_t I, typename Args>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename util::tuple_element<I, Args>::type const&&
+        typename hpx::tuple_element<I, Args>::type const&&
         get(hpx::actions::detail::argument_holder<Args> const&& t)
     {
-        return std::forward<typename util::tuple_element<I, Args>::type const>(
-            util::get<I>(t.data()));
+        return std::forward<typename hpx::tuple_element<I, Args>::type const>(
+            hpx::get<I>(t.data()));
     }
-}}    // namespace hpx::util
+}    // namespace hpx
 
 namespace hpx { namespace actions {
     ///////////////////////////////////////////////////////////////////////////
@@ -276,10 +276,10 @@ namespace hpx { namespace actions {
         /// retrieve the N's argument
         template <std::size_t N>
         constexpr inline
-            typename util::tuple_element<N, arguments_type>::type const&
+            typename hpx::tuple_element<N, arguments_type>::type const&
             get() const
         {
-            return util::get<N>(arguments_);
+            return hpx::get<N>(arguments_);
         }
 
         /// Extract the current invocation count for this action
@@ -333,7 +333,7 @@ namespace hpx { namespace actions {
 
     ///////////////////////////////////////////////////////////////////////////
     template <std::size_t N, typename Action>
-    constexpr inline typename util::tuple_element<N,
+    constexpr inline typename hpx::tuple_element<N,
         typename transfer_action<Action>::arguments_type>::type const&
     get(transfer_base_action<Action> const& args)
     {

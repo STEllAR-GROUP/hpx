@@ -21,7 +21,7 @@ namespace hpx { namespace traits {
         template <typename T>
         struct is_tuple_like_impl<T,
             typename util::always_void<decltype(
-                util::tuple_size<T>::value)>::type> : std::true_type
+                hpx::tuple_size<T>::value)>::type> : std::true_type
         {
         };
     }    // namespace detail

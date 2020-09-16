@@ -42,7 +42,7 @@ void test_wait_for_two_out_of_five_futures()
     hpx::lcos::local::packaged_task<int()> pt5(make_int_slowly);
     hpx::lcos::future<int> f5 = pt5.get_future();
 
-    typedef hpx::when_some_result<hpx::util::tuple<hpx::lcos::future<int>,
+    typedef hpx::when_some_result<hpx::tuple<hpx::lcos::future<int>,
         hpx::lcos::future<int>, hpx::lcos::future<int>, hpx::lcos::future<int>,
         hpx::lcos::future<int>>>
         result_type;
@@ -58,11 +58,11 @@ void test_wait_for_two_out_of_five_futures()
     HPX_TEST(!f5.valid());
 
     HPX_TEST_EQ(result.indices.size(), count);
-    HPX_TEST(!hpx::util::get<0>(result.futures).is_ready());
-    HPX_TEST(hpx::util::get<1>(result.futures).is_ready());
-    HPX_TEST(!hpx::util::get<2>(result.futures).is_ready());
-    HPX_TEST(hpx::util::get<3>(result.futures).is_ready());
-    HPX_TEST(!hpx::util::get<4>(result.futures).is_ready());
+    HPX_TEST(!hpx::get<0>(result.futures).is_ready());
+    HPX_TEST(hpx::get<1>(result.futures).is_ready());
+    HPX_TEST(!hpx::get<2>(result.futures).is_ready());
+    HPX_TEST(hpx::get<3>(result.futures).is_ready());
+    HPX_TEST(!hpx::get<4>(result.futures).is_ready());
 }
 
 void test_wait_for_three_out_of_five_futures()
@@ -83,7 +83,7 @@ void test_wait_for_three_out_of_five_futures()
     hpx::lcos::future<int> f5 = pt5.get_future();
     pt5();
 
-    typedef hpx::when_some_result<hpx::util::tuple<hpx::lcos::future<int>,
+    typedef hpx::when_some_result<hpx::tuple<hpx::lcos::future<int>,
         hpx::lcos::future<int>, hpx::lcos::future<int>, hpx::lcos::future<int>,
         hpx::lcos::future<int>>>
         result_type;
@@ -99,11 +99,11 @@ void test_wait_for_three_out_of_five_futures()
     HPX_TEST(!f5.valid());
 
     HPX_TEST_EQ(result.indices.size(), count);
-    HPX_TEST(hpx::util::get<0>(result.futures).is_ready());
-    HPX_TEST(!hpx::util::get<1>(result.futures).is_ready());
-    HPX_TEST(hpx::util::get<2>(result.futures).is_ready());
-    HPX_TEST(!hpx::util::get<3>(result.futures).is_ready());
-    HPX_TEST(hpx::util::get<4>(result.futures).is_ready());
+    HPX_TEST(hpx::get<0>(result.futures).is_ready());
+    HPX_TEST(!hpx::get<1>(result.futures).is_ready());
+    HPX_TEST(hpx::get<2>(result.futures).is_ready());
+    HPX_TEST(!hpx::get<3>(result.futures).is_ready());
+    HPX_TEST(hpx::get<4>(result.futures).is_ready());
 }
 
 void test_wait_for_two_out_of_five_late_futures()
@@ -121,7 +121,7 @@ void test_wait_for_two_out_of_five_late_futures()
     hpx::lcos::local::packaged_task<int()> pt5(make_int_slowly);
     hpx::lcos::future<int> f5 = pt5.get_future();
 
-    typedef hpx::when_some_result<hpx::util::tuple<hpx::lcos::future<int>,
+    typedef hpx::when_some_result<hpx::tuple<hpx::lcos::future<int>,
         hpx::lcos::future<int>, hpx::lcos::future<int>, hpx::lcos::future<int>,
         hpx::lcos::future<int>>>
         result_type;
@@ -140,11 +140,11 @@ void test_wait_for_two_out_of_five_late_futures()
     result_type result = r.get();
 
     HPX_TEST_EQ(result.indices.size(), count);
-    HPX_TEST(!hpx::util::get<0>(result.futures).is_ready());
-    HPX_TEST(hpx::util::get<1>(result.futures).is_ready());
-    HPX_TEST(!hpx::util::get<2>(result.futures).is_ready());
-    HPX_TEST(hpx::util::get<3>(result.futures).is_ready());
-    HPX_TEST(!hpx::util::get<4>(result.futures).is_ready());
+    HPX_TEST(!hpx::get<0>(result.futures).is_ready());
+    HPX_TEST(hpx::get<1>(result.futures).is_ready());
+    HPX_TEST(!hpx::get<2>(result.futures).is_ready());
+    HPX_TEST(hpx::get<3>(result.futures).is_ready());
+    HPX_TEST(!hpx::get<4>(result.futures).is_ready());
 }
 
 void test_wait_for_two_out_of_five_deferred_futures()
@@ -162,7 +162,7 @@ void test_wait_for_two_out_of_five_deferred_futures()
     hpx::lcos::future<int> f5 =
         hpx::async(hpx::launch::deferred, &make_int_slowly);
 
-    typedef hpx::when_some_result<hpx::util::tuple<hpx::lcos::future<int>,
+    typedef hpx::when_some_result<hpx::tuple<hpx::lcos::future<int>,
         hpx::lcos::future<int>, hpx::lcos::future<int>, hpx::lcos::future<int>,
         hpx::lcos::future<int>>>
         result_type;
@@ -178,11 +178,11 @@ void test_wait_for_two_out_of_five_deferred_futures()
     result_type result = r.get();
 
     HPX_TEST_EQ(result.indices.size(), count);
-    HPX_TEST(hpx::util::get<0>(result.futures).is_ready());
-    HPX_TEST(hpx::util::get<1>(result.futures).is_ready());
-    HPX_TEST(!hpx::util::get<2>(result.futures).is_ready());
-    HPX_TEST(!hpx::util::get<3>(result.futures).is_ready());
-    HPX_TEST(!hpx::util::get<4>(result.futures).is_ready());
+    HPX_TEST(hpx::get<0>(result.futures).is_ready());
+    HPX_TEST(hpx::get<1>(result.futures).is_ready());
+    HPX_TEST(!hpx::get<2>(result.futures).is_ready());
+    HPX_TEST(!hpx::get<3>(result.futures).is_ready());
+    HPX_TEST(!hpx::get<4>(result.futures).is_ready());
 }
 
 template <class Container>

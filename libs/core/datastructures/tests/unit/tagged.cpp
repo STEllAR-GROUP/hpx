@@ -76,8 +76,8 @@ void tagged_pair_test()
     {
         pair p(42, 43);
 
-        HPX_TEST_EQ(hpx::util::get<0>(p).value_, 42);
-        HPX_TEST_EQ(hpx::util::get<1>(p).value_, 43);
+        HPX_TEST_EQ(hpx::get<0>(p).value_, 42);
+        HPX_TEST_EQ(hpx::get<1>(p).value_, 43);
     }
 
     {
@@ -105,16 +105,13 @@ void tagged_tuple_test()
         tuple t;
 
         static_assert(
-            std::is_same<typename hpx::util::tuple_element<0, tuple>::type,
-                A>::value,
+            std::is_same<typename hpx::tuple_element<0, tuple>::type, A>::value,
             "");
         static_assert(
-            std::is_same<typename hpx::util::tuple_element<1, tuple>::type,
-                B>::value,
+            std::is_same<typename hpx::tuple_element<1, tuple>::type, B>::value,
             "");
         static_assert(
-            std::is_same<typename hpx::util::tuple_element<2, tuple>::type,
-                C>::value,
+            std::is_same<typename hpx::tuple_element<2, tuple>::type, C>::value,
             "");
 
         static_assert(
@@ -142,9 +139,9 @@ void tagged_tuple_test()
     {
         tuple t(42, 43, 44);
 
-        HPX_TEST_EQ(hpx::util::get<0>(t).value_, 42);
-        HPX_TEST_EQ(hpx::util::get<1>(t).value_, 43);
-        HPX_TEST_EQ(hpx::util::get<2>(t).value_, 44);
+        HPX_TEST_EQ(hpx::get<0>(t).value_, 42);
+        HPX_TEST_EQ(hpx::get<1>(t).value_, 43);
+        HPX_TEST_EQ(hpx::get<2>(t).value_, 44);
     }
 
     {
@@ -160,7 +157,7 @@ void tagged_tuple_test()
     {
         using hpx::util::make_tagged_tuple;
         tuple t = make_tagged_tuple<tag::tag1, tag::tag2, tag::tag3>(
-            hpx::util::make_tuple(42, 43, 44));
+            hpx::make_tuple(42, 43, 44));
 
         HPX_TEST_EQ(t.tag1().value_, 42);
         HPX_TEST_EQ(t.tag2().value_, 43);

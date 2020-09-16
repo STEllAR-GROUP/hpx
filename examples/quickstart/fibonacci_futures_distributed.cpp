@@ -38,7 +38,7 @@ hpx::id_type here;
 
 struct when_all_wrapper
 {
-    typedef hpx::util::tuple<
+    typedef hpx::tuple<
             hpx::lcos::future<std::uint64_t>
           , hpx::lcos::future<std::uint64_t> > data_type;
 
@@ -47,7 +47,7 @@ struct when_all_wrapper
     ) const
     {
         data_type v = data.get();
-        return hpx::util::get<0>(v).get() + hpx::util::get<1>(v).get();
+        return hpx::get<0>(v).get() + hpx::get<1>(v).get();
     }
 };
 

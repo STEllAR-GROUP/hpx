@@ -169,12 +169,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     template <typename ExPolicy, typename Future, typename F1, typename FwdIter,
         typename Stride>
     // requires traits::is_future<Future>
-    std::vector<hpx::util::tuple<FwdIter, std::size_t>>
-    get_bulk_iteration_shape(std::true_type /*has_variable_chunk_size*/,
-        ExPolicy&& policy, std::vector<Future>& /*workitems*/, F1&& /*f1*/,
-        FwdIter& first, std::size_t& count, Stride s)
+    std::vector<hpx::tuple<FwdIter, std::size_t>> get_bulk_iteration_shape(
+        std::true_type /*has_variable_chunk_size*/, ExPolicy&& policy,
+        std::vector<Future>& /*workitems*/, F1&& /*f1*/, FwdIter& first,
+        std::size_t& count, Stride s)
     {
-        using tuple_type = hpx::util::tuple<FwdIter, std::size_t>;
+        using tuple_type = hpx::tuple<FwdIter, std::size_t>;
 
         std::size_t const cores = execution::processing_units_count(
             policy.parameters(), policy.executor());
@@ -211,7 +211,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             // in last chunk, consider only remaining number of elements
             std::size_t chunk = (std::min)(chunk_size, count);
 
-            shape.push_back(hpx::util::make_tuple(first, chunk));
+            shape.push_back(hpx::make_tuple(first, chunk));
 
             // modifies 'chunk'
             first = parallel::v1::detail::next(first, count, chunk);
@@ -311,12 +311,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     template <typename ExPolicy, typename Future, typename F1, typename FwdIter,
         typename Stride>
     // requires traits::is_future<Future>
-    std::vector<hpx::util::tuple<FwdIter, std::size_t, std::size_t>>
+    std::vector<hpx::tuple<FwdIter, std::size_t, std::size_t>>
     get_bulk_iteration_shape_idx(std::true_type /*has_variable_chunk_size*/,
         ExPolicy&& policy, std::vector<Future>& workitems, F1&& f1,
         FwdIter first, std::size_t count, Stride s)
     {
-        using tuple_type = hpx::util::tuple<FwdIter, std::size_t, std::size_t>;
+        using tuple_type = hpx::tuple<FwdIter, std::size_t, std::size_t>;
 
         std::size_t const cores = execution::processing_units_count(
             policy.parameters(), policy.executor());
@@ -353,7 +353,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             // in last chunk, consider only remaining number of elements
             std::size_t chunk = (std::min)(chunk_size, count);
 
-            shape.push_back(hpx::util::make_tuple(first, chunk, base_idx));
+            shape.push_back(hpx::make_tuple(first, chunk, base_idx));
 
             // modifies 'chunk'
             first = parallel::v1::detail::next(first, count, chunk);

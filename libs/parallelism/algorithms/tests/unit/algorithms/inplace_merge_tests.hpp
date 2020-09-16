@@ -127,7 +127,7 @@ void test_inplace_merge(
     typedef typename std::vector<DataType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const left_size = 300007, right_size = 123456;
     std::vector<DataType> res(left_size + right_size), sol;
@@ -167,7 +167,7 @@ void test_inplace_merge_async(
     typedef typename std::vector<DataType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const left_size = 300007, right_size = 123456;
     std::vector<DataType> res(left_size + right_size), sol;
@@ -381,7 +381,7 @@ void test_inplace_merge_etc(
 
     typedef typename std::vector<DataType>::iterator base_iterator;
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const left_size = 300007, right_size = 123456;
     std::vector<DataType> res(left_size + right_size), sol, org;
@@ -454,7 +454,7 @@ void test_inplace_merge_stable(
     typedef typename std::vector<ElemType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const left_size = 300007, right_size = 123456;
     std::vector<ElemType> res(left_size + right_size);

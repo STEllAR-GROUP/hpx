@@ -50,7 +50,7 @@ struct HPX_EXPORT locality_namespace
     typedef std::int32_t component_type;
 
     // stores the locality endpoints, and number of OS-threads running on this locality
-    typedef hpx::util::tuple<
+    typedef hpx::tuple<
         parcelset::endpoints_type, std::uint32_t>
     partition_type;
 

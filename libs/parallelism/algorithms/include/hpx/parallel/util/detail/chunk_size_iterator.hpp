@@ -23,13 +23,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     template <typename Iterator>
     struct chunk_size_iterator
       : public hpx::util::iterator_facade<chunk_size_iterator<Iterator>,
-            hpx::util::tuple<Iterator, std::size_t> const,
-            std::input_iterator_tag>
+            hpx::tuple<Iterator, std::size_t> const, std::input_iterator_tag>
     {
     private:
         typedef hpx::util::iterator_facade<chunk_size_iterator<Iterator>,
-            hpx::util::tuple<Iterator, std::size_t> const,
-            std::input_iterator_tag>
+            hpx::tuple<Iterator, std::size_t> const, std::input_iterator_tag>
             base_type;
 
     public:
@@ -46,23 +44,23 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         HPX_HOST_DEVICE
         Iterator& iterator()
         {
-            return hpx::util::get<0>(data_);
+            return hpx::get<0>(data_);
         }
         HPX_HOST_DEVICE
         Iterator iterator() const
         {
-            return hpx::util::get<0>(data_);
+            return hpx::get<0>(data_);
         }
 
         HPX_HOST_DEVICE
         std::size_t& chunk()
         {
-            return hpx::util::get<1>(data_);
+            return hpx::get<1>(data_);
         }
         HPX_HOST_DEVICE
         std::size_t chunk() const
         {
-            return hpx::util::get<1>(data_);
+            return hpx::get<1>(data_);
         }
 
     protected:
@@ -89,7 +87,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
 
     private:
-        hpx::util::tuple<Iterator, std::size_t> data_;
+        hpx::tuple<Iterator, std::size_t> data_;
         std::size_t chunk_size_;
         std::size_t count_;
     };
@@ -98,12 +96,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     template <typename Iterator>
     struct chunk_size_idx_iterator
       : public hpx::util::iterator_facade<chunk_size_idx_iterator<Iterator>,
-            hpx::util::tuple<Iterator, std::size_t, std::size_t> const,
+            hpx::tuple<Iterator, std::size_t, std::size_t> const,
             std::input_iterator_tag>
     {
     private:
         typedef hpx::util::iterator_facade<chunk_size_idx_iterator<Iterator>,
-            hpx::util::tuple<Iterator, std::size_t, std::size_t> const,
+            hpx::tuple<Iterator, std::size_t, std::size_t> const,
             std::input_iterator_tag>
             base_type;
 
@@ -121,29 +119,29 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         HPX_HOST_DEVICE
         Iterator& iterator()
         {
-            return hpx::util::get<0>(data_);
+            return hpx::get<0>(data_);
         }
         HPX_HOST_DEVICE
         Iterator iterator() const
         {
-            return hpx::util::get<0>(data_);
+            return hpx::get<0>(data_);
         }
 
         HPX_HOST_DEVICE
         std::size_t& chunk()
         {
-            return hpx::util::get<1>(data_);
+            return hpx::get<1>(data_);
         }
         HPX_HOST_DEVICE
         std::size_t chunk() const
         {
-            return hpx::util::get<1>(data_);
+            return hpx::get<1>(data_);
         }
 
         HPX_HOST_DEVICE
         std::size_t& base_index()
         {
-            return hpx::util::get<2>(data_);
+            return hpx::get<2>(data_);
         }
 
     protected:
@@ -171,7 +169,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
 
     private:
-        hpx::util::tuple<Iterator, std::size_t, std::size_t> data_;
+        hpx::tuple<Iterator, std::size_t, std::size_t> data_;
         std::size_t count_;
         std::size_t chunk_size_;
     };

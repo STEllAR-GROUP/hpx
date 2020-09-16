@@ -192,10 +192,10 @@ namespace hpx { namespace parcelset
         std::int64_t count = 0;
         for (auto && p : pending_parcels_)
         {
-            count += hpx::util::get<0>(p.second).size();
+            count += hpx::get<0>(p.second).size();
             HPX_ASSERT(
-                hpx::util::get<0>(p.second).size() ==
-                hpx::util::get<1>(p.second).size());
+                hpx::get<0>(p.second).size() ==
+                hpx::get<1>(p.second).size());
         }
         return count;
     }

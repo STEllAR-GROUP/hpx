@@ -376,7 +376,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::distance(first, last),
                     [old_value, new_value, proj = std::forward<Proj>(proj)](
                         reference t) -> void {
-                        using hpx::util::get;
+                        using hpx::get;
                         if (hpx::util::invoke(proj, get<0>(t)) == old_value)
                             get<1>(t) = new_value;
                         else
@@ -539,7 +539,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::distance(first, last),
                     [new_value, f = std::forward<F>(f),
                         proj = std::forward<Proj>(proj)](reference t) -> void {
-                        using hpx::util::get;
+                        using hpx::get;
                         using hpx::util::invoke;
                         if (invoke(f, invoke(proj, get<0>(t))))
                             get<1>(t) = new_value;

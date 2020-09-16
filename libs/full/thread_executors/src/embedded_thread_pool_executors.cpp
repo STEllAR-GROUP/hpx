@@ -33,7 +33,6 @@
 #include <hpx/threading_base/create_thread.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/thread_description.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -198,7 +197,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
     // bounds on the executor's queue size.
     template <typename Scheduler>
     void embedded_thread_pool_executor<Scheduler>::add_at(
-        util::steady_clock::time_point const& abs_time, closure_type&& f,
+        std::chrono::steady_clock::time_point const& abs_time, closure_type&& f,
         util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
@@ -238,12 +237,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
     // violate bounds on the executor's queue size.
     template <typename Scheduler>
     void embedded_thread_pool_executor<Scheduler>::add_after(
-        util::steady_clock::duration const& rel_time, closure_type&& f,
+        std::chrono::steady_clock::duration const& rel_time, closure_type&& f,
         util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
-        return add_at(util::steady_clock::now() + rel_time, std::move(f), desc,
-            stacksize, ec);
+        return add_at(std::chrono::steady_clock::now() + rel_time, std::move(f),
+            desc, stacksize, ec);
     }
 
     // Return an estimate of the number of waiting tasks.

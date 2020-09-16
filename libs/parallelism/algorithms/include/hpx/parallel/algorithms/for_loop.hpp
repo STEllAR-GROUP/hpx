@@ -765,42 +765,40 @@ namespace hpx {
             ///////////////////////////////////////////////////////////////////////
             template <typename... Ts, std::size_t... Is>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void init_iteration(
-                hpx::util::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
+                hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
                 std::size_t part_index)
             {
-                int const _sequencer[] = {0,
-                    (hpx::util::get<Is>(args).init_iteration(part_index),
-                        0)...};
+                int const _sequencer[] = {
+                    0, (hpx::get<Is>(args).init_iteration(part_index), 0)...};
                 (void) _sequencer;
             }
 
             template <typename... Ts, std::size_t... Is, typename F, typename B>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void invoke_iteration(
-                hpx::util::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
-                F&& f, B part_begin)
+                hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>, F&& f,
+                B part_begin)
             {
                 hpx::util::invoke(std::forward<F>(f), part_begin,
-                    hpx::util::get<Is>(args).iteration_value()...);
+                    hpx::get<Is>(args).iteration_value()...);
             }
 
             template <typename... Ts, std::size_t... Is>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void next_iteration(
-                hpx::util::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
+                hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
                 std::size_t part_index)
             {
-                int const _sequencer[] = {0,
-                    (hpx::util::get<Is>(args).next_iteration(part_index),
-                        0)...};
+                int const _sequencer[] = {
+                    0, (hpx::get<Is>(args).next_iteration(part_index), 0)...};
                 (void) _sequencer;
             }
 
             template <typename... Ts, std::size_t... Is>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void exit_iteration(
-                hpx::util::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
+                hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
                 std::size_t size)
             {
                 int const _sequencer[] = {
-                    0, (hpx::util::get<Is>(args).exit_iteration(size), 0)...};
+                    0, (hpx::get<Is>(args).exit_iteration(size), 0)...};
                 (void) _sequencer;
             }
 
@@ -809,13 +807,13 @@ namespace hpx {
             struct part_iterations;
 
             template <typename F, typename S, typename... Ts>
-            struct part_iterations<F, S, hpx::util::tuple<Ts...>>
+            struct part_iterations<F, S, hpx::tuple<Ts...>>
             {
                 typedef typename hpx::util::decay<F>::type fun_type;
 
                 fun_type f_;
                 S stride_;
-                hpx::util::tuple<Ts...> args_;
+                hpx::tuple<Ts...> args_;
 
                 template <typename F_, typename S_, typename Args>
                 part_iterations(F_&& f, S_&& stride, Args&& args)
@@ -861,7 +859,7 @@ namespace hpx {
             };
 
             template <typename F, typename S>
-            struct part_iterations<F, S, hpx::util::tuple<>>
+            struct part_iterations<F, S, hpx::tuple<>>
             {
                 typedef typename hpx::util::decay<F>::type fun_type;
 
@@ -972,12 +970,11 @@ namespace hpx {
 
                     // we need to decay copy here to properly transport everything
                     // to a GPU device
-                    typedef hpx::util::tuple<
-                        typename hpx::util::decay<Ts>::type...>
+                    typedef hpx::tuple<typename hpx::util::decay<Ts>::type...>
                         args_type;
 
                     args_type args =
-                        hpx::util::forward_as_tuple(std::forward<Ts>(ts)...);
+                        hpx::forward_as_tuple(std::forward<Ts>(ts)...);
 
                     return util::partitioner<ExPolicy>::call_with_index(policy,
                         first, size, stride,
@@ -1024,13 +1021,11 @@ namespace hpx {
                     is_seq;
 
                 std::size_t size = parallel::v1::detail::distance(first, last);
-                auto&& t =
-                    hpx::util::forward_as_tuple(std::forward<Args>(args)...);
+                auto&& t = hpx::forward_as_tuple(std::forward<Args>(args)...);
 
                 return for_loop_algo().call(std::forward<ExPolicy>(policy),
                     is_seq(), first, size, stride,
-                    hpx::util::get<sizeof...(Args) - 1>(t),
-                    hpx::util::get<Is>(t)...);
+                    hpx::get<sizeof...(Args) - 1>(t), hpx::get<Is>(t)...);
             }
 
             // reshuffle arguments, last argument is function object, will go first
@@ -1062,13 +1057,11 @@ namespace hpx {
                 typedef execution::is_sequenced_execution_policy<ExPolicy>
                     is_seq;
 
-                auto&& t =
-                    hpx::util::forward_as_tuple(std::forward<Args>(args)...);
+                auto&& t = hpx::forward_as_tuple(std::forward<Args>(args)...);
 
                 return for_loop_algo().call(std::forward<ExPolicy>(policy),
                     is_seq(), first, size, stride,
-                    hpx::util::get<sizeof...(Args) - 1>(t),
-                    hpx::util::get<Is>(t)...);
+                    hpx::get<sizeof...(Args) - 1>(t), hpx::get<Is>(t)...);
             }
             /// \endcond
         }    // namespace detail

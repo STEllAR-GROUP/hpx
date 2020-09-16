@@ -24,8 +24,8 @@ int hpx_main()
     std::fill(std::begin(yvalues), std::end(yvalues), 1.0);
 
     using hpx::util::make_zip_iterator;
-    using hpx::util::tuple;
-    using hpx::util::get;
+    using hpx::tuple;
+    using hpx::get;
 
     double result =
         hpx::transform_reduce(

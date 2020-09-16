@@ -87,7 +87,7 @@ void test_partition_copy(ExPolicy policy, DataType)
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
-    using hpx::util::get;
+    using hpx::get;
 
     int rand_base = std::rand();
     auto pred = [rand_base](
@@ -123,7 +123,7 @@ void test_partition_copy_async(ExPolicy policy, DataType)
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
-    using hpx::util::get;
+    using hpx::get;
 
     int rand_base = std::rand();
     auto pred = [rand_base](

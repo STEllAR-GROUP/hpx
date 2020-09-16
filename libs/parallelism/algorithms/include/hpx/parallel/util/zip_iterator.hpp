@@ -21,13 +21,13 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <int N, typename R, typename ZipIter>
     R get_iter(ZipIter&& zipiter)
     {
-        return hpx::util::get<N>(zipiter.get_iterator_tuple());
+        return hpx::get<N>(zipiter.get_iterator_tuple());
     }
 
     template <int N, typename R, typename ZipIter>
     R get_iter(hpx::future<ZipIter>&& zipiter)
     {
-        typedef typename hpx::util::tuple_element<N,
+        typedef typename hpx::tuple_element<N,
             typename ZipIter::iterator_tuple_type>::type result_type;
 
         return lcos::make_future<result_type>(
@@ -54,30 +54,30 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ZipIter>
-    std::pair<typename hpx::util::tuple_element<0,
+    std::pair<typename hpx::tuple_element<0,
                   typename ZipIter::iterator_tuple_type>::type,
-        typename hpx::util::tuple_element<1,
+        typename hpx::tuple_element<1,
             typename ZipIter::iterator_tuple_type>::type>
     get_iter_pair(ZipIter&& zipiter)
     {
         typedef typename ZipIter::iterator_tuple_type iterator_tuple_type;
 
         iterator_tuple_type t = zipiter.get_iterator_tuple();
-        return std::make_pair(hpx::util::get<0>(t), hpx::util::get<1>(t));
+        return std::make_pair(hpx::get<0>(t), hpx::get<1>(t));
     }
 
     template <typename ZipIter>
-    hpx::future<std::pair<typename hpx::util::tuple_element<0,
+    hpx::future<std::pair<typename hpx::tuple_element<0,
                               typename ZipIter::iterator_tuple_type>::type,
-        typename hpx::util::tuple_element<1,
+        typename hpx::tuple_element<1,
             typename ZipIter::iterator_tuple_type>::type>>
     get_iter_pair(hpx::future<ZipIter>&& zipiter)
     {
         typedef typename ZipIter::iterator_tuple_type iterator_tuple_type;
 
         typedef std::pair<
-            typename hpx::util::tuple_element<0, iterator_tuple_type>::type,
-            typename hpx::util::tuple_element<1, iterator_tuple_type>::type>
+            typename hpx::tuple_element<0, iterator_tuple_type>::type,
+            typename hpx::tuple_element<1, iterator_tuple_type>::type>
             result_type;
 
         return lcos::make_future<result_type>(std::move(zipiter),
@@ -86,9 +86,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Tag1, typename Tag2, typename ZipIter>
-    hpx::util::tagged_pair<Tag1(typename hpx::util::tuple_element<0,
+    hpx::util::tagged_pair<Tag1(typename hpx::tuple_element<0,
                                typename ZipIter::iterator_tuple_type>::type),
-        Tag2(typename hpx::util::tuple_element<1,
+        Tag2(typename hpx::tuple_element<1,
             typename ZipIter::iterator_tuple_type>::type)>
     get_iter_tagged_pair(ZipIter&& zipiter)
     {
@@ -98,18 +98,17 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename Tag1, typename Tag2, typename ZipIter>
     hpx::future<hpx::util::tagged_pair<
-        Tag1(typename hpx::util::tuple_element<0,
+        Tag1(typename hpx::tuple_element<0,
             typename ZipIter::iterator_tuple_type>::type),
-        Tag2(typename hpx::util::tuple_element<1,
+        Tag2(typename hpx::tuple_element<1,
             typename ZipIter::iterator_tuple_type>::type)>>
     get_iter_tagged_pair(hpx::future<ZipIter>&& zipiter)
     {
         typedef typename ZipIter::iterator_tuple_type iterator_tuple_type;
 
-        typedef hpx::util::tagged_pair<Tag1(typename hpx::util::tuple_element<0,
-                                           iterator_tuple_type>::type),
-            Tag2(typename hpx::util::tuple_element<1,
-                iterator_tuple_type>::type)>
+        typedef hpx::util::tagged_pair<
+            Tag1(typename hpx::tuple_element<0, iterator_tuple_type>::type),
+            Tag2(typename hpx::tuple_element<1, iterator_tuple_type>::type)>
             result_type;
 
         return lcos::make_future<result_type>(

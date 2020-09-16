@@ -14,7 +14,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 struct cout_continuation
 {
-    typedef hpx::util::tuple<
+    typedef hpx::tuple<
             hpx::lcos::future<int>
           , hpx::lcos::future<int>
           , hpx::lcos::future<int> > data_type;
@@ -24,9 +24,9 @@ struct cout_continuation
     ) const
     {
         data_type v = data.get();
-        std::cout << hpx::util::get<0>(v).get() << "\n";
-        std::cout << hpx::util::get<1>(v).get() << "\n";
-        std::cout << hpx::util::get<2>(v).get() << "\n";
+        std::cout << hpx::get<0>(v).get() << "\n";
+        std::cout << hpx::get<1>(v).get() << "\n";
+        std::cout << hpx::get<2>(v).get() << "\n";
     }
 };
 ///////////////////////////////////////////////////////////////////////////////

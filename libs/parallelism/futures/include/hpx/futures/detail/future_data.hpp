@@ -22,7 +22,6 @@
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/timing/steady_clock.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -283,7 +282,7 @@ namespace hpx { namespace lcos { namespace detail {
         virtual state wait(error_code& ec = throws);
 
         virtual future_status wait_until(
-            util::steady_clock::time_point const& abs_time,
+            std::chrono::steady_clock::time_point const& abs_time,
             error_code& ec = throws);
 
         virtual std::exception_ptr get_exception_ptr() const = 0;
@@ -764,8 +763,8 @@ namespace hpx { namespace lcos { namespace detail {
         timed_future_data() {}
 
         template <typename Result_>
-        timed_future_data(
-            util::steady_clock::time_point const& abs_time, Result_&& init)
+        timed_future_data(std::chrono::steady_clock::time_point const& abs_time,
+            Result_&& init)
         {
             hpx::intrusive_ptr<timed_future_data> this_(this);
 
@@ -846,7 +845,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         virtual future_status wait_until(
-            util::steady_clock::time_point const& abs_time,
+            std::chrono::steady_clock::time_point const& abs_time,
             error_code& ec = throws)
         {
             if (!started_test())

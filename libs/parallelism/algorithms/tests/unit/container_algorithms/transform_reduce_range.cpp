@@ -30,10 +30,10 @@ void test_transform_reduce(IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    typedef hpx::util::tuple<std::size_t, std::size_t> result_type;
+    typedef hpx::tuple<std::size_t, std::size_t> result_type;
 
-    using hpx::util::get;
-    using hpx::util::make_tuple;
+    using hpx::get;
+    using hpx::make_tuple;
 
     auto reduce_op = [](result_type v1, result_type v2) -> result_type {
         return make_tuple(get<0>(v1) * get<0>(v2), get<1>(v1) * get<1>(v2));
@@ -71,10 +71,10 @@ void test_transform_reduce(ExPolicy&& policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    typedef hpx::util::tuple<std::size_t, std::size_t> result_type;
+    typedef hpx::tuple<std::size_t, std::size_t> result_type;
 
-    using hpx::util::get;
-    using hpx::util::make_tuple;
+    using hpx::get;
+    using hpx::make_tuple;
 
     auto reduce_op = [](result_type v1, result_type v2) -> result_type {
         return make_tuple(get<0>(v1) * get<0>(v2), get<1>(v1) * get<1>(v2));

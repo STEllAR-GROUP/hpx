@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 # Compatibility with using Boost.FileSystem, introduced in V1.4.0
 hpx_option(
   HPX_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE BOOL
-  "Enable compatibility of hpx::util::tuple with std::tuple. (default: ON)" ON
+  "Enable compatibility of hpx::tuple with std::tuple. (default: ON)" ON
   ADVANCED
   CATEGORY "Modules"
   MODULE DATASTRUCTURES

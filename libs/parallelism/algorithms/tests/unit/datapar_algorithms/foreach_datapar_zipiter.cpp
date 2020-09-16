@@ -27,8 +27,8 @@ struct set_42
     template <typename Tuple>
     void operator()(Tuple&& t)
     {
-        hpx::util::get<0>(t) = 42;
-        hpx::util::get<1>(t) = 42;
+        hpx::get<0>(t) = 42;
+        hpx::get<1>(t) = 42;
     }
 };
 

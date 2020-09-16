@@ -74,7 +74,7 @@ void test_unique(ExPolicy policy, DataType)
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size), d;
@@ -96,7 +96,7 @@ void test_unique_async(ExPolicy policy, DataType)
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size), d;

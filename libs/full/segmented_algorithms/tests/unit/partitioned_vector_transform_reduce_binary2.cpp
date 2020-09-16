@@ -22,9 +22,9 @@ struct multiply
 {
     template <typename T>
     typename hpx::util::decay<T>::type operator()(
-        hpx::util::tuple<T, T> const& r) const
+        hpx::tuple<T, T> const& r) const
     {
-        using hpx::util::get;
+        using hpx::get;
         return get<0>(r) * get<1>(r);
     }
 };

@@ -1003,7 +1003,7 @@ namespace hpx { namespace parallel { namespace execution {
 
                 auto func = make_fused_bulk_sync_execute_helper<result_type>(
                     exec, std::forward<F>(f), shape,
-                    hpx::util::make_tuple(std::forward<Ts>(ts)...));
+                    hpx::make_tuple(std::forward<Ts>(ts)...));
 
                 shared_state_type p =
                     lcos::detail::make_continuation_exec<result_type>(
@@ -1022,7 +1022,7 @@ namespace hpx { namespace parallel { namespace execution {
             {
                 auto func = make_fused_bulk_sync_execute_helper<void>(exec,
                     std::forward<F>(f), shape,
-                    hpx::util::make_tuple(std::forward<Ts>(ts)...));
+                    hpx::make_tuple(std::forward<Ts>(ts)...));
 
                 typename hpx::traits::detail::shared_state_ptr<void>::type p =
                     lcos::detail::make_continuation_exec<void>(
@@ -1118,7 +1118,7 @@ namespace hpx { namespace parallel { namespace execution {
 
                 auto func = make_fused_bulk_async_execute_helper<result_type>(
                     exec, std::forward<F>(f), shape,
-                    hpx::util::make_tuple(std::forward<Ts>(ts)...));
+                    hpx::make_tuple(std::forward<Ts>(ts)...));
 
                 // void or std::vector<func_result_type>
                 typedef typename bulk_then_execute_result<F, Shape, Future,

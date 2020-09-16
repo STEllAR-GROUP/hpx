@@ -116,7 +116,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // right to be used by the third step--which operates on the
                 // same partitions the first step operated on.
 
-                using hpx::util::get;
+                using hpx::get;
                 using hpx::util::make_zip_iterator;
 
                 auto f3 = [op](zip_iterator part_begin, std::size_t part_size,

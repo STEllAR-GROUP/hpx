@@ -175,7 +175,7 @@ namespace hpx { namespace lcos {
                 typedef typename util::decay<ReduceOp>::type reduce_op_type;
 
                 typedef detail::reduce_invoker<Action, reduce_op_type,
-                    typename util::tuple_element<Is,
+                    typename hpx::tuple_element<Is,
                         typename Action::arguments_type>::type...>
                     reduce_invoker_type;
 

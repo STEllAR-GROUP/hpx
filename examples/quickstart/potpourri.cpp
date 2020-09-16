@@ -14,7 +14,7 @@
 #include <vector>
 
 void final_task(
-    hpx::future<hpx::util::tuple<hpx::future<double>, hpx::future<void>>>)
+    hpx::future<hpx::tuple<hpx::future<double>, hpx::future<void>>>)
 {
     hpx::cout << "in final_task" << hpx::endl;
 }

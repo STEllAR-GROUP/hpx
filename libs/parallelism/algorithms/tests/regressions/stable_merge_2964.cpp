@@ -52,7 +52,7 @@ void test_merge_stable(ExPolicy policy, DataType, int rand_base)
 
     typedef typename std::pair<DataType, int> ElemType;
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const size1 = 1000007, size2 = 960202;
     std::vector<ElemType> src1(size1), src2(size2), dest(size1 + size2);

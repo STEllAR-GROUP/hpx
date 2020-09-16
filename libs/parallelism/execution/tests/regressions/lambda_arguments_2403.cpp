@@ -21,7 +21,7 @@ int hpx_main()
     auto zip_it_end = hpx::util::make_zip_iterator(large.end());
 
     hpx::for_each(hpx::execution::datapar, zip_it_begin, zip_it_end,
-        [](auto& t) -> void { hpx::util::get<0>(t) = 10.0; });
+        [](auto& t) -> void { hpx::get<0>(t) = 10.0; });
 
     HPX_TEST_EQ(std::count(large.begin(), large.end(), 10.0),
         std::ptrdiff_t(large.size()));

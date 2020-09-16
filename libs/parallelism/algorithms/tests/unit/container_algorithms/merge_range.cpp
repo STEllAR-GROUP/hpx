@@ -96,7 +96,7 @@ void test_merge(ExPolicy policy, DataType)
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
@@ -128,7 +128,7 @@ void test_merge_async(ExPolicy policy, DataType)
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),

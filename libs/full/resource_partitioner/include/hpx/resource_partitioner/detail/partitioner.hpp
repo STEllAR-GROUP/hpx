@@ -66,7 +66,7 @@ namespace hpx { namespace resource { namespace detail {
         std::vector<threads::mask_type> assigned_pus_;    // mask
 
         // pu index/exclusive/assigned
-        std::vector<util::tuple<std::size_t, bool, bool>> assigned_pu_nums_;
+        std::vector<hpx::tuple<std::size_t, bool, bool>> assigned_pu_nums_;
 
         // counter for number of threads bound to this pool
         std::size_t num_threads_;

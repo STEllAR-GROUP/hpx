@@ -143,7 +143,7 @@ namespace hpx { namespace compute { namespace host {
                     parallel::util::detail::no_data>;
 
                 auto&& arguments =
-                    hpx::util::forward_as_tuple(std::forward<Args>(args)...);
+                    hpx::forward_as_tuple(std::forward<Args>(args)...);
 
                 cancellation_token tok;
                 partitioner::call(

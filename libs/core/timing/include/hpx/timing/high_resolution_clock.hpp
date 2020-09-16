@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #if defined(__bgq__)
 #include <hwi/include/bqc/A2_inlines.h>
@@ -15,7 +16,7 @@
 #include <chrono>
 #include <cstdint>
 
-namespace hpx { namespace util {
+namespace hpx { namespace chrono {
     struct high_resolution_clock
     {
         // This function returns a tick count with a resolution (not
@@ -49,4 +50,11 @@ namespace hpx { namespace util {
             return (duration_values::max)().count();
         }
     };
+}}    // namespace hpx::chrono
+
+namespace hpx { namespace util {
+    using high_resolution_clock HPX_DEPRECATED_V(1, 6,
+        "hpx::util::high_resolution_clock is deprecated. Use "
+        "hpx::chrono::high_resolution_clock instead.") =
+        hpx::chrono::high_resolution_clock;
 }}    // namespace hpx::util

@@ -37,7 +37,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
     template <typename F, typename... Ts>
     struct closure
     {
-        typedef hpx::util::tuple<typename util::decay<Ts>::type...> args_type;
+        typedef hpx::tuple<typename util::decay<Ts>::type...> args_type;
         typedef typename util::decay<F>::type fun_type;
 
         fun_type f_;

@@ -18,7 +18,6 @@
 #include <hpx/threading_base/create_work.hpp>
 #include <hpx/threading_base/register_thread.hpp>
 #include <hpx/threading_base/thread_data.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <boost/asio/basic_waitable_timer.hpp>
 #include <boost/asio/io_service.hpp>
@@ -332,10 +331,10 @@ namespace hpx { namespace threads { namespace detail {
     /// behalf of one of the threads#detail#set_thread_state functions).
     template <typename SchedulingPolicy>
     thread_result_type at_timer(SchedulingPolicy& scheduler,
-        util::steady_clock::time_point& abs_time, thread_id_type const& thrd,
-        thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-        thread_priority priority, std::atomic<bool>* started,
-        bool retry_on_active)
+        std::chrono::steady_clock::time_point& abs_time,
+        thread_id_type const& thrd, thread_state_enum newstate,
+        thread_state_ex_enum newstate_ex, thread_priority priority,
+        std::atomic<bool>* started, bool retry_on_active)
     {
         if (HPX_UNLIKELY(!thrd))
         {
@@ -363,7 +362,7 @@ namespace hpx { namespace threads { namespace detail {
 
         // create timer firing in correspondence with given time
         using deadline_timer =
-            boost::asio::basic_waitable_timer<util::steady_clock>;
+            boost::asio::basic_waitable_timer<std::chrono::steady_clock>;
 
         boost::asio::io_service* s = get_default_timer_service();
         HPX_ASSERT(s);

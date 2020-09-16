@@ -103,13 +103,13 @@ namespace hpx { namespace threads {
     void execution_agent::sleep_until(
         hpx::util::steady_time_point const& sleep_time, const char* desc)
     {
-        auto now = hpx::util::steady_clock::now();
+        auto now = std::chrono::steady_clock::now();
 
         // Just yield until time has passed by...
         for (std::size_t k = 0; now < sleep_time.value(); ++k)
         {
             yield_k(k, desc);
-            now = hpx::util::steady_clock::now();
+            now = std::chrono::steady_clock::now();
         }
     }
 

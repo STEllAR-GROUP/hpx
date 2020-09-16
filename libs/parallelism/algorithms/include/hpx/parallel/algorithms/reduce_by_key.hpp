@@ -57,8 +57,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 typedef typename std::iterator_traits<Iterator>::reference
                     element_type;
-                typedef hpx::util::tuple<element_type, element_type,
-                    element_type>
+                typedef hpx::tuple<element_type, element_type, element_type>
                     type;
             };
 
@@ -143,9 +142,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 // resolves to a tuple of values for *(it-1), *it, *(it+1)
 
-                element_type left = hpx::util::get<0>(value);
-                element_type mid = hpx::util::get<1>(value);
-                element_type right = hpx::util::get<2>(value);
+                element_type left = hpx::get<0>(value);
+                element_type mid = hpx::get<1>(value);
+                element_type right = hpx::get<2>(value);
 
                 // we need to determine which of three states this
                 // index is. It can be:
@@ -174,7 +173,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             // the iterator we want is 'second' part of tagged_pair type (from copy_if)
             auto t = zipiter.out.get_iterator_tuple();
-            iKey key_end = hpx::util::get<0>(t);
+            iKey key_end = hpx::get<0>(t);
             return util::in_out_result<iKey, iVal>{key_end,
                 std::next(val_start, std::distance(key_start, key_end))};
         }
@@ -189,7 +188,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return lcos::make_future<result_type>(
                 std::move(ziter), [=](ZIter zipiter) {
                     auto t = zipiter.second.get_iterator_tuple();
-                    iKey key_end = hpx::util::get<0>(t);
+                    iKey key_end = hpx::get<0>(t);
                     return result_type{key_end,
                         std::next(
                             val_start, std::distance(key_start, key_end))};
@@ -352,7 +351,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 zip_type_in initial;
                 //
-                typedef hpx::util::tuple<value_type, reduce_key_series_states>
+                typedef hpx::tuple<value_type, reduce_key_series_states>
                     lambda_type;
                 hpx::parallel::inclusive_scan(
                     sync_policy, states_begin, states_end, states_out_begin,
@@ -369,7 +368,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         if (b_state.start)
                         {
                             debug_reduce_by_key(" = " << b_val << std::endl);
-                            return make_tuple(b_val,
+                            return hpx::make_tuple(b_val,
                                 reduce_key_series_states(
                                     a_state.start || b_state.start,
                                     b_state.end));
@@ -380,7 +379,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             debug_reduce_by_key(
                                 " = " << func(a_val, b_val) << std::endl);
                             value_type temp = func(a_val, b_val);
-                            return make_tuple(temp,
+                            return hpx::make_tuple(temp,
                                 reduce_key_series_states(
                                     a_state.start || b_state.start,
                                     b_state.end));

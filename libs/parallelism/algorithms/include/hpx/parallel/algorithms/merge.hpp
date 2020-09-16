@@ -46,9 +46,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         // sequential merge with projection function.
         template <typename InIter1, typename InIter2, typename OutIter,
             typename Comp, typename Proj1, typename Proj2>
-        hpx::util::tuple<InIter1, InIter2, OutIter> sequential_merge(
-            InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
-            OutIter dest, Comp&& comp, Proj1&& proj1, Proj2&& proj2)
+        hpx::tuple<InIter1, InIter2, OutIter> sequential_merge(InIter1 first1,
+            InIter1 last1, InIter2 first2, InIter2 last2, OutIter dest,
+            Comp&& comp, Proj1&& proj1, Proj2&& proj2)
         {
             if (first1 != last1 && first2 != last2)
             {
@@ -73,7 +73,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             dest = std::copy(first1, last1, dest);
             dest = std::copy(first2, last2, dest);
 
-            return hpx::util::make_tuple(last1, last2, dest);
+            return hpx::make_tuple(last1, last2, dest);
         }
 
         struct upper_bound_helper
@@ -237,13 +237,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         template <typename ExPolicy, typename RandIter1, typename RandIter2,
             typename RandIter3, typename Comp, typename Proj1, typename Proj2>
-        hpx::future<hpx::util::tuple<RandIter1, RandIter2, RandIter3>>
-        parallel_merge(ExPolicy&& policy, RandIter1 first1, RandIter1 last1,
+        hpx::future<hpx::tuple<RandIter1, RandIter2, RandIter3>> parallel_merge(
+            ExPolicy&& policy, RandIter1 first1, RandIter1 last1,
             RandIter2 first2, RandIter2 last2, RandIter3 dest, Comp&& comp,
             Proj1&& proj1, Proj2&& proj2)
         {
-            typedef hpx::util::tuple<RandIter1, RandIter2, RandIter3>
-                result_type;
+            typedef hpx::tuple<RandIter1, RandIter2, RandIter3> result_type;
 
             typedef typename std::remove_reference<ExPolicy>::type ExPolicy_;
             typedef typename std::remove_reference<Comp>::type Comp_;
@@ -263,7 +262,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 std::move(proj1), std::move(proj2), false,
                                 lower_bound_helper());
 
-                            return hpx::util::make_tuple(last1, last2,
+                            return hpx::make_tuple(last1, last2,
                                 dest + (last1 - first1) + (last2 - first2));
                         }
                         catch (...)
@@ -291,10 +290,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename OutIter, typename Comp, typename Proj1, typename Proj2>
-            static hpx::util::tuple<InIter1, InIter2, OutIter> sequential(
-                ExPolicy, InIter1 first1, InIter1 last1, InIter2 first2,
-                InIter2 last2, OutIter dest, Comp&& comp, Proj1&& proj1,
-                Proj2&& proj2)
+            static hpx::tuple<InIter1, InIter2, OutIter> sequential(ExPolicy,
+                InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
+                OutIter dest, Comp&& comp, Proj1&& proj1, Proj2&& proj2)
             {
                 return sequential_merge(first1, last1, first2, last2, dest,
                     std::forward<Comp>(comp), std::forward<Proj1>(proj1),
@@ -305,13 +303,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typename RandIter3, typename Comp, typename Proj1,
                 typename Proj2>
             static typename util::detail::algorithm_result<ExPolicy,
-                hpx::util::tuple<RandIter1, RandIter2, RandIter3>>::type
+                hpx::tuple<RandIter1, RandIter2, RandIter3>>::type
             parallel(ExPolicy&& policy, RandIter1 first1, RandIter1 last1,
                 RandIter2 first2, RandIter2 last2, RandIter3 dest, Comp&& comp,
                 Proj1&& proj1, Proj2&& proj2)
             {
-                typedef hpx::util::tuple<RandIter1, RandIter2, RandIter3>
-                    result_type;
+                typedef hpx::tuple<RandIter1, RandIter2, RandIter3> result_type;
                 typedef util::detail::algorithm_result<ExPolicy, result_type>
                     algorithm_result;
 
@@ -461,7 +458,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least random access iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-        typedef hpx::util::tuple<RandIter1, RandIter2, RandIter3> result_type;
+        typedef hpx::tuple<RandIter1, RandIter2, RandIter3> result_type;
 
         return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
             detail::merge<result_type>().call(std::forward<ExPolicy>(policy),

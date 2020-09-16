@@ -92,17 +92,19 @@ namespace hpx { namespace util {
                 type;
         };
     }    // namespace detail
+}}       // namespace hpx::util
 
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename... Ts>
-    struct tuple_size<tagged_tuple<Ts...>>
-      : tuple_size<tuple<typename detail::tag_elem<Ts>::type...>>
+    struct tuple_size<util::tagged_tuple<Ts...>>
+      : tuple_size<tuple<typename util::detail::tag_elem<Ts>::type...>>
     {
     };
 
     template <std::size_t N, typename... Ts>
-    struct tuple_element<N, tagged_tuple<Ts...>>
-      : tuple_element<N, tuple<typename detail::tag_elem<Ts>::type...>>
+    struct tuple_element<N, util::tagged_tuple<Ts...>>
+      : tuple_element<N, tuple<typename util::detail::tag_elem<Ts>::type...>>
     {
     };
-}}    // namespace hpx::util
+}    // namespace hpx

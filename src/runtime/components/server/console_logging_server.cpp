@@ -53,7 +53,7 @@ namespace hpx { namespace components { namespace server
     {
         std::lock_guard<util::spinlock> l(util::detail::get_log_lock());
 
-        using hpx::util::get;
+        using hpx::get;
 
         for (message_type const& msg : msgs)
         {

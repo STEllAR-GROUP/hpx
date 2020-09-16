@@ -327,7 +327,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef typename traits_out::segment_iterator segment_iterator_out;
             typedef typename traits_out::local_iterator local_iterator_type_out;
 
-            typedef typename hpx::util::tuple<local_iterator_type_in,
+            typedef typename hpx::tuple<local_iterator_type_in,
                 local_iterator_type_in>
                 local_iterator_in_tuple;
 
@@ -351,7 +351,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     results.push_back(dispatch(traits_in::get_id(sit_in),
                         segmented_scan_T<T>(), policy, std::true_type(), beg,
                         end, op, conv));
-                    in_iters.push_back(hpx::util::make_tuple(beg, end));
+                    in_iters.push_back(hpx::make_tuple(beg, end));
                     out_iters.push_back(sit_out);
                 }
             }
@@ -366,7 +366,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     results.push_back(dispatch(traits_in::get_id(sit_in),
                         segmented_scan_T<T>(), policy, std::true_type(), beg,
                         end, op, conv));
-                    in_iters.push_back(hpx::util::make_tuple(beg, end));
+                    in_iters.push_back(hpx::make_tuple(beg, end));
                     out_iters.push_back(sit_out);
                 }
 
@@ -381,7 +381,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         results.push_back(dispatch(traits_in::get_id(sit_in),
                             segmented_scan_T<T>(), policy, std::true_type(),
                             beg, end, op, conv));
-                        in_iters.push_back(hpx::util::make_tuple(beg, end));
+                        in_iters.push_back(hpx::make_tuple(beg, end));
                         out_iters.push_back(sit_out);
                     }
                 }
@@ -394,7 +394,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     results.push_back(dispatch(traits_in::get_id(sit_in),
                         segmented_scan_T<T>(), policy, std::true_type(), beg,
                         end, op, conv));
-                    in_iters.push_back(hpx::util::make_tuple(beg, end));
+                    in_iters.push_back(hpx::make_tuple(beg, end));
                     out_iters.push_back(sit_out);
                 }
             }
@@ -403,7 +403,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             T last_value = init;
             for (std::size_t i = 0; i < results.size(); ++i)
             {
-                using hpx::util::get;
+                using hpx::get;
                 local_iterator_type_out out = traits_out::begin(out_iters[i]);
 
                 // 2. Step: use the init values to dispatch final scan for each
@@ -534,7 +534,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 !hpx::traits::is_forward_iterator<SegIter>::value>
                 forced_seq;
 
-            typedef typename hpx::util::tuple<local_iterator_type_in,
+            typedef typename hpx::tuple<local_iterator_type_in,
                 local_iterator_type_in>
                 local_iterator_in_tuple;
 
@@ -561,7 +561,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 local_iterator_type_in end = traits_in::end(sit_in);
                 if (beg != end)
                 {
-                    in_iters.push_back(hpx::util::make_tuple(beg, end));
+                    in_iters.push_back(hpx::make_tuple(beg, end));
                     out_iters.push_back(sit_out);
                     results.push_back(dispatch_async(traits_in::get_id(sit_in),
                         segmented_scan_T<T>(), policy, forced_seq(), beg, end,
@@ -576,7 +576,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 if (beg != end)
                 {
-                    in_iters.push_back(hpx::util::make_tuple(beg, end));
+                    in_iters.push_back(hpx::make_tuple(beg, end));
                     out_iters.push_back(sit_out);
                     results.push_back(dispatch_async(traits_in::get_id(sit_in),
                         segmented_scan_T<T>(), policy, forced_seq(), beg, end,
@@ -591,7 +591,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     end = traits_in::end(sit_in);
                     if (beg != end)
                     {
-                        in_iters.push_back(hpx::util::make_tuple(beg, end));
+                        in_iters.push_back(hpx::make_tuple(beg, end));
                         out_iters.push_back(sit_out);
                         results.push_back(dispatch_async(
                             traits_in::get_id(sit_in), segmented_scan_T<T>(),
@@ -604,7 +604,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 end = traits_in::local(last);
                 if (beg != end)
                 {
-                    in_iters.push_back(hpx::util::make_tuple(beg, end));
+                    in_iters.push_back(hpx::make_tuple(beg, end));
                     out_iters.push_back(sit_out);
                     results.push_back(dispatch_async(traits_in::get_id(sit_in),
                         segmented_scan_T<T>(), policy, forced_seq(), beg, end,
@@ -625,7 +625,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             for (auto const& res : results)
             {
-                using hpx::util::get;
+                using hpx::get;
                 segment_iterator_out out_it = out_iters[i];
                 local_iterator_type_out out = traits_out::begin(out_it);
                 local_iterator_in_tuple in_tuple = in_iters[i];

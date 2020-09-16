@@ -120,7 +120,7 @@ namespace hpx {
         public:
             explicit async_traversal_frame(Visitor visitor, Args... args)
               : Visitor(std::move(visitor))
-              , args_(util::make_tuple(std::move(args)...))
+              , args_(hpx::make_tuple(std::move(args)...))
               , finished_(false)
             {
             }
@@ -135,7 +135,7 @@ namespace hpx {
             explicit async_traversal_frame(async_traverse_in_place_tag<Visitor>,
                 MapperArg&& mapper_arg, Args... args)
               : Visitor(std::forward<MapperArg>(mapper_arg))
-              , args_(util::make_tuple(std::move(args)...))
+              , args_(hpx::make_tuple(std::move(args)...))
               , finished_(false)
             {
             }
@@ -274,9 +274,9 @@ namespace hpx {
             }
 
             constexpr auto operator*() const noexcept
-                -> decltype(util::get<Begin>(*target_))
+                -> decltype(hpx::get<Begin>(*target_))
             {
-                return util::get<Begin>(*target_);
+                return hpx::get<Begin>(*target_);
             }
 
             template <std::size_t Position>
@@ -314,7 +314,7 @@ namespace hpx {
         /// Returns a static range for the given type
         template <typename T,
             typename Range = static_async_range<typename std::decay<T>::type,
-                0U, util::tuple_size<typename std::decay<T>::type>::value>>
+                0U, hpx::tuple_size<typename std::decay<T>::type>::value>>
         Range make_static_range(T&& element)
         {
             auto pointer = std::addressof(element);
@@ -408,8 +408,8 @@ namespace hpx {
             {
                 // Create a new hierarchy which contains the
                 // the parent (the last traversed element).
-                auto hierarchy = util::tuple_cat(
-                    util::make_tuple(std::forward<Parent>(parent)), hierarchy_);
+                auto hierarchy = hpx::tuple_cat(
+                    hpx::make_tuple(std::forward<Parent>(parent)), hierarchy_);
 
                 return async_traversal_point<Frame,
                     typename std::decay<Parent>::type, Hierarchy...>(
@@ -452,8 +452,8 @@ namespace hpx {
                 {
                     // Store the current call hierarchy into a tuple for
                     // later re-entrance.
-                    auto hierarchy = util::tuple_cat(
-                        util::make_tuple(current.next()), hierarchy_);
+                    auto hierarchy = hpx::tuple_cat(
+                        hpx::make_tuple(current.next()), hierarchy_);
 
                     // First detach the current execution context
                     detach();
@@ -573,7 +573,7 @@ namespace hpx {
                 if (!current.is_finished())
                 {
                     traversal_point_of_t<Frame> point(
-                        frame, util::make_tuple(), detached);
+                        frame, hpx::make_tuple(), detached);
 
                     point.async_traverse(std::forward<Current>(current));
 
@@ -601,8 +601,7 @@ namespace hpx {
                     // Don't forward the arguments here, since we still need
                     // the objects in a valid state later.
                     traversal_point_of_t<Frame, Parent, Hierarchy...> point(
-                        frame, util::make_tuple(parent, hierarchy...),
-                        detached);
+                        frame, hpx::make_tuple(parent, hierarchy...), detached);
 
                     point.async_traverse(std::forward<Current>(current));
 
@@ -624,7 +623,7 @@ namespace hpx {
         template <typename Frame, typename State>
         void resume_traversal_callable<Frame, State>::operator()()
         {
-            auto hierarchy = util::tuple_cat(util::make_tuple(frame_), state_);
+            auto hierarchy = hpx::tuple_cat(hpx::make_tuple(frame_), state_);
             util::invoke_fused(resume_state_callable{}, std::move(hierarchy));
         }
 
@@ -671,7 +670,7 @@ namespace hpx {
             auto range = make_static_range(frame->head());
 
             auto resumer = make_resume_traversal_callable(
-                frame, util::make_tuple(std::move(range)));
+                frame, hpx::make_tuple(std::move(range)));
 
             // Start the asynchronous traversal
             resumer();
@@ -714,7 +713,7 @@ namespace hpx {
             auto range = make_static_range(frame->head());
 
             auto resumer = make_resume_traversal_callable(
-                frame, util::make_tuple(std::move(range)));
+                frame, hpx::make_tuple(std::move(range)));
 
             // Start the asynchronous traversal
             resumer();

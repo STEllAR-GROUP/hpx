@@ -135,7 +135,7 @@ namespace hpx { namespace actions {
     {
         return base_type::derived_type::construct_thread_function(
             std::move(target), lva, comptype,
-            util::get<Is>(std::move(this->arguments_))...);
+            hpx::get<Is>(std::move(this->arguments_))...);
     }
 
     template <typename Action>
@@ -174,7 +174,7 @@ namespace hpx { namespace actions {
 #endif
         applier::detail::apply_helper<typename base_type::derived_type>::call(
             std::move(data), target, lva, comptype, this->priority_,
-            std::move(util::get<Is>(this->arguments_))...);
+            std::move(hpx::get<Is>(this->arguments_))...);
     }
 
     template <typename Action>

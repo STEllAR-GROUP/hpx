@@ -130,7 +130,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         detail::distance(first, last),
                         [](zip_iterator part_begin, std::size_t part_size,
                             std::size_t) {
-                            using hpx::util::get;
+                            using hpx::get;
 
                             auto iters = part_begin.get_iterator_tuple();
                             util::move_n(

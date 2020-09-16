@@ -249,7 +249,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             HPX_HOST_DEVICE HPX_FORCEINLINE void operator()(
                 Iter part_begin, std::size_t part_size, std::size_t)
             {
-                using hpx::util::get;
+                using hpx::get;
                 auto iters = part_begin.get_iterator_tuple();
                 util::copy_n(get<0>(iters), part_size, get<1>(iters));
             }
@@ -297,7 +297,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         hpx::util::make_zip_iterator(first, dest),
                         detail::distance(first, last), copy_iteration(),
                         [](zip_iterator&& last) -> zip_iterator {
-                            using hpx::util::get;
+                            using hpx::get;
                             auto iters = last.get_iterator_tuple();
                             util::copy_synchronize(
                                 get<0>(iters), get<1>(iters));
@@ -406,14 +406,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         hpx::util::make_zip_iterator(first, dest), count,
                         [](zip_iterator part_begin, std::size_t part_size,
                             std::size_t) {
-                            using hpx::util::get;
+                            using hpx::get;
 
                             auto iters = part_begin.get_iterator_tuple();
                             util::copy_n(
                                 get<0>(iters), part_size, get<1>(iters));
                         },
                         [](zip_iterator&& last) -> zip_iterator {
-                            using hpx::util::get;
+                            using hpx::get;
                             auto iters = last.get_iterator_tuple();
                             util::copy_synchronize(
                                 get<0>(iters), get<1>(iters));
@@ -526,7 +526,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
                 std::size_t init = 0;
 
-                using hpx::util::get;
+                using hpx::get;
                 using hpx::util::make_zip_iterator;
                 typedef util::scan_partitioner<ExPolicy,
                     util::in_out_result<FwdIter1, FwdIter3>, std::size_t>

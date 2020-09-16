@@ -103,8 +103,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     };
 
     template <typename Iterator1, typename Iterator2, typename Iterator3>
-    struct algorithm_result_helper<
-        hpx::util::tuple<Iterator1, Iterator2, Iterator3>,
+    struct algorithm_result_helper<hpx::tuple<Iterator1, Iterator2, Iterator3>,
         typename std::enable_if<
             hpx::traits::is_segmented_local_iterator<Iterator1>::value ||
             hpx::traits::is_segmented_local_iterator<Iterator2>::value ||
@@ -114,17 +113,15 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         typedef hpx::traits::segmented_local_iterator_traits<Iterator2> traits2;
         typedef hpx::traits::segmented_local_iterator_traits<Iterator3> traits3;
 
-        static HPX_FORCEINLINE hpx::util::tuple<
-            typename traits1::local_iterator, typename traits2::local_iterator,
-            typename traits3::local_iterator>
-        call(hpx::util::tuple<typename traits1::local_raw_iterator,
+        static HPX_FORCEINLINE hpx::tuple<typename traits1::local_iterator,
+            typename traits2::local_iterator, typename traits3::local_iterator>
+        call(hpx::tuple<typename traits1::local_raw_iterator,
             typename traits2::local_raw_iterator,
             typename traits3::local_raw_iterator>&& p)
         {
-            return hpx::util::make_tuple(
-                traits1::remote(std::move(hpx::util::get<0>(p))),
-                traits2::remote(std::move(hpx::util::get<1>(p))),
-                traits3::remote(std::move(hpx::util::get<2>(p))));
+            return hpx::make_tuple(traits1::remote(std::move(hpx::get<0>(p))),
+                traits2::remote(std::move(hpx::get<1>(p))),
+                traits3::remote(std::move(hpx::get<2>(p))));
         }
     };
 
@@ -211,7 +208,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename Iterator1, typename Iterator2, typename Iterator3>
     struct algorithm_result_helper<
-        future<hpx::util::tuple<Iterator1, Iterator2, Iterator3>>,
+        future<hpx::tuple<Iterator1, Iterator2, Iterator3>>,
         typename std::enable_if<
             hpx::traits::is_segmented_local_iterator<Iterator1>::value ||
             hpx::traits::is_segmented_local_iterator<Iterator2>::value ||
@@ -221,12 +218,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         typedef hpx::traits::segmented_local_iterator_traits<Iterator2> traits2;
         typedef hpx::traits::segmented_local_iterator_traits<Iterator3> traits3;
 
-        typedef hpx::util::tuple<typename traits1::local_raw_iterator,
+        typedef hpx::tuple<typename traits1::local_raw_iterator,
             typename traits2::local_raw_iterator,
             typename traits3::local_raw_iterator>
             arg_type;
 
-        static HPX_FORCEINLINE future<hpx::util::tuple<
+        static HPX_FORCEINLINE future<hpx::tuple<
             typename traits1::local_iterator, typename traits2::local_iterator,
             typename traits3::local_iterator>>
         call(future<arg_type>&& f)
@@ -235,14 +232,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             // clang-format off
             return f.then(hpx::launch::sync,
                 [](future<arg_type>&& f)
-                    -> hpx::util::tuple<typename traits1::local_iterator,
+                    -> hpx::tuple<typename traits1::local_iterator,
                         typename traits2::local_iterator,
                         typename traits3::local_iterator> {
                     auto&& p = f.get();
-                    return hpx::util::make_tuple(
-                        traits1::remote(std::move(hpx::util::get<0>(p))),
-                        traits2::remote(std::move(hpx::util::get<1>(p))),
-                        traits3::remote(std::move(hpx::util::get<2>(p))));
+                    return hpx::make_tuple(
+                        traits1::remote(std::move(hpx::get<0>(p))),
+                        traits2::remote(std::move(hpx::get<1>(p))),
+                        traits3::remote(std::move(hpx::get<2>(p))));
                 });
             // clang-format on
         }

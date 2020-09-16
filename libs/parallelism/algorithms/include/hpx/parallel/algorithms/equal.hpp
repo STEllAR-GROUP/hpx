@@ -288,10 +288,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         [&f, &proj1, &proj2, &tok](zip_iterator const& curr) {
                             reference t = *curr;
                             if (!hpx::util::invoke(f,
-                                    hpx::util::invoke(
-                                        proj1, hpx::util::get<0>(t)),
-                                    hpx::util::invoke(
-                                        proj2, hpx::util::get<1>(t))))
+                                    hpx::util::invoke(proj1, hpx::get<0>(t)),
+                                    hpx::util::invoke(proj2, hpx::get<1>(t))))
                             {
                                 tok.cancel();
                             }
@@ -389,8 +387,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::loop_n<ExPolicy>(it, part_count, tok,
                         [&f, &tok](zip_iterator const& curr) {
                             reference t = *curr;
-                            if (!hpx::util::invoke(f, hpx::util::get<0>(t),
-                                    hpx::util::get<1>(t)))
+                            if (!hpx::util::invoke(
+                                    f, hpx::get<0>(t), hpx::get<1>(t)))
                             {
                                 tok.cancel();
                             }

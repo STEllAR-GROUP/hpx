@@ -22,8 +22,7 @@ int hpx_main()
 
     hpx::for_each(
         hpx::execution::datapar, zip_it_begin, zip_it_end, [](auto t) {
-            using comp_type =
-                typename hpx::util::tuple_element<0, decltype(t)>::type;
+            using comp_type = typename hpx::tuple_element<0, decltype(t)>::type;
             using var_type = typename hpx::util::decay<comp_type>::type;
 
             var_type mass_density = 0.0;

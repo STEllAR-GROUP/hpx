@@ -101,24 +101,23 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE
-                std::pair<typename hpx::util::tuple_element<0,
+                std::pair<typename hpx::tuple_element<0,
                               typename Iter::iterator_tuple_type>::type,
-                    typename hpx::util::tuple_element<1,
+                    typename hpx::tuple_element<1,
                         typename Iter::iterator_tuple_type>::type>
                 execute(Iter part_begin, std::size_t part_size)
             {
                 auto iters = part_begin.get_iterator_tuple();
                 return util::transform_loop_n<execution_policy_type>(
-                    hpx::util::get<0>(iters), part_size,
-                    hpx::util::get<1>(iters),
+                    hpx::get<0>(iters), part_size, hpx::get<1>(iters),
                     transform_projected<F, Proj>{f_, proj_});
             }
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE
-                std::pair<typename hpx::util::tuple_element<0,
+                std::pair<typename hpx::tuple_element<0,
                               typename Iter::iterator_tuple_type>::type,
-                    typename hpx::util::tuple_element<1,
+                    typename hpx::tuple_element<1,
                         typename Iter::iterator_tuple_type>::type>
                 operator()(Iter part_begin, std::size_t part_size,
                     std::size_t /*part_index*/)
@@ -366,19 +365,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE
-                hpx::util::tuple<typename hpx::util::tuple_element<0,
-                                     typename Iter::iterator_tuple_type>::type,
-                    typename hpx::util::tuple_element<1,
+                hpx::tuple<typename hpx::tuple_element<0,
+                               typename Iter::iterator_tuple_type>::type,
+                    typename hpx::tuple_element<1,
                         typename Iter::iterator_tuple_type>::type,
-                    typename hpx::util::tuple_element<2,
+                    typename hpx::tuple_element<2,
                         typename Iter::iterator_tuple_type>::type>
                 operator()(Iter part_begin, std::size_t part_size,
                     std::size_t /*part_index*/)
             {
                 auto iters = part_begin.get_iterator_tuple();
                 return util::transform_binary_loop_n<execution_policy_type>(
-                    hpx::util::get<0>(iters), part_size,
-                    hpx::util::get<1>(iters), hpx::util::get<2>(iters),
+                    hpx::get<0>(iters), part_size, hpx::get<1>(iters),
+                    hpx::get<2>(iters),
                     transform_binary_projected<F, Proj1, Proj2>{
                         f_, proj1_, proj2_});
             }
@@ -396,7 +395,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename OutIter, typename F, typename Proj1, typename Proj2>
-            static hpx::util::tuple<InIter1, InIter2, OutIter> sequential(
+            static hpx::tuple<InIter1, InIter2, OutIter> sequential(
                 ExPolicy&& policy, InIter1 first1, InIter1 last1,
                 InIter2 first2, OutIter dest, F&& f, Proj1&& proj1,
                 Proj2&& proj2)
@@ -410,7 +409,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename FwdIter3, typename F, typename Proj1, typename Proj2>
             static typename util::detail::algorithm_result<ExPolicy,
-                hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3>>::type
+                hpx::tuple<FwdIter1, FwdIter2, FwdIter3>>::type
             parallel(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, FwdIter3 dest, F&& f, Proj1&& proj1,
                 Proj2&& proj2)
@@ -431,8 +430,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 return util::detail::algorithm_result<ExPolicy,
-                    hpx::util::tuple<FwdIter1, FwdIter2,
-                        FwdIter3>>::get(hpx::util::make_tuple(std::move(first1),
+                    hpx::tuple<FwdIter1, FwdIter2,
+                        FwdIter3>>::get(hpx::make_tuple(std::move(first1),
                     std::move(first2), std::move(dest)));
             }
         };
@@ -454,7 +453,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 "Requires at least forward iterator.");
 
             typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-            typedef hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3> result_type;
+            typedef hpx::tuple<FwdIter1, FwdIter2, FwdIter3> result_type;
 
             return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
                 detail::transform_binary<result_type>().call(
@@ -606,7 +605,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename OutIter, typename F, typename Proj1, typename Proj2>
-            static hpx::util::tuple<InIter1, InIter2, OutIter> sequential(
+            static hpx::tuple<InIter1, InIter2, OutIter> sequential(
                 ExPolicy&& policy, InIter1 first1, InIter1 last1,
                 InIter2 first2, InIter2 last2, OutIter dest, F&& f,
                 Proj1&& proj1, Proj2&& proj2)
@@ -620,7 +619,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename FwdIter3, typename F, typename Proj1, typename Proj2>
             static typename util::detail::algorithm_result<ExPolicy,
-                hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3>>::type
+                hpx::tuple<FwdIter1, FwdIter2, FwdIter3>>::type
             parallel(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, F&& f,
                 Proj1&& proj1, Proj2&& proj2)
@@ -642,8 +641,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 return util::detail::algorithm_result<ExPolicy,
-                    hpx::util::tuple<FwdIter1, FwdIter2,
-                        FwdIter3>>::get(hpx::util::make_tuple(std::move(first1),
+                    hpx::tuple<FwdIter1, FwdIter2,
+                        FwdIter3>>::get(hpx::make_tuple(std::move(first1),
                     std::move(first2), std::move(dest)));
             }
         };
@@ -665,7 +664,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 "Requires at least forward iterator.");
 
             typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-            typedef hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3> result_type;
+            typedef hpx::tuple<FwdIter1, FwdIter2, FwdIter3> result_type;
 
             return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
                 detail::transform_binary2<result_type>().call(

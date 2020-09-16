@@ -18,7 +18,7 @@ namespace hpx {
     ///
     /// \param f    [in] A future holding an arbitrary sequence of values stored
     ///             in a tuple-like container. This facility supports
-    ///             \a hpx::util::tuple<>, \a std::pair<T1, T2>, and
+    ///             \a hpx::tuple<>, \a std::pair<T1, T2>, and
     ///             \a std::array<T, N>
     ///
     /// \return     Returns an equivalent container (same container type as
@@ -108,8 +108,7 @@ namespace hpx { namespace lcos {
                 {
                     typedef typename traits::future_traits<T>::type result_type;
                     result_type* result = state->get_result();
-                    this->base_type::set_value(
-                        std::move(hpx::util::get<I>(*result)));
+                    this->base_type::set_value(std::move(hpx::get<I>(*result)));
                     return;
                 }
                 catch (...)
@@ -150,7 +149,7 @@ namespace hpx { namespace lcos {
         template <typename Result, typename Tuple, std::size_t I,
             typename Future>
         inline typename hpx::traits::detail::shared_state_ptr<
-            typename hpx::util::tuple_element<I, Tuple>::type>::type
+            typename hpx::tuple_element<I, Tuple>::type>::type
         extract_nth_continuation(Future& future)
         {
             typedef split_nth_continuation<Result> shared_state;
@@ -164,24 +163,20 @@ namespace hpx { namespace lcos {
 
         ///////////////////////////////////////////////////////////////////////
         template <std::size_t I, typename Tuple>
-        HPX_FORCEINLINE
-            hpx::future<typename hpx::util::tuple_element<I, Tuple>::type>
-            extract_nth_future(hpx::future<Tuple>& future)
+        HPX_FORCEINLINE hpx::future<typename hpx::tuple_element<I, Tuple>::type>
+        extract_nth_future(hpx::future<Tuple>& future)
         {
-            typedef
-                typename hpx::util::tuple_element<I, Tuple>::type result_type;
+            typedef typename hpx::tuple_element<I, Tuple>::type result_type;
 
             return hpx::traits::future_access<hpx::future<result_type>>::create(
                 extract_nth_continuation<result_type, Tuple, I>(future));
         }
 
         template <std::size_t I, typename Tuple>
-        HPX_FORCEINLINE
-            hpx::future<typename hpx::util::tuple_element<I, Tuple>::type>
-            extract_nth_future(hpx::shared_future<Tuple>& future)
+        HPX_FORCEINLINE hpx::future<typename hpx::tuple_element<I, Tuple>::type>
+        extract_nth_future(hpx::shared_future<Tuple>& future)
         {
-            typedef
-                typename hpx::util::tuple_element<I, Tuple>::type result_type;
+            typedef typename hpx::tuple_element<I, Tuple>::type result_type;
 
             return hpx::traits::future_access<hpx::future<result_type>>::create(
                 extract_nth_continuation<result_type, Tuple, I>(future));
@@ -189,19 +184,18 @@ namespace hpx { namespace lcos {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename... Ts, std::size_t... Is>
-        HPX_FORCEINLINE hpx::util::tuple<hpx::future<Ts>...>
-        split_future_helper(hpx::future<hpx::util::tuple<Ts...>>&& f,
-            hpx::util::index_pack<Is...>)
+        HPX_FORCEINLINE hpx::tuple<hpx::future<Ts>...> split_future_helper(
+            hpx::future<hpx::tuple<Ts...>>&& f, hpx::util::index_pack<Is...>)
         {
-            return hpx::util::make_tuple(extract_nth_future<Is>(f)...);
+            return hpx::make_tuple(extract_nth_future<Is>(f)...);
         }
 
         template <typename... Ts, std::size_t... Is>
-        HPX_FORCEINLINE hpx::util::tuple<hpx::future<Ts>...>
-        split_future_helper(hpx::shared_future<hpx::util::tuple<Ts...>>&& f,
+        HPX_FORCEINLINE hpx::tuple<hpx::future<Ts>...> split_future_helper(
+            hpx::shared_future<hpx::tuple<Ts...>>&& f,
             hpx::util::index_pack<Is...>)
         {
-            return hpx::util::make_tuple(extract_nth_future<Is>(f)...);
+            return hpx::make_tuple(extract_nth_future<Is>(f)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -323,31 +317,31 @@ namespace hpx { namespace lcos {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename... Ts>
-    HPX_FORCEINLINE hpx::util::tuple<hpx::future<Ts>...> split_future(
-        hpx::future<hpx::util::tuple<Ts...>>&& f)
+    HPX_FORCEINLINE hpx::tuple<hpx::future<Ts>...> split_future(
+        hpx::future<hpx::tuple<Ts...>>&& f)
     {
         return detail::split_future_helper(std::move(f),
             typename hpx::util::make_index_pack<sizeof...(Ts)>::type());
     }
 
-    HPX_FORCEINLINE hpx::util::tuple<hpx::future<void>> split_future(
-        hpx::future<hpx::util::tuple<>>&& f)
+    HPX_FORCEINLINE hpx::tuple<hpx::future<void>> split_future(
+        hpx::future<hpx::tuple<>>&& f)
     {
-        return hpx::util::make_tuple(hpx::future<void>(std::move(f)));
+        return hpx::make_tuple(hpx::future<void>(std::move(f)));
     }
 
     template <typename... Ts>
-    HPX_FORCEINLINE hpx::util::tuple<hpx::future<Ts>...> split_future(
-        hpx::shared_future<hpx::util::tuple<Ts...>>&& f)
+    HPX_FORCEINLINE hpx::tuple<hpx::future<Ts>...> split_future(
+        hpx::shared_future<hpx::tuple<Ts...>>&& f)
     {
         return detail::split_future_helper(std::move(f),
             typename hpx::util::make_index_pack<sizeof...(Ts)>::type());
     }
 
-    HPX_FORCEINLINE hpx::util::tuple<hpx::future<void>> split_future(
-        hpx::shared_future<hpx::util::tuple<>>&& f)
+    HPX_FORCEINLINE hpx::tuple<hpx::future<void>> split_future(
+        hpx::shared_future<hpx::tuple<>>&& f)
     {
-        return hpx::util::make_tuple(hpx::make_future<void>(std::move(f)));
+        return hpx::make_tuple(hpx::make_future<void>(std::move(f)));
     }
 
     ///////////////////////////////////////////////////////////////////////////

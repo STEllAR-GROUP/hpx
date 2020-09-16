@@ -23,7 +23,7 @@ namespace hpx { namespace util {
         template <typename Tuple>
         struct fused_index_pack
           : make_index_pack<
-                util::tuple_size<typename std::decay<Tuple>::type>::value>
+                hpx::tuple_size<typename std::decay<Tuple>::type>::value>
         {
         };
 
@@ -34,14 +34,14 @@ namespace hpx { namespace util {
         template <typename F, typename Tuple, std::size_t... Is>
         struct invoke_fused_result_impl<F, Tuple&, index_pack<Is...>>
           : util::invoke_result<F,
-                typename util::tuple_element<Is, Tuple>::type&...>
+                typename hpx::tuple_element<Is, Tuple>::type&...>
         {
         };
 
         template <typename F, typename Tuple, std::size_t... Is>
         struct invoke_fused_result_impl<F, Tuple&&, index_pack<Is...>>
           : util::invoke_result<F,
-                typename util::tuple_element<Is, Tuple>::type&&...>
+                typename hpx::tuple_element<Is, Tuple>::type&&...>
         {
         };
 
@@ -77,7 +77,7 @@ namespace hpx { namespace util {
         invoke_fused_impl(index_pack<Is...>, F&& f, Tuple&& t)
         {
             return HPX_INVOKE(
-                std::forward<F>(f), util::get<Is>(std::forward<Tuple>(t))...);
+                std::forward<F>(f), hpx::get<Is>(std::forward<Tuple>(t))...);
         }
     }    // namespace detail
 
