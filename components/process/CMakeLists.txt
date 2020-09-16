@@ -103,12 +103,12 @@ set(process_headers
 )
 
 set(process_sources
-    util/windows/shell_path.cpp
-    util/windows/search_path.cpp
-    util/windows/create_pipe.cpp
-    util/posix/shell_path.cpp
-    util/posix/search_path.cpp
-    util/posix/create_pipe.cpp
+    util/windows/shell_path_w.cpp
+    util/windows/search_path_w.cpp
+    util/windows/create_pipe_w.cpp
+    util/posix/shell_path_u.cpp
+    util/posix/search_path_u.cpp
+    util/posix/create_pipe_u.cpp
     server/child_component.cpp
     process.cpp
 )
