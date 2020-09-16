@@ -137,7 +137,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-        std::uint64_t get_creation_time(bool reset)
+        std::uint64_t get_creation_time(bool reset) override
         {
             std::uint64_t time = 0;
 
@@ -147,7 +147,7 @@ namespace hpx { namespace threads { namespace policies {
             return time;
         }
 
-        std::uint64_t get_cleanup_time(bool reset)
+        std::uint64_t get_cleanup_time(bool reset) override
         {
             std::uint64_t time = 0;
 
@@ -630,7 +630,7 @@ namespace hpx { namespace threads { namespace policies {
         ///////////////////////////////////////////////////////////////////////
         // Queries the current average thread wait time of the queues.
         std::int64_t get_average_thread_wait_time(
-            std::size_t num_thread = std::size_t(-1)) const
+            std::size_t num_thread = std::size_t(-1)) const override
         {
             // Return average thread wait time of one specific queue.
             std::uint64_t wait_time = 0;
@@ -656,7 +656,7 @@ namespace hpx { namespace threads { namespace policies {
         ///////////////////////////////////////////////////////////////////////
         // Queries the current average task wait time of the queues.
         std::int64_t get_average_task_wait_time(
-            std::size_t num_thread = std::size_t(-1)) const
+            std::size_t num_thread = std::size_t(-1)) const override
         {
             // Return average task wait time of one specific queue.
             std::uint64_t wait_time = 0;
