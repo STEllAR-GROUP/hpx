@@ -17,19 +17,19 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution_base {
+namespace hpx { namespace execution_base { namespace experimental {
 #if defined(DOXYGEN)
     /// connect is a customization point object.
     /// From some subexpression `s` and `r`, let `S` be the type such that `decltype((s))`
     /// is `S` and let `R` be the type such that `decltype((r))` is `R`. The result of
-    /// the expression `hpx::execution_base::connect(s, r)` is then equivalent to:
+    /// the expression `hpx::execution_base::experimental::connect(s, r)` is then equivalent to:
     ///     * `s.connect(r)`, if that expression is valid and returns a type
     ///       satisfying the `operation_state`
-    ///       (\see hpx::execution_base::traits::is_operation_state)
+    ///       (\see hpx::execution_base::experimental::traits::is_operation_state)
     ///       and if `S` satifies the `sender` concept.
     ///     * `s.connect(r)`, if that expression is valid and returns a type
     ///       satisfying the `operation_state`
-    ///       (\see hpx::execution_base::traits::is_operation_state)
+    ///       (\see hpx::execution_base::experimental::traits::is_operation_state)
     ///       and if `S` satifies the `sender` concept.
     ///       Overload resolution is performed in a context that include the declaration
     ///       `void connect();`
@@ -46,9 +46,9 @@ namespace hpx { namespace execution_base {
         /// operation itself might not have started yet. In order to get the result
         /// of this asynchronous operation, a sender needs to be connected to a
         /// receiver with the corresponding value, error and done channels:
-        ///     * `hpx::execution_base::connect`
+        ///     * `hpx::execution_base::experimental::connect`
         ///
-        /// In addition, `hpx::execution_base::traits::sender_traits ` needs to
+        /// In addition, `hpx::execution_base::experimental::::sender_traits ` needs to
         /// be specialized in some form.
         ///
         /// A sender's destructor shall not block pending completion of submitted
@@ -95,10 +95,10 @@ namespace hpx { namespace execution_base {
             -> decltype(std::declval<S&&>().connect(std::forward<R>(r)))
         {
             static_assert(
-                hpx::execution_base::traits::is_operation_state_v<decltype(
-                    std::declval<S&&>().connect(std::forward<R>(r)))>,
-                "hpx::execution_base::connect needs to return a type "
-                "satisfying the operation_state concept");
+                hpx::execution_base::experimental::traits::is_operation_state_v<
+                    decltype(std::declval<S&&>().connect(std::forward<R>(r)))>,
+                "hpx::execution_base::experimental::connect needs to return a "
+                "type satisfying the operation_state concept");
 
             return std::forward<S>(s).connect(std::forward<R>(r));
         }
@@ -114,8 +114,8 @@ namespace hpx { namespace execution_base {
 
             template <typename Sender>
             constexpr bool specialized(
-                typename hpx::execution_base::traits::sender_traits<
-                    Sender>::__unspecialized*)
+                typename hpx::execution_base::experimental::traits::
+                    sender_traits<Sender>::__unspecialized*)
             {
                 return false;
             }
@@ -146,24 +146,33 @@ namespace hpx { namespace execution_base {
             template <typename Sender, typename Receiver>
             struct is_sender_to_impl<true, Sender, Receiver>
               : std::integral_constant<bool,
-                    hpx::traits::is_invocable<hpx::execution_base::connect_t,
-                        Sender&&, Receiver&&>::value ||
-                    hpx::traits::is_invocable<hpx::execution_base::connect_t,
-                        Sender&&, Receiver&>::value ||
-                    hpx::traits::is_invocable <hpx::execution_base::connect_t,
-                        Sender&&, Receiver const&>::value ||
-                    hpx::traits::is_invocable <hpx::execution_base::connect_t,
-                        Sender&, Receiver&&>::value ||
-                    hpx::traits::is_invocable <hpx::execution_base::connect_t,
-                        Sender&, Receiver&>::value ||
-                    hpx::traits::is_invocable <hpx::execution_base::connect_t,
-                        Sender&, Receiver const&>::value ||
-                    hpx::traits::is_invocable <hpx::execution_base::connect_t,
-                        Sender const&, Receiver&&>::value ||
-                    hpx::traits::is_invocable <hpx::execution_base::connect_t,
-                        Sender const&, Receiver&>::value ||
-                    hpx::traits::is_invocable <hpx::execution_base::connect_t,
-                        Sender const&, Receiver const&>::value>
+                    hpx::traits::is_invocable<
+                        hpx::execution_base::experimental::connect_t,
+                            Sender&&, Receiver&&>::value ||
+                    hpx::traits::is_invocable<
+                        hpx::execution_base::experimental::connect_t,
+                            Sender&&, Receiver&>::value ||
+                    hpx::traits::is_invocable<
+                        hpx::execution_base::experimental::connect_t,
+                            Sender&&, Receiver const&>::value ||
+                    hpx::traits::is_invocable<
+                        hpx::execution_base::experimental::connect_t,
+                            Sender&, Receiver&&>::value ||
+                    hpx::traits::is_invocable<
+                        hpx::execution_base::experimental::connect_t,
+                            Sender&, Receiver&>::value ||
+                    hpx::traits::is_invocable<
+                        hpx::execution_base::experimental::connect_t,
+                            Sender&, Receiver const&>::value ||
+                    hpx::traits::is_invocable<
+                        hpx::execution_base::experimental::connect_t,
+                            Sender const&, Receiver&&>::value ||
+                    hpx::traits::is_invocable<
+                        hpx::execution_base::experimental::connect_t,
+                            Sender const&, Receiver&>::value ||
+                    hpx::traits::is_invocable<
+                        hpx::execution_base::experimental::connect_t,
+                            Sender const&, Receiver const&>::value>
             {
             };
             // clang-format on
@@ -265,4 +274,4 @@ namespace hpx { namespace execution_base {
         };
     }    // namespace traits
 
-}}    // namespace hpx::execution_base
+}}}    // namespace hpx::execution_base::experimental

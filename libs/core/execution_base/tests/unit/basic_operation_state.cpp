@@ -36,13 +36,14 @@ namespace mylib {
     {
     };
 
-    void tag_invoke(hpx::execution_base::start_t, state_4) {}
+    void tag_invoke(hpx::execution_base::experimental::start_t, state_4) {}
 
     struct state_5
     {
     };
 
-    void tag_invoke(hpx::execution_base::start_t, state_5) noexcept
+    void tag_invoke(
+        hpx::execution_base::experimental::start_t, state_5) noexcept
     {
         start_called = true;
     }
@@ -50,33 +51,30 @@ namespace mylib {
 
 int main()
 {
-    static_assert(
-        !hpx::execution_base::traits::is_operation_state<mylib::state_1>::value,
+    using hpx::execution_base::experimental::traits::is_operation_state;
+
+    static_assert(!is_operation_state<mylib::state_1>::value,
         "mylib::state_1 is not an operation state");
-    static_assert(
-        !hpx::execution_base::traits::is_operation_state<mylib::state_2>::value,
+    static_assert(!is_operation_state<mylib::state_2>::value,
         "mylib::state_2 is not an operation state");
-    static_assert(
-        hpx::execution_base::traits::is_operation_state<mylib::state_3>::value,
+    static_assert(is_operation_state<mylib::state_3>::value,
         "mylib::state_3 is an operation state");
-    static_assert(
-        !hpx::execution_base::traits::is_operation_state<mylib::state_4>::value,
+    static_assert(!is_operation_state<mylib::state_4>::value,
         "mylib::state_4 is not an operation state");
-    static_assert(
-        hpx::execution_base::traits::is_operation_state<mylib::state_5>::value,
+    static_assert(is_operation_state<mylib::state_5>::value,
         "mylib::state_5 is an operation state");
 
     {
         mylib::state_3 state;
 
-        hpx::execution_base::start(state);
+        hpx::execution_base::experimental::start(state);
         HPX_TEST(start_called);
         start_called = false;
     }
     {
         mylib::state_5 state;
 
-        hpx::execution_base::start(state);
+        hpx::execution_base::experimental::start(state);
         HPX_TEST(start_called);
         start_called = false;
     }

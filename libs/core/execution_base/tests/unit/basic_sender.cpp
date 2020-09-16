@@ -109,7 +109,7 @@ constexpr bool unspecialized(...)
 
 template <typename Sender>
 constexpr bool unspecialized(
-    typename hpx::execution_base::traits::sender_traits<
+    typename hpx::execution_base::experimental::traits::sender_traits<
         Sender>::__unspecialized*)
 {
     return true;
@@ -134,35 +134,35 @@ int main()
     static_assert(!unspecialized<sender_1>(nullptr),
         "sender_1 should have sender_traits");
 
-    static_assert(!hpx::execution_base::traits::is_sender<non_sender_1>::value,
-        "non_sender_1 is not a sender");
-    static_assert(!hpx::execution_base::traits::is_sender<non_sender_2>::value,
-        "non_sender_2 is not a sender");
-    static_assert(!hpx::execution_base::traits::is_sender<non_sender_3>::value,
-        "non_sender_3 is not a sender");
-    static_assert(!hpx::execution_base::traits::is_sender<non_sender_4>::value,
-        "non_sender_4 is not a sender");
-    static_assert(!hpx::execution_base::traits::is_sender<non_sender_5>::value,
-        "non_sender_5 is not a sender");
-    static_assert(!hpx::execution_base::traits::is_sender<non_sender_6>::value,
-        "non_sender_6 is not a sender");
-    static_assert(!hpx::execution_base::traits::is_sender<non_sender_7>::value,
-        "non_sender_7 is not a sender");
-    static_assert(hpx::execution_base::traits::is_sender<sender_1>::value,
-        "sender_1 is a sender");
+    using hpx::execution_base::experimental::traits::is_sender;
+    using hpx::execution_base::experimental::traits::is_sender_to;
 
     static_assert(
-        hpx::execution_base::traits::is_sender_to<sender_1, receiver>::value,
-        "sender_1 is a sender to receiver");
-    static_assert(!hpx::execution_base::traits::is_sender_to<sender_1,
-                      non_sender_1>::value,
-        "sender_1 is not a sender to non_sender_1");
+        !is_sender<non_sender_1>::value, "non_sender_1 is not a sender");
     static_assert(
-        !hpx::execution_base::traits::is_sender_to<sender_1, sender_1>::value,
+        !is_sender<non_sender_2>::value, "non_sender_2 is not a sender");
+    static_assert(
+        !is_sender<non_sender_3>::value, "non_sender_3 is not a sender");
+    static_assert(
+        !is_sender<non_sender_4>::value, "non_sender_4 is not a sender");
+    static_assert(
+        !is_sender<non_sender_5>::value, "non_sender_5 is not a sender");
+    static_assert(
+        !is_sender<non_sender_6>::value, "non_sender_6 is not a sender");
+    static_assert(
+        !is_sender<non_sender_7>::value, "non_sender_7 is not a sender");
+    static_assert(is_sender<sender_1>::value, "sender_1 is a sender");
+
+    static_assert(is_sender_to<sender_1, receiver>::value,
+        "sender_1 is a sender to receiver");
+    static_assert(!is_sender_to<sender_1, non_sender_1>::value,
+        "sender_1 is not a sender to non_sender_1");
+    static_assert(!is_sender_to<sender_1, sender_1>::value,
         "sender_1 is not a sender to sender_1");
 
     receiver r;
-    hpx::execution_base::start(hpx::execution_base::connect(sender_1{}, r));
+    hpx::execution_base::experimental::start(
+        hpx::execution_base::experimental::connect(sender_1{}, r));
 
     HPX_TEST_EQ(r.i, 4711);
 
