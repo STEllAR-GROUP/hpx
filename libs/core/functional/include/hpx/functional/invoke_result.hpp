@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/type_support/always_void.hpp>
 
 #include <type_traits>
@@ -15,123 +16,20 @@
 namespace hpx { namespace util {
     namespace detail {
         ///////////////////////////////////////////////////////////////////////
-        // f(t0, t1, ..., tN)
         template <typename T, typename Enable = void>
-        struct result_of_function_object
+        struct invoke_result_impl
         {
         };
 
         template <typename F, typename... Ts>
-        struct result_of_function_object<F(Ts...),
+        struct invoke_result_impl<F(Ts...),
             typename util::always_void<decltype(
-                std::declval<F>()(std::declval<Ts>()...))>::type>
+                HPX_INVOKE(std::declval<F>(), std::declval<Ts>()...))>::type>
         {
-            using type = decltype(std::declval<F>()(std::declval<Ts>()...));
+            using type =
+                decltype(HPX_INVOKE(std::declval<F>(), std::declval<Ts>()...));
         };
 
-        ///////////////////////////////////////////////////////////////////////
-        template <typename T>
-        struct result_of_member_pointer_impl;
-
-        // t0.*f
-        template <typename R, typename C>
-        struct result_of_member_pointer_impl<R C::*>
-        {
-            R& operator()(C&);
-            R const& operator()(C const&);
-            R&& operator()(C&&);
-            R const&& operator()(C const&&);
-        };
-
-        // (t0.*f)(t1, ..., tN)
-        template <typename R, typename C, typename... Ps>
-        struct result_of_member_pointer_impl<R (C::*)(Ps...)>
-        {
-            R operator()(C&, Ps...);
-            R operator()(C&&, Ps...);
-        };
-
-        template <typename R, typename C, typename... Ps>
-        struct result_of_member_pointer_impl<R (C::*)(Ps...) const>
-        {
-            R operator()(C const&, Ps...);
-            R operator()(C const&&, Ps...);
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        namespace has_dereference_impl {
-            struct fallback
-            {
-                template <typename T>
-                fallback(T const&)
-                {
-                }
-            };
-
-            fallback operator*(fallback);
-
-            template <typename T>
-            struct has_dereference
-            {
-                static bool const value =
-                    !std::is_same<decltype(*std::declval<T>()),
-                        fallback>::value;
-            };
-        }    // namespace has_dereference_impl
-        using has_dereference_impl::has_dereference;
-
-        template <typename C, typename T, typename Enable = void>
-        struct result_of_member_pointer
-        {
-        };
-
-        // t0.*f, (t0.*f)(t1, ..., tN)
-        template <typename C, typename F, typename T0, typename... Ts>
-        struct result_of_member_pointer<C, F(T0, Ts...),
-            typename std::enable_if<
-                std::is_base_of<C, typename std::decay<T0>::type>::value>::type>
-          : result_of_function_object<result_of_member_pointer_impl<
-                typename std::decay<F>::type>(T0, Ts...)>
-        {
-        };
-
-        // (*t0).*f, ((*t0).*f)(t1, ..., tN)
-        template <typename C, typename F, typename T0, typename... Ts>
-        struct result_of_member_pointer<C, F(T0, Ts...),
-            typename std::enable_if<std::enable_if<
-                !std::is_base_of<C, typename std::decay<T0>::type>::value,
-                has_dereference<T0>>::type::value>::type>
-          : result_of_function_object<
-                result_of_member_pointer_impl<typename std::decay<F>::type>(
-                    decltype(*std::declval<T0>()), Ts...)>
-        {
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename FD, typename T>
-        struct invoke_result_impl : result_of_function_object<T>
-        {
-        };
-
-        template <typename M, typename C, typename F, typename... Ts>
-        struct invoke_result_impl<M C::*, F(Ts...)>
-          : result_of_member_pointer<C, M C::*(Ts...)>
-        {
-        };
-
-        template <typename R, typename C, typename... Ps, typename F,
-            typename... Ts>
-        struct invoke_result_impl<R (C::*)(Ps...), F(Ts...)>
-          : result_of_member_pointer<C, R (C::*(Ts...))(Ps...)>
-        {
-        };
-
-        template <typename R, typename C, typename... Ps, typename F,
-            typename... Ts>
-        struct invoke_result_impl<R (C::*)(Ps...) const, F(Ts...)>
-          : result_of_member_pointer<C, R (C::*(Ts...))(Ps...) const>
-        {
-        };
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -144,8 +42,7 @@ namespace hpx { namespace util {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
     template <typename F, typename... Ts>
-    struct result_of<F(Ts...)>
-      : detail::invoke_result_impl<typename std::decay<F>::type, F(Ts...)>
+    struct result_of<F(Ts...)> : detail::invoke_result_impl<F(Ts...)>
     {
     };
 #if defined(HPX_GCC_VERSION)
@@ -154,9 +51,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
-    struct invoke_result
-      : detail::invoke_result_impl<typename std::decay<F>::type,
-            F && (Ts && ...)>
+    struct invoke_result : detail::invoke_result_impl<F && (Ts && ...)>
     {
     };
 }}    // namespace hpx::util

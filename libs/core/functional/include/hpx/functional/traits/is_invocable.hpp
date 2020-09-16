@@ -5,39 +5,50 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedname:is_callable
+
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/invoke_result.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/type_support/always_void.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+        ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable = void>
         struct is_invocable_impl : std::false_type
         {
+            static_assert(std::is_function<T>::value,
+                "Argument must be of the form F(Ts...)");
         };
 
         template <typename F, typename... Ts>
         struct is_invocable_impl<F(Ts...),
-            typename util::always_void<
-                typename util::invoke_result<F, Ts...>::type>::type>
-          : std::true_type
+            typename util::always_void<decltype(HPX_INVOKE(std::declval<F>(),
+                std::declval<Ts>()...))>::type> : std::true_type
         {
         };
 
-        template <typename T, typename R,
-            bool IsInvocable = is_invocable_impl<T>::value>
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename R, typename Enable = void>
         struct is_invocable_r_impl : std::false_type
         {
         };
 
         template <typename F, typename... Ts, typename R>
-        struct is_invocable_r_impl<F(Ts...), R, /*IsInvocable=*/true>
-          : std::is_convertible<typename util::invoke_result<F, Ts...>::type, R>
+        struct is_invocable_r_impl<F(Ts...), R,
+            typename util::always_void<decltype(
+                HPX_INVOKE(std::declval<F>(), std::declval<Ts>()...))>::type>
+          : std::integral_constant<bool,
+                std::is_void<R>::value ||
+                    std::is_convertible<decltype(HPX_INVOKE(std::declval<F>(),
+                                            std::declval<Ts>()...)),
+                        R>::value>
         {
         };
     }    // namespace detail
@@ -70,9 +81,4 @@ namespace hpx { namespace traits {
     {
     };
 
-    template <typename F, typename... Ts>
-    struct is_invocable_r<void, F, Ts...>
-      : detail::is_invocable_impl<F && (Ts && ...)>
-    {
-    };
 }}    // namespace hpx::traits
