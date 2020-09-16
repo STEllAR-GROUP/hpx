@@ -97,14 +97,14 @@ namespace hpx { namespace util {
         // The actual function pointers. Some of them need to be exported,
         // because through the miracle of chained headers they get referenced
         // outside of the HPX library.
-        extern init_t* init_function;
-        extern finalize_t* finalize_function;
-        extern register_thread_t* register_thread_function;
-        extern new_task_string_t* new_task_string_function;
-        extern new_task_address_t* new_task_address_function;
-        extern sample_value_t* sample_value_function;
-        extern send_t* send_function;
-        extern recv_t* recv_function;
+        HPX_CORE_EXPORT extern init_t* init_function;
+        HPX_CORE_EXPORT extern finalize_t* finalize_function;
+        HPX_CORE_EXPORT extern register_thread_t* register_thread_function;
+        HPX_CORE_EXPORT extern new_task_string_t* new_task_string_function;
+        HPX_CORE_EXPORT extern new_task_address_t* new_task_address_function;
+        HPX_CORE_EXPORT extern sample_value_t* sample_value_function;
+        HPX_CORE_EXPORT extern send_t* send_function;
+        HPX_CORE_EXPORT extern recv_t* recv_function;
         HPX_CORE_EXPORT extern update_task_string_t*
             update_task_string_function;
         HPX_CORE_EXPORT extern update_task_address_t*
