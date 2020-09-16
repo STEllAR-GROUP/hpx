@@ -630,7 +630,7 @@ namespace hpx { namespace threads { namespace policies {
         ///////////////////////////////////////////////////////////////////////
         // Queries the current average thread wait time of the queues.
         std::int64_t get_average_thread_wait_time(
-            std::size_t num_thread = std::size_t(-1)) const
+            std::size_t num_thread = std::size_t(-1)) const override
         {
             // Return average thread wait time of one specific queue.
             std::uint64_t wait_time = 0;
@@ -656,7 +656,7 @@ namespace hpx { namespace threads { namespace policies {
         ///////////////////////////////////////////////////////////////////////
         // Queries the current average task wait time of the queues.
         std::int64_t get_average_task_wait_time(
-            std::size_t num_thread = std::size_t(-1)) const
+            std::size_t num_thread = std::size_t(-1)) const override
         {
             // Return average task wait time of one specific queue.
             std::uint64_t wait_time = 0;
