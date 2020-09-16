@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution_base {
+namespace hpx { namespace execution_base { namespace experimental {
 
 #if defined(DOXYGEN)
     /// set_value is a customization point object. The expression
@@ -166,10 +166,10 @@ namespace hpx { namespace execution_base {
             struct is_receiver_impl<true, T, E>
               : std::integral_constant<bool,
                     hpx::traits::is_invocable<
-                        hpx::execution_base::set_done_t,
+                        hpx::execution_base::experimental::set_done_t,
                             typename std::decay<T>::type&&>::value &&
                     hpx::traits::is_invocable<
-                        hpx::execution_base::set_error_t,
+                        hpx::execution_base::experimental::set_error_t,
                             typename std::decay<T>::type&&, E>::value>
             {
             };
@@ -205,7 +205,7 @@ namespace hpx { namespace execution_base {
             struct is_receiver_of_impl<true, T, As...>
               : std::integral_constant<bool,
                     hpx::traits::is_invocable<
-                        hpx::execution_base::set_value_t,
+                        hpx::execution_base::experimental::set_value_t,
                             typename std::decay<T>::type&&, As...>::value>
             {
             };
@@ -235,7 +235,7 @@ namespace hpx { namespace execution_base {
             template <typename T, typename... As>
             struct is_nothrow_receiver_of_impl<true, T, As...>
               : std::integral_constant<bool,
-                    noexcept(hpx::execution_base::set_value(
+                    noexcept(hpx::execution_base::experimental::set_value(
                         std::declval<T>(), std::declval<As>()...))>
             {
             };
@@ -252,4 +252,4 @@ namespace hpx { namespace execution_base {
             is_nothrow_receiver_of<T, As...>::value;
 
     }    // namespace traits
-}}       // namespace hpx::execution_base
+}}}      // namespace hpx::execution_base::experimental
