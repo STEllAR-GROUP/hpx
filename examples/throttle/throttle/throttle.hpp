@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/future.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -53,3 +55,4 @@ namespace throttle
     };
 }
 
+#endif

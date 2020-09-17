@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include "row_range.hpp"
 #include "server/row.hpp"
 
@@ -41,3 +43,4 @@ namespace jacobi
     };
 }
 
+#endif

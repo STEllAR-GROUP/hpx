@@ -7,6 +7,8 @@
 // This test demonstrates the issue as reported by
 //      #1787: discover_counter_types not working
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/util.hpp>
@@ -36,3 +38,4 @@ int main(int argc, char** argv)
 {
     return hpx::init(argc, argv);
 }
+#endif

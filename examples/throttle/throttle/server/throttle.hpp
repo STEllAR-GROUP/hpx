@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
@@ -83,3 +85,4 @@ HPX_REGISTER_ACTION_DECLARATION(
     throttle::server::throttle::is_suspended_action
   , throttle_is_suspended_action);
 
+#endif

@@ -7,6 +7,8 @@
 //
 //  http://gcc.gnu.org/bugzilla/show_bug.cgi?id=52072
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/plain_actions.hpp>
@@ -58,3 +60,4 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv);
 }
+#endif

@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
@@ -153,4 +154,4 @@ namespace hpx { namespace components
         naming::id_type gid_;
     };
 }}
-
+#endif

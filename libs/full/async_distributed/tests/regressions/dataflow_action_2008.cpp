@@ -7,6 +7,8 @@
 // This demonstrated the compilation error when using an action that returns a
 // future inside dataflow (issue #2008)
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
@@ -32,3 +34,4 @@ int main(int argc, char* argv[])
 {
     return hpx::init(argc, argv);
 }
+#endif

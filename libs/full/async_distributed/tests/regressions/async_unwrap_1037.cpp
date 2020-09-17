@@ -7,6 +7,8 @@
 // This test case demonstrates the issue described in #1037:
 // implicit unwrapping of futures in async broken
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/futures/future.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
@@ -81,3 +83,4 @@ int main()
     HPX_TEST_EQ(f3.get(), 1);
     return hpx::util::report_errors();
 }
+#endif

@@ -100,6 +100,7 @@ namespace hpx { namespace compute { namespace host {
                 std::move(targets), num_partitions);
         }
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         /// Create one object on one of the localities associated by
         /// this policy instance
         ///
@@ -120,6 +121,7 @@ namespace hpx { namespace compute { namespace host {
             return components::create_async<Component>(
                 target_locality, std::forward<Ts>(ts)..., std::move(t));
         }
+#endif
 
         /// \cond NOINTERNAL
         typedef std::pair<hpx::id_type, std::vector<hpx::id_type>>

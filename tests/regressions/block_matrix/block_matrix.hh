@@ -2,9 +2,10 @@
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+#pragma once
 
-#ifndef BLOCK_MATRIX_HH
-#define BLOCK_MATRIX_HH
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include "defs.hh"
 #include "matrix.hh"
@@ -121,4 +122,4 @@ struct block_matrix_t {
 
 std::ostream& operator<<(std::ostream& os, const block_matrix_t& a);
 
-#endif // #ifndef BLOCK_MATRIX_HH
+#endif

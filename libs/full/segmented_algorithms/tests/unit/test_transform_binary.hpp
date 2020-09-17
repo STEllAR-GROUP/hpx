@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/include/parallel_count.hpp>
 #include <hpx/include/parallel_transform.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
@@ -167,3 +169,4 @@ void transform_binary_tests(std::vector<hpx::id_type>& localities)
             hpx::execution::par(hpx::execution::task), v, w, x, V(1));
     }
 }
+#endif

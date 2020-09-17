@@ -21,6 +21,8 @@
 //
 
 // Include statements.
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/chrono.hpp>
 #include <hpx/iostream.hpp>
@@ -284,3 +286,4 @@ int main(int argc, char* argv[])
     // Initialize and run HPX.
     return init(desc_commandline, argc, argv);
 }
+#endif

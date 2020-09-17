@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/include/client.hpp>
 
@@ -51,4 +53,4 @@ struct simple_mobile_object
 
 }}
 
-
+#endif

@@ -9,6 +9,8 @@
 //
 // This example builds upon and extends example seven.
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/modules/collectives.hpp>
@@ -743,3 +745,4 @@ int main(int argc, char* argv[])
 
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
+#endif

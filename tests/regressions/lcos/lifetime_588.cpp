@@ -7,6 +7,8 @@
 // This test case demonstrates the issue described in #588: Continuations do not
 // keep object alive
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
@@ -92,3 +94,4 @@ int main()
 
     return hpx::util::report_errors();
 }
+#endif

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 
@@ -120,4 +122,4 @@ namespace examples { namespace server
     HPX_REGISTER_COMPONENT(HPX_PP_CAT(__template_accumulator_, type))         \
 /**/
 
-
+#endif

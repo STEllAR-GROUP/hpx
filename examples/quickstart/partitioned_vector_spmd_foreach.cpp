@@ -11,6 +11,8 @@
 // elements is done directly, with best possible performance, working directly
 // on the std::vector's the data is stored in.
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/algorithm.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
@@ -200,3 +202,4 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
+#endif

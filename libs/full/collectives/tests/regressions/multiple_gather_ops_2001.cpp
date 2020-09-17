@@ -7,6 +7,8 @@
 // This test case demonstrates the issue described in #2001: Gathering more
 // than once segfaults
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
@@ -59,3 +61,4 @@ int main(int argc, char* argv[])
     std::vector<std::string> const cfg = {"hpx.run_hpx_main!=1"};
     return hpx::init(argc, argv, cfg);
 }
+#endif

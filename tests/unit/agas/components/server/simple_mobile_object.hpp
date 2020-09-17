@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/modules/actions.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
@@ -44,4 +46,4 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::test::server::simple_mobile_object::get_lva_action,
     simple_mobile_object_get_lva_action);
 
-
+#endif

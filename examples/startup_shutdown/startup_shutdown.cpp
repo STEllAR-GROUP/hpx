@@ -24,6 +24,8 @@
 // turning this module into a HPX component, as otherwise the startup function
 // would not be executed by the runtime system.
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/include/util.hpp>
@@ -87,3 +89,4 @@ namespace startup_shutdown
 // it for the purpose of this example.
 HPX_REGISTER_STARTUP_MODULE(::startup_shutdown::get_startup);
 
+#endif

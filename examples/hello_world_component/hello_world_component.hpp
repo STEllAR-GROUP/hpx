@@ -7,6 +7,8 @@
 //[hello_world_hpp_getting_started
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
@@ -51,5 +53,5 @@ namespace examples
     };
 }
 
+#endif
 //]
-

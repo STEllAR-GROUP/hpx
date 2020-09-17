@@ -9,6 +9,8 @@
 // processing unit) for a thread which is created by calling hpx::apply() or
 // hpx::async().
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/iostream.hpp>
@@ -83,3 +85,4 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+#endif

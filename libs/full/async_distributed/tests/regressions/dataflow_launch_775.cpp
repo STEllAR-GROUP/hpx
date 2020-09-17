@@ -7,6 +7,8 @@
 // This test case demonstrates the issue described in #774: using local dataflow
 // without explicit namespace.
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
@@ -46,3 +48,4 @@ int main()
 
     return 0;
 }
+#endif

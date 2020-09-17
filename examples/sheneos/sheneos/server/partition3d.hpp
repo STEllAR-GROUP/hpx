@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 
 #include <cstddef>
@@ -235,3 +237,4 @@ HPX_REGISTER_ACTION_DECLARATION(
     set_value_action_vector_double);
 
 
+#endif

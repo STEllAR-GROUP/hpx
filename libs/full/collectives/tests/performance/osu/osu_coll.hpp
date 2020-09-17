@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #define SKIP 200
 #define SKIP_LARGE 10
 #define LARGE_MESSAGE_SIZE 8192
@@ -202,3 +204,4 @@ inline std::vector<hpx::id_type> create_components(params const& p)
 
     return components;
 }
+#endif

@@ -7,6 +7,8 @@
 // The purpose of this example is to demonstrate the simplest way to create and
 // use a performance counter for HPX.
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/iostream.hpp>
 #include <hpx/include/performance_counters.hpp>
@@ -84,4 +86,4 @@ int main(int argc, char* argv[])
     // Initialize and run HPX.
     return hpx::init(opts, argc, argv);
 }
-
+#endif

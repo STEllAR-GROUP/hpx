@@ -6,6 +6,8 @@
 
 // This example is meant for inclusion in the documentation.
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/apply.hpp>
@@ -54,3 +56,4 @@ int main(int argc, char* argv[])
 
     return 0;
 }
+#endif

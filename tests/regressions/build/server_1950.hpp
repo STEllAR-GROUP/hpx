@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
 
@@ -22,4 +24,4 @@ struct HPX_COMPONENT_EXPORT test_server
 
 typedef test_server::call_action call_action;
 HPX_REGISTER_ACTION_DECLARATION(call_action);
-
+#endif

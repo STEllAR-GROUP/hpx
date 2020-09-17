@@ -7,6 +7,8 @@
 
 // hpxinspect:noinclude:hpx::util::from_string
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/util.hpp>
@@ -114,3 +116,4 @@ int main(int argc, char* argv[])
     return hpx::init(argc, argv, cfg);
 }
 
+#endif

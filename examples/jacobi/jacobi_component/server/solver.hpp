@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include "../grid.hpp"
 #include "../stencil_iterator.hpp"
 #include "stencil_iterator.hpp"
@@ -148,3 +150,4 @@ HPX_REGISTER_ACTION_DECLARATION(
   , jacobi_server_solver_run_action
 )
 
+#endif

@@ -9,6 +9,8 @@
 //
 // This example builds on example six.
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/serialization.hpp>
@@ -459,3 +461,4 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);
 }
+#endif

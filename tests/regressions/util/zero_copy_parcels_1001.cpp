@@ -7,6 +7,8 @@
 // This test verifies that issue #1001 is resolved
 // (Zero copy serialization raises assert).
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/actions.hpp>
@@ -82,4 +84,4 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
-
+#endif

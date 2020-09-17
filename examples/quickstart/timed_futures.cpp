@@ -8,6 +8,8 @@
 // make_ready_future_after to orchestrate timed operations with 'normal'
 // asynchronous work.
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/iostream.hpp>
 #include <hpx/modules/timing.hpp>
@@ -72,3 +74,4 @@ int main(int argc, char* argv[])
     return hpx::init(argc, argv);
 }
 
+#endif

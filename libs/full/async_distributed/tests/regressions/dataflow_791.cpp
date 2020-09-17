@@ -6,6 +6,8 @@
 
 // Static blocked LU Decomposition
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
@@ -352,3 +354,4 @@ void initLoop(int i)
         for (int k = 0; k < size; k++)
             A[i * size + j] += L[i * size + k] * U[k * size + j];
 }
+#endif

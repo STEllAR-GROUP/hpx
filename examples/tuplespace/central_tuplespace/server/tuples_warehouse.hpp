@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/chrono.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
@@ -321,3 +323,4 @@ namespace examples { namespace server {
 }}    // namespace examples::server
 
 #undef TS_DEBUG
+#endif

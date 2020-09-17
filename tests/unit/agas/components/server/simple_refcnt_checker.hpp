@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/modules/actions.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
@@ -55,4 +57,4 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::test::server::simple_refcnt_checker::take_reference_action,
     simple_refcnt_checker_take_reference_action);
 
-
+#endif

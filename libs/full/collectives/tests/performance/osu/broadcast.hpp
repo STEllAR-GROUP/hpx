@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/util/bind_action.hpp>
 
@@ -185,3 +187,4 @@ namespace hpx { namespace lcos {
         }
     }    // namespace detail
 }}       // namespace hpx::lcos
+#endif
