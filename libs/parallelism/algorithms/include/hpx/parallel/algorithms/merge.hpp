@@ -396,6 +396,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     util::detail::handle_local_exceptions<ExPolicy>::call(
                         std::current_exception());
+                    HPX_ASSERT(false);
+                    // To silence no return statement in all control blocks
+                    auto len1 = detail::distance(first1, last1);
+                    auto len2 = detail::distance(first2, last2);
+                    return {std::next(first1, len1), std::next(first2, len2),
+                        std::next(dest, len1 + len2)};
                 }
 
                 // Not reachable.
@@ -688,6 +694,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     // Not reachable.
                     HPX_ASSERT(false);
+                    return last;
                 });
         }
 
