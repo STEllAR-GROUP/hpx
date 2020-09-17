@@ -153,6 +153,7 @@ jobs:
           name: Check that the modules are well clang-formatted
           command: |
               cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
+              clang-format --version
               clang-format -i **/*.{cpp,hpp}
               git diff --exit-code > /tmp/modified_clang_format_files.txt
       - store_artifacts:
@@ -169,6 +170,7 @@ jobs:
           name: Check that CMake files are well cmake-formatted
           command: |
               cd /hpx/source && shopt -s globstar # to activate the ** globbing
+              cmake-format --version
               cmake-format -i **/*.cmake **/CMakeLists.txt
               git diff --exit-code > /tmp/modified_cmake_format_files.txt
       - store_artifacts:
