@@ -13,8 +13,8 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -44,7 +44,8 @@ int hpx_main(int argc, char* argv[])
         bool up = true;
         std::vector<hpx::future<void>> fs;
 
-        hpx::parallel::execution::pool_executor exec("default");
+        hpx::execution::parallel_executor exec(
+            hpx::resource::get_thread_pool("default"));
 
         std::random_device rd;
         std::mt19937 gen(rd());

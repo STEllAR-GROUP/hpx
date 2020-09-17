@@ -105,11 +105,11 @@ namespace hpx { namespace parallel { namespace execution {
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
         async_execute(F&& f, Ts&&... ts)
         {
-            return detail::thread_pool_async_execute_helper(pool_, priority_,
+            return hpx::detail::async_launch_policy_dispatch<decltype(
+                launch::async)>::call(launch::async, pool_, priority_,
                 stacksize_,
                 threads::thread_schedule_hint(get_next_thread_num()),
-                hpx::launch::async, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename Future, typename... Ts>
@@ -117,18 +117,33 @@ namespace hpx { namespace parallel { namespace execution {
             Future, Ts...>::type>
         then_execute(F&& f, Future&& predecessor, Ts&&... ts)
         {
-            return detail::thread_pool_then_execute_helper(*this, launch::async,
-                std::forward<F>(f), std::forward<Future>(predecessor),
-                std::forward<Ts>(ts)...);
+            using result_type =
+                typename hpx::util::detail::invoke_deferred_result<F, Future,
+                    Ts...>::type;
+
+            auto&& func = hpx::util::one_shot(hpx::util::bind_back(
+                std::forward<F>(f), std::forward<Ts>(ts)...));
+
+            typename hpx::traits::detail::shared_state_ptr<result_type>::type
+                p = hpx::lcos::detail::make_continuation_exec<result_type>(
+                    std::forward<Future>(predecessor), *this, std::move(func));
+
+            return hpx::traits::future_access<
+                hpx::lcos::future<result_type>>::create(std::move(p));
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
         template <typename F, typename... Ts>
         void post(F&& f, Ts&&... ts)
         {
-            return detail::thread_pool_post_helper(pool_, priority_, stacksize_,
+            char const* annotation =
+                hpx::traits::get_function_annotation<F>::call(f);
+            hpx::util::thread_description desc(f, annotation);
+
+            detail::post_policy_dispatch<decltype(launch::async)>::call(
+                launch::async, desc, pool_, priority_, stacksize_,
                 threads::thread_schedule_hint(get_next_thread_num()),
-                launch::async, std::forward<F>(f), std::forward<Ts>(ts)...);
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename S, typename... Ts>
@@ -136,7 +151,7 @@ namespace hpx { namespace parallel { namespace execution {
             typename detail::bulk_function_result<F, S, Ts...>::type>>
         bulk_async_execute(F&& f, S const& shape, Ts&&... ts) const
         {
-            return detail::thread_pool_bulk_async_execute_helper(pool_,
+            return detail::hierarchical_bulk_async_execute_helper(pool_,
                 priority_, stacksize_, schedulehint_, first_thread_,
                 num_threads_, hierarchical_threshold_, launch::async,
                 std::forward<F>(f), shape, std::forward<Ts>(ts)...);
@@ -148,7 +163,7 @@ namespace hpx { namespace parallel { namespace execution {
         bulk_then_execute(
             F&& f, S const& shape, Future&& predecessor, Ts&&... ts)
         {
-            return detail::thread_pool_bulk_then_execute_helper(*this,
+            return detail::hierarchical_bulk_then_execute_helper(*this,
                 launch::async, std::forward<F>(f), shape,
                 std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
         }

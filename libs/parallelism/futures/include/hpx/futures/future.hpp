@@ -395,6 +395,12 @@ namespace hpx { namespace lcos { namespace detail {
     inline typename traits::detail::shared_state_ptr<ContResult>::type
     make_continuation_exec(Future const& future, Executor&& exec, F&& f);
 
+    template <typename ContResult, typename Future, typename Executor,
+        typename Policy, typename F>
+    inline typename traits::detail::shared_state_ptr<ContResult>::type
+    make_continuation_exec_policy(
+        Future const& future, Executor&& exec, Policy&& policy, F&& f);
+
     template <typename ContResult, typename Allocator, typename Future,
         typename Policy, typename F>
     inline typename traits::detail::shared_state_ptr<

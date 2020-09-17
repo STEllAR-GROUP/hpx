@@ -505,24 +505,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
             timing = run_benchmark<>(
                 iterations, vector_size, std::move(alloc), std::move(policy));
         }
-        else if (executor == 3)
-        {
-            // Thread pool executor and allocator with thread pool executor.
-            using executor_type =
-                hpx::parallel::execution::thread_pool_executor;
-
-            auto policy = hpx::execution::par.on(executor_type());
-            hpx::compute::host::detail::policy_allocator<STREAM_TYPE,
-                decltype(policy)>
-                alloc(policy);
-
-            timing = run_benchmark<>(
-                iterations, vector_size, std::move(alloc), std::move(policy));
-        }
         else
         {
             HPX_THROW_EXCEPTION(hpx::commandline_option_error, "hpx_main",
-                "Invalid executor id given (0-3 allowed");
+                "Invalid executor id given (0-2 allowed");
         }
     }
     time_total = mysecond() - time_total;
@@ -601,8 +587,8 @@ int main(int argc, char* argv[])
              hpx::program_options::value<std::size_t>()->default_value(0),
             "size of vector (default: 1024)")
         (   "executor",
-            hpx::program_options::value<std::size_t>()->default_value(3),
-            "executor to use (0-3) (default: 3, thread_pool_executor)")
+            hpx::program_options::value<std::size_t>()->default_value(2),
+            "executor to use (0-2) (default: 2, parallel_executor)")
 
 #if defined(HPX_HAVE_COMPUTE)
         (   "use-accelerator",

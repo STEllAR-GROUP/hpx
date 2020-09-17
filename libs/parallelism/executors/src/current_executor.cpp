@@ -15,15 +15,14 @@ namespace hpx { namespace threads {
         {
             HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::get_executor",
                 "null thread id encountered");
-            return parallel::execution::current_executor(
-                static_cast<policies::scheduler_base*>(nullptr));
+            return parallel::execution::current_executor();
         }
 
         if (&ec != &throws)
             ec = make_success_code();
 
         return parallel::execution::current_executor(
-            get_thread_id_data(id)->get_scheduler_base());
+            get_thread_id_data(id)->get_scheduler_base()->get_parent_pool());
     }
 }}    // namespace hpx::threads
 

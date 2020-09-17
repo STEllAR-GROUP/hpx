@@ -9,12 +9,14 @@
 #include <hpx/config.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <cstdint>
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace parallel { namespace execution { namespace detail {
@@ -24,12 +26,24 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     struct post_policy_dispatch
     {
         template <typename F, typename... Ts>
-        static void call(Policy const&,
+        static void call(Policy const& policy,
             hpx::util::thread_description const& desc,
             threads::thread_pool_base* pool, threads::thread_priority priority,
             threads::thread_stacksize stacksize,
             threads::thread_schedule_hint hint, F&& f, Ts&&... ts)
         {
+            if (policy == launch::sync)
+            {
+                using result_type =
+                    typename hpx::util::detail::invoke_deferred_result<F,
+                        Ts...>::type;
+
+                using is_void = typename std::is_void<result_type>::type;
+                hpx::detail::call_sync(
+                    is_void{}, std::forward<F>(f), std::forward<Ts>(ts)...);
+                return;
+            }
+
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...)),
@@ -38,12 +52,24 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         }
 
         template <typename F, typename... Ts>
-        static void call(Policy const&,
+        static void call(Policy const& policy,
             hpx::util::thread_description const& desc,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize,
             threads::thread_schedule_hint hint, F&& f, Ts&&... ts)
         {
+            if (policy == launch::sync)
+            {
+                using result_type =
+                    typename hpx::util::detail::invoke_deferred_result<F,
+                        Ts...>::type;
+
+                using is_void = typename std::is_void<result_type>::type;
+                hpx::detail::call_sync(
+                    is_void{}, std::forward<F>(f), std::forward<Ts>(ts)...);
+                return;
+            }
+
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...)),
@@ -55,6 +81,18 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         static void call(Policy const& policy,
             hpx::util::thread_description const& desc, F&& f, Ts&&... ts)
         {
+            if (policy == launch::sync)
+            {
+                using result_type =
+                    typename hpx::util::detail::invoke_deferred_result<F,
+                        Ts...>::type;
+
+                using is_void = typename std::is_void<result_type>::type;
+                hpx::detail::call_sync(
+                    is_void{}, std::forward<F>(f), std::forward<Ts>(ts)...);
+                return;
+            }
+
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...)),
@@ -116,6 +154,55 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 threads::thread_stacksize_default,
                 threads::thread_schedule_hint{}, std::forward<F>(f),
                 std::forward<Ts>(ts)...);
+        }
+    };
+
+    template <>
+    struct post_policy_dispatch<launch::sync_policy>
+    {
+        template <typename F, typename... Ts>
+        static void call(launch::sync_policy const&,
+            hpx::util::thread_description const& desc,
+            threads::thread_pool_base* pool, threads::thread_priority priority,
+            threads::thread_stacksize stacksize,
+            threads::thread_schedule_hint /*hint*/, F&& f, Ts&&... ts)
+        {
+            using result_type =
+                typename hpx::util::detail::invoke_deferred_result<F,
+                    Ts...>::type;
+
+            using is_void = typename std::is_void<result_type>::type;
+            hpx::detail::call_sync(
+                is_void{}, std::forward<F>(f), std::forward<Ts>(ts)...);
+        }
+
+        template <typename F, typename... Ts>
+        static void call(launch::sync_policy const& policy,
+            hpx::util::thread_description const& desc,
+            threads::thread_priority priority,
+            threads::thread_stacksize stacksize,
+            threads::thread_schedule_hint hint, F&& f, Ts&&... ts)
+        {
+            using result_type =
+                typename hpx::util::detail::invoke_deferred_result<F,
+                    Ts...>::type;
+
+            using is_void = typename std::is_void<result_type>::type;
+            hpx::detail::call_sync(
+                is_void{}, std::forward<F>(f), std::forward<Ts>(ts)...);
+        }
+
+        template <typename F, typename... Ts>
+        static void call(launch::sync_policy const& policy,
+            hpx::util::thread_description const& desc, F&& f, Ts&&... ts)
+        {
+            using result_type =
+                typename hpx::util::detail::invoke_deferred_result<F,
+                    Ts...>::type;
+
+            using is_void = typename std::is_void<result_type>::type;
+            hpx::detail::call_sync(
+                is_void{}, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
     };
 }}}}    // namespace hpx::parallel::execution::detail

@@ -15,9 +15,9 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/modules/timing.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -45,7 +45,8 @@ int hpx_main(int argc, char* argv[])
 
     hpx::threads::thread_pool_base& worker_pool =
         hpx::resource::get_thread_pool("worker");
-    hpx::parallel::execution::pool_executor worker_exec("worker");
+    hpx::execution::parallel_executor worker_exec(
+        &hpx::resource::get_thread_pool("worker"));
     std::size_t const worker_pool_threads =
         hpx::resource::get_num_threads("worker");
 

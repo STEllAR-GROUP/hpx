@@ -295,4 +295,25 @@ namespace hpx { namespace lcos { namespace detail {
                 launch::async_policy{});
         return p;
     }
+
+    template <typename ContResult, typename Future, typename Executor,
+        typename Policy, typename F>
+    inline typename traits::detail::shared_state_ptr<ContResult>::type
+    make_continuation_exec_policy(
+        Future const& future, Executor&& exec, Policy&& policy, F&& f)
+    {
+        using shared_state = detail::continuation<Future, F, ContResult>;
+        using init_no_addref = typename shared_state::init_no_addref;
+        using spawner_type =
+            executor_spawner<typename std::decay<Executor>::type>;
+
+        // create a continuation
+        typename traits::detail::shared_state_ptr<ContResult>::type p(
+            new shared_state(init_no_addref{}, std::forward<F>(f)), false);
+        static_cast<shared_state*>(p.get())
+            ->template attach_nounwrap<spawner_type>(future,
+                spawner_type{std::forward<Executor>(exec)},
+                std::forward<Policy>(policy));
+        return p;
+    }
 }}}    // namespace hpx::lcos::detail
