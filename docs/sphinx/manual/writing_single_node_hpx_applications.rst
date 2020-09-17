@@ -572,14 +572,18 @@ Parallel algorithms
      * Description
      * In header
      * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::parallel::v1::is_heap`
+   * * :cpp:func:`hpx::is_heap`
      * Returns ``true`` if the range is max heap.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`is_heap`
-   * * :cpp:func:`hpx::parallel::v1::is_heap_until`
+   * * :cpp:func:`hpx::is_heap_until`
      * Returns the first element that breaks a max heap.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`is_heap_until`
+   * * :cpp:func:`hpx::make_heap`
+     * Constructs a max heap in the range [first, last).
+     * ``<hpx/algorithm.hpp>``
+     * :cppreference-algorithm:`make_heap`
 
 .. list-table:: Minimum/maximum operations (In Header: <hpx/algorithm.hpp>)
 

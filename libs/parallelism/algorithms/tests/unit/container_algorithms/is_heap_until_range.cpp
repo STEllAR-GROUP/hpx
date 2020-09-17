@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -52,14 +53,10 @@ struct user_defined_type
 };
 
 ////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename DataType>
-void test_is_heap_until(ExPolicy policy, DataType)
+template <typename DataType>
+void test_is_heap_until(DataType)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
-    using hpx::get;
+    using hpx::util::get;
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size);
@@ -68,14 +65,14 @@ void test_is_heap_until(ExPolicy policy, DataType)
     auto heap_end_iter = std::next(std::begin(c), std::rand() % c.size());
     std::make_heap(std::begin(c), heap_end_iter);
 
-    auto result = hpx::parallel::is_heap_until(policy, c);
+    auto result = hpx::ranges::is_heap_until(c);
     auto solution = std::is_heap_until(std::begin(c), std::end(c));
 
     HPX_TEST(result == solution);
 }
 
 template <typename ExPolicy, typename DataType>
-void test_is_heap_until_async(ExPolicy policy, DataType)
+void test_is_heap_until(ExPolicy&& policy, DataType)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -90,7 +87,29 @@ void test_is_heap_until_async(ExPolicy policy, DataType)
     auto heap_end_iter = std::next(std::begin(c), std::rand() % c.size());
     std::make_heap(std::begin(c), heap_end_iter);
 
-    auto f = hpx::parallel::is_heap_until(policy, c);
+    auto result = hpx::ranges::is_heap_until(policy, c);
+    auto solution = std::is_heap_until(std::begin(c), std::end(c));
+
+    HPX_TEST(result == solution);
+}
+
+template <typename ExPolicy, typename DataType>
+void test_is_heap_until_async(ExPolicy&& policy, DataType)
+{
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+
+    using hpx::get;
+
+    std::size_t const size = 10007;
+    std::vector<DataType> c(size);
+    std::iota(std::begin(c), std::end(c), DataType(std::rand()));
+
+    auto heap_end_iter = std::next(std::begin(c), std::rand() % c.size());
+    std::make_heap(std::begin(c), heap_end_iter);
+
+    auto f = hpx::ranges::is_heap_until(policy, c);
     auto result = f.get();
     auto solution = std::is_heap_until(std::begin(c), std::end(c));
 
@@ -101,6 +120,8 @@ template <typename DataType>
 void test_is_heap_until()
 {
     using namespace hpx::execution;
+
+    test_is_heap_until(DataType());
 
     test_is_heap_until(seq, DataType());
     test_is_heap_until(par, DataType());

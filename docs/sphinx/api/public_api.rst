@@ -53,12 +53,13 @@ Functions
 - :cpp:func:`hpx::generate_n`
 - :cpp:func:`hpx::parallel::v1::includes`
 - :cpp:func:`hpx::parallel::v1::inplace_merge`
-- :cpp:func:`hpx::parallel::v1::is_heap`
-- :cpp:func:`hpx::parallel::v1::is_heap_until`
+- :cpp:func:`hpx::is_heap`
+- :cpp:func:`hpx::is_heap_until`
 - :cpp:func:`hpx::parallel::v1::is_partitioned`
 - :cpp:func:`hpx::parallel::v1::is_sorted`
 - :cpp:func:`hpx::parallel::v1::is_sorted_until`
 - :cpp:func:`hpx::parallel::v1::lexicographical_compare`
+- :cpp:func:`hpx::make_heap`
 - :cpp:func:`hpx::parallel::v1::max_element`
 - :cpp:func:`hpx::parallel::v1::merge`
 - :cpp:func:`hpx::parallel::v1::min_element`

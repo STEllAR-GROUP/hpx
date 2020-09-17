@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -75,9 +76,39 @@ struct user_defined_type
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag, typename DataType>
+void test_is_heap(IteratorTag, DataType, bool test_for_is_heap = true)
+{
+    typedef typename std::vector<DataType>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<DataType> c(10007);
+    std::iota(std::begin(c), std::end(c), DataType(gen()));
+
+    auto heap_end_iter = std::next(std::begin(c), dis(gen));
+    std::make_heap(std::begin(c), heap_end_iter);
+
+    if (test_for_is_heap)
+    {
+        bool result =
+            hpx::is_heap(iterator(std::begin(c)), iterator(std::end(c)));
+        bool solution = std::is_heap(std::begin(c), std::end(c));
+
+        HPX_TEST_EQ(result, solution);
+    }
+    else
+    {
+        iterator result =
+            hpx::is_heap_until(iterator(std::begin(c)), iterator(std::end(c)));
+        auto solution = std::is_heap_until(std::begin(c), std::end(c));
+
+        HPX_TEST(result.base() == solution);
+    }
+}
+
 template <typename ExPolicy, typename IteratorTag, typename DataType>
 void test_is_heap(
-    ExPolicy policy, IteratorTag, DataType, bool test_for_is_heap = true)
+    ExPolicy&& policy, IteratorTag, DataType, bool test_for_is_heap = true)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -94,7 +125,7 @@ void test_is_heap(
 
     if (test_for_is_heap)
     {
-        bool result = hpx::parallel::is_heap(
+        bool result = hpx::is_heap(
             policy, iterator(std::begin(c)), iterator(std::end(c)));
         bool solution = std::is_heap(std::begin(c), std::end(c));
 
@@ -102,7 +133,7 @@ void test_is_heap(
     }
     else
     {
-        iterator result = hpx::parallel::is_heap_until(
+        iterator result = hpx::is_heap_until(
             policy, iterator(std::begin(c)), iterator(std::end(c)));
         auto solution = std::is_heap_until(std::begin(c), std::end(c));
 
@@ -110,9 +141,40 @@ void test_is_heap(
     }
 }
 
+template <typename IteratorTag, typename DataType, typename Pred>
+void test_is_heap_with_pred(
+    IteratorTag, DataType, Pred pred, bool test_for_is_heap = true)
+{
+    typedef typename std::vector<DataType>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<DataType> c(10007);
+    std::iota(std::begin(c), std::end(c), DataType(gen()));
+
+    auto heap_end_iter = std::next(std::begin(c), dis(gen));
+    std::make_heap(std::begin(c), heap_end_iter);
+
+    if (test_for_is_heap)
+    {
+        bool result =
+            hpx::is_heap(iterator(std::begin(c)), iterator(std::end(c)), pred);
+        bool solution = std::is_heap(std::begin(c), std::end(c), pred);
+
+        HPX_TEST_EQ(result, solution);
+    }
+    else
+    {
+        iterator result = hpx::is_heap_until(
+            iterator(std::begin(c)), iterator(std::end(c)), pred);
+        auto solution = std::is_heap_until(std::begin(c), std::end(c), pred);
+
+        HPX_TEST(result.base() == solution);
+    }
+}
+
 template <typename ExPolicy, typename IteratorTag, typename DataType,
     typename Pred>
-void test_is_heap_with_pred(ExPolicy policy, IteratorTag, DataType, Pred pred,
+void test_is_heap_with_pred(ExPolicy&& policy, IteratorTag, DataType, Pred pred,
     bool test_for_is_heap = true)
 {
     static_assert(
@@ -130,7 +192,7 @@ void test_is_heap_with_pred(ExPolicy policy, IteratorTag, DataType, Pred pred,
 
     if (test_for_is_heap)
     {
-        bool result = hpx::parallel::is_heap(
+        bool result = hpx::is_heap(
             policy, iterator(std::begin(c)), iterator(std::end(c)), pred);
         bool solution = std::is_heap(std::begin(c), std::end(c), pred);
 
@@ -138,7 +200,7 @@ void test_is_heap_with_pred(ExPolicy policy, IteratorTag, DataType, Pred pred,
     }
     else
     {
-        iterator result = hpx::parallel::is_heap_until(
+        iterator result = hpx::is_heap_until(
             policy, iterator(std::begin(c)), iterator(std::end(c)), pred);
         auto solution = std::is_heap_until(std::begin(c), std::end(c), pred);
 
@@ -148,7 +210,7 @@ void test_is_heap_with_pred(ExPolicy policy, IteratorTag, DataType, Pred pred,
 
 template <typename ExPolicy, typename IteratorTag, typename DataType>
 void test_is_heap_async(
-    ExPolicy policy, IteratorTag, DataType, bool test_for_is_heap = true)
+    ExPolicy&& policy, IteratorTag, DataType, bool test_for_is_heap = true)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -165,7 +227,7 @@ void test_is_heap_async(
 
     if (test_for_is_heap)
     {
-        auto f = hpx::parallel::is_heap(
+        auto f = hpx::is_heap(
             policy, iterator(std::begin(c)), iterator(std::end(c)));
         bool result = f.get();
         bool solution = std::is_heap(std::begin(c), std::end(c));
@@ -174,7 +236,7 @@ void test_is_heap_async(
     }
     else
     {
-        auto f = hpx::parallel::is_heap_until(
+        auto f = hpx::is_heap_until(
             policy, iterator(std::begin(c)), iterator(std::end(c)));
         iterator result = f.get();
         auto solution = std::is_heap_until(std::begin(c), std::end(c));
@@ -184,9 +246,49 @@ void test_is_heap_async(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_is_heap_exception(IteratorTag, bool test_for_is_heap = true)
+{
+    typedef std::vector<int>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<int> c(10007);
+    std::iota(std::begin(c), std::end(c), gen());
+    std::make_heap(std::begin(c), std::end(c));
+
+    bool caught_exception = false;
+    try
+    {
+        if (test_for_is_heap)
+        {
+            hpx::is_heap(
+                iterator(std::begin(c)), iterator(std::end(c)), throw_always());
+        }
+        else
+        {
+            hpx::is_heap_until(
+                iterator(std::begin(c)), iterator(std::end(c)), throw_always());
+        }
+
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<hpx::execution::sequenced_policy,
+            IteratorTag>::call(hpx::execution::seq, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_is_heap_exception(
-    ExPolicy policy, IteratorTag, bool test_for_is_heap = true)
+    ExPolicy&& policy, IteratorTag, bool test_for_is_heap = true)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -204,12 +306,12 @@ void test_is_heap_exception(
     {
         if (test_for_is_heap)
         {
-            hpx::parallel::is_heap(policy, iterator(std::begin(c)),
-                iterator(std::end(c)), throw_always());
+            hpx::is_heap(policy, iterator(std::begin(c)), iterator(std::end(c)),
+                throw_always());
         }
         else
         {
-            hpx::parallel::is_heap_until(policy, iterator(std::begin(c)),
+            hpx::is_heap_until(policy, iterator(std::begin(c)),
                 iterator(std::end(c)), throw_always());
         }
 
@@ -230,7 +332,7 @@ void test_is_heap_exception(
 
 template <typename ExPolicy, typename IteratorTag>
 void test_is_heap_exception_async(
-    ExPolicy policy, IteratorTag, bool test_for_is_heap = true)
+    ExPolicy&& policy, IteratorTag, bool test_for_is_heap = true)
 {
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -245,15 +347,15 @@ void test_is_heap_exception_async(
     {
         if (test_for_is_heap)
         {
-            auto f = hpx::parallel::is_heap(policy, iterator(std::begin(c)),
+            auto f = hpx::is_heap(policy, iterator(std::begin(c)),
                 iterator(std::end(c)), throw_always());
             returned_from_algorithm = true;
             f.get();
         }
         else
         {
-            auto f = hpx::parallel::is_heap_until(policy,
-                iterator(std::begin(c)), iterator(std::end(c)), throw_always());
+            auto f = hpx::is_heap_until(policy, iterator(std::begin(c)),
+                iterator(std::end(c)), throw_always());
             returned_from_algorithm = true;
             f.get();
         }
@@ -275,9 +377,47 @@ void test_is_heap_exception_async(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_is_heap_bad_alloc(IteratorTag, bool test_for_is_heap = true)
+{
+    typedef std::vector<int>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<int> c(10007);
+    std::iota(std::begin(c), std::end(c), gen());
+    std::make_heap(std::begin(c), std::end(c));
+
+    bool caught_bad_alloc = false;
+    try
+    {
+        if (test_for_is_heap)
+        {
+            hpx::is_heap(iterator(std::begin(c)), iterator(std::end(c)),
+                throw_bad_alloc());
+        }
+        else
+        {
+            hpx::is_heap_until(iterator(std::begin(c)), iterator(std::end(c)),
+                throw_bad_alloc());
+        }
+
+        HPX_TEST(false);
+    }
+    catch (std::bad_alloc const&)
+    {
+        caught_bad_alloc = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_bad_alloc);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_is_heap_bad_alloc(
-    ExPolicy policy, IteratorTag, bool test_for_is_heap = true)
+    ExPolicy&& policy, IteratorTag, bool test_for_is_heap = true)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -295,12 +435,12 @@ void test_is_heap_bad_alloc(
     {
         if (test_for_is_heap)
         {
-            hpx::parallel::is_heap(policy, iterator(std::begin(c)),
-                iterator(std::end(c)), throw_bad_alloc());
+            hpx::is_heap(policy, iterator(std::begin(c)), iterator(std::end(c)),
+                throw_bad_alloc());
         }
         else
         {
-            hpx::parallel::is_heap_until(policy, iterator(std::begin(c)),
+            hpx::is_heap_until(policy, iterator(std::begin(c)),
                 iterator(std::end(c)), throw_bad_alloc());
         }
 
@@ -320,7 +460,7 @@ void test_is_heap_bad_alloc(
 
 template <typename ExPolicy, typename IteratorTag>
 void test_is_heap_bad_alloc_async(
-    ExPolicy policy, IteratorTag, bool test_for_is_heap = true)
+    ExPolicy&& policy, IteratorTag, bool test_for_is_heap = true)
 {
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -335,16 +475,15 @@ void test_is_heap_bad_alloc_async(
     {
         if (test_for_is_heap)
         {
-            auto f = hpx::parallel::is_heap(policy, iterator(std::begin(c)),
+            auto f = hpx::is_heap(policy, iterator(std::begin(c)),
                 iterator(std::end(c)), throw_bad_alloc());
             returned_from_algorithm = true;
             f.get();
         }
         else
         {
-            auto f =
-                hpx::parallel::is_heap_until(policy, iterator(std::begin(c)),
-                    iterator(std::end(c)), throw_bad_alloc());
+            auto f = hpx::is_heap_until(policy, iterator(std::begin(c)),
+                iterator(std::end(c)), throw_bad_alloc());
             returned_from_algorithm = true;
             f.get();
         }
@@ -370,15 +509,19 @@ void test_is_heap(bool test_for_is_heap = true)
 {
     using namespace hpx::execution;
 
+    test_is_heap(IteratorTag(), int(), test_for_is_heap);
     test_is_heap(seq, IteratorTag(), int(), test_for_is_heap);
     test_is_heap(par, IteratorTag(), int(), test_for_is_heap);
     test_is_heap(par_unseq, IteratorTag(), int(), test_for_is_heap);
 
+    test_is_heap(IteratorTag(), user_defined_type(), test_for_is_heap);
     test_is_heap(seq, IteratorTag(), user_defined_type(), test_for_is_heap);
     test_is_heap(par, IteratorTag(), user_defined_type(), test_for_is_heap);
     test_is_heap(
         par_unseq, IteratorTag(), user_defined_type(), test_for_is_heap);
 
+    test_is_heap_with_pred(
+        IteratorTag(), int(), std::greater<int>(), test_for_is_heap);
     test_is_heap_with_pred(
         seq, IteratorTag(), int(), std::greater<int>(), test_for_is_heap);
     test_is_heap_with_pred(
@@ -401,6 +544,8 @@ void test_is_heap_exception(bool test_for_is_heap = true)
 {
     using namespace hpx::execution;
 
+    test_is_heap_exception(IteratorTag(), test_for_is_heap);
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
@@ -416,6 +561,8 @@ template <typename IteratorTag>
 void test_is_heap_bad_alloc(bool test_for_is_heap = true)
 {
     using namespace hpx::execution;
+
+    test_is_heap_bad_alloc(IteratorTag(), test_for_is_heap);
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
