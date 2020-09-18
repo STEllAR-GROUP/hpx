@@ -189,14 +189,9 @@ function(write_config_defines_file)
     endif()
   endforeach()
 
-  # write to temporary file first and copy only if necessary
-  string(TOUPPER ${OPTION_NAMESPACE} NAMESPACE_UPPER)
-  set(TEMP_FILENAME
-      "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${NAMESPACE_UPPER}"
-  )
-
   # if the user has not specified a template, generate a proper header file
   if(NOT OPTION_TEMPLATE)
+    string(TOUPPER ${OPTION_NAMESPACE} NAMESPACE_UPPER)
     set(PREAMBLE
         "//  Copyright (c) 2019-2020 STE||AR Group\n"
         "//\n"
@@ -208,15 +203,13 @@ function(write_config_defines_file)
         "\n"
         "#pragma once"
     )
-    file(WRITE ${TEMP_FILENAME} ${PREAMBLE} ${hpx_config_defines})
+    set(TEMP_FILENAME
+        "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${NAMESPACE_UPPER}"
+    )
+    file(WRITE ${TEMP_FILENAME} ${PREAMBLE} ${hpx_config_defines} "\n")
+    configure_file("${TEMP_FILENAME}" "${OPTION_FILENAME}" COPYONLY)
+    file(REMOVE "${TEMP_FILENAME}")
   else()
-    configure_file("${OPTION_TEMPLATE}" "${TEMP_FILENAME}" @ONLY)
+    configure_file("${OPTION_TEMPLATE}" "${OPTION_FILENAME}" @ONLY)
   endif()
-
-  # now copy the file, if it's different
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${TEMP_FILENAME}"
-            "${OPTION_FILENAME}"
-  )
-  file(REMOVE "${TEMP_FILENAME}")
 endfunction()

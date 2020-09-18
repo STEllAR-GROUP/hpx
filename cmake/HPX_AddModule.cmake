@@ -157,20 +157,10 @@ function(add_hpx_module libname modulename)
         set(module_headers "${module_headers}#include <${header_file}>\n")
       endif()
     endforeach(header_file)
-
-    # write to temporary file first and copy only if necessary
-    set(TEMP_FILENAME
-        "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${modulename_upper}"
-    )
     configure_file(
       "${PROJECT_SOURCE_DIR}/cmake/templates/global_module_header.hpp.in"
-      "${TEMP_FILENAME}"
+      "${global_header}"
     )
-    execute_process(
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different "${TEMP_FILENAME}"
-              "${global_header}"
-    )
-    file(REMOVE "${TEMP_FILENAME}")
     set(generated_headers ${global_header})
   endif()
 
@@ -192,21 +182,10 @@ function(add_hpx_module libname modulename)
     set(global_config_file
         ${CMAKE_CURRENT_BINARY_DIR}/include/hpx/config/version.hpp
     )
-
-    # write to temporary file first and copy only if necessary
-    set(TEMP_FILENAME
-        "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${modulename_upper}"
-    )
     configure_file(
       "${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/config_version.hpp.in"
-      "${TEMP_FILENAME}" @ONLY
+      "${global_config_file}" @ONLY
     )
-    execute_process(
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different "${TEMP_FILENAME}"
-              "${global_config_file}"
-    )
-    file(REMOVE "${TEMP_FILENAME}")
-
     set(generated_headers ${generated_headers} ${global_config_file})
     # Global config defines file (different from the one for each module)
     set(global_config_file
