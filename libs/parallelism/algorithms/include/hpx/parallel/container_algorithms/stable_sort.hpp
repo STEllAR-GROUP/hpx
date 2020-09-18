@@ -91,7 +91,7 @@ namespace hpx { namespace parallel { inline namespace rangev1 {
         typename Compare = v1::detail::less,
         typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_range<Rng>::value&&
             traits::is_projected_range<Proj, Rng>::value&&
             traits::is_indirect_callable<ExPolicy, Compare,

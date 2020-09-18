@@ -175,9 +175,8 @@ namespace hpx { namespace lcos { namespace local {
     std::vector<hpx::future<void>> define_spmd_block(
         ExPolicy&& policy, std::size_t num_images, F&& f, Args&&... args)
     {
-        static_assert(
-            parallel::execution::is_async_execution_policy<ExPolicy>::value,
-            "parallel::execution::is_async_execution_policy<ExPolicy>::value");
+        static_assert(hpx::is_async_execution_policy<ExPolicy>::value,
+            "hpx::is_async_execution_policy<ExPolicy>::value");
 
         using ftype = typename std::decay<F>::type;
         using first_type = typename hpx::util::first_argument<ftype>::type;
@@ -208,13 +207,12 @@ namespace hpx { namespace lcos { namespace local {
     // Synchronous version
     template <typename ExPolicy, typename F, typename... Args,
         typename = typename std::enable_if<
-            !hpx::parallel::execution::is_async_execution_policy<
-                ExPolicy>::value>::type>
+            !hpx::is_async_execution_policy<ExPolicy>::value>::type>
     void define_spmd_block(
         ExPolicy&& policy, std::size_t num_images, F&& f, Args&&... args)
     {
-        static_assert(parallel::execution::is_execution_policy<ExPolicy>::value,
-            "parallel::execution::is_execution_policy<ExPolicy>::value");
+        static_assert(hpx::is_execution_policy<ExPolicy>::value,
+            "hpx::is_execution_policy<ExPolicy>::value");
 
         using ftype = typename std::decay<F>::type;
         using first_type = typename hpx::util::first_argument<ftype>::type;
@@ -277,8 +275,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
     // Synchronous version
     template <typename ExPolicy, typename F, typename... Args,
         typename = typename std::enable_if<
-            !hpx::parallel::execution::is_async_execution_policy<
-                ExPolicy>::value>::type>
+            !hpx::is_async_execution_policy<ExPolicy>::value>::type>
     void define_spmd_block(
         ExPolicy&& policy, std::size_t num_images, F&& f, Args&&... args)
     {

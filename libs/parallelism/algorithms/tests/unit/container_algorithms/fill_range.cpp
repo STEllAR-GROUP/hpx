@@ -41,9 +41,8 @@ void test_fill(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_fill(ExPolicy policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());

@@ -63,9 +63,8 @@ void test_count_if(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_count_if(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef std::vector<int>::difference_type diff_type;
@@ -135,9 +134,8 @@ void test_count_if_exception(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_count_if_exception(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -211,9 +209,8 @@ void test_count_if_exception_async(ExPolicy&& p, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_count_if_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>

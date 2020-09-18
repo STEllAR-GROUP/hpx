@@ -91,7 +91,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename Rng, typename OutIter, typename T,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
                     OutIter>::value&& traits::is_projected_range<Proj,
                     Rng>::value&& traits::is_indirect_callable<ExPolicy,
@@ -191,7 +191,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename Rng, typename OutIter, typename F,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
                     OutIter>::value&& traits::is_projected_range<Proj,
                     Rng>::value&& traits::is_indirect_callable<ExPolicy, F,

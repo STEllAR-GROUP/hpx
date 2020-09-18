@@ -216,7 +216,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           the last element moved.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter1>::value&&
                     hpx::traits::is_iterator<FwdIter2>::value)>
     typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
@@ -228,7 +228,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::uninitialized_move<FwdIter2>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last, dest);
@@ -352,7 +352,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter1, typename Size,
         typename FwdIter2,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter1>::value&&
                     hpx::traits::is_iterator<FwdIter2>::value)>
     typename util::detail::algorithm_result<ExPolicy,
@@ -365,7 +365,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         // if count is representing a negative value, we do nothing
         if (detail::is_negative(count))

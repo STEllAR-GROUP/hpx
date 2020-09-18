@@ -231,8 +231,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         find_(ExPolicy&& policy, FwdIter first, FwdIter last, T const& val,
             Proj&& proj, std::true_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             if (first == last)
             {
@@ -259,8 +258,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         find_if_(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
             Proj&& proj, std::true_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             if (first == last)
             {
@@ -288,8 +286,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         find_if_not_(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
             Proj&& proj, std::true_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             if (first == last)
             {

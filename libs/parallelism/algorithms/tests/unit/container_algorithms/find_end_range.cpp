@@ -53,9 +53,8 @@ void test_find_end1(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_find_end1(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
 
@@ -102,9 +101,8 @@ void test_find_end1_proj(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_find_end1_proj(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
 
@@ -229,9 +227,8 @@ void test_find_end2(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_find_end2(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
 
@@ -284,9 +281,8 @@ void test_find_end2_proj(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_find_end2_proj(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
 
@@ -421,9 +417,8 @@ void test_find_end3(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_find_end3(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
 
@@ -474,9 +469,8 @@ void test_find_end3_proj(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_find_end3_proj(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
 
@@ -611,9 +605,8 @@ void test_find_end4(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_find_end4(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
 
@@ -664,9 +657,8 @@ void test_find_end4_proj(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_find_end4_proj(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
 

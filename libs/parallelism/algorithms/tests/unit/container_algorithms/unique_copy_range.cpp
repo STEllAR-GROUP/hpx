@@ -70,9 +70,8 @@ struct random_fill
 template <typename ExPolicy, typename DataType>
 void test_unique_copy(ExPolicy policy, DataType)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     using hpx::get;
 
@@ -95,9 +94,8 @@ void test_unique_copy(ExPolicy policy, DataType)
 template <typename ExPolicy, typename DataType>
 void test_unique_copy_async(ExPolicy policy, DataType)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     using hpx::get;
 

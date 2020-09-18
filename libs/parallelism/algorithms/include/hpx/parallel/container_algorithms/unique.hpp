@@ -90,7 +90,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename Rng, typename Pred = detail::equal_to,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
                     Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
                     Pred, traits::projected_range<Proj, Rng>,
@@ -181,7 +181,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename Rng, typename FwdIter2,
         typename Pred = detail::equal_to,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
                     FwdIter2>::value&& traits::is_projected_range<Proj,
                     Rng>::value&& traits::is_indirect_callable<ExPolicy, Pred,

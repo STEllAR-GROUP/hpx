@@ -10,13 +10,17 @@
 #include <hpx/algorithms/config/defines.hpp>
 #include <hpx/algorithm.hpp>
 
+// different versions of clang-format produce different results
+// clang-format off
 #if HPX_ALGORITHMS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/traits/segmented_iterator_traits.hpp is deprecated, \
     please include hpx/algorithms/traits/segmented_iterator_traits.hpp")
 #else
-#warning "The header hpx/traits/segmented_iterator_traits.hpp is deprecated, \
+#warning                                                                       \
+    "The header hpx/traits/segmented_iterator_traits.hpp is deprecated, \
     please include hpx/algorithms/traits/segmented_iterator_traits.hpp"
 #endif
 #endif
+// clang-format on

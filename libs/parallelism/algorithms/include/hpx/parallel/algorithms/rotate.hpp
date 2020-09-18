@@ -173,7 +173,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           pair(first + (last - new_first), last).
     ///
     template <typename ExPolicy, typename FwdIter,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter>::value)>
     typename util::detail::algorithm_result<ExPolicy,
         util::in_out_result<FwdIter, FwdIter>>::type
@@ -183,7 +183,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least forward iterator.");
 
         typedef std::integral_constant<bool,
-            execution::is_sequenced_execution_policy<ExPolicy>::value ||
+            hpx::is_sequenced_execution_policy<ExPolicy>::value ||
                 !hpx::traits::is_bidirectional_iterator<FwdIter>::value>
             is_seq;
 
@@ -315,7 +315,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         HPX_CONCEPT_REQUIRES_(hpx::traits::is_iterator<FwdIter1>::value&&
-                execution::is_execution_policy<ExPolicy>::value&&
+                hpx::is_execution_policy<ExPolicy>::value&&
                     hpx::traits::is_iterator<FwdIter2>::value)>
     typename util::detail::algorithm_result<ExPolicy,
         util::in_out_result<FwdIter1, FwdIter2>>::type
@@ -328,7 +328,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least forward iterator.");
 
         typedef std::integral_constant<bool,
-            execution::is_sequenced_execution_policy<ExPolicy>::value ||
+            hpx::is_sequenced_execution_policy<ExPolicy>::value ||
                 !hpx::traits::is_bidirectional_iterator<FwdIter1>::value>
             is_seq;
 

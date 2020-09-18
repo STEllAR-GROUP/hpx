@@ -92,9 +92,8 @@ struct random_fill
 template <typename ExPolicy, typename DataType>
 void test_inplace_merge(ExPolicy policy, DataType)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     std::size_t const left_size = 300007, right_size = 123456;
     std::vector<DataType> res(left_size + right_size), sol;
@@ -126,9 +125,8 @@ void test_inplace_merge(ExPolicy policy, DataType)
 template <typename ExPolicy, typename DataType>
 void test_inplace_merge_async(ExPolicy policy, DataType)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     std::size_t const left_size = 300007, right_size = 123456;
     std::vector<DataType> res(left_size + right_size), sol;

@@ -113,7 +113,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
 
-            typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             return detail::adjacent_difference<FwdIter2>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
@@ -181,8 +181,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
 
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
+    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
     adjacent_difference(
         ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
@@ -260,8 +259,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Op>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
+    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
     adjacent_difference(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest, Op&& op)

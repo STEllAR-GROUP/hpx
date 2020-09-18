@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,7 +13,7 @@
 
 #include <type_traits>
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx {
     namespace detail {
         /// \cond NOINTERNAL
         template <typename T>
@@ -61,10 +61,13 @@ namespace hpx { namespace parallel { namespace execution {
     ///
     template <typename T>
     struct is_execution_policy
-      : execution::detail::is_execution_policy<
-            typename hpx::util::decay<T>::type>
+      : hpx::detail::is_execution_policy<typename hpx::util::decay<T>::type>
     {
     };
+
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_execution_policy_v =
+        is_execution_policy<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     /// Extension: Detect whether given execution policy enables parallelization
@@ -81,10 +84,14 @@ namespace hpx { namespace parallel { namespace execution {
     ///
     template <typename T>
     struct is_parallel_execution_policy
-      : execution::detail::is_parallel_execution_policy<
+      : hpx::detail::is_parallel_execution_policy<
             typename hpx::util::decay<T>::type>
     {
     };
+
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_parallel_execution_policy_v =
+        is_parallel_execution_policy<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     /// Extension: Detect whether given execution policy does not enable
@@ -104,10 +111,14 @@ namespace hpx { namespace parallel { namespace execution {
     // extension:
     template <typename T>
     struct is_sequenced_execution_policy
-      : execution::detail::is_sequenced_execution_policy<
+      : hpx::detail::is_sequenced_execution_policy<
             typename hpx::util::decay<T>::type>
     {
     };
+
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_sequenced_execution_policy_v =
+        is_sequenced_execution_policy<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     /// Extension: Detect whether given execution policy makes algorithms
@@ -127,25 +138,77 @@ namespace hpx { namespace parallel { namespace execution {
     // extension:
     template <typename T>
     struct is_async_execution_policy
-      : execution::detail::is_async_execution_policy<
+      : hpx::detail::is_async_execution_policy<
             typename hpx::util::decay<T>::type>
     {
     };
+
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_async_execution_policy_v =
+        is_async_execution_policy<T>::value;
 
     /// \cond NOINTERNAL
     template <typename T>
     struct is_rebound_execution_policy
-      : execution::detail::is_rebound_execution_policy<
+      : hpx::detail::is_rebound_execution_policy<
             typename hpx::util::decay<T>::type>
     {
     };
 
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_rebound_execution_policy_v =
+        is_rebound_execution_policy<T>::value;
+
     // extension:
     template <typename T>
     struct is_vectorpack_execution_policy
-      : execution::detail::is_vectorpack_execution_policy<
+      : hpx::detail::is_vectorpack_execution_policy<
             typename hpx::util::decay<T>::type>
     {
     };
+
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_vectorpack_execution_policy_v =
+        is_vectorpack_execution_policy<T>::value;
+    /// \endcond
+}    // namespace hpx
+
+namespace hpx { namespace parallel { namespace execution {
+
+    template <typename T>
+    using is_execution_policy HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::execution::is_execution_policy is deprecated, use "
+        "hpx::is_execution_policy instead") = hpx::is_execution_policy<T>;
+
+    template <typename T>
+    using is_parallel_execution_policy HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::execution::is_parallel_execution_policy is deprecated, "
+        "use hpx::is_parallel_execution_policy instead") =
+        hpx::is_parallel_execution_policy<T>;
+
+    template <typename T>
+    using is_sequenced_execution_policy HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::execution::is_sequenced_execution_policy is "
+        "deprecated, use hpx::is_sequenced_execution_policy instead") =
+        hpx::is_sequenced_execution_policy<T>;
+
+    /// \cond
+    template <typename T>
+    using is_async_execution_policy HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::execution::is_async_execution_policy is deprecated, "
+        "use hpx::is_async_execution_policy instead") =
+        hpx::is_async_execution_policy<T>;
+
+    template <typename T>
+    using is_rebound_execution_policy HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::execution::is_rebound_execution_policy is deprecated, "
+        "use hpx::is_rebound_execution_policy instead") =
+        hpx::is_rebound_execution_policy<T>;
+
+    template <typename T>
+    using is_vectorpack_execution_policy HPX_DEPRECATED_V(1, 6,
+        "hpx:parallel::execution:::is_vectorpack_execution_policy is "
+        "deprecated, use hpx::is_vectorpack_execution_policy instead") =
+        hpx::is_vectorpack_execution_policy<T>;
     /// \endcond
 }}}    // namespace hpx::parallel::execution

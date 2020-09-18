@@ -39,8 +39,8 @@ namespace hpx { namespace compute { namespace host {
         /// The policy_allocator allocates blocks of memory touched according to
         /// the distribution policy of the given executor.
         template <typename T, typename Policy,
-            typename Enable = typename std::enable_if<hpx::parallel::execution::
-                    is_execution_policy<Policy>::value>::type>
+            typename Enable = typename std::enable_if<
+                hpx::is_execution_policy<Policy>::value>::type>
         struct policy_allocator
         {
             using policy_type = Policy;

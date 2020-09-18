@@ -195,8 +195,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             ExPolicy&& policy, InIterB first, InIterE last, T init, F&& f,
             std::true_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
             typedef typename hpx::util::decay<T>::type init_type;
 
             if (first == last)

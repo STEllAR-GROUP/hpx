@@ -284,7 +284,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Iter, typename Sent, typename T,
             typename Reduce, typename Convert,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::traits::is_invocable<Convert,
                     typename std::iterator_traits<Iter>::value_type
@@ -351,7 +351,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Iter2, typename T,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::traits::is_iterator<Iter2>::value
             )>
@@ -391,7 +391,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Iter2, typename T, typename Reduce, typename Convert,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::traits::is_iterator<Iter2>::value &&
                 hpx::traits::is_invocable<Convert,
@@ -461,7 +461,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Rng, typename T, typename Reduce,
             typename Convert,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::traits::is_invocable<Convert,
                     typename hpx::traits::range_iterator<Rng>::type
@@ -536,7 +536,7 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Rng, typename Iter2, typename T,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::traits::is_iterator<Iter2>::value
             )>
@@ -582,7 +582,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Rng, typename Iter2,
             typename T, typename Reduce, typename Convert,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::traits::is_iterator<Iter2>::value &&
                 hpx::traits::is_invocable<Convert,

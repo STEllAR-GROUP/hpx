@@ -117,8 +117,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           \a first2.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
+    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
     swap_ranges(
         ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
@@ -128,7 +127,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::swap_ranges<FwdIter2>().call(
             std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2);

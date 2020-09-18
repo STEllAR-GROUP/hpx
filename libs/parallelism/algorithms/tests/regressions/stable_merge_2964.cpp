@@ -46,9 +46,8 @@ struct random_fill
 template <typename ExPolicy, typename DataType>
 void test_merge_stable(ExPolicy policy, DataType, int rand_base)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef typename std::pair<DataType, int> ElemType;
 

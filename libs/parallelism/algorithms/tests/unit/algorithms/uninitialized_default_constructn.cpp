@@ -40,9 +40,8 @@ std::size_t const data_size = 10007;
 template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_default_construct_n(ExPolicy policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef default_constructable* base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -93,9 +92,8 @@ void test_uninitialized_default_construct_n_async(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_default_construct_n2(ExPolicy policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef value_constructable* base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -174,9 +172,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_default_construct_n_exception(
     ExPolicy policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef test::count_instances_v<default_constructable> data_type;
     typedef data_type* base_iterator;
@@ -304,9 +301,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_default_construct_n_bad_alloc(
     ExPolicy policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef test::count_instances_v<default_constructable> data_type;
     typedef data_type* base_iterator;

@@ -52,11 +52,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 return *this;
             }
 
+            // different versions of clang-format produce different results
+            // clang-format off
             operator T const&() const
             {
                 HPX_ASSERT(item_ != 0);
                 return *item_;
             }
+            // clang-format on
 
         private:
             T const* item_;

@@ -123,9 +123,8 @@ template <typename ExPolicy, typename IteratorTag, typename DataType,
 void test_unique(
     ExPolicy policy, IteratorTag, DataType, Pred pred, int rand_base)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef typename std::vector<DataType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -150,9 +149,8 @@ template <typename ExPolicy, typename IteratorTag, typename DataType,
 void test_unique_async(
     ExPolicy policy, IteratorTag, DataType, Pred pred, int rand_base)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef typename std::vector<DataType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -177,9 +175,8 @@ void test_unique_async(
 template <typename ExPolicy, typename IteratorTag>
 void test_unique_exception(ExPolicy policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -249,9 +246,8 @@ void test_unique_exception_async(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_unique_bad_alloc(ExPolicy policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -319,9 +315,8 @@ void test_unique_bad_alloc_async(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag, typename DataType>
 void test_unique_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef typename std::vector<DataType>::iterator base_iterator;
 

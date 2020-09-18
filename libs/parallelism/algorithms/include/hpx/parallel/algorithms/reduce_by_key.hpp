@@ -563,7 +563,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::equal_to<typename std::iterator_traits<RanIter>::value_type>,
         typename Func =
             std::plus<typename std::iterator_traits<RanIter2>::value_type>,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<RanIter>::value&&
                     hpx::traits::is_iterator<RanIter2>::value&&
                         hpx::traits::is_iterator<FwdIter1>::value&&
@@ -595,7 +595,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 keys_output, values_output});
         }
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::reduce_by_key<FwdIter1, FwdIter2>().call(
             std::forward<ExPolicy>(policy), is_seq(), key_first, key_last,

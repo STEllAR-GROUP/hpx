@@ -240,8 +240,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         adjacent_difference_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
             FwdIter2 dest, Op&& op, std::true_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
             typedef util::detail::algorithm_result<ExPolicy, FwdIter2> result;
 
             if (first == last)

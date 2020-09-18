@@ -71,7 +71,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           pair(first + (last - new_first), last).
     ///
     template <typename ExPolicy, typename Rng,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_range<Rng>::value)>
     typename util::detail::algorithm_result<ExPolicy,
         util::in_out_result<typename hpx::traits::range_iterator<Rng>::type,
@@ -131,9 +131,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           element past the last element copied.
     ///
     template <typename ExPolicy, typename Rng, typename OutIter,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_range<Rng>::value&&
-                    hpx::traits::is_iterator<OutIter>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value&& hpx::traits::is_range<
+                Rng>::value&& hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<ExPolicy,
         util::in_out_result<typename hpx::traits::range_iterator<Rng>::type,
             OutIter>>::type
