@@ -49,7 +49,7 @@ int main(int argc, char ** argv)
 
     double suspend_time = 0;
     double resume_time  = 0;
-    hpx::util::high_resolution_timer timer;
+    hpx::chrono::high_resolution_timer timer;
 
     for (std::size_t i = 0; i < repetitions; ++i)
     {

@@ -38,7 +38,7 @@ void inclusive_scan_benchmark()
         double const val(0);
         auto op = [](double v1, double v2) { return v1 + v2; };
 
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
         hpx::parallel::inclusive_scan(hpx::execution::par, std::begin(c),
             std::end(c), std::begin(d), op, val);
         double elapsed = t.elapsed();

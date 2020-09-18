@@ -190,7 +190,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
     threads::thread_state_ex_enum condition_variable::wait_until(
         std::unique_lock<mutex_type>& lock,
-        util::steady_time_point const& abs_time, char const* description,
+        hpx::chrono::steady_time_point const& abs_time, char const* description,
         error_code& ec)
     {
         HPX_ASSERT(lock.owns_lock());

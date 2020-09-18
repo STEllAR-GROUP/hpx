@@ -122,7 +122,7 @@ namespace hpx { namespace parcelset
         try {
             try {
                 // mark start of serialization
-                util::high_resolution_timer timer;
+                hpx::chrono::high_resolution_timer timer;
                 std::int64_t overall_add_parcel_time = 0;
                 performance_counters::parcels::data_point& data =
                     buffer.data_point_;

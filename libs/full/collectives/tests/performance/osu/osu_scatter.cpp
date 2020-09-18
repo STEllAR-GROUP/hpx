@@ -89,7 +89,7 @@ void run_benchmark(params const& p)
         double elapsed = 0.0;
         for (std::size_t i = 0; i < iterations + skip; ++i)
         {
-            hpx::util::high_resolution_timer t;
+            hpx::chrono::high_resolution_timer t;
             typedef hpx::serialization::serialize_buffer<char> buffer_type;
             hpx::id_type dst = localities[0];
             scatter_action()(dst, localities,

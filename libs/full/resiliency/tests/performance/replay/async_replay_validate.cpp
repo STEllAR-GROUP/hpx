@@ -54,12 +54,12 @@ int universal_ans(std::uint64_t delay_ns, double error)
         ++counter;
     }
 
-    std::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
     while (true)
     {
         // Check if we've reached the specified delay.
-        if ((hpx::util::high_resolution_clock::now() - start) >= delay_ns)
+        if ((hpx::chrono::high_resolution_clock::now() - start) >= delay_ns)
         {
             // Re-run the thread if the thread was meant to re-run
             if (error_flag)
@@ -89,7 +89,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::vector<hpx::future<int>> vect;
         vect.reserve(num_iterations);
 
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         for (int i = 0; i < num_iterations; ++i)
         {

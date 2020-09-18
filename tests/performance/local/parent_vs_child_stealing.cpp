@@ -35,7 +35,7 @@ double measure_one(Policy policy)
     std::vector<hpx::future<void> > threads;
     threads.reserve(iterations);
 
-    std::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
     for (std::size_t i = 0; i != iterations; ++i)
     {
@@ -44,7 +44,7 @@ double measure_one(Policy policy)
 
     hpx::wait_all(threads);
 
-    std::uint64_t stop = hpx::util::high_resolution_clock::now();
+    std::uint64_t stop = hpx::chrono::high_resolution_clock::now();
     return static_cast<double>(stop - start) / 1e9;
 }
 

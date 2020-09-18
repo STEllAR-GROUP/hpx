@@ -412,10 +412,11 @@ namespace hpx { namespace threads { namespace detail {
     /// new value after it expired (at the given time)
     template <typename SchedulingPolicy>
     thread_id_type set_thread_state_timed(SchedulingPolicy& scheduler,
-        util::steady_time_point const& abs_time, thread_id_type const& thrd,
-        thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-        thread_priority priority, thread_schedule_hint schedulehint,
-        std::atomic<bool>* started, bool retry_on_active, error_code& ec)
+        hpx::chrono::steady_time_point const& abs_time,
+        thread_id_type const& thrd, thread_state_enum newstate,
+        thread_state_ex_enum newstate_ex, thread_priority priority,
+        thread_schedule_hint schedulehint, std::atomic<bool>* started,
+        bool retry_on_active, error_code& ec)
     {
         if (HPX_UNLIKELY(!thrd))
         {
@@ -441,8 +442,9 @@ namespace hpx { namespace threads { namespace detail {
 
     template <typename SchedulingPolicy>
     thread_id_type set_thread_state_timed(SchedulingPolicy& scheduler,
-        util::steady_time_point const& abs_time, thread_id_type const& id,
-        std::atomic<bool>* started, bool retry_on_active, error_code& ec)
+        hpx::chrono::steady_time_point const& abs_time,
+        thread_id_type const& id, std::atomic<bool>* started,
+        bool retry_on_active, error_code& ec)
     {
         return set_thread_state_timed(scheduler, abs_time, id, pending,
             wait_timeout, thread_priority_normal, thread_schedule_hint(),
@@ -453,10 +455,11 @@ namespace hpx { namespace threads { namespace detail {
     /// new value after it expired (after the given duration)
     template <typename SchedulingPolicy>
     thread_id_type set_thread_state_timed(SchedulingPolicy& scheduler,
-        util::steady_duration const& rel_time, thread_id_type const& thrd,
-        thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-        thread_priority priority, thread_schedule_hint schedulehint,
-        std::atomic<bool>& started, bool retry_on_active, error_code& ec)
+        hpx::chrono::steady_duration const& rel_time,
+        thread_id_type const& thrd, thread_state_enum newstate,
+        thread_state_ex_enum newstate_ex, thread_priority priority,
+        thread_schedule_hint schedulehint, std::atomic<bool>& started,
+        bool retry_on_active, error_code& ec)
     {
         return set_thread_state_timed(scheduler, rel_time.from_now(), thrd,
             newstate, newstate_ex, priority, schedulehint, started,
@@ -465,8 +468,9 @@ namespace hpx { namespace threads { namespace detail {
 
     template <typename SchedulingPolicy>
     thread_id_type set_thread_state_timed(SchedulingPolicy& scheduler,
-        util::steady_duration const& rel_time, thread_id_type const& thrd,
-        std::atomic<bool>* started, bool retry_on_active, error_code& ec)
+        hpx::chrono::steady_duration const& rel_time,
+        thread_id_type const& thrd, std::atomic<bool>* started,
+        bool retry_on_active, error_code& ec)
     {
         return set_thread_state_timed(scheduler, rel_time.from_now(), thrd,
             pending, wait_timeout, thread_priority_normal,

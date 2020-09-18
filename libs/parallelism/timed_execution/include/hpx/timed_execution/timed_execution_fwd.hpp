@@ -61,7 +61,7 @@ namespace hpx { namespace parallel { namespace execution {
 
             template <typename TwoWayExecutor, typename F, typename... Ts>
             HPX_FORCEINLINE static auto call(TwoWayExecutor&& exec,
-                hpx::util::steady_duration const& rel_time, F&& f, Ts&&... ts)
+                hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
                 -> decltype(execution::async_execute(
                     timed_executor<TwoWayExecutor&>(exec, rel_time),
                     std::forward<F>(f), std::forward<Ts>(ts)...))
@@ -119,7 +119,7 @@ namespace hpx { namespace parallel { namespace execution {
         // async_execute_after dispatch point
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto async_execute_after(Executor&& exec,
-            hpx::util::steady_duration const& rel_time, F&& f, Ts&&... ts) ->
+            hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts) ->
             typename timed_async_execute_fn_helper<typename std::decay<
                 Executor>::type>::template result<Executor, F, Ts...>::type
         {
@@ -143,7 +143,7 @@ namespace hpx { namespace parallel { namespace execution {
         // sync_execute_after dispatch point
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto sync_execute_after(Executor&& exec,
-            hpx::util::steady_duration const& rel_time, F&& f, Ts&&... ts) ->
+            hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts) ->
             typename timed_sync_execute_fn_helper<typename std::decay<
                 Executor>::type>::template result<Executor, F, Ts...>::type
         {
@@ -168,7 +168,7 @@ namespace hpx { namespace parallel { namespace execution {
         // post_after dispatch point
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto post_after(Executor&& exec,
-            hpx::util::steady_duration const& rel_time, F&& f, Ts&&... ts) ->
+            hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts) ->
             typename timed_post_fn_helper<typename std::decay<Executor>::type>::
                 template result<Executor, F, Ts...>::type
         {
@@ -182,7 +182,7 @@ namespace hpx { namespace parallel { namespace execution {
         {
             template <typename Executor, typename F, typename... Ts>
             HPX_FORCEINLINE auto operator()(Executor&& exec,
-                hpx::util::steady_duration const& rel_time, F&& f,
+                hpx::chrono::steady_duration const& rel_time, F&& f,
                 Ts&&... ts) const
                 -> decltype(post_after(std::forward<Executor>(exec), rel_time,
                     std::forward<F>(f), std::forward<Ts>(ts)...))
@@ -212,7 +212,7 @@ namespace hpx { namespace parallel { namespace execution {
         {
             template <typename Executor, typename F, typename... Ts>
             HPX_FORCEINLINE auto operator()(Executor&& exec,
-                hpx::util::steady_duration const& rel_time, F&& f,
+                hpx::chrono::steady_duration const& rel_time, F&& f,
                 Ts&&... ts) const
                 -> decltype(sync_execute_after(std::forward<Executor>(exec),
                     rel_time, std::forward<F>(f), std::forward<Ts>(ts)...))
@@ -257,7 +257,7 @@ namespace hpx { namespace parallel { namespace execution {
         {
             template <typename Executor, typename F, typename... Ts>
             HPX_FORCEINLINE auto operator()(Executor&& exec,
-                hpx::util::steady_duration const& rel_time, F&& f,
+                hpx::chrono::steady_duration const& rel_time, F&& f,
                 Ts&&... ts) const
                 -> decltype(async_execute_after(std::forward<Executor>(exec),
                     rel_time, std::forward<F>(f), std::forward<Ts>(ts)...))

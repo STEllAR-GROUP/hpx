@@ -418,7 +418,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                     for (std::uint64_t iter = 0; iter < iterations; ++iter)
                     {
                         b.wait();
-                        hpx::util::high_resolution_timer t;
+                        hpx::chrono::high_resolution_timer t;
 
                         auto range = numa_ranges[domain];
 

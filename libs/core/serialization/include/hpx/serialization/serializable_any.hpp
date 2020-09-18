@@ -296,7 +296,7 @@ namespace hpx { namespace util {
         T const& cast() const
         {
             if (type() != typeid(T))
-                throw bad_any_cast(type(), typeid(T));
+                throw hpx::bad_any_cast(type(), typeid(T));
 
             return detail::any::get_table<T>::is_small::value ?
                 *reinterpret_cast<T const*>(&object) :

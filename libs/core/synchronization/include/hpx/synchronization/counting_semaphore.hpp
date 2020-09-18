@@ -143,13 +143,13 @@ namespace hpx { namespace lcos { namespace local {
         //                  exception is required ([thread.req.exception]).
         // Error conditions: Any of the error conditions allowed for mutex types
         //                  ([thread.mutex.requirements.mutex]).
-        bool try_acquire_until(util::steady_time_point const& abs_time)
+        bool try_acquire_until(hpx::chrono::steady_time_point const& abs_time)
         {
             std::unique_lock<mutex_type> l(mtx_);
             return sem_.wait_until(l, abs_time, 1);
         }
 
-        bool try_acquire_for(util::steady_duration const& rel_time)
+        bool try_acquire_for(hpx::chrono::steady_duration const& rel_time)
         {
             return try_acquire_until(rel_time.from_now());
         }

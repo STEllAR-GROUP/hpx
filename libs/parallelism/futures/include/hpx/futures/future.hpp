@@ -718,7 +718,7 @@ namespace hpx { namespace lcos { namespace detail {
         //   - future_status::timeout if the function is returning because the
         //     absolute timeout (30.2.4) specified by abs_time has expired.
         // Throws: timeout-related exceptions (30.2.4).
-        future_status wait_until(hpx::util::steady_time_point const& abs_time,
+        future_status wait_until(hpx::chrono::steady_time_point const& abs_time,
             error_code& ec = throws) const
         {
             if (!shared_state_)
@@ -741,7 +741,7 @@ namespace hpx { namespace lcos { namespace detail {
         //   - future_status::timeout if the function is returning because the
         //     relative timeout (30.2.4) specified by rel_time has expired.
         // Throws: timeout-related exceptions (30.2.4).
-        future_status wait_for(hpx::util::steady_duration const& rel_time,
+        future_status wait_for(hpx::chrono::steady_duration const& rel_time,
             error_code& ec = throws) const
         {
             return wait_until(rel_time.from_now(), ec);
@@ -1437,7 +1437,7 @@ namespace hpx { namespace lcos {
     // a given point in time
     template <int DeductionGuard = 0, typename T>
     future<typename hpx::util::decay_unwrap<T>::type> make_ready_future_at(
-        hpx::util::steady_time_point const& abs_time, T&& init)
+        hpx::chrono::steady_time_point const& abs_time, T&& init)
     {
         typedef typename hpx::util::decay_unwrap<T>::type result_type;
         typedef lcos::detail::timed_future_data<result_type> shared_state;
@@ -1451,7 +1451,7 @@ namespace hpx { namespace lcos {
 
     template <int DeductionGuard = 0, typename T>
     future<typename hpx::util::decay_unwrap<T>::type> make_ready_future_after(
-        hpx::util::steady_duration const& rel_time, T&& init)
+        hpx::chrono::steady_duration const& rel_time, T&& init)
     {
         return make_ready_future_at(rel_time.from_now(), std::forward<T>(init));
     }
@@ -1483,7 +1483,7 @@ namespace hpx { namespace lcos {
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
     inline future<void> make_ready_future_at(
-        hpx::util::steady_time_point const& abs_time)
+        hpx::chrono::steady_time_point const& abs_time)
     {
         typedef lcos::detail::timed_future_data<void> shared_state;
 
@@ -1493,21 +1493,21 @@ namespace hpx { namespace lcos {
 
     template <typename T>
     typename std::enable_if<std::is_void<T>::value, future<void>>::type
-    make_ready_future_at(hpx::util::steady_time_point const& abs_time)
+    make_ready_future_at(hpx::chrono::steady_time_point const& abs_time)
     {
         return make_ready_future_at(abs_time);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     inline future<void> make_ready_future_after(
-        hpx::util::steady_duration const& rel_time)
+        hpx::chrono::steady_duration const& rel_time)
     {
         return make_ready_future_at(rel_time.from_now());
     }
 
     template <typename T>
     typename std::enable_if<std::is_void<T>::value, future<void>>::type
-    make_ready_future_after(hpx::util::steady_duration const& rel_time)
+    make_ready_future_after(hpx::chrono::steady_duration const& rel_time)
     {
         return make_ready_future_at(rel_time.from_now());
     }

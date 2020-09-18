@@ -50,7 +50,7 @@ namespace hpx { namespace execution {
         /// \param time_cs      The execution time for each chunk.
         ///
         explicit persistent_auto_chunk_size(
-            hpx::util::steady_duration const& time_cs,
+            hpx::chrono::steady_duration const& time_cs,
             std::uint64_t num_iters_for_timing = 0)
           : chunk_size_time_(time_cs.value().count())
           , min_time_(200000)
@@ -65,8 +65,8 @@ namespace hpx { namespace execution {
         ///                     combined.
         /// \param time_cs       The execution time for each chunk.
         ///
-        persistent_auto_chunk_size(hpx::util::steady_duration const& time_cs,
-            hpx::util::steady_duration const& rel_time,
+        persistent_auto_chunk_size(hpx::chrono::steady_duration const& time_cs,
+            hpx::chrono::steady_duration const& rel_time,
             std::uint64_t num_iters_for_timing = 0)
           : chunk_size_time_(time_cs.value().count())
           , min_time_(rel_time.value().count())
@@ -89,7 +89,7 @@ namespace hpx { namespace execution {
             // perform measurements only if necessary
             if (num_iters_for_timing_ > 0)
             {
-                using hpx::util::high_resolution_clock;
+                using hpx::chrono::high_resolution_clock;
                 std::uint64_t t = high_resolution_clock::now();
 
                 std::size_t test_chunk_size = f(num_iters_for_timing_);

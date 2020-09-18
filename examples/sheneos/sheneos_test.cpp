@@ -295,13 +295,13 @@ HPX_ACTION_USES_MEDIUM_STACK(test_bulk_action);
 HPX_PLAIN_ACTION(test_sheneos_bulk, test_bulk_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-void wait_for_task(std::size_t i, hpx::util::high_resolution_timer& t)
+void wait_for_task(std::size_t i, hpx::chrono::high_resolution_timer& t)
 {
     std::cout << "Finished task " << i << ": " << t.elapsed() << " [s]"
               << std::endl;
 }
 
-void wait_for_bulk_one_task(std::size_t i, hpx::util::high_resolution_timer& t)
+void wait_for_bulk_one_task(std::size_t i, hpx::chrono::high_resolution_timer& t)
 {
     std::cout << "Finished bulk-one task " << i << ": " << t.elapsed()
         << " [s]" << std::endl;
@@ -327,7 +327,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "Seed: " << seed << std::endl;
 
     {
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         // Create a distributed interpolation object with the name
         // shen_symbolic_name. The interpolation object will have

@@ -74,8 +74,8 @@ int hpx_main(variables_map& vm)
         in(buffer, any_in);
         HPX_TEST(any_in.has_value());
         HPX_TEST(any.type() == any_in.type());
-        HPX_TEST_EQ(hpx::util::any_cast<small_object>(any),
-            hpx::util::any_cast<small_object>(any_in));
+        HPX_TEST_EQ(hpx::any_cast<small_object>(any),
+            hpx::any_cast<small_object>(any_in));
     }
 
     {
@@ -90,8 +90,8 @@ int hpx_main(variables_map& vm)
         any_type any_in;
         in(buffer, any_in);
         HPX_TEST(any.type() == any_in.type());
-        HPX_TEST_EQ(hpx::util::any_cast<big_object>(any),
-            hpx::util::any_cast<big_object>(any_in));
+        HPX_TEST_EQ(
+            hpx::any_cast<big_object>(any), hpx::any_cast<big_object>(any_in));
     }
 
     return finalize();

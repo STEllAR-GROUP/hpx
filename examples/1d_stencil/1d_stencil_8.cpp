@@ -644,7 +644,7 @@ void do_all_work(std::uint64_t nt, std::uint64_t nx, std::uint64_t np,
     stepper step(nl);
 
     // Measure execution time.
-    std::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
 
     // Perform all work and wait for it to finish
     hpx::future<stepper_server::space> result = step.do_work(np/nl, nx, nt, nd);
@@ -667,7 +667,7 @@ void do_all_work(std::uint64_t nt, std::uint64_t nx, std::uint64_t np,
             }
         }
 
-        std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+        std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
         // Print the solution at time-step 'nt'.
         if (print_results)

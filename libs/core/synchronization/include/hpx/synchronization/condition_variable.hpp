@@ -107,7 +107,8 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         cv_status wait_until(std::unique_lock<mutex>& lock,
-            util::steady_time_point const& abs_time, error_code& ec = throws)
+            hpx::chrono::steady_time_point const& abs_time,
+            error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
@@ -136,7 +137,7 @@ namespace hpx { namespace lcos { namespace local {
 
         template <typename Predicate>
         bool wait_until(std::unique_lock<mutex>& lock,
-            util::steady_time_point const& abs_time, Predicate pred,
+            hpx::chrono::steady_time_point const& abs_time, Predicate pred,
             error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
@@ -150,14 +151,15 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         cv_status wait_for(std::unique_lock<mutex>& lock,
-            util::steady_duration const& rel_time, error_code& ec = throws)
+            hpx::chrono::steady_duration const& rel_time,
+            error_code& ec = throws)
         {
             return wait_until(lock, rel_time.from_now(), ec);
         }
 
         template <typename Predicate>
         bool wait_for(std::unique_lock<mutex>& lock,
-            util::steady_duration const& rel_time, Predicate pred,
+            hpx::chrono::steady_duration const& rel_time, Predicate pred,
             error_code& ec = throws)
         {
             return wait_until(lock, rel_time.from_now(), std::move(pred), ec);
@@ -244,7 +246,8 @@ namespace hpx { namespace lcos { namespace local {
 
         template <typename Lock>
         cv_status wait_until(Lock& lock,
-            util::steady_time_point const& abs_time, error_code& ec = throws)
+            hpx::chrono::steady_time_point const& abs_time,
+            error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
@@ -272,8 +275,9 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         template <typename Lock, typename Predicate>
-        bool wait_until(Lock& lock, util::steady_time_point const& abs_time,
-            Predicate pred, error_code& ec = throws)
+        bool wait_until(Lock& lock,
+            hpx::chrono::steady_time_point const& abs_time, Predicate pred,
+            error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
@@ -286,14 +290,15 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         template <typename Lock>
-        cv_status wait_for(Lock& lock, util::steady_duration const& rel_time,
+        cv_status wait_for(Lock& lock,
+            hpx::chrono::steady_duration const& rel_time,
             error_code& ec = throws)
         {
             return wait_until(lock, rel_time.from_now(), ec);
         }
 
         template <typename Lock, typename Predicate>
-        bool wait_for(Lock& lock, util::steady_duration const& rel_time,
+        bool wait_for(Lock& lock, hpx::chrono::steady_duration const& rel_time,
             Predicate pred, error_code& ec = throws)
         {
             return wait_until(lock, rel_time.from_now(), std::move(pred), ec);
@@ -343,7 +348,7 @@ namespace hpx { namespace lcos { namespace local {
 
         template <typename Lock, typename Predicate>
         bool wait_until(Lock& lock, stop_token stoken,
-            util::steady_time_point const& abs_time, Predicate pred,
+            hpx::chrono::steady_time_point const& abs_time, Predicate pred,
             error_code& ec = throws)
         {
             if (stoken.stop_requested())
@@ -399,7 +404,7 @@ namespace hpx { namespace lcos { namespace local {
 
         template <typename Lock, typename Predicate>
         bool wait_for(Lock& lock, stop_token stoken,
-            util::steady_duration const& rel_time, Predicate pred,
+            hpx::chrono::steady_duration const& rel_time, Predicate pred,
             error_code& ec = throws)
         {
             return wait_until(

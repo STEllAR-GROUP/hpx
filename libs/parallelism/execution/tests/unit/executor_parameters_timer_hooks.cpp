@@ -70,7 +70,7 @@ struct timer_hooks_parameters
     void mark_begin_execution(Executor&&)
     {
         ++count_;
-        time_ = hpx::util::high_resolution_clock::now();
+        time_ = hpx::chrono::high_resolution_clock::now();
     }
 
     template <typename Executor>
@@ -81,7 +81,7 @@ struct timer_hooks_parameters
     template <typename Executor>
     void mark_end_execution(Executor&&)
     {
-        time_ = hpx::util::high_resolution_clock::now() - time_;
+        time_ = hpx::chrono::high_resolution_clock::now() - time_;
         ++count_;
     }
 

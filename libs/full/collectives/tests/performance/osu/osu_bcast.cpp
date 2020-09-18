@@ -49,7 +49,7 @@ struct broadcast_component
         double elapsed = 0.0;
         for (std::size_t i = 0; i < iterations + skip; ++i)
         {
-            hpx::util::high_resolution_timer t;
+            hpx::chrono::high_resolution_timer t;
 
             recv_buffer = bcast(ids, 0,
                 buffer_type(&send_buffer[0], size, buffer_type::reference))

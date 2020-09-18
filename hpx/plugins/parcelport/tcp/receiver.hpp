@@ -371,7 +371,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         connection_handler& parcelport_;
 
         /// Counters and timers for parcels received.
-        util::high_resolution_timer timer_;
+        hpx::chrono::high_resolution_timer timer_;
 
         mutex_type mtx_;
         hpx::util::atomic_count operation_in_flight_;

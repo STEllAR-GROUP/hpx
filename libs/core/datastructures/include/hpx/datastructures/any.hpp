@@ -765,7 +765,7 @@ namespace hpx { namespace util {
         T const& cast() const
         {
             if (type() != typeid(T))
-                throw bad_any_cast(type(), typeid(T));
+                throw hpx::bad_any_cast(type(), typeid(T));
 
             return hpx::util::detail::any::get_table<T>::is_small::value ?
                 *reinterpret_cast<T const*>(&object) :
@@ -987,7 +987,7 @@ namespace hpx { namespace util {
         T const& cast() const
         {
             if (type() != typeid(T))
-                throw bad_any_cast(type(), typeid(T));
+                throw hpx::bad_any_cast(type(), typeid(T));
 
             return hpx::util::detail::any::get_table<T>::is_small::value ?
                 *reinterpret_cast<T const*>(&object) :
@@ -1177,7 +1177,7 @@ namespace hpx { namespace util {
         T const& cast() const
         {
             if (type() != typeid(T))
-                throw bad_any_cast(type(), typeid(T));
+                throw hpx::bad_any_cast(type(), typeid(T));
 
             return hpx::util::detail::any::get_table<T>::is_small::value ?
                 *reinterpret_cast<T const*>(&object) :
@@ -1364,7 +1364,7 @@ namespace hpx { namespace util {
         T const& cast() const
         {
             if (type() != typeid(T))
-                throw bad_any_cast(type(), typeid(T));
+                throw hpx::bad_any_cast(type(), typeid(T));
 
             return hpx::util::detail::any::get_table<T>::is_small::value ?
                 *reinterpret_cast<T const*>(&object) :
@@ -1515,7 +1515,7 @@ namespace hpx { namespace util {
 
         nonref* result = any_cast<nonref>(&operand);
         if (!result)
-            throw bad_any_cast(operand.type(), typeid(T));
+            throw hpx::bad_any_cast(operand.type(), typeid(T));
         return static_cast<T>(*result);
     }
 

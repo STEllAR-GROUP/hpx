@@ -115,7 +115,7 @@ int hpx_main()
 
         string word;
         cout << "Loading file: example_text.txt\n";
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         int fileLines = 0;;
         std::string example_path = wordlist_path + "example_text.txt";

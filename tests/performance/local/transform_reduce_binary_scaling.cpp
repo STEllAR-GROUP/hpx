@@ -57,12 +57,12 @@ template <typename ExPolicy>
 std::int64_t measure_inner_product(int count, ExPolicy && policy,
     std::vector<float> const& data1, std::vector<float> const& data2)
 {
-    std::int64_t start = hpx::util::high_resolution_clock::now();
+    std::int64_t start = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i != count; ++i)
         measure_inner_product(policy, data1, data2);
 
-    return (hpx::util::high_resolution_clock::now() - start) / count;
+    return (hpx::chrono::high_resolution_clock::now() - start) / count;
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

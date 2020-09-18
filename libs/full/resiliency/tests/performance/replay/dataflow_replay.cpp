@@ -311,7 +311,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "Starting 1d stencil with dataflow replay" << std::endl;
 
     // Measure execution time.
-    std::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
 
     {
         // limit depth of dependency tree
@@ -326,7 +326,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     std::cout << "Time elapsed: "
               << static_cast<double>(
-                     hpx::util::high_resolution_clock::now() - t) /
+                     hpx::chrono::high_resolution_clock::now() - t) /
             1e9
               << std::endl;
     std::cout << "Errors occurred: " << counter << std::endl;

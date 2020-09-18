@@ -307,7 +307,7 @@ namespace hpx { namespace threads { namespace detail {
         std::vector<mask_info> masks;
         for (std::int64_t index : b)
         {
-            masks.push_back(util::make_tuple(static_cast<std::size_t>(index),
+            masks.push_back(hpx::make_tuple(static_cast<std::size_t>(index),
                 t.init_socket_affinity_mask_from_socket(
                     static_cast<std::size_t>(index))));
         }
@@ -320,7 +320,7 @@ namespace hpx { namespace threads { namespace detail {
         std::vector<mask_info> masks;
         for (std::int64_t index : b)
         {
-            masks.push_back(util::make_tuple(static_cast<std::size_t>(index),
+            masks.push_back(hpx::make_tuple(static_cast<std::size_t>(index),
                 t.init_numa_node_affinity_mask_from_numa_node(
                     static_cast<std::size_t>(index))));
         }
@@ -357,7 +357,7 @@ namespace hpx { namespace threads { namespace detail {
         {
             std::vector<mask_info> masks;
             masks.push_back(
-                util::make_tuple(std::size_t(-1), extract_machine_mask(t, ec)));
+                hpx::make_tuple(std::size_t(-1), extract_machine_mask(t, ec)));
             return masks;
         }
 
@@ -417,7 +417,7 @@ namespace hpx { namespace threads { namespace detail {
             {
                 mask_type mask = t.init_core_affinity_mask_from_core(
                     static_cast<std::size_t>(index + base));
-                masks.push_back(util::make_tuple(
+                masks.push_back(hpx::make_tuple(
                     static_cast<std::size_t>(index), mask & socket_mask));
             }
         }
@@ -427,7 +427,7 @@ namespace hpx { namespace threads { namespace detail {
         {
             mask_type mask = extract_machine_mask(t, ec);
             masks.push_back(
-                util::make_tuple(std::size_t(-1), mask & socket_mask));
+                hpx::make_tuple(std::size_t(-1), mask & socket_mask));
         }
         break;
 
@@ -501,7 +501,7 @@ namespace hpx { namespace threads { namespace detail {
 
                 mask_type mask = t.init_thread_affinity_mask(
                     base_core, static_cast<std::size_t>(index));
-                masks.push_back(util::make_tuple(
+                masks.push_back(hpx::make_tuple(
                     static_cast<std::size_t>(index), mask & core_mask));
             }
         }
@@ -510,8 +510,7 @@ namespace hpx { namespace threads { namespace detail {
         case spec_type::unknown:
         {
             mask_type mask = extract_machine_mask(t, ec);
-            masks.push_back(
-                util::make_tuple(std::size_t(-1), mask & core_mask));
+            masks.push_back(hpx::make_tuple(std::size_t(-1), mask & core_mask));
         }
         break;
 

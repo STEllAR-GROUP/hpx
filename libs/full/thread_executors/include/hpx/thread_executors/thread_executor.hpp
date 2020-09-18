@@ -233,7 +233,7 @@ namespace hpx { namespace threads {
                 closure_type&& f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
-            void add_at(util::steady_time_point const& abs_time,
+            void add_at(hpx::chrono::steady_time_point const& abs_time,
                 closure_type&& f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec)
             {
@@ -249,7 +249,7 @@ namespace hpx { namespace threads {
                 closure_type&& f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
-            void add_after(util::steady_duration const& rel_time,
+            void add_after(hpx::chrono::steady_duration const& rel_time,
                 closure_type&& f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec)
             {
@@ -419,8 +419,8 @@ namespace hpx { namespace threads {
                 ->add_at(abs_time, std::move(f), desc, stacksize, ec);
         }
 
-        void add_at(util::steady_time_point const& abs_time, closure_type f,
-            char const* desc = "",
+        void add_at(hpx::chrono::steady_time_point const& abs_time,
+            closure_type f, char const* desc = "",
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize_default,
             error_code& ec = throws)
@@ -447,8 +447,8 @@ namespace hpx { namespace threads {
                 ->add_after(rel_time, std::move(f), desc, stacksize, ec);
         }
 
-        void add_after(util::steady_duration const& rel_time, closure_type f,
-            char const* desc = "",
+        void add_after(hpx::chrono::steady_duration const& rel_time,
+            closure_type f, char const* desc = "",
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize_default,
             error_code& ec = throws)

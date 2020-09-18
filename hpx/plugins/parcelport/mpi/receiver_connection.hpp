@@ -238,7 +238,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             return false;
         }
 
-        util::high_resolution_timer timer_;
+        hpx::chrono::high_resolution_timer timer_;
 
         connection_state state_;
 

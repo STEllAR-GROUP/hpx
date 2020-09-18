@@ -28,7 +28,7 @@ namespace jacobi_smp {
         std::shared_ptr<vector> grid_new(new vector(n * n, 1));
         std::shared_ptr<vector> grid_old(new vector(n * n, 1));
 
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
         for(std::size_t i = 0; i < iterations; ++i)
         {
             // MSVC is unhappy if the OMP loop variable is unsigned

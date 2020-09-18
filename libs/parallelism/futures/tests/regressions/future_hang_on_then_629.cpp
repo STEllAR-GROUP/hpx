@@ -156,7 +156,7 @@ int hpx_main(variables_map& vm)
 
         for (std::uint64_t i = 0; (test_runs == 0) || (i < test_runs); ++i)
         {
-            hpx::util::high_resolution_timer local_clock;
+            hpx::chrono::high_resolution_timer local_clock;
 
             d += hpx::async<null_tree_action>(here, 0, 1, max_depth, children,
                 delay_iterations, num_localities)

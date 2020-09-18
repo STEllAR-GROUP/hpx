@@ -52,7 +52,7 @@ namespace hpx { namespace execution {
         ///                     to decide how many loop iterations should be
         ///                     combined.
         ///
-        explicit auto_chunk_size(hpx::util::steady_duration const& rel_time,
+        explicit auto_chunk_size(hpx::chrono::steady_duration const& rel_time,
             std::uint64_t num_iters_for_timing = 0)
           : min_time_(rel_time.value().count())
           , num_iters_for_timing_(num_iters_for_timing)
@@ -74,7 +74,7 @@ namespace hpx { namespace execution {
             // perform measurements only if necessary
             if (num_iters_for_timing_ > 0)
             {
-                using hpx::util::high_resolution_clock;
+                using hpx::chrono::high_resolution_clock;
                 std::uint64_t t = high_resolution_clock::now();
 
                 // use executor to launch given function for measurements

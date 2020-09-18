@@ -180,7 +180,7 @@ double perform_2n_iterations()
         (*coroutines[indices[i]])(wait_signaled);
     }
 
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
 
     for (std::uint64_t i = 0; i < iterations; ++i)
     {

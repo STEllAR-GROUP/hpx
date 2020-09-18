@@ -75,14 +75,14 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::vector<hpx::future<void> > tasks;
         tasks.reserve(num_tasks);
 
-        std::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
         for (std::size_t i = 0; i != num_tasks; ++i)
             tasks.push_back(hpx::async(&test_func));
 
         hpx::wait_all(tasks);
 
-        std::uint64_t end = hpx::util::high_resolution_clock::now();
+        std::uint64_t end = hpx::chrono::high_resolution_clock::now();
 
         seqential_time_per_task =
             static_cast<double>(end - start) / 1e9 / num_tasks;
@@ -95,12 +95,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
     double hierarchical_time_per_task = 0;
 
     {
-        std::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
         hpx::future<void> f = hpx::async(&spawn_level, num_tasks);
         hpx::wait_all(f);
 
-        std::uint64_t end = hpx::util::high_resolution_clock::now();
+        std::uint64_t end = hpx::chrono::high_resolution_clock::now();
 
         hierarchical_time_per_task =
             static_cast<double>(end - start) / 1e9 / num_tasks;

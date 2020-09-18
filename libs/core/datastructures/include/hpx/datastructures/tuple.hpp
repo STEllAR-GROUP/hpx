@@ -1031,44 +1031,44 @@ namespace hpx { namespace util {
         "hpx::util::tuple_element is deprecated. Use hpx::tuple_size "
         "instead.") = hpx::tuple_element<I, T>;
 
+    template <typename... Ts>
     HPX_DEPRECATED_V(1, 6,
         "hpx::util::make_tuple is deprecated. Use hpx::make_tuple instead.")
-    template <typename... Ts>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto make_tuple(Ts&&... vs)
     {
         return hpx::make_tuple(std::forward<Ts>(vs)...);
     }
 
+    template <typename... Ts>
     HPX_DEPRECATED_V(
         1, 6, "hpx::util::tie is deprecated. Use hpx::tie instead.")
-    template <typename... Ts>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tie(Ts&&... vs)
     {
         return hpx::tie(std::forward<Ts>(vs)...);
     }
 
+    template <typename... Ts>
     HPX_DEPRECATED_V(1, 6,
         "hpx::util::forward_as_tuple is deprecated. Use hpx::forward_as_tuple "
         "instead.")
-    template <typename... Ts>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto forward_as_tuple(Ts&&... vs)
     {
         return hpx::forward_as_tuple(std::forward<Ts>(vs)...);
     }
 
+    template <typename... Ts>
     HPX_DEPRECATED_V(1, 6,
         "hpx::util::tuple_cat is deprecated. Use hpx::tuple_cat "
         "instead.")
-    template <typename... Ts>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat(Ts&&... vs)
     {
         return hpx::tuple_cat(std::forward<Ts>(vs)...);
     }
 
+    template <typename... Ts>
     HPX_DEPRECATED_V(1, 6,
         "hpx::util::get is deprecated. Use hpx::get "
         "instead.")
-    template <typename... Ts>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto get(Ts&&... vs)
     {
         return hpx::get(std::forward<Ts>(vs)...);

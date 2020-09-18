@@ -24,7 +24,7 @@ using hpx::program_options::store;
 using hpx::program_options::command_line_parser;
 using hpx::program_options::notify;
 
-using hpx::util::high_resolution_timer;
+using hpx::chrono::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
 // thread local globals

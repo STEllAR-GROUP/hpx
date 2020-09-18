@@ -102,7 +102,7 @@ namespace jacobi
             {
                 HPX_ASSERT(stencil_iterators[0].id);
 
-                hpx::util::high_resolution_timer t;
+                hpx::chrono::high_resolution_timer t;
 
                 t.restart();
                 /*
