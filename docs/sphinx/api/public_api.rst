@@ -84,7 +84,7 @@ Functions
 - :cpp:func:`hpx::parallel::v1::search`
 - :cpp:func:`hpx::parallel::v1::search_n`
 - :cpp:func:`hpx::parallel::v1::set_difference`
-- :cpp:func:`hpx::parallel::v1::set_intersection`
+- :cpp:func:`hpx::set_intersection`
 - :cpp:func:`hpx::parallel::v1::set_symmetric_difference`
 - :cpp:func:`hpx::parallel::v1::set_union`
 - :cpp:func:`hpx::parallel::v1::sort`

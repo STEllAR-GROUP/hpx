@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@
 
 #include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
@@ -37,11 +38,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         class rewritable_ref
         {
         public:
-            rewritable_ref()
+            constexpr rewritable_ref()
               : item_(0)
             {
             }
-            rewritable_ref(T const& item)
+            constexpr rewritable_ref(T const& item)
               : item_(item)
             {
             }
@@ -72,33 +73,29 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     struct set_chunk_data
     {
-        set_chunk_data()
-        {
-            start = len = start_index = (std::size_t)(-1);
-        }
-        std::size_t start;
-        std::size_t len;
-        std::size_t start_index;
+        std::size_t start = std::size_t(-1);
+        std::size_t len = std::size_t(-1);
+        std::size_t start_index = std::size_t(-1);
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename RanIter1, typename RanIter2,
-        typename FwdIter, typename F, typename Combiner, typename SetOp>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    set_operation(ExPolicy policy, RanIter1 first1, RanIter1 last1,
-        RanIter2 first2, RanIter2 last2, FwdIter dest, F&& f,
-        Combiner&& combiner, SetOp&& setop)
+    template <typename ExPolicy, typename Iter1, typename Sent1, typename Iter2,
+        typename Sent2, typename Iter3, typename F, typename Combiner,
+        typename SetOp>
+    typename util::detail::algorithm_result<ExPolicy, Iter3>::type
+    set_operation(ExPolicy policy, Iter1 first1, Sent1 last1, Iter2 first2,
+        Sent2 last2, Iter3 dest, F&& f, Combiner&& combiner, SetOp&& setop)
     {
-        typedef typename std::iterator_traits<RanIter1>::difference_type
-            difference_type1;
-        typedef typename std::iterator_traits<RanIter2>::difference_type
-            difference_type2;
+        using difference_type1 =
+            typename std::iterator_traits<Iter1>::difference_type;
+        using difference_type2 =
+            typename std::iterator_traits<Iter2>::difference_type;
 
         // allocate intermediate buffers
-        difference_type1 len1 = std::distance(first1, last1);
-        difference_type2 len2 = std::distance(first2, last2);
+        difference_type1 len1 = detail::distance(first1, last1);
+        difference_type2 len2 = detail::distance(first2, last2);
 
-        typedef typename set_operations_buffer<FwdIter>::type buffer_type;
+        typedef typename set_operations_buffer<Iter3>::type buffer_type;
 
         std::size_t cores = execution::processing_units_count(
             policy.parameters(), policy.executor());
@@ -177,8 +174,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         };
 
         // second step, is executed after all partitions are done running
+
+        // different versions of clang-format produce different formatting
+        // clang-format off
         auto f2 = [buffer, chunks, cores, dest](
-                      std::vector<future<void>> &&) -> FwdIter {
+                      std::vector<future<void>>&&) -> Iter3 {
+            // clang-format on
             // accumulate real length
             set_chunk_data* chunk = chunks.get();
             chunk->start_index = 0;
@@ -211,7 +212,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         };
 
         // fill the buffer piecewise
-        return parallel::util::partitioner<ExPolicy, FwdIter, void>::call(
+        return parallel::util::partitioner<ExPolicy, Iter3, void>::call(
             policy, chunks.get(), cores, std::move(f1), std::move(f2));
     }
 

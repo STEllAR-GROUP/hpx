@@ -42,7 +42,6 @@ namespace hpx {
     using hpx::parallel::search;
     using hpx::parallel::search_n;
     using hpx::parallel::set_difference;
-    using hpx::parallel::set_intersection;
     using hpx::parallel::set_symmetric_difference;
     using hpx::parallel::set_union;
     using hpx::parallel::sort;

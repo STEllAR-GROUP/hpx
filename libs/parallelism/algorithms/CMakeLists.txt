@@ -104,6 +104,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/reverse.hpp
     hpx/parallel/container_algorithms/rotate.hpp
     hpx/parallel/container_algorithms/search.hpp
+    hpx/parallel/container_algorithms/set_intersection.hpp
     hpx/parallel/container_algorithms/sort.hpp
     hpx/parallel/container_algorithms/stable_sort.hpp
     hpx/parallel/container_algorithms/transform.hpp

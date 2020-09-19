@@ -32,8 +32,8 @@ void test_set_intersection1(IteratorTag)
 
     std::vector<std::size_t> c3(2 * c1.size()), c4(2 * c1.size());    //-V656
 
-    hpx::set_intersection(iterator(std::begin(c1)), iterator(std::end(c1)),
-        std::begin(c2), std::end(c2), std::begin(c3));
+    hpx::ranges::set_intersection(iterator(std::begin(c1)),
+        iterator(std::end(c1)), std::begin(c2), std::end(c2), std::begin(c3));
 
     std::set_intersection(std::begin(c1), std::end(c1), std::begin(c2),
         std::end(c2), std::begin(c4));
@@ -45,8 +45,9 @@ void test_set_intersection1(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_intersection1(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -59,7 +60,7 @@ void test_set_intersection1(ExPolicy&& policy, IteratorTag)
 
     std::vector<std::size_t> c3(2 * c1.size()), c4(2 * c1.size());    //-V656
 
-    hpx::set_intersection(policy, iterator(std::begin(c1)),
+    hpx::ranges::set_intersection(policy, iterator(std::begin(c1)),
         iterator(std::end(c1)), std::begin(c2), std::end(c2), std::begin(c3));
 
     std::set_intersection(std::begin(c1), std::end(c1), std::begin(c2),
@@ -83,7 +84,7 @@ void test_set_intersection1_async(ExPolicy&& p, IteratorTag)
 
     std::vector<std::size_t> c3(2 * c1.size()), c4(2 * c1.size());    //-V656
 
-    hpx::future<void> result = hpx::set_intersection(p,
+    hpx::future<void> result = hpx::ranges::set_intersection(p,
         iterator(std::begin(c1)), iterator(std::end(c1)), std::begin(c2),
         std::end(c2), std::begin(c3));
     result.wait();
@@ -133,8 +134,9 @@ void test_set_intersection2(IteratorTag)
 
     std::vector<std::size_t> c3(2 * c1.size()), c4(2 * c1.size());    //-V656
 
-    hpx::set_intersection(iterator(std::begin(c1)), iterator(std::end(c1)),
-        std::begin(c2), std::end(c2), std::begin(c3), comp);
+    hpx::ranges::set_intersection(iterator(std::begin(c1)),
+        iterator(std::end(c1)), std::begin(c2), std::end(c2), std::begin(c3),
+        comp);
 
     std::set_intersection(std::begin(c1), std::end(c1), std::begin(c2),
         std::end(c2), std::begin(c4), comp);
@@ -146,8 +148,9 @@ void test_set_intersection2(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_intersection2(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -162,7 +165,7 @@ void test_set_intersection2(ExPolicy&& policy, IteratorTag)
 
     std::vector<std::size_t> c3(2 * c1.size()), c4(2 * c1.size());    //-V656
 
-    hpx::set_intersection(policy, iterator(std::begin(c1)),
+    hpx::ranges::set_intersection(policy, iterator(std::begin(c1)),
         iterator(std::end(c1)), std::begin(c2), std::end(c2), std::begin(c3),
         comp);
 
@@ -176,8 +179,9 @@ void test_set_intersection2(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_intersection2_async(ExPolicy&& p, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -192,7 +196,7 @@ void test_set_intersection2_async(ExPolicy&& p, IteratorTag)
 
     std::vector<std::size_t> c3(2 * c1.size()), c4(2 * c1.size());    //-V656
 
-    hpx::future<void> result = hpx::set_intersection(p,
+    hpx::future<void> result = hpx::ranges::set_intersection(p,
         iterator(std::begin(c1)), iterator(std::end(c1)), std::begin(c2),
         std::end(c2), std::begin(c3), comp);
     result.wait();
@@ -244,8 +248,9 @@ void test_set_intersection_exception(IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::set_intersection(decorated_iterator(std::begin(c1),
-                                  []() { throw std::runtime_error("test"); }),
+        hpx::ranges::set_intersection(
+            decorated_iterator(
+                std::begin(c1), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
             std::begin(c3));
 
@@ -268,8 +273,9 @@ void test_set_intersection_exception(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_intersection_exception(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -286,7 +292,7 @@ void test_set_intersection_exception(ExPolicy&& policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::set_intersection(policy,
+        hpx::ranges::set_intersection(policy,
             decorated_iterator(
                 std::begin(c1), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
@@ -310,8 +316,9 @@ void test_set_intersection_exception(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_intersection_exception_async(ExPolicy&& p, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -329,7 +336,7 @@ void test_set_intersection_exception_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::set_intersection(p,
+        hpx::future<void> f = hpx::ranges::set_intersection(p,
             decorated_iterator(
                 std::begin(c1), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
@@ -396,8 +403,8 @@ void test_set_intersection_bad_alloc(IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::set_intersection(decorated_iterator(std::begin(c1),
-                                  []() { throw std::bad_alloc(); }),
+        hpx::ranges::set_intersection(decorated_iterator(std::begin(c1),
+                                          []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
             std::begin(c3));
 
@@ -418,8 +425,9 @@ void test_set_intersection_bad_alloc(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_intersection_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -436,7 +444,7 @@ void test_set_intersection_bad_alloc(ExPolicy&& policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::set_intersection(policy,
+        hpx::ranges::set_intersection(policy,
             decorated_iterator(
                 std::begin(c1), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
@@ -459,8 +467,9 @@ void test_set_intersection_bad_alloc(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_intersection_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -478,7 +487,7 @@ void test_set_intersection_bad_alloc_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::set_intersection(p,
+        hpx::future<void> f = hpx::ranges::set_intersection(p,
             decorated_iterator(
                 std::begin(c1), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,85 +8,9 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/decay.hpp>
-
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/copy.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/set_operation.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/loop.hpp>
-
-#include <algorithm>
-#include <iterator>
-#include <type_traits>
-#include <utility>
-
-namespace hpx { namespace parallel { inline namespace v1 {
-    ///////////////////////////////////////////////////////////////////////////
-    // set_intersection
-    namespace detail {
-        /// \cond NOINTERNAL
-        template <typename FwdIter>
-        struct set_intersection
-          : public detail::algorithm<set_intersection<FwdIter>, FwdIter>
-        {
-            set_intersection()
-              : set_intersection::algorithm("set_intersection")
-            {
-            }
-
-            template <typename ExPolicy, typename InIter1, typename InIter2,
-                typename OutIter, typename F>
-            static OutIter sequential(ExPolicy, InIter1 first1, InIter1 last1,
-                InIter2 first2, InIter2 last2, OutIter dest, F&& f)
-            {
-                return std::set_intersection(
-                    first1, last1, first2, last2, dest, std::forward<F>(f));
-            }
-
-            template <typename ExPolicy, typename RanIter1, typename RanIter2,
-                typename F>
-            static
-                typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-                parallel(ExPolicy&& policy, RanIter1 first1, RanIter1 last1,
-                    RanIter2 first2, RanIter2 last2, FwdIter dest, F&& f)
-            {
-                typedef typename std::iterator_traits<RanIter1>::difference_type
-                    difference_type1;
-                typedef typename std::iterator_traits<RanIter2>::difference_type
-                    difference_type2;
-
-                if (first1 == last1 || first2 == last2)
-                {
-                    typedef util::detail::algorithm_result<ExPolicy, FwdIter>
-                        result;
-                    return result::get(std::move(dest));
-                }
-
-                typedef
-                    typename set_operations_buffer<FwdIter>::type buffer_type;
-                typedef typename hpx::util::decay<F>::type func_type;
-
-                return set_operation(
-                    std::forward<ExPolicy>(policy), first1, last1, first2,
-                    last2, dest, std::forward<F>(f),
-                    // calculate approximate destination index
-                    [](difference_type1 idx1, difference_type2 idx2)
-                        -> difference_type1 { return (std::min)(idx1, idx2); },
-                    // perform required set operation for one chunk
-                    [](RanIter1 part_first1, RanIter1 part_last1,
-                        RanIter2 part_first2, RanIter2 part_last2,
-                        buffer_type* dest, func_type const& f) -> buffer_type* {
-                        return std::set_intersection(part_first1, part_last1,
-                            part_first2, part_last2, dest, f);
-                    });
-            }
-        };
-        /// \endcond
-    }    // namespace detail
+#if defined(DOXYGEN)
+namespace hpx {
+    // clang-format off
 
     /// Constructs a sorted range beginning at dest consisting of all elements
     /// present in both sorted ranges [first1, last1) and
@@ -175,10 +99,185 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename FwdIter3, typename Pred = detail::less>
-    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter3>::type>::type
+    typename util::detail::algorithm_result<ExPolicy, FwdIter3>::type
     set_intersection(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, Pred&& op = Pred())
+            FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, Pred&& op = Pred());
+
+    // clang-format on
+}    // namespace hpx
+
+#else    // DOXYGEN
+
+#include <hpx/config.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/type_support/decay.hpp>
+
+#include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/set_operation.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/result_types.hpp>
+
+#include <algorithm>
+#include <iterator>
+#include <type_traits>
+#include <utility>
+
+namespace hpx { namespace parallel { inline namespace v1 {
+    ///////////////////////////////////////////////////////////////////////////
+    // set_intersection
+    namespace detail {
+
+        template <typename Iter1, typename Sent1, typename Iter2,
+            typename Sent2, typename Iter3, typename Comp, typename Proj1,
+            typename Proj2>
+        constexpr parallel::util::in_in_out_result<Iter1, Iter2, Iter3>
+        sequential_set_intersection(Iter1 first1, Sent1 last1, Iter2 first2,
+            Sent2 last2, Iter3 dest, Comp&& comp, Proj1&& proj1, Proj2&& proj2)
+        {
+            while (first1 != last1 && first2 != last2)
+            {
+                if (hpx::util::invoke(comp, hpx::util::invoke(proj1, *first1),
+                        hpx::util::invoke(proj2, *first2)))
+                {
+                    ++first1;
+                }
+                else
+                {
+                    if (!hpx::util::invoke(comp,
+                            hpx::util::invoke(proj2, *first2),
+                            hpx::util::invoke(proj1, *first1)))
+                    {
+                        *dest++ = *first1++;
+                    }
+                    ++first2;
+                }
+            }
+            return {first1, first2, dest};
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Iter1, typename Iter2, typename Iter3>
+        util::in_in_out_result<Iter1, Iter2, Iter3> compose_in_in_out_result(
+            Iter1 it1, Iter2 it2, Iter3 dest)
+        {
+            return util::in_in_out_result<Iter1, Iter2, Iter3>{it1, it2, dest};
+        }
+
+        template <typename Iter1, typename Iter2, typename Iter3>
+        hpx::future<util::in_in_out_result<Iter1, Iter2, Iter3>>
+        compose_in_in_out_result(
+            Iter1 it1, Iter2 it2, hpx::future<Iter3>&& dest)
+        {
+            return dest.then([it1, it2](hpx::future<Iter3>&& f) {
+                return util::in_in_out_result<Iter1, Iter2, Iter3>{
+                    it1, it2, f.get()};
+            });
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Result>
+        struct set_intersection
+          : public detail::algorithm<set_intersection<Result>, Result>
+        {
+            set_intersection()
+              : set_intersection::algorithm("set_intersection")
+            {
+            }
+
+            template <typename ExPolicy, typename Iter1, typename Sent1,
+                typename Iter2, typename Sent2, typename Iter3, typename F,
+                typename Proj1, typename Proj2>
+            static util::in_in_out_result<Iter1, Iter2, Iter3> sequential(
+                ExPolicy, Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
+                Iter3 dest, F&& f, Proj1&& proj1, Proj2&& proj2)
+            {
+                return sequential_set_intersection(first1, last1, first2, last2,
+                    dest, std::forward<F>(f), std::forward<Proj1>(proj1),
+                    std::forward<Proj2>(proj2));
+            }
+
+            template <typename ExPolicy, typename Iter1, typename Sent1,
+                typename Iter2, typename Sent2, typename Iter3, typename F,
+                typename Proj1, typename Proj2>
+            static typename util::detail::algorithm_result<ExPolicy,
+                util::in_in_out_result<Iter1, Iter2, Iter3>>::type
+            parallel(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
+                Sent2 last2, Iter3 dest, F&& f, Proj1&& proj1, Proj2&& proj2)
+            {
+                using difference_type1 =
+                    typename std::iterator_traits<Iter1>::difference_type;
+                using difference_type2 =
+                    typename std::iterator_traits<Iter2>::difference_type;
+
+                using result_type = util::in_in_out_result<Iter1, Iter2, Iter3>;
+                using result =
+                    util::detail::algorithm_result<ExPolicy, result_type>;
+
+                if (first1 == last1 || first2 == last2)
+                {
+                    return result::get(result_type{
+                        std::move(first1), std::move(first2), std::move(dest)});
+                }
+
+                typedef typename set_operations_buffer<Iter3>::type buffer_type;
+                typedef typename hpx::util::decay<F>::type func_type;
+
+                auto last = set_operation(
+                    std::forward<ExPolicy>(policy), first1, last1, first2,
+                    last2, dest, std::forward<F>(f),
+                    // calculate approximate destination index
+                    [](difference_type1 idx1, difference_type2 idx2)
+                        -> difference_type1 { return (std::min)(idx1, idx2); },
+                    // perform required set operation for one chunk
+                    [proj1 = std::forward<Proj1>(proj1),
+                        proj2 = std::forward<Proj2>(proj2)](Iter1 part_first1,
+                        Sent1 part_last1, Iter2 part_first2, Sent2 part_last2,
+                        buffer_type* dest, func_type const& f) -> buffer_type* {
+                        return sequential_set_intersection(part_first1,
+                            part_last1, part_first2, part_last2, dest, f, proj1,
+                            proj2)
+                            .out;
+                    });
+
+                // construct return value
+                difference_type1 len1 = detail::distance(first1, last1);
+                difference_type2 len2 = detail::distance(first2, last2);
+                auto len = (std::min)(len1, len2);
+
+                detail::advance(first1, len);
+                detail::advance(first2, len);
+                return compose_in_in_out_result(
+                    std::move(first1), std::move(first2), std::move(last));
+            }
+        };
+    }    // namespace detail
+
+    // clang-format off
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename FwdIter3, typename Pred = detail::less,
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter1>::value &&
+            hpx::traits::is_iterator<FwdIter2>::value &&
+            hpx::traits::is_iterator<FwdIter3>::value &&
+            hpx::traits::is_invocable<Pred,
+                typename std::iterator_traits<FwdIter1>::value_type,
+                typename std::iterator_traits<FwdIter2>::value_type
+            >::value
+        )>
+    // clang-format on
+    HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::set_intersection is deprecated, use "
+        "hpx::set_intersection instead")
+        typename util::detail::algorithm_result<ExPolicy, FwdIter3>::type
+        set_intersection(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, Pred&& op = Pred())
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
@@ -187,14 +286,109 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter3>::value),
             "Requires at least forward iterator.");
 
-        typedef std::integral_constant<bool,
+        using is_seq = std::integral_constant<bool,
             hpx::is_sequenced_execution_policy<ExPolicy>::value ||
                 !hpx::traits::is_random_access_iterator<FwdIter1>::value ||
-                !hpx::traits::is_random_access_iterator<FwdIter2>::value>
-            is_seq;
+                !hpx::traits::is_random_access_iterator<FwdIter2>::value>;
 
-        return detail::set_intersection<FwdIter3>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
-            last2, dest, std::forward<Pred>(op));
+        using result_type =
+            parallel::util::in_in_out_result<FwdIter1, FwdIter2, FwdIter3>;
+
+        return util::get_third_element(
+            detail::set_intersection<result_type>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
+                last2, dest, std::forward<Pred>(op),
+                util::projection_identity(), util::projection_identity()));
     }
 }}}    // namespace hpx::parallel::v1
+
+namespace hpx {
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::set_intersection
+    HPX_INLINE_CONSTEXPR_VARIABLE struct set_intersection_t final
+      : hpx::functional::tag<set_intersection_t>
+    {
+    private:
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename FwdIter3, typename Pred = hpx::parallel::v1::detail::less,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::traits::is_iterator<FwdIter3>::value &&
+                hpx::traits::is_invocable<Pred,
+                    typename std::iterator_traits<FwdIter1>::value_type,
+                    typename std::iterator_traits<FwdIter2>::value_type
+                >::value
+            )>
+        // clang-format on
+        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter3>::type
+        tag_invoke(set_intersection_t, ExPolicy&& policy, FwdIter1 first1,
+            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, FwdIter3 dest,
+            Pred&& op = Pred())
+        {
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+                "Requires at least forward iterator.");
+            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+                "Requires at least forward iterator.");
+            static_assert((hpx::traits::is_forward_iterator<FwdIter3>::value),
+                "Requires at least forward iterator.");
+
+            using is_seq = std::integral_constant<bool,
+                hpx::parallel::execution::is_sequenced_execution_policy<
+                    ExPolicy>::value ||
+                    !hpx::traits::is_random_access_iterator<FwdIter1>::value ||
+                    !hpx::traits::is_random_access_iterator<FwdIter2>::value>;
+
+            using result_type = hpx::parallel::util::in_in_out_result<FwdIter1,
+                FwdIter2, FwdIter3>;
+
+            return hpx::parallel::util::get_third_element(
+                hpx::parallel::v1::detail::set_intersection<result_type>().call(
+                    std::forward<ExPolicy>(policy), is_seq(), first1, last1,
+                    first2, last2, dest, std::forward<Pred>(op),
+                    hpx::parallel::util::projection_identity(),
+                    hpx::parallel::util::projection_identity()));
+        }
+
+        // clang-format off
+        template <typename FwdIter1, typename FwdIter2, typename FwdIter3,
+            typename Pred = hpx::parallel::v1::detail::less,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::traits::is_iterator<FwdIter3>::value &&
+                hpx::traits::is_invocable<Pred,
+                    typename std::iterator_traits<FwdIter1>::value_type,
+                    typename std::iterator_traits<FwdIter2>::value_type
+                >::value
+            )>
+        // clang-format on
+        friend FwdIter3 tag_invoke(set_intersection_t, FwdIter1 first1,
+            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, FwdIter3 dest,
+            Pred&& op = Pred())
+        {
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+                "Requires at least forward iterator.");
+            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+                "Requires at least forward iterator.");
+            static_assert((hpx::traits::is_forward_iterator<FwdIter3>::value),
+                "Requires at least forward iterator.");
+
+            using result_type = hpx::parallel::util::in_in_out_result<FwdIter1,
+                FwdIter2, FwdIter3>;
+
+            return hpx::parallel::util::get_third_element(
+                hpx::parallel::v1::detail::set_intersection<result_type>().call(
+                    hpx::execution::seq, std::true_type(), first1, last1,
+                    first2, last2, dest, std::forward<Pred>(op),
+                    hpx::parallel::util::projection_identity(),
+                    hpx::parallel::util::projection_identity()));
+        }
+    } set_intersection{};
+}    // namespace hpx
+
+#endif    // DOXYGEN

@@ -59,6 +59,7 @@ set(tests
     rotate_copy_range
     search_range
     searchn_range
+    set_intersection_range
     sort_range
     stable_sort_range
     transform_range

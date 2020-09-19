@@ -553,7 +553,7 @@ Parallel algorithms
      * Computes the difference between two sets.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`set_difference`
-   * * :cpp:func:`hpx::parallel::v1::set_intersection`
+   * * :cpp:func:`hpx::set_intersection`
      * Computes the intersection of two sets.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`set_intersection`
