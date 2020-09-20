@@ -32,6 +32,7 @@
 #include <hpx/parallel/container_algorithms/reverse.hpp>
 #include <hpx/parallel/container_algorithms/rotate.hpp>
 #include <hpx/parallel/container_algorithms/search.hpp>
+#include <hpx/parallel/container_algorithms/set_difference.hpp>
 #include <hpx/parallel/container_algorithms/set_intersection.hpp>
 #include <hpx/parallel/container_algorithms/sort.hpp>
 #include <hpx/parallel/container_algorithms/stable_sort.hpp>

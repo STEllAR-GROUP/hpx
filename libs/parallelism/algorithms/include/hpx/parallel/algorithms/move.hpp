@@ -206,7 +206,7 @@ namespace hpx {
         tag_invoke(move_t, ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
             FwdIter2 dest)
         {
-            return hpx::parallel::v1::detail::get_second_element(
+            return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::transfer<
                     hpx::parallel::v1::detail::move<FwdIter1, FwdIter2>>(
                     std::forward<ExPolicy>(policy), first, last, dest));

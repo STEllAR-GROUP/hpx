@@ -225,8 +225,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         std::move(first1), std::move(first2), std::move(dest)});
                 }
 
-                typedef typename set_operations_buffer<Iter3>::type buffer_type;
-                typedef typename hpx::util::decay<F>::type func_type;
+                using buffer_type = typename set_operations_buffer<Iter3>::type;
+                using func_type = typename hpx::util::decay<F>::type;
 
                 auto last = set_operation(
                     std::forward<ExPolicy>(policy), first1, last1, first2,
@@ -250,10 +250,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 difference_type2 len2 = detail::distance(first2, last2);
                 auto len = (std::min)(len1, len2);
 
-                detail::advance(first1, len);
-                detail::advance(first2, len);
-                return compose_in_in_out_result(
-                    std::move(first1), std::move(first2), std::move(last));
+                return compose_in_in_out_result(std::next(first1, len),
+                    std::next(first2, len), std::move(last));
             }
         };
     }    // namespace detail
