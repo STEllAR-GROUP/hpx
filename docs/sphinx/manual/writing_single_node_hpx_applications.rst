@@ -545,7 +545,7 @@ Parallel algorithms
      * Merges two ordered ranges in-place.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`inplace_merge`
-   * * :cpp:func:`hpx::parallel::v1::includes`
+   * * :cpp:func:`hpx::includes`
      * Returns true if one set is a subset of another.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`includes`

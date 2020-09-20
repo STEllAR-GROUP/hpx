@@ -30,6 +30,7 @@ set(tests
     foreach_range
     foreach_range_projection
     generate_range
+    includes_range
     inplace_merge_range
     is_heap_range
     is_heap_until_range

@@ -51,7 +51,7 @@ Functions
 - :cpp:func:`hpx::for_each_n`
 - :cpp:func:`hpx::generate`
 - :cpp:func:`hpx::generate_n`
-- :cpp:func:`hpx::parallel::v1::includes`
+- :cpp:func:`hpx::includes`
 - :cpp:func:`hpx::parallel::v1::inplace_merge`
 - :cpp:func:`hpx::is_heap`
 - :cpp:func:`hpx::is_heap_until`

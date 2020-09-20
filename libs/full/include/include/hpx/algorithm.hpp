@@ -15,7 +15,6 @@
 
 namespace hpx {
     using hpx::parallel::adjacent_find;
-    using hpx::parallel::includes;
     using hpx::parallel::inplace_merge;
     using hpx::parallel::is_partitioned;
     using hpx::parallel::is_sorted;

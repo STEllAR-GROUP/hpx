@@ -45,7 +45,7 @@ void test_includes1(IteratorTag)
     base_iterator end_it = std::next(std::begin(c1), end);
 
     {
-        bool result = hpx::includes(
+        bool result = hpx::ranges::includes(
             iterator(std::begin(c1)), iterator(std::end(c1)), start_it, end_it);
 
         bool expected =
@@ -64,7 +64,7 @@ void test_includes1(IteratorTag)
             std::uniform_int_distribution<> dis(0, c2.size() - 1);
             ++c2[dis(gen)];    //-V104
 
-            bool result = hpx::includes(iterator(std::begin(c1)),
+            bool result = hpx::ranges::includes(iterator(std::begin(c1)),
                 iterator(std::end(c1)), std::begin(c2), std::end(c2));
 
             bool expected = std::includes(
@@ -79,8 +79,9 @@ void test_includes1(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_includes1(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -100,7 +101,7 @@ void test_includes1(ExPolicy&& policy, IteratorTag)
     base_iterator end_it = std::next(std::begin(c1), end);
 
     {
-        bool result = hpx::includes(policy, iterator(std::begin(c1)),
+        bool result = hpx::ranges::includes(policy, iterator(std::begin(c1)),
             iterator(std::end(c1)), start_it, end_it);
 
         bool expected =
@@ -119,8 +120,9 @@ void test_includes1(ExPolicy&& policy, IteratorTag)
             std::uniform_int_distribution<> dis(0, c2.size() - 1);
             ++c2[dis(gen)];    //-V104
 
-            bool result = hpx::includes(policy, iterator(std::begin(c1)),
-                iterator(std::end(c1)), std::begin(c2), std::end(c2));
+            bool result =
+                hpx::ranges::includes(policy, iterator(std::begin(c1)),
+                    iterator(std::end(c1)), std::begin(c2), std::end(c2));
 
             bool expected = std::includes(
                 std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
@@ -151,8 +153,8 @@ void test_includes1_async(ExPolicy&& p, IteratorTag)
     base_iterator end_it = std::next(std::begin(c1), end);
 
     {
-        hpx::future<bool> result = hpx::includes(p, iterator(std::begin(c1)),
-            iterator(std::end(c1)), start_it, end_it);
+        hpx::future<bool> result = hpx::ranges::includes(p,
+            iterator(std::begin(c1)), iterator(std::end(c1)), start_it, end_it);
         result.wait();
 
         bool expected =
@@ -172,7 +174,7 @@ void test_includes1_async(ExPolicy&& p, IteratorTag)
             ++c2[dis(gen)];    //-V104
 
             hpx::future<bool> result =
-                hpx::includes(p, iterator(std::begin(c1)),
+                hpx::ranges::includes(p, iterator(std::begin(c1)),
                     iterator(std::end(c1)), std::begin(c2), std::end(c2));
             result.wait();
 
@@ -228,7 +230,7 @@ void test_includes2(IteratorTag)
     base_iterator end_it = std::next(std::begin(c1), end);
 
     {
-        bool result = hpx::includes(iterator(std::begin(c1)),
+        bool result = hpx::ranges::includes(iterator(std::begin(c1)),
             iterator(std::end(c1)), start_it, end_it, std::less<std::size_t>());
 
         bool expected = std::includes(std::begin(c1), std::end(c1), start_it,
@@ -247,9 +249,9 @@ void test_includes2(IteratorTag)
             std::uniform_int_distribution<> dis(0, c2.size() - 1);
             ++c2[dis(gen)];    //-V104
 
-            bool result =
-                hpx::includes(iterator(std::begin(c1)), iterator(std::end(c1)),
-                    std::begin(c2), std::end(c2), std::less<std::size_t>());
+            bool result = hpx::ranges::includes(iterator(std::begin(c1)),
+                iterator(std::end(c1)), std::begin(c2), std::end(c2),
+                std::less<std::size_t>());
 
             bool expected = std::includes(std::begin(c1), std::end(c1),
                 std::begin(c2), std::end(c2), std::less<std::size_t>());
@@ -263,8 +265,9 @@ void test_includes2(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_includes2(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -284,7 +287,7 @@ void test_includes2(ExPolicy&& policy, IteratorTag)
     base_iterator end_it = std::next(std::begin(c1), end);
 
     {
-        bool result = hpx::includes(policy, iterator(std::begin(c1)),
+        bool result = hpx::ranges::includes(policy, iterator(std::begin(c1)),
             iterator(std::end(c1)), start_it, end_it, std::less<std::size_t>());
 
         bool expected = std::includes(std::begin(c1), std::end(c1), start_it,
@@ -303,9 +306,9 @@ void test_includes2(ExPolicy&& policy, IteratorTag)
             std::uniform_int_distribution<> dis(0, c2.size() - 1);
             ++c2[dis(gen)];    //-V104
 
-            bool result = hpx::includes(policy, iterator(std::begin(c1)),
-                iterator(std::end(c1)), std::begin(c2), std::end(c2),
-                std::less<std::size_t>());
+            bool result = hpx::ranges::includes(policy,
+                iterator(std::begin(c1)), iterator(std::end(c1)),
+                std::begin(c2), std::end(c2), std::less<std::size_t>());
 
             bool expected = std::includes(std::begin(c1), std::end(c1),
                 std::begin(c2), std::end(c2), std::less<std::size_t>());
@@ -337,8 +340,9 @@ void test_includes2_async(ExPolicy&& p, IteratorTag)
     base_iterator end_it = std::next(std::begin(c1), end);
 
     {
-        hpx::future<bool> result = hpx::includes(p, iterator(std::begin(c1)),
-            iterator(std::end(c1)), start_it, end_it, std::less<std::size_t>());
+        hpx::future<bool> result = hpx::ranges::includes(p,
+            iterator(std::begin(c1)), iterator(std::end(c1)), start_it, end_it,
+            std::less<std::size_t>());
         result.wait();
 
         bool expected = std::includes(std::begin(c1), std::end(c1), start_it,
@@ -357,7 +361,7 @@ void test_includes2_async(ExPolicy&& p, IteratorTag)
             std::uniform_int_distribution<> dis(0, c2.size() - 1);
             ++c2[dis(gen)];    //-V104
 
-            hpx::future<bool> result = hpx::includes(p,
+            hpx::future<bool> result = hpx::ranges::includes(p,
                 iterator(std::begin(c1)), iterator(std::end(c1)),
                 std::begin(c2), std::end(c2), std::less<std::size_t>());
             result.wait();
@@ -421,7 +425,7 @@ void test_includes_exception(IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::includes(iterator(std::begin(c1)), iterator(std::end(c1)),
+        hpx::ranges::includes(iterator(std::begin(c1)), iterator(std::end(c1)),
             start_it, end_it, [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), true;
             });
@@ -445,8 +449,9 @@ void test_includes_exception(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_includes_exception(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -473,8 +478,9 @@ void test_includes_exception(ExPolicy&& policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::includes(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
-            start_it, end_it, [](std::size_t v1, std::size_t v2) {
+        hpx::ranges::includes(policy, iterator(std::begin(c1)),
+            iterator(std::end(c1)), start_it, end_it,
+            [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), true;
             });
 
@@ -522,11 +528,11 @@ void test_includes_exception_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<bool> f =
-            hpx::includes(p, iterator(std::begin(c1)), iterator(std::end(c1)),
-                start_it, end_it, [](std::size_t v1, std::size_t v2) {
-                    return throw std::runtime_error("test"), true;
-                });
+        hpx::future<bool> f = hpx::ranges::includes(p, iterator(std::begin(c1)),
+            iterator(std::end(c1)), start_it, end_it,
+            [](std::size_t v1, std::size_t v2) {
+                return throw std::runtime_error("test"), true;
+            });
         returned_from_algorithm = true;
         f.get();
 
@@ -598,7 +604,7 @@ void test_includes_bad_alloc(IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::includes(iterator(std::begin(c1)), iterator(std::end(c1)),
+        hpx::ranges::includes(iterator(std::begin(c1)), iterator(std::end(c1)),
             start_it, end_it, [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), true;
             });
@@ -620,8 +626,9 @@ void test_includes_bad_alloc(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_includes_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -648,8 +655,9 @@ void test_includes_bad_alloc(ExPolicy&& policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::includes(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
-            start_it, end_it, [](std::size_t v1, std::size_t v2) {
+        hpx::ranges::includes(policy, iterator(std::begin(c1)),
+            iterator(std::end(c1)), start_it, end_it,
+            [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), true;
             });
 
@@ -696,11 +704,11 @@ void test_includes_bad_alloc_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<bool> f =
-            hpx::includes(p, iterator(std::begin(c1)), iterator(std::end(c1)),
-                start_it, end_it, [](std::size_t v1, std::size_t v2) {
-                    return throw std::bad_alloc(), true;
-                });
+        hpx::future<bool> f = hpx::ranges::includes(p, iterator(std::begin(c1)),
+            iterator(std::end(c1)), start_it, end_it,
+            [](std::size_t v1, std::size_t v2) {
+                return throw std::bad_alloc(), true;
+            });
         returned_from_algorithm = true;
         f.get();
 
