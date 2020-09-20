@@ -22,6 +22,7 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <functional>
 #include <iterator>
 #include <memory>
@@ -199,14 +200,15 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
         else
         {
-            value_type* ptr =
-                std::get_temporary_buffer<value_type>(nelem).first;
+            // acquire uninitialized memory
+            value_type* ptr = static_cast<value_type*>(
+                std::malloc(sizeof(value_type) * nelem));
             if (ptr == nullptr)
             {
                 throw std::bad_alloc();
             }
-            owner = true;
             global_buf = range_buf(ptr, ptr + nelem);
+            owner = true;
         }
 
         // processing
@@ -226,9 +228,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             construct = false;
         }
 
-        if (global_buf.begin() != nullptr && owner)
+        if (owner)
         {
-            std::return_temporary_buffer(global_buf.begin());
+            std::free(global_buf.begin());
         }
     }
 

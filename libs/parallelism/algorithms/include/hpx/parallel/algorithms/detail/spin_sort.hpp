@@ -124,9 +124,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 construct = false;
             }
 
-            if (owner && ptr != nullptr)
+            if (owner)
             {
-                std::return_temporary_buffer(ptr);
+                std::free(ptr);
             }
         }
     };    // End of class spin_sort_helper
@@ -163,7 +163,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         if (ptr == nullptr)
         {
-            ptr = std::get_temporary_buffer<value_type>(nptr).first;
+            // acquire uninitialized memory
+            ptr = static_cast<value_type*>(
+                std::malloc(nptr * sizeof(value_type)));
             if (ptr == nullptr)
             {
                 throw std::bad_alloc();
@@ -171,7 +173,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             owner = true;
         }
 
-        range_buf rng_buf(ptr, (ptr + nptr));
+        range_buf rng_buf(ptr, ptr + nptr);
 
         std::uint32_t nlevel =
             util::nbits64(((nelem + sort_min - 1) / sort_min) - 1) - 1;
