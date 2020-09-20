@@ -549,7 +549,7 @@ Parallel algorithms
      * Returns true if one set is a subset of another.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`includes`
-   * * :cpp:func:`hpx::parallel::v1::set_difference`
+   * * :cpp:func:`hpx::set_difference`
      * Computes the difference between two sets.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`set_difference`
@@ -557,11 +557,11 @@ Parallel algorithms
      * Computes the intersection of two sets.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`set_intersection`
-   * * :cpp:func:`hpx::parallel::v1::set_symmetric_difference`
+   * * :cpp:func:`hpx::set_symmetric_difference`
      * Computes the symmetric difference between two sets.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`set_symmetric_difference`
-   * * :cpp:func:`hpx::parallel::v1::set_union`
+   * * :cpp:func:`hpx::set_union`
      * Computes the union of two sets.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`set_union`

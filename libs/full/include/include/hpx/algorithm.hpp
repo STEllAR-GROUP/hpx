@@ -40,8 +40,6 @@ namespace hpx {
     using hpx::parallel::rotate_copy;
     using hpx::parallel::search;
     using hpx::parallel::search_n;
-    using hpx::parallel::set_symmetric_difference;
-    using hpx::parallel::set_union;
     using hpx::parallel::sort;
     using hpx::parallel::stable_partition;
     using hpx::parallel::stable_sort;

@@ -15,3 +15,5 @@
 #include <hpx/parallel/container_algorithms/includes.hpp>
 #include <hpx/parallel/container_algorithms/set_difference.hpp>
 #include <hpx/parallel/container_algorithms/set_intersection.hpp>
+#include <hpx/parallel/container_algorithms/set_symmetric_difference.hpp>
+#include <hpx/parallel/container_algorithms/set_union.hpp>

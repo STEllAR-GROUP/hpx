@@ -56,6 +56,11 @@ void test_includes1(IteratorTag)
     }
 
     {
+        // make sure std::less is not violated by incrementing one of the
+        // elements
+        std::transform(std::begin(c1), std::end(c1), std::begin(c1),
+            [](std::size_t val) { return 2 * val; });
+
         std::vector<std::size_t> c2;
         std::copy(start_it, end_it, std::back_inserter(c2));
 
@@ -111,6 +116,11 @@ void test_includes1(ExPolicy&& policy, IteratorTag)
     }
 
     {
+        // make sure std::less is not violated by incrementing one of the
+        // elements
+        std::transform(std::begin(c1), std::end(c1), std::begin(c1),
+            [](std::size_t val) { return 2 * val; });
+
         std::vector<std::size_t> c2;
         std::copy(start_it, end_it, std::back_inserter(c2));
 
@@ -163,6 +173,11 @@ void test_includes1_async(ExPolicy&& p, IteratorTag)
     }
 
     {
+        // make sure std::less is not violated by incrementing one of the
+        // elements
+        std::transform(std::begin(c1), std::end(c1), std::begin(c1),
+            [](std::size_t val) { return 2 * val; });
+
         std::vector<std::size_t> c2;
         std::copy(start_it, end_it, std::back_inserter(c2));
 
@@ -239,6 +254,11 @@ void test_includes2(IteratorTag)
     }
 
     {
+        // make sure std::less is not violated by incrementing one of the
+        // elements
+        std::transform(std::begin(c1), std::end(c1), std::begin(c1),
+            [](std::size_t val) { return 2 * val; });
+
         std::vector<std::size_t> c2;
         std::copy(start_it, end_it, std::back_inserter(c2));
 
@@ -295,6 +315,11 @@ void test_includes2(ExPolicy&& policy, IteratorTag)
     }
 
     {
+        // make sure std::less is not violated by incrementing one of the
+        // elements
+        std::transform(std::begin(c1), std::end(c1), std::begin(c1),
+            [](std::size_t val) { return 2 * val; });
+
         std::vector<std::size_t> c2;
         std::copy(start_it, end_it, std::back_inserter(c2));
 
@@ -349,6 +374,11 @@ void test_includes2_async(ExPolicy&& p, IteratorTag)
     }
 
     {
+        // make sure std::less is not violated by incrementing one of the
+        // elements
+        std::transform(std::begin(c1), std::end(c1), std::begin(c1),
+            [](std::size_t val) { return 2 * val; });
+
         std::vector<std::size_t> c2;
         std::copy(start_it, end_it, std::back_inserter(c2));
 

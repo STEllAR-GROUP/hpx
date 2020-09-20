@@ -102,6 +102,7 @@ namespace hpx {
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/upper_lower_bound.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
@@ -120,67 +121,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // includes
     namespace detail {
 
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Iter, typename Sent, typename T, typename F,
-            typename Proj, typename CancelToken>
-        Iter lower_bound(Iter first, Sent last, T&& value, F&& f, Proj&& proj,
-            CancelToken& tok)
-        {
-            using difference_type =
-                typename std::iterator_traits<Iter>::difference_type;
-
-            difference_type count = detail::distance(first, last);
-            while (count > 0)
-            {
-                if (tok.was_cancelled())
-                    break;
-
-                difference_type step = count / 2;
-                Iter it = detail::next(first, step);
-
-                if (hpx::util::invoke(f, hpx::util::invoke(proj, *it), value))
-                {
-                    first = ++it;
-                    count -= step + 1;
-                }
-                else
-                {
-                    count = step;
-                }
-            }
-            return first;
-        }
-
-        template <typename Iter, typename Sent, typename T, typename F,
-            typename Proj, typename CancelToken>
-        Iter upper_bound(Iter first, Sent last, T&& value, F&& f, Proj&& proj,
-            CancelToken& tok)
-        {
-            using difference_type =
-                typename std::iterator_traits<Iter>::difference_type;
-
-            difference_type count = detail::distance(first, last);
-            while (count > 0)
-            {
-                if (tok.was_cancelled())
-                    break;
-
-                difference_type step = count / 2;
-                Iter it = detail::next(first, step);
-
-                if (!hpx::util::invoke(f, hpx::util::invoke(proj, *it), value))
-                {
-                    first = ++it;
-                    count -= step + 1;
-                }
-                else
-                {
-                    count = step;
-                }
-            }
-            return first;
-        }
-
         template <typename Iter1, typename Sent1, typename Iter2,
             typename Sent2, typename F, typename Proj1, typename Proj2,
             typename CancelToken>
@@ -194,14 +134,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return false;
                 }
 
-                if (first1 == last1 ||
-                    hpx::util::invoke(f, hpx::util::invoke(proj2, *first2),
-                        hpx::util::invoke(proj1, *first1)))
+                if (first1 == last1)
                 {
                     return false;
                 }
-                if (!hpx::util::invoke(f, hpx::util::invoke(proj1, *first1),
-                        hpx::util::invoke(proj2, *first2)))
+
+                auto&& value1 = hpx::util::invoke(proj1, *first1);
+                auto&& value2 = hpx::util::invoke(proj2, *first2);
+
+                if (hpx::util::invoke(f, value2, value1))
+                {
+                    return false;
+                }
+
+                if (!hpx::util::invoke(f, value1, value2))
                 {
                     ++first2;
                 }
@@ -218,14 +164,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             while (first2 != last2)
             {
-                if (first1 == last1 ||
-                    hpx::util::invoke(f, hpx::util::invoke(proj2, *first2),
-                        hpx::util::invoke(proj1, *first1)))
+                if (first1 == last1)
                 {
                     return false;
                 }
-                if (!hpx::util::invoke(f, hpx::util::invoke(proj1, *first1),
-                        hpx::util::invoke(proj2, *first2)))
+
+                auto&& value1 = hpx::util::invoke(proj1, *first1);
+                auto&& value2 = hpx::util::invoke(proj2, *first2);
+
+                if (hpx::util::invoke(f, value2, value1))
+                {
+                    return false;
+                }
+
+                if (!hpx::util::invoke(f, value1, value2))
                 {
                     ++first2;
                 }
@@ -273,73 +225,79 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy), first2,
-                    detail::distance(first2, last2),
+
+                auto f1 =
                     [first1, last1, first2, last2, tok, f = std::forward<F>(f),
                         proj1 = std::forward<Proj1>(proj1),
                         proj2 = std::forward<Proj2>(proj2)](Iter2 part_begin,
                         std::size_t part_count) mutable -> bool {
-                        Iter2 part_end = detail::next(part_begin, part_count);
-                        auto&& value = hpx::util::invoke(proj2, *part_begin);
-                        if (first2 != part_begin)
-                        {
-                            part_begin = upper_bound(
-                                part_begin, part_end, value, f, proj2, tok);
-                            if (tok.was_cancelled())
-                            {
-                                return false;
-                            }
-                            if (part_begin == part_end)
-                            {
-                                return true;
-                            }
-                        }
+                    Iter2 part_end = detail::next(part_begin, part_count);
 
-                        Iter1 low =
-                            lower_bound(first1, last1, value, f, proj1, tok);
+                    auto value = hpx::util::invoke(proj2, *part_begin);
+                    if (first2 != part_begin && part_count > 1)
+                    {
+                        part_begin = detail::upper_bound(
+                            part_begin, part_end, value, f, proj2, tok);
                         if (tok.was_cancelled())
                         {
                             return false;
                         }
-
-                        if (low == last1 ||
-                            hpx::util::invoke(f,
-                                hpx::util::invoke(proj1, *part_begin),
-                                hpx::util::invoke(proj2, *low)))
+                        if (part_begin == part_end)
                         {
-                            tok.cancel();
+                            return true;
+                        }
+                        value = hpx::util::invoke(proj2, *part_begin);
+                    }
+
+                    Iter1 low = detail::lower_bound(
+                        first1, last1, value, f, proj1, tok);
+                    if (tok.was_cancelled())
+                    {
+                        return false;
+                    }
+
+                    if (low == last1 ||
+                        hpx::util::invoke(
+                            f, value, hpx::util::invoke(proj1, *low)))
+                    {
+                        tok.cancel();
+                        return false;
+                    }
+
+                    Iter1 high = last1;
+                    if (part_end != last2)
+                    {
+                        auto&& value1 = hpx::util::invoke(proj2, *part_end);
+
+                        high = detail::upper_bound(
+                            low, last1, value1, f, proj1, tok);
+                        part_end = detail::upper_bound(
+                            part_end, last2, value1, f, proj2, tok);
+
+                        if (tok.was_cancelled())
+                        {
                             return false;
                         }
+                    }
 
-                        Iter1 high = last1;
-                        if (part_end != last2)
-                        {
-                            auto&& value1 = hpx::util::invoke(proj2, *part_end);
+                    if (!sequential_includes(low, high, part_begin, part_end, f,
+                            proj1, proj2, tok))
+                    {
+                        tok.cancel();
+                    }
+                    return !tok.was_cancelled();
+                };
 
-                            high =
-                                upper_bound(low, last1, value1, f, proj1, tok);
-                            part_end = upper_bound(
-                                part_end, last2, value1, f, proj2, tok);
+                auto f2 = [](std::vector<hpx::future<bool>>&& results) {
+                    return std::all_of(hpx::util::begin(results),
+                        hpx::util::end(results),
+                        [](hpx::future<bool>& val) { return val.get(); });
+                };
 
-                            if (tok.was_cancelled())
-                            {
-                                return false;
-                            }
-                        }
-
-                        if (!sequential_includes(low, high, part_begin,
-                                part_end, f, proj1, proj2, tok))
-                        {
-                            tok.cancel();
-                        }
-                        return !tok.was_cancelled();
-                    },
-                    [](std::vector<hpx::future<bool>>&& results) {
-                        return std::all_of(hpx::util::begin(results),
-                            hpx::util::end(results),
-                            [](hpx::future<bool>& val) { return val.get(); });
-                    });
+                return util::partitioner<ExPolicy, bool>::call(
+                    std::forward<ExPolicy>(policy), first2,
+                    detail::distance(first2, last2), std::move(f1),
+                    std::move(f2));
             }
         };
     }    // namespace detail

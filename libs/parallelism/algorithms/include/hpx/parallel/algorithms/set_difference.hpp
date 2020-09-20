@@ -117,6 +117,7 @@ namespace hpx {
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/set_operation.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -136,7 +137,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename Iter1, typename Sent1, typename Iter2,
             typename Sent2, typename Iter3, typename Comp, typename Proj1,
             typename Proj2>
-        util::in_out_result<Iter1, Iter3> sequential_set_difference(
+        constexpr util::in_out_result<Iter1, Iter3> sequential_set_difference(
             Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest,
             Comp&& comp, Proj1&& proj1, Proj2&& proj2)
         {
@@ -147,16 +148,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return util::copy(first1, last1, dest);
                 }
 
-                if (hpx::util::invoke(comp, hpx::util::invoke(proj1, *first1),
-                        hpx::util::invoke(proj2, *first2)))
+                auto&& value1 = hpx::util::invoke(proj1, *first1);
+                auto&& value2 = hpx::util::invoke(proj2, *first2);
+
+                if (hpx::util::invoke(comp, value1, value2))
                 {
                     *dest++ = *first1++;
                 }
                 else
                 {
-                    if (!hpx::util::invoke(comp,
-                            hpx::util::invoke(proj2, *first2),
-                            hpx::util::invoke(proj1, *first1)))
+                    if (!hpx::util::invoke(comp, value2, value1))
                     {
                         ++first1;
                     }
@@ -164,23 +165,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
             }
             return {first1, dest};
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Iter1, typename Iter3>
-        util::in_out_result<Iter1, Iter3> compose_in_out_result(
-            Iter1 it1, Iter3 dest)
-        {
-            return util::in_out_result<Iter1, Iter3>{it1, dest};
-        }
-
-        template <typename Iter1, typename Iter3>
-        hpx::future<util::in_out_result<Iter1, Iter3>> compose_in_out_result(
-            Iter1 it1, hpx::future<Iter3>&& dest)
-        {
-            return dest.then([it1](hpx::future<Iter3>&& f) {
-                return util::in_out_result<Iter1, Iter3>{it1, f.get()};
-            });
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -238,30 +222,35 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using buffer_type = typename set_operations_buffer<Iter3>::type;
                 using func_type = typename hpx::util::decay<F>::type;
 
-                auto last = set_operation(
-                    std::forward<ExPolicy>(policy), first1, last1, first2,
-                    last2, dest, std::forward<F>(f),
-                    // calculate approximate destination index
-                    [](difference_type1 idx1, difference_type2 idx2)
-                        -> difference_type1 { return idx1; },
-                    // perform required set operation for one chunk
-                    [proj1 = std::forward<Proj1>(proj1),
-                        proj2 = std::forward<Proj2>(proj2)](Iter1 part_first1,
-                        Sent1 part_last1, Iter2 part_first2, Sent2 part_last2,
-                        buffer_type* dest, func_type const& f) -> buffer_type* {
-                        return sequential_set_difference(part_first1,
-                            part_last1, part_first2, part_last2, dest, f, proj1,
-                            proj2)
-                            .out;
-                    });
+                // calculate approximate destination index
+                auto f1 = [](difference_type1 idx1,
+                              difference_type2 idx2) -> difference_type1 {
+                    return idx1;
+                };
+
+                // perform required set operation for one chunk
+                auto f2 = [proj1, proj2](Iter1 part_first1, Sent1 part_last1,
+                              Iter2 part_first2, Sent2 part_last2,
+                              buffer_type* dest, func_type const& f) {
+                    auto result =
+                        sequential_set_difference(part_first1, part_last1,
+                            part_first2, part_last2, dest, f, proj1, proj2);
+                    // second element gets dropped on the floor later
+                    return util::in_in_out_result<Iter1, Iter2, buffer_type*>{
+                        result.in, part_first2, result.out};
+                };
+
+                auto last = set_operation(std::forward<ExPolicy>(policy),
+                    first1, last1, first2, last2, dest, std::forward<F>(f),
+                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2),
+                    std::move(f1), std::move(f2));
 
                 // construct return value
-                difference_type1 len1 = detail::distance(first1, last1);
-                difference_type2 len2 = detail::distance(first2, last2);
-                auto len = (std::min)(len1, len2);
-
-                return compose_in_out_result(
-                    std::next(first1, len), std::move(last));
+                return util::detail::convert_to_result(std::move(last),
+                    [](util::in_in_out_result<Iter1, Iter2, Iter3> const& p)
+                        -> result_type {
+                        return {p.in1, p.out};
+                    });
             }
         };
     }    // namespace detail

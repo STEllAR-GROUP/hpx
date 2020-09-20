@@ -142,16 +142,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             while (first1 != last1 && first2 != last2)
             {
-                if (hpx::util::invoke(comp, hpx::util::invoke(proj1, *first1),
-                        hpx::util::invoke(proj2, *first2)))
+                auto&& value1 = hpx::util::invoke(proj1, *first1);
+                auto&& value2 = hpx::util::invoke(proj2, *first2);
+
+                if (hpx::util::invoke(comp, value1, value2))
                 {
                     ++first1;
                 }
                 else
                 {
-                    if (!hpx::util::invoke(comp,
-                            hpx::util::invoke(proj2, *first2),
-                            hpx::util::invoke(proj1, *first1)))
+                    if (!hpx::util::invoke(comp, value2, value1))
                     {
                         *dest++ = *first1++;
                     }
@@ -159,25 +159,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
             }
             return {first1, first2, dest};
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Iter1, typename Iter2, typename Iter3>
-        util::in_in_out_result<Iter1, Iter2, Iter3> compose_in_in_out_result(
-            Iter1 it1, Iter2 it2, Iter3 dest)
-        {
-            return util::in_in_out_result<Iter1, Iter2, Iter3>{it1, it2, dest};
-        }
-
-        template <typename Iter1, typename Iter2, typename Iter3>
-        hpx::future<util::in_in_out_result<Iter1, Iter2, Iter3>>
-        compose_in_in_out_result(
-            Iter1 it1, Iter2 it2, hpx::future<Iter3>&& dest)
-        {
-            return dest.then([it1, it2](hpx::future<Iter3>&& f) {
-                return util::in_in_out_result<Iter1, Iter2, Iter3>{
-                    it1, it2, f.get()};
-            });
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -228,30 +209,24 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using buffer_type = typename set_operations_buffer<Iter3>::type;
                 using func_type = typename hpx::util::decay<F>::type;
 
-                auto last = set_operation(
-                    std::forward<ExPolicy>(policy), first1, last1, first2,
-                    last2, dest, std::forward<F>(f),
-                    // calculate approximate destination index
-                    [](difference_type1 idx1, difference_type2 idx2)
-                        -> difference_type1 { return (std::min)(idx1, idx2); },
-                    // perform required set operation for one chunk
-                    [proj1 = std::forward<Proj1>(proj1),
-                        proj2 = std::forward<Proj2>(proj2)](Iter1 part_first1,
-                        Sent1 part_last1, Iter2 part_first2, Sent2 part_last2,
-                        buffer_type* dest, func_type const& f) -> buffer_type* {
-                        return sequential_set_intersection(part_first1,
-                            part_last1, part_first2, part_last2, dest, f, proj1,
-                            proj2)
-                            .out;
-                    });
+                // calculate approximate destination index
+                auto f1 = [](difference_type1 idx1,
+                              difference_type2 idx2) -> difference_type1 {
+                    return (std::min)(idx1, idx2);
+                };
 
-                // construct return value
-                difference_type1 len1 = detail::distance(first1, last1);
-                difference_type2 len2 = detail::distance(first2, last2);
-                auto len = (std::min)(len1, len2);
+                // perform required set operation for one chunk
+                auto f2 = [proj1, proj2](Iter1 part_first1, Sent1 part_last1,
+                              Iter2 part_first2, Sent2 part_last2,
+                              buffer_type* dest, func_type const& f) {
+                    return sequential_set_intersection(part_first1, part_last1,
+                        part_first2, part_last2, dest, f, proj1, proj2);
+                };
 
-                return compose_in_in_out_result(std::next(first1, len),
-                    std::next(first2, len), std::move(last));
+                return set_operation(std::forward<ExPolicy>(policy), first1,
+                    last1, first2, last2, dest, std::forward<F>(f),
+                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2),
+                    std::move(f1), std::move(f2));
             }
         };
     }    // namespace detail

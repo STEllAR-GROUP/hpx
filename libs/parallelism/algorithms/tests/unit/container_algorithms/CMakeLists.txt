@@ -62,6 +62,8 @@ set(tests
     searchn_range
     set_difference_range
     set_intersection_range
+    set_symmetric_difference_range
+    set_union_range
     sort_range
     stable_sort_range
     transform_range

@@ -96,7 +96,7 @@ namespace hpx { namespace parallel { namespace util {
     hpx::future<O> get_second_element(
         hpx::future<util::in_out_result<I, O>>&& f)
     {
-        return lcos::make_future<O>(
+        return hpx::make_future<O>(
             std::move(f), [](util::in_out_result<I, O>&& p) { return p.out; });
     }
 

@@ -32,6 +32,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/set_operation.hpp
     hpx/parallel/algorithms/detail/spin_sort.hpp
     hpx/parallel/algorithms/detail/transfer.hpp
+    hpx/parallel/algorithms/detail/upper_lower_bound.hpp
     hpx/parallel/algorithms/equal.hpp
     hpx/parallel/algorithms/exclusive_scan.hpp
     hpx/parallel/algorithms/fill.hpp
@@ -107,6 +108,8 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/search.hpp
     hpx/parallel/container_algorithms/set_difference.hpp
     hpx/parallel/container_algorithms/set_intersection.hpp
+    hpx/parallel/container_algorithms/set_symmetric_difference.hpp
+    hpx/parallel/container_algorithms/set_union.hpp
     hpx/parallel/container_algorithms/sort.hpp
     hpx/parallel/container_algorithms/stable_sort.hpp
     hpx/parallel/container_algorithms/transform.hpp
