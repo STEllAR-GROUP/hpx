@@ -253,16 +253,11 @@ namespace hpx { namespace util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        // Use dedicated macro so it may be overridden
-#if !defined(HPX_FORMAT_EXPORT)
-#define HPX_FORMAT_EXPORT HPX_EXPORT
-#endif
-
-        HPX_FORMAT_EXPORT void format_to(std::ostream& os,
+        HPX_EXPORT void format_to(std::ostream& os,
             boost::string_ref format_str, format_arg const* args,
             std::size_t count);
 
-        HPX_FORMAT_EXPORT std::string format(boost::string_ref format_str,
+        HPX_EXPORT std::string format(boost::string_ref format_str,
             format_arg const* args, std::size_t count);
     }    // namespace detail
 
