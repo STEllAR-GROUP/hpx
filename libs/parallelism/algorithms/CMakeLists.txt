@@ -47,6 +47,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/is_partitioned.hpp
     hpx/parallel/algorithms/is_sorted.hpp
     hpx/parallel/algorithms/lexicographical_compare.hpp
+    hpx/parallel/algorithms/make_heap.hpp
     hpx/parallel/algorithms/merge.hpp
     hpx/parallel/algorithms/minmax.hpp
     hpx/parallel/algorithms/mismatch.hpp
@@ -90,6 +91,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/generate.hpp
     hpx/parallel/container_algorithms.hpp
     hpx/parallel/container_algorithms/is_heap.hpp
+    hpx/parallel/container_algorithms/make_heap.hpp
     hpx/parallel/container_algorithms/merge.hpp
     hpx/parallel/container_algorithms/minmax.hpp
     hpx/parallel/container_algorithms/mismatch.hpp

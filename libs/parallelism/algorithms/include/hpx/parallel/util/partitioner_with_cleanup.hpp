@@ -95,7 +95,7 @@ namespace hpx { namespace parallel { namespace util {
 
                 // always rethrow if 'errors' is not empty or workitems has
                 // exceptional future
-                handle_local_exceptions::call(
+                handle_local_exceptions::call_with_cleanup(
                     workitems, errors, std::forward<Cleanup>(cleanup));
 
                 try
@@ -180,7 +180,7 @@ namespace hpx { namespace parallel { namespace util {
                         std::vector<hpx::future<Result>>&& r) mutable -> R {
                         HPX_UNUSED(scoped_params);
 
-                        handle_local_exceptions::call(
+                        handle_local_exceptions::call_with_cleanup(
                             r, errors, std::forward<Cleanup>(cleanup));
                         return f(std::move(r));
                     },

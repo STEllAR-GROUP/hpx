@@ -109,7 +109,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
 
         template <typename T, typename Cleanup>
-        static void call(std::vector<hpx::future<T>>& workitems,
+        static void call_with_cleanup(std::vector<hpx::future<T>>& workitems,
             std::list<std::exception_ptr>& errors, Cleanup&& cleanup,
             bool throw_errors = true)
         {
@@ -221,7 +221,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
 
         template <typename T, typename Cleanup>
-        static void call(std::vector<hpx::future<T>> const& workitems,
+        static void call_with_cleanup(
+            std::vector<hpx::future<T>> const& workitems,
             std::list<std::exception_ptr>&, Cleanup&&, bool = true)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)

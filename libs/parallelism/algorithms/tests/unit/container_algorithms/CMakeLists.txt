@@ -33,6 +33,7 @@ set(tests
     inplace_merge_range
     is_heap_range
     is_heap_until_range
+    make_heap_range
     max_element_range
     merge_range
     min_element_range
