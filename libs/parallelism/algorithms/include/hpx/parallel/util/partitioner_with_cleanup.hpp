@@ -172,7 +172,7 @@ namespace hpx { namespace parallel { namespace util {
                 // wait for all tasks to finish
 #if defined(HPX_COMPUTE_DEVICE_CODE)
                 HPX_ASSERT(false);
-                return hpx::make_ready_future();
+                return hpx::future<R>{};
 #else
                 return hpx::dataflow(
                     [errors = std::move(errors),

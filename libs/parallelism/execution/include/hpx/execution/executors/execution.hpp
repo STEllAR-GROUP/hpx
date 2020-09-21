@@ -1104,7 +1104,9 @@ namespace hpx { namespace parallel { namespace execution {
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
                 HPX_ASSERT(false);
-                return make_ready_future();
+                return typename hpx::traits::executor_future<Executor,
+                    typename bulk_then_execute_result<F, Shape, Future,
+                        Ts...>::type>::type{};
 #else
                 // result_of_t<F(Shape::value_type, Future)>
                 typedef typename then_bulk_function_result<F, Shape, Future,
