@@ -23,21 +23,21 @@ namespace hpx { namespace lcos {
     // This function creates P/A communicator objects, (where P is the number
     // of participating sites, and A is the arity). Each invocation of the
     // function returns the communication node closest to the caller.
-    //
-    //               /                     \
-    //              0                       8
-    //             / \                     / \
-    //            /   \                   /   \
-    //           /     \                 /     \
-    //          /       \               /       \
-    //         /         \             /         \
-    //        0           4           8           2
-    //       / \         / \         / \         / \
-    //      /   \       /   \       /   \       /   \
-    //     0     2     4     6     8     0     2     4    <-- communicator nodes
-    //    / \   / \   / \   / \   / \   / \   / \   / \
-    //   0   1 2   3 4   5 6   7 8   9 0   1 2   3 4   5  <-- participants
-    //
+    /*
+                     /                     \
+                    0                       8
+                   / \                     / \
+                  /   \                   /   \
+                 /     \                 /     \
+                /       \               /       \
+               /         \             /         \
+              0           4           8           2
+             / \         / \         / \         / \
+            /   \       /   \       /   \       /   \
+           0     2     4     6     8     0     2     4    <-- communicator nodes
+          / \   / \   / \   / \   / \   / \   / \   / \
+         0   1 2   3 4   5 6   7 8   9 0   1 2   3 4   5  <-- participants
+    */
     // As can be seen from the graph, every evenly numbered participant should
     // create an communication node, while every odd numbered participant should
     // connect to its left neighbor (similar for other arities).
