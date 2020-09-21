@@ -68,7 +68,7 @@ void test_apply_with_executor(Executor& exec)
     }
 
     {
-        hpx::lcos::promise<std::int32_t> p;
+        hpx::lcos::local::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         p.set_value(1);

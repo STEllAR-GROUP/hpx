@@ -47,7 +47,7 @@ void wait_until(hpx::lcos::shared_future<int> f)
 
 void test_wait_for()
 {
-    hpx::lcos::promise<int> promise;
+    hpx::lcos::local::promise<int> promise;
     hpx::lcos::shared_future<int> future = promise.get_future();
 
     hpx::thread thread(&wait_for, future);
@@ -71,7 +71,7 @@ void test_wait_for()
 
 void test_wait_until()
 {
-    hpx::lcos::promise<int> promise;
+    hpx::lcos::local::promise<int> promise;
     hpx::lcos::shared_future<int> future = promise.get_future();
 
     hpx::thread thread(&wait_until, future);
