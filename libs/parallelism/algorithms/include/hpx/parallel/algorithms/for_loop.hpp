@@ -1068,7 +1068,7 @@ namespace hpx {
 
         template <typename ExPolicy, typename I, typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 (hpx::traits::is_iterator<I>::value ||
                     std::is_integral<I>::value))>
         HPX_DEPRECATED_V(1, 6,
@@ -1103,7 +1103,7 @@ namespace hpx {
 
         template <typename ExPolicy, typename I, typename S, typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                execution::is_execution_policy<ExPolicy>::value&&
+                hpx::is_execution_policy<ExPolicy>::value&&
                     std::is_integral<S>::value &&
                 (hpx::traits::is_iterator<I>::value ||
                     std::is_integral<I>::value))>
@@ -1144,7 +1144,7 @@ namespace hpx {
         template <typename ExPolicy, typename I, typename Size,
             typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                execution::is_execution_policy<ExPolicy>::value&&
+                hpx::is_execution_policy<ExPolicy>::value&&
                     std::is_integral<Size>::value &&
                 (hpx::traits::is_iterator<I>::value ||
                     std::is_integral<I>::value))>
@@ -1180,7 +1180,7 @@ namespace hpx {
         template <typename ExPolicy, typename I, typename Size, typename S,
             typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                execution::is_execution_policy<ExPolicy>::value&& std::
+                hpx::is_execution_policy<ExPolicy>::value&& std::
                     is_integral<Size>::value&& std::is_integral<S>::value &&
                 (hpx::traits::is_iterator<I>::value ||
                     std::is_integral<I>::value))>
@@ -1225,7 +1225,7 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename I, typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 (hpx::traits::is_iterator<I>::value ||
                  std::is_integral<I>::value)
             )>
@@ -1269,7 +1269,7 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename I, typename S, typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 std::is_integral<S>::value &&
                 (hpx::traits::is_iterator<I>::value ||
                  std::is_integral<I>::value)
@@ -1320,7 +1320,7 @@ namespace hpx {
         template <typename ExPolicy, typename I, typename Size,
             typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 std::is_integral<Size>::value &&
                 (hpx::traits::is_iterator<I>::value ||
                  std::is_integral<I>::value)
@@ -1367,7 +1367,7 @@ namespace hpx {
         template <typename ExPolicy, typename I, typename Size, typename S,
             typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 std::is_integral<Size>::value &&
                 std::is_integral<S>::value &&
                 (hpx::traits::is_iterator<I>::value ||

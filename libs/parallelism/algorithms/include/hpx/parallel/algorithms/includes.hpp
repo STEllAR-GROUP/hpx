@@ -346,7 +346,7 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Pred = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value &&
                 hpx::traits::is_invocable<Pred,

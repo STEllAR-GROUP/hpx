@@ -393,7 +393,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename Rng, typename F,
         typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_range<Rng>::value &&
             hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
             hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
@@ -474,7 +474,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename FwdIter, typename Sent, typename F,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_forward_iterator<FwdIter>::value &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
                 hpx::parallel::traits::is_projected<Proj, FwdIter>::value &&
@@ -497,7 +497,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Rng, typename F,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
@@ -554,7 +554,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename FwdIter, typename Size, typename F,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_forward_iterator<FwdIter>::value &&
                 hpx::parallel::traits::is_projected<Proj, FwdIter>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, F,

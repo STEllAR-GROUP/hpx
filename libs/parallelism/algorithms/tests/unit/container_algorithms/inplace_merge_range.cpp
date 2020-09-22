@@ -168,8 +168,8 @@ void test_inplace_merge_stable(
 {
 #if defined(HPX_HAVE_STABLE_INPLACE_MERGE)
     static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+        hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef typename std::pair<DataType, int> ElemType;
     typedef typename std::vector<ElemType>::iterator base_iterator;

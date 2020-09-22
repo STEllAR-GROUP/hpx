@@ -513,7 +513,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format off
     template <typename ExPolicy, typename FwdIter, typename T,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIter>::value
         )>
     // clang-format on
@@ -643,7 +643,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format off
     template <typename ExPolicy, typename FwdIter, typename F,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIter>::value &&
             hpx::traits::is_invocable<F,
                 typename std::iterator_traits<FwdIter>::value_type
@@ -777,7 +777,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format off
     template <typename ExPolicy, typename FwdIter, typename F,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIter>::value &&
             hpx::traits::is_invocable<F,
                 typename std::iterator_traits<FwdIter>::value_type
@@ -976,7 +976,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename Pred = detail::equal_to,
         typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value
         )>
@@ -1120,7 +1120,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value
         )>
@@ -1158,7 +1158,7 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename T,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
@@ -1199,7 +1199,7 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename F,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value &&
                 hpx::traits::is_invocable<F,
                     typename std::iterator_traits<FwdIter>::value_type
@@ -1245,7 +1245,7 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename F,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value &&
                 hpx::traits::is_invocable<F,
                     typename std::iterator_traits<FwdIter>::value_type
@@ -1293,7 +1293,7 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Pred,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value &&
                 hpx::traits::is_invocable<Pred,
@@ -1326,7 +1326,7 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
@@ -1412,7 +1412,7 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Pred,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value &&
                 hpx::traits::is_invocable<Pred,
@@ -1445,7 +1445,7 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value
             )>

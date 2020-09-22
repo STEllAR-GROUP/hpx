@@ -223,8 +223,8 @@ template <typename ExPolicy, typename IteratorTag, typename DataType>
 void test_merge_etc(ExPolicy&& policy, IteratorTag, DataType, int rand_base)
 {
     static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+        hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef typename std::vector<DataType>::iterator base_iterator;
 
@@ -327,8 +327,8 @@ template <typename ExPolicy, typename IteratorTag, typename DataType>
 void test_merge_stable(ExPolicy&& policy, IteratorTag, DataType, int rand_base)
 {
     static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+        hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef typename std::pair<DataType, int> ElemType;
     typedef typename std::vector<ElemType>::iterator base_iterator;

@@ -467,7 +467,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<RandIter1>::value &&
             hpx::traits::is_iterator<RandIter2>::value &&
             hpx::traits::is_iterator<RandIter3>::value &&
@@ -725,7 +725,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
 
-        ///////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////
         template <typename Iter>
         inline void get_void_result(Iter)
         {
@@ -745,7 +745,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename RandIter,
         typename Comp = detail::less, typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<RandIter>::value &&
             traits::is_projected<Proj, RandIter>::value &&
             traits::is_indirect_callable<ExPolicy, Comp,
@@ -784,7 +784,7 @@ namespace hpx {
         template <typename ExPolicy, typename RandIter1, typename RandIter2,
             typename RandIter3, typename Comp = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<RandIter1>::value &&
                 hpx::traits::is_iterator<RandIter2>::value &&
                 hpx::traits::is_iterator<RandIter3>::value &&
@@ -873,7 +873,7 @@ namespace hpx {
         template <typename ExPolicy, typename RandIter,
             typename Comp = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<RandIter>::value &&
                 hpx::traits::is_invocable<Comp,
                     typename std::iterator_traits<RandIter>::value_type,

@@ -277,7 +277,7 @@ namespace hpx { namespace ranges {
             typename Proj1 = hpx::parallel::util::projection_identity,
             typename Proj2 = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent1, Iter1>::value &&
                 hpx::parallel::traits::is_projected<Proj1, Iter1>::value &&
                 hpx::traits::is_sentinel_for<Sent2, Iter2>::value &&
@@ -322,7 +322,7 @@ namespace hpx { namespace ranges {
             typename Proj1 = hpx::parallel::util::projection_identity,
             typename Proj2 = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng1>::value &&
                 hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
                 hpx::traits::is_range<Rng2>::value &&

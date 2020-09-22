@@ -270,7 +270,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename RandIter,
         typename Comp = detail::less, typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<RandIter>::value &&
             traits::is_projected<Proj, RandIter>::value &&
             traits::is_indirect_callable<ExPolicy, Comp,
@@ -410,7 +410,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename RandIter,
         typename Comp = detail::less, typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<RandIter>::value &&
             traits::is_projected<Proj, RandIter>::value &&
             traits::is_indirect_callable<ExPolicy, Comp,
@@ -449,7 +449,7 @@ namespace hpx {
         template <typename ExPolicy, typename RandIter,
             typename Comp = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<RandIter>::value &&
                 hpx::traits::is_invocable<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
@@ -511,7 +511,7 @@ namespace hpx {
         template <typename ExPolicy, typename RandIter,
             typename Comp = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<RandIter>::value &&
                 hpx::traits::is_invocable<Comp,
                     typename std::iterator_traits<RandIter>::value_type,

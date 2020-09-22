@@ -265,7 +265,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter, typename Pred,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter>::value&&
                     traits::is_projected<Proj, FwdIter>::value&&
                         traits::is_indirect_callable<ExPolicy, Pred,
@@ -339,7 +339,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter, typename T,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter>::value&&
                     traits::is_projected<Proj, FwdIter>::value)>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type remove(

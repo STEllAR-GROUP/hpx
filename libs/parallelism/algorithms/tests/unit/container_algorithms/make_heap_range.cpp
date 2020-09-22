@@ -44,8 +44,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_make_heap1(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+        hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -118,8 +118,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_make_heap2(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+        hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -209,8 +209,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_make_heap_exception(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+        hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -333,8 +333,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_make_heap_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+        hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>

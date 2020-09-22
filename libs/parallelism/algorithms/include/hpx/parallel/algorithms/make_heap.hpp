@@ -420,7 +420,7 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename RndIter, typename Comp,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<RndIter>::value &&
                 hpx::traits::is_invocable<Comp,
                     typename std::iterator_traits<RndIter>::value_type,
@@ -451,7 +451,7 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename RndIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<RndIter>::value
             )>
         // clang-format on

@@ -151,7 +151,7 @@ namespace hpx { namespace ranges {
             typename Comp,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, Comp,
                     hpx::parallel::traits::projected<Proj, Iter>,
@@ -180,7 +180,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Rng, typename Comp,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, Comp,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
@@ -214,7 +214,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy,
                     std::less<typename std::iterator_traits<Iter>::value_type>,
@@ -245,7 +245,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Rng,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy,
                     std::less<typename std::iterator_traits<
