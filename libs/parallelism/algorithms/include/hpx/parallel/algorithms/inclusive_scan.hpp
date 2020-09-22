@@ -516,8 +516,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// \a inclusive_scan includes the ith input element in the ith sum.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    inline typename std::enable_if<
-        hpx::is_execution_policy<ExPolicy>::value,
+    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
     inclusive_scan(
         ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)

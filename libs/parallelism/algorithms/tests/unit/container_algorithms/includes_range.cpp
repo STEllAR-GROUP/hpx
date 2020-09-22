@@ -79,8 +79,7 @@ void test_includes1(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_includes1(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -281,8 +280,7 @@ void test_includes2(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_includes2(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -475,8 +473,7 @@ void test_includes_exception(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_includes_exception(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -652,8 +649,7 @@ void test_includes_bad_alloc(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_includes_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;

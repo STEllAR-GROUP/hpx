@@ -140,8 +140,8 @@ void test_merge(IteratorTag, DataType, Comp comp, int rand_base)
     auto solution = std::merge(std::begin(src1), std::end(src1),
         std::begin(src2), std::end(src2), std::begin(dest_sol), comp);
 
-    bool equality = test::equal(std::begin(dest_res), result.base(),
-        std::begin(dest_sol), solution);
+    bool equality = test::equal(
+        std::begin(dest_res), result.base(), std::begin(dest_sol), solution);
 
     HPX_TEST(equality);
 }
@@ -172,8 +172,8 @@ void test_merge(
     auto solution = std::merge(std::begin(src1), std::end(src1),
         std::begin(src2), std::end(src2), std::begin(dest_sol), comp);
 
-    bool equality = test::equal(std::begin(dest_res), result.base(),
-        std::begin(dest_sol), solution);
+    bool equality = test::equal(
+        std::begin(dest_res), result.base(), std::begin(dest_sol), solution);
 
     HPX_TEST(equality);
 }
@@ -205,8 +205,8 @@ void test_merge_async(
     auto solution = std::merge(std::begin(src1), std::end(src1),
         std::begin(src2), std::end(src2), std::begin(dest_sol), comp);
 
-    bool equality = test::equal(std::begin(dest_res), result.base(),
-        std::begin(dest_sol), solution);
+    bool equality = test::equal(
+        std::begin(dest_res), result.base(), std::begin(dest_sol), solution);
 
     HPX_TEST(equality);
 }

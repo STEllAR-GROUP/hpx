@@ -45,8 +45,7 @@ void test_set_intersection1(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_intersection1(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -148,8 +147,7 @@ void test_set_intersection2(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_intersection2(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -179,8 +177,7 @@ void test_set_intersection2(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_intersection2_async(ExPolicy&& p, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -273,8 +270,7 @@ void test_set_intersection_exception(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_intersection_exception(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -316,8 +312,7 @@ void test_set_intersection_exception(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_intersection_exception_async(ExPolicy&& p, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -425,8 +420,7 @@ void test_set_intersection_bad_alloc(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_intersection_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -467,8 +461,7 @@ void test_set_intersection_bad_alloc(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_intersection_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;

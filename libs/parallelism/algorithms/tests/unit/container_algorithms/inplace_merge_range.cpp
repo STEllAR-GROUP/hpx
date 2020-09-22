@@ -265,6 +265,122 @@ void test_inplace_merge_stable()
         user_defined_type>();
 }
 
+///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag, typename DataType>
+void test_inplace_merge_etc(IteratorTag, DataType, int rand_base)
+{
+    typedef typename std::vector<DataType>::iterator base_iterator;
+
+    std::size_t const left_size = 300007, right_size = 123456;
+    std::vector<DataType> res(left_size + right_size), sol, org;
+
+    base_iterator res_first = std::begin(res);
+    base_iterator res_middle = res_first + left_size;
+    base_iterator res_last = std::end(res);
+
+    std::generate(res_first, res_middle, random_fill(rand_base, 6));
+    std::generate(res_middle, res_last, random_fill(rand_base, 8));
+    std::sort(res_first, res_middle);
+    std::sort(res_middle, res_last);
+
+    org = sol = res;
+    base_iterator sol_first = std::begin(sol);
+    base_iterator sol_middle = sol_first + left_size;
+    base_iterator sol_last = std::end(sol);
+
+    // Test projection.
+    {
+        typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+        sol = res = org;
+
+        DataType val;
+        hpx::ranges::inplace_merge(
+            policy, iterator(res_first), iterator(res_middle),
+            iterator(res_last),
+            [](DataType const& a, DataType const& b) -> bool { return a < b; },
+            [&val](DataType const& elem) -> DataType& {
+                // This is projection.
+                return val;
+            });
+
+        // The container must not be changed.
+        bool equality = test::equal(res_first, res_last, sol_first, sol_last);
+
+        HPX_TEST(equality);
+    }
+}
+
+template <typename ExPolicy, typename IteratorTag, typename DataType>
+void test_inplace_merge_etc(
+    ExPolicy&& policy, IteratorTag, DataType, int rand_base)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    typedef typename std::vector<DataType>::iterator base_iterator;
+
+    std::size_t const left_size = 300007, right_size = 123456;
+    std::vector<DataType> res(left_size + right_size), sol, org;
+
+    base_iterator res_first = std::begin(res);
+    base_iterator res_middle = res_first + left_size;
+    base_iterator res_last = std::end(res);
+
+    std::generate(res_first, res_middle, random_fill(rand_base, 6));
+    std::generate(res_middle, res_last, random_fill(rand_base, 8));
+    std::sort(res_first, res_middle);
+    std::sort(res_middle, res_last);
+
+    org = sol = res;
+    base_iterator sol_first = std::begin(sol);
+    base_iterator sol_middle = sol_first + left_size;
+    base_iterator sol_last = std::end(sol);
+
+    // Test projection.
+    {
+        typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+        sol = res = org;
+
+        DataType val;
+        hpx::ranges::inplace_merge(
+            policy, iterator(res_first), iterator(res_middle),
+            iterator(res_last),
+            [](DataType const& a, DataType const& b) -> bool { return a < b; },
+            [&val](DataType const& elem) -> DataType& {
+                // This is projection.
+                return val;
+            });
+
+        // The container must not be changed.
+        bool equality = test::equal(res_first, res_last, sol_first, sol_last);
+
+        HPX_TEST(equality);
+    }
+}
+
+template <typename IteratorTag, typename DataType>
+void test_inplace_merge_etc()
+{
+    using namespace hpx::execution;
+
+    int rand_base = _gen();
+
+    ////////// Another test cases for justifying the implementation.
+    test_inplace_merge_etc(IteratorTag(), DataType(), rand_base);
+    test_inplace_merge_etc(seq, IteratorTag(), DataType(), rand_base);
+    test_inplace_merge_etc(par, IteratorTag(), DataType(), rand_base);
+    test_inplace_merge_etc(par_unseq, IteratorTag(), DataType(), rand_base);
+}
+
+void test_inplace_merge_etc()
+{
+    test_inplace_merge_stable<std::random_access_iterator_tag, int>();
+    test_inplace_merge_stable<std::random_access_iterator_tag,
+        user_defined_type>();
+}
+
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     if (vm.count("seed"))
@@ -275,6 +391,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
 
     test_inplace_merge();
+    test_inplace_merge_etc();
     test_inplace_merge_stable();
 
     return hpx::finalize();

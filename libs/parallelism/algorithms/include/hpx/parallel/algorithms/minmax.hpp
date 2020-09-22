@@ -234,12 +234,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter,
         typename Proj = util::projection_identity, typename F = detail::less,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter>::value&&
-                    traits::is_projected<Proj, FwdIter>::value&&
-                        traits::is_indirect_callable<ExPolicy, F,
-                            traits::projected<Proj, FwdIter>,
-                            traits::projected<Proj, FwdIter>>::value)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&& hpx::
+                traits::is_iterator<FwdIter>::value&& traits::is_projected<Proj,
+                    FwdIter>::value&& traits::is_indirect_callable<ExPolicy, F,
+                    traits::projected<Proj, FwdIter>,
+                    traits::projected<Proj, FwdIter>>::value)>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     min_element(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f = F(),
         Proj&& proj = Proj())
@@ -452,12 +451,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter,
         typename Proj = util::projection_identity, typename F = detail::less,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter>::value&&
-                    traits::is_projected<Proj, FwdIter>::value&&
-                        traits::is_indirect_callable<ExPolicy, F,
-                            traits::projected<Proj, FwdIter>,
-                            traits::projected<Proj, FwdIter>>::value)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&& hpx::
+                traits::is_iterator<FwdIter>::value&& traits::is_projected<Proj,
+                    FwdIter>::value&& traits::is_indirect_callable<ExPolicy, F,
+                    traits::projected<Proj, FwdIter>,
+                    traits::projected<Proj, FwdIter>>::value)>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     max_element(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f = F(),
         Proj&& proj = Proj())
@@ -703,12 +701,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
     template <typename ExPolicy, typename FwdIter,
         typename Proj = util::projection_identity, typename F = detail::less,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter>::value&&
-                    traits::is_projected<Proj, FwdIter>::value&&
-                        traits::is_indirect_callable<ExPolicy, F,
-                            traits::projected<Proj, FwdIter>,
-                            traits::projected<Proj, FwdIter>>::value)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&& hpx::
+                traits::is_iterator<FwdIter>::value&& traits::is_projected<Proj,
+                    FwdIter>::value&& traits::is_indirect_callable<ExPolicy, F,
+                    traits::projected<Proj, FwdIter>,
+                    traits::projected<Proj, FwdIter>>::value)>
     typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<tag::min(FwdIter), tag::max(FwdIter)>>::type
     minmax_element(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f = F(),

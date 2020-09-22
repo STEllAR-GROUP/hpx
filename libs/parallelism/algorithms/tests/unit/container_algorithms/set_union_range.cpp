@@ -45,8 +45,7 @@ void test_set_union1(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_union1(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -147,8 +146,7 @@ void test_set_union2(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_union2(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -178,8 +176,7 @@ void test_set_union2(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_union2_async(ExPolicy&& p, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -271,8 +268,7 @@ void test_set_union_exception(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_union_exception(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -314,8 +310,7 @@ void test_set_union_exception(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_union_exception_async(ExPolicy&& p, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -423,8 +418,7 @@ void test_set_union_bad_alloc(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_union_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -465,8 +459,7 @@ void test_set_union_bad_alloc(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_set_union_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;

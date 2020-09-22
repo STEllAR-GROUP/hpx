@@ -1054,11 +1054,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter, typename Pred,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter>::value&&
-                    traits::is_projected<Proj, FwdIter>::value&&
-                        traits::is_indirect_callable<ExPolicy, Pred,
-                            traits::projected<Proj, FwdIter>>::value)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&& hpx::
+                traits::is_iterator<FwdIter>::value&& traits::is_projected<Proj,
+                    FwdIter>::value&& traits::is_indirect_callable<ExPolicy,
+                    Pred, traits::projected<Proj, FwdIter>>::value)>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type partition(
         ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred,
         Proj&& proj = Proj())

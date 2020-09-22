@@ -249,8 +249,8 @@ void test_inplace_merge_exception(IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::inplace_merge(iterator(res_first),
-            iterator(res_middle), iterator(res_last), throw_always());
+        hpx::inplace_merge(iterator(res_first), iterator(res_middle),
+            iterator(res_last), throw_always());
 
         HPX_TEST(false);
     }
@@ -292,8 +292,8 @@ void test_inplace_merge_exception(ExPolicy&& policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::inplace_merge(policy, iterator(res_first),
-            iterator(res_middle), iterator(res_last), throw_always());
+        hpx::inplace_merge(policy, iterator(res_first), iterator(res_middle),
+            iterator(res_last), throw_always());
 
         HPX_TEST(false);
     }
@@ -375,8 +375,8 @@ void test_inplace_merge_bad_alloc(IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::inplace_merge(iterator(res_first),
-            iterator(res_middle), iterator(res_last), throw_bad_alloc());
+        hpx::inplace_merge(iterator(res_first), iterator(res_middle),
+            iterator(res_last), throw_bad_alloc());
 
         HPX_TEST(false);
     }
@@ -416,8 +416,8 @@ void test_inplace_merge_bad_alloc(ExPolicy&& policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::inplace_merge(policy, iterator(res_first),
-            iterator(res_middle), iterator(res_last), throw_bad_alloc());
+        hpx::inplace_merge(policy, iterator(res_first), iterator(res_middle),
+            iterator(res_last), throw_bad_alloc());
 
         HPX_TEST(false);
     }
@@ -512,30 +512,6 @@ void test_inplace_merge_etc(IteratorTag, DataType, int rand_base)
 
         HPX_TEST(equality);
     }
-
-//     // Test projection.
-//     {
-// #if defined(HPX_HAVE_STABLE_INPLACE_MERGE)
-//         typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-//
-//         sol = res = org;
-//
-//         DataType val;
-//         hpx::inplace_merge(
-//             policy, iterator(res_first), iterator(res_middle),
-//             iterator(res_last),
-//             [](DataType const& a, DataType const& b) -> bool { return a < b; },
-//             [&val](DataType const& elem) -> DataType& {
-//                 // This is projection.
-//                 return val;
-//             });
-//
-//         // The container must not be changed.
-//         bool equality = test::equal(res_first, res_last, sol_first, sol_last);
-//
-//         HPX_TEST(equality);
-// #endif
-//     }
 }
 
 template <typename ExPolicy, typename IteratorTag, typename DataType>
@@ -578,30 +554,6 @@ void test_inplace_merge_etc(
 
         HPX_TEST(equality);
     }
-
-//     // Test projection.
-//     {
-// #if defined(HPX_HAVE_STABLE_INPLACE_MERGE)
-//         typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-//
-//         sol = res = org;
-//
-//         DataType val;
-//         hpx::inplace_merge(
-//             policy, iterator(res_first), iterator(res_middle),
-//             iterator(res_last),
-//             [](DataType const& a, DataType const& b) -> bool { return a < b; },
-//             [&val](DataType const& elem) -> DataType& {
-//                 // This is projection.
-//                 return val;
-//             });
-//
-//         // The container must not be changed.
-//         bool equality = test::equal(res_first, res_last, sol_first, sol_last);
-//
-//         HPX_TEST(equality);
-// #endif
-//     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

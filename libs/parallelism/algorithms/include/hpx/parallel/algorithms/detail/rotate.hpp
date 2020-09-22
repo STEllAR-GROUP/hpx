@@ -12,6 +12,7 @@
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 
+#include <algorithm>
 #include <functional>
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {

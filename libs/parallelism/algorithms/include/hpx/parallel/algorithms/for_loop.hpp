@@ -1067,8 +1067,7 @@ namespace hpx {
         }    // namespace detail
 
         template <typename ExPolicy, typename I, typename... Args,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+            HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value &&
                 (hpx::traits::is_iterator<I>::value ||
                     std::is_integral<I>::value))>
         HPX_DEPRECATED_V(1, 6,
@@ -1102,9 +1101,8 @@ namespace hpx {
         }
 
         template <typename ExPolicy, typename I, typename S, typename... Args,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value&&
-                    std::is_integral<S>::value &&
+            HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
+                                      std::is_integral<S>::value &&
                 (hpx::traits::is_iterator<I>::value ||
                     std::is_integral<I>::value))>
         HPX_DEPRECATED_V(1, 6,
@@ -1143,9 +1141,8 @@ namespace hpx {
 
         template <typename ExPolicy, typename I, typename Size,
             typename... Args,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value&&
-                    std::is_integral<Size>::value &&
+            HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
+                                      std::is_integral<Size>::value &&
                 (hpx::traits::is_iterator<I>::value ||
                     std::is_integral<I>::value))>
         HPX_DEPRECATED_V(1, 6,
@@ -1180,8 +1177,8 @@ namespace hpx {
         template <typename ExPolicy, typename I, typename Size, typename S,
             typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value&& std::
-                    is_integral<Size>::value&& std::is_integral<S>::value &&
+                hpx::is_execution_policy<ExPolicy>::value&& std::is_integral<
+                    Size>::value&& std::is_integral<S>::value &&
                 (hpx::traits::is_iterator<I>::value ||
                     std::is_integral<I>::value))>
         HPX_DEPRECATED_V(1, 6,
