@@ -168,15 +168,22 @@ void test5()
         K.push_back(my_rand());
     M = K;
 
-    std::uint64_t* Ptr =
-        std::get_temporary_buffer<std::uint64_t>(KMax >> 1).first;
+    // spin_sort assumes that the memory is uninitialized
+    std::uint64_t* Ptr = static_cast<std::uint64_t*>(
+        std::malloc(sizeof(std::uint64_t) * (KMax >> 1)));
     if (Ptr == nullptr)
         throw std::bad_alloc();
-    range<std::uint64_t*> Rbuf(Ptr, Ptr + (KMax >> 1));
-
-    spin_sort(K.begin(), K.end(), comp, Rbuf);
-
-    std::return_temporary_buffer(Ptr);
+    try
+    {
+        range<std::uint64_t*> Rbuf(Ptr, Ptr + (KMax >> 1));
+        spin_sort(K.begin(), K.end(), comp, Rbuf);
+    }
+    catch (...)
+    {
+        std::free(Ptr);
+        throw;
+    }
+    std::free(Ptr);
 
     std::stable_sort(M.begin(), M.end(), comp);
     for (unsigned i = 0; i < KMax; i++)
