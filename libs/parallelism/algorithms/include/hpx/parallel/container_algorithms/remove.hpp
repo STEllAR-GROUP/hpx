@@ -73,9 +73,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename Rng, typename T,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_range<Rng>::value&&
-                    traits::is_projected_range<Proj, Rng>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value&& hpx::traits::is_range<
+                Rng>::value&& traits::is_projected_range<Proj, Rng>::value)>
     typename util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng>::type>::type
     remove(ExPolicy&& policy, Rng&& rng, T const& value, Proj&& proj = Proj())
@@ -149,7 +149,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename Rng, typename Pred,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
                     Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
                     Pred, traits::projected_range<Proj, Rng>>::value)>

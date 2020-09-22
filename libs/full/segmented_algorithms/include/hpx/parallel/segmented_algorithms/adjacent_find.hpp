@@ -272,8 +272,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         adjacent_find_(ExPolicy&& policy, FwdIter first, FwdIter last,
             Pred&& op, std::true_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
             typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
 
             if (first == last)

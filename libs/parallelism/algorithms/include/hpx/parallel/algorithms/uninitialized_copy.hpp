@@ -204,8 +204,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           the last element copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
+    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
     uninitialized_copy(
         ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
@@ -215,7 +214,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::uninitialized_copy<FwdIter2>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last, dest);
@@ -307,8 +306,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter1, typename Size,
         typename FwdIter2>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
+    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
     uninitialized_copy_n(
         ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest)
@@ -318,7 +316,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         // if count is representing a negative value, we do nothing
         if (detail::is_negative(count))

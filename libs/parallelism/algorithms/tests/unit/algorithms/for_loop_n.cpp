@@ -27,9 +27,8 @@ std::mt19937 gen(seed);
 template <typename ExPolicy, typename IteratorTag>
 void test_for_loop_n(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -94,9 +93,8 @@ void for_loop_n_test()
 template <typename ExPolicy>
 void test_for_loop_n_idx(ExPolicy&& policy)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());

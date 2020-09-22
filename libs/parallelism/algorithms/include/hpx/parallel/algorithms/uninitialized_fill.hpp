@@ -184,16 +184,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           otherwise.
     ///
     template <typename ExPolicy, typename FwdIter, typename T>
-    inline
-        typename std::enable_if<execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy>::type>::type
-        uninitialized_fill(
-            ExPolicy&& policy, FwdIter first, FwdIter last, T const& value)
+    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
+        typename util::detail::algorithm_result<ExPolicy>::type>::type
+    uninitialized_fill(
+        ExPolicy&& policy, FwdIter first, FwdIter last, T const& value)
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::uninitialized_fill().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last, value);
@@ -305,11 +304,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           otherwise.
     ///
     template <typename ExPolicy, typename FwdIter, typename Size, typename T>
-    inline
-        typename std::enable_if<execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy>::type>::type
-        uninitialized_fill_n(
-            ExPolicy&& policy, FwdIter first, Size count, T const& value)
+    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
+        typename util::detail::algorithm_result<ExPolicy>::type>::type
+    uninitialized_fill_n(
+        ExPolicy&& policy, FwdIter first, Size count, T const& value)
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
@@ -320,7 +318,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return util::detail::algorithm_result<ExPolicy>::get();
         }
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::uninitialized_fill_n().call(
             std::forward<ExPolicy>(policy), is_seq(), first, std::size_t(count),

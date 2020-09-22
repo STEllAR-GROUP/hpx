@@ -137,7 +137,7 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Rng,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
@@ -152,9 +152,7 @@ namespace hpx { namespace ranges {
                 (hpx::traits::is_forward_iterator<iterator_type>::value),
                 "Required at least forward iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::destroy<iterator_type>().call(
                 std::forward<ExPolicy>(policy), is_seq{}, hpx::util::begin(rng),
@@ -164,7 +162,7 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
         // clang-format on
@@ -175,9 +173,7 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Required at least forward iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::destroy<Iter>().call(
                 std::forward<ExPolicy>(policy), is_seq{}, first, last);
@@ -229,7 +225,7 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
@@ -247,9 +243,7 @@ namespace hpx { namespace ranges {
                     FwdIter>::get(std::move(first));
             }
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::destroy_n<FwdIter>().call(
                 std::forward<ExPolicy>(policy), is_seq{}, first,

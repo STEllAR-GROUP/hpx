@@ -186,8 +186,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         for_each_(ExPolicy&& policy, SegIterB first, SegIterE last, F&& f,
             Proj&& proj, std::true_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             if (first == last)
             {

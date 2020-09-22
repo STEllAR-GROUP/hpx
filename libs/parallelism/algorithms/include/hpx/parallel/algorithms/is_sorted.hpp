@@ -161,16 +161,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           the function always returns true.
     ///
     template <typename ExPolicy, typename FwdIter, typename Pred = detail::less>
-    inline
-        typename std::enable_if<execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, bool>::type>::type
-        is_sorted(ExPolicy&& policy, FwdIter first, FwdIter last,
-            Pred&& pred = Pred())
+    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
+        typename util::detail::algorithm_result<ExPolicy, bool>::type>::type
+    is_sorted(
+        ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred = Pred())
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::is_sorted<FwdIter>().call(std::forward<ExPolicy>(policy),
             is_seq(), first, last, std::forward<Pred>(pred));
@@ -315,8 +314,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           sequence is sorted, last is returned.
     ///
     template <typename ExPolicy, typename FwdIter, typename Pred = detail::less>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
+    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type>::type
     is_sorted_until(
         ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred = Pred())
@@ -324,7 +322,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::is_sorted_until<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,

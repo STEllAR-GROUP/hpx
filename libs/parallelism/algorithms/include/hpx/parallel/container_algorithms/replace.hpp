@@ -73,7 +73,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename Rng, typename T1, typename T2,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
                     Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
                     std::equal_to<T1>, traits::projected_range<Proj, Rng>,
@@ -158,7 +158,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename Rng, typename F, typename T,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
                     Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
                     F, traits::projected_range<Proj, Rng>>::value)>
@@ -237,7 +237,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename Rng, typename OutIter, typename T1,
         typename T2, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
                     Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
                     std::equal_to<T1>, traits::projected_range<Proj, Rng>,
@@ -337,7 +337,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename Rng, typename OutIter, typename F,
         typename T, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
                     Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
                     F, traits::projected_range<Proj, Rng>>::value)>

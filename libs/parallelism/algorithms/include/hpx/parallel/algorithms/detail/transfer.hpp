@@ -57,8 +57,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         transfer_(ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest,
             std::false_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             return Algo().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last, dest);
@@ -116,7 +115,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename Algo, typename ExPolicy, typename FwdIter1,
             typename Sent1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_sentinel_for<Sent1, FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value

@@ -175,16 +175,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           elements, the function is always true.
     ///
     template <typename ExPolicy, typename FwdIter, typename Pred>
-    inline
-        typename std::enable_if<execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, bool>::type>::type
-        is_partitioned(
-            ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred)
+    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
+        typename util::detail::algorithm_result<ExPolicy, bool>::type>::type
+    is_partitioned(ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred)
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::is_partitioned<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,

@@ -193,7 +193,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           \a parallel_task_policy and returns \a void otherwise.
     ///
     template <typename ExPolicy, typename FwdIter,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter>::value)>
     typename util::detail::algorithm_result<ExPolicy>::type
     uninitialized_value_construct(
@@ -202,7 +202,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::uninitialized_value_construct<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last);
@@ -318,7 +318,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           the last element constructed.
     ///
     template <typename ExPolicy, typename FwdIter, typename Size,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter>::value)>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     uninitialized_value_construct_n(
@@ -334,7 +334,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::move(first));
         }
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::uninitialized_value_construct_n<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first,

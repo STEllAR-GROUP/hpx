@@ -115,7 +115,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           It returns \a last.
     ///
     template <typename ExPolicy, typename BidirIter,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<BidirIter>::value)>
     typename util::detail::algorithm_result<ExPolicy, BidirIter>::type reverse(
         ExPolicy&& policy, BidirIter first, BidirIter last)
@@ -124,7 +124,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
             "Requires at least bidirectional iterator.");
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::reverse<BidirIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last);
@@ -243,7 +243,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename BidirIter, typename FwdIter,
         HPX_CONCEPT_REQUIRES_(hpx::traits::is_iterator<BidirIter>::value&&
-                execution::is_execution_policy<ExPolicy>::value&&
+                hpx::is_execution_policy<ExPolicy>::value&&
                     hpx::traits::is_iterator<FwdIter>::value)>
     typename util::detail::algorithm_result<ExPolicy,
         util::in_out_result<BidirIter, FwdIter>>::type
@@ -256,7 +256,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::reverse_copy<util::in_out_result<BidirIter, FwdIter>>()
             .call(std::forward<ExPolicy>(policy), is_seq(), first, last,

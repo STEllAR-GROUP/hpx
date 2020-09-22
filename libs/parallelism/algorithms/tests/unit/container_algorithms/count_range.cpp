@@ -72,9 +72,8 @@ void test_count(IteratorTag, DataType)
 template <typename ExPolicy, typename IteratorTag, typename DataType>
 void test_count(ExPolicy&& policy, IteratorTag, DataType)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     std::vector<DataType> c{10007};
     std::generate(std::begin(c), std::end(c), random_fill(0, 20));
@@ -90,9 +89,8 @@ void test_count(ExPolicy&& policy, IteratorTag, DataType)
 template <typename ExPolicy, typename IteratorTag, typename DataType>
 void test_count_async(ExPolicy&& policy, IteratorTag, DataType)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     std::vector<DataType> c{10007};
     std::generate(std::begin(c), std::end(c), random_fill(0, 20));

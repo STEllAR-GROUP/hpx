@@ -68,9 +68,8 @@ void test_equal_binary1(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_equal_binary1(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef hpx::util::iterator_range<base_iterator> base_range;
@@ -225,9 +224,8 @@ void test_equal_binary2(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_equal_binary2(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef hpx::util::iterator_range<base_iterator> base_range;
@@ -383,9 +381,8 @@ void test_equal_binary_exception(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_equal_binary_exception(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef hpx::util::iterator_range<base_iterator> base_range;
@@ -495,9 +492,8 @@ void equal_binary_exception_test()
 template <typename ExPolicy, typename IteratorTag>
 void test_equal_binary_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef hpx::util::iterator_range<base_iterator> base_range;

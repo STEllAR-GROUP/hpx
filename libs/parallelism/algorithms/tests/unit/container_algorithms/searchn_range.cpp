@@ -42,9 +42,8 @@ struct user_defined_type_2
 template <typename ExPolicy, typename IteratorTag>
 void test_search_n1(ExPolicy policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
     // fill vector with random values above 2
@@ -103,9 +102,8 @@ void search_test_n1()
 template <typename ExPolicy, typename IteratorTag>
 void test_search_n2(ExPolicy policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
     // fill vector with random values about 2
@@ -173,9 +171,8 @@ void search_test_n2()
 template <typename ExPolicy, typename IteratorTag>
 void test_search_n3(ExPolicy policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
     // fill vector with random values above 2
@@ -237,9 +234,8 @@ void search_test_n3()
 template <typename ExPolicy, typename IteratorTag>
 void test_search_n4(ExPolicy policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
     // fill vector with random values above 2
@@ -304,9 +300,8 @@ void search_test_n4()
 template <typename ExPolicy, typename IteratorTag>
 void test_search_n5(ExPolicy policy, IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     std::vector<user_defined_type_1> c(10007);
 

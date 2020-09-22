@@ -110,9 +110,8 @@ template <typename ExPolicy, typename IteratorTag, typename DataType>
 void test_is_heap(
     ExPolicy&& policy, IteratorTag, DataType, bool test_for_is_heap = true)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef typename std::vector<DataType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -177,9 +176,8 @@ template <typename ExPolicy, typename IteratorTag, typename DataType,
 void test_is_heap_with_pred(ExPolicy&& policy, IteratorTag, DataType, Pred pred,
     bool test_for_is_heap = true)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef typename std::vector<DataType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -212,9 +210,8 @@ template <typename ExPolicy, typename IteratorTag, typename DataType>
 void test_is_heap_async(
     ExPolicy&& policy, IteratorTag, DataType, bool test_for_is_heap = true)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef typename std::vector<DataType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -290,9 +287,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_is_heap_exception(
     ExPolicy&& policy, IteratorTag, bool test_for_is_heap = true)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -419,9 +415,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_is_heap_bad_alloc(
     ExPolicy&& policy, IteratorTag, bool test_for_is_heap = true)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;

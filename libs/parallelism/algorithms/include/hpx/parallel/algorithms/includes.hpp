@@ -277,18 +277,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred = detail::less>
-    inline
-        typename std::enable_if<execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, bool>::type>::type
-        includes(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred())
+    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
+        typename util::detail::algorithm_result<ExPolicy, bool>::type>::type
+    includes(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+        FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred())
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::includes().call(std::forward<ExPolicy>(policy), is_seq(),
             first1, last1, first2, last2, std::forward<Pred>(op));

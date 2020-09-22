@@ -250,8 +250,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     result_type>::get(result_type{last, dest});
             }
 
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
             return segmented_transfer(Algo(), std::forward<ExPolicy>(policy),
                 is_seq(), first, last, dest);
         }

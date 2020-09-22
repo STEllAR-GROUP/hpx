@@ -192,8 +192,7 @@ namespace hpx { namespace parallel { namespace traits {
         struct is_indirect_callable<ExPolicy, F, hpx::util::pack<Projected...>,
             typename std::enable_if<
                 hpx::util::all_of<is_projected_indirect<Projected>...>::value &&
-                (!hpx::parallel::execution::is_vectorpack_execution_policy<
-                     ExPolicy>::value ||
+                (!hpx::is_vectorpack_execution_policy<ExPolicy>::value ||
                     !hpx::util::all_of<
                         is_projected_zip_iterator<Projected>...>::value)>::type>
           : is_indirect_callable_impl<F,
@@ -209,8 +208,7 @@ namespace hpx { namespace parallel { namespace traits {
         struct is_indirect_callable<ExPolicy, F, hpx::util::pack<Projected...>,
             typename std::enable_if<
                 hpx::util::all_of<is_projected_indirect<Projected>...>::value &&
-                hpx::parallel::execution::is_vectorpack_execution_policy<
-                    ExPolicy>::value &&
+                hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
                 hpx::util::all_of<
                     is_projected_zip_iterator<Projected>...>::value>::type>
           : is_indirect_callable_impl<F,

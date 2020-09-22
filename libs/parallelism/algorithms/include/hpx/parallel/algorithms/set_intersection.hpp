@@ -175,8 +175,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename FwdIter3, typename Pred = detail::less>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
+    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter3>::type>::type
     set_intersection(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, Pred&& op = Pred())
@@ -189,7 +188,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least forward iterator.");
 
         typedef std::integral_constant<bool,
-            execution::is_sequenced_execution_policy<ExPolicy>::value ||
+            hpx::is_sequenced_execution_policy<ExPolicy>::value ||
                 !hpx::traits::is_random_access_iterator<FwdIter1>::value ||
                 !hpx::traits::is_random_access_iterator<FwdIter2>::value>
             is_seq;

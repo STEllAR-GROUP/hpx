@@ -202,7 +202,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename Proj = util::projection_identity,
         typename Compare = detail::less,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<RandomIt>::value &&
             hpx::traits::is_sentinel_for<Sentinel, RandomIt>::value &&
             traits::is_projected<Proj, RandomIt>::value &&
@@ -219,7 +219,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_random_access_iterator<RandomIt>::value),
             "Requires a random access iterator.");
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::stable_sort<RandomIt>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,

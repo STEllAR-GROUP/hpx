@@ -258,8 +258,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         exclusive_scan_(ExPolicy&& policy, InIter first, InIter last,
             OutIter dest, T&& init, Op&& op, std::true_type, Conv&& conv)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             if (first == last)
                 return util::detail::algorithm_result<ExPolicy, OutIter>::get(
