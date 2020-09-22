@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <functional>
 #include <iterator>
 #include <list>
@@ -56,7 +57,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             if (ptr != nullptr)
             {
-                std::return_temporary_buffer(ptr);
+                std::free(ptr);
             }
         }
     };    // end struct parallel_stable_sort
@@ -101,7 +102,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 return last;
             }
 
-            ptr = std::get_temporary_buffer<value_type>(nptr).first;
+            // leave memory uninitialized, sample_sort will manage construction
+            // etc.
+            ptr = static_cast<value_type*>(
+                std::malloc(sizeof(value_type) * nptr));
             if (ptr == nullptr)
             {
                 throw std::bad_alloc();
