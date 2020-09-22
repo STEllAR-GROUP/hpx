@@ -19,6 +19,7 @@
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/rotate.hpp>
 #include <hpx/parallel/algorithms/reverse.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -35,36 +36,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // rotate
     namespace detail {
         /// \cond NOINTERNAL
-        template <typename InIter>
-        void sequential_rotate_helper(
-            InIter first, InIter new_first, InIter last)
-        {
-            InIter next = new_first;
-            while (first != next)
-            {
-                std::iter_swap(first++, next++);
-                if (next == last)
-                {
-                    next = new_first;
-                }
-                else if (first == new_first)
-                {
-                    new_first = next;
-                }
-            }
-        }
-
-        template <typename InIter>
-        inline util::in_out_result<InIter, InIter> sequential_rotate(
-            InIter first, InIter new_first, InIter last)
-        {
-            if (first != new_first && new_first != last)
-                sequential_rotate_helper(first, new_first, last);
-
-            std::advance(first, std::distance(new_first, last));
-            return util::in_out_result<InIter, InIter>{first, last};
-        }
-
         template <typename ExPolicy, typename FwdIter>
         hpx::future<util::in_out_result<FwdIter, FwdIter>> rotate_helper(
             ExPolicy policy, FwdIter first, FwdIter new_first, FwdIter last)
@@ -109,7 +80,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static IterPair sequential(
                 ExPolicy, InIter first, InIter new_first, InIter last)
             {
-                return sequential_rotate(first, new_first, last);
+                return detail::sequential_rotate(first, new_first, last);
             }
 
             template <typename ExPolicy, typename FwdIter>

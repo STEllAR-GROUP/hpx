@@ -21,12 +21,16 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+int seed = std::random_device{}();
+std::mt19937 _gen(seed);
+
+////////////////////////////////////////////////////////////////////////////
 struct user_defined_type
 {
     user_defined_type() = default;
     user_defined_type(int rand_no)
       : val(rand_no)
-      , name(name_list[std::rand() % name_list.size()])
+      , name(name_list[_gen() % name_list.size()])
     {
     }
 
@@ -74,7 +78,7 @@ const std::vector<std::string> user_defined_type::name_list{
 struct random_fill
 {
     random_fill(int rand_base, int range)
-      : gen(std::rand())
+      : gen(_gen())
       , dist(rand_base - range / 2, rand_base + range / 2)
     {
     }
@@ -171,16 +175,259 @@ void test_merge()
     test_merge<user_defined_type>();
 }
 
+///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag, typename DataType>
+void test_merge_etc(IteratorTag, DataType, int rand_base)
+{
+    typedef typename std::vector<DataType>::iterator base_iterator;
+
+    std::size_t const size1 = 300007, size2 = 123456;
+    std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
+        dest_sol(size1 + size2);
+
+    std::generate(std::begin(src1), std::end(src1), random_fill(rand_base, 6));
+    std::generate(std::begin(src2), std::end(src2), random_fill(rand_base, 8));
+    std::sort(std::begin(src1), std::end(src1));
+    std::sort(std::begin(src2), std::end(src2));
+
+    // Test projection.
+    {
+        typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+        DataType val;
+        hpx::ranges::merge(
+            iterator(std::begin(src1)), iterator(std::end(src1)),
+            iterator(std::begin(src2)), iterator(std::end(src2)),
+            iterator(std::begin(dest_res)),
+            [](DataType const& a, DataType const& b) -> bool { return a < b; },
+            [&val](DataType const&) -> DataType {
+                // This is projection.
+                return val;
+            },
+            [&val](DataType const&) -> DataType {
+                // This is projection.
+                return val + 1;
+            });
+
+        bool equality1 =
+            std::equal(std::begin(src1), std::end(src1), std::begin(dest_res));
+        bool equality2 = std::equal(
+            std::begin(src2), std::end(src2), std::begin(dest_res) + size1);
+
+        HPX_TEST(equality1);
+        HPX_TEST(equality2);
+    }
+}
+
+template <typename ExPolicy, typename IteratorTag, typename DataType>
+void test_merge_etc(ExPolicy&& policy, IteratorTag, DataType, int rand_base)
+{
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+
+    typedef typename std::vector<DataType>::iterator base_iterator;
+
+    std::size_t const size1 = 300007, size2 = 123456;
+    std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
+        dest_sol(size1 + size2);
+
+    std::generate(std::begin(src1), std::end(src1), random_fill(rand_base, 6));
+    std::generate(std::begin(src2), std::end(src2), random_fill(rand_base, 8));
+    std::sort(std::begin(src1), std::end(src1));
+    std::sort(std::begin(src2), std::end(src2));
+
+    // Test projection.
+    {
+        typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+        DataType val;
+        hpx::ranges::merge(
+            policy, iterator(std::begin(src1)), iterator(std::end(src1)),
+            iterator(std::begin(src2)), iterator(std::end(src2)),
+            iterator(std::begin(dest_res)),
+            [](DataType const& a, DataType const& b) -> bool { return a < b; },
+            [&val](DataType const&) -> DataType {
+                // This is projection.
+                return val;
+            },
+            [&val](DataType const&) -> DataType {
+                // This is projection.
+                return val + 1;
+            });
+
+        bool equality1 =
+            std::equal(std::begin(src1), std::end(src1), std::begin(dest_res));
+        bool equality2 = std::equal(
+            std::begin(src2), std::end(src2), std::begin(dest_res) + size1);
+
+        HPX_TEST(equality1);
+        HPX_TEST(equality2);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag, typename DataType>
+void test_merge_stable(IteratorTag, DataType, int rand_base)
+{
+    typedef typename std::pair<DataType, int> ElemType;
+    typedef typename std::vector<ElemType>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::size_t const size1 = 300007, size2 = 123456;
+    std::vector<ElemType> src1(size1), src2(size2), dest(size1 + size2);
+
+    int no = 0;
+    auto rf = random_fill(rand_base, 6);
+    std::generate(
+        std::begin(src1), std::end(src1), [&no, &rf]() -> std::pair<int, int> {
+            return {rf(), no++};
+        });
+    rf = random_fill(rand_base, 8);
+    std::generate(
+        std::begin(src2), std::end(src2), [&no, &rf]() -> std::pair<int, int> {
+            return {rf(), no++};
+        });
+    std::sort(std::begin(src1), std::end(src1));
+    std::sort(std::begin(src2), std::end(src2));
+
+    hpx::merge(
+        iterator(std::begin(src1)), iterator(std::end(src1)),
+        iterator(std::begin(src2)), iterator(std::end(src2)),
+        iterator(std::begin(dest)),
+        [](DataType const& a, DataType const& b) -> bool { return a < b; },
+        [](ElemType const& elem) -> DataType const& {
+            // This is projection.
+            return elem.first;
+        },
+        [](ElemType const& elem) -> DataType const& {
+            // This is projection.
+            return elem.first;
+        });
+
+    bool stable = true;
+    int check_count = 0;
+    for (auto i = 1u; i < size1 + size2; ++i)
+    {
+        if (dest[i - 1].first == dest[i].first)
+        {
+            ++check_count;
+            if (dest[i - 1].second > dest[i].second)
+                stable = false;
+        }
+    }
+
+    bool test_is_meaningful = check_count >= 100;
+
+    HPX_TEST(test_is_meaningful);
+    HPX_TEST(stable);
+}
+
+template <typename ExPolicy, typename IteratorTag, typename DataType>
+void test_merge_stable(ExPolicy&& policy, IteratorTag, DataType, int rand_base)
+{
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+
+    typedef typename std::pair<DataType, int> ElemType;
+    typedef typename std::vector<ElemType>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::size_t const size1 = 300007, size2 = 123456;
+    std::vector<ElemType> src1(size1), src2(size2), dest(size1 + size2);
+
+    int no = 0;
+    auto rf = random_fill(rand_base, 6);
+    std::generate(
+        std::begin(src1), std::end(src1), [&no, &rf]() -> std::pair<int, int> {
+            return {rf(), no++};
+        });
+    rf = random_fill(rand_base, 8);
+    std::generate(
+        std::begin(src2), std::end(src2), [&no, &rf]() -> std::pair<int, int> {
+            return {rf(), no++};
+        });
+    std::sort(std::begin(src1), std::end(src1));
+    std::sort(std::begin(src2), std::end(src2));
+
+    hpx::merge(
+        policy, iterator(std::begin(src1)), iterator(std::end(src1)),
+        iterator(std::begin(src2)), iterator(std::end(src2)),
+        iterator(std::begin(dest)),
+        [](DataType const& a, DataType const& b) -> bool { return a < b; },
+        [](ElemType const& elem) -> DataType const& {
+            // This is projection.
+            return elem.first;
+        },
+        [](ElemType const& elem) -> DataType const& {
+            // This is projection.
+            return elem.first;
+        });
+
+    bool stable = true;
+    int check_count = 0;
+    for (auto i = 1u; i < size1 + size2; ++i)
+    {
+        if (dest[i - 1].first == dest[i].first)
+        {
+            ++check_count;
+            if (dest[i - 1].second > dest[i].second)
+                stable = false;
+        }
+    }
+
+    bool test_is_meaningful = check_count >= 100;
+
+    HPX_TEST(test_is_meaningful);
+    HPX_TEST(stable);
+}
+
+template <typename IteratorTag>
+void test_merge_stable()
+{
+    ////////// Test cases for checking whether the algorithm is stable.
+    using namespace hpx::execution;
+
+    int rand_base = _gen();
+
+    test_merge_stable(IteratorTag(), int(), rand_base);
+    test_merge_stable(seq, IteratorTag(), int(), rand_base);
+    test_merge_stable(par, IteratorTag(), int(), rand_base);
+    test_merge_stable(par_unseq, IteratorTag(), int(), rand_base);
+    test_merge_stable(seq, IteratorTag(), user_defined_type(), rand_base);
+    test_merge_stable(par, IteratorTag(), user_defined_type(), rand_base);
+    test_merge_stable(par_unseq, IteratorTag(), user_defined_type(), rand_base);
+}
+
+template <typename IteratorTag>
+void test_merge_etc()
+{
+    ////////// Test cases for checking whether the algorithm is stable.
+    using namespace hpx::execution;
+
+    int rand_base = _gen();
+
+    ////////// Another test cases for justifying the implementation.
+    test_merge_etc(IteratorTag(), user_defined_type(), rand_base);
+    test_merge_etc(seq, IteratorTag(), user_defined_type(), rand_base);
+    test_merge_etc(par, IteratorTag(), user_defined_type(), rand_base);
+    test_merge_etc(par_unseq, IteratorTag(), user_defined_type(), rand_base);
+}
+
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
+    {
         seed = vm["seed"].as<unsigned int>();
-
+        _gen.seed(seed);
+    }
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
 
     test_merge();
+    test_merge_stable<std::random_access_iterator_tag>();
+    test_merge_etc<std::random_access_iterator_tag>();
+
     return hpx::finalize();
 }
 

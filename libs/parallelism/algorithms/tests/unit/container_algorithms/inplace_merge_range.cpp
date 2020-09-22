@@ -21,6 +21,10 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+int seed = std::random_device{}();
+std::mt19937 _gen(seed);
+
+////////////////////////////////////////////////////////////////////////////
 struct user_defined_type
 {
     user_defined_type() = default;
@@ -158,6 +162,66 @@ void test_inplace_merge_async(ExPolicy policy, DataType)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename ExPolicy, typename IteratorTag, typename DataType>
+void test_inplace_merge_stable(
+    ExPolicy&& policy, IteratorTag, DataType, int rand_base)
+{
+#if defined(HPX_HAVE_STABLE_INPLACE_MERGE)
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+
+    typedef typename std::pair<DataType, int> ElemType;
+    typedef typename std::vector<ElemType>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::size_t const left_size = 300007, right_size = 123456;
+    std::vector<ElemType> res(left_size + right_size);
+
+    base_iterator res_first = std::begin(res);
+    base_iterator res_middle = res_first + left_size;
+    base_iterator res_last = std::end(res);
+
+    int no = 0;
+    auto rf = random_fill(rand_base, 6);
+    std::generate(res_first, res_middle, [&no, &rf]() -> std::pair<int, int> {
+        return { rf(), no++ };
+        });
+    rf = random_fill(rand_base, 8);
+    std::generate(res_middle, res_last, [&no, &rf]() -> std::pair<int, int> {
+        return { rf(), no++ };
+        });
+    std::sort(res_first, res_middle);
+    std::sort(res_middle, res_last);
+
+    hpx::inplace_merge(
+        policy, iterator(res_first), iterator(res_middle), iterator(res_last),
+        [](DataType const& a, DataType const& b) -> bool { return a < b; },
+        [](ElemType const& elem) -> DataType const& {
+            // This is projection.
+            return elem.first;
+        });
+
+    bool stable = true;
+    int check_count = 0;
+    for (std::size_t i = 1u; i < left_size + right_size; ++i)
+    {
+        if (res[i - 1].first == res[i].first)
+        {
+            ++check_count;
+            if (res[i - 1].second > res[i].second)
+                stable = false;
+        }
+    }
+
+    bool test_is_meaningful = check_count >= 100;
+
+    HPX_TEST(test_is_meaningful);
+    HPX_TEST(stable);
+#endif
+}
+
+///////////////////////////////////////////////////////////////////////////////
 template <typename DataType>
 void test_inplace_merge()
 {
@@ -176,6 +240,18 @@ void test_inplace_merge()
     test_inplace_merge<int>();
     test_inplace_merge<user_defined_type>();
 }
+
+
+////////// Test cases for checking whether the algorithm is stable.
+test_inplace_merge_stable(seq, IteratorTag(), int(), rand_base);
+test_inplace_merge_stable(par, IteratorTag(), int(), rand_base);
+test_inplace_merge_stable(par_unseq, IteratorTag(), int(), rand_base);
+test_inplace_merge_stable(
+    seq, IteratorTag(), user_defined_type(), rand_base);
+test_inplace_merge_stable(
+    par, IteratorTag(), user_defined_type(), rand_base);
+test_inplace_merge_stable(
+    par_unseq, IteratorTag(), user_defined_type(), rand_base);
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {

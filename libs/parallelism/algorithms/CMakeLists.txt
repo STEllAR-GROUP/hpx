@@ -28,6 +28,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/insertion_sort.hpp
     hpx/parallel/algorithms/detail/is_sorted.hpp
     hpx/parallel/algorithms/detail/parallel_stable_sort.hpp
+    hpx/parallel/algorithms/detail/rotate.hpp
     hpx/parallel/algorithms/detail/sample_sort.hpp
     hpx/parallel/algorithms/detail/set_operation.hpp
     hpx/parallel/algorithms/detail/spin_sort.hpp

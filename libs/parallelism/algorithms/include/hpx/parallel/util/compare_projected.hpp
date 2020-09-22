@@ -25,7 +25,7 @@ namespace hpx { namespace parallel { namespace util {
     struct compare_projected<Compare, Proj>
     {
         template <typename Compare_, typename Proj_>
-        compare_projected(Compare_&& comp, Proj_&& proj)
+        constexpr compare_projected(Compare_&& comp, Proj_&& proj)
           : comp_(std::forward<Compare_>(comp))
           , proj_(std::forward<Proj_>(proj))
         {
@@ -47,7 +47,7 @@ namespace hpx { namespace parallel { namespace util {
     struct compare_projected<Compare, util::projection_identity>
     {
         template <typename Compare_>
-        compare_projected(Compare_&& comp, util::projection_identity)
+        constexpr compare_projected(Compare_&& comp, util::projection_identity)
           : comp_(std::forward<Compare_>(comp))
         {
         }
@@ -67,7 +67,8 @@ namespace hpx { namespace parallel { namespace util {
     struct compare_projected<Compare, Proj1, Proj2>
     {
         template <typename Compare_, typename Proj1_, typename Proj2_>
-        compare_projected(Compare_&& comp, Proj1_&& proj1, Proj2_&& proj2)
+        constexpr compare_projected(
+            Compare_&& comp, Proj1_&& proj1, Proj2_&& proj2)
           : comp_(std::forward<Compare_>(comp))
           , proj1_(std::forward<Proj1_>(proj1))
           , proj2_(std::forward<Proj2_>(proj2))
@@ -91,7 +92,7 @@ namespace hpx { namespace parallel { namespace util {
     struct compare_projected<Compare, util::projection_identity, Proj2>
     {
         template <typename Compare_, typename Proj2_>
-        compare_projected(
+        constexpr compare_projected(
             Compare_&& comp, util::projection_identity, Proj2_&& proj2)
           : comp_(std::forward<Compare_>(comp))
           , proj2_(std::forward<Proj2_>(proj2))
@@ -113,7 +114,7 @@ namespace hpx { namespace parallel { namespace util {
     struct compare_projected<Compare, Proj1, util::projection_identity>
     {
         template <typename Compare_, typename Proj1_>
-        compare_projected(
+        constexpr compare_projected(
             Compare_&& comp, Proj1_&& proj1, util::projection_identity)
           : comp_(std::forward<Compare_>(comp))
           , proj1_(std::forward<Proj1_>(proj1))
@@ -137,7 +138,7 @@ namespace hpx { namespace parallel { namespace util {
         util::projection_identity>
     {
         template <typename Compare_>
-        compare_projected(Compare_&& comp, util::projection_identity,
+        constexpr compare_projected(Compare_&& comp, util::projection_identity,
             util::projection_identity)
           : comp_(std::forward<Compare_>(comp))
         {

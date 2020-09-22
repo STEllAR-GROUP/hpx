@@ -15,13 +15,11 @@
 
 namespace hpx {
     using hpx::parallel::adjacent_find;
-    using hpx::parallel::inplace_merge;
     using hpx::parallel::is_partitioned;
     using hpx::parallel::is_sorted;
     using hpx::parallel::is_sorted_until;
     using hpx::parallel::lexicographical_compare;
     using hpx::parallel::max_element;
-    using hpx::parallel::merge;
     using hpx::parallel::min_element;
     using hpx::parallel::minmax_element;
     using hpx::parallel::partition;
