@@ -52,7 +52,7 @@ Functions
 - :cpp:func:`hpx::generate`
 - :cpp:func:`hpx::generate_n`
 - :cpp:func:`hpx::includes`
-- :cpp:func:`hpx::parallel::v1::inplace_merge`
+- :cpp:func:`hpx::inplace_merge`
 - :cpp:func:`hpx::is_heap`
 - :cpp:func:`hpx::is_heap_until`
 - :cpp:func:`hpx::parallel::v1::is_partitioned`
@@ -61,7 +61,7 @@ Functions
 - :cpp:func:`hpx::parallel::v1::lexicographical_compare`
 - :cpp:func:`hpx::make_heap`
 - :cpp:func:`hpx::parallel::v1::max_element`
-- :cpp:func:`hpx::parallel::v1::merge`
+- :cpp:func:`hpx::merge`
 - :cpp:func:`hpx::parallel::v1::min_element`
 - :cpp:func:`hpx::parallel::v1::minmax_element`
 - :cpp:func:`hpx::parallel::v1::mismatch`
@@ -118,9 +118,11 @@ Functions
 - :cpp:func:`hpx::ranges::generate`
 - :cpp:func:`hpx::ranges::generate_n`
 - :cpp:func:`hpx::ranges::includes`
+- :cpp:func:`hpx::ranges::inplace_merge`
 - :cpp:func:`hpx::ranges::is_heap`
 - :cpp:func:`hpx::ranges::is_heap_until`
 - :cpp:func:`hpx::ranges::make_heap`
+- :cpp:func:`hpx::ranges::merge`
 - :cpp:func:`hpx::ranges::move`
 - :cpp:func:`hpx::ranges::none_of`
 - :cpp:func:`hpx::ranges::set_difference`

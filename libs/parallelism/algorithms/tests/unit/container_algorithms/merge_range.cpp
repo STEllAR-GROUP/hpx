@@ -93,14 +93,9 @@ struct random_fill
 };
 
 ////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename DataType>
-void test_merge(ExPolicy policy, DataType)
+template <typename DataType>
+void test_merge(DataType)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
-
-    using hpx::get;
-
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
         dest_sol(size1 + size2);
@@ -110,27 +105,24 @@ void test_merge(ExPolicy policy, DataType)
     std::sort(std::begin(src1), std::end(src1));
     std::sort(std::begin(src2), std::end(src2));
 
-    auto result =
-        hpx::parallel::merge(policy, src1, src2, std::begin(dest_res));
+    auto result = hpx::ranges::merge(src1, src2, std::begin(dest_res));
     auto solution = std::merge(std::begin(src1), std::end(src1),
         std::begin(src2), std::end(src2), std::begin(dest_sol));
 
-    HPX_TEST(get<0>(result) == std::end(src1));
-    HPX_TEST(get<1>(result) == std::end(src2));
+    HPX_TEST(result.in1 == std::end(src1));
+    HPX_TEST(result.in2 == std::end(src2));
 
     bool equality = test::equal(
-        std::begin(dest_res), get<2>(result), std::begin(dest_sol), solution);
+        std::begin(dest_res), result.out, std::begin(dest_sol), solution);
 
     HPX_TEST(equality);
 }
 
 template <typename ExPolicy, typename DataType>
-void test_merge_async(ExPolicy policy, DataType)
+void test_merge(ExPolicy&& policy, DataType)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
-
-    using hpx::get;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
@@ -141,16 +133,44 @@ void test_merge_async(ExPolicy policy, DataType)
     std::sort(std::begin(src1), std::end(src1));
     std::sort(std::begin(src2), std::end(src2));
 
-    auto f = hpx::parallel::merge(policy, src1, src2, std::begin(dest_res));
+    auto result = hpx::ranges::merge(policy, src1, src2, std::begin(dest_res));
+    auto solution = std::merge(std::begin(src1), std::end(src1),
+        std::begin(src2), std::end(src2), std::begin(dest_sol));
+
+    HPX_TEST(result.in1 == std::end(src1));
+    HPX_TEST(result.in2 == std::end(src2));
+
+    bool equality = test::equal(
+        std::begin(dest_res), result.out, std::begin(dest_sol), solution);
+
+    HPX_TEST(equality);
+}
+
+template <typename ExPolicy, typename DataType>
+void test_merge_async(ExPolicy&& policy, DataType)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    std::size_t const size1 = 300007, size2 = 123456;
+    std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
+        dest_sol(size1 + size2);
+
+    std::generate(std::begin(src1), std::end(src1), random_fill(0, 6));
+    std::generate(std::begin(src2), std::end(src2), random_fill(0, 8));
+    std::sort(std::begin(src1), std::end(src1));
+    std::sort(std::begin(src2), std::end(src2));
+
+    auto f = hpx::ranges::merge(policy, src1, src2, std::begin(dest_res));
     auto result = f.get();
     auto solution = std::merge(std::begin(src1), std::end(src1),
         std::begin(src2), std::end(src2), std::begin(dest_sol));
 
-    HPX_TEST(get<0>(result) == std::end(src1));
-    HPX_TEST(get<1>(result) == std::end(src2));
+    HPX_TEST(result.in1 == std::end(src1));
+    HPX_TEST(result.in2 == std::end(src2));
 
     bool equality = test::equal(
-        std::begin(dest_res), get<2>(result), std::begin(dest_sol), solution);
+        std::begin(dest_res), result.out, std::begin(dest_sol), solution);
 
     HPX_TEST(equality);
 }
@@ -160,6 +180,8 @@ template <typename DataType>
 void test_merge()
 {
     using namespace hpx::execution;
+
+    test_merge(DataType());
 
     test_merge(seq, DataType());
     test_merge(par, DataType());
@@ -222,8 +244,7 @@ void test_merge_etc(IteratorTag, DataType, int rand_base)
 template <typename ExPolicy, typename IteratorTag, typename DataType>
 void test_merge_etc(ExPolicy&& policy, IteratorTag, DataType, int rand_base)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef typename std::vector<DataType>::iterator base_iterator;
@@ -291,7 +312,7 @@ void test_merge_stable(IteratorTag, DataType, int rand_base)
     std::sort(std::begin(src1), std::end(src1));
     std::sort(std::begin(src2), std::end(src2));
 
-    hpx::merge(
+    hpx::ranges::merge(
         iterator(std::begin(src1)), iterator(std::end(src1)),
         iterator(std::begin(src2)), iterator(std::end(src2)),
         iterator(std::begin(dest)),
@@ -326,8 +347,7 @@ void test_merge_stable(IteratorTag, DataType, int rand_base)
 template <typename ExPolicy, typename IteratorTag, typename DataType>
 void test_merge_stable(ExPolicy&& policy, IteratorTag, DataType, int rand_base)
 {
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef typename std::pair<DataType, int> ElemType;
@@ -351,7 +371,7 @@ void test_merge_stable(ExPolicy&& policy, IteratorTag, DataType, int rand_base)
     std::sort(std::begin(src1), std::end(src1));
     std::sort(std::begin(src2), std::end(src2));
 
-    hpx::merge(
+    hpx::ranges::merge(
         policy, iterator(std::begin(src1)), iterator(std::end(src1)),
         iterator(std::begin(src2)), iterator(std::end(src2)),
         iterator(std::begin(dest)),

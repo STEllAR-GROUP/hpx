@@ -537,11 +537,11 @@ Parallel algorithms
      * Description
      * In header
      * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::parallel::v1::merge`
+   * * :cpp:func:`hpx::merge`
      * Merges two sorted ranges.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`merge`
-   * * :cpp:func:`hpx::parallel::v1::inplace_merge`
+   * * :cpp:func:`hpx::inplace_merge`
      * Merges two ordered ranges in-place.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`inplace_merge`

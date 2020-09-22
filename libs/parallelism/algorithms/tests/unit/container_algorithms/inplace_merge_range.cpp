@@ -30,7 +30,7 @@ struct user_defined_type
     user_defined_type() = default;
     user_defined_type(int rand_no)
       : val(rand_no)
-      , name(name_list[std::rand() % name_list.size()])
+      , name(name_list[_gen() % name_list.size()])
     {
     }
 
@@ -78,7 +78,7 @@ const std::vector<std::string> user_defined_type::name_list{
 struct random_fill
 {
     random_fill(int rand_base, int range)
-      : gen(std::rand())
+      : gen(_gen())
       , dist(rand_base - range / 2, rand_base + range / 2)
     {
     }
@@ -166,9 +166,7 @@ template <typename ExPolicy, typename IteratorTag, typename DataType>
 void test_inplace_merge_stable(
     ExPolicy&& policy, IteratorTag, DataType, int rand_base)
 {
-#if defined(HPX_HAVE_STABLE_INPLACE_MERGE)
-    static_assert(
-        hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef typename std::pair<DataType, int> ElemType;
@@ -185,16 +183,16 @@ void test_inplace_merge_stable(
     int no = 0;
     auto rf = random_fill(rand_base, 6);
     std::generate(res_first, res_middle, [&no, &rf]() -> std::pair<int, int> {
-        return { rf(), no++ };
-        });
+        return {rf(), no++};
+    });
     rf = random_fill(rand_base, 8);
     std::generate(res_middle, res_last, [&no, &rf]() -> std::pair<int, int> {
-        return { rf(), no++ };
-        });
+        return {rf(), no++};
+    });
     std::sort(res_first, res_middle);
     std::sort(res_middle, res_last);
 
-    hpx::inplace_merge(
+    hpx::ranges::inplace_merge(
         policy, iterator(res_first), iterator(res_middle), iterator(res_last),
         [](DataType const& a, DataType const& b) -> bool { return a < b; },
         [](ElemType const& elem) -> DataType const& {
@@ -218,7 +216,6 @@ void test_inplace_merge_stable(
 
     HPX_TEST(test_is_meaningful);
     HPX_TEST(stable);
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -241,28 +238,45 @@ void test_inplace_merge()
     test_inplace_merge<user_defined_type>();
 }
 
+template <typename IteratorTag, typename DataType>
+void test_inplace_merge_stable()
+{
+    ////////// Test cases for checking whether the algorithm is stable.
+    using namespace hpx::execution;
 
-////////// Test cases for checking whether the algorithm is stable.
-test_inplace_merge_stable(seq, IteratorTag(), int(), rand_base);
-test_inplace_merge_stable(par, IteratorTag(), int(), rand_base);
-test_inplace_merge_stable(par_unseq, IteratorTag(), int(), rand_base);
-test_inplace_merge_stable(
-    seq, IteratorTag(), user_defined_type(), rand_base);
-test_inplace_merge_stable(
-    par, IteratorTag(), user_defined_type(), rand_base);
-test_inplace_merge_stable(
-    par_unseq, IteratorTag(), user_defined_type(), rand_base);
+    int rand_base = _gen();
+
+    ////////// Test cases for checking whether the algorithm is stable.
+    test_inplace_merge_stable(seq, IteratorTag(), int(), rand_base);
+    test_inplace_merge_stable(par, IteratorTag(), int(), rand_base);
+    test_inplace_merge_stable(par_unseq, IteratorTag(), int(), rand_base);
+    test_inplace_merge_stable(
+        seq, IteratorTag(), user_defined_type(), rand_base);
+    test_inplace_merge_stable(
+        par, IteratorTag(), user_defined_type(), rand_base);
+    test_inplace_merge_stable(
+        par_unseq, IteratorTag(), user_defined_type(), rand_base);
+}
+
+void test_inplace_merge_stable()
+{
+    test_inplace_merge_stable<std::random_access_iterator_tag, int>();
+    test_inplace_merge_stable<std::random_access_iterator_tag,
+        user_defined_type>();
+}
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
+    {
         seed = vm["seed"].as<unsigned int>();
-
+        _gen.seed(seed);
+    }
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
 
     test_inplace_merge();
+    test_inplace_merge_stable();
+
     return hpx::finalize();
 }
 
