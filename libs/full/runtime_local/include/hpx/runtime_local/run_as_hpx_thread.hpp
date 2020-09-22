@@ -10,7 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
@@ -55,8 +55,7 @@ namespace hpx { namespace threads {
                     {
                         // Execute the given function, forward all parameters,
                         // store result.
-                        result.emplace(
-                            util::invoke(f, std::forward<Ts>(ts)...));
+                        result.emplace(HPX_INVOKE(f, std::forward<Ts>(ts)...));
                     }
                     catch (...)
                     {
@@ -105,7 +104,7 @@ namespace hpx { namespace threads {
                     try
                     {
                         // Execute the given function, forward all parameters.
-                        util::invoke(f, std::forward<Ts>(ts)...);
+                        HPX_INVOKE(f, std::forward<Ts>(ts)...);
                     }
                     catch (...)
                     {

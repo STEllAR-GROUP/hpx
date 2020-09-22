@@ -10,8 +10,9 @@
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/pack_traversal/detail/container_category.hpp>
@@ -148,11 +149,11 @@ namespace hpx {
 
             /// Calls the visitor with the given element
             template <typename T>
-            auto traverse(T&& value)
-                -> decltype(util::invoke(std::declval<Visitor&>(),
-                    async_traverse_visit_tag{}, std::forward<T>(value)))
+            auto traverse(T&& value) ->
+                typename hpx::util::invoke_result<Visitor&,
+                    async_traverse_visit_tag, T>::type
             {
-                return util::invoke(visitor(), async_traverse_visit_tag{},
+                return HPX_INVOKE(visitor(), async_traverse_visit_tag{},
                     std::forward<T>(value));
             }
 
@@ -172,7 +173,7 @@ namespace hpx {
 
                 // Invoke the visitor with the current value and the
                 // callable object to resume the control flow.
-                util::invoke(visitor(), async_traverse_detach_tag{},
+                HPX_INVOKE(visitor(), async_traverse_detach_tag{},
                     std::forward<T>(value), std::move(resumable));
             }
 
@@ -183,7 +184,7 @@ namespace hpx {
                 bool expected = false;
                 if (finished_.compare_exchange_strong(expected, true))
                 {
-                    util::invoke(visitor(), async_traverse_complete_tag{},
+                    HPX_INVOKE(visitor(), async_traverse_complete_tag{},
                         std::move(args_));
                 }
             }

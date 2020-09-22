@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 
 #include <utility>
@@ -32,7 +32,7 @@ namespace hpx { namespace util {
             constexpr typename util::invoke_result<MemberPointer, Ts...>::type
             operator()(Ts&&... vs) const
             {
-                return util::invoke(_pm, std::forward<Ts>(vs)...);
+                return HPX_INVOKE(_pm, std::forward<Ts>(vs)...);
             }
 
             MemberPointer _pm;

@@ -238,10 +238,11 @@ namespace hpx {
 #include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
+#include <hpx/functional/detail/invoke.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
-#include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -275,7 +276,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             call(T&& t)
             {
                 T&& tmp = std::forward<T>(t);
-                hpx::util::invoke(f_, hpx::util::invoke(proj_, tmp));
+                HPX_INVOKE(f_, HPX_INVOKE(proj_, tmp));
             }
 
             template <typename T>
@@ -283,8 +284,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 hpx::traits::is_value_proxy<T>::value>::type
             call(T&& t)
             {
-                auto tmp = hpx::util::invoke(proj_, std::forward<T>(t));
-                hpx::util::invoke_r<void>(f_, tmp);
+                auto tmp = HPX_INVOKE(proj_, std::forward<T>(t));
+                HPX_INVOKE(f_, tmp);
             }
 
             template <typename Iter>
@@ -310,7 +311,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             call(T&& t)
             {
                 T&& tmp = std::forward<T>(t);
-                hpx::util::invoke(f_, tmp);
+                HPX_INVOKE(f_, tmp);
             }
 
             template <typename T>
@@ -319,7 +320,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             call(T&& t)
             {
                 auto tmp = std::forward<T>(t);
-                hpx::util::invoke_r<void>(f_, tmp);
+                HPX_INVOKE(f_, tmp);
             }
 
             template <typename Iter>

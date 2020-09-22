@@ -9,8 +9,8 @@
 //  Creative Commons Attribution 4.0 International License
 //  (http://creativecommons.org/licenses/by/4.0/).
 
+#include <hpx/functional/bind_back.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/modules/functional.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/threading.hpp>

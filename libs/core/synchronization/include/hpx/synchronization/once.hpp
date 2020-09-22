@@ -11,7 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/synchronization/event.hpp>
 
 #include <atomic>
@@ -60,8 +60,7 @@ namespace hpx { namespace lcos { namespace local {
                     // wrapped function was throwing an exception before
                     flag.event_.reset();
 
-                    util::invoke(
-                        std::forward<F>(f), std::forward<Args>(args)...);
+                    HPX_INVOKE(std::forward<F>(f), std::forward<Args>(args)...);
 
                     // set status to done, release waiting threads
                     flag.status_.store(function_complete_flag_value);

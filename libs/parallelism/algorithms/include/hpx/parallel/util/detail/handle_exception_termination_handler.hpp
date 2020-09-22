@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/functional.hpp>
+#include <hpx/functional/function.hpp>
 
 namespace hpx { namespace parallel { namespace util { namespace detail {
     using parallel_exception_termination_handler_type =

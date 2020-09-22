@@ -9,7 +9,6 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/modules/functional.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>

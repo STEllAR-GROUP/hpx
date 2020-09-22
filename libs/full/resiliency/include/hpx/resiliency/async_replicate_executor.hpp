@@ -14,10 +14,11 @@
 #include <hpx/resiliency/async_replicate.hpp>
 #include <hpx/resiliency/resiliency_cpos.hpp>
 
+#include <hpx/functional/detail/invoke.hpp>
+#include <hpx/functional/invoke_fused.hpp>
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
-#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 
 #include <cstddef>
@@ -84,7 +85,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                             else
                             {
                                 auto&& result = f.get();
-                                if (hpx::util::invoke(pred, result))
+                                if (HPX_INVOKE(pred, result))
                                 {
                                     valid_results.emplace_back(
                                         std::move(result));
@@ -94,7 +95,7 @@ namespace hpx { namespace resiliency { namespace experimental {
 
                         if (!valid_results.empty())
                         {
-                            return hpx::util::invoke(std::forward<Vote>(vote),
+                            return HPX_INVOKE(std::forward<Vote>(vote),
                                 std::move(valid_results));
                         }
 

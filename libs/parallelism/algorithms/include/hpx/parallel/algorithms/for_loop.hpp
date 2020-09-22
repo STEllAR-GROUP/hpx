@@ -733,10 +733,11 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/functional/detail/invoke.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/executors.hpp>
-#include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/type_support.hpp>
@@ -778,7 +779,7 @@ namespace hpx {
                 hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>, F&& f,
                 B part_begin)
             {
-                hpx::util::invoke(std::forward<F>(f), part_begin,
+                HPX_INVOKE(std::forward<F>(f), part_begin,
                     hpx::get<Is>(args).iteration_value()...);
             }
 
@@ -879,7 +880,7 @@ namespace hpx {
                 {
                     while (part_steps != 0)
                     {
-                        hpx::util::invoke(f_, part_begin);
+                        HPX_INVOKE(f_, part_begin);
 
                         // NVCC seems to have a bug with std::min...
                         std::size_t chunk =
@@ -935,7 +936,7 @@ namespace hpx {
                     std::size_t count = size;
                     while (count != 0)
                     {
-                        hpx::util::invoke(f, first, args.iteration_value()...);
+                        HPX_INVOKE(f, first, args.iteration_value()...);
 
                         // NVCC seems to have a bug with std::min...
                         std::size_t chunk =

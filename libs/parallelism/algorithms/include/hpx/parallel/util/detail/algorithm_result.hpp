@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/executors/execution_policy_fwd.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -259,7 +259,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     typename hpx::util::invoke_result<Conv, U>::type convert_to_result(
         U&& val, Conv&& conv)
     {
-        return hpx::util::invoke(conv, val);
+        return HPX_INVOKE(conv, val);
     }
 
     template <typename U, typename Conv,

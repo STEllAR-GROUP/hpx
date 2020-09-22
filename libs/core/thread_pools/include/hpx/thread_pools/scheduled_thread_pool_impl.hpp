@@ -12,7 +12,7 @@
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
@@ -649,7 +649,7 @@ namespace hpx { namespace threads { namespace detail {
     {
         while (first != last)
         {
-            util::invoke(destproj, *dest++) = util::invoke(srcproj, *first++);
+            HPX_INVOKE(destproj, *dest++) = HPX_INVOKE(srcproj, *first++);
         }
         return dest;
     }
@@ -659,7 +659,7 @@ namespace hpx { namespace threads { namespace detail {
     {
         while (first != last)
         {
-            init = std::move(init) + util::invoke(proj, *first++);
+            init = std::move(init) + HPX_INVOKE(proj, *first++);
         }
         return init;
     }

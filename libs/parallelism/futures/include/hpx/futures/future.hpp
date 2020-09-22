@@ -13,7 +13,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future_fwd.hpp>
@@ -1073,9 +1073,8 @@ namespace hpx { namespace lcos {
         convert_future_helper(Future&& f, Conv&& conv)    //-V659
         {
             return f.then(hpx::launch::sync,
-                [conv = std::forward<Conv>(conv)](Future&& f) -> T {
-                    return hpx::util::invoke(conv, f.get());
-                });
+                [conv = std::forward<Conv>(conv)](
+                    Future&& f) -> T { return HPX_INVOKE(conv, f.get()); });
         }
     }    // namespace detail
 
@@ -1348,7 +1347,7 @@ namespace hpx { namespace lcos {
         return f.then(hpx::launch::sync,
             [conv = std::forward<Conv>(conv)](
                 hpx::lcos::shared_future<U> const& f) {
-                return hpx::util::invoke(conv, f.get());
+                return HPX_INVOKE(conv, f.get());
             });
     }
 

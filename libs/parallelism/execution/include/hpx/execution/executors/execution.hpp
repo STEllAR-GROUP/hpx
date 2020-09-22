@@ -22,7 +22,8 @@
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
@@ -297,8 +298,7 @@ namespace hpx { namespace parallel { namespace execution {
             // fall-back: emulate sync_execute using async_execute
             template <typename TwoWayExecutor, typename F, typename... Ts>
             static auto call_impl(std::false_type, TwoWayExecutor&& exec, F&& f,
-                Ts&&... ts) -> decltype(hpx::util::invoke(std::forward<F>(f),
-                std::forward<Ts>(ts)...))
+                Ts&&... ts) -> typename hpx::util::invoke_result<F, Ts...>::type
             {
                 try
                 {
@@ -310,7 +310,7 @@ namespace hpx { namespace parallel { namespace execution {
                     return async_execute_dispatch(0,
                         std::forward<TwoWayExecutor>(exec),
                         [&]() -> result_type {
-                            return hpx::util::invoke(
+                            return HPX_INVOKE(
                                 std::forward<F>(f), std::forward<Ts>(ts)...);
                         })
                         .get();
@@ -336,9 +336,8 @@ namespace hpx { namespace parallel { namespace execution {
 
             template <typename TwoWayExecutor, typename F, typename... Ts>
             HPX_FORCEINLINE static auto call_impl(hpx::traits::detail::wrap_int,
-                TwoWayExecutor&& exec, F&& f, Ts&&... ts)
-                -> decltype(hpx::util::invoke(
-                    std::forward<F>(f), std::forward<Ts>(ts)...))
+                TwoWayExecutor&& exec, F&& f, Ts&&... ts) ->
+                typename hpx::util::invoke_result<F, Ts...>::type
             {
                 typedef typename std::is_void<typename hpx::util::detail::
                         invoke_deferred_result<F, Ts...>::type>::type is_void;

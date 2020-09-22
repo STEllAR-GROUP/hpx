@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/functional/invoke.hpp>
 
 #include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/executors/execution_policy.hpp>

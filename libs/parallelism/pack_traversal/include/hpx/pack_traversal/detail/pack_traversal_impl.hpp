@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
@@ -211,7 +211,7 @@ namespace hpx { namespace util { namespace detail {
         constexpr auto apply_spread_impl(std::false_type, C&& callable,
             T&&... args) -> typename invoke_result<C, T...>::type
         {
-            return hpx::util::invoke(
+            return HPX_INVOKE(
                 std::forward<C>(callable), std::forward<T>(args)...);
         }
 

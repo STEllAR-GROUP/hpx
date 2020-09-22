@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/threading_base/thread_description.hpp>
@@ -139,7 +139,7 @@ namespace hpx { namespace util {
                 Ts...>::type
             operator()(Ts&&... ts)
             {
-                return util::invoke(f_, std::forward<Ts>(ts)...);
+                return HPX_INVOKE(f_, std::forward<Ts>(ts)...);
             }
 
             template <typename Archive>

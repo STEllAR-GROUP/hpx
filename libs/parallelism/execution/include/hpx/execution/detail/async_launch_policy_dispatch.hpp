@@ -11,7 +11,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
@@ -38,7 +38,7 @@ namespace hpx { namespace detail {
         try
         {
             return lcos::make_ready_future<R>(
-                util::invoke(std::forward<F>(f), std::move(vs)...));
+                HPX_INVOKE(std::forward<F>(f), std::move(vs)...));
         }
         catch (...)
         {
@@ -53,7 +53,7 @@ namespace hpx { namespace detail {
     {
         try
         {
-            util::invoke(std::forward<F>(f), std::move(vs)...);
+            HPX_INVOKE(std::forward<F>(f), std::move(vs)...);
             return lcos::make_ready_future();
         }
         catch (...)

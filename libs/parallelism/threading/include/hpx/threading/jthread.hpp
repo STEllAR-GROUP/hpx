@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/functional.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/synchronization/stop_token.hpp>
 #include <hpx/threading/thread.hpp>
 
@@ -24,14 +24,14 @@ namespace hpx {
         static void invoke(std::false_type, F&& f, stop_token&& st, Ts&&... ts)
         {
             // started thread does not expect a stop token:
-            hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
+            HPX_INVOKE(std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename... Ts>
         static void invoke(std::true_type, F&& f, stop_token&& st, Ts&&... ts)
         {
             // pass the stop_token as first argument to the started thread:
-            hpx::util::invoke(
+            HPX_INVOKE(
                 std::forward<F>(f), std::move(st), std::forward<Ts>(ts)...);
         }
 
