@@ -173,6 +173,7 @@ namespace hpx { namespace util {
         {
         };
 
+        template <std::size_t J>
         static empty at_index_check(...);
 
         template <std::size_t J, typename T>
