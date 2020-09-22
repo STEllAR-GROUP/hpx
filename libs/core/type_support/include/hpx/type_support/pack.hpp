@@ -147,21 +147,25 @@ namespace hpx { namespace util {
         };
 
 #if defined(HPX_HAVE_BUILTIN_TYPE_PACK_ELEMENT)
-        template <std::size_t I, typename Ts, bool InBounds = (I < Ts::size)>
-        struct at_index_impl : empty
+        template <std::size_t I, typename Ts, bool C = (I < Ts::size)>
+        struct at_index_impl
         {
+            using type = empty;
         };
 
         template <std::size_t I, typename... Ts>
-        struct at_index_impl<I, pack<Ts...>, /*InBounds*/ true>
+        struct at_index_impl<I, pack<Ts...>, true>
         {
-            using type = __type_pack_element<I, Ts...>;
+            using type = struct
+            {
+                using type = __type_pack_element<I, Ts...>;
+            };
         };
 #else
         template <std::size_t I, typename T>
         struct indexed
         {
-            using type = T;
+            typedef T type;
         };
 
         template <typename Ts, typename Is>
@@ -173,22 +177,22 @@ namespace hpx { namespace util {
         {
         };
 
-        static empty at_index_check(...);
-
-        template <std::size_t J, typename T>
-        static indexed<J, T> at_index_check(indexed<J, T> const&);
-
         template <std::size_t I, typename Ts>
         struct at_index_impl
-          : decltype(detail::at_index_check<I>(
-                indexer<Ts, typename make_index_pack<Ts::size>::type>()))
         {
+            static empty check_(...);
+
+            template <std::size_t J, typename T>
+            static indexed<J, T> check_(indexed<J, T> const&);
+
+            typedef decltype(check_<I>(
+                indexer<Ts, typename make_index_pack<Ts::size>::type>())) type;
         };
 #endif
     }    // namespace detail
 
     template <std::size_t I, typename... Ts>
-    struct at_index : detail::at_index_impl<I, pack<Ts...>>
+    struct at_index : detail::at_index_impl<I, pack<Ts...>>::type
     {
     };
 
