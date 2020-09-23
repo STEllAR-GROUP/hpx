@@ -296,8 +296,7 @@ void test_inplace_merge_etc(IteratorTag, DataType, int rand_base)
 
         DataType val;
         hpx::ranges::inplace_merge(
-            iterator(res_first), iterator(res_middle),
-            iterator(res_last),
+            iterator(res_first), iterator(res_middle), iterator(res_last),
             [](DataType const& a, DataType const& b) -> bool { return a < b; },
             [&val](DataType const& elem) -> DataType& {
                 // This is projection.
