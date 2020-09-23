@@ -17,7 +17,7 @@ set(debugging_compat_headers
     hpx/util/debug/demangle_helper.hpp
 )
 
-set(debugging_sources attach_debugger.cpp backtrace.cpp)
+set(debugging_sources attach_debugger.cpp backtrace.cpp print.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(

@@ -9,34 +9,16 @@
 #include <hpx/config.hpp>
 
 #include <array>
-#include <bitset>
 #include <chrono>
-#include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <cstring>
-#include <iomanip>
 #include <iostream>
-#include <iterator>
 #include <sstream>
 #include <string>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(__linux) || defined(linux) || defined(__linux__)
-#include <sys/mman.h>
-#include <unistd.h>
-#elif defined(__APPLE__)
-#include <crt_externs.h>
-#include <unistd.h>
-#define environ (*_NSGetEnviron())
-#elif defined(HPX_WINDOWS)
-#include <winsock2.h>
-#define environ _environ
-#else
-extern char** environ;
-#endif
 
 // ------------------------------------------------------------
 // This file provides a simple to use printf style debugging
@@ -84,10 +66,13 @@ namespace hpx { namespace debug {
     // ------------------------------------------------------------------
     namespace detail {
 
+        template <typename Int>
+        HPX_CORE_EXPORT void print_dec(std::ostream& os, Int const& v, int n);
+
         template <int N, typename T>
         struct dec
         {
-            dec(T const& v)
+            constexpr dec(T const& v)
               : data_(v)
             {
             }
@@ -97,15 +82,14 @@ namespace hpx { namespace debug {
             friend std::ostream& operator<<(
                 std::ostream& os, dec<N, T> const& d)
             {
-                os << std::right << std::setfill('0') << std::setw(N)
-                   << std::noshowbase << std::dec << d.data_;
+                detail::print_dec(os, d.data_, N);
                 return os;
             }
         };
     }    // namespace detail
 
     template <int N = 2, typename T>
-    detail::dec<N, T> dec(T const& v)
+    constexpr detail::dec<N, T> dec(T const& v)
     {
         return detail::dec<N, T>(v);
     }
@@ -115,26 +99,22 @@ namespace hpx { namespace debug {
     // ------------------------------------------------------------------
     struct ptr
     {
-        ptr(void const* v)
-          : data_(v)
-        {
-        }
-        ptr(std::uintptr_t const v)
-          : data_(reinterpret_cast<void const*>(v))
-        {
-        }
+        HPX_CORE_EXPORT ptr(void const* v);
+        HPX_CORE_EXPORT ptr(std::uintptr_t v);
+
         void const* data_;
-        friend std::ostream& operator<<(std::ostream& os, ptr const& d)
-        {
-            os << d.data_;
-            return os;
-        }
+
+        HPX_CORE_EXPORT friend std::ostream& operator<<(
+            std::ostream& os, ptr const& d);
     };
 
     // ------------------------------------------------------------------
     // format as zero padded hex
     // ------------------------------------------------------------------
     namespace detail {
+
+        template <typename Int>
+        HPX_CORE_EXPORT void print_hex(std::ostream& os, Int v, int n);
 
         template <int N = 4, typename T = int, typename Enable = void>
         struct hex;
@@ -143,41 +123,46 @@ namespace hpx { namespace debug {
         struct hex<N, T,
             typename std::enable_if<!std::is_pointer<T>::value>::type>
         {
-            hex(T const& v)
+            constexpr hex(T const& v)
               : data_(v)
             {
             }
+
             T const& data_;
+
             friend std::ostream& operator<<(
-                std::ostream& os, const hex<N, T>& d)
+                std::ostream& os, hex<N, T> const& d)
             {
-                os << std::right << "0x" << std::setfill('0') << std::setw(N)
-                   << std::noshowbase << std::hex << d.data_;
+                detail::print_hex(os, d.data_, N);
                 return os;
             }
         };
+
+        template <typename Int>
+        HPX_CORE_EXPORT void print_ptr(std::ostream& os, Int v, int n);
 
         template <int N, typename T>
         struct hex<N, T,
             typename std::enable_if<std::is_pointer<T>::value>::type>
         {
-            hex(T const& v)
+            constexpr hex(T const& v)
               : data_(v)
             {
             }
+
             T const& data_;
+
             friend std::ostream& operator<<(
-                std::ostream& os, const hex<N, T>& d)
+                std::ostream& os, hex<N, T> const& d)
             {
-                os << std::right << std::setw(N) << std::noshowbase << std::hex
-                   << d.data_;
+                detail::print_ptr(os, d.data_, N);
                 return os;
             }
         };
     }    // namespace detail
 
     template <int N = 4, typename T>
-    detail::hex<N, T> hex(T const& v)
+    constexpr detail::hex<N, T> hex(T const& v)
     {
         return detail::hex<N, T>(v);
     }
@@ -187,25 +172,30 @@ namespace hpx { namespace debug {
     // ------------------------------------------------------------------
     namespace detail {
 
+        template <typename Int>
+        HPX_CORE_EXPORT void print_bin(std::ostream& os, Int v, int n);
+
         template <int N = 8, typename T = int>
         struct bin
         {
-            bin(T const& v)
+            constexpr bin(T const& v)
               : data_(v)
             {
             }
+
             T const& data_;
+
             friend std::ostream& operator<<(
-                std::ostream& os, const bin<N, T>& d)
+                std::ostream& os, bin<N, T> const& d)
             {
-                os << std::bitset<N>(d.data_);
+                detail::print_bin(os, d.data_, N);
                 return os;
             }
         };
     }    // namespace detail
 
     template <int N = 8, typename T>
-    detail::bin<N, T> bin(T const& v)
+    constexpr detail::bin<N, T> bin(T const& v)
     {
         return detail::bin<N, T>(v);
     }
@@ -213,17 +203,24 @@ namespace hpx { namespace debug {
     // ------------------------------------------------------------------
     // format as padded string
     // ------------------------------------------------------------------
+    namespace detail {
+
+        HPX_CORE_EXPORT void print_str(std::ostream& os, char const* v, int n);
+    }
+
     template <int N = 20>
     struct str
     {
-        str(const char* v)
+        constexpr str(char const* v)
           : data_(v)
         {
         }
-        const char* data_;
+
+        char const* data_;
+
         friend std::ostream& operator<<(std::ostream& os, str<N> const& d)
         {
-            os << std::left << std::setfill(' ') << std::setw(N) << d.data_;
+            detail::print_str(os, d.data_, N);
             return os;
         }
     };
@@ -233,35 +230,32 @@ namespace hpx { namespace debug {
     // ------------------------------------------------------------------
     struct ipaddr
     {
-        ipaddr(const void* a)
-          : data_(reinterpret_cast<const uint8_t*>(a))
-          , ipdata_(0)
-        {
-        }
-        ipaddr(const uint32_t a)
-          : data_(reinterpret_cast<const uint8_t*>(&ipdata_))
-          , ipdata_(a)
-        {
-        }
-        const uint8_t* data_;
-        const uint32_t ipdata_;
+        HPX_CORE_EXPORT ipaddr(void const* a);
+        HPX_CORE_EXPORT ipaddr(std::uint32_t a);
 
-        friend std::ostream& operator<<(std::ostream& os, ipaddr const& p)
-        {
-            os << std::dec << int(p.data_[0]) << "." << int(p.data_[1]) << "."
-               << int(p.data_[2]) << "." << int(p.data_[3]);
-            return os;
-        }
+        std::uint8_t const* data_;
+        std::uint32_t const ipdata_;
+
+        HPX_CORE_EXPORT friend std::ostream& operator<<(
+            std::ostream& os, ipaddr const& p);
     };
+
+    // ------------------------------------------------------------------
+    // helper class for printing time since start
+    // ------------------------------------------------------------------
+    namespace detail {
+        struct current_time_print_helper
+        {
+            HPX_CORE_EXPORT friend std::ostream& operator<<(
+                std::ostream& os, current_time_print_helper const&);
+        };
+    }    // namespace detail
 
     // ------------------------------------------------------------------
     // helper function for printing CRC32
     // ------------------------------------------------------------------
-    inline uint32_t crc32(const void* /*address*/, size_t /*length*/)
+    constexpr inline std::uint32_t crc32(void const*, std::size_t)
     {
-        //        boost::crc_32_type result;
-        //        result.process_bytes(address, length);
-        //        return result.checksum();
         return 0;
     }
 
@@ -272,32 +266,15 @@ namespace hpx { namespace debug {
     // ------------------------------------------------------------------
     struct mem_crc32
     {
-        mem_crc32(const void* a, std::size_t len, const char* txt)
-          : addr_(reinterpret_cast<const uint64_t*>(a))
-          , len_(len)
-          , txt_(txt)
-        {
-        }
-        const uint64_t* addr_;
-        const std::size_t len_;
-        const char* txt_;
-        friend std::ostream& operator<<(std::ostream& os, mem_crc32 const& p)
-        {
-            const uint64_t* uintBuf = static_cast<const uint64_t*>(p.addr_);
-            os << "Memory:";
-            os << " address " << hpx::debug::ptr(p.addr_) << " length "
-               << hpx::debug::hex<6>(p.len_)
-               << " CRC32:" << hpx::debug::hex<8>(crc32(p.addr_, p.len_))
-               << "\n";
-            for (size_t i = 0;
-                 i < (std::min)(size_t(std::ceil(p.len_ / 8.0)), size_t(128));
-                 i++)
-            {
-                os << hpx::debug::hex<16>(*uintBuf++) << " ";
-            }
-            os << " : " << p.txt_;
-            return os;
-        }
+        HPX_CORE_EXPORT mem_crc32(
+            void const* a, std::size_t len, char const* txt);
+
+        std::uint64_t const* addr_;
+        std::size_t const len_;
+        char const* txt_;
+
+        HPX_CORE_EXPORT friend std::ostream& operator<<(
+            std::ostream& os, mem_crc32 const& p);
     };
 
     namespace detail {
@@ -315,7 +292,6 @@ namespace hpx { namespace debug {
         {
             tuple_print(os, t, std::make_index_sequence<sizeof...(Args)>());
         }
-
 #else
         // C++14 version
         // helper function to print a tuple of any size
@@ -345,9 +321,7 @@ namespace hpx { namespace debug {
             using expander = int[];
             (void) expander{0, (void(os << ' ' << args), 0)...};
         }
-
 #endif
-
     }    // namespace detail
 
     namespace detail {
@@ -357,49 +331,45 @@ namespace hpx { namespace debug {
         // ------------------------------------------------------------------
         struct hostname_print_helper
         {
-            const char* get_hostname() const
-            {
-                static bool initialized = false;
-                static char hostname_[20];
-                if (!initialized)
-                {
-                    initialized = true;
-                    gethostname(hostname_, std::size_t(12));
-                    std::string temp = "(" + std::to_string(guess_rank()) + ")";
-                    std::strcat(hostname_, temp.c_str());
-                }
-                return hostname_;
-            }
+            HPX_CORE_EXPORT char const* get_hostname() const;
+            HPX_CORE_EXPORT int guess_rank() const;
 
-            int guess_rank() const
-            {
-                std::vector<std::string> env_strings{"_RANK=", "_NODEID="};
-                for (char** current = environ; *current; current++)
-                {
-                    auto e = std::string(*current);
-                    for (auto s : env_strings)
-                    {
-                        auto pos = e.find(s);
-                        if (pos != std::string::npos)
-                        {
-                            //std::cout << "Got a rank string : " << e << std::endl;
-                            return std::stoi(e.substr(pos + s.size(), 5));
-                        }
-                    }
-                }
-                return -1;
-            }
+            HPX_CORE_EXPORT friend std::ostream& operator<<(
+                std::ostream& os, hostname_print_helper const& h);
         };
 
-        inline std::ostream& operator<<(
-            std::ostream& os, hostname_print_helper const& h)
-        {
-            os << debug::str<13>(h.get_hostname()) << " ";
-            return os;
-        }
+        ///////////////////////////////////////////////////////////////////////
+        HPX_CORE_EXPORT void register_print_info(void (*)(std::ostream&));
+        HPX_CORE_EXPORT void generate_prefix(std::ostream& os);
 
+        ///////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
         template <typename... Args>
-        void display(const char* prefix, Args const&... args);
+        void display(char const* prefix, Args const&... args)
+        {
+            // using a temp stream object with a single copy to cout at the end
+            // prevents multiple threads from injecting overlapping text
+            std::stringstream tempstream;
+            tempstream << prefix;
+            generate_prefix(tempstream);
+            ((tempstream << args << " "), ...);
+            tempstream << std::endl;
+            std::cout << tempstream.str();
+        }
+#else
+        template <typename... Args>
+        void display(char const* prefix, Args const&... args)
+        {
+            // using a temp stream object with a single copy to cout at the end
+            // prevents multiple threads from injecting overlapping text
+            std::stringstream tempstream;
+            tempstream << prefix;
+            generate_prefix(tempstream);
+            variadic_print(tempstream, args...);
+            tempstream << std::endl;
+            std::cout << tempstream.str();
+        }
+#endif
 
         template <typename... Args>
         void debug(Args const&... args)
@@ -442,11 +412,12 @@ namespace hpx { namespace debug {
     struct scoped_var
     {
         // capture tuple elements by reference - no temp vars in constructor please
-        const char* prefix_;
-        const std::tuple<Args const&...> message_;
+        char const* prefix_;
+        std::tuple<Args const&...> const message_;
         std::string buffered_msg;
+
         //
-        scoped_var(const char* p, Args const&... args)
+        scoped_var(char const* p, Args const&... args)
           : prefix_(p)
           , message_(args...)
         {
@@ -468,8 +439,8 @@ namespace hpx { namespace debug {
     struct timed_var
     {
         mutable std::chrono::steady_clock::time_point time_start_;
-        const double delay_;
-        const std::tuple<Args...> message_;
+        double const delay_;
+        std::tuple<Args...> const message_;
         //
         timed_var(double const& delay, Args const&... args)
           : time_start_(std::chrono::steady_clock::now())
@@ -494,13 +465,14 @@ namespace hpx { namespace debug {
         }
 
         friend std::ostream& operator<<(
-            std::ostream& os, const timed_var<Args...>& ti)
+            std::ostream& os, timed_var<Args...> const& ti)
         {
             detail::tuple_print(os, ti.message_);
             return os;
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     template <bool enable>
     struct enable_print;
 
@@ -548,13 +520,13 @@ namespace hpx { namespace debug {
 
         template <typename T, std::size_t N>
         constexpr void array(
-            std::string const& name, const std::array<T, N>&) const
+            std::string const& name, std::array<T, N> const&) const
         {
         }
 
-        template <typename Iter>
+        template <typename T>
         constexpr void array(
-            std::string const& name, Iter begin, Iter end) const
+            std::string const& name, T const* data, std::size_t size) const
         {
         }
 
@@ -571,7 +543,7 @@ namespace hpx { namespace debug {
         }
 
         template <typename T, typename V>
-        void set(T& var, V const& val)
+        constexpr void set(T& var, V const& val)
         {
         }
 
@@ -589,12 +561,18 @@ namespace hpx { namespace debug {
         }
     };
 
+    namespace detail {
+        template <typename T>
+        HPX_CORE_EXPORT void print_array(
+            std::string const& name, T const* data, std::size_t size);
+    }
+
     // when true, debug statements produce valid output
     template <>
     struct enable_print<true>
     {
     private:
-        const char* prefix_;
+        char const* prefix_;
 
     public:
         constexpr enable_print()
@@ -643,7 +621,7 @@ namespace hpx { namespace debug {
         }
 
         template <typename... T, typename... Args>
-        void timed(const timed_var<T...>& init, Args const&... args) const
+        void timed(timed_var<T...> const& init, Args const&... args) const
         {
             auto now = std::chrono::steady_clock::now();
             if (init.elapsed(now))
@@ -655,33 +633,20 @@ namespace hpx { namespace debug {
         template <typename T>
         void array(std::string const& name, std::vector<T> const& v) const
         {
-            std::cout << str<20>(name.c_str()) << ": {"
-                      << debug::dec<4>(v.size()) << "} : ";
-            std::copy(std::begin(v), std::end(v),
-                std::ostream_iterator<T>(std::cout, ", "));
-            std::cout << "\n";
+            detail::print_array(name, v.data(), v.size());
         }
 
         template <typename T, std::size_t N>
-        void array(std::string const& name, const std::array<T, N>& v) const
+        void array(std::string const& name, std::array<T, N> const& v) const
         {
-            std::cout << str<20>(name.c_str()) << ": {"
-                      << debug::dec<4>(v.size()) << "} : ";
-            std::copy(std::begin(v), std::end(v),
-                std::ostream_iterator<T>(std::cout, ", "));
-            std::cout << "\n";
+            detail::print_array(name, v.data(), N);
         }
 
-        template <typename Iter>
-        void array(std::string const& name, Iter begin, Iter end) const
+        template <typename T>
+        void array(
+            std::string const& name, T const* data, std::size_t size) const
         {
-            std::cout << str<20>(name.c_str()) << ": {"
-                      << debug::dec<4>(std::distance(begin, end)) << "} : ";
-            std::copy(begin, end,
-                std::ostream_iterator<
-                    typename std::iterator_traits<Iter>::value_type>(
-                    std::cout, ", "));
-            std::cout << std::endl;
+            detail::print_array(name, data, size);
         }
 
         template <typename T, typename... Args>

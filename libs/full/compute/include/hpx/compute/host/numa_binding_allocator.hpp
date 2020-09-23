@@ -36,11 +36,11 @@
 // Can be used to enable debugging of the allocator page mapping
 //#define NUMA_BINDING_ALLOCATOR_INIT_MEMORY
 
-#if !defined(NDEBUG)
-#define NUMA_BINDING_ALLOCATOR_DEBUG true
-#else
 #if !defined(NUMA_BINDING_ALLOCATOR_DEBUG)
-#define NUMA_BINDING_ALLOCATOR_DEBUG true
+#if defined(HPX_DEBUG)
+#define NUMA_BINDING_ALLOCATOR_DEBUG false
+#else
+#define NUMA_BINDING_ALLOCATOR_DEBUG false
 #endif
 #endif
 

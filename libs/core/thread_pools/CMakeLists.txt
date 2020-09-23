@@ -30,7 +30,13 @@ add_hpx_module(
   SOURCES ${thread_pools_sources}
   HEADERS ${thread_pools_headers}
   COMPAT_HEADERS ${thread_pools_compat_headers}
-  MODULE_DEPENDENCIES hpx_assertion hpx_config hpx_errors hpx_itt_notify
-                      hpx_logging hpx_schedulers
+  MODULE_DEPENDENCIES
+    hpx_assertion
+    hpx_config
+    hpx_debugging
+    hpx_errors
+    hpx_itt_notify
+    hpx_logging
+    hpx_schedulers
   CMAKE_SUBDIRS examples tests
 )

@@ -33,6 +33,9 @@
 
 #include <algorithm>
 #include <atomic>
+#ifdef HPX_HAVE_MAX_CPU_COUNT
+#include <bitset>
+#endif
 #include <cstddef>
 #include <cstdint>
 #include <exception>

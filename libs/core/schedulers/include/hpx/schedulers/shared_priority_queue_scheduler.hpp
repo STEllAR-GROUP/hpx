@@ -52,12 +52,10 @@ static_assert(false,
 #else
 
 #if !defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
-#if !defined(NDEBUG)
+#if defined(HPX_DEBUG)
 #define SHARED_PRIORITY_SCHEDULER_DEBUG false
 #else
-#if !defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
 #define SHARED_PRIORITY_SCHEDULER_DEBUG false
-#endif
 #endif
 #endif
 
@@ -1206,17 +1204,12 @@ namespace hpx { namespace threads { namespace policies {
             if (!debug_init_)
             {
                 debug_init_ = true;
-                spq_arr.array(
-                    "# d_lookup_  ", &d_lookup_[0], &d_lookup_[num_workers_]);
-                spq_arr.array(
-                    "# q_lookup_  ", &q_lookup_[0], &q_lookup_[num_workers_]);
-                spq_arr.array(
-                    "# q_counts_  ", &q_counts_[0], &q_counts_[num_domains_]);
-                spq_arr.array(
-                    "# q_offset_  ", &q_offset_[0], &q_offset_[num_domains_]);
+                spq_arr.array("# d_lookup_  ", &d_lookup_[0], num_workers_);
+                spq_arr.array("# q_lookup_  ", &q_lookup_[0], num_workers_);
+                spq_arr.array("# q_counts_  ", &q_counts_[0], num_domains_);
+                spq_arr.array("# q_offset_  ", &q_offset_[0], num_domains_);
 #ifdef SHARED_PRIORITY_SCHEDULER_LINUX
-                spq_arr.array(
-                    "# schedcpu_  ", &schedcpu_[0], &schedcpu_[num_workers_]);
+                spq_arr.array("# schedcpu_  ", &schedcpu_[0], num_workers_);
 #endif
                 for (std::size_t d = 0; d < num_domains_; ++d)
                 {

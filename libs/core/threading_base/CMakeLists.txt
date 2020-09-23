@@ -59,6 +59,7 @@ set(threading_base_compat_headers
 set(threading_base_sources
     execution_agent.cpp
     external_timer.cpp
+    print.cpp
     register_thread.cpp
     scheduler_base.cpp
     thread_data.cpp
@@ -92,6 +93,7 @@ add_hpx_module(
     hpx_execution_base
     hpx_config
     hpx_coroutines
+    hpx_debugging
     hpx_errors
     hpx_format
     hpx_functional

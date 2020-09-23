@@ -19,8 +19,6 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS} ${${test}_LIBS}
     EXCLUDE_FROM_ALL
     FOLDER ${folder_name}
-    NOLIBS
-    DEPENDENCIES hpx_errors hpx_debugging hpx_threading_base hpx_testing
   )
 
   add_hpx_unit_test("modules.debugging" ${test} ${${test}_PARAMETERS})
