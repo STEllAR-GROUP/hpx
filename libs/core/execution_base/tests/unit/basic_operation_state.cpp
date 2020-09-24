@@ -36,14 +36,13 @@ namespace mylib {
     {
     };
 
-    void tag_invoke(hpx::execution_base::experimental::start_t, state_4) {}
+    void tag_invoke(hpx::execution::experimental::start_t, state_4) {}
 
     struct state_5
     {
     };
 
-    void tag_invoke(
-        hpx::execution_base::experimental::start_t, state_5) noexcept
+    void tag_invoke(hpx::execution::experimental::start_t, state_5) noexcept
     {
         start_called = true;
     }
@@ -51,7 +50,7 @@ namespace mylib {
 
 int main()
 {
-    using hpx::execution_base::experimental::traits::is_operation_state;
+    using hpx::execution::experimental::traits::is_operation_state;
 
     static_assert(!is_operation_state<mylib::state_1>::value,
         "mylib::state_1 is not an operation state");
@@ -67,14 +66,14 @@ int main()
     {
         mylib::state_3 state;
 
-        hpx::execution_base::experimental::start(state);
+        hpx::execution::experimental::start(state);
         HPX_TEST(start_called);
         start_called = false;
     }
     {
         mylib::state_5 state;
 
-        hpx::execution_base::experimental::start(state);
+        hpx::execution::experimental::start(state);
         HPX_TEST(start_called);
         start_called = false;
     }

@@ -16,11 +16,11 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution_base { namespace experimental {
+namespace hpx { namespace execution { namespace experimental {
 
 #if defined(DOXYGEN)
     /// set_value is a customization point object. The expression
-    /// `hpx::execution_base::set_value(r, as...)` is equivalent to:
+    /// `hpx::execution::set_value(r, as...)` is equivalent to:
     ///     * `r.set_value(as...)`, if that expression is valid. If the function selected
     ///       does not send to value(s) `as...` to the Receiver `r`'s value channel,
     ///       the program is ill-formed (no diagnostic required).
@@ -34,7 +34,7 @@ namespace hpx { namespace execution_base { namespace experimental {
     void set_value(R&& r, As&&... as);
 
     /// set_done is a customization point object. The expression
-    /// `hpx::execution_base::set_done(r)` is equivalent to:
+    /// `hpx::execution::set_done(r)` is equivalent to:
     ///     * `r.set_done()`, if that expression is valid. If the function selected
     ///       does not signal the Receiver `r`'s done channel,
     ///       the program is ill-formed (no diagnostic required).
@@ -48,7 +48,7 @@ namespace hpx { namespace execution_base { namespace experimental {
     void set_done(R&& r);
 
     /// set_error is a customization point object. The expression
-    /// `hpx::execution_base::set_error(r, e)` is equivalent to:
+    /// `hpx::execution::set_error(r, e)` is equivalent to:
     ///     * `r.set_done(e)`, if that expression is valid. If the function selected
     ///       does not send the error e the Receiver `r`'s error channel,
     ///       the program is ill-formed (no diagnostic required).
@@ -69,16 +69,16 @@ namespace hpx { namespace execution_base { namespace experimental {
         /// being canceled. As such, the Receiver concept is defined by having the
         /// following two customization points defined, which form the completion-signal
         /// operations:
-        ///     * `hpx::execution_base::experimental::set_done`
-        ///     * `hpx::execution_base::experimental::set_error`
+        ///     * `hpx::execution::experimental::set_done`
+        ///     * `hpx::execution::experimental::set_error`
         ///
         /// Those two functions denote the completion-signal operations. The Receiver
         /// contract is as follows:
         ///     * None of a Receiver's completion-signal operation shall be invoked
-        ///       before `hpx::execution_base::experimental::start` has been called on the operation
+        ///       before `hpx::execution::experimental::start` has been called on the operation
         ///       state object that was returned by connecting a Receiver to a sender
-        ///       `hpx::execution_base::experimental::connect`.
-        ///     * Once `hpx::execution_base::start` has been called on the operation
+        ///       `hpx::execution::experimental::connect`.
+        ///     * Once `hpx::execution::start` has been called on the operation
         ///       state object, exactly one of the Receiver's completion-signal operation
         ///       shall complete without an exception before the Receiver is destroyed
         ///
@@ -86,21 +86,21 @@ namespace hpx { namespace execution_base { namespace experimental {
         /// without throwing an exception, the Receiver contract has been satisfied.
         /// In other words: The asynchronous operation has been completed.
         ///
-        /// \see hpx::execution_base::traits::is_receiver_of
+        /// \see hpx::execution::traits::is_receiver_of
         template <typename T, typename E = std::exception_ptr>
         struct is_receiver;
 
         /// The `receiver_of` concept is a refinement of the `Receiver` concept by
         /// requiring one additional completion-signal operation:
-        ///     * `hpx::execution_base::set_value`
+        ///     * `hpx::execution::set_value`
         ///
         /// This completion-signal operation adds the following to the Receiver's
         /// contract:
-        ///     * If `hpx::execution_base::set_value` exits with an exception, it
-        ///       is still valid to call `hpx::execution_base::set_error` or
-        ///       `hpx::execution_base::set_done`
+        ///     * If `hpx::execution::set_value` exits with an exception, it
+        ///       is still valid to call `hpx::execution::set_error` or
+        ///       `hpx::execution::set_done`
         ///
-        /// \see hpx::execution_base::traits::is_receiver
+        /// \see hpx::execution::traits::is_receiver
         template <typename T, typename... As>
         struct is_receiver_of;
 
@@ -165,10 +165,10 @@ namespace hpx { namespace execution_base { namespace experimental {
             struct is_receiver_impl<true, T, E>
               : std::integral_constant<bool,
                     hpx::traits::is_invocable<
-                        hpx::execution_base::experimental::set_done_t,
+                        hpx::execution::experimental::set_done_t,
                             typename std::decay<T>::type&&>::value &&
                     hpx::traits::is_invocable<
-                        hpx::execution_base::experimental::set_error_t,
+                        hpx::execution::experimental::set_error_t,
                             typename std::decay<T>::type&&, E>::value>
             {
             };
@@ -204,7 +204,7 @@ namespace hpx { namespace execution_base { namespace experimental {
             struct is_receiver_of_impl<true, T, As...>
               : std::integral_constant<bool,
                     hpx::traits::is_invocable<
-                        hpx::execution_base::experimental::set_value_t,
+                        hpx::execution::experimental::set_value_t,
                             typename std::decay<T>::type&&, As...>::value>
             {
             };
@@ -234,7 +234,7 @@ namespace hpx { namespace execution_base { namespace experimental {
             template <typename T, typename... As>
             struct is_nothrow_receiver_of_impl<true, T, As...>
               : std::integral_constant<bool,
-                    noexcept(hpx::execution_base::experimental::set_value(
+                    noexcept(hpx::execution::experimental::set_value(
                         std::declval<T>(), std::declval<As>()...))>
             {
             };
@@ -251,4 +251,4 @@ namespace hpx { namespace execution_base { namespace experimental {
             is_nothrow_receiver_of<T, As...>::value;
 
     }    // namespace traits
-}}}      // namespace hpx::execution_base::experimental
+}}}      // namespace hpx::execution::experimental

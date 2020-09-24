@@ -180,9 +180,9 @@ namespace mylib {
 
 int main()
 {
-    using hpx::execution_base::experimental::traits::is_nothrow_receiver_of;
-    using hpx::execution_base::experimental::traits::is_receiver;
-    using hpx::execution_base::experimental::traits::is_receiver_of;
+    using hpx::execution::experimental::traits::is_nothrow_receiver_of;
+    using hpx::execution::experimental::traits::is_receiver;
+    using hpx::execution::experimental::traits::is_receiver_of;
 
     static_assert(is_receiver<mylib::receiver_1>::value,
         "mylib::receiver_1 should be a receiver");
@@ -242,32 +242,32 @@ int main()
 
     {
         mylib::receiver_1 rcv;
-        hpx::execution_base::experimental::set_done(std::move(rcv));
+        hpx::execution::experimental::set_done(std::move(rcv));
         HPX_TEST(done_called);
         done_called = false;
     }
     {
         mylib::receiver_1 rcv;
-        hpx::execution_base::experimental::set_error(
+        hpx::execution::experimental::set_error(
             std::move(rcv), std::exception_ptr{});
         HPX_TEST(error_called);
         error_called = false;
     }
     {
         mylib::receiver_1 rcv;
-        hpx::execution_base::experimental::set_value(std::move(rcv), 1);
+        hpx::execution::experimental::set_value(std::move(rcv), 1);
         HPX_TEST(value_called);
         value_called = false;
     }
     {
         mylib::receiver_2 rcv;
-        hpx::execution_base::experimental::set_done(std::move(rcv));
+        hpx::execution::experimental::set_done(std::move(rcv));
         HPX_TEST(done_called);
         done_called = false;
     }
     {
         mylib::receiver_2 rcv;
-        hpx::execution_base::experimental::set_error(std::move(rcv), 1);
+        hpx::execution::experimental::set_error(std::move(rcv), 1);
         HPX_TEST(error_called);
         error_called = false;
     }

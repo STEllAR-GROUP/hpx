@@ -14,10 +14,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution_base { namespace experimental {
+namespace hpx { namespace execution { namespace experimental {
 #if defined(DOXYGEN)
     /// start is a customization point object. The expression
-    /// `hpx::execution_base::experimental::start(r)` is equivalent to:
+    /// `hpx::execution::experimental::start(r)` is equivalent to:
     ///     * `r.start()`, if that expression is valid. If the function selected
     ///       does not signal the receiver `r`'s done channel,
     ///       the program is ill-formed (no diagnostic required).
@@ -33,12 +33,12 @@ namespace hpx { namespace execution_base { namespace experimental {
 
     namespace traits {
         /// An `operation_state` is an object representing the asynchronous operation
-        /// that has been returned from calling `hpx::execution_base::experimental::connect` with
+        /// that has been returned from calling `hpx::execution::experimental::connect` with
         /// a `sender` and a `receiver`. The only operation on an `operation_state`
         /// is:
-        ///     * `hpx::execution_base::experimental::start`
+        ///     * `hpx::execution::experimental::start`
         ///
-        /// `hpx::execution_base::experimental::start` can be called exactly once. Once it has
+        /// `hpx::execution::experimental::start` can be called exactly once. Once it has
         /// been invoked, the caller needs to ensure that the receiver's completion
         /// signaling operations strongly happen before the destructor of the state
         /// is called. The call to `hpx::basic_exceution::start` needs to happen
@@ -75,7 +75,7 @@ namespace hpx { namespace execution_base { namespace experimental {
             template <typename O>
             struct is_operation_state_impl<true, O>
               : std::integral_constant<bool,
-                    noexcept(hpx::execution_base::experimental::start(
+                    noexcept(hpx::execution::experimental::start(
                         std::declval<O&&>()))>
             {
             };
@@ -86,7 +86,7 @@ namespace hpx { namespace execution_base { namespace experimental {
           : detail::is_operation_state_impl<std::is_destructible<O>::value &&
                     std::is_object<O>::value &&
                     hpx::traits::is_invocable<
-                        hpx::execution_base::experimental::start_t,
+                        hpx::execution::experimental::start_t,
                         typename std::decay<O>::type&&>::value,
                 O>
         {
@@ -95,4 +95,4 @@ namespace hpx { namespace execution_base { namespace experimental {
         template <typename O>
         constexpr bool is_operation_state_v = is_operation_state<O>::value;
     }    // namespace traits
-}}}      // namespace hpx::execution_base::experimental
+}}}      // namespace hpx::execution::experimental
