@@ -8,7 +8,7 @@
 This directory holds modularized libraries HPX is build upon. Those libraries
 can be seen as independent modules, with clear dependencies and no cycles.
 
-The tool ```create_library_skeleton.py`` can be used to generate a basic
+The tool ```create_module_skeleton.py`` can be used to generate a basic
 skeleton. The structure of this skeleton should be as follows:
 
 * ``<lib_name>/``
