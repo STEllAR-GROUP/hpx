@@ -17,8 +17,7 @@ foreach(test ${tests})
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources}
     NOLIBS
-    DEPENDENCIES hpx_execution_base hpx_testing
-                 ${BOOST_UNDERLYING_THREAD_LIBRARY}
+    DEPENDENCIES hpx_core ${BOOST_UNDERLYING_THREAD_LIBRARY}
     EXCLUDE_FROM_ALL
     FOLDER "Tests/Unit/Modules/Core/ExecutionBase"
   )

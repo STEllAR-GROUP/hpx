@@ -99,6 +99,7 @@ namespace hpx { namespace execution_base {
             return lhs.impl_ != rhs.impl_;
         }
 
-        friend std::ostream& operator<<(std::ostream&, agent_ref const&);
+        HPX_CORE_EXPORT friend std::ostream& operator<<(
+            std::ostream&, agent_ref const&);
     };
 }}    // namespace hpx::execution_base
