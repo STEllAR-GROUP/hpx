@@ -84,7 +84,7 @@ double run_inplace_merge_benchmark_hpx(int test_count, ExPolicy policy,
         hpx::copy(hpx::execution::par, org_first, org_last, first);
 
         std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
-        hpx::parallel::inplace_merge(policy, first, middle, last);
+        hpx::inplace_merge(policy, first, middle, last);
         time += hpx::util::high_resolution_clock::now() - elapsed;
     }
 

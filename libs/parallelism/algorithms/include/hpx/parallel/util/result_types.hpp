@@ -85,6 +85,73 @@ namespace hpx { namespace parallel { namespace util {
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////
+    template <typename I, typename O>
+    O get_second_element(util::in_out_result<I, O>&& p)
+    {
+        return p.out;
+    }
+
+    template <typename I, typename O>
+    hpx::future<O> get_second_element(
+        hpx::future<util::in_out_result<I, O>>&& f)
+    {
+        return hpx::make_future<O>(
+            std::move(f), [](util::in_out_result<I, O>&& p) { return p.out; });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename I1, typename I2, typename O>
+    struct in_in_out_result
+    {
+        HPX_NO_UNIQUE_ADDRESS I1 in1;
+        HPX_NO_UNIQUE_ADDRESS I2 in2;
+        HPX_NO_UNIQUE_ADDRESS O out;
+
+        template <typename II1, typename II2, typename O1,
+            typename Enable = typename std::enable_if<
+                std::is_convertible<I1 const&, II1&>::value &&
+                std::is_convertible<I2 const&, II2&>::value &&
+                std::is_convertible<O const&, O1&>::value>::type>
+        constexpr operator in_in_out_result<II1, II2, O1>() const&
+        {
+            return {in1, in2, out};
+        }
+
+        template <typename II2, typename II1, typename O1,
+            typename Enable =
+                typename std::enable_if<std::is_convertible<I1, II1>::value &&
+                    std::is_convertible<I2, II2>::value &&
+                    std::is_convertible<O, O1>::value>::type>
+        constexpr operator in_in_out_result<II1, II2, O1>() &&
+        {
+            return {std::move(in1), std::move(in2), std::move(out)};
+        }
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned)
+        {
+            // clang-format off
+            ar & in1 & in2 & out;
+            // clang-format on
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////
+    template <typename I1, typename I2, typename O>
+    O get_third_element(util::in_in_out_result<I1, I2, O>&& p)
+    {
+        return p.out;
+    }
+
+    template <typename I1, typename I2, typename O>
+    hpx::future<O> get_third_element(
+        hpx::future<util::in_in_out_result<I1, I2, O>>&& f)
+    {
+        return lcos::make_future<O>(std::move(f),
+            [](in_in_out_result<I1, I2, O>&& p) { return p.out; });
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename I, typename F>
     struct in_fun_result
@@ -162,5 +229,7 @@ namespace hpx { namespace parallel { namespace util {
 
 namespace hpx { namespace ranges {
     using hpx::parallel::util::in_fun_result;
+    using hpx::parallel::util::in_in_out_result;
+    using hpx::parallel::util::in_in_result;
     using hpx::parallel::util::in_out_result;
 }}    // namespace hpx::ranges

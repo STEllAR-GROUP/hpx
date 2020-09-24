@@ -17,6 +17,7 @@
 #include <hpx/parallel/container_algorithms/find.hpp>
 #include <hpx/parallel/container_algorithms/for_each.hpp>
 #include <hpx/parallel/container_algorithms/generate.hpp>
+#include <hpx/parallel/container_algorithms/includes.hpp>
 #include <hpx/parallel/container_algorithms/is_heap.hpp>
 #include <hpx/parallel/container_algorithms/make_heap.hpp>
 #include <hpx/parallel/container_algorithms/merge.hpp>
@@ -31,6 +32,10 @@
 #include <hpx/parallel/container_algorithms/reverse.hpp>
 #include <hpx/parallel/container_algorithms/rotate.hpp>
 #include <hpx/parallel/container_algorithms/search.hpp>
+#include <hpx/parallel/container_algorithms/set_difference.hpp>
+#include <hpx/parallel/container_algorithms/set_intersection.hpp>
+#include <hpx/parallel/container_algorithms/set_symmetric_difference.hpp>
+#include <hpx/parallel/container_algorithms/set_union.hpp>
 #include <hpx/parallel/container_algorithms/sort.hpp>
 #include <hpx/parallel/container_algorithms/stable_sort.hpp>
 #include <hpx/parallel/container_algorithms/transform.hpp>

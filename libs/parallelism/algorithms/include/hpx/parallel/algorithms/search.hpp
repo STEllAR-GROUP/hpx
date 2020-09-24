@@ -229,7 +229,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename Pred = detail::equal_to,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter>::value&&
                     traits::is_projected<Proj1, FwdIter>::value&&
                         hpx::traits::is_iterator<FwdIter2>::value&&
@@ -445,7 +445,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename Pred = detail::equal_to,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter>::value&&
                     traits::is_projected<Proj1, FwdIter>::value&&
                         hpx::traits::is_iterator<FwdIter2>::value&&

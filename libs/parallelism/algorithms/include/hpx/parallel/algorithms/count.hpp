@@ -335,7 +335,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
         typename T, typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             traits::is_projected<Proj, FwdIterB>::value &&
             hpx::traits::is_iterator<FwdIterB>::value
         )>
@@ -447,7 +447,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
         typename F, typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIterB>::value &&
             traits::is_projected<Proj, FwdIterB>::value &&
             traits::is_indirect_callable<ExPolicy, F,
@@ -483,7 +483,7 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename T,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
@@ -529,7 +529,7 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename F,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value &&
                 hpx::traits::is_invocable<F,
                     typename std::iterator_traits<FwdIter>::value_type

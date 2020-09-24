@@ -145,12 +145,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter, typename T1, typename T2,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter>::value&&
-                    traits::is_projected<Proj, FwdIter>::value&&
-                        traits::is_indirect_callable<ExPolicy,
-                            std::equal_to<T1>, traits::projected<Proj, FwdIter>,
-                            traits::projected<Proj, T1 const*>>::value)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&& hpx::
+                traits::is_iterator<FwdIter>::value&& traits::is_projected<Proj,
+                    FwdIter>::value&& traits::is_indirect_callable<ExPolicy,
+                    std::equal_to<T1>, traits::projected<Proj, FwdIter>,
+                    traits::projected<Proj, T1 const*>>::value)>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type replace(
         ExPolicy&& policy, FwdIter first, FwdIter last, T1 const& old_value,
         T2 const& new_value, Proj&& proj = Proj())
@@ -299,11 +298,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter, typename F, typename T,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter>::value&&
-                    traits::is_projected<Proj, FwdIter>::value&&
-                        traits::is_indirect_callable<ExPolicy, F,
-                            traits::projected<Proj, FwdIter>>::value)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&& hpx::
+                traits::is_iterator<FwdIter>::value&& traits::is_projected<Proj,
+                    FwdIter>::value&& traits::is_indirect_callable<ExPolicy, F,
+                    traits::projected<Proj, FwdIter>>::value)>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type replace_if(
         ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
         T const& new_value, Proj&& proj = Proj())
@@ -455,7 +453,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename T1, typename T2, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<
             ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1>::value&&
                 traits::is_projected<Proj, FwdIter1>::value&&
                     traits::is_indirect_callable<ExPolicy, std::equal_to<T1>,
@@ -637,7 +635,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename F, typename T, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter1>::value&&
                     traits::is_projected<Proj, FwdIter1>::value&&
                         traits::is_indirect_callable<ExPolicy, F,

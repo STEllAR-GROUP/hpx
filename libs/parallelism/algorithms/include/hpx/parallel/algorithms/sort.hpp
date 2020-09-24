@@ -371,7 +371,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename Compare = detail::less,
         typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<RandomIt>::value &&
             traits::is_projected<Proj, RandomIt>::value &&
             traits::is_indirect_callable<ExPolicy, Compare,

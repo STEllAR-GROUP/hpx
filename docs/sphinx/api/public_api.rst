@@ -51,8 +51,8 @@ Functions
 - :cpp:func:`hpx::for_each_n`
 - :cpp:func:`hpx::generate`
 - :cpp:func:`hpx::generate_n`
-- :cpp:func:`hpx::parallel::v1::includes`
-- :cpp:func:`hpx::parallel::v1::inplace_merge`
+- :cpp:func:`hpx::includes`
+- :cpp:func:`hpx::inplace_merge`
 - :cpp:func:`hpx::is_heap`
 - :cpp:func:`hpx::is_heap_until`
 - :cpp:func:`hpx::parallel::v1::is_partitioned`
@@ -61,7 +61,7 @@ Functions
 - :cpp:func:`hpx::parallel::v1::lexicographical_compare`
 - :cpp:func:`hpx::make_heap`
 - :cpp:func:`hpx::parallel::v1::max_element`
-- :cpp:func:`hpx::parallel::v1::merge`
+- :cpp:func:`hpx::merge`
 - :cpp:func:`hpx::parallel::v1::min_element`
 - :cpp:func:`hpx::parallel::v1::minmax_element`
 - :cpp:func:`hpx::parallel::v1::mismatch`
@@ -83,10 +83,10 @@ Functions
 - :cpp:func:`hpx::parallel::v1::rotate_copy`
 - :cpp:func:`hpx::parallel::v1::search`
 - :cpp:func:`hpx::parallel::v1::search_n`
-- :cpp:func:`hpx::parallel::v1::set_difference`
-- :cpp:func:`hpx::parallel::v1::set_intersection`
-- :cpp:func:`hpx::parallel::v1::set_symmetric_difference`
-- :cpp:func:`hpx::parallel::v1::set_union`
+- :cpp:func:`hpx::set_difference`
+- :cpp:func:`hpx::set_intersection`
+- :cpp:func:`hpx::set_symmetric_difference`
+- :cpp:func:`hpx::set_union`
 - :cpp:func:`hpx::parallel::v1::sort`
 - :cpp:func:`hpx::parallel::v1::stable_partition`
 - :cpp:func:`hpx::parallel::v1::stable_sort`
@@ -117,8 +117,18 @@ Functions
 - :cpp:func:`hpx::ranges::for_each_n`
 - :cpp:func:`hpx::ranges::generate`
 - :cpp:func:`hpx::ranges::generate_n`
+- :cpp:func:`hpx::ranges::includes`
+- :cpp:func:`hpx::ranges::inplace_merge`
+- :cpp:func:`hpx::ranges::is_heap`
+- :cpp:func:`hpx::ranges::is_heap_until`
+- :cpp:func:`hpx::ranges::make_heap`
+- :cpp:func:`hpx::ranges::merge`
 - :cpp:func:`hpx::ranges::move`
 - :cpp:func:`hpx::ranges::none_of`
+- :cpp:func:`hpx::ranges::set_difference`
+- :cpp:func:`hpx::ranges::set_intersection`
+- :cpp:func:`hpx::ranges::set_symmetric_difference`
+- :cpp:func:`hpx::ranges::set_union`
 
 Header ``hpx/any.hpp``
 ======================

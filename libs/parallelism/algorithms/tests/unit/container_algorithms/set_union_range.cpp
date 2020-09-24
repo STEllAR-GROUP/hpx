@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2107 Hartmut Kaiser
+//  Copyright (c) 2015-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,7 +19,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_set_symmetric_difference1(IteratorTag)
+void test_set_union1(IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -32,18 +32,18 @@ void test_set_symmetric_difference1(IteratorTag)
 
     std::vector<std::size_t> c3(2 * c1.size()), c4(2 * c1.size());    //-V656
 
-    hpx::set_symmetric_difference(iterator(std::begin(c1)),
-        iterator(std::end(c1)), std::begin(c2), std::end(c2), std::begin(c3));
+    hpx::ranges::set_union(iterator(std::begin(c1)), iterator(std::end(c1)),
+        std::begin(c2), std::end(c2), std::begin(c3));
 
-    std::set_symmetric_difference(std::begin(c1), std::end(c1), std::begin(c2),
-        std::end(c2), std::begin(c4));
+    std::set_union(std::begin(c1), std::end(c1), std::begin(c2), std::end(c2),
+        std::begin(c4));
 
     // verify values
     HPX_TEST(std::equal(std::begin(c3), std::end(c3), std::begin(c4)));
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_set_symmetric_difference1(ExPolicy&& policy, IteratorTag)
+void test_set_union1(ExPolicy&& policy, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -59,18 +59,18 @@ void test_set_symmetric_difference1(ExPolicy&& policy, IteratorTag)
 
     std::vector<std::size_t> c3(2 * c1.size()), c4(2 * c1.size());    //-V656
 
-    hpx::set_symmetric_difference(policy, iterator(std::begin(c1)),
+    hpx::ranges::set_union(policy, iterator(std::begin(c1)),
         iterator(std::end(c1)), std::begin(c2), std::end(c2), std::begin(c3));
 
-    std::set_symmetric_difference(std::begin(c1), std::end(c1), std::begin(c2),
-        std::end(c2), std::begin(c4));
+    std::set_union(std::begin(c1), std::end(c1), std::begin(c2), std::end(c2),
+        std::begin(c4));
 
     // verify values
     HPX_TEST(std::equal(std::begin(c3), std::end(c3), std::begin(c4)));
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_set_symmetric_difference1_async(ExPolicy&& p, IteratorTag)
+void test_set_union1_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -83,42 +83,42 @@ void test_set_symmetric_difference1_async(ExPolicy&& p, IteratorTag)
 
     std::vector<std::size_t> c3(2 * c1.size()), c4(2 * c1.size());    //-V656
 
-    hpx::future<void> result = hpx::set_symmetric_difference(p,
+    hpx::future<void> result = hpx::ranges::set_union(p,
         iterator(std::begin(c1)), iterator(std::end(c1)), std::begin(c2),
         std::end(c2), std::begin(c3));
     result.wait();
 
-    std::set_symmetric_difference(std::begin(c1), std::end(c1), std::begin(c2),
-        std::end(c2), std::begin(c4));
+    std::set_union(std::begin(c1), std::end(c1), std::begin(c2), std::end(c2),
+        std::begin(c4));
 
     // verify values
     HPX_TEST(std::equal(std::begin(c3), std::end(c3), std::begin(c4)));
 }
 
 template <typename IteratorTag>
-void test_set_symmetric_difference1()
+void test_set_union1()
 {
     using namespace hpx::execution;
 
-    test_set_symmetric_difference1(IteratorTag());
+    test_set_union1(IteratorTag());
 
-    test_set_symmetric_difference1(seq, IteratorTag());
-    test_set_symmetric_difference1(par, IteratorTag());
-    test_set_symmetric_difference1(par_unseq, IteratorTag());
+    test_set_union1(seq, IteratorTag());
+    test_set_union1(par, IteratorTag());
+    test_set_union1(par_unseq, IteratorTag());
 
-    test_set_symmetric_difference1_async(seq(task), IteratorTag());
-    test_set_symmetric_difference1_async(par(task), IteratorTag());
+    test_set_union1_async(seq(task), IteratorTag());
+    test_set_union1_async(par(task), IteratorTag());
 }
 
-void set_symmetric_difference_test1()
+void set_union_test1()
 {
-    test_set_symmetric_difference1<std::random_access_iterator_tag>();
-    test_set_symmetric_difference1<std::forward_iterator_tag>();
+    test_set_union1<std::random_access_iterator_tag>();
+    test_set_union1<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_set_symmetric_difference2(IteratorTag)
+void test_set_union2(IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -133,19 +133,18 @@ void test_set_symmetric_difference2(IteratorTag)
 
     std::vector<std::size_t> c3(2 * c1.size()), c4(2 * c1.size());    //-V656
 
-    hpx::set_symmetric_difference(iterator(std::begin(c1)),
-        iterator(std::end(c1)), std::begin(c2), std::end(c2), std::begin(c3),
-        comp);
+    hpx::ranges::set_union(iterator(std::begin(c1)), iterator(std::end(c1)),
+        std::begin(c2), std::end(c2), std::begin(c3), comp);
 
-    std::set_symmetric_difference(std::begin(c1), std::end(c1), std::begin(c2),
-        std::end(c2), std::begin(c4), comp);
+    std::set_union(std::begin(c1), std::end(c1), std::begin(c2), std::end(c2),
+        std::begin(c4), comp);
 
     // verify values
     HPX_TEST(std::equal(std::begin(c3), std::end(c3), std::begin(c4)));
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_set_symmetric_difference2(ExPolicy&& policy, IteratorTag)
+void test_set_union2(ExPolicy&& policy, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -163,19 +162,19 @@ void test_set_symmetric_difference2(ExPolicy&& policy, IteratorTag)
 
     std::vector<std::size_t> c3(2 * c1.size()), c4(2 * c1.size());    //-V656
 
-    hpx::set_symmetric_difference(policy, iterator(std::begin(c1)),
+    hpx::ranges::set_union(policy, iterator(std::begin(c1)),
         iterator(std::end(c1)), std::begin(c2), std::end(c2), std::begin(c3),
         comp);
 
-    std::set_symmetric_difference(std::begin(c1), std::end(c1), std::begin(c2),
-        std::end(c2), std::begin(c4), comp);
+    std::set_union(std::begin(c1), std::end(c1), std::begin(c2), std::end(c2),
+        std::begin(c4), comp);
 
     // verify values
     HPX_TEST(std::equal(std::begin(c3), std::end(c3), std::begin(c4)));
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_set_symmetric_difference2_async(ExPolicy&& p, IteratorTag)
+void test_set_union2_async(ExPolicy&& p, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -193,42 +192,42 @@ void test_set_symmetric_difference2_async(ExPolicy&& p, IteratorTag)
 
     std::vector<std::size_t> c3(2 * c1.size()), c4(2 * c1.size());    //-V656
 
-    hpx::future<void> result = hpx::set_symmetric_difference(p,
+    hpx::future<void> result = hpx::ranges::set_union(p,
         iterator(std::begin(c1)), iterator(std::end(c1)), std::begin(c2),
         std::end(c2), std::begin(c3), comp);
     result.wait();
 
-    std::set_symmetric_difference(std::begin(c1), std::end(c1), std::begin(c2),
-        std::end(c2), std::begin(c4), comp);
+    std::set_union(std::begin(c1), std::end(c1), std::begin(c2), std::end(c2),
+        std::begin(c4), comp);
 
     // verify values
     HPX_TEST(std::equal(std::begin(c3), std::end(c3), std::begin(c4)));
 }
 
 template <typename IteratorTag>
-void test_set_symmetric_difference2()
+void test_set_union2()
 {
     using namespace hpx::execution;
 
-    test_set_symmetric_difference2(IteratorTag());
+    test_set_union2(IteratorTag());
 
-    test_set_symmetric_difference2(seq, IteratorTag());
-    test_set_symmetric_difference2(par, IteratorTag());
-    test_set_symmetric_difference2(par_unseq, IteratorTag());
+    test_set_union2(seq, IteratorTag());
+    test_set_union2(par, IteratorTag());
+    test_set_union2(par_unseq, IteratorTag());
 
-    test_set_symmetric_difference2_async(seq(task), IteratorTag());
-    test_set_symmetric_difference2_async(par(task), IteratorTag());
+    test_set_union2_async(seq(task), IteratorTag());
+    test_set_union2_async(par(task), IteratorTag());
 }
 
-void set_symmetric_difference_test2()
+void set_union_test2()
 {
-    test_set_symmetric_difference2<std::random_access_iterator_tag>();
-    test_set_symmetric_difference2<std::forward_iterator_tag>();
+    test_set_union2<std::random_access_iterator_tag>();
+    test_set_union2<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_set_symmetric_difference_exception(IteratorTag)
+void test_set_union_exception(IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -245,9 +244,8 @@ void test_set_symmetric_difference_exception(IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::set_symmetric_difference(
-            decorated_iterator(
-                std::begin(c1), []() { throw std::runtime_error("test"); }),
+        hpx::ranges::set_union(decorated_iterator(std::begin(c1),
+                                   []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
             std::begin(c3));
 
@@ -268,7 +266,7 @@ void test_set_symmetric_difference_exception(IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_set_symmetric_difference_exception(ExPolicy&& policy, IteratorTag)
+void test_set_union_exception(ExPolicy&& policy, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -288,7 +286,7 @@ void test_set_symmetric_difference_exception(ExPolicy&& policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::set_symmetric_difference(policy,
+        hpx::ranges::set_union(policy,
             decorated_iterator(
                 std::begin(c1), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
@@ -310,7 +308,7 @@ void test_set_symmetric_difference_exception(ExPolicy&& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_set_symmetric_difference_exception_async(ExPolicy&& p, IteratorTag)
+void test_set_union_exception_async(ExPolicy&& p, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -331,7 +329,7 @@ void test_set_symmetric_difference_exception_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::set_symmetric_difference(p,
+        hpx::future<void> f = hpx::ranges::set_union(p,
             decorated_iterator(
                 std::begin(c1), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
@@ -357,31 +355,31 @@ void test_set_symmetric_difference_exception_async(ExPolicy&& p, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_set_symmetric_difference_exception()
+void test_set_union_exception()
 {
     using namespace hpx::execution;
 
-    test_set_symmetric_difference_exception(IteratorTag());
+    test_set_union_exception(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_set_symmetric_difference_exception(seq, IteratorTag());
-    test_set_symmetric_difference_exception(par, IteratorTag());
+    test_set_union_exception(seq, IteratorTag());
+    test_set_union_exception(par, IteratorTag());
 
-    test_set_symmetric_difference_exception_async(seq(task), IteratorTag());
-    test_set_symmetric_difference_exception_async(par(task), IteratorTag());
+    test_set_union_exception_async(seq(task), IteratorTag());
+    test_set_union_exception_async(par(task), IteratorTag());
 }
 
-void set_symmetric_difference_exception_test()
+void set_union_exception_test()
 {
-    test_set_symmetric_difference_exception<std::random_access_iterator_tag>();
-    test_set_symmetric_difference_exception<std::forward_iterator_tag>();
+    test_set_union_exception<std::random_access_iterator_tag>();
+    test_set_union_exception<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_set_symmetric_difference_bad_alloc(IteratorTag)
+void test_set_union_bad_alloc(IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -398,8 +396,8 @@ void test_set_symmetric_difference_bad_alloc(IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::set_symmetric_difference(decorated_iterator(std::begin(c1),
-                                          []() { throw std::bad_alloc(); }),
+        hpx::ranges::set_union(decorated_iterator(std::begin(c1),
+                                   []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
             std::begin(c3));
 
@@ -418,7 +416,7 @@ void test_set_symmetric_difference_bad_alloc(IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_set_symmetric_difference_bad_alloc(ExPolicy&& policy, IteratorTag)
+void test_set_union_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -438,7 +436,7 @@ void test_set_symmetric_difference_bad_alloc(ExPolicy&& policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::set_symmetric_difference(policy,
+        hpx::ranges::set_union(policy,
             decorated_iterator(
                 std::begin(c1), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
@@ -459,7 +457,7 @@ void test_set_symmetric_difference_bad_alloc(ExPolicy&& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_set_symmetric_difference_bad_alloc_async(ExPolicy&& p, IteratorTag)
+void test_set_union_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -480,7 +478,7 @@ void test_set_symmetric_difference_bad_alloc_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::set_symmetric_difference(p,
+        hpx::future<void> f = hpx::ranges::set_union(p,
             decorated_iterator(
                 std::begin(c1), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
@@ -505,26 +503,26 @@ void test_set_symmetric_difference_bad_alloc_async(ExPolicy&& p, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_set_symmetric_difference_bad_alloc()
+void test_set_union_bad_alloc()
 {
     using namespace hpx::execution;
 
-    test_set_symmetric_difference_bad_alloc(IteratorTag());
+    test_set_union_bad_alloc(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_set_symmetric_difference_bad_alloc(seq, IteratorTag());
-    test_set_symmetric_difference_bad_alloc(par, IteratorTag());
+    test_set_union_bad_alloc(seq, IteratorTag());
+    test_set_union_bad_alloc(par, IteratorTag());
 
-    test_set_symmetric_difference_bad_alloc_async(seq(task), IteratorTag());
-    test_set_symmetric_difference_bad_alloc_async(par(task), IteratorTag());
+    test_set_union_bad_alloc_async(seq(task), IteratorTag());
+    test_set_union_bad_alloc_async(par(task), IteratorTag());
 }
 
-void set_symmetric_difference_bad_alloc_test()
+void set_union_bad_alloc_test()
 {
-    test_set_symmetric_difference_bad_alloc<std::random_access_iterator_tag>();
-    test_set_symmetric_difference_bad_alloc<std::forward_iterator_tag>();
+    test_set_union_bad_alloc<std::random_access_iterator_tag>();
+    test_set_union_bad_alloc<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -537,10 +535,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    set_symmetric_difference_test1();
-    set_symmetric_difference_test2();
-    set_symmetric_difference_exception_test();
-    set_symmetric_difference_bad_alloc_test();
+    set_union_test1();
+    set_union_test2();
+    set_union_exception_test();
+    set_union_bad_alloc_test();
     return hpx::finalize();
 }
 

@@ -75,7 +75,7 @@ double run_merge_benchmark_hpx(int test_count, ExPolicy policy, FwdIter1 first1,
 
     for (int i = 0; i < test_count; ++i)
     {
-        hpx::parallel::merge(policy, first1, last1, first2, last2, dest);
+        hpx::merge(policy, first1, last1, first2, last2, dest);
     }
 
     time = hpx::util::high_resolution_clock::now() - time;

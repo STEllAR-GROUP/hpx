@@ -337,27 +337,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
         };
 #endif
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename I, typename O>
-        O get_second_element(util::in_out_result<I, O>&& p)
-        {
-            return p.out;
-        }
-
-        template <typename I, typename O>
-        hpx::future<O> get_second_element(
-            hpx::future<util::in_out_result<I, O>>&& f)
-        {
-            return lcos::make_future<O>(std::move(f),
-                [](util::in_out_result<I, O>&& p) { return p.out; });
-        }
     }    // namespace detail
 
     // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value)>
     // clang-format on
@@ -427,7 +412,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIter1, typename Size,
         typename FwdIter2,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value)>
     // clang-format on
@@ -599,7 +584,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred,
         HPX_CONCEPT_REQUIRES_(
-            hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value &&
             hpx::traits::is_invocable<Pred,
@@ -638,7 +623,7 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
@@ -648,7 +633,7 @@ namespace hpx {
         tag_invoke(hpx::copy_t, ExPolicy&& policy, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest)
         {
-            return parallel::v1::detail::get_second_element(
+            return parallel::util::get_second_element(
                 parallel::v1::detail::transfer<
                     parallel::v1::detail::copy_iter<FwdIter1, FwdIter2>>(
                     std::forward<ExPolicy>(policy), first, last, dest));
@@ -664,7 +649,7 @@ namespace hpx {
         friend FwdIter2 tag_invoke(
             hpx::copy_t, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
-            return parallel::v1::detail::get_second_element(
+            return parallel::util::get_second_element(
                 parallel::v1::detail::transfer<
                     parallel::v1::detail::copy_iter<FwdIter1, FwdIter2>>(
                     hpx::execution::seq, first, last, dest));
@@ -681,7 +666,7 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter1, typename Size,
             typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
@@ -707,7 +692,7 @@ namespace hpx {
                 hpx::parallel::execution::is_sequenced_execution_policy<
                     ExPolicy>;
 
-            return hpx::parallel::v1::detail::get_second_element(
+            return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::copy_n<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
                     .call(std::forward<ExPolicy>(policy), is_seq(), first,
@@ -737,7 +722,7 @@ namespace hpx {
                     FwdIter2>::get(std::move(dest));
             }
 
-            return hpx::parallel::v1::detail::get_second_element(
+            return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::copy_n<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
                     .call(hpx::execution::seq, std::true_type{}, first,
@@ -755,7 +740,7 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Pred,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value &&
                 hpx::traits::is_invocable<Pred,
@@ -777,7 +762,7 @@ namespace hpx {
                 hpx::parallel::execution::is_sequenced_execution_policy<
                     ExPolicy>;
 
-            return hpx::parallel::v1::detail::get_second_element(
+            return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::copy_if<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
                     .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
@@ -803,7 +788,7 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::get_second_element(
+            return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::copy_if<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
                     .call(hpx::execution::seq, std::true_type{}, first, last,

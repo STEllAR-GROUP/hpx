@@ -330,7 +330,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Op, typename T,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value &&
             hpx::traits::is_invocable<Op,
@@ -433,7 +433,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Op,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value &&
             hpx::traits::is_invocable<Op,
@@ -516,8 +516,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// \a inclusive_scan includes the ith input element in the ith sum.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
+    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
     inclusive_scan(
         ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)

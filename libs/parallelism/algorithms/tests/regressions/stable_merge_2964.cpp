@@ -70,7 +70,7 @@ void test_merge_stable(ExPolicy policy, DataType, int rand_base)
     std::sort(std::begin(src1), std::end(src1));
     std::sort(std::begin(src2), std::end(src2));
 
-    hpx::parallel::merge(
+    hpx::ranges::merge(
         policy, std::begin(src1), std::end(src1), std::begin(src2),
         std::end(src2), std::begin(dest),
         [](DataType const& a, DataType const& b) -> bool { return a < b; },
@@ -127,7 +127,7 @@ int hpx_main(int argc, char** argv)
 
     // I expect a stable merge to order {3, 'a'} and {3, 'b'} before {3, 'c'}
     // because they come from the first sequence
-    hpx::parallel::merge(hpx::execution::par, a1.begin(), a1.end(), a2.begin(),
+    hpx::ranges::merge(hpx::execution::par, a1.begin(), a1.end(), a2.begin(),
         a2.end(), result.begin(), [](ElemType const& a, ElemType const& b) {
             return std::get<0>(a) < std::get<0>(b);
         });
@@ -139,7 +139,7 @@ int hpx_main(int argc, char** argv)
     HPX_TEST(result == solution);
 
     // Expect {3, 'c'}, {3, 'a'}, {3, 'b'} in order.
-    hpx::parallel::merge(hpx::execution::par, a2.begin(), a2.end(), a1.begin(),
+    hpx::ranges::merge(hpx::execution::par, a2.begin(), a2.end(), a1.begin(),
         a1.end(), result.begin(), [](ElemType const& a, ElemType const& b) {
             return std::get<0>(a) < std::get<0>(b);
         });
@@ -150,7 +150,7 @@ int hpx_main(int argc, char** argv)
 
     HPX_TEST(result == solution);
 
-    // Do moduler operation for avoiding overflow in ramdom_fill. (#2954)
+    // Do modulus operation for avoiding overflow in ramdom_fill. (#2954)
     std::uniform_int_distribution<> dis(0, 9999);
     int rand_base = dis(_rand);
 

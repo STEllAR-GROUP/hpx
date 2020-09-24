@@ -28,10 +28,12 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/insertion_sort.hpp
     hpx/parallel/algorithms/detail/is_sorted.hpp
     hpx/parallel/algorithms/detail/parallel_stable_sort.hpp
+    hpx/parallel/algorithms/detail/rotate.hpp
     hpx/parallel/algorithms/detail/sample_sort.hpp
     hpx/parallel/algorithms/detail/set_operation.hpp
     hpx/parallel/algorithms/detail/spin_sort.hpp
     hpx/parallel/algorithms/detail/transfer.hpp
+    hpx/parallel/algorithms/detail/upper_lower_bound.hpp
     hpx/parallel/algorithms/equal.hpp
     hpx/parallel/algorithms/exclusive_scan.hpp
     hpx/parallel/algorithms/fill.hpp
@@ -90,6 +92,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/for_each.hpp
     hpx/parallel/container_algorithms/generate.hpp
     hpx/parallel/container_algorithms.hpp
+    hpx/parallel/container_algorithms/includes.hpp
     hpx/parallel/container_algorithms/is_heap.hpp
     hpx/parallel/container_algorithms/make_heap.hpp
     hpx/parallel/container_algorithms/merge.hpp
@@ -104,6 +107,10 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/reverse.hpp
     hpx/parallel/container_algorithms/rotate.hpp
     hpx/parallel/container_algorithms/search.hpp
+    hpx/parallel/container_algorithms/set_difference.hpp
+    hpx/parallel/container_algorithms/set_intersection.hpp
+    hpx/parallel/container_algorithms/set_symmetric_difference.hpp
+    hpx/parallel/container_algorithms/set_union.hpp
     hpx/parallel/container_algorithms/sort.hpp
     hpx/parallel/container_algorithms/stable_sort.hpp
     hpx/parallel/container_algorithms/transform.hpp

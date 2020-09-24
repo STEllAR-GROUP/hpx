@@ -267,9 +267,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     hpx::future<typename hpx::util::invoke_result<Conv, U>::type>
     convert_to_result(hpx::future<U>&& f, Conv&& conv)
     {
-        typedef typename hpx::util::invoke_result<Conv, U>::type result_type;
+        using result_type = typename hpx::util::invoke_result<Conv, U>::type;
 
-        return lcos::make_future<result_type>(
+        return hpx::make_future<result_type>(
             std::move(f), std::forward<Conv>(conv));
     }
 }}}}    // namespace hpx::parallel::util::detail

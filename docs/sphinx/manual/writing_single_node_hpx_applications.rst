@@ -537,31 +537,31 @@ Parallel algorithms
      * Description
      * In header
      * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::parallel::v1::merge`
+   * * :cpp:func:`hpx::merge`
      * Merges two sorted ranges.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`merge`
-   * * :cpp:func:`hpx::parallel::v1::inplace_merge`
+   * * :cpp:func:`hpx::inplace_merge`
      * Merges two ordered ranges in-place.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`inplace_merge`
-   * * :cpp:func:`hpx::parallel::v1::includes`
+   * * :cpp:func:`hpx::includes`
      * Returns true if one set is a subset of another.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`includes`
-   * * :cpp:func:`hpx::parallel::v1::set_difference`
+   * * :cpp:func:`hpx::set_difference`
      * Computes the difference between two sets.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`set_difference`
-   * * :cpp:func:`hpx::parallel::v1::set_intersection`
+   * * :cpp:func:`hpx::set_intersection`
      * Computes the intersection of two sets.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`set_intersection`
-   * * :cpp:func:`hpx::parallel::v1::set_symmetric_difference`
+   * * :cpp:func:`hpx::set_symmetric_difference`
      * Computes the symmetric difference between two sets.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`set_symmetric_difference`
-   * * :cpp:func:`hpx::parallel::v1::set_union`
+   * * :cpp:func:`hpx::set_union`
      * Computes the union of two sets.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`set_union`

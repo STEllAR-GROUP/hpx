@@ -269,8 +269,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename T, typename Op>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
+    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
     exclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest, T init, Op&& op)
@@ -349,8 +348,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename T>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
+    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
     exclusive_scan(
         ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest, T init)
