@@ -30,8 +30,6 @@ set(tests
     for_loop_exception_range
     for_loop_induction_range
     for_loop_induction_async_range
-    for_loop_n_range
-    for_loop_n_strided_range
     for_loop_reduction_range
     for_loop_reduction_async_range
     for_loop_strided_range

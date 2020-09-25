@@ -131,8 +131,6 @@ Functions
 - :cpp:func:`hpx::ranges::set_union`
 - :cpp:func:`hpx::ranges::for_loop`
 - :cpp:func:`hpx::ranges::for_loop_strided`
-- :cpp:func:`hpx::ranges::for_loop_n`
-- :cpp:func:`hpx::ranges::for_loop_n_strided`
 
 Header ``hpx/any.hpp``
 ======================
