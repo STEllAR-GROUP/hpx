@@ -25,6 +25,8 @@ If you can't find what you're looking for in the documentation, please:
 * read or ask questions tagged with |hpx| on `StackOverflow
   <hpx_stackoverflow_>`_.
 
+See :ref:`citing_hpx` for details on how to cite |hpx| in publications.
+
 What is |hpx|?
 ==============
 
@@ -103,6 +105,7 @@ What's so special about |hpx|?
    :maxdepth: 2
 
    releases
+   citing
    about_hpx
 
 
