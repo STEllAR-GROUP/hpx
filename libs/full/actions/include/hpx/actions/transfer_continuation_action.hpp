@@ -16,7 +16,6 @@
 #include <hpx/actions/transfer_base_action.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/async_distributed/applier/apply_helper.hpp>
-#include <hpx/modules/datastructures.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>

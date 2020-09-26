@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/serialization/detail/extra_archive_data.hpp>
 #include <hpx/synchronization/spinlock.hpp>
