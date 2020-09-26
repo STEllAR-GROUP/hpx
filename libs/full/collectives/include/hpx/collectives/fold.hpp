@@ -174,10 +174,10 @@ namespace hpx { namespace lcos {
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -255,7 +255,7 @@ namespace hpx { namespace lcos {
             template <typename FoldOp>
             struct fold_invoker
             {
-                typedef typename util::decay<FoldOp>::type fold_op_type;
+                typedef typename std::decay<FoldOp>::type fold_op_type;
 
                 typedef detail::fold_invoker<Action, fold_op_type,
                     typename hpx::tuple_element<Is,

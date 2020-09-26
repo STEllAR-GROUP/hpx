@@ -13,9 +13,9 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <exception>
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace parallel { inline namespace v1 {
@@ -214,8 +214,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         template <typename ExPolicy, typename Result = void>
         struct handle_exception
-          : handle_exception_impl<typename hpx::util::decay<ExPolicy>::type,
-                Result>
+          : handle_exception_impl<typename std::decay<ExPolicy>::type, Result>
         {
         };
         /// \endcond

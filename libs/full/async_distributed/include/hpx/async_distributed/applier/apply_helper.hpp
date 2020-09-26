@@ -21,7 +21,6 @@
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/traits/action_decorate_continuation.hpp>
 #include <hpx/traits/action_schedule_thread.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <chrono>
 #include <exception>

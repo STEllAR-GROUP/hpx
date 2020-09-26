@@ -20,8 +20,8 @@
 #include <hpx/type_support/unused.hpp>
 
 #include <memory>
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace functional
@@ -54,8 +54,8 @@ namespace hpx { namespace util { namespace functional
         struct apply_continuation_impl
         {
 
-            typedef typename util::decay<Bound>::type bound_type;
-            typedef typename util::decay<Continuation>::type continuation_type;
+            typedef typename std::decay<Bound>::type bound_type;
+            typedef typename std::decay<Continuation>::type continuation_type;
 
             apply_continuation_impl() = default;
 
@@ -109,12 +109,12 @@ namespace hpx { namespace util { namespace functional
         struct apply_continuation_impl<Bound, hpx::util::unused_type>
         {
 
-            typedef typename util::decay<Bound>::type bound_type;
+            typedef typename std::decay<Bound>::type bound_type;
 
             apply_continuation_impl() = default;
 
             template <typename Bound_, typename Enable = typename
-                std::enable_if<!std::is_same<typename hpx::util::decay<Bound_>::type,
+                std::enable_if<!std::is_same<typename std::decay<Bound_>::type,
                     apply_continuation_impl>::value>::type>
             explicit apply_continuation_impl(Bound_ && bound)
               : bound_(std::forward<Bound_>(bound))
@@ -183,8 +183,8 @@ namespace hpx { namespace util { namespace functional
         struct async_continuation_impl
         {
 
-            typedef typename util::decay<Bound>::type bound_type;
-            typedef typename util::decay<Continuation>::type continuation_type;
+            typedef typename std::decay<Bound>::type bound_type;
+            typedef typename std::decay<Continuation>::type continuation_type;
 
             async_continuation_impl()
               : bound_(), cont_()
@@ -247,14 +247,14 @@ namespace hpx { namespace util { namespace functional
         struct async_continuation_impl<Bound, hpx::util::unused_type>
         {
 
-            typedef typename util::decay<Bound>::type bound_type;
+            typedef typename std::decay<Bound>::type bound_type;
 
             async_continuation_impl()
               : bound_()
             {}
 
             template <typename Bound_, typename Enable = typename
-                std::enable_if<!std::is_same<typename hpx::util::decay<Bound_>::type,
+                std::enable_if<!std::is_same<typename std::decay<Bound_>::type,
                     async_continuation_impl>::value>::type>
             explicit async_continuation_impl(Bound_ && bound)
               : bound_(std::forward<Bound_>(bound))

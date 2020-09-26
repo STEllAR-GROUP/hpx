@@ -13,6 +13,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
+#include <type_traits>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -33,6 +34,6 @@ namespace hpx {
     template <typename Action, typename F, typename... Ts>
     HPX_FORCEINLINE auto async_cb(F&& f, Ts&&... ts)
         -> decltype(detail::async_cb_action_dispatch<Action,
-            typename util::decay<F>::type>::call(std::forward<F>(f),
+            typename std::decay<F>::type>::call(std::forward<F>(f),
             std::forward<Ts>(ts)...));
 }    // namespace hpx

@@ -171,8 +171,8 @@ namespace hpx { namespace cuda { namespace experimental {
                 result.push_back(parallel::execution::async_execute(
                     host_executor_,
                     [this, current, s](F&& f, Ts&&... ts) mutable {
-                        typedef typename hpx::util::decay<decltype(s)>::type
-                            shape_type;
+                        typedef
+                            typename std::decay<decltype(s)>::type shape_type;
 
                         std::array<shape_type, 1> cuda_shape{{s}};
                         parallel::execution::bulk_sync_execute(

@@ -10,7 +10,6 @@
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution_base/execution.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <type_traits>
 

@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/type_support/always_void.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <type_traits>
 
@@ -28,8 +27,7 @@ namespace hpx { namespace traits {
     }    // namespace detail
 
     template <typename Action, typename Enable = void>
-    struct is_action
-      : detail::is_action_impl<typename util::decay<Action>::type>
+    struct is_action : detail::is_action_impl<typename std::decay<Action>::type>
     {
     };
 

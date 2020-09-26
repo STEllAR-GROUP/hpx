@@ -18,7 +18,6 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -105,7 +104,7 @@ namespace hpx
     ///                     message. The default value is \a true.
     template <typename Result>
     typename std::enable_if<
-        !std::is_same<typename util::decay<Result>::type, naming::address>::value
+        !std::is_same<typename std::decay<Result>::type, naming::address>::value
     >::type
     set_lco_value(naming::id_type const& id, Result && t, bool move_credits = true)
     {
@@ -123,7 +122,7 @@ namespace hpx
     ///                     message. The default value is \a true.
     template <typename Result>
     typename std::enable_if<
-        !std::is_same<typename util::decay<Result>::type, naming::address>::value
+        !std::is_same<typename std::decay<Result>::type, naming::address>::value
     >::type
     set_lco_value_unmanaged(naming::id_type const& id, Result && t,
         bool move_credits = true)
@@ -160,7 +159,7 @@ namespace hpx
     ///                     message. The default value is \a true.
     template <typename Result>
     typename std::enable_if<
-        !std::is_same<typename util::decay<Result>::type, naming::address>::value
+        !std::is_same<typename std::decay<Result>::type, naming::address>::value
     >::type
     set_lco_value(naming::id_type const& id, Result && t,
         naming::id_type const& cont, bool move_credits = true)
@@ -181,7 +180,7 @@ namespace hpx
     ///                     message. The default value is \a true.
     template <typename Result>
     typename std::enable_if<
-        !std::is_same<typename util::decay<Result>::type, naming::address>::value
+        !std::is_same<typename std::decay<Result>::type, naming::address>::value
     >::type
     set_lco_value_unmanaged(naming::id_type const& id, Result && t,
         naming::id_type const& cont, bool move_credits = true)
@@ -464,7 +463,7 @@ namespace hpx
     void set_lco_value(naming::id_type const& id, naming::address && addr,
         Result && t, bool move_credits)
     {
-        typedef typename util::decay<Result>::type remote_result_type;
+        typedef typename std::decay<Result>::type remote_result_type;
         typedef typename traits::promise_local_result<
                 remote_result_type
             >::type local_result_type;
@@ -500,7 +499,7 @@ namespace hpx
     void set_lco_value(naming::id_type const& id, naming::address && addr,
         Result && t, naming::id_type const& cont, bool move_credits)
     {
-        typedef typename util::decay<Result>::type remote_result_type;
+        typedef typename std::decay<Result>::type remote_result_type;
         typedef typename traits::promise_local_result<
                 remote_result_type
             >::type local_result_type;

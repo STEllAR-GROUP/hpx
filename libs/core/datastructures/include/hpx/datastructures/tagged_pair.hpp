@@ -13,7 +13,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/tagged.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -43,24 +42,24 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Tag1, typename Tag2, typename T1, typename T2>
-    constexpr HPX_FORCEINLINE tagged_pair<Tag1(typename decay<T1>::type),
-        Tag2(typename decay<T2>::type)>
+    constexpr HPX_FORCEINLINE tagged_pair<Tag1(typename std::decay<T1>::type),
+        Tag2(typename std::decay<T2>::type)>
     make_tagged_pair(std::pair<T1, T2>&& p)
     {
-        typedef tagged_pair<Tag1(typename decay<T1>::type),
-            Tag2(typename decay<T2>::type)>
+        typedef tagged_pair<Tag1(typename std::decay<T1>::type),
+            Tag2(typename std::decay<T2>::type)>
             result_type;
 
         return result_type(std::move(p));
     }
 
     template <typename Tag1, typename Tag2, typename T1, typename T2>
-    constexpr HPX_FORCEINLINE tagged_pair<Tag1(typename decay<T1>::type),
-        Tag2(typename decay<T2>::type)>
+    constexpr HPX_FORCEINLINE tagged_pair<Tag1(typename std::decay<T1>::type),
+        Tag2(typename std::decay<T2>::type)>
     make_tagged_pair(std::pair<T1, T2> const& p)
     {
-        typedef tagged_pair<Tag1(typename decay<T1>::type),
-            Tag2(typename decay<T2>::type)>
+        typedef tagged_pair<Tag1(typename std::decay<T1>::type),
+            Tag2(typename std::decay<T2>::type)>
             result_type;
 
         return result_type(p);
@@ -102,12 +101,12 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Tag1, typename Tag2, typename T1, typename T2>
-    constexpr HPX_FORCEINLINE tagged_pair<Tag1(typename decay<T1>::type),
-        Tag2(typename decay<T2>::type)>
+    constexpr HPX_FORCEINLINE tagged_pair<Tag1(typename std::decay<T1>::type),
+        Tag2(typename std::decay<T2>::type)>
     make_tagged_pair(T1&& t1, T2&& t2)
     {
-        typedef tagged_pair<Tag1(typename decay<T1>::type),
-            Tag2(typename decay<T2>::type)>
+        typedef tagged_pair<Tag1(typename std::decay<T1>::type),
+            Tag2(typename std::decay<T2>::type)>
             result_type;
 
         return result_type(std::forward<T1>(t1), std::forward<T2>(t2));

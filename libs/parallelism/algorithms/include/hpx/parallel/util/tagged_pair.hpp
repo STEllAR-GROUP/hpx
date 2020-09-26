@@ -14,7 +14,6 @@
 #include <hpx/datastructures/tagged_pair.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <cstddef>
 #include <type_traits>

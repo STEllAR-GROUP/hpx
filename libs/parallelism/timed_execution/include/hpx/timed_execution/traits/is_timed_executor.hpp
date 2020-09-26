@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <type_traits>
 
@@ -29,7 +28,7 @@ namespace hpx { namespace parallel { namespace execution {
     // Precondition: T is a complete type
     template <typename T>
     struct is_timed_executor
-      : detail::is_timed_executor<typename hpx::util::decay<T>::type>
+      : detail::is_timed_executor<typename std::decay<T>::type>
     {
     };
 

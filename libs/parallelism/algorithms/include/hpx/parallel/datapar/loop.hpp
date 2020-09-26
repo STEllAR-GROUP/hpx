@@ -17,7 +17,6 @@
 #include <hpx/executors/datapar/execution_policy_fwd.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/util/loop.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -48,11 +47,10 @@ namespace hpx { namespace parallel { namespace util {
         HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
             hpx::is_vectorpack_execution_policy<ExPolicy>::value,
             typename traits::vector_pack_type<
-                typename hpx::util::decay<Vector>::type::value_type,
-                1>::type>::type
+                typename std::decay<Vector>::type::value_type, 1>::type>::type
         accumulate_values(F&& f, Vector const& value)
         {
-            typedef typename hpx::util::decay<Vector>::type vector_type;
+            typedef typename std::decay<Vector>::type vector_type;
             typedef typename vector_type::value_type entry_type;
 
             entry_type accum = value[0];
@@ -115,7 +113,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename Iterator>
         struct datapar_loop
         {
-            typedef typename hpx::util::decay<Iterator>::type iterator_type;
+            typedef typename std::decay<Iterator>::type iterator_type;
             typedef typename std::iterator_traits<iterator_type>::value_type
                 value_type;
 
@@ -178,7 +176,7 @@ namespace hpx { namespace parallel { namespace util {
                 std::pair<InIter1, InIter2>>::type
             call(InIter1 it1, InIter1 last1, InIter2 it2, F&& f)
             {
-                typedef typename hpx::util::decay<InIter1>::type iterator_type;
+                typedef typename std::decay<InIter1>::type iterator_type;
                 typedef typename std::iterator_traits<iterator_type>::value_type
                     value_type;
 
@@ -233,7 +231,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename Iterator>
         struct datapar_loop_n
         {
-            typedef typename hpx::util::decay<Iterator>::type iterator_type;
+            typedef typename std::decay<Iterator>::type iterator_type;
             typedef typename std::iterator_traits<iterator_type>::value_type
                 value_type;
 

@@ -10,7 +10,6 @@
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/detected.hpp>
 
 #include <cstddef>
@@ -375,7 +374,7 @@ namespace hpx { namespace traits {
 
     template <typename Executor>
     struct is_threads_executor
-      : detail::is_threads_executor<typename hpx::util::decay<Executor>::type>
+      : detail::is_threads_executor<typename std::decay<Executor>::type>
     {
     };
 

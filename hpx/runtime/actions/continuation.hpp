@@ -25,7 +25,6 @@
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/is_continuation.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -136,7 +135,7 @@ namespace hpx { namespace actions
         template <typename F, typename Enable =
             typename std::enable_if<
                !std::is_same<
-                    typename util::decay<F>::type, typed_continuation
+                    typename std::decay<F>::type, typed_continuation
                 >::value
             >::type
         >
@@ -254,7 +253,7 @@ namespace hpx { namespace actions
         template <typename F, typename Enable =
             typename std::enable_if<
                !std::is_same<
-                    typename util::decay<F>::type, typed_continuation
+                    typename std::decay<F>::type, typed_continuation
                 >::value
             >::type
         >
@@ -365,7 +364,7 @@ namespace hpx { namespace actions
         template <typename F, typename Enable =
             typename std::enable_if<
                !std::is_same<
-                    typename util::decay<F>::type, typed_continuation
+                    typename std::decay<F>::type, typed_continuation
                 >::value
             >::type
         >

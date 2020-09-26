@@ -740,7 +740,8 @@ namespace hpx {
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/modules/type_support.hpp>
+#include <hpx/type_support/pack.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_loop_induction.hpp>
@@ -810,7 +811,7 @@ namespace hpx {
             template <typename F, typename S, typename... Ts>
             struct part_iterations<F, S, hpx::tuple<Ts...>>
             {
-                typedef typename hpx::util::decay<F>::type fun_type;
+                typedef typename std::decay<F>::type fun_type;
 
                 fun_type f_;
                 S stride_;
@@ -862,7 +863,7 @@ namespace hpx {
             template <typename F, typename S>
             struct part_iterations<F, S, hpx::tuple<>>
             {
-                typedef typename hpx::util::decay<F>::type fun_type;
+                typedef typename std::decay<F>::type fun_type;
 
                 fun_type f_;
                 S stride_;
@@ -971,7 +972,7 @@ namespace hpx {
 
                     // we need to decay copy here to properly transport everything
                     // to a GPU device
-                    typedef hpx::tuple<typename hpx::util::decay<Ts>::type...>
+                    typedef hpx::tuple<typename std::decay<Ts>::type...>
                         args_type;
 
                     args_type args =
@@ -1427,8 +1428,8 @@ namespace hpx { namespace traits {
             parallel::v2::detail::part_iterations<F, S, Tuple> const&
                 f) noexcept
         {
-            return get_function_address<
-                typename hpx::util::decay<F>::type>::call(f.f_);
+            return get_function_address<typename std::decay<F>::type>::call(
+                f.f_);
         }
     };
 
@@ -1440,8 +1441,8 @@ namespace hpx { namespace traits {
             parallel::v2::detail::part_iterations<F, S, Tuple> const&
                 f) noexcept
         {
-            return get_function_annotation<
-                typename hpx::util::decay<F>::type>::call(f.f_);
+            return get_function_annotation<typename std::decay<F>::type>::call(
+                f.f_);
         }
     };
 
@@ -1455,7 +1456,7 @@ namespace hpx { namespace traits {
                 f) noexcept
         {
             return get_function_annotation_itt<
-                typename hpx::util::decay<F>::type>::call(f.f_);
+                typename std::decay<F>::type>::call(f.f_);
         }
     };
 #endif

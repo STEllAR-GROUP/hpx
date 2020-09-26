@@ -15,7 +15,6 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/threading.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
@@ -142,12 +141,12 @@ namespace hpx { namespace parallel { namespace execution {
             Ts&&... ts)
             -> decltype(sync_execute_at_helper<
                 typename hpx::traits::executor_execution_category<
-                    typename hpx::util::decay<Executor>::type>::type>::call(0,
+                    typename std::decay<Executor>::type>::type>::call(0,
                 std::forward<Executor>(exec), abs_time, std::forward<F>(f),
                 std::forward<Ts>(ts)...))
         {
             typedef typename hpx::traits::executor_execution_category<
-                typename hpx::util::decay<Executor>::type>::type tag;
+                typename std::decay<Executor>::type>::type tag;
 
             return sync_execute_at_helper<tag>::call(0,
                 std::forward<Executor>(exec), abs_time, std::forward<F>(f),
@@ -231,12 +230,12 @@ namespace hpx { namespace parallel { namespace execution {
             Ts&&... ts)
             -> decltype(async_execute_at_helper<
                 typename hpx::traits::executor_execution_category<
-                    typename hpx::util::decay<Executor>::type>::type>::call(0,
+                    typename std::decay<Executor>::type>::type>::call(0,
                 std::forward<Executor>(exec), abs_time, std::forward<F>(f),
                 std::forward<Ts>(ts)...))
         {
             typedef typename hpx::traits::executor_execution_category<
-                typename hpx::util::decay<Executor>::type>::type tag;
+                typename std::decay<Executor>::type>::type tag;
             return async_execute_at_helper<tag>::call(0,
                 std::forward<Executor>(exec), abs_time, std::forward<F>(f),
                 std::forward<Ts>(ts)...);
@@ -310,7 +309,7 @@ namespace hpx { namespace parallel { namespace execution {
             Ts&&... ts)
         {
             typedef typename hpx::traits::executor_execution_category<
-                typename hpx::util::decay<Executor>::type>::type tag;
+                typename std::decay<Executor>::type>::type tag;
 
             return post_at_helper<tag>::call(0, std::forward<Executor>(exec),
                 abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);

@@ -136,7 +136,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename T>
         struct fill_iteration
         {
-            typename hpx::util::decay<T>::type val_;
+            typename std::decay<T>::type val_;
 
             template <typename U>
             HPX_HOST_DEVICE typename std::enable_if<

@@ -12,7 +12,6 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/brace_initializable_traits.hpp>
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <string>
 #include <type_traits>
@@ -211,7 +210,7 @@ namespace hpx { namespace serialization {
                 {
                     // cast it to let it be run for templated
                     // member functions
-                    const_cast<typename util::decay<T>::type&>(t).serialize(
+                    const_cast<typename std::decay<T>::type&>(t).serialize(
                         ar, 0);
                 }
             };

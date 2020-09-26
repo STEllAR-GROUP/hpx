@@ -188,17 +188,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename Op, typename Proj>
         struct count_iteration
         {
-            typedef
-                typename hpx::util::decay<ExPolicy>::type execution_policy_type;
-            typedef typename hpx::util::decay<Proj>::type proj_type;
-            typedef typename hpx::util::decay<Op>::type op_type;
+            typedef typename std::decay<ExPolicy>::type execution_policy_type;
+            typedef typename std::decay<Proj>::type proj_type;
+            typedef typename std::decay<Op>::type op_type;
 
             op_type op_;
             proj_type proj_;
 
             template <typename Op_, typename Proj_,
                 typename U = typename std::enable_if<
-                    !std::is_same<typename hpx::util::decay<Op_>::type,
+                    !std::is_same<typename std::decay<Op_>::type,
                         count_iteration>::value>::type>
             HPX_HOST_DEVICE count_iteration(Op_&& op, Proj_&& proj)
               : op_(std::forward<Op_>(op))

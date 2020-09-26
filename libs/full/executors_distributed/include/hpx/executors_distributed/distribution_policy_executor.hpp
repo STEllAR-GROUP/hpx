@@ -17,7 +17,6 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/server/invoke_function.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <type_traits>
@@ -39,15 +38,13 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Action, typename... Ts>
         struct distribution_policy_execute_result_impl<Action, true, Ts...>
         {
-            typedef
-                typename hpx::util::decay<Action>::type::local_result_type type;
+            typedef typename std::decay<Action>::type::local_result_type type;
         };
 
         template <typename F, typename... Ts>
         struct distribution_policy_execute_result
           : distribution_policy_execute_result_impl<F,
-                hpx::traits::is_action<
-                    typename hpx::util::decay<F>::type>::value,
+                hpx::traits::is_action<typename std::decay<F>::type>::value,
                 Ts...>
         {
         };
@@ -121,7 +118,7 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename DistPolicy_,
             typename Enable = typename std::enable_if<
                 !std::is_same<distribution_policy_executor,
-                    typename hpx::util::decay<DistPolicy_>::type>::value>::type>
+                    typename std::decay<DistPolicy_>::type>::value>::type>
         distribution_policy_executor(DistPolicy_&& policy)
           : policy_(std::forward<DistPolicy_>(policy))
         {
@@ -182,10 +179,10 @@ namespace hpx { namespace parallel { namespace execution {
     /// \param policy   The distribution_policy to create an executor from
     ///
     template <typename DistPolicy>
-    distribution_policy_executor<typename hpx::util::decay<DistPolicy>::type>
+    distribution_policy_executor<typename std::decay<DistPolicy>::type>
     make_distribution_policy_executor(DistPolicy&& policy)
     {
-        typedef typename hpx::util::decay<DistPolicy>::type dist_policy_type;
+        typedef typename std::decay<DistPolicy>::type dist_policy_type;
         return distribution_policy_executor<dist_policy_type>(
             std::forward<DistPolicy>(policy));
     }

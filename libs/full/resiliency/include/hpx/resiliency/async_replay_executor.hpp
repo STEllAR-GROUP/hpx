@@ -15,11 +15,12 @@
 #include <hpx/resiliency/resiliency_cpos.hpp>
 
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/modules/type_support.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <exception>

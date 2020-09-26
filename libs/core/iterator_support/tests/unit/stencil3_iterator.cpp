@@ -163,10 +163,10 @@ namespace test {
     };
 
     template <typename F>
-    inline custom_stencil_transformer<typename hpx::util::decay<F>::type>
+    inline custom_stencil_transformer<typename std::decay<F>::type>
     make_custom_stencil_transformer(F&& f)
     {
-        typedef custom_stencil_transformer<typename hpx::util::decay<F>::type>
+        typedef custom_stencil_transformer<typename std::decay<F>::type>
             transformer_type;
         return transformer_type(std::forward<F>(f));
     }

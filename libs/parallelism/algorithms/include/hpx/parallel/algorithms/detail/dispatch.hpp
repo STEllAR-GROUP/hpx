@@ -11,7 +11,6 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/executors/execution.hpp>
@@ -106,9 +105,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             try
             {
 #endif
-                typedef typename hpx::util::decay<
+                typedef typename std::decay<
                     ExPolicy>::type::executor_parameters_type parameters_type;
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+                typedef typename std::decay<ExPolicy>::type::executor_type
                     executor_type;
 
                 parallel::util::detail::scoped_executor_parameters_ref<

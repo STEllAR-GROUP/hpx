@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <type_traits>
 
@@ -23,7 +22,7 @@ namespace hpx { namespace traits {
 
     template <typename Policy>
     struct is_launch_policy
-      : detail::is_launch_policy<typename hpx::util::decay<Policy>::type>
+      : detail::is_launch_policy<typename std::decay<Policy>::type>
     {
     };
 }}    // namespace hpx::traits

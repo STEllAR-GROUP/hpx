@@ -12,10 +12,10 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tagged.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/identity.hpp>
 
 #include <cstddef>
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace util {
@@ -41,7 +41,7 @@ namespace hpx { namespace util {
         template <typename Tag, typename T>
         struct tagged_type
         {
-            typedef typename decay<T>::type decayed_type;
+            typedef typename std::decay<T>::type decayed_type;
             typedef typename hpx::util::identity<Tag(decayed_type)>::type type;
         };
     }    // namespace detail

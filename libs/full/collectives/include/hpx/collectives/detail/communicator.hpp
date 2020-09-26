@@ -26,7 +26,6 @@
 #include <hpx/runtime_local/get_num_localities.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <cstddef>
 #include <memory>

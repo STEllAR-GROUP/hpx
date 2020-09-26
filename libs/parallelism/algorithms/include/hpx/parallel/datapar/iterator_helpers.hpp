@@ -46,8 +46,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     template <typename Iter1, typename Iter2>
     struct iterators_datapar_compatible_impl
     {
-        typedef typename hpx::util::decay<Iter1>::type iterator1_type;
-        typedef typename hpx::util::decay<Iter2>::type iterator2_type;
+        typedef typename std::decay<Iter1>::type iterator1_type;
+        typedef typename std::decay<Iter2>::type iterator2_type;
 
         typedef typename std::iterator_traits<iterator1_type>::value_type
             value1_type;
@@ -84,8 +84,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     struct iterator_datapar_compatible<Iter,
         typename std::enable_if<
             hpx::traits::is_random_access_iterator<Iter>::value>::type>
-      : iterator_datapar_compatible_impl<
-            typename hpx::util::decay<Iter>::type>::type
+      : iterator_datapar_compatible_impl<typename std::decay<Iter>::type>::type
     {
     };
 

@@ -244,7 +244,6 @@ namespace hpx {
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
-#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -334,10 +333,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename F, typename Proj>
         struct for_each_iteration
         {
-            using execution_policy_type =
-                typename hpx::util::decay<ExPolicy>::type;
-            using fun_type = typename hpx::util::decay<F>::type;
-            using proj_type = typename hpx::util::decay<Proj>::type;
+            using execution_policy_type = typename std::decay<ExPolicy>::type;
+            using fun_type = typename std::decay<F>::type;
+            using proj_type = typename std::decay<Proj>::type;
 
             fun_type f_;
             proj_type proj_;
@@ -729,8 +727,8 @@ namespace hpx { namespace traits {
             parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const&
                 f) noexcept
         {
-            return get_function_address<
-                typename hpx::util::decay<F>::type>::call(f.f_);
+            return get_function_address<typename std::decay<F>::type>::call(
+                f.f_);
         }
     };
 
@@ -742,8 +740,8 @@ namespace hpx { namespace traits {
             parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const&
                 f) noexcept
         {
-            return get_function_annotation<
-                typename hpx::util::decay<F>::type>::call(f.f_);
+            return get_function_annotation<typename std::decay<F>::type>::call(
+                f.f_);
         }
     };
 
@@ -757,7 +755,7 @@ namespace hpx { namespace traits {
                 f) noexcept
         {
             return get_function_annotation_itt<
-                typename hpx::util::decay<F>::type>::call(f.f_);
+                typename std::decay<F>::type>::call(f.f_);
         }
     };
 #endif

@@ -16,7 +16,6 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <iostream>

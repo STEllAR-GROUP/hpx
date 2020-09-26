@@ -107,7 +107,6 @@ namespace hpx { namespace lcos {
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime_local/get_num_localities.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
@@ -266,7 +265,7 @@ namespace hpx { namespace lcos {
     ///////////////////////////////////////////////////////////////////////////
     // all_gather plain values
     template <typename T>
-    hpx::future<std::vector<typename util::decay<T>::type>> all_gather(
+    hpx::future<std::vector<typename std::decay<T>::type>> all_gather(
         hpx::future<hpx::id_type>&& fid, T&& local_result,
         std::size_t this_site = std::size_t(-1))
     {
@@ -275,7 +274,7 @@ namespace hpx { namespace lcos {
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
         }
 
-        using arg_type = typename util::decay<T>::type;
+        using arg_type = typename std::decay<T>::type;
 
         auto all_gather_data_direct =
             [local_result = std::forward<T>(local_result), this_site](
@@ -301,7 +300,7 @@ namespace hpx { namespace lcos {
     }
 
     template <typename T>
-    hpx::future<std::vector<typename util::decay<T>::type>> all_gather(
+    hpx::future<std::vector<typename std::decay<T>::type>> all_gather(
         char const* basename, T&& local_result,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),

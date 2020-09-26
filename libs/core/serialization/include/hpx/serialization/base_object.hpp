@@ -14,8 +14,6 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
 
-#include <hpx/type_support/decay.hpp>
-
 #include <type_traits>
 
 namespace hpx { namespace serialization {
@@ -36,7 +34,7 @@ namespace hpx { namespace serialization {
         {
             access::serialize(ar,
                 static_cast<Base&>(
-                    const_cast<typename hpx::util::decay<Derived>::type&>(d_)),
+                    const_cast<typename std::decay<Derived>::type&>(d_)),
                 0);
         }
     };

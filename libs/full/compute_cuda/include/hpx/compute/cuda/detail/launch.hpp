@@ -15,7 +15,6 @@
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/compute/cuda/detail/scoped_active_target.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cuda_runtime.h>
@@ -37,8 +36,8 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
     template <typename F, typename... Ts>
     struct closure
     {
-        typedef hpx::tuple<typename util::decay<Ts>::type...> args_type;
-        typedef typename util::decay<F>::type fun_type;
+        typedef hpx::tuple<typename std::decay<Ts>::type...> args_type;
+        typedef typename std::decay<F>::type fun_type;
 
         fun_type f_;
         args_type args_;

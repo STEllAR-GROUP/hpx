@@ -48,8 +48,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename F, typename Proj>
         struct transform_projected
         {
-            typename hpx::util::decay<F>::type& f_;
-            typename hpx::util::decay<Proj>::type& proj_;
+            typename std::decay<F>::type& f_;
+            typename std::decay<Proj>::type& proj_;
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE auto operator()(Iter curr)
@@ -63,10 +63,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename F, typename Proj>
         struct transform_iteration
         {
-            typedef
-                typename hpx::util::decay<ExPolicy>::type execution_policy_type;
-            typedef typename hpx::util::decay<F>::type fun_type;
-            typedef typename hpx::util::decay<Proj>::type proj_type;
+            typedef typename std::decay<ExPolicy>::type execution_policy_type;
+            typedef typename std::decay<F>::type fun_type;
+            typedef typename std::decay<Proj>::type proj_type;
 
             fun_type f_;
             proj_type proj_;
@@ -299,9 +298,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename F, typename Proj1, typename Proj2>
         struct transform_binary_projected
         {
-            typename hpx::util::decay<F>::type& f_;
-            typename hpx::util::decay<Proj1>::type& proj1_;
-            typename hpx::util::decay<Proj2>::type& proj2_;
+            typename std::decay<F>::type& f_;
+            typename std::decay<Proj1>::type& proj1_;
+            typename std::decay<Proj2>::type& proj2_;
 
             template <typename Iter1, typename Iter2>
             HPX_HOST_DEVICE HPX_FORCEINLINE auto operator()(
@@ -317,11 +316,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename F, typename Proj1, typename Proj2>
         struct transform_binary_iteration
         {
-            typedef
-                typename hpx::util::decay<ExPolicy>::type execution_policy_type;
-            typedef typename hpx::util::decay<F>::type fun_type;
-            typedef typename hpx::util::decay<Proj1>::type proj1_type;
-            typedef typename hpx::util::decay<Proj2>::type proj2_type;
+            typedef typename std::decay<ExPolicy>::type execution_policy_type;
+            typedef typename std::decay<F>::type fun_type;
+            typedef typename std::decay<Proj1>::type proj1_type;
+            typedef typename std::decay<Proj2>::type proj2_type;
 
             fun_type f_;
             proj1_type proj1_;
@@ -817,8 +815,8 @@ namespace hpx { namespace traits {
             parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> const&
                 f) noexcept
         {
-            return get_function_address<
-                typename hpx::util::decay<F>::type>::call(f.f_);
+            return get_function_address<typename std::decay<F>::type>::call(
+                f.f_);
         }
     };
 
@@ -830,8 +828,8 @@ namespace hpx { namespace traits {
             parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> const&
                 f) noexcept
         {
-            return get_function_annotation<
-                typename hpx::util::decay<F>::type>::call(f.f_);
+            return get_function_annotation<typename std::decay<F>::type>::call(
+                f.f_);
         }
     };
 
@@ -845,7 +843,7 @@ namespace hpx { namespace traits {
                 f) noexcept
         {
             return get_function_annotation_itt<
-                typename hpx::util::decay<F>::type>::call(f.f_);
+                typename std::decay<F>::type>::call(f.f_);
         }
     };
 #endif

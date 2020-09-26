@@ -12,7 +12,6 @@
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/execution.hpp>
-#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/algorithms/detail/spin_sort.hpp>
 #include <hpx/parallel/util/merge_four.hpp>

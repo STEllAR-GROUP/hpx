@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/detail/invoke.hpp>
-#include <hpx/type_support/decay.hpp>
 
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace parallel { namespace util {
@@ -17,8 +17,8 @@ namespace hpx { namespace parallel { namespace util {
     template <typename Pred, typename Proj>
     struct invoke_projected
     {
-        typedef typename hpx::util::decay<Pred>::type pred_type;
-        typedef typename hpx::util::decay<Proj>::type proj_type;
+        typedef typename std::decay<Pred>::type pred_type;
+        typedef typename std::decay<Proj>::type proj_type;
 
         pred_type pred_;
         proj_type proj_;

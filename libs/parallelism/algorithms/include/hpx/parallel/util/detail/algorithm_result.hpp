@@ -247,7 +247,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename T = void>
     struct algorithm_result
-      : algorithm_result_impl<typename hpx::util::decay<ExPolicy>::type, T>
+      : algorithm_result_impl<typename std::decay<ExPolicy>::type, T>
     {
         static_assert(!std::is_lvalue_reference<T>::value,
             "T shouldn't be a lvalue reference");

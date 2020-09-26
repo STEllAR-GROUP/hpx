@@ -11,7 +11,6 @@
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/executors/exception_list.hpp>
-#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/sample_sort.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 

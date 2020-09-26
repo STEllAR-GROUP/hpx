@@ -14,7 +14,6 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/runtime/components/colocating_distribution_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -256,7 +255,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             using hpx::traits::segmented_local_iterator_traits;
             return detail::algorithm_result_helper<R>::call(
                 algo.call(std::forward<ExPolicy>(policy), std::true_type(),
-                    segmented_local_iterator_traits<typename hpx::util::decay<
+                    segmented_local_iterator_traits<typename std::decay<
                         Args>::type>::local(std::forward<Args>(args))...));
         }
 
@@ -267,7 +266,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             using hpx::traits::segmented_local_iterator_traits;
             return detail::algorithm_result_helper<R>::call(
                 algo.call(std::forward<ExPolicy>(policy), std::false_type(),
-                    segmented_local_iterator_traits<typename hpx::util::decay<
+                    segmented_local_iterator_traits<typename std::decay<
                         Args>::type>::local(std::forward<Args>(args))...));
         }
     };
@@ -282,7 +281,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             using hpx::traits::segmented_local_iterator_traits;
             return algo.call(std::forward<ExPolicy>(policy), std::true_type(),
-                segmented_local_iterator_traits<typename hpx::util::decay<
+                segmented_local_iterator_traits<typename std::decay<
                     Args>::type>::local(std::forward<Args>(args))...);
         }
 
@@ -293,7 +292,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             using hpx::traits::segmented_local_iterator_traits;
             return algo.call(std::forward<ExPolicy>(policy), std::false_type(),
-                segmented_local_iterator_traits<typename hpx::util::decay<
+                segmented_local_iterator_traits<typename std::decay<
                     Args>::type>::local(std::forward<Args>(args))...);
         }
     };
@@ -303,8 +302,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct dispatcher
     {
         typedef typename parallel::util::detail::algorithm_result<ExPolicy,
-            typename hpx::util::decay<Algo>::type::result_type>::type
-            result_type;
+            typename std::decay<Algo>::type::result_type>::type result_type;
 
         typedef dispatcher_helper<result_type, Algo> base_dispatcher;
 
@@ -350,16 +348,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Algo, typename ExPolicy, typename IsSeq,
         typename... Args>
-    HPX_FORCEINLINE future<typename hpx::util::decay<Algo>::type::result_type>
+    HPX_FORCEINLINE future<typename std::decay<Algo>::type::result_type>
     dispatch_async(id_type const& id, Algo&& algo, ExPolicy const& policy,
         IsSeq, Args&&... args)
     {
-        typedef typename hpx::util::decay<Algo>::type algo_type;
+        typedef typename std::decay<Algo>::type algo_type;
         typedef typename parallel::util::detail::algorithm_result<ExPolicy,
             typename algo_type::result_type>::type result_type;
 
         algorithm_invoker_action<algo_type, ExPolicy, typename IsSeq::type,
-            result_type(typename hpx::util::decay<Args>::type...)>
+            result_type(typename std::decay<Args>::type...)>
             act;
 
         return hpx::async(act, hpx::colocated(id), std::forward<Algo>(algo),
@@ -368,12 +366,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename Algo, typename ExPolicy, typename IsSeq,
         typename... Args>
-    HPX_FORCEINLINE typename hpx::util::decay<Algo>::type::result_type dispatch(
+    HPX_FORCEINLINE typename std::decay<Algo>::type::result_type dispatch(
         id_type const& id, Algo&& algo, ExPolicy const& policy, IsSeq is_seq,
         Args&&... args)
     {
         // synchronously invoke remote operation
-        future<typename hpx::util::decay<Algo>::type::result_type> f =
+        future<typename std::decay<Algo>::type::result_type> f =
             dispatch_async(id, std::forward<Algo>(algo), policy, is_seq,
                 std::forward<Args>(args)...);
         f.wait();

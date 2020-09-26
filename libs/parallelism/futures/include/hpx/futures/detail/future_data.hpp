@@ -22,7 +22,6 @@
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <boost/container/small_vector.hpp>
@@ -559,7 +558,7 @@ namespace hpx { namespace lcos { namespace detail {
             // set the received result, reset error status
             try
             {
-                typedef typename util::decay<T>::type naked_type;
+                typedef typename std::decay<T>::type naked_type;
 
                 typedef traits::get_remote_result<result_type, naked_type>
                     get_remote_result_type;

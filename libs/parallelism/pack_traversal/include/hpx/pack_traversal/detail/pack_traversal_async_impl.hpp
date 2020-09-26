@@ -17,6 +17,7 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/pack_traversal/detail/container_category.hpp>
 #include <hpx/type_support/always_void.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <atomic>

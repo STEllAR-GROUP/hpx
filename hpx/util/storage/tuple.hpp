@@ -6,10 +6,9 @@
 
 #pragma once
 
+#include <hpx/serialization/serializable_any.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/serialization/serializable_any.hpp>
 
 #include <type_traits>
 #include <vector>
@@ -84,7 +83,7 @@ namespace hpx { namespace util { namespace storage {
         template <typename T>
         tuple& push_back(const T& field,
             typename std::enable_if<!std::is_same<elem_type,
-                typename util::decay<T>::type>::value>::type* = nullptr)
+                typename std::decay<T>::type>::value>::type* = nullptr)
         {
             tuple_.push_back(elem_type(field));    // insert an any object
             return *this;
