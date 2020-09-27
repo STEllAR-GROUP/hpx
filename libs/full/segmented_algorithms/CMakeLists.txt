@@ -35,7 +35,12 @@ set(segmented_algorithms_headers
     hpx/parallel/segmented_algorithms/transform_reduce.hpp
 )
 
-set(segmented_algorithms_compat_headers hpx/util/zip_iterator.hpp)
+# cmake-format: off
+set(segmented_algorithms_compat_headers
+    hpx/segmented_algorithms.hpp => hpx/modules/segmented_algorithms.hpp
+    hpx/util/zip_iterator.hpp => hpx/modules/segmented_algorithms.hpp
+)
+# cmake-format: on
 
 include(HPX_AddModule)
 add_hpx_module(

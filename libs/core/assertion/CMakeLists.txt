@@ -15,7 +15,12 @@ set(assertion_headers
 )
 
 # Default location is $HPX_ROOT/libs/assertion/include_compatibility
-set(assertion_compat_headers hpx/assertion.hpp hpx/util/assert.hpp)
+# cmake-format: off
+set(assertion_compat_headers
+    hpx/assertion.hpp => hpx/assert.hpp
+    hpx/util/assert.hpp => hpx/assert.hpp
+)
+# cmake-format: on
 
 # Default location is $HPX_ROOT/libs/assertion/src
 set(assertion_sources assertion.cpp source_location.cpp)

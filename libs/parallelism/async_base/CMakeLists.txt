@@ -16,9 +16,12 @@ set(async_base_headers
 
 set(async_base_sources launch_policy.cpp)
 
-set(async_base_compat_headers hpx/runtime/launch_policy.hpp
-                              hpx/traits/is_launch_policy.hpp
+# cmake-format: off
+set(async_base_compat_headers
+    hpx/runtime/launch_policy.hpp => hpx/future.hpp
+    hpx/traits/is_launch_policy.hpp => hpx/future.hpp
 )
+# cmake-format: on
 
 include(HPX_AddModule)
 add_hpx_module(

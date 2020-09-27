@@ -14,7 +14,11 @@ set(itt_notify_headers hpx/modules/itt_notify.hpp
 )
 
 # Default location is $HPX_ROOT/libs/itt_notify/include_compatibility
-set(itt_notify_compat_headers hpx/util/itt_notify.hpp)
+# cmake-format: off
+set(itt_notify_compat_headers
+    hpx/util/itt_notify.hpp => hpx/modules/itt_notify.hpp
+)
+# cmake-format: on
 
 set(itt_notify_sources itt_notify.cpp thread_name.cpp)
 

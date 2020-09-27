@@ -32,7 +32,9 @@ set(compute_cuda_headers
     hpx/compute/detail/target_distribution_policy.hpp
 )
 
+# cmake-format: off
 set(compute_cuda_compat_headers)
+# cmake-format: on
 
 set(compute_cuda_sources)
 
@@ -47,6 +49,7 @@ add_hpx_module(
   CUDA
   SOURCES ${compute_cuda_sources}
   HEADERS ${compute_cuda_headers}
+  COMPAT_HEADERS ${compute_cuda_compat_headers}
   DEPENDENCIES hpx_core hpx_parallelism
   MODULE_DEPENDENCIES hpx_compute hpx_async_cuda hpx_program_options
                       ${compute_cuda_optional_module_dependencies}

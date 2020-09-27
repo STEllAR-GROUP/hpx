@@ -24,14 +24,16 @@ set(actions_headers
 )
 
 # Default location is $HPX_ROOT/libs/actions/include_compatibility
+# cmake-format: off
 set(actions_compat_headers
-    hpx/runtime/actions_fwd.hpp
-    hpx/runtime/actions/action_support.hpp
-    hpx/runtime/actions/base_action.hpp
-    hpx/runtime/actions/transfer_base_action.hpp
-    hpx/runtime/actions/transfer_action.hpp
-    hpx/runtime/actions/transfer_continuation_action.hpp
+    hpx/runtime/actions_fwd.hpp => hpx/actions/actions_fwd.hpp
+    hpx/runtime/actions/action_support.hpp => hpx/actions_base/actions_base_support.hpp
+    hpx/runtime/actions/base_action.hpp => hpx/actions/base_action.hpp
+    hpx/runtime/actions/transfer_action.hpp => hpx/actions/transfer_action.hpp
+    hpx/runtime/actions/transfer_base_action.hpp => hpx/actions/transfer_base_action.hpp
+    hpx/runtime/actions/transfer_continuation_action.hpp => hpx/actions/transfer_continuation_action.hpp
 )
+# cmake-format: on
 
 set(actions_sources base_action.cpp)
 

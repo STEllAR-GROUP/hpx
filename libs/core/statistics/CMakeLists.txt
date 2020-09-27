@@ -15,10 +15,16 @@ set(statistics_headers
 )
 
 # Default location is $HPX_ROOT/libs/statistics/include_compatibility
+# cmake-format: off
 set(statistics_compat_headers
-    hpx/statistics.hpp hpx/util/histogram.hpp hpx/util/max.hpp hpx/util/min.hpp
-    hpx/util/rolling_max.hpp hpx/util/rolling_min.hpp
+    hpx/statistics.hpp => hpx/modules/statistics.hpp
+    hpx/util/histogram.hpp => hpx/modules/statistics.hpp
+    hpx/util/max.hpp => hpx/modules/statistics.hpp
+    hpx/util/min.hpp => hpx/modules/statistics.hpp
+    hpx/util/rolling_max.hpp => hpx/modules/statistics.hpp
+    hpx/util/rolling_min.hpp => hpx/modules/statistics.hpp
 )
+# cmake-format: on
 
 # Default location is $HPX_ROOT/libs/statistics/src
 set(statistics_sources)

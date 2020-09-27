@@ -20,17 +20,19 @@ set(async_combinators_headers
     hpx/async_combinators/when_some.hpp
 )
 
+# cmake-format: off
 set(async_combinators_compat_headers
-    hpx/lcos/split_future.hpp
-    hpx/lcos/wait_all.hpp
-    hpx/lcos/wait_any.hpp
-    hpx/lcos/wait_each.hpp
-    hpx/lcos/wait_some.hpp
-    hpx/lcos/when_all.hpp
-    hpx/lcos/when_any.hpp
-    hpx/lcos/when_each.hpp
-    hpx/lcos/when_some.hpp
+    hpx/lcos/split_future.hpp => hpx/future.hpp
+    hpx/lcos/wait_all.hpp => hpx/future.hpp
+    hpx/lcos/wait_any.hpp => hpx/future.hpp
+    hpx/lcos/wait_each.hpp => hpx/future.hpp
+    hpx/lcos/wait_some.hpp => hpx/future.hpp
+    hpx/lcos/when_all.hpp => hpx/future.hpp
+    hpx/lcos/when_any.hpp => hpx/future.hpp
+    hpx/lcos/when_each.hpp => hpx/future.hpp
+    hpx/lcos/when_some.hpp => hpx/future.hpp
 )
+# cmake-format: on
 
 include(HPX_AddModule)
 add_hpx_module(

@@ -10,10 +10,14 @@ set(concepts_headers hpx/concepts/concepts.hpp hpx/concepts/has_member_xxx.hpp
                      hpx/concepts/has_xxx.hpp
 )
 
+# cmake-format: off
 set(concepts_compat_headers
-    hpx/concepts.hpp hpx/traits/concepts.hpp hpx/traits/has_member_xxx.hpp
-    hpx/traits/has_xxx.hpp
+    hpx/concepts.hpp => hpx/modules/concepts.hpp
+    hpx/traits/concepts.hpp => hpx/modules/concepts.hpp
+    hpx/traits/has_member_xxx.hpp => hpx/modules/concepts.hpp
+    hpx/traits/has_xxx.hpp => hpx/modules/concepts.hpp
 )
+# cmake-format: on
 
 set(concepts_sources)
 

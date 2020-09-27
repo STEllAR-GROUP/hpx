@@ -24,19 +24,21 @@ set(cache_headers
 )
 
 # Default location is $HPX_ROOT/libs/cache/include_compatibility
+# cmake-format: off
 set(cache_compat_headers
-    hpx/util/cache/local_cache.hpp
-    hpx/util/cache/lru_cache.hpp
-    hpx/util/cache/entries/entry.hpp
-    hpx/util/cache/entries/fifo_entry.hpp
-    hpx/util/cache/entries/lfu_entry.hpp
-    hpx/util/cache/entries/lru_entry.hpp
-    hpx/util/cache/entries/size_entry.hpp
-    hpx/util/cache/policies/always.hpp
-    hpx/util/cache/statistics/local_full_statistics.hpp
-    hpx/util/cache/statistics/local_statistics.hpp
-    hpx/util/cache/statistics/no_statistics.hpp
+    hpx/util/cache/local_cache.hpp => hpx/modules/cache.hpp
+    hpx/util/cache/lru_cache.hpp => hpx/modules/cache.hpp
+    hpx/util/cache/entries/entry.hpp => hpx/modules/cache.hpp
+    hpx/util/cache/entries/fifo_entry.hpp => hpx/modules/cache.hpp
+    hpx/util/cache/entries/lfu_entry.hpp => hpx/modules/cache.hpp
+    hpx/util/cache/entries/lru_entry.hpp => hpx/modules/cache.hpp
+    hpx/util/cache/entries/size_entry.hpp => hpx/modules/cache.hpp
+    hpx/util/cache/policies/always.hpp => hpx/modules/cache.hpp
+    hpx/util/cache/statistics/local_full_statistics.hpp => hpx/modules/cache.hpp
+    hpx/util/cache/statistics/local_statistics.hpp => hpx/modules/cache.hpp
+    hpx/util/cache/statistics/no_statistics.hpp => hpx/modules/cache.hpp
 )
+# cmake-format: on
 
 # Default location is $HPX_ROOT/libs/cache/src
 set(cache_sources)

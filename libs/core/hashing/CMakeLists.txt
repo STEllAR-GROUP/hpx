@@ -8,9 +8,13 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 set(hashing_headers hpx/hashing/fibhash.hpp hpx/hashing/jenkins_hash.hpp)
 
-set(hashing_compat_headers hpx/hashing.hpp hpx/util/fibhash.hpp
-                           hpx/util/jenkins_hash.hpp
+# cmake-format: off
+set(hashing_compat_headers
+    hpx/hashing.hpp => hpx/modules/hashing.hpp
+    hpx/util/fibhash.hpp => hpx/modules/hashing.hpp
+    hpx/util/jenkins_hash.hpp => hpx/modules/hashing.hpp
 )
+# cmake-format: on
 
 set(hashing_sources)
 

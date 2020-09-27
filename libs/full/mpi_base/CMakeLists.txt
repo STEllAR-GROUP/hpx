@@ -21,9 +21,12 @@ endif()
 set(mpi_base_headers hpx/mpi_base/mpi.hpp hpx/mpi_base/mpi_environment.hpp)
 
 # Default location is $HPX_ROOT/libs/mpi_base/include_compatibility
-set(mpi_base_compat_headers hpx/plugins/parcelport/mpi/mpi.hpp
-                            hpx/plugins/parcelport/mpi/mpi_environment.hpp
+# cmake-format: off
+set(mpi_base_compat_headers
+    hpx/plugins/parcelport/mpi/mpi.hpp => hpx/modules/mpi_base.hpp
+    hpx/plugins/parcelport/mpi/mpi_environment.hpp => hpx/modules/mpi_base.hpp
 )
+# cmake-format: on
 
 set(mpi_base_sources mpi_environment.cpp)
 

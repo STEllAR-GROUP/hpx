@@ -15,11 +15,14 @@ set(timed_execution_headers
     hpx/timed_execution/traits/is_timed_executor.hpp
 )
 
+# cmake-format: off
 set(timed_execution_compat_headers
-    hpx/parallel/executors/timed_execution.hpp
-    hpx/parallel/executors/timed_execution_fwd.hpp
-    hpx/parallel/executors/timed_executors.hpp hpx/traits/is_timed_executor.hpp
+    hpx/parallel/executors/timed_execution.hpp => hpx/include/parallel_executors.hpp
+    hpx/parallel/executors/timed_execution_fwd.hpp => hpx/include/parallel_executors.hpp
+    hpx/parallel/executors/timed_executors.hpp => hpx/include/parallel_executors.hpp
+    hpx/traits/is_timed_executor.hpp => hpx/include/parallel_executors.hpp
 )
+# cmake-format: on
 
 include(HPX_AddModule)
 add_hpx_module(

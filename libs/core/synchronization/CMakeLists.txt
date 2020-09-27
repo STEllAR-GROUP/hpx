@@ -42,23 +42,25 @@ set(synchronization_headers
 )
 
 # Default location is $HPX_ROOT/libs/synchronization/include_compatibility
+# cmake-format: off
 set(synchronization_compat_headers
-    hpx/lcos/local/barrier.hpp
-    hpx/lcos/local/condition_variable.hpp
-    hpx/lcos/local/counting_semaphore.hpp
-    hpx/lcos/local/event.hpp
-    hpx/lcos/local/latch.hpp
-    hpx/lcos/local/mutex.hpp
-    hpx/lcos/local/no_mutex.hpp
-    hpx/lcos/local/once.hpp
-    hpx/lcos/local/recursive_mutex.hpp
-    hpx/lcos/local/shared_mutex.hpp
-    hpx/lcos/local/sliding_semaphore.hpp
-    hpx/lcos/local/spinlock.hpp
-    hpx/lcos/local/spinlock_no_backoff.hpp
-    hpx/lcos/local/spinlock_pool.hpp
-    hpx/synchronization.hpp
+    hpx/lcos/local/barrier.hpp => hpx/barrier.hpp
+    hpx/lcos/local/condition_variable.hpp => hpx/condition_variable.hpp
+    hpx/lcos/local/counting_semaphore.hpp => hpx/counting_semaphore.hpp
+    hpx/lcos/local/event.hpp => hpx/modules/synchronization.hpp
+    hpx/lcos/local/latch.hpp => hpx/latch.hpp
+    hpx/lcos/local/mutex.hpp => hpx/mutex.hpp
+    hpx/lcos/local/no_mutex.hpp => hpx/mutex.hpp
+    hpx/lcos/local/once.hpp => hpx/mutex.hpp
+    hpx/lcos/local/recursive_mutex.hpp => hpx/mutex.hpp
+    hpx/lcos/local/shared_mutex.hpp => hpx/shared_mutex.hpp
+    hpx/lcos/local/sliding_semaphore.hpp => hpx/modules/synchronization.hpp
+    hpx/lcos/local/spinlock.hpp => hpx/mutex.hpp
+    hpx/lcos/local/spinlock_no_backoff.hpp => hpx/modules/synchronization.hpp
+    hpx/lcos/local/spinlock_pool.hpp => hpx/modules/synchronization.hpp
+    hpx/synchronization.hpp => hpx/modules/synchronization.hpp
 )
+# cmake-format: on
 
 set(synchronization_sources
     detail/condition_variable.cpp detail/counting_semaphore.cpp

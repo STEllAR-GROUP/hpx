@@ -16,11 +16,16 @@ set(timing_headers
 )
 
 # Default location is $HPX_ROOT/libs/timing/include_compatibility
+# cmake-format: off
 set(timing_compat_headers
-    hpx/timing.hpp hpx/util/high_resolution_clock.hpp
-    hpx/util/high_resolution_timer.hpp hpx/util/scoped_timer.hpp
-    hpx/util/steady_clock.hpp hpx/util/tick_counter.hpp
+    hpx/timing.hpp => hpx/chrono.hpp
+    hpx/util/high_resolution_clock.hpp => hpx/chrono.hpp
+    hpx/util/high_resolution_timer.hpp => hpx/chrono.hpp
+    hpx/util/scoped_timer.hpp => hpx/chrono.hpp
+    hpx/util/steady_clock.hpp => hpx/chrono.hpp
+    hpx/util/tick_counter.hpp => hpx/modules/timing.hpp
 )
+# cmake-format: on
 
 # cmake will not create a separate VS project without any source files, thus
 # this adds a dummy (empty) source file to the target Default location is

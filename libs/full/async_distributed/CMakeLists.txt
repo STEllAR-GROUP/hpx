@@ -54,33 +54,35 @@ set(async_headers
     hpx/async_distributed/sync.hpp
 )
 
+# cmake-format: off
 set(async_compat_headers
-    hpx/apply.hpp
-    hpx/dataflow.hpp
-    hpx/lcos/async_callback_fwd.hpp
-    hpx/lcos/async_callback.hpp
-    hpx/lcos/async_continue_callback_fwd.hpp
-    hpx/lcos/async_continue_callback.hpp
-    hpx/lcos/async_continue_fwd.hpp
-    hpx/lcos/async_continue.hpp
-    hpx/lcos/async_fwd.hpp
-    hpx/lcos/async.hpp
-    hpx/lcos/dataflow.hpp
-    hpx/lcos/sync_fwd.hpp
-    hpx/lcos/sync.hpp
-    hpx/runtime/applier/applier.hpp
-    hpx/runtime/applier/apply_callback.hpp
-    hpx/runtime/applier/apply_continue_callback.hpp
-    hpx/runtime/applier/apply_continue_fwd.hpp
-    hpx/runtime/applier/apply_continue.hpp
-    hpx/runtime/applier/apply_helper.hpp
-    hpx/runtime/applier/apply.hpp
-    hpx/runtime/applier/bind_naming_wrappers.hpp
-    hpx/runtime/applier_fwd.hpp
-    hpx/runtime/applier/register_apply_colocated.hpp
-    hpx/runtime/applier/trigger.hpp
-    hpx/sync.hpp
+    hpx/apply.hpp => hpx/include/async.hpp
+    hpx/dataflow.hpp => hpx/include/async.hpp
+    hpx/lcos/async_callback_fwd.hpp => hpx/include/async.hpp
+    hpx/lcos/async_callback.hpp => hpx/include/async.hpp
+    hpx/lcos/async_continue_callback_fwd.hpp => hpx/include/async.hpp
+    hpx/lcos/async_continue_callback.hpp => hpx/include/async.hpp
+    hpx/lcos/async_continue_fwd.hpp => hpx/include/async.hpp
+    hpx/lcos/async_continue.hpp => hpx/include/async.hpp
+    hpx/lcos/async_fwd.hpp => hpx/include/async.hpp
+    hpx/lcos/async.hpp => hpx/include/async.hpp
+    hpx/lcos/dataflow.hpp => hpx/include/async.hpp
+    hpx/lcos/sync_fwd.hpp => hpx/include/async.hpp
+    hpx/lcos/sync.hpp => hpx/include/async.hpp
+    hpx/runtime/applier/applier.hpp => hpx/include/async.hpp
+    hpx/runtime/applier/apply_callback.hpp => hpx/include/async.hpp
+    hpx/runtime/applier/apply_continue_callback.hpp => hpx/include/async.hpp
+    hpx/runtime/applier/apply_continue_fwd.hpp => hpx/include/async.hpp
+    hpx/runtime/applier/apply_continue.hpp => hpx/include/async.hpp
+    hpx/runtime/applier/apply_helper.hpp => hpx/include/async.hpp
+    hpx/runtime/applier/apply.hpp => hpx/include/async.hpp
+    hpx/runtime/applier/bind_naming_wrappers.hpp => hpx/include/async.hpp
+    hpx/runtime/applier_fwd.hpp => hpx/include/async.hpp
+    hpx/runtime/applier/register_apply_colocated.hpp => hpx/include/async.hpp
+    hpx/runtime/applier/trigger.hpp => hpx/include/async.hpp
+    hpx/sync.hpp => hpx/include/async.hpp
 )
+# cmake-format: on
 
 include(HPX_AddModule)
 add_hpx_module(

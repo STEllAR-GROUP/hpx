@@ -13,9 +13,12 @@ set(command_line_handling_headers
     hpx/command_line_handling/parse_command_line.hpp
 )
 
-set(command_line_handling_compat_headers hpx/util/command_line_handling.hpp
-                                         hpx/util/parse_command_line.hpp
+# cmake-format: off
+set(command_line_handling_compat_headers
+    hpx/util/command_line_handling.hpp => hpx/modules/command_line_handling.hpp
+    hpx/util/parse_command_line.hpp => hpx/modules/command_line_handling.hpp
 )
+# cmake-format: on
 
 set(command_line_handling_sources command_line_handling.cpp
                                   parse_command_line.cpp

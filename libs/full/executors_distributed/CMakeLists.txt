@@ -16,9 +16,11 @@ set(executors_distributed_headers
     hpx/executors_distributed/distribution_policy_executor.hpp
 )
 
+# cmake-format: off
 set(executors_distributed_compat_headers
-    hpx/parallel/executors/distribution_policy_executor.hpp
+    hpx/parallel/executors/distribution_policy_executor.hpp => hpx/modules/executors_distributed.hpp
 )
+# cmake-format: on
 
 include(HPX_AddModule)
 add_hpx_module(

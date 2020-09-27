@@ -10,7 +10,11 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(prefix_headers hpx/prefix/find_prefix.hpp)
 
-set(prefix_compat_headers hpx/util/find_prefix.hpp)
+# cmake-format: off
+set(prefix_compat_headers
+    hpx/util/find_prefix.hpp => hpx/modules/prefix.hpp
+)
+# cmake-format: on
 
 set(prefix_sources find_prefix.cpp)
 
