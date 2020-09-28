@@ -9,7 +9,6 @@
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 

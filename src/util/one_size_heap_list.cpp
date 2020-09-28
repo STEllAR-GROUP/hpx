@@ -7,17 +7,17 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/state.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/functional/bind_front.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/state.hpp>
 #include <hpx/util/one_size_heap_list.hpp>
 #if defined(HPX_DEBUG)
 #include <hpx/modules/logging.hpp>
 #endif
-#include <hpx/threading_base/register_thread.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/threading_base/register_thread.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/util/wrapper_heap_base.hpp>
 
 #include <cstddef>
@@ -26,25 +26,19 @@
 #include <mutex>
 #include <string>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     one_size_heap_list::~one_size_heap_list() noexcept
     {
 #if defined(HPX_DEBUG)
         LOSH_(info) << hpx::util::format(
             "{1}::~{1}: size({2}), max_count({3}), alloc_count({4}), "
             "free_count({5})",
-            name(),
-            heap_count_,
-            max_alloc_count_,
-            alloc_count_,
-            free_count_);
+            name(), heap_count_, max_alloc_count_, alloc_count_, free_count_);
 
         if (alloc_count_ > free_count_)
         {
             LOSH_(warning) << hpx::util::format(
-                "{1}::~{1}: releasing with {2} allocated objects",
-                name(),
+                "{1}::~{1}: releasing with {2} allocated objects", name(),
                 alloc_count_ - free_count_);
         }
 #endif
@@ -57,9 +51,8 @@ namespace hpx { namespace util
         if (HPX_UNLIKELY(0 == count))
         {
             guard.unlock();
-            HPX_THROW_EXCEPTION(bad_parameter,
-                name() + "::alloc",
-                "cannot allocate 0 objects");
+            HPX_THROW_EXCEPTION(
+                bad_parameter, name() + "::alloc", "cannot allocate 0 objects");
         }
 
         //std::size_t size = 0;
@@ -68,7 +61,7 @@ namespace hpx { namespace util
             if (!heap_list_.empty())
             {
                 //size = heap_list_.size();
-                for (auto & heap : heap_list_)
+                for (auto& heap : heap_list_)
                 {
                     bool allocated = false;
 
@@ -83,7 +76,7 @@ namespace hpx { namespace util
                         // Allocation succeeded, update statistics.
                         alloc_count_ += count;
                         if (alloc_count_ - free_count_ > max_alloc_count_)
-                            max_alloc_count_ = alloc_count_- free_count_;
+                            max_alloc_count_ = alloc_count_ - free_count_;
 #endif
                         return p;
                     }
@@ -93,9 +86,7 @@ namespace hpx { namespace util
                         "{1}::alloc: failed to allocate from heap[{2}] "
                         "(heap[{2}] has allocated {3} objects and has "
                         "space for {4} more objects)",
-                        name(),
-                        heap->heap_count(),
-                        heap->size(),
+                        name(), heap->heap_count(), heap->size(),
                         heap->free_size());
 #endif
                 }
@@ -109,8 +100,8 @@ namespace hpx { namespace util
             heap_list_.push_front(create_heap_(
                 class_name_.c_str(), heap_count_ + 1, parameters_));
 #else
-            heap_list_.push_front(create_heap_(
-                class_name_.c_str(), 0, parameters_));
+            heap_list_.push_front(
+                create_heap_(class_name_.c_str(), 0, parameters_));
 #endif
 
             iterator itnew = heap_list_.begin();
@@ -119,18 +110,16 @@ namespace hpx { namespace util
 
             {
                 util::unlock_guard<unique_lock_type> ul(guard);
-                result = heap->alloc((void**)&p, count);
+                result = heap->alloc((void**) &p, count);
             }
 
             if (HPX_UNLIKELY(!result || nullptr == p))
             {
                 // out of memory
                 guard.unlock();
-                HPX_THROW_EXCEPTION(out_of_memory,
-                    name() + "::alloc",
+                HPX_THROW_EXCEPTION(out_of_memory, name() + "::alloc",
                     hpx::util::format(
-                        "new heap failed to allocate {1} objects",
-                        count));
+                        "new heap failed to allocate {1} objects", count));
             }
 
 #if defined(HPX_DEBUG)
@@ -138,10 +127,8 @@ namespace hpx { namespace util
             ++heap_count_;
 
             LOSH_(info) << hpx::util::format(
-                "{1}::alloc: creating new heap[{2}], size is now {3}",
-                name(),
-                heap_count_,
-                heap_list_.size());
+                "{1}::alloc: creating new heap[{2}], size is now {3}", name(),
+                heap_count_, heap_list_.size());
 #endif
             did_create = true;
         }
@@ -163,7 +150,7 @@ namespace hpx { namespace util
                 hpx::threads::make_thread_function_nullary(util::bind_front(
                     &one_size_heap_list::free, this, p, count)),
                 "one_size_heap_list::free");
-                hpx::threads::register_work(data);
+            hpx::threads::register_work(data);
             return true;
         }
         return false;
@@ -182,7 +169,7 @@ namespace hpx { namespace util
             return;
 
         // Find the heap which allocated this pointer.
-        for (auto & heap : heap_list_)
+        for (auto& heap : heap_list_)
         {
             bool did_allocate = false;
 
@@ -204,11 +191,9 @@ namespace hpx { namespace util
 
         ul.unlock();
 
-        HPX_THROW_EXCEPTION(bad_parameter,
-            name() + "::free",
+        HPX_THROW_EXCEPTION(bad_parameter, name() + "::free",
             hpx::util::format(
-                "pointer {1} was not allocated by this {2}",
-                p, name()));
+                "pointer {1} was not allocated by this {2}", p, name()));
     }
 
     bool one_size_heap_list::did_alloc(void* p) const
@@ -235,4 +220,4 @@ namespace hpx { namespace util
             return std::string("one_size_heap_list(unknown)");
         return std::string("one_size_heap_list(") + class_name_ + ")";
     }
-}}
+}}    // namespace hpx::util

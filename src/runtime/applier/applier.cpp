@@ -11,10 +11,10 @@
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/modules/threadmanager.hpp>
-#include <hpx/util/thread_description.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
+#include <hpx/threading_base/thread_description.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
