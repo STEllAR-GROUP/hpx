@@ -110,17 +110,10 @@ function(add_hpx_module libname modulename)
   if(${_have_compatibility_headers_option}
      AND HPX_${modulename_upper}_WITH_COMPATIBILITY_HEADERS
   )
-    set(COMPAT_HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include_compatibility")
+    set(COMPAT_HEADER_ROOT "${CMAKE_CURRENT_BINARY_DIR}/include_compatibility")
+    file(MAKE_DIRECTORY ${COMPAT_HEADER_ROOT})
     hpx_debug(
       "Add module ${modulename}: COMPAT_HEADER_ROOT: ${COMPAT_HEADER_ROOT}"
-    )
-
-    set(COMPAT_HEADER_BINARY_ROOT
-        "${CMAKE_CURRENT_BINARY_DIR}/include_compatibility"
-    )
-    file(MAKE_DIRECTORY ${COMPAT_HEADER_BINARY_ROOT})
-    hpx_debug(
-      "Add module ${modulename}: COMPAT_HEADER_BINARY_ROOT: ${COMPAT_HEADER_BINARY_ROOT}"
     )
   endif()
 
@@ -146,22 +139,17 @@ function(add_hpx_module libname modulename)
     foreach(compat_header IN LISTS ${modulename}_COMPAT_HEADERS)
       string(REPLACE "=>" ";" compat_header "${compat_header}")
       list(LENGTH compat_header compat_header_length)
-
-      list(GET compat_header 0 old_header)
-      if(compat_header_length EQUAL 1)
-        list(APPEND compat_headers "${COMPAT_HEADER_ROOT}/${old_header}")
-      elseif(compat_header_length EQUAL 2)
-        list(GET compat_header 1 new_header)
-        configure_file(
-          "${PROJECT_SOURCE_DIR}/cmake/templates/compatibility_header.hpp.in"
-          "${COMPAT_HEADER_BINARY_ROOT}/${old_header}"
-        )
-        list(APPEND generated_compat_headers
-             "${COMPAT_HEADER_BINARY_ROOT}/${old_header}"
-        )
-      else()
+      if(NOT compat_header_length EQUAL 2)
         message(FATAL_ERROR "Invalid compatibility header ${compat_header}")
       endif()
+
+      list(GET compat_header 0 old_header)
+      list(GET compat_header 1 new_header)
+      configure_file(
+        "${PROJECT_SOURCE_DIR}/cmake/templates/compatibility_header.hpp.in"
+        "${COMPAT_HEADER_ROOT}/${old_header}"
+      )
+      list(APPEND compat_headers "${COMPAT_HEADER_ROOT}/${old_header}")
     endforeach()
   endif()
 
@@ -235,7 +223,7 @@ function(add_hpx_module libname modulename)
     cuda_add_library(
       hpx_${modulename} STATIC
       ${sources} ${config_entries_source} ${${modulename}_OBJECTS}
-      ${headers} ${generated_headers} ${compat_headers} ${generated_compat_headers}
+      ${headers} ${generated_headers} ${compat_headers}
     )
     # cmake-format: on
   else()
@@ -243,7 +231,7 @@ function(add_hpx_module libname modulename)
     add_library(
       hpx_${modulename} STATIC
       ${sources} ${config_entries_source} ${${modulename}_OBJECTS}
-      ${headers} ${generated_headers} ${compat_headers} ${generated_compat_headers}
+      ${headers} ${generated_headers} ${compat_headers}
     )
     # cmake-format: on
   endif()
@@ -276,13 +264,8 @@ function(add_hpx_module libname modulename)
   if(${_have_compatibility_headers_option}
      AND HPX_${modulename_upper}_WITH_COMPATIBILITY_HEADERS
   )
-    if(EXISTS ${COMPAT_HEADER_ROOT})
-      target_include_directories(
-        hpx_${modulename} PUBLIC $<BUILD_INTERFACE:${COMPAT_HEADER_ROOT}>
-      )
-    endif()
     target_include_directories(
-      hpx_${modulename} PUBLIC $<BUILD_INTERFACE:${COMPAT_HEADER_BINARY_ROOT}>
+      hpx_${modulename} PUBLIC $<BUILD_INTERFACE:${COMPAT_HEADER_ROOT}>
     )
   endif()
 
@@ -313,15 +296,9 @@ function(add_hpx_module libname modulename)
   )
     add_hpx_source_group(
       NAME hpx_${modulename}
-      ROOT ${COMPAT_HEADER_ROOT}/hpx
-      CLASS "Compatibility Header Files"
-      TARGETS ${compat_headers}
-    )
-    add_hpx_source_group(
-      NAME hpx_${modulename}
       ROOT ${COMPAT_HEADER_BINARY_ROOT}/hpx
       CLASS "Generated Files"
-      TARGETS ${generated_compat_headers}
+      TARGETS ${compat_headers}
     )
   endif()
 
@@ -386,15 +363,8 @@ function(add_hpx_module libname modulename)
   if(${_have_compatibility_headers_option}
      AND HPX_${modulename_upper}_WITH_COMPATIBILITY_HEADERS
   )
-    if(EXISTS ${COMPAT_HEADER_ROOT})
-      install(
-        DIRECTORY ${COMPAT_HEADER_ROOT}/hpx
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-        COMPONENT ${modulename}
-      )
-    endif()
     install(
-      DIRECTORY ${COMPAT_HEADER_BINARY_ROOT}/hpx
+      DIRECTORY ${COMPAT_HEADER_ROOT}/hpx
       DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
       COMPONENT ${modulename}
     )
