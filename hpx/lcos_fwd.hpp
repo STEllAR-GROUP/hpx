@@ -15,24 +15,24 @@
 
 #include <vector>
 
-namespace hpx
-{
+namespace hpx {
     /// \namespace lcos
-    namespace lcos
-    {
+    namespace lcos {
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         class HPX_EXPORT base_lco;
 
-        template <typename Result, typename RemoteResult =
-            typename traits::promise_remote_result<Result>::type,
+        template <typename Result,
+            typename RemoteResult =
+                typename traits::promise_remote_result<Result>::type,
             typename ComponentType = traits::detail::managed_component_tag>
         class base_lco_with_value;
 
         template <typename ComponentType>
         class base_lco_with_value<void, void, ComponentType>;
 
-        template <typename Result, typename RemoteResult =
-            typename traits::promise_remote_result<Result>::type>
+        template <typename Result,
+            typename RemoteResult =
+                typename traits::promise_remote_result<Result>::type>
         class promise;
 
         template <typename Action,
@@ -44,21 +44,19 @@ namespace hpx
         template <typename ValueType>
         struct object_semaphore;
 
-        namespace server
-        {
+        namespace server {
             template <typename ValueType>
             struct object_semaphore;
         }
 #endif
 
-        namespace local
-        {
+        namespace local {
             class barrier;
 
             template <typename R>
             class promise;
-        }
-    }
+        }    // namespace local
+    }        // namespace lcos
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) &&                                   \
     defined(HPX_HAVE_PROMISE_ALIAS_COMPATIBLILITY)
@@ -71,5 +69,4 @@ namespace hpx
         "hpx::promise will refer to the local-only promise in the future.") =
         lcos::promise<Result, RemoteResult>;
 #endif
-}
-
+}    // namespace hpx
