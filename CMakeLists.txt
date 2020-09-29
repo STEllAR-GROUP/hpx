@@ -66,8 +66,8 @@ endif()
 # ##############################################################################
 set(HPX_VERSION_MAJOR 1)
 set(HPX_VERSION_MINOR 5)
-set(HPX_VERSION_SUBMINOR 0)
-set(HPX_VERSION_DATE 20200902)
+set(HPX_VERSION_SUBMINOR 1)
+set(HPX_VERSION_DATE 20200930)
 set(HPX_VERSION_TAG "")
 
 set(HPX_VERSION
