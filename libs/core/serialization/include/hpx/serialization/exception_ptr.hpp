@@ -7,10 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/functional.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <exception>
+#include <functional>
 
 namespace hpx { namespace util {
     enum exception_type
@@ -47,10 +47,10 @@ namespace hpx { namespace util {
 namespace hpx { namespace serialization {
     namespace detail {
         using save_custom_exception_handler_type =
-            util::function_nonser<void(hpx::serialization::output_archive&,
+            std::function<void(hpx::serialization::output_archive&,
                 std::exception_ptr const&, unsigned int)>;
         using load_custom_exception_handler_type =
-            util::function_nonser<void(hpx::serialization::input_archive&,
+            std::function<void(hpx::serialization::input_archive&,
                 std::exception_ptr&, unsigned int)>;
 
         HPX_CORE_EXPORT void set_save_custom_exception_handler(
