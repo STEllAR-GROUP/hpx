@@ -53,7 +53,7 @@ echo "Closed issues"
 echo "============="
 
 if [[ "$1" = "--limit" ]]; then
-    hub issue --limit 15 --state=closed --milestone="${VERSION_MILESTONE_ID}" --format="* :hpx-issue:\`%I\` - %t%n"
+    hub issue --limit 50 --state=closed --milestone="${VERSION_MILESTONE_ID}" --format="* :hpx-issue:\`%I\` - %t%n"
 else
     hub issue --state=closed --milestone="${VERSION_MILESTONE_ID}" --format="* :hpx-issue:\`%I\` - %t%n"
 fi
@@ -67,7 +67,7 @@ echo "===================="
 # a milestone, filter out the unwanted PRs, and remove the printed milestone
 # from every PR instead.
 if [[ "$1" = "--limit" ]]; then
-    hub pr list --limit 15 --state=closed --format="[%Mn]* :hpx-pr:\`%I\` - %t%n" |
+    hub pr list --limit 50 --state=closed --format="[%Mn]* :hpx-pr:\`%I\` - %t%n" |
     sed -n "s/^\[${VERSION_MILESTONE_ID}\]\(.*\)/\1/p"
 else
     hub pr list  --state=closed --format="[%Mn]* :hpx-pr:\`%I\` - %t%n" |
