@@ -36,7 +36,7 @@ set(datastructures_headers
 
 # cmake-format: off
 set(datastructures_compat_headers
-    hpx/datastructures.hpp => hpx/modules/util.hpp
+    hpx/datastructures.hpp => hpx/modules/datastructures.hpp
     hpx/traits/supports_streaming_with_any.hpp => hpx/modules/datastructures.hpp
     hpx/traits/is_tuple_like.hpp => hpx/modules/datastructures.hpp
     hpx/util/any.hpp => hpx/any.hpp
