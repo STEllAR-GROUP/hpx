@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
+//  Copyright (c)      2020 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -268,12 +269,18 @@ namespace hpx { namespace traits
         {
             return "100";
         }
+
         static void init(int *argc, char ***argv, util::command_line_handling &cfg)
         {
             util::mpi_environment::init(argc, argv, cfg.rtcfg_);
             cfg.num_localities_ =
                 static_cast<std::size_t>(util::mpi_environment::size());
             cfg.node_ = static_cast<std::size_t>(util::mpi_environment::rank());
+        }
+
+        static void destroy()
+        {
+            util::mpi_environment::finalize();
         }
 
         static char const* call()

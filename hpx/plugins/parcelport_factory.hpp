@@ -1,5 +1,6 @@
 //  Copyright (c)      2014 Thomas Heller
 //  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c)      2020 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -66,8 +67,9 @@ namespace hpx { namespace plugins
             factories.push_back(this);
         }
 
-        ///
-        ~parcelport_factory() override = default;
+        ~parcelport_factory() override {
+            traits::plugin_config_data<Parcelport>::destroy();
+        }
 
         void get_plugin_info(std::vector<std::string> & fillini) override
         {

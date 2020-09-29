@@ -262,6 +262,9 @@ struct plugin_config_data<hpx::parcelset::policies::libfabric::parcelport> {
         FUNC_END_DEBUG_MSG;
     }
 
+    static void destroy()
+    {}
+
     static char const* call()
     {
         FUNC_START_DEBUG_MSG;
