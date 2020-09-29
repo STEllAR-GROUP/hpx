@@ -232,7 +232,8 @@ namespace hpx { namespace util {
         {
             int is_finalized = 0;
             MPI_Finalized(&is_finalized);
-            if (!is_finalized) {
+            if (!is_finalized)
+            {
                 MPI_Finalize();
             }
         }
