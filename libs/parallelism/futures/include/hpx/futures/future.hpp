@@ -25,8 +25,10 @@
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/modules/serialization.hpp>
+#include <hpx/serialization/detail/non_default_constructible.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
+#include <hpx/serialization/exception_ptr.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/type_support/decay.hpp>
 
