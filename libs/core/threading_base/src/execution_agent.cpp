@@ -95,13 +95,13 @@ namespace hpx { namespace threads {
     }
 
     void execution_agent::sleep_for(
-        hpx::util::steady_duration const& sleep_duration, const char* desc)
+        hpx::chrono::steady_duration const& sleep_duration, const char* desc)
     {
         sleep_until(sleep_duration.from_now(), desc);
     }
 
     void execution_agent::sleep_until(
-        hpx::util::steady_time_point const& sleep_time, const char* desc)
+        hpx::chrono::steady_time_point const& sleep_time, const char* desc)
     {
         auto now = std::chrono::steady_clock::now();
 

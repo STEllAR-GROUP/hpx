@@ -958,7 +958,7 @@ namespace hpx {
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
 
         {
-            hpx::util::high_resolution_timer t;
+            hpx::chrono::high_resolution_timer t;
             double start_time = t.elapsed();
             double current = 0.0;
             do
@@ -1010,7 +1010,7 @@ namespace hpx {
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
 
         {
-            hpx::util::high_resolution_timer t;
+            hpx::chrono::high_resolution_timer t;
             double start_time = t.elapsed();
             double current = 0.0;
             do

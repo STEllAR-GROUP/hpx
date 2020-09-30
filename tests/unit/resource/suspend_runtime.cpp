@@ -34,7 +34,7 @@ void test_scheduler(
     hpx::start(nullptr, argc, argv, init_args);
     hpx::suspend();
 
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
 
     while (t.elapsed() < 2)
     {

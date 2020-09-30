@@ -50,7 +50,7 @@ using hpx::async;
 using hpx::future;
 using hpx::lcos::wait_each;
 
-using hpx::util::high_resolution_timer;
+using hpx::chrono::high_resolution_timer;
 
 // global vars we stick here to make printouts easy for plotting
 static std::string queuing = "default";
@@ -276,8 +276,8 @@ void measure_function_futures_limiting_executor(
     {
         hpx::execution::experimental::limiting_executor<Executor> signal_exec(
             exec, tasks, tasks + 1000);
-        hpx::for_loop(hpx::execution::par.with(fixed), 0, count,
-            [&](std::uint64_t) {
+        hpx::for_loop(
+            hpx::execution::par.with(fixed), 0, count, [&](std::uint64_t) {
                 hpx::apply(signal_exec, [&]() {
                     null_function();
                     sanity_check--;
@@ -343,9 +343,9 @@ void measure_function_futures_for_loop(std::uint64_t count, bool csv,
 {
     // start the clock
     high_resolution_timer walltime;
-    hpx::for_loop(hpx::execution::par.on(exec).with(
-                      hpx::execution::static_chunk_size(1),
-                      unlimited_number_of_chunks()),
+    hpx::for_loop(
+        hpx::execution::par.on(exec).with(
+            hpx::execution::static_chunk_size(1), unlimited_number_of_chunks()),
         0, count, [](std::uint64_t) { null_function(); });
 
     // stop the clock
@@ -546,7 +546,7 @@ int hpx_main(variables_map& vm)
 
         hpx::execution::parallel_executor par;
         hpx::parallel::execution::parallel_executor_aggregated par_agg;
-        hpx::parallel::execution::parallel_executor par_nostack(
+        hpx::execution::parallel_executor par_nostack(
             hpx::threads::thread_priority_default,
             hpx::threads::thread_stacksize_nostack);
 

@@ -49,7 +49,7 @@ std::uint64_t foreach_vector(Policy&& policy, Vector const& v)
 {
     typedef typename Vector::value_type value_type;
 
-    std::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i != test_count; ++i)
     {
@@ -57,7 +57,7 @@ std::uint64_t foreach_vector(Policy&& policy, Vector const& v)
             std::forward<Policy>(policy), v, wait_op<Vector>());
     }
 
-    return (hpx::util::high_resolution_clock::now() - start) / test_count;
+    return (hpx::chrono::high_resolution_clock::now() - start) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

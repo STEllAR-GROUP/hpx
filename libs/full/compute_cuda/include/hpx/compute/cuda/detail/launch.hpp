@@ -132,8 +132,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
     {
         typedef closure<F, Ts...> closure_type;
         launch_helper<closure_type>::call(t, grid_dim, block_dim,
-            std::forward<F>(f),
-            util::forward_as_tuple(std::forward<Ts>(vs)...));
+            std::forward<F>(f), hpx::forward_as_tuple(std::forward<Ts>(vs)...));
     }
 }}}}    // namespace hpx::cuda::experimental::detail
 

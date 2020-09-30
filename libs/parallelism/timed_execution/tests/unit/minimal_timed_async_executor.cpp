@@ -177,7 +177,7 @@ struct test_timed_async_executor1 : test_async_executor1
     static hpx::future<
         typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
     async_execute_at(
-        hpx::util::steady_time_point const& abs_time, F&& f, Ts&&... ts)
+        hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         ++count_async_at;
         hpx::this_thread::sleep_until(abs_time);
@@ -216,7 +216,7 @@ struct test_timed_async_executor3 : test_timed_async_executor2
     template <typename F, typename... Ts>
     static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     sync_execute_at(
-        hpx::util::steady_time_point const& abs_time, F&& f, Ts&&... ts)
+        hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         ++count_sync_at;
         hpx::this_thread::sleep_until(abs_time);
@@ -252,7 +252,7 @@ struct test_timed_async_executor5 : test_timed_async_executor4
 {
     template <typename F, typename... Ts>
     static void post_at(
-        hpx::util::steady_time_point const& abs_time, F&& f, Ts&&... ts)
+        hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         ++count_apply_at;
         hpx::this_thread::sleep_until(abs_time);

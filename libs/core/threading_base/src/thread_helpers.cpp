@@ -51,7 +51,7 @@ namespace hpx { namespace threads {
 
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type set_thread_state(thread_id_type const& id,
-        util::steady_time_point const& abs_time,
+        hpx::chrono::steady_time_point const& abs_time,
         std::atomic<bool>* timer_started, thread_state_enum state,
         thread_state_ex_enum stateex, thread_priority priority,
         bool retry_on_active, error_code& ec)
@@ -492,7 +492,7 @@ namespace hpx { namespace this_thread {
     }
 
     threads::thread_state_ex_enum suspend(
-        util::steady_time_point const& abs_time,
+        hpx::chrono::steady_time_point const& abs_time,
         threads::thread_id_type const& nextid,
         util::thread_description const& description, error_code& ec)
     {

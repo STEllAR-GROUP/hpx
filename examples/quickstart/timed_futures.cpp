@@ -19,7 +19,7 @@ void wake_up_after_2_seconds()
 {
     hpx::cout << "waiting for 2 seconds\n";
 
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
 
     // Schedule a wakeup after 2 seconds.
     using std::chrono::seconds;
@@ -38,7 +38,7 @@ int return_int_at_time()
 {
     hpx::cout << "generating an 'int' value 2 seconds from now\n";
 
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
 
     // Schedule a wakeup 2 seconds from now.
     using namespace std::chrono;

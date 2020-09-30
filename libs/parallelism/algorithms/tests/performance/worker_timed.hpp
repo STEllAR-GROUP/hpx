@@ -18,12 +18,12 @@ inline void worker_timed(std::uint64_t delay_ns)
     if (delay_ns == 0)
         return;
 
-    std::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
     while (true)
     {
         // Check if we've reached the specified delay.
-        if ((hpx::util::high_resolution_clock::now() - start) >= delay_ns)
+        if ((hpx::chrono::high_resolution_clock::now() - start) >= delay_ns)
             break;
     }
 }

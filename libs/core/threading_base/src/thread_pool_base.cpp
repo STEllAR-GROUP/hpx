@@ -94,14 +94,14 @@ namespace hpx { namespace threads {
     {
         // scale timestamps to nanoseconds
         std::uint64_t base_timestamp = util::hardware::timestamp();
-        std::uint64_t base_time = util::high_resolution_clock::now();
+        std::uint64_t base_time = hpx::chrono::high_resolution_clock::now();
         std::uint64_t curr_timestamp = util::hardware::timestamp();
-        std::uint64_t curr_time = util::high_resolution_clock::now();
+        std::uint64_t curr_time = hpx::chrono::high_resolution_clock::now();
 
         while ((curr_time - base_time) <= 100000)
         {
             curr_timestamp = util::hardware::timestamp();
-            curr_time = util::high_resolution_clock::now();
+            curr_time = hpx::chrono::high_resolution_clock::now();
         }
 
         if (curr_timestamp - base_timestamp != 0)

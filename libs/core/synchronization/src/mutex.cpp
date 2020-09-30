@@ -121,8 +121,9 @@ namespace hpx { namespace lcos { namespace local {
 
     timed_mutex::~timed_mutex() {}
 
-    bool timed_mutex::try_lock_until(util::steady_time_point const& abs_time,
-        char const* description, error_code& ec)
+    bool timed_mutex::try_lock_until(
+        hpx::chrono::steady_time_point const& abs_time, char const* description,
+        error_code& ec)
     {
         HPX_ASSERT(threads::get_self_ptr() != nullptr);
 

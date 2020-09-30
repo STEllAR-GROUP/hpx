@@ -120,7 +120,7 @@ namespace hpx { namespace plugins { namespace parcel
             reset_num_parcels_per_message_parcels_(0),
         num_messages_(0), reset_num_messages_(0),
             reset_num_parcels_per_message_messages_(0),
-        started_at_(util::high_resolution_clock::now()),
+        started_at_(hpx::chrono::high_resolution_clock::now()),
         reset_time_num_parcels_(0),
         last_parcel_time_(started_at_),
         histogram_min_boundary_(-1),
@@ -155,7 +155,7 @@ namespace hpx { namespace plugins { namespace parcel
         ++num_parcels_;
 
         // get time since last parcel
-        std::int64_t parcel_time = util::high_resolution_clock::now();
+        std::int64_t parcel_time = hpx::chrono::high_resolution_clock::now();
         std::int64_t time_since_last_parcel = parcel_time - last_parcel_time_;
         last_parcel_time_ = parcel_time;
 
@@ -285,7 +285,7 @@ namespace hpx { namespace plugins { namespace parcel
     coalescing_message_handler::get_average_time_between_parcels(bool reset)
     {
         std::lock_guard<mutex_type> l(mtx_);
-        std::int64_t now = util::high_resolution_clock::now();
+        std::int64_t now = hpx::chrono::high_resolution_clock::now();
         if (num_parcels_ == 0)
         {
             if (reset) started_at_ = now;
@@ -414,7 +414,7 @@ namespace hpx { namespace plugins { namespace parcel
             hpx::util::tag::histogram::num_bins = double(num_buckets),
             hpx::util::tag::histogram::min_range = double(min_boundary),
             hpx::util::tag::histogram::max_range = double(max_boundary)));
-        last_parcel_time_ = util::high_resolution_clock::now();
+        last_parcel_time_ = hpx::chrono::high_resolution_clock::now();
 
         result = util::bind_front(&coalescing_message_handler::
             get_time_between_parcels_histogram, this);

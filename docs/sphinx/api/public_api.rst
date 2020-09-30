@@ -139,17 +139,18 @@ Corresponds to the C++ standard library header :cppreference-header:`any`.
 Classes
 -------
 
-- :cpp:type:`hpx::util::any`
-- :cpp:type:`hpx::util::any_nonser`
-- :cpp:type:`hpx::util::bad_any_cast`
-- :cpp:type:`hpx::util::unique_any_nonser`
+- :cpp:type:`hpx::any`
+- :cpp:type:`hpx::any_nonser`
+- :cpp:type:`hpx::bad_any_cast`
+- :cpp:type:`hpx::unique_any_nonser`
 
 Functions
 ---------
 
-- :cpp:func:`hpx::util::make_any`
-- :cpp:func:`hpx::util::make_any_nonser`
-- :cpp:func:`hpx::util::make_unique_any_nonser`
+- :cpp:func:`hpx::any_cast`
+- :cpp:func:`hpx::make_any`
+- :cpp:func:`hpx::make_any_nonser`
+- :cpp:func:`hpx::make_unique_any_nonser`
 
 Header ``hpx/assert.hpp``
 =========================

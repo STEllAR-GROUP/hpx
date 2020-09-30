@@ -368,7 +368,7 @@ namespace hpx { namespace lcos {
 
         std::size_t lazy_values_size = lazy_values_.size();
         hpx::intrusive_ptr<frame_type> p(
-            new frame_type(util::forward_as_tuple(std::move(lazy_values_)),
+            new frame_type(hpx::forward_as_tuple(std::move(lazy_values_)),
                 std::forward<F>(func), lazy_values_size));
 
         p->do_await();

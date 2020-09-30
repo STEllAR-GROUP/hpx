@@ -394,8 +394,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename RndIter, typename Sent, typename Comp,
                 typename Proj>
             static typename util::detail::algorithm_result<
-                execution::parallel_task_policy, RndIter>::type
-            parallel(execution::parallel_task_policy policy, RndIter first,
+                hpx::execution::parallel_task_policy, RndIter>::type
+            parallel(hpx::execution::parallel_task_policy policy, RndIter first,
                 Sent last, Comp&& comp, Proj&& proj)
             {
                 return execution::async_execute(policy.executor(),
@@ -494,7 +494,7 @@ namespace hpx {
                 "Requires random access iterator.");
 
             hpx::parallel::v1::detail::make_heap<RndIter>().call(
-                hpx::parallel::execution::seq, std::true_type{}, first, last,
+                hpx::execution::seq, std::true_type{}, first, last,
                 std::forward<Comp>(comp),
                 hpx::parallel::util::projection_identity{});
         }
@@ -515,7 +515,7 @@ namespace hpx {
                 typename std::iterator_traits<RndIter>::value_type;
 
             hpx::parallel::v1::detail::make_heap<RndIter>().call(
-                hpx::parallel::execution::seq, std::true_type{}, first, last,
+                hpx::execution::seq, std::true_type{}, first, last,
                 std::less<value_type>(),
                 hpx::parallel::util::projection_identity{});
         }

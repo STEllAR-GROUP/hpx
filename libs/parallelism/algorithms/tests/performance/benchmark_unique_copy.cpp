@@ -50,14 +50,14 @@ template <typename InIter, typename OutIter>
 double run_unique_copy_benchmark_std(
     int test_count, InIter first, InIter last, OutIter dest)
 {
-    std::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < test_count; ++i)
     {
         std::unique_copy(first, last, dest);
     }
 
-    time = hpx::util::high_resolution_clock::now() - time;
+    time = hpx::chrono::high_resolution_clock::now() - time;
 
     return (time * 1e-9) / test_count;
 }
@@ -67,14 +67,14 @@ template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
 double run_unique_copy_benchmark_hpx(int test_count, ExPolicy policy,
     FwdIter1 first, FwdIter1 last, FwdIter2 dest)
 {
-    std::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < test_count; ++i)
     {
         hpx::parallel::unique_copy(policy, first, last, dest);
     }
 
-    time = hpx::util::high_resolution_clock::now() - time;
+    time = hpx::chrono::high_resolution_clock::now() - time;
 
     return (time * 1e-9) / test_count;
 }
@@ -98,8 +98,7 @@ void run_benchmark(std::size_t vector_size, int test_count,
 
     // initialize data
     using namespace hpx::execution;
-    hpx::parallel::generate(
-        par, std::begin(v), std::end(v), random_fill(random_range));
+    hpx::generate(par, std::begin(v), std::end(v), random_fill(random_range));
 
     auto dest_dist =
         std::distance(std::begin(result), std::unique_copy(first, last, dest));

@@ -59,13 +59,9 @@ set(tests
     foreach
     foreach_executors
     foreach_prefetching
-    foreach_projection
     foreachn
     foreachn_exception
     foreachn_bad_alloc
-    foreachn_projection
-    foreachn_projection_exception
-    foreachn_projection_bad_alloc
     for_loop
     for_loop_exception
     for_loop_induction

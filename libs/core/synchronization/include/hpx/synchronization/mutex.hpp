@@ -86,23 +86,23 @@ namespace hpx { namespace lcos { namespace local {
         using mutex::unlock;
 
         HPX_CORE_EXPORT bool try_lock_until(
-            util::steady_time_point const& abs_time, char const* description,
-            error_code& ec = throws);
+            hpx::chrono::steady_time_point const& abs_time,
+            char const* description, error_code& ec = throws);
 
-        bool try_lock_until(
-            util::steady_time_point const& abs_time, error_code& ec = throws)
+        bool try_lock_until(hpx::chrono::steady_time_point const& abs_time,
+            error_code& ec = throws)
         {
             return try_lock_until(abs_time, "mutex::try_lock_until", ec);
         }
 
-        bool try_lock_for(util::steady_duration const& rel_time,
+        bool try_lock_for(hpx::chrono::steady_duration const& rel_time,
             char const* description, error_code& ec = throws)
         {
             return try_lock_until(rel_time.from_now(), description, ec);
         }
 
-        bool try_lock_for(
-            util::steady_duration const& rel_time, error_code& ec = throws)
+        bool try_lock_for(hpx::chrono::steady_duration const& rel_time,
+            error_code& ec = throws)
         {
             return try_lock_for(rel_time, "mutex::try_lock_for", ec);
         }

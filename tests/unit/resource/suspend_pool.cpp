@@ -52,7 +52,7 @@ int hpx_main(int argc, char* argv[])
 
     {
         // Suspend and resume pool with future
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         while (t.elapsed() < 1)
         {
@@ -75,7 +75,7 @@ int hpx_main(int argc, char* argv[])
     {
         // Suspend and resume pool with callback
         hpx::lcos::local::counting_semaphore sem;
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         while (t.elapsed() < 1)
         {
@@ -103,7 +103,7 @@ int hpx_main(int argc, char* argv[])
 
     {
         // Suspend pool with some threads already suspended
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         while (t.elapsed() < 1)
         {

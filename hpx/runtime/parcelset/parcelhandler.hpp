@@ -244,7 +244,7 @@ namespace hpx { namespace parcelset
 
         double get_current_time() const
         {
-            return util::high_resolution_timer::now();
+            return hpx::chrono::high_resolution_timer::now();
         }
 
         /// \brief Factory function used in serialization to create a given

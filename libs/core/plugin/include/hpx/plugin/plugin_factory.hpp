@@ -48,8 +48,7 @@ namespace hpx { namespace util { namespace plugin {
             if (it != e.end())
             {
                 abstract_factory<BasePlugin>** xw =
-                    hpx::util::any_cast<abstract_factory<BasePlugin>*>(
-                        &(*it).second);
+                    hpx::any_cast<abstract_factory<BasePlugin>*>(&(*it).second);
 
                 if (!xw)
                 {

@@ -509,7 +509,7 @@ void test_write(
     //
     DEBUG_OUTPUT(1, "Passed Barrier at start of write on rank " << rank);
     //
-    hpx::util::high_resolution_timer timerWrite;
+    hpx::chrono::high_resolution_timer timerWrite;
     hpx::util::simple_profiler level1("Write function", rank==0 && !options.warmup);
     //
     bool active = (rank==0) || (rank>0 && options.all2all);
@@ -735,7 +735,7 @@ void test_read(
     // this is mostly the same as the put loop, except that the received future
     // is not an int, but a transfer buffer which we have to copy out of.
     //
-    hpx::util::high_resolution_timer timerRead;
+    hpx::chrono::high_resolution_timer timerRead;
     //
     if (rank==0) std::cout << "Iteration ";
     bool active = (rank==0) || (rank>0 && options.all2all);
@@ -770,7 +770,7 @@ void test_read(
         //
         //
         for (uint64_t i = 0; i < num_transfer_slots; i++) {
-            hpx::util::high_resolution_timer looptimer;
+            hpx::chrono::high_resolution_timer looptimer;
             uint64_t send_rank;
             if (options.distribution==0) {
               // pick a random locality to send to
@@ -854,7 +854,7 @@ void test_read(
         background.get();
 #endif
         //
-        hpx::util::high_resolution_timer movetimer;
+        hpx::chrono::high_resolution_timer movetimer;
         std::vector<hpx::future<int> > final_list;
         for (uint64_t i = 0; i < nranks; i++) {
             // move the contents of intermediate vector into final list
@@ -867,7 +867,7 @@ void test_read(
             double movetime = movetimer.elapsed();
             int numwait = static_cast<int>(final_list.size());
         )
-        hpx::util::high_resolution_timer futuretimer;
+        hpx::chrono::high_resolution_timer futuretimer;
 
         DEBUG_OUTPUT(1, "Waiting for whena_all future on rank " << rank);
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);

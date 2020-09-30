@@ -107,7 +107,7 @@ namespace hpx { namespace resource { namespace detail {
         {
             assigned_pus_.push_back(pu_mask);
             assigned_pu_nums_.push_back(
-                util::make_tuple(pu_index, exclusive, false));
+                hpx::make_tuple(pu_index, exclusive, false));
         }
     }
 

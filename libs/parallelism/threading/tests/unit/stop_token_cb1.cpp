@@ -364,14 +364,14 @@ void test_cancellation_single_thread_performance()
 
     constexpr int iteration_count = 100'000;
 
-    auto start = hpx::util::high_resolution_clock::now();
+    auto start = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < iteration_count; ++i)
     {
         hpx::stop_callback<decltype(callback)> r(s.get_token(), callback);
     }
 
-    auto end = hpx::util::high_resolution_clock::now();
+    auto end = hpx::chrono::high_resolution_clock::now();
 
     auto time1 = end - start;
 
@@ -382,7 +382,7 @@ void test_cancellation_single_thread_performance()
         callback_batch<decltype(callback)> b{s.get_token(), callback};
     }
 
-    end = hpx::util::high_resolution_clock::now();
+    end = hpx::chrono::high_resolution_clock::now();
 
     auto time2 = end - start;
 
@@ -397,7 +397,7 @@ void test_cancellation_single_thread_performance()
         callback_batch<decltype(callback)> b4{s.get_token(), callback};
     }
 
-    end = hpx::util::high_resolution_clock::now();
+    end = hpx::chrono::high_resolution_clock::now();
 
     auto time3 = end - start;
 

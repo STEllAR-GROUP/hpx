@@ -92,7 +92,7 @@ void sort_by_key_benchmark()
         o_keys = keys;
         o_values = values;
 
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
         hpx::parallel::sort_by_key(
             hpx::execution::par, keys.begin(), keys.end(), values.begin());
         auto elapsed = static_cast<std::uint64_t>(t.elapsed_nanoseconds());
@@ -228,7 +228,7 @@ void test_sort_by_key1()
     //
     const int seconds = 1;
     //
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
     do
     {
         //
@@ -266,7 +266,7 @@ void test_sort_by_key1()
             [](double a) { return std::floor(a); });
     } while (t.elapsed() < seconds);
     //
-    hpx::util::high_resolution_timer t2;
+    hpx::chrono::high_resolution_timer t2;
     do
     {
         test_sort_by_key_async(seq(task), int(), int(), std::equal_to<int>(),

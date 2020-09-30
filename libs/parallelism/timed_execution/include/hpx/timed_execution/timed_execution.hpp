@@ -41,7 +41,8 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename NonBlockingOneWayExecutor, typename F,
                 typename... Ts>
             HPX_FORCEINLINE static auto call(NonBlockingOneWayExecutor&& exec,
-                hpx::util::steady_time_point const& abs_time, F&& f, Ts&&... ts)
+                hpx::chrono::steady_time_point const& abs_time, F&& f,
+                Ts&&... ts)
                 -> decltype(execution::post(
                     timed_executor<NonBlockingOneWayExecutor&>(exec, abs_time),
                     std::forward<F>(f), std::forward<Ts>(ts)...))
@@ -54,7 +55,7 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename NonBlockingOneWayExecutor, typename F,
                 typename... Ts>
             HPX_FORCEINLINE static auto call(NonBlockingOneWayExecutor&& exec,
-                hpx::util::steady_duration const& rel_time, F&& f, Ts&&... ts)
+                hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
                 -> decltype(execution::post(
                     timed_executor<NonBlockingOneWayExecutor&>(exec, rel_time),
                     std::forward<F>(f), std::forward<Ts>(ts)...))
@@ -70,7 +71,7 @@ namespace hpx { namespace parallel { namespace execution {
             {
                 using type =
                     decltype(call(std::declval<NonBlockingOneWayExecutor>(),
-                        std::declval<hpx::util::steady_time_point const&>(),
+                        std::declval<hpx::chrono::steady_time_point const&>(),
                         std::declval<F>(), std::declval<Ts>()...));
             };
         };
@@ -92,7 +93,8 @@ namespace hpx { namespace parallel { namespace execution {
         {
             template <typename OneWayExecutor, typename F, typename... Ts>
             HPX_FORCEINLINE static auto call(OneWayExecutor&& exec,
-                hpx::util::steady_time_point const& abs_time, F&& f, Ts&&... ts)
+                hpx::chrono::steady_time_point const& abs_time, F&& f,
+                Ts&&... ts)
                 -> decltype(execution::sync_execute(
                     timed_executor<OneWayExecutor&>(exec, abs_time),
                     std::forward<F>(f), std::forward<Ts>(ts)...))
@@ -104,7 +106,7 @@ namespace hpx { namespace parallel { namespace execution {
 
             template <typename OneWayExecutor, typename F, typename... Ts>
             HPX_FORCEINLINE static auto call(OneWayExecutor&& exec,
-                hpx::util::steady_duration const& rel_time, F&& f, Ts&&... ts)
+                hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
                 -> decltype(execution::sync_execute(
                     timed_executor<OneWayExecutor&>(exec, rel_time),
                     std::forward<F>(f), std::forward<Ts>(ts)...))
@@ -118,7 +120,7 @@ namespace hpx { namespace parallel { namespace execution {
             struct result
             {
                 using type = decltype(call(std::declval<OneWayExecutor>(),
-                    std::declval<hpx::util::steady_time_point const&>(),
+                    std::declval<hpx::chrono::steady_time_point const&>(),
                     std::declval<F>(), std::declval<Ts>()...));
             };
         };

@@ -60,14 +60,14 @@ template <typename InIter, typename OutIter1, typename OutIter2, typename Pred>
 double run_partition_copy_benchmark_std(int test_count, InIter first,
     InIter last, OutIter1 dest_true, OutIter2 dest_false, Pred pred)
 {
-    std::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < test_count; ++i)
     {
         std::partition_copy(first, last, dest_true, dest_false, pred);
     }
 
-    time = hpx::util::high_resolution_clock::now() - time;
+    time = hpx::chrono::high_resolution_clock::now() - time;
 
     return (time * 1e-9) / test_count;
 }
@@ -79,7 +79,7 @@ double run_partition_copy_benchmark_hpx(int test_count, ExPolicy policy,
     FwdIter1 first, FwdIter1 last, FwdIter2 dest_true, FwdIter3 dest_false,
     Pred pred)
 {
-    std::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < test_count; ++i)
     {
@@ -88,7 +88,7 @@ double run_partition_copy_benchmark_hpx(int test_count, ExPolicy policy,
             policy, first, last, dest_true, dest_false, pred);
     }
 
-    time = hpx::util::high_resolution_clock::now() - time;
+    time = hpx::chrono::high_resolution_clock::now() - time;
 
     return (time * 1e-9) / test_count;
 }
@@ -113,7 +113,7 @@ void run_benchmark(std::size_t vector_size, int test_count, IteratorTag)
 
     // initialize data
     using namespace hpx::execution;
-    hpx::parallel::generate(par, std::begin(v), std::end(v), random_fill());
+    hpx::generate(par, std::begin(v), std::end(v), random_fill());
 
     std::cout << "* Running Benchmark..." << std::endl;
 

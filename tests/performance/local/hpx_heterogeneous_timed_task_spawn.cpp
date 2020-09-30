@@ -38,7 +38,7 @@ using hpx::threads::make_thread_function_nullary;
 using hpx::this_thread::suspend;
 using hpx::threads::get_thread_count;
 
-using hpx::util::high_resolution_timer;
+using hpx::chrono::high_resolution_timer;
 
 using hpx::cout;
 using hpx::flush;

@@ -60,14 +60,14 @@ namespace hpx { namespace execution_base {
     }
 
     void agent_ref::sleep_for(
-        hpx::util::steady_duration const& sleep_duration, const char* desc)
+        hpx::chrono::steady_duration const& sleep_duration, const char* desc)
     {
         HPX_ASSERT(*this == hpx::execution_base::this_thread::agent());
         impl_->sleep_for(sleep_duration, desc);
     }
 
     void agent_ref::sleep_until(
-        hpx::util::steady_time_point const& sleep_time, const char* desc)
+        hpx::chrono::steady_time_point const& sleep_time, const char* desc)
     {
         HPX_ASSERT(*this == hpx::execution_base::this_thread::agent());
         impl_->sleep_until(sleep_time, desc);

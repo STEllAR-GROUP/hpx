@@ -67,9 +67,9 @@ namespace hpx { namespace execution_base {
             void suspend(char const* desc) override;
             void resume(char const* desc) override;
             void abort(char const* desc) override;
-            void sleep_for(hpx::util::steady_duration const& sleep_duration,
+            void sleep_for(hpx::chrono::steady_duration const& sleep_duration,
                 char const* desc) override;
-            void sleep_until(hpx::util::steady_time_point const& sleep_time,
+            void sleep_until(hpx::chrono::steady_time_point const& sleep_time,
                 char const* desc) override;
 
         private:
@@ -191,13 +191,14 @@ namespace hpx { namespace execution_base {
         }
 
         void default_agent::sleep_for(
-            hpx::util::steady_duration const& sleep_duration, char const* desc)
+            hpx::chrono::steady_duration const& sleep_duration,
+            char const* desc)
         {
             std::this_thread::sleep_for(sleep_duration.value());
         }
 
         void default_agent::sleep_until(
-            hpx::util::steady_time_point const& sleep_time, char const* desc)
+            hpx::chrono::steady_time_point const& sleep_time, char const* desc)
         {
             std::this_thread::sleep_until(sleep_time.value());
         }

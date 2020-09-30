@@ -331,13 +331,13 @@ namespace hpx { namespace parallel { namespace execution {
         typedef typename hpx::traits::executor_parameters_type<
             base_executor_type>::type parameters_type;
 
-        timed_executor(hpx::util::steady_time_point const& abs_time)
+        timed_executor(hpx::chrono::steady_time_point const& abs_time)
           : exec_(BaseExecutor())
           , execute_at_(abs_time.value())
         {
         }
 
-        timed_executor(hpx::util::steady_duration const& rel_time)
+        timed_executor(hpx::chrono::steady_duration const& rel_time)
           : exec_(BaseExecutor())
           , execute_at_(rel_time.from_now())
         {
@@ -345,7 +345,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename Executor>
         timed_executor(
-            Executor&& exec, hpx::util::steady_time_point const& abs_time)
+            Executor&& exec, hpx::chrono::steady_time_point const& abs_time)
           : exec_(std::forward<Executor>(exec))
           , execute_at_(abs_time.value())
         {
@@ -353,7 +353,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename Executor>
         timed_executor(
-            Executor&& exec, hpx::util::steady_duration const& rel_time)
+            Executor&& exec, hpx::chrono::steady_duration const& rel_time)
           : exec_(std::forward<Executor>(exec))
           , execute_at_(rel_time.from_now())
         {

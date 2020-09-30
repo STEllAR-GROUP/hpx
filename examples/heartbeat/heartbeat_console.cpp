@@ -25,7 +25,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     else
         hpx::cout << "ever.\n" << hpx::flush;
 
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
     while (runfor <= 0 || t.elapsed() < runfor)
     {
         hpx::this_thread::suspend(1000);

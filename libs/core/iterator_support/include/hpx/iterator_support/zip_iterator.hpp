@@ -213,7 +213,7 @@ namespace hpx { namespace util {
                 typename zip_iterator_reference<tuple<Ts...>>::type
                 call(util::index_pack<Is...>, tuple<Ts...> const& iterators)
             {
-                return util::forward_as_tuple(*hpx::get<Is>(iterators)...);
+                return hpx::forward_as_tuple(*hpx::get<Is>(iterators)...);
             }
         };
 
@@ -372,7 +372,7 @@ namespace hpx { namespace util {
         }
 
         HPX_HOST_DEVICE explicit zip_iterator(Ts const&... vs)
-          : base_type(util::tie(vs...))
+          : base_type(hpx::tie(vs...))
         {
         }
 
@@ -444,7 +444,7 @@ namespace hpx { namespace util {
         }
 
         HPX_HOST_DEVICE explicit zip_iterator(Ts const&... vs)
-          : base_type(util::tie(vs...))
+          : base_type(hpx::tie(vs...))
         {
         }
 
@@ -541,7 +541,7 @@ namespace hpx { namespace traits {
             static result_type call(
                 util::index_pack<Is...>, hpx::tuple<Ts_...> const& t)
             {
-                return util::make_tuple(
+                return hpx::make_tuple(
                     typename F::template apply<Ts>()(hpx::get<Is>(t))...);
             }
 

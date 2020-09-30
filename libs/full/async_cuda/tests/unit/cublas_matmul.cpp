@@ -172,7 +172,7 @@ void matrixMultiply(hpx::cuda::experimental::cublas_executor& cublas,
 
     // Perform warmup operation with cublas
     // note cublas is column major ordering : transpose the order
-    hpx::util::high_resolution_timer t1;
+    hpx::chrono::high_resolution_timer t1;
     //
     std::cout << "calling CUBLAS...\n";
     auto fut = hpx::async(cublas, cublasSgemm, CUBLAS_OP_N, CUBLAS_OP_N,
@@ -189,7 +189,7 @@ void matrixMultiply(hpx::cuda::experimental::cublas_executor& cublas,
     // get_future will create a new event attached to a new future
     // so we can reuse the same cublas executor stream if we want
 
-    hpx::util::high_resolution_timer t2;
+    hpx::chrono::high_resolution_timer t2;
     for (std::size_t j = 0; j < iterations; j++)
     {
         hpx::apply(cublas, cublasSgemm, CUBLAS_OP_N, CUBLAS_OP_N,
@@ -232,7 +232,7 @@ void matrixMultiply(hpx::cuda::experimental::cublas_executor& cublas,
         // allocate storage for the CPU result
         std::vector<T> reference(size_C);
 
-        hpx::util::high_resolution_timer t3;
+        hpx::chrono::high_resolution_timer t3;
         matrixMulCPU<T>(reference.data(), h_A.data(), h_B.data(),
             matrix_size.uiHA, matrix_size.uiWA, matrix_size.uiWB);
         double us3 = t3.elapsed_microseconds();

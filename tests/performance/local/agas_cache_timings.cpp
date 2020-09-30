@@ -174,11 +174,11 @@ void test_insert(gva_cache_type& cache, std::size_t num_entries)
         gva_cache_key key(hpx::detail::get_next_id(), 1);
         hpx::agas::gva value(locality, ct, 1, std::uint64_t(0), 0);
 
-        std::uint64_t t = hpx::util::high_resolution_clock::now();
+        std::uint64_t t = hpx::chrono::high_resolution_clock::now();
 
         cache.insert(key, value);
 
-        timings.push_back(hpx::util::high_resolution_clock::now() - t);
+        timings.push_back(hpx::chrono::high_resolution_clock::now() - t);
     }
 
     calculate_histogram("insert", timings);
@@ -195,11 +195,11 @@ void test_get(gva_cache_type& cache, hpx::naming::gid_type first_key)
         gva_cache_key idbase;
         gva_cache_type::entry_type e;
 
-        std::uint64_t t = hpx::util::high_resolution_clock::now();
+        std::uint64_t t = hpx::chrono::high_resolution_clock::now();
 
         cache.get_entry(key, idbase, e);
 
-        timings.push_back(hpx::util::high_resolution_clock::now() - t);
+        timings.push_back(hpx::chrono::high_resolution_clock::now() - t);
     }
 
     calculate_histogram("   get", timings);
@@ -218,11 +218,11 @@ void test_update(gva_cache_type& cache, hpx::naming::gid_type first_key)
         gva_cache_key key(++first_key, 1);
         hpx::agas::gva value(locality, ct, 1, std::uint64_t(1), 1);
 
-        std::uint64_t t = hpx::util::high_resolution_clock::now();
+        std::uint64_t t = hpx::chrono::high_resolution_clock::now();
 
         cache.update(key, value);
 
-        timings.push_back(hpx::util::high_resolution_clock::now() - t);
+        timings.push_back(hpx::chrono::high_resolution_clock::now() - t);
     }
 
     calculate_histogram("update", timings);
@@ -244,7 +244,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     hpx::naming::gid_type first_key = hpx::detail::get_next_id();
 
-    hpx::util::high_resolution_timer t1;
+    hpx::chrono::high_resolution_timer t1;
 
     test_insert(cache, num_entries);
     test_get(cache, first_key);

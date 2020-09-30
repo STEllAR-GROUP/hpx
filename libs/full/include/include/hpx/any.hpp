@@ -8,13 +8,3 @@
 
 #include <hpx/datastructures/any.hpp>
 #include <hpx/serialization/serializable_any.hpp>
-
-namespace hpx {
-    using hpx::util::any;
-    using hpx::util::any_nonser;
-    using hpx::util::bad_any_cast;
-    using hpx::util::make_any;
-    using hpx::util::make_any_nonser;
-    using hpx::util::make_unique_any_nonser;
-    using hpx::util::unique_any_nonser;
-}    // namespace hpx

@@ -45,7 +45,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     {
         // Keep track of the time required to execute.
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         std::uint64_t r = fibonacci(n);
 

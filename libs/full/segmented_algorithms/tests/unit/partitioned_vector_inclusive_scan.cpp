@@ -49,7 +49,7 @@ void inclusive_scan_algo_tests_with_policy(std::size_t size,
     msg7(typeid(ExPolicy).name(), typeid(DistPolicy).name(), typeid(T).name(),
         regular, size, dist_policy.get_num_partitions(),
         dist_policy.get_localities().size());
-    hpx::util::high_resolution_timer t1;
+    hpx::chrono::high_resolution_timer t1;
 
     std::vector<T> out(in.size());
     T val(0);
@@ -81,7 +81,7 @@ void inclusive_scan_algo_tests_segmented_out_with_policy(std::size_t size,
         in_dist_policy.get_localities().size(),
         out_dist_policy.get_num_partitions(),
         out_dist_policy.get_localities().size());
-    hpx::util::high_resolution_timer t1;
+    hpx::chrono::high_resolution_timer t1;
 
     T val(0);
 
@@ -108,7 +108,7 @@ void inclusive_scan_algo_tests_inplace_with_policy(std::size_t size,
     msg7(typeid(ExPolicy).name(), typeid(DistPolicy).name(), typeid(T).name(),
         inplace, size, dist_policy.get_num_partitions(),
         dist_policy.get_localities().size());
-    hpx::util::high_resolution_timer t1;
+    hpx::chrono::high_resolution_timer t1;
 
     hpx::partitioned_vector<T> in(size, dist_policy);
     iota_vector(in, T(1));
@@ -141,7 +141,7 @@ void inclusive_scan_algo_tests_with_policy_async(std::size_t size,
     msg7(typeid(ExPolicy).name(), typeid(DistPolicy).name(), typeid(T).name(),
         async, size, dist_policy.get_num_partitions(),
         dist_policy.get_localities().size());
-    hpx::util::high_resolution_timer t1;
+    hpx::chrono::high_resolution_timer t1;
 
     std::vector<T> out(in.size());
     T val(0);
@@ -174,7 +174,7 @@ void inclusive_scan_algo_tests_segmented_out_with_policy_async(std::size_t size,
         in_dist_policy.get_localities().size(),
         out_dist_policy.get_num_partitions(),
         out_dist_policy.get_localities().size());
-    hpx::util::high_resolution_timer t1;
+    hpx::chrono::high_resolution_timer t1;
 
     T val(0);
 
@@ -202,7 +202,7 @@ void inclusive_scan_algo_tests_inplace_with_policy_async(std::size_t size,
     msg7(typeid(ExPolicy).name(), typeid(DistPolicy).name(), typeid(T).name(),
         async_inplace, size, dist_policy.get_num_partitions(),
         dist_policy.get_localities().size());
-    hpx::util::high_resolution_timer t1;
+    hpx::chrono::high_resolution_timer t1;
 
     hpx::partitioned_vector<T> in(size, dist_policy);
     iota_vector(in, T(1));

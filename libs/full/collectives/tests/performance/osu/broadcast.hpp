@@ -17,7 +17,7 @@
 #define HPX_DEFINE_COMPONENT_BROADCAST(NAME, TYPE)                             \
     void HPX_PP_CAT(NAME, _)(TYPE const& value)                                \
     {                                                                          \
-        NAME.set(hpx::util::any(value));                                       \
+        NAME.set(hpx::any(value));                                             \
     }                                                                          \
     HPX_DEFINE_COMPONENT_ACTION(broadcast_component, HPX_PP_CAT(NAME, _));     \
                                                                                \
@@ -104,7 +104,7 @@ namespace hpx { namespace lcos {
             }
         }
 
-        void set(hpx::util::any const& v)
+        void set(hpx::any const& v)
         {
             hpx::wait_all(ready_future);
             {
@@ -124,7 +124,7 @@ namespace hpx { namespace lcos {
         hpx::lcos::local::and_gate bcast_gate;
         hpx::lcos::local::promise<void> ready_promise;
         hpx::future<void> ready_future;
-        hpx::util::any recv_value;
+        hpx::any recv_value;
         hpx::future<void> bcast_future;
     };
 

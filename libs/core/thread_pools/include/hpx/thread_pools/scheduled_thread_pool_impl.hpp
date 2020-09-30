@@ -625,9 +625,10 @@ namespace hpx { namespace threads { namespace detail {
 
     template <typename Scheduler>
     thread_id_type scheduled_thread_pool<Scheduler>::set_state(
-        util::steady_time_point const& abs_time, thread_id_type const& id,
-        thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-        thread_priority priority, error_code& ec)
+        hpx::chrono::steady_time_point const& abs_time,
+        thread_id_type const& id, thread_state_enum newstate,
+        thread_state_ex_enum newstate_ex, thread_priority priority,
+        error_code& ec)
     {
         return detail::set_thread_state_timed(*sched_, abs_time, id, newstate,
             newstate_ex, priority,

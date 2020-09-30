@@ -69,7 +69,7 @@ int size = 200;
 
 std::uint64_t get_tick_count()
 {
-    return hpx::util::high_resolution_clock::now() / 1000;
+    return hpx::chrono::high_resolution_clock::now() / 1000;
 }
 
 int hpx_main(int argc, char* argv[])

@@ -53,7 +53,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Deprecate a given functionality starting HPX V1.6
 #if !defined(HPX_HAVE_DEPRECATION_WARNINGS_V1_6)
-#define HPX_HAVE_DEPRECATION_WARNINGS_V1_6 0
+#define HPX_HAVE_DEPRECATION_WARNINGS_V1_6 1
 #endif
 
 #if (HPX_VERSION_FULL >= 010600) && (HPX_HAVE_DEPRECATION_WARNINGS_V1_6 != 0)

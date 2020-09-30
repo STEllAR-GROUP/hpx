@@ -42,7 +42,7 @@ void test_scheduler(
     std::size_t const default_pool_threads =
         hpx::resource::get_num_threads("default");
 
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
 
     while (t.elapsed() < 2)
     {

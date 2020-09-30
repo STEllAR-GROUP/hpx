@@ -293,7 +293,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     stepper step;
 
     // Measure execution time.
-    std::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
 
     // Execute nt time steps on nx grid points and print the final solution.
     hpx::future<stepper::space> result = step.do_work(np, nx, nt, nd);
@@ -301,7 +301,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     stepper::space solution = result.get();
     hpx::wait_all(solution);
 
-    std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     // We're done with the periodic policy now, so disable it.
     apex::deregister_policy(periodic_policy_handle);

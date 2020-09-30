@@ -96,7 +96,7 @@ int hpx_main(int argc, char* argv[])
         std::size_t thread_num = 0;
         bool up = true;
         std::vector<hpx::future<void>> fs;
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
         while (t.elapsed() < 2)
         {
             for (std::size_t i = 0;

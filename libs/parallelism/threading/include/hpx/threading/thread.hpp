@@ -257,9 +257,9 @@ namespace hpx {
         HPX_PARALLELISM_EXPORT void interrupt();
 
         HPX_PARALLELISM_EXPORT void sleep_until(
-            util::steady_time_point const& abs_time);
+            hpx::chrono::steady_time_point const& abs_time);
 
-        inline void sleep_for(util::steady_duration const& rel_time)
+        inline void sleep_for(hpx::chrono::steady_duration const& rel_time)
         {
             sleep_until(rel_time.from_now());
         }

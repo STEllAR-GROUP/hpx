@@ -29,7 +29,7 @@ int main()
         return hpx::async([]() -> void { do_more_work(); });
     });
 
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
 
     hpx::future<void> fut2 = std::move(fut);
     fut2.get();

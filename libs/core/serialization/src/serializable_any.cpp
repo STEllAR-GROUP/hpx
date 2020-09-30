@@ -9,8 +9,8 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-    The class hpx::util::any is built based on boost::spirit::hold_any class.
-    It adds support for HPX serialization, move assignment, == operator.
+    The class hpx::any is built based on boost::spirit::hold_any class. It adds
+    support for HPX serialization, move assignment, == operator.
 ==============================================================================*/
 
 #include <hpx/config.hpp>

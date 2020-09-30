@@ -178,7 +178,7 @@ namespace hpx
                     buffer.chunks_.reserve(num_chunks);
 
                     // mark start of serialization
-                    util::high_resolution_timer timer;
+                    hpx::chrono::high_resolution_timer timer;
 
                     {
                         // Serialize the data

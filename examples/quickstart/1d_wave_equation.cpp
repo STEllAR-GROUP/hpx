@@ -47,7 +47,7 @@ using hpx::async;
 using hpx::lcos::future;
 using hpx::lcos::wait;
 
-using hpx::util::high_resolution_timer;
+using hpx::chrono::high_resolution_timer;
 
 using hpx::finalize;
 using hpx::find_here;

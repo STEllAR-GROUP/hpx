@@ -94,18 +94,17 @@ namespace hpx { namespace program_options {
             is desired. May be be called several times if value of the same
             option is specified more than once.
         */
-        virtual void parse(hpx::util::any_nonser& value_store,
+        virtual void parse(hpx::any_nonser& value_store,
             const std::vector<std::string>& new_tokens, bool utf8) const = 0;
 
         /** Called to assign default value to 'value_store'. Returns
             true if default value is assigned, and false if no default
             value exists. */
-        virtual bool apply_default(
-            hpx::util::any_nonser& value_store) const = 0;
+        virtual bool apply_default(hpx::any_nonser& value_store) const = 0;
 
         /** Called when final value of an option is determined.
         */
-        virtual void notify(const hpx::util::any_nonser& value_store) const = 0;
+        virtual void notify(const hpx::any_nonser& value_store) const = 0;
 
         virtual ~value_semantic() {}
     };
@@ -130,12 +129,12 @@ namespace hpx { namespace program_options {
     class HPX_EXPORT value_semantic_codecvt_helper<char> : public value_semantic
     {
     private:    // base overrides
-        void parse(hpx::util::any_nonser& value_store,
+        void parse(hpx::any_nonser& value_store,
             const std::vector<std::string>& new_tokens,
             bool utf8) const override;
 
     protected:    // interface for derived classes.
-        virtual void xparse(hpx::util::any_nonser& value_store,
+        virtual void xparse(hpx::any_nonser& value_store,
             const std::vector<std::string>& new_tokens) const = 0;
     };
 
@@ -151,12 +150,12 @@ namespace hpx { namespace program_options {
       : public value_semantic
     {
     private:    // base overrides
-        void parse(hpx::util::any_nonser& value_store,
+        void parse(hpx::any_nonser& value_store,
             const std::vector<std::string>& new_tokens,
             bool utf8) const override;
 
     protected:    // interface for derived classes.
-        virtual void xparse(hpx::util::any_nonser& value_store,
+        virtual void xparse(hpx::any_nonser& value_store,
             const std::vector<std::wstring>& new_tokens) const = 0;
     };
 
@@ -190,17 +189,17 @@ namespace hpx { namespace program_options {
             the first string from 'new_tokens' to 'value_store', without
             any modifications.
          */
-        void xparse(hpx::util::any_nonser& value_store,
+        void xparse(hpx::any_nonser& value_store,
             const std::vector<std::string>& new_tokens) const override;
 
         /** Does nothing. */
-        bool apply_default(hpx::util::any_nonser&) const override
+        bool apply_default(hpx::any_nonser&) const override
         {
             return false;
         }
 
         /** Does nothing. */
-        void notify(const hpx::util::any_nonser&) const override {}
+        void notify(const hpx::any_nonser&) const override {}
 
     private:
         bool m_zero_tokens;
@@ -248,7 +247,7 @@ namespace hpx { namespace program_options {
         */
         typed_value* default_value(const T& v)
         {
-            m_default_value = hpx::util::any_nonser(v);
+            m_default_value = hpx::any_nonser(v);
             m_default_value_as_text = hpx::util::to_string(v);
             return this;
         }
@@ -261,7 +260,7 @@ namespace hpx { namespace program_options {
         */
         typed_value* default_value(const T& v, const std::string& textual)
         {
-            m_default_value = hpx::util::any_nonser(v);
+            m_default_value = hpx::any_nonser(v);
             m_default_value_as_text = textual;
             return this;
         }
@@ -272,7 +271,7 @@ namespace hpx { namespace program_options {
         */
         typed_value* implicit_value(const T& v)
         {
-            m_implicit_value = hpx::util::any_nonser(v);
+            m_implicit_value = hpx::any_nonser(v);
             m_implicit_value_as_text = hpx::util::to_string(v);
             return this;
         }
@@ -296,7 +295,7 @@ namespace hpx { namespace program_options {
         */
         typed_value* implicit_value(const T& v, const std::string& textual)
         {
-            m_implicit_value = hpx::util::any_nonser(v);
+            m_implicit_value = hpx::any_nonser(v);
             m_implicit_value_as_text = textual;
             return this;
         }
@@ -389,7 +388,7 @@ namespace hpx { namespace program_options {
 
         /** Creates an instance of the 'validator' class and calls
             its operator() to perform the actual conversion. */
-        void xparse(hpx::util::any_nonser& value_store,
+        void xparse(hpx::any_nonser& value_store,
             const std::vector<std::basic_string<Char>>& new_tokens)
             const override;
 
@@ -397,8 +396,7 @@ namespace hpx { namespace program_options {
             'default_value', stores that value into 'value_store'.
             Returns true if default value was stored.
         */
-        virtual bool apply_default(
-            hpx::util::any_nonser& value_store) const override
+        virtual bool apply_default(hpx::any_nonser& value_store) const override
         {
             if (!m_default_value.has_value())
             {
@@ -414,7 +412,7 @@ namespace hpx { namespace program_options {
         /** If an address of variable to store value was specified
             when creating *this, stores the value there. Otherwise,
             does nothing. */
-        void notify(const hpx::util::any_nonser& value_store) const override;
+        void notify(const hpx::any_nonser& value_store) const override;
 
     public:    // typed_value_base overrides
         const std::type_info& value_type() const override
@@ -425,12 +423,12 @@ namespace hpx { namespace program_options {
     private:
         T* m_store_to;
 
-        // Default value is stored as hpx::util::any_nonser and not
+        // Default value is stored as hpx::any_nonser and not
         // as boost::optional to avoid unnecessary instantiations.
         std::string m_value_name;
-        hpx::util::any_nonser m_default_value;
+        hpx::any_nonser m_default_value;
         std::string m_default_value_as_text;
-        hpx::util::any_nonser m_implicit_value;
+        hpx::any_nonser m_implicit_value;
         std::string m_implicit_value_as_text;
         bool m_composing, m_implicit, m_multitoken, m_zero_tokens, m_required;
         std::function<void(const T&)> m_notifier;

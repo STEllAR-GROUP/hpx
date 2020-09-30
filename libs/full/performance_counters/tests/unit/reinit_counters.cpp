@@ -40,7 +40,7 @@ public:
     {
         hpx::performance_counters::counter_values_array value;
 
-        value.time_ = hpx::util::high_resolution_clock::now();
+        value.time_ = hpx::chrono::high_resolution_clock::now();
         value.status_ = hpx::performance_counters::status_new_data;
         value.count_ = ++invocation_count_;
 

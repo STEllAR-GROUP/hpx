@@ -36,7 +36,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
             std::unique_lock<mutex_type>& l, std::ptrdiff_t count);
 
         HPX_CORE_EXPORT bool wait_until(std::unique_lock<mutex_type>& l,
-            util::steady_time_point const& abs_time, std::ptrdiff_t count);
+            hpx::chrono::steady_time_point const& abs_time,
+            std::ptrdiff_t count);
 
         HPX_CORE_EXPORT bool try_wait(
             std::unique_lock<mutex_type>& l, std::ptrdiff_t count = 1);

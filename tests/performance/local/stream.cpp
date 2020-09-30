@@ -55,7 +55,7 @@ hpx::threads::topology& retrieve_topology()
 ///////////////////////////////////////////////////////////////////////////////
 double mysecond()
 {
-    return hpx::util::high_resolution_clock::now() * 1e-9;
+    return hpx::chrono::high_resolution_clock::now() * 1e-9;
 }
 
 int checktick()

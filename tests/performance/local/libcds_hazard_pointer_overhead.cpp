@@ -51,7 +51,7 @@ using hpx::async;
 using hpx::future;
 using hpx::lcos::wait_each;
 
-using hpx::util::high_resolution_timer;
+using hpx::chrono::high_resolution_timer;
 
 using hpx::cout;
 using hpx::flush;

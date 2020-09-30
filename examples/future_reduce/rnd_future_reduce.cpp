@@ -97,7 +97,7 @@ hpx::future<int> test_reduce()
 //----------------------------------------------------------------------------
 int hpx_main()
 {
-  hpx::util::high_resolution_timer htimer;
+  hpx::chrono::high_resolution_timer htimer;
   // run N times and see if we get approximately the right amount of fails
   int count = 0;
   for (int i=0; i<TEST_LOOPS; i++) {
