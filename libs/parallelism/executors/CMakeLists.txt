@@ -18,6 +18,7 @@ set(executors_headers
     hpx/executors/async.hpp
     hpx/executors/dataflow.hpp
     hpx/executors/detail/hierarchical_spawning.hpp
+    hpx/executors/detail/splittable_task.hpp
     hpx/executors/exception_list.hpp
     hpx/executors/execution_policy_fwd.hpp
     hpx/executors/execution_policy.hpp
@@ -28,6 +29,7 @@ set(executors_headers
     hpx/executors/restricted_thread_pool_executor.hpp
     hpx/executors/sequenced_executor.hpp
     hpx/executors/service_executors.hpp
+    hpx/executors/splittable_executor.hpp
     hpx/executors/sync.hpp
     hpx/executors/thread_pool_attached_executors.hpp
     hpx/executors/thread_pool_executor.hpp

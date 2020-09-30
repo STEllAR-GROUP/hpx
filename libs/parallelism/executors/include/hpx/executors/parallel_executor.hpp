@@ -33,6 +33,7 @@
 #include <hpx/synchronization/latch.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
@@ -302,6 +303,22 @@ namespace hpx { namespace execution {
             // clang-format off
             ar & priority_ & stacksize_ & policy_ & hierarchical_threshold_;
             // clang-format on
+        }
+        /// \endcond
+
+    public:
+        /// \cond NOINTERNAL
+        threads::thread_priority get_priority() const
+        {
+            return priority_;
+        }
+        threads::thread_stacksize get_stacksize() const
+        {
+            return stacksize_;
+        }
+        threads::thread_schedule_hint get_schedulehint() const
+        {
+            return schedulehint_;
         }
         /// \endcond
 
