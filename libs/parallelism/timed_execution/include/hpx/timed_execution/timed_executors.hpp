@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -110,7 +110,7 @@ namespace hpx { namespace parallel { namespace execution {
         };
 
         template <>
-        struct sync_execute_at_helper<sequenced_execution_tag>
+        struct sync_execute_at_helper<hpx::execution::sequenced_execution_tag>
         {
             template <typename Executor, typename F, typename... Ts>
             static auto call(hpx::traits::detail::wrap_int, Executor&& exec,
@@ -199,7 +199,7 @@ namespace hpx { namespace parallel { namespace execution {
         };
 
         template <>
-        struct async_execute_at_helper<sequenced_execution_tag>
+        struct async_execute_at_helper<hpx::execution::sequenced_execution_tag>
         {
             template <typename Executor, typename F, typename... Ts>
             static auto call(hpx::traits::detail::wrap_int, Executor&& exec,
@@ -281,7 +281,7 @@ namespace hpx { namespace parallel { namespace execution {
         };
 
         template <>
-        struct post_at_helper<sequenced_execution_tag>
+        struct post_at_helper<hpx::execution::sequenced_execution_tag>
         {
             template <typename Executor, typename F, typename... Ts>
             static void call(hpx::traits::detail::wrap_int, Executor&& exec,

@@ -31,29 +31,30 @@ namespace hpx { namespace util { namespace detail {
         template <typename... T>
         class spread_box
         {
-            tuple<T...> boxed_;
+            hpx::tuple<T...> boxed_;
 
         public:
-            explicit constexpr spread_box(tuple<T...> boxed)
+            explicit constexpr spread_box(hpx::tuple<T...> boxed)
               : boxed_(std::move(boxed))
             {
             }
 
-            tuple<T...> unbox()
+            hpx::tuple<T...> unbox()
             {
                 return std::move(boxed_);
             }
         };
+
         template <>
         class spread_box<>
         {
         public:
             explicit constexpr spread_box() noexcept {}
-            explicit constexpr spread_box(tuple<> const&) noexcept {}
+            explicit constexpr spread_box(hpx::tuple<> const&) noexcept {}
 
-            constexpr tuple<> unbox() const noexcept
+            constexpr hpx::tuple<> unbox() const noexcept
             {
-                return tuple<>{};
+                return hpx::tuple<>{};
             }
         };
 
@@ -117,9 +118,9 @@ namespace hpx { namespace util { namespace detail {
         /// Converts types to the a tuple carrying the single type and
         /// spread_box objects to its underlying tuple.
         template <typename T>
-        constexpr tuple<T> undecorate(T&& type)
+        constexpr hpx::tuple<T> undecorate(T&& type)
         {
-            return tuple<T>{std::forward<T>(type)};
+            return hpx::tuple<T>{std::forward<T>(type)};
         }
         template <typename... T>
         constexpr auto undecorate(spread_box<T...> type)
@@ -153,14 +154,14 @@ namespace hpx { namespace util { namespace detail {
         };
 
         /// A callable object which maps its content back to a tuple.
-        template <template <typename...> class Type = tuple>
-        using tupelizer_of_t = tupelizer_base<tuple<>, Type>;
+        template <template <typename...> class Type = hpx::tuple>
+        using tupelizer_of_t = tupelizer_base<hpx::tuple<>, Type>;
 
         /// A callable object which maps its content back to a tuple like
         /// type if it wasn't empty. For empty types arguments an empty
         /// spread box is returned instead. This is useful to propagate
         /// empty mappings back to the caller.
-        template <template <typename...> class Type = tuple>
+        template <template <typename...> class Type = hpx::tuple>
         using flat_tupelizer_of_t = tupelizer_base<spread_box<>, Type>;
 
         /// A callable object which maps its content back to an
@@ -267,17 +268,17 @@ namespace hpx { namespace util { namespace detail {
 
         /// Converts an empty tuple to void
         template <typename First, typename... Rest>
-        constexpr tuple<First, Rest...> voidify_empty_tuple(
-            tuple<First, Rest...> val)
+        constexpr hpx::tuple<First, Rest...> voidify_empty_tuple(
+            hpx::tuple<First, Rest...> val)
         {
             return val;
         }
-        inline void voidify_empty_tuple(tuple<> const&) noexcept {}
+        inline void voidify_empty_tuple(hpx::tuple<> const&) noexcept {}
 
         /// Converts the given variadic arguments into a tuple in a way
         /// that spread return values are inserted into the current pack.
         ///
-        /// If the returned tuple is empty, voidis returned instead.
+        /// If the returned tuple is empty, void is returned instead.
         template <typename... T>
         constexpr auto tupelize_or_void(T&&... args)
             -> decltype(voidify_empty_tuple(tupelize(std::forward<T>(args)...)))
