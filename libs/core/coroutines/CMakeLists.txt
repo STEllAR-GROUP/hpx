@@ -100,6 +100,13 @@ elseif(HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
   )
 endif()
 
+set_source_files_properties(
+  src/detail/coroutine_impl.cpp PROPERTIES SKIP_UNITY_BUILD_INCLUSION TRUE
+)
+set_source_files_properties(
+  src/detail/coroutine_self.cpp PROPERTIES SKIP_UNITY_BUILD_INCLUSION TRUE
+)
+
 include(HPX_AddModule)
 add_hpx_module(
   core coroutines
