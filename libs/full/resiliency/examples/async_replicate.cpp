@@ -56,7 +56,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     {
         // Initialize a high resolution timer
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         // successful replicate
         hpx::future<int> f =

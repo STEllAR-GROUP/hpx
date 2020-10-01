@@ -273,7 +273,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         parcelset::locality there_;
 
         /// Counters and their data containers.
-        util::high_resolution_timer timer_;
+        hpx::chrono::high_resolution_timer timer_;
         parcelset::parcelport* pp_;
 
         postprocess_handler_type handler_;

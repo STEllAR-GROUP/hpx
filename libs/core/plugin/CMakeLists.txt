@@ -25,19 +25,21 @@ set(plugin_headers
 )
 
 # Default location is $HPX_ROOT/libs/plugin/include_compatibility
+# cmake-format: off
 set(plugin_compat_headers
-    hpx/plugin.hpp
-    hpx/util/plugin.hpp
-    hpx/util/plugin/abstract_factory.hpp
-    hpx/util/plugin/concrete_factory.hpp
-    hpx/util/plugin/config.hpp
-    hpx/util/plugin/dll.hpp
-    hpx/util/plugin/export_plugin.hpp
-    hpx/util/plugin/plugin_factory.hpp
-    hpx/util/plugin/plugin_wrapper.hpp
-    hpx/util/plugin/virtual_constructor.hpp
-    hpx/traits/plugin_config_data.hpp
+    hpx/plugin.hpp => hpx/modules/plugin.hpp
+    hpx/util/plugin.hpp => hpx/modules/plugin.hpp
+    hpx/util/plugin/abstract_factory.hpp => hpx/modules/plugin.hpp
+    hpx/util/plugin/concrete_factory.hpp => hpx/modules/plugin.hpp
+    hpx/util/plugin/config.hpp => hpx/modules/plugin.hpp
+    hpx/util/plugin/dll.hpp => hpx/modules/plugin.hpp
+    hpx/util/plugin/export_plugin.hpp => hpx/modules/plugin.hpp
+    hpx/util/plugin/plugin_factory.hpp => hpx/modules/plugin.hpp
+    hpx/util/plugin/plugin_wrapper.hpp => hpx/modules/plugin.hpp
+    hpx/util/plugin/virtual_constructor.hpp => hpx/modules/plugin.hpp
+    hpx/traits/plugin_config_data.hpp => hpx/modules/plugin.hpp
 )
+# cmake-format: on
 
 include(HPX_AddModule)
 add_hpx_module(

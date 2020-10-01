@@ -331,7 +331,7 @@ namespace hpx { namespace util
                 key_tracker_.insert(key_tracker_.end(), l);
 
             cache_.insert(std::make_pair(
-                l, util::make_tuple(
+                l, hpx::make_tuple(
                     value_type(), 1, max_connections_per_locality_, kt
                 ))
             );

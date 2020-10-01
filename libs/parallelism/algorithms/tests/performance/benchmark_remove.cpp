@@ -98,9 +98,9 @@ double run_remove_benchmark_std(int test_count, OrgIter org_first,
         // Restore [first, last) with original data.
         hpx::copy(hpx::execution::par, org_first, org_last, first);
 
-        std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
+        std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now();
         (void) std::remove(first, last, value);
-        time += hpx::util::high_resolution_clock::now() - elapsed;
+        time += hpx::chrono::high_resolution_clock::now() - elapsed;
     }
 
     return (time * 1e-9) / test_count;
@@ -120,9 +120,9 @@ double run_remove_benchmark_hpx(int test_count, ExPolicy policy,
         // Restore [first, last) with original data.
         hpx::copy(hpx::execution::par, org_first, org_last, first);
 
-        std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
+        std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now();
         hpx::parallel::remove(policy, first, last, value);
-        time += hpx::util::high_resolution_clock::now() - elapsed;
+        time += hpx::chrono::high_resolution_clock::now() - elapsed;
     }
 
     return (time * 1e-9) / test_count;
@@ -146,8 +146,7 @@ void run_benchmark(std::size_t vector_size, int test_count,
 
     // initialize data
     using namespace hpx::execution;
-    hpx::parallel::generate(
-        par, std::begin(v), std::end(v), random_fill(random_range));
+    hpx::generate(par, std::begin(v), std::end(v), random_fill(random_range));
     org_v = v;
 
     auto value = DataType(static_cast<int>(random_range / 2));

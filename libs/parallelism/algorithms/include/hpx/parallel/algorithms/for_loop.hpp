@@ -366,12 +366,12 @@ namespace hpx {
         ExPolicy&& policy, typename std::decay<I>::type first, I last, S stride,
         Args&&... args);
 
-    /// The for_loop implements loop functionality over a range specified by
+    /// The for_loop_n implements loop functionality over a range specified by
     /// integral or iterator bounds. For the iterator case, these algorithms
     /// resemble for_each from the Parallelism TS, but leave to the programmer
     /// when and if to dereference the iterator.
     ///
-    /// The execution of for_loop without specifying an execution policy is
+    /// The execution of for_loop_n without specifying an execution policy is
     /// equivalent to specifying \a hpx::execution::seq as the execution
     /// policy.
     ///
@@ -1254,8 +1254,10 @@ namespace hpx {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop must be called with at least a function object");
 
-            return for_loop(
-                hpx::execution::seq, first, last, std::forward<Args>(args)...);
+            using hpx::util::make_index_pack;
+            return parallel::v2::detail::for_loop(hpx::execution::seq, first,
+                last, 1, typename make_index_pack<sizeof...(Args) - 1>::type(),
+                std::forward<Args>(args)...);
         }
     } for_loop{};
 
@@ -1304,7 +1306,10 @@ namespace hpx {
                 "for_loop_strided must be called with at least a function "
                 "object");
 
-            return for_loop_strided(hpx::execution::seq, first, last, stride,
+            using hpx::util::make_index_pack;
+            return parallel::v2::detail::for_loop(hpx::execution::seq, first,
+                last, stride,
+                typename make_index_pack<sizeof...(Args) - 1>::type(),
                 std::forward<Args>(args)...);
         }
     } for_loop_strided{};
@@ -1351,8 +1356,10 @@ namespace hpx {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_n must be called with at least a function object");
 
-            return for_loop_n(
-                hpx::execution::seq, first, size, std::forward<Args>(args)...);
+            using hpx::util::make_index_pack;
+            return parallel::v2::detail::for_loop_n(hpx::execution::seq, first,
+                size, 1, typename make_index_pack<sizeof...(Args) - 1>::type(),
+                std::forward<Args>(args)...);
         }
     } for_loop_n{};
 
@@ -1401,11 +1408,14 @@ namespace hpx {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_n_strided must be called with at least a function "
                 "object");
-            return for_loop_strided_n(hpx::execution::seq, first, size, stride,
+
+            using hpx::util::make_index_pack;
+            return parallel::v2::detail::for_loop_n(hpx::execution::seq, first,
+                size, stride,
+                typename make_index_pack<sizeof...(Args) - 1>::type(),
                 std::forward<Args>(args)...);
         }
     } for_loop_n_strided{};
-
 }    // namespace hpx
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)

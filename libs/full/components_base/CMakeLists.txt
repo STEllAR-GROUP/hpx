@@ -16,10 +16,14 @@ set(components_base_headers
 )
 
 # Default location is $HPX_ROOT/libs/components_base/include_compatibility
+# cmake-format: off
 set(components_base_compat_headers
-    hpx/runtime/components/pinned_ptr.hpp hpx/runtime/get_lva.hpp
-    hpx/traits/component_pin_support.hpp hpx/traits/is_component.hpp
+    hpx/runtime/get_lva.hpp => hpx/components_base/get_lva.hpp
+    hpx/runtime/components/pinned_ptr.hpp => hpx/components_base/pinned_ptr.hpp
+    hpx/traits/component_pin_support.hpp => hpx/components_base/traits/component_pin_support.hpp
+    hpx/traits/is_component.hpp => hpx/components_base/traits/is_component.hpp
 )
+# cmake-format: on
 
 set(components_base_sources)
 

@@ -86,7 +86,7 @@ namespace jacobi_smp {
         std::shared_ptr<future_vector> deps_src
             (new future_vector(dependencies.size(), hpx::make_ready_future()));
 
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
         for(std::size_t iter = 0; iter < iterations; ++iter)
         {
             for(std::size_t block = 0; block < block_ranges.size(); ++block)

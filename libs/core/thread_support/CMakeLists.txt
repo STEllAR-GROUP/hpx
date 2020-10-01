@@ -14,11 +14,16 @@ set(thread_support_headers
     hpx/thread_support/atomic_count.hpp
 )
 
+# cmake-format: off
 set(thread_support_compat_headers
-    hpx/thread_support.hpp hpx/util/assert_owns_lock.hpp
-    hpx/util/atomic_count.hpp hpx/util/set_thread_name.hpp
-    hpx/util/thread_specific_ptr.hpp hpx/util/unlock_guard.hpp
+    hpx/thread_support.hpp => hpx/modules/thread_support.hpp
+    hpx/util/assert_owns_lock.hpp => hpx/modules/thread_support.hpp
+    hpx/util/atomic_count.hpp => hpx/modules/thread_support.hpp
+    hpx/util/set_thread_name. => hpx/modules/thread_support.hpp
+    hpx/util/thread_specific_ptr.hpp => hpx/modules/thread_support.hpp
+    hpx/util/unlock_guard.hpp => hpx/modules/thread_support.hpp
 )
+# cmake-format: on
 
 set(thread_support_sources set_thread_name.cpp)
 

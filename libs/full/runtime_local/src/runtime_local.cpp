@@ -512,7 +512,7 @@ namespace hpx {
             HPX_ASSERT(nullptr == threads::thread_self::get_self());
 
             runtime_ = this;
-            runtime_uptime() = util::high_resolution_clock::now();
+            runtime_uptime() = hpx::chrono::high_resolution_clock::now();
         }
     }
 
@@ -527,7 +527,7 @@ namespace hpx {
     std::uint64_t runtime::get_system_uptime()
     {
         std::int64_t diff =
-            util::high_resolution_clock::now() - runtime_uptime();
+            hpx::chrono::high_resolution_clock::now() - runtime_uptime();
         return diff < 0LL ? 0ULL : static_cast<std::uint64_t>(diff);
     }
 

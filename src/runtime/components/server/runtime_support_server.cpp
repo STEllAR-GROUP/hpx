@@ -698,7 +698,7 @@ namespace hpx { namespace components { namespace server {
             threads::threadmanager& tm = appl.get_thread_manager();
             naming::resolver_client& agas_client = appl.get_agas_client();
 
-            util::high_resolution_timer t;
+            hpx::chrono::high_resolution_timer t;
             double start_time = t.elapsed();
             bool timed_out = false;
             error_code ec(lightweight);

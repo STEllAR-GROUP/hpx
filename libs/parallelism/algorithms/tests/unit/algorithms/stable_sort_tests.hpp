@@ -133,11 +133,11 @@ void test_stable_sort1(ExPolicy&& policy, T)
     rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
         (std::numeric_limits<T>::max)(), T(std::rand()));
 
-    std::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
     hpx::parallel::stable_sort(
         std::forward<ExPolicy>(policy), c.begin(), c.end());
-    std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, std::less<T>(), elapsed, true) != 0);
     HPX_TEST(is_sorted);
@@ -158,11 +158,11 @@ void test_stable_sort1_comp(ExPolicy&& policy, T, Compare comp = Compare())
     rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
         (std::numeric_limits<T>::max)(), T(std::rand()));
 
-    std::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
     hpx::parallel::stable_sort(
         std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
-    std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
     HPX_TEST(is_sorted);
@@ -183,12 +183,12 @@ void test_stable_sort1_async(ExPolicy&& policy, T, Compare comp = Compare())
     rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
         (std::numeric_limits<T>::max)(), T(std::rand()));
 
-    std::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, non blocking
     hpx::future<void> f = hpx::parallel::stable_sort(
         std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
     f.get();
-    std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
     HPX_TEST(is_sorted);
@@ -547,11 +547,11 @@ void test_stable_sort2(ExPolicy&& policy, T)
     std::vector<T> c(HPX_SORT_TEST_SIZE);
     std::iota(std::begin(c), std::end(c), 0);
 
-    std::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
     hpx::parallel::stable_sort(
         std::forward<ExPolicy>(policy), c.begin(), c.end());
-    std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, std::less<T>(), elapsed, true) != 0);
     HPX_TEST(is_sorted);
@@ -570,11 +570,11 @@ void test_stable_sort2_comp(ExPolicy&& policy, T, Compare comp = Compare())
     std::vector<T> c(HPX_SORT_TEST_SIZE);
     std::iota(std::begin(c), std::end(c), 0);
 
-    std::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
     hpx::parallel::stable_sort(
         std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
-    std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
     HPX_TEST(is_sorted);
@@ -593,12 +593,12 @@ void test_stable_sort2_async(ExPolicy&& policy, T, Compare comp = Compare())
     std::vector<T> c(HPX_SORT_TEST_SIZE);
     std::iota(std::begin(c), std::end(c), T(0));
 
-    std::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, non blocking
     hpx::future<void> f = hpx::parallel::stable_sort(
         std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
     f.get();
-    std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
     HPX_TEST(is_sorted);
@@ -619,11 +619,11 @@ void test_stable_sort1(ExPolicy&& policy, const std::string&)
     std::vector<std::string> c;
     rnd_strings(c);
 
-    std::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
     hpx::parallel::stable_sort(
         std::forward<ExPolicy>(policy), c.begin(), c.end());
-    std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, std::less<std::string>(), elapsed, true) != 0);
     HPX_TEST(is_sorted);
@@ -645,11 +645,11 @@ void test_stable_sort1_comp(
     std::vector<std::string> c;
     rnd_strings(c);
 
-    std::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
     hpx::parallel::stable_sort(
         std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
-    std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
     HPX_TEST(is_sorted);
@@ -670,12 +670,12 @@ void test_stable_sort1_async_str(ExPolicy&& policy, Compare comp = Compare())
     std::vector<std::string> c;
     rnd_strings(c);
 
-    std::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, non blocking
     hpx::future<void> f = hpx::parallel::stable_sort(
         std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
     f.get();
-    std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
     HPX_TEST(is_sorted);

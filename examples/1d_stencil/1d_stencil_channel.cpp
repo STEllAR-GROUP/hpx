@@ -53,7 +53,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::size_t num_worker_threads = hpx::get_num_worker_threads();
     std::size_t rank = hpx::get_locality_id();
 
-    hpx::util::high_resolution_timer t_main;
+    hpx::chrono::high_resolution_timer t_main;
 
     // Keep only partial data
     std::size_t Nx = Nx_global / num_localities;
@@ -90,7 +90,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     executor_type executor(numa_domains);
     auto policy = hpx::execution::par.on(executor);
 
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
     for (std::size_t t = 0; t < steps; ++t)
     {
         data_type& curr = U[t % 2];

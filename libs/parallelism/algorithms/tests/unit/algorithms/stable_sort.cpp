@@ -33,7 +33,7 @@ void sort_benchmark()
         rnd_fill<double>(c, (std::numeric_limits<double>::min)(),
             (std::numeric_limits<double>::max)(), double(std::rand()));
 
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
         // sort, blocking when seq, par, par_vec
         hpx::parallel::stable_sort(par, c.begin(), c.end());
         auto elapsed = static_cast<std::uint64_t>(t.elapsed_nanoseconds());

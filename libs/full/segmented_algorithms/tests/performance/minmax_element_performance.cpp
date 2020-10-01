@@ -54,7 +54,7 @@ struct random_fill
 double run_min_element_benchmark(
     int test_count, hpx::partitioned_vector<int> const& v)
 {
-    std::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i != test_count; ++i)
     {
@@ -63,7 +63,7 @@ double run_min_element_benchmark(
             hpx::execution::par, v.begin(), v.end());
     }
 
-    time = hpx::util::high_resolution_clock::now() - time;
+    time = hpx::chrono::high_resolution_clock::now() - time;
 
     return (time * 1e-9) / test_count;
 }
@@ -72,7 +72,7 @@ double run_min_element_benchmark(
 double run_max_element_benchmark(
     int test_count, hpx::partitioned_vector<int> const& v)
 {
-    std::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i != test_count; ++i)
     {
@@ -81,7 +81,7 @@ double run_max_element_benchmark(
             hpx::execution::par, v.begin(), v.end());
     }
 
-    time = hpx::util::high_resolution_clock::now() - time;
+    time = hpx::chrono::high_resolution_clock::now() - time;
 
     return (time * 1e-9) / test_count;
 }
@@ -90,7 +90,7 @@ double run_max_element_benchmark(
 double run_minmax_element_benchmark(
     int test_count, hpx::partitioned_vector<int> const& v)
 {
-    std::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i != test_count; ++i)
     {
@@ -99,7 +99,7 @@ double run_minmax_element_benchmark(
             hpx::execution::par, v.begin(), v.end());
     }
 
-    time = hpx::util::high_resolution_clock::now() - time;
+    time = hpx::chrono::high_resolution_clock::now() - time;
 
     return (time * 1e-9) / test_count;
 }

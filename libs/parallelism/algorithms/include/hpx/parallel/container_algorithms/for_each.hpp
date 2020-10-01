@@ -399,12 +399,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
                 hpx::parallel::traits::projected_range<Proj, Rng>>::value)>
     // clang-format on
-    typename util::detail::algorithm_result<ExPolicy,
-        typename hpx::traits::range_iterator<Rng>::type>::type
-        HPX_DEPRECATED_V(1, 6,
-            "hpx::parallel::for_each is deprecated, use "
-            "hpx::ranges::for_each instead")
-            for_each(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())
+    HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::for_each is deprecated, use "
+        "hpx::ranges::for_each instead")
+        typename util::detail::algorithm_result<ExPolicy,
+            typename hpx::traits::range_iterator<Rng>::type>::type
+        for_each(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())
     {
         return for_each(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), std::forward<F>(f), std::forward<Proj>(proj));

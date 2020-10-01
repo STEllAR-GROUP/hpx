@@ -71,7 +71,7 @@ double receive_double(
 {
     std::size_t skip = SKIP_LARGE;
 
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
 
     message_double_action msg;
     for (std::size_t i = 0; i != loop + skip; ++i)
@@ -103,7 +103,7 @@ double receive(hpx::naming::id_type dest, char* send_buffer, std::size_t size,
     typedef hpx::serialization::serialize_buffer<char> buffer_type;
     buffer_type recv_buffer;
 
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
 
     message_action msg;
     for (std::size_t i = 0; i != loop + skip; ++i)
@@ -112,8 +112,8 @@ double receive(hpx::naming::id_type dest, char* send_buffer, std::size_t size,
         if (i == skip)
             t.restart();
 
+        using hpx::for_each;
         using hpx::execution::par;
-        using hpx::parallel::for_each;
 
         std::size_t const start = 0;
 
@@ -159,7 +159,7 @@ void run_benchmark(hpx::program_options::variables_map& vm)
     char* send_buffer = align_buffer(send_buffer_orig.get(), align_size);
 
     // perform actual measurements
-    hpx::util::high_resolution_timer timer;
+    hpx::chrono::high_resolution_timer timer;
 
     // test for single double
     double latency = receive_double(there, loop, window_size);

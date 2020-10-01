@@ -84,12 +84,12 @@ skynet_f(std::int64_t num, std::int64_t size, std::int64_t div)
 int main()
 {
     {
-        std::uint64_t t = hpx::util::high_resolution_clock::now();
+        std::uint64_t t = hpx::chrono::high_resolution_clock::now();
 
         hpx::future<std::int64_t> result = hpx::async(skynet, 0, 1000000, 10);
         result.wait();
 
-        t = hpx::util::high_resolution_clock::now() - t;
+        t = hpx::chrono::high_resolution_clock::now() - t;
 
         hpx::cout
             << "Result 1: " << result.get() << " in "
@@ -97,12 +97,12 @@ int main()
     }
 
     {
-        std::uint64_t t = hpx::util::high_resolution_clock::now();
+        std::uint64_t t = hpx::chrono::high_resolution_clock::now();
 
         hpx::future<std::int64_t> result = hpx::async(skynet_f, 0, 1000000, 10);
         result.wait();
 
-        t = hpx::util::high_resolution_clock::now() - t;
+        t = hpx::chrono::high_resolution_clock::now() - t;
 
         hpx::cout
             << "Result 2: " << result.get() << " in "

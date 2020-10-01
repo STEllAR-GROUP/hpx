@@ -110,7 +110,8 @@ function(add_hpx_module libname modulename)
   if(${_have_compatibility_headers_option}
      AND HPX_${modulename_upper}_WITH_COMPATIBILITY_HEADERS
   )
-    set(COMPAT_HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include_compatibility")
+    set(COMPAT_HEADER_ROOT "${CMAKE_CURRENT_BINARY_DIR}/include_compatibility")
+    file(MAKE_DIRECTORY ${COMPAT_HEADER_ROOT})
     hpx_debug(
       "Add module ${modulename}: COMPAT_HEADER_ROOT: ${COMPAT_HEADER_ROOT}"
     )
@@ -132,12 +133,24 @@ function(add_hpx_module libname modulename)
   if(${_have_compatibility_headers_option}
      AND HPX_${modulename_upper}_WITH_COMPATIBILITY_HEADERS
   )
-    list(
-      TRANSFORM ${modulename}_COMPAT_HEADERS
-      PREPEND ${COMPAT_HEADER_ROOT}/
-              OUTPUT_VARIABLE
-              compat_headers
+    string(REPLACE ";=>;" "=>" ${modulename}_COMPAT_HEADERS
+                   "${${modulename}_COMPAT_HEADERS}"
     )
+    foreach(compat_header IN LISTS ${modulename}_COMPAT_HEADERS)
+      string(REPLACE "=>" ";" compat_header "${compat_header}")
+      list(LENGTH compat_header compat_header_length)
+      if(NOT compat_header_length EQUAL 2)
+        message(FATAL_ERROR "Invalid compatibility header ${compat_header}")
+      endif()
+
+      list(GET compat_header 0 old_header)
+      list(GET compat_header 1 new_header)
+      configure_file(
+        "${PROJECT_SOURCE_DIR}/cmake/templates/compatibility_header.hpp.in"
+        "${COMPAT_HEADER_ROOT}/${old_header}"
+      )
+      list(APPEND compat_headers "${COMPAT_HEADER_ROOT}/${old_header}")
+    endforeach()
   endif()
 
   # This header generation is disabled for config module specific generated
@@ -267,13 +280,13 @@ function(add_hpx_module libname modulename)
   target_include_directories(hpx_${modulename} PRIVATE ${HPX_SOURCE_DIR})
 
   add_hpx_source_group(
-    NAME hpx_{modulename}
+    NAME hpx_${modulename}
     ROOT ${HEADER_ROOT}/hpx
     CLASS "Header Files"
     TARGETS ${headers}
   )
   add_hpx_source_group(
-    NAME hpx_{modulename}
+    NAME hpx_${modulename}
     ROOT ${SOURCE_ROOT}
     CLASS "Source Files"
     TARGETS ${sources}
@@ -283,22 +296,22 @@ function(add_hpx_module libname modulename)
   )
     add_hpx_source_group(
       NAME hpx_${modulename}
-      ROOT ${COMPAT_HEADER_ROOT}/hpx
-      CLASS "Header Files"
+      ROOT ${COMPAT_HEADER_BINARY_ROOT}/hpx
+      CLASS "Generated Files"
       TARGETS ${compat_headers}
     )
   endif()
 
   if(${modulename}_GLOBAL_HEADER_GEN OR ${modulename}_CONFIG_FILES)
     add_hpx_source_group(
-      NAME hpx_{modulename}
+      NAME hpx_${modulename}
       ROOT ${CMAKE_CURRENT_BINARY_DIR}/include/hpx
       CLASS "Generated Files"
       TARGETS ${generated_headers}
     )
   endif()
   add_hpx_source_group(
-    NAME hpx_{modulename}
+    NAME hpx_${modulename}
     ROOT ${CMAKE_CURRENT_BINARY_DIR}/include/hpx
     CLASS "Generated Files"
     TARGETS ${config_header}
@@ -351,7 +364,7 @@ function(add_hpx_module libname modulename)
      AND HPX_${modulename_upper}_WITH_COMPATIBILITY_HEADERS
   )
     install(
-      DIRECTORY include_compatibility/hpx
+      DIRECTORY ${COMPAT_HEADER_ROOT}/hpx
       DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
       COMPONENT ${modulename}
     )

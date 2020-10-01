@@ -167,10 +167,9 @@ struct test_timed_sync_executor1 : test_sync_executor1
     typedef hpx::execution::sequenced_execution_tag execution_category;
 
     template <typename F, typename... Ts>
-    typename hpx::util::detail::invoke_deferred_result<F,
-        Ts...>::type static sync_execute_at(hpx::util::steady_time_point const&
-                                                abs_time,
-        F&& f, Ts&&... ts)
+    typename hpx::util::detail::invoke_deferred_result<F, Ts...>::
+        type static sync_execute_at(
+            hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         ++count_sync_at;
         hpx::this_thread::sleep_until(abs_time);
@@ -206,7 +205,7 @@ struct test_timed_sync_executor2 : test_sync_executor2
 {
     template <typename F, typename... Ts>
     static void post_at(
-        hpx::util::steady_time_point const& abs_time, F&& f, Ts&&... ts)
+        hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         ++count_apply_at;
         hpx::this_thread::sleep_until(abs_time);

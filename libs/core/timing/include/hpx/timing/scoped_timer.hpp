@@ -17,7 +17,7 @@ namespace hpx { namespace util {
     struct scoped_timer
     {
         scoped_timer(T& t, bool enabled = true)
-          : started_at_(enabled ? hpx::util::high_resolution_clock::now() : 0)
+          : started_at_(enabled ? hpx::chrono::high_resolution_clock::now() : 0)
           , t_(enabled ? &t : nullptr)
         {
         }
@@ -34,7 +34,8 @@ namespace hpx { namespace util {
         {
             if (enabled())
             {
-                *t_ += (hpx::util::high_resolution_clock::now() - started_at_);
+                *t_ +=
+                    (hpx::chrono::high_resolution_clock::now() - started_at_);
             }
         }
 

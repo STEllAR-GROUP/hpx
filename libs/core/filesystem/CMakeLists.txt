@@ -13,7 +13,11 @@ endif()
 
 set(filesystem_headers hpx/modules/filesystem.hpp)
 
-set(filesystem_compat_headers hpx/filesystem.hpp)
+# cmake-format: off
+set(filesystem_compat_headers
+    hpx/filesystem.hpp => hpx/modules/filesystem.hpp
+)
+# cmake-format: on
 
 include(HPX_AddModule)
 add_hpx_module(

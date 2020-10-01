@@ -20,15 +20,17 @@ set(runtime_configuration_headers
     hpx/runtime_configuration/static_factory_data.hpp
 )
 
+# cmake-format: off
 set(runtime_configuration_compat_headers
-    hpx/util/ini.hpp
-    hpx/util/init_ini_data.hpp
-    hpx/util/runtime_configuration.hpp
-    hpx/plugins/plugin_registry_base.hpp
-    hpx/runtime/components/component_registry_base.hpp
-    hpx/runtime/components/static_factory_data.hpp
-    hpx/runtime/runtime_mode.hpp
+    hpx/util/ini.hpp => hpx/modules/runtime_configuration.hpp
+    hpx/util/init_ini_data.hpp => hpx/modules/runtime_configuration.hpp
+    hpx/util/runtime_configuration.hpp => hpx/modules/runtime_configuration.hpp
+    hpx/plugins/plugin_registry_base.hpp => hpx/modules/runtime_configuration.hpp
+    hpx/runtime/components/component_registry_base.hpp => hpx/modules/runtime_configuration.hpp
+    hpx/runtime/components/static_factory_data.hpp => hpx/modules/runtime_configuration.hpp
+    hpx/runtime/runtime_mode.hpp => hpx/modules/runtime_configuration.hpp
 )
+# cmake-format: on
 
 set(runtime_configuration_sources ini.cpp init_ini_data.cpp
                                   runtime_configuration.cpp runtime_mode.cpp

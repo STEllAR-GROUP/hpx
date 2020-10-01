@@ -40,11 +40,15 @@ set(coroutines_headers
     hpx/coroutines/thread_id_type.hpp
 )
 
+# cmake-format: off
 set(coroutines_compat_headers
-    hpx/coroutines.hpp hpx/runtime/threads/coroutines/coroutine.hpp
-    hpx/runtime/threads/coroutines/coroutine_fwd.hpp
-    hpx/runtime/threads/thread_enums.hpp hpx/runtime/threads/thread_id_type.hpp
+    hpx/coroutines.hpp => hpx/modules/coroutines.hpp
+    hpx/runtime/threads/coroutines/coroutine.hpp => hpx/modules/coroutines.hpp
+    hpx/runtime/threads/coroutines/coroutine_fwd.hpp => hpx/modules/coroutines.hpp
+    hpx/runtime/threads/thread_enums.hpp => hpx/modules/coroutines.hpp
+    hpx/runtime/threads/thread_id_type.hpp => hpx/modules/coroutines.hpp
 )
+# cmake-format: on
 
 set(coroutines_sources
     detail/context_base.cpp

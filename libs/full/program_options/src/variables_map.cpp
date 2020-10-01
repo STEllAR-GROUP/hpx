@@ -124,7 +124,7 @@ namespace hpx { namespace program_options {
             }
             if (m.count(key) == 0)
             {
-                hpx::util::any_nonser def;
+                hpx::any_nonser def;
                 if (d.semantic()->apply_default(def))
                 {
                     m[key] = variable_value(def, true);

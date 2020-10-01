@@ -26,6 +26,13 @@ set(tests
     find_end_range2
     find_first_of_range
     find_first_of_range2
+    for_loop_range
+    for_loop_exception_range
+    for_loop_induction_range
+    for_loop_induction_async_range
+    for_loop_reduction_range
+    for_loop_reduction_async_range
+    for_loop_strided_range
     foreach_adapt
     foreach_range
     foreach_range_projection

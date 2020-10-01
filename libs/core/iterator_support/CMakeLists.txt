@@ -19,16 +19,18 @@ set(iterator_support_headers
     hpx/iterator_support/zip_iterator.hpp
 )
 
+# cmake-format: off
 set(iterator_support_compat_headers
-    hpx/iterator_support.hpp
-    hpx/traits/is_iterator.hpp
-    hpx/traits/is_range.hpp
-    hpx/util/iterator_adaptor.hpp
-    hpx/util/iterator_facade.hpp
-    hpx/util/iterator_range.hpp
-    hpx/util/range.hpp
-    hpx/util/transform_iterator.hpp
+    hpx/iterator_support.hpp => hpx/modules/iterator_support.hpp
+    hpx/traits/is_iterator.hpp => hpx/modules/iterator_support.hpp
+    hpx/traits/is_range.hpp => hpx/modules/iterator_support.hpp
+    hpx/util/iterator_adaptor.hpp => hpx/modules/iterator_support.hpp
+    hpx/util/iterator_facade.hpp => hpx/modules/iterator_support.hpp
+    hpx/util/iterator_range.hpp => hpx/modules/iterator_support.hpp
+    hpx/util/range.hpp => hpx/modules/iterator_support.hpp
+    hpx/util/transform_iterator.hpp => hpx/modules/iterator_support.hpp
 )
+# cmake-format: on
 
 set(iterator_support_sources)
 

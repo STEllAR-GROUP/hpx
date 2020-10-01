@@ -125,7 +125,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             HPX_ASSERT_OWNS_LOCK(l);
             reinitialize_data<T>(l);
-            return hpx::util::any_cast<std::vector<T>&>(data_);
+            return hpx::any_cast<std::vector<T>&>(data_);
         }
 
         template <typename Lock>
@@ -153,7 +153,7 @@ namespace hpx { namespace lcos { namespace detail {
         std::size_t const connect_to_;
         std::size_t which_;
         bool needs_initialization_;
-        hpx::util::unique_any_nonser data_;
+        hpx::unique_any_nonser data_;
         lcos::local::and_gate gate_;
 
         // valid if site_ != connect_to_

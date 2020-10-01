@@ -286,7 +286,7 @@ namespace hpx { namespace ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                    hpx::parallel::execution::sequenced_policy, Comp,
+                    hpx::execution::sequenced_policy, Comp,
                     hpx::parallel::traits::projected<Proj, Iter>,
                     hpx::parallel::traits::projected<Proj, Iter>
                 >::value
@@ -299,7 +299,7 @@ namespace hpx { namespace ranges {
                 "Requires random access iterator.");
 
             return hpx::parallel::v1::detail::make_heap<Iter>().call(
-                hpx::parallel::execution::seq, std::true_type{}, first, last,
+                hpx::execution::seq, std::true_type{}, first, last,
                 std::forward<Comp>(comp), std::forward<Proj>(proj));
         }
 
@@ -309,7 +309,7 @@ namespace hpx { namespace ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                    hpx::parallel::execution::sequenced_policy, Comp,
+                    hpx::execution::sequenced_policy, Comp,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >::value
@@ -326,9 +326,9 @@ namespace hpx { namespace ranges {
                 "Requires random access iterator.");
 
             return hpx::parallel::v1::detail::make_heap<iterator_type>().call(
-                hpx::parallel::execution::seq, std::true_type{},
-                hpx::util::begin(rng), hpx::util::end(rng),
-                std::forward<Comp>(comp), std::forward<Proj>(proj));
+                hpx::execution::seq, std::true_type{}, hpx::util::begin(rng),
+                hpx::util::end(rng), std::forward<Comp>(comp),
+                std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -337,7 +337,7 @@ namespace hpx { namespace ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                    hpx::parallel::execution::sequenced_policy,
+                    hpx::execution::sequenced_policy,
                     std::less<typename std::iterator_traits<Iter>::value_type>,
                     hpx::parallel::traits::projected<Proj, Iter>,
                     hpx::parallel::traits::projected<Proj, Iter>
@@ -353,7 +353,7 @@ namespace hpx { namespace ranges {
             using value_type = typename std::iterator_traits<Iter>::value_type;
 
             return hpx::parallel::v1::detail::make_heap<Iter>().call(
-                hpx::parallel::execution::seq, std::true_type{}, first, last,
+                hpx::execution::seq, std::true_type{}, first, last,
                 std::less<value_type>(), std::forward<Proj>(proj));
         }
 
@@ -363,7 +363,7 @@ namespace hpx { namespace ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<
-                    hpx::parallel::execution::sequenced_policy,
+                    hpx::execution::sequenced_policy,
                     std::less<typename std::iterator_traits<
                         typename hpx::traits::range_iterator<Rng>::type
                     >::value_type>,
@@ -386,9 +386,9 @@ namespace hpx { namespace ranges {
                 typename std::iterator_traits<iterator_type>::value_type;
 
             return hpx::parallel::v1::detail::make_heap<iterator_type>().call(
-                hpx::parallel::execution::seq, std::true_type{},
-                hpx::util::begin(rng), hpx::util::end(rng),
-                std::less<value_type>(), std::forward<Proj>(proj));
+                hpx::execution::seq, std::true_type{}, hpx::util::begin(rng),
+                hpx::util::end(rng), std::less<value_type>(),
+                std::forward<Proj>(proj));
         }
     } make_heap{};
 }}    // namespace hpx::ranges

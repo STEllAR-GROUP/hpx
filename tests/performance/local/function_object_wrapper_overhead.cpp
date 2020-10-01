@@ -44,7 +44,7 @@ template <typename F>
 void run(F const & f, std::uint64_t local_iterations)
 {
     std::uint64_t i = 0;
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
 
     for (; i < local_iterations; ++i)
         f();

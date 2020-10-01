@@ -116,12 +116,12 @@ namespace hpx { namespace util {
             bool pre_shutdown = false);
 
         interval_timer(util::function_nonser<bool()> const& f,
-            util::steady_duration const& rel_time, char const* description = "",
-            bool pre_shutdown = false);
+            hpx::chrono::steady_duration const& rel_time,
+            char const* description = "", bool pre_shutdown = false);
         interval_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            util::steady_duration const& rel_time, char const* description = "",
-            bool pre_shutdown = false);
+            hpx::chrono::steady_duration const& rel_time,
+            char const* description = "", bool pre_shutdown = false);
 
         ~interval_timer();
 
@@ -152,7 +152,7 @@ namespace hpx { namespace util {
 
         void change_interval(std::int64_t new_interval);
 
-        void change_interval(util::steady_duration const& new_interval);
+        void change_interval(hpx::chrono::steady_duration const& new_interval);
 
     private:
         std::shared_ptr<detail::interval_timer> timer_;

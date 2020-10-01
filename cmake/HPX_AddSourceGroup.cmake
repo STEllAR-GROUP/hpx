@@ -34,13 +34,11 @@ function(add_hpx_source_group)
       string(REGEX REPLACE "/" "\\\\\\\\" relpath "${relpath}")
 
       if(GROUP_CLASS)
-        if(NOT ("${relpath}" STREQUAL ""))
-          hpx_debug(
-            "add_source_group.${name}"
-            "Adding '${target}' to source group '${GROUP_CLASS}', sub-group '${relpath}'"
-          )
-          source_group("${GROUP_CLASS}\\${relpath}" FILES ${target})
-        endif()
+        hpx_debug(
+          "add_source_group.${name}"
+          "Adding '${target}' to source group '${GROUP_CLASS}', sub-group '${relpath}'"
+        )
+        source_group("${GROUP_CLASS}\\${relpath}" FILES ${target})
       else()
         hpx_debug("add_source_group.${name}"
                   "Adding ${target} to source group ${relpath}"

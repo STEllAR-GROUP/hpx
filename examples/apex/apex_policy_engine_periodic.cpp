@@ -60,7 +60,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     {
         // Keep track of the time required to execute.
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         // Wait for fib() to return the value
         fibonacci_action fib;

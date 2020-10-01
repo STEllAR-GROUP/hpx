@@ -23,20 +23,22 @@ set(logging_headers
 )
 
 # Default location is $HPX_ROOT/libs/logging/include_compatibility
+# cmake-format: off
 set(logging_compat_headers
-    hpx/logging.hpp
-    hpx/util/logging.hpp
-    hpx/util/logging/writer/format_write.hpp
-    hpx/util/logging/writer/named_write.hpp
-    hpx/util/logging/logging.hpp
-    hpx/util/logging/format/formatter/high_precision_time.hpp
-    hpx/util/logging/format/formatter/defaults.hpp
-    hpx/util/logging/format/formatter/thread_id.hpp
-    hpx/util/logging/format/named_write.hpp
-    hpx/util/logging/format/destination/defaults.hpp
-    hpx/util/logging/format/destination/file.hpp
-    hpx/util/logging/format/optimize.hpp
+    hpx/logging.hpp => hpx/modules/logging.hpp
+    hpx/util/logging.hpp => hpx/modules/logging.hpp
+    hpx/util/logging/writer/format_write.hpp => hpx/modules/logging.hpp
+    hpx/util/logging/writer/named_write.hpp => hpx/modules/logging.hpp
+    hpx/util/logging/logging.hpp => hpx/modules/logging.hpp
+    hpx/util/logging/format/formatter/high_precision_time.hpp => hpx/modules/logging.hpp
+    hpx/util/logging/format/formatter/defaults.hpp => hpx/modules/logging.hpp
+    hpx/util/logging/format/formatter/thread_id.hpp => hpx/modules/logging.hpp
+    hpx/util/logging/format/named_write.hpp => hpx/modules/logging.hpp
+    hpx/util/logging/format/destination/defaults.hpp => hpx/modules/logging.hpp
+    hpx/util/logging/format/destination/file.hpp => hpx/modules/logging.hpp
+    hpx/util/logging/format/optimize.hpp => hpx/modules/logging.hpp
 )
+# cmake-format: on
 
 # Default location is $HPX_ROOT/libs/logging/src
 set(logging_sources

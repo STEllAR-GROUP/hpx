@@ -19,7 +19,12 @@ set(util_headers
     hpx/util/traits/await_traits.hpp
 )
 
-set(util_compat_headers hpx/util.hpp hpx/util/await_traits.hpp)
+# cmake-format: off
+set(util_compat_headers
+    hpx/util.hpp => hpx/include/util.hpp
+    hpx/util/await_traits.hpp => hpx/include/util.hpp
+)
+# cmake-format: on
 
 set(util_sources manage_config.cpp regex_from_pattern.cpp sed_transform.cpp)
 

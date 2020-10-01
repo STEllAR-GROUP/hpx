@@ -274,7 +274,7 @@ void copy_test()
     int i;
     char c;
     double d;
-    hpx::util::tie(i, c, d) = hpx::make_tuple(1, 'a', 5.5);
+    hpx::tie(i, c, d) = hpx::make_tuple(1, 'a', 5.5);
 
     HPX_TEST_EQ(i, 1);
     HPX_TEST_EQ(c, 'a');
@@ -350,20 +350,19 @@ void tie_test()
     char b;
     foo c(5);
 
-    hpx::util::tie(a, b, c) = hpx::make_tuple(2, 'a', foo(3));
+    hpx::tie(a, b, c) = hpx::make_tuple(2, 'a', foo(3));
     HPX_TEST_EQ(a, 2);
     HPX_TEST_EQ(b, 'a');
     HPX_TEST(c == foo(3));
 
-    hpx::util::tie(a, hpx::ignore, c) =
-        hpx::make_tuple((short int) 5, false, foo(5));
+    hpx::tie(a, hpx::ignore, c) = hpx::make_tuple((short int) 5, false, foo(5));
     HPX_TEST_EQ(a, 5);
     HPX_TEST_EQ(b, 'a');
     HPX_TEST(c == foo(5));
 
     // testing assignment from std::pair
     int i, j;
-    hpx::util::tie(i, j) = std::make_pair(1, 2);
+    hpx::tie(i, j) = std::make_pair(1, 2);
     HPX_TEST(i == 1 && j == 2);
 
     hpx::tuple<int, int, float> ta;

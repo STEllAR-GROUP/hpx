@@ -44,7 +44,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     {
         // Initialize a high resolution timer
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         hpx::future<int> f =
             hpx::resiliency::experimental::async_replicate_vote(
@@ -58,7 +58,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     {
         // Initialize a high resolution timer
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         hpx::future<int> f =
             hpx::resiliency::experimental::async_replicate_vote_validate(

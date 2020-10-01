@@ -46,7 +46,7 @@ namespace hpx { namespace util { namespace detail
 
         ~pool_timer();
 
-        bool start(util::steady_duration const& time_duration, bool evaluate);
+        bool start(hpx::chrono::steady_duration const& time_duration, bool evaluate);
         bool stop();
 
         bool is_started() const { return is_started_; }
@@ -105,7 +105,7 @@ namespace hpx { namespace util { namespace detail
         }
     }
 
-    bool pool_timer::start(util::steady_duration const& time_duration,
+    bool pool_timer::start(hpx::chrono::steady_duration const& time_duration,
         bool evaluate_)
     {
         std::unique_lock<mutex_type> l(mtx_);
@@ -207,7 +207,7 @@ namespace hpx { namespace util
         timer_->terminate();
     }
 
-    bool pool_timer::start(util::steady_duration const& time_duration,
+    bool pool_timer::start(hpx::chrono::steady_duration const& time_duration,
         bool evaluate)
     {
         return timer_->start(time_duration, evaluate);

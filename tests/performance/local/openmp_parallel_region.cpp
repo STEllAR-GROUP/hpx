@@ -51,7 +51,7 @@ int main(int argc, char ** argv)
         << "threads, parallel region [s]"
         << std::endl;
 
-    hpx::util::high_resolution_timer timer;
+    hpx::chrono::high_resolution_timer timer;
 
     for (std::size_t i = 0; i < repetitions; ++i)
     {

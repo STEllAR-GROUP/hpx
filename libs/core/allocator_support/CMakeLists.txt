@@ -10,9 +10,13 @@ set(allocator_support_headers hpx/allocator_support/allocator_deleter.hpp
                               hpx/allocator_support/internal_allocator.hpp
 )
 
-set(allocator_support_compat_headers hpx/util/allocator_deleter.hpp
-                                     hpx/util/internal_allocator.hpp
+# cmake-format: off
+set(allocator_support_compat_headers
+    hpx/allocator_support.hpp => hpx/modules/allocator_support.hpp
+    hpx/util/allocator_deleter.hpp => hpx/modules/allocator_support.hpp
+    hpx/util/internal_allocator.hpp => hpx/modules/allocator_support.hpp
 )
+# cmake-format: on
 
 set(allocator_support_sources)
 

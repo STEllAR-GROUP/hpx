@@ -25,15 +25,15 @@ namespace hpx { namespace util { namespace storage {
         struct compare_any
         {
             bool operator()(
-                hpx::util::any const& lhs, hpx::util::any const& rhs) const
+                hpx::any const& lhs, hpx::any const& rhs) const
             {
                 return lhs.equal_to(rhs);
             }
         };
 
     public:
-        using tuple_holder = std::vector<hpx::util::any>;
-        using elem_type = hpx::util::any;
+        using tuple_holder = std::vector<hpx::any>;
+        using elem_type = hpx::any;
         using hash_elem_functor = hpx::util::hash_any;
         using compare_elem_functor = compare_any;
 
@@ -99,7 +99,7 @@ namespace hpx { namespace util { namespace storage {
         template <typename T>
         T get(unsigned int index)
         {
-            return hpx::util::any_cast<T>(tuple_.at(index));
+            return hpx::any_cast<T>(tuple_.at(index));
         }
 
         iterator begin()

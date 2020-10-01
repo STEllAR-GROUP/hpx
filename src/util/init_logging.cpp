@@ -8,20 +8,19 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
-#include <hpx/modules/logging.hpp>
 #include <hpx/logging/format/named_write.hpp>
 #include <hpx/logging/manipulator.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/threadmanager.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
-#include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/modules/threadmanager.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
+#include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/type_support/static.hpp>
 #include <hpx/util/get_entry_as.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/util/init_logging.hpp>
 
 #include <boost/config.hpp>
@@ -40,7 +39,8 @@
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
-#pragma warning (disable: 4250) // 'class1' : inherits 'class2::member' via dominance
+#pragma warning(                                                               \
+    disable : 4250)    // 'class1' : inherits 'class2::member' via dominance
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -355,18 +355,19 @@ namespace hpx { namespace util {
             logger_writer_type& writer = agas_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            agas_logger()->writer().set_destination("android_log",
-                android_log("hpx.agas"));
+            agas_logger()->writer().set_destination(
+                "android_log", android_log("hpx.agas"));
 #else
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
 #endif
             if (logformat.empty())
                 logformat = "|\\n";
 
-            writer.set_destination("console", console(lvl, destination_agas)); //-V106
+            writer.set_destination(
+                "console", console(lvl, destination_agas));    //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
 
@@ -380,15 +381,18 @@ namespace hpx { namespace util {
     {
         std::string loglevel, logdest, logformat;
 
-        if (ini.has_section("hpx.logging.parcel")) {
+        if (ini.has_section("hpx.logging.parcel"))
+        {
             util::section const* logini = ini.get_section("hpx.logging.parcel");
             HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            if (!loglevel.empty()) {
+            if (!loglevel.empty())
+            {
                 logdest = logini->get_entry("destination", empty);
-                logformat = detail::unescape(logini->get_entry("format", empty));
+                logformat =
+                    detail::unescape(logini->get_entry("format", empty));
             }
         }
 
@@ -398,22 +402,22 @@ namespace hpx { namespace util {
 
         if (hpx::util::logging::level::disable_all != lvl)
         {
-           logger_writer_type& writer = parcel_logger()->writer();
+            logger_writer_type& writer = parcel_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            parcel_logger()->writer().set_destination("android_log",
-                android_log("hpx.parcel"));
+            parcel_logger()->writer().set_destination(
+                "android_log", android_log("hpx.parcel"));
 #else
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
 #endif
             if (logformat.empty())
                 logformat = "|\\n";
 
-            writer.set_destination("console",
-                console(lvl, destination_parcel)); //-V106
+            writer.set_destination(
+                "console", console(lvl, destination_parcel));    //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
 
@@ -427,15 +431,18 @@ namespace hpx { namespace util {
     {
         std::string loglevel, logdest, logformat;
 
-        if (ini.has_section("hpx.logging.timing")) {
+        if (ini.has_section("hpx.logging.timing"))
+        {
             util::section const* logini = ini.get_section("hpx.logging.timing");
             HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            if (!loglevel.empty()) {
+            if (!loglevel.empty())
+            {
                 logdest = logini->get_entry("destination", empty);
-                logformat = detail::unescape(logini->get_entry("format", empty));
+                logformat =
+                    detail::unescape(logini->get_entry("format", empty));
             }
         }
 
@@ -445,22 +452,22 @@ namespace hpx { namespace util {
 
         if (hpx::util::logging::level::disable_all != lvl)
         {
-           logger_writer_type& writer = timing_logger()->writer();
+            logger_writer_type& writer = timing_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
 
-            writer.set_destination("android_log",
-                android_log("hpx.timing"));
+            writer.set_destination("android_log", android_log("hpx.timing"));
 #else
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
 #endif
             if (logformat.empty())
                 logformat = "|\\n";
 
-            writer.set_destination("console", console(lvl, destination_timing)); //-V106
+            writer.set_destination(
+                "console", console(lvl, destination_timing));    //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
 
@@ -473,15 +480,18 @@ namespace hpx { namespace util {
     {
         std::string loglevel, logdest, logformat;
 
-        if (ini.has_section("hpx.logging")) {
+        if (ini.has_section("hpx.logging"))
+        {
             util::section const* logini = ini.get_section("hpx.logging");
             HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            if (!loglevel.empty()) {
+            if (!loglevel.empty())
+            {
                 logdest = logini->get_entry("destination", empty);
-                logformat = detail::unescape(logini->get_entry("format", empty));
+                logformat =
+                    detail::unescape(logini->get_entry("format", empty));
             }
         }
 
@@ -493,13 +503,13 @@ namespace hpx { namespace util {
         logger_writer_type& error_writer = hpx_error_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
-        if (logdest.empty())      // ensure minimal defaults
+        if (logdest.empty())    // ensure minimal defaults
             logdest = isconsole ? "android_log" : "console";
 
         writer.set_destination("android_log", android_log("hpx"));
         error_writer.set_destination("android_log", android_log("hpx"));
 #else
-        if (logdest.empty())      // ensure minimal defaults
+        if (logdest.empty())    // ensure minimal defaults
             logdest = isconsole ? "cerr" : "console";
 #endif
         if (logformat.empty())
@@ -507,7 +517,8 @@ namespace hpx { namespace util {
 
         if (hpx::util::logging::level::disable_all != lvl)
         {
-            writer.set_destination("console", console(lvl, destination_hpx)); //-V106
+            writer.set_destination(
+                "console", console(lvl, destination_hpx));    //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
 
@@ -515,8 +526,8 @@ namespace hpx { namespace util {
             hpx_logger()->set_enabled(lvl);
 
             // errors are logged to the given destination and to cerr
-            error_writer.set_destination("console",
-                console(lvl, destination_hpx)); //-V106
+            error_writer.set_destination(
+                "console", console(lvl, destination_hpx));    //-V106
 #if !defined(ANDROID) && !defined(__ANDROID__)
             if (logdest != "cerr")
                 error_writer.write(logformat, logdest + " cerr");
@@ -526,14 +537,17 @@ namespace hpx { namespace util {
             hpx_error_logger()->mark_as_initialized();
             hpx_error_logger()->set_enabled(lvl);
         }
-        else {
+        else
+        {
             // errors are always logged to cerr
-            if (!isconsole) {
-                error_writer.set_destination("console",
-                    console(lvl, destination_hpx)); //-V106
+            if (!isconsole)
+            {
+                error_writer.set_destination(
+                    "console", console(lvl, destination_hpx));    //-V106
                 error_writer.write(logformat, "console");
             }
-            else {
+            else
+            {
 #if defined(ANDROID) || defined(__ANDROID__)
                 error_writer.write(logformat, "android_log");
 #else
@@ -552,15 +566,19 @@ namespace hpx { namespace util {
     {
         std::string loglevel, logdest, logformat;
 
-        if (ini.has_section("hpx.logging.application")) {
-            util::section const* logini = ini.get_section("hpx.logging.application");
+        if (ini.has_section("hpx.logging.application"))
+        {
+            util::section const* logini =
+                ini.get_section("hpx.logging.application");
             HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            if (!loglevel.empty()) {
+            if (!loglevel.empty())
+            {
                 logdest = logini->get_entry("destination", empty);
-                logformat = detail::unescape(logini->get_entry("format", empty));
+                logformat =
+                    detail::unescape(logini->get_entry("format", empty));
             }
         }
 
@@ -573,17 +591,19 @@ namespace hpx { namespace util {
             logger_writer_type& writer = app_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            writer.set_destination("android_log", android_log("hpx.application"));
+            writer.set_destination(
+                "android_log", android_log("hpx.application"));
 #else
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
 #endif
             if (logformat.empty())
                 logformat = "|\\n";
 
-            writer.set_destination("console", console(lvl, destination_app)); //-V106
+            writer.set_destination(
+                "console", console(lvl, destination_app));    //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
 
@@ -597,15 +617,19 @@ namespace hpx { namespace util {
     {
         std::string loglevel, logdest, logformat;
 
-        if (ini.has_section("hpx.logging.debuglog")) {
-            util::section const* logini = ini.get_section("hpx.logging.debuglog");
+        if (ini.has_section("hpx.logging.debuglog"))
+        {
+            util::section const* logini =
+                ini.get_section("hpx.logging.debuglog");
             HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            if (!loglevel.empty()) {
+            if (!loglevel.empty())
+            {
                 logdest = logini->get_entry("destination", empty);
-                logformat = detail::unescape(logini->get_entry("format", empty));
+                logformat =
+                    detail::unescape(logini->get_entry("format", empty));
             }
         }
 
@@ -618,18 +642,18 @@ namespace hpx { namespace util {
             logger_writer_type& writer = debuglog_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
             writer.set_destination("android_log", android_log("hpx.debuglog"));
 #else
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
 #endif
             if (logformat.empty())
                 logformat = "|\\n";
 
-            writer.set_destination("console",
-                console(lvl, destination_debuglog)); //-V106
+            writer.set_destination(
+                "console", console(lvl, destination_debuglog));    //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
 
@@ -643,15 +667,19 @@ namespace hpx { namespace util {
     {
         std::string loglevel, logdest, logformat;
 
-        if (ini.has_section("hpx.logging.console.agas")) {
-            util::section const* logini = ini.get_section("hpx.logging.console.agas");
+        if (ini.has_section("hpx.logging.console.agas"))
+        {
+            util::section const* logini =
+                ini.get_section("hpx.logging.console.agas");
             HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            if (!loglevel.empty()) {
+            if (!loglevel.empty())
+            {
                 logdest = logini->get_entry("destination", empty);
-                logformat = detail::unescape(logini->get_entry("format", empty));
+                logformat =
+                    detail::unescape(logini->get_entry("format", empty));
             }
         }
 
@@ -664,11 +692,11 @@ namespace hpx { namespace util {
             logger_writer_type& writer = agas_console_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = "android_log";
             writer.set_destination("android_log", android_log("hpx.agas"));
 #else
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = "cerr";
 #endif
             if (logformat.empty())
@@ -686,16 +714,19 @@ namespace hpx { namespace util {
     {
         std::string loglevel, logdest, logformat;
 
-        if (ini.has_section("hpx.logging.console.parcel")) {
+        if (ini.has_section("hpx.logging.console.parcel"))
+        {
             util::section const* logini =
                 ini.get_section("hpx.logging.console.parcel");
             HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            if (!loglevel.empty()) {
+            if (!loglevel.empty())
+            {
                 logdest = logini->get_entry("destination", empty);
-                logformat = detail::unescape(logini->get_entry("format", empty));
+                logformat =
+                    detail::unescape(logini->get_entry("format", empty));
             }
         }
 
@@ -708,11 +739,11 @@ namespace hpx { namespace util {
             logger_writer_type& writer = parcel_console_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = "android_log";
             writer.set_destination("android_log", android_log("hpx.parcel"));
 #else
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = "cerr";
 #endif
             if (logformat.empty())
@@ -730,15 +761,19 @@ namespace hpx { namespace util {
     {
         std::string loglevel, logdest, logformat;
 
-        if (ini.has_section("hpx.logging.console.timing")) {
-            util::section const* logini = ini.get_section("hpx.logging.console.timing");
+        if (ini.has_section("hpx.logging.console.timing"))
+        {
+            util::section const* logini =
+                ini.get_section("hpx.logging.console.timing");
             HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            if (!loglevel.empty()) {
+            if (!loglevel.empty())
+            {
                 logdest = logini->get_entry("destination", empty);
-                logformat = detail::unescape(logini->get_entry("format", empty));
+                logformat =
+                    detail::unescape(logini->get_entry("format", empty));
             }
         }
 
@@ -751,11 +786,11 @@ namespace hpx { namespace util {
             logger_writer_type& writer = timing_console_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = "android_log";
             writer.set_destination("android_log", android_log("hpx.timing"));
 #else
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = "cerr";
 #endif
             if (logformat.empty())
@@ -773,15 +808,19 @@ namespace hpx { namespace util {
     {
         std::string loglevel, logdest, logformat;
 
-        if (ini.has_section("hpx.logging.console")) {
-            util::section const* logini = ini.get_section("hpx.logging.console");
+        if (ini.has_section("hpx.logging.console"))
+        {
+            util::section const* logini =
+                ini.get_section("hpx.logging.console");
             HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            if (!loglevel.empty()) {
+            if (!loglevel.empty())
+            {
                 logdest = logini->get_entry("destination", empty);
-                logformat = detail::unescape(logini->get_entry("format", empty));
+                logformat =
+                    detail::unescape(logini->get_entry("format", empty));
             }
         }
 
@@ -794,11 +833,11 @@ namespace hpx { namespace util {
             logger_writer_type& writer = hpx_console_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = "android_log";
             writer.set_destination("android_log", android_log("hpx"));
 #else
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = "cerr";
 #endif
             if (logformat.empty())
@@ -816,16 +855,19 @@ namespace hpx { namespace util {
     {
         std::string loglevel, logdest, logformat;
 
-        if (ini.has_section("hpx.logging.console.application")) {
+        if (ini.has_section("hpx.logging.console.application"))
+        {
             util::section const* logini =
                 ini.get_section("hpx.logging.console.application");
             HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            if (!loglevel.empty()) {
+            if (!loglevel.empty())
+            {
                 logdest = logini->get_entry("destination", empty);
-                logformat = detail::unescape(logini->get_entry("format", empty));
+                logformat =
+                    detail::unescape(logini->get_entry("format", empty));
             }
         }
 
@@ -838,11 +880,12 @@ namespace hpx { namespace util {
             logger_writer_type& writer = app_console_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = "android_log";
-            writer.set_destination("android_log", android_log("hpx.application"));
+            writer.set_destination(
+                "android_log", android_log("hpx.application"));
 #else
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = "cerr";
 #endif
             if (logformat.empty())
@@ -860,16 +903,19 @@ namespace hpx { namespace util {
     {
         std::string loglevel, logdest, logformat;
 
-        if (ini.has_section("hpx.logging.console.debuglog")) {
+        if (ini.has_section("hpx.logging.console.debuglog"))
+        {
             util::section const* logini =
                 ini.get_section("hpx.logging.console.debuglog");
             HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            if (!loglevel.empty()) {
+            if (!loglevel.empty())
+            {
                 logdest = logini->get_entry("destination", empty);
-                logformat = detail::unescape(logini->get_entry("format", empty));
+                logformat =
+                    detail::unescape(logini->get_entry("format", empty));
             }
         }
 
@@ -882,11 +928,11 @@ namespace hpx { namespace util {
             logger_writer_type& writer = debuglog_console_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = "android_log";
             writer.set_destination("android_log", android_log("hpx.debuglog"));
 #else
-            if (logdest.empty())      // ensure minimal defaults
+            if (logdest.empty())    // ensure minimal defaults
                 logdest = "cerr";
 #endif
             if (logformat.empty())
@@ -898,11 +944,10 @@ namespace hpx { namespace util {
             debuglog_console_logger()->set_enabled(lvl);
         }
     }
-}}
+}}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace detail
-{
+namespace hpx { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     void init_logging(runtime_configuration& ini, bool isconsole)
     {
@@ -922,16 +967,16 @@ namespace hpx { namespace util { namespace detail
         init_app_console_log(ini);
         init_debuglog_console_log(ini);
     }
-}}}
+}}}    // namespace hpx::util::detail
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
 
-#else  // HPX_HAVE_LOGGING
+#else    // HPX_HAVE_LOGGING
 
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/init_logging.hpp>
 
@@ -939,8 +984,7 @@ namespace hpx { namespace util { namespace detail
 #include <string>
 #include <vector>
 
-namespace hpx { namespace util { namespace detail
-{
+namespace hpx { namespace util { namespace detail {
     void init_logging(runtime_configuration& ini, bool)
     {
         // warn if logging is requested
@@ -948,16 +992,19 @@ namespace hpx { namespace util { namespace detail
         if (util::get_entry_as<int>(ini, "hpx.logging.level", -1) > 0 ||
             util::get_entry_as<int>(ini, "hpx.logging.timing.level", -1) > 0 ||
             util::get_entry_as<int>(ini, "hpx.logging.agas.level", -1) > 0 ||
-            util::get_entry_as<int>(ini, "hpx.logging.debuglog.level", -1) > 0 ||
-            util::get_entry_as<int>(ini, "hpx.logging.application.level", -1) > 0)
+            util::get_entry_as<int>(ini, "hpx.logging.debuglog.level", -1) >
+                0 ||
+            util::get_entry_as<int>(ini, "hpx.logging.application.level", -1) >
+                0)
         {
-            std::cerr << "hpx::init_logging: warning: logging is requested even "
-                         "while it was disabled at compile time. If you "
-                         "need logging to be functional, please reconfigure and "
-                         "rebuild HPX with HPX_WITH_LOGGING set to ON."
-                      << std::endl;
+            std::cerr
+                << "hpx::init_logging: warning: logging is requested even "
+                   "while it was disabled at compile time. If you "
+                   "need logging to be functional, please reconfigure and "
+                   "rebuild HPX with HPX_WITH_LOGGING set to ON."
+                << std::endl;
         }
     }
-}}}
+}}}    // namespace hpx::util::detail
 
-#endif // HPX_HAVE_LOGGING
+#endif    // HPX_HAVE_LOGGING

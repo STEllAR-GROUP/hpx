@@ -73,7 +73,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t loop, std::size_t size,
     std::unique_ptr<char[]> send_buffer(new char[size]);
     std::memset(send_buffer.get(), 'a', size);
 
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
 
     isend_action send;
     for (std::size_t i = 0; i != loop + skip; ++i)

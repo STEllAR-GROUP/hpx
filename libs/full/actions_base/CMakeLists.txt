@@ -33,24 +33,26 @@ set(actions_base_headers
 )
 
 # Default location is $HPX_ROOT/libs/actions_base/include_compatibility
+# cmake-format: off
 set(actions_base_compat_headers
-    hpx/runtime/actions_base_fwd.hpp
-    hpx/runtime/actions/action_priority.hpp
-    hpx/runtime/actions/action_support.hpp
-    hpx/runtime/actions/basic_action.hpp
-    hpx/runtime/actions/basic_action_fwd.hpp
-    hpx/runtime/actions/component_action.hpp
-    hpx/runtime/actions/continuation_fwd.hpp
-    hpx/runtime/actions/detail/action_factory.hpp
-    hpx/runtime/actions/plain_action.hpp
-    hpx/runtime/actions/preassigned_action_id.hpp
-    hpx/traits/action_continuation.hpp
-    hpx/traits/action_priority.hpp
-    hpx/traits/action_select_direct_execution.hpp
-    hpx/traits/action_remote_result.hpp
-    hpx/traits/action_stacksize.hpp
-    hpx/traits/extract_action.hpp
+    hpx/runtime/actions_base_fwd.hpp => hpx/modules/actions_base.hpp
+    hpx/runtime/actions/action_priority.hpp => hpx/modules/actions_base.hpp
+    hpx/runtime/actions/action_support.hpp => hpx/modules/actions_base.hpp
+    hpx/runtime/actions/basic_action.hpp => hpx/modules/actions_base.hpp
+    hpx/runtime/actions/basic_action_fwd.hpp => hpx/modules/actions_base.hpp
+    hpx/runtime/actions/component_action.hpp => hpx/modules/actions_base.hpp
+    hpx/runtime/actions/continuation_fwd.hpp => hpx/modules/actions_base.hpp
+    hpx/runtime/actions/detail/action_factory.hpp => hpx/modules/actions_base.hpp
+    hpx/runtime/actions/plain_action.hpp => hpx/modules/actions_base.hpp
+    hpx/runtime/actions/preassigned_action_id.hpp => hpx/modules/actions_base.hpp
+    hpx/traits/action_continuation.hpp => hpx/modules/actions_base.hpp
+    hpx/traits/action_priority.hpp => hpx/modules/actions_base.hpp
+    hpx/traits/action_select_direct_execution.hpp => hpx/modules/actions_base.hpp
+    hpx/traits/action_remote_result.hpp => hpx/modules/actions_base.hpp
+    hpx/traits/action_stacksize.hpp => hpx/modules/actions_base.hpp
+    hpx/traits/extract_action.hpp => hpx/modules/actions_base.hpp
 )
+# cmake-format: on
 
 set(actions_base_sources detail/action_factory.cpp)
 

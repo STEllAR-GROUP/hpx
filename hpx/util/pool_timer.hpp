@@ -35,7 +35,7 @@ namespace hpx { namespace util
 
         ~pool_timer();
 
-        bool start(util::steady_duration const& time_duration,
+        bool start(hpx::chrono::steady_duration const& time_duration,
             bool evaluate = false);
         bool stop();
 

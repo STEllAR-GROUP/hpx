@@ -162,7 +162,7 @@ void test_reduce_by_key1(ExPolicy&& policy, Tkey, Tval, bool benchmark,
     o_values = values;
     o_keys = keys;
 
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
     // reduce_by_key, blocking when seq, par, par_vec
     auto result = hpx::parallel::reduce_by_key(std::forward<ExPolicy>(policy),
         keys.begin(), keys.end(), values.begin(), keys.begin(), values.begin(),
@@ -263,7 +263,7 @@ void test_reduce_by_key_const(ExPolicy&& policy, Tkey, Tval, bool benchmark,
     const std::vector<Tkey> const_keys(keys.begin(), keys.end());
     const std::vector<Tval> const_values(values.begin(), values.end());
 
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
     // reduce_by_key, blocking when seq, par, par_vec
     auto result = hpx::parallel::reduce_by_key(std::forward<ExPolicy>(policy),
         const_keys.begin(), const_keys.end(), const_values.begin(),
@@ -362,7 +362,7 @@ void test_reduce_by_key_async(
     o_keys = keys;
 
     // reduce_by_key, blocking when seq, par, par_vec
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
     auto fresult = hpx::parallel::reduce_by_key(std::forward<ExPolicy>(policy),
         keys.begin(), keys.end(), values.begin(), keys.begin(), values.begin(),
         op);
@@ -405,7 +405,7 @@ void test_reduce_by_key1()
 {
     using namespace hpx::execution;
     //
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
     do
     {
         test_reduce_by_key1(seq, int(), int(), false, std::equal_to<int>(),
@@ -444,7 +444,7 @@ void test_reduce_by_key1()
             [](double a) { return std::floor(a); });
     } while (t.elapsed() < 2);
     //
-    hpx::util::high_resolution_timer t3;
+    hpx::chrono::high_resolution_timer t3;
     do
     {
         test_reduce_by_key_const(seq, int(), int(), false, std::equal_to<int>(),
@@ -462,7 +462,7 @@ void test_reduce_by_key1()
             [](double a) { return std::floor(a); });
     } while (t3.elapsed() < 0.5);
     //
-    hpx::util::high_resolution_timer t2;
+    hpx::chrono::high_resolution_timer t2;
     do
     {
         test_reduce_by_key_async(seq(task), int(), int(), std::equal_to<int>(),

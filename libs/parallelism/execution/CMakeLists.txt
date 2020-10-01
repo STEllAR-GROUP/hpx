@@ -50,33 +50,35 @@ set(execution_sources execution_parameter_callbacks.cpp
                       polymorphic_executor.cpp
 )
 
+# cmake-format: off
 set(execution_compat_headers
-    hpx/async_launch_policy_dispatch.hpp
-    hpx/parallel/execution.hpp
-    hpx/parallel/executor_parameters.hpp
-    hpx/parallel/executors/auto_chunk_size.hpp
-    hpx/parallel/executors/dynamic_chunk_size.hpp
-    hpx/parallel/executors/execution.hpp
-    hpx/parallel/executors/execution_information_fwd.hpp
-    hpx/parallel/executors/execution_information.hpp
-    hpx/parallel/executors/execution_parameters_fwd.hpp
-    hpx/parallel/executors/execution_parameters.hpp
-    hpx/parallel/executors/fused_bulk_execute.hpp
-    hpx/parallel/executors/guided_chunk_size.hpp
-    hpx/parallel/executors/persistent_auto_chunk_size.hpp
-    hpx/parallel/executors/post_policy_dispatch.hpp
-    hpx/parallel/executors/rebind_executor.hpp
-    hpx/parallel/executors/static_chunk_size.hpp
-    hpx/parallel/traits/vector_pack_alignment_size.hpp
-    hpx/parallel/traits/vector_pack_count_bits.hpp
-    hpx/parallel/traits/vector_pack_load_store.hpp
-    hpx/parallel/traits/vector_pack_type.hpp
-    hpx/sync_launch_policy_dispatch.hpp
-    hpx/traits/executor_traits.hpp
-    hpx/traits/is_execution_policy.hpp
-    hpx/traits/is_executor.hpp
-    hpx/traits/is_executor_parameters.hpp
+    hpx/async_launch_policy_dispatch.hpp => hpx/execution.hpp
+    hpx/parallel/execution.hpp => hpx/execution.hpp
+    hpx/parallel/executor_parameters.hpp => hpx/execution.hpp
+    hpx/parallel/executors/auto_chunk_size.hpp => hpx/execution.hpp
+    hpx/parallel/executors/dynamic_chunk_size.hpp => hpx/execution.hpp
+    hpx/parallel/executors/execution.hpp => hpx/execution.hpp
+    hpx/parallel/executors/execution_information_fwd.hpp => hpx/execution.hpp
+    hpx/parallel/executors/execution_information.hpp => hpx/execution.hpp
+    hpx/parallel/executors/execution_parameters_fwd.hpp => hpx/execution.hpp
+    hpx/parallel/executors/execution_parameters.hpp => hpx/execution.hpp
+    hpx/parallel/executors/fused_bulk_execute.hpp => hpx/execution.hpp
+    hpx/parallel/executors/guided_chunk_size.hpp => hpx/execution.hpp
+    hpx/parallel/executors/persistent_auto_chunk_size.hpp => hpx/execution.hpp
+    hpx/parallel/executors/post_policy_dispatch.hpp => hpx/execution.hpp
+    hpx/parallel/executors/rebind_executor.hpp => hpx/execution.hpp
+    hpx/parallel/executors/static_chunk_size.hpp => hpx/execution.hpp
+    hpx/parallel/traits/vector_pack_alignment_size.hpp => hpx/execution.hpp
+    hpx/parallel/traits/vector_pack_count_bits.hpp => hpx/execution.hpp
+    hpx/parallel/traits/vector_pack_load_store.hpp => hpx/execution.hpp
+    hpx/parallel/traits/vector_pack_type.hpp => hpx/execution.hpp
+    hpx/sync_launch_policy_dispatch.hpp => hpx/execution.hpp
+    hpx/traits/executor_traits.hpp => hpx/execution.hpp
+    hpx/traits/is_execution_policy.hpp => hpx/execution.hpp
+    hpx/traits/is_executor.hpp => hpx/execution.hpp
+    hpx/traits/is_executor_parameters.hpp => hpx/execution.hpp
 )
+# cmake-format: on
 
 include(HPX_AddModule)
 add_hpx_module(

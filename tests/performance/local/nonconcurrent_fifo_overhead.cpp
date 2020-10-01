@@ -36,7 +36,7 @@ using hpx::program_options::command_line_parser;
 using hpx::program_options::notify;
 
 namespace compat = hpx::compat;
-using hpx::util::high_resolution_timer;
+using hpx::chrono::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
 std::uint64_t threads = 1;

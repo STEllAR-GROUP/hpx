@@ -104,13 +104,12 @@ namespace hpx { namespace lcos { namespace detail {
     std::size_t calculate_num_connected(
         std::size_t num_sites, std::size_t site, std::size_t arity)
     {
-        std::size_t num_children =
-            hpx::ranges::count(hpx::parallel::execution::par,
-                hpx::util::make_counting_iterator(site + 1),
-                hpx::util::make_counting_iterator(num_sites), site,
-                [&](std::size_t node) {
-                    return calculate_connected_node(node, arity);
-                });
+        std::size_t num_children = hpx::ranges::count(hpx::execution::par,
+            hpx::util::make_counting_iterator(site + 1),
+            hpx::util::make_counting_iterator(num_sites), site,
+            [&](std::size_t node) {
+                return calculate_connected_node(node, arity);
+            });
         return num_children + 1;
     }
 

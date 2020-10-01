@@ -106,7 +106,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         std::vector<int> tokens(iterations, -1);
 
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         std::atomic<std::uint64_t> counter(iterations);
         for (std::uint64_t i = 0; (i != iterations); ++i)

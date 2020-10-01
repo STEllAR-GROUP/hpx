@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
             ZEROCOPY_DATASIZE, general_buffer_type::take);
 
         {
-            hpx::util::high_resolution_timer t;
+            hpx::chrono::high_resolution_timer t;
 
             for (int i = 0; i != 100; ++i)
                 zc.get(hpx::launch::sync, ZEROCOPY_DATASIZE);
@@ -237,7 +237,7 @@ int main(int argc, char* argv[])
         }
 
         {
-            hpx::util::high_resolution_timer t;
+            hpx::chrono::high_resolution_timer t;
 
             for (int i = 0; i != 100; ++i)
                 zc.get_here(hpx::launch::sync, buffer);

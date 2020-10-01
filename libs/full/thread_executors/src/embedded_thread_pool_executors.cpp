@@ -25,7 +25,6 @@
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/thread_executors/detail/on_self_reset.hpp>
 #include <hpx/thread_executors/manage_thread_executor.hpp>
 #include <hpx/thread_executors/resource_manager.hpp>
@@ -33,6 +32,7 @@
 #include <hpx/threading_base/create_thread.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/thread_description.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 
 #include <atomic>
 #include <chrono>

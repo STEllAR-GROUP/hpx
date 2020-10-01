@@ -27,9 +27,11 @@ namespace hpx { namespace execution_base {
         virtual void suspend(char const* desc) = 0;
         virtual void resume(char const* desc) = 0;
         virtual void abort(char const* desc) = 0;
-        virtual void sleep_for(hpx::util::steady_duration const& sleep_duration,
+        virtual void sleep_for(
+            hpx::chrono::steady_duration const& sleep_duration,
             char const* desc) = 0;
-        virtual void sleep_until(hpx::util::steady_time_point const& sleep_time,
+        virtual void sleep_until(
+            hpx::chrono::steady_time_point const& sleep_time,
             char const* desc) = 0;
     };
 }}    // namespace hpx::execution_base

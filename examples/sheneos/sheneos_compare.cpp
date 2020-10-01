@@ -364,7 +364,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "Seed: " << seed << std::endl;
 
     {
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         // Create a distributed interpolation object with the name
         // shen_symbolic_name. The interpolation object will have

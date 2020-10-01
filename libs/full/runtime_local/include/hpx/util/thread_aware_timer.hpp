@@ -62,18 +62,18 @@ namespace hpx { namespace util {
         double elapsed_max()
             const    // return estimated maximum value for elapsed()
         {
-            return (util::high_resolution_clock::max)() * 1e-9;
+            return (hpx::chrono::high_resolution_clock::max)() * 1e-9;
         }
 
         double elapsed_min() const    // return minimum value for elapsed()
         {
-            return (util::high_resolution_clock::min)() * 1e-9;
+            return (hpx::chrono::high_resolution_clock::min)() * 1e-9;
         }
 
     protected:
         static void sample_time(hpx::lcos::local::promise<std::uint64_t>& p)
         {
-            p.set_value(util::high_resolution_clock::now());
+            p.set_value(hpx::chrono::high_resolution_clock::now());
         }
 
     public:

@@ -12,7 +12,11 @@ set(io_service_headers hpx/io_service/io_service_pool.hpp
                        hpx/io_service/io_service_thread_pool.hpp
 )
 
-set(io_service_compat_headers hpx/util/io_service_pool.hpp)
+# cmake-format: off
+set(io_service_compat_headers
+    hpx/util/io_service_pool.hpp => hpx/modules/io_service.hpp
+)
+# cmake-format: on
 
 set(io_service_sources io_service_pool.cpp io_service_thread_pool.cpp)
 

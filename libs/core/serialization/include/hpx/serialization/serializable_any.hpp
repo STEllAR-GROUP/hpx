@@ -9,7 +9,7 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-    The class hpx::util::any is built based on boost::spirit::hold_any class.
+    The class hpx::any is built based on boost::spirit::hold_any class.
     It adds support for HPX serialization, move assignment, == operator.
 ==============================================================================*/
 
@@ -296,7 +296,7 @@ namespace hpx { namespace util {
         T const& cast() const
         {
             if (type() != typeid(T))
-                throw bad_any_cast(type(), typeid(T));
+                throw hpx::bad_any_cast(type(), typeid(T));
 
             return detail::any::get_table<T>::is_small::value ?
                 *reinterpret_cast<T const*>(&object) :
@@ -403,8 +403,10 @@ namespace hpx { namespace util {
 #endif
 
     template <typename T, typename Char>
-    basic_any<serialization::input_archive, serialization::output_archive, Char>
-    make_any(T&& t)
+    HPX_DEPRECATED_V(1, 6,
+        "hpx::util::make_any is deprecated. Please use hpx::make_any instead.")
+    basic_any<serialization::input_archive, serialization::output_archive,
+        Char> make_any(T&& t)
     {
         return basic_any<serialization::input_archive,
             serialization::output_archive, Char, std::true_type>(
@@ -413,8 +415,10 @@ namespace hpx { namespace util {
 
     ////////////////////////////////////////////////////////////////////////////
     // backwards compatibility
-    using any = basic_any<serialization::input_archive,
-        serialization::output_archive, char, std::true_type>;
+    using any HPX_DEPRECATED_V(
+        1, 6, "hpx::util::any is deprecated. Please use hpx::any instead.") =
+        basic_any<serialization::input_archive, serialization::output_archive,
+            char, std::true_type>;
     using wany = basic_any<serialization::input_archive,
         serialization::output_archive, wchar_t, std::true_type>;
 
@@ -428,6 +432,21 @@ namespace hpx { namespace util {
             serialization::output_archive, Char, std::true_type>& elem) const;
     };
 }}    // namespace hpx::util
+
+namespace hpx {
+    template <typename T, typename Char>
+    util::basic_any<serialization::input_archive, serialization::output_archive,
+        Char>
+    make_any(T&& t)
+    {
+        return util::basic_any<serialization::input_archive,
+            serialization::output_archive, Char, std::true_type>(
+            std::forward<T>(t));
+    }
+
+    using any = util::basic_any<serialization::input_archive,
+        serialization::output_archive, char, std::true_type>;
+}    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_MSVC) && HPX_MSVC >= 1400

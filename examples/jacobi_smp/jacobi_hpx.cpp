@@ -55,7 +55,7 @@ namespace jacobi_smp {
         std::shared_ptr<deps_vector> deps_old(
             new deps_vector(n_block, hpx::make_ready_future()));
 
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
         for(std::size_t i = 0; i < iterations; ++i)
         {
             for(std::size_t y = 1, j = 0; y < n -1; y += block_size, ++j)

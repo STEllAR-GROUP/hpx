@@ -68,7 +68,7 @@ namespace hpx { namespace util {
     spread_this(T&&... args)
     {
         return detail::spreading::spread_box<typename std::decay<T>::type...>(
-            util::make_tuple(std::forward<T>(args)...));
+            hpx::make_tuple(std::forward<T>(args)...));
     }
 
     /// Traverses the pack with the given visitor.

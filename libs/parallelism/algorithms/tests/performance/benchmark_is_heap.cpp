@@ -57,14 +57,14 @@ double run_is_heap_benchmark_std(int test_count, std::vector<int> const& v)
 {
     std::cout << "--- run_is_heap_benchmark_std ---" << std::endl;
     bool result = true;
-    std::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < test_count; ++i)
     {
         result = std::is_heap(std::begin(v), std::end(v));
     }
 
-    time = hpx::util::high_resolution_clock::now() - time;
+    time = hpx::chrono::high_resolution_clock::now() - time;
 
     std::cout << "Is Heap? : " << result << std::endl;
 
@@ -76,7 +76,7 @@ double run_is_heap_benchmark_seq(int test_count, std::vector<int> const& v)
 {
     std::cout << "--- run_is_heap_benchmark_seq ---" << std::endl;
     bool result = true;
-    std::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < test_count; ++i)
     {
@@ -84,7 +84,7 @@ double run_is_heap_benchmark_seq(int test_count, std::vector<int> const& v)
         result = hpx::is_heap(seq, std::begin(v), std::end(v));
     }
 
-    time = hpx::util::high_resolution_clock::now() - time;
+    time = hpx::chrono::high_resolution_clock::now() - time;
 
     std::cout << "Is Heap? : " << result << std::endl;
 
@@ -96,7 +96,7 @@ double run_is_heap_benchmark_par(int test_count, std::vector<int> const& v)
 {
     std::cout << "--- run_is_heap_benchmark_par ---" << std::endl;
     bool result = true;
-    std::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < test_count; ++i)
     {
@@ -104,7 +104,7 @@ double run_is_heap_benchmark_par(int test_count, std::vector<int> const& v)
         result = hpx::is_heap(par, std::begin(v), std::end(v));
     }
 
-    time = hpx::util::high_resolution_clock::now() - time;
+    time = hpx::chrono::high_resolution_clock::now() - time;
 
     std::cout << "Is Heap? : " << result << std::endl;
 
@@ -117,7 +117,7 @@ double run_is_heap_benchmark_par_unseq(
 {
     std::cout << "--- run_is_heap_benchmark_par_unseq ---" << std::endl;
     bool result = true;
-    std::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < test_count; ++i)
     {
@@ -125,7 +125,7 @@ double run_is_heap_benchmark_par_unseq(
         result = hpx::is_heap(par_unseq, std::begin(v), std::end(v));
     }
 
-    time = hpx::util::high_resolution_clock::now() - time;
+    time = hpx::chrono::high_resolution_clock::now() - time;
 
     std::cout << "Is Heap? : " << result << std::endl;
 
@@ -165,7 +165,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     // initialize data
     using namespace hpx::execution;
-    hpx::parallel::generate(par, std::begin(v), std::end(v), random_fill());
+    hpx::generate(par, std::begin(v), std::end(v), random_fill());
     std::make_heap(std::begin(v), std::next(std::begin(v), break_pos));
     if (break_pos < vector_size)
         v[break_pos] =

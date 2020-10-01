@@ -62,9 +62,9 @@ double run_partition_benchmark_std(int test_count, OrgIter org_first,
         // Restore [first, last) with original data.
         hpx::copy(hpx::execution::par, org_first, org_last, first);
 
-        std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
+        std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now();
         std::partition(first, last, pred);
-        time += hpx::util::high_resolution_clock::now() - elapsed;
+        time += hpx::chrono::high_resolution_clock::now() - elapsed;
     }
 
     return (time * 1e-9) / test_count;
@@ -82,9 +82,9 @@ double run_partition_benchmark_hpx(int test_count, ExPolicy policy,
         // Restore [first, last) with original data.
         hpx::copy(hpx::execution::par, org_first, org_last, first);
 
-        std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
+        std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now();
         hpx::parallel::partition(policy, first, last, pred);
-        time += hpx::util::high_resolution_clock::now() - elapsed;
+        time += hpx::chrono::high_resolution_clock::now() - elapsed;
     }
 
     return (time * 1e-9) / test_count;
@@ -108,7 +108,7 @@ void run_benchmark(
 
     // initialize data
     using namespace hpx::execution;
-    hpx::parallel::generate(par, std::begin(v), std::end(v), random_fill());
+    hpx::generate(par, std::begin(v), std::end(v), random_fill());
     org_v = v;
 
     auto org_first = std::begin(org_v);

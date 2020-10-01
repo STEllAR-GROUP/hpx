@@ -117,7 +117,7 @@ int hpx_main()
         fin.open(wordlist_path);
         int wordcount = 0;
         cout << "Reading dictionary file to memory...\n";
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
         if(fin.is_open())
         {
             string temp;

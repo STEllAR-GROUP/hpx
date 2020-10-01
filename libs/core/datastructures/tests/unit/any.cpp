@@ -17,15 +17,11 @@
 
 #include "small_big_object.hpp"
 
-using hpx::util::any_cast;
-using hpx::util::any_nonser;
-using hpx::util::streamable_any_nonser;
-
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     {
-        streamable_any_nonser any1(big_object(30, 40));
+        hpx::util::streamable_any_nonser any1(big_object(30, 40));
         std::stringstream buffer;
 
         buffer << any1;
@@ -37,14 +33,16 @@ int main()
     {
         // test equality
         {
-            any_nonser any1_nonser(7), any2_nonser(7), any3_nonser(10),
+            hpx::any_nonser any1_nonser(7), any2_nonser(7), any3_nonser(10),
                 any4_nonser(std::string("seven"));
 
-            HPX_TEST_EQ(any_cast<int>(any1_nonser), 7);
-            HPX_TEST_NEQ(any_cast<int>(any1_nonser), 10);
-            HPX_TEST_NEQ(any_cast<int>(any1_nonser), 10.0f);
-            HPX_TEST_EQ(any_cast<int>(any1_nonser), any_cast<int>(any1_nonser));
-            HPX_TEST_EQ(any_cast<int>(any1_nonser), any_cast<int>(any2_nonser));
+            HPX_TEST_EQ(hpx::any_cast<int>(any1_nonser), 7);
+            HPX_TEST_NEQ(hpx::any_cast<int>(any1_nonser), 10);
+            HPX_TEST_NEQ(hpx::any_cast<int>(any1_nonser), 10.0f);
+            HPX_TEST_EQ(hpx::any_cast<int>(any1_nonser),
+                hpx::any_cast<int>(any1_nonser));
+            HPX_TEST_EQ(hpx::any_cast<int>(any1_nonser),
+                hpx::any_cast<int>(any2_nonser));
             HPX_TEST(any1_nonser.type() == any3_nonser.type());
             HPX_TEST(any1_nonser.type() != any4_nonser.type());
 
@@ -56,13 +54,13 @@ int main()
             any3_nonser = other_str;
             any4_nonser = 10.0f;
 
-            HPX_TEST_EQ(any_cast<std::string>(any1_nonser), long_str);
-            HPX_TEST_NEQ(any_cast<std::string>(any1_nonser), other_str);
+            HPX_TEST_EQ(hpx::any_cast<std::string>(any1_nonser), long_str);
+            HPX_TEST_NEQ(hpx::any_cast<std::string>(any1_nonser), other_str);
             HPX_TEST(any1_nonser.type() == typeid(std::string));
-            HPX_TEST(any_cast<std::string>(any1_nonser) ==
-                any_cast<std::string>(any1_nonser));
-            HPX_TEST(any_cast<std::string>(any1_nonser) ==
-                any_cast<std::string>(any2_nonser));
+            HPX_TEST(hpx::any_cast<std::string>(any1_nonser) ==
+                hpx::any_cast<std::string>(any1_nonser));
+            HPX_TEST(hpx::any_cast<std::string>(any1_nonser) ==
+                hpx::any_cast<std::string>(any2_nonser));
             HPX_TEST(any1_nonser.type() == any3_nonser.type());
             HPX_TEST(any1_nonser.type() != any4_nonser.type());
         }
@@ -75,16 +73,16 @@ int main()
 
             small_object const f(17);
 
-            any_nonser any1_nonser(f);
-            any_nonser any2_nonser(any1_nonser);
-            any_nonser any3_nonser = any1_nonser;
+            hpx::any_nonser any1_nonser(f);
+            hpx::any_nonser any2_nonser(any1_nonser);
+            hpx::any_nonser any3_nonser = any1_nonser;
 
-            HPX_TEST_EQ(
-                (any_cast<small_object>(any1_nonser))(2), uint64_t(17 + 2));
-            HPX_TEST_EQ(
-                (any_cast<small_object>(any2_nonser))(4), uint64_t(17 + 4));
-            HPX_TEST_EQ(
-                (any_cast<small_object>(any3_nonser))(6), uint64_t(17 + 6));
+            HPX_TEST_EQ((hpx::any_cast<small_object>(any1_nonser))(2),
+                uint64_t(17 + 2));
+            HPX_TEST_EQ((hpx::any_cast<small_object>(any2_nonser))(4),
+                uint64_t(17 + 4));
+            HPX_TEST_EQ((hpx::any_cast<small_object>(any3_nonser))(6),
+                uint64_t(17 + 6));
         }
 
         {
@@ -95,31 +93,31 @@ int main()
 
             big_object const f(5, 12);
 
-            any_nonser any1_nonser(f);
-            any_nonser any2_nonser(any1_nonser);
-            any_nonser any3_nonser = any1_nonser;
+            hpx::any_nonser any1_nonser(f);
+            hpx::any_nonser any2_nonser(any1_nonser);
+            hpx::any_nonser any3_nonser = any1_nonser;
 
-            HPX_TEST_EQ((any_cast<big_object>(any1_nonser))(3, 4),
+            HPX_TEST_EQ((hpx::any_cast<big_object>(any1_nonser))(3, 4),
                 uint64_t(5 + 12 + 3 + 4));
-            HPX_TEST_EQ((any_cast<big_object>(any2_nonser))(5, 6),
+            HPX_TEST_EQ((hpx::any_cast<big_object>(any2_nonser))(5, 6),
                 uint64_t(5 + 12 + 5 + 6));
-            HPX_TEST_EQ((any_cast<big_object>(any3_nonser))(7, 8),
+            HPX_TEST_EQ((hpx::any_cast<big_object>(any3_nonser))(7, 8),
                 uint64_t(5 + 12 + 7 + 8));
         }
 
         // move semantics
         {
-            any_nonser any1(5);
+            hpx::any_nonser any1(5);
             HPX_TEST(any1.has_value());
-            any_nonser any2(std::move(any1));
+            hpx::any_nonser any2(std::move(any1));
             HPX_TEST(any2.has_value());
             HPX_TEST(!any1.has_value());    // NOLINT
         }
 
         {
-            any_nonser any1(5);
+            hpx::any_nonser any1(5);
             HPX_TEST(any1.has_value());
-            any_nonser any2;
+            hpx::any_nonser any2;
             HPX_TEST(!any2.has_value());
 
             any2 = std::move(any1);

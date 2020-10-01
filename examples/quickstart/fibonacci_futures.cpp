@@ -259,7 +259,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (test == "all" || test == "0")
     {
         // Keep track of the time required to execute.
-        std::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
         for (std::size_t i = 0; i != max_runs; ++i)
         {
@@ -268,7 +268,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             r = fibonacci_serial(n);
         }
 
-        std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
+        std::uint64_t d = hpx::chrono::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_serial({1}) == {2},"
             "elapsed time:,{3},[s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, d / max_runs);
@@ -279,7 +279,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (test == "all" || test == "1")
     {
         // Keep track of the time required to execute.
-        std::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
         for (std::size_t i = 0; i != max_runs; ++i)
         {
@@ -288,7 +288,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             r = fibonacci_future_one(n).get();
         }
 
-        std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
+        std::uint64_t d = hpx::chrono::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_future_one({1}) == {2},"
             "elapsed time:,{3},[s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, d / max_runs);
@@ -299,7 +299,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (test == "all" || test == "2")
     {
         // Keep track of the time required to execute.
-        std::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
         for (std::size_t i = 0; i != max_runs; ++i)
         {
@@ -308,8 +308,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
             r = fibonacci(n);
         }
 
-//        double d = double(hpx::util::high_resolution_clock::now() - start) / 1.e9;
-        std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
+//        double d = double(hpx::chrono::high_resolution_clock::now() - start) / 1.e9;
+        std::uint64_t d = hpx::chrono::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci({1}) == {2},elapsed time:,{3},[s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, d / max_runs);
 
@@ -319,7 +319,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (test == "all" || test == "9")
     {
         // Keep track of the time required to execute.
-        std::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
         for (std::size_t i = 0; i != max_runs; ++i)
         {
@@ -328,7 +328,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             r = fibonacci_fork(n);
         }
 
-        std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
+        std::uint64_t d = hpx::chrono::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_fork({1}) == {2},elapsed time:,{3},[s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, d / max_runs);
 
@@ -338,7 +338,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (test == "all" || test == "3")
     {
         // Keep track of the time required to execute.
-        std::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
         for (std::size_t i = 0; i != max_runs; ++i)
         {
@@ -347,7 +347,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             r = fibonacci_future(n).get();
         }
 
-        std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
+        std::uint64_t d = hpx::chrono::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_future({1}) == {2},elapsed time:,{3},[s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, d / max_runs);
 
@@ -357,7 +357,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (test == "all" || test == "8")
     {
         // Keep track of the time required to execute.
-        std::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
         for (std::size_t i = 0; i != max_runs; ++i)
         {
@@ -366,7 +366,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             r = fibonacci_future_fork(n).get();
         }
 
-        std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
+        std::uint64_t d = hpx::chrono::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_future_fork({1}) == {2},elapsed time:,{3},[s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, d / max_runs);
 
@@ -376,7 +376,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (test == "all" || test == "6")
     {
         // Keep track of the time required to execute.
-        std::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
         for (std::size_t i = 0; i != max_runs; ++i)
         {
@@ -385,7 +385,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             r = fibonacci_future_when_all(n).get();
         }
 
-        std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
+        std::uint64_t d = hpx::chrono::high_resolution_clock::now() - start;
         char const* fmt =
             "fibonacci_future_when_all({1}) == {2},elapsed time:,{3},[s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, d / max_runs);
@@ -396,7 +396,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (test == "all" || test == "7")
     {
         // Keep track of the time required to execute.
-        std::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
         for (std::size_t i = 0; i != max_runs; ++i)
         {
@@ -405,7 +405,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             r = fibonacci_future_unwrapped_when_all(n).get();
         }
 
-        std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
+        std::uint64_t d = hpx::chrono::high_resolution_clock::now() - start;
         char const* fmt =
             "fibonacci_future_unwrapped_when_all({1}) == {2},elapsed time:,{3},[s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, d / max_runs);
@@ -416,7 +416,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (test == "all" || test == "4")
     {
         // Keep track of the time required to execute.
-        std::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
         for (std::size_t i = 0; i != max_runs; ++i)
         {
@@ -425,7 +425,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             r = fibonacci_future_all(n).get();
         }
 
-        std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
+        std::uint64_t d = hpx::chrono::high_resolution_clock::now() - start;
         char const* fmt =
             "fibonacci_future_all({1}) == {2},elapsed time:,{3},[s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, d / max_runs);
@@ -436,7 +436,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (test == "all" || test == "5")
     {
         // Keep track of the time required to execute.
-        std::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
         for (std::size_t i = 0; i != max_runs; ++i)
         {
@@ -445,7 +445,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             r = fibonacci_future_all_when_all(n).get();
         }
 
-        std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
+        std::uint64_t d = hpx::chrono::high_resolution_clock::now() - start;
         char const* fmt =
             "fibonacci_future_all_when_all({1}) == {2},elapsed time:,{3},[s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, d / max_runs);

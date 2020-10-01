@@ -98,7 +98,7 @@ int hpx_main()
 
         {
             double delay_sec = delay * 1e-6;
-            hpx::util::high_resolution_timer td;
+            hpx::chrono::high_resolution_timer td;
 
             while (true)
             {

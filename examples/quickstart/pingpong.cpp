@@ -85,7 +85,7 @@ int hpx_main(hpx::program_options::variables_map &b_arg)
     {
         std::vector<double> data(vsize, double(3.11));
 
-        hpx::util::high_resolution_timer timer1;
+        hpx::chrono::high_resolution_timer timer1;
 
         if (numiter != 0) {
             on_recv_action act;
@@ -121,7 +121,7 @@ int hpx_main(hpx::program_options::variables_map &b_arg)
         std::shared_ptr<std::vector<double> > data(
             std::make_shared<std::vector<double> >(vsize, double(3.11)));
 
-        hpx::util::high_resolution_timer timer1;
+        hpx::chrono::high_resolution_timer timer1;
 
         if (numiter != 0) {
             on_recv_ind_action act;

@@ -39,31 +39,33 @@ set(runtime_local_headers
     hpx/util/thread_aware_timer.hpp
 )
 
+# cmake-format: off
 set(runtime_local_compat_headers
-    hpx/custom_exception_info.hpp
-    hpx/parallel/executors/pool_executor.hpp
-    hpx/parallel/executors/service_executors.hpp
-    hpx/runtime/config_entry.hpp
-    hpx/runtime/get_locality_id.hpp
-    hpx/runtime/get_num_localities.hpp
-    hpx/runtime/get_os_thread_count.hpp
-    hpx/runtime/get_thread_name.hpp
-    hpx/runtime/get_worker_thread_num.hpp
-    hpx/runtime/report_error.hpp
-    hpx/runtime/shutdown_function.hpp
-    hpx/runtime/startup_function.hpp
-    hpx/runtime/thread_hooks.hpp
-    hpx/runtime/thread_pool_helpers.hpp
-    hpx/runtime/threads/executors/pool_executor.hpp
-    hpx/runtime/threads/executors/service_executors.hpp
-    hpx/runtime/threads/run_as_hpx_thread.hpp
-    hpx/runtime/threads/run_as_os_thread.hpp
-    hpx/runtime_handlers.hpp
-    hpx/util/debug/thread_stacktrace.hpp
-    hpx/util/debugging.hpp
-    hpx/util/interval_timer.hpp
-    hpx/util/thread_mapper.hpp
+    hpx/custom_exception_info.hpp => hpx/modules/runtime_local.hpp
+    hpx/parallel/executors/pool_executor.hpp => hpx/include/parallel_executors.hpp
+    hpx/parallel/executors/service_executors.hpp => hpx/include/parallel_executors.hpp
+    hpx/runtime/config_entry.hpp => hpx/modules/runtime_local.hpp
+    hpx/runtime/get_locality_id.hpp => hpx/runtime.hpp
+    hpx/runtime/get_num_localities.hpp => hpx/runtime.hpp
+    hpx/runtime/get_os_thread_count.hpp => hpx/runtime.hpp
+    hpx/runtime/get_thread_name.hpp => hpx/runtime.hpp
+    hpx/runtime/get_worker_thread_num.hpp => hpx/runtime.hpp
+    hpx/runtime/report_error.hpp => hpx/modules/runtime_local.hpp
+    hpx/runtime/shutdown_function.hpp => hpx/runtime.hpp
+    hpx/runtime/startup_function.hpp => hpx/runtime.hpp
+    hpx/runtime/thread_hooks.hpp => hpx/modules/runtime_local.hpp
+    hpx/runtime/thread_pool_helpers.hpp => hpx/modules/runtime_local.hpp
+    hpx/runtime/threads/executors/pool_executor.hpp => hpx/modules/runtime_local.hpp
+    hpx/runtime/threads/executors/service_executors.hpp => hpx/modules/runtime_local.hpp
+    hpx/runtime/threads/run_as_hpx_thread.hpp => hpx/include/run_as.hpp
+    hpx/runtime/threads/run_as_os_thread.hpp => hpx/include/run_as.hpp
+    hpx/runtime_handlers.hpp => hpx/modules/runtime_local.hpp
+    hpx/util/debug/thread_stacktrace.hpp => hpx/modules/runtime_local.hpp
+    hpx/util/debugging.hpp => hpx/modules/runtime_local.hpp
+    hpx/util/interval_timer.hpp => hpx/modules/runtime_local.hpp
+    hpx/util/thread_mapper.hpp => hpx/modules/runtime_local.hpp
 )
+# cmake-format: on
 
 set(runtime_local_sources
     custom_exception_info.cpp

@@ -35,9 +35,8 @@ namespace hpx { namespace components {
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_DECLARE_FACTORY_STATIC(name, base)                                 \
-    extern "C" HPX_PLUGIN_EXPORT_API std::map<std::string,                     \
-        hpx::util::any_nonser>* HPX_PLUGIN_API HPX_PLUGIN_LIST_NAME(name,      \
-        base)() /**/
+    extern "C" HPX_PLUGIN_EXPORT_API std::map<std::string, hpx::any_nonser>*   \
+        HPX_PLUGIN_API HPX_PLUGIN_LIST_NAME(name, base)() /**/
 
 #define HPX_DEFINE_FACTORY_STATIC(module, name, base)                          \
     {                                                                          \

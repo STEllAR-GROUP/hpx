@@ -61,7 +61,7 @@ double wait_tasks(std::size_t num_samples, std::size_t num_tasks,
         chunk_results.reserve(num_chunks);
 
         // wait of tasks in chunks
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
         if (num_chunks == 1)
         {
             hpx::wait_all(chunks[0]);

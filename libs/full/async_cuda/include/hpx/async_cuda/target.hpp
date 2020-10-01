@@ -240,4 +240,11 @@ namespace hpx { namespace cuda { namespace experimental {
     HPX_EXPORT target& get_default_target();
 }}}    // namespace hpx::cuda::experimental
 
+namespace hpx { namespace compute { namespace cuda {
+    using target HPX_DEPRECATED_V(1, 6,
+        "hpx::compute::cuda::target is deprecated. Please use "
+        "hpx::cuda::experimental::target instead.") =
+        hpx::cuda::experimental::target;
+}}}    // namespace hpx::compute::cuda
+
 #include <hpx/config/warnings_suffix.hpp>

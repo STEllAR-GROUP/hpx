@@ -28,7 +28,7 @@ using hpx::threads::get_self_id;
 using hpx::threads::get_self;
 using hpx::threads::set_thread_state;
 
-using hpx::util::high_resolution_timer;
+using hpx::chrono::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)

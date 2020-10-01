@@ -1,7 +1,7 @@
 //  Copyright Vladimir Prus 2004.
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
-//  (See accomphpx::util::any_nonsering file LICENSE_1_0.txt
+//  (See accompanying file LICENSE_1_0.txt
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
@@ -38,7 +38,7 @@ namespace hpx { namespace program_options {
     }    // namespace
 
     void value_semantic_codecvt_helper<char>::parse(
-        hpx::util::any_nonser& value_store,
+        hpx::any_nonser& value_store,
         const std::vector<std::string>& new_tokens, bool utf8) const
     {
         if (utf8)
@@ -60,7 +60,7 @@ namespace hpx { namespace program_options {
     }
 
     void value_semantic_codecvt_helper<wchar_t>::parse(
-        hpx::util::any_nonser& value_store,
+        hpx::any_nonser& value_store,
         const std::vector<std::string>& new_tokens, bool utf8) const
     {
         std::vector<wstring> tokens;
@@ -107,7 +107,7 @@ namespace hpx { namespace program_options {
             return 1;
     }
 
-    void untyped_value::xparse(hpx::util::any_nonser& value_store,
+    void untyped_value::xparse(hpx::any_nonser& value_store,
         const std::vector<std::string>& new_tokens) const
     {
         if (value_store.has_value())
@@ -132,13 +132,12 @@ namespace hpx { namespace program_options {
     }
 
     /* Validates bool value.
-        util::any_nonser of "1", "true", "yes", "on" will be converted to "1".
-        util::any_nonser of "0", "false", "no", "off" will be converted to "0".
+        hpx::any_nonser of "1", "true", "yes", "on" will be converted to "1".
+        hpx::any_nonser of "0", "false", "no", "off" will be converted to "0".
         Case is ignored. The 'xs' vector can either be empty, in which
         case the value is 'true', or can contain explicit value.
     */
-    void validate(
-        hpx::util::any_nonser& v, const vector<string>& xs, bool*, int)
+    void validate(hpx::any_nonser& v, const vector<string>& xs, bool*, int)
     {
         check_first_occurrence(v);
         string s(get_single_string(xs, true));
@@ -147,9 +146,9 @@ namespace hpx { namespace program_options {
             i = char(std::tolower(i));
 
         if (s.empty() || s == "on" || s == "yes" || s == "1" || s == "true")
-            v = hpx::util::any_nonser(true);
+            v = hpx::any_nonser(true);
         else if (s == "off" || s == "no" || s == "0" || s == "false")
-            v = hpx::util::any_nonser(false);
+            v = hpx::any_nonser(false);
         else
             throw invalid_bool_value(s);
     }
@@ -159,8 +158,7 @@ namespace hpx { namespace program_options {
     // create auxiliary 'widen' routine to convert from char* into
     // needed string type, and that's more work.
     HPX_EXPORT
-    void validate(
-        hpx::util::any_nonser& v, const vector<wstring>& xs, bool*, int)
+    void validate(hpx::any_nonser& v, const vector<wstring>& xs, bool*, int)
     {
         check_first_occurrence(v);
         wstring s(get_single_string(xs, true));
@@ -169,33 +167,33 @@ namespace hpx { namespace program_options {
             i = wchar_t(tolower(i));
 
         if (s.empty() || s == L"on" || s == L"yes" || s == L"1" || s == L"true")
-            v = hpx::util::any_nonser(true);
+            v = hpx::any_nonser(true);
         else if (s == L"off" || s == L"no" || s == L"0" || s == L"false")
-            v = hpx::util::any_nonser(false);
+            v = hpx::any_nonser(false);
         else
             throw invalid_bool_value(convert_value(s));
     }
 
     HPX_EXPORT
     void validate(
-        hpx::util::any_nonser& v, const vector<string>& xs, std::string*, int)
+        hpx::any_nonser& v, const vector<string>& xs, std::string*, int)
     {
         check_first_occurrence(v);
-        v = hpx::util::any_nonser(get_single_string(xs));
+        v = hpx::any_nonser(get_single_string(xs));
     }
 
     HPX_EXPORT
     void validate(
-        hpx::util::any_nonser& v, const vector<wstring>& xs, std::string*, int)
+        hpx::any_nonser& v, const vector<wstring>& xs, std::string*, int)
     {
         check_first_occurrence(v);
-        v = hpx::util::any_nonser(get_single_string(xs));
+        v = hpx::any_nonser(get_single_string(xs));
     }
 
     namespace validators {
 
         HPX_EXPORT
-        void check_first_occurrence(const hpx::util::any_nonser& value)
+        void check_first_occurrence(const hpx::any_nonser& value)
         {
             if (value.has_value())
                 throw multiple_occurrences();

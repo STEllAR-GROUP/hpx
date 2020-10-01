@@ -62,9 +62,9 @@ double run_inplace_merge_benchmark_std(int test_count, OrgIter org_first,
         // Restore [first, last) with original data.
         hpx::copy(hpx::execution::par, org_first, org_last, first);
 
-        std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
+        std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now();
         std::inplace_merge(first, middle, last);
-        time += hpx::util::high_resolution_clock::now() - elapsed;
+        time += hpx::chrono::high_resolution_clock::now() - elapsed;
     }
 
     return (time * 1e-9) / test_count;
@@ -83,9 +83,9 @@ double run_inplace_merge_benchmark_hpx(int test_count, ExPolicy policy,
         // Restore [first, last) with original data.
         hpx::copy(hpx::execution::par, org_first, org_last, first);
 
-        std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
+        std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now();
         hpx::inplace_merge(policy, first, middle, last);
-        time += hpx::util::high_resolution_clock::now() - elapsed;
+        time += hpx::chrono::high_resolution_clock::now() - elapsed;
     }
 
     return (time * 1e-9) / test_count;
@@ -111,8 +111,8 @@ void run_benchmark(std::size_t vector_left_size, std::size_t vector_right_size,
 
     // initialize data
     using namespace hpx::execution;
-    hpx::parallel::generate(par, first, middle, random_fill(random_range));
-    hpx::parallel::generate(par, middle, last, random_fill(random_range));
+    hpx::generate(par, first, middle, random_fill(random_range));
+    hpx::generate(par, middle, last, random_fill(random_range));
     hpx::parallel::sort(par, first, middle);
     hpx::parallel::sort(par, middle, last);
     org_c = c;

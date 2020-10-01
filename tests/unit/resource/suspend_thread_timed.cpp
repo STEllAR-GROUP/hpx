@@ -51,7 +51,7 @@ int hpx_main(int argc, char* argv[])
         std::mt19937 gen(rd());
         std::uniform_int_distribution<int> dist(1, 100);
 
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         while (t.elapsed() < 1)
         {

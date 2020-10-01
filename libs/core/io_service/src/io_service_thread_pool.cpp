@@ -60,9 +60,10 @@ namespace hpx { namespace threads { namespace detail {
     }
 
     threads::thread_id_type io_service_thread_pool::set_state(
-        util::steady_time_point const& abs_time, thread_id_type const& id,
-        thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-        thread_priority priority, error_code& ec)
+        hpx::chrono::steady_time_point const& abs_time,
+        thread_id_type const& id, thread_state_enum newstate,
+        thread_state_ex_enum newstate_ex, thread_priority priority,
+        error_code& ec)
     {
         return id;
     }

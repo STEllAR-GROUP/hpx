@@ -22,19 +22,21 @@ set(type_support_headers
     hpx/type_support/void_guard.hpp
 )
 
+# cmake-format: off
 set(type_support_compat_headers
-    hpx/type_support.hpp
-    hpx/util/always_void.hpp
-    hpx/util/decay.hpp
-    hpx/util/detected.hpp
-    hpx/util/identity.hpp
-    hpx/util/lazy_conditional.hpp
-    hpx/util/lazy_enable_if.hpp
-    hpx/util/static.hpp
-    hpx/util/unwrap_ref.hpp
-    hpx/util/unused.hpp
-    hpx/util/void_guard.hpp
+    hpx/type_support.hpp => hpx/modules/type_support.hpp
+    hpx/util/always_void.hpp => hpx/modules/type_support.hpp
+    hpx/util/decay.hpp => hpx/modules/type_support.hpp
+    hpx/util/detected.hpp => hpx/modules/type_support.hpp
+    hpx/util/identity.hpp => hpx/modules/type_support.hpp
+    hpx/util/lazy_conditional.hpp => hpx/modules/type_support.hpp
+    hpx/util/lazy_enable_if.hpp => hpx/modules/type_support.hpp
+    hpx/util/static.hpp => hpx/modules/type_support.hpp
+    hpx/util/unwrap_ref.hpp => hpx/modules/type_support.hpp
+    hpx/util/unused.hpp => hpx/modules/type_support.hpp
+    hpx/util/void_guard.hpp => hpx/modules/type_support.hpp
 )
+# cmake-format: on
 
 set(type_support_sources)
 

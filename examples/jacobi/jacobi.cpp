@@ -22,7 +22,7 @@ using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
 
-using hpx::util::high_resolution_timer;
+using hpx::chrono::high_resolution_timer;
 
 using hpx::init;
 using hpx::finalize;

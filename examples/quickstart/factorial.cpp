@@ -40,7 +40,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::uint64_t n = vm["n-value"].as<std::uint64_t>();
 
     {
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         std::uint64_t r =
             hpx::async<factorial_action>(hpx::find_here(), n).get();

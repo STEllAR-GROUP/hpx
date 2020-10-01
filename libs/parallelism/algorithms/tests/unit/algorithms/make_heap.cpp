@@ -76,7 +76,7 @@ void test_make_heap_async1(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_make_heap1()
 {
-    using namespace hpx::parallel::execution;
+    using namespace hpx::execution;
 
     test_make_heap1(IteratorTag());
 
@@ -152,7 +152,7 @@ void test_make_heap_async2(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_make_heap2()
 {
-    using namespace hpx::parallel::execution;
+    using namespace hpx::execution;
 
     test_make_heap2(IteratorTag());
 
@@ -270,7 +270,7 @@ void test_make_heap_exception_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_make_heap_exception()
 {
-    using namespace hpx::parallel::execution;
+    using namespace hpx::execution;
 
     test_make_heap_exception(IteratorTag());
 
@@ -393,7 +393,7 @@ void test_make_heap_bad_alloc_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_make_heap_bad_alloc()
 {
-    using namespace hpx::parallel::execution;
+    using namespace hpx::execution;
 
     test_make_heap_bad_alloc(IteratorTag());
 

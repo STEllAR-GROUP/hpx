@@ -90,6 +90,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/fill.hpp
     hpx/parallel/container_algorithms/find.hpp
     hpx/parallel/container_algorithms/for_each.hpp
+    hpx/parallel/container_algorithms/for_loop.hpp
     hpx/parallel/container_algorithms/generate.hpp
     hpx/parallel/container_algorithms.hpp
     hpx/parallel/container_algorithms/includes.hpp
@@ -162,12 +163,13 @@ set(algorithms_headers
 
 # cmake-format: off
 set(algorithms_compat_headers
-    hpx/parallel/traits/projected.hpp
-    hpx/parallel/traits/projected_range.hpp
-    hpx/traits/is_value_proxy.hpp
-    hpx/traits/segmented_iterator_traits.hpp
-    hpx/util/tagged_pair.hpp
-    hpx/util/tagged_tuple.hpp
+    hpx/algorithms.hpp => hpx/algorithm.hpp
+    hpx/parallel/traits/projected.hpp => hpx/algorithms/traits/projected.hpp
+    hpx/parallel/traits/projected_range.hpp => hpx/algorithms/traits/projected_range.hpp
+    hpx/traits/is_value_proxy.hpp => hpx/algorithms/traits/is_value_proxy.hpp
+    hpx/traits/segmented_iterator_traits.hpp => hpx/algorithms/traits/segmented_iterator_traits.hpp
+    hpx/util/tagged_pair.hpp => hpx/datastructures/tagged_pair.hpp
+    hpx/util/tagged_tuple.hpp => hpx/datastructures/tagged_tuple.hpp
 )
 # cmake-format: on
 

@@ -10,7 +10,12 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(asio_headers hpx/asio/asio_util.hpp hpx/asio/map_hostnames.hpp)
 
-set(asio_compat_headers hpx/util/asio_util.hpp hpx/util/map_hostnames.hpp)
+# cmake-format: off
+set(asio_compat_headers
+    hpx/util/asio_util.hpp => hpx/modules/asio.hpp
+    hpx/util/map_hostnames.hpp => hpx/modules/asio.hpp
+)
+# cmake-format: on
 
 set(asio_sources asio_util.cpp map_hostnames.cpp)
 

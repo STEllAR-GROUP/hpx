@@ -23,7 +23,7 @@ namespace hpx { namespace threads {
     template <typename Executor, typename F, typename... Ts>
     typename std::enable_if<
         hpx::traits::is_threads_executor<Executor>::value>::type
-    post_at(Executor&& exec, hpx::util::steady_time_point const& abs_time,
+    post_at(Executor&& exec, hpx::chrono::steady_time_point const& abs_time,
         F&& f, Ts&&... ts)
     {
         exec.add_at(abs_time,
@@ -35,7 +35,7 @@ namespace hpx { namespace threads {
     template <typename Executor, typename F, typename... Ts>
     typename std::enable_if<
         hpx::traits::is_threads_executor<Executor>::value>::type
-    post_after(Executor&& exec, hpx::util::steady_duration const& rel_time,
+    post_after(Executor&& exec, hpx::chrono::steady_duration const& rel_time,
         F&& f, Ts&&... ts)
     {
         exec.add_after(rel_time,
@@ -50,7 +50,7 @@ namespace hpx { namespace threads {
         hpx::future<typename hpx::util::detail::invoke_deferred_result<F,
             Ts...>::type>>::type
     async_execute_at(Executor&& exec,
-        hpx::util::steady_time_point const& abs_time, F&& f, Ts&&... ts)
+        hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         typedef
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
@@ -74,7 +74,7 @@ namespace hpx { namespace threads {
         hpx::future<typename hpx::util::detail::invoke_deferred_result<F,
             Ts...>::type>>::type
     async_execute_after(Executor&& exec,
-        hpx::util::steady_duration const& rel_time, F&& f, Ts&&... ts)
+        hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
     {
         typedef
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
@@ -97,7 +97,7 @@ namespace hpx { namespace threads {
         typename hpx::util::detail::invoke_deferred_result<F,
             Ts...>::type>::type
     sync_execute_at(Executor&& exec,
-        hpx::util::steady_time_point const& abs_time, F&& f, Ts&&... ts)
+        hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         return async_execute_at(std::forward<Executor>(exec), abs_time,
             std::forward<F>(f), std::forward<Ts>(ts)...)
@@ -109,7 +109,7 @@ namespace hpx { namespace threads {
         typename hpx::util::detail::invoke_deferred_result<F,
             Ts...>::type>::type
     sync_execute_after(Executor&& exec,
-        hpx::util::steady_duration const& rel_time, F&& f, Ts&&... ts)
+        hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
     {
         return async_execute_after(std::forward<Executor>(exec), rel_time,
             std::forward<F>(f), std::forward<Ts>(ts)...)

@@ -13,7 +13,7 @@
 #include <cstddef>
 #include <vector>
 
-using hpx::util::high_resolution_timer;
+using hpx::chrono::high_resolution_timer;
 
 #include <QtGui/QApplication>
 #include "widget.hpp"

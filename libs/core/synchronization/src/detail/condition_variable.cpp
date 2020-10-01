@@ -10,11 +10,11 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
@@ -190,7 +190,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
     threads::thread_state_ex_enum condition_variable::wait_until(
         std::unique_lock<mutex_type>& lock,
-        util::steady_time_point const& abs_time, char const* description,
+        hpx::chrono::steady_time_point const& abs_time, char const* description,
         error_code& ec)
     {
         HPX_ASSERT(lock.owns_lock());

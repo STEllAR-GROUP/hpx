@@ -70,7 +70,7 @@ int monitor(double runfor, std::string const& name, std::uint64_t pause)
 
     std::int64_t zero_time = 0;
 
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
     while (runfor < 0 || t.elapsed() < runfor)
     {
         // stop collecting data when the runtime is exiting

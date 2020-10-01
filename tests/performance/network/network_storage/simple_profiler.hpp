@@ -128,7 +128,7 @@ class simple_profiler {
     }
     //
     simple_profiler                              *_parent;
-    hpx::util::high_resolution_timer              _timer;
+    hpx::chrono::high_resolution_timer            _timer;
     const char *                                  _title;
     std::map<const char *, valtype>               _profiles;
     bool                                          _done;

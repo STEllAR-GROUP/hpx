@@ -58,7 +58,7 @@ namespace hpx { namespace execution_base {
         void sleep_for(std::chrono::duration<Rep, Period> const& sleep_duration,
             char const* desc = "hpx::execution_base::agent_ref::sleep_for")
         {
-            sleep_for(hpx::util::steady_duration{sleep_duration}, desc);
+            sleep_for(hpx::chrono::steady_duration{sleep_duration}, desc);
         }
 
         template <typename Clock, typename Duration>
@@ -66,7 +66,7 @@ namespace hpx { namespace execution_base {
             std::chrono::time_point<Clock, Duration> const& sleep_time,
             char const* desc = "hpx::execution_base::agent_ref::sleep_until")
         {
-            sleep_until(hpx::util::steady_time_point{sleep_time}, desc);
+            sleep_until(hpx::chrono::steady_time_point{sleep_time}, desc);
         }
 
         agent_base& ref()
@@ -82,10 +82,10 @@ namespace hpx { namespace execution_base {
     private:
         agent_base* impl_;
 
-        void sleep_for(
-            hpx::util::steady_duration const& sleep_duration, char const* desc);
+        void sleep_for(hpx::chrono::steady_duration const& sleep_duration,
+            char const* desc);
         void sleep_until(
-            hpx::util::steady_time_point const& sleep_time, char const* desc);
+            hpx::chrono::steady_time_point const& sleep_time, char const* desc);
 
         friend constexpr bool operator==(
             agent_ref const& lhs, agent_ref const& rhs)

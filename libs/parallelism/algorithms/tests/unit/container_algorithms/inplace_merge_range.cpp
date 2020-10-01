@@ -116,7 +116,7 @@ void test_inplace_merge(ExPolicy policy, DataType)
     auto sol_middle = sol_first + left_size;
     auto sol_last = std::end(sol);
 
-    auto result = hpx::parallel::inplace_merge(policy, res, res_middle);
+    auto result = hpx::ranges::inplace_merge(policy, res, res_middle);
     std::inplace_merge(sol_first, sol_middle, sol_last);
 
     HPX_TEST(result == res_last);
@@ -149,7 +149,7 @@ void test_inplace_merge_async(ExPolicy policy, DataType)
     auto sol_middle = sol_first + left_size;
     auto sol_last = std::end(sol);
 
-    auto f = hpx::parallel::inplace_merge(policy, res, res_middle);
+    auto f = hpx::ranges::inplace_merge(policy, res, res_middle);
     auto result = f.get();
     std::inplace_merge(sol_first, sol_middle, sol_last);
 

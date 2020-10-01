@@ -50,26 +50,28 @@ set(functional_headers
 )
 
 # Default location is $HPX_ROOT/libs/functional/include_compatibility
+# cmake-format: off
 set(functional_compat_headers
-    hpx/functional/result_of.hpp
-    hpx/functional/traits/is_callable.hpp
-    hpx/util/bind.hpp
-    hpx/util/bind_back.hpp
-    hpx/util/bind_front.hpp
-    hpx/util/deferred_call.hpp
-    hpx/util/first_argument.hpp
-    hpx/util/function.hpp
-    hpx/util/function_ref.hpp
-    hpx/util/invoke.hpp
-    hpx/util/invoke_fused.hpp
-    hpx/util/mem_fn.hpp
-    hpx/util/one_shot.hpp
-    hpx/util/protect.hpp
-    hpx/util/result_of.hpp
-    hpx/util/serializable_function.hpp
-    hpx/util/serializable_unique_function.hpp
-    hpx/util/unique_function.hpp
+    hpx/functional/result_of.hpp => hpx/functional/invoke_result.hpp
+    hpx/functional/traits/is_callable.hpp => hpx/functional/traits/is_invocable.hpp
+    hpx/util/bind.hpp => hpx/functional.hpp
+    hpx/util/bind_back.hpp => hpx/functional.hpp
+    hpx/util/bind_front.hpp => hpx/functional.hpp
+    hpx/util/deferred_call.hpp => hpx/functional.hpp
+    hpx/util/first_argument.hpp => hpx/functional.hpp
+    hpx/util/function.hpp => hpx/functional.hpp
+    hpx/util/function_ref.hpp => hpx/functional.hpp
+    hpx/util/invoke.hpp => hpx/functional.hpp
+    hpx/util/invoke_fused.hpp => hpx/functional.hpp
+    hpx/util/mem_fn.hpp => hpx/functional.hpp
+    hpx/util/one_shot.hpp => hpx/functional.hpp
+    hpx/util/protect.hpp => hpx/functional.hpp
+    hpx/util/result_of.hpp => hpx/functional.hpp
+    hpx/util/serializable_function.hpp => hpx/functional.hpp
+    hpx/util/serializable_unique_function.hpp => hpx/functional.hpp
+    hpx/util/unique_function.hpp => hpx/functional.hpp
 )
+# cmake-format: on
 
 # Default location is $HPX_ROOT/libs/functional/src
 set(functional_sources basic_function.cpp empty_function.cpp)

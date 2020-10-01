@@ -16,7 +16,11 @@ set(preprocessor_headers
 )
 
 # Default location is $HPX_ROOT/libs/preprocessor/include_compatibility
-set(preprocessor_compat_headers)
+# cmake-format: off
+set(preprocessor_compat_headers
+    hpx/preprocessor.hpp => hpx/modules/preprocessor.hpp
+)
+# cmake-format: on
 
 # Default location is $HPX_ROOT/libs/preprocessor/src
 set(preprocessor_sources)

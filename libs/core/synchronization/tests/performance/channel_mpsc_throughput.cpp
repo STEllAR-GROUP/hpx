@@ -57,14 +57,14 @@ inline void channel_set(hpx::lcos::local::channel_mpsc<data>& c, data&& val)
 // Produce
 double thread_func_0(hpx::lcos::local::channel_mpsc<data>& c)
 {
-    std::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i != NUM_TESTS; ++i)
     {
         channel_set(c, data{i});
     }
 
-    std::uint64_t end = hpx::util::high_resolution_clock::now();
+    std::uint64_t end = hpx::chrono::high_resolution_clock::now();
 
     return static_cast<double>(end - start) / 1e9;
 }
@@ -72,7 +72,7 @@ double thread_func_0(hpx::lcos::local::channel_mpsc<data>& c)
 // Consume
 double thread_func_1(hpx::lcos::local::channel_mpsc<data>& c)
 {
-    std::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i != NUM_TESTS; ++i)
     {
@@ -83,7 +83,7 @@ double thread_func_1(hpx::lcos::local::channel_mpsc<data>& c)
         }
     }
 
-    std::uint64_t end = hpx::util::high_resolution_clock::now();
+    std::uint64_t end = hpx::chrono::high_resolution_clock::now();
 
     return static_cast<double>(end - start) / 1e9;
 }

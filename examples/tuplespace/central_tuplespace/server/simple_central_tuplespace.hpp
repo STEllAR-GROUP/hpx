@@ -106,7 +106,7 @@ namespace examples { namespace server
             tuple_type read(tuple_type const& tp, double const timeout) const
             {
                 tuple_type result;
-                hpx::util::high_resolution_timer t;
+                hpx::chrono::high_resolution_timer t;
 
                 do
                 {
@@ -136,7 +136,7 @@ namespace examples { namespace server
             tuple_type take(tuple_type const& tp, double const timeout)
             {
                 tuple_type result;
-                hpx::util::high_resolution_timer t;
+                hpx::chrono::high_resolution_timer t;
 
                 do
                 {

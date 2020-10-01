@@ -176,13 +176,13 @@ namespace hpx { namespace experimental {
                 auto next = make_next_transformer(end, end_val);
 
                 return type(
-                    util::make_tuple(util::make_transform_iterator(it, prev),
-                        it, util::make_transform_iterator(it, next)));
+                    hpx::make_tuple(util::make_transform_iterator(it, prev), it,
+                        util::make_transform_iterator(it, next)));
             }
 
             static type create(Iterator const& it)
             {
-                return type(util::make_tuple(
+                return type(hpx::make_tuple(
                     util::make_transform_iterator(it, left_transformer()), it,
                     util::make_transform_iterator(it, right_transformer())));
             }
@@ -266,7 +266,7 @@ std::uint64_t bench_stencil3_iterator_full()
     std::vector<int> values(partition_size);
     std::iota(std::begin(values), std::end(values), 0);
 
-    std::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
     auto r = hpx::experimental::make_stencil3_full_range(
         values.begin(), values.end(), &values.back(), &values.front());
@@ -280,7 +280,7 @@ std::uint64_t bench_stencil3_iterator_full()
         result += get<0>(val) + get<1>(val) + get<2>(val);
     });
 
-    return hpx::util::high_resolution_clock::now() - start;
+    return hpx::chrono::high_resolution_clock::now() - start;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -303,7 +303,7 @@ namespace hpx { namespace experimental {
 
         explicit stencil3_iterator_v1(Iterator const& it)
           : base_type(
-                util::make_tuple(detail::previous(it), it, detail::next(it)))
+                hpx::make_tuple(detail::previous(it), it, detail::next(it)))
         {
         }
 
@@ -339,7 +339,7 @@ std::uint64_t bench_stencil3_iterator_v1()
     std::vector<int> values(partition_size);
     std::iota(std::begin(values), std::end(values), 0);
 
-    std::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
     auto r = hpx::experimental::make_stencil3_range_v1(
         values.begin() + 1, values.end() - 1);
@@ -357,7 +357,7 @@ std::uint64_t bench_stencil3_iterator_v1()
     result += values[partition_size - 2] + values.back() + values.front();
     HPX_UNUSED(result);
 
-    return hpx::util::high_resolution_clock::now() - start;
+    return hpx::chrono::high_resolution_clock::now() - start;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -448,7 +448,7 @@ std::uint64_t bench_stencil3_iterator_v2()
     std::vector<int> values(partition_size);
     std::iota(std::begin(values), std::end(values), 0);
 
-    std::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
     auto r = hpx::experimental::make_stencil3_range_v2(
         values.begin() + 1, values.end() - 1);
@@ -466,7 +466,7 @@ std::uint64_t bench_stencil3_iterator_v2()
     result += values[partition_size - 2] + values.back() + values.front();
     HPX_UNUSED(result);
 
-    return hpx::util::high_resolution_clock::now() - start;
+    return hpx::chrono::high_resolution_clock::now() - start;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -475,7 +475,7 @@ std::uint64_t bench_stencil3_iterator_explicit()
     std::vector<int> values(partition_size);
     std::iota(std::begin(values), std::end(values), 0);
 
-    std::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
     // handle all elements explicitly
     int result = values.back() + values.front() + values[1];
@@ -490,7 +490,7 @@ std::uint64_t bench_stencil3_iterator_explicit()
     result += values[partition_size - 2] + values.back() + values.front();
     HPX_UNUSED(result);
 
-    return hpx::util::high_resolution_clock::now() - start;
+    return hpx::chrono::high_resolution_clock::now() - start;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

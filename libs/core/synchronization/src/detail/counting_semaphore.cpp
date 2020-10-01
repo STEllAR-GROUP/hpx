@@ -40,7 +40,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
     }
 
     bool counting_semaphore::wait_until(std::unique_lock<mutex_type>& l,
-        util::steady_time_point const& abs_time, std::ptrdiff_t count)
+        hpx::chrono::steady_time_point const& abs_time, std::ptrdiff_t count)
     {
         HPX_ASSERT_OWNS_LOCK(l);
 

@@ -43,7 +43,7 @@ int hpx_main()
     BMP SetImage;
     SetImage.SetBitDepth(24);
     SetImage.SetSize(sizeX * 2, sizeY);
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
 
     {
         using namespace std;

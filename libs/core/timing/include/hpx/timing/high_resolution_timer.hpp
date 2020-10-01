@@ -58,18 +58,18 @@ namespace hpx { namespace chrono {
         double elapsed_max()
             const    // return estimated maximum value for elapsed()
         {
-            return (util::high_resolution_clock::max)() * 1e-9;
+            return (hpx::chrono::high_resolution_clock::max)() * 1e-9;
         }
 
         double elapsed_min() const    // return minimum value for elapsed()
         {
-            return (util::high_resolution_clock::min)() * 1e-9;
+            return (hpx::chrono::high_resolution_clock::min)() * 1e-9;
         }
 
     protected:
         static std::uint64_t take_time_stamp()
         {
-            return util::high_resolution_clock::now();
+            return hpx::chrono::high_resolution_clock::now();
         }
 
     private:

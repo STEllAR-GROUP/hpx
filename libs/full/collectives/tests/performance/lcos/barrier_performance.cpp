@@ -21,7 +21,7 @@ void global_barrier()
 {
     hpx::lcos::barrier b("new_global_barrier");
 
-    hpx::util::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer t;
     for (std::size_t i = 0; i != iterations; ++i)
     {
         b.wait();
@@ -37,11 +37,11 @@ void global_barrier()
 int hpx_main()
 {
     if (hpx::get_locality_id() == 0)
-        startup_end = hpx::util::high_resolution_timer::now();
+        startup_end = hpx::chrono::high_resolution_timer::now();
     global_barrier();
 
     if (hpx::get_locality_id() == 0)
-        shutdown_start = hpx::util::high_resolution_timer::now();
+        shutdown_start = hpx::chrono::high_resolution_timer::now();
     return hpx::finalize();
 }
 
@@ -50,9 +50,9 @@ int main(int argc, char* argv[])
     std::vector<std::string> cfg = {
         "hpx.run_hpx_main!=1", "hpx.os_threads!=all"};
 
-    double startup_start = hpx::util::high_resolution_timer::now();
+    double startup_start = hpx::chrono::high_resolution_timer::now();
     return hpx::init(argc, argv, cfg);
-    double shutdown_end = hpx::util::high_resolution_timer::now();
+    double shutdown_end = hpx::chrono::high_resolution_timer::now();
 
     if (startup_end > 1e-10)
     {

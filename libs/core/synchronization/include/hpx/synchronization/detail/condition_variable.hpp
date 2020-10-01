@@ -126,12 +126,13 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
         HPX_CORE_EXPORT threads::thread_state_ex_enum wait_until(
             std::unique_lock<mutex_type>& lock,
-            util::steady_time_point const& abs_time, char const* description,
-            error_code& ec = throws);
+            hpx::chrono::steady_time_point const& abs_time,
+            char const* description, error_code& ec = throws);
 
         threads::thread_state_ex_enum wait_until(
             std::unique_lock<mutex_type>& lock,
-            util::steady_time_point const& abs_time, error_code& ec = throws)
+            hpx::chrono::steady_time_point const& abs_time,
+            error_code& ec = throws)
         {
             return wait_until(
                 lock, abs_time, "condition_variable::wait_until", ec);
@@ -139,15 +140,16 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
         threads::thread_state_ex_enum wait_for(
             std::unique_lock<mutex_type>& lock,
-            util::steady_duration const& rel_time, char const* description,
-            error_code& ec = throws)
+            hpx::chrono::steady_duration const& rel_time,
+            char const* description, error_code& ec = throws)
         {
             return wait_until(lock, rel_time.from_now(), description, ec);
         }
 
         threads::thread_state_ex_enum wait_for(
             std::unique_lock<mutex_type>& lock,
-            util::steady_duration const& rel_time, error_code& ec = throws)
+            hpx::chrono::steady_duration const& rel_time,
+            error_code& ec = throws)
         {
             return wait_until(
                 lock, rel_time.from_now(), "condition_variable::wait_for", ec);

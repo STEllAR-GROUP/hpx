@@ -12,7 +12,11 @@ set(threading_headers hpx/thread.hpp hpx/threading/jthread.hpp
                       hpx/threading/thread.hpp
 )
 
-set(threading_compat_headers hpx/runtime/threads/thread.hpp)
+# cmake-format: off
+set(threading_compat_headers
+    hpx/runtime/threads/thread.hpp => hpx/thread.hpp
+)
+# cmake-format: on
 
 set(threading_sources thread.cpp)
 

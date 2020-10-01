@@ -31,24 +31,26 @@ set(futures_headers
     hpx/futures/traits/promise_remote_result.hpp
 )
 
+# cmake-format: off
 set(futures_compat_headers
-    hpx/lcos/future.hpp
-    hpx/lcos/local/futures_factory.hpp
-    hpx/lcos/local/packaged_continuation.hpp
-    hpx/lcos/local/promise.hpp
-    hpx/lcos_local/promise.hpp
-    hpx/traits/acquire_future.hpp
-    hpx/traits/acquire_shared_state.hpp
-    hpx/traits/future_access.hpp
-    hpx/traits/future_then_result.hpp
-    hpx/traits/future_traits.hpp
-    hpx/traits/get_remote_result.hpp
-    hpx/traits/is_future.hpp
-    hpx/traits/is_future_range.hpp
-    hpx/traits/is_future_tuple.hpp
-    hpx/traits/promise_local_result.hpp
-    hpx/traits/promise_remote_result.hpp
+    hpx/lcos/future.hpp => hpx/future.hpp
+    hpx/lcos/local/futures_factory.hpp => hpx/future.hpp
+    hpx/lcos/local/packaged_continuation.hpp => hpx/future.hpp
+    hpx/lcos/local/promise.hpp => hpx/future.hpp
+    hpx/lcos_local/promise.hpp => hpx/future.hpp
+    hpx/traits/acquire_future.hpp => hpx/future.hpp
+    hpx/traits/acquire_shared_state.hpp => hpx/future.hpp
+    hpx/traits/future_access.hpp => hpx/future.hpp
+    hpx/traits/future_then_result.hpp => hpx/future.hpp
+    hpx/traits/future_traits.hpp => hpx/future.hpp
+    hpx/traits/get_remote_result.hpp => hpx/future.hpp
+    hpx/traits/is_future.hpp => hpx/future.hpp
+    hpx/traits/is_future_range.hpp => hpx/future.hpp
+    hpx/traits/is_future_tuple.hpp => hpx/future.hpp
+    hpx/traits/promise_local_result.hpp => hpx/future.hpp
+    hpx/traits/promise_remote_result.hpp => hpx/future.hpp
 )
+# cmake-format: on
 
 set(futures_sources future_data.cpp)
 

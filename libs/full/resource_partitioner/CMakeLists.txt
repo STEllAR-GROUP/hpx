@@ -15,10 +15,13 @@ set(resource_partitioner_headers
     hpx/resource_partitioner/partitioner_fwd.hpp
 )
 
+# cmake-format: off
 set(resource_partitioner_compat_headers
-    hpx/resource_partitioner.hpp hpx/runtime/resource/partitioner.hpp
-    hpx/runtime/resource/partitioner_fwd.hpp
+    hpx/resource_partitioner.hpp => hpx/include/resource_partitioner.hpp
+    hpx/runtime/resource/partitioner.hpp => hpx/include/resource_partitioner.hpp
+    hpx/runtime/resource/partitioner_fwd.hpp => hpx/include/resource_partitioner.hpp
 )
+# cmake-format: on
 
 set(resource_partitioner_sources detail_partitioner.cpp partitioner.cpp)
 
