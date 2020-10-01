@@ -15,12 +15,15 @@ set(batch_environments_headers
     hpx/batch_environments/slurm_environment.hpp
 )
 
+# cmake-format: off
 set(batch_environments_compat_headers
-    hpx/util/batch_environments/alps_environment.hpp
-    hpx/util/batch_environment.hpp
-    hpx/util/batch_environments/pbs_environment.hpp
-    hpx/util/batch_environments/slurm_environment.hpp
+    hpx/batch_environments.hpp => hpx/modules/batch_environments.hpp
+    hpx/util/batch_environment.hpp => hpx/modules/batch_environments.hpp
+    hpx/util/batch_environments/alps_environment.hpp => hpx/modules/batch_environments.hpp
+    hpx/util/batch_environments/pbs_environment.hpp => hpx/modules/batch_environments.hpp
+    hpx/util/batch_environments/slurm_environment.hpp => hpx/modules/batch_environments.hpp
 )
+# cmake-format: on
 
 set(batch_environments_sources alps_environment.cpp batch_environment.cpp
                                pbs_environment.cpp slurm_environment.cpp

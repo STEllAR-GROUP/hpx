@@ -32,7 +32,9 @@ set(program_options_headers
     hpx/program_options/detail/value_semantic.hpp
 )
 
+# cmake-format: off
 set(program_options_compat_headers)
+# cmake-format: on
 
 # Default location is $HPX_ROOT/libs/program_options/src
 set(program_options_sources
@@ -55,6 +57,7 @@ add_hpx_module(
   GLOBAL_HEADER_GEN OFF
   SOURCES ${program_options_sources}
   HEADERS ${program_options_headers}
+  COMPAT_HEADERS ${program_options_compat_headers}
   DEPENDENCIES hpx_core hpx_parallelism ${__boost_program_options}
   CMAKE_SUBDIRS examples tests
 )

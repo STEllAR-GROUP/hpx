@@ -14,9 +14,12 @@ set(static_reinit_headers hpx/static_reinit/reinitializable_static.hpp
 )
 
 # Default location is $HPX_ROOT/libs/static_reinit/include_compatibility
-set(static_reinit_compat_headers hpx/util/reinitializable_static.hpp
-                                 hpx/util/static_reinit.hpp
+# cmake-format: off
+set(static_reinit_compat_headers
+    hpx/util/reinitializable_static.hpp => hpx/modules/static_reinit.hpp
+    hpx/util/static_reinit.hpp => hpx/modules/static_reinit.hpp
 )
+# cmake-format: on
 
 set(static_reinit_sources static_reinit.cpp)
 

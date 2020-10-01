@@ -15,7 +15,11 @@ set(format_headers
 )
 
 # Default location is $HPX_ROOT/libs/format/include_compatibility
-set(format_compat_headers hpx/util/format.hpp)
+# cmake-format: off
+set(format_compat_headers
+    hpx/util/format.hpp => hpx/format.hpp
+)
+# cmake-format: on
 
 # Default location is $HPX_ROOT/libs/format/src
 set(format_sources format.cpp util/bad_lexical_cast.cpp)

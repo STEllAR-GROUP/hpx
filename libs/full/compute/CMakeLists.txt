@@ -30,10 +30,14 @@ set(compute_headers
     hpx/compute/vector.hpp
 )
 
+# cmake-format: off
 set(compute_compat_headers
-    hpx/compute.hpp hpx/parallel/util/numa_allocator.hpp
-    hpx/parallel/util/numa_binding_allocator.hpp hpx/util/functional/new.hpp
+    hpx/compute.hpp => hpx/include/compute.hpp
+    hpx/parallel/util/numa_allocator.hpp => hpx/include/compute.hpp
+    hpx/parallel/util/numa_binding_allocator.hpp => hpx/include/compute.hpp
+    hpx/util/functional/new.hpp => hpx/include/compute.hpp
 )
+# cmake-format: on
 
 set(compute_sources get_host_targets.cpp host_target.cpp numa_domains.cpp)
 

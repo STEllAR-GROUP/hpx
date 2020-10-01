@@ -12,7 +12,12 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(testing_headers hpx/modules/testing.hpp)
 
 # Default location is $HPX_ROOT/libs/testing/include_compatibility
-set(testing_compat_headers hpx/testing.hpp hpx/util/lightweight_test.hpp)
+# cmake-format: off
+set(testing_compat_headers
+    hpx/testing.hpp => hpx/modules/testing.hpp
+    hpx/util/lightweight_test.hpp => hpx/modules/testing.hpp
+)
+# cmake-format: on
 
 # Default location is $HPX_ROOT/libs/testing/src
 set(testing_sources testing.cpp)

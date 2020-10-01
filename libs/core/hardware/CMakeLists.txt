@@ -23,18 +23,20 @@ set(hardware_headers
 )
 
 # Default location is $HPX_ROOT/libs/hardware/include_compatibility
+# cmake-format: off
 set(hardware_compat_headers
-    hpx/util/hardware/cpuid/linux_x86.hpp
-    hpx/util/hardware/cpuid/msvc.hpp
-    hpx/util/hardware/timestamp/bgq.hpp
-    hpx/util/hardware/timestamp/linux_generic.hpp
-    hpx/util/hardware/timestamp/linux_x86_32.hpp
-    hpx/util/hardware/timestamp/linux_x86_64.hpp
-    hpx/util/hardware/timestamp/msvc.hpp
-    hpx/util/hardware/bit_manipulation.hpp
-    hpx/util/hardware/cpuid.hpp
-    hpx/util/hardware/timestamp.hpp
+    hpx/util/hardware/cpuid/linux_x86.hpp => hpx/modules/hardware.hpp
+    hpx/util/hardware/cpuid/msvc.hpp => hpx/modules/hardware.hpp
+    hpx/util/hardware/timestamp/bgq.hpp => hpx/modules/hardware.hpp
+    hpx/util/hardware/timestamp/linux_generic.hpp => hpx/modules/hardware.hpp
+    hpx/util/hardware/timestamp/linux_x86_32.hpp => hpx/modules/hardware.hpp
+    hpx/util/hardware/timestamp/linux_x86_64.hpp => hpx/modules/hardware.hpp
+    hpx/util/hardware/timestamp/msvc.hpp => hpx/modules/hardware.hpp
+    hpx/util/hardware/bit_manipulation.hpp => hpx/modules/hardware.hpp
+    hpx/util/hardware/cpuid.hpp => hpx/modules/hardware.hpp
+    hpx/util/hardware/timestamp.hpp => hpx/modules/hardware.hpp
 )
+# cmake-format: on
 
 # Default location is $HPX_ROOT/libs/hardware/src
 set(hardware_sources)

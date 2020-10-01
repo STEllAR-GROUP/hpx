@@ -36,15 +36,18 @@ set(collectives_headers
 )
 
 # Default location is $HPX_ROOT/libs/collectives/include_compatibility
+# cmake-format: off
 set(collectives_compat_headers
-    hpx/lcos/barrier.hpp
-    hpx/lcos/broadcast.hpp
-    hpx/lcos/fold.hpp
-    hpx/lcos/gather.hpp
-    hpx/lcos/latch.hpp
-    hpx/lcos/reduce.hpp
-    hpx/lcos/spmd_block.hpp
+    hpx/collectives.hpp => hpx/include/lcos.hpp
+    hpx/lcos/barrier.hpp => hpx/barrier.hpp
+    hpx/lcos/broadcast.hpp => hpx/include/lcos.hpp
+    hpx/lcos/fold.hpp => hpx/include/lcos.hpp
+    hpx/lcos/gather.hpp => hpx/include/lcos.hpp
+    hpx/lcos/latch.hpp => hpx/latch.hpp
+    hpx/lcos/reduce.hpp => hpx/include/lcos.hpp
+    hpx/lcos/spmd_block.hpp => hpx/include/lcos.hpp
 )
+# cmake-format: on
 
 # Default location is $HPX_ROOT/libs/collectives/src
 set(collectives_sources

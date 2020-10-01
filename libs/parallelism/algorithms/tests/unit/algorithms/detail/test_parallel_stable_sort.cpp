@@ -7,7 +7,7 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/execution/execution_policy.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/detail/parallel_stable_sort.hpp>
 

@@ -22,16 +22,27 @@ set(lcos_local_headers
 )
 
 # Default location is $HPX_ROOT/libs/lcos_local/include_compatibility
+# cmake-format: off
 set(lcos_local_compat_headers
-    hpx/lcos/local/and_gate.hpp
-    hpx/lcos/local/channel.hpp
-    hpx/lcos/local/composable_guard.hpp
-    hpx/lcos/local/conditional_trigger.hpp
-    hpx/lcos/local/packaged_task.hpp
-    hpx/lcos/local/receive_buffer.hpp
-    hpx/lcos/local/spmd_block.hpp
-    hpx/lcos/local/trigger.hpp
+    hpx/local_lcos.hpp => hpx/modules/lcos_local.hpp
+    hpx/lcos/local/and_gate.hpp => hpx/include/local_lcos.hpp
+    hpx/lcos/local/channel.hpp => hpx/include/local_lcos.hpp
+    hpx/lcos/local/composable_guard.hpp => hpx/include/local_lcos.hpp
+    hpx/lcos/local/conditional_trigger.hpp => hpx/include/local_lcos.hpp
+    hpx/lcos/local/packaged_task.hpp => hpx/future.hpp
+    hpx/lcos/local/receive_buffer.hpp => hpx/include/local_lcos.hpp
+    hpx/lcos/local/spmd_block.hpp => hpx/algorithms/parallel/spmd_block.hpp
+    hpx/lcos/local/trigger.hpp => hpx/include/local_lcos.hpp
+    hpx/local_lcos/and_gate.hpp => hpx/lcos_local/and_gate.hpp
+    hpx/local_lcos/channel.hpp => hpx/lcos_local/channel.hpp
+    hpx/local_lcos/composable_guard.hpp => hpx/lcos_local/composable_guard.hpp
+    hpx/local_lcos/conditional_trigger.hpp => hpx/lcos_local/conditional_trigger.hpp
+    hpx/local_lcos/packaged_task.hpp => hpx/lcos_local/packaged_task.hpp
+    hpx/local_lcos/receive_buffer.hpp => hpx/lcos_local/receive_buffer.hpp
+    hpx/local_lcos/spmd_block.hpp => hpx/lcos_local/spmd_block.hpp
+    hpx/local_lcos/trigger.hpp => hpx/lcos_local/trigger.hpp
 )
+# cmake-format: on
 
 set(lcos_local_sources composable_guard.cpp preprocess_future.cpp)
 

@@ -37,24 +37,26 @@ set(threading_base_headers
     hpx/threading_base/threading_base_fwd.hpp
 )
 
+# cmake-format: off
 set(threading_base_compat_headers
-    hpx/runtime/threads/execution_agent.hpp
-    hpx/runtime/threads/policies/callback_notifier.hpp
-    hpx/runtime/threads/policies/scheduler_base.hpp
-    hpx/runtime/threads/policies/scheduler_mode.hpp
-    hpx/runtime/threads/policies/thread_queue_init_parameters.hpp
-    hpx/runtime/threads/register_thread.hpp
-    hpx/runtime/threads/thread_data.hpp
-    hpx/runtime/threads/thread_data_stackful.hpp
-    hpx/runtime/threads/thread_data_stackless.hpp
-    hpx/runtime/threads/thread_helpers.hpp
-    hpx/runtime/threads/thread_init_data.hpp
-    hpx/runtime/threads/thread_pool_base.hpp
-    hpx/runtime/threads/thread_specific_ptr.hpp
-    hpx/util/annotated_function.hpp
-    hpx/util/external_timer.hpp
-    hpx/util/thread_description.hpp
+    hpx/runtime/threads/execution_agent.hpp => hpx/modules/threading_base.hpp
+    hpx/runtime/threads/policies/callback_notifier.hpp => hpx/modules/threading_base.hpp
+    hpx/runtime/threads/policies/scheduler_base.hpp => hpx/modules/threading_base.hpp
+    hpx/runtime/threads/policies/scheduler_mode.hpp => hpx/modules/threading_base.hpp
+    hpx/runtime/threads/policies/thread_queue_init_parameters.hpp => hpx/modules/threading_base.hpp
+    hpx/runtime/threads/register_thread.hpp => hpx/modules/threading_base.hpp
+    hpx/runtime/threads/thread_data.hpp => hpx/modules/threading_base.hpp
+    hpx/runtime/threads/thread_data_stackful.hpp => hpx/modules/threading_base.hpp
+    hpx/runtime/threads/thread_data_stackless.hpp => hpx/modules/threading_base.hpp
+    hpx/runtime/threads/thread_helpers.hpp => hpx/modules/threading_base.hpp
+    hpx/runtime/threads/thread_init_data.hpp => hpx/modules/threading_base.hpp
+    hpx/runtime/threads/thread_pool_base.hpp => hpx/modules/threading_base.hpp
+    hpx/runtime/threads/thread_specific_ptr.hpp => hpx/modules/threading_base.hpp
+    hpx/util/annotated_function.hpp => hpx/modules/threading_base.hpp
+    hpx/util/external_timer.hpp => hpx/modules/threading_base.hpp
+    hpx/util/thread_description.hpp => hpx/modules/threading_base.hpp
 )
+# cmake-format: on
 
 set(threading_base_sources
     execution_agent.cpp

@@ -31,9 +31,12 @@ set(async_cuda_headers
 )
 
 # Default location is $HPX_ROOT/libs/async_cuda/include_compatibility
-set(async_cuda_compat_headers hpx/compute/cuda/get_targets.hpp
-                              hpx/compute/cuda/target.hpp
+# cmake-format: off
+set(async_cuda_compat_headers
+    hpx/compute/cuda/get_targets.hpp => hpx/async_cuda/get_targets.hpp
+    hpx/compute/cuda/target.hpp => hpx/async_cuda/target.hpp
 )
+# cmake-format: on
 
 set(async_cuda_sources cuda_future.cpp cuda_target.cpp get_targets.cpp)
 

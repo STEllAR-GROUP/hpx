@@ -17,9 +17,12 @@ set(lcos_distributed_headers
     hpx/lcos_distributed/server/channel.hpp
 )
 
-set(lcos_distributed_compat_headers hpx/lcos/channel.hpp
-                                    hpx/lcos/server/channel.hpp
+# cmake-format: off
+set(lcos_distributed_compat_headers
+    hpx/lcos/channel.hpp => hpx/channel.hpp
+    hpx/lcos/server/channel.hpp => hpx/include/lcos.hpp
 )
+# cmake-format: on
 
 set(lcos_distributed_sources)
 

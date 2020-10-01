@@ -12,9 +12,12 @@ set(threadmanager_headers hpx/modules/threadmanager.hpp
                           hpx/threadmanager/threadmanager_fwd.hpp
 )
 
-set(threadmanager_compat_headers hpx/threadmanager.hpp
-                                 hpx/runtime/threads/threadmanager.hpp
+# cmake-format: off
+set(threadmanager_compat_headers
+    hpx/threadmanager.hpp => hpx/modules/threadmanager.hpp
+    hpx/runtime/threads/threadmanager.hpp => hpx/include/threadmanager.hpp
 )
+# cmake-format: on
 
 set(threadmanager_sources threadmanager.cpp)
 
