@@ -40,12 +40,10 @@
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
-#include <boost/system/error_code.hpp>
-#include <boost/system/system_error.hpp>
-
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <system_error>
 
 #if defined(HPX_COROUTINES_HAVE_SWAP_CONTEXT_EMULATION)
 extern "C" void switch_to_fiber(void* lpFiber) noexcept;
@@ -222,8 +220,8 @@ namespace hpx { namespace threads { namespace coroutines {
                     static_cast<LPVOID>(this));
                 if (nullptr == m_ctx)
                 {
-                    throw boost::system::system_error(boost::system::error_code(
-                        GetLastError(), boost::system::system_category()));
+                    throw std::system_error(
+                        GetLastError(), std::system_category());
                 }
             }
 

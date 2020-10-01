@@ -25,7 +25,6 @@
 
 namespace hpx { namespace filesystem {
     using namespace std::filesystem;
-    using std::error_code;
     using std::filesystem::canonical;
 
     inline path initial_path()
@@ -51,7 +50,7 @@ namespace hpx { namespace filesystem {
         }
     }
 
-    inline path canonical(path const& p, path const& base, error_code& ec)
+    inline path canonical(path const& p, path const& base, std::error_code& ec)
     {
         if (p.is_relative())
         {
@@ -65,7 +64,11 @@ namespace hpx { namespace filesystem {
 
 }}    // namespace hpx::filesystem
 #else
+#include <hpx/config/detail/compat_error_code.hpp>
+
 #include <boost/filesystem.hpp>
+
+#include <system_error>
 
 static_assert(BOOST_FILESYSTEM_VERSION == 3,
     "HPX requires Boost.Filesystem version 3 (or support for the C++17 "
@@ -73,6 +76,24 @@ static_assert(BOOST_FILESYSTEM_VERSION == 3,
 
 namespace hpx { namespace filesystem {
     using namespace boost::filesystem;
-    using boost::system::error_code;
+
+    using boost::filesystem::canonical;
+    inline path canonical(path const& p, path const& base, std::error_code& ec)
+    {
+        return canonical(p, base, compat_error_code(ec));
+    }
+
+    using boost::filesystem::exists;
+    inline bool exists(path const& p, std::error_code& ec) noexcept
+    {
+        return exists(p, compat_error_code(ec));
+    }
+
+    using boost::filesystem::is_regular_file;
+    inline bool is_regular_file(path const& p, std::error_code& ec) noexcept
+    {
+        return is_regular_file(p, compat_error_code(ec));
+    }
+
 }}    // namespace hpx::filesystem
 #endif

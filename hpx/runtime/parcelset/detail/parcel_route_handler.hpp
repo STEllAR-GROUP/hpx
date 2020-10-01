@@ -10,8 +10,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/modules/errors.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
+
+#include <system_error>
 
 namespace hpx { namespace parcelset { namespace detail
 {
@@ -19,7 +20,7 @@ namespace hpx { namespace parcelset { namespace detail
     // until after the data has been reliably sent (which is needed for zero
     // copy serialization).
     void HPX_EXPORT parcel_route_handler(
-        boost::system::error_code const& ec,
+        std::error_code const& ec,
         parcelset::parcel const& p);
 }}}
 

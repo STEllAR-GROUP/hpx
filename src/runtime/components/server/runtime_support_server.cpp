@@ -70,6 +70,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <system_error>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -1518,7 +1519,7 @@ namespace hpx { namespace components { namespace server {
                 typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
                 boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
                 tokenizer tokens(component_path, sep);
-                fs::error_code fsec;
+                std::error_code fsec;
                 for (tokenizer::iterator it = tokens.begin();
                      it != tokens.end(); ++it)
                 {
@@ -1992,7 +1993,7 @@ namespace hpx { namespace components { namespace server {
                 typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
                 boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
                 tokenizer tokens(component_path, sep);
-                fs::error_code fsec;
+                std::error_code fsec;
                 for (tokenizer::iterator it = tokens.begin();
                      it != tokens.end(); ++it)
                 {

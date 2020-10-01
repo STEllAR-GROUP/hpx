@@ -30,6 +30,7 @@
 #include <mutex>
 #include <random>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -307,7 +308,7 @@ mutex_type keep_alive_mutex;
 alive_map  keep_alive_buffers;
 
 //
-void async_callback(const uint64_t index, boost::system::error_code const& ec,
+void async_callback(const uint64_t index, std::error_code const& ec,
     hpx::parcelset::parcel const& p)
 {
     scoped_lock lock(keep_alive_mutex);

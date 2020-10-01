@@ -20,6 +20,7 @@
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/is_continuation.hpp>
 
+#include <system_error>
 #include <type_traits>
 #include <utility>
 
@@ -273,7 +274,7 @@ namespace hpx { namespace detail {
 
                     // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
-                    cb(boost::system::error_code(), parcelset::parcel());
+                    cb(std::error_code(), parcelset::parcel());
 #else
                     cb();
 #endif
@@ -288,7 +289,7 @@ namespace hpx { namespace detail {
 
                 // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
-                cb(boost::system::error_code(), parcelset::parcel());
+                cb(std::error_code(), parcelset::parcel());
 #else
                 cb();
 #endif
@@ -338,7 +339,7 @@ namespace hpx { namespace detail {
 
                     // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
-                    cb(boost::system::error_code(), parcelset::parcel());
+                    cb(std::error_code(), parcelset::parcel());
 #else
                     cb();
 #endif
@@ -352,7 +353,7 @@ namespace hpx { namespace detail {
 
                 // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
-                cb(boost::system::error_code(), parcelset::parcel());
+                cb(std::error_code(), parcelset::parcel());
 #else
                 cb();
 #endif

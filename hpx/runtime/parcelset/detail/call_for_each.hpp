@@ -14,6 +14,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 
 #include <cstddef>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -48,7 +49,7 @@ namespace hpx { namespace parcelset
                 return *this;
             }
 
-            void operator()(boost::system::error_code const& e)
+            void operator()(std::error_code const& e)
             {
                 HPX_ASSERT(parcels_.size() == handlers_.size());
                 for(std::size_t i = 0; i < parcels_.size(); ++i)

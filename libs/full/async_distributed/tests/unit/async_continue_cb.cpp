@@ -13,6 +13,7 @@
 #include <atomic>
 #include <chrono>
 #include <cstdint>
+#include <system_error>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -39,7 +40,7 @@ HPX_PLAIN_ACTION(mult2);    // defines mult2_action
 std::atomic<int> callback_called(0);
 
 #if defined(HPX_HAVE_NETWORKING)
-void cb(boost::system::error_code const& ec, hpx::parcelset::parcel const& p)
+void cb(std::error_code const& ec, hpx::parcelset::parcel const& p)
 {
     ++callback_called;
 }

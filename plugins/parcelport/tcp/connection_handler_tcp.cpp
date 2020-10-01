@@ -11,17 +11,18 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/config/detail/compat_error_code.hpp>
 #include <hpx/asio/asio_util.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/plugins/parcelport/tcp/connection_handler.hpp>
 #include <hpx/plugins/parcelport/tcp/receiver.hpp>
 #include <hpx/plugins/parcelport/tcp/sender.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/util/get_entry_as.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
+#include <hpx/util/get_entry_as.hpp>
 
 #include <boost/asio/ip/tcp.hpp>
 
@@ -278,7 +279,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     }
 
     // accepted new incoming connection
-    void connection_handler::handle_accept(boost::system::error_code const & e,
+    void connection_handler::handle_accept(std::error_code const & e,
         std::shared_ptr<receiver> receiver_conn)
     {
         if(!e)
@@ -322,20 +323,21 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
     // Handle completion of a read operation.
     void connection_handler::handle_read_completion(
-        boost::system::error_code const& e,
+        std::error_code const& e,
         std::shared_ptr<receiver> receiver_conn)
     {
         if (!e) return;
 
-        if (e != boost::asio::error::operation_aborted &&
-            e != boost::asio::error::eof)
+        if (!compat_error_code::equal(
+                e, boost::asio::error::operation_aborted) &&
+            !compat_error_code::equal(e, boost::asio::error::eof))
         {
             LPT_(error)
                 << "handle read operation completion: error: "
                 << e.message();
         }
 
-//         if (e != boost::asio::error::eof)
+        //if (!compat_error_code::equal(e, boost::asio::error::eof))
         {
             // remove this connection from the list of known connections
             std::lock_guard<lcos::local::spinlock> l(connections_mtx_);

@@ -13,11 +13,10 @@
 #include <hpx/errors/error.hpp>
 #include <hpx/errors/exception_fwd.hpp>
 
-#include <boost/system/error_code.hpp>
-
 #include <exception>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
@@ -43,32 +42,27 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Returns generic HPX error category used for new errors.
-    HPX_CORE_EXPORT boost::system::error_category const& get_hpx_category();
+    HPX_CORE_EXPORT std::error_category const& get_hpx_category();
 
     /// \brief Returns generic HPX error category used for errors re-thrown
     ///        after the exception has been de-serialized.
-    HPX_CORE_EXPORT boost::system::error_category const&
-    get_hpx_rethrow_category();
+    HPX_CORE_EXPORT std::error_category const& get_hpx_rethrow_category();
 
     /// \cond NOINTERNAL
-    HPX_CORE_EXPORT boost::system::error_category const&
-    get_lightweight_hpx_category();
+    HPX_CORE_EXPORT std::error_category const& get_lightweight_hpx_category();
 
-    HPX_CORE_EXPORT boost::system::error_category const& get_hpx_category(
-        throwmode mode);
+    HPX_CORE_EXPORT std::error_category const& get_hpx_category(throwmode mode);
 
-    inline boost::system::error_code make_system_error_code(
+    inline std::error_code make_system_error_code(
         error e, throwmode mode = plain)
     {
-        return boost::system::error_code(
-            static_cast<int>(e), get_hpx_category(mode));
+        return std::error_code(static_cast<int>(e), get_hpx_category(mode));
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline boost::system::error_condition make_error_condition(
-        error e, throwmode mode)
+    inline std::error_condition make_error_condition(error e, throwmode mode)
     {
-        return boost::system::error_condition(
+        return std::error_condition(
             static_cast<int>(e), get_hpx_category(mode));
     }
     /// \endcond
@@ -83,7 +77,7 @@ namespace hpx {
     /// \note Class hpx::error_code is an adjunct to error reporting by
     /// exception
     ///
-    class error_code : public boost::system::error_code    //-V690
+    class error_code : public std::error_code    //-V690
     {
     public:
         /// Construct an object of type error_code.
@@ -96,7 +90,7 @@ namespace hpx {
         ///
         /// \throws nothing
         explicit error_code(throwmode mode = plain)
-          : boost::system::error_code(make_system_error_code(success, mode))
+          : std::error_code(make_system_error_code(success, mode))
         {
         }
 
@@ -218,8 +212,7 @@ namespace hpx {
         /// * value() == hpx::success and category() == hpx::get_hpx_category()
         void clear()
         {
-            this->boost::system::error_code::assign(
-                success, get_hpx_category());
+            this->std::error_code::assign(success, get_hpx_category());
             exception_ = std::exception_ptr();
         }
 

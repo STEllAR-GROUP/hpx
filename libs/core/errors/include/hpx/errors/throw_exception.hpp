@@ -17,10 +17,9 @@
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 
-#include <boost/system/error_code.hpp>
-
 #include <exception>
 #include <string>
+#include <system_error>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -49,9 +48,9 @@ namespace hpx { namespace detail {
         std::string const& file = "<unknown>", long line = -1,
         std::string const& auxinfo = "");
 
-    HPX_CORE_EXPORT std::exception_ptr get_exception(
-        boost::system::error_code const& ec, std::string const& msg,
-        throwmode mode, std::string const& func = "<unknown>",
+    HPX_CORE_EXPORT std::exception_ptr get_exception(std::error_code const& ec,
+        std::string const& msg, throwmode mode,
+        std::string const& func = "<unknown>",
         std::string const& file = "<unknown>", long line = -1,
         std::string const& auxinfo = "");
 

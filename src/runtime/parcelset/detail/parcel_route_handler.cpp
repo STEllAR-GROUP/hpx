@@ -15,6 +15,8 @@
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_distributed.hpp>
 
+#include <system_error>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail
 {
@@ -24,7 +26,7 @@ namespace hpx { namespace detail
 namespace hpx { namespace parcelset { namespace detail
 {
     void parcel_route_handler(
-        boost::system::error_code const& ec,
+        std::error_code const& ec,
         parcelset::parcel const& p)
     {
         parcelhandler& ph = hpx::get_runtime_distributed().get_parcel_handler();

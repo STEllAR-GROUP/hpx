@@ -13,9 +13,8 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/functional/function.hpp>
 
-#include <boost/system/error_code.hpp>
-
 #include <cstddef>
+#include <system_error>
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
@@ -88,7 +87,7 @@ namespace hpx {
             parcelport_background_mode mode = parcelport_background_mode_all);
 
         typedef util::function_nonser<
-            void(boost::system::error_code const&, parcel const&)
+            void(std::error_code const&, parcel const&)
         > write_handler_type;
 
         ///////////////////////////////////////////////////////////////////////

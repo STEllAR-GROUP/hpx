@@ -66,6 +66,7 @@
 #include <mutex>
 #include <sstream>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -1499,7 +1500,7 @@ bool addressing_service::resolve_cached(
 ///////////////////////////////////////////////////////////////////////////////
 void addressing_service::route(
     parcelset::parcel p
-  , util::function_nonser<void(boost::system::error_code const&,
+  , util::function_nonser<void(std::error_code const&,
         parcelset::parcel const&)> && f
   , threads::thread_priority local_priority
     )
@@ -1509,7 +1510,7 @@ void addressing_service::route(
         // reschedule this call as an HPX thread
         void (addressing_service::*route_ptr)(
             parcelset::parcel,
-            util::function_nonser<void(boost::system::error_code const&,
+            util::function_nonser<void(std::error_code const&,
                 parcelset::parcel const&)> &&,
             threads::thread_priority
         ) = &addressing_service::route;

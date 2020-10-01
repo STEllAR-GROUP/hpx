@@ -20,6 +20,7 @@
 #include <hpx/async_distributed/applier/apply.hpp>
 
 #include <cstddef>
+#include <system_error>
 #include <type_traits>
 #include <utility>
 
@@ -162,7 +163,7 @@ namespace hpx {
 
             // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
-            cb(boost::system::error_code(), parcelset::parcel());
+            cb(std::error_code(), parcelset::parcel());
 #else
             cb();
 #endif

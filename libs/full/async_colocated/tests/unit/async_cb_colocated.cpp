@@ -15,6 +15,7 @@
 #include <atomic>
 #include <chrono>
 #include <cstdint>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -76,7 +77,7 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 std::atomic<int> callback_called(0);
 
 #if defined(HPX_HAVE_NETWORKING)
-void cb(boost::system::error_code const& ec, hpx::parcelset::parcel const& p)
+void cb(std::error_code const& ec, hpx::parcelset::parcel const& p)
 {
     ++callback_called;
 }

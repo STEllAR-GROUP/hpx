@@ -21,6 +21,7 @@ set(config_headers
     hpx/config/constexpr.hpp
     hpx/config/debug.hpp
     hpx/config/deprecation.hpp
+    hpx/config/detail/compat_error_code.hpp
     hpx/config/emulate_deleted.hpp
     hpx/config/export_definitions.hpp
     hpx/config/forceinline.hpp

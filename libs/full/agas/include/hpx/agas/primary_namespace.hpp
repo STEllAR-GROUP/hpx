@@ -18,6 +18,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -67,8 +68,8 @@ namespace hpx { namespace agas {
 
 #if defined(HPX_HAVE_NETWORKING)
         void route(parcelset::parcel&& p,
-            util::function_nonser<void(boost::system::error_code const&,
-                parcelset::parcel const&)>&& f);
+            util::function_nonser<void(
+                std::error_code const&, parcelset::parcel const&)>&& f);
 #endif
 
         resolved_type resolve_gid(naming::gid_type const& id);

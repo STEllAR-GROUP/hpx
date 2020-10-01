@@ -44,6 +44,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -53,7 +54,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
       : public parcelset::parcelport_connection<sender, std::vector<char> >
     {
         using postprocess_handler_type = util::unique_function_nonser<void(
-            boost::system::error_code const&)>;
+            std::error_code const&)>;
 
     public:
         /// Construct a sending parcelport_connection with the given io_service.
@@ -166,7 +167,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // this additional wrapping of the handler into a bind object is
             // needed to keep  this parcelport_connection object alive for the whole
             // write operation
-            void (sender::*f)(boost::system::error_code const&, std::size_t)
+            void (sender::*f)(std::error_code const&, std::size_t)
                 = &sender::handle_write;
 
             using util::placeholders::_1;
@@ -182,7 +183,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
 
         /// handle completed write operation
-        void handle_write(boost::system::error_code const& e, std::size_t bytes)
+        void handle_write(std::error_code const& e, std::size_t bytes)
         {
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             state_ = state_handle_write;
@@ -213,7 +214,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 // inform post-processing handler of error as well
                 util::unique_function_nonser<
                     void(
-                        boost::system::error_code const&
+                        std::error_code const&
                       , parcelset::locality const&
                       , std::shared_ptr<sender>
                     )
@@ -235,7 +236,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             socket_.set_option(quickack);
 #endif
 
-            void (sender::*f)(boost::system::error_code const&)
+            void (sender::*f)(std::error_code const&)
                 = &sender::handle_read_ack;
 
             using util::placeholders::_1;
@@ -244,7 +245,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 util::bind(f, shared_from_this(), _1));
         }
 
-        void handle_read_ack(boost::system::error_code const& e)
+        void handle_read_ack(std::error_code const& e)
         {
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             state_ = state_handle_read_ack;
@@ -255,7 +256,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // parcels have to be sent.
             util::unique_function_nonser<
                 void(
-                    boost::system::error_code const&
+                    std::error_code const&
                   , parcelset::locality const&
                   , std::shared_ptr<sender>
                 )
@@ -279,7 +280,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         postprocess_handler_type handler_;
         util::unique_function_nonser<
             void(
-                boost::system::error_code const&
+                std::error_code const&
                 , parcelset::locality const&
                 , std::shared_ptr<sender>
                 )
