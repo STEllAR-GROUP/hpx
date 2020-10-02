@@ -296,7 +296,7 @@ function(add_hpx_module libname modulename)
   )
     add_hpx_source_group(
       NAME hpx_${modulename}
-      ROOT ${COMPAT_HEADER_BINARY_ROOT}/hpx
+      ROOT ${COMPAT_HEADER_ROOT}/hpx
       CLASS "Generated Files"
       TARGETS ${compat_headers}
     )
