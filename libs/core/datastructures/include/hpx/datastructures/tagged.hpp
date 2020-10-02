@@ -1,5 +1,5 @@
 //  Copyright Eric Niebler 2013-2015
-//  Copyright 2015 Hartmut Kaiser
+//  Copyright 2015-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -43,7 +43,7 @@ namespace hpx { namespace util {
             struct unpack_getter
             {
                 typedef typename Tag::template getter<T,
-                    typename tuple_element<I, T>::type, I>
+                    typename hpx::tuple_element<I, T>::type, I>
                     type;
 
             private:

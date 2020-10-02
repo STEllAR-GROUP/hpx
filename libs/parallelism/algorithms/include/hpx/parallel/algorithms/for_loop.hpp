@@ -1017,8 +1017,7 @@ namespace hpx {
                     "Requires at least forward iterator or integral loop "
                     "boundaries.");
 
-                typedef execution::is_sequenced_execution_policy<ExPolicy>
-                    is_seq;
+                typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
                 std::size_t size = parallel::v1::detail::distance(first, last);
                 auto&& t = hpx::forward_as_tuple(std::forward<Args>(args)...);
@@ -1054,8 +1053,7 @@ namespace hpx {
                     "Requires at least forward iterator or integral loop "
                     "boundaries.");
 
-                typedef execution::is_sequenced_execution_policy<ExPolicy>
-                    is_seq;
+                typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
                 auto&& t = hpx::forward_as_tuple(std::forward<Args>(args)...);
 

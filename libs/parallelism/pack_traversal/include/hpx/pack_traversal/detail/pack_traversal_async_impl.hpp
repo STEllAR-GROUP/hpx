@@ -104,7 +104,7 @@ namespace hpx {
         class async_traversal_frame : public Visitor
         {
         protected:
-            tuple<Args...> args_;
+            hpx::tuple<Args...> args_;
             std::atomic<bool> finished_;
 
             Visitor& visitor() noexcept
@@ -141,7 +141,7 @@ namespace hpx {
             }
 
             /// Returns the arguments of the frame
-            tuple<Args...>& head() noexcept
+            hpx::tuple<Args...>& head() noexcept
             {
                 return args_;
             }
@@ -376,12 +376,12 @@ namespace hpx {
         class async_traversal_point
         {
             Frame frame_;
-            tuple<Hierarchy...> hierarchy_;
+            hpx::tuple<Hierarchy...> hierarchy_;
             bool& detached_;
 
         public:
             explicit async_traversal_point(
-                Frame frame, tuple<Hierarchy...> hierarchy, bool& detached)
+                Frame frame, hpx::tuple<Hierarchy...> hierarchy, bool& detached)
               : frame_(std::move(frame))
               , hierarchy_(std::move(hierarchy))
               , detached_(detached)

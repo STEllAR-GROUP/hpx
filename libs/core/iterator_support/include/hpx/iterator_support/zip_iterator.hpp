@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2014 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -29,9 +29,9 @@ namespace hpx { namespace util {
         struct zip_iterator_value;
 
         template <typename... Ts>
-        struct zip_iterator_value<tuple<Ts...>>
+        struct zip_iterator_value<hpx::tuple<Ts...>>
         {
-            typedef tuple<typename std::iterator_traits<Ts>::value_type...>
+            typedef hpx::tuple<typename std::iterator_traits<Ts>::value_type...>
                 type;
         };
 
@@ -40,9 +40,10 @@ namespace hpx { namespace util {
         struct zip_iterator_reference;
 
         template <typename... Ts>
-        struct zip_iterator_reference<tuple<Ts...>>
+        struct zip_iterator_reference<hpx::tuple<Ts...>>
         {
-            typedef tuple<typename std::iterator_traits<Ts>::reference...> type;
+            typedef hpx::tuple<typename std::iterator_traits<Ts>::reference...>
+                type;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -174,15 +175,17 @@ namespace hpx { namespace util {
         struct zip_iterator_category;
 
         template <typename T>
-        struct zip_iterator_category<tuple<T>,
-            typename std::enable_if<tuple_size<tuple<T>>::value == 1>::type>
+        struct zip_iterator_category<hpx::tuple<T>,
+            typename std::enable_if<hpx::tuple_size<hpx::tuple<T>>::value ==
+                1>::type>
         {
             typedef typename std::iterator_traits<T>::iterator_category type;
         };
 
         template <typename T, typename U>
-        struct zip_iterator_category<tuple<T, U>,
-            typename std::enable_if<tuple_size<tuple<T, U>>::value == 2>::type>
+        struct zip_iterator_category<hpx::tuple<T, U>,
+            typename std::enable_if<hpx::tuple_size<hpx::tuple<T, U>>::value ==
+                2>::type>
           : zip_iterator_category_impl<
                 typename std::iterator_traits<T>::iterator_category,
                 typename std::iterator_traits<U>::iterator_category>
@@ -190,14 +193,14 @@ namespace hpx { namespace util {
         };
 
         template <typename T, typename U, typename... Tail>
-        struct zip_iterator_category<tuple<T, U, Tail...>,
+        struct zip_iterator_category<hpx::tuple<T, U, Tail...>,
             typename std::enable_if<(
-                tuple_size<tuple<T, U, Tail...>>::value > 2)>::type>
+                hpx::tuple_size<hpx::tuple<T, U, Tail...>>::value > 2)>::type>
           : zip_iterator_category_impl<
                 typename zip_iterator_category_impl<
                     typename std::iterator_traits<T>::iterator_category,
                     typename std::iterator_traits<U>::iterator_category>::type,
-                typename zip_iterator_category<tuple<Tail...>>::type>
+                typename zip_iterator_category<hpx::tuple<Tail...>>::type>
         {
         };
 
@@ -206,12 +209,13 @@ namespace hpx { namespace util {
         struct dereference_iterator;
 
         template <typename... Ts>
-        struct dereference_iterator<tuple<Ts...>>
+        struct dereference_iterator<hpx::tuple<Ts...>>
         {
             template <std::size_t... Is>
             HPX_HOST_DEVICE static
-                typename zip_iterator_reference<tuple<Ts...>>::type
-                call(util::index_pack<Is...>, tuple<Ts...> const& iterators)
+                typename zip_iterator_reference<hpx::tuple<Ts...>>::type
+                call(
+                    util::index_pack<Is...>, hpx::tuple<Ts...> const& iterators)
             {
                 return hpx::forward_as_tuple(*hpx::get<Is>(iterators)...);
             }
@@ -357,12 +361,13 @@ namespace hpx { namespace util {
 
     template <typename... Ts>
     class zip_iterator
-      : public detail::zip_iterator_base<tuple<Ts...>, zip_iterator<Ts...>>
+      : public detail::zip_iterator_base<hpx::tuple<Ts...>, zip_iterator<Ts...>>
     {
         static_assert(
             sizeof...(Ts) != 0, "zip_iterator must wrap at least one iterator");
 
-        typedef detail::zip_iterator_base<tuple<Ts...>, zip_iterator<Ts...>>
+        typedef detail::zip_iterator_base<hpx::tuple<Ts...>,
+            zip_iterator<Ts...>>
             base_type;
 
     public:
@@ -376,7 +381,7 @@ namespace hpx { namespace util {
         {
         }
 
-        HPX_HOST_DEVICE explicit zip_iterator(tuple<Ts...>&& t)
+        HPX_HOST_DEVICE explicit zip_iterator(hpx::tuple<Ts...>&& t)
           : base_type(std::move(t))
         {
         }
@@ -426,15 +431,15 @@ namespace hpx { namespace util {
     };
 
     template <typename... Ts>
-    class zip_iterator<tuple<Ts...>>
-      : public detail::zip_iterator_base<tuple<Ts...>,
-            zip_iterator<tuple<Ts...>>>
+    class zip_iterator<hpx::tuple<Ts...>>
+      : public detail::zip_iterator_base<hpx::tuple<Ts...>,
+            zip_iterator<hpx::tuple<Ts...>>>
     {
         static_assert(
             sizeof...(Ts) != 0, "zip_iterator must wrap at least one iterator");
 
-        typedef detail::zip_iterator_base<tuple<Ts...>,
-            zip_iterator<tuple<Ts...>>>
+        typedef detail::zip_iterator_base<hpx::tuple<Ts...>,
+            zip_iterator<hpx::tuple<Ts...>>>
             base_type;
 
     public:
@@ -448,7 +453,7 @@ namespace hpx { namespace util {
         {
         }
 
-        HPX_HOST_DEVICE explicit zip_iterator(tuple<Ts...>&& t)
+        HPX_HOST_DEVICE explicit zip_iterator(hpx::tuple<Ts...>&& t)
           : base_type(std::move(t))
         {
         }

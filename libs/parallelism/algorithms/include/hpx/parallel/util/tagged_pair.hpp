@@ -1,5 +1,5 @@
 //  Copyright Eric Niebler 2013-2015
-//  Copyright 2015 Hartmut Kaiser
+//  Copyright 2015-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -43,16 +43,17 @@ namespace hpx { namespace util {
     }
 
     template <typename Tag1, typename Tag2, typename... Ts>
-    hpx::future<tagged_pair<Tag1(typename tuple_element<0, tuple<Ts...>>::type),
-        Tag2(typename tuple_element<1, tuple<Ts...>>::type)>>
-    make_tagged_pair(hpx::future<tuple<Ts...>>&& f)
+    hpx::future<tagged_pair<
+        Tag1(typename hpx::tuple_element<0, hpx::tuple<Ts...>>::type),
+        Tag2(typename hpx::tuple_element<1, hpx::tuple<Ts...>>::type)>>
+    make_tagged_pair(hpx::future<hpx::tuple<Ts...>>&& f)
     {
         static_assert(
             sizeof...(Ts) >= 2, "tuple must have at least 2 elements");
 
         typedef hpx::util::tagged_pair<
-            Tag1(typename tuple_element<0, tuple<Ts...>>::type),
-            Tag2(typename tuple_element<1, tuple<Ts...>>::type)>
+            Tag1(typename hpx::tuple_element<0, hpx::tuple<Ts...>>::type),
+            Tag2(typename hpx::tuple_element<1, hpx::tuple<Ts...>>::type)>
             result_type;
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
@@ -60,7 +61,7 @@ namespace hpx { namespace util {
         return hpx::future<result_type>();
 #else
         return lcos::make_future<result_type>(
-            std::move(f), [](tuple<Ts...>&& p) -> result_type {
+            std::move(f), [](hpx::tuple<Ts...>&& p) -> result_type {
                 return make_tagged_pair<Tag1, Tag2>(std::move(p));
             });
 #endif

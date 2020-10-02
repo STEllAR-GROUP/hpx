@@ -234,8 +234,8 @@ namespace hpx { namespace lcos { namespace detail {
         {
             detail::dataflow_finalization<dataflow_type> this_f_(this);
 
-            parallel::execution::parallel_policy_executor<launch::async_policy>
-                exec{policy};
+            hpx::execution::parallel_policy_executor<launch::async_policy> exec{
+                policy};
 
             exec.post(std::move(this_f_), std::move(futures));
         }
@@ -244,8 +244,8 @@ namespace hpx { namespace lcos { namespace detail {
         {
             detail::dataflow_finalization<dataflow_type> this_f_(this);
 
-            parallel::execution::parallel_policy_executor<launch::fork_policy>
-                exec{policy};
+            hpx::execution::parallel_policy_executor<launch::fork_policy> exec{
+                policy};
 
             exec.post(std::move(this_f_), std::move(futures));
         }
@@ -318,7 +318,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             detail::dataflow_finalization<dataflow_type> this_f_(this);
 
-            parallel::execution::post(std::forward<Executor>(exec),
+            hpx::parallel::execution::post(std::forward<Executor>(exec),
                 std::move(this_f_), std::move(futures));
         }
 
