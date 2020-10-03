@@ -36,6 +36,7 @@
 #endif
 
 #include <hpx/config.hpp>
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/coroutine_fwd.hpp>
 #include <hpx/coroutines/detail/context_base.hpp>

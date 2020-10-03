@@ -19,7 +19,6 @@ Core modules
    /libs/core/asio/docs/index.rst
    /libs/core/assertion/docs/index.rst
    /libs/core/cache/docs/index.rst
-   /libs/core/concepts/docs/index.rst
    /libs/core/concurrency/docs/index.rst
    /libs/core/config/docs/index.rst
    /libs/core/config_registry/docs/index.rst
@@ -31,6 +30,7 @@ Core modules
    /libs/core/filesystem/docs/index.rst
    /libs/core/format/docs/index.rst
    /libs/core/functional/docs/index.rst
+   /libs/core/fundamentals/docs/index.rst
    /libs/core/hardware/docs/index.rst
    /libs/core/hashing/docs/index.rst
    /libs/core/ini/docs/index.rst

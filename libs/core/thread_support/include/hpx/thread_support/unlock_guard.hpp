@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/config/non_copyable.hpp>
 
 namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////

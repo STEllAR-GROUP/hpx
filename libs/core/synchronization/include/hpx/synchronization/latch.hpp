@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/assert.hpp>
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>

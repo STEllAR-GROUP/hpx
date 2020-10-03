@@ -14,7 +14,6 @@ set(iterator_support_headers
     hpx/iterator_support/iterator_adaptor.hpp
     hpx/iterator_support/iterator_facade.hpp
     hpx/iterator_support/iterator_range.hpp
-    hpx/iterator_support/range.hpp
     hpx/iterator_support/transform_iterator.hpp
     hpx/iterator_support/zip_iterator.hpp
 )
@@ -27,7 +26,6 @@ set(iterator_support_compat_headers
     hpx/util/iterator_adaptor.hpp => hpx/modules/iterator_support.hpp
     hpx/util/iterator_facade.hpp => hpx/modules/iterator_support.hpp
     hpx/util/iterator_range.hpp => hpx/modules/iterator_support.hpp
-    hpx/util/range.hpp => hpx/modules/iterator_support.hpp
     hpx/util/transform_iterator.hpp => hpx/modules/iterator_support.hpp
 )
 # cmake-format: on
@@ -44,6 +42,6 @@ add_hpx_module(
   HEADERS ${iterator_support_headers}
   COMPAT_HEADERS ${iterator_support_compat_headers}
   MODULE_DEPENDENCIES hpx_config hpx_datastructures hpx_functional
-                      hpx_serialization hpx_type_support
+                      hpx_fundamentals hpx_serialization hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

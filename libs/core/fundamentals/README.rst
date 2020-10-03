@@ -6,11 +6,11 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-========
-concepts
-========
+===
+fundamentals
+===
 
 This library is part of HPX.
 
 Documentation can be found `here
-<https://hpx-docs.stellar-group.org/latest/html/libs/concepts/docs/index.html>`__.
+<https://hpx-docs.stellar-group.org/latest/html/libs/fundamentals/docs/index.html>`__.

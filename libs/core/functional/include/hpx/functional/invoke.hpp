@@ -9,14 +9,10 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/type_support/void_guard.hpp>
 
 #include <utility>
 
 namespace hpx { namespace util {
-
-#define HPX_INVOKE_R(R, F, ...)                                                \
-    (::hpx::util::void_guard<R>(), HPX_INVOKE(F, __VA_ARGS__))
 
     /// Invokes the given callable object f with the content of
     /// the argument pack vs

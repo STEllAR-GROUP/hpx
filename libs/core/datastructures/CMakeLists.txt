@@ -54,6 +54,6 @@ add_hpx_module(
   HEADERS ${datastructures_headers}
   COMPAT_HEADERS ${datastructures_compat_headers}
   EXCLUDE_FROM_GLOBAL_HEADER "hpx/datastructures/variant_helper.hpp"
-  MODULE_DEPENDENCIES hpx_assertion hpx_config hpx_concepts hpx_type_support
+  MODULE_DEPENDENCIES hpx_assertion hpx_config hpx_fundamentals
   CMAKE_SUBDIRS examples tests
 )

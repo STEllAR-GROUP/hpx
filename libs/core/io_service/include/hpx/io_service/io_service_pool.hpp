@@ -11,8 +11,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/concurrency/barrier.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 
 #include <asio/io_context.hpp>

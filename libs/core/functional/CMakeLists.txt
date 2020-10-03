@@ -12,7 +12,6 @@ set(functional_headers
     hpx/functional/detail/basic_function.hpp
     hpx/functional/detail/empty_function.hpp
     hpx/functional/detail/function_registration.hpp
-    hpx/functional/detail/invoke.hpp
     hpx/functional/detail/reset_function.hpp
     hpx/functional/detail/vtable/callable_vtable.hpp
     hpx/functional/detail/vtable/copyable_vtable.hpp
@@ -92,11 +91,11 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_assertion
     hpx_config
+    hpx_fundamentals
     hpx_datastructures
     hpx_debugging
     hpx_errors
     hpx_itt_notify
     hpx_serialization
-    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

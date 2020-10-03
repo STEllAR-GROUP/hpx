@@ -14,6 +14,7 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/execution_base/register_locks.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/modules/itt_notify.hpp>

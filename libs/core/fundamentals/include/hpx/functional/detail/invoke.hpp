@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/type_support/void_guard.hpp>
 
 #include <functional>
 #include <type_traits>
@@ -107,5 +108,8 @@ namespace hpx { namespace util { namespace detail {
 
 #define HPX_INVOKE(F, ...)                                                     \
     (::hpx::util::detail::invoke<decltype((F))>(F)(__VA_ARGS__))
+
+#define HPX_INVOKE_R(R, F, ...)                                                \
+    (::hpx::util::void_guard<R>(), HPX_INVOKE(F, __VA_ARGS__))
 
 }}}    // namespace hpx::util::detail

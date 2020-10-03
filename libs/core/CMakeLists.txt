@@ -16,7 +16,6 @@ set(_hpx_core_modules
     asio
     assertion
     cache
-    concepts
     concurrency
     config
     config_registry
@@ -28,6 +27,7 @@ set(_hpx_core_modules
     filesystem
     format
     functional
+    fundamentals
     hardware
     hashing
     ini

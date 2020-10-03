@@ -14,6 +14,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/hashing/fibhash.hpp>
 #include <hpx/synchronization/spinlock.hpp>

@@ -33,6 +33,7 @@
 #include <winnt.h>
 
 #include <hpx/config.hpp>
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/coroutines/config/defines.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>

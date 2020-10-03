@@ -63,7 +63,6 @@ add_hpx_module(
     hpx_config
     hpx_format
     hpx_filesystem
-    hpx_format
     hpx_timing
     hpx_thread_support
   CMAKE_SUBDIRS examples tests

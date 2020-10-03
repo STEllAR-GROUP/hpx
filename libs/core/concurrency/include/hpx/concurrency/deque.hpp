@@ -19,6 +19,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/concurrency/detail/freelist.hpp>
 #include <hpx/concurrency/detail/tagged_ptr_pair.hpp>
 

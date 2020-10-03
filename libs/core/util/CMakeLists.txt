@@ -33,7 +33,7 @@ add_hpx_module(
   SOURCES ${util_sources}
   HEADERS ${util_headers}
   COMPAT_HEADERS ${util_compat_headers}
-  MODULE_DEPENDENCIES hpx_config hpx_concepts hpx_errors hpx_format
+  MODULE_DEPENDENCIES hpx_config hpx_errors hpx_format hpx_fundamentals
                       hpx_iterator_support
   CMAKE_SUBDIRS examples tests
 )
