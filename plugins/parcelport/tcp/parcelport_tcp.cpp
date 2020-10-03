@@ -13,7 +13,8 @@
 #include <hpx/plugins/parcelport/tcp/sender.hpp>
 #include <hpx/plugins/parcelport_factory.hpp>
 
-namespace hpx { namespace traits {
+namespace hpx { namespace traits
+{
     // Inject additional configuration data into the factory registry for this
     // type. This information ends up in the system wide configuration database
     // under the plugin specific section:
@@ -30,8 +31,7 @@ namespace hpx { namespace traits {
             return "1";
         }
 
-        static void init(
-            int* argc, char*** argv, util::command_line_handling& cfg)
+        static void init(int *argc, char ***argv, util::command_line_handling &cfg)
         {
         }
 
@@ -42,8 +42,10 @@ namespace hpx { namespace traits {
             return "";
         }
     };
-}}    // namespace hpx::traits
+}}
 
-HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::tcp::connection_handler, tcp);
+HPX_REGISTER_PARCELPORT(
+    hpx::parcelset::policies::tcp::connection_handler,
+    tcp);
 
 #endif

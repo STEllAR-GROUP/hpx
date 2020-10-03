@@ -12,7 +12,13 @@
 #include <hpx/runtime_local/state.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 
-namespace hpx { namespace agas {
-    // return whether resolver client is in state described by 'mask'
-    HPX_EXPORT bool router_is(state st);
-}}    // namespace hpx::agas
+namespace hpx
+{
+    namespace agas
+    {
+        // return whether resolver client is in state described by 'mask'
+        HPX_EXPORT bool router_is(state st);
+    }
+}
+
+

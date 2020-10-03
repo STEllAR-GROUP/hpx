@@ -12,14 +12,14 @@
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 
 // The memory pool specialization need to be pulled in before encode_parcels
-#include <hpx/plugins/parcelport_factory.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/plugins/parcelport_factory.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 //
 #include <hpx/runtime_local/thread_stacktrace.hpp>
@@ -32,33 +32,33 @@
 // --------------------------------------------------------------------
 // Controls whether we are allowed to suspend threads that are sending
 // when we have maxed out the number of sends we can handle
-#define HPX_PARCELPORT_LIBFABRIC_SUSPEND_WAKE                                  \
-    (HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS / 2)
+#define HPX_PARCELPORT_LIBFABRIC_SUSPEND_WAKE  (HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS/2)
+
 
 // --------------------------------------------------------------------
 // Enable the use of boost small_vector for certain short lived storage
 // elements within the parcelport. This can reduce some memory allocations
-#define HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR true
+#define HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR    true
 
 #define HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED 1
 
 // --------------------------------------------------------------------
+#include <plugins/parcelport/unordered_map.hpp>
 #include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/locality.hpp>
-#include <plugins/parcelport/unordered_map.hpp>
 
-#include <plugins/parcelport/libfabric/connection_handler.hpp>
-#include <plugins/parcelport/libfabric/libfabric_controller.hpp>
 #include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
-#include <plugins/parcelport/libfabric/rdma_locks.hpp>
-#include <plugins/parcelport/libfabric/sender.hpp>
-#include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/performance_counter.hpp>
 #include <plugins/parcelport/rma_memory_pool.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
+#include <plugins/parcelport/libfabric/rdma_locks.hpp>
+#include <plugins/parcelport/libfabric/libfabric_controller.hpp>
+#include <plugins/parcelport/libfabric/sender.hpp>
+#include <plugins/parcelport/libfabric/connection_handler.hpp>
 
 //
 #if HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR
-#include <boost/container/small_vector.hpp>
+# include <boost/container/small_vector.hpp>
 #endif
 //
 #include <atomic>
@@ -77,7 +77,11 @@
 
 using namespace hpx::parcelset::policies;
 
-namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
+namespace hpx {
+namespace parcelset {
+namespace policies {
+namespace libfabric
+{
     // --------------------------------------------------------------------
     // parcelport, the implementation of the parcelport itself
     // --------------------------------------------------------------------
@@ -87,17 +91,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
         typedef parcelport_impl<parcelport> base_type;
 
     public:
+
         // These are the types used in the parcelport for locking etc
         // Note that spinlock is the only supported mutex that works on HPX+OS threads
         // and condition_variable_any can be used across HPX/OS threads
-        typedef hpx::lcos::local::spinlock mutex_type;
-        typedef hpx::parcelset::policies::libfabric::scoped_lock<mutex_type>
-            scoped_lock;
-        typedef hpx::parcelset::policies::libfabric::unique_lock<mutex_type>
-            unique_lock;
-        typedef rma_memory_region<libfabric_region_provider> region_type;
-        typedef memory_region_allocator<libfabric_region_provider>
-            allocator_type;
+        typedef hpx::lcos::local::spinlock                                   mutex_type;
+        typedef hpx::parcelset::policies::libfabric::scoped_lock<mutex_type> scoped_lock;
+        typedef hpx::parcelset::policies::libfabric::unique_lock<mutex_type> unique_lock;
+        typedef rma_memory_region<libfabric_region_provider>                 region_type;
+        typedef memory_region_allocator<libfabric_region_provider>        allocator_type;
 
         // --------------------------------------------------------------------
         // main vars used to manage the RDMA controller and interface
@@ -117,27 +119,25 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
         // more consistent reuse of classes/types.
         // The use of pointer allocators etc is a dreadful hack and needs reworking
 
-        typedef header<HPX_PARCELPORT_LIBFABRIC_MESSAGE_HEADER_SIZE>
-            header_type;
-        static constexpr unsigned int header_size =
-            header_type::header_block_size;
-        typedef rma_memory_pool<libfabric_region_provider> memory_pool_type;
-        typedef pinned_memory_vector<char, header_size, region_type,
-            memory_pool_type>
+        typedef header<HPX_PARCELPORT_LIBFABRIC_MESSAGE_HEADER_SIZE> header_type;
+        static constexpr unsigned int header_size = header_type::header_block_size;
+        typedef rma_memory_pool<libfabric_region_provider>         memory_pool_type;
+        typedef pinned_memory_vector<char, header_size, region_type, memory_pool_type>
             snd_data_type;
-        typedef parcel_buffer<snd_data_type> snd_buffer_type;
+        typedef parcel_buffer<snd_data_type>                       snd_buffer_type;
         // when terminating the parcelport, this is used to restrict access
-        mutex_type stop_mutex;
+        mutex_type  stop_mutex;
 
-        boost::lockfree::stack<sender*,
+        boost::lockfree::stack<
+            sender*,
             boost::lockfree::capacity<HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS>,
-            boost::lockfree::fixed_sized<true>>
-            senders_;
+            boost::lockfree::fixed_sized<true>
+        > senders_;
 
         // Used to help with shutdown
-        std::atomic<bool> stopped_;
+        std::atomic<bool>         stopped_;
 
-        memory_pool_type* chunk_pool_;
+        memory_pool_type*         chunk_pool_;
 
         // performance_counters::parcels::gatherer& parcels_sent_;
 
@@ -158,8 +158,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
         // return a sender object back to the parcelport_impl
         // this is used by the send_immediate version of parcelport_impl
         // --------------------------------------------------------------------
-        sender* get_connection(
-            parcelset::locality const& dest, fi_addr_t& fi_addr);
+        sender* get_connection(parcelset::locality const& dest, fi_addr_t &fi_addr);
 
         void reclaim_connection(sender* s);
 
@@ -178,12 +177,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
         /// Return the name of this locality
         std::string get_locality_name() const;
 
-        parcelset::locality agas_locality(
-            util::runtime_configuration const& ini) const;
+        parcelset::locality agas_locality(util::runtime_configuration const & ini) const;
 
         parcelset::locality create_locality() const;
 
-        static void suspended_task_debug(const std::string& match);
+        static void suspended_task_debug(const std::string &match);
 
         void do_stop();
 
@@ -192,8 +190,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
 
         // --------------------------------------------------------------------
         template <typename Handler>
-        bool async_write(Handler&& handler, sender* sender, fi_addr_t addr,
-            snd_buffer_type& buffer);
+        bool async_write(Handler && handler,
+            sender *sender, fi_addr_t addr,
+            snd_buffer_type &buffer);
 
         // --------------------------------------------------------------------
         // This is called to poll for completions and handle all incoming messages
@@ -208,76 +207,77 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
             std::size_t num_thread, parcelport_background_mode mode);
         void io_service_work();
         bool background_work_OS_thread();
-    };
-}}}}    // namespace hpx::parcelset::policies::libfabric
 
-namespace hpx { namespace traits {
-    // Inject additional configuration data into the factory registry for this
-    // type. This information ends up in the system wide configuration database
-    // under the plugin specific section:
-    //
-    //      [hpx.parcel.libfabric]
-    //      ...
-    //      priority = 100
-    //
-    template <>
-    struct plugin_config_data<hpx::parcelset::policies::libfabric::parcelport>
-    {
-        static char const* priority()
-        {
-            FUNC_START_DEBUG_MSG;
-            static int log_init = false;
-            if (!log_init)
-            {
-#if defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING) ||                          \
+    };
+}}}}
+
+namespace hpx {
+namespace traits {
+// Inject additional configuration data into the factory registry for this
+// type. This information ends up in the system wide configuration database
+// under the plugin specific section:
+//
+//      [hpx.parcel.libfabric]
+//      ...
+//      priority = 100
+//
+template<>
+struct plugin_config_data<hpx::parcelset::policies::libfabric::parcelport> {
+    static char const* priority() {
+        FUNC_START_DEBUG_MSG;
+        static int log_init = false;
+        if (!log_init) {
+#if defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING) || \
     defined(HPX_PARCELPORT_LIBFABRIC_HAVE_DEV_MODE)
-                boost::log::add_console_log(std::clog,
-                    // This makes the sink to write log records that look like this:
-                    // 1: <normal> A normal severity message
-                    // 2: <error> An error severity message
-                    boost::log::keywords::format = (boost::log::expressions::
-                                                        stream
-                        // << hpx::util::format("{:05}", expr::attr< unsigned int >("LineID"))
-                        << boost::log::expressions::attr<unsigned int>("LineID")
-                        << ": <" << boost::log::trivial::severity << "> "
-                        << boost::log::expressions::smessage));
-                boost::log::add_common_attributes();
+            boost::log::add_console_log(
+            std::clog,
+            // This makes the sink to write log records that look like this:
+            // 1: <normal> A normal severity message
+            // 2: <error> An error severity message
+            boost::log::keywords::format =
+                (
+                    boost::log::expressions::stream
+                    // << hpx::util::format("{:05}", expr::attr< unsigned int >("LineID"))
+                    << boost::log::expressions::attr< unsigned int >("LineID")
+                    << ": <" << boost::log::trivial::severity
+                    << "> " << boost::log::expressions::smessage
+                )
+            );
+            boost::log::add_common_attributes();
 #endif
-                log_init = true;
-            }
-            FUNC_END_DEBUG_MSG;
-            return "10000";
+            log_init = true;
         }
+        FUNC_END_DEBUG_MSG;
+        return "10000";
+    }
 
-        // This is used to initialize your parcelport,
-        // for example check for availability of devices etc.
-        static void init(
-            int* argc, char*** argv, util::command_line_handling& cfg)
-        {
-            FUNC_START_DEBUG_MSG;
+    // This is used to initialize your parcelport,
+    // for example check for availability of devices etc.
+    static void init(int *argc, char ***argv, util::command_line_handling &cfg) {
+        FUNC_START_DEBUG_MSG;
 #ifdef HPX_PARCELPORT_LIBFABRIC_HAVE_PMI
-            cfg.ini_config_.push_back("hpx.parcel.bootstrap!=libfabric");
+        cfg.ini_config_.push_back("hpx.parcel.bootstrap!=libfabric");
 #endif
 
-            FUNC_END_DEBUG_MSG;
-        }
+        FUNC_END_DEBUG_MSG;
+    }
 
-        static void destroy() {}
+    static void destroy() {}
 
-        static char const* call()
-        {
-            FUNC_START_DEBUG_MSG;
-            FUNC_END_DEBUG_MSG;
-            // @TODO : check which of these are obsolete after recent changes
-            return "provider = "
-                   "${HPX_PARCELPORT_LIBFABRIC_"
-                   "PROVIDER:" HPX_PARCELPORT_LIBFABRIC_PROVIDER "}\n"
-                   "domain = "
-                   "${HPX_PARCELPORT_LIBFABRIC_"
-                   "DOMAIN:" HPX_PARCELPORT_LIBFABRIC_DOMAIN "}\n"
-                   "endpoint = "
-                   "${HPX_PARCELPORT_LIBFABRIC_"
-                   "ENDPOINT:" HPX_PARCELPORT_LIBFABRIC_ENDPOINT "}\n";
-        }
-    };
-}}    // namespace hpx::traits
+    static char const* call()
+    {
+        FUNC_START_DEBUG_MSG;
+        FUNC_END_DEBUG_MSG;
+        // @TODO : check which of these are obsolete after recent changes
+        return
+        "provider = ${HPX_PARCELPORT_LIBFABRIC_PROVIDER:"
+                HPX_PARCELPORT_LIBFABRIC_PROVIDER "}\n"
+        "domain = ${HPX_PARCELPORT_LIBFABRIC_DOMAIN:"
+                HPX_PARCELPORT_LIBFABRIC_DOMAIN "}\n"
+        "endpoint = ${HPX_PARCELPORT_LIBFABRIC_ENDPOINT:"
+                HPX_PARCELPORT_LIBFABRIC_ENDPOINT "}\n"
+        ;
+    }
+};
+}}
+

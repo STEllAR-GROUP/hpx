@@ -8,10 +8,13 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx {
+namespace hpx
+{
     /// \namespace components
-    namespace components {
+    namespace components
+    {
         template <typename Derived, typename Stub>
         class client_base;
     }
-}    // namespace hpx
+}
+
