@@ -35,12 +35,10 @@
 #include <utility>
 
 #if !defined(QUEUE_HOLDER_NUMA_DEBUG)
-#if !defined(NDEBUG)
+#if defined(HPX_DEBUG)
 #define QUEUE_HOLDER_NUMA_DEBUG false
 #else
-#if !defined(QUEUE_HOLDER_NUMA_DEBUG)
 #define QUEUE_HOLDER_NUMA_DEBUG false
-#endif
 #endif
 #endif
 

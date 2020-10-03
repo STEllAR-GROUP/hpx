@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iomanip>
 #include <iterator>
 #include <memory>
 #include <numeric>

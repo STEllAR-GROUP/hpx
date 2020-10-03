@@ -37,12 +37,10 @@
 #include <utility>
 
 #if !defined(QUEUE_HOLDER_THREAD_DEBUG)
-#if !defined(NDEBUG)
+#if defined(HPX_DEBUG)
 #define QUEUE_HOLDER_THREAD_DEBUG false
 #else
-#if !defined(QUEUE_HOLDER_THREAD_DEBUG)
 #define QUEUE_HOLDER_THREAD_DEBUG false
-#endif
 #endif
 #endif
 

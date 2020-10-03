@@ -45,12 +45,10 @@
 #include <vector>
 
 #if !defined(THREAD_QUEUE_MC_DEBUG)
-#if !defined(NDEBUG)
+#if defined(HPX_DEBUG)
 #define THREAD_QUEUE_MC_DEBUG false
 #else
-#if !defined(THREAD_QUEUE_MC_DEBUG)
 #define THREAD_QUEUE_MC_DEBUG false
-#endif
 #endif
 #endif
 
