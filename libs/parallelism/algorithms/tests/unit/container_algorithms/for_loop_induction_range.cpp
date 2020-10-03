@@ -155,23 +155,21 @@ void test_for_loop_induction_stride_life_out(ExPolicy&& policy)
 ///////////////////////////////////////////////////////////////////////////////
 void test_for_loop_induction()
 {
-    using namespace hpx::parallel;
+    test_for_loop_induction(hpx::execution::seq);
+    test_for_loop_induction(hpx::execution::par);
+    test_for_loop_induction(hpx::execution::par_unseq);
 
-    test_for_loop_induction(execution::seq);
-    test_for_loop_induction(execution::par);
-    test_for_loop_induction(execution::par_unseq);
+    test_for_loop_induction_stride(hpx::execution::seq);
+    test_for_loop_induction_stride(hpx::execution::par);
+    test_for_loop_induction_stride(hpx::execution::par_unseq);
 
-    test_for_loop_induction_stride(execution::seq);
-    test_for_loop_induction_stride(execution::par);
-    test_for_loop_induction_stride(execution::par_unseq);
+    test_for_loop_induction_life_out(hpx::execution::seq);
+    test_for_loop_induction_life_out(hpx::execution::par);
+    test_for_loop_induction_life_out(hpx::execution::par_unseq);
 
-    test_for_loop_induction_life_out(execution::seq);
-    test_for_loop_induction_life_out(execution::par);
-    test_for_loop_induction_life_out(execution::par_unseq);
-
-    test_for_loop_induction_stride_life_out(execution::seq);
-    test_for_loop_induction_stride_life_out(execution::par);
-    test_for_loop_induction_stride_life_out(execution::par_unseq);
+    test_for_loop_induction_stride_life_out(hpx::execution::seq);
+    test_for_loop_induction_stride_life_out(hpx::execution::par);
+    test_for_loop_induction_stride_life_out(hpx::execution::par_unseq);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
