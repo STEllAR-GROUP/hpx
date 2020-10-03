@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,20 +29,20 @@ namespace hpx { namespace parallel { namespace execution {
         };
 
         template <>
-        struct is_not_weaker<parallel_execution_tag, unsequenced_execution_tag>
-          : std::true_type
+        struct is_not_weaker<hpx::execution::parallel_execution_tag,
+            hpx::execution::unsequenced_execution_tag> : std::true_type
         {
         };
 
         template <>
-        struct is_not_weaker<sequenced_execution_tag, unsequenced_execution_tag>
-          : std::true_type
+        struct is_not_weaker<hpx::execution::sequenced_execution_tag,
+            hpx::execution::unsequenced_execution_tag> : std::true_type
         {
         };
 
         template <>
-        struct is_not_weaker<sequenced_execution_tag, parallel_execution_tag>
-          : std::true_type
+        struct is_not_weaker<hpx::execution::sequenced_execution_tag,
+            hpx::execution::parallel_execution_tag> : std::true_type
         {
         };
         /// \endcond

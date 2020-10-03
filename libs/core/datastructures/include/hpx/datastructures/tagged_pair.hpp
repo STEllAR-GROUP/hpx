@@ -1,5 +1,5 @@
 //  Copyright Eric Niebler 2013-2015
-//  Copyright 2015 Hartmut Kaiser
+//  Copyright 2015-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -67,32 +67,34 @@ namespace hpx { namespace util {
     }
 
     template <typename Tag1, typename Tag2, typename... Ts>
-    constexpr HPX_FORCEINLINE
-        tagged_pair<Tag1(typename tuple_element<0, tuple<Ts...>>::type),
-            Tag2(typename tuple_element<1, tuple<Ts...>>::type)>
-        make_tagged_pair(tuple<Ts...>&& p)
+    constexpr HPX_FORCEINLINE tagged_pair<
+        Tag1(typename hpx::tuple_element<0, hpx::tuple<Ts...>>::type),
+        Tag2(typename hpx::tuple_element<1, hpx::tuple<Ts...>>::type)>
+    make_tagged_pair(hpx::tuple<Ts...>&& p)
     {
         static_assert(
-            sizeof...(Ts) >= 2, "tuple must have at least 2 elements");
+            sizeof...(Ts) >= 2, "hpx::tuple must have at least 2 elements");
 
-        typedef tagged_pair<Tag1(typename tuple_element<0, tuple<Ts...>>::type),
-            Tag2(typename tuple_element<1, tuple<Ts...>>::type)>
+        typedef tagged_pair<
+            Tag1(typename hpx::tuple_element<0, hpx::tuple<Ts...>>::type),
+            Tag2(typename hpx::tuple_element<1, hpx::tuple<Ts...>>::type)>
             result_type;
 
         return result_type(std::move(get<0>(p)), std::move(get<1>(p)));
     }
 
     template <typename Tag1, typename Tag2, typename... Ts>
-    constexpr HPX_FORCEINLINE
-        tagged_pair<Tag1(typename tuple_element<0, tuple<Ts...>>::type),
-            Tag2(typename tuple_element<1, tuple<Ts...>>::type)>
-        make_tagged_pair(tuple<Ts...> const& p)
+    constexpr HPX_FORCEINLINE tagged_pair<
+        Tag1(typename hpx::tuple_element<0, hpx::tuple<Ts...>>::type),
+        Tag2(typename hpx::tuple_element<1, hpx::tuple<Ts...>>::type)>
+    make_tagged_pair(hpx::tuple<Ts...> const& p)
     {
         static_assert(
-            sizeof...(Ts) >= 2, "tuple must have at least 2 elements");
+            sizeof...(Ts) >= 2, "hpx::tuple must have at least 2 elements");
 
-        typedef tagged_pair<Tag1(typename tuple_element<0, tuple<Ts...>>::type),
-            Tag2(typename tuple_element<1, tuple<Ts...>>::type)>
+        typedef tagged_pair<
+            Tag1(typename hpx::tuple_element<0, hpx::tuple<Ts...>>::type),
+            Tag2(typename hpx::tuple_element<1, hpx::tuple<Ts...>>::type)>
             result_type;
 
         return result_type(get<0>(p), get<1>(p));
@@ -122,7 +124,7 @@ namespace hpx {
 
     template <std::size_t N, typename Tag1, typename Tag2>
     struct tuple_element<N, util::tagged_pair<Tag1, Tag2>>
-      : tuple_element<N,
+      : hpx::tuple_element<N,
             std::pair<typename util::detail::tag_elem<Tag1>::type,
                 typename util::detail::tag_elem<Tag2>::type>>
     {
