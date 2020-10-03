@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <iterator>
 #include <iomanip>
+#include <random>
 #include <stdexcept>
 #include <string>
 #include <vector>

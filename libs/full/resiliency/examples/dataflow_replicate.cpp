@@ -14,6 +14,7 @@
 
 #include <atomic>
 #include <iostream>
+#include <random>
 #include <stdexcept>
 
 std::mt19937 gen(1);
