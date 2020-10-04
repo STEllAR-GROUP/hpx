@@ -1,5 +1,6 @@
 //  Copyright (c)      2014 Thomas Heller
 //  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c)      2020 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,9 +13,9 @@
 #include <hpx/plugins/parcelport_factory_base.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
 #include <hpx/plugins/unique_plugin_name.hpp>
+#include <hpx/prefix/find_prefix.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>
@@ -26,8 +27,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace plugins
-{
+namespace hpx { namespace plugins {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a parcelport_factory provides a minimal implementation of a
     /// parcelport factory. If no additional functionality is required
@@ -66,10 +66,12 @@ namespace hpx { namespace plugins
             factories.push_back(this);
         }
 
-        ///
-        ~parcelport_factory() override = default;
+        ~parcelport_factory() override
+        {
+            traits::plugin_config_data<Parcelport>::destroy();
+        }
 
-        void get_plugin_info(std::vector<std::string> & fillini) override
+        void get_plugin_info(std::vector<std::string>& fillini) override
         {
             std::string name = unique_plugin_name<parcelport_factory>::call();
             fillini.emplace_back(std::string("[hpx.parcel.") + name + "]");
@@ -80,7 +82,8 @@ namespace hpx { namespace plugins
 
             std::string name_uc;
             name_uc.reserve(name.size());
-            std::transform(name.begin(), name.end(), std::back_inserter(name_uc),
+            std::transform(name.begin(), name.end(),
+                std::back_inserter(name_uc),
                 [](char c) { return std::toupper(c); });
 
             // basic parcelport configuration ...
@@ -103,10 +106,12 @@ namespace hpx { namespace plugins
                 name_uc +
                 "_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}");
             fillini.emplace_back("zero_copy_optimization = ${HPX_PARCEL_" +
-                name_uc + "_ZERO_COPY_OPTIMIZATION:"
+                name_uc +
+                "_ZERO_COPY_OPTIMIZATION:"
                 "$[hpx.parcel.zero_copy_optimization]}");
             fillini.emplace_back("async_serialization = ${HPX_PARCEL_" +
-                name_uc + "_ASYNC_SERIALIZATION:"
+                name_uc +
+                "_ASYNC_SERIALIZATION:"
                 "$[hpx.parcel.async_serialization]}");
             fillini.emplace_back("priority = ${HPX_PARCEL_" + name_uc +
                 "_PRIORITY:" +
@@ -117,13 +122,15 @@ namespace hpx { namespace plugins
             if (more != nullptr)    // -V547
             {
                 std::vector<std::string> data;
-                hpx::string_util::split(data, more, hpx::string_util::is_any_of("\n"));
-                std::copy(data.begin(), data.end(), std::back_inserter(fillini));
+                hpx::string_util::split(
+                    data, more, hpx::string_util::is_any_of("\n"));
+                std::copy(
+                    data.begin(), data.end(), std::back_inserter(fillini));
             }
         }
 
-        void init(int* argc, char*** argv,
-            util::command_line_handling& cfg) override
+        void init(
+            int* argc, char*** argv, util::command_line_handling& cfg) override
         {
             // initialize the parcelport with the parameters we got passed in at start
             traits::plugin_config_data<Parcelport>::init(argc, argv, cfg);
@@ -140,7 +147,7 @@ namespace hpx { namespace plugins
             return new Parcelport(cfg, notifier);
         }
     };
-}}
+}}    // namespace hpx::plugins
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This macro is used create and to register a minimal component factory with
@@ -164,5 +171,3 @@ namespace hpx { namespace plugins
 #define HPX_REGISTER_PARCELPORT(Parcelport, pluginname)                        \
     HPX_REGISTER_PARCELPORT_(                                                  \
         Parcelport, HPX_PP_CAT(parcelport_, pluginname), pluginname)
-
-

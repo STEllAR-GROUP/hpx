@@ -34,6 +34,9 @@ namespace hpx { namespace traits
         static void init(int *argc, char ***argv, util::command_line_handling &cfg)
         {
         }
+
+        static void destroy() {}
+
         static char const* call()
         {
             return "";

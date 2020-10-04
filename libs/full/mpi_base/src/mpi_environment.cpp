@@ -1,4 +1,5 @@
 //  Copyright (c) 2013-2015 Thomas Heller
+//  Copyright (c)      2020 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -229,7 +230,12 @@ namespace hpx { namespace util {
     {
         if (enabled() && has_called_init())
         {
-            MPI_Finalize();
+            int is_finalized = 0;
+            MPI_Finalized(&is_finalized);
+            if (!is_finalized)
+            {
+                MPI_Finalize();
+            }
         }
     }
 

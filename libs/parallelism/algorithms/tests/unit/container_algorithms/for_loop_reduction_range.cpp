@@ -96,19 +96,17 @@ void test_for_loop_reduction_min(ExPolicy&& policy)
 ///////////////////////////////////////////////////////////////////////////////
 void test_for_loop_reduction()
 {
-    using namespace hpx::parallel;
+    test_for_loop_reduction_plus(hpx::execution::seq);
+    test_for_loop_reduction_plus(hpx::execution::par);
+    test_for_loop_reduction_plus(hpx::execution::par_unseq);
 
-    test_for_loop_reduction_plus(execution::seq);
-    test_for_loop_reduction_plus(execution::par);
-    test_for_loop_reduction_plus(execution::par_unseq);
+    test_for_loop_reduction_multiplies(hpx::execution::seq);
+    test_for_loop_reduction_multiplies(hpx::execution::par);
+    test_for_loop_reduction_multiplies(hpx::execution::par_unseq);
 
-    test_for_loop_reduction_multiplies(execution::seq);
-    test_for_loop_reduction_multiplies(execution::par);
-    test_for_loop_reduction_multiplies(execution::par_unseq);
-
-    test_for_loop_reduction_min(execution::seq);
-    test_for_loop_reduction_min(execution::par);
-    test_for_loop_reduction_min(execution::par_unseq);
+    test_for_loop_reduction_min(hpx::execution::seq);
+    test_for_loop_reduction_min(hpx::execution::par);
+    test_for_loop_reduction_min(hpx::execution::par_unseq);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

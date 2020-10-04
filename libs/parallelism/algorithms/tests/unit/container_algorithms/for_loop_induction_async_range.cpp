@@ -159,12 +159,11 @@ void test_for_loop_induction_stride_life_out(ExPolicy&& policy)
 ///////////////////////////////////////////////////////////////////////////////
 void test_for_loop_induction()
 {
-    using namespace hpx::parallel;
-
-    test_for_loop_induction(execution::seq(execution::task));
-    test_for_loop_induction_stride(execution::seq(execution::task));
-    test_for_loop_induction_life_out(execution::par(execution::task));
-    test_for_loop_induction_stride_life_out(execution::par(execution::task));
+    test_for_loop_induction(hpx::execution::seq(hpx::execution::task));
+    test_for_loop_induction_stride(hpx::execution::seq(hpx::execution::task));
+    test_for_loop_induction_life_out(hpx::execution::par(hpx::execution::task));
+    test_for_loop_induction_stride_life_out(
+        hpx::execution::par(hpx::execution::task));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

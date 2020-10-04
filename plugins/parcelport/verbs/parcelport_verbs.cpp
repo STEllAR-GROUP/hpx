@@ -1696,6 +1696,8 @@ struct plugin_config_data<hpx::parcelset::policies::verbs::parcelport> {
         FUNC_END_DEBUG_MSG;
     }
 
+    static void destroy() {}
+
     static char const* call()
     {
         FUNC_START_DEBUG_MSG;

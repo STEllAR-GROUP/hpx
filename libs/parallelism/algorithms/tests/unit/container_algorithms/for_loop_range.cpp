@@ -70,14 +70,12 @@ void test_for_loop_async(ExPolicy&& p)
 
 void test_for_loop()
 {
-    using namespace hpx::parallel;
+    test_for_loop(hpx::execution::seq);
+    test_for_loop(hpx::execution::par);
+    test_for_loop(hpx::execution::par_unseq);
 
-    test_for_loop(execution::seq);
-    test_for_loop(execution::par);
-    test_for_loop(execution::par_unseq);
-
-    test_for_loop_async(execution::seq(execution::task));
-    test_for_loop_async(execution::par(execution::task));
+    test_for_loop_async(hpx::execution::seq(hpx::execution::task));
+    test_for_loop_async(hpx::execution::par(hpx::execution::task));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
