@@ -36,10 +36,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename FwdIter,
-            typename Pred>
+            typename Pred, typename Proj>
         static typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         segmented_adjacent_find(Algo&& algo, ExPolicy const& policy,
-            FwdIter first, FwdIter last, Pred&& op, std::true_type)
+            FwdIter first, FwdIter last, Pred&& pred, Proj&& proj,
+            std::true_type)
         {
             typedef hpx::traits::segmented_iterator_traits<FwdIter> traits;
             typedef typename traits::segment_iterator segment_iterator1;
@@ -52,6 +53,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             FwdIter output = last;
 
+            util::invoke_projected<Pred, Proj> pred_projected{
+                std::forward<Pred>(pred), std::forward<Proj>(proj)};
+
             if (sit == send)
             {
                 // all elements are on the same partition
@@ -60,7 +64,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (beg != end)
                 {
                     local_iterator_type out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, op);
+                        algo, policy, std::true_type(), beg, end, pred, proj);
                     output = traits::compose(sit, out);
                 }
             }
@@ -74,7 +78,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (beg != end)
                 {
                     out = dispatch(traits::get_id(sit), algo, policy,
-                        std::true_type(), beg, end, op);
+                        std::true_type(), beg, end, pred, proj);
                     if (out != end)
                     {
                         found = true;
@@ -83,7 +87,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
                 FwdIter ending = traits::compose(sit, std::prev(end));
                 if (!found &&
-                    hpx::util::invoke(op, *ending, *std::next(ending)))
+                    hpx::util::invoke(
+                        pred_projected, *ending, *std::next(ending)))
                 {
                     found = true;
                     output = traits::compose(sit, std::prev(end));
@@ -99,7 +104,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         if (beg != end)
                         {
                             out = dispatch(traits::get_id(sit), algo, policy,
-                                std::true_type(), beg, end, op);
+                                std::true_type(), beg, end, pred, proj);
                             if (out != end)
                             {
                                 found = true;
@@ -109,7 +114,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         }
                         ending = traits::compose(sit, std::prev(end));
                         if (hpx::util::invoke(
-                                op, *ending, *std::next(ending)) &&
+                                pred_projected, *ending, *std::next(ending)) &&
                             !found)
                         {
                             found = true;
@@ -125,7 +130,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (beg != end && !found)
                 {
                     out = dispatch(traits::get_id(sit), algo, policy,
-                        std::true_type(), beg, end, op);
+                        std::true_type(), beg, end, pred, proj);
                     if (out != end)
                     {
                         found = true;
@@ -138,10 +143,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename FwdIter,
-            typename Pred>
+            typename Pred, typename Proj>
         static typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         segmented_adjacent_find(Algo&& algo, ExPolicy const& policy,
-            FwdIter first, FwdIter last, Pred&& op, std::false_type)
+            FwdIter first, FwdIter last, Pred&& pred, Proj&& proj,
+            std::false_type)
         {
             typedef hpx::traits::segmented_iterator_traits<FwdIter> traits;
             typedef typename traits::segment_iterator segment_iterator1;
@@ -163,6 +169,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::vector<FwdIter> between_segments;
             between_segments.reserve(std::distance(sit, send));
 
+            util::invoke_projected<Pred, Proj> pred_projected{
+                std::forward<Pred>(pred), std::forward<Proj>(proj)};
+
             if (sit == send)
             {
                 // all elements are on the same partition
@@ -172,7 +181,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     segments.push_back(hpx::make_future<FwdIter>(
                         dispatch_async(traits::get_id(sit), algo, policy,
-                            forced_seq(), beg, end, op),
+                            forced_seq(), beg, end, pred, proj),
                         [sit, end, last](
                             local_iterator_type const& out) -> FwdIter {
                             if (out != end)
@@ -191,7 +200,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     segments.push_back(hpx::make_future<FwdIter>(
                         dispatch_async(traits::get_id(sit), algo, policy,
-                            forced_seq(), beg, end, op),
+                            forced_seq(), beg, end, pred, proj),
                         [sit, end, last](
                             local_iterator_type const& out) -> FwdIter {
                             if (out != end)
@@ -211,7 +220,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         between_segments.push_back(traits::compose(sit, beg));
                         segments.push_back(hpx::make_future<FwdIter>(
                             dispatch_async(traits::get_id(sit), algo, policy,
-                                forced_seq(), beg, end, op),
+                                forced_seq(), beg, end, pred, proj),
                             [sit, end, last](
                                 local_iterator_type const& out) -> FwdIter {
                                 if (out != end)
@@ -230,7 +239,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     between_segments.push_back(traits::compose(sit, beg));
                     segments.push_back(hpx::make_future<FwdIter>(
                         dispatch_async(traits::get_id(sit), algo, policy,
-                            forced_seq(), beg, end, op),
+                            forced_seq(), beg, end, pred, proj),
                         [sit, end, last](
                             local_iterator_type const& out) -> FwdIter {
                             if (out != end)
@@ -242,7 +251,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             return result::get(dataflow(
-                [=](segment_type&& r) -> FwdIter {
+                [=](segment_type&& r) mutable -> FwdIter {
                     // handle any remote exceptions, will throw on error
                     std::list<std::exception_ptr> errors;
                     parallel::util::detail::handle_remote_exceptions<
@@ -254,7 +263,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     {
                         if (*it != last)
                             return *it;
-                        if (hpx::util::invoke(op,
+                        if (hpx::util::invoke(pred_projected,
                                 *std::prev(between_segments[i]),
                                 *(between_segments[i])))
                             return std::prev(between_segments[i]);
@@ -268,10 +277,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
-        template <typename ExPolicy, typename FwdIter, typename Pred>
+        template <typename ExPolicy, typename FwdIter, typename Pred,
+            typename Proj>
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         adjacent_find_(ExPolicy&& policy, FwdIter first, FwdIter last,
-            Pred&& op, std::true_type)
+            Pred&& pred, Proj&& proj, std::true_type)
         {
             typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
             typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
@@ -287,14 +297,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return segmented_adjacent_find(
                 adjacent_find<typename iterator_traits::local_iterator>(),
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<Pred>(op), is_seq());
+                std::forward<Pred>(pred), std::forward<Proj>(proj), is_seq());
         }
 
         // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename FwdIter, typename Pred>
+        template <typename ExPolicy, typename FwdIter, typename Pred,
+            typename Proj>
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         adjacent_find_(ExPolicy&& policy, FwdIter first, FwdIter last,
-            Pred&& op, std::false_type);
+            Pred&& pred, Proj&& proj, std::false_type);
         /// \endcond
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1

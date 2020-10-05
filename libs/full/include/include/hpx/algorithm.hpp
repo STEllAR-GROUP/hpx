@@ -14,7 +14,6 @@
 #endif
 
 namespace hpx {
-    using hpx::parallel::adjacent_find;
     using hpx::parallel::is_sorted;
     using hpx::parallel::is_sorted_until;
     using hpx::parallel::lexicographical_compare;

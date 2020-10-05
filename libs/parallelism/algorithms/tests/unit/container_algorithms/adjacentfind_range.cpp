@@ -13,7 +13,6 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
-#include <random>
 #include <string>
 #include <vector>
 
@@ -43,7 +42,7 @@ void test_adjacent_find(ExPolicy policy, IteratorTag)
     c[random_pos] = 1;
     c[random_pos + 1] = 1;
 
-    iterator index = hpx::adjacent_find(
+    iterator index = hpx::ranges::adjacent_find(
         policy, iterator(std::begin(c)), iterator(std::end(c)));
 
     base_iterator test_index = std::begin(c) + random_pos;
@@ -66,8 +65,8 @@ void test_adjacent_find_async(ExPolicy p, IteratorTag)
     c[random_pos] = 1;
     c[random_pos + 1] = 1;
 
-    hpx::future<iterator> f =
-        hpx::adjacent_find(p, iterator(std::begin(c)), iterator(std::end(c)));
+    hpx::future<iterator> f = hpx::ranges::adjacent_find(
+        p, iterator(std::begin(c)), iterator(std::end(c)));
     f.wait();
 
     // create iterator at position of value to be found

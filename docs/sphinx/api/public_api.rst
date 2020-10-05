@@ -31,7 +31,7 @@ Classes
 Functions
 ---------
 
-- :cpp:func:`hpx::parallel::v1::adjacent_find`
+- :cpp:func:`hpx::adjacent_find`
 - :cpp:func:`hpx::all_of`
 - :cpp:func:`hpx::any_of`
 - :cpp:func:`hpx::copy`
@@ -98,6 +98,7 @@ Functions
 - :cpp:func:`hpx::for_loop_n`
 - :cpp:func:`hpx::for_loop_n_strided`
 
+- :cpp:func:`hpx::ranges::adjacent_find`
 - :cpp:func:`hpx::ranges::all_of`
 - :cpp:func:`hpx::ranges::any_of`
 - :cpp:func:`hpx::ranges::copy`
