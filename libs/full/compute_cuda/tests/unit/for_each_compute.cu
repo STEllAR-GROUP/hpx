@@ -28,15 +28,14 @@ typedef hpx::compute::vector<int, target_allocator> target_vector;
 void test_for_each(executor_type& exec, target_vector& d_A)
 {
     std::vector<int> h_C(d_A.size());
-    hpx::parallel::copy(
-        hpx::parallel::execution::par, d_A.begin(), d_A.end(), h_C.begin());
+    hpx::copy(hpx::execution::par, d_A.begin(), d_A.end(), h_C.begin());
 
     // FIXME : Lambda function given to for_each() is momentarily defined as
     //         HPX_HOST_DEVICE in place of HPX_DEVICE to allow the host_side
     //         result_of<> (used inside for_each()) to get the return
     //         type
 
-    hpx::ranges::for_each(hpx::parallel::execution::par.on(exec), d_A,
+    hpx::ranges::for_each(hpx::execution::par.on(exec), d_A,
         [] HPX_HOST_DEVICE(int& i) { i += 5; });
 
     for (std::size_t i = 0; i != h_C.size(); ++i)
@@ -68,8 +67,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     target_vector d_A(N, alloc);
 
     // copy data to device
-    hpx::parallel::copy(
-        hpx::parallel::execution::par, h_A.begin(), h_A.end(), d_A.begin());
+    hpx::copy(hpx::execution::par, h_A.begin(), h_A.end(), d_A.begin());
 
     // create executor
     executor_type exec(target);

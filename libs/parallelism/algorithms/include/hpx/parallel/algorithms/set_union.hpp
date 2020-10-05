@@ -337,8 +337,7 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             using is_seq = std::integral_constant<bool,
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>::value ||
+                ::hpx::is_sequenced_execution_policy<ExPolicy>::value ||
                     !hpx::traits::is_random_access_iterator<FwdIter1>::value ||
                     !hpx::traits::is_random_access_iterator<FwdIter2>::value>;
 

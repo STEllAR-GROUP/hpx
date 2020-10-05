@@ -167,9 +167,7 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
                 "Requires random access iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::make_heap<Iter>().call(
                 std::forward<ExPolicy>(policy), is_seq{}, first, last,
@@ -200,9 +198,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_random_access_iterator<iterator_type>::value,
                 "Requires random access iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::make_heap<iterator_type>().call(
                 std::forward<ExPolicy>(policy), is_seq{}, hpx::util::begin(rng),
@@ -231,9 +227,7 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
                 "Requires random access iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
             using value_type = typename std::iterator_traits<Iter>::value_type;
 
             return hpx::parallel::v1::detail::make_heap<Iter>().call(
@@ -268,9 +262,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_random_access_iterator<iterator_type>::value,
                 "Requires random access iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
             using value_type =
                 typename std::iterator_traits<iterator_type>::value_type;
 

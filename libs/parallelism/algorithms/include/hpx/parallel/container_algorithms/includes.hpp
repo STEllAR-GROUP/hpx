@@ -259,9 +259,7 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<Iter2>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::includes().call(
                 std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
@@ -336,9 +334,7 @@ namespace hpx { namespace ranges {
                 (hpx::traits::is_forward_iterator<iterator_type2>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::includes().call(
                 std::forward<ExPolicy>(policy), is_seq(),

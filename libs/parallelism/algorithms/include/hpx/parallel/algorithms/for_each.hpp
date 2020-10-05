@@ -432,8 +432,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         for_each_n_(ExPolicy&& policy, FwdIter first, Size count, F&& f,
             Proj&& proj, std::false_type)
         {
-            using is_seq =
-                parallel::execution::is_sequenced_execution_policy<ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return detail::for_each_n<FwdIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first,
@@ -563,8 +562,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         for_each_(ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,
             Proj&& proj, std::false_type)
         {
-            using is_seq =
-                parallel::execution::is_sequenced_execution_policy<ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             if (first == last)
             {

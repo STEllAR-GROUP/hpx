@@ -437,9 +437,7 @@ namespace hpx {
                 hpx::traits::is_random_access_iterator<RndIter>::value,
                 "Requires random access iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
                 hpx::parallel::v1::detail::make_heap<RndIter>().call(
@@ -463,9 +461,7 @@ namespace hpx {
                 hpx::traits::is_random_access_iterator<RndIter>::value,
                 "Requires random access iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
             using value_type =
                 typename std::iterator_traits<RndIter>::value_type;
 

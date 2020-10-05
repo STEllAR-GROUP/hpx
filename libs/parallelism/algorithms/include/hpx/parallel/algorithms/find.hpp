@@ -497,7 +497,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Requires at least forward iterator.");
 
-            typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+            typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             return detail::find<Iter>().call(std::forward<ExPolicy>(policy),
                 is_seq(), first, last, val, std::forward<Proj>(proj));
@@ -626,7 +626,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Requires at least forward iterator.");
 
-            typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+            typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             return detail::find_if<Iter>().call(std::forward<ExPolicy>(policy),
                 is_seq(), first, last, std::forward<F>(f),
@@ -760,7 +760,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq = execution::is_sequenced_execution_policy<ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return detail::find_if_not<Iter>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last,
@@ -993,7 +993,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        using is_seq = execution::is_sequenced_execution_policy<ExPolicy>;
+        using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
         return detail::find_end<FwdIter1>().call(std::forward<ExPolicy>(policy),
             is_seq(), first1, last1, first2, last2, std::forward<Pred>(op),
@@ -1138,7 +1138,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
-        using is_seq = execution::is_sequenced_execution_policy<ExPolicy>;
+        using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
         return detail::find_first_of<FwdIter1>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last, s_first,
@@ -1312,9 +1312,7 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::find_end<FwdIter1>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
@@ -1341,9 +1339,7 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::find_end<FwdIter1>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
@@ -1431,9 +1427,7 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Subsequence requires at least forward iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::find_first_of<FwdIter1>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last, s_first,
@@ -1460,9 +1454,7 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Subsequence requires at least forward iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::find_first_of<FwdIter1>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last, s_first,

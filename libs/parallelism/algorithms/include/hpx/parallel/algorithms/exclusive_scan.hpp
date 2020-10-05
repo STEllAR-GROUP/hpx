@@ -170,8 +170,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         exclusive_scan_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
             FwdIter2 dest, T&& init, Op&& op, std::false_type, Conv&& conv)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             return exclusive_scan<FwdIter2>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last, dest,

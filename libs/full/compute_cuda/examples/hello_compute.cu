@@ -47,12 +47,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     hpx::compute::vector<int, allocator_type> d_B(N, alloc);
     hpx::compute::vector<int, allocator_type> d_C(N, alloc);
 
-    hpx::parallel::copy(
-        hpx::parallel::execution::seq,
-        h_A.begin(), h_A.end(), d_A.begin());
-    hpx::parallel::copy(
-        hpx::parallel::execution::seq,
-        h_B.begin(), h_B.end(), d_B.begin());
+    hpx::copy(hpx::execution::seq, h_A.begin(), h_A.end(), d_A.begin());
+    hpx::copy(hpx::execution::seq, h_B.begin(), h_B.end(), d_B.begin());
 
     int threadsPerBlock = 256;
     int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
@@ -66,9 +62,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }, d_A.data(), d_B.data(), d_C.data());
 
 
-    hpx::parallel::copy(
-        hpx::parallel::execution::seq,
-        d_C.begin(), d_C.end(), h_C.begin());
+    hpx::copy(hpx::execution::seq, d_C.begin(), d_C.end(), h_C.begin());
 
     bool success = true;
     for(int i = 0; i < N; ++i)

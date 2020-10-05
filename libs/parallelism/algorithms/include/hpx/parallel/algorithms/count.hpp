@@ -309,8 +309,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         count_(ExPolicy&& policy, FwdIterB first, FwdIterE last, T const& value,
             Proj&& proj, std::false_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             typedef typename std::iterator_traits<FwdIterB>::difference_type
                 difference_type;
@@ -421,8 +420,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         count_if_(ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,
             Proj&& proj, std::false_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             typedef typename std::iterator_traits<FwdIterB>::difference_type
                 difference_type;

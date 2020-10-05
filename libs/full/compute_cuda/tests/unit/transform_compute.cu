@@ -7,15 +7,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/include/compute.hpp>
-#include <hpx/include/parallel_transform.hpp>
 #include <hpx/include/parallel_copy.hpp>
+#include <hpx/include/parallel_transform.hpp>
 
 #include <hpx/modules/testing.hpp>
 
 #include <hpx/hpx_init.hpp>
 
-#include <numeric>
 #include <iostream>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -33,30 +33,24 @@ struct transform_test
     //         type
 
     template <typename T>
-    HPX_HOST_DEVICE int operator()(T const & a, T const & b)
+    HPX_HOST_DEVICE int operator()(T const& a, T const& b)
     {
         return a + 3.0 * b;
     }
 };
 
-
-void test_transform(executor_type& exec,
-    target_vector& d_A, target_vector& d_B, target_vector& d_C,
-    std::vector<int> const& ref)
+void test_transform(executor_type& exec, target_vector& d_A, target_vector& d_B,
+    target_vector& d_C, std::vector<int> const& ref)
 {
-    hpx::parallel::transform(
-        hpx::parallel::execution::par.on(exec),
-        d_A.begin(), d_A.end(), d_B.begin(), d_C.begin(),
-        transform_test());
+    hpx::parallel::transform(hpx::execution::par.on(exec), d_A.begin(), d_A.end(),
+        d_B.begin(), d_C.begin(), transform_test());
 
     std::vector<int> h_C(d_C.size());
-    hpx::parallel::copy(
-        hpx::parallel::execution::par,
-        d_C.begin(), d_C.end(), h_C.begin());
+    hpx::copy(hpx::execution::par, d_C.begin(), d_C.end(), h_C.begin());
 
     HPX_TEST_EQ(h_C.size(), ref.size());
     HPX_TEST_EQ(d_C.size(), ref.size());
-    for(std::size_t i = 0; i != ref.size(); ++i)
+    for (std::size_t i = 0; i != ref.size(); ++i)
     {
         HPX_TEST_EQ(h_C[i], ref[i]);
         HPX_TEST_EQ(d_C[i], ref[i]);
@@ -65,7 +59,7 @@ void test_transform(executor_type& exec,
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::random_device{}();
+    unsigned int seed = (unsigned int) std::random_device{}();
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -81,8 +75,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::iota(h_A.begin(), h_A.end(), dis(gen));
     std::iota(h_B.begin(), h_B.end(), dis(gen));
 
-    std::transform(
-        h_A.begin(), h_A.end(), h_B.begin(), h_C_ref.begin(),
+    std::transform(h_A.begin(), h_A.end(), h_B.begin(), h_C_ref.begin(),
         [](int a, int b) { return a + 3.0 * b; });
 
     // define execution targets (here device 0), allows overlapping operations
@@ -98,13 +91,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     // copy data to device
     hpx::future<void> f =
-        hpx::parallel::copy(
-            hpx::parallel::execution::par(hpx::parallel::execution::task),
+        hpx::copy(hpx::execution::par(hpx::parallel::execution::task),
             h_A.begin(), h_A.end(), d_A.begin());
 
-        hpx::parallel::copy(
-            hpx::parallel::execution::par,
-            h_B.begin(), h_B.end(), d_B.begin());
+    hpx::copy(hpx::execution::par, h_B.begin(), h_B.end(), d_B.begin());
 
     // synchronize with copy operation to A
     f.get();
@@ -125,10 +115,8 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // Initialize and run HPX
     hpx::init(desc_commandline, argc, argv);

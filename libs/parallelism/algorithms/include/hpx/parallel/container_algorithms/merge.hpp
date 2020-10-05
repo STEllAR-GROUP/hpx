@@ -446,8 +446,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             (hpx::traits::is_random_access_iterator<RandIter3>::value),
             "Requires at least random access iterator.");
 
-        using is_seq =
-            hpx::parallel::execution::is_sequenced_execution_policy<ExPolicy>;
+        using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
         using result_type =
             hpx::parallel::util::in_in_out_result<iterator_type1,
                 iterator_type2, RandIter3>;
@@ -491,8 +490,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_random_access_iterator<iterator_type>::value,
             "Required at least random access iterator.");
 
-        using is_seq =
-            hpx::parallel::execution::is_sequenced_execution_policy<ExPolicy>;
+        using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
         return hpx::parallel::v1::detail::inplace_merge<RandIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
@@ -552,9 +550,7 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_random_access_iterator<Iter3>::value,
                 "Requires at least random access iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
             using result_type = hpx::ranges::merge_result<iterator_type1,
                 iterator_type2, Iter3>;
 
@@ -598,9 +594,7 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_random_access_iterator<Iter3>::value,
                 "Requires at least random access iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
             using result_type = hpx::ranges::merge_result<Iter1, Iter2, Iter3>;
 
             return hpx::parallel::v1::detail::merge<result_type>().call(
@@ -734,9 +728,7 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
                 "Required at least random access iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::inplace_merge<Iter>().call(
                 std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
@@ -766,9 +758,7 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
                 "Required at least random access iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::inplace_merge<Iter>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, middle, last,

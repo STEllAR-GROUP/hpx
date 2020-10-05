@@ -251,9 +251,8 @@ namespace hpx { namespace compute { namespace host {
         using executor_type = block_executor<Executor>;
         using executor_parameters_type =
             typename executor_type::executor_parameters_type;
-        using policy_type =
-            hpx::parallel::execution::parallel_policy_shim<executor_type,
-                executor_parameters_type>;
+        using policy_type = hpx::execution::parallel_policy_shim<executor_type,
+            executor_parameters_type>;
         using base_type = detail::policy_allocator<T, policy_type>;
         using target_type = std::vector<host::target>;
 

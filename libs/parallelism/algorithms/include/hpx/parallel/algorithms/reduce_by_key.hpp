@@ -220,8 +220,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
 
         template <typename Executor, typename Parameters>
-        struct remove_asynchronous<hpx::parallel::execution::
-                sequenced_task_policy_shim<Executor, Parameters>>
+        struct remove_asynchronous<
+            hpx::execution::sequenced_task_policy_shim<Executor, Parameters>>
         {
             typedef hpx::execution::sequenced_policy type;
         };
@@ -233,8 +233,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
 
         template <typename Executor, typename Parameters>
-        struct remove_asynchronous<hpx::parallel::execution::
-                parallel_task_policy_shim<Executor, Parameters>>
+        struct remove_asynchronous<
+            hpx::execution::parallel_task_policy_shim<Executor, Parameters>>
         {
             typedef hpx::execution::parallel_policy type;
         };

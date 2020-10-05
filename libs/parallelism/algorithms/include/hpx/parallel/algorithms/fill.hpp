@@ -197,8 +197,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         fill_(ExPolicy&& policy, FwdIter first, Sent last, T const& value,
             std::false_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             return detail::fill<FwdIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last, value);
@@ -284,7 +283,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         // if count is representing a negative value, we do nothing
         if (detail::is_negative(count))
@@ -370,9 +369,7 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::v1::detail::is_negative(count))

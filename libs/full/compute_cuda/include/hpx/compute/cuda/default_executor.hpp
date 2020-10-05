@@ -230,7 +230,7 @@ namespace hpx { namespace parallel { namespace execution {
     template <>
     struct executor_execution_category<cuda::experimental::default_executor>
     {
-        typedef parallel::execution::parallel_execution_tag type;
+        typedef ::hpx::execution::parallel_execution_tag type;
     };
 
     template <>

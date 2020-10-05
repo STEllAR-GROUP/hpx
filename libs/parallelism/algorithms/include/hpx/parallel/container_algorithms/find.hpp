@@ -572,8 +572,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typename hpx::traits::range_iterator<Rng2>::type>::value),
             "Requires at least forward iterator.");
 
-        using is_seq =
-            hpx::parallel::execution::is_sequenced_execution_policy<ExPolicy>;
+        using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
         return hpx::parallel::v1::detail::find_end<iterator_type>().call(
             std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng1),
@@ -617,8 +616,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typename hpx::traits::range_iterator<Rng2>::type>::value),
             "Subsequence requires at least forward iterator.");
 
-        using is_seq =
-            hpx::parallel::execution::is_sequenced_execution_policy<ExPolicy>;
+        using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
         return hpx::parallel::v1::detail::find_first_of<iterator_type>().call(
             std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng1),
@@ -953,9 +951,7 @@ namespace hpx { namespace ranges {
                     typename hpx::traits::range_iterator<Rng2>::type>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::find_end<iterator_type>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
@@ -991,9 +987,7 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<Iter2>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::find_end<Iter1>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
@@ -1106,9 +1100,7 @@ namespace hpx { namespace ranges {
                     typename hpx::traits::range_iterator<Rng2>::type>::value),
                 "Subsequence requires at least forward iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::find_first_of<iterator_type>()
                 .call(std::forward<ExPolicy>(policy), is_seq(),
@@ -1144,9 +1136,7 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<Iter2>::value),
                 "Subsequence requires at least forward iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::find_first_of<Iter1>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
