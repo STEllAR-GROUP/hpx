@@ -31,7 +31,6 @@ configure_extra_options+=" -DHPX_WITH_THREAD_SCHEDULERS=\"abp-priority;local;sta
 configure_extra_options+=" -DHPX_WITH_MALLOC=system"
 configure_extra_options+=" -DHPX_WITH_CXX${CXX_STD}=ON"
 configure_extra_options+=" -DHPX_WITH_NETWORKING=OFF"
-configure_extra_options+=" -DHPX_WITH_DEPRECATION_WARNINGS=OFF"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=OFF"
 configure_extra_options+=" -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=ON"
