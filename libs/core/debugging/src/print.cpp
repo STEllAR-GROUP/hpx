@@ -137,6 +137,12 @@ namespace hpx { namespace debug {
 
         template HPX_CORE_EXPORT void print_bin(
             std::ostream&, std::uint64_t, int);
+
+#if defined(__APPLE__)
+        // Explicit instantiation necessary to solve undefined symbol for MacOS
+        template HPX_CORE_EXPORT void print_bin(
+            std::ostream&, unsigned long, int);
+#endif
     }    // namespace detail
 
     // ------------------------------------------------------------------
