@@ -221,11 +221,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         transform_(ExPolicy&& policy, SegIter first, SegIter last, OutIter dest,
             F&& f, Proj&& proj, std::true_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
-            typedef util::detail::algorithm_result<ExPolicy,
-                hpx::util::tagged_pair<tag::in(SegIter), tag::out(OutIter)>>
-                result;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+            using result = util::detail::algorithm_result<ExPolicy,
+                hpx::util::tagged_pair<tag::in(SegIter), tag::out(OutIter)>>;
 
             if (first == last)
             {
@@ -486,12 +484,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             InIter2 first2, OutIter dest, F&& f, Proj1&& proj1, Proj2&& proj2,
             std::true_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
-            typedef util::detail::algorithm_result<ExPolicy,
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+            using result = util::detail::algorithm_result<ExPolicy,
                 hpx::util::tagged_tuple<tag::in1(InIter1), tag::in2(InIter2),
-                    tag::out(OutIter)>>
-                result;
+                    tag::out(OutIter)>>;
 
             auto last2 = first2;
             detail::advance(last2, std::distance(first1, last1));
@@ -764,12 +760,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             InIter2 first2, InIter2 last2, OutIter dest, F&& f, Proj1&& proj1,
             Proj2&& proj2, std::true_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
-            typedef util::detail::algorithm_result<ExPolicy,
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+            using result = util::detail::algorithm_result<ExPolicy,
                 hpx::util::tagged_tuple<tag::in1(InIter1), tag::in2(InIter2),
-                    tag::out(OutIter)>>
-                result;
+                    tag::out(OutIter)>>;
 
             if (first1 == last1)
             {

@@ -303,6 +303,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 !hpx::traits::is_random_access_iterator<FwdIter1>::value ||
                 !hpx::traits::is_random_access_iterator<FwdIter2>::value>;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         using result_type =
             parallel::util::in_in_out_result<FwdIter1, FwdIter2, FwdIter3>;
 
@@ -311,6 +315,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
                 last2, dest, std::forward<Pred>(op),
                 util::projection_identity(), util::projection_identity()));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -350,8 +357,7 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             using is_seq = std::integral_constant<bool,
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>::value ||
+                hpx::is_sequenced_execution_policy<ExPolicy>::value ||
                     !hpx::traits::is_random_access_iterator<FwdIter1>::value ||
                     !hpx::traits::is_random_access_iterator<FwdIter2>::value>;
 

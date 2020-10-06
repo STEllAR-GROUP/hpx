@@ -40,12 +40,15 @@ int hpx_main(hpx::program_options::variables_map& vm)
             hpx::cuda::experimental::get_local_targets());
 
     {
-        using namespace hpx::parallel;
         hpx::partitioned_vector<int, target_vector> v(1000, policy);
-        hpx::ranges::for_each(execution::seq, v, pfo());
-        hpx::ranges::for_each(execution::par, v, pfo());
-        hpx::ranges::for_each(execution::seq(execution::task), v, pfo()).get();
-        hpx::ranges::for_each(execution::par(execution::task), v, pfo()).get();
+        hpx::ranges::for_each(hpx::execution::seq, v, pfo());
+        hpx::ranges::for_each(hpx::execution::par, v, pfo());
+        hpx::ranges::for_each(
+            hpx::execution::seq(hpx::execution::task), v, pfo())
+            .get();
+        hpx::ranges::for_each(
+            hpx::execution::par(hpx::execution::task), v, pfo())
+            .get();
     }
 
     // TODO: add more

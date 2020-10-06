@@ -499,9 +499,7 @@ namespace hpx { namespace ranges {
                         std::move(first), std::move(dest)});
             }
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::copy_n<
                 ranges::copy_n_result<FwdIter1, FwdIter2>>()
@@ -569,9 +567,7 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::copy_if<
                 hpx::parallel::util::in_out_result<FwdIter1, FwdIter>>()
@@ -603,9 +599,7 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::copy_if<
                 hpx::parallel::util::in_out_result<
@@ -700,8 +694,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
         copy(ExPolicy&& policy, FwdIter1 iter, Sent1 sent, FwdIter dest)
     {
         using copy_iter_t = detail::copy_iter<FwdIter1, FwdIter>;
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::transfer<copy_iter_t>(
             std::forward<ExPolicy>(policy), iter, sent, dest);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     // clang-format off
@@ -722,8 +723,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
         using copy_iter_t = detail::copy_iter<
             typename hpx::traits::range_traits<Rng>::iterator_type, FwdIter>;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::transfer<copy_iter_t>(std::forward<ExPolicy>(policy),
             hpx::util::begin(rng), hpx::util::end(rng), dest);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     // clang-format off

@@ -45,11 +45,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     // copy data from host to device
     hpx::parallel::copy(
-        hpx::parallel::execution::par, h_A.begin(), h_A.end(), d_A.begin());
+        hpx::execution::par, h_A.begin(), h_A.end(), d_A.begin());
 
     // copy data from device to host
     hpx::parallel::copy(
-        hpx::parallel::execution::par, d_A.begin(), d_A.end(), h_B.begin());
+        hpx::execution::par, d_A.begin(), d_A.end(), h_B.begin());
 
     if (std::equal(h_A.begin(), h_A.end(), h_B.begin()))
         std::cout << "Copy succeeded!\n";
