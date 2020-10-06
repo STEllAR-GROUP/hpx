@@ -67,7 +67,6 @@ void test_bulk_sync()
 
     hpx::cuda::experimental::target target;
     executor exec(target);
-//    traits::bulk_execute(exec, hpx::util::bind(&bulk_test, _1), v);
     hpx::parallel::execution::bulk_sync_execute(exec, bulk_test(), v);
 }
 
@@ -83,12 +82,9 @@ void test_bulk_async()
 
     hpx::cuda::experimental::target target;
     executor exec(target);
-//    hpx::when_all(traits::bulk_async_execute(
-//        exec, hpx::util::bind(&bulk_test, _1), v)
-//    ).get();
     hpx::when_all(
-        hpx::parallel::execution::bulk_async_execute(exec, bulk_test(), v)
-    ).get();
+        hpx::parallel::execution::bulk_async_execute(exec, bulk_test(), v))
+        .get();
 }
 
 int hpx_main(int argc, char* argv[])
@@ -104,8 +100,8 @@ int hpx_main(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

@@ -309,10 +309,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         count_(ExPolicy&& policy, FwdIterB first, FwdIterE last, T const& value,
             Proj&& proj, std::false_type)
         {
-            typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-            typedef typename std::iterator_traits<FwdIterB>::difference_type
-                difference_type;
+            using difference_type =
+                typename std::iterator_traits<FwdIterB>::difference_type;
 
             return detail::count<difference_type>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last, value,
@@ -351,8 +351,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         typedef hpx::traits::is_segmented_iterator<FwdIterB> is_segmented;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::count_(std::forward<ExPolicy>(policy), first, last,
             value, std::forward<Proj>(proj), is_segmented{});
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -420,14 +427,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
         count_if_(ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,
             Proj&& proj, std::false_type)
         {
-            typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-            typedef typename std::iterator_traits<FwdIterB>::difference_type
-                difference_type;
+            using difference_type =
+                typename std::iterator_traits<FwdIterB>::difference_type;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
             return detail::count_if<difference_type>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last,
                 std::forward<F>(f), std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
         }
 
         // forward declare the segmented version of this algorithm
@@ -465,8 +479,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         typedef hpx::traits::is_segmented_iterator<FwdIterB> is_segmented;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::count_if_(std::forward<ExPolicy>(policy), first, last,
             std::forward<F>(f), std::forward<Proj>(proj), is_segmented{});
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
 

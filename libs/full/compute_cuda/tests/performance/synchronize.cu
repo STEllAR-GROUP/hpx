@@ -25,7 +25,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     {
         auto cuda_stream = target.native_handle().get_stream();
-        hpx::util::high_resolution_timer timer;
+        hpx::chrono::high_resolution_timer timer;
         for (std::size_t i = 0; i != iterations; ++i)
         {
             dummy<<<1, 1, 0, cuda_stream>>>();
@@ -37,7 +37,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     }
 
     {
-        hpx::util::high_resolution_timer timer;
+        hpx::chrono::high_resolution_timer timer;
         for (std::size_t i = 0; i != iterations; ++i)
         {
             executor.sync_execute([] HPX_DEVICE() {});
@@ -47,7 +47,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                   << elapsed << '\n';
     }
     {
-        hpx::util::high_resolution_timer timer;
+        hpx::chrono::high_resolution_timer timer;
         for (std::size_t i = 0; i != iterations; ++i)
         {
             executor.post([] HPX_DEVICE() {});
@@ -58,7 +58,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                   << '\n';
     }
     {
-        hpx::util::high_resolution_timer timer;
+        hpx::chrono::high_resolution_timer timer;
         for (std::size_t i = 0; i != iterations; ++i)
         {
             executor.post([] HPX_DEVICE() {});
@@ -70,7 +70,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             << elapsed << '\n';
     }
     {
-        hpx::util::high_resolution_timer timer;
+        hpx::chrono::high_resolution_timer timer;
         for (std::size_t i = 0; i != iterations; ++i)
         {
             executor.async_execute([] HPX_DEVICE() {}).get();

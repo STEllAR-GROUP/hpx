@@ -244,8 +244,7 @@ namespace hpx { namespace compute { namespace host {
             hpx::parallel::execution::restricted_thread_pool_executor>
     struct block_allocator
       : public detail::policy_allocator<T,
-            hpx::parallel::execution::parallel_policy_shim<
-                block_executor<Executor>,
+            hpx::execution::parallel_policy_shim<block_executor<Executor>,
                 typename block_executor<Executor>::executor_parameters_type>>
     {
         using executor_type = block_executor<Executor>;

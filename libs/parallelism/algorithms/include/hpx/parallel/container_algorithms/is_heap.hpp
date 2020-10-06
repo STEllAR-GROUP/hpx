@@ -325,16 +325,23 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         using iterator_type = typename hpx::traits::range_iterator<Rng>::type;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         static_assert(
             (hpx::traits::is_random_access_iterator<iterator_type>::value),
             "Requires a random access iterator.");
 
-        using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
         return hpx::parallel::v1::detail::is_heap<iterator_type>().call(
             std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
             hpx::util::end(rng), std::forward<Comp>(comp),
             std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     // clang-format off
@@ -359,16 +366,23 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         using iterator_type = typename hpx::traits::range_iterator<Rng>::type;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         static_assert(
             (hpx::traits::is_random_access_iterator<iterator_type>::value),
             "Requires a random access iterator.");
 
-        using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
         return hpx::parallel::v1::detail::is_heap_until<iterator_type>().call(
             std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
             hpx::util::end(rng), std::forward<Comp>(comp),
             std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -406,7 +420,7 @@ namespace hpx { namespace ranges {
                 (hpx::traits::is_random_access_iterator<iterator_type>::value),
                 "Requires a random access iterator.");
 
-            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::is_heap<iterator_type>().call(
                 std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
@@ -435,7 +449,7 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_random_access_iterator<Iter>::value),
                 "Requires a random access iterator.");
 
-            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::is_heap<Iter>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last,
@@ -529,7 +543,7 @@ namespace hpx { namespace ranges {
                 (hpx::traits::is_random_access_iterator<iterator_type>::value),
                 "Requires a random access iterator.");
 
-            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::is_heap_until<iterator_type>()
                 .call(std::forward<ExPolicy>(policy), is_seq(),
@@ -558,7 +572,7 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_random_access_iterator<Iter>::value),
                 "Requires a random access iterator.");
 
-            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::is_heap_until<Iter>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last,

@@ -186,7 +186,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             ExPolicy&& policy, FwdIter first, FwdIter last, F&& f, Proj&& proj,
             std::true_type)
         {
-            typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             return segmented_none_of(none_of(), std::forward<ExPolicy>(policy),
                 first, last, std::forward<F>(f), std::forward<Proj>(proj),
@@ -355,7 +355,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             ExPolicy&& policy, FwdIter first, FwdIter last, F&& f, Proj&& proj,
             std::true_type)
         {
-            typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             return segmented_any_of(any_of(), std::forward<ExPolicy>(policy),
                 first, last, std::forward<F>(f), std::forward<Proj>(proj),
@@ -524,7 +524,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             ExPolicy&& policy, FwdIter first, FwdIter last, F&& f, Proj&& proj,
             std::true_type)
         {
-            typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             return segmented_all_of(all_of(), std::forward<ExPolicy>(policy),
                 first, last, std::forward<F>(f), std::forward<Proj>(proj),

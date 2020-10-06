@@ -31,8 +31,8 @@ namespace hpx { namespace util {
         template <typename... Ts>
         struct zip_iterator_value<hpx::tuple<Ts...>>
         {
-            typedef hpx::tuple<typename std::iterator_traits<Ts>::value_type...>
-                type;
+            using type =
+                hpx::tuple<typename std::iterator_traits<Ts>::value_type...>;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -42,8 +42,8 @@ namespace hpx { namespace util {
         template <typename... Ts>
         struct zip_iterator_reference<hpx::tuple<Ts...>>
         {
-            typedef hpx::tuple<typename std::iterator_traits<Ts>::reference...>
-                type;
+            using type =
+                hpx::tuple<typename std::iterator_traits<Ts>::reference...>;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -438,9 +438,8 @@ namespace hpx { namespace util {
         static_assert(
             sizeof...(Ts) != 0, "zip_iterator must wrap at least one iterator");
 
-        typedef detail::zip_iterator_base<hpx::tuple<Ts...>,
-            zip_iterator<hpx::tuple<Ts...>>>
-            base_type;
+        using base_type = detail::zip_iterator_base<hpx::tuple<Ts...>,
+            zip_iterator<hpx::tuple<Ts...>>>;
 
     public:
         HPX_HOST_DEVICE zip_iterator()

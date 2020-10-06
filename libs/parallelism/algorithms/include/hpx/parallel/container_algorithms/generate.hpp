@@ -213,6 +213,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         using iterator_type = typename hpx::traits::range_iterator<Rng>::type;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         static_assert((hpx::traits::is_forward_iterator<iterator_type>::value),
             "Required at least forward iterator.");
 
@@ -221,6 +225,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         return detail::generate_(std::forward<ExPolicy>(policy),
             hpx::util::begin(rng), hpx::util::end(rng), std::forward<F>(f),
             is_segmented());
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -342,7 +349,7 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             if (hpx::parallel::v1::detail::is_negative(count))
             {

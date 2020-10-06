@@ -209,7 +209,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         min_element_(ExPolicy&& policy, SegIter first, SegIter last, F&& f,
             Proj&& proj, std::true_type)
         {
-            typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             SegIter result = first;
             if (first == last || ++first == last)
@@ -233,7 +233,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         max_element_(ExPolicy&& policy, SegIter first, SegIter last, F&& f,
             Proj&& proj, std::true_type)
         {
-            typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             SegIter result = first;
             if (first == last || ++first == last)
@@ -484,8 +484,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         minmax_element_(ExPolicy&& policy, SegIter first, SegIter last, F&& f,
             Proj&& proj, std::true_type)
         {
-            typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-            typedef std::pair<SegIter, SegIter> result_type;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+            using result_type = std::pair<SegIter, SegIter>;
 
             result_type result(first, first);
             if (first == last || ++first == last)

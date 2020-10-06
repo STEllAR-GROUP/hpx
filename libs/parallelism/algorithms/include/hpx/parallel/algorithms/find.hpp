@@ -497,7 +497,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Requires at least forward iterator.");
 
-            typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             return detail::find<Iter>().call(std::forward<ExPolicy>(policy),
                 is_seq(), first, last, val, std::forward<Proj>(proj));
@@ -524,8 +524,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::find_(std::forward<ExPolicy>(policy), first, last,
             std::move(val), util::projection_identity(), is_segmented());
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -626,7 +633,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Requires at least forward iterator.");
 
-            typedef ::hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             return detail::find_if<Iter>().call(std::forward<ExPolicy>(policy),
                 is_seq(), first, last, std::forward<F>(f),
@@ -657,8 +664,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::find_if_(std::forward<ExPolicy>(policy), first, last,
             std::forward<F>(f), util::projection_identity(), is_segmented());
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -760,7 +774,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return detail::find_if_not<Iter>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last,
@@ -792,8 +806,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::find_if_not_(std::forward<ExPolicy>(policy), first, last,
             std::forward<F>(f), util::projection_identity(), is_segmented());
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -993,11 +1014,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::find_end<FwdIter1>().call(std::forward<ExPolicy>(policy),
             is_seq(), first1, last1, first2, last2, std::forward<Pred>(op),
             std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1138,12 +1166,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
-        using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::find_first_of<FwdIter1>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last, s_first,
             s_last, std::forward<Pred>(op), std::forward<Proj1>(proj1),
             std::forward<Proj2>(proj2));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -1312,7 +1347,7 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::find_end<FwdIter1>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
@@ -1339,7 +1374,7 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::find_end<FwdIter1>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
@@ -1427,7 +1462,7 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Subsequence requires at least forward iterator.");
 
-            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::find_first_of<FwdIter1>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last, s_first,
@@ -1454,7 +1489,7 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Subsequence requires at least forward iterator.");
 
-            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::find_first_of<FwdIter1>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last, s_first,

@@ -42,8 +42,8 @@ struct transform_test
 void test_transform(executor_type& exec, target_vector& d_A, target_vector& d_B,
     target_vector& d_C, std::vector<int> const& ref)
 {
-    hpx::parallel::transform(hpx::execution::par.on(exec), d_A.begin(), d_A.end(),
-        d_B.begin(), d_C.begin(), transform_test());
+    hpx::parallel::transform(hpx::execution::par.on(exec), d_A.begin(),
+        d_A.end(), d_B.begin(), d_C.begin(), transform_test());
 
     std::vector<int> h_C(d_C.size());
     hpx::copy(hpx::execution::par, d_C.begin(), d_C.end(), h_C.begin());
@@ -90,9 +90,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     target_vector d_C(N, allocA);
 
     // copy data to device
-    hpx::future<void> f =
-        hpx::copy(hpx::execution::par(hpx::parallel::execution::task),
-            h_A.begin(), h_A.end(), d_A.begin());
+    hpx::future<void> f = hpx::copy(hpx::execution::par(hpx::execution::task),
+        h_A.begin(), h_A.end(), d_A.begin());
 
     hpx::copy(hpx::execution::par, h_B.begin(), h_B.end(), d_B.begin());
 

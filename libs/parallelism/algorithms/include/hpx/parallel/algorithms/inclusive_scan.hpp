@@ -209,7 +209,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         inclusive_scan_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
             FwdIter2 dest, T&& init, Op&& op, std::false_type, Conv&& conv)
         {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return inclusive_scan<FwdIter2>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
@@ -222,7 +222,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         inclusive_scan_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
             FwdIter2 dest, Op&& op, std::false_type, Conv&& conv)
         {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return inclusive_scan<FwdIter2>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last, dest,

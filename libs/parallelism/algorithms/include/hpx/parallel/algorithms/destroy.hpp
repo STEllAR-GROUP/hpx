@@ -217,8 +217,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::destroy<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq{}, first, last);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -291,8 +298,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::destroy_n<FwdIter>().call(std::forward<ExPolicy>(policy),
             is_seq{}, first, std::size_t(count));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
 

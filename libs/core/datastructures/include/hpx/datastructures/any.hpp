@@ -1478,42 +1478,92 @@ namespace hpx { namespace util {
     {
         lhs.swap(rhs);
     }
+}}    // namespace hpx::util
 
-    // boost::any-like casting
+namespace hpx {
+#if defined(HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
+    template <typename T, typename... Ts>
+    util::basic_any<void, void, void, std::true_type> make_any_nonser(
+        Ts&&... ts)
+    {
+        return util::basic_any<void, void, void, std::true_type>(
+            std::in_place_type<T>, std::forward<Ts>(ts)...);
+    }
+
+    template <typename T, typename U, typename... Ts>
+    util::basic_any<void, void, void, std::true_type> make_any_nonser(
+        std::initializer_list<U> il, Ts&&... ts)
+    {
+        return util::basic_any<void, void, void, std::true_type>(
+            std::in_place_type<T>, il, std::forward<Ts>(ts)...);
+    }
+
+    template <typename T, typename... Ts>
+    util::basic_any<void, void, void, std::false_type> make_unique_any_nonser(
+        Ts&&... ts)
+    {
+        return util::basic_any<void, void, void, std::false_type>(
+            std::in_place_type<T>, std::forward<Ts>(ts)...);
+    }
+
+    template <typename T, typename U, typename... Ts>
+    util::basic_any<void, void, void, std::false_type> make_unique_any_nonser(
+        std::initializer_list<U> il, Ts&&... ts)
+    {
+        return util::basic_any<void, void, void, std::false_type>(
+            std::in_place_type<T>, il, std::forward<Ts>(ts)...);
+    }
+#endif
+
+    template <typename T>
+    util::basic_any<void, void, void, std::true_type> make_any_nonser(T&& t)
+    {
+        return util::basic_any<void, void, void, std::true_type>(
+            std::forward<T>(t));
+    }
+
+    template <typename T>
+    util::basic_any<void, void, void, std::false_type> make_unique_any_nonser(
+        T&& t)
+    {
+        return util::basic_any<void, void, void, std::false_type>(
+            std::forward<T>(t));
+    }
+
+    using any_nonser = util::basic_any<void, void, void, std::true_type>;
+    using unique_any_nonser =
+        util::basic_any<void, void, void, std::false_type>;
+
     template <typename T, typename IArch, typename OArch, typename Char,
         typename Copyable>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::util::any_cast is deprecated. Please use hpx::any_cast instead.")
     inline T* any_cast(
-        basic_any<IArch, OArch, Char, Copyable>* operand) noexcept
+        util::basic_any<IArch, OArch, Char, Copyable>* operand) noexcept
     {
         if (operand && operand->type() == typeid(T))
         {
-            return detail::any::any_cast_support::template call<T>(operand);
+            return util::detail::any::any_cast_support::template call<T>(
+                operand);
         }
         return nullptr;
     }
 
     template <typename T, typename IArch, typename OArch, typename Char,
         typename Copyable>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::util::any_cast is deprecated. Please use hpx::any_cast instead.")
     inline T const* any_cast(
-        basic_any<IArch, OArch, Char, Copyable> const* operand) noexcept
+        util::basic_any<IArch, OArch, Char, Copyable> const* operand) noexcept
     {
-        return any_cast<T>(
-            const_cast<basic_any<IArch, OArch, Char, Copyable>*>(operand));
+        return hpx::any_cast<T>(
+            const_cast<util::basic_any<IArch, OArch, Char, Copyable>*>(
+                operand));
     }
 
     template <typename T, typename IArch, typename OArch, typename Char,
         typename Copyable>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::util::any_cast is deprecated. Please use hpx::any_cast instead.")
-    T any_cast(basic_any<IArch, OArch, Char, Copyable>& operand)
+    T any_cast(util::basic_any<IArch, OArch, Char, Copyable>& operand)
     {
         using nonref = typename std::remove_reference<T>::type;
 
-        nonref* result = any_cast<nonref>(&operand);
+        nonref* result = hpx::any_cast<nonref>(&operand);
         if (!result)
             throw hpx::bad_any_cast(operand.type(), typeid(T));
         return static_cast<T>(*result);
@@ -1521,16 +1571,18 @@ namespace hpx { namespace util {
 
     template <typename T, typename IArch, typename OArch, typename Char,
         typename Copyable>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::util::any_cast is deprecated. Please use hpx::any_cast instead.")
-    T const& any_cast(basic_any<IArch, OArch, Char, Copyable> const& operand)
+    T const& any_cast(
+        util::basic_any<IArch, OArch, Char, Copyable> const& operand)
     {
         using nonref = typename std::remove_reference<T>::type;
 
-        return any_cast<nonref const&>(
-            const_cast<basic_any<IArch, OArch, Char, Copyable>&>(operand));
+        return hpx::any_cast<nonref const&>(
+            const_cast<util::basic_any<IArch, OArch, Char, Copyable>&>(
+                operand));
     }
+}    // namespace hpx
 
+namespace hpx { namespace util {
 #if defined(HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
     ////////////////////////////////////////////////////////////////////////////
     // make copyable any
@@ -1669,108 +1721,6 @@ namespace hpx { namespace util {
         basic_any<void, void, wchar_t, std::false_type>;
 
 }}    // namespace hpx::util
-
-namespace hpx {
-#if defined(HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
-    template <typename T, typename... Ts>
-    util::basic_any<void, void, void, std::true_type> make_any_nonser(
-        Ts&&... ts)
-    {
-        return util::basic_any<void, void, void, std::true_type>(
-            std::in_place_type<T>, std::forward<Ts>(ts)...);
-    }
-
-    template <typename T, typename U, typename... Ts>
-    util::basic_any<void, void, void, std::true_type> make_any_nonser(
-        std::initializer_list<U> il, Ts&&... ts)
-    {
-        return util::basic_any<void, void, void, std::true_type>(
-            std::in_place_type<T>, il, std::forward<Ts>(ts)...);
-    }
-
-    template <typename T, typename... Ts>
-    util::basic_any<void, void, void, std::false_type> make_unique_any_nonser(
-        Ts&&... ts)
-    {
-        return util::basic_any<void, void, void, std::false_type>(
-            std::in_place_type<T>, std::forward<Ts>(ts)...);
-    }
-
-    template <typename T, typename U, typename... Ts>
-    util::basic_any<void, void, void, std::false_type> make_unique_any_nonser(
-        std::initializer_list<U> il, Ts&&... ts)
-    {
-        return util::basic_any<void, void, void, std::false_type>(
-            std::in_place_type<T>, il, std::forward<Ts>(ts)...);
-    }
-#endif
-
-    template <typename T>
-    util::basic_any<void, void, void, std::true_type> make_any_nonser(T&& t)
-    {
-        return util::basic_any<void, void, void, std::true_type>(
-            std::forward<T>(t));
-    }
-
-    template <typename T>
-    util::basic_any<void, void, void, std::false_type> make_unique_any_nonser(
-        T&& t)
-    {
-        return util::basic_any<void, void, void, std::false_type>(
-            std::forward<T>(t));
-    }
-
-    using any_nonser = util::basic_any<void, void, void, std::true_type>;
-    using unique_any_nonser =
-        util::basic_any<void, void, void, std::false_type>;
-
-    template <typename T, typename IArch, typename OArch, typename Char,
-        typename Copyable>
-    inline T* any_cast(
-        util::basic_any<IArch, OArch, Char, Copyable>* operand) noexcept
-    {
-        if (operand && operand->type() == typeid(T))
-        {
-            return util::detail::any::any_cast_support::template call<T>(
-                operand);
-        }
-        return nullptr;
-    }
-
-    template <typename T, typename IArch, typename OArch, typename Char,
-        typename Copyable>
-    inline T const* any_cast(
-        util::basic_any<IArch, OArch, Char, Copyable> const* operand) noexcept
-    {
-        return hpx::any_cast<T>(
-            const_cast<util::basic_any<IArch, OArch, Char, Copyable>*>(
-                operand));
-    }
-
-    template <typename T, typename IArch, typename OArch, typename Char,
-        typename Copyable>
-    T any_cast(util::basic_any<IArch, OArch, Char, Copyable>& operand)
-    {
-        using nonref = typename std::remove_reference<T>::type;
-
-        nonref* result = hpx::any_cast<nonref>(&operand);
-        if (!result)
-            throw hpx::bad_any_cast(operand.type(), typeid(T));
-        return static_cast<T>(*result);
-    }
-
-    template <typename T, typename IArch, typename OArch, typename Char,
-        typename Copyable>
-    T const& any_cast(
-        util::basic_any<IArch, OArch, Char, Copyable> const& operand)
-    {
-        using nonref = typename std::remove_reference<T>::type;
-
-        return hpx::any_cast<nonref const&>(
-            const_cast<util::basic_any<IArch, OArch, Char, Copyable>&>(
-                operand));
-    }
-}    // namespace hpx
 
 ////////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_MSVC) && HPX_MSVC >= 1400

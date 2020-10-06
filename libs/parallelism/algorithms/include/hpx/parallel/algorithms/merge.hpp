@@ -498,14 +498,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
             (hpx::traits::is_random_access_iterator<RandIter3>::value),
             "Requires at least random access iterator.");
 
-        using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
         using result_type =
             util::in_in_out_result<RandIter1, RandIter2, RandIter3>;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::merge<result_type>().call(std::forward<ExPolicy>(policy),
             is_seq(), first1, last1, first2, last2, dest,
             std::forward<Comp>(comp), std::forward<Proj1>(proj1),
             std::forward<Proj2>(proj2));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -764,11 +771,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_random_access_iterator<RandIter>::value),
             "Required at least random access iterator.");
 
-        using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::inplace_merge<RandIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, middle, last,
             std::forward<Comp>(comp), std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -810,7 +824,7 @@ namespace hpx {
                 (hpx::traits::is_random_access_iterator<RandIter3>::value),
                 "Requires at least random access iterator.");
 
-            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
             using result_type = hpx::parallel::util::in_in_out_result<RandIter1,
                 RandIter2, RandIter3>;
 
@@ -888,7 +902,7 @@ namespace hpx {
                 (hpx::traits::is_random_access_iterator<RandIter>::value),
                 "Required at least random access iterator.");
 
-            using is_seq = ::hpx::is_sequenced_execution_policy<ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::get_void_result(
                 hpx::parallel::v1::detail::inplace_merge<RandIter>().call(

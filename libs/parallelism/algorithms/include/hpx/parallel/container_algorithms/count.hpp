@@ -182,10 +182,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
         using iterator_type =
             typename hpx::traits::range_traits<Rng>::iterator_type;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         static_assert((hpx::traits::is_forward_iterator<iterator_type>::value),
             "Required at least forward iterator.");
 
         using is_segmented = hpx::traits::is_segmented_iterator<iterator_type>;
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
 
         return detail::count_(std::forward<ExPolicy>(policy),
             hpx::util::begin(rng), hpx::util::end(rng), value,
@@ -215,10 +222,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
         using iterator_type =
             typename hpx::traits::range_traits<Rng>::iterator_type;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         static_assert((hpx::traits::is_forward_iterator<iterator_type>::value),
             "Required at least forward iterator.");
 
         using is_segmented = hpx::traits::is_segmented_iterator<iterator_type>;
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
 
         return detail::count_if_(std::forward<ExPolicy>(policy),
             hpx::util::begin(rng), hpx::util::end(rng), std::forward<F>(f),
