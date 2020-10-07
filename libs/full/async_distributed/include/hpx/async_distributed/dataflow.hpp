@@ -47,10 +47,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail {
-    template <typename Action, typename Args>
-    struct dataflow_return_impl</*IsAction=*/true, Action, Args>
+    template <typename Policy, typename Action, typename Args>
+    struct dataflow_return_impl</*IsAction=*/true, Policy, Action, Args>
     {
-        typedef typename Action::result_type type;
+        using type = hpx::lcos::future<typename Action::result_type>;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -60,10 +60,8 @@ namespace hpx { namespace lcos { namespace detail {
     {
         template <typename Allocator, typename Policy_, typename Component,
             typename Signature, typename Derived, typename... Ts>
-        HPX_FORCEINLINE static lcos::future<typename traits::
-                promise_local_result<typename hpx::actions::basic_action<
-                    Component, Signature, Derived>::remote_result_type>::type>
-        call(Allocator const& alloc, Policy_&& policy,
+        HPX_FORCEINLINE static decltype(auto) call(Allocator const& alloc,
+            Policy_&& policy,
             hpx::actions::basic_action<Component, Signature, Derived> const&
                 act,
             naming::id_type const& id, Ts&&... ts)
@@ -83,12 +81,10 @@ namespace hpx { namespace lcos { namespace detail {
     {
         template <typename Allocator, typename Component, typename Signature,
             typename Derived, typename... Ts>
-        HPX_FORCEINLINE static auto call(Allocator const& alloc,
+        HPX_FORCEINLINE static decltype(auto) call(Allocator const& alloc,
             hpx::actions::basic_action<Component, Signature, Derived> const&
                 act,
             naming::id_type const& id, Ts&&... ts)
-            -> decltype(dataflow_dispatch_impl<true, launch>::call(
-                alloc, launch::async, act, id, std::forward<Ts>(ts)...))
         {
             return dataflow_dispatch_impl<true, launch>::call(
                 alloc, launch::async, act, id, std::forward<Ts>(ts)...);

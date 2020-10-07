@@ -1,23 +1,25 @@
-//  Copyright (c) 2013 Thomas Heller
+//  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2013 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/lcos_local.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/program_options.hpp>
 
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -41,11 +43,44 @@ using hpx::util::report_errors;
 using hpx::util::unwrapping;
 
 ///////////////////////////////////////////////////////////////////////////////
+struct additional_argument
+{
+};
+
+struct additional_argument_executor
+{
+    template <typename F, typename... Ts>
+    decltype(auto) async_execute(F&& f, Ts&&... ts)
+    {
+        return hpx::async(
+            std::forward<F>(f), additional_argument{}, std::forward<Ts>(ts)...);
+    }
+
+    template <typename A, typename... Ts>
+    void post(
+        hpx::lcos::detail::dataflow_finalization<A>&& f, hpx::tuple<Ts...>&& t)
+    {
+        additional_argument a;
+        hpx::apply(f, hpx::tuple_cat(hpx::tie(a), std::move(t)));
+    }
+};
+
+namespace hpx { namespace parallel { namespace execution {
+    template <>
+    struct is_one_way_executor<additional_argument_executor> : std::true_type
+    {
+    };
+
+    template <>
+    struct is_two_way_executor<additional_argument_executor> : std::true_type
+    {
+    };
+}}}    // namespace hpx::parallel::execution
 
 std::atomic<std::uint32_t> void_f_count;
 std::atomic<std::uint32_t> int_f_count;
 
-void void_f()
+void void_f(additional_argument)
 {
     ++void_f_count;
 }
@@ -58,18 +93,18 @@ int int_f()
 std::atomic<std::uint32_t> void_f1_count;
 std::atomic<std::uint32_t> int_f1_count;
 
-void void_f1(int)
+void void_f1(additional_argument, int)
 {
     ++void_f1_count;
 }
-int int_f1(int i)
+int int_f1(additional_argument, int i)
 {
     ++int_f1_count;
     return i + 42;
 }
 
 std::atomic<std::uint32_t> int_f2_count;
-int int_f2(int l, int r)
+int int_f2(additional_argument, int l, int r)
 {
     ++int_f2_count;
     return l + r;
@@ -77,7 +112,7 @@ int int_f2(int l, int r)
 
 std::atomic<std::uint32_t> int_f_vector_count;
 
-int int_f_vector(std::vector<int> const& vf)
+int int_f_vector(additional_argument, std::vector<int> const& vf)
 {
     int sum = 0;
     for (int f : vf)
@@ -133,7 +168,7 @@ void function_pointers(Executor& exec)
 std::atomic<std::uint32_t> future_void_f1_count;
 std::atomic<std::uint32_t> future_void_f2_count;
 
-void future_void_f1(future<void> f1)
+void future_void_f1(additional_argument, future<void> f1)
 {
     HPX_TEST(f1.is_ready());
     ++future_void_f1_count;
@@ -145,7 +180,7 @@ void future_void_sf1(shared_future<void> f1)
     ++future_void_f1_count;
 }
 
-void future_void_f2(future<void> f1, future<void> f2)
+void future_void_f2(additional_argument, future<void> f1, future<void> f2)
 {
     HPX_TEST(f1.is_ready());
     HPX_TEST(f2.is_ready());
@@ -155,14 +190,14 @@ void future_void_f2(future<void> f1, future<void> f2)
 std::atomic<std::uint32_t> future_int_f1_count;
 std::atomic<std::uint32_t> future_int_f2_count;
 
-int future_int_f1(future<void> f1)
+int future_int_f1(additional_argument, future<void> f1)
 {
     HPX_TEST(f1.is_ready());
     ++future_int_f1_count;
     return 1;
 }
 
-int future_int_f2(future<int> f1, future<int> f2)
+int future_int_f2(additional_argument, future<int> f1, future<int> f2)
 {
     HPX_TEST(f1.is_ready());
     HPX_TEST(f2.is_ready());
@@ -172,7 +207,7 @@ int future_int_f2(future<int> f1, future<int> f2)
 
 std::atomic<std::uint32_t> future_int_f_vector_count;
 
-int future_int_f_vector(std::vector<future<int>>& vf)
+int future_int_f_vector(additional_argument, std::vector<future<int>>& vf)
 {
     int sum = 0;
     for (future<int>& f : vf)
@@ -246,11 +281,11 @@ void future_function_pointers(Executor& exec)
 std::atomic<std::uint32_t> void_f4_count;
 std::atomic<std::uint32_t> int_f4_count;
 
-void void_f4(int)
+void void_f4(additional_argument, int)
 {
     ++void_f4_count;
 }
-int int_f4(int i)
+int int_f4(additional_argument, int i)
 {
     ++int_f4_count;
     return i + 42;
@@ -259,11 +294,11 @@ int int_f4(int i)
 std::atomic<std::uint32_t> void_f5_count;
 std::atomic<std::uint32_t> int_f5_count;
 
-void void_f5(int, hpx::future<int>)
+void void_f5(additional_argument, int, hpx::future<int>)
 {
     ++void_f5_count;
 }
-int int_f5(int i, hpx::future<int> j)
+int int_f5(additional_argument, int i, hpx::future<int> j)
 {
     ++int_f5_count;
     return i + j.get() + 42;
@@ -325,15 +360,7 @@ void plain_deferred_arguments(Executor& exec)
 int hpx_main(variables_map&)
 {
     {
-        hpx::execution::sequenced_executor exec;
-        function_pointers(exec);
-        future_function_pointers(exec);
-        plain_arguments(exec);
-        plain_deferred_arguments(exec);
-    }
-
-    {
-        hpx::execution::parallel_executor exec;
+        additional_argument_executor exec;
         function_pointers(exec);
         future_function_pointers(exec);
         plain_arguments(exec);
