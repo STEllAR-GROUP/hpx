@@ -157,7 +157,7 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN)
 endif()
 
 # PkgConfig
-if(NOT MSVC)
+if(NOT MSVC AND NOT APPLE)
   find_package(PkgConfig)
   if(PKGCONFIG_FOUND)
     create_pkgconfig_test(
@@ -180,6 +180,7 @@ endif()
 if(NOT CMAKE_TOOLCHAIN_FILE
    AND PKGCONFIG_FOUND
    AND NOT MSVC
+   AND NOT APPLE
 )
   set(build_systems ${build_systems} pkgconfig)
   set(pkgconfig_tests build_dir install_dir)
