@@ -5,11 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/apply.hpp>
-#include <hpx/include/async.hpp>
-#include <hpx/include/lcos_local.hpp>
-#include <hpx/include/parallel_executors.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstdint>
