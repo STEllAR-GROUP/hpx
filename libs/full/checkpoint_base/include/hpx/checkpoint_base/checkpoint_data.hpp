@@ -134,13 +134,10 @@ namespace hpx { namespace util {
 
 namespace hpx { namespace serialization { namespace detail {
     // This is explicitly instantiated to ensure that the id is stable across
-    // shared libraries. MSVC and gcc/clang require different handling of
-    // exported explicitly instantiated templates.
-#if defined(HPX_MSVC)
-    extern template struct extra_archive_data_id_helper<
-        hpx::util::checkpointing_tag>;
-#else
-    extern template struct HPX_EXPORT
-        extra_archive_data_id_helper<hpx::util::checkpointing_tag>;
-#endif
+    // shared libraries.
+    template <>
+    struct extra_archive_data_id_helper<hpx::util::checkpointing_tag>
+    {
+        HPX_EXPORT static void id() noexcept;
+    };
 }}}    // namespace hpx::serialization::detail

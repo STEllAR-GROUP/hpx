@@ -43,19 +43,18 @@ namespace hpx { namespace serialization {
         using output_pointer_tracker = std::map<void const*, std::uint64_t>;
 
         // This is explicitly instantiated to ensure that the id is stable across
-        // shared libraries. MSVC and gcc/clang require different handling of
-        // exported explicitly instantiated templates.
-#if defined(HPX_MSVC)
-        extern template struct extra_archive_data_id_helper<
-            input_pointer_tracker>;
-        extern template struct extra_archive_data_id_helper<
-            output_pointer_tracker>;
-#else
-        extern template struct HPX_CORE_EXPORT
-            extra_archive_data_id_helper<input_pointer_tracker>;
-        extern template struct HPX_CORE_EXPORT
-            extra_archive_data_id_helper<output_pointer_tracker>;
-#endif
+        // shared libraries.
+        template <>
+        struct extra_archive_data_id_helper<input_pointer_tracker>
+        {
+            HPX_CORE_EXPORT static void id() noexcept;
+        };
+
+        template <>
+        struct extra_archive_data_id_helper<output_pointer_tracker>
+        {
+            HPX_CORE_EXPORT static void id() noexcept;
+        };
     }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////

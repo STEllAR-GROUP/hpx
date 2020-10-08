@@ -17,7 +17,9 @@ namespace hpx { namespace serialization { namespace detail {
     template <typename T>
     struct extra_archive_data_id_helper
     {
-        static void dummy() noexcept {}
+        // this is intentionally left unimplemented, will lead to linker errors
+        // if used with unknown data type
+        static void id() noexcept;
     };
 
     using extra_archive_data_id_type = void (*)();
@@ -25,7 +27,7 @@ namespace hpx { namespace serialization { namespace detail {
     template <typename T>
     constexpr extra_archive_data_id_type extra_archive_data_id()
     {
-        return &extra_archive_data_id_helper<T>::dummy;
+        return &extra_archive_data_id_helper<T>::id;
     }
 
     struct extra_archive_data_member_base;
