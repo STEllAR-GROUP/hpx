@@ -222,6 +222,16 @@ namespace boost
         // atomic
         {"(\\bstd\\s*::\\s*atomic\\b)", "std::atomic", "atomic"},
         {"(\\bstd\\s*::\\s*(memory_order_*)\\b)", "std::\\2", "atomic"},
+        // random
+        {"(\\bstd\\s*::\\s*(minstd_rand(0)?)\\b)", "std::\\2", "random"},
+        {"(\\bstd\\s*::\\s*(mt19937(_64)?)\\b)", "std::\\2", "random"},
+        {"(\\bstd\\s*::\\s*random_device\\b)", "std::random_device", "random"},
+        {"(\\bstd\\s*::\\s*uniform_int_distribution\\b)",
+            "std::uniform_int_distribution", "random"},
+        {"(\\bstd\\s*::\\s*uniform_real_distribution\\b)",
+            "std::uniform_real_distribution", "random"},
+        {"(\\bstd\\s*::\\s*exponential_distribution\\b)",
+            "std::exponential_distribution", "random"},
         // boost
         {"(\\bhpx\\s*::\\s*intrusive_ptr\\b)", "hpx::intrusive_ptr",
             "hpx/modules/memory.hpp"},

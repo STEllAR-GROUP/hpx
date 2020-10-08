@@ -11,6 +11,7 @@
 
 #include <cstddef>
 #include <ctime>
+#include <random>
 #include <vector>
 
 #include <hpx/modules/program_options.hpp>
