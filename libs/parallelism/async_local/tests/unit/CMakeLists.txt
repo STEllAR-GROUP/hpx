@@ -6,12 +6,15 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests apply_local apply_local_executor async_local async_local_executor)
+set(tests apply_local apply_local_executor async_local async_local_executor
+          async_local_executor_additional_arguments
+)
 
 set(apply_local_PARAMETERS THREADS_PER_LOCALITY 4)
 set(apply_local_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(async_local_PARAMETERS THREADS_PER_LOCALITY 4)
 set(async_local_executor_PARAMETERS THREADS_PER_LOCALITY 4)
+set(async_local_executor_additional_arguments_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
