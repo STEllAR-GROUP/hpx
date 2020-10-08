@@ -8,8 +8,7 @@
 
 #pragma once
 
-#include <hpx/config/constexpr.hpp>
-#include <hpx/config/export_definitions.hpp>
+#include <hpx/config.hpp>
 
 #include <cstddef>
 #include <functional>
@@ -125,6 +124,12 @@ namespace hpx { namespace threads {
         thread_id_repr thrd_;
     };
 
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+    // We can't actually refer to this in device code. This is only to satisfy
+    // the compiler.
+    extern HPX_DEVICE thread_id invalid_thread_id;
+#else
     constexpr thread_id invalid_thread_id;
+#endif
 
 }}    // namespace hpx::threads
