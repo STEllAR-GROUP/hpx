@@ -53,7 +53,7 @@ namespace hpx { namespace parcelset { namespace detail {
 
             archive_ << p;
 
-            auto handle_futures = archive_.try_get_extra_data<
+            auto* handle_futures = archive_.try_get_extra_data<
                 serialization::detail::preprocess_futures>();
 
             // We are doing a fixed point iteration until we are sure that the
