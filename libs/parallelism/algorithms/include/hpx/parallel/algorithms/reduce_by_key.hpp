@@ -319,7 +319,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             reduce_begin + 1, key_state.begin() + 1),
                         make_zip_iterator(reduce_end - 1, key_state.end() - 1),
                         [&kernel, &comp](zip_ref ref) {
-                            kernel(get<0>(ref), get<1>(ref), comp);
+                            kernel(hpx::get<0>(ref), hpx::get<1>(ref), comp);
                         });
                     // Last element
                     element_type elemN = *std::prev(key_last);
@@ -357,10 +357,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     sync_policy, states_begin, states_end, states_out_begin,
                     // B is the current entry, A is the one passed in from 'previous'
                     [&func](zip_type_in a, zip_type_in b) -> lambda_type {
-                        value_type a_val = get<0>(a);
-                        reduce_key_series_states a_state = get<1>(a);
-                        value_type b_val = get<0>(b);
-                        reduce_key_series_states b_state = get<1>(b);
+                        value_type a_val = hpx::get<0>(a);
+                        reduce_key_series_states a_state = hpx::get<1>(a);
+                        value_type b_val = hpx::get<0>(b);
+                        reduce_key_series_states b_state = hpx::get<1>(b);
                         debug_reduce_by_key("{ " << a_val << "+" << b_val
                                                  << " },\t" << a_state
                                                  << b_state);
@@ -403,7 +403,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         make_zip_iterator(keys_output, values_output,
                             hpx::util::begin(key_state)),
                         // copies to dest only when 'end' state is true
-                        [](zip2_ref it) { return get<2>(it).end; }),
+                        [](zip2_ref it) { return hpx::get<2>(it).end; }),
                     keys_output, values_output);
             }
         }
