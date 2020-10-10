@@ -41,6 +41,8 @@ set(tests
     inplace_merge_range
     is_heap_range
     is_heap_until_range
+    is_partitioned_range
+    is_partitioned_projection_range
     make_heap_range
     max_element_range
     merge_range

@@ -610,7 +610,7 @@ Parallel algorithms
      * Description
      * In header
      * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::parallel::v1::is_partitioned`
+   * * :cpp:func:`hpx::is_partitioned`
      * Returns ``true`` if each true element for a predicate precedes the false elements in a range.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`is_partitioned`

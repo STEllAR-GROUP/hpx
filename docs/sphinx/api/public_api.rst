@@ -55,7 +55,7 @@ Functions
 - :cpp:func:`hpx::inplace_merge`
 - :cpp:func:`hpx::is_heap`
 - :cpp:func:`hpx::is_heap_until`
-- :cpp:func:`hpx::parallel::v1::is_partitioned`
+- :cpp:func:`hpx::is_partitioned`
 - :cpp:func:`hpx::parallel::v1::is_sorted`
 - :cpp:func:`hpx::parallel::v1::is_sorted_until`
 - :cpp:func:`hpx::parallel::v1::lexicographical_compare`
@@ -121,6 +121,7 @@ Functions
 - :cpp:func:`hpx::ranges::inplace_merge`
 - :cpp:func:`hpx::ranges::is_heap`
 - :cpp:func:`hpx::ranges::is_heap_until`
+- :cpp:func:`hpx::ranges::is_partitioned`
 - :cpp:func:`hpx::ranges::make_heap`
 - :cpp:func:`hpx::ranges::merge`
 - :cpp:func:`hpx::ranges::move`
