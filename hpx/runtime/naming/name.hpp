@@ -67,8 +67,6 @@ namespace hpx { namespace naming
     /// Global identifier for components across the HPX system.
     struct HPX_EXPORT gid_type
     {
-        struct tag {};
-
         // These typedefs are for Boost.ICL.
         typedef gid_type size_type;
         typedef gid_type difference_type;
@@ -379,12 +377,13 @@ namespace hpx { namespace naming
         HPX_SERIALIZATION_SPLIT_MEMBER()
 
         // lock implementation
-        typedef util::spinlock_pool<tag> internal_mutex_type;
+        using spinlock_pool = util::spinlock_pool<gid_type>;
 
         // returns whether lock has been acquired
         bool acquire_lock()
         {
-            internal_mutex_type::scoped_lock l(this);
+            std::lock_guard<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
             bool was_locked = (id_msb_ & is_locked_mask) ? true : false;
             if (!was_locked)
             {
@@ -397,7 +396,8 @@ namespace hpx { namespace naming
         void relinquish_lock()
         {
             util::ignore_lock(this);
-            internal_mutex_type::scoped_lock l(this);
+            std::lock_guard<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
             util::reset_ignored(this);
 
             id_msb_ &= ~is_locked_mask;

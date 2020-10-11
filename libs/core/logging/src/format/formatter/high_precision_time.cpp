@@ -50,7 +50,7 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
         void operator()(std::ostream& to) const override
         {
             auto const val = std::chrono::system_clock::now();
-            std::time_t tt = std::chrono::system_clock::to_time_t(val);
+            std::time_t const tt = std::chrono::system_clock::to_time_t(val);
 
 #if defined(__linux) || defined(linux) || defined(__linux__) ||                \
     defined(__FreeBSD__) || defined(__APPLE__)
@@ -63,20 +63,19 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
             // fall back to non-thread-safe version on other platforms
             std::tm local_tm;
             {
-                static boost::detail::spinlock mutex =
-                    BOOST_DETAIL_SPINLOCK_INIT;
-                std::unique_lock<boost::detail::spinlock> ul(mutex);
+                static hpx::util::detail::spinlock mutex;
+                std::lock_guard<hpx::util::detail::spinlock> ul(mutex);
                 local_tm = *std::localtime(&tt);
             }
 #endif
 
-            std::chrono::nanoseconds nanosecs =
+            std::chrono::nanoseconds const nanosecs =
                 std::chrono::duration_cast<std::chrono::nanoseconds>(
                     val.time_since_epoch());
-            std::chrono::microseconds microsecs =
+            std::chrono::microseconds const microsecs =
                 std::chrono::duration_cast<std::chrono::microseconds>(
                     val.time_since_epoch());
-            std::chrono::milliseconds millisecs =
+            std::chrono::milliseconds const millisecs =
                 std::chrono::duration_cast<std::chrono::milliseconds>(
                     val.time_since_epoch());
 

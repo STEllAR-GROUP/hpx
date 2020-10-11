@@ -7,11 +7,12 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 set(thread_support_headers
-    hpx/thread_support/set_thread_name.hpp
-    hpx/thread_support/thread_specific_ptr.hpp
     hpx/thread_support/assert_owns_lock.hpp
-    hpx/thread_support/unlock_guard.hpp
     hpx/thread_support/atomic_count.hpp
+    hpx/thread_support/set_thread_name.hpp
+    hpx/thread_support/spinlock.hpp
+    hpx/thread_support/thread_specific_ptr.hpp
+    hpx/thread_support/unlock_guard.hpp
 )
 
 # cmake-format: off
@@ -25,7 +26,7 @@ set(thread_support_compat_headers
 )
 # cmake-format: on
 
-set(thread_support_sources set_thread_name.cpp)
+set(thread_support_sources set_thread_name.cpp spinlock.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
