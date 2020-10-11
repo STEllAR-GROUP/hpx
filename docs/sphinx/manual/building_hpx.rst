@@ -167,11 +167,11 @@ Software and libraries
 
 In the simplest case, |hpx| depends on |boost|_ and |hwloc|_. So, before you
 read further, please make sure you have a recent version of |boost|_ installed
-on your target machine. |hpx| currently requires at least Boost V1.61.0 to work
+on your target machine. |hpx| currently requires at least Boost V1.65.0 to work
 properly. It may build and run with older versions, but we do not test |hpx|
 with those versions, so please be warned.
 
-The installation of Boost is described in detail in Boost's `Getting Started <https://www.boost.org/doc/libs/1_73_0/more/getting_started/index.html>`_
+The installation of Boost is described in detail in Boost's `Getting Started <https://www.boost.org/more/getting_started/index.html>`_
 document. However, if you've never used the Boost
 libraries (or even if you have), here's a quick primer:
 :ref:`boost_installation`.
@@ -220,7 +220,7 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      *
      *
    * * |boost_libraries|_
-     * 1.64.0
+     * 1.65.0
      *
    * * |hwloc|_
      * 1.5
@@ -252,7 +252,7 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      *
      *
    * * |boost|_
-     * 1.64.0
+     * 1.65.0
      *
    * * |hwloc|_
      * 1.5

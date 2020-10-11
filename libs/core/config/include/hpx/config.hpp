@@ -35,9 +35,9 @@
 
 #include <boost/version.hpp>
 
-#if BOOST_VERSION < 106100
+#if BOOST_VERSION < 106500
 // Please update your Boost installation (see www.boost.org for details).
-#error HPX cannot be compiled with a Boost version earlier than 1.61.0
+#error HPX cannot be compiled with a Boost version earlier than 1.65.0
 #endif
 
 #include <hpx/preprocessor/cat.hpp>
