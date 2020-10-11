@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2016 Hartmut Kaiser
+//  Copyright (c) 2011-2020 Hartmut Kaiser
 //  Copyright (c) 2016 Parsa Amini
 //  Copyright (c) 2016 Thomas Heller
 //
@@ -12,6 +12,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/agas/agas_fwd.hpp>
+#include <hpx/agas/gva.hpp>
+#include <hpx/agas/primary_namespace.hpp>
 #include <hpx/cache/lru_cache.hpp>
 #include <hpx/cache/statistics/local_full_statistics.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
@@ -19,11 +22,8 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
-#include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/agas/locality_namespace.hpp>
-#include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/agas/symbol_namespace.hpp>
-#include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
@@ -212,6 +212,11 @@ public:
       , naming::id_type const& id
       , std::int64_t compensated_credit
         );
+
+    server::primary_namespace& get_local_primary_namespace_service()
+    {
+        return primary_ns_.get_service();
+    }
 
     naming::address::address_type get_primary_ns_lva() const
     {

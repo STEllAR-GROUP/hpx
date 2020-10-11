@@ -22,7 +22,10 @@ namespace hpx { namespace test
             action_move_semantics, server::action_move_semantics
         > base_type;
 
-        action_move_semantics() {}
+        action_move_semantics() = default;
+        explicit action_move_semantics(naming::id_type const& id)
+          : base_type(id)
+        {}
         action_move_semantics(hpx::future<naming::id_type> && id)
           : base_type(std::move(id))
         {}

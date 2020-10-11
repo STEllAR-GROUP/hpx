@@ -8,7 +8,7 @@
 .. _full_modules:
 
 ==================
-Main |hpx| modules
+full modules
 ==================
 
 .. toctree::
@@ -16,6 +16,8 @@ Main |hpx| modules
 
    /libs/full/actions/docs/index.rst
    /libs/full/actions_base/docs/index.rst
+   /libs/full/agas/docs/index.rst
+   /libs/full/async_colocated/docs/index.rst
    /libs/full/async_cuda/docs/index.rst
    /libs/full/async_distributed/docs/index.rst
    /libs/full/async_mpi/docs/index.rst
@@ -32,6 +34,7 @@ Main |hpx| modules
    /libs/full/init_runtime/docs/index.rst
    /libs/full/lcos_distributed/docs/index.rst
    /libs/full/mpi_base/docs/index.rst
+   /libs/full/naming/docs/index.rst
    /libs/full/performance_counters/docs/index.rst
    /libs/full/program_options/docs/index.rst
    /libs/full/resiliency/docs/index.rst

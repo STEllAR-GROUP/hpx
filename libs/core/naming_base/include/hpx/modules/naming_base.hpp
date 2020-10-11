@@ -18,5 +18,4 @@ namespace hpx { namespace naming {
 
     constexpr std::uint32_t invalid_locality_id =
         ~static_cast<std::uint32_t>(0);
-
 }}    // namespace hpx::naming

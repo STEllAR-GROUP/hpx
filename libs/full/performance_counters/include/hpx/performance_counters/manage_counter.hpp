@@ -11,8 +11,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/naming.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 
 namespace hpx { namespace performance_counters {
     /// Install a new performance counter in a way, which will uninstall it

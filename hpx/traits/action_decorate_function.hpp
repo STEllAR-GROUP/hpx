@@ -8,7 +8,7 @@
 
 #include <hpx/concepts/has_xxx.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/naming.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 

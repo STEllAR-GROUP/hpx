@@ -6,5 +6,5 @@
 
 #pragma once
 
-#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/components_base/component_type.hpp>
 

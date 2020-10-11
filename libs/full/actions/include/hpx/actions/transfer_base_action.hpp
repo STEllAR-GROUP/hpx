@@ -17,12 +17,12 @@
 #include <hpx/actions/base_action.hpp>
 #include <hpx/actions/register_action.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
+#include <hpx/actions_base/detail/invocation_count_registry.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/action_stacksize.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
 #include <hpx/runtime_local/detail/serialize_exception.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
@@ -342,9 +342,9 @@ namespace hpx { namespace actions {
 }}    // namespace hpx::actions
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-#include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
+#include <hpx/actions_base/detail/per_action_data_counter_registry.hpp>
 
-namespace hpx { namespace parcelset { namespace detail {
+namespace hpx { namespace actions { namespace detail {
     /// \cond NOINTERNAL
     template <typename Action>
     void register_per_action_data_counter_types(
@@ -354,7 +354,7 @@ namespace hpx { namespace parcelset { namespace detail {
             hpx::actions::detail::get_action_name<Action>());
     }
     /// \endcond
-}}}       // namespace hpx::parcelset::detail
+}}}    // namespace hpx::actions::detail
 #endif    // HPX_HAVE_PARCELPORT_ACTION_COUNTERS
 
 #endif    // HPX_HAVE_NETWORKING

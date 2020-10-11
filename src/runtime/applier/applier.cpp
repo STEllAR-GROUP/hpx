@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assert.hpp>
+#include <hpx/agas/agas_fwd.hpp>
 #include <hpx/execution_base/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/threadmanager.hpp>
@@ -50,15 +51,10 @@ namespace hpx { namespace applier {
 
     void applier::initialize(std::uint64_t rts)
     {
-        naming::resolver_client& agas_client = get_agas_client();
+        naming::resolver_client& agas_client = naming::get_agas_client();
         runtime_support_id_ =
             naming::id_type(agas_client.get_local_locality().get_msb(), rts,
                 naming::id_type::unmanaged);
-    }
-
-    naming::resolver_client& applier::get_agas_client()
-    {
-        return hpx::naming::get_agas_client();
     }
 
 #if defined(HPX_HAVE_NETWORKING)

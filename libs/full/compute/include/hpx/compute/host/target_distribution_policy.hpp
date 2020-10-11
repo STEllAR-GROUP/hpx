@@ -16,7 +16,7 @@
 #include <hpx/async_local/dataflow.hpp>
 #endif
 #include <hpx/futures/future.hpp>
-#include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/runtime/components/create_component_helpers.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 
@@ -117,7 +117,7 @@ namespace hpx { namespace compute { namespace host {
         {
             target_type t = this->get_next_target();
             hpx::id_type target_locality = t.get_locality();
-            return components::stub_base<Component>::create_async(
+            return components::create_async<Component>(
                 target_locality, std::forward<Ts>(ts)..., std::move(t));
         }
 
@@ -172,9 +172,8 @@ namespace hpx { namespace compute { namespace host {
                 }
 
                 objs.push_back(
-                    components::stub_base<Component>::bulk_create_async(
-                        localities.back(), num_partitions, ts...,
-                        std::move(it->second)));
+                    components::bulk_create_async<Component>(localities.back(),
+                        num_partitions, ts..., std::move(it->second)));
             }
 
             return hpx::dataflow(

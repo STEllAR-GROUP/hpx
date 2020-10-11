@@ -39,6 +39,11 @@ struct test_client
 {
     typedef hpx::components::client_base<test_client, test_server> base_type;
 
+    explicit test_client(hpx::id_type const& id) noexcept
+      : base_type(id)
+    {
+    }
+
     test_client(hpx::future<hpx::id_type>&& id) noexcept
       : base_type(std::move(id))
     {
@@ -50,7 +55,7 @@ struct test_client
 ///////////////////////////////////////////////////////////////////////////////
 bool test_get_ptr1(hpx::id_type id)
 {
-    test_client t = test_client::create(id);
+    test_client t = hpx::new_<test_client>(id);
     HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_id());
 
     try {
@@ -71,7 +76,7 @@ bool test_get_ptr1(hpx::id_type id)
 
 bool test_get_ptr2(hpx::id_type id)
 {
-    test_client t = test_client::create(id);
+    test_client t = hpx::new_<test_client>(id);
     HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_id());
 
     hpx::future<std::shared_ptr<test_server> > f =
@@ -98,7 +103,7 @@ bool test_get_ptr2(hpx::id_type id)
 ///////////////////////////////////////////////////////////////////////////////
 bool test_get_ptr3(hpx::id_type id)
 {
-    test_client t = test_client::create(id);
+    test_client t = hpx::new_<test_client>(id);
     HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_id());
 
     try {
@@ -117,7 +122,7 @@ bool test_get_ptr3(hpx::id_type id)
 
 bool test_get_ptr4(hpx::id_type id)
 {
-    test_client t = test_client::create(id);
+    test_client t = hpx::new_<test_client>(id);
     HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_id());
 
     hpx::future<std::shared_ptr<test_server> > f = hpx::get_ptr(t);

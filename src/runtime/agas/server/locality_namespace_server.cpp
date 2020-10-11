@@ -9,10 +9,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/agas/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/modules/format.hpp>
+#include <hpx/components_base/component_type.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -20,8 +22,6 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
-#include <hpx/runtime/agas/server/primary_namespace.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/timing/scoped_timer.hpp>
 #include <hpx/util/get_and_reset_value.hpp>

@@ -15,6 +15,7 @@
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
+#include <hpx/agas/agas_fwd.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>

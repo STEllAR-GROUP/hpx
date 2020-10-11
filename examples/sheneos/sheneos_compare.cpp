@@ -369,8 +369,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
         // Create a distributed interpolation object with the name
         // shen_symbolic_name. The interpolation object will have
         // num_partitions partitions
-        sheneos::interpolator shen;
-        shen.create(datafilename, shen_symbolic_name, num_partitions);
+        sheneos::interpolator shen = hpx::new_<sheneos::interpolator>(
+            hpx::find_here(), datafilename, shen_symbolic_name, num_partitions);
+
         FNAME(read_nuc_table)();
         std::cout << "Created interpolator: " << t.elapsed() << " [s]"
                   << std::endl;

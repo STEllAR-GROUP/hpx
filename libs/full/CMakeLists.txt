@@ -13,6 +13,8 @@ include(HPX_Message)
 set(_hpx_full_modules
     actions
     actions_base
+    agas
+    async_colocated
     async_cuda
     async_distributed
     async_mpi
@@ -29,6 +31,7 @@ set(_hpx_full_modules
     init_runtime
     lcos_distributed
     mpi_base
+    naming
     performance_counters
     program_options
     resiliency
@@ -42,7 +45,7 @@ set(_hpx_full_modules
 # cmake-format: on
 
 hpx_info("")
-hpx_info("Configuring libhpx modules:")
+hpx_info("Configuring libhpx_full modules:")
 
 foreach(module ${_hpx_full_modules})
   add_subdirectory(${module})

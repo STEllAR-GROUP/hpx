@@ -154,7 +154,7 @@ namespace libfabric
         if (!parcelport_enabled_) return false;
 
 #ifndef HPX_PARCELPORT_LIBFABRIC_HAVE_PMI
-        auto &as = this->applier_->get_agas_client();
+        auto &as = naming::get_agas_client();
         libfabric_controller_->initialize_localities(as);
 #endif
 

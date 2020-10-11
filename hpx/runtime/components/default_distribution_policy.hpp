@@ -19,7 +19,7 @@
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/modules/execution.hpp>
-#include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/runtime/components/create_component_helpers.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -106,15 +106,13 @@ namespace hpx { namespace components
         template <typename Component, typename ...Ts>
         hpx::future<hpx::id_type> create(Ts&&... vs) const
         {
-            using components::stub_base;
-
             if (localities_)
             {
                 for (hpx::id_type const& loc: *localities_)
                 {
                     if (get_num_items(1, loc) != 0)
                     {
-                        return stub_base<Component>::create_async(
+                        return create_async<Component>(
                             loc, std::forward<Ts>(vs)...);
                     }
                 }
@@ -122,7 +120,7 @@ namespace hpx { namespace components
 
             // by default the object will be created on the current
             // locality
-            return stub_base<Component>::create_async(
+            return create_async<Component>(
                 hpx::find_here(), std::forward<Ts>(vs)...);
         }
 
@@ -148,8 +146,6 @@ namespace hpx { namespace components
         hpx::future<std::vector<bulk_locality_result> >
         bulk_create(std::size_t count, Ts&&... vs) const
         {
-            using components::stub_base;
-
             if (localities_ && localities_->size() > 1)
             {
                 // schedule creation of all objects across given localities
@@ -157,7 +153,7 @@ namespace hpx { namespace components
                 objs.reserve(localities_->size());
                 for (hpx::id_type const& loc: *localities_)
                 {
-                    objs.push_back(stub_base<Component>::bulk_create_async(
+                    objs.push_back(bulk_create_async<Component>(
                         loc, get_num_items(count, loc), vs...));
                 }
 
@@ -185,8 +181,8 @@ namespace hpx { namespace components
             // handle special cases
             hpx::id_type id = get_next_target();
 
-            hpx::future<std::vector<hpx::id_type> > f =
-                stub_base<Component>::bulk_create_async(
+            hpx::future<std::vector<hpx::id_type>> f =
+                bulk_create_async<Component>(
                     id, count, std::forward<Ts>(vs)...);
 
             return f.then(hpx::launch::sync,

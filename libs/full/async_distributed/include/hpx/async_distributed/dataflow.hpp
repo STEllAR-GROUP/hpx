@@ -26,8 +26,8 @@
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/naming.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>

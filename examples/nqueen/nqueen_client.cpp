@@ -57,7 +57,6 @@ int hpx_main(hpx::program_options::variables_map&)
             for(std::list<nqueen::board>::iterator iter = b.begin();
                 iter != b.end(); ++iter)
             {
-                iter->create(locality_);
                 iter->init_board(sz);
                 soln_count_total+= iter->solve_board(iter->access_board(),
                                                      sz, 0, i);
@@ -81,7 +80,6 @@ int hpx_main(hpx::program_options::variables_map&)
             for(std::vector<nqueen::board>::iterator iter = b.begin();
                 iter != b.end(); ++iter)
             {
-                iter->create(locality_);
                 iter->init_board(default_size);
                 soln_count_total+= iter->solve_board(iter->access_board(),
                                                      default_size, 0, i);

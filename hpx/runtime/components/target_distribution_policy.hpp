@@ -19,7 +19,7 @@
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/runtime/components/create_component_helpers.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -71,7 +71,7 @@ namespace hpx { namespace components
         {
             // by default the object will be created on the current
             // locality
-            return components::stub_base<Component>::create_async(
+            return components::create_async<Component>(
                 get_next_target(), std::forward<Ts>(vs)...);
         }
 
@@ -101,7 +101,7 @@ namespace hpx { namespace components
             // locality
             hpx::id_type id = get_next_target();
             hpx::future<std::vector<hpx::id_type> > f =
-                components::stub_base<Component>::bulk_create_async(
+                components::bulk_create_async<Component>(
                     id, count, std::forward<Ts>(vs)...);
 
             return f.then(hpx::launch::sync,

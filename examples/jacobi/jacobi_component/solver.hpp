@@ -42,7 +42,9 @@ namespace jacobi
 
             HPX_ASSERT(localities.size() > 0);
 
-            this->create(localities[0], g, nx, line_block);
+            this->base_type::operator=(
+                hpx::components::create_async<server::solver>(
+                    localities[0], g, nx, line_block));
         }
 
         void run(std::size_t max_iterations)

@@ -13,7 +13,6 @@
 
 #include <utility>
 
-using hpx::components::stub_base;
 using hpx::components::client_base;
 using hpx::components::component;
 using hpx::components::component_base;
@@ -42,6 +41,8 @@ struct hello_world : client_base<hello_world, hello_world_server>
 {
     typedef client_base<hello_world, hello_world_server> base_type;
 
+    hello_world() = default;
+    explicit hello_world(hpx::id_type const& id) : base_type(id) {}
     hello_world(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
 
     void print() { async<print_action>(this->get_id()).get(); }
@@ -50,7 +51,7 @@ struct hello_world : client_base<hello_world, hello_world_server>
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    hello_world hw = hello_world::create(find_here());
+    hello_world hw = hpx::new_<hello_world>(find_here());
 
     hw.print();
 

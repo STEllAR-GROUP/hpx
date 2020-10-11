@@ -18,10 +18,10 @@
 #include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/checkpoint_base/checkpoint_data.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/naming.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/get_ptr.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/traits/is_client.hpp>

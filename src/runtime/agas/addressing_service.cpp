@@ -11,11 +11,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
+#include <hpx/agas/primary_namespace.hpp>
+#include <hpx/agas/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/async_distributed/apply.hpp>
+#include <hpx/components_base/traits/component_supports_migration.hpp>
 #include <hpx/execution_base/register_locks.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
@@ -28,6 +31,7 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
+#include <hpx/performance_counters/server/primary_namespace_counters.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
@@ -35,10 +39,8 @@
 #include <hpx/runtime/agas/detail/bootstrap_locality_namespace.hpp>
 #include <hpx/runtime/agas/locality_namespace.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
-#include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
-#include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/find_here.hpp>
@@ -52,7 +54,6 @@
 #include <hpx/serialization/vector.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
-#include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/insert_checked.hpp>
@@ -2491,7 +2492,7 @@ void addressing_service::register_counter_types()
         counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
     // install counters for services
-    primary_ns_.register_counter_types();
+    primary_namespace_register_counter_types();
     component_ns_->register_counter_types();
     locality_ns_->register_counter_types();
     symbol_ns_.register_counter_types();

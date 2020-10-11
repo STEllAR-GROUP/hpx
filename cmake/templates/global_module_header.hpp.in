@@ -11,5 +11,4 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_MODULE_@modulename_upper@)
-@module_headers@
-#endif
+@module_headers@#endif

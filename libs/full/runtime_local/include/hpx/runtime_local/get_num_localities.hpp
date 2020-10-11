@@ -11,9 +11,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/components_base/component_type.hpp>
 #include <hpx/futures/future_fwd.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 
 #include <cstdint>
 

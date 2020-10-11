@@ -11,8 +11,9 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
+#include <hpx/components_base/component_type.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/copy_component.hpp>
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/components/server/distributed_metadata_base.hpp>
@@ -21,7 +22,6 @@
 #include <hpx/serialization/unordered_map.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/functional/bind_front.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>

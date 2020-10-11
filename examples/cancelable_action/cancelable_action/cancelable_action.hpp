@@ -11,6 +11,8 @@
 
 #include "stubs/cancelable_action.hpp"
 
+#include <utility>
+
 namespace examples
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -33,7 +35,11 @@ namespace examples
         /// Create a client side representation of an object which is newly
         /// created on the given locality
         explicit cancelable_action(hpx::naming::id_type const& target_gid)
-          : base_type(stub_type::create_async(target_gid))
+          : base_type(hpx::new_<cancelable_action>(target_gid))
+        {}
+
+        cancelable_action(hpx::future<hpx::id_type>&& target_gid)
+          : base_type(std::move(target_gid))
         {}
 
         ///////////////////////////////////////////////////////////////////////

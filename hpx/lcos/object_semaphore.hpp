@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_distributed/async.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/lcos/server/object_semaphore.hpp>
 #include <hpx/runtime/components/client_base.hpp>
@@ -50,7 +51,7 @@ namespace hpx { namespace lcos
         void signal(launch::sync_policy,
             ValueType const& val, std::uint64_t count = 1)
         {
-            signal(hpx::async, val, count).get();
+            signal(hpx::launch::async, val, count).get();
         }
 
         ///////////////////////////////////////////////////////////////////////

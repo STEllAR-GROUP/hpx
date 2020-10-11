@@ -13,9 +13,9 @@
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
+#include <hpx/runtime/components/create_component_helpers.hpp>
 #include <hpx/runtime/components/default_distribution_policy.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
-#include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
@@ -264,8 +264,7 @@ namespace hpx { namespace components
             template <typename ...Ts>
             static type call(hpx::id_type const& locality, Ts&&... vs)
             {
-                using components::stub_base;
-                return stub_base<Component>::create_async(
+                return components::create_async<Component>(
                     locality, std::forward<Ts>(vs)...);
             }
 
@@ -286,8 +285,7 @@ namespace hpx { namespace components
             static type call(hpx::id_type const& locality, std::size_t count,
                 Ts&&... vs)
             {
-                using components::stub_base;
-                return stub_base<Component>::bulk_create_async(
+                return components::bulk_create_async<Component>(
                     locality, count, std::forward<Ts>(vs)...);
             }
 
@@ -452,9 +450,8 @@ namespace hpx { namespace components
             template <typename ...Ts>
             static type call(hpx::id_type const& locality, Ts&&... vs)
             {
-                using components::stub_base;
                 return make_client<Client>(
-                    stub_base<component_type>::create_async(
+                    components::create_async<component_type>(
                         locality, std::forward<Ts>(vs)...));
             }
 

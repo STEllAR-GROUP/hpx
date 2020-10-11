@@ -45,12 +45,10 @@ HPX_REGISTER_ACTION(print_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 struct hello_world
-  : hpx::components::client_base<
-        hello_world, hpx::components::stub_base<hello_world_server> >
+  : hpx::components::client_base<hello_world, hello_world_server>
 {
-    typedef hpx::components::client_base<
-        hello_world, hpx::components::stub_base<hello_world_server>
-    > base_type;
+    typedef hpx::components::client_base<hello_world, hello_world_server>
+        base_type;
 
     hello_world(hpx::future<hpx::id_type>&& id)
       : base_type(std::move(id))

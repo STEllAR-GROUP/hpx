@@ -11,17 +11,18 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/agas/agas_fwd.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/modules/errors.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/modules/logging.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>

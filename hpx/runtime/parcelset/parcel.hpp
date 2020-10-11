@@ -15,10 +15,9 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/naming.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>

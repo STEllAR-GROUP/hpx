@@ -14,10 +14,10 @@
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
+#include <hpx/agas/agas_fwd.hpp>
+#include <hpx/components_base/component_type.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime/agas_fwd.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 

@@ -13,14 +13,14 @@
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/modules/naming.hpp>
 #include <hpx/runtime/basename_registration_fwd.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/get_colocation_id.hpp>
-#include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
-#include <hpx/runtime_local/get_num_localities.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>
+#include <hpx/runtime_local/get_locality_id.hpp>
+#include <hpx/runtime_local/get_num_localities.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2017 Hartmut Kaiser
+# Copyright (c) 2007-2020 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -6,19 +6,14 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    apply_colocated
     apply_local
     apply_local_executor
     apply_remote
     apply_remote_client
-    async_cb_colocated
     async_cb_remote
     async_cb_remote_client
-    async_colocated
     async_continue
     async_continue_cb
-    async_continue_cb_colocated
-    async_continue_colocated
     async_local
     async_local_executor
     async_remote
@@ -28,18 +23,15 @@ set(tests
     sync_remote
 )
 
-set(apply_colocated_PARAMETERS LOCALITIES 2)
 set(apply_remote_PARAMETERS LOCALITIES 2)
 set(apply_remote_client_PARAMETERS LOCALITIES 2)
 set(apply_local_PARAMETERS THREADS_PER_LOCALITY 4)
 set(apply_local_executor_PARAMETERS THREADS_PER_LOCALITY 4)
-set(async_cb_colocated_PARAMETERS LOCALITIES 2)
 set(async_local_PARAMETERS THREADS_PER_LOCALITY 4)
 set(async_local_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(async_continue_PARAMETERS LOCALITIES 2)
 set(async_continue_cb_PARAMETERS LOCALITIES 2)
-set(async_continue_cb_colocated_PARAMETERS LOCALITIES 2)
 set(async_remote_PARAMETERS LOCALITIES 2)
 set(async_remote_client_PARAMETERS LOCALITIES 2)
 set(async_cb_remote_PARAMETERS LOCALITIES 2)

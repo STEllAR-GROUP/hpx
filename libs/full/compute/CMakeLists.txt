@@ -59,7 +59,12 @@ add_hpx_module(
   COMPAT_HEADERS ${compute_compat_headers}
   DEPENDENCIES hpx_core hpx_parallelism
   MODULE_DEPENDENCIES
-    hpx_program_options hpx_resource_partitioner hpx_runtime_configuration
-    hpx_runtime_local hpx_threadmanager ${compute_optional_module_dependencies}
+    hpx_naming
+    hpx_program_options
+    hpx_resource_partitioner
+    hpx_runtime_configuration
+    hpx_runtime_local
+    hpx_threadmanager
+    ${compute_optional_module_dependencies}
   CMAKE_SUBDIRS examples tests
 )

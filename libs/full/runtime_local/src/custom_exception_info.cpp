@@ -14,7 +14,6 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/threading.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/runtime_local/config_entry.hpp>

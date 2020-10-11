@@ -13,7 +13,7 @@
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/get_ptr.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/traits/component_supports_migration.hpp>
+#include <hpx/components_base/traits/component_supports_migration.hpp>
 
 #include <cstdint>
 #include <memory>

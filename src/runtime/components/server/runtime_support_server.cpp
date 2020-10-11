@@ -389,7 +389,7 @@ namespace hpx { namespace components { namespace server {
         bool dijkstra_token)
     {
         applier::applier& appl = hpx::applier::get_applier();
-        naming::resolver_client& agas_client = appl.get_agas_client();
+        naming::resolver_client& agas_client = naming::get_agas_client();
 
         agas_client.start_shutdown();
 
@@ -512,7 +512,7 @@ namespace hpx { namespace components { namespace server {
                       "initializing application shutdown";
 
         applier::applier& appl = hpx::applier::get_applier();
-        naming::resolver_client& agas_client = appl.get_agas_client();
+        naming::resolver_client& agas_client = naming::get_agas_client();
 
         agas_client.start_shutdown();
 
@@ -578,8 +578,7 @@ namespace hpx { namespace components { namespace server {
     void runtime_support::terminate_all()
     {
         std::vector<naming::gid_type> locality_ids;
-        applier::applier& appl = hpx::applier::get_applier();
-        appl.get_agas_client().get_localities(locality_ids);
+        naming::get_agas_client().get_localities(locality_ids);
         std::reverse(locality_ids.begin(), locality_ids.end());
 
         // Terminate all localities except the local one, we can't use
@@ -696,7 +695,7 @@ namespace hpx { namespace components { namespace server {
 
             applier::applier& appl = hpx::applier::get_applier();
             threads::threadmanager& tm = appl.get_thread_manager();
-            naming::resolver_client& agas_client = appl.get_agas_client();
+            naming::resolver_client& agas_client = naming::get_agas_client();
 
             hpx::chrono::high_resolution_timer t;
             double start_time = t.elapsed();

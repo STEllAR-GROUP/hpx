@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/plain_action.hpp>
+#include <hpx/async_colocated/async_colocated.hpp>
 #include <hpx/async_distributed/async.hpp>
-#include <hpx/async_distributed/detail/async_colocated.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/server/copy_component.hpp>

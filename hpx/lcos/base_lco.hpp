@@ -12,9 +12,9 @@
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/component_action.hpp>
+#include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/get_lva.hpp>
 #include <hpx/lcos_fwd.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>

@@ -20,13 +20,8 @@ set(async_headers
     hpx/async_distributed/applier/apply_continue_callback.hpp
     hpx/async_distributed/applier/apply_continue_fwd.hpp
     hpx/async_distributed/applier/apply_continue.hpp
-    hpx/async_distributed/applier/apply_helper.hpp
     hpx/async_distributed/applier/apply.hpp
     hpx/async_distributed/applier/bind_naming_wrappers.hpp
-    hpx/async_distributed/applier/detail/apply_colocated_callback_fwd.hpp
-    hpx/async_distributed/applier/detail/apply_colocated_callback.hpp
-    hpx/async_distributed/applier/detail/apply_colocated_fwd.hpp
-    hpx/async_distributed/applier/detail/apply_colocated.hpp
     hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp
     hpx/async_distributed/applier/detail/apply_implementations.hpp
     hpx/async_distributed/applier_fwd.hpp
@@ -41,10 +36,6 @@ set(async_headers
     hpx/async_distributed/async_continue.hpp
     hpx/async_distributed/async.hpp
     hpx/async_distributed/dataflow.hpp
-    hpx/async_distributed/detail/async_colocated_callback_fwd.hpp
-    hpx/async_distributed/detail/async_colocated_callback.hpp
-    hpx/async_distributed/detail/async_colocated_fwd.hpp
-    hpx/async_distributed/detail/async_colocated.hpp
     hpx/async_distributed/detail/async_implementations_fwd.hpp
     hpx/async_distributed/detail/async_implementations.hpp
     hpx/async_distributed/detail/async_unwrap_result_implementations_fwd.hpp
@@ -93,7 +84,7 @@ add_hpx_module(
   HEADERS ${async_headers}
   COMPAT_HEADERS ${async_compat_headers}
   DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES hpx_actions_base hpx_runtime_configuration
+  MODULE_DEPENDENCIES hpx_actions hpx_naming hpx_runtime_configuration
                       hpx_runtime_local hpx_threadmanager
   CMAKE_SUBDIRS examples tests
 )

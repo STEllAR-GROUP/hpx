@@ -21,7 +21,8 @@ void interrupt_do_it(examples::cancelable_action ca)
 void handle_interruption_using_exception(hpx::id_type const& id)
 {
     // create a component encapsulating the 'do_it' operation
-    examples::cancelable_action ca(id);
+    examples::cancelable_action ca =
+        hpx::new_<examples::server::cancelable_action>(id);
 
     // start a separate thread which will wait for a while and interrupt
     // the 'do_it' operation
@@ -44,7 +45,8 @@ void handle_interruption_using_exception(hpx::id_type const& id)
 void handle_interruption_using_error_code(hpx::id_type const& id)
 {
     // create a component encapsulating the 'do_it' operation
-    examples::cancelable_action ca(id);
+    examples::cancelable_action ca =
+        hpx::new_<examples::server::cancelable_action>(id);
 
     // start a separate thread which will wait for a while and interrupt
     // the 'do_it' operation

@@ -57,7 +57,7 @@ void test_find_all_clients_from_basename()
 {
     char const* basename = "/find_all_clients_from_prefix_test/";
 
-    test_client t1 = test_client::create(hpx::find_here());
+    test_client t1 = hpx::new_<test_client>(hpx::find_here());
 
     // register our component with AGAS
     HPX_TEST((hpx::register_with_basename(basename, t1).get()));
@@ -92,7 +92,7 @@ void test_find_clients_from_basename()
 {
     char const* basename = "/find_clients_from_prefix_test/";
 
-    test_client t1 = test_client::create(hpx::find_here());
+    test_client t1 = hpx::new_<test_client>(hpx::find_here());
 
     // register our component with AGAS
     HPX_TEST((hpx::register_with_basename(basename, t1).get()));
@@ -134,7 +134,7 @@ void test_find_client_from_basename()
 {
     char const* basename = "/find_client_from_prefix_test/";
 
-    test_client t1 = test_client::create(hpx::find_here());
+    test_client t1 = hpx::new_<test_client>(hpx::find_here());
 
     // register our component with AGAS
     HPX_TEST((hpx::register_with_basename(basename, t1).get()));

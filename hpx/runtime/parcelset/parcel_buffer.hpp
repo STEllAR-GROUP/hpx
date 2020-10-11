@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/performance_counters/parcels/data_point.hpp>
+#include <hpx/runtime/parcelset/detail/data_point.hpp>
 #include <hpx/serialization/serialization_chunk.hpp>
 
 #include <cstdint>

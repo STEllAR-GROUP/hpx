@@ -93,7 +93,12 @@ add_hpx_module(
   COMPAT_HEADERS ${runtime_local_compat_headers}
   DEPENDENCIES hpx_core hpx_parallelism
   MODULE_DEPENDENCIES
-    hpx_command_line_handling hpx_program_options hpx_resource_partitioner
-    hpx_runtime_configuration hpx_threadmanager hpx_thread_executors
+    hpx_command_line_handling
+    hpx_components_base
+    hpx_program_options
+    hpx_resource_partitioner
+    hpx_runtime_configuration
+    hpx_threadmanager
+    hpx_thread_executors
   CMAKE_SUBDIRS examples tests
 )

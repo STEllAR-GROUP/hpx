@@ -12,9 +12,9 @@
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/plain_action.hpp>
+#include <hpx/components_base/component_type.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/serialization/vector.hpp>
 
 #include <cstddef>

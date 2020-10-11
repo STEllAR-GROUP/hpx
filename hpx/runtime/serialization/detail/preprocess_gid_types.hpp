@@ -9,9 +9,9 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/naming.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/serialization/detail/extra_archive_data.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 

@@ -16,6 +16,8 @@
 
 #include "stubs/managed_refcnt_checker.hpp"
 
+#include <utility>
+
 namespace hpx { namespace test
 {
 
@@ -35,10 +37,13 @@ struct managed_refcnt_monitor
     lcos::future<void> flag_;
     naming::id_type const locality_;
 
-    using base_type::create;
-
   public:
     typedef server::managed_refcnt_checker server_type;
+
+    managed_refcnt_monitor(hpx::future<id_type>&& id)
+      : base_type(std::move(id))
+    {
+    }
 
     /// Create a new component on the target locality.
     explicit managed_refcnt_monitor(naming::gid_type const& locality)
@@ -49,7 +54,8 @@ struct managed_refcnt_monitor
             naming::get_locality_from_gid(locality), naming::id_type::unmanaged)
     {
         static_cast<base_type&>(*this) =
-            stub_type::create_async(locality_, flag_promise_.get_id());
+            hpx::new_<server::managed_refcnt_checker>(
+                locality_, flag_promise_.get_id());
     }
 
     /// Create a new component on the target locality.
@@ -60,7 +66,8 @@ struct managed_refcnt_monitor
       , locality_(naming::get_locality_from_id(locality))
     {
         static_cast<base_type&>(*this) =
-            stub_type::create_async(locality_, flag_promise_.get_id());
+            hpx::new_<server::managed_refcnt_checker>(
+                locality_, flag_promise_.get_id());
     }
 
     lcos::future<void> take_reference_async(
@@ -98,7 +105,7 @@ struct managed_refcnt_monitor
         // Schedule a wakeup.
         threads::set_thread_state(threads::get_self_id(), d, threads::pending);
 
-        // Suspend this pxthread.
+        // Suspend this thread.
         threads::get_self().yield(
             threads::thread_result_type(threads::suspended,
                 hpx::threads::invalid_thread_id)
@@ -119,27 +126,26 @@ struct managed_object
       , stubs::managed_refcnt_checker
     > base_type;
 
-  private:
-    using base_type::create;
-
   public:
     typedef server::managed_refcnt_checker server_type;
 
+    managed_object(hpx::future<id_type>&& id)
+      : base_type(std::move(id))
+    {
+    }
+
     /// Create a new component on the target locality.
-    explicit managed_object(
-        naming::gid_type const& locality
-        )
-      : base_type(stub_type::create_async(
+    explicit managed_object(naming::gid_type const& locality)
+      : base_type(hpx::new_<server::managed_refcnt_checker>(
             naming::id_type(locality, naming::id_type::unmanaged),
             naming::invalid_id))
     {
     }
 
     /// Create a new component on the target locality.
-    explicit managed_object(
-        naming::id_type const& locality
-        )
-      : base_type(stub_type::create_async(locality, naming::invalid_id))
+    explicit managed_object(naming::id_type const& locality)
+      : base_type(hpx::new_<server::managed_refcnt_checker>(
+            locality, naming::invalid_id))
     {
     }
 };
