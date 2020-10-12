@@ -232,6 +232,14 @@ namespace boost
             "std::uniform_real_distribution", "random"},
         {"(\\bstd\\s*::\\s*exponential_distribution\\b)",
             "std::exponential_distribution", "random"},
+        // system_error
+        {"(\\bstd\\s*::\\s*error_code\\b)", "std::error_code", "system_error"},
+        {"(\\bstd\\s*::\\s*error_condition\\b)", "std::error_condition",
+            "system_error"},
+        {"(\\bstd\\s*::\\s*error_category\\b)", "std::error_category",
+            "system_error"},
+        {"(\\bstd\\s*::\\s*system_error\\b)", "std::system_error",
+            "system_error"},
         // boost
         {"(\\bhpx\\s*::\\s*intrusive_ptr\\b)", "hpx::intrusive_ptr",
             "hpx/modules/memory.hpp"},

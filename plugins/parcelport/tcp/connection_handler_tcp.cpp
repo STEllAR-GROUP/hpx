@@ -42,6 +42,7 @@
 #include <mutex>
 #include <sstream>
 #include <string>
+#include <system_error>
 
 namespace hpx { namespace parcelset { namespace policies { namespace tcp
 {

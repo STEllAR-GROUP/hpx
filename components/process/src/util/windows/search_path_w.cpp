@@ -24,6 +24,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 
 namespace hpx { namespace components { namespace process { namespace windows
 {
