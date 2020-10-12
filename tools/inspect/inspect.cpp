@@ -808,11 +808,7 @@ void print_output(std::ostream& out, inspector_list const& inspectors);
 
 //  cpp_main()  --------------------------------------------------------------//
 
-#if !INSPECT_USE_BOOST_TEST
-int main( int argc_param, char * argv_param[] )
-#else
 int cpp_main( int argc_param, char * argv_param[] )
-#endif
 {
     using namespace hpx::program_options;
     options_description desc_commandline(
@@ -1225,3 +1221,21 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
       "</html>\n";
   }
 }
+
+#if !INSPECT_USE_BOOST_TEST
+int main(int argc, char* argv[])
+{
+    try
+    {
+        return cpp_main(argc, argv);
+    }
+    catch (std::exception const& e)
+    {
+        std::cerr << "caught exception: " << e.what() << "\n";
+    }
+    catch (...)
+    {
+        std::cerr << "caught unknown exception\n";
+    }
+}
+#endif
