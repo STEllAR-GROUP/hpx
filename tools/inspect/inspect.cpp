@@ -910,6 +910,7 @@ int cpp_main( int argc_param, char * argv_param[] )
             .run()
         );
     store(opts, vm);
+    notify(vm);
 
     std::size_t limit;
 
