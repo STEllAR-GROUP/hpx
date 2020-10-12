@@ -5,6 +5,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/system/system_error.hpp
+// hpxinspect:nodeprecatedname:boost::system::system_error
+
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/errors/error.hpp>

@@ -5,6 +5,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/system/error_code.hpp
+// hpxinspect:nodeprecatedname:boost::system::error_code
+// hpxinspect:nodeprecatedinclude:boost/system/system_error.hpp
+// hpxinspect:nodeprecatedname:boost::system::system_error
+
 #include <hpx/config.hpp>
 #include <hpx/asio/asio_util.hpp>
 #include <hpx/util/from_string.hpp>
@@ -23,6 +28,7 @@
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/system/error_code.hpp>
+#include <boost/system/system_error.hpp>
 
 #include <ctime>
 #include <exception>

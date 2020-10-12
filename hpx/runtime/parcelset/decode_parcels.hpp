@@ -5,6 +5,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/system/system_error.hpp
+// hpxinspect:nodeprecatedname:boost::system::system_error
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -26,6 +29,7 @@
 #if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
 #include <boost/exception/exception.hpp>
 #endif
+#include <boost/system/system_error.hpp>
 
 #include <cstddef>
 #include <cstdint>

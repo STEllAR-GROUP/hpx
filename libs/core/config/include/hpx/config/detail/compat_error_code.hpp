@@ -4,6 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/system/error_code.hpp
+// hpxinspect:nodeprecatedname:boost::system::error_code
+
 #pragma once
 
 #include <hpx/config.hpp>

@@ -10,6 +10,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/system/error_code.hpp
+// hpxinspect:nodeprecatedname:boost::system::error_code
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -33,6 +36,7 @@
 #include <boost/asio/placeholders.hpp>
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
+#include <boost/system/error_code.hpp>
 /* The boost asio support includes termios.h.
  * The termios.h file on ppc64le defines these macros, which
  * are also used by blaze, blaze_tensor as Template names.
