@@ -136,6 +136,7 @@ namespace hpx { namespace serialization {
         void reset()
         {
             size_ = 0;
+            extra_data_.reset();
         }
 
         // access extra data stored

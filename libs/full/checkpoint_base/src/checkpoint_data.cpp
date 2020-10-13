@@ -12,8 +12,7 @@ namespace hpx { namespace serialization { namespace detail {
 
     // This is explicitly instantiated to ensure that the id is stable across
     // shared libraries.
-    void
-    extra_archive_data_id_helper<hpx::util::checkpointing_tag>::id() noexcept
+    void extra_archive_data_helper<hpx::util::checkpointing_tag>::id() noexcept
     {
     }
 }}}    // namespace hpx::serialization::detail

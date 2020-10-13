@@ -15,19 +15,30 @@
 namespace hpx { namespace serialization { namespace detail {
 
     template <typename T>
-    struct extra_archive_data_id_helper
+    struct extra_archive_data_helper
     {
         // this is intentionally left unimplemented, will lead to linker errors
         // if used with unknown data type
         static void id() noexcept;
+
+        // this is a function that should e implemented in order to reset the
+        // extra archive data item
+        static constexpr void reset(T* data) noexcept;
     };
 
     using extra_archive_data_id_type = void (*)();
 
     template <typename T>
-    constexpr extra_archive_data_id_type extra_archive_data_id()
+    constexpr extra_archive_data_id_type extra_archive_data_id() noexcept
     {
-        return &extra_archive_data_id_helper<T>::id;
+        return &extra_archive_data_helper<T>::id;
+    }
+
+    template <typename T>
+    constexpr void reset_extra_archive_data(T* data) noexcept(
+        noexcept(extra_archive_data_helper<T>::reset(data)))
+    {
+        extra_archive_data_helper<T>::reset(data);
     }
 
     struct extra_archive_data_member_base;
@@ -64,6 +75,7 @@ namespace hpx { namespace serialization { namespace detail {
         }
 
         virtual ~extra_archive_data_member_base() = default;
+        virtual void reset() = 0;
 
         extra_archive_data_node next_;
     };
@@ -84,6 +96,11 @@ namespace hpx { namespace serialization { namespace detail {
         T* value() noexcept
         {
             return std::addressof(t_);
+        }
+
+        void reset() override
+        {
+            reset_extra_archive_data(&t_);
         }
 
         T t_;
@@ -139,6 +156,17 @@ namespace hpx { namespace serialization { namespace detail {
         T* try_get() noexcept
         {
             return head_.get<T>();
+        }
+
+        // reset all extra archive data
+        void reset()
+        {
+            auto* ptr = head_.ptr_.get();
+            while (ptr != nullptr)
+            {
+                ptr->reset();
+                ptr = ptr->next_.ptr_.get();
+            }
         }
 
         extra_archive_data_node head_;
