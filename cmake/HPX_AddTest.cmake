@@ -6,7 +6,9 @@
 
 function(add_hpx_test category name)
   set(options FAILURE_EXPECTED RUN_SERIAL)
-  set(one_value_args EXECUTABLE LOCALITIES THREADS_PER_LOCALITY RUNWRAPPER)
+  set(one_value_args EXECUTABLE LOCALITIES THREADS_PER_LOCALITY TIMEOUT
+                     RUNWRAPPER
+  )
   set(multi_value_args ARGS PARCELPORTS)
   cmake_parse_arguments(
     ${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN}
@@ -113,6 +115,11 @@ function(add_hpx_test category name)
     if(${run_serial})
       set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
     endif()
+    if(${name}_TIMEOUT)
+      set_tests_properties(
+        "${_full_name}" PROPERTIES TIMEOUT ${${name}_TIMEOUT}
+      )
+    endif()
   else()
     if(HPX_WITH_PARCELPORT_VERBS)
       set(_add_test FALSE)
@@ -129,6 +136,11 @@ function(add_hpx_test category name)
         set(_full_name "${category}.distributed.verbs.${name}")
         add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "verbs" ${args})
         set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
+        if(${name}_TIMEOUT)
+          set_tests_properties(
+            "${_full_name}" PROPERTIES TIMEOUT ${${name}_TIMEOUT}
+          )
+        endif()
       endif()
     endif()
     if(HPX_WITH_PARCELPORT_MPI)
@@ -148,6 +160,11 @@ function(add_hpx_test category name)
                                               ${args}
         )
         set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
+        if(${name}_TIMEOUT)
+          set_tests_properties(
+            "${_full_name}" PROPERTIES TIMEOUT ${${name}_TIMEOUT}
+          )
+        endif()
       endif()
     endif()
     if(HPX_WITH_PARCELPORT_TCP)
@@ -165,10 +182,14 @@ function(add_hpx_test category name)
         set(_full_name "${category}.distributed.tcp.${name}")
         add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "tcp" ${args})
         set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
+        if(${name}_TIMEOUT)
+          set_tests_properties(
+            "${_full_name}" PROPERTIES TIMEOUT ${${name}_TIMEOUT}
+          )
+        endif()
       endif()
     endif()
   endif()
-
 endfunction(add_hpx_test)
 
 function(add_hpx_test_target_dependencies category name)
