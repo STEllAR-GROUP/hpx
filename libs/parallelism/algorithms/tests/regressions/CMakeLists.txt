@@ -6,6 +6,7 @@
 
 set(tests
     count_3646
+    fill_executor_5016
     for_each_annotated_function
     for_loop_2281
     minimal_findend
