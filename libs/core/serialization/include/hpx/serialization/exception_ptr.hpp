@@ -38,8 +38,10 @@ namespace hpx { namespace util {
 
 #if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
         // boost exceptions
-        boost_exception = 13
+        boost_exception = 13,
 #endif
+
+        std_system_error = 14
     };
 }}    // namespace hpx::util
 

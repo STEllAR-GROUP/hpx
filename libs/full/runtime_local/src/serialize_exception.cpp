@@ -25,6 +25,7 @@
 #include <exception>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 #include <typeinfo>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -151,6 +152,13 @@ namespace hpx { namespace runtime_local { namespace detail {
             err_value = e.code().value();
             err_message = e.code().message();
         }
+        catch (std::system_error const& e)
+        {
+            type = hpx::util::std_system_error;
+            what = e.what();
+            err_value = e.code().value();
+            err_message = e.code().message();
+        }
         catch (std::runtime_error const& e)
         {
             type = hpx::util::std_runtime_error;
@@ -222,7 +230,8 @@ namespace hpx { namespace runtime_local { namespace detail {
             ar & err_value;
             // clang-format on
         }
-        else if (hpx::util::boost_system_error == type)
+        else if (hpx::util::boost_system_error == type ||
+            hpx::util::std_system_error == type)
         {
             // clang-format off
             ar & err_value & err_message;
@@ -268,7 +277,8 @@ namespace hpx { namespace runtime_local { namespace detail {
             ar & err_value;
             // clang-format on
         }
-        else if (hpx::util::boost_system_error == type)
+        else if (hpx::util::boost_system_error == type ||
+            hpx::util::std_system_error == type)
         {
             // clang-format off
             ar & err_value & err_message;
@@ -374,6 +384,18 @@ namespace hpx { namespace runtime_local { namespace detail {
             e = hpx::detail::construct_exception(
                 boost::system::system_error(
                     err_value, boost::system::system_category(), err_message),
+                hpx::detail::construct_exception_info(throw_function_,
+                    throw_file_, throw_line_, throw_back_trace_,
+                    throw_locality_, throw_hostname_, throw_pid_,
+                    throw_shepherd_, throw_thread_id_, throw_thread_name_,
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_));
+            break;
+
+        // std::system_error
+        case hpx::util::std_system_error:
+            e = hpx::detail::construct_exception(
+                std::system_error(
+                    err_value, std::system_category(), err_message),
                 hpx::detail::construct_exception_info(throw_function_,
                     throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
