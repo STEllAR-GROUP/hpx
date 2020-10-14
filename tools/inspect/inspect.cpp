@@ -808,11 +808,7 @@ void print_output(std::ostream& out, inspector_list const& inspectors);
 
 //  cpp_main()  --------------------------------------------------------------//
 
-#if !INSPECT_USE_BOOST_TEST
-int main( int argc_param, char * argv_param[] )
-#else
 int cpp_main( int argc_param, char * argv_param[] )
-#endif
 {
     using namespace hpx::program_options;
     options_description desc_commandline(
@@ -848,48 +844,48 @@ int cpp_main( int argc_param, char * argv_param[] )
         ("limit,l", value<std::size_t>(),
             "set limit to the length check tool (default: 90)")
 
-        ("license", value<bool>(&license_ck)->implicit_value(false),
+        ("license", value<bool>(&license_ck)->implicit_value(true)->zero_tokens(),
             "check for Boost license violations (default: off)")
-        ("spdx_license", value<bool>(&spdx_license_ck)->implicit_value(false),
+        ("spdx_license", value<bool>(&spdx_license_ck)->implicit_value(true)->zero_tokens(),
             "check for SPDX license violations (default: off)")
-        ("copyright", value<bool>(&copyright_ck)->implicit_value(false),
+        ("copyright", value<bool>(&copyright_ck)->implicit_value(true)->zero_tokens(),
             "check for copyright violations (default: off)")
-        ("crlf", value<bool>(&crlf_ck)->implicit_value(false),
+        ("crlf", value<bool>(&crlf_ck)->implicit_value(true)->zero_tokens(),
             "check for crlf (line endings) violations (default: off)")
-        ("end", value<bool>(&end_ck)->implicit_value(false),
+        ("end", value<bool>(&end_ck)->implicit_value(true)->zero_tokens(),
             "check for missing newline at end of file violations (default: off)")
-        ("link", value<bool>(&link_ck)->implicit_value(false),
+        ("link", value<bool>(&link_ck)->implicit_value(true)->zero_tokens(),
             "check for unlinked files violations (default: off)")
-        ("path_name", value<bool>(&path_name_ck)->implicit_value(false),
+        ("path_name", value<bool>(&path_name_ck)->implicit_value(true)->zero_tokens(),
             "check for path name violations (default: off)")
-        ("tab", value<bool>(&tab_ck)->implicit_value(false),
+        ("tab", value<bool>(&tab_ck)->implicit_value(true)->zero_tokens(),
             "check for tab violations (default: off)")
-        ("ascii", value<bool>(&ascii_ck)->implicit_value(false),
+        ("ascii", value<bool>(&ascii_ck)->implicit_value(true)->zero_tokens(),
             "check for non-ascii character usage violations (default: off)")
-        ("apple_macro", value<bool>(&apple_ck)->implicit_value(false),
+        ("apple_macro", value<bool>(&apple_ck)->implicit_value(true)->zero_tokens(),
             "check for apple macro violations (default: off)")
-        ("assert_macro", value<bool>(&assert_ck)->implicit_value(false),
+        ("assert_macro", value<bool>(&assert_ck)->implicit_value(true)->zero_tokens(),
             "check for plain assert usage violations (default: off)")
-        ("deprecated_macro", value<bool>(&deprecated_ck)->implicit_value(false),
+        ("deprecated_macro", value<bool>(&deprecated_ck)->implicit_value(true)->zero_tokens(),
             "check for deprecated Boost configuration macro usage violations "
             "(default: off)")
-        ("minmax", value<bool>(&minmax_ck)->implicit_value(false),
+        ("minmax", value<bool>(&minmax_ck)->implicit_value(true)->zero_tokens(),
             "check for minmax usage violations (default: off)")
-        ("unnamed", value<bool>(&unnamed_ck)->implicit_value(false),
+        ("unnamed", value<bool>(&unnamed_ck)->implicit_value(true)->zero_tokens(),
             "check for unnamed namespace usage violations (default: off)")
-        ("whitespace", value<bool>(&whitespace_ck)->implicit_value(false),
+        ("whitespace", value<bool>(&whitespace_ck)->implicit_value(true)->zero_tokens(),
             "check for endline whitespace violations (default: off)")
-        ("length", value<bool>(&length_ck)->implicit_value(false),
+        ("length", value<bool>(&length_ck)->implicit_value(true)->zero_tokens(),
             "check for exceeding character limit (default: off)")
-        ("include", value<bool>(&include_ck)->implicit_value(false),
+        ("include", value<bool>(&include_ck)->implicit_value(true)->zero_tokens(),
             "check for certain #include's (default: off)")
-        ("pragma_once", value<bool>(&pragma_once_ck)->implicit_value(false),
+        ("pragma_once", value<bool>(&pragma_once_ck)->implicit_value(true)->zero_tokens(),
             "check for #pragma once (default: off)")
         ("deprecated_include",
-            value<bool>(&deprecated_include_ck)->implicit_value(false),
+            value<bool>(&deprecated_include_ck)->implicit_value(true)->zero_tokens(),
             "check for deprecated #include's (default: off)")
         ("deprecated_name",
-            value<bool>(&deprecated_names_ck)->implicit_value(false),
+            value<bool>(&deprecated_names_ck)->implicit_value(true)->zero_tokens(),
             "check for deprecated names usage violations (default: off)")
 
         ("all,a", "check for all violations (default: no checks are performed)")
@@ -914,6 +910,7 @@ int cpp_main( int argc_param, char * argv_param[] )
             .run()
         );
     store(opts, vm);
+    notify(vm);
 
     std::size_t limit;
 
@@ -1225,3 +1222,21 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
       "</html>\n";
   }
 }
+
+#if !INSPECT_USE_BOOST_TEST
+int main(int argc, char* argv[])
+{
+    try
+    {
+        return cpp_main(argc, argv);
+    }
+    catch (std::exception const& e)
+    {
+        std::cerr << "caught exception: " << e.what() << "\n";
+    }
+    catch (...)
+    {
+        std::cerr << "caught unknown exception\n";
+    }
+}
+#endif
