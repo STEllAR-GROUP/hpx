@@ -117,6 +117,8 @@ function(add_hpx_module libname modulename)
     )
   endif()
 
+  set(all_headers ${${modulename}_HEADERS})
+
   # Write full path for the sources files
   list(
     TRANSFORM ${modulename}_SOURCES
@@ -150,12 +152,24 @@ function(add_hpx_module libname modulename)
         "${COMPAT_HEADER_ROOT}/${old_header}"
       )
       list(APPEND compat_headers "${COMPAT_HEADER_ROOT}/${old_header}")
+      list(APPEND all_headers ${old_header})
     endforeach()
   endif()
 
   # This header generation is disabled for config module specific generated
   # headers are included
   if(${modulename}_GLOBAL_HEADER_GEN)
+    if("hpx/modules/${modulename}.hpp" IN_LIST all_headers)
+      string(
+        CONCAT
+          error_message
+          "Global header generation turned on for module ${modulename} but the "
+          "header \"hpx/modules/${modulename}.hpp\" is also listed explicitly as"
+          "a header. Turn off global header generation or remove the "
+          "\"hpx/modules/${modulename}.hpp\" file."
+      )
+      hpx_error(${error_message})
+    endif()
     # Add a global include file that include all module headers
     set(global_header
         "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/modules/${modulename}.hpp"
