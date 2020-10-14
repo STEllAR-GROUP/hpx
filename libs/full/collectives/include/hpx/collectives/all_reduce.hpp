@@ -106,7 +106,7 @@ namespace hpx { namespace lcos {
 #include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime_local/get_num_localities.hpp>
+#include <hpx/runtime_distributed/get_num_localities.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/type_support/unused.hpp>
 

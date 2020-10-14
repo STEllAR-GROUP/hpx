@@ -224,9 +224,8 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/components/stubs/stub_base.hpp
     hpx/runtime/components/target_distribution_policy.hpp
     hpx/runtime/components/unwrapping_result_policy.hpp
-    hpx/runtime_distributed.hpp
     hpx/runtime/find_here.hpp
-    hpx/runtime/find_localities.hpp
+    hpx/runtime/find_all_localities.hpp
     hpx/runtime/get_colocation_id.hpp
     hpx/runtime/get_locality_name.hpp
     hpx/runtime/get_ptr.hpp

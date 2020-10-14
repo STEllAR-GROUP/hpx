@@ -851,7 +851,7 @@ An example of how to use the ``partitioned_vector`` container
 with distribution policies would be::
 
     #include <hpx/include/partitioned_vector.hpp>
-    #include <hpx/runtime/find_localities.hpp>
+    #include <hpx/runtime_distributed/find_localities.hpp>
 
     // The following code generates all necessary boiler plate to enable the
     // remote creation of 'partitioned_vector' segments

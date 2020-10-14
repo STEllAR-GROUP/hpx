@@ -72,7 +72,7 @@ add_hpx_module(
     hpx_performance_counters
     hpx_program_options
     hpx_runtime_configuration
-    hpx_runtime_local
+    hpx_runtime_distributed
     hpx_threadmanager
   CMAKE_SUBDIRS examples tests
 )

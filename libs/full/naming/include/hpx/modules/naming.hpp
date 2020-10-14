@@ -9,15 +9,3 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/naming_base.hpp>
 
-namespace hpx {
-
-    namespace naming {
-
-        struct HPX_EXPORT gid_type;
-        struct HPX_EXPORT id_type;
-        struct HPX_EXPORT address;
-    }    // namespace naming
-
-    // Pulling important types into the main namespace
-    using naming::id_type;
-}    // namespace hpx

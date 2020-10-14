@@ -38,7 +38,6 @@
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
-#include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -48,6 +47,7 @@
 #include <hpx/runtime/threads/threadmanager_counters.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime_local/debugging.hpp>

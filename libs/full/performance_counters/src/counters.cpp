@@ -25,7 +25,7 @@
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_distributed.hpp>
-#include <hpx/runtime_local/get_num_localities.hpp>
+#include <hpx/runtime_distributed/get_num_localities.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/serialize.hpp>

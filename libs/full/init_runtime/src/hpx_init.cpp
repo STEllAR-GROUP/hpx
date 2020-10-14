@@ -64,8 +64,8 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
-#include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/query_counters.hpp>

@@ -8,7 +8,7 @@
 .. _full_modules:
 
 ==================
-full modules
+Main |hpx| modules
 ==================
 
 .. toctree::
@@ -40,6 +40,7 @@ full modules
    /libs/full/resiliency/docs/index.rst
    /libs/full/resource_partitioner/docs/index.rst
    /libs/full/runtime_configuration/docs/index.rst
+   /libs/full/runtime_distributed/docs/index.rst
    /libs/full/runtime_local/docs/index.rst
    /libs/full/segmented_algorithms/docs/index.rst
    /libs/full/thread_executors/docs/index.rst

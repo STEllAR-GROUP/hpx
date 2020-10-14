@@ -37,6 +37,7 @@ set(_hpx_full_modules
     resiliency
     resource_partitioner
     runtime_configuration
+    runtime_distributed
     runtime_local
     segmented_algorithms
     thread_executors
@@ -45,7 +46,7 @@ set(_hpx_full_modules
 # cmake-format: on
 
 hpx_info("")
-hpx_info("Configuring libhpx_full modules:")
+hpx_info("Configuring libhpx modules:")
 
 foreach(module ${_hpx_full_modules})
   add_subdirectory(${module})
