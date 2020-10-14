@@ -1936,11 +1936,6 @@ if(HPX_WITH_COMPILER_WARNINGS)
   else() # Trial and error approach for any other compiler ...
     hpx_add_compile_flag_if_available(-Wall LANGUAGES CXX C Fortran)
     hpx_add_compile_flag_if_available(-Wextra LANGUAGES CXX C Fortran)
-    # This is a new warning popping up from the boost headers with no particular
-    # meaning
-    hpx_add_compile_flag_if_available(
-      -Wno-unused-local-typedefs LANGUAGES CXX C Fortran
-    )
     hpx_add_compile_flag_if_available(
       -Wno-strict-aliasing LANGUAGES CXX C Fortran
     )

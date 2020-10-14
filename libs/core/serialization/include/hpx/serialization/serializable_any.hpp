@@ -63,7 +63,7 @@ namespace hpx { namespace util { namespace detail { namespace any {
         virtual void load_object(void**, IArch& ar, unsigned) = 0;
 
         template <typename Arch>
-        void serialize(Arch& ar, unsigned)
+        void serialize(Arch&, unsigned)
         {
         }
 

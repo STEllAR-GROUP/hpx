@@ -16,6 +16,7 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
 #include <hpx/type_support/static.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstdint>
 #include <map>
@@ -104,6 +105,8 @@ namespace hpx { namespace serialization { namespace detail {
                     msg += ", for typename " + *name + "\n";
                     msg += collect_registered_typenames();
                 }
+#else
+                HPX_UNUSED(name);
 #endif
                 HPX_THROW_EXCEPTION(
                     serialization_error, "polymorphic_id_factory::create", msg);

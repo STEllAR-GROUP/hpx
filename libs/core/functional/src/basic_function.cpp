@@ -27,7 +27,7 @@
 namespace hpx { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     function_base::function_base(
-        function_base const& other, vtable const* empty_vtable)
+        function_base const& other, vtable const* /* empty_vtable */)
       : vptr(other.vptr)
       , object(other.object)
     {
@@ -58,7 +58,7 @@ namespace hpx { namespace util { namespace detail {
     }
 
     void function_base::op_assign(
-        function_base const& other, vtable const* empty_vtable)
+        function_base const& other, vtable const* /* empty_vtable */)
     {
         if (vptr == other.vptr)
         {

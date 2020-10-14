@@ -231,7 +231,7 @@ namespace hpx { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Exception>
-    inline bool is_of_lightweight_hpx_category(Exception const& e)
+    inline bool is_of_lightweight_hpx_category(Exception const&)
     {
         return false;
     }

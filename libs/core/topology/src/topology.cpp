@@ -169,6 +169,7 @@ namespace hpx { namespace threads {
 
     bool topology::reduce_thread_priority(error_code& ec) const
     {
+        HPX_UNUSED(ec);
 #ifdef HPX_HAVE_NICE_THREADLEVEL
 #if defined(__linux__) && !defined(__ANDROID__) && !defined(__bgq__)
         pid_t tid;

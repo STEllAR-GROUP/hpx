@@ -49,7 +49,6 @@ void test_exclusive_scan_validate(
     ExPolicy p, std::vector<int>& a, std::vector<int>& b)
 {
     using namespace hpx::execution;
-    typedef std::vector<int>::iterator Iter;
 
     // test 1, fill array with numbers counting from 0, then run scan algorithm
     a.clear();

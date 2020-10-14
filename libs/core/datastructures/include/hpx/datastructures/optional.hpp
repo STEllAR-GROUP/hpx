@@ -372,7 +372,7 @@ namespace hpx { namespace util {
     }
 
     template <typename T>
-    constexpr bool operator<(optional<T> const& opt, nullopt_t) noexcept
+    constexpr bool operator<(optional<T> const&, nullopt_t) noexcept
     {
         return false;
     }
@@ -384,7 +384,7 @@ namespace hpx { namespace util {
     }
 
     template <typename T>
-    constexpr bool operator>=(optional<T> const& opt, nullopt_t) noexcept
+    constexpr bool operator>=(optional<T> const&, nullopt_t) noexcept
     {
         return true;
     }
@@ -402,7 +402,7 @@ namespace hpx { namespace util {
     }
 
     template <typename T>
-    constexpr bool operator>(nullopt_t, optional<T> const& opt) noexcept
+    constexpr bool operator>(nullopt_t, optional<T> const&) noexcept
     {
         return false;
     }
@@ -414,7 +414,7 @@ namespace hpx { namespace util {
     }
 
     template <typename T>
-    constexpr bool operator<=(nullopt_t, optional<T> const& opt) noexcept
+    constexpr bool operator<=(nullopt_t, optional<T> const&) noexcept
     {
         return true;
     }

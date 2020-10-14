@@ -109,8 +109,14 @@ add_hpx_module(
   SOURCES ${coroutines_sources}
   HEADERS ${coroutines_headers} OBJECTS "${switch_to_fiber_object}"
   COMPAT_HEADERS ${coroutines_compat_headers}
-  MODULE_DEPENDENCIES hpx_assertion hpx_config hpx_errors hpx_format
-                      hpx_functional hpx_util
+  MODULE_DEPENDENCIES
+    hpx_assertion
+    hpx_config
+    hpx_errors
+    hpx_format
+    hpx_functional
+    hpx_type_support
+    hpx_util
   CMAKE_SUBDIRS examples tests
 )
 

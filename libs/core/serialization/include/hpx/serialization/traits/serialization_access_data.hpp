@@ -29,32 +29,35 @@ namespace hpx { namespace traits {
         }
 
         // functions related to output operations
-        static constexpr void write(Container& cont, std::size_t count,
-            std::size_t current, void const* address)
+        static constexpr void write(Container& /* cont */,
+            std::size_t /* count */, std::size_t /* current */,
+            void const* /* address */)
         {
         }
 
-        static bool flush(serialization::binary_filter* filter, Container& cont,
-            std::size_t current, std::size_t size, std::size_t& written)
+        static bool flush(serialization::binary_filter* /* filter */,
+            Container& /* cont */, std::size_t /* current */, std::size_t size,
+            std::size_t& written)
         {
             written = size;
             return true;
         }
 
         // functions related to input operations
-        static constexpr void read(Container const& cont, std::size_t count,
-            std::size_t current, void* address)
+        static constexpr void read(Container const& /* cont */,
+            std::size_t /* count */, std::size_t /* current */,
+            void* /* address */)
         {
         }
 
-        static constexpr std::size_t init_data(Container const& cont,
-            serialization::binary_filter* filter, std::size_t current,
-            std::size_t decompressed_size)
+        static constexpr std::size_t init_data(Container const& /* cont */,
+            serialization::binary_filter* /* filter */,
+            std::size_t /* current */, std::size_t decompressed_size)
         {
             return decompressed_size;
         }
 
-        static constexpr void reset(Container& cont) {}
+        static constexpr void reset(Container& /* cont */) {}
     };
 
     ///////////////////////////////////////////////////////////////////////

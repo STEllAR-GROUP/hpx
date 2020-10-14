@@ -28,7 +28,7 @@ namespace hpx { namespace serialization {
         ///////////////////////////////////////////////////////////////////////////
         // TODO: This is not scalable, and painful to update.
         void save(output_archive& ar, std::exception_ptr const& ep,
-            unsigned int version)
+            unsigned int /* version */)
         {
             hpx::util::exception_type type(hpx::util::unknown_exception);
             std::string what;
@@ -162,8 +162,8 @@ namespace hpx { namespace serialization {
 
         ///////////////////////////////////////////////////////////////////////////
         // TODO: This is not scalable, and painful to update.
-        void load(
-            input_archive& ar, std::exception_ptr& e, unsigned int version)
+        void load(input_archive& ar, std::exception_ptr& e,
+            unsigned int /* version */)
         {
             hpx::util::exception_type type(hpx::util::unknown_exception);
             std::string what;

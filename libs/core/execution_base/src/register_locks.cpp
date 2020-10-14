@@ -379,9 +379,9 @@ namespace hpx { namespace util {
 
     void trace_depth_lock_detection(std::size_t) {}
 
-    void ignore_lock(void const* lock) {}
+    void ignore_lock(void const* /* lock */) {}
 
-    void reset_ignored(void const* lock) {}
+    void reset_ignored(void const* /* lock */) {}
 
     void ignore_all_locks() {}
 
@@ -392,6 +392,6 @@ namespace hpx { namespace util {
         return std::unique_ptr<held_locks_data>();
     }
 
-    void set_held_locks_data(std::unique_ptr<held_locks_data>&& data) {}
+    void set_held_locks_data(std::unique_ptr<held_locks_data>&& /* data */) {}
 #endif
 }}    // namespace hpx::util

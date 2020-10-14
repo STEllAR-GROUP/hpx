@@ -26,9 +26,6 @@ void test_replace_copy(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     typedef test::test_container<std::vector<std::size_t>, IteratorTag>
         test_vector;
 
@@ -58,9 +55,6 @@ void test_replace_copy(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_replace_copy_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     typedef test::test_container<std::vector<std::size_t>, IteratorTag>
         test_vector;
 

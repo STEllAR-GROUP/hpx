@@ -48,7 +48,6 @@ void test_async_zero()
 {
     using namespace hpx::execution;
     typedef std::vector<int>::iterator Iter;
-    typedef hpx::future<std::pair<Iter, Iter>> Fut_Iter;
     std::vector<int> a;
     std::vector<int> b, c, d;
 
@@ -73,7 +72,6 @@ void test_async_zero()
 void test_one(std::vector<int> a)
 {
     using namespace hpx::execution;
-    typedef std::vector<int>::iterator Iter;
     std::size_t n = a.size();
     std::vector<int> b(n), c(n), d(n);
     std::vector<int> b_ans(n), c_ans(n), d_ans(n);
@@ -111,8 +109,6 @@ void print(std::vector<int> const& result, std::vector<int> const& correct)
 void test_async_one(std::vector<int> a)
 {
     using namespace hpx::execution;
-    typedef std::vector<int>::iterator Iter;
-    typedef hpx::future<std::pair<Iter, Iter>> Fut_Iter;
     std::size_t n = a.size();
     std::vector<int> b(n), c(n), d(n);
     std::vector<int> b_ans(n), c_ans(n), d_ans(n);

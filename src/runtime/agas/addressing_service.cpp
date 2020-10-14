@@ -2839,8 +2839,6 @@ void addressing_service::unmark_as_migrated(
 hpx::future<std::pair<naming::id_type, naming::address>>
 addressing_service::begin_migration(naming::id_type const& id)
 {
-    typedef std::pair<naming::id_type, naming::address> result_type;
-
     if (!id)
     {
         HPX_THROW_EXCEPTION(bad_parameter,

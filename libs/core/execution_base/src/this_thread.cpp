@@ -90,7 +90,7 @@ namespace hpx { namespace execution_base {
         {
         }
 
-        void default_agent::yield(char const* desc)
+        void default_agent::yield(char const* /* desc */)
         {
 #if defined(HPX_SMT_PAUSE)
             HPX_SMT_PAUSE;
@@ -103,7 +103,7 @@ namespace hpx { namespace execution_base {
 #endif
         }
 
-        void default_agent::yield_k(std::size_t k, char const* desc)
+        void default_agent::yield_k(std::size_t k, char const* /* desc */)
         {
             if (k < 4)    //-V112
             {
@@ -141,7 +141,7 @@ namespace hpx { namespace execution_base {
             }
         }
 
-        void default_agent::suspend(char const* desc)
+        void default_agent::suspend(char const* /* desc */)
         {
             std::unique_lock<std::mutex> l(mtx_);
             HPX_ASSERT(running_);
@@ -163,7 +163,7 @@ namespace hpx { namespace execution_base {
             }
         }
 
-        void default_agent::resume(char const* desc)
+        void default_agent::resume(char const* /* desc */)
         {
             {
                 std::unique_lock<std::mutex> l(mtx_);
@@ -176,7 +176,7 @@ namespace hpx { namespace execution_base {
             suspend_cv_.notify_one();
         }
 
-        void default_agent::abort(char const* desc)
+        void default_agent::abort(char const* /* desc */)
         {
             {
                 std::unique_lock<std::mutex> l(mtx_);
@@ -192,13 +192,14 @@ namespace hpx { namespace execution_base {
 
         void default_agent::sleep_for(
             hpx::chrono::steady_duration const& sleep_duration,
-            char const* desc)
+            char const* /* desc */)
         {
             std::this_thread::sleep_for(sleep_duration.value());
         }
 
         void default_agent::sleep_until(
-            hpx::chrono::steady_time_point const& sleep_time, char const* desc)
+            hpx::chrono::steady_time_point const& sleep_time,
+            char const* /* desc */)
         {
             std::this_thread::sleep_until(sleep_time.value());
         }

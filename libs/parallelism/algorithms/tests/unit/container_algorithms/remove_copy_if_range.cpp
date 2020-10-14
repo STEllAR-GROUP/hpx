@@ -25,9 +25,6 @@ void test_remove_copy_if(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
 
     test_vector c(10007);
@@ -63,9 +60,6 @@ void test_remove_copy_if(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_remove_copy_if_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
 
     test_vector c(10007);
@@ -105,9 +99,6 @@ void test_remove_copy_if_outiter(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
 
     test_vector c(10007);
@@ -134,9 +125,6 @@ void test_remove_copy_if_outiter(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_remove_copy_if_outiter_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
 
     test_vector c(10007);
@@ -187,9 +175,6 @@ void test_remove_copy_if_exception(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
 
     test_vector c(10007);
@@ -221,9 +206,6 @@ void test_remove_copy_if_exception(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_remove_copy_if_exception_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
 
     test_vector c(10007);
@@ -286,9 +268,6 @@ void test_remove_copy_if_bad_alloc(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
 
     test_vector c(10007);
@@ -318,9 +297,6 @@ void test_remove_copy_if_bad_alloc(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_remove_copy_if_bad_alloc_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
 
     test_vector c(10007);

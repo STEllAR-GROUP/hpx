@@ -24,9 +24,6 @@ template <typename IteratorTag,
     typename Proj = hpx::parallel::util::projection_identity>
 void test_none_of_seq(IteratorTag, Proj proj = Proj())
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     std::size_t iseq[] = {0, 1, 3};
     for (std::size_t i : iseq)
     {
@@ -50,9 +47,6 @@ void test_none_of(ExPolicy&& policy, IteratorTag, Proj proj = Proj())
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     std::size_t iseq[] = {0, 1, 3};
     for (std::size_t i : iseq)
     {
@@ -73,9 +67,6 @@ template <typename ExPolicy, typename IteratorTag,
     typename Proj = hpx::parallel::util::projection_identity>
 void test_none_of_async(ExPolicy p, IteratorTag, Proj proj = Proj())
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     std::size_t iseq[] = {0, 23, 10007};
     for (std::size_t i : iseq)
     {
@@ -160,9 +151,6 @@ void none_of_test()
 template <typename IteratorTag>
 void test_none_of_exception(IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     std::size_t iseq[] = {0, 23, 10007};
     for (std::size_t i : iseq)
     {
@@ -199,9 +187,6 @@ void test_none_of_exception(ExPolicy&& policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     std::size_t iseq[] = {0, 23, 10007};
     for (std::size_t i : iseq)
     {
@@ -234,9 +219,6 @@ void test_none_of_exception(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_none_of_exception_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     std::size_t iseq[] = {0, 23, 10007};
     for (std::size_t i : iseq)
     {
@@ -300,9 +282,6 @@ void test_none_of_bad_alloc(ExPolicy&& policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     std::size_t iseq[] = {0, 23, 10007};
     for (std::size_t i : iseq)
     {
@@ -333,9 +312,6 @@ void test_none_of_bad_alloc(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_none_of_bad_alloc_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     std::size_t iseq[] = {0, 23, 10007};
     for (std::size_t i : iseq)
     {

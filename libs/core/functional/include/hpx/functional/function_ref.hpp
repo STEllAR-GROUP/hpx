@@ -56,7 +56,7 @@ namespace hpx { namespace util {
         }
 
         template <typename F>
-        constexpr bool is_empty_function_ptr(F const& f) noexcept
+        constexpr bool is_empty_function_ptr(F const&) noexcept
         {
             return false;
         }

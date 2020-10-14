@@ -7,6 +7,7 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <boost/utility/string_ref.hpp>
 
@@ -96,6 +97,7 @@ namespace hpx { namespace util { namespace detail {
                     std::size_t const id =
                         field.arg_id ? field.arg_id - 1 : index;
                     HPX_ASSERT(id < count);
+                    HPX_UNUSED(count);
                     args[id](os, field.spec);
                     ++index;
                 }

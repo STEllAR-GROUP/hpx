@@ -74,8 +74,6 @@ HPX_PLAIN_DIRECT_ACTION(irecv);
 ///////////////////////////////////////////////////////////////////////////////
 void recv_async(hpx::id_type dest, std::size_t size, std::size_t window_size)
 {
-    using buffer_type = hpx::serialization::serialize_buffer<char>;
-
     using hpx::for_loop;
     using hpx::execution::par;
 

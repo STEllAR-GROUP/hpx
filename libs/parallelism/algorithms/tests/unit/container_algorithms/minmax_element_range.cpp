@@ -28,7 +28,6 @@ void test_minmax_element(ExPolicy policy, IteratorTag)
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     typedef test::test_container<std::vector<std::size_t>, IteratorTag>
         test_vector;
@@ -61,7 +60,6 @@ template <typename ExPolicy, typename IteratorTag>
 void test_minmax_element_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     typedef test::test_container<std::vector<std::size_t>, IteratorTag>
         test_vector;

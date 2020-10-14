@@ -157,10 +157,8 @@ void test4()
 
 void test5()
 {
-    typedef std::vector<std::uint64_t>::iterator iter_t;
     typedef std::less<std::uint64_t> compare;
     constexpr std::uint32_t KMax = NUMELEMS;
-    typedef std::vector<std::uint64_t>::iterator iter_t;
     std::vector<std::uint64_t> K, M;
     std::mt19937_64 my_rand(std::rand());
     compare comp;
