@@ -60,6 +60,7 @@ namespace hpx { namespace cuda { namespace experimental {
             runtime_registration_wrapper(hpx::runtime* rt);
             ~runtime_registration_wrapper();
             hpx::runtime* rt_;
+            bool registered_;
         };
 
         // -------------------------------------------------------------
