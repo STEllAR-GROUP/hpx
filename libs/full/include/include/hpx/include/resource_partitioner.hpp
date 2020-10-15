@@ -8,3 +8,4 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
+#include <hpx/runtime_local/thread_pool_helpers.hpp>
