@@ -9,6 +9,7 @@ set(tests
     local_dataflow
     local_dataflow_boost_small_vector
     local_dataflow_executor
+    local_dataflow_external_future
     local_dataflow_executor_additional_arguments
     local_dataflow_std_array
     run_guarded
@@ -16,6 +17,7 @@ set(tests
 )
 
 set(local_dataflow_PARAMETERS THREADS_PER_LOCALITY 4)
+set(local_dataflow_external_future_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_dataflow_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_dataflow_executor_additional_arguments_PARAMETERS THREADS_PER_LOCALITY
                                                             4

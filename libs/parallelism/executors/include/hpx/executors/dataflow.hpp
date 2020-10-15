@@ -148,6 +148,22 @@ namespace hpx { namespace lcos { namespace detail {
     {
     };
 
+    template <typename Executor, typename Frame, typename Func,
+        typename Futures, typename Enable = void>
+    struct has_dataflow_finalize : std::false_type
+    {
+    };
+
+    template <typename Executor, typename Frame, typename Func,
+        typename Futures>
+    struct has_dataflow_finalize<Executor, Frame, Func, Futures,
+        typename hpx::util::always_void<decltype(
+            std::declval<Executor>().dataflow_finalize(std::declval<Frame>(),
+                std::declval<Func>(), std::declval<Futures>()))>::type>
+      : std::true_type
+    {
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Policy, typename Func, typename Futures>
     struct dataflow_frame    //-V690
@@ -337,20 +353,32 @@ namespace hpx { namespace lcos { namespace detail {
 
         // The overload for hpx::dataflow taking an executor simply forwards
         // to the corresponding executor customization point.
-        //
-        // parallel::execution::executor
-        // threads::executor
         template <typename Executor, typename Futures_>
         HPX_FORCEINLINE typename std::enable_if<
-            traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value ||
-            traits::is_threads_executor<Executor>::value>::type
+            (traits::is_one_way_executor<Executor>::value ||
+                traits::is_two_way_executor<Executor>::value ||
+                traits::is_threads_executor<Executor>::value) &&
+            !has_dataflow_finalize<Executor, dataflow_frame, Func,
+                Futures_>::value>::type
         finalize(Executor&& exec, Futures_&& futures)
         {
             detail::dataflow_finalization<dataflow_type> this_f_(this);
 
             hpx::parallel::execution::post(std::forward<Executor>(exec),
                 std::move(this_f_), std::forward<Futures_>(futures));
+        }
+
+        template <typename Executor, typename Futures_>
+        HPX_FORCEINLINE typename std::enable_if<
+            (traits::is_one_way_executor<Executor>::value ||
+                traits::is_two_way_executor<Executor>::value ||
+                traits::is_threads_executor<Executor>::value) &&
+            has_dataflow_finalize<Executor, dataflow_frame, Func,
+                Futures_>::value>::type
+        finalize(Executor&& exec, Futures_&& futures)
+        {
+            std::forward<Executor>(exec).dataflow_finalize(
+                this, std::move(func_), std::forward<Futures_>(futures));
         }
 
     public:
