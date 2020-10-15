@@ -11,7 +11,17 @@
 
 #if defined(HPX_HAVE_HIP)
 
+    #if defined(__clang__)
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdouble-promotion"
+    #pragma clang diagnostic ignored "-Wsign-compare"
+    #pragma clang diagnostic ignored "-Wunused-variable"
+    #endif
+
     #include <hip/hip_runtime.h>
+    #if defined(__clang__)
+    #pragma clang diagnostic pop
+    #endif
 
     #ifdef _WIN32
         #define CUDART_CB __stdcall
