@@ -344,7 +344,7 @@ namespace hpx {
 #define HPX_REGISTER_ALLGATHER_DECLARATION(...) /**/
 
 ////////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_ALLGATHER(...) /**/
+#define HPX_REGISTER_ALLGATHER(...)             /**/
 
 #endif    // COMPUTE_HOST_CODE
 #endif    // DOXYGEN

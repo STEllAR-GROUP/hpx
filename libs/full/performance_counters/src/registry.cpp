@@ -38,7 +38,13 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters {
+
     ///////////////////////////////////////////////////////////////////////////
+    void registry::clear()
+    {
+        countertypes_.clear();
+    }
+
     registry::counter_type_map_type::iterator registry::locate_counter_type(
         std::string const& type_name)
     {
@@ -1221,4 +1227,11 @@ namespace hpx { namespace performance_counters {
             ec = make_success_code();
         return status_valid_data;
     }
+
+    registry& registry::instance()
+    {
+        static registry instance_;
+        return instance_;
+    }
+
 }}    // namespace hpx::performance_counters

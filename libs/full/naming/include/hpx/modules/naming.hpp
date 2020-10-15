@@ -8,4 +8,3 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/naming_base.hpp>
-

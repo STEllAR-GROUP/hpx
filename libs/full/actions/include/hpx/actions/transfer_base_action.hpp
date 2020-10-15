@@ -354,7 +354,7 @@ namespace hpx { namespace actions { namespace detail {
             hpx::actions::detail::get_action_name<Action>());
     }
     /// \endcond
-}}}    // namespace hpx::actions::detail
+}}}       // namespace hpx::actions::detail
 #endif    // HPX_HAVE_PARCELPORT_ACTION_COUNTERS
 
 #endif    // HPX_HAVE_NETWORKING

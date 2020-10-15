@@ -499,7 +499,7 @@ namespace hpx {
     namespace {
         std::uint64_t& runtime_uptime()
         {
-            static thread_local std::uint64_t uptime;
+            static thread_local std::uint64_t uptime = 0;
             return uptime;
         }
     }    // namespace
@@ -704,7 +704,7 @@ namespace hpx {
 
     runtime*& get_runtime_ptr()
     {
-        static thread_local runtime* runtime_;
+        static thread_local runtime* runtime_ = nullptr;
         return runtime_;
     }
 

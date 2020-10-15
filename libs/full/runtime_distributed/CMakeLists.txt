@@ -9,8 +9,7 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(runtime_distributed_headers
-    hpx/runtime_distributed.hpp
-    hpx/runtime_distributed/get_num_localities.hpp
+    hpx/runtime_distributed.hpp hpx/runtime_distributed/get_num_localities.hpp
     hpx/runtime_distributed/find_localities.hpp
 )
 
@@ -32,6 +31,6 @@ add_hpx_module(
   HEADERS ${runtime_distributed_headers}
   COMPAT_HEADERS ${runtime_distributed_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_runtime_local
+  MODULE_DEPENDENCIES hpx_performance_counters hpx_runtime_local
   CMAKE_SUBDIRS examples tests
 )

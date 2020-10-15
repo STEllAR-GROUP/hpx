@@ -67,7 +67,13 @@ add_hpx_module(
   SOURCES ${performance_counters_sources}
   HEADERS ${performance_counters_headers}
   DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES hpx_actions hpx_agas hpx_async_colocated
-                      hpx_async_distributed hpx_naming hpx_runtime_distributed
+  MODULE_DEPENDENCIES
+    hpx_actions
+    hpx_agas
+    hpx_async_colocated
+    hpx_async_distributed
+    hpx_naming
+    hpx_runtime_local
+    hpx_runtime_distributed
   CMAKE_SUBDIRS examples tests
 )

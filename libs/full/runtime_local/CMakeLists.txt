@@ -15,7 +15,7 @@ set(runtime_local_headers
     hpx/runtime_local/detail/runtime_local_fwd.hpp
     hpx/runtime_local/detail/serialize_exception.hpp
     hpx/runtime_local/get_locality_id.hpp
-    hpx/runtime_local/get_num_nocomponent_localities.hpp
+    hpx/runtime_local/get_num_all_localities.hpp
     hpx/runtime_local/get_os_thread_count.hpp
     hpx/runtime_local/get_thread_name.hpp
     hpx/runtime_local/get_worker_thread_num.hpp
@@ -92,11 +92,7 @@ add_hpx_module(
   COMPAT_HEADERS ${runtime_local_compat_headers}
   DEPENDENCIES hpx_core hpx_parallelism
   MODULE_DEPENDENCIES
-    hpx_command_line_handling
-    hpx_program_options
-    hpx_resource_partitioner
-    hpx_runtime_configuration
-    hpx_threadmanager
-    hpx_thread_executors
+    hpx_command_line_handling hpx_program_options hpx_resource_partitioner
+    hpx_runtime_configuration hpx_threadmanager hpx_thread_executors
   CMAKE_SUBDIRS examples tests
 )

@@ -19,6 +19,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters {
+
     ///////////////////////////////////////////////////////////////////////////
     class registry
     {
@@ -41,7 +42,10 @@ namespace hpx { namespace performance_counters {
         typedef std::map<std::string, counter_data> counter_type_map_type;
 
     public:
-        registry() {}
+        registry() = default;
+
+        /// \brief Reset registry by deleting all stored counter types
+        void clear();
 
         /// \brief Add a new performance counter type to the (local) registry
         counter_status add_counter_type(counter_info const& info,
@@ -164,5 +168,8 @@ namespace hpx { namespace performance_counters {
 
     private:
         counter_type_map_type countertypes_;
+
+    public:
+        static registry& instance();
     };
 }}    // namespace hpx::performance_counters

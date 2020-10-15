@@ -20,7 +20,7 @@
 #include <hpx/runtime/get_locality_name.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
-#include <hpx/runtime_local/get_num_nocomponent_localities.hpp>
+#include <hpx/runtime_local/get_num_all_localities.hpp>
 
 #include <cstddef>
 #include <cstdint>

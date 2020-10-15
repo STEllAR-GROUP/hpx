@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -402,7 +402,6 @@ namespace hpx {
         used_cores_map_type used_cores_map_;
 
         std::unique_ptr<components::server::runtime_support> runtime_support_;
-        std::shared_ptr<performance_counters::registry> counters_;
         std::shared_ptr<util::query_counters> active_counters_;
     };
 }    // namespace hpx
