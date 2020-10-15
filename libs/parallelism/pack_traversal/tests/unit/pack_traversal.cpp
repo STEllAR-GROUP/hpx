@@ -187,9 +187,9 @@ struct my_allocator
         using other = my_allocator<O>;
     };
 
-    pointer allocate(size_type n, void const* hint = nullptr)
+    pointer allocate(size_type n, void const* = nullptr)
     {
-        return std::allocator<T>{}.allocate(n, hint);
+        return std::allocator<T>{}.allocate(n);
     }
 
     void deallocate(pointer p, size_type n)

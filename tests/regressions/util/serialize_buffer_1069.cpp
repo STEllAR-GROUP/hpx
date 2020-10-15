@@ -39,10 +39,10 @@ public:
     // we want to make sure anything else uses the std allocator
     template <typename U> struct rebind { typedef std::allocator<U> other; };
 
-    pointer allocate(size_type n, const void *hint=nullptr)
+    pointer allocate(size_type n, const void* = nullptr)
     {
         HPX_TEST_EQ(n, static_cast<size_type>(MEMORY_BLOCK_SIZE));
-        return std::allocator<T>::allocate(n, hint);
+        return std::allocator<T>::allocate(n);
     }
 
     void deallocate(pointer p, size_type n)

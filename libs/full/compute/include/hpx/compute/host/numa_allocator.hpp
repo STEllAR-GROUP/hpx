@@ -84,8 +84,7 @@ namespace hpx { namespace parallel { namespace util {
         }
 
         // memory allocation
-        pointer allocate(size_type cnt,
-            typename std::allocator<void>::const_pointer = nullptr)
+        pointer allocate(size_type cnt, const void* = nullptr)
         {
             // allocate memory
             pointer p =

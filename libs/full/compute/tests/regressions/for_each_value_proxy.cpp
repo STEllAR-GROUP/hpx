@@ -110,8 +110,7 @@ struct test_allocator
     // topo.allocate(). The pointer hint may be used to provide locality of
     // reference: the allocator, if supported by the implementation, will
     // attempt to allocate the new memory block as close as possible to hint.
-    pointer allocate(
-        size_type n, std::allocator<void>::const_pointer hint = nullptr)
+    pointer allocate(size_type n, const void* hint = nullptr)
     {
         return new T[n];
     }
