@@ -249,8 +249,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
         move(ExPolicy&& policy, FwdIter1 iter, Sent1 sent, FwdIter dest)
     {
         using move_iter_t = detail::move<FwdIter1, FwdIter>;
+
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::transfer<move_iter_t>(
             std::forward<ExPolicy>(policy), iter, sent, dest);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     // clang-format off
@@ -272,8 +280,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
             detail::move<typename hpx::traits::range_traits<Rng>::iterator_type,
                 FwdIter>;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::transfer<move_iter_t>(std::forward<ExPolicy>(policy),
             hpx::util::begin(rng), hpx::util::end(rng), dest);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
 

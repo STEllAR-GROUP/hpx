@@ -47,33 +47,27 @@ int hpx_main(hpx::program_options::variables_map& vm)
     hpx::compute::vector<int, allocator_type> d_B(N, alloc);
     hpx::compute::vector<int, allocator_type> d_C(N, alloc);
 
-    hpx::parallel::copy(
-        hpx::parallel::execution::seq,
-        h_A.begin(), h_A.end(), d_A.begin());
-    hpx::parallel::copy(
-        hpx::parallel::execution::seq,
-        h_B.begin(), h_B.end(), d_B.begin());
+    hpx::copy(hpx::execution::seq, h_A.begin(), h_A.end(), d_A.begin());
+    hpx::copy(hpx::execution::seq, h_B.begin(), h_B.end(), d_B.begin());
 
     int threadsPerBlock = 256;
     int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
 
-    hpx::cuda::experimental::detail::launch(target, blocksPerGrid, threadsPerBlock,
-        [=] __device__ (int* A, int* B, int* C) mutable
-        {
+    hpx::cuda::experimental::detail::launch(
+        target, blocksPerGrid, threadsPerBlock,
+        [=] __device__(int* A, int* B, int* C) mutable {
             int i = blockDim.x * blockIdx.x + threadIdx.x;
-            if(i < N)
+            if (i < N)
                 C[i] = A[i] + B[i];
-        }, d_A.data(), d_B.data(), d_C.data());
+        },
+        d_A.data(), d_B.data(), d_C.data());
 
-
-    hpx::parallel::copy(
-        hpx::parallel::execution::seq,
-        d_C.begin(), d_C.end(), h_C.begin());
+    hpx::copy(hpx::execution::seq, d_C.begin(), d_C.end(), h_C.begin());
 
     bool success = true;
-    for(int i = 0; i < N; ++i)
+    for (int i = 0; i < N; ++i)
     {
-        if(h_C[i] != h_C_ref[i] || h_C[i] != h_A[i] + h_B[i])
+        if (h_C[i] != h_C_ref[i] || h_C[i] != h_A[i] + h_B[i])
         {
             std::cout << "Error at " << i << "\n";
             std::cout << h_C[i] << " != " << h_C_ref[i] << "\n";
@@ -81,7 +75,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             success = false;
         }
     }
-    if(success)
+    if (success)
     {
         std::cout << "Yay!\n";
     }
@@ -96,10 +90,8 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);

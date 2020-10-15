@@ -201,8 +201,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         generate_(
             ExPolicy&& policy, Iter first, Sent last, F&& f, std::false_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                is_seq;
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             return detail::generate<Iter>().call(std::forward<ExPolicy>(policy),
                 is_seq(), first, last, std::forward<F>(f));
@@ -233,8 +232,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::generate_(std::forward<ExPolicy>(policy), first, last,
             std::forward<F>(f), is_segmented());
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -289,7 +295,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
-        using is_seq = execution::is_sequenced_execution_policy<ExPolicy>;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
         if (detail::is_negative(count))
         {
@@ -297,9 +303,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::move(first));
         }
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::generate_n<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, std::size_t(count),
             std::forward<F>(f));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -371,9 +384,7 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            using is_seq =
-                hpx::parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             if (hpx::parallel::v1::detail::is_negative(count))
             {

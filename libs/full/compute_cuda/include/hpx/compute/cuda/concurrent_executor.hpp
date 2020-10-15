@@ -195,7 +195,7 @@ namespace hpx { namespace parallel { namespace execution {
     struct executor_execution_category<
         cuda::experimental::concurrent_executor<Executor>>
     {
-        typedef parallel::execution::parallel_execution_tag type;
+        typedef ::hpx::execution::parallel_execution_tag type;
     };
 
     template <typename Executor>

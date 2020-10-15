@@ -45,7 +45,7 @@ namespace hpx { namespace parcelset
         parcel_data::parcel_data() :
 #if defined(HPX_HAVE_PARCEL_PROFILING)
             start_time_(0),
-            creation_time_(util::high_resolution_timer::now()),
+            creation_time_(chrono::high_resolution_timer::now()),
 #endif
             source_id_(naming::invalid_gid),
             dest_(naming::invalid_gid),
@@ -56,7 +56,7 @@ namespace hpx { namespace parcelset
             bool has_continuation) :
 #if defined(HPX_HAVE_PARCEL_PROFILING)
             start_time_(0),
-            creation_time_(util::high_resolution_timer::now()),
+            creation_time_(chrono::high_resolution_timer::now()),
 #endif
             source_id_(naming::invalid_gid),
             dest_(std::move(dest)),

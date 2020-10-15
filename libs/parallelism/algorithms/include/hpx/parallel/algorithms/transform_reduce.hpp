@@ -353,8 +353,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         transform_reduce_(ExPolicy&& policy, Iter first, Sent last, T&& init,
             Reduce&& red_op, Convert&& conv_op, std::false_type)
         {
-            using is_seq =
-                parallel::execution::is_sequenced_execution_policy<ExPolicy>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
             using init_type = typename hpx::util::decay<T>::type;
 
             return transform_reduce<init_type>().call(
@@ -403,9 +402,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::transform_reduce_(std::forward<ExPolicy>(policy), first,
             last, std::move(init), std::forward<Reduce>(red_op),
             std::forward<Convert>(conv_op), is_segmented());
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -611,7 +617,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Requires at least forward iterator.");
 
-            typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return detail::transform_reduce_binary<T>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,

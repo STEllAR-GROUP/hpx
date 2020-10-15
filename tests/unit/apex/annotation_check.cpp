@@ -19,8 +19,8 @@
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/runtime_local/pool_executor.hpp>
-#include <hpx/util/annotated_function.hpp>
 #include "apex_options.hpp"
 
 #include <atomic>

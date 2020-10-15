@@ -968,16 +968,35 @@ namespace hpx { namespace lcos {
         template <typename F>
         decltype(auto) then(F&& f, error_code& ec = throws)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            // This and the similar ifdefs below for future::then and
+            // shared_future::then only work to satisfy nvcc up to at least
+            // CUDA 11. Without this nvcc fails to compile some code with
+            // "error: cannot use an entity undefined in device code" without
+            // specifying what entity it refers to.
+            HPX_ASSERT(false);
+            using future_type = decltype(
+                base_type::then(std::move(*this), std::forward<F>(f), ec));
+            return future_type{};
+#else
             invalidate on_exit(*this);
             return base_type::then(std::move(*this), std::forward<F>(f), ec);
+#endif
         }
 
         template <typename T0, typename F>
         decltype(auto) then(T0&& t0, F&& f, error_code& ec = throws)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+            using future_type = decltype(base_type::then(std::move(*this),
+                std::forward<T0>(t0), std::forward<F>(f), ec));
+            return future_type{};
+#else
             invalidate on_exit(*this);
             return base_type::then(
                 std::move(*this), std::forward<T0>(t0), std::forward<F>(f), ec);
+#endif
         }
 
         template <typename Allocator, typename F>
@@ -985,9 +1004,16 @@ namespace hpx { namespace lcos {
             -> decltype(base_type::then_alloc(
                 alloc, std::move(*this), std::forward<F>(f), ec))
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+            using future_type = decltype(base_type::then_alloc(
+                alloc, std::move(*this), std::forward<F>(f), ec));
+            return future_type{};
+#else
             invalidate on_exit(*this);
             return base_type::then_alloc(
                 alloc, std::move(*this), std::forward<F>(f), ec);
+#endif
         }
 
         using base_type::wait;
@@ -1249,15 +1275,29 @@ namespace hpx { namespace lcos {
         template <typename F>
         decltype(auto) then(F&& f, error_code& ec = throws) const
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+            using future_type = decltype(
+                base_type::then(shared_future(*this), std::forward<F>(f), ec));
+            return future_type{};
+#else
             return base_type::then(
                 shared_future(*this), std::forward<F>(f), ec);
+#endif
         }
 
         template <typename T0, typename F>
         decltype(auto) then(T0&& t0, F&& f, error_code& ec = throws) const
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+            using future_type = decltype(base_type::then(shared_future(*this),
+                std::forward<T0>(t0), std::forward<F>(f), ec));
+            return future_type{};
+#else
             return base_type::then(shared_future(*this), std::forward<T0>(t0),
                 std::forward<F>(f), ec);
+#endif
         }
 
         template <typename Allocator, typename F>
@@ -1265,8 +1305,15 @@ namespace hpx { namespace lcos {
             -> decltype(base_type::then_alloc(
                 alloc, std::move(*this), std::forward<F>(f), ec))
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+            using future_type = decltype(base_type::then_alloc(
+                alloc, shared_future(*this), std::forward<F>(f), ec));
+            return future_type{};
+#else
             return base_type::then_alloc(
                 alloc, shared_future(*this), std::forward<F>(f), ec);
+#endif
         }
 
         using base_type::wait;

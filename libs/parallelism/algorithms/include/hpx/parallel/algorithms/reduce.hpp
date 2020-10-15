@@ -329,8 +329,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         typedef hpx::traits::is_segmented_iterator<FwdIterB> is_segmented;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::reduce_(std::forward<ExPolicy>(policy), first, last,
             std::move(init), std::forward<F>(f), is_segmented{});
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     // clang-format off
@@ -348,8 +355,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         typedef hpx::traits::is_segmented_iterator<FwdIterB> is_segmented;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::reduce_(std::forward<ExPolicy>(policy), first, last,
             std::move(init), std::plus<T>(), is_segmented{});
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     // clang-format off
@@ -365,12 +379,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename std::iterator_traits<FwdIterB>::value_type>::type
         reduce(ExPolicy&& policy, FwdIterB first, FwdIterE last)
     {
-        typedef typename std::iterator_traits<FwdIterB>::value_type value_type;
+        using value_type = typename std::iterator_traits<FwdIterB>::value_type;
 
-        typedef hpx::traits::is_segmented_iterator<FwdIterB> is_segmented;
+        using is_segmented = hpx::traits::is_segmented_iterator<FwdIterB>;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::reduce_(std::forward<ExPolicy>(policy), first, last,
             value_type{}, std::plus<value_type>(), is_segmented{});
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
 
