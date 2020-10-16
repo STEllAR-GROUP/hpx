@@ -30,8 +30,11 @@ if(HPX_WITH_HIP AND NOT TARGET roc::hipblas)
     roc::hipblas SYSTEM INTERFACE ${hipblas_INCLUDE_DIRS}
   )
 
-  set(HPX_WITH_COMPUTE ON)
-  hpx_add_config_define(HPX_HAVE_COMPUTE)
-  hpx_add_config_define(HPX_HAVE_HIP)
+  if(NOT HPX_FIND_PACKAGE)
+    # The cmake variables are supposed to be cached no need to redefine them
+    set(HPX_WITH_COMPUTE ON)
+    hpx_add_config_define(HPX_HAVE_COMPUTE)
+    hpx_add_config_define(HPX_HAVE_HIP)
+  endif()
 
 endif()
