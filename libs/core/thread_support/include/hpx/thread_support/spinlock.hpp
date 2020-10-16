@@ -7,6 +7,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+// see https://rigtorp.se/spinlock/
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -22,27 +24,41 @@ namespace hpx { namespace util { namespace detail {
         HPX_NON_COPYABLE(spinlock);
 
     private:
-        std::atomic_flag m = ATOMIC_FLAG_INIT;
+        std::atomic<bool> m;
 
         HPX_CORE_EXPORT void yield_k(unsigned) noexcept;
 
     public:
-        spinlock() = default;
+        spinlock() noexcept
+          : m(false)
+        {
+        }
 
         bool try_lock() noexcept
         {
-            return !m.test_and_set(std::memory_order_acquire);
+            // First do a relaxed load to check if lock is free in order to prevent
+            // unnecessary cache misses if someone does while(!try_lock())
+            return !m.load(std::memory_order_relaxed) &&
+                !m.exchange(true, std::memory_order_acquire);
         }
 
         void lock() noexcept
         {
-            for (unsigned k = 0; !try_lock(); ++k)
-                yield_k(k);
+            // Optimistically assume the lock is free on the first try
+            if (!m.exchange(true, std::memory_order_acquire))
+                return;
+
+            // Wait for lock to be released without generating cache misses
+            unsigned k = 0;
+            do
+            {
+                yield_k(k++);
+            } while (!try_lock());
         }
 
         void unlock() noexcept
         {
-            m.clear(std::memory_order_release);
+            m.store(false, std::memory_order_release);
         }
     };
 
