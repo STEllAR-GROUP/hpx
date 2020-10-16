@@ -46,7 +46,6 @@ if(HPX_RUNTIME_DISTRIBUTED_WITH_TESTS)
       modules.runtime_distributed
       HEADERS ${runtime_distributed_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-      NOLIBS
       DEPENDENCIES hpx_runtime_distributed
     )
   endif()

@@ -59,6 +59,9 @@
 #include <string>
 #include <utility>
 #include <vector>
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+#include <chrono>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -433,7 +436,29 @@ namespace hpx { namespace parcelset
         }
     }
 
+    void parcelhandler::put_parcel(parcel p)
+    {
+        auto handler = [this](boost::system::error_code const& ec,
+                           parcel const& p) -> void {
+            invoke_write_handler(ec, p);
+        };
+
+        put_parcel_impl(std::move(p), std::move(handler));
+    }
+
     void parcelhandler::put_parcel(parcel p, write_handler_type f)
+    {
+        auto handler = [this, f = std::move(f)](
+                           boost::system::error_code const& ec,
+                           parcel const& p) -> void {
+            invoke_write_handler(ec, p);
+            f(ec, p);
+        };
+
+        put_parcel_impl(std::move(p), std::move(handler));
+    }
+
+    void parcelhandler::put_parcel_impl(parcel&& p, write_handler_type&& f)
     {
 #if defined(HPX_HAVE_NETWORKING)
         HPX_ASSERT(is_networking_enabled_);
@@ -529,8 +554,36 @@ namespace hpx { namespace parcelset
 #endif
     }
 
-    void parcelhandler::put_parcels(std::vector<parcel> parcels,
-        std::vector<write_handler_type> handlers)
+    void parcelhandler::put_parcels(std::vector<parcel> parcels)
+    {
+        std::vector<write_handler_type> handlers(parcels.size(),
+            [this](boost::system::error_code const& ec, parcel const& p)
+                -> void { return invoke_write_handler(ec, p); });
+
+        put_parcels_impl(std::move(parcels), std::move(handlers));
+    }
+
+    void parcelhandler::put_parcels(
+        std::vector<parcel> parcels, std::vector<write_handler_type> funcs)
+    {
+        std::vector<write_handler_type> handlers;
+
+        handlers.reserve(parcels.size());
+        for (std::size_t i = 0; i != parcels.size(); ++i)
+        {
+            handlers.push_back([this, f = std::move(funcs[i])](
+                                   boost::system::error_code const& ec,
+                                   parcel const& p) -> void {
+                invoke_write_handler(ec, p);
+                f(ec, p);
+            });
+        }
+
+        put_parcels_impl(std::move(parcels), std::move(handlers));
+    }
+
+    void parcelhandler::put_parcels_impl(std::vector<parcel>&& parcels,
+        std::vector<write_handler_type>&& handlers)
     {
 #if defined(HPX_HAVE_NETWORKING)
         HPX_ASSERT(is_networking_enabled_);
@@ -689,6 +742,18 @@ namespace hpx { namespace parcelset
 #endif
     }
 
+    void parcelhandler::invoke_write_handler(
+        boost::system::error_code const& ec, parcel const& p) const
+    {
+        write_handler_type f;
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            f = write_handler_;
+        }
+        f(ec, p);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     std::int64_t parcelhandler::get_outgoing_queue_length(bool reset) const
     {
         std::int64_t parcel_count = 0;
@@ -1642,7 +1707,7 @@ namespace hpx { namespace parcelset
 
 #if defined(HPX_HAVE_PARCEL_PROFILING)
         // set the current local time for this locality
-        p.set_start_time(get_current_time());
+        p.set_start_time(hpx::chrono::high_resolution_timer::now());
 #endif
     }
 }}
