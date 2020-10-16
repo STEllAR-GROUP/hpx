@@ -10,10 +10,11 @@
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/debugging/backtrace.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
 #include <hpx/modules/command_line_handling.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/runtime_local/config_entry.hpp>

@@ -8,13 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/pack_traversal/detail/container_category.hpp>
 #include <hpx/pack_traversal/traits/pack_traversal_rebind_container.hpp>
 #include <hpx/type_support/always_void.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/detail/reserve.hpp>
 
@@ -211,7 +212,7 @@ namespace hpx { namespace util { namespace detail {
         constexpr auto apply_spread_impl(std::false_type, C&& callable,
             T&&... args) -> typename invoke_result<C, T...>::type
         {
-            return hpx::util::invoke(
+            return HPX_INVOKE(
                 std::forward<C>(callable), std::forward<T>(args)...);
         }
 

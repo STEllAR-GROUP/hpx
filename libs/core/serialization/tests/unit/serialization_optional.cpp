@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/modules/datastructures.hpp>
+#include <hpx/datastructures/optional.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/optional.hpp>
 #include <hpx/serialization/output_archive.hpp>

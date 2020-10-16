@@ -732,14 +732,16 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/modules/concepts.hpp>
-#include <hpx/modules/datastructures.hpp>
+#include <hpx/functional/detail/invoke.hpp>
+#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/executors.hpp>
-#include <hpx/modules/functional.hpp>
-#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/modules/type_support.hpp>
+#include <hpx/type_support/pack.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_loop_induction.hpp>
@@ -778,7 +780,7 @@ namespace hpx {
                 hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>, F&& f,
                 B part_begin)
             {
-                hpx::util::invoke(std::forward<F>(f), part_begin,
+                HPX_INVOKE(std::forward<F>(f), part_begin,
                     hpx::get<Is>(args).iteration_value()...);
             }
 
@@ -809,7 +811,7 @@ namespace hpx {
             template <typename F, typename S, typename... Ts>
             struct part_iterations<F, S, hpx::tuple<Ts...>>
             {
-                typedef typename hpx::util::decay<F>::type fun_type;
+                typedef typename std::decay<F>::type fun_type;
 
                 fun_type f_;
                 S stride_;
@@ -861,7 +863,7 @@ namespace hpx {
             template <typename F, typename S>
             struct part_iterations<F, S, hpx::tuple<>>
             {
-                typedef typename hpx::util::decay<F>::type fun_type;
+                typedef typename std::decay<F>::type fun_type;
 
                 fun_type f_;
                 S stride_;
@@ -879,7 +881,7 @@ namespace hpx {
                 {
                     while (part_steps != 0)
                     {
-                        hpx::util::invoke(f_, part_begin);
+                        HPX_INVOKE(f_, part_begin);
 
                         // NVCC seems to have a bug with std::min...
                         std::size_t chunk =
@@ -935,7 +937,7 @@ namespace hpx {
                     std::size_t count = size;
                     while (count != 0)
                     {
-                        hpx::util::invoke(f, first, args.iteration_value()...);
+                        HPX_INVOKE(f, first, args.iteration_value()...);
 
                         // NVCC seems to have a bug with std::min...
                         std::size_t chunk =
@@ -970,7 +972,7 @@ namespace hpx {
 
                     // we need to decay copy here to properly transport everything
                     // to a GPU device
-                    typedef hpx::tuple<typename hpx::util::decay<Ts>::type...>
+                    typedef hpx::tuple<typename std::decay<Ts>::type...>
                         args_type;
 
                     args_type args =
@@ -1426,8 +1428,8 @@ namespace hpx { namespace traits {
             parallel::v2::detail::part_iterations<F, S, Tuple> const&
                 f) noexcept
         {
-            return get_function_address<
-                typename hpx::util::decay<F>::type>::call(f.f_);
+            return get_function_address<typename std::decay<F>::type>::call(
+                f.f_);
         }
     };
 
@@ -1439,8 +1441,8 @@ namespace hpx { namespace traits {
             parallel::v2::detail::part_iterations<F, S, Tuple> const&
                 f) noexcept
         {
-            return get_function_annotation<
-                typename hpx::util::decay<F>::type>::call(f.f_);
+            return get_function_annotation<typename std::decay<F>::type>::call(
+                f.f_);
         }
     };
 
@@ -1454,7 +1456,7 @@ namespace hpx { namespace traits {
                 f) noexcept
         {
             return get_function_annotation_itt<
-                typename hpx::util::decay<F>::type>::call(f.f_);
+                typename std::decay<F>::type>::call(f.f_);
         }
     };
 #endif

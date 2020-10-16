@@ -435,15 +435,15 @@ namespace hpx {
         };
 
         template <typename Action, typename Callback, typename... Ts>
-        apply_c_p_cb_impl<Action, typename util::decay<Callback>::type,
-            typename util::decay<Ts>::type...>
+        apply_c_p_cb_impl<Action, typename std::decay<Callback>::type,
+            typename std::decay<Ts>::type...>
         apply_c_p_cb(naming::id_type const& contid, naming::address&& addr,
             naming::id_type const& id, threads::thread_priority p,
             Callback&& cb, Ts&&... vs)
         {
             typedef apply_c_p_cb_impl<Action,
-                typename util::decay<Callback>::type,
-                typename util::decay<Ts>::type...>
+                typename std::decay<Callback>::type,
+                typename std::decay<Ts>::type...>
                 result_type;
 
             return result_type(contid, std::move(addr), id, p,

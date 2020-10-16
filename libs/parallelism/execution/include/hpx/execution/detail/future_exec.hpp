@@ -26,7 +26,6 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <exception>
 #include <iterator>

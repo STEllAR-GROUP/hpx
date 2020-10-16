@@ -10,7 +10,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/iterator_support.hpp>
+#include <hpx/iterator_support/counting_iterator.hpp>
+#include <hpx/iterator_support/iterator_range.hpp>
 
 #include <type_traits>
 #include <utility>

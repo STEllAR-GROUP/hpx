@@ -14,7 +14,6 @@
 #include <hpx/datastructures/tagged_tuple.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <cstddef>
 #include <utility>

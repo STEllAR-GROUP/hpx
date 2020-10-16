@@ -10,11 +10,11 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/futures/future_fwd.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/get_remote_result.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/functional.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
@@ -22,7 +22,6 @@
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <boost/container/small_vector.hpp>
@@ -559,7 +558,7 @@ namespace hpx { namespace lcos { namespace detail {
             // set the received result, reset error status
             try
             {
-                typedef typename util::decay<T>::type naked_type;
+                typedef typename std::decay<T>::type naked_type;
 
                 typedef traits::get_remote_result<result_type, naked_type>
                     get_remote_result_type;

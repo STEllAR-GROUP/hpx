@@ -195,12 +195,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename InIter, typename T,
             typename Reduce, typename Convert>
         typename util::detail::algorithm_result<ExPolicy,
-            typename hpx::util::decay<T>::type>::type
+            typename std::decay<T>::type>::type
         transform_reduce_(ExPolicy&& policy, InIter first, InIter last,
             T&& init, Reduce&& red_op, Convert&& conv_op, std::true_type)
         {
             using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-            using init_type = typename hpx::util::decay<T>::type;
+            using init_type = typename std::decay<T>::type;
 
             if (first == last)
             {
@@ -218,7 +218,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename Iter, typename Sent, typename T,
             typename Reduce, typename Convert>
         typename util::detail::algorithm_result<ExPolicy,
-            typename hpx::util::decay<T>::type>::type
+            typename std::decay<T>::type>::type
         transform_reduce_(ExPolicy&& policy, Iter first, Sent last, T&& init,
             Reduce&& red_op, Convert&& conv_op, std::false_type);
 
@@ -413,7 +413,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::true_type)
         {
             using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-            using init_type = typename hpx::util::decay<T>::type;
+            using init_type = typename std::decay<T>::type;
 
             if (first1 == last1)
             {

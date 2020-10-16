@@ -50,7 +50,7 @@ namespace hpx { namespace threads {
             result_type;
 
         char const* annotation = hpx::traits::get_function_annotation<
-            typename hpx::util::decay<F>::type>::call(f);
+            typename std::decay<F>::type>::call(f);
         lcos::local::futures_factory<result_type()> p(
             std::forward<Executor>(exec),
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
@@ -104,7 +104,7 @@ namespace hpx { namespace threads {
     post(Executor&& exec, F&& f, Ts&&... ts)
     {
         char const* annotation = hpx::traits::get_function_annotation<
-            typename hpx::util::decay<F>::type>::call(f);
+            typename std::decay<F>::type>::call(f);
         exec.add(
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
             annotation, threads::pending, true, exec.get_stacksize(),
@@ -115,7 +115,7 @@ namespace hpx { namespace threads {
     template <typename Executor, typename F, typename Hint, typename... Ts>
     HPX_FORCEINLINE typename std::enable_if<
         hpx::traits::is_threads_executor<Executor>::value &&
-        std::is_same<typename hpx::util::decay<Hint>::type,
+        std::is_same<typename std::decay<Hint>::type,
             hpx::threads::thread_schedule_hint>::value>::type
     post(
         Executor&& exec, F&& f, Hint&& hint, const char* annotation, Ts&&... ts)

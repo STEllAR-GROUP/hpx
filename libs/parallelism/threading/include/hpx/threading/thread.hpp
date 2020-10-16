@@ -8,9 +8,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/function.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/future_fwd.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/functional.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
@@ -47,7 +49,7 @@ namespace hpx {
 
         template <typename F,
             typename Enable = typename std::enable_if<!std::is_same<
-                typename hpx::util::decay<F>::type, thread>::value>::type>
+                typename std::decay<F>::type, thread>::value>::type>
         explicit thread(F&& f)
         {
             auto thrd_data = threads::get_self_id_data();

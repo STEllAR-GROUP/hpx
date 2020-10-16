@@ -57,11 +57,11 @@ void tagged_pair_test()
         static_assert(std::is_same<decltype(p.second), B>::value, "");
 
         static_assert(
-            std::is_same<typename hpx::util::decay<decltype(p.tag1())>::type,
+            std::is_same<typename std::decay<decltype(p.tag1())>::type,
                 A>::value,
             "");
         static_assert(
-            std::is_same<typename hpx::util::decay<decltype(p.tag2())>::type,
+            std::is_same<typename std::decay<decltype(p.tag2())>::type,
                 B>::value,
             "");
     }
@@ -115,15 +115,15 @@ void tagged_tuple_test()
             "");
 
         static_assert(
-            std::is_same<typename hpx::util::decay<decltype(t.tag1())>::type,
+            std::is_same<typename std::decay<decltype(t.tag1())>::type,
                 A>::value,
             "");
         static_assert(
-            std::is_same<typename hpx::util::decay<decltype(t.tag2())>::type,
+            std::is_same<typename std::decay<decltype(t.tag2())>::type,
                 B>::value,
             "");
         static_assert(
-            std::is_same<typename hpx::util::decay<decltype(t.tag3())>::type,
+            std::is_same<typename std::decay<decltype(t.tag3())>::type,
                 C>::value,
             "");
     }

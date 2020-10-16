@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/sync.hpp>
-#include <hpx/type_support/decay.hpp>
 
+#include <type_traits>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -25,6 +25,6 @@ namespace hpx {
     template <typename Action, typename F, typename... Ts>
     HPX_FORCEINLINE auto sync(F&& f, Ts&&... ts)
         -> decltype(detail::sync_action_dispatch<Action,
-            typename util::decay<F>::type>::call(std::forward<F>(f),
+            typename std::decay<F>::type>::call(std::forward<F>(f),
             std::forward<Ts>(ts)...));
 }    // namespace hpx

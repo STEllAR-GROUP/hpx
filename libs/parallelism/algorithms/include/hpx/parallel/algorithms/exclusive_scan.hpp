@@ -23,6 +23,7 @@
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
+#include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <algorithm>

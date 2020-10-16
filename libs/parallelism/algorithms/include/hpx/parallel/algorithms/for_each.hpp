@@ -238,12 +238,12 @@ namespace hpx {
 #include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/modules/concepts.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/functional/detail/invoke.hpp>
+#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
-#include <hpx/modules/functional.hpp>
-#include <hpx/modules/iterator_support.hpp>
-#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -275,7 +275,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             call(T&& t)
             {
                 T&& tmp = std::forward<T>(t);
-                hpx::util::invoke(f_, hpx::util::invoke(proj_, tmp));
+                HPX_INVOKE(f_, HPX_INVOKE(proj_, tmp));
             }
 
             template <typename T>
@@ -283,8 +283,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 hpx::traits::is_value_proxy<T>::value>::type
             call(T&& t)
             {
-                auto tmp = hpx::util::invoke(proj_, std::forward<T>(t));
-                hpx::util::invoke_r<void>(f_, tmp);
+                auto tmp = HPX_INVOKE(proj_, std::forward<T>(t));
+                HPX_INVOKE(f_, tmp);
             }
 
             template <typename Iter>
@@ -310,7 +310,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             call(T&& t)
             {
                 T&& tmp = std::forward<T>(t);
-                hpx::util::invoke(f_, tmp);
+                HPX_INVOKE(f_, tmp);
             }
 
             template <typename T>
@@ -319,7 +319,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             call(T&& t)
             {
                 auto tmp = std::forward<T>(t);
-                hpx::util::invoke_r<void>(f_, tmp);
+                HPX_INVOKE(f_, tmp);
             }
 
             template <typename Iter>
@@ -333,10 +333,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename F, typename Proj>
         struct for_each_iteration
         {
-            using execution_policy_type =
-                typename hpx::util::decay<ExPolicy>::type;
-            using fun_type = typename hpx::util::decay<F>::type;
-            using proj_type = typename hpx::util::decay<Proj>::type;
+            using execution_policy_type = typename std::decay<ExPolicy>::type;
+            using fun_type = typename std::decay<F>::type;
+            using proj_type = typename std::decay<Proj>::type;
 
             fun_type f_;
             proj_type proj_;
@@ -728,8 +727,8 @@ namespace hpx { namespace traits {
             parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const&
                 f) noexcept
         {
-            return get_function_address<
-                typename hpx::util::decay<F>::type>::call(f.f_);
+            return get_function_address<typename std::decay<F>::type>::call(
+                f.f_);
         }
     };
 
@@ -741,8 +740,8 @@ namespace hpx { namespace traits {
             parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const&
                 f) noexcept
         {
-            return get_function_annotation<
-                typename hpx::util::decay<F>::type>::call(f.f_);
+            return get_function_annotation<typename std::decay<F>::type>::call(
+                f.f_);
         }
     };
 
@@ -756,7 +755,7 @@ namespace hpx { namespace traits {
                 f) noexcept
         {
             return get_function_annotation_itt<
-                typename hpx::util::decay<F>::type>::call(f.f_);
+                typename std::decay<F>::type>::call(f.f_);
         }
     };
 #endif

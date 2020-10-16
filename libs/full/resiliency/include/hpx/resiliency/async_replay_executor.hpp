@@ -14,11 +14,13 @@
 #include <hpx/resiliency/async_replay.hpp>
 #include <hpx/resiliency/resiliency_cpos.hpp>
 
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/modules/async_local.hpp>
-#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/modules/type_support.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -97,7 +99,7 @@ namespace hpx { namespace resiliency { namespace experimental {
 
                         auto&& result = f.get();
 
-                        if (!hpx::util::invoke(this_->pred_, result))
+                        if (!HPX_INVOKE(this_->pred_, result))
                         {
                             // execute the task again if an error occurred and
                             // this was not the last attempt

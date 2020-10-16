@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 

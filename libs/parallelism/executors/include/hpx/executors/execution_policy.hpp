@@ -23,7 +23,6 @@
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/executors/sequenced_executor.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <memory>
 #include <type_traits>

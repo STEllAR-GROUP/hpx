@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/decay.hpp>
 
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace detail {
@@ -21,7 +21,7 @@ namespace hpx {
     template <typename F, typename... Ts>
     HPX_FORCEINLINE decltype(auto) async(F&& f, Ts&&... ts)
     {
-        return detail::async_dispatch<typename util::decay<F>::type>::call(
+        return detail::async_dispatch<typename std::decay<F>::type>::call(
             std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 }    // namespace hpx

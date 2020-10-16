@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <type_traits>
 
@@ -61,7 +60,7 @@ namespace hpx {
     ///
     template <typename T>
     struct is_execution_policy
-      : hpx::detail::is_execution_policy<typename hpx::util::decay<T>::type>
+      : hpx::detail::is_execution_policy<typename std::decay<T>::type>
     {
     };
 
@@ -84,8 +83,7 @@ namespace hpx {
     ///
     template <typename T>
     struct is_parallel_execution_policy
-      : hpx::detail::is_parallel_execution_policy<
-            typename hpx::util::decay<T>::type>
+      : hpx::detail::is_parallel_execution_policy<typename std::decay<T>::type>
     {
     };
 
@@ -111,8 +109,7 @@ namespace hpx {
     // extension:
     template <typename T>
     struct is_sequenced_execution_policy
-      : hpx::detail::is_sequenced_execution_policy<
-            typename hpx::util::decay<T>::type>
+      : hpx::detail::is_sequenced_execution_policy<typename std::decay<T>::type>
     {
     };
 
@@ -138,8 +135,7 @@ namespace hpx {
     // extension:
     template <typename T>
     struct is_async_execution_policy
-      : hpx::detail::is_async_execution_policy<
-            typename hpx::util::decay<T>::type>
+      : hpx::detail::is_async_execution_policy<typename std::decay<T>::type>
     {
     };
 
@@ -150,8 +146,7 @@ namespace hpx {
     /// \cond NOINTERNAL
     template <typename T>
     struct is_rebound_execution_policy
-      : hpx::detail::is_rebound_execution_policy<
-            typename hpx::util::decay<T>::type>
+      : hpx::detail::is_rebound_execution_policy<typename std::decay<T>::type>
     {
     };
 
@@ -163,7 +158,7 @@ namespace hpx {
     template <typename T>
     struct is_vectorpack_execution_policy
       : hpx::detail::is_vectorpack_execution_policy<
-            typename hpx::util::decay<T>::type>
+            typename std::decay<T>::type>
     {
     };
 

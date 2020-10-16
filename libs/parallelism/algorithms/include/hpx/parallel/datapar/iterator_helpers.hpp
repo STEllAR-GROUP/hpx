@@ -12,6 +12,7 @@
 #include <hpx/execution/traits/vector_pack_alignment_size.hpp>
 #include <hpx/execution/traits/vector_pack_load_store.hpp>
 #include <hpx/execution/traits/vector_pack_type.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 
 #include <cstddef>
@@ -45,8 +46,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     template <typename Iter1, typename Iter2>
     struct iterators_datapar_compatible_impl
     {
-        typedef typename hpx::util::decay<Iter1>::type iterator1_type;
-        typedef typename hpx::util::decay<Iter2>::type iterator2_type;
+        typedef typename std::decay<Iter1>::type iterator1_type;
+        typedef typename std::decay<Iter2>::type iterator2_type;
 
         typedef typename std::iterator_traits<iterator1_type>::value_type
             value1_type;
@@ -83,8 +84,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     struct iterator_datapar_compatible<Iter,
         typename std::enable_if<
             hpx::traits::is_random_access_iterator<Iter>::value>::type>
-      : iterator_datapar_compatible_impl<
-            typename hpx::util::decay<Iter>::type>::type
+      : iterator_datapar_compatible_impl<typename std::decay<Iter>::type>::type
     {
     };
 
@@ -209,22 +209,22 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         template <typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE static
-            typename hpx::util::invoke_result<F, V1*>::type
+            typename HPX_INVOKE_result<F, V1*>::type
             call1(F&& f, Iter& it)
         {
             store_on_exit_unaligned<Iter, V1> tmp(it);
             ++it;
-            return hpx::util::invoke(f, &tmp);
+            return HPX_INVOKE(f, &tmp);
         }
 
         template <typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE static
-            typename hpx::util::invoke_result<F, V*>::type
+            typename HPX_INVOKE_result<F, V*>::type
             callv(F&& f, Iter& it)
         {
             store_on_exit<Iter, V> tmp(it);
             std::advance(it, traits::vector_pack_size<V>::value);
-            return hpx::util::invoke(f, &tmp);
+            return HPX_INVOKE(f, &tmp);
         }
     };
 
@@ -233,8 +233,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     struct invoke_vectorized_in2
     {
         template <typename F, typename Iter1, typename Iter2>
-        static typename hpx::util::invoke_result<F, V1*, V2*>::type
-        call_aligned(F&& f, Iter1& it1, Iter2& it2)
+        static typename HPX_INVOKE_result<F, V1*, V2*>::type call_aligned(
+            F&& f, Iter1& it1, Iter2& it2)
         {
             static_assert(traits::vector_pack_size<V1>::value ==
                     traits::vector_pack_size<V2>::value,
@@ -251,12 +251,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::advance(it1, traits::vector_pack_size<V1>::value);
             std::advance(it2, traits::vector_pack_size<V2>::value);
 
-            return hpx::util::invoke(std::forward<F>(f), &tmp1, &tmp2);
+            return HPX_INVOKE(std::forward<F>(f), &tmp1, &tmp2);
         }
 
         template <typename F, typename Iter1, typename Iter2>
-        static typename hpx::util::invoke_result<F, V1*, V2*>::type
-        call_unaligned(F&& f, Iter1& it1, Iter2& it2)
+        static typename HPX_INVOKE_result<F, V1*, V2*>::type call_unaligned(
+            F&& f, Iter1& it1, Iter2& it2)
         {
             static_assert(traits::vector_pack_size<V1>::value ==
                     traits::vector_pack_size<V2>::value,
@@ -273,7 +273,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::advance(it1, traits::vector_pack_size<V1>::value);
             std::advance(it2, traits::vector_pack_size<V2>::value);
 
-            return hpx::util::invoke(std::forward<F>(f), &tmp1, &tmp2);
+            return HPX_INVOKE(std::forward<F>(f), &tmp1, &tmp2);
         }
     };
 
@@ -291,7 +291,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         template <typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE static
-            typename hpx::util::invoke_result<F, V11*, V12*>::type
+            typename HPX_INVOKE_result<F, V11*, V12*>::type
             call1(F&& f, Iter1& it1, Iter2& it2)
         {
             return invoke_vectorized_in2<V11, V12>::call_aligned(
@@ -300,7 +300,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         template <typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE static
-            typename hpx::util::invoke_result<F, V1*, V2*>::type
+            typename HPX_INVOKE_result<F, V1*, V2*>::type
             callv(F&& f, Iter1& it1, Iter2& it2)
         {
             if (is_data_aligned(it1) || is_data_aligned(it2))
@@ -327,7 +327,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             V tmp(traits::vector_pack_load<V, value_type>::aligned(it));
 
-            auto ret = hpx::util::invoke(f, &tmp);
+            auto ret = HPX_INVOKE(f, &tmp);
             traits::vector_pack_store<decltype(ret), value_type>::aligned(
                 ret, dest);
 
@@ -344,7 +344,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             V tmp(traits::vector_pack_load<V, value_type>::unaligned(it));
 
-            auto ret = hpx::util::invoke(f, &tmp);
+            auto ret = HPX_INVOKE(f, &tmp);
             traits::vector_pack_store<decltype(ret), value_type>::unaligned(
                 ret, dest);
 
@@ -373,7 +373,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             V1 tmp1(traits::vector_pack_load<V1, value_type1>::aligned(it1));
             V2 tmp2(traits::vector_pack_load<V2, value_type2>::aligned(it2));
 
-            auto ret = hpx::util::invoke(f, &tmp1, &tmp2);
+            auto ret = HPX_INVOKE(f, &tmp1, &tmp2);
             traits::vector_pack_store<decltype(ret), value_type1>::aligned(
                 ret, dest);
 
@@ -399,7 +399,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             V1 tmp1(traits::vector_pack_load<V1, value_type1>::unaligned(it1));
             V2 tmp2(traits::vector_pack_load<V2, value_type2>::unaligned(it2));
 
-            auto ret = hpx::util::invoke(f, &tmp1, &tmp2);
+            auto ret = HPX_INVOKE(f, &tmp1, &tmp2);
             traits::vector_pack_store<decltype(ret), value_type1>::unaligned(
                 ret, dest);
 

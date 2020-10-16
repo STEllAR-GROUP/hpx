@@ -90,11 +90,11 @@ namespace hpx { namespace lcos {
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/calculate_fanout.hpp>
 
 #include <cstddef>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -172,7 +172,7 @@ namespace hpx { namespace lcos {
             template <typename ReduceOp>
             struct reduce_invoker_helper
             {
-                typedef typename util::decay<ReduceOp>::type reduce_op_type;
+                typedef typename std::decay<ReduceOp>::type reduce_op_type;
 
                 typedef detail::reduce_invoker<Action, reduce_op_type,
                     typename hpx::tuple_element<Is,

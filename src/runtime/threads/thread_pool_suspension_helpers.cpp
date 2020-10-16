@@ -6,8 +6,8 @@
 
 #include <hpx/async_local/apply.hpp>
 #include <hpx/async_local/async.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/modules/functional.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>

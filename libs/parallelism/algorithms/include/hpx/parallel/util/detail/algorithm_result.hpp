@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/executors/execution_policy_fwd.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -247,7 +247,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename T = void>
     struct algorithm_result
-      : algorithm_result_impl<typename hpx::util::decay<ExPolicy>::type, T>
+      : algorithm_result_impl<typename std::decay<ExPolicy>::type, T>
     {
         static_assert(!std::is_lvalue_reference<T>::value,
             "T shouldn't be a lvalue reference");
@@ -259,7 +259,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     typename hpx::util::invoke_result<Conv, U>::type convert_to_result(
         U&& val, Conv&& conv)
     {
-        return hpx::util::invoke(conv, val);
+        return HPX_INVOKE(conv, val);
     }
 
     template <typename U, typename Conv,

@@ -18,7 +18,7 @@
 #include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -171,7 +171,7 @@ namespace hpx { namespace parallel { namespace execution {
                         // properly handle all exceptions thrown from 'f'
                         try
                         {
-                            hpx::util::invoke(f, *it, ts...);
+                            HPX_INVOKE(f, *it, ts...);
                         }
                         catch (...)
                         {
@@ -387,7 +387,7 @@ namespace hpx { namespace parallel { namespace execution {
                             // properly handle all exceptions thrown from 'f'
                             try
                             {
-                                hpx::util::invoke(f, *it, ts...);
+                                HPX_INVOKE(f, *it, ts...);
                             }
                             catch (...)
                             {

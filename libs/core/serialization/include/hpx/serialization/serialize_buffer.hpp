@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/datastructures.hpp>
+#include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
 #include <hpx/modules/errors.hpp>
 
 #include <hpx/serialization/array.hpp>

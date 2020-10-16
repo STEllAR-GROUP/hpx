@@ -17,8 +17,8 @@
 #include <hpx/traits/action_decorate_function.hpp>
 
 #include <mutex>
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace components
 {
@@ -83,7 +83,7 @@ namespace hpx { namespace components
         struct decorate_wrapper
         {
             template <typename F, typename Enable = typename
-                std::enable_if<!std::is_same<typename hpx::util::decay<F>::type,
+                std::enable_if<!std::is_same<typename std::decay<F>::type,
                     decorate_wrapper>::value>::type>
             // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
             decorate_wrapper(F && f)

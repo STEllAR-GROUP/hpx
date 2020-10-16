@@ -132,7 +132,6 @@ namespace hpx { namespace lcos {
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime_local/get_num_localities.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>

@@ -17,7 +17,6 @@
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/executors/exception_list.hpp>
@@ -408,7 +407,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
         static_assert(hpx::is_execution_policy<ExPolicy>::value,
             "hpx::is_execution_policy<ExPolicy>::value");
 
-        typedef typename hpx::util::decay<ExPolicy>::type policy_type;
+        typedef typename std::decay<ExPolicy>::type policy_type;
         task_block<policy_type> trh(std::forward<ExPolicy>(policy));
 
         // invoke the user supplied function

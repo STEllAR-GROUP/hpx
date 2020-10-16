@@ -58,9 +58,8 @@ namespace hpx { namespace traits {
         static char const* call(
             lcos::detail::dataflow_finalization<Frame> const& f) noexcept
         {
-            char const* annotation =
-                hpx::traits::get_function_annotation<typename hpx::util::decay<
-                    function_type>::type>::call(f.this_->func_);
+            char const* annotation = hpx::traits::get_function_annotation<
+                typename std::decay<function_type>::type>::call(f.this_->func_);
             return annotation;
         }
     };

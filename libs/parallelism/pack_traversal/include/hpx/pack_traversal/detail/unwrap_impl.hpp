@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/traits/is_tuple_like.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
@@ -157,7 +157,7 @@ namespace hpx { namespace util { namespace detail {
         static auto apply(C&& callable, T&& unwrapped) ->
             typename invoke_result<C, T>::type
         {
-            return util::invoke(
+            return HPX_INVOKE(
                 std::forward<C>(callable), std::forward<T>(unwrapped));
         }
     };

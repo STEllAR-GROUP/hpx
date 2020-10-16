@@ -27,6 +27,7 @@
 
 #include <exception>
 #include <memory>
+#include <type_traits>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -199,7 +200,7 @@ namespace hpx { namespace lcos {
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
-            using callback_type = typename util::decay<Callback>::type;
+            using callback_type = typename std::decay<Callback>::type;
 
 #if defined(HPX_HAVE_NETWORKING)
             auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
@@ -241,7 +242,7 @@ namespace hpx { namespace lcos {
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
-            using callback_type = typename util::decay<Callback>::type;
+            using callback_type = typename std::decay<Callback>::type;
 
 #if defined(HPX_HAVE_NETWORKING)
             auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
@@ -375,7 +376,7 @@ namespace hpx { namespace lcos {
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
-            using callback_type = typename util::decay<Callback>::type;
+            using callback_type = typename std::decay<Callback>::type;
 
 #if defined(HPX_HAVE_NETWORKING)
             auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{

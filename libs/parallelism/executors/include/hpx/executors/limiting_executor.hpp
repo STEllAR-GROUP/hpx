@@ -12,7 +12,7 @@
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/this_thread.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/threading_base/print.hpp>
 
 #include <atomic>
@@ -91,7 +91,7 @@ namespace hpx { namespace execution { namespace experimental {
             decltype(auto) operator()(Ts&&... ts)
             {
                 on_exit _{limiting_};
-                return hpx::util::invoke(f_, std::forward<Ts>(ts)...);
+                return HPX_INVOKE(f_, std::forward<Ts>(ts)...);
             }
 
             // returns true if too many tasks would be in flight
@@ -143,7 +143,7 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename... Ts>
             decltype(auto) operator()(Ts&&... ts)
             {
-                return hpx::util::invoke(f_, std::forward<Ts>(ts)...);
+                return HPX_INVOKE(f_, std::forward<Ts>(ts)...);
             }
 
             // NB. use ">=" because counting is external

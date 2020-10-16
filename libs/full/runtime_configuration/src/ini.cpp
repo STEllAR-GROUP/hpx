@@ -13,13 +13,13 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-
 #include <fstream>
 #include <iostream>
 #include <list>
 #include <mutex>
 #include <regex>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -557,8 +557,8 @@ namespace hpx { namespace util {
             return std::forward<F1>(f1);
 
         // otherwise create a combined callback
-        typedef compose_callback_impl<typename util::decay<F1>::type,
-            typename util::decay<F2>::type>
+        typedef compose_callback_impl<typename std::decay<F1>::type,
+            typename std::decay<F2>::type>
             result_type;
         return result_type(std::forward<F1>(f1), std::forward<F2>(f2));
     }

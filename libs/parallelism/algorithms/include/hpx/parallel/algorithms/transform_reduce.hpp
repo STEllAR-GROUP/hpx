@@ -254,6 +254,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
@@ -269,6 +270,7 @@ namespace hpx {
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -349,12 +351,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename Iter, typename Sent, typename T,
             typename Reduce, typename Convert>
         inline typename util::detail::algorithm_result<ExPolicy,
-            typename hpx::util::decay<T>::type>::type
+            typename std::decay<T>::type>::type
         transform_reduce_(ExPolicy&& policy, Iter first, Sent last, T&& init,
             Reduce&& red_op, Convert&& conv_op, std::false_type)
         {
             using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-            using init_type = typename hpx::util::decay<T>::type;
+            using init_type = typename std::decay<T>::type;
 
             return transform_reduce<init_type>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last,
@@ -366,7 +368,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename FwdIter, typename T,
             typename Reduce, typename Convert>
         typename util::detail::algorithm_result<ExPolicy,
-            typename hpx::util::decay<T>::type>::type
+            typename std::decay<T>::type>::type
         transform_reduce_(ExPolicy&& policy, FwdIter first, FwdIter last,
             T&& init, Reduce&& red_op, Convert&& conv_op, std::true_type);
 
@@ -434,7 +436,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename Op1, typename Op2, typename T>
         struct transform_reduce_binary_partition
         {
-            typedef typename hpx::util::decay<T>::type value_type;
+            typedef typename std::decay<T>::type value_type;
 
             Op1 op1_;
             Op2 op2_;

@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/continuation_fwd.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <exception>
@@ -24,7 +24,7 @@ namespace hpx { namespace actions
     {
         try
         {
-            cont.trigger_value(util::invoke(
+            cont.trigger_value(HPX_INVOKE(
                 std::forward<F>(f), std::forward<Ts>(vs)...));
         } catch (...) {
             // make sure hpx::exceptions are propagated back to the client
@@ -39,7 +39,7 @@ namespace hpx { namespace actions
     {
         try
         {
-            util::invoke(std::forward<F>(f), std::forward<Ts>(vs)...);
+            HPX_INVOKE(std::forward<F>(f), std::forward<Ts>(vs)...);
             cont.trigger();
         } catch (...) {
             // make sure hpx::exceptions are propagated back to the client

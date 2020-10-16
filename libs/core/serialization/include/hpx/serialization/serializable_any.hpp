@@ -161,11 +161,11 @@ namespace hpx { namespace util {
         basic_any(T&& x,
             typename std::enable_if<std::is_copy_constructible<
                 typename std::decay<T>::type>::value>::type* = nullptr)
-          : table(detail::any::get_table<typename util::decay<T>::type>::
+          : table(detail::any::get_table<typename std::decay<T>::type>::
                     template get<IArch, OArch, Char, std::true_type>())
           , object(nullptr)
         {
-            using value_type = typename util::decay<T>::type;
+            using value_type = typename std::decay<T>::type;
             new_object<T>(object,
                 typename detail::any::get_table<value_type>::is_small(),
                 std::forward<T>(x));

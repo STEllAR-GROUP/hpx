@@ -12,8 +12,8 @@
 #include <hpx/async_distributed/applier/apply_continue_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/serialization/access.hpp>
-#include <hpx/type_support/decay.hpp>
 
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace actions {
@@ -22,8 +22,8 @@ namespace hpx { namespace actions {
     struct continuation2_impl
     {
     private:
-        typedef typename util::decay<Cont>::type cont_type;
-        typedef typename util::decay<F>::type function_type;
+        typedef typename std::decay<Cont>::type cont_type;
+        typedef typename std::decay<F>::type function_type;
 
     public:
         continuation2_impl() {}

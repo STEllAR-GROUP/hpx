@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/type_support/decay.hpp>
 
+#include <type_traits>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -22,23 +22,24 @@ namespace hpx { namespace lcos { namespace detail {
 namespace hpx {
     template <typename F, typename... Ts>
     HPX_FORCEINLINE auto dataflow(F&& f, Ts&&... ts) -> decltype(
-        lcos::detail::dataflow_dispatch<typename util::decay<F>::type>::call(
+        lcos::detail::dataflow_dispatch<typename std::decay<F>::type>::call(
             hpx::util::internal_allocator<>{}, std::forward<F>(f),
             std::forward<Ts>(ts)...))
     {
-        return lcos::detail::dataflow_dispatch<typename util::decay<F>::type>::
+        return lcos::detail::dataflow_dispatch<typename std::decay<F>::type>::
             call(hpx::util::internal_allocator<>{}, std::forward<F>(f),
                 std::forward<Ts>(ts)...);
     }
 
     template <typename Allocator, typename F, typename... Ts>
-    HPX_FORCEINLINE auto
-    dataflow_alloc(Allocator const& alloc, F&& f, Ts&&... ts) -> decltype(
-        lcos::detail::dataflow_dispatch<typename util::decay<F>::type>::call(
-            alloc, std::forward<F>(f), std::forward<Ts>(ts)...))
+    HPX_FORCEINLINE auto dataflow_alloc(
+        Allocator const& alloc, F&& f, Ts&&... ts)
+        -> decltype(
+            lcos::detail::dataflow_dispatch<typename std::decay<F>::type>::call(
+                alloc, std::forward<F>(f), std::forward<Ts>(ts)...))
     {
         return lcos::detail::dataflow_dispatch<
-            typename util::decay<F>::type>::call(alloc, std::forward<F>(f),
+            typename std::decay<F>::type>::call(alloc, std::forward<F>(f),
             std::forward<Ts>(ts)...);
     }
 }    // namespace hpx

@@ -11,9 +11,10 @@
 #include <hpx/assert.hpp>
 #include <hpx/collectives/detail/communication_set_node.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/iterator_support/counting_iterator.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/container_algorithms/count.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/components/component_factory.hpp>

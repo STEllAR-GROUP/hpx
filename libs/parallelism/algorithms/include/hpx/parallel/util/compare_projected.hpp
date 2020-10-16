@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 
 #include <hpx/parallel/util/projection_identity.hpp>
 
@@ -34,9 +34,8 @@ namespace hpx { namespace parallel { namespace util {
         template <typename T1, typename T2>
         inline constexpr bool operator()(T1&& t1, T2&& t2) const
         {
-            return hpx::util::invoke(comp_,
-                hpx::util::invoke(proj_, std::forward<T1>(t1)),
-                hpx::util::invoke(proj_, std::forward<T2>(t2)));
+            return HPX_INVOKE(comp_, HPX_INVOKE(proj_, std::forward<T1>(t1)),
+                HPX_INVOKE(proj_, std::forward<T2>(t2)));
         }
 
         Compare comp_;
@@ -55,7 +54,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename T1, typename T2>
         inline constexpr bool operator()(T1&& t1, T2&& t2) const
         {
-            return hpx::util::invoke(
+            return HPX_INVOKE(
                 comp_, std::forward<T1>(t1), std::forward<T2>(t2));
         }
 
@@ -78,9 +77,8 @@ namespace hpx { namespace parallel { namespace util {
         template <typename T1, typename T2>
         inline constexpr bool operator()(T1&& t1, T2&& t2) const
         {
-            return hpx::util::invoke(comp_,
-                hpx::util::invoke(proj1_, std::forward<T1>(t1)),
-                hpx::util::invoke(proj2_, std::forward<T2>(t2)));
+            return HPX_INVOKE(comp_, HPX_INVOKE(proj1_, std::forward<T1>(t1)),
+                HPX_INVOKE(proj2_, std::forward<T2>(t2)));
         }
 
         Compare comp_;
@@ -102,8 +100,8 @@ namespace hpx { namespace parallel { namespace util {
         template <typename T1, typename T2>
         inline constexpr bool operator()(T1&& t1, T2&& t2) const
         {
-            return hpx::util::invoke(comp_, std::forward<T1>(t1),
-                hpx::util::invoke(proj2_, std::forward<T2>(t2)));
+            return HPX_INVOKE(comp_, std::forward<T1>(t1),
+                HPX_INVOKE(proj2_, std::forward<T2>(t2)));
         }
 
         Compare comp_;
@@ -124,8 +122,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename T1, typename T2>
         inline constexpr bool operator()(T1&& t1, T2&& t2) const
         {
-            return hpx::util::invoke(comp_,
-                hpx::util::invoke(proj1_, std::forward<T1>(t1)),
+            return HPX_INVOKE(comp_, HPX_INVOKE(proj1_, std::forward<T1>(t1)),
                 std::forward<T2>(t2));
         }
 
@@ -147,7 +144,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename T1, typename T2>
         inline constexpr bool operator()(T1&& t1, T2&& t2) const
         {
-            return hpx::util::invoke(
+            return HPX_INVOKE(
                 comp_, std::forward<T1>(t1), std::forward<T2>(t2));
         }
 

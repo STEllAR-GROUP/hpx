@@ -9,7 +9,6 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/modules/functional.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
@@ -48,8 +47,7 @@ void local_tests(hpx::program_options::variables_map& vm)
         std::atomic<std::size_t> c(0);
         for (std::size_t j = 1; j <= pxthreads; ++j)
         {
-            hpx::async(
-                hpx::util::bind(&barrier_test, pxthreads + 1, j, std::ref(c)));
+            hpx::async(&barrier_test, pxthreads + 1, j, std::ref(c));
         }
 
         hpx::lcos::barrier b(

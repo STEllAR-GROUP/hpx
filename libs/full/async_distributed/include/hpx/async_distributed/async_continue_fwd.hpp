@@ -17,11 +17,8 @@
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/type_support/decay.hpp>
 
-#ifndef HPX_MSVC
 #include <type_traits>
-#endif
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
@@ -29,7 +26,7 @@ namespace hpx {
         template <typename Action, typename Cont>
         struct result_of_async_continue
           : traits::action_remote_result<typename util::invoke_result<
-                typename util::decay<Cont>::type, naming::id_type,
+                typename std::decay<Cont>::type, naming::id_type,
                 typename hpx::traits::extract_action<
                     Action>::remote_result_type>::type>
         {

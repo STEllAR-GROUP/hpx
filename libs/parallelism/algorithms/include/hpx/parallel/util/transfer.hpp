@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/pointer_category.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/result_types.hpp>
@@ -95,9 +94,9 @@ namespace hpx { namespace parallel { namespace util {
         InIter first, Sent last, OutIter dest)
     {
         typedef typename hpx::traits::pointer_category<
-            typename hpx::util::decay<typename hpx::traits::
+            typename std::decay<typename hpx::traits::
                     remove_const_iterator_value_type<InIter>::type>::type,
-            typename hpx::util::decay<OutIter>::type>::type category;
+            typename std::decay<OutIter>::type>::type category;
         return detail::copy_helper<category>::call(first, last, dest);
     }
 
@@ -136,9 +135,9 @@ namespace hpx { namespace parallel { namespace util {
         InIter first, std::size_t count, OutIter dest)
     {
         typedef typename hpx::traits::pointer_category<
-            typename hpx::util::decay<typename hpx::traits::
+            typename std::decay<typename hpx::traits::
                     remove_const_iterator_value_type<InIter>::type>::type,
-            typename hpx::util::decay<OutIter>::type>::type category;
+            typename std::decay<OutIter>::type>::type category;
         return detail::copy_n_helper<category>::call(first, count, dest);
     }
 
@@ -161,8 +160,8 @@ namespace hpx { namespace parallel { namespace util {
         InIter const& first, OutIter const& dest)
     {
         typedef typename hpx::traits::pointer_category<
-            typename hpx::util::decay<InIter>::type,
-            typename hpx::util::decay<OutIter>::type>::type category;
+            typename std::decay<InIter>::type,
+            typename std::decay<OutIter>::type>::type category;
         detail::copy_synchronize_helper<category>::call(first, dest);
     }
 
@@ -201,8 +200,8 @@ namespace hpx { namespace parallel { namespace util {
         InIter first, Sent last, OutIter dest)
     {
         typedef typename hpx::traits::pointer_category<
-            typename hpx::util::decay<InIter>::type,
-            typename hpx::util::decay<OutIter>::type>::type category;
+            typename std::decay<InIter>::type,
+            typename std::decay<OutIter>::type>::type category;
         return detail::move_helper<category>::call(first, last, dest);
     }
 
@@ -240,8 +239,8 @@ namespace hpx { namespace parallel { namespace util {
         InIter first, std::size_t count, OutIter dest)
     {
         typedef typename hpx::traits::pointer_category<
-            typename hpx::util::decay<InIter>::type,
-            typename hpx::util::decay<OutIter>::type>::type category;
+            typename std::decay<InIter>::type,
+            typename std::decay<OutIter>::type>::type category;
         return detail::move_n_helper<category>::call(first, count, dest);
     }
 }}}    // namespace hpx::parallel::util

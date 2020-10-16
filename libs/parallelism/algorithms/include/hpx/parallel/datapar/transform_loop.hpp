@@ -18,7 +18,6 @@
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/transform_loop.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -33,7 +32,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename Iterator>
         struct datapar_transform_loop_n
         {
-            typedef typename hpx::util::decay<Iterator>::type iterator_type;
+            typedef typename std::decay<Iterator>::type iterator_type;
 
             typedef typename traits::vector_pack_type<
                 typename std::iterator_traits<iterator_type>::value_type>::type
@@ -88,7 +87,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename Iterator>
         struct datapar_transform_loop
         {
-            typedef typename hpx::util::decay<Iterator>::type iterator_type;
+            typedef typename std::decay<Iterator>::type iterator_type;
             typedef typename std::iterator_traits<iterator_type>::value_type
                 value_type;
 
@@ -125,7 +124,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename Iter1, typename Iter2>
         struct datapar_transform_binary_loop_n
         {
-            typedef typename hpx::util::decay<Iter1>::type iterator1_type;
+            typedef typename std::decay<Iter1>::type iterator1_type;
             typedef typename std::iterator_traits<iterator1_type>::value_type
                 value_type;
 
@@ -189,8 +188,8 @@ namespace hpx { namespace parallel { namespace util {
         template <typename Iter1, typename Iter2>
         struct datapar_transform_binary_loop
         {
-            typedef typename hpx::util::decay<Iter1>::type iterator1_type;
-            typedef typename hpx::util::decay<Iter2>::type iterator2_type;
+            typedef typename std::decay<Iter1>::type iterator1_type;
+            typedef typename std::decay<Iter2>::type iterator2_type;
 
             typedef typename std::iterator_traits<iterator1_type>::value_type
                 value1_type;

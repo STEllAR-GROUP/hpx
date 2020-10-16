@@ -13,7 +13,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
@@ -35,7 +35,7 @@ namespace hpx { namespace parallel { namespace util {
         typename hpx::util::invoke_result<F, Iters...>::type>::type
     loop_step(VecOnly, F&& f, Iters&... its)
     {
-        return hpx::util::invoke(std::forward<F>(f), (its++)...);
+        return HPX_INVOKE(std::forward<F>(f), (its++)...);
     }
 
     template <typename ExPolicy, typename Iter>
@@ -292,7 +292,7 @@ namespace hpx { namespace parallel { namespace util {
             !hpx::is_vectorpack_execution_policy<ExPolicy>::value, T>::type
         accumulate_values(F&& f, T&& v, T1&& init)
         {
-            return hpx::util::invoke(
+            return HPX_INVOKE(
                 std::forward<F>(f), std::forward<T1>(init), std::forward<T>(v));
         }
     }    // namespace detail
@@ -749,11 +749,11 @@ namespace hpx { namespace parallel { namespace util {
     HPX_FORCEINLINE T accumulate(
         Iter first, Iter last, Reduce&& r, Conv&& conv = Conv())
     {
-        T val = hpx::util::invoke(conv, *first);
+        T val = HPX_INVOKE(conv, *first);
         ++first;
         while (last != first)
         {
-            val = hpx::util::invoke(r, val, *first);
+            val = HPX_INVOKE(r, val, *first);
             ++first;
         }
         return val;
@@ -764,13 +764,12 @@ namespace hpx { namespace parallel { namespace util {
     HPX_FORCEINLINE T accumulate(
         Iter1 first1, Iter1 last1, Iter2 first2, Reduce&& r, Conv&& conv)
     {
-        T val = hpx::util::invoke(conv, *first1, *first2);
+        T val = HPX_INVOKE(conv, *first1, *first2);
         ++first1;
         ++first2;
         while (last1 != first1)
         {
-            val = hpx::util::invoke(
-                r, val, hpx::util::invoke(conv, *first1, *first2));
+            val = HPX_INVOKE(r, val, HPX_INVOKE(conv, *first1, *first2));
             ++first1;
             ++first2;
         }

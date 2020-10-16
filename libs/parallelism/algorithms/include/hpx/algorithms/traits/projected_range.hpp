@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 
@@ -26,7 +25,7 @@ namespace hpx { namespace parallel { namespace traits {
     template <typename Proj, typename Rng>
     struct projected_range_result_of<Proj, Rng,
         typename std::enable_if<hpx::traits::is_range<Rng>::value>::type>
-      : detail::projected_result_of<typename hpx::util::decay<Proj>::type,
+      : detail::projected_result_of<typename std::decay<Proj>::type,
             typename hpx::traits::range_iterator<Rng>::type>
     {
     };
@@ -40,7 +39,7 @@ namespace hpx { namespace parallel { namespace traits {
     template <typename Proj, typename Rng>
     struct is_projected_range<Proj, Rng,
         typename std::enable_if<hpx::traits::is_range<Rng>::value>::type>
-      : detail::is_projected<typename hpx::util::decay<Proj>::type,
+      : detail::is_projected<typename std::decay<Proj>::type,
             typename hpx::traits::range_iterator<Rng>::type>
     {
     };
@@ -55,7 +54,7 @@ namespace hpx { namespace parallel { namespace traits {
     struct projected_range<Proj, Rng,
         typename std::enable_if<hpx::traits::is_range<Rng>::value>::type>
     {
-        typedef typename hpx::util::decay<Proj>::type projector_type;
+        typedef typename std::decay<Proj>::type projector_type;
         typedef typename hpx::traits::range_iterator<Rng>::type iterator_type;
     };
 }}}    // namespace hpx::parallel::traits

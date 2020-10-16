@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 
 #include <algorithm>
@@ -30,7 +30,7 @@ namespace hpx { namespace parallel { namespace util {
             {
                 for (/* */; first != last; (void) ++first, ++dest)
                 {
-                    *dest = hpx::util::invoke(std::forward<F>(f), first);
+                    *dest = HPX_INVOKE(std::forward<F>(f), first);
                 }
                 return std::make_pair(std::move(first), std::move(dest));
             }
@@ -59,8 +59,7 @@ namespace hpx { namespace parallel { namespace util {
             {
                 for (/* */; first1 != last1; (void) ++first1, ++first2, ++dest)
                 {
-                    *dest =
-                        hpx::util::invoke(std::forward<F>(f), first1, first2);
+                    *dest = HPX_INVOKE(std::forward<F>(f), first1, first2);
                 }
                 return hpx::make_tuple(
                     std::move(first1), std::move(first2), std::move(dest));
@@ -76,8 +75,7 @@ namespace hpx { namespace parallel { namespace util {
                 for (/* */; first1 != last1 && first2 != last2;
                      (void) ++first1, ++first2, ++dest)
                 {
-                    *dest =
-                        hpx::util::invoke(std::forward<F>(f), first1, first2);
+                    *dest = HPX_INVOKE(std::forward<F>(f), first1, first2);
                 }
                 return hpx::make_tuple(first1, first2, dest);
             }
@@ -118,7 +116,7 @@ namespace hpx { namespace parallel { namespace util {
             {
                 for (/* */; count != 0; (void) --count, ++first, ++dest)
                 {
-                    *dest = hpx::util::invoke(f, first);
+                    *dest = HPX_INVOKE(f, first);
                 }
                 return std::make_pair(std::move(first), std::move(dest));
             }
@@ -150,7 +148,7 @@ namespace hpx { namespace parallel { namespace util {
                 for (/* */; count != 0;
                      (void) --count, ++first1, first2++, ++dest)
                 {
-                    *dest = hpx::util::invoke(f, first1, first2);
+                    *dest = HPX_INVOKE(f, first1, first2);
                 }
                 return hpx::make_tuple(
                     std::move(first1), std::move(first2), std::move(dest));

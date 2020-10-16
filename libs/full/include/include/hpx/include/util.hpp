@@ -30,7 +30,6 @@
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_and_reset_value.hpp>

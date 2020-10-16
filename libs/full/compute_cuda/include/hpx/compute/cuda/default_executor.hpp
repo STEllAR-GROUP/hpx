@@ -17,7 +17,6 @@
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <hpx/execution/executors/execution.hpp>
 

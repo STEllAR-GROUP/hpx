@@ -12,7 +12,6 @@
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
@@ -155,7 +154,7 @@ namespace hpx { namespace util {
         // Returns: *this.
         template <typename U,
             HPX_CONCEPT_REQUIRES_(
-                !std::is_same<tagged, typename decay<U>::type>::value &&
+                !std::is_same<tagged, typename std::decay<U>::type>::value &&
                 std::is_convertible<U, Base>::value)>
         tagged& operator=(U&& u)
         {

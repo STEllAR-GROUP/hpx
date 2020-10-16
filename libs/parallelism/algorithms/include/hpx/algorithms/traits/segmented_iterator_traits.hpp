@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <type_traits>
 #include <utility>

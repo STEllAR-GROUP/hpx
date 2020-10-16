@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
-#include <hpx/modules/functional.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstddef>
 #include <map>

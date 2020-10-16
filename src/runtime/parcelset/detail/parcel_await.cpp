@@ -8,8 +8,8 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions/actions_fwd.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/lcos_local/detail/preprocess_future.hpp>
-#include <hpx/modules/functional.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>

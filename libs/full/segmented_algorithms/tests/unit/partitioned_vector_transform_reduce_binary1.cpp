@@ -12,17 +12,16 @@
 #include <hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
-#include <iterator>
-
 #include <cstddef>
+#include <iterator>
+#include <type_traits>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 struct multiply
 {
     template <typename T>
-    typename hpx::util::decay<T>::type operator()(
-        hpx::tuple<T, T> const& r) const
+    typename std::decay<T>::type operator()(hpx::tuple<T, T> const& r) const
     {
         using hpx::get;
         return get<0>(r) * get<1>(r);

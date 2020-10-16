@@ -193,11 +193,11 @@ namespace hpx {
     template <typename Action, typename F, typename... Ts>
     HPX_FORCEINLINE auto async(F&& f, Ts&&... ts)
         -> decltype(detail::async_action_dispatch<Action,
-            typename util::decay<F>::type>::call(std::forward<F>(f),
+            typename std::decay<F>::type>::call(std::forward<F>(f),
             std::forward<Ts>(ts)...))
     {
         return detail::async_action_dispatch<Action,
-            typename util::decay<F>::type>::call(std::forward<F>(f),
+            typename std::decay<F>::type>::call(std::forward<F>(f),
             std::forward<Ts>(ts)...);
     }
 }    // namespace hpx
@@ -261,11 +261,11 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static auto call(
             Policy_&& launch_policy, F&& f, Ts&&... ts)
             -> decltype(
-                detail::async_launch_policy_dispatch<typename util::decay<
+                detail::async_launch_policy_dispatch<typename std::decay<
                     F>::type>::call(std::forward<Policy_>(launch_policy),
                     std::forward<F>(f), std::forward<Ts>(ts)...))
         {
-            return detail::async_launch_policy_dispatch<typename util::decay<
+            return detail::async_launch_policy_dispatch<typename std::decay<
                 F>::type>::call(std::forward<Policy_>(launch_policy),
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }

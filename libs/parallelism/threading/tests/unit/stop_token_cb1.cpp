@@ -11,7 +11,7 @@
 
 #include <hpx/hpx_main.hpp>
 
-#include <hpx/modules/datastructures.hpp>
+#include <hpx/datastructures/optional.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/threading.hpp>
