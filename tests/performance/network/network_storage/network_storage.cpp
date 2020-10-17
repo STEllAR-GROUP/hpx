@@ -157,7 +157,7 @@ char                      *local_storage = nullptr;
 hpx::lcos::local::spinlock storage_mutex;
 
 //
-typedef struct {
+struct test_options {
     std::uint64_t iterations;
     std::uint64_t local_storage_MB;
     std::uint64_t global_storage_MB;
@@ -169,7 +169,7 @@ typedef struct {
     bool          all2all;
     bool          distribution;
     bool          nolocal;
-} test_options;
+};
 
 //----------------------------------------------------------------------------
 void allocate_local_storage(uint64_t local_storage_bytes)
