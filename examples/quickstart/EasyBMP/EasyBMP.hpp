@@ -6,7 +6,7 @@
 *   email: macklin01@users.sourceforge.net       *
 * support: http://easybmp.sourceforge.net        *
 *                                                *
-*          file: EasyBMP.h                       * 
+*          file: EasyBMP.hpp                     *
 *    date added: 01-31-2005                      *
 * date modified: 12-01-2006                      *
 *       version: 1.06                            *
@@ -64,9 +64,9 @@
 // set to a default of 96 dpi
 #endif
 
-#include "EasyBMP_DataStructures.h"
-#include "EasyBMP_BMP.h"
-#include "EasyBMP_VariousBMPutilities.h"
+#include "EasyBMP_DataStructures.hpp"
+#include "EasyBMP_BMP.hpp"
+#include "EasyBMP_VariousBMPutilities.hpp"
 
 #ifndef _EasyBMP_Version_
 #define _EasyBMP_Version_ 1.06

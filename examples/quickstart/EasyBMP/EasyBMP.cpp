@@ -18,9 +18,9 @@
 *                                                *
 *************************************************/
 
-#include "EasyBMP.h"
+#include "EasyBMP.hpp"
 
-/* These functions are defined in EasyBMP.h */
+/* These functions are defined in EasyBMP.hpp */
 
 bool EasyBMPwarnings = true;
 
@@ -37,7 +37,7 @@ bool GetEasyBMPwarningState(void)
     return EasyBMPwarnings;
 }
 
-/* These functions are defined in EasyBMP_DataStructures.h */
+/* These functions are defined in EasyBMP_DataStructures.hpp */
 
 int IntPow(int base, int exponent)
 {
@@ -128,7 +128,7 @@ void BMFH::display(void)
          << endl;
 }
 
-/* These functions are defined in EasyBMP_BMP.h */
+/* These functions are defined in EasyBMP_BMP.hpp */
 
 RGBApixel BMP::GetPixel(int i, int j) const
 {
@@ -514,7 +514,7 @@ bool BMP::WriteToFile(const char* FileName)
         {
             cout << "EasyBMP Error: Data types are wrong size!" << endl
                  << "               You may need to mess with "
-                    "EasyBMP_DataTypes.h"
+                    "EasyBMP_DataTypes.hpp"
                  << endl
                  << "               to fix these errors, and then recompile."
                  << endl
@@ -814,7 +814,7 @@ bool BMP::ReadFromFile(const char* FileName)
         {
             cout << "EasyBMP Error: Data types are wrong size!" << endl
                  << "               You may need to mess with "
-                    "EasyBMP_DataTypes.h"
+                    "EasyBMP_DataTypes.hpp"
                  << endl
                  << "               to fix these errors, and then recompile."
                  << endl
@@ -1507,7 +1507,7 @@ int BMP::TellHorizontalDPI(void)
     return (int) (XPelsPerMeter / (double) 39.37007874015748);
 }
 
-/* These functions are defined in EasyBMP_VariousBMPutilities.h */
+/* These functions are defined in EasyBMP_VariousBMPutilities.hpp */
 
 BMFH GetBMFH(const char* szFileNameIn)
 {

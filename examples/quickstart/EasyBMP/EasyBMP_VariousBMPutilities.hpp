@@ -6,7 +6,7 @@
 *   email: macklin01@users.sourceforge.net       *
 * support: http://easybmp.sourceforge.net        *
 *                                                *
-*          file: EasyBMP_VariousBMPutilities.h   *
+*          file: EasyBMP_VariousBMPutilities.hpp *
 *    date added: 05-02-2005                      *
 * date modified: 12-01-2006                      *
 *       version: 1.06                            *

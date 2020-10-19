@@ -7,10 +7,8 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include "block_matrix.hh"
-#include "matrix.hh"
-
-
+#include "block_matrix.hpp"
+#include "matrix.hpp"
 
 // Level 1
 

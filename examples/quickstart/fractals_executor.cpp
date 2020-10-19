@@ -17,7 +17,7 @@
 
 #include <vector>
 
-#include "EasyBMP/EasyBMP.h"
+#include "EasyBMP/EasyBMP.hpp"
 #include "EasyBMP/EasyBMP.cpp"
 
 int const sizeY = 256;

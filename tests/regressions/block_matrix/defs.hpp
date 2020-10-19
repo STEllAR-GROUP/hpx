@@ -34,4 +34,5 @@ std::string mkstr(const T& x)
   os << x;
   return os.str();
 }
+
 #endif

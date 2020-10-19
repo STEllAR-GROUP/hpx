@@ -7,7 +7,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 
-#include "matrix.hh"
+#include "matrix.hpp"
 
 #include <cstddef>
 

@@ -7,11 +7,11 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 
-#include "algorithms.hh"
+#include "algorithms.hpp"
 
-#include "block_matrix.hh"
-#include "matrix.hh"
-#include "matrix_hpx.hh"
+#include "block_matrix.hpp"
+#include "matrix.hpp"
+#include "matrix_hpx.hpp"
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
@@ -561,4 +561,5 @@ void gemm(bool transa, bool transb,
     assert(0);
   }
 }
+
 #endif

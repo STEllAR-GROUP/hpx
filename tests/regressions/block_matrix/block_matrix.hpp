@@ -7,9 +7,9 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
-#include "defs.hh"
-#include "matrix.hh"
-#include "matrix_hpx.hh"
+#include "defs.hpp"
+#include "matrix.hpp"
+#include "matrix_hpx.hpp"
 
 #include <hpx/hpx.hpp>
 

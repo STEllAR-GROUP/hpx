@@ -7,7 +7,7 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include "defs.hh"
+#include "defs.hpp"
 
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/shared_ptr.hpp>
@@ -93,4 +93,5 @@ struct matrix_t {
 };
 
 std::ostream& operator<<(std::ostream& os, const matrix_t& a);
+
 #endif
