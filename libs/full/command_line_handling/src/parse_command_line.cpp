@@ -510,9 +510,9 @@ namespace hpx { namespace util {
                   "values. Do not use with --hpx:pu-step, --hpx:pu-offset, or "
                   "--hpx:affinity options. Implies --hpx:numa-sensitive=1"
                   "(--hpx:bind=none disables defining thread affinities).")
-                ("hpx:use-process-mask", "use the process mask to restrict"
+                ("hpx:use-process-mask", "use the process mask to restrict "
                  "available hardware resources (implies "
-                 "--hpx:ignore-batch-environment)")
+                 "--hpx:ignore-batch-env)")
                 ("hpx:print-bind",
                   "print to the console the bit masks calculated from the "
                   "arguments specified to all --hpx:bind options.")
