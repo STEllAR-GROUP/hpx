@@ -26,9 +26,6 @@ if(HPX_WITH_HIP AND NOT TARGET roc::hipblas)
       correct location"
     )
   endif()
-  target_include_directories(
-    roc::hipblas SYSTEM INTERFACE ${hipblas_INCLUDE_DIRS}
-  )
 
   if(NOT HPX_FIND_PACKAGE)
     # The cmake variables are supposed to be cached no need to redefine them
