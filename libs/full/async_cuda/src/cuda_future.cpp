@@ -63,7 +63,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
     runtime_registration_wrapper::~runtime_registration_wrapper()
     {
         // Unregister the thread from HPX, this should be done once in the end
-        // before the external thread exists, if the runtime registration
+        // before the external thread exits, if the runtime registration
         // wrapper actually registered the thread (it may not do so if the
         // wrapper is constructed on a HPX worker thread).
         if (registered_)
