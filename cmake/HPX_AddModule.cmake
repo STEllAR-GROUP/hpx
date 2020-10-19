@@ -25,6 +25,12 @@ function(add_hpx_module libname modulename)
     ${modulename} "${options}" "${one_value_args}" "${multi_value_args}"
     ${ARGN}
   )
+  if(${modulename}_UNPARSED_ARGUMENTS)
+    message(
+      AUTHOR_WARNING
+        "Arguments were not used by the module: ${${modulename}_UNPARSED_ARGUMENTS}"
+    )
+  endif()
 
   include(HPX_Message)
   include(HPX_Option)
