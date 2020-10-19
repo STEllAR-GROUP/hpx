@@ -48,7 +48,7 @@ endif()
 # ##############################################################################
 # project metadata
 # ##############################################################################
-project(HPX CXX C)
+project(HPX CXX)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -1978,7 +1978,7 @@ endif()
 # Configure Warnings
 if(HPX_WITH_COMPILER_WARNINGS)
   if(MSVC) # Adding special warning settings for the MSVC compiler ...
-    hpx_add_compile_flag(-W3 LANGUAGES C CXX)
+    hpx_add_compile_flag(-W3 LANGUAGES CXX)
     # According to the ifort Windows manual, W3 isn't supported
     hpx_add_compile_flag(-W1 LANGUAGES Fortran)
 
@@ -2020,10 +2020,10 @@ if(HPX_WITH_COMPILER_WARNINGS)
     endif()
 
   else() # Trial and error approach for any other compiler ...
-    hpx_add_compile_flag_if_available(-Wall LANGUAGES CXX C Fortran)
-    hpx_add_compile_flag_if_available(-Wextra LANGUAGES CXX C Fortran)
+    hpx_add_compile_flag_if_available(-Wall LANGUAGES CXX Fortran)
+    hpx_add_compile_flag_if_available(-Wextra LANGUAGES CXX Fortran)
     hpx_add_compile_flag_if_available(
-      -Wno-strict-aliasing LANGUAGES CXX C Fortran
+      -Wno-strict-aliasing LANGUAGES CXX Fortran
     )
     hpx_add_compile_flag_if_available(-Wno-sign-promo LANGUAGES CXX)
     hpx_add_compile_flag_if_available(-Wno-attributes LANGUAGES CXX)
@@ -2070,16 +2070,16 @@ endif()
 # Configure compiler warnings as errors
 if(HPX_WITH_COMPILER_WARNINGS_AS_ERRORS)
   if(MSVC)
-    hpx_add_compile_flag(-WX LANGUAGES C CXX Fortran)
+    hpx_add_compile_flag(-WX LANGUAGES CXX Fortran)
   else()
-    hpx_add_compile_flag_if_available(-Werror LANGUAGES CXX C Fortran)
+    hpx_add_compile_flag_if_available(-Werror LANGUAGES CXX Fortran)
   endif()
 endif()
 
 # Diagnostics
 if(MSVC)
   # Display full paths in diagnostics
-  hpx_add_compile_flag(-FC LANGUAGES C CXX)
+  hpx_add_compile_flag(-FC LANGUAGES CXX)
   if(CMAKE_CL_64)
     set(__target_arch "x86_64")
   else()
@@ -2089,34 +2089,32 @@ if(MSVC)
 else()
   # Show the flags that toggle each warning
   hpx_add_compile_flag_if_available(
-    -fdiagnostics-show-option LANGUAGES CXX C Fortran
+    -fdiagnostics-show-option LANGUAGES CXX Fortran
   )
 
   # VLAs are a GNU extensions that we forbid as they are not supported on MSVC
   hpx_add_compile_flag_if_available(-Werror=vla)
   # No return statement in a non-void function can lead to garbage return values
   # in GCC.
-  hpx_add_compile_flag_if_available(-Werror=return-type LANGUAGES CXX C)
+  hpx_add_compile_flag_if_available(-Werror=return-type LANGUAGES CXX)
 
   # We get false positives all over the place with this.
   if(CMAKE_COMPILER_IS_GNUCXX)
     hpx_add_compile_flag_if_available(
-      -Wno-unused-but-set-parameter LANGUAGES CXX C
+      -Wno-unused-but-set-parameter LANGUAGES CXX
     )
     hpx_add_compile_flag_if_available(
-      -Wno-unused-but-set-variable LANGUAGES CXX C
+      -Wno-unused-but-set-variable LANGUAGES CXX
     )
     # Uninitialized variables are bad, earlier compilers issue spurious warnings
-    hpx_add_compile_flag_if_available(-Werror=uninitialized LANGUAGES CXX C)
-    hpx_add_compile_flag_if_available(
-      -Wno-unused-local-typedefs LANGUAGES CXX C
-    )
+    hpx_add_compile_flag_if_available(-Werror=uninitialized LANGUAGES CXX)
+    hpx_add_compile_flag_if_available(-Wno-unused-local-typedefs LANGUAGES CXX)
     # -Werror=maybe-uninitialized leads to false positives.
-    hpx_add_compile_flag_if_available(-Wno-maybe-uninitialized LANGUAGES CXX C)
+    hpx_add_compile_flag_if_available(-Wno-maybe-uninitialized LANGUAGES CXX)
   endif()
 
   # Silence warning about __sync_fetch_and_nand changing semantics
-  hpx_add_compile_flag_if_available(-Wno-sync-nand LANGUAGES CXX C)
+  hpx_add_compile_flag_if_available(-Wno-sync-nand LANGUAGES CXX)
 
   # Silence warnings about deleting polymorphic objects with non-virtual dtors.
   # These come from within Boost.
@@ -2139,13 +2137,11 @@ else()
   endif()
 
   if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-    hpx_add_compile_flag_if_available(-Wno-deprecated-register LANGUAGES CXX C)
+    hpx_add_compile_flag_if_available(-Wno-deprecated-register LANGUAGES CXX)
   endif()
 
   if(HPX_WITH_HIDDEN_VISIBILITY)
-    hpx_add_compile_flag_if_available(
-      -fvisibility=hidden LANGUAGES CXX C Fortran
-    )
+    hpx_add_compile_flag_if_available(-fvisibility=hidden LANGUAGES CXX Fortran)
     hpx_add_link_flag_if_available(-fvisibility=hidden TARGETS SHARED EXE)
     hpx_add_config_define(HPX_HAVE_ELF_HIDDEN_VISIBILITY)
     hpx_add_config_define(HPX_HAVE_COROUTINE_GCC_HIDDEN_VISIBILITY)

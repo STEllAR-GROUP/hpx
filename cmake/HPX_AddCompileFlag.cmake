@@ -212,8 +212,10 @@ function(hpx_add_compile_flag_if_available FLAG)
     elseif(_lang STREQUAL "C")
       check_c_compiler_flag(${FLAG} HPX_WITH_${_lang}_FLAG_${_name})
     elseif(_lang STREQUAL "Fortran")
-      # Assuming the C compiler accepts the same flags as the fortran one ...
-      check_c_compiler_flag(${FLAG} HPX_WITH_${_lang}_FLAG_${_name})
+      if(HPX_WITH_FORTRAN)
+        # Assuming the C compiler accepts the same flags as the fortran one ...
+        check_c_compiler_flag(${FLAG} HPX_WITH_${_lang}_FLAG_${_name})
+      endif()
     else()
       hpx_error("Unsupported language ${_lang}.")
     endif()
