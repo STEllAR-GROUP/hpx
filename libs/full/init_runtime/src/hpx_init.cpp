@@ -108,11 +108,15 @@ namespace hpx_startup {
 namespace hpx { namespace detail {
     // forward declarations only
     void console_print(std::string const&);
+}}    // namespace hpx::detail
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+namespace hpx { namespace detail {
+    // forward declarations only
     void list_symbolic_name(std::string const&, hpx::id_type const&);
     void list_component_type(std::string const&, components::component_type);
 }}    // namespace hpx::detail
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 HPX_PLAIN_ACTION_ID(hpx::detail::console_print, console_print_action,
     hpx::actions::console_print_action_id)
 HPX_PLAIN_ACTION_ID(hpx::detail::list_component_type,
