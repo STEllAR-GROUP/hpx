@@ -114,7 +114,6 @@ function(create_pkgconfig_test name hpx_dir)
   add_hpx_pseudo_target(${name})
   add_hpx_pseudo_dependencies(${name} ${name}.make_compile)
 
-  # add_hpx_unit_test( "build" ${name} EXECUTABLE "${build_dir}/test" )
 endfunction()
 
 create_cmake_test(
