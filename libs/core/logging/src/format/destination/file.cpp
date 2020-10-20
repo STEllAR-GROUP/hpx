@@ -18,9 +18,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/logging/message.hpp>
-
-#include <boost/config.hpp>
-#include <boost/smart_ptr/detail/spinlock.hpp>
+#include <hpx/thread_support/spinlock.hpp>
 
 #include <fstream>
 #include <memory>
@@ -44,7 +42,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 
     struct file_impl : file
     {
-        typedef boost::detail::spinlock mutex_type;
+        typedef hpx::util::detail::spinlock mutex_type;
 
         explicit file_impl(std::string const& file_name, file_settings set)
           : file(file_name, set)
@@ -84,7 +82,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         }
 
         std::ofstream out;
-        mutable mutex_type mtx_ = BOOST_DETAIL_SPINLOCK_INIT;
+        mutable mutex_type mtx_;
     };
 
     std::unique_ptr<file> file::make(

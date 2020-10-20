@@ -33,6 +33,7 @@
 #include <cstdint>
 #include <forward_list>
 #include <memory>
+#include <mutex>
 #include <stack>
 #include <string>
 #include <utility>
@@ -73,10 +74,7 @@ namespace hpx { namespace threads {
         thread_data& operator=(thread_data&&) = delete;
 
     public:
-        struct tag
-        {
-        };
-        using mutex_type = util::spinlock_pool<tag>;
+        using spinlock_pool = util::spinlock_pool<thread_data>;
 
         /// The get_state function queries the state of this thread instance.
         ///
@@ -276,25 +274,29 @@ namespace hpx { namespace threads {
 #else
         util::thread_description get_description() const
         {
-            mutex_type::scoped_lock l(this);
+            std::lock_guard<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
             return description_;
         }
         util::thread_description set_description(util::thread_description value)
         {
-            mutex_type::scoped_lock l(this);
+            std::lock_guard<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
             std::swap(description_, value);
             return value;
         }
 
         util::thread_description get_lco_description() const
         {
-            mutex_type::scoped_lock l(this);
+            std::lock_guard<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
             return lco_description_;
         }
         util::thread_description set_lco_description(
             util::thread_description value)
         {
-            mutex_type::scoped_lock l(this);
+            std::lock_guard<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
             std::swap(lco_description_, value);
             return value;
         }
@@ -396,12 +398,14 @@ namespace hpx { namespace threads {
 #ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
         char const* get_backtrace() const noexcept
         {
-            mutex_type::scoped_lock l(this);
+            std::lock_guard<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
             return backtrace_;
         }
         char const* set_backtrace(char const* value) noexcept
         {
-            mutex_type::scoped_lock l(this);
+            std::lock_guard<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
 
             char const* bt = backtrace_;
             backtrace_ = value;
@@ -410,13 +414,15 @@ namespace hpx { namespace threads {
 #else
         util::backtrace const* get_backtrace() const noexcept
         {
-            mutex_type::scoped_lock l(this);
+            std::lock_guard<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
             return backtrace_;
         }
         util::backtrace const* set_backtrace(
             util::backtrace const* value) noexcept
         {
-            mutex_type::scoped_lock l(this);
+            std::lock_guard<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
 
             util::backtrace const* bt = backtrace_;
             backtrace_ = value;
@@ -427,7 +433,9 @@ namespace hpx { namespace threads {
         // Generate full backtrace for captured stack
         std::string backtrace()
         {
-            mutex_type::scoped_lock l(this);
+            std::lock_guard<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
+
             std::string bt;
             if (0 != backtrace_)
             {
@@ -457,26 +465,30 @@ namespace hpx { namespace threads {
         // handle thread interruption
         bool interruption_requested() const noexcept
         {
-            mutex_type::scoped_lock l(this);
+            std::lock_guard<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
             return requested_interrupt_;
         }
 
         bool interruption_enabled() const noexcept
         {
-            mutex_type::scoped_lock l(this);
+            std::lock_guard<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
             return enabled_interrupt_;
         }
 
         bool set_interruption_enabled(bool enable) noexcept
         {
-            mutex_type::scoped_lock l(this);
+            std::lock_guard<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
             std::swap(enabled_interrupt_, enable);
             return enable;
         }
 
         void interrupt(bool flag = true)
         {
-            mutex_type::scoped_lock l(this);
+            std::unique_lock<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
             if (flag && !enabled_interrupt_)
             {
                 l.unlock();

@@ -11,19 +11,18 @@
 #include <hpx/config.hpp>
 #include <hpx/execution_base/register_locks.hpp>
 #include <hpx/modules/itt_notify.hpp>
-
-#include <boost/smart_ptr/detail/spinlock.hpp>
+#include <hpx/thread_support/spinlock.hpp>
 
 namespace hpx { namespace util {
 
-    /// boost::mutex-compatible spinlock class
+    /// Lockable spinlock class
     struct spinlock
     {
     public:
         HPX_NON_COPYABLE(spinlock);
 
     private:
-        boost::detail::spinlock m = BOOST_DETAIL_SPINLOCK_INIT;
+        hpx::util::detail::spinlock m;
 
     public:
         spinlock(char const* /*desc*/ = nullptr)
@@ -36,7 +35,7 @@ namespace hpx { namespace util {
             HPX_ITT_SYNC_DESTROY(this);
         }
 
-        void lock()
+        void lock() noexcept
         {
             HPX_ITT_SYNC_PREPARE(this);
             m.lock();
@@ -44,7 +43,7 @@ namespace hpx { namespace util {
             util::register_lock(this);
         }
 
-        bool try_lock()
+        bool try_lock() noexcept
         {
             HPX_ITT_SYNC_PREPARE(this);
             if (m.try_lock())
@@ -57,19 +56,12 @@ namespace hpx { namespace util {
             return false;
         }
 
-        void unlock()
+        void unlock() noexcept
         {
             HPX_ITT_SYNC_RELEASING(this);
             m.unlock();
             HPX_ITT_SYNC_RELEASED(this);
             util::unregister_lock(this);
-        }
-
-        typedef boost::detail::spinlock* native_handle_type;
-
-        native_handle_type native_handle()
-        {
-            return &m;
         }
     };
 

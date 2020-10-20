@@ -94,6 +94,7 @@ add_hpx_module(
     hpx_assertion
     hpx_execution_base
     hpx_config
+    hpx_concurrency
     hpx_coroutines
     hpx_debugging
     hpx_errors

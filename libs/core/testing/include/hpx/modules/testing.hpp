@@ -15,9 +15,8 @@
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
+#include <hpx/thread_support/spinlock.hpp>
 #include <hpx/util/ios_flags_saver.hpp>
-
-#include <boost/smart_ptr/detail/spinlock.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -41,13 +40,13 @@ namespace hpx { namespace util {
         struct fixture
         {
         public:
-            using mutex_type = boost::detail::spinlock;
+            using mutex_type = hpx::util::detail::spinlock;
 
         private:
             std::ostream& stream_;
             static std::atomic<std::size_t> sanity_failures_;
             static std::atomic<std::size_t> test_failures_;
-            mutex_type mutex_ = BOOST_DETAIL_SPINLOCK_INIT;
+            mutex_type mutex_;
 
         public:
             fixture(std::ostream& stream)

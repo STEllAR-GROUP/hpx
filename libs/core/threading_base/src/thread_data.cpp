@@ -105,12 +105,15 @@ namespace hpx { namespace threads {
 
     void thread_data::run_thread_exit_callbacks()
     {
-        mutex_type::scoped_lock l(this);
+        std::unique_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
 
         while (!exit_funcs_.empty())
         {
             {
-                hpx::util::unlock_guard<mutex_type::scoped_lock> ul(l);
+                hpx::util::unlock_guard<
+                    std::unique_lock<hpx::util::detail::spinlock>>
+                    ul(l);
                 if (!exit_funcs_.front().empty())
                     exit_funcs_.front()();
             }
@@ -122,7 +125,8 @@ namespace hpx { namespace threads {
     bool thread_data::add_thread_exit_callback(
         util::function_nonser<void()> const& f)
     {
-        mutex_type::scoped_lock l(this);
+        std::lock_guard<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
 
         if (ran_exit_funcs_ || get_state().state() == terminated)
         {
@@ -136,7 +140,8 @@ namespace hpx { namespace threads {
 
     void thread_data::free_thread_exit_callbacks()
     {
-        mutex_type::scoped_lock l(this);
+        std::lock_guard<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
 
         // Exit functions should have been executed.
         HPX_ASSERT(exit_funcs_.empty() || ran_exit_funcs_);

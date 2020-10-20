@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors/exception.hpp>
+#include <hpx/thread_support/spinlock.hpp>
 
-#include <boost/smart_ptr/detail/spinlock.hpp>
 #include <boost/system/error_code.hpp>
 
 #include <cstddef>
@@ -37,7 +37,7 @@ namespace hpx {
         // TODO: Does this need to be hpx::lcos::local::spinlock?
         // typedef hpx::lcos::local::spinlock mutex_type;
         // TODO: Add correct initialization of boost spinlock.
-        typedef boost::detail::spinlock mutex_type;
+        typedef hpx::util::detail::spinlock mutex_type;
 
         typedef std::list<std::exception_ptr> exception_list_type;
         exception_list_type exceptions_;
