@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/components_base/component_type.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_future.hpp>
@@ -19,7 +20,6 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/make_client.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
@@ -218,7 +218,7 @@ namespace hpx { namespace components
 {
     namespace detail
     {
-        // Wrap a give type such that it is usable as a stub_base.
+        // Wrap a given type such that it is usable as a stub_base.
         // The main template is chosen whenever the argument Stub is not a (or
         // not derived from) a stub_base. In this case Stub should be a server
         // side component implementation type.
@@ -372,23 +372,6 @@ namespace hpx { namespace components
         explicit operator bool() const noexcept
         {
             return valid();
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        /// Create a new instance of an object on the locality as
-        /// given by the parameter \a targetgid
-        template <typename ...Ts>
-        static Derived create(id_type const& targetgid, Ts&&... vs)
-        {
-            return Derived(stub_type::create_async(targetgid,
-                std::forward<Ts>(vs)...));
-        }
-
-        template <typename ...Ts>
-        static Derived create_colocated(id_type const& id, Ts&&... vs)
-        {
-            return Derived(stub_type::create_colocated_async(id,
-                std::forward<Ts>(vs)...));
         }
 
         void free()

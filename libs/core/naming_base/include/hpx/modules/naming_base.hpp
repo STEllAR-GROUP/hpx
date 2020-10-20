@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,12 +11,20 @@
 
 #include <cstdint>
 
-namespace hpx { namespace naming {
+namespace hpx {
+    namespace naming {
 
-    using component_type = std::int32_t;
-    using address_type = std::uint64_t;
+        using component_type = std::int32_t;
+        using address_type = std::uint64_t;
 
-    constexpr std::uint32_t invalid_locality_id =
-        ~static_cast<std::uint32_t>(0);
+        constexpr std::uint32_t invalid_locality_id =
+            ~static_cast<std::uint32_t>(0);
 
-}}    // namespace hpx::naming
+        struct HPX_EXPORT gid_type;
+        struct HPX_EXPORT id_type;
+        struct HPX_EXPORT address;
+    }    // namespace naming
+
+    // Pulling important types into the main namespace
+    using naming::id_type;
+}    // namespace hpx

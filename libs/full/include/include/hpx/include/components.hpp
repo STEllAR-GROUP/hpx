@@ -20,7 +20,7 @@
 #include <hpx/runtime/components/component_commandline.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
 
-#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/components_base/component_type.hpp>
 
 #include <hpx/runtime/components/runtime_support.hpp>
 

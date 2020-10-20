@@ -11,16 +11,16 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_distributed/applier/detail/apply_colocated_callback_fwd.hpp>
-#include <hpx/async_distributed/applier/detail/apply_colocated_fwd.hpp>
+#include <hpx/async_colocated/apply_colocated_callback_fwd.hpp>
+#include <hpx/async_colocated/apply_colocated_fwd.hpp>
+#include <hpx/async_colocated/async_colocated.hpp>
+#include <hpx/async_colocated/async_colocated_callback.hpp>
 #include <hpx/async_distributed/applier/detail/apply_implementations.hpp>
-#include <hpx/async_distributed/detail/async_colocated.hpp>
-#include <hpx/async_distributed/detail/async_colocated_callback.hpp>
 #include <hpx/async_distributed/detail/async_implementations.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/runtime/components/create_component_helpers.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -86,10 +86,10 @@ namespace hpx { namespace components
         {
             if (!id_)
             {
-                return components::stub_base<Component>::create_async(
+                return create_async<Component>(
                     hpx::find_here(), std::forward<Ts>(vs)...);
             }
-            return components::stub_base<Component>::create_colocated_async(
+            return create_colocated_async<Component>(
                 id_, std::forward<Ts>(vs)...);
         }
 
@@ -115,20 +115,18 @@ namespace hpx { namespace components
         hpx::future<std::vector<bulk_locality_result> >
         bulk_create(std::size_t count, Ts&&... vs) const
         {
-            using components::stub_base;
-
             hpx::id_type id;
             hpx::future<std::vector<hpx::id_type> > f;
             if (!id_)
             {
                 id = hpx::find_here();
-                f = stub_base<Component>::bulk_create_async(
+                f = bulk_create_async<Component>(
                         id, count, std::forward<Ts>(vs)...);
             }
             else
             {
                 id = id_;
-                f = stub_base<Component>::bulk_create_colocated_async(
+                f = bulk_create_colocated_async<Component>(
                         id, count, std::forward<Ts>(vs)...);
             }
 

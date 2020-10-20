@@ -8,15 +8,15 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/errors.hpp>
-#include <hpx/async_distributed/detail/async_colocated_fwd.hpp>
+#include <hpx/async_colocated/async_colocated_fwd.hpp>
+#include <hpx/components_base/component_type.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/runtime_configuration/ini.hpp>
 
 #include <cstddef>
 #include <cstdint>

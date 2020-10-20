@@ -7,9 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/components_base/component_type.hpp>
+#include <hpx/modules/naming.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 

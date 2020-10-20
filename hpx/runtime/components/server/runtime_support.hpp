@@ -13,14 +13,15 @@
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
+#include <hpx/agas/agas_fwd.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>

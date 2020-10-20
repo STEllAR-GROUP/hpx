@@ -14,14 +14,14 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/applier/apply_callback.hpp>
+#include <hpx/components_base/component_type.hpp>
+#include <hpx/components_base/traits/component_supports_migration.hpp>
+#include <hpx/components_base/traits/component_type_is_compatible.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
-#include <hpx/traits/component_supports_migration.hpp>
-#include <hpx/traits/component_type_is_compatible.hpp>
 
 #include <boost/asio/error.hpp>
 

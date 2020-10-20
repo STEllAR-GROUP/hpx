@@ -66,12 +66,13 @@ add_hpx_module(
   DEPENDENCIES hpx_core hpx_parallelism
   MODULE_DEPENDENCIES
     hpx_actions
+    hpx_async_colocated
     hpx_async_distributed
     hpx_init_runtime
     hpx_performance_counters
     hpx_program_options
     hpx_runtime_configuration
-    hpx_runtime_local
+    hpx_runtime_distributed
     hpx_threadmanager
   CMAKE_SUBDIRS examples tests
 )

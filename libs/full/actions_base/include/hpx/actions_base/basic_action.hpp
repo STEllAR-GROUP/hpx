@@ -15,6 +15,8 @@
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/basic_action_fwd.hpp>
 #include <hpx/actions_base/detail/action_factory.hpp>
+#include <hpx/actions_base/detail/invocation_count_registry.hpp>
+#include <hpx/actions_base/detail/per_action_data_counter_registry.hpp>
 #include <hpx/actions_base/preassigned_action_id.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
@@ -34,10 +36,8 @@
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>

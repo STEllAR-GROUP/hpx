@@ -6,12 +6,16 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#include <hpx/lcos/promise.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/async_colocated/async_colocated.hpp>
+#include <hpx/async_colocated/async_colocated_callback.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/async_distributed/async_callback.hpp>
 #include <hpx/async_distributed/async_continue_callback.hpp>
-#include <hpx/async_distributed/detail/async_colocated.hpp>
-#include <hpx/async_distributed/detail/async_colocated_callback.hpp>
-#include <hpx/lcos/promise.hpp>
+#endif
 
 namespace hpx { namespace distribtued {
     using hpx::lcos::promise;

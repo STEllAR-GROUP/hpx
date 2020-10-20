@@ -10,8 +10,15 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/components_base/include
 set(components_base_headers
-    hpx/components_base/get_lva.hpp hpx/components_base/pinned_ptr.hpp
+    hpx/components_base/get_lva.hpp
+    hpx/components_base/component_type.hpp
+    hpx/components_base/pinned_ptr.hpp
+    hpx/components_base/traits/component_config_data.hpp
+    hpx/components_base/traits/component_heap_type.hpp
     hpx/components_base/traits/component_pin_support.hpp
+    hpx/components_base/traits/component_supports_migration.hpp
+    hpx/components_base/traits/component_type_is_compatible.hpp
+    hpx/components_base/traits/component_type_database.hpp
     hpx/components_base/traits/is_component.hpp
 )
 
@@ -19,8 +26,14 @@ set(components_base_headers
 # cmake-format: off
 set(components_base_compat_headers
     hpx/runtime/get_lva.hpp => hpx/components_base/get_lva.hpp
+    hpx/runtime/components/component_type.hpp => hpx/components_base/component_type.hpp
     hpx/runtime/components/pinned_ptr.hpp => hpx/components_base/pinned_ptr.hpp
+    hpx/traits/component_config_data.hpp => hpx/components_base/traits/component_config_data.hpp
+    hpx/traits/component_heap_type.hpp => hpx/components_base/traits/component_heap_type.hpp
     hpx/traits/component_pin_support.hpp => hpx/components_base/traits/component_pin_support.hpp
+    hpx/traits/component_supports_migration.hpp => hpx/components_base/traits/component_supports_migration.hpp
+    hpx/traits/component_type_is_compatible.hpp => hpx/components_base/traits/component_type_is_compatible.hpp
+    hpx/traits/component_type_database.hpp => hpx/components_base/traits/component_type_database.hpp
     hpx/traits/is_component.hpp => hpx/components_base/traits/is_component.hpp
 )
 # cmake-format: on
@@ -37,5 +50,6 @@ add_hpx_module(
   HEADERS ${components_base_headers}
   COMPAT_HEADERS ${components_base_compat_headers}
   DEPENDENCIES hpx_core
+  MODULE_DEPENDENCIES hpx_naming
   CMAKE_SUBDIRS examples tests
 )

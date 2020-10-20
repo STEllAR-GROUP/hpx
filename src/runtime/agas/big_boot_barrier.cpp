@@ -13,6 +13,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/plain_action.hpp>
+#include <hpx/agas/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/bind_front.hpp>
@@ -24,7 +25,6 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
-#include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>

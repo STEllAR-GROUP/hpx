@@ -41,7 +41,7 @@ add_hpx_module(
   SOURCES ${init_runtime_sources}
   HEADERS ${init_runtime_headers}
   DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES hpx_program_options hpx_runtime_local
+  MODULE_DEPENDENCIES hpx_naming hpx_program_options hpx_runtime_local
                       ${init_runtime_optional_module_dependencies}
   CMAKE_SUBDIRS examples tests
 )

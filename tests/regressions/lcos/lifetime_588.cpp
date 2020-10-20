@@ -66,7 +66,7 @@ struct test_client
 hpx::id_type test_server::create_new(hpx::id_type const& id) const
 {
     // this waits for the new object to be created
-    return test_client::create(id).get_id();
+    return hpx::new_<test_client>(id).get_id();
 }
 
 int main()
@@ -78,7 +78,7 @@ int main()
         // repeating this a couple of times forces the issue ...
         for (int i = 0; i != 100; ++i)
         {
-            test_client c =  test_client::create(id);  // create a new instance
+            test_client c = hpx::new_<test_client>(id);  // create a new instance
 
             // this construct overwrites the original client with a newly created
             // one which causes the only reference to the initial test_server to go

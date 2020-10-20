@@ -46,7 +46,7 @@ int hpx_main(variables_map& vm)
             if (!localities.empty()) {
                 // use AGAS client to get the component type as we do not
                 // register any factories
-                t.create(localities[0]);
+                t = hpx::new_<throttle::throttle>(localities[0]);
                 hpx::agas::register_name(hpx::launch::sync,
                     throttle_component_name, t.get_id());
             }

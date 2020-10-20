@@ -5,16 +5,18 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/actions_base/detail/invocation_count_registry.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/performance_counters/action_invocation_counter_discoverer.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
 
 #include <cstdint>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters {
+
     ///////////////////////////////////////////////////////////////////////////
     // Discoverer function for action invocation counters
     bool action_invocation_counter_discoverer(counter_info const& info,
@@ -29,7 +31,8 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return false;
 
-        bool result = registry.counter_discoverer(info, p, f, mode, ec);
+        bool result = action_invocation_counter_discoverer(
+            registry, info, p, f, mode, ec);
         if (!result || ec)
             return false;
 

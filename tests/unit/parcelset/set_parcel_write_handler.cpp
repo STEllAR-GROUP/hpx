@@ -4,12 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_main.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
 #include <cstddef>
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -18,7 +19,7 @@ void test(hpx::id_type const& id)
 {
     hpx::trigger_lco_event(id);
 }
-HPX_PLAIN_ACTION(test);     // defines test_action
+HPX_PLAIN_ACTION(test);    // defines test_action
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<std::size_t> write_handler_called(0);
@@ -26,20 +27,44 @@ std::atomic<std::size_t> write_handler_called(0);
 bool is_test_action(hpx::parcelset::parcel const& p)
 {
 #if defined(HPX_HAVE_NETWORKING)
-    return dynamic_cast<
-            hpx::actions::transfer_action<test_action>*
-        >(p.get_action()) != nullptr;
+    return dynamic_cast<hpx::actions::transfer_action<test_action>*>(
+               p.get_action()) != nullptr;
 #else
     return true;
 #endif
 }
 
-void write_handler(boost::system::error_code const&,
-    hpx::parcelset::parcel const& p)
+void write_handler(
+    boost::system::error_code const&, hpx::parcelset::parcel const& p)
 {
     if (is_test_action(p))
         ++write_handler_called;
 }
+
+// working around non-copy-ability of packaged_task
+struct indirect_packaged_task
+{
+    using packaged_task_type = hpx::lcos::local::packaged_task<void()>;
+
+    indirect_packaged_task()
+      : pt(std::make_shared<packaged_task_type>([]() {}))
+    {
+    }
+
+    auto get_future()
+    {
+        return pt->get_future();
+    }
+
+    template <typename... Ts>
+    void operator()(Ts&&... vs)
+    {
+        // This needs to be run on a HPX thread
+        hpx::apply(std::move(*pt));
+    }
+
+    std::shared_ptr<packaged_task_type> pt;
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
@@ -53,15 +78,19 @@ int main()
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
 
     {
-        std::vector<hpx::future<void> > wait_for;
-        for (hpx::id_type const& id: localities)
+        std::vector<hpx::future<void>> wait_for;
+        for (hpx::id_type const& id : localities)
         {
-            hpx::lcos::promise<void> p;
-            auto f = p.get_future();
+            hpx::lcos::promise<void> p_remote;
+            auto f_remote = p_remote.get_future();
 
-            hpx::apply<test_action>(id, p.get_id());
+            indirect_packaged_task p_local;
+            auto f_local = p_local.get_future();
 
-            wait_for.push_back(std::move(f));
+            hpx::apply_cb<test_action>(id, p_local, p_remote.get_id());
+
+            wait_for.push_back(std::move(f_remote));
+            wait_for.push_back(std::move(f_local));
         }
 
         hpx::wait_all(wait_for);
@@ -73,15 +102,19 @@ int main()
     hpx::parcel_write_handler_type f2 = hpx::set_parcel_write_handler(f1);
 
     {
-        std::vector<hpx::future<void> > wait_for;
-        for (hpx::id_type const& id: localities)
+        std::vector<hpx::future<void>> wait_for;
+        for (hpx::id_type const& id : localities)
         {
-            hpx::lcos::promise<void> p;
-            auto f = p.get_future();
+            hpx::lcos::promise<void> p_remote;
+            auto f_remote = p_remote.get_future();
 
-            hpx::apply<test_action>(id, p.get_id());
+            indirect_packaged_task p_local;
+            auto f_local = p_local.get_future();
 
-            wait_for.push_back(std::move(f));
+            hpx::apply_cb<test_action>(id, p_local, p_remote.get_id());
+
+            wait_for.push_back(std::move(f_remote));
+            wait_for.push_back(std::move(f_local));
         }
 
         hpx::wait_all(wait_for);

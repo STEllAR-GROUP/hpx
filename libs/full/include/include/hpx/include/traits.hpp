@@ -48,7 +48,12 @@
 #include <hpx/actions_base/traits/action_select_direct_execution.hpp>
 #include <hpx/actions_base/traits/action_stacksize.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
+#include <hpx/components_base/traits/component_config_data.hpp>
+#include <hpx/components_base/traits/component_heap_type.hpp>
 #include <hpx/components_base/traits/component_pin_support.hpp>
+#include <hpx/components_base/traits/component_supports_migration.hpp>
+#include <hpx/components_base/traits/component_type_database.hpp>
+#include <hpx/components_base/traits/component_type_is_compatible.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/traits/get_remote_result.hpp>
@@ -61,11 +66,6 @@
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
-#include <hpx/traits/component_config_data.hpp>
-#include <hpx/traits/component_heap_type.hpp>
-#include <hpx/traits/component_supports_migration.hpp>
-#include <hpx/traits/component_type_database.hpp>
-#include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_valid_action.hpp>

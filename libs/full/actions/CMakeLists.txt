@@ -16,6 +16,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(actions_headers
     hpx/actions/action_support.hpp
     hpx/actions/actions_fwd.hpp
+    hpx/actions/apply_helper.hpp
     hpx/actions/base_action.hpp
     hpx/actions/register_action.hpp
     hpx/actions/transfer_base_action.hpp
@@ -26,6 +27,7 @@ set(actions_headers
 # Default location is $HPX_ROOT/libs/actions/include_compatibility
 # cmake-format: off
 set(actions_compat_headers
+    hpx/async_distributed/applier/apply_helper.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions_fwd.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions/action_support.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions/base_action.hpp => hpx/modules/actions.hpp
@@ -46,7 +48,7 @@ add_hpx_module(
   SOURCES ${actions_sources}
   HEADERS ${actions_headers}
   COMPAT_HEADERS ${actions_compat_headers}
-  MODULE_DEPENDENCIES hpx_actions_base hpx_async_distributed hpx_runtime_local
+  MODULE_DEPENDENCIES hpx_actions_base hpx_runtime_local
   DEPENDENCIES hpx_core
   CMAKE_SUBDIRS examples tests
 )

@@ -13,9 +13,8 @@
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier_fwd.hpp>    // this needs to go first
+#include <hpx/components_base/component_type.hpp>
 #include <hpx/modules/threadmanager.hpp>
-#include <hpx/runtime/agas_fwd.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
@@ -49,13 +48,6 @@ namespace hpx { namespace applier {
         ~applier() = default;
 
         void initialize(std::uint64_t rts);
-
-        /// \brief Allow access to the AGAS client instance used with this
-        ///        \a applier.
-        ///
-        /// This function returns a reference to the resolver client this
-        /// applier instance has been created with.
-        agas::addressing_service& get_agas_client();
 
 #if defined(HPX_HAVE_NETWORKING)
         /// \brief Access the \a parcelhandler instance associated with this

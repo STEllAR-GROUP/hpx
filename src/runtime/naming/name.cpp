@@ -19,6 +19,7 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>

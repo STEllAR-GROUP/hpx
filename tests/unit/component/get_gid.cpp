@@ -44,6 +44,11 @@ struct test_client : client_base<test_client, stub_base<test_server> >
 {
     typedef client_base<test_client, stub_base<test_server> > base_type;
 
+    explicit test_client(hpx::id_type const& id) noexcept
+      : base_type(id)
+    {
+    }
+
     test_client(hpx::future<hpx::id_type>&& id) noexcept
       : base_type(std::move(id))
     {
@@ -55,7 +60,7 @@ struct test_client : client_base<test_client, stub_base<test_server> >
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    test_client t = test_client::create(find_here());
+    test_client t = hpx::new_<test_client>(find_here());
     HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_id());
 
     t.check_gid();

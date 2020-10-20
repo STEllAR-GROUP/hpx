@@ -6,11 +6,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/agas/agas_fwd.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/async_distributed/applier/bind_naming_wrappers.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
 
 #include <cstddef>
 
@@ -27,7 +28,7 @@ namespace hpx { namespace applier
                 "applier is not valid");
             return false;
         }
-        return appl->get_agas_client().bind_local(gid_, addr, ec);
+        return naming::get_agas_client().bind_local(gid_, addr, ec);
     }
 
     void unbind_gid_local(naming::gid_type const& gid_, error_code& ec)
@@ -39,7 +40,7 @@ namespace hpx { namespace applier
                     "applier is not valid");
             }
             else {
-                appl->get_agas_client().unbind_local(gid_, ec);
+                naming::get_agas_client().unbind_local(gid_, ec);
             }
         }
         else {
@@ -57,7 +58,7 @@ namespace hpx { namespace applier
                 "applier is not valid");
             return false;
         }
-        return appl->get_agas_client().bind_range_local(gid, count, addr, offset, ec);
+        return naming::get_agas_client().bind_range_local(gid, count, addr, offset, ec);
     }
 
     void unbind_range_local(naming::gid_type const& gid, std::size_t count,
@@ -69,7 +70,7 @@ namespace hpx { namespace applier
                 "applier is not valid");
         }
         else {
-            appl->get_agas_client().unbind_range_local(gid, count, ec);
+            naming::get_agas_client().unbind_range_local(gid, count, ec);
         }
     }
 }}

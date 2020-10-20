@@ -17,7 +17,7 @@
 #include <hpx/async_distributed/dataflow.hpp>
 #endif
 #include <hpx/futures/future.hpp>
-#include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/runtime/components/create_component_helpers.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 
@@ -120,7 +120,7 @@ namespace hpx { namespace cuda { namespace experimental {
         {
             target_type t = this->get_next_target();
             hpx::id_type target_locality = t.get_locality();
-            return components::stub_base<Component>::create_async(
+            return components::create_async<Component>(
                 target_locality, std::forward<Ts>(ts)..., std::move(t));
         }
 
@@ -161,7 +161,7 @@ namespace hpx { namespace cuda { namespace experimental {
                 hpx::id_type target_locality = t.get_locality();
 
                 std::size_t num_partitions = this->get_num_items(count, t);
-                objs.push_back(components::stub_base<Component>::create_async(
+                objs.push_back(components::create_async<Component>(
                     target_locality, num_partitions, ts..., std::move(t)));
 
                 localities.push_back(std::move(target_locality));

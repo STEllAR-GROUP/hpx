@@ -10,10 +10,10 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assert.hpp>
+#include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>

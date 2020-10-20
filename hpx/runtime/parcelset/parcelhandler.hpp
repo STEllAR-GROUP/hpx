@@ -11,17 +11,18 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/agas/agas_fwd.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/modules/errors.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/modules/logging.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
@@ -193,15 +194,7 @@ namespace hpx { namespace parcelset
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
-        HPX_FORCEINLINE void put_parcel(parcel p)
-        {
-            auto f = [this](boost::system::error_code const& ec,
-                         parcel const& p) -> void {
-                invoke_write_handler(ec, p);
-            };
-
-            put_parcel(std::move(p), std::move(f));
-        }
+        void put_parcel(parcel p);
 
         /// A parcel is submitted for transport at the source locality site to
         /// the parcel set of the locality with the put-parcel command
@@ -222,7 +215,8 @@ namespace hpx { namespace parcelset
         ///                 where \a err is the status code of the operation and
         ///                       \a size is the number of successfully
         ///                              transferred bytes.
-        void put_parcels(std::vector<parcel> p, std::vector<write_handler_type> f);
+        void put_parcels(
+            std::vector<parcel> p, std::vector<write_handler_type> f);
 
         /// This put_parcel() function overload is asynchronous, but no
         /// callback is provided by the user.
@@ -233,19 +227,7 @@ namespace hpx { namespace parcelset
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
-        void put_parcels(std::vector<parcel> parcels)
-        {
-            std::vector<write_handler_type> handlers(parcels.size(),
-                [this](boost::system::error_code const& ec, parcel const& p)
-                    -> void { return invoke_write_handler(ec, p); });
-
-            put_parcels(std::move(parcels), std::move(handlers));
-        }
-
-        double get_current_time() const
-        {
-            return hpx::chrono::high_resolution_timer::now();
-        }
+        void put_parcels(std::vector<parcel> parcels);
 
         /// \brief Factory function used in serialization to create a given
         /// locality endpoint
@@ -400,17 +382,13 @@ namespace hpx { namespace parcelset
         void list_parcelport(std::ostringstream& strm,
             std::string const& ppname, int priority, bool bootstrap) const;
 
+        void put_parcel_impl(parcel&& p, write_handler_type&& f);
+        void put_parcels_impl(
+            std::vector<parcel>&& p, std::vector<write_handler_type>&& f);
+
         // manage default exception handler
         void invoke_write_handler(
-            boost::system::error_code const& ec, parcel const & p) const
-        {
-            write_handler_type f;
-            {
-                std::lock_guard<mutex_type> l(mtx_);
-                f = write_handler_;
-            }
-            f(ec, p);
-        }
+            boost::system::error_code const& ec, parcel const & p) const;
 
         write_handler_type set_write_handler(write_handler_type f)
         {

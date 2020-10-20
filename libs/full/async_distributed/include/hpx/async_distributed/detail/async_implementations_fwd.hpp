@@ -11,7 +11,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_local/async_fwd.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/modules/naming.hpp>
 
 namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////

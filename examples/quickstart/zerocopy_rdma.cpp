@@ -159,9 +159,7 @@ HPX_REGISTER_ACTION_DECLARATION(zerocopy_get_action);
 HPX_REGISTER_ACTION(zerocopy_get_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-struct zerocopy
-  : hpx::components::client_base<
-        zerocopy, hpx::components::stub_base<zerocopy_server> >
+struct zerocopy : hpx::components::client_base<zerocopy, zerocopy_server>
 {
 private:
     // Copy he data once into the destination buffer if the get() operation was
@@ -177,9 +175,7 @@ private:
     }
 
 public:
-    typedef hpx::components::client_base<
-        zerocopy, hpx::components::stub_base<zerocopy_server>
-    > base_type;
+    typedef hpx::components::client_base<zerocopy, zerocopy_server> base_type;
 
     zerocopy(hpx::future<hpx::id_type>&& fid)
       : base_type(std::move(fid))

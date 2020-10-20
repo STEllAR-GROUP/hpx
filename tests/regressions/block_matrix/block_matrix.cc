@@ -80,7 +80,7 @@ block_vector_t::block_vector_t(std::shared_ptr<structure_t> str):
   str(str), elts(str->B)
 {
   for (std::ptrdiff_t b=0; b<str->B; ++b) {
-    elts[b] = vector_t_client::create(str->locs[b], str->size(b));
+    elts[b] = hpx::new_<vector_t_client>(str->locs[b], str->size(b));
   }
 }
 
@@ -122,7 +122,7 @@ block_matrix_t::block_matrix_t(std::shared_ptr<structure_t> istr,
 {
   for (std::ptrdiff_t jb=0; jb<jstr->B; ++jb) {
     for (std::ptrdiff_t ib=0; ib<istr->B; ++ib) {
-      elts[ib+istr->B*jb] = matrix_t_client::create(istr->locs[ib],
+      elts[ib+istr->B*jb] = hpx::new_<matrix_t_client>(istr->locs[ib],
                                  istr->size(ib), jstr->size(jb));
     }
   }

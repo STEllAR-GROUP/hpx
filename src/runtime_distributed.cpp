@@ -38,7 +38,6 @@
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
-#include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -48,6 +47,7 @@
 #include <hpx/runtime/threads/threadmanager_counters.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime_local/debugging.hpp>
@@ -414,8 +414,6 @@ namespace hpx {
 
         LPROGRESS_;
 
-        counters_ = std::make_shared<performance_counters::registry>();
-
 #if defined(HPX_HAVE_NETWORKING)
         agas_client_.bootstrap(parcel_handler_, ini_);
 #else
@@ -440,6 +438,9 @@ namespace hpx {
     runtime_distributed::~runtime_distributed()
     {
         LRT_(debug) << "~runtime_distributed(entering)";
+
+        // reset counter registry
+        get_counter_registry().clear();
 
         runtime_support_->delete_function_lists();
 
@@ -931,13 +932,13 @@ namespace hpx {
 
     performance_counters::registry& runtime_distributed::get_counter_registry()
     {
-        return *counters_;
+        return performance_counters::registry::instance();
     }
 
     performance_counters::registry const&
     runtime_distributed::get_counter_registry() const
     {
-        return *counters_;
+        return performance_counters::registry::instance();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1791,7 +1792,7 @@ namespace hpx {
 
     runtime_distributed*& get_runtime_distributed_ptr()
     {
-        static thread_local runtime_distributed* runtime_distributed_;
+        static thread_local runtime_distributed* runtime_distributed_ = nullptr;
         return runtime_distributed_;
     }
 
@@ -1972,5 +1973,4 @@ namespace hpx { namespace parcelset {
             .do_background_work(num_thread, mode);
     }
 }}    // namespace hpx::parcelset
-
 #endif

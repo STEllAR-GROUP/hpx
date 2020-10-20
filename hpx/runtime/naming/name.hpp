@@ -18,7 +18,7 @@
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/modules/naming.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #include <hpx/thread_support/atomic_count.hpp>

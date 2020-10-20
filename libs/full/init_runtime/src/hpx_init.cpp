@@ -29,6 +29,7 @@
 #ifdef HPX_HAVE_MODULE_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>
 #endif
+#include <hpx/modules/naming.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
@@ -37,7 +38,6 @@
 #include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/variables_map.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
@@ -64,8 +64,8 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
-#include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/query_counters.hpp>
@@ -108,11 +108,15 @@ namespace hpx_startup {
 namespace hpx { namespace detail {
     // forward declarations only
     void console_print(std::string const&);
+}}    // namespace hpx::detail
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+namespace hpx { namespace detail {
+    // forward declarations only
     void list_symbolic_name(std::string const&, hpx::id_type const&);
     void list_component_type(std::string const&, components::component_type);
 }}    // namespace hpx::detail
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 HPX_PLAIN_ACTION_ID(hpx::detail::console_print, console_print_action,
     hpx::actions::console_print_action_id)
 HPX_PLAIN_ACTION_ID(hpx::detail::list_component_type,

@@ -13,6 +13,8 @@ include(HPX_Message)
 set(_hpx_full_modules
     actions
     actions_base
+    agas
+    async_colocated
     async_cuda
     async_distributed
     async_mpi
@@ -29,11 +31,13 @@ set(_hpx_full_modules
     init_runtime
     lcos_distributed
     mpi_base
+    naming
     performance_counters
     program_options
     resiliency
     resource_partitioner
     runtime_configuration
+    runtime_distributed
     runtime_local
     segmented_algorithms
     thread_executors

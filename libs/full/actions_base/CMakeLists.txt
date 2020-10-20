@@ -22,6 +22,8 @@ set(actions_base_headers
     hpx/actions_base/component_action.hpp
     hpx/actions_base/continuation_fwd.hpp
     hpx/actions_base/detail/action_factory.hpp
+    hpx/actions_base/detail/invocation_count_registry.hpp
+    hpx/actions_base/detail/per_action_data_counter_registry.hpp
     hpx/actions_base/plain_action.hpp
     hpx/actions_base/preassigned_action_id.hpp
     hpx/actions_base/traits/action_continuation.hpp
@@ -43,8 +45,10 @@ set(actions_base_compat_headers
     hpx/runtime/actions/component_action.hpp => hpx/modules/actions_base.hpp
     hpx/runtime/actions/continuation_fwd.hpp => hpx/modules/actions_base.hpp
     hpx/runtime/actions/detail/action_factory.hpp => hpx/modules/actions_base.hpp
+    hpx/runtime/actions/detail/invocation_count_registry.hpp => hpx/actions_base/detail/invocation_count_registry.hpp
     hpx/runtime/actions/plain_action.hpp => hpx/modules/actions_base.hpp
     hpx/runtime/actions/preassigned_action_id.hpp => hpx/modules/actions_base.hpp
+    hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp => hpx/actions_base/detail/per_action_data_counter_registry.hpp
     hpx/traits/action_continuation.hpp => hpx/modules/actions_base.hpp
     hpx/traits/action_priority.hpp => hpx/modules/actions_base.hpp
     hpx/traits/action_select_direct_execution.hpp => hpx/modules/actions_base.hpp
@@ -54,7 +58,10 @@ set(actions_base_compat_headers
 )
 # cmake-format: on
 
-set(actions_base_sources detail/action_factory.cpp)
+set(actions_base_sources
+    detail/action_factory.cpp detail/invocation_count_registry.cpp
+    detail/per_action_data_counter_registry.cpp
+)
 
 include(HPX_AddModule)
 add_hpx_module(
@@ -65,7 +72,7 @@ add_hpx_module(
   SOURCES ${actions_base_sources}
   HEADERS ${actions_base_headers}
   COMPAT_HEADERS ${actions_base_compat_headers}
-  MODULE_DEPENDENCIES hpx_async_base hpx_components_base
+  MODULE_DEPENDENCIES hpx_async_base hpx_components_base hpx_naming
   DEPENDENCIES hpx_core
   CMAKE_SUBDIRS examples tests
 )

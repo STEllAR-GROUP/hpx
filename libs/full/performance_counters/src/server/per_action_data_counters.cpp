@@ -11,7 +11,7 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
+#include <hpx/performance_counters/per_action_data_counter_discoverer.hpp>
 
 #include <cstdint>
 #include <string>
@@ -24,7 +24,7 @@ namespace hpx { namespace performance_counters {
     // Discoverer function for per-action parcel data counters
     bool per_action_data_counter_discoverer(counter_info const& info,
         discover_counter_func const& f, discover_counters_mode mode,
-        hpx::parcelset::detail::per_action_data_counter_registry& registry,
+        hpx::actions::detail::per_action_data_counter_registry& registry,
         error_code& ec)
     {
         // compose the counter name templates
@@ -34,7 +34,8 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return false;
 
-        bool result = registry.counter_discoverer(info, p, f, mode, ec);
+        bool result = per_action_counter_counter_discoverer(
+            registry, info, p, f, mode, ec);
         if (!result || ec)
             return false;
 
@@ -48,7 +49,7 @@ namespace hpx { namespace performance_counters {
         discover_counter_func const& f, discover_counters_mode mode,
         error_code& ec)
     {
-        using hpx::parcelset::detail::per_action_data_counter_registry;
+        using hpx::actions::detail::per_action_data_counter_registry;
         return per_action_data_counter_discoverer(
             info, f, mode, per_action_data_counter_registry::instance(), ec);
     }
@@ -56,7 +57,7 @@ namespace hpx { namespace performance_counters {
     ///////////////////////////////////////////////////////////////////////////
     // Creation function for per-action parcel data counters
     naming::gid_type per_action_data_counter_creator(counter_info const& info,
-        hpx::parcelset::detail::per_action_data_counter_registry& registry,
+        hpx::actions::detail::per_action_data_counter_registry& registry,
         hpx::util::function_nonser<std::int64_t(
             std::string const&, bool)> const& counter_func,
         error_code& ec)
@@ -111,7 +112,7 @@ namespace hpx { namespace performance_counters {
             std::string const&, bool)> const& f,
         error_code& ec)
     {
-        using hpx::parcelset::detail::per_action_data_counter_registry;
+        using hpx::actions::detail::per_action_data_counter_registry;
         return per_action_data_counter_creator(
             info, per_action_data_counter_registry::instance(), f, ec);
     }

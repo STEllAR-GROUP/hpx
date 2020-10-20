@@ -11,10 +11,12 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
+#include <hpx/components_base/component_type.hpp>
+#include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/runtime/components/create_component_helpers.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -22,8 +24,6 @@
 #include <hpx/serialization/string.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -72,7 +72,7 @@ namespace hpx { namespace components
                 hpx::id_type const& best_locality =
                     get_best_locality(std::move(values), localities_);
 
-                return stub_base<Component>::create_async(
+                return create_async<Component>(
                     best_locality, std::forward<Ts>(vs)...);
             }
 
@@ -104,7 +104,7 @@ namespace hpx { namespace components
 
                 for (std::size_t i = 0; i != to_create.size(); ++i)
                 {
-                    objs.push_back(stub_base<Component>::bulk_create_async(
+                    objs.push_back(bulk_create_async<Component>(
                         localities_[i], to_create[i], vs...));
                 }
 
@@ -228,17 +228,15 @@ namespace hpx { namespace components
         template <typename Component, typename ...Ts>
         hpx::future<hpx::id_type> create(Ts&&... vs) const
         {
-            using components::stub_base;
-
             // handle special cases
             if (localities_.size() == 0)
             {
-                return stub_base<Component>::create_async(
+                return create_async<Component>(
                     hpx::find_here(), std::forward<Ts>(vs)...);
             }
             else if (localities_.size() == 1)
             {
-                return stub_base<Component>::create_async(
+                return create_async<Component>(
                     localities_.front(), std::forward<Ts>(vs)...);
             }
 
@@ -272,8 +270,6 @@ namespace hpx { namespace components
         hpx::future<std::vector<bulk_locality_result> >
         bulk_create(std::size_t count, Ts&&... vs) const
         {
-            using components::stub_base;
-
             if (localities_.size() > 1)
             {
                 // schedule creation of all objects across given localities
@@ -293,7 +289,7 @@ namespace hpx { namespace components
                 localities_.empty() ? hpx::find_here() : localities_.front();
 
             hpx::future<std::vector<hpx::id_type> > f =
-                stub_base<Component>::bulk_create_async(
+                bulk_create_async<Component>(
                     id, count, std::forward<Ts>(vs)...);
 
             return f.then(hpx::launch::sync,

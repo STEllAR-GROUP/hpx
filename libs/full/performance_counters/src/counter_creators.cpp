@@ -10,10 +10,10 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/server/primary_namespace_counters.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
-#include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
@@ -23,6 +23,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters {
+
     ///////////////////////////////////////////////////////////////////////////
     // Creation functions to be registered with counter types
 
@@ -495,6 +496,7 @@ namespace hpx { namespace performance_counters {
     }
 
     namespace detail {
+
         naming::gid_type retrieve_agas_counter(std::string const& name,
             naming::id_type const& agas_id, error_code& ec)
         {
@@ -528,8 +530,7 @@ namespace hpx { namespace performance_counters {
             }
             case agas::primary_ns_statistics_counter:
             {
-                agas::server::primary_namespace::statistics_counter_action
-                    action;
+                agas::primary_namespace_statistics_counter_action action;
                 return action(agas_id, name).get_gid();
             }
             default:

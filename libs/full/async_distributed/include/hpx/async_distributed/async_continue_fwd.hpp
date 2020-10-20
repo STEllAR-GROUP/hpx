@@ -15,7 +15,7 @@
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/modules/naming.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 
 #include <type_traits>

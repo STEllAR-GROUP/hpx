@@ -5,15 +5,15 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/components_base/component_type.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -15,7 +15,7 @@ set(runtime_local_headers
     hpx/runtime_local/detail/runtime_local_fwd.hpp
     hpx/runtime_local/detail/serialize_exception.hpp
     hpx/runtime_local/get_locality_id.hpp
-    hpx/runtime_local/get_num_localities.hpp
+    hpx/runtime_local/get_num_all_localities.hpp
     hpx/runtime_local/get_os_thread_count.hpp
     hpx/runtime_local/get_thread_name.hpp
     hpx/runtime_local/get_worker_thread_num.hpp
@@ -46,7 +46,6 @@ set(runtime_local_compat_headers
     hpx/parallel/executors/service_executors.hpp => hpx/include/parallel_executors.hpp
     hpx/runtime/config_entry.hpp => hpx/modules/runtime_local.hpp
     hpx/runtime/get_locality_id.hpp => hpx/runtime.hpp
-    hpx/runtime/get_num_localities.hpp => hpx/runtime.hpp
     hpx/runtime/get_os_thread_count.hpp => hpx/runtime.hpp
     hpx/runtime/get_thread_name.hpp => hpx/runtime.hpp
     hpx/runtime/get_worker_thread_num.hpp => hpx/runtime.hpp

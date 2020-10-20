@@ -50,5 +50,6 @@ add_hpx_module(
   HEADERS ${segmented_algorithms_headers}
   COMPAT_HEADERS ${segmented_algorithms_compat_headers}
   DEPENDENCIES hpx_core hpx_parallelism
+  MODULE_DEPENDENCIES hpx_async_colocated hpx_async_distributed
   CMAKE_SUBDIRS examples tests
 )

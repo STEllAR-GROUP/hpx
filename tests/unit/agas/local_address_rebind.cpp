@@ -27,18 +27,16 @@ using hpx::naming::get_agas_client;
 using hpx::naming::detail::get_stripped_gid;
 using hpx::naming::address;
 
-using hpx::test::simple_mobile_object;
-
 using hpx::util::report_errors;
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(
-    variables_map& vm
-    )
+int hpx_main(variables_map& vm)
 {
     {
-        simple_mobile_object a(hpx::find_here());
-        simple_mobile_object b(hpx::find_here());
+        hpx::test::simple_mobile_object a =
+            hpx::new_<hpx::test::server::simple_mobile_object>(hpx::find_here());
+        hpx::test::simple_mobile_object b =
+            hpx::new_<hpx::test::server::simple_mobile_object>(hpx::find_here());
 
         id_type a_id = a.get_id();
         gid_type a_gid = get_stripped_gid(a_id.get_gid());
@@ -86,10 +84,7 @@ int hpx_main(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(
-    int argc
-  , char* argv[]
-    )
+int main(int argc, char* argv[])
 {
     // Configure application-specific options.
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");

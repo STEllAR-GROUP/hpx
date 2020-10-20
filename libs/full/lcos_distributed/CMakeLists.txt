@@ -36,6 +36,6 @@ add_hpx_module(
   HEADERS ${lcos_distributed_headers}
   COMPAT_HEADERS ${lcos_distributed_compat_headers}
   DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES hpx_actions hpx_async_distributed
+  MODULE_DEPENDENCIES hpx_actions hpx_async_distributed hpx_naming
   CMAKE_SUBDIRS examples tests
 )

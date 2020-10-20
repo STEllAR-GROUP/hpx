@@ -95,7 +95,7 @@ hpx::id_type matrix_t_server::gemv_process(bool trans, double alpha,
 {
   auto fx = hpx::async(vector_t_server::get_data_action(), x);
   auto fx_result = fx.get();
-  vector_t_client y = vector_t_client::create(hpx::find_here(), data->NI);
+  vector_t_client y = hpx::new_<vector_t_client>(hpx::find_here(), data->NI);
   auto y_ptr = y.get_ptr();
   ::gemv(trans, alpha, *data, *fx_result, 0.0, *y_ptr);
   return y.get_id();

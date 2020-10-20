@@ -22,7 +22,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     lcos/base_lco_with_value.cpp
     lcos/promise.cpp
     runtime/actions/continuation.cpp
-    runtime/actions/detail/invocation_count_registry.cpp
     runtime/agas/addressing_service.cpp
     runtime/agas/big_boot_barrier.cpp
     runtime/agas/component_namespace.cpp
@@ -32,10 +31,8 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/agas/detail/hosted_locality_namespace.cpp
     runtime/agas/interface.cpp
     runtime/agas/locality_namespace.cpp
-    runtime/agas/primary_namespace.cpp
     runtime/agas/server/component_namespace_server.cpp
     runtime/agas/server/locality_namespace_server.cpp
-    runtime/agas/server/primary_namespace_server.cpp
     runtime/agas/server/route.cpp
     runtime/agas/server/symbol_namespace_server.cpp
     runtime/agas/symbol_namespace.cpp
@@ -61,7 +58,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/parcelset/detail/parcel_await.cpp
     runtime/parcelset/detail/parcel_route_handler.cpp
     runtime/parcelset/detail/per_action_data_counter.cpp
-    runtime/parcelset/detail/per_action_data_counter_registry.cpp
     runtime/parcelset/locality.cpp
     runtime/parcelset/parcel.cpp
     runtime/parcelset/parcelhandler.cpp
@@ -157,7 +153,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/actions/continuation2_impl.hpp
     hpx/runtime/actions/continuation.hpp
     hpx/runtime/actions/continuation_impl.hpp
-    hpx/runtime/actions/detail/invocation_count_registry.hpp
     hpx/runtime/actions/lambda_to_action.hpp
     hpx/runtime/actions/make_continuation.hpp
     hpx/runtime/actions/set_lco_value_continuation.hpp
@@ -169,15 +164,11 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/agas/detail/bootstrap_locality_namespace.hpp
     hpx/runtime/agas/detail/hosted_component_namespace.hpp
     hpx/runtime/agas/detail/hosted_locality_namespace.hpp
-    hpx/runtime/agas_fwd.hpp
-    hpx/runtime/agas/gva.hpp
     hpx/runtime/agas/interface.hpp
     hpx/runtime/agas/locality_namespace.hpp
     hpx/runtime/agas/namespace_action_code.hpp
-    hpx/runtime/agas/primary_namespace.hpp
     hpx/runtime/agas/server/component_namespace.hpp
     hpx/runtime/agas/server/locality_namespace.hpp
-    hpx/runtime/agas/server/primary_namespace.hpp
     hpx/runtime/agas/server/symbol_namespace.hpp
     hpx/runtime/agas/symbol_namespace.hpp
     hpx/runtime/basename_registration_fwd.hpp
@@ -193,15 +184,16 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/components/component_registry.hpp
     hpx/runtime/components/component_startup_shutdown_base.hpp
     hpx/runtime/components/component_startup_shutdown.hpp
-    hpx/runtime/components/component_type.hpp
     hpx/runtime/components/console_error_sink.hpp
     hpx/runtime/components/console_logging.hpp
     hpx/runtime/components/copy_component.hpp
+    hpx/runtime/components/create_component_helpers.hpp
     hpx/runtime/components/default_distribution_policy.hpp
     hpx/runtime/components/derived_component_factory.hpp
     hpx/runtime/components_fwd.hpp
     hpx/runtime/components/make_client.hpp
     hpx/runtime/components/migrate_component.hpp
+    hpx/runtime/components/new.hpp
     hpx/runtime/components/runtime_support.hpp
     hpx/runtime/components/server/abstract_component_base.hpp
     hpx/runtime/components/server/abstract_migration_support.hpp
@@ -232,15 +224,13 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/components/stubs/stub_base.hpp
     hpx/runtime/components/target_distribution_policy.hpp
     hpx/runtime/components/unwrapping_result_policy.hpp
-    hpx/runtime_distributed.hpp
     hpx/runtime/find_here.hpp
-    hpx/runtime/find_localities.hpp
+    hpx/runtime/find_all_localities.hpp
     hpx/runtime/get_colocation_id.hpp
     hpx/runtime/get_locality_name.hpp
     hpx/runtime/get_ptr.hpp
     hpx/runtime/message_handler_fwd.hpp
     hpx/runtime/naming/address.hpp
-    hpx/runtime/naming_fwd.hpp
     hpx/runtime/naming/id_type.hpp
     hpx/runtime/naming/id_type_impl.hpp
     hpx/runtime/naming/name.hpp
@@ -249,10 +239,11 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/naming/unmanaged.hpp
     hpx/runtime/parcelset/decode_parcels.hpp
     hpx/runtime/parcelset/detail/call_for_each.hpp
+    hpx/runtime/parcelset/detail/data_point.hpp
+    hpx/runtime/parcelset/detail/gatherer.hpp
     hpx/runtime/parcelset/detail/parcel_await.hpp
     hpx/runtime/parcelset/detail/parcel_route_handler.hpp
     hpx/runtime/parcelset/detail/per_action_data_counter.hpp
-    hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp
     hpx/runtime/parcelset/encode_parcels.hpp
     hpx/runtime/parcelset_fwd.hpp
     hpx/runtime/parcelset/locality.hpp
@@ -277,11 +268,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/traits/action_schedule_thread.hpp
     hpx/traits/action_serialization_filter.hpp
     hpx/traits/action_was_object_migrated.hpp
-    hpx/traits/component_config_data.hpp
-    hpx/traits/component_heap_type.hpp
-    hpx/traits/component_supports_migration.hpp
-    hpx/traits/component_type_database.hpp
-    hpx/traits/component_type_is_compatible.hpp
     hpx/traits/is_client.hpp
     hpx/traits/is_continuation.hpp
     hpx/traits/is_distribution_policy.hpp

@@ -13,21 +13,21 @@
 
 #if defined(HPX_HAVE_PARCELPORT_TCP)
 
-#include <hpx/assert.hpp>
-#include <hpx/asio/asio_util.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/performance_counters/parcels/data_point.hpp>
-#include <hpx/performance_counters/parcels/gatherer.hpp>
+#include <hpx/asio/asio_util.hpp>
+#include <hpx/assert.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/plugins/parcelport/tcp/locality.hpp>
+#include <hpx/runtime/parcelset/detail/data_point.hpp>
+#include <hpx/runtime/parcelset/detail/gatherer.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/state.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/deferred_call.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/functional/unique_function.hpp>
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>

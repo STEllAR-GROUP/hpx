@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cstdint>
@@ -18,14 +18,13 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace naming
-{
-    namespace detail
-    {
+namespace hpx { namespace naming {
+
+    namespace detail {
         struct HPX_EXPORT id_type_impl;
         HPX_EXPORT void intrusive_ptr_add_ref(id_type_impl* p);
         HPX_EXPORT void intrusive_ptr_release(id_type_impl* p);
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // the local gid is actually just a wrapper around the real thing
@@ -38,13 +37,13 @@ namespace hpx { namespace naming
         enum management_type
         {
             unknown_deleter = -1,
-            unmanaged = 0,          ///< unmanaged GID
-            managed = 1,            ///< managed GID
-            managed_move_credit = 2 ///< managed GID which will give up all
-                                    ///< credits when sent
+            unmanaged = 0,             ///< unmanaged GID
+            managed = 1,               ///< managed GID
+            managed_move_credit = 2    ///< managed GID which will give up all
+                                       ///< credits when sent
         };
 
-        id_type() = default;
+        constexpr id_type() noexcept = default;
 
         id_type(std::uint64_t lsb_id, management_type t);
         id_type(gid_type const& gid, management_type t);
@@ -54,17 +53,17 @@ namespace hpx { namespace naming
           : gid_(o.gid_)
         {
         }
-        id_type(id_type && o) noexcept
+        id_type(id_type&& o) noexcept
           : gid_(std::move(o.gid_))
         {
         }
 
-        id_type & operator=(id_type const & o) noexcept
+        id_type& operator=(id_type const& o) noexcept
         {
             gid_ = o.gid_;
             return *this;
         }
-        id_type & operator=(id_type && o) noexcept
+        id_type& operator=(id_type&& o) noexcept
         {
             gid_ = std::move(o.gid_);
             return *this;
@@ -80,16 +79,16 @@ namespace hpx { namespace naming
         id_type& operator++();
         id_type operator++(int);
 
-        explicit operator bool() const;
+        explicit operator bool() const noexcept;
 
         // comparison is required as well
-        friend bool operator== (id_type const& lhs, id_type const& rhs);
-        friend bool operator!= (id_type const& lhs, id_type const& rhs);
+        friend bool operator==(id_type const& lhs, id_type const& rhs);
+        friend bool operator!=(id_type const& lhs, id_type const& rhs);
 
-        friend bool operator< (id_type const& lhs, id_type const& rhs);
-        friend bool operator<= (id_type const& lhs, id_type const& rhs);
-        friend bool operator> (id_type const& lhs, id_type const& rhs);
-        friend bool operator>= (id_type const& lhs, id_type const& rhs);
+        friend bool operator<(id_type const& lhs, id_type const& rhs);
+        friend bool operator<=(id_type const& lhs, id_type const& rhs);
+        friend bool operator>(id_type const& lhs, id_type const& rhs);
+        friend bool operator>=(id_type const& lhs, id_type const& rhs);
 
         // access the internal parts of the gid
         std::uint64_t get_msb() const;
@@ -104,12 +103,13 @@ namespace hpx { namespace naming
         void make_unmanaged() const;
 
     private:
-        friend HPX_EXPORT std::ostream& operator<<(std::ostream& os,
-            id_type const& id);
+        friend HPX_EXPORT std::ostream& operator<<(
+            std::ostream& os, id_type const& id);
 
         friend class hpx::serialization::access;
 
-        void save(serialization::output_archive& ar, unsigned int version) const;
+        void save(
+            serialization::output_archive& ar, unsigned int version) const;
         void load(serialization::input_archive& ar, unsigned int version);
 
         HPX_SERIALIZATION_SPLIT_MEMBER()
@@ -118,8 +118,12 @@ namespace hpx { namespace naming
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    id_type const invalid_id = id_type();
-}}
+    static id_type const invalid_id = id_type();
+}}    // namespace hpx::naming
+
+// Pulling important types into the main namespace
+namespace hpx {
+    using naming::invalid_id;
+}    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
-

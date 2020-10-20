@@ -9,9 +9,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/agas_fwd.hpp>
+#include <hpx/agas/agas_fwd.hpp>
+#include <hpx/components_base/component_type.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>

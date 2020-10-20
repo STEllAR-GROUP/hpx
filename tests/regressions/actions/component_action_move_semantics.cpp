@@ -27,7 +27,7 @@ std::size_t pass_object(hpx::naming::id_type id)
 {
     using hpx::test::action_move_semantics;
 
-    action_move_semantics test = action_move_semantics::create(id);
+    action_move_semantics test = hpx::new_<action_move_semantics>(id);
 
     Object obj;
     obj.reset_count();
@@ -41,7 +41,7 @@ std::size_t move_object(hpx::naming::id_type id)
 {
     using hpx::test::action_move_semantics;
 
-    action_move_semantics test = action_move_semantics::create(id);
+    action_move_semantics test = hpx::new_<action_move_semantics>(id);
 
     Object obj;
     obj.reset_count();
@@ -55,7 +55,7 @@ std::size_t return_object(hpx::naming::id_type id)
 {
     using hpx::test::action_move_semantics;
 
-    action_move_semantics test = action_move_semantics::create(id);
+    action_move_semantics test = hpx::new_<action_move_semantics>(id);
 
     Object obj(hpx::async<Action>(test.get_id()).get());
     return obj.get_count();
@@ -67,7 +67,7 @@ std::size_t return_move_object(hpx::naming::id_type id)
 {
     using hpx::test::action_move_semantics;
 
-    action_move_semantics test = action_move_semantics::create(id);
+    action_move_semantics test = hpx::new_<action_move_semantics>(id);
 
     Object obj(std::move(hpx::async<Action>(test.get_id()).move_out()));
     return obj.get_count();

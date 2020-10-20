@@ -21,7 +21,7 @@
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime_local/get_num_localities.hpp>
+#include <hpx/runtime_distributed/get_num_localities.hpp>
 
 #include <climits>
 #include <cmath>

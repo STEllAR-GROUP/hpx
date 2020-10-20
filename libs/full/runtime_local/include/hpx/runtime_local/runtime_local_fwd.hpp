@@ -17,7 +17,7 @@
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/detail/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
-#include <hpx/runtime_local/get_num_localities.hpp>
+#include <hpx/runtime_local/get_num_all_localities.hpp>
 #include <hpx/runtime_local/get_os_thread_count.hpp>
 #include <hpx/runtime_local/get_thread_name.hpp>
 #include <hpx/runtime_local/get_worker_thread_num.hpp>

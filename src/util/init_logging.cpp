@@ -11,11 +11,10 @@
 #include <hpx/logging/format/named_write.hpp>
 #include <hpx/logging/manipulator.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/naming.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/threading_base/thread_data.hpp>

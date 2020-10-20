@@ -10,10 +10,10 @@
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS) && defined(HPX_HAVE_NETWORKING)
 
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/performance_counters/parcels/data_point.hpp>
-#include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
+#include <hpx/runtime/parcelset/detail/data_point.hpp>
+#include <hpx/runtime/parcelset/detail/gatherer.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstdint>
 #include <string>

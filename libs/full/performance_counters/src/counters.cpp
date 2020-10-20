@@ -24,8 +24,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
-#include <hpx/runtime_distributed.hpp>
-#include <hpx/runtime_local/get_num_localities.hpp>
+#include <hpx/runtime_local/get_num_all_localities.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -513,10 +512,15 @@ namespace hpx { namespace performance_counters {
         create_counter_func const& create_counter,
         discover_counters_func const& discover_counters, error_code& ec)
     {
-        runtime_distributed* rtd = get_runtime_distributed_ptr();
-        return rtd ? rtd->get_counter_registry().add_counter_type(
-                         info, create_counter, discover_counters, ec) :
-                     status_generic_error;
+        if (hpx::get_runtime_ptr() == nullptr)
+        {
+            HPX_THROWS_IF(ec, bad_parameter,
+                "performance_counters::add_counter_type",
+                "the runtime is not currently running");
+            return status_generic_error;
+        }
+        return registry::instance().add_counter_type(
+            info, create_counter, discover_counters, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -525,10 +529,15 @@ namespace hpx { namespace performance_counters {
         discover_counter_func const& discover_counter,
         discover_counters_mode mode, error_code& ec)
     {
-        runtime_distributed* rtd = get_runtime_distributed_ptr();
-        return rtd ? rtd->get_counter_registry().discover_counter_types(
-                         discover_counter, mode, ec) :
-                     status_generic_error;
+        if (hpx::get_runtime_ptr() == nullptr)
+        {
+            HPX_THROWS_IF(ec, bad_parameter,
+                "performance_counters::discover_counter_types",
+                "the runtime is not currently running");
+            return status_generic_error;
+        }
+        return registry::instance().discover_counter_types(
+            discover_counter, mode, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -537,20 +546,30 @@ namespace hpx { namespace performance_counters {
         discover_counter_func const& discover_counter,
         discover_counters_mode mode, error_code& ec)
     {
-        runtime_distributed* rtd = get_runtime_distributed_ptr();
-        return rtd ? rtd->get_counter_registry().discover_counter_type(
-                         info, discover_counter, mode, ec) :
-                     status_generic_error;
+        if (hpx::get_runtime_ptr() == nullptr)
+        {
+            HPX_THROWS_IF(ec, bad_parameter,
+                "performance_counters::discover_counter_types",
+                "the runtime is not currently running");
+            return status_generic_error;
+        }
+        return registry::instance().discover_counter_type(
+            info, discover_counter, mode, ec);
     }
 
     counter_status discover_counter_type(std::string const& name,
         discover_counter_func const& discover_counter,
         discover_counters_mode mode, error_code& ec)
     {
-        runtime_distributed* rtd = get_runtime_distributed_ptr();
-        return rtd ? rtd->get_counter_registry().discover_counter_type(
-                         name, discover_counter, mode, ec) :
-                     status_generic_error;
+        if (hpx::get_runtime_ptr() == nullptr)
+        {
+            HPX_THROWS_IF(ec, bad_parameter,
+                "performance_counters::discover_counter_types",
+                "the runtime is not currently running");
+            return status_generic_error;
+        }
+        return registry::instance().discover_counter_type(
+            name, discover_counter, mode, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -595,10 +614,12 @@ namespace hpx { namespace performance_counters {
     ///////////////////////////////////////////////////////////////////////////
     counter_status remove_counter_type(counter_info const& info, error_code& ec)
     {
-        // the runtime might not be available any more
-        runtime_distributed* rtd = get_runtime_distributed_ptr();
-        return rtd ? rtd->get_counter_registry().remove_counter_type(info, ec) :
-                     status_generic_error;
+        // the runtime could be gone already
+        if (hpx::get_runtime_ptr() == nullptr)
+        {
+            return status_generic_error;
+        }
+        return registry::instance().remove_counter_type(info, ec);
     }
 
     /// \brief Retrieve the counter type for the given counter name from the
@@ -606,30 +627,33 @@ namespace hpx { namespace performance_counters {
     counter_status get_counter_type(
         std::string const& name, counter_info& info, error_code& ec)
     {
-        // the runtime might not be available any more
-        runtime_distributed* rtd = get_runtime_distributed_ptr();
-        return rtd ?
-            rtd->get_counter_registry().get_counter_type(name, info, ec) :
-            status_generic_error;
+        if (hpx::get_runtime_ptr() == nullptr)
+        {
+            HPX_THROWS_IF(ec, bad_parameter,
+                "performance_counters::get_counter_type",
+                "the runtime is not currently running");
+            return status_generic_error;
+        }
+        return registry::instance().get_counter_type(name, info, ec);
     }
 
     namespace detail {
         naming::gid_type create_raw_counter_value(counter_info const& info,
             std::int64_t* countervalue, error_code& ec)
         {
+            HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
             naming::gid_type gid;
-            get_runtime_distributed()
-                .get_counter_registry()
-                .create_raw_counter_value(info, countervalue, gid, ec);
+            registry::instance().create_raw_counter_value(
+                info, countervalue, gid, ec);
             return gid;
         }
 
         naming::gid_type create_raw_counter(counter_info const& info,
             hpx::util::function_nonser<std::int64_t()> const& f, error_code& ec)
         {
+            HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
             naming::gid_type gid;
-            get_runtime_distributed().get_counter_registry().create_raw_counter(
-                info, f, gid, ec);
+            registry::instance().create_raw_counter(info, f, gid, ec);
             return gid;
         }
 
@@ -637,9 +661,9 @@ namespace hpx { namespace performance_counters {
             hpx::util::function_nonser<std::int64_t(bool)> const& f,
             error_code& ec)
         {
+            HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
             naming::gid_type gid;
-            get_runtime_distributed().get_counter_registry().create_raw_counter(
-                info, f, gid, ec);
+            registry::instance().create_raw_counter(info, f, gid, ec);
             return gid;
         }
 
@@ -647,9 +671,9 @@ namespace hpx { namespace performance_counters {
             hpx::util::function_nonser<std::vector<std::int64_t>()> const& f,
             error_code& ec)
         {
+            HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
             naming::gid_type gid;
-            get_runtime_distributed().get_counter_registry().create_raw_counter(
-                info, f, gid, ec);
+            registry::instance().create_raw_counter(info, f, gid, ec);
             return gid;
         }
 
@@ -658,9 +682,9 @@ namespace hpx { namespace performance_counters {
                 f,
             error_code& ec)
         {
+            HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
             naming::gid_type gid;
-            get_runtime_distributed().get_counter_registry().create_raw_counter(
-                info, f, gid, ec);
+            registry::instance().create_raw_counter(info, f, gid, ec);
             return gid;
         }
 
@@ -669,9 +693,9 @@ namespace hpx { namespace performance_counters {
         naming::gid_type create_counter(
             counter_info const& info, error_code& ec)
         {
+            HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
             naming::gid_type gid;
-            get_runtime_distributed().get_counter_registry().create_counter(
-                info, gid, ec);
+            registry::instance().create_counter(info, gid, ec);
             return gid;
         }
 
@@ -682,11 +706,10 @@ namespace hpx { namespace performance_counters {
             std::string const& base_counter_name,
             std::vector<std::size_t> const& parameters, error_code& ec)
         {
+            HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
             naming::gid_type gid;
-            get_runtime_distributed()
-                .get_counter_registry()
-                .create_statistics_counter(
-                    info, base_counter_name, parameters, gid, ec);
+            registry::instance().create_statistics_counter(
+                info, base_counter_name, parameters, gid, ec);
             return gid;
         }
 
@@ -696,10 +719,10 @@ namespace hpx { namespace performance_counters {
         naming::gid_type create_arithmetics_counter(counter_info const& info,
             std::vector<std::string> const& base_counter_names, error_code& ec)
         {
+            HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
             naming::gid_type gid;
-            get_runtime_distributed()
-                .get_counter_registry()
-                .create_arithmetics_counter(info, base_counter_names, gid, ec);
+            registry::instance().create_arithmetics_counter(
+                info, base_counter_names, gid, ec);
             return gid;
         }
 
@@ -710,11 +733,10 @@ namespace hpx { namespace performance_counters {
             counter_info const& info,
             std::vector<std::string> const& base_counter_names, error_code& ec)
         {
+            HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
             naming::gid_type gid;
-            get_runtime_distributed()
-                .get_counter_registry()
-                .create_arithmetics_counter_extended(
-                    info, base_counter_names, gid, ec);
+            registry::instance().create_arithmetics_counter_extended(
+                info, base_counter_names, gid, ec);
             return gid;
         }
 
@@ -722,16 +744,15 @@ namespace hpx { namespace performance_counters {
         counter_status add_counter(
             naming::id_type const& id, counter_info const& info, error_code& ec)
         {
-            return get_runtime_distributed().get_counter_registry().add_counter(
-                id, info, ec);
+            HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
+            return registry::instance().add_counter(id, info, ec);
         }
 
         counter_status remove_counter(
             counter_info const& info, naming::id_type const& id, error_code& ec)
         {
-            return get_runtime_distributed()
-                .get_counter_registry()
-                .remove_counter(info, id, ec);
+            HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
+            return registry::instance().remove_counter(info, id, ec);
         }
 
         // create an arbitrary counter on this locality
@@ -740,10 +761,10 @@ namespace hpx { namespace performance_counters {
             // find create function for given counter
             error_code ec;
 
+            HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
+
             create_counter_func f;
-            get_runtime_distributed()
-                .get_counter_registry()
-                .get_counter_create_function(info, f, ec);
+            registry::instance().get_counter_create_function(info, f, ec);
             if (ec)
             {
                 HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
@@ -1193,38 +1214,50 @@ namespace hpx { namespace performance_counters {
     void counter_value::serialize(
         serialization::output_archive& ar, const unsigned int)
     {
-        ar& status_& time_& count_& value_& scaling_& scale_inverse_;
+        // clang-format off
+        ar & status_ & time_ & count_ & value_ & scaling_ & scale_inverse_;
+        // clang-format on
     }
 
     void counter_value::serialize(
         serialization::input_archive& ar, const unsigned int)
     {
-        ar& status_& time_& count_& value_& scaling_& scale_inverse_;
+        // clang-format off
+        ar & status_ & time_ & count_ & value_ & scaling_ & scale_inverse_;
+        // clang-format on
     }
 
     void counter_values_array::serialize(
         serialization::output_archive& ar, const unsigned int)
     {
-        ar& status_& time_& count_& values_& scaling_& scale_inverse_;
+        // clang-format off
+        ar & status_ & time_ & count_ & values_ & scaling_ & scale_inverse_;
+        // clang-format on
     }
 
     void counter_values_array::serialize(
         serialization::input_archive& ar, const unsigned int)
     {
-        ar& status_& time_& count_& values_& scaling_& scale_inverse_;
+        // clang-format off
+        ar & status_ & time_ & count_ & values_ & scaling_ & scale_inverse_;
+        // clang-format on
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void counter_type_path_elements::serialize(
         serialization::output_archive& ar, const unsigned int)
     {
-        ar& objectname_& countername_& parameters_;
+        // clang-format off
+        ar & objectname_ & countername_ & parameters_;
+        // clang-format on
     }
 
     void counter_type_path_elements::serialize(
         serialization::input_archive& ar, const unsigned int)
     {
-        ar& objectname_& countername_& parameters_;
+        // clang-format off
+        ar & objectname_ & countername_ & parameters_;
+        // clang-format on
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1235,9 +1268,11 @@ namespace hpx { namespace performance_counters {
         hpx::serialization::base_object_type<counter_path_elements, base_type>
             base = hpx::serialization::base_object<base_type>(*this);
 
-        ar& base& parentinstancename_& instancename_& subinstancename_&
-            parentinstanceindex_& instanceindex_& subinstanceindex_&
-                parentinstance_is_basename_;
+        // clang-format off
+        ar & base & parentinstancename_ & instancename_ & subinstancename_ &
+            parentinstanceindex_ & instanceindex_ & subinstanceindex_ &
+            parentinstance_is_basename_;
+        // clang-format on
     }
 
     void counter_path_elements::serialize(
@@ -1247,21 +1282,29 @@ namespace hpx { namespace performance_counters {
         hpx::serialization::base_object_type<counter_path_elements, base_type>
             base = hpx::serialization::base_object<base_type>(*this);
 
-        ar& base& parentinstancename_& instancename_& subinstancename_&
-            parentinstanceindex_& instanceindex_& subinstanceindex_&
-                parentinstance_is_basename_;
+        // clang-format off
+        ar & base & parentinstancename_ & instancename_ & subinstancename_ &
+            parentinstanceindex_ & instanceindex_ & subinstanceindex_ &
+            parentinstance_is_basename_;
+        // clang-format on
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void counter_info::serialize(
         serialization::output_archive& ar, const unsigned int)
     {
-        ar& type_& version_& status_& fullname_& helptext_& unit_of_measure_;
+        // clang-format off
+        ar & type_ & version_ & status_ & fullname_ & helptext_ &
+            unit_of_measure_;
+        // clang-format on
     }
 
     void counter_info::serialize(
         serialization::input_archive& ar, const unsigned int)
     {
-        ar& type_& version_& status_& fullname_& helptext_& unit_of_measure_;
+        // clang-format off
+        ar & type_ & version_ & status_ & fullname_ & helptext_ &
+            unit_of_measure_;
+        // clang-format on
     }
 }}    // namespace hpx::performance_counters

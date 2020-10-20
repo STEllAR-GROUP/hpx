@@ -14,7 +14,6 @@
 #include <string>
 #include <utility>
 
-using hpx::components::stub_base;
 using hpx::components::client_base;
 using hpx::components::component;
 using hpx::components::component_base;
@@ -50,6 +49,8 @@ struct message : client_base<message, message_server>
 {
     typedef client_base<message, message_server> base_type;
 
+    explicit message(hpx::id_type const& id) : base_type(id) {}
+
     message(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
 
     void print() { async<print_action>(this->get_id()).get(); }
@@ -59,7 +60,7 @@ struct message : client_base<message, message_server>
 int main()
 {
     std::string msg = "hello world\n";
-    message ms = message::create(hpx::find_here(), msg);
+    message ms = hpx::new_<message>(hpx::find_here(), msg);
 
     ms.print();
 

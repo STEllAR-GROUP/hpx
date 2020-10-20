@@ -12,6 +12,7 @@
 #include <hpx/include/client.hpp>
 
 #include <cstdint>
+#include <utility>
 
 #include "server/simple_mobile_object.hpp"
 
@@ -31,10 +32,13 @@ struct simple_mobile_object
     typedef server::simple_mobile_object server_type;
 
     /// Create a new component on the target locality.
-    explicit simple_mobile_object(
-        naming::id_type const& locality
-        )
-      : base_type(stub_type::create_async(locality))
+    explicit simple_mobile_object(naming::id_type const& id)
+      : base_type(id)
+    {
+    }
+
+    simple_mobile_object(hpx::future<hpx::id_type>&& id)
+      : base_type(std::move(id))
     {
     }
 
