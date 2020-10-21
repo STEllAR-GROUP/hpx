@@ -633,11 +633,11 @@ Parallel algorithms
      * Description
      * In header
      * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::parallel::v1::is_sorted`
+   * * :cpp:func:`hpx::is_sorted`
      * Returns ``true`` if each element in a range is sorted.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`is_sorted`
-   * * :cpp:func:`hpx::parallel::v1::is_sorted_until`
+   * * :cpp:func:`hpx::is_sorted_until`
      * Returns the first unsorted element.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`is_sorted_until`

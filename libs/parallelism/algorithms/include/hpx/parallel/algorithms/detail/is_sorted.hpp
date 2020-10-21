@@ -1,3 +1,4 @@
+//  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2019 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -7,27 +8,55 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <iterator>
 #include <type_traits>
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
-    // provide implementation of std::distance supporting iterators/sentinels
-    // std::is_sorted is not available on all supported platforms yet
-    template <typename Iter, typename Sent, typename Compare>
-    inline bool is_sorted_sequential(Iter first, Sent last, Compare const& comp)
+    template <typename Iter, typename Sent, typename Compare,
+        typename Proj = hpx::parallel::util::projection_identity>
+    inline constexpr bool is_sorted_sequential(
+        Iter first, Sent last, Compare&& comp, Proj&& proj = Proj())
     {
         bool sorted = true;
         if (first != last)
         {
-            for (Iter it1 = first, it2 = first + 1;
-                 it2 != last && (sorted = !comp(*it2, *it1)); it1 = it2++)
+            for (Iter it1 = first, it2 = ++first; it2 != last &&
+                 (sorted = !HPX_INVOKE(
+                      comp, HPX_INVOKE(proj, *it2), HPX_INVOKE(proj, *it1)));
+                 it1 = it2++)
             {
                 /**/
             }
         }
         return sorted;
+    }
+
+    template <typename Iter, typename Sent, typename Compare,
+        typename Proj = hpx::parallel::util::projection_identity>
+    inline constexpr Iter is_sorted_until_sequential(
+        Iter first, Sent last, Compare&& comp, Proj&& proj = Proj())
+    {
+        if (first != last)
+        {
+            Iter it1 = first;
+            Iter it2 = ++first;
+            for (; it2 != last &&
+                 !HPX_INVOKE(
+                     comp, HPX_INVOKE(proj, *it2), HPX_INVOKE(proj, *it1));
+                 it1 = it2++)
+            {
+                /**/
+            }
+
+            return it2;
+        }
+        else
+        {
+            return first;
+        }
     }
 
 }}}}    // namespace hpx::parallel::v1::detail

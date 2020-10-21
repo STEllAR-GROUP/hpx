@@ -159,7 +159,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy, InIter first, InIter last, Pred&& pred, Proj&& proj)
             {
                 return std::adjacent_find(first, last,
-                    util::invoke_projected<Pred, Proj>(pred, proj));
+                    util::invoke_projected<Pred, Proj>(
+                        std::forward<Pred>(pred), std::forward<Proj>(proj)));
             }
 
             template <typename ExPolicy, typename FwdIter, typename Pred,

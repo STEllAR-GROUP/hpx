@@ -7,3 +7,4 @@
 #pragma once
 
 #include <hpx/parallel/algorithms/is_sorted.hpp>
+#include <hpx/parallel/container_algorithms/is_sorted.hpp>
