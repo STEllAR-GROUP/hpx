@@ -1,5 +1,6 @@
 // Copyright (c) 2013 Erik Schnetter
 //
+// SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,6 +11,7 @@
 #include "matrix.hpp"
 
 #include <hpx/hpx.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/include/components.hpp>
 
 #include <cassert>
@@ -36,7 +38,7 @@ struct vector_t_server:
   // Temporarily, to allow creating a remote object from local data
   vector_t_server(const vector_t& x): data(std::make_shared<vector_t>(x)) {}
   // We don't really want these
-  vector_t_server() { assert(0); }
+  vector_t_server() { HPX_ASSERT(0); }
 
   std::shared_ptr<vector_t> get_data() { return data; }
   HPX_DEFINE_COMPONENT_ACTION(vector_t_server, get_data);
@@ -125,7 +127,7 @@ struct matrix_t_server:
   // Temporarily, to allow creating a remote object from local data
   matrix_t_server(const matrix_t& a): data(std::make_shared<matrix_t>(a)) {}
   // We don't really want these
-  matrix_t_server() { assert(0); }
+  matrix_t_server() { HPX_ASSERT(0); }
 
   std::shared_ptr<matrix_t> get_data() { return data; }
   HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, get_data);

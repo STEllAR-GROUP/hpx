@@ -1,11 +1,13 @@
 // Copyright (c) 2013 Erik Schnetter
 //
+// SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
+#include <hpx/assert.hpp>
 
 #include "algorithms.hpp"
 
@@ -30,7 +32,7 @@
 
 void axpy(double alpha, const vector_t& x, vector_t& y)
 {
-  assert(x.N == y.N);
+  HPX_ASSERT(x.N == y.N);
   if (alpha == 0.0) return;
   if (alpha == 1.0) {
     for (std::ptrdiff_t i=0; i<y.N; ++i) {
@@ -45,7 +47,7 @@ void axpy(double alpha, const vector_t& x, vector_t& y)
 
 void axpy(double alpha, const block_vector_t& x, block_vector_t& y)
 {
-  assert(x.str == y.str);
+  HPX_ASSERT(x.str == y.str);
   std::vector<hpx::future<void>> fs;
   for (std::ptrdiff_t ib=0; ib<y.str->B; ++ib) {
     fs.push_back(y.block(ib).axpy(alpha, x.block(ib)));
@@ -59,7 +61,7 @@ void axpy(double alpha, const block_vector_t& x, block_vector_t& y)
 
 void copy(const vector_t& x, vector_t& y)
 {
-  assert(x.N == y.N);
+  HPX_ASSERT(x.N == y.N);
   for (std::ptrdiff_t i=0; i<y.N; ++i) {
     y(i) = x(i);
   }
@@ -67,7 +69,7 @@ void copy(const vector_t& x, vector_t& y)
 
 void copy(const block_vector_t& x, block_vector_t& y)
 {
-  assert(x.str == y.str);
+  HPX_ASSERT(x.str == y.str);
   std::vector<hpx::future<void>> fs;
   for (std::ptrdiff_t ib=0; ib<y.str->B; ++ib) {
     fs.push_back(y.block(ib).copy(x.block(ib)));
@@ -160,8 +162,8 @@ void axpy(bool trans, double alpha, const matrix_t& a, matrix_t& b)
 {
   if (alpha == 0.0) return;
   if (!trans) {
-    assert(b.NI == a.NI);
-    assert(b.NJ == a.NJ);
+    HPX_ASSERT(b.NI == a.NI);
+    HPX_ASSERT(b.NJ == a.NJ);
     if (alpha == 1.0) {
       for (std::ptrdiff_t j=0; j<b.NJ; ++j) {
         for (std::ptrdiff_t i=0; i<b.NI; ++i) {
@@ -176,8 +178,8 @@ void axpy(bool trans, double alpha, const matrix_t& a, matrix_t& b)
       }
     }
   } else {
-    assert(b.NI == a.NJ);
-    assert(b.NJ == a.NI);
+    HPX_ASSERT(b.NI == a.NJ);
+    HPX_ASSERT(b.NJ == a.NI);
     if (alpha == 1.0) {
       for (std::ptrdiff_t j=0; j<b.NJ; ++j) {
         for (std::ptrdiff_t i=0; i<b.NI; ++i) {
@@ -200,16 +202,16 @@ void axpy(bool trans, double alpha, const block_matrix_t& a,
   if (alpha == 0.0) return;
   std::vector<hpx::future<void>> fs;
   if (!trans) {
-    assert(b.istr == a.istr);
-    assert(b.jstr == a.jstr);
+    HPX_ASSERT(b.istr == a.istr);
+    HPX_ASSERT(b.jstr == a.jstr);
     for (std::ptrdiff_t jb=0; jb<b.jstr->B; ++jb) {
       for (std::ptrdiff_t ib=0; ib<b.istr->B; ++ib) {
         fs.push_back(b.block(ib,jb).axpy(trans, alpha, a.block(ib,jb)));
       }
     }
   } else {
-    assert(b.istr == a.jstr);
-    assert(b.jstr == a.istr);
+    HPX_ASSERT(b.istr == a.jstr);
+    HPX_ASSERT(b.jstr == a.istr);
     for (std::ptrdiff_t jb=0; jb<b.jstr->B; ++jb) {
       for (std::ptrdiff_t ib=0; ib<b.istr->B; ++ib) {
         fs.push_back(b.block(ib,jb).axpy(trans, alpha, a.block(jb,ib)));
@@ -226,16 +228,16 @@ void axpy(bool trans, double alpha, const block_matrix_t& a,
 void copy(bool transa, const matrix_t& a, matrix_t& b)
 {
   if (!transa) {
-    assert(b.NI == a.NI);
-    assert(b.NJ == a.NJ);
+    HPX_ASSERT(b.NI == a.NI);
+    HPX_ASSERT(b.NJ == a.NJ);
     for (std::ptrdiff_t j=0; j<b.NJ; ++j) {
       for (std::ptrdiff_t i=0; i<b.NI; ++i) {
         b(i,j) = a(i,j);
       }
     }
   } else {
-    assert(b.NI == a.NJ);
-    assert(b.NJ == a.NI);
+    HPX_ASSERT(b.NI == a.NJ);
+    HPX_ASSERT(b.NJ == a.NI);
     for (std::ptrdiff_t j=0; j<b.NJ; ++j) {
       for (std::ptrdiff_t i=0; i<b.NI; ++i) {
         b(i,j) = a(j,i);
@@ -248,16 +250,16 @@ void copy(bool transa, const block_matrix_t& a, block_matrix_t& b)
 {
   std::vector<hpx::future<void>> fs;
   if (!transa) {
-    assert(b.istr == a.istr);
-    assert(b.jstr == a.jstr);
+    HPX_ASSERT(b.istr == a.istr);
+    HPX_ASSERT(b.jstr == a.jstr);
     for (std::ptrdiff_t jb=0; jb<b.jstr->B; ++jb) {
       for (std::ptrdiff_t ib=0; ib<b.istr->B; ++ib) {
         fs.push_back(b.block(ib,jb).copy(transa, a.block(ib,jb)));
       }
     }
   } else {
-    assert(b.istr == a.jstr);
-    assert(b.jstr == a.istr);
+    HPX_ASSERT(b.istr == a.jstr);
+    HPX_ASSERT(b.jstr == a.istr);
     for (std::ptrdiff_t jb=0; jb<b.jstr->B; ++jb) {
       for (std::ptrdiff_t ib=0; ib<b.istr->B; ++ib) {
         fs.push_back(b.block(ib,jb).copy(transa, a.block(jb,ib)));
@@ -277,8 +279,8 @@ void gemv(bool trans, double alpha, const matrix_t& a, const vector_t& x,
   scal(beta, y);
   if (alpha == 0.0) return;
   if (!trans) {
-    assert(a.NJ == x.N);
-    assert(a.NI == y.N);
+    HPX_ASSERT(a.NJ == x.N);
+    HPX_ASSERT(a.NI == y.N);
     for (std::ptrdiff_t j=0; j<x.N; ++j) {
       double tmp = alpha * x(j);
       for (std::ptrdiff_t i=0; i<y.N; ++i) {
@@ -286,8 +288,8 @@ void gemv(bool trans, double alpha, const matrix_t& a, const vector_t& x,
       }
     }
   } else {
-    assert(a.NI == x.N);
-    assert(a.NJ == y.N);
+    HPX_ASSERT(a.NI == x.N);
+    HPX_ASSERT(a.NJ == y.N);
     for (std::ptrdiff_t j=0; j<y.N; ++j) {
       double tmp = 0.0;
       for (std::ptrdiff_t i=0; i<x.N; ++i) {
@@ -305,8 +307,8 @@ void gemv(bool trans, double alpha,
   scal(beta, y);
   if (alpha == 0.0) return;
   if (!trans) {
-    assert(a.jstr == x.str);
-    assert(a.istr == y.str);
+    HPX_ASSERT(a.jstr == x.str);
+    HPX_ASSERT(a.istr == y.str);
     block_vector_t xtmp(x.str);
     copy(x, xtmp);
     scal(alpha, xtmp);
@@ -320,10 +322,10 @@ void gemv(bool trans, double alpha,
     }
   } else {
     // TODO
-    assert(0);
+    HPX_ASSERT(0);
 #if 0
-    assert(a.jstr == x.str);
-    assert(a.istr == y.str);
+    HPX_ASSERT(a.jstr == x.str);
+    HPX_ASSERT(a.istr == y.str);
     for (std::ptrdiff_t jb=0; jb<y.str->B; ++jb) {
       vector_t tmp(y.str->size(jb));
       scal(0.0, tmp);
@@ -423,9 +425,9 @@ void gemm(bool transa, bool transb,
   if (!transb) {
     if (!transa) {
       // c = alpha a b + beta c
-      assert(b.NI == a.NJ);
-      assert(c.NI == a.NI);
-      assert(c.NJ == b.NJ);
+      HPX_ASSERT(b.NI == a.NJ);
+      HPX_ASSERT(c.NI == a.NI);
+      HPX_ASSERT(c.NJ == b.NJ);
       for (std::ptrdiff_t j=0; j<c.NJ; ++j) {
         if (beta == 0.0) {
           for (std::ptrdiff_t i=0; i<c.NI; ++i) {
@@ -447,9 +449,9 @@ void gemm(bool transa, bool transb,
       }
     } else {
       // c = alpha a^T b + beta c
-      assert(b.NI == a.NI);
-      assert(c.NI == a.NJ);
-      assert(c.NJ == b.NJ);
+      HPX_ASSERT(b.NI == a.NI);
+      HPX_ASSERT(c.NI == a.NJ);
+      HPX_ASSERT(c.NJ == b.NJ);
       for (std::ptrdiff_t j=0; j<c.NJ; ++j) {
         for (std::ptrdiff_t i=0; i<c.NI; ++i) {
           double tmp = 0.0;
@@ -467,9 +469,9 @@ void gemm(bool transa, bool transb,
   } else {
     if (!transa) {
       // c = alpha a b^T + beta c
-      assert(b.NJ == a.NJ);
-      assert(c.NI == a.NI);
-      assert(c.NJ == b.NI);
+      HPX_ASSERT(b.NJ == a.NJ);
+      HPX_ASSERT(c.NI == a.NI);
+      HPX_ASSERT(c.NJ == b.NI);
       for (std::ptrdiff_t j=0; j<c.NJ; ++j) {
         if (beta == 0.0) {
           for (std::ptrdiff_t i=0; i<c.NI; ++i) {
@@ -491,9 +493,9 @@ void gemm(bool transa, bool transb,
       }
     } else {
       // c = alpha a^T b^T + beta c
-      assert(b.NJ == a.NI);
-      assert(c.NI == a.NJ);
-      assert(c.NJ == b.NI);
+      HPX_ASSERT(b.NJ == a.NI);
+      HPX_ASSERT(c.NI == a.NJ);
+      HPX_ASSERT(c.NJ == b.NI);
       for (std::ptrdiff_t j=0; j<c.NJ; ++j) {
         for (std::ptrdiff_t i=0; i<c.NI; ++i) {
           double tmp = 0.0;
@@ -520,9 +522,9 @@ void gemm(bool transa, bool transb,
   if (!transb) {
     if (!transa) {
       // c = alpha a b + beta c
-      assert(b.istr == a.jstr);
-      assert(c.istr == a.istr);
-      assert(c.jstr == b.jstr);
+      HPX_ASSERT(b.istr == a.jstr);
+      HPX_ASSERT(c.istr == a.istr);
+      HPX_ASSERT(c.jstr == b.jstr);
 #if 0
       for (std::ptrdiff_t jb=0; jb<c.jstr->B; ++jb) {
         for (std::ptrdiff_t ib=0; ib<c.istr->B; ++ib) {
@@ -554,11 +556,11 @@ void gemm(bool transa, bool transb,
       }
     } else {
       // TODO
-      assert(0);
+      HPX_ASSERT(0);
     }
   } else {
     // TODO
-    assert(0);
+    HPX_ASSERT(0);
   }
 }
 

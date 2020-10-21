@@ -1,5 +1,6 @@
 // Copyright (c) 2013 Erik Schnetter
 //
+// SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,6 +10,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include "defs.hpp"
 
+#include <hpx/assert.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/shared_ptr.hpp>
 #include <hpx/serialization/vector.hpp>
@@ -42,17 +44,17 @@ struct vector_t {
   // We don't really want these
   vector_t() = default;
   vector_t(const vector_t&) = default;
-  vector_t& operator=(const vector_t&) { assert(0); return *this; }
+  vector_t& operator=(const vector_t&) { HPX_ASSERT(0); return *this; }
 
   operator std::string() const { return mkstr(*this); }
   const double& operator()(std::ptrdiff_t i) const
   {
-    assert(i>=0 && i<N);
+    HPX_ASSERT(i>=0 && i<N);
     return elts[i];
   }
   double& operator()(std::ptrdiff_t i)
   {
-    assert(i>=0 && i<N);
+    HPX_ASSERT(i>=0 && i<N);
     return elts[i];
   }
 };
@@ -82,12 +84,12 @@ struct matrix_t {
   operator std::string() const { return mkstr(*this); }
   const double& operator()(std::ptrdiff_t i, std::ptrdiff_t j) const
   {
-    assert(i>=0 && i<NI && j>=0 && j<NJ);
+    HPX_ASSERT(i>=0 && i<NI && j>=0 && j<NJ);
     return elts[i+NI*j];
   }
   double& operator()(std::ptrdiff_t i, std::ptrdiff_t j)
   {
-    assert(i>=0 && i<NI && j>=0 && j<NJ);
+    HPX_ASSERT(i>=0 && i<NI && j>=0 && j<NJ);
     return elts[i+NI*j];
   }
 };
