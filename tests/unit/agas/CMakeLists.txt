@@ -13,7 +13,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       find_clients_from_prefix
       find_ids_from_prefix
       get_colocation_id
-      gid_type
       local_address_rebind
       local_embedded_ref_to_local_object
       refcnted_symbol_to_local_object

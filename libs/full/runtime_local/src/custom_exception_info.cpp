@@ -465,7 +465,9 @@ namespace hpx {
         std::uint32_t const* locality = xi.get<hpx::detail::throw_locality>();
         if (locality)
             return *locality;
-        return naming::invalid_locality_id;
+
+        // same as naming::invalid_locality_id
+        return ~static_cast<std::uint32_t>(0);
     }
 
     /// Return the (operating system) process id of the locality where the

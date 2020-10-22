@@ -35,7 +35,6 @@ set(_hpx_core_modules
     itt_notify
     logging
     memory
-    naming_base
     plugin
     prefix
     preprocessor

@@ -122,11 +122,14 @@ namespace hpx { namespace compute { namespace host {
         {
             return host::get_local_targets();
         }
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         static hpx::future<std::vector<target>> get_targets(
             hpx::id_type const& locality)
         {
             return host::get_targets(locality);
         }
+#endif
 
         friend bool operator==(target const& lhs, target const& rhs)
         {

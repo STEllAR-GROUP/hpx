@@ -25,8 +25,8 @@ set(init_runtime_headers
 set(init_runtime_sources hpx_init.cpp hpx_main_winsocket.cpp)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(init_runtime_optional_module_dependencies hpx_async_distributed
-                                                hpx_performance_counters
+  set(init_runtime_optional_module_dependencies
+      hpx_async_distributed hpx_naming hpx_performance_counters
   )
 endif()
 
@@ -41,7 +41,7 @@ add_hpx_module(
   SOURCES ${init_runtime_sources}
   HEADERS ${init_runtime_headers}
   DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES hpx_naming hpx_program_options hpx_runtime_local
+  MODULE_DEPENDENCIES hpx_program_options hpx_runtime_local
                       ${init_runtime_optional_module_dependencies}
   CMAKE_SUBDIRS examples tests
 )

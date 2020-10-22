@@ -10,7 +10,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/modules/naming.hpp>
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/runtime/naming/id_type.hpp>
+#endif
 
 #include <vector>
 

@@ -5,9 +5,11 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
+
 if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
   return()
 endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(agas_headers

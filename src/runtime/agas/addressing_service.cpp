@@ -929,8 +929,6 @@ bool addressing_service::unbind_range_local(
 { // {{{ unbind_range implementation
     try {
 
-        naming::gid_type gid = naming::detail::get_stripped_gid(lower_id);
-
         addr = primary_ns_.unbind_gid(count, lower_id);
 
         return true;
