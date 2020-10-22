@@ -355,7 +355,7 @@ Parallel algorithms
      * Description
      * In header
      * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::parallel::v1::adjacent_find`
+   * * :cpp:func:`hpx::adjacent_find`
      * Computes the differences between adjacent elements in a range.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`adjacent_find`

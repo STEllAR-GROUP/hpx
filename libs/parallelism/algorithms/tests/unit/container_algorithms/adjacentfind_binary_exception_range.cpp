@@ -19,12 +19,12 @@
 
 #include "test_utils.hpp"
 
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename ExPolicy, typename IteratorTag>
-void test_adjacent_find_bad_alloc(ExPolicy policy, IteratorTag)
+void test_adjacent_find_exception(ExPolicy policy, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -32,32 +32,33 @@ void test_adjacent_find_bad_alloc(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
-
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen() + 1);
 
-    bool caught_bad_alloc = false;
+    bool caught_exception = false;
     try
     {
-        hpx::adjacent_find(policy,
-            decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
-            decorated_iterator(std::end(c)));
+        hpx::ranges::adjacent_find(policy,
+            decorated_iterator(
+                std::begin(c), []() { throw std::runtime_error("test"); }),
+            decorated_iterator(std::end(c)), std::greater<std::size_t>());
         HPX_TEST(false);
     }
-    catch (std::bad_alloc const&)
+    catch (hpx::exception_list const& e)
     {
-        caught_bad_alloc = true;
+        caught_exception = true;
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
     catch (...)
     {
         HPX_TEST(false);
     }
 
-    HPX_TEST(caught_bad_alloc);
+    HPX_TEST(caught_exception);
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_adjacent_find_bad_alloc_async(ExPolicy p, IteratorTag)
+void test_adjacent_find_exception_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -66,14 +67,15 @@ void test_adjacent_find_bad_alloc_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen() + 1);
 
-    bool caught_bad_alloc = false;
+    bool caught_exception = false;
     bool returned_from_algorithm = false;
 
     try
     {
-        hpx::future<decorated_iterator> f = hpx::adjacent_find(p,
-            decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
-            decorated_iterator(std::end(c)));
+        hpx::future<decorated_iterator> f = hpx::ranges::adjacent_find(p,
+            decorated_iterator(
+                std::begin(c), []() { throw std::runtime_error("test"); }),
+            decorated_iterator(std::end(c)), std::greater<std::size_t>());
 
         returned_from_algorithm = true;
 
@@ -81,38 +83,39 @@ void test_adjacent_find_bad_alloc_async(ExPolicy p, IteratorTag)
 
         HPX_TEST(false);
     }
-    catch (std::bad_alloc const&)
+    catch (hpx::exception_list const& e)
     {
-        caught_bad_alloc = true;
+        caught_exception = true;
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
     catch (...)
     {
         HPX_TEST(false);
     }
 
-    HPX_TEST(caught_bad_alloc);
     HPX_TEST(returned_from_algorithm);
+    HPX_TEST(caught_exception);
 }
 
 template <typename IteratorTag>
-void test_adjacent_find_bad_alloc()
+void test_adjacent_find_exception()
 {
     using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_adjacent_find_bad_alloc(seq, IteratorTag());
-    test_adjacent_find_bad_alloc(par, IteratorTag());
+    test_adjacent_find_exception(seq, IteratorTag());
+    test_adjacent_find_exception(par, IteratorTag());
 
-    test_adjacent_find_bad_alloc_async(seq(task), IteratorTag());
-    test_adjacent_find_bad_alloc_async(par(task), IteratorTag());
+    test_adjacent_find_exception_async(seq(task), IteratorTag());
+    test_adjacent_find_exception_async(par(task), IteratorTag());
 }
 
-void adjacent_find_bad_alloc_test()
+void adjacent_find_exception_test()
 {
-    test_adjacent_find_bad_alloc<std::random_access_iterator_tag>();
-    test_adjacent_find_bad_alloc<std::forward_iterator_tag>();
+    test_adjacent_find_exception<std::random_access_iterator_tag>();
+    test_adjacent_find_exception<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
@@ -123,7 +126,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     gen.seed(seed);
 
-    adjacent_find_bad_alloc_test();
+    adjacent_find_exception_test();
     return hpx::finalize();
 }
 

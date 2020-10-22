@@ -39,9 +39,9 @@ void test_adjacent_find_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::adjacent_find(policy,
+        hpx::ranges::adjacent_find(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
-            decorated_iterator(std::end(c)));
+            decorated_iterator(std::end(c)), std::greater<std::size_t>());
         HPX_TEST(false);
     }
     catch (std::bad_alloc const&)
@@ -66,14 +66,14 @@ void test_adjacent_find_bad_alloc_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen() + 1);
 
-    bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
+    bool caught_bad_alloc = false;
 
     try
     {
-        hpx::future<decorated_iterator> f = hpx::adjacent_find(p,
+        hpx::future<decorated_iterator> f = hpx::ranges::adjacent_find(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
-            decorated_iterator(std::end(c)));
+            decorated_iterator(std::end(c)), std::greater<std::size_t>());
 
         returned_from_algorithm = true;
 

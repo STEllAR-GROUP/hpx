@@ -4,9 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/algorithm.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/parallel_adjacent_find.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -39,7 +39,7 @@ void test_adjacent_find_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::adjacent_find(policy,
+        hpx::adjacent_find(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::greater<std::size_t>());
         HPX_TEST(false);
@@ -71,7 +71,7 @@ void test_adjacent_find_bad_alloc_async(ExPolicy p, IteratorTag)
 
     try
     {
-        hpx::future<decorated_iterator> f = hpx::parallel::adjacent_find(p,
+        hpx::future<decorated_iterator> f = hpx::adjacent_find(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::greater<std::size_t>());
 

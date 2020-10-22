@@ -25,16 +25,25 @@ std::mt19937 gen(seed);
 std::uniform_int_distribution<> dis(2, 101);
 std::uniform_int_distribution<> dist(2, 10005);
 
-template <typename ExPolicy, typename IteratorTag>
-void test_adjacent_find(ExPolicy policy, IteratorTag)
+struct negate
+{
+    template <typename T>
+    T operator()(T x)
+    {
+        return -x;
+    }
+};
+
+template <typename ExPolicy, typename Proj, typename IteratorTag>
+void test_adjacent_find(ExPolicy policy, Proj&& proj, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
     //fill vector with random values about 1
     std::iota(std::begin(c), std::end(c), dis(gen));
 
@@ -43,22 +52,22 @@ void test_adjacent_find(ExPolicy policy, IteratorTag)
     c[random_pos] = 100000;
     c[random_pos + 1] = 1;
 
-    iterator index = hpx::adjacent_find(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), std::greater<std::size_t>());
+    iterator index = hpx::ranges::adjacent_find(policy, iterator(std::begin(c)),
+        iterator(std::end(c)), std::less<int>(), std::forward<Proj>(proj));
 
     base_iterator test_index = std::begin(c) + random_pos;
 
     HPX_TEST(index == iterator(test_index));
 }
 
-template <typename ExPolicy, typename IteratorTag>
-void test_adjacent_find_async(ExPolicy p, IteratorTag)
+template <typename ExPolicy, typename Proj, typename IteratorTag>
+void test_adjacent_find_async(ExPolicy p, Proj&& proj, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     // fill vector with random values above 1
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), dis(gen));
 
     std::size_t random_pos = dist(gen);    //-V101
@@ -66,8 +75,9 @@ void test_adjacent_find_async(ExPolicy p, IteratorTag)
     c[random_pos] = 100000;
     c[random_pos + 1] = 1;
 
-    hpx::future<iterator> f = hpx::adjacent_find(p, iterator(std::begin(c)),
-        iterator(std::end(c)), std::greater<std::size_t>());
+    hpx::future<iterator> f =
+        hpx::ranges::adjacent_find(p, iterator(std::begin(c)),
+            iterator(std::end(c)), std::less<int>(), std::forward<Proj>(proj));
     f.wait();
 
     // create iterator at position of value to be found
@@ -75,22 +85,78 @@ void test_adjacent_find_async(ExPolicy p, IteratorTag)
     HPX_TEST(f.get() == iterator(test_index));
 }
 
+template <typename ExPolicy, typename Proj>
+void test_adjacent_find(ExPolicy policy, Proj&& proj)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    typedef std::vector<int>::iterator iterator;
+
+    std::vector<int> c(10007);
+    //fill vector with random values about 1
+    std::iota(std::begin(c), std::end(c), dis(gen));
+
+    std::size_t random_pos = dist(gen);    //-V101
+
+    c[random_pos] = 100000;
+    c[random_pos + 1] = 1;
+
+    iterator index = hpx::ranges::adjacent_find(
+        policy, c, std::less<int>(), std::forward<Proj>(proj));
+
+    iterator test_index = std::begin(c) + random_pos;
+
+    HPX_TEST(index == iterator(test_index));
+}
+
+template <typename ExPolicy, typename Proj>
+void test_adjacent_find_async(ExPolicy p, Proj&& proj)
+{
+    typedef std::vector<int>::iterator iterator;
+
+    // fill vector with random values above 1
+    std::vector<int> c(10007);
+    std::iota(std::begin(c), std::end(c), dis(gen));
+
+    std::size_t random_pos = dist(gen);    //-V101
+
+    c[random_pos] = 100000;
+    c[random_pos + 1] = 1;
+
+    hpx::future<iterator> f = hpx::ranges::adjacent_find(
+        p, c, std::less<int>(), std::forward<Proj>(proj));
+    f.wait();
+
+    // create iterator at position of value to be found
+    iterator test_index = std::begin(c) + random_pos;
+    HPX_TEST(f.get() == iterator(test_index));
+}
+
 template <typename IteratorTag>
 void test_adjacent_find()
 {
     using namespace hpx::execution;
-    test_adjacent_find(seq, IteratorTag());
-    test_adjacent_find(par, IteratorTag());
-    test_adjacent_find(par_unseq, IteratorTag());
+    test_adjacent_find(seq, negate(), IteratorTag());
+    test_adjacent_find(par, negate(), IteratorTag());
+    test_adjacent_find(par_unseq, negate(), IteratorTag());
 
-    test_adjacent_find_async(seq(task), IteratorTag());
-    test_adjacent_find_async(par(task), IteratorTag());
+    test_adjacent_find_async(seq(task), negate(), IteratorTag());
+    test_adjacent_find_async(par(task), negate(), IteratorTag());
 }
 
 void adjacent_find_test()
 {
+    using namespace hpx::execution;
     test_adjacent_find<std::random_access_iterator_tag>();
     test_adjacent_find<std::forward_iterator_tag>();
+
+    test_adjacent_find(seq, negate());
+    test_adjacent_find(par, negate());
+    test_adjacent_find(par_unseq, negate());
+
+    test_adjacent_find_async(seq(task), negate());
+    test_adjacent_find_async(par(task), negate());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
