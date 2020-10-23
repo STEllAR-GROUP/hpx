@@ -24,6 +24,7 @@
 #if defined(HPX_HAVE_PAPI) && defined(__linux__) && !defined(__ANDROID) &&     \
     !defined(ANDROID)
 #include <sys/syscall.h>
+#include <unistd.h>
 #endif
 
 namespace hpx { namespace util {
