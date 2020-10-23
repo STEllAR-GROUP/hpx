@@ -33,10 +33,10 @@ struct vector_t_server:
 {
   std::shared_ptr<vector_t> data;
 
-  vector_t_server(std::ptrdiff_t N): data(std::make_shared<vector_t>(N)) {}
+  explicit vector_t_server(std::ptrdiff_t N): data(std::make_shared<vector_t>(N)) {}
   vector_t_server& operator=(const vector_t_server&) = delete;
   // Temporarily, to allow creating a remote object from local data
-  vector_t_server(const vector_t& x): data(std::make_shared<vector_t>(x)) {}
+  explicit vector_t_server(const vector_t& x): data(std::make_shared<vector_t>(x)) {}
   // We don't really want these
   vector_t_server() { HPX_ASSERT(0); }
 
@@ -70,7 +70,7 @@ struct vector_t_client:
 
   vector_t_client() =default;
   explicit vector_t_client(hpx::id_type const& id) : base_type(id) {}
-  vector_t_client(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
+  explicit vector_t_client(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
 
   std::shared_ptr<vector_t> get_ptr() const
   {
@@ -125,7 +125,7 @@ struct matrix_t_server:
   }
   matrix_t_server& operator=(const matrix_t_server&) = delete;
   // Temporarily, to allow creating a remote object from local data
-  matrix_t_server(const matrix_t& a): data(std::make_shared<matrix_t>(a)) {}
+  explicit matrix_t_server(const matrix_t& a): data(std::make_shared<matrix_t>(a)) {}
   // We don't really want these
   matrix_t_server() { HPX_ASSERT(0); }
 
@@ -167,7 +167,7 @@ struct matrix_t_client:
 
   matrix_t_client() =default;
   explicit matrix_t_client(hpx::id_type const& id) : base_type(id) {}
-  matrix_t_client(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
+  explicit matrix_t_client(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
 
   std::shared_ptr<matrix_t> get_ptr() const
   {

@@ -58,7 +58,7 @@ struct block_vector_t {
   template<typename S, typename T> using P = std::pair<S,T>;
   std::shared_ptr<structure_t> str;
   std::vector<vector_t_client> elts;
-  block_vector_t(std::shared_ptr<structure_t> str);
+  explicit block_vector_t(std::shared_ptr<structure_t> str);
   block_vector_t(std::shared_ptr<structure_t> str, IL<P<int, IL<double>>> x);
   operator std::string() const { return mkstr(*this); }
   const vector_t_client& block(std::ptrdiff_t b) const

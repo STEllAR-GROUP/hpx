@@ -18,7 +18,7 @@
 
 
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const std::vector<T> v)
+std::ostream& operator<<(std::ostream& os, std::vector<T> const& v)
 {
   os << "[";
   for (std::size_t i=0; i<v.size(); ++i) {

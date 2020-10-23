@@ -39,8 +39,8 @@ struct vector_t {
     ar & elts;
   }
 
-  vector_t(std::ptrdiff_t N): N(N), elts(N) {}
-  vector_t(std::initializer_list<double> x): N(x.size()), elts(x) {}
+  explicit vector_t(std::ptrdiff_t N): N(N), elts(N) {}
+  explicit vector_t(std::initializer_list<double> x): N(x.size()), elts(x) {}
   // We don't really want these
   vector_t() = default;
   vector_t(const vector_t&) = default;
@@ -76,7 +76,7 @@ struct matrix_t {
   }
 
   matrix_t(std::ptrdiff_t NI, std::ptrdiff_t NJ): NI(NI), NJ(NJ), elts(NI*NJ) {}
-  matrix_t(std::initializer_list<std::initializer_list<double>> a);
+  explicit matrix_t(std::initializer_list<std::initializer_list<double>> a);
   // We don't really want these
   matrix_t() = default;
   matrix_t(const matrix_t&) = default;
