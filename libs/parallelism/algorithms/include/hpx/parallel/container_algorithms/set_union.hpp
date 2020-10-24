@@ -299,8 +299,10 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
             static_assert((hpx::traits::is_forward_iterator<Iter2>::value),
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<Iter3>::value),
-                "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator<Iter3>::value ||
+                    (hpx::is_sequenced_execution_policy<ExPolicy>::value &&
+                        hpx::traits::is_output_iterator<Iter3>::value),
+                "Requires at least forward iterator or sequential execution.");
 
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy<ExPolicy>::value ||
@@ -351,8 +353,10 @@ namespace hpx { namespace ranges {
             static_assert(
                 (hpx::traits::is_forward_iterator<iterator_type2>::value),
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<Iter3>::value),
-                "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator<Iter3>::value ||
+                    (hpx::is_sequenced_execution_policy<ExPolicy>::value &&
+                        hpx::traits::is_output_iterator<Iter3>::value),
+                "Requires at least forward iterator or sequential execution.");
 
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy<ExPolicy>::value ||
@@ -399,8 +403,8 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
             static_assert((hpx::traits::is_forward_iterator<Iter2>::value),
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<Iter3>::value),
-                "Requires at least forward iterator.");
+            static_assert((hpx::traits::is_output_iterator<Iter3>::value),
+                "Requires at least output iterator.");
 
             using result_type = set_union_result<Iter1, Iter2, Iter3>;
 
@@ -446,8 +450,8 @@ namespace hpx { namespace ranges {
             static_assert(
                 (hpx::traits::is_forward_iterator<iterator_type2>::value),
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<Iter3>::value),
-                "Requires at least forward iterator.");
+            static_assert((hpx::traits::is_output_iterator<Iter3>::value),
+                "Requires at least output iterator.");
 
             using result_type =
                 set_union_result<iterator_type1, iterator_type2, Iter3>;

@@ -267,9 +267,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename Rng, typename F,
         typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&&
-            hpx::traits::is_range<Rng>::value&&
-            traits::is_projected_range<Proj, Rng>::value&&
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_range<Rng>::value &&
+            traits::is_projected_range<Proj, Rng>::value &&
             traits::is_indirect_callable<ExPolicy, F,
                 traits::projected_range<Proj, Rng>
             >::value
@@ -291,9 +291,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename Rng, typename F,
         typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&&
-            hpx::traits::is_range<Rng>::value&&
-            traits::is_projected_range<Proj, Rng>::value&&
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_range<Rng>::value &&
+            traits::is_projected_range<Proj, Rng>::value &&
             traits::is_indirect_callable<ExPolicy, F,
                 traits::projected_range<Proj, Rng>
             >::value
@@ -430,9 +430,9 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Rng, typename F,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_range<Rng>::value&&
-                hpx::parallel::traits::is_projected_range<Proj, Rng>::value&&
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_range<Rng>::value &&
+                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >::value
@@ -458,10 +458,10 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Iter, typename Sent, typename F,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<Iter>::value&&
-                hpx::traits::is_sentinel_for<Sent, Iter>::value&&
-                hpx::parallel::traits::is_projected<Proj, Iter>::value&&
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<Iter>::value &&
+                hpx::traits::is_sentinel_for<Sent, Iter>::value &&
+                hpx::parallel::traits::is_projected<Proj, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
                     hpx::parallel::traits::projected<Proj, Iter>
                 >::value
@@ -507,9 +507,9 @@ namespace hpx { namespace ranges {
         template <typename Iter, typename Sent, typename F,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<Iter>::value&&
-                hpx::traits::is_sentinel_for<Sent, Iter>::value&&
-                hpx::parallel::traits::is_projected<Proj, Iter>::value&&
+                hpx::traits::is_iterator<Iter>::value &&
+                hpx::traits::is_sentinel_for<Sent, Iter>::value &&
+                hpx::parallel::traits::is_projected<Proj, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
                 hpx::execution::sequenced_policy, F,
                     hpx::parallel::traits::projected<Proj, Iter>
@@ -537,9 +537,9 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Rng, typename F,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_range<Rng>::value&&
-                hpx::parallel::traits::is_projected_range<Proj, Rng>::value&&
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_range<Rng>::value &&
+                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >::value
@@ -565,10 +565,10 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Iter, typename Sent, typename F,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<Iter>::value&&
-                hpx::traits::is_sentinel_for<Sent, Iter>::value&&
-                hpx::parallel::traits::is_projected<Proj, Iter>::value&&
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<Iter>::value &&
+                hpx::traits::is_sentinel_for<Sent, Iter>::value &&
+                hpx::parallel::traits::is_projected<Proj, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
                     hpx::parallel::traits::projected<Proj, Iter>
                 >::value
@@ -590,8 +590,8 @@ namespace hpx { namespace ranges {
         template <typename Rng, typename F,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value&&
-                hpx::parallel::traits::is_projected_range<Proj, Rng>::value&&
+                hpx::traits::is_range<Rng>::value &&
+                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<
                 hpx::execution::sequenced_policy, F,
                     hpx::parallel::traits::projected_range<Proj, Rng>
@@ -614,9 +614,9 @@ namespace hpx { namespace ranges {
         template <typename Iter, typename Sent, typename F,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<Iter>::value&&
-                hpx::traits::is_sentinel_for<Sent, Iter>::value&&
-                hpx::parallel::traits::is_projected<Proj, Iter>::value&&
+                hpx::traits::is_iterator<Iter>::value &&
+                hpx::traits::is_sentinel_for<Sent, Iter>::value &&
+                hpx::parallel::traits::is_projected<Proj, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
                 hpx::execution::sequenced_policy, F,
                     hpx::parallel::traits::projected<Proj, Iter>

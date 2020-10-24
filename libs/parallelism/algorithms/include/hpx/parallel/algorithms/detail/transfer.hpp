@@ -127,8 +127,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-                "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value ||
+                    (hpx::is_sequenced_execution_policy<ExPolicy>::value &&
+                        hpx::traits::is_output_iterator<FwdIter2>::value),
+                "Requires at least forward iterator or sequential execution.");
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             return transfer_<Algo>(std::forward<ExPolicy>(policy), first, last,

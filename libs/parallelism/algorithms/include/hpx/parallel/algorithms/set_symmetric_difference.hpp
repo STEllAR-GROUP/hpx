@@ -350,8 +350,10 @@ namespace hpx {
                 "Requires at least forward iterator.");
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter3>::value),
-                "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator<FwdIter3>::value ||
+                    (hpx::is_sequenced_execution_policy<ExPolicy>::value &&
+                        hpx::traits::is_output_iterator<FwdIter3>::value),
+                "Requires at least forward iterator or sequential execution.");
 
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy<ExPolicy>::value ||
@@ -391,8 +393,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter3>::value),
-                "Requires at least forward iterator.");
+            static_assert((hpx::traits::is_output_iterator<FwdIter3>::value),
+                "Requires at least output iterator.");
 
             using result_type = hpx::parallel::util::in_in_out_result<FwdIter1,
                 FwdIter2, FwdIter3>;

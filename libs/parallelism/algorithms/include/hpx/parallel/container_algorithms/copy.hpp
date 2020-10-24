@@ -430,8 +430,8 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename FwdIter1, typename Sent1, typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value&&
-                hpx::traits::is_sentinel_for<Sent1, FwdIter1>::value&&
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_sentinel_for<Sent1, FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
@@ -448,7 +448,7 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename Rng, typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value&&
+                hpx::traits::is_range<Rng>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
@@ -487,8 +487,9 @@ namespace hpx { namespace ranges {
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-                "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value ||
+                    hpx::is_sequenced_execution_policy<ExPolicy>::value,
+                "Requires at least forward iterator or sequential execution.");
 
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::v1::detail::is_negative(count))
@@ -518,8 +519,8 @@ namespace hpx { namespace ranges {
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-                "Requires at least forward iterator.");
+            static_assert((hpx::traits::is_output_iterator<FwdIter2>::value),
+                "Requires at least output iterator.");
 
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::v1::detail::is_negative(count))
@@ -564,8 +565,10 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
 
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Required at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value ||
+                    (hpx::is_sequenced_execution_policy<ExPolicy>::value &&
+                        hpx::traits::is_output_iterator<FwdIter>::value),
+                "Requires at least forward iterator or sequential execution.");
 
             using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
@@ -596,8 +599,10 @@ namespace hpx { namespace ranges {
         tag_invoke(hpx::ranges::copy_if_t, ExPolicy&& policy, Rng&& rng,
             FwdIter dest, Pred&& pred, Proj&& proj = Proj())
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Required at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value ||
+                    (hpx::is_sequenced_execution_policy<ExPolicy>::value &&
+                        hpx::traits::is_output_iterator<FwdIter>::value),
+                "Requires at least forward iterator or sequential execution.");
 
             using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
@@ -632,8 +637,8 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
 
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Required at least forward iterator.");
+            static_assert((hpx::traits::is_output_iterator<FwdIter>::value),
+                "Required at least output iterator.");
 
             return hpx::parallel::v1::detail::copy_if<
                 hpx::parallel::util::in_out_result<FwdIter1, FwdIter>>()
@@ -659,8 +664,8 @@ namespace hpx { namespace ranges {
         tag_invoke(hpx::ranges::copy_if_t, Rng&& rng, FwdIter dest, Pred&& pred,
             Proj&& proj = Proj())
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Required at least forward iterator.");
+            static_assert((hpx::traits::is_output_iterator<FwdIter>::value),
+                "Required at least output iterator.");
 
             return hpx::parallel::v1::detail::copy_if<
                 hpx::parallel::util::in_out_result<
@@ -681,9 +686,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIter1, typename Sent1,
         typename FwdIter,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&&
-            hpx::traits::is_iterator<FwdIter1>::value&&
-            hpx::traits::is_sentinel_for<Sent1, FwdIter1>::value&&
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter1>::value &&
+            hpx::traits::is_sentinel_for<Sent1, FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter>::value
         )>
     // clang-format on
@@ -708,8 +713,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format off
     template <typename ExPolicy, typename Rng, typename FwdIter,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&&
-            hpx::traits::is_range<Rng>::value&&
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_range<Rng>::value &&
             hpx::traits::is_iterator<FwdIter>::value
         )>
     // clang-format on
@@ -738,10 +743,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename Rng, typename OutIter, typename F,
         typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&&
-            hpx::traits::is_range<Rng>::value&&
-            traits::is_projected_range<Proj, Rng>::value&&
-            hpx::traits::is_iterator<OutIter>::value&&
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_range<Rng>::value &&
+            traits::is_projected_range<Proj, Rng>::value &&
+            hpx::traits::is_iterator<OutIter>::value &&
             traits::is_indirect_callable<ExPolicy, F,
                 traits::projected_range<Proj, Rng>
             >::value

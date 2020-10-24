@@ -304,7 +304,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     typename std::iterator_traits<Iter>::value_type;
 
                 return detail::accumulate(first, last, std::forward<T_>(init),
-                    [&r, &conv](T const& res, value_type const& next) -> T {
+                    [&r, &conv](T const& res, value_type&& next) -> T {
                         return hpx::util::invoke(
                             r, res, hpx::util::invoke(conv, next));
                     });
@@ -493,7 +493,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // this is to support vectorization, it will call op1 for each
                 // of the elements of a value-pack
                 auto result = util::detail::accumulate_values<ExPolicy>(
-                    [&op1](T const& sum, T const& val) -> T {
+                    [&op1](T const& sum, T&& val) -> T {
                         return hpx::util::invoke(op1, sum, val);
                     },
                     std::move(part_sum), std::move(init));
@@ -569,7 +569,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     // this is to support vectorization, it will call op1
                     // for each of the elements of a value-pack
                     auto result = util::detail::accumulate_values<ExPolicy>(
-                        [&op1](T const& sum, T const& val) -> T {
+                        [&op1](T const& sum, T&& val) -> T {
                             return hpx::util::invoke(op1, sum, val);
                         },
                         part_sum);

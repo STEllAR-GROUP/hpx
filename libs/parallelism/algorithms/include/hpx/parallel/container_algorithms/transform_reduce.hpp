@@ -464,14 +464,14 @@ namespace hpx { namespace ranges {
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::is_invocable_v<Convert,
-                    typename hpx::traits::range_iterator<Rng>::type
+                    typename hpx::traits::range_traits<Rng>::value_type
                 > &&
                 hpx::is_invocable_v<Reduce,
                     typename hpx::util::invoke_result<Convert,
-                        typename hpx::traits::range_iterator<Rng>::type
+                        typename hpx::traits::range_traits<Rng>::value_type
                     >::type,
                     typename hpx::util::invoke_result<Convert,
-                        typename hpx::traits::range_iterator<Rng>::type
+                        typename hpx::traits::range_traits<Rng>::value_type
                     >::type
                 >
             )>
@@ -502,15 +502,16 @@ namespace hpx { namespace ranges {
         template <typename Rng, typename T, typename Reduce, typename Convert,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
-                hpx::is_invocable_v<Convert,
-                   typename hpx::traits::range_iterator<Rng>::type> &&
-                hpx::is_invocable_v<Reduce,
-                   typename hpx::util::invoke_result<Convert,
-                       typename hpx::traits::range_iterator<Rng>::type
-                   >::type,
-                   typename hpx::util::invoke_result<Convert,
-                       typename hpx::traits::range_iterator<Rng>::type
-                   >::type
+                hpx::traits::is_invocable<Convert,
+                    typename hpx::traits::range_traits<Rng>::value_type
+                >::value &&
+                hpx::traits::is_invocable<Reduce,
+                    typename hpx::util::invoke_result<Convert,
+                        typename hpx::traits::range_traits<Rng>::value_type
+                    >::type,
+                    typename hpx::util::invoke_result<Convert,
+                        typename hpx::traits::range_traits<Rng>::value_type
+                    >::type
                 >
             )>
         // clang-format on
@@ -586,16 +587,16 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value &&
                 hpx::traits::is_iterator<Iter2>::value &&
                 hpx::is_invocable_v<Convert,
-                    typename hpx::traits::range_iterator<Rng>::type,
+                    typename hpx::traits::range_traits<Rng>::value_type,
                     typename std::iterator_traits<Iter2>::value_type
                 > &&
                 hpx::is_invocable_v<Reduce,
                     typename hpx::util::invoke_result<Convert,
-                        typename hpx::traits::range_iterator<Rng>::type,
+                        typename hpx::traits::range_traits<Rng>::value_type,
                         typename std::iterator_traits<Iter2>::value_type
                     >::type,
                     typename hpx::util::invoke_result<Convert,
-                        typename hpx::traits::range_iterator<Rng>::type,
+                        typename hpx::traits::range_traits<Rng>::value_type,
                         typename std::iterator_traits<Iter2>::value_type
                     >::type
                 >
@@ -625,16 +626,16 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value &&
                 hpx::traits::is_iterator<Iter2>::value &&
                 hpx::is_invocable_v<Convert,
-                    typename hpx::traits::range_iterator<Rng>::type,
+                    typename hpx::traits::range_traits<Rng>::value_type,
                     typename std::iterator_traits<Iter2>::value_type
                 > &&
                 hpx::is_invocable_v<Reduce,
                     typename hpx::util::invoke_result<Convert,
-                        typename hpx::traits::range_iterator<Rng>::type,
+                        typename hpx::traits::range_traits<Rng>::value_type,
                         typename std::iterator_traits<Iter2>::value_type
                     >::type,
                     typename hpx::util::invoke_result<Convert,
-                        typename hpx::traits::range_iterator<Rng>::type,
+                        typename hpx::traits::range_traits<Rng>::value_typee,
                         typename std::iterator_traits<Iter2>::value_type
                     >::type
                 >
