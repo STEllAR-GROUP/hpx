@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/components/new.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 
 #include <hpx/components/process/child.hpp>
 

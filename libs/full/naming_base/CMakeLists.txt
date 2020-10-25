@@ -11,22 +11,31 @@ if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
 endif()
 
 # Default location is $HPX_ROOT/libs/naming_base/include
-set(naming_base_headers hpx/naming_base/gid_type.hpp
-                        hpx/naming_base/naming_base.hpp
+set(naming_base_headers
+    hpx/naming_base/address.hpp hpx/naming_base/gid_type.hpp
+    hpx/naming_base/id_type.hpp hpx/naming_base/naming_base.hpp
+    hpx/naming_base/unmanaged.hpp
 )
 
-set(naming_base_compat_headers)
+# cmake-format: off
+set(naming_base_compat_headers
+    hpx/runtime/naming/address.hpp => hpx/modules/naming_base.hpp
+    hpx/runtime/naming/id_type.hpp => hpx/modules/naming_base.hpp
+    hpx/runtime/naming/unmanaged.hpp => hpx/modules/naming_base.hpp
+)
+# cmake-format: on
 
-set(naming_base_sources gid_type.cpp)
+set(naming_base_sources address.cpp gid_type.cpp id_type.cpp unmanaged.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
   full naming_base
-  COMPATIBILITY_HEADERS OFF
+  COMPATIBILITY_HEADERS ON # introduced in V1.6.0
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   HEADERS ${naming_base_headers}
+  COMPAT_HEADERS ${naming_base_compat_headers}
   SOURCES ${naming_base_sources}
-  DEPENDENCIES hpx_core
+  DEPENDENCIES hpx_core hpx_parallelism
   CMAKE_SUBDIRS examples tests
 )

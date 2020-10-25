@@ -9,7 +9,7 @@
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/serialization/access.hpp>
 
 #include <type_traits>

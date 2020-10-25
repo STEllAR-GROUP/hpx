@@ -13,10 +13,10 @@
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/modules/components_base.hpp>
+#include <hpx/naming_base/address.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime/naming/address.hpp>
 #include <hpx/traits/is_client.hpp>
 
 #include <boost/utility/string_ref.hpp>

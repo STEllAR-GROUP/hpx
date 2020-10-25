@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/concurrency/spinlock.hpp>
+#include <hpx/naming_base/id_type.hpp>
 
 #include <cstddef>
 #include <mutex>

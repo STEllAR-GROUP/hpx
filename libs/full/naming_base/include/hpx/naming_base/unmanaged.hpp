@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,10 +9,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/naming/name.hpp>
+#include <hpx/naming_base/id_type.hpp>
 
-namespace hpx { namespace naming
-{
+namespace hpx { namespace naming {
+
     /// The helper function \a hpx::unmanaged can be used to generate
     /// a global identifier which does not participate in the automatic
     /// garbage collection.
@@ -31,14 +31,9 @@ namespace hpx { namespace naming
     ///             the user to take full responsibility for keeping the referenced
     ///             objects alive long enough.
     ///
-    inline id_type unmanaged(id_type const& id)
-    {
-        return id_type(detail::strip_internal_bits_from_gid(id.get_msb()),
-            id.get_lsb(), id_type::unmanaged);
-    }
-}}
+    HPX_EXPORT id_type unmanaged(id_type const& id);
+}}    // namespace hpx::naming
 
-namespace hpx
-{
+namespace hpx {
     using naming::unmanaged;
 }

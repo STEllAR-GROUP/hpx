@@ -21,8 +21,8 @@
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/threading.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>

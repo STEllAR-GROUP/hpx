@@ -15,12 +15,12 @@
 #include <hpx/iterator_support/counting_iterator.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/parallel/container_algorithms/count.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/components/server/component.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime_distributed/get_num_localities.hpp>
 
 #include <climits>

@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include <hpx/runtime_fwd.hpp>
-#include <hpx/runtime/find_here.hpp>
-#include <hpx/runtime/actions/set_lco_value_continuation.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/actions/continuation2_impl.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/runtime/actions/set_lco_value_continuation.hpp>
+#include <hpx/runtime/find_here.hpp>
+#include <hpx/runtime_fwd.hpp>
 
 #include <type_traits>
 #include <utility>

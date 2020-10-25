@@ -101,8 +101,8 @@ namespace hpx { namespace naming {
 
         explicit inline gid_type(
             std::uint64_t msb_id, std::uint64_t lsb_id) noexcept;
-        inline gid_type(gid_type const& rhs) noexcept;
-        inline gid_type(gid_type&& rhs) noexcept;
+        inline constexpr gid_type(gid_type const& rhs) noexcept;
+        inline constexpr gid_type(gid_type&& rhs) noexcept;
 
         ~gid_type() = default;
 
@@ -290,14 +290,10 @@ namespace hpx { namespace naming {
         friend HPX_EXPORT std::ostream& operator<<(
             std::ostream& os, gid_type const& id);
 
-        friend class hpx::serialization::access;
-
-        void save(
-            serialization::output_archive& ar, unsigned int version) const;
-
-        void load(serialization::input_archive& ar, unsigned int version);
-
-        HPX_SERIALIZATION_SPLIT_MEMBER()
+        friend HPX_EXPORT void save(
+            serialization::output_archive& ar, gid_type const&, unsigned int);
+        friend HPX_EXPORT void load(
+            serialization::input_archive& ar, gid_type&, unsigned int);
 
         // lock implementation
         using spinlock_pool = util::spinlock_pool<gid_type>;
@@ -338,6 +334,13 @@ namespace hpx { namespace naming {
         std::uint64_t id_msb_ = 0;
         std::uint64_t id_lsb_ = 0;
     };
+
+    HPX_EXPORT void save(
+        serialization::output_archive& ar, gid_type const&, unsigned int);
+    HPX_EXPORT void load(
+        serialization::input_archive& ar, gid_type&, unsigned int version);
+
+    HPX_SERIALIZATION_SPLIT_FREE(gid_type);
 }}    // namespace hpx::naming
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -534,6 +537,22 @@ namespace hpx { namespace naming {
             std::uint64_t const lsb = id.get_lsb();
             return gid_type(msb, lsb);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        constexpr bool has_credits(gid_type const& gid) noexcept
+        {
+            return (gid.get_msb() & gid_type::has_credits_mask) ? true : false;
+        }
+
+        constexpr bool gid_was_split(gid_type const& gid) noexcept
+        {
+            return (gid.get_msb() & gid_type::was_split_mask) ? true : false;
+        }
+
+        constexpr void set_credit_split_mask_for_gid(gid_type& gid) noexcept
+        {
+            gid.set_msb(gid.get_msb() | gid_type::was_split_mask);
+        }
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -550,13 +569,13 @@ namespace hpx { namespace naming {
     {
     }
 
-    inline gid_type::gid_type(gid_type const& rhs) noexcept
+    inline constexpr gid_type::gid_type(gid_type const& rhs) noexcept
       : id_msb_(naming::detail::strip_lock_from_gid(rhs.get_msb()))
       , id_lsb_(rhs.get_lsb())
     {
     }
 
-    inline gid_type::gid_type(gid_type&& rhs) noexcept
+    inline constexpr gid_type::gid_type(gid_type&& rhs) noexcept
       : id_msb_(naming::detail::strip_lock_from_gid(rhs.get_msb()))
       , id_lsb_(rhs.get_lsb())
     {

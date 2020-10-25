@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2019 Hartmut Kaiser
+//  Copyright (c) 2015-2020 Hartmut Kaiser
 //  Copyright (c) 2015-2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,9 +9,9 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/modules/datastructures.hpp>
-#include <hpx/modules/naming.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/thread_support.hpp>
-#include <hpx/runtime/naming/name.hpp>
+#include <hpx/naming/credit_handling.hpp>
 #include <hpx/serialization/detail/extra_archive_data.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
@@ -22,9 +22,10 @@
 #include <utility>
 #include <vector>
 
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace serialization { namespace detail {
 
+    ///////////////////////////////////////////////////////////////////////////
     // This class allows to handle credit splitting for gid_types during
     // serialization.
     class preprocess_gid_types
@@ -87,7 +88,7 @@ namespace hpx { namespace serialization { namespace detail {
             split_gids_.insert(split_gids_map::value_type(&gid, split_gid));
         }
 
-        bool has_gid(naming::gid_type const& gid) const
+        bool has_gid(naming::gid_type const& gid) const noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
             return split_gids_.find(&gid) != split_gids_.end();
@@ -106,7 +107,7 @@ namespace hpx { namespace serialization { namespace detail {
             return new_gid;
         }
 
-        split_gids_map move_split_gids()
+        split_gids_map move_split_gids() noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
             return std::move(split_gids_);

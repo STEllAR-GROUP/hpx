@@ -18,11 +18,10 @@
 #include <hpx/components_base/traits/component_type_is_compatible.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/modules/threading_base.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/runtime/parcelset/put_parcel.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>

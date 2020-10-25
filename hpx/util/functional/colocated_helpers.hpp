@@ -11,9 +11,8 @@
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/unique_ptr.hpp>
 #include <hpx/type_support/decay.hpp>

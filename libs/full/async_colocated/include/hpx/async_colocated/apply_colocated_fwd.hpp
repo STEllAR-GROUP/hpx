@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/traits/is_continuation.hpp>
 
 #include <type_traits>

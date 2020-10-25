@@ -10,11 +10,10 @@
 /// \file hpx/components/unordered_map/unordered_map_segmented_iterator.hpp
 /// \brief This file contains the implementation of iterators for hpx::unordered_map.
 
- // The idea for these iterators is taken from
- // http://lafstern.org/matt/segmented.pdf.
+// The idea for these iterators is taken from
+// http://lafstern.org/matt/segmented.pdf.
 
 #include <hpx/config.hpp>
-//#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 

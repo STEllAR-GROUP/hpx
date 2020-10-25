@@ -46,7 +46,6 @@ if(HPX_NAMING_BASE_WITH_TESTS)
       modules.naming_base
       HEADERS ${naming_base_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-      NOLIBS
       DEPENDENCIES hpx_naming_base
     )
   endif()

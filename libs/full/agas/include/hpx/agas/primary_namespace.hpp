@@ -13,7 +13,7 @@
 #include <hpx/agas/gva.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/runtime/naming/address.hpp>
+#include <hpx/naming_base/address.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 
 #include <cstdint>

@@ -15,8 +15,8 @@
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/find_here.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #endif

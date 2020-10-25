@@ -9,8 +9,9 @@
 #include <hpx/agas/agas_fwd.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/async_distributed/applier/bind_naming_wrappers.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/name.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/naming_base/gid_type.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 
 #include <cstddef>

@@ -8,8 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/name.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/naming_base/gid_type.hpp>
+#include <hpx/naming_base/naming_base.hpp>
 
 #include <cstddef>
 

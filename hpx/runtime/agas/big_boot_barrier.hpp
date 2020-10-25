@@ -13,13 +13,13 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assert.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/util/connection_cache.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
+#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/util/connection_cache.hpp>
 #include <boost/lockfree/queue.hpp>
 
 #include <condition_variable>

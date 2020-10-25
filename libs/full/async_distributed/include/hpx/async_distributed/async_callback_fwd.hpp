@@ -11,7 +11,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_local/async_fwd.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/naming_base/id_type.hpp>
 
 #include <type_traits>
 #include <utility>

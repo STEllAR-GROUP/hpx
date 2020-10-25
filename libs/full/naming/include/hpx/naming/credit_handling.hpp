@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/naming_base/gid_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cstddef>
@@ -46,22 +46,6 @@ namespace hpx { namespace naming {
         {
             HPX_ASSERT(log2credits >= 0);
             return static_cast<std::int64_t>(1) << log2credits;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        constexpr bool has_credits(gid_type const& id) noexcept
-        {
-            return (id.get_msb() & gid_type::has_credits_mask) ? true : false;
-        }
-
-        constexpr bool gid_was_split(gid_type const& id) noexcept
-        {
-            return (id.get_msb() & gid_type::was_split_mask) ? true : false;
-        }
-
-        constexpr void set_credit_split_mask_for_gid(gid_type& id) noexcept
-        {
-            id.set_msb(id.get_msb() | gid_type::was_split_mask);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -182,5 +166,28 @@ namespace hpx { namespace naming {
 
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT void decrement_refcnt(gid_type* gid);
+
+        ///////////////////////////////////////////////////////////////////////
+        // credit management (called during serialization), this function
+        // has to be 'const' as save() above has to be 'const'.
+        void preprocess_gid(
+            id_type_impl const&, serialization::output_archive& ar);
+
+        ///////////////////////////////////////////////////////////////////////
+        // serialization
+        HPX_EXPORT void save(
+            serialization::output_archive& ar, id_type_impl const&, unsigned);
+        HPX_EXPORT void load(
+            serialization::input_archive& ar, id_type_impl&, unsigned);
+
+        HPX_SERIALIZATION_SPLIT_FREE(id_type_impl);
     }    // namespace detail
-}}       // namespace hpx::naming
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT void save(
+        serialization::output_archive& ar, id_type const&, unsigned int);
+    HPX_EXPORT void load(
+        serialization::input_archive& ar, id_type&, unsigned int);
+
+    HPX_SERIALIZATION_SPLIT_FREE(id_type);
+}}    // namespace hpx::naming

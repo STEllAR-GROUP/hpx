@@ -12,10 +12,11 @@
 #include <hpx/async_distributed/applier/bind_naming_wrappers.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/naming/credit_handling.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime_fwd.hpp>
 
 #include <cstdint>

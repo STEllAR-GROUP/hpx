@@ -6,9 +6,9 @@
 
 #include <hpx/async_distributed/apply.hpp>
 #include <hpx/lcos/base_lco.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/naming/address.hpp>
 #if defined(HPX_MSVC) && !defined(HPX_DEBUG)
 #include <hpx/lcos/base_lco_with_value.hpp>
 #endif

@@ -53,8 +53,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/components/server/wrapper_heap.cpp
     runtime/components/stubs/runtime_support_stubs.cpp
     runtime/get_locality_name.cpp
-    runtime/naming/address.cpp
-    runtime/naming/name.cpp
     runtime/parcelset/detail/parcel_await.cpp
     runtime/parcelset/detail/parcel_route_handler.cpp
     runtime/parcelset/detail/per_action_data_counter.cpp
@@ -63,7 +61,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/parcelset/parcelhandler.cpp
     runtime/parcelset/parcelport.cpp
     runtime/parcelset/put_parcel.cpp
-    runtime/serialization/detail/preprocess_gid_types.cpp
     runtime/set_parcel_write_handler.cpp
     runtime/threads/threadmanager_counters.cpp
     runtime/trigger_lco.cpp
@@ -106,9 +103,8 @@ endif()
 
 # List all headers (local and distributed)
 set(hpx_HEADERS
-    hpx/lcos_fwd.hpp hpx/runtime/serialization/detail/preprocess_gid_types.hpp
-    hpx/traits/managed_component_policies.hpp hpx/traits/pointer_category.hpp
-    hpx/traits/rma_memory_region_traits.hpp
+    hpx/lcos_fwd.hpp hpx/traits/managed_component_policies.hpp
+    hpx/traits/pointer_category.hpp hpx/traits/rma_memory_region_traits.hpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
@@ -226,17 +222,10 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/components/unwrapping_result_policy.hpp
     hpx/runtime/find_here.hpp
     hpx/runtime/find_all_localities.hpp
-    hpx/runtime/get_colocation_id.hpp
     hpx/runtime/get_locality_name.hpp
     hpx/runtime/get_ptr.hpp
     hpx/runtime/message_handler_fwd.hpp
-    hpx/runtime/naming/address.hpp
-    hpx/runtime/naming/id_type.hpp
-    hpx/runtime/naming/id_type_impl.hpp
-    hpx/runtime/naming/name.hpp
     hpx/runtime/naming/resolver_client.hpp
-    hpx/runtime/naming/split_gid.hpp
-    hpx/runtime/naming/unmanaged.hpp
     hpx/runtime/parcelset/decode_parcels.hpp
     hpx/runtime/parcelset/detail/call_for_each.hpp
     hpx/runtime/parcelset/detail/data_point.hpp

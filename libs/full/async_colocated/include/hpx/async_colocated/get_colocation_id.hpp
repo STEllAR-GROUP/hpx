@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,10 +12,10 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/futures/future_fwd.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/naming_base/id_type.hpp>
 
-namespace hpx
-{
+namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the id of the locality where the object referenced by the
     ///        given id is currently located on
@@ -45,5 +45,4 @@ namespace hpx
     /// \see    \a hpx::get_colocation_id(launch::sync_policy)
     HPX_EXPORT lcos::future<naming::id_type> get_colocation_id(
         naming::id_type const& id);
-}
-
+}    // namespace hpx

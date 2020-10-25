@@ -12,15 +12,19 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(naming_headers hpx/naming/credit_handling.hpp hpx/naming/naming.hpp)
+set(naming_headers
+    hpx/naming/credit_handling.hpp hpx/naming/naming.hpp
+    hpx/naming/split_gid.hpp hpx/naming/detail/preprocess_gid_types.hpp
+)
 
 # cmake-format: off
 set(naming_compat_headers
     hpx/runtime/naming_fwd.hpp => hpx/modules/naming.hpp
+    hpx/runtime/naming/split_gid.hpp => hpx/modules/naming.hpp
 )
 # cmake-format: on
 
-set(naming_sources credit_handling.cpp)
+set(naming_sources credit_handling.cpp detail/preprocess_gid_types.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
@@ -32,6 +36,6 @@ add_hpx_module(
   HEADERS ${naming_headers}
   COMPAT_HEADERS ${naming_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_agas hpx_naming_base
+  MODULE_DEPENDENCIES hpx_agas hpx_checkpoint_base hpx_naming_base
   CMAKE_SUBDIRS examples tests
 )

@@ -14,8 +14,8 @@
 #include <hpx/assert.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/synchronization/barrier.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
