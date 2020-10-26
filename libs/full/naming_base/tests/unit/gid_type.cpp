@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx.hpp>
-#include <hpx/runtime/naming/name.hpp>
+#include <hpx/modules/naming.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstdint>

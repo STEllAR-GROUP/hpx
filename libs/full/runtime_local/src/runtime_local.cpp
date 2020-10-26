@@ -1963,7 +1963,8 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt || rt->get_state() == state_invalid)
         {
-            return naming::invalid_locality_id;
+            // same as naming::invalid_locality_id
+            return ~static_cast<std::uint32_t>(0);
         }
 
         return rt->get_locality_id(ec);

@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/naming_base.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -206,7 +205,7 @@ namespace hpx {
     {
         return invoke_with_exception_info(e, [](exception_info const* xi) {
             return xi ? get_error_locality_id(*xi) :
-                        naming::invalid_locality_id;
+                        ~static_cast<std::uint32_t>(0);
         });
     }
     /// \endcond

@@ -26,11 +26,13 @@
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/modules/naming.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/type_support/always_void.hpp>
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/modules/naming.hpp>
+#endif
 
 #include <cstddef>
 #include <exception>
@@ -437,6 +439,7 @@ namespace hpx { namespace lcos { namespace detail {
                 alloc, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         template <typename Allocator, typename P, typename F, typename... Ts>
         HPX_FORCEINLINE static auto call(Allocator const& alloc, P&& p, F&& f,
             typename std::enable_if<
@@ -453,6 +456,7 @@ namespace hpx { namespace lcos { namespace detail {
                 Policy>::call(alloc, std::forward<P>(p), std::forward<F>(f), id,
                 std::forward<Ts>(ts)...);
         }
+#endif
     };
 
     // executors

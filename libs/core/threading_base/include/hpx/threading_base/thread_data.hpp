@@ -20,7 +20,6 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/modules/naming_base.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
@@ -245,7 +244,7 @@ namespace hpx { namespace threads {
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         constexpr
 #endif
-            naming::address_type
+            std::uint64_t    // same as naming::address_type
             get_component_id() const noexcept
         {
             return 0;
@@ -310,7 +309,8 @@ namespace hpx { namespace threads {
             std::uint32_t
             get_parent_locality_id() const noexcept
         {
-            return naming::invalid_locality_id;
+            // this is the same as naming::invalid_locality_id
+            return ~static_cast<std::uint32_t>(0);
         }
 
         /// Return the thread id of the parent thread

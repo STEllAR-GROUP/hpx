@@ -26,10 +26,6 @@
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
-#ifdef HPX_HAVE_MODULE_MPI_BASE
-#include <hpx/modules/mpi_base.hpp>
-#endif
-#include <hpx/modules/naming.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
@@ -58,9 +54,13 @@
 #include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/variables_map.hpp>
 
+#ifdef HPX_HAVE_MODULE_MPI_BASE
+#include <hpx/modules/mpi_base.hpp>
+#endif
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/naming.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>

@@ -6,9 +6,13 @@
 
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(naming_headers hpx/modules/naming.hpp)
+set(naming_headers hpx/naming/credit_handling.hpp hpx/naming/naming.hpp)
 
 # cmake-format: off
 set(naming_compat_headers
@@ -16,17 +20,18 @@ set(naming_compat_headers
 )
 # cmake-format: on
 
-set(naming_sources)
+set(naming_sources credit_handling.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
   full naming
   COMPATIBILITY_HEADERS ON # added in hpx V1.6.0
   DEPRECATION_WARNINGS
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
   SOURCES ${naming_sources}
   HEADERS ${naming_headers}
   COMPAT_HEADERS ${naming_compat_headers}
   DEPENDENCIES hpx_core
+  MODULE_DEPENDENCIES hpx_agas hpx_naming_base
   CMAKE_SUBDIRS examples tests
 )

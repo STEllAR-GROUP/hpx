@@ -32,6 +32,7 @@ set(_hpx_full_modules
     lcos_distributed
     mpi_base
     naming
+    naming_base
     performance_counters
     program_options
     resiliency

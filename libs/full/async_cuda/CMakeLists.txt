@@ -42,7 +42,8 @@ set(async_cuda_sources cuda_future.cpp cuda_target.cpp get_targets.cpp)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(async_cuda_extra_module_dependencies
-      hpx_actions_base hpx_async_distributed hpx_performance_counters
+      hpx_actions_base hpx_async_distributed hpx_naming
+      hpx_performance_counters
   )
 endif()
 
@@ -55,7 +56,7 @@ add_hpx_module(
   SOURCES ${async_cuda_sources}
   HEADERS ${async_cuda_headers}
   COMPAT_HEADERS ${async_cuda_compat_headers}
-  MODULE_DEPENDENCIES hpx_naming hpx_program_options hpx_runtime_configuration
+  MODULE_DEPENDENCIES hpx_program_options hpx_runtime_configuration
                       hpx_runtime_local ${async_cuda_extra_module_dependencies}
   DEPENDENCIES hpx_core hpx_parallelism Cuda::cuda
   CMAKE_SUBDIRS examples tests

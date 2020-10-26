@@ -12,7 +12,6 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/modules/naming_base.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #if defined(HPX_HAVE_APEX)
@@ -40,7 +39,8 @@ namespace hpx { namespace threads {
                 return get_locality_id_f(ec);
             }
 
-            return naming::invalid_locality_id;
+            // same as naming::invalid_locality_id
+            return ~static_cast<std::uint32_t>(0);
         }
     }    // namespace detail
 
@@ -330,7 +330,8 @@ namespace hpx { namespace threads {
 
     std::uint32_t get_parent_locality_id()
     {
-        return naming::invalid_locality_id;
+        // same as naming::invalid_locality_id
+        return ~static_cast<std::uint32_t>(0);
     }
 #else
     thread_id_type get_parent_id()
@@ -360,11 +361,13 @@ namespace hpx { namespace threads {
         {
             return thrd_data->get_parent_locality_id();
         }
-        return naming::invalid_locality_id;
+
+        // same as naming::invalid_locality_id
+        return ~static_cast<std::uint32_t>(0);
     }
 #endif
 
-    naming::address_type get_self_component_id()
+    std::uint64_t get_self_component_id()
     {
 #ifndef HPX_HAVE_THREAD_TARGET_ADDRESS
         return 0;

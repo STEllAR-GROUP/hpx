@@ -1,0 +1,150 @@
+//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2011      Bryce Lelbach
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include <hpx/assert.hpp>
+#include <hpx/modules/logging.hpp>
+#include <hpx/naming_base/gid_type.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
+#include <hpx/util/ios_flags_saver.hpp>
+
+#include <cstdint>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <memory>
+#include <mutex>
+#include <sstream>
+#include <string>
+#include <utility>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace naming {
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool operator==(gid_type const& lhs, gid_type const& rhs) noexcept
+    {
+        std::int64_t lhs_msb =
+            detail::strip_internal_bits_from_gid(lhs.id_msb_);
+        std::int64_t rhs_msb =
+            detail::strip_internal_bits_from_gid(rhs.id_msb_);
+
+        return (lhs_msb == rhs_msb) && (lhs.id_lsb_ == rhs.id_lsb_);
+    }
+
+    bool operator<(gid_type const& lhs, gid_type const& rhs) noexcept
+    {
+        std::int64_t lhs_msb =
+            detail::strip_internal_bits_from_gid(lhs.id_msb_);
+        std::int64_t rhs_msb =
+            detail::strip_internal_bits_from_gid(rhs.id_msb_);
+
+        if (lhs_msb < rhs_msb)
+        {
+            return true;
+        }
+        if (lhs_msb > rhs_msb)
+        {
+            return false;
+        }
+        return lhs.id_lsb_ < rhs.id_lsb_;
+    }
+
+    bool operator<=(gid_type const& lhs, gid_type const& rhs) noexcept
+    {
+        std::int64_t lhs_msb =
+            detail::strip_internal_bits_from_gid(lhs.id_msb_);
+        std::int64_t rhs_msb =
+            detail::strip_internal_bits_from_gid(rhs.id_msb_);
+
+        if (lhs_msb < rhs_msb)
+        {
+            return true;
+        }
+        if (lhs_msb > rhs_msb)
+        {
+            return false;
+        }
+        return lhs.id_lsb_ <= rhs.id_lsb_;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    gid_type operator+(gid_type const& lhs, gid_type const& rhs) noexcept
+    {
+        std::uint64_t lsb = lhs.id_lsb_ + rhs.id_lsb_;
+        std::uint64_t msb = lhs.id_msb_ + rhs.id_msb_;
+
+#if defined(HPX_DEBUG)
+        // make sure we're using the operator+ in proper contexts only
+        std::uint64_t lhs_internal_bits =
+            detail::get_internal_bits(lhs.id_msb_);
+
+        std::uint64_t msb_test =
+            detail::strip_internal_bits_and_component_type_from_gid(
+                lhs.id_msb_) +
+            detail::strip_internal_bits_and_locality_from_gid(rhs.id_msb_);
+
+        HPX_ASSERT(msb == (msb_test | lhs_internal_bits));
+#endif
+
+        if (lsb < lhs.id_lsb_ || lsb < rhs.id_lsb_)
+            ++msb;
+
+        return gid_type(msb, lsb);
+    }
+
+    gid_type operator-(gid_type const& lhs, gid_type const& rhs) noexcept
+    {
+        std::uint64_t lsb = lhs.id_lsb_ - rhs.id_lsb_;
+        std::uint64_t msb = lhs.id_msb_ - rhs.id_msb_;
+
+        if (lsb > lhs.id_lsb_)
+            --msb;
+
+        return gid_type(msb, lsb);
+    }
+
+    std::string gid_type::to_string() const
+    {
+        std::ostringstream out;
+        out << std::hex << std::right << std::setfill('0') << std::setw(16)
+            << id_msb_ << std::right << std::setfill('0') << std::setw(16)
+            << id_lsb_;
+        return out.str();
+    }
+
+    std::ostream& operator<<(std::ostream& os, gid_type const& id)
+    {
+        hpx::util::ios_flags_saver ifs(os);
+        if (id != naming::invalid_gid)
+        {
+            os << std::hex << "{" << std::right << std::setfill('0')
+               << std::setw(16) << id.id_msb_ << ", " << std::right
+               << std::setfill('0') << std::setw(16) << id.id_lsb_ << "}";
+        }
+        else
+        {
+            os << "{invalid}";
+        }
+        return os;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void gid_type::save(
+        serialization::output_archive& ar, const unsigned int version) const
+    {
+        ar << id_msb_ << id_lsb_;
+    }
+
+    void gid_type::load(
+        serialization::input_archive& ar, const unsigned int /*version*/)
+    {
+        ar >> id_msb_ >> id_lsb_;
+
+        id_msb_ &= ~is_locked_mask;    // strip lock-bit upon receive
+    }
+}}    // namespace hpx::naming

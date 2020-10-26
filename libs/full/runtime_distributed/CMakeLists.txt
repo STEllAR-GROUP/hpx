@@ -35,6 +35,7 @@ add_hpx_module(
   HEADERS ${runtime_distributed_headers}
   COMPAT_HEADERS ${runtime_distributed_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_performance_counters hpx_runtime_local
+  MODULE_DEPENDENCIES hpx_naming hpx_naming_base hpx_performance_counters
+                      hpx_runtime_local
   CMAKE_SUBDIRS examples tests
 )
