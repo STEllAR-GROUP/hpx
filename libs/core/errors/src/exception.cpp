@@ -5,6 +5,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/system/system_error.hpp
+// hpxinspect:nodeprecatedname:boost::system::system_error
+
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/errors/error.hpp>
@@ -20,6 +23,8 @@
 #include <unistd.h>
 #endif
 
+#include <boost/system/system_error.hpp>
+
 #include <algorithm>
 #include <atomic>
 #include <cstddef>
@@ -30,6 +35,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -40,7 +46,7 @@ namespace hpx {
     /// \param e    The parameter \p e holds the hpx::error code the new
     ///             exception should encapsulate.
     exception::exception(error e)
-      : boost::system::system_error(make_error_code(e, plain))
+      : std::system_error(make_error_code(e, plain))
     {
         HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
         if (e != success)
@@ -50,16 +56,16 @@ namespace hpx {
     }
 
     /// Construct a hpx::exception from a boost#system_error.
-    exception::exception(boost::system::system_error const& e)
-      : boost::system::system_error(e)
+    exception::exception(std::system_error const& e)
+      : std::system_error(e)
     {
         LERR_(error) << "created exception: " << this->what();
     }
 
     /// Construct a hpx::exception from a boost#system#error_code (this is
     /// new for Boost V1.69).
-    exception::exception(boost::system::error_code const& e)
-      : boost::system::system_error(e)
+    exception::exception(std::error_code const& e)
+      : std::system_error(e)
     {
         LERR_(error) << "created exception: " << this->what();
     }
@@ -76,7 +82,7 @@ namespace hpx {
     ///               default) or to the category \a hpx_category_rethrow
     ///               (if mode is \a rethrow).
     exception::exception(error e, char const* msg, throwmode mode)
-      : boost::system::system_error(make_system_error_code(e, mode), msg)
+      : std::system_error(make_system_error_code(e, mode), msg)
     {
         HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
         if (e != success)
@@ -97,7 +103,7 @@ namespace hpx {
     ///               default) or to the category \a hpx_category_rethrow
     ///               (if mode is \a rethrow).
     exception::exception(error e, std::string const& msg, throwmode mode)
-      : boost::system::system_error(make_system_error_code(e, mode), msg)
+      : std::system_error(make_system_error_code(e, mode), msg)
     {
         HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
         if (e != success)
@@ -119,8 +125,7 @@ namespace hpx {
     /// \throws nothing
     error exception::get_error() const noexcept
     {
-        return static_cast<error>(
-            this->boost::system::system_error::code().value());
+        return static_cast<error>(this->std::system_error::code().value());
     }
 
     /// The function \a get_error_code() returns a hpx::error_code which
@@ -134,8 +139,7 @@ namespace hpx {
     error_code exception::get_error_code(throwmode mode) const noexcept
     {
         (void) mode;
-        return error_code(
-            this->boost::system::system_error::code().value(), *this);
+        return error_code(this->std::system_error::code().value(), *this);
     }
 
     static custom_exception_info_handler_type custom_exception_info_handler;
@@ -280,6 +284,9 @@ namespace hpx { namespace detail {
     template HPX_CORE_EXPORT std::exception_ptr get_exception(
         boost::system::system_error const&, std::string const&,
         std::string const&, long, std::string const&);
+    template HPX_CORE_EXPORT std::exception_ptr get_exception(
+        std::system_error const&, std::string const&, std::string const&, long,
+        std::string const&);
 
     template HPX_CORE_EXPORT std::exception_ptr get_exception(
         std::exception const&, std::string const&, std::string const&, long,
@@ -331,6 +338,8 @@ namespace hpx { namespace detail {
     template HPX_CORE_EXPORT void throw_exception(
         boost::system::system_error const&, std::string const&,
         std::string const&, long);
+    template HPX_CORE_EXPORT void throw_exception(
+        std::system_error const&, std::string const&, std::string const&, long);
 
     template HPX_CORE_EXPORT void throw_exception(
         std::exception const&, std::string const&, std::string const&, long);
@@ -403,7 +412,7 @@ namespace hpx {
         {
             return he.get_error();
         }
-        catch (boost::system::system_error const& e)
+        catch (std::system_error const& e)
         {
             int code = e.code().value();
             if (code < success || code >= last_error)

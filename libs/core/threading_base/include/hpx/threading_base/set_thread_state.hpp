@@ -28,6 +28,7 @@
 #include <functional>
 #include <memory>
 #include <sstream>
+#include <system_error>
 
 namespace hpx { namespace threads { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
@@ -370,7 +371,7 @@ namespace hpx { namespace threads { namespace detail {
 
         // let the timer invoke the set_state on the new (suspended) thread
         t.async_wait([wake_id, priority, retry_on_active](
-                         const boost::system::error_code& ec) {
+                         const std::error_code& ec) {
             if (ec.value() == boost::system::errc::operation_canceled)
             {
                 detail::set_thread_state(wake_id, pending, wait_abort, priority,

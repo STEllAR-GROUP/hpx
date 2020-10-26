@@ -12,9 +12,6 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/naming_base.hpp>
 
-#include <boost/system/error_code.hpp>
-#include <boost/system/system_error.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <exception>

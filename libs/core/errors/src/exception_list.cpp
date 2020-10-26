@@ -9,12 +9,11 @@
 #include <hpx/errors/exception_list.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 
-#include <boost/system/system_error.hpp>
-
 #include <exception>
 #include <mutex>
 #include <set>
 #include <string>
+#include <system_error>
 #include <utility>
 
 namespace hpx {
@@ -110,7 +109,7 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::system::error_code exception_list::get_error() const
+    std::error_code exception_list::get_error() const
     {
         std::lock_guard<mutex_type> l(mtx_);
         if (exceptions_.empty())

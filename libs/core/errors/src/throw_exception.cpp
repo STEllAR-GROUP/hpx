@@ -10,10 +10,9 @@
 #include <hpx/errors/exception.hpp>
 #include <hpx/modules/filesystem.hpp>
 
-#include <boost/system/error_code.hpp>
-
 #include <exception>
 #include <string>
+#include <system_error>
 
 namespace hpx { namespace detail {
     HPX_NORETURN void throw_exception(error errcode, std::string const& msg,
@@ -41,7 +40,7 @@ namespace hpx { namespace detail {
             p.string(), file, line, auxinfo);
     }
 
-    std::exception_ptr get_exception(boost::system::error_code const& ec,
+    std::exception_ptr get_exception(std::error_code const& ec,
         std::string const& /* msg */, throwmode /* mode */,
         std::string const& func, std::string const& file, long line,
         std::string const& auxinfo)

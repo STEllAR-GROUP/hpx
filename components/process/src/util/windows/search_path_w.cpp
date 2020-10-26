@@ -24,6 +24,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 
 namespace hpx { namespace components { namespace process { namespace windows
 {
@@ -95,7 +96,7 @@ namespace hpx { namespace components { namespace process { namespace windows
             {
                 filesystem::path p2 = p;
                 p2 += *it2;
-                filesystem::error_code ec;
+                std::error_code ec;
                 bool file = filesystem::is_regular_file(p2, ec);
                 if (!ec && file &&
                     SHGetFileInfoA(p2.string().c_str(), 0, nullptr, 0,

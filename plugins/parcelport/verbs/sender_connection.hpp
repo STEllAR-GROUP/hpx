@@ -12,6 +12,7 @@
 //
 #include <memory>
 #include <cstdint>
+#include <system_error>
 #include <utility>
 //
 #include <plugins/parcelport/verbs/rdma/verbs_endpoint.hpp>
@@ -37,7 +38,7 @@ namespace verbs
     {
     private:
         typedef util::function_nonser<
-            void(boost::system::error_code const&, parcel const&)
+            void(std::error_code const&, parcel const&)
             > write_handler_type;
 
     public:

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/config/detail/compat_error_code.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
@@ -23,10 +24,13 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 
+#if defined(HPX_HAVE_NETWORKING)
 #include <boost/asio/error.hpp>
+#endif
 
 #include <exception>
 #include <memory>
+#include <system_error>
 #include <type_traits>
 #include <utility>
 
@@ -42,14 +46,15 @@ namespace hpx { namespace lcos {
             hpx::intrusive_ptr<detail::promise_data<Result>> shared_state;
 
             void operator()(
-                boost::system::error_code const& ec, parcelset::parcel const& p)
+                std::error_code const& ec, parcelset::parcel const& p)
             {
                 // any error in the parcel layer will be stored in the future object
                 if (ec)
                 {
                     if (hpx::tolerate_node_faults())
                     {
-                        if (ec == boost::asio::error::connection_reset)
+                        if (compat_error_code::equal(
+                                ec, boost::asio::error::connection_reset))
                             return;
                     }
                     std::exception_ptr exception = HPX_GET_EXCEPTION(ec,
@@ -67,7 +72,7 @@ namespace hpx { namespace lcos {
             Callback cb;
 
             void operator()(
-                boost::system::error_code const& ec, parcelset::parcel const& p)
+                std::error_code const& ec, parcelset::parcel const& p)
             {
                 // any error in the parcel layer will be stored in the future object
                 if (ec)
@@ -537,7 +542,7 @@ namespace hpx { namespace lcos {
 
                         // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
-                        cb(boost::system::error_code(), parcelset::parcel());
+                        cb(std::error_code(), parcelset::parcel());
 #else
                         cb();
 #endif
@@ -548,14 +553,14 @@ namespace hpx { namespace lcos {
                 else
                 {
                     // local, direct execution
-                    auto && result = action_type::execute_function(
+                    auto&& result = action_type::execute_function(
                         addr.address_, addr.type_, std::forward<Ts>(vs)...);
                     this->shared_state_->mark_as_started();
                     this->shared_state_->set_remote_data(std::move(result));
 
                     // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
-                    cb(boost::system::error_code(), parcelset::parcel());
+                    cb(std::error_code(), parcelset::parcel());
 #else
                     cb();
 #endif
@@ -595,7 +600,7 @@ namespace hpx { namespace lcos {
 
                         // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
-                        cb(boost::system::error_code(), parcelset::parcel());
+                        cb(std::error_code(), parcelset::parcel());
 #else
                         cb();
 #endif
@@ -612,7 +617,7 @@ namespace hpx { namespace lcos {
 
                     // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
-                    cb(boost::system::error_code(), parcelset::parcel());
+                    cb(std::error_code(), parcelset::parcel());
 #else
                     cb();
 #endif

@@ -9,9 +9,11 @@
 #include <hpx/include/async.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <system_error>
+
 #if defined(HPX_HAVE_NETWORKING)
-void async_callback(uint64_t index, boost::system::error_code const& ec,
-    hpx::parcelset::parcel const& p)
+void async_callback(
+    uint64_t index, std::error_code const& ec, hpx::parcelset::parcel const& p)
 {
 }
 #else

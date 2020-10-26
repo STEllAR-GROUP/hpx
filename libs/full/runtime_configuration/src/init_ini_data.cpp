@@ -26,6 +26,7 @@
 #include <memory>
 #include <random>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -37,7 +38,7 @@ namespace hpx { namespace util {
         try
         {
             namespace fs = filesystem;
-            fs::error_code ec;
+            std::error_code ec;
             if (!fs::exists(loc, ec) || ec)
                 return false;    // avoid exception on missing file
             ini.read(loc);
@@ -147,7 +148,7 @@ namespace hpx { namespace util {
         if (!hpx_ini_file.empty())
         {
             namespace fs = filesystem;
-            fs::error_code ec;
+            std::error_code ec;
             if (!fs::exists(hpx_ini_file, ec) || ec)
             {
                 std::cerr
@@ -200,7 +201,7 @@ namespace hpx { namespace util {
                 fs::directory_iterator nodir;
                 fs::path this_path(*it);
 
-                fs::error_code ec;
+                std::error_code ec;
                 if (!fs::exists(this_path, ec) || ec)
                     continue;
 
@@ -420,7 +421,7 @@ namespace hpx { namespace util {
             fs::directory_iterator nodir;
             fs::path libs_path(libs);
 
-            fs::error_code ec;
+            std::error_code ec;
             if (!fs::exists(libs_path, ec) || ec)
                 return plugin_registries;    // given directory doesn't exist
 
@@ -458,7 +459,7 @@ namespace hpx { namespace util {
                         i - 1, version.length() + 1);    // - 1 for one more dot
 #endif
                 // ensure base directory, remove symlinks, etc.
-                fs::error_code fsec;
+                std::error_code fsec;
                 fs::path canonical_curr =
                     fs::canonical(curr, fs::initial_path(), fsec);
                 if (fsec)

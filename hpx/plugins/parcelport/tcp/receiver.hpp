@@ -10,6 +10,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/system/error_code.hpp
+// hpxinspect:nodeprecatedname:boost::system::error_code
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -33,6 +36,7 @@
 #include <boost/asio/placeholders.hpp>
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
+#include <boost/system/error_code.hpp>
 /* The boost asio support includes termios.h.
  * The termios.h file on ppc64le defines these macros, which
  * are also used by blaze, blaze_tensor as Template names.
@@ -45,6 +49,7 @@
 #include <memory>
 #include <mutex>
 #include <sstream>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -115,7 +120,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 socket_.set_option(quickack);
 #endif
 
-                void (receiver::*f)(boost::system::error_code const&,
+                void (receiver::*f)(std::error_code const&,
                         std::size_t, Handler)
                     = &receiver::handle_read_header<Handler>;
 
@@ -146,7 +151,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         /// Handle a completed read of the message size from the
         /// message header.
         template <typename Handler>
-        void handle_read_header(boost::system::error_code const& e,
+        void handle_read_header(std::error_code const& e,
             std::size_t bytes_transferred, Handler handler)
         {
             HPX_ASSERT(operation_in_flight_ == 0);
@@ -182,7 +187,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     static_cast<std::size_t>(
                         static_cast<std::uint32_t>(buffer_.num_chunks_.second));
 
-                void (receiver::*f)(boost::system::error_code const&,
+                void (receiver::*f)(std::error_code const&,
                         Handler) = nullptr;
 
                 if (num_zero_copy_chunks != 0) {
@@ -240,7 +245,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         /// Handle a completed read of message data.
         template <typename Handler>
-        void handle_read_chunk_data(boost::system::error_code const& e,
+        void handle_read_chunk_data(std::error_code const& e,
             Handler handler)
         {
             if (e) {
@@ -270,7 +275,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 }
 
                 // Start an asynchronous call to receive the data.
-                void (receiver::*f)(boost::system::error_code const&,
+                void (receiver::*f)(std::error_code const&,
                         Handler)
                     = &receiver::handle_read_data<Handler>;
 
@@ -299,7 +304,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         /// Handle a completed read of message data.
         template <typename Handler>
-        void handle_read_data(boost::system::error_code const& e,
+        void handle_read_data(std::error_code const& e,
             Handler handler)
         {
             if (e) {
@@ -315,7 +320,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     buffer_.data_point_.time_;
 
                 // now send acknowledgment byte
-                void (receiver::*f)(boost::system::error_code const&,
+                void (receiver::*f)(std::error_code const&,
                         Handler)
                     = &receiver::handle_write_ack<Handler>;
 
@@ -344,7 +349,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
 
         template <typename Handler>
-        void handle_write_ack(boost::system::error_code const& e,
+        void handle_write_ack(std::error_code const& e,
             Handler handler)
         {
             HPX_ASSERT(operation_in_flight_ != 0);

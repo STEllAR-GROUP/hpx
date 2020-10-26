@@ -40,6 +40,7 @@
 #include <mutex>
 #include <set>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -1135,7 +1136,7 @@ public:
     ///                   destination.
     void route(
         parcelset::parcel p
-      , util::function_nonser<void(boost::system::error_code const&,
+      , util::function_nonser<void(std::error_code const&,
             parcelset::parcel const&)> &&
       , threads::thread_priority local_priority =
             threads::thread_priority_default);

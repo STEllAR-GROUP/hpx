@@ -12,9 +12,8 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/system/error_code.hpp>
-
 #include <string>
+#include <system_error>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
@@ -215,7 +214,7 @@ namespace hpx {
 }    // namespace hpx
 
 /// \cond NOEXTERNAL
-namespace boost { namespace system {
+namespace std {
     // make sure our errors get recognized by the Boost.System library
     template <>
     struct is_error_code_enum<hpx::error>
@@ -228,5 +227,5 @@ namespace boost { namespace system {
     {
         static const bool value = true;
     };
-}}    // namespace boost::system
+}    // namespace std
 /// \endcond

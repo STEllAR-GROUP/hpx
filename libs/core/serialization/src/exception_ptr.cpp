@@ -5,6 +5,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/system/system_error.hpp
+// hpxinspect:nodeprecatedname:boost::system::system_error
+
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/serialization/exception_ptr.hpp>
@@ -15,11 +18,14 @@
 #include <boost/exception/exception.hpp>
 #endif
 
+#include <boost/system/system_error.hpp>
+
 #include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 #include <typeinfo>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -80,6 +86,13 @@ namespace hpx { namespace serialization {
             catch (boost::system::system_error const& e)
             {
                 type = hpx::util::boost_system_error;
+                what = e.what();
+                err_value = e.code().value();
+                err_message = e.code().message();
+            }
+            catch (std::system_error const& e)
+            {
+                type = hpx::util::std_system_error;
                 what = e.what();
                 err_value = e.code().value();
                 err_message = e.code().message();
@@ -152,7 +165,8 @@ namespace hpx { namespace serialization {
                 ar & err_value;
                 // clang-format on
             }
-            else if (hpx::util::boost_system_error == type)
+            else if (hpx::util::boost_system_error == type ||
+                hpx::util::std_system_error == type)
             {
                 // clang-format off
                 ar & err_value & err_message;
@@ -184,7 +198,8 @@ namespace hpx { namespace serialization {
                 ar & err_value;
                 // clang-format on
             }
-            else if (hpx::util::boost_system_error == type)
+            else if (hpx::util::boost_system_error == type ||
+                hpx::util::std_system_error == type)
             {
                 // clang-format off
                 ar & err_value& err_message;
@@ -251,13 +266,15 @@ namespace hpx { namespace serialization {
             case hpx::util::boost_system_error:
                 e = hpx::detail::get_exception(
                     boost::system::system_error(err_value,
-#if BOOST_VERSION < 106600 && !defined(BOOST_SYSTEM_NO_DEPRECATED)
-                        boost::system::get_system_category()
-#else
-                        boost::system::system_category()
-#endif
-                            ,
-                        err_message),
+                        boost::system::system_category(), err_message),
+                    throw_function_, throw_file_, throw_line_);
+                break;
+
+            // std::system_error
+            case hpx::util::std_system_error:
+                e = hpx::detail::get_exception(
+                    std::system_error(
+                        err_value, std::system_category(), err_message),
                     throw_function_, throw_file_, throw_line_);
                 break;
 

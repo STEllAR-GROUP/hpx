@@ -29,8 +29,6 @@
 #include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/topology/topology.hpp>
 
-#include <boost/system/system_error.hpp>
-
 #include <algorithm>
 #include <atomic>
 #ifdef HPX_HAVE_MAX_CPU_COUNT
@@ -45,6 +43,7 @@
 #include <mutex>
 #include <numeric>
 #include <string>
+#include <system_error>
 #include <thread>
 #include <type_traits>
 #include <utility>
@@ -533,12 +532,12 @@ namespace hpx { namespace threads { namespace detail {
                 report_error(global_thread_num, std::current_exception());
                 return;
             }
-            catch (boost::system::system_error const& e)
+            catch (std::system_error const& e)
             {
                 LFATAL_    //-V128
                     << "thread_func: " << id_.name()
                     << " thread_num:" << global_thread_num    //-V128
-                    << " : caught boost::system::system_error: " << e.what()
+                    << " : caught std::system_error: " << e.what()
                     << ", aborted thread execution";
 
                 report_error(global_thread_num, std::current_exception());

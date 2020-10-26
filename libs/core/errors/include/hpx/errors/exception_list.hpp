@@ -12,13 +12,12 @@
 #include <hpx/errors/exception.hpp>
 #include <hpx/thread_support/spinlock.hpp>
 
-#include <boost/system/error_code.hpp>
-
 #include <cstddef>
 #include <exception>
 #include <list>
 #include <mutex>
 #include <string>
+#include <system_error>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -91,7 +90,7 @@ namespace hpx {
         }
 
         /// \cond NOINTERNAL
-        boost::system::error_code get_error() const;
+        std::error_code get_error() const;
 
         std::string get_message() const;
         /// \endcond

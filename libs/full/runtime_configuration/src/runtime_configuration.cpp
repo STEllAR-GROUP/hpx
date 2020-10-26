@@ -37,6 +37,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -570,7 +571,7 @@ namespace hpx { namespace util {
         if (!path.empty())
         {
             fs::path this_p(path);
-            fs::error_code fsec;
+            std::error_code fsec;
             fs::path canonical_p =
                 fs::canonical(this_p, fs::initial_path(), fsec);
             if (fsec)

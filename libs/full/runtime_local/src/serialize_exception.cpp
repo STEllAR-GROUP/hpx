@@ -4,6 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/system/system_error.hpp
+// hpxinspect:nodeprecatedname:boost::system::system_error
+
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
@@ -15,11 +18,14 @@
 #include <boost/exception/exception.hpp>
 #endif
 
+#include <boost/system/system_error.hpp>
+
 #include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 #include <typeinfo>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -146,6 +152,13 @@ namespace hpx { namespace runtime_local { namespace detail {
             err_value = e.code().value();
             err_message = e.code().message();
         }
+        catch (std::system_error const& e)
+        {
+            type = hpx::util::std_system_error;
+            what = e.what();
+            err_value = e.code().value();
+            err_message = e.code().message();
+        }
         catch (std::runtime_error const& e)
         {
             type = hpx::util::std_runtime_error;
@@ -217,7 +230,8 @@ namespace hpx { namespace runtime_local { namespace detail {
             ar & err_value;
             // clang-format on
         }
-        else if (hpx::util::boost_system_error == type)
+        else if (hpx::util::boost_system_error == type ||
+            hpx::util::std_system_error == type)
         {
             // clang-format off
             ar & err_value & err_message;
@@ -263,7 +277,8 @@ namespace hpx { namespace runtime_local { namespace detail {
             ar & err_value;
             // clang-format on
         }
-        else if (hpx::util::boost_system_error == type)
+        else if (hpx::util::boost_system_error == type ||
+            hpx::util::std_system_error == type)
         {
             // clang-format off
             ar & err_value & err_message;
@@ -367,14 +382,20 @@ namespace hpx { namespace runtime_local { namespace detail {
         // boost::system::system_error
         case hpx::util::boost_system_error:
             e = hpx::detail::construct_exception(
-                boost::system::system_error(err_value,
-#if BOOST_VERSION < 106600 && !defined(BOOST_SYSTEM_NO_DEPRECATED)
-                    boost::system::get_system_category()
-#else
-                    boost::system::system_category()
-#endif
-                        ,
-                    err_message),
+                boost::system::system_error(
+                    err_value, boost::system::system_category(), err_message),
+                hpx::detail::construct_exception_info(throw_function_,
+                    throw_file_, throw_line_, throw_back_trace_,
+                    throw_locality_, throw_hostname_, throw_pid_,
+                    throw_shepherd_, throw_thread_id_, throw_thread_name_,
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_));
+            break;
+
+        // std::system_error
+        case hpx::util::std_system_error:
+            e = hpx::detail::construct_exception(
+                std::system_error(
+                    err_value, std::system_category(), err_message),
                 hpx::detail::construct_exception_info(throw_function_,
                     throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,

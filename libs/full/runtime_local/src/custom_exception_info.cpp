@@ -5,6 +5,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/system/system_error.hpp
+// hpxinspect:nodeprecatedname:boost::system::system_error
+
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
@@ -26,6 +29,8 @@
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/version.hpp>
 
+#include <boost/system/system_error.hpp>
+
 #if defined(HPX_WINDOWS)
 #include <process.h>
 #elif defined(HPX_HAVE_UNISTD_H)
@@ -42,6 +47,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -297,6 +303,8 @@ namespace hpx { namespace detail {
         hpx::exception const&, hpx::exception_info info);
     template HPX_EXPORT std::exception_ptr construct_exception(
         boost::system::system_error const&, hpx::exception_info info);
+    template HPX_EXPORT std::exception_ptr construct_exception(
+        std::system_error const&, hpx::exception_info info);
     template HPX_EXPORT std::exception_ptr construct_exception(
         std::exception const&, hpx::exception_info info);
     template HPX_EXPORT std::exception_ptr construct_exception(

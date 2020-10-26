@@ -15,14 +15,12 @@
 #include <hpx/errors/exception_fwd.hpp>
 #include <hpx/errors/exception_info.hpp>
 
-#include <boost/system/error_code.hpp>
-#include <boost/system/system_error.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <functional>
 #include <string>
+#include <system_error>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -37,7 +35,7 @@ namespace hpx {
     /// are either of this type or of a type derived from it. This implies that
     /// it is always safe to use this type only in catch statements guarding
     /// HPX library calls.
-    class HPX_CORE_EXPORT exception : public boost::system::system_error
+    class HPX_CORE_EXPORT exception : public std::system_error
     {
     public:
         /// Construct a hpx::exception from a \a hpx::error.
@@ -47,13 +45,13 @@ namespace hpx {
         explicit exception(error e = success);
 
         /// Construct a hpx::exception from a boost#system_error.
-        explicit exception(boost::system::system_error const& e);
+        explicit exception(std::system_error const& e);
 
         /// Construct a hpx::exception from a boost#system#error_code (this is
         /// new for Boost V1.69). This constructor is required to compensate
         /// for the changes introduced as a resolution to LWG3162
         /// (https://cplusplus.github.io/LWG/issue3162).
-        explicit exception(boost::system::error_code const& e);
+        explicit exception(std::error_code const& e);
 
         /// Construct a hpx::exception from a \a hpx::error and an error message.
         ///
