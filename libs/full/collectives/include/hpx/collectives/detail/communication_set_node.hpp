@@ -15,8 +15,8 @@
 #include <hpx/datastructures/any.hpp>
 #include <hpx/lcos_local/and_gate.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>

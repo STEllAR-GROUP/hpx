@@ -10,9 +10,9 @@
 #include <hpx/components_fwd.hpp>
 
 #include <hpx/futures/future.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/basename_registration_fwd.hpp>
 #include <hpx/runtime/components/make_client.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 
 #include <cstddef>
 #include <string>

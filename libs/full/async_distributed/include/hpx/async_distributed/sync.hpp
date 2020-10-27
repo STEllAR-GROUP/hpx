@@ -19,8 +19,8 @@
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_valid_action.hpp>

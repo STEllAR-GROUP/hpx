@@ -13,7 +13,7 @@
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/util/functional/segmented_iterator_helpers.hpp>
 
 #include <cstddef>

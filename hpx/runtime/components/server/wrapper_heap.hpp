@@ -11,7 +11,7 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/itt_notify.hpp>
-#include <hpx/runtime/naming/name.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/util/generate_unique_ids.hpp>

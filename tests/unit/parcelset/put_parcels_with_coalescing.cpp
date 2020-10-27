@@ -10,6 +10,7 @@
 #include <hpx/iostream.hpp>
 #include <hpx/include/parcel_coalescing.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/modules/naming.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>

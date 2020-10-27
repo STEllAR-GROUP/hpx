@@ -20,9 +20,8 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>

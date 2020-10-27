@@ -9,18 +9,18 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
+#include <hpx/futures/traits/future_access.hpp>
 #include <hpx/lcos/detail/promise_lco.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/futures/traits/future_access.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 
 #include <exception>

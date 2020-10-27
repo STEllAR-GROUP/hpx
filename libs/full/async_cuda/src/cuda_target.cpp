@@ -15,8 +15,8 @@
 #include <hpx/threading_base/thread_helpers.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/find_here.hpp>
-#include <hpx/runtime/naming/id_type_impl.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS)
 #if defined(HPX_HAVE_MAX_CPU_COUNT)
@@ -25,6 +25,7 @@
 #include <hpx/serialization/dynamic_bitset.hpp>
 #endif
 #endif
+#include <hpx/naming/credit_handling.hpp>
 #include <hpx/serialization/serialize.hpp>
 #endif
 #endif

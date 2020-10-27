@@ -10,11 +10,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/agas/agas_fwd.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming/address.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/futures/future.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/naming_base/id_type.hpp>
 
 #include <cstdint>
 #include <map>

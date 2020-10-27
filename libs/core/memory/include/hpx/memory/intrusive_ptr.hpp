@@ -46,10 +46,7 @@ namespace hpx { namespace memory {
     public:
         using element_type = T;
 
-        constexpr intrusive_ptr() noexcept
-          : px(nullptr)
-        {
-        }
+        constexpr intrusive_ptr() noexcept = default;
 
         intrusive_ptr(T* p, bool add_ref = true)
           : px(p)
@@ -89,7 +86,7 @@ namespace hpx { namespace memory {
         }
 
         // Move support
-        intrusive_ptr(intrusive_ptr&& rhs) noexcept
+        constexpr intrusive_ptr(intrusive_ptr&& rhs) noexcept
           : px(rhs.px)
         {
             rhs.px = nullptr;
@@ -107,7 +104,7 @@ namespace hpx { namespace memory {
         template <typename U,
             typename Enable = typename std::enable_if<
                 memory::detail::sp_convertible<U, T>::value>::type>
-        intrusive_ptr(intrusive_ptr<U>&& rhs)
+        constexpr intrusive_ptr(intrusive_ptr<U>&& rhs)
           : px(rhs.px)
         {
             rhs.px = nullptr;
@@ -148,12 +145,12 @@ namespace hpx { namespace memory {
             this_type(rhs, add_ref).swap(*this);
         }
 
-        T* get() const noexcept
+        constexpr T* get() const noexcept
         {
             return px;
         }
 
-        T* detach() noexcept
+        constexpr T* detach() noexcept
         {
             T* ret = px;
             px = nullptr;
@@ -172,12 +169,12 @@ namespace hpx { namespace memory {
             return px;
         }
 
-        explicit operator bool() const noexcept
+        explicit constexpr operator bool() const noexcept
         {
             return px != nullptr;
         }
 
-        void swap(intrusive_ptr& rhs) noexcept
+        constexpr void swap(intrusive_ptr& rhs) noexcept
         {
             T* tmp = px;
             px = rhs.px;
@@ -185,7 +182,7 @@ namespace hpx { namespace memory {
         }
 
     private:
-        T* px;
+        T* px = nullptr;
     };
 
     template <typename T, typename U>

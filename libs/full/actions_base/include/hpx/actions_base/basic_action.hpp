@@ -31,13 +31,13 @@
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>

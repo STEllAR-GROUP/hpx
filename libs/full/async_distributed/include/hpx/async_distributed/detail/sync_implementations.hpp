@@ -14,8 +14,8 @@
 #include <hpx/async_distributed/detail/sync_implementations_fwd.hpp>
 #include <hpx/async_local/sync_fwd.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 
 #include <cstddef>

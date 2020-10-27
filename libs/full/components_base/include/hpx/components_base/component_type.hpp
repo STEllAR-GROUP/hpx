@@ -12,7 +12,9 @@
 #include <hpx/assert.hpp>
 #include <hpx/components_base/traits/component_type_database.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/modules/naming.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/naming_base/gid_type.hpp>
+#include <hpx/naming_base/naming_base.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -22,17 +24,18 @@
 #include <hpx/type_support/decay.hpp>
 
 #include <cstdint>
+#include <iosfwd>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components {
 
     // declared in hpx/modules/naming.hpp
-    // typedef std::int32_t component_type;
+    // using component_type = std::int32_t;
 
     enum component_enum_type
     {
-        component_invalid = -1,
+        component_invalid = naming::address::component_invalid,
 
         // Runtime support component (provides system services such as
         // component creation, etc.). One per locality.
@@ -193,6 +196,13 @@ namespace hpx { namespace components {
     }
 
 }}    // namespace hpx::components
+
+namespace hpx { namespace naming {
+
+    // this is defined in this module as its implementation relies on
+    // components::get_component_type_name()
+    HPX_EXPORT std::ostream& operator<<(std::ostream&, address const&);
+}}    // namespace hpx::naming
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_DEFINE_GET_COMPONENT_TYPE(component)                               \

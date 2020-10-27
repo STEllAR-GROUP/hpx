@@ -10,10 +10,10 @@
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/lcos_local/detail/preprocess_future.hpp>
+#include <hpx/naming/detail/preprocess_gid_types.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/serialization/detail/preprocess_gid_types.hpp>
 #include <hpx/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialize.hpp>

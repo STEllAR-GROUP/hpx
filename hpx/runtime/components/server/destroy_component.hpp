@@ -9,10 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime_fwd.hpp>
+#include <hpx/naming_base/address.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
-#include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime_fwd.hpp>
 
 #include <sstream>
 

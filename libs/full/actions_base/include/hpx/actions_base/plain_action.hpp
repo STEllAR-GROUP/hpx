@@ -13,11 +13,11 @@
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components_base/traits/component_type_database.hpp>
+#include <hpx/naming_base/address.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
-#include <hpx/runtime/naming/address.hpp>
 
 #include <boost/utility/string_ref.hpp>
 

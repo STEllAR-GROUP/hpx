@@ -12,7 +12,7 @@
 #include <hpx/async_local/async_fwd.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
-#include <hpx/runtime/naming/name.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/traits/is_continuation.hpp>
 
 #include <type_traits>

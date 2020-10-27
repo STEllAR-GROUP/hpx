@@ -19,10 +19,10 @@
 #include <hpx/lcos_local/and_gate.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime_distributed/get_num_localities.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>

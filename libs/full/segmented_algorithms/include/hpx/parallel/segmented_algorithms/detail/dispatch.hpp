@@ -12,8 +12,8 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/components/colocating_distribution_policy.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

@@ -134,17 +134,17 @@ namespace hpx { namespace naming {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void gid_type::save(
-        serialization::output_archive& ar, const unsigned int version) const
+    void save(
+        serialization::output_archive& ar, gid_type const& gid, unsigned int)
     {
-        ar << id_msb_ << id_lsb_;
+        ar << gid.id_msb_ << gid.id_lsb_;
     }
 
-    void gid_type::load(
-        serialization::input_archive& ar, const unsigned int /*version*/)
+    void load(serialization::input_archive& ar, gid_type& gid, unsigned int)
     {
-        ar >> id_msb_ >> id_lsb_;
+        ar >> gid.id_msb_ >> gid.id_lsb_;
 
-        id_msb_ &= ~is_locked_mask;    // strip lock-bit upon receive
+        // strip lock-bit upon receive
+        gid.id_msb_ &= ~gid_type::is_locked_mask;
     }
 }}    // namespace hpx::naming

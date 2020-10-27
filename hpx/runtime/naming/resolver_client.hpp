@@ -7,6 +7,5 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 

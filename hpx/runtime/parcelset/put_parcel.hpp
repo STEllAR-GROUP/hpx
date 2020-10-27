@@ -18,9 +18,10 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming/split_gid.hpp>
+#include <hpx/naming/credit_handling.hpp>
+#include <hpx/naming/split_gid.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>

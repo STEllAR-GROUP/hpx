@@ -36,7 +36,6 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>

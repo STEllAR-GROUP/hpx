@@ -14,11 +14,11 @@
 #include <hpx/assert.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 
 #include <type_traits>
 

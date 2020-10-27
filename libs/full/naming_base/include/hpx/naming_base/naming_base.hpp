@@ -14,6 +14,11 @@
 namespace hpx {
     namespace naming {
 
+        namespace detail {
+
+            struct HPX_EXPORT id_type_impl;
+        }    // namespace detail
+
         using component_type = std::int32_t;
         using address_type = std::uint64_t;
 

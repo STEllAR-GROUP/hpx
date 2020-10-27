@@ -12,8 +12,8 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/type_support/decay.hpp>

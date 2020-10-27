@@ -13,14 +13,14 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/agas/agas_fwd.hpp>
-#include <hpx/runtime/agas/server/locality_namespace.hpp>
+#include <hpx/futures/future.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/agas/locality_namespace.hpp>
+#include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming/address.hpp>
 
 #include <cstdint>
 #include <map>

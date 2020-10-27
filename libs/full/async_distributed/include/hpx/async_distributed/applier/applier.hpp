@@ -15,8 +15,8 @@
 #include <hpx/async_distributed/applier_fwd.hpp>    // this needs to go first
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/modules/threadmanager.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/name.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 

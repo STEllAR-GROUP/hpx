@@ -5,19 +5,26 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/functional/bind.hpp>
+#include <hpx/lcos_local/detail/preprocess_future.hpp>
+#include <hpx/memory/serialization/intrusive_ptr.hpp>
+#include <hpx/modules/checkpoint_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/naming/credit_handling.hpp>
-#include <hpx/runtime/agas/addressing_service.hpp>
+#include <hpx/naming/detail/preprocess_gid_types.hpp>
+#include <hpx/naming/split_gid.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/split_gid.hpp>
-#include <hpx/runtime_fwd.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 
 #include <cstdint>
@@ -91,6 +98,15 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace naming { namespace detail {
+
+    struct gid_serialization_data;
+}}}    // namespace hpx::naming::detail
+
+HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::detail::gid_serialization_data)
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -405,5 +421,203 @@ namespace hpx { namespace naming {
         // Fire-and-forget semantics.
         error_code ec(lightweight);
         agas::decref(gid, credits, ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail {
+
+        // custom deleter for managed gid_types, will be called when the last
+        // copy of the corresponding naming::id_type goes out of scope
+        void gid_managed_deleter(id_type_impl* p)
+        {
+            // a credit of zero means the component is not (globally) reference
+            // counted
+            if (detail::has_credits(*p))
+            {
+                // execute the deleter directly
+                detail::decrement_refcnt(p);
+            }
+            else
+            {
+                // delete local gid representation if needed
+                delete p;
+            }
+        }
+
+        // custom deleter for unmanaged gid_types, will be called when the last
+        // copy of the corresponding naming::id_type goes out of scope
+        void gid_unmanaged_deleter(id_type_impl* p)
+        {
+            delete p;    // delete local gid representation only
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // prepare the given id, note: this function modifies the passed id
+        void handle_credit_splitting(serialization::output_archive& ar,
+            id_type_impl& gid,
+            serialization::detail::preprocess_gid_types& split_gids)
+        {
+            auto& handle_futures =
+                ar.get_extra_data<serialization::detail::preprocess_futures>();
+
+            // avoid races between the split-handling and the future
+            // preprocessing
+            handle_futures.increment_future_count();
+
+            auto f = split_gid_if_needed(gid).then(hpx::launch::sync,
+                [&split_gids, &handle_futures, &gid](
+                    hpx::future<gid_type>&& gid_future) {
+                    HPX_UNUSED(handle_futures);
+                    HPX_ASSERT(handle_futures.has_futures());
+                    split_gids.add_gid(gid, gid_future.get());
+                });
+
+            handle_futures.await_future(
+                *traits::future_access<decltype(f)>::get_shared_state(f),
+                false);
+        }
+
+        void preprocess_gid(
+            id_type_impl const& id_impl, serialization::output_archive& ar)
+        {
+            // unmanaged gids do not require any special handling
+            // check-pointing does not require any special handling here neither
+            if (id_type::unmanaged == id_impl.get_management_type() ||
+                id_type::managed_move_credit == id_impl.get_management_type())
+            {
+                return;
+            }
+
+            // we should not call this function during check-pointing operations
+            if (ar.try_get_extra_data<util::checkpointing_tag>() != nullptr)
+            {
+                // this is a check-pointing operation, we do not support this
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "id_type_impl::preprocess_gid",
+                    "can't check-point managed id_type's, use a component "
+                    "client instead");
+            }
+
+            auto& split_gids = ar.get_extra_data<
+                serialization::detail::preprocess_gid_types>();
+
+            if (split_gids.has_gid(id_impl))
+            {
+                // the gid has been split already and we don't need to do
+                // anything further
+                return;
+            }
+
+            HPX_ASSERT(has_credits(id_impl));
+
+            // Request new credits from AGAS if needed (i.e. the remainder
+            // of the credit splitting is equal to one).
+            HPX_ASSERT(id_type::managed == id_impl.get_management_type());
+
+            handle_credit_splitting(
+                ar, const_cast<id_type_impl&>(id_impl), split_gids);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        struct gid_serialization_data
+        {
+            gid_type gid_;
+            id_type::management_type type_;
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned)
+            {
+                // clang-format off
+                ar & gid_ & type_;
+                // clang-format on
+            }
+        };
+
+        // serialization
+        void save(serialization::output_archive& ar,
+            id_type_impl const& id_impl, unsigned)
+        {
+            // Avoid performing side effects if the archive is not saving the
+            // data.
+            id_type::management_type type = id_impl.get_management_type();
+            if (ar.is_preprocessing())
+            {
+                preprocess_gid(id_impl, ar);
+
+                gid_serialization_data data{id_impl, type};
+                ar << data;
+                return;
+            }
+
+            if (id_type::unmanaged != type &&
+                ar.try_get_extra_data<util::checkpointing_tag>() != nullptr)
+            {
+                // this is a check-pointing operation, we do not support this
+                HPX_THROW_EXCEPTION(invalid_status, "id_type_impl::save",
+                    "can't check-point managed id_type's, use a component "
+                    "client instead");
+            }
+
+            gid_type new_gid;
+            if (id_type::unmanaged == type)
+            {
+                new_gid = id_impl;
+            }
+            else if (id_type::managed_move_credit == type)
+            {
+                // all credits will be moved to the returned gid
+                new_gid = move_gid(const_cast<id_type_impl&>(id_impl));
+                type = id_type::managed;
+            }
+            else
+            {
+                auto& split_gids = ar.get_extra_data<
+                    serialization::detail::preprocess_gid_types>();
+
+                new_gid = split_gids.get_new_gid(id_impl);
+                HPX_ASSERT(new_gid != invalid_gid);
+            }
+
+#if defined(HPX_DEBUG)
+            auto* split_gids = ar.try_get_extra_data<
+                serialization::detail::preprocess_gid_types>();
+            HPX_ASSERT(!split_gids || !split_gids->has_gid(id_impl));
+#endif
+
+            gid_serialization_data data{new_gid, type};
+            ar << data;
+        }
+
+        void load(
+            serialization::input_archive& ar, id_type_impl& id_impl, unsigned)
+        {
+            gid_serialization_data data;
+            ar >> data;
+
+            if (id_type::unmanaged != data.type_ &&
+                id_type::managed != data.type_)
+            {
+                HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
+                    "trying to load id_type with unknown deleter");
+            }
+
+            static_cast<gid_type&>(id_impl) = data.gid_;
+            id_impl.set_management_type(data.type_);
+        }
+    }    // namespace detail
+
+    ///////////////////////////////////////////////////////////////////////////
+    void save(
+        serialization::output_archive& ar, id_type const& id, unsigned int)
+    {
+        // We serialize the intrusive ptr and use pointer tracking here. This
+        // avoids multiple credit splitting if we need multiple future await
+        // passes (they all work on the same archive).
+        ar << id.impl();
+    }
+
+    void load(serialization::input_archive& ar, id_type& id, unsigned int)
+    {
+        ar >> id.impl();
     }
 }}    // namespace hpx::naming

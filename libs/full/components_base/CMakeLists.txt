@@ -42,7 +42,7 @@ set(components_base_compat_headers
 )
 # cmake-format: on
 
-set(components_base_sources)
+set(components_base_sources address_ostream.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
@@ -54,6 +54,6 @@ add_hpx_module(
   HEADERS ${components_base_headers}
   COMPAT_HEADERS ${components_base_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_naming hpx_naming_base
+  MODULE_DEPENDENCIES hpx_naming_base
   CMAKE_SUBDIRS examples tests
 )

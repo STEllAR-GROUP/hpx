@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <hpx/runtime/naming/name.hpp>
-
 #include <cstddef>
 #include <cstdint>
 

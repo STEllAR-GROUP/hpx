@@ -12,9 +12,8 @@
 #include <hpx/agas/agas_fwd.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/naming/name.hpp>
+#include <hpx/naming_base/address.hpp>
+#include <hpx/naming_base/id_type.hpp>
 
 #include <cstdint>
 #include <string>

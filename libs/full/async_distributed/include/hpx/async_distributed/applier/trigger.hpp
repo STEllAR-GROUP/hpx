@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
 
 #include <exception>

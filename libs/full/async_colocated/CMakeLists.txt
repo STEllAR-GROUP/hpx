@@ -21,6 +21,7 @@ set(async_colocated_headers
     hpx/async_colocated/apply_colocated_callback.hpp
     hpx/async_colocated/apply_colocated_fwd.hpp
     hpx/async_colocated/apply_colocated.hpp
+    hpx/async_colocated/get_colocation_id.hpp
 )
 
 # cmake-format: off
@@ -33,10 +34,11 @@ set(async_colocated_compat_headers
     hpx/async_distributed/applier/detail/apply_colocated_callback.hpp => hpx/async_colocated/apply_colocated_callback.hpp
     hpx/async_distributed/applier/detail/apply_colocated_fwd.hpp  => hpx/async_colocated/apply_colocated_fwd.hpp
     hpx/async_distributed/applier/detail/apply_colocated.hpp  => hpx/async_colocated/apply_colocated.hpp
+    hpx/runtime/get_colocation_id.hpp  => hpx/async_colocated/get_colocation_id.hpp
 )
 # cmake-format: on
 
-set(async_colocated_sources)
+set(async_colocated_sources get_colocation_id.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(

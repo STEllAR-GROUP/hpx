@@ -17,7 +17,7 @@
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/modules/async_distributed.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #endif
 
 #include <cstddef>
