@@ -165,6 +165,20 @@ namespace hpx { namespace execution {
         {
         }
 
+        parallel_policy_executor require(
+            hpx::threads::thread_schedule_hint hint)
+        {
+            auto exec = *this;
+            exec.schedulehint_ = hint;
+            return exec;
+        }
+
+        hpx::threads::thread_schedule_hint query(
+            hpx::threads::thread_schedule_hint)
+        {
+            return schedulehint_;
+        }
+
         /// \cond NOINTERNAL
         bool operator==(parallel_policy_executor const& rhs) const noexcept
         {
@@ -302,6 +316,14 @@ namespace hpx { namespace execution {
 
     using parallel_executor = parallel_policy_executor<hpx::launch>;
 }}    // namespace hpx::execution
+
+namespace hpx { namespace threads {
+    template <typename Policy>
+    struct thread_schedule_hint::is_applicable_property<
+        hpx::execution::parallel_policy_executor<Policy>> : std::true_type
+    {
+    };
+}}    // namespace hpx::threads
 
 namespace hpx { namespace parallel { namespace execution {
     using parallel_executor HPX_DEPRECATED_V(1, 6,
