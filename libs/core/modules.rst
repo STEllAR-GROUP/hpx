@@ -42,6 +42,7 @@ Core modules
    /libs/core/plugin/docs/index.rst
    /libs/core/prefix/docs/index.rst
    /libs/core/preprocessor/docs/index.rst
+   /libs/core/properties/docs/index.rst
    /libs/core/schedulers/docs/index.rst
    /libs/core/serialization/docs/index.rst
    /libs/core/static_reinit/docs/index.rst
