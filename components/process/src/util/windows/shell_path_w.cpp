@@ -16,6 +16,8 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 
+#include <windows.h>
+
 namespace hpx { namespace components { namespace process { namespace windows
 {
     filesystem::path shell_path()
