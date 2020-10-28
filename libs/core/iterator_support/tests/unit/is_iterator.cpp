@@ -9,10 +9,6 @@
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/testing.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
-#endif
-
 #include <cstddef>
 #include <forward_list>
 #include <iterator>
