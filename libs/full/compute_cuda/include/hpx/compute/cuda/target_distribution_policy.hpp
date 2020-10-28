@@ -13,11 +13,11 @@
 #if defined(HPX_HAVE_GPU_SUPPORT) && defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 
 #include <hpx/assert.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_distributed/dataflow.hpp>
 #endif
 #include <hpx/futures/future.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/components/create_component_helpers.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
