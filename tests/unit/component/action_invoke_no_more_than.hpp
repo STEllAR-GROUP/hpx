@@ -10,12 +10,13 @@
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/traits/action_decorate_continuation.hpp>
+#include <hpx/actions/continuation.hpp>
+#include <hpx/actions/traits/action_decorate_continuation.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/synchronization/counting_semaphore.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/static.hpp>
@@ -231,6 +232,6 @@ namespace hpx { namespace actions { namespace detail {
             };                                                                 \
         }                                                                      \
     }                                                                          \
-/**/
+    /**/
 
 #endif

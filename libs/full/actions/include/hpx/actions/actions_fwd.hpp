@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions/continuation_fwd.hpp>
 #include <hpx/actions_base/actions_base_fwd.hpp>
-#include <hpx/actions_base/continuation_fwd.hpp>
 
 namespace hpx { namespace actions {
 

@@ -21,7 +21,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     lcos/base_lco_with_value_3.cpp
     lcos/base_lco_with_value.cpp
     lcos/promise.cpp
-    runtime/actions/continuation.cpp
     runtime/agas/addressing_service.cpp
     runtime/agas/big_boot_barrier.cpp
     runtime/agas/component_namespace.cpp
@@ -146,12 +145,9 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/plugins/unique_plugin_name.hpp
     hpx/runtime_fwd.hpp
     hpx/runtime/actions/continuation2_impl.hpp
-    hpx/runtime/actions/continuation.hpp
     hpx/runtime/actions/continuation_impl.hpp
     hpx/runtime/actions/lambda_to_action.hpp
     hpx/runtime/actions/make_continuation.hpp
-    hpx/runtime/actions/set_lco_value_continuation.hpp
-    hpx/runtime/actions/trigger.hpp
     hpx/runtime/agas/addressing_service.hpp
     hpx/runtime/agas/big_boot_barrier.hpp
     hpx/runtime/agas/component_namespace.hpp

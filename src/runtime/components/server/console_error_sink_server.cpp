@@ -7,17 +7,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/basic_action.hpp>
-// This is needed to get rid of an undefined reference to
-// hpx::actions::detail::register_remote_action_invocation_count
+#include <hpx/actions/continuation.hpp>
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
+#include <hpx/actions_base/basic_action.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime_configuration/ini.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
+#include <hpx/runtime_configuration/ini.hpp>
+#include <hpx/runtime_local/custom_exception_info.hpp>
 
 #include <exception>
 

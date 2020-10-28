@@ -11,12 +11,12 @@
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions/base_action.hpp>
+#include <hpx/actions/continuation.hpp>
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/lambda_to_action.hpp>
 #include <hpx/runtime/actions/make_continuation.hpp>
 #endif

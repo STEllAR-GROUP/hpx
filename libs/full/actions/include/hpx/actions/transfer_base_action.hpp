@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2011-2016 Thomas Heller
 //
@@ -16,6 +16,8 @@
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/actions/base_action.hpp>
 #include <hpx/actions/register_action.hpp>
+#include <hpx/actions/traits/action_continuation.hpp>
+#include <hpx/actions/traits/action_trigger_continuation.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/detail/invocation_count_registry.hpp>
 #include <hpx/actions_base/traits/action_does_termination_detection.hpp>
@@ -45,6 +47,7 @@
 #include <utility>
 
 namespace hpx { namespace actions {
+
     ///////////////////////////////////////////////////////////////////////////
     // If one or more arguments of the action are non-default-constructible,
     // the transfer_action does not store the argument tuple directly but a
@@ -137,6 +140,7 @@ namespace hpx {
 }    // namespace hpx
 
 namespace hpx { namespace actions {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
     struct transfer_base_action : base_action_data
@@ -145,29 +149,31 @@ namespace hpx { namespace actions {
         HPX_NON_COPYABLE(transfer_base_action);
 
     public:
-        typedef typename Action::component_type component_type;
-        typedef typename Action::derived_type derived_type;
-        typedef typename Action::result_type result_type;
-        typedef typename Action::arguments_type arguments_base_type;
-        typedef typename std::conditional<
+        using component_type = typename Action::component_type;
+        using derived_type = typename Action::derived_type;
+        using result_type = typename Action::result_type;
+        using arguments_base_type = typename Action::arguments_type;
+        using arguments_type = typename std::conditional<
             std::is_constructible<arguments_base_type>::value,
             arguments_base_type,
-            detail::argument_holder<arguments_base_type>>::type arguments_type;
-        typedef typename Action::continuation_type continuation_type;
+            detail::argument_holder<arguments_base_type>>::type;
+
+        using continuation_type =
+            typename traits::action_continuation<Action>::type;
 
         // This is the priority value this action has been instantiated with
         // (statically). This value might be different from the priority member
         // holding the runtime value an action has been created with
-        HPX_STATIC_CONSTEXPR threads::thread_priority priority_value =
+        static constexpr threads::thread_priority priority_value =
             traits::action_priority<Action>::value;
 
         // This is the stacksize value this action has been instantiated with
         // (statically). This value might be different from the stacksize member
         // holding the runtime value an action has been created with
-        HPX_STATIC_CONSTEXPR threads::thread_stacksize stacksize_value =
+        static constexpr threads::thread_stacksize stacksize_value =
             traits::action_stacksize<Action>::value;
 
-        typedef typename Action::direct_execution direct_execution;
+        using direct_execution = typename Action::direct_execution;
 
         // construct an empty transfer_action to avoid serialization overhead
         transfer_base_action() = default;

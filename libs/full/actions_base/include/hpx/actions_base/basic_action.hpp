@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -18,12 +18,15 @@
 #include <hpx/actions_base/detail/invocation_count_registry.hpp>
 #include <hpx/actions_base/detail/per_action_data_counter_registry.hpp>
 #include <hpx/actions_base/preassigned_action_id.hpp>
+#include <hpx/actions_base/traits/action_continuation_fwd.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
 #include <hpx/actions_base/traits/action_stacksize.hpp>
+#include <hpx/actions_base/traits/action_trigger_continuation_fwd.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/sync.hpp>
 #include <hpx/async_local/sync_fwd.hpp>
+#include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -38,7 +41,6 @@
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/type_support/pack.hpp>
@@ -174,7 +176,8 @@ namespace hpx { namespace actions {
                 LTM_(debug) << "Executing " << Action::get_action_name(lva_)
                             << " with continuation(" << cont_.get_id() << ")";
 
-                actions::trigger(std::move(cont_),
+                traits::action_trigger_continuation<
+                    typename Action::continuation_type>::call(std::move(cont_),
                     util::functional::invoke_fused{},
                     action_invoke<Action>{lva_, comptype_}, std::move(args_));
 
@@ -246,8 +249,7 @@ namespace hpx { namespace actions {
             typename traits::promise_local_result<remote_result_type>::type;
 
         using continuation_type =
-            hpx::actions::typed_continuation<local_result_type,
-                remote_result_type>;
+            typename traits::action_continuation<basic_action>::type;
 
         static constexpr std::size_t arity = sizeof...(Args);
 

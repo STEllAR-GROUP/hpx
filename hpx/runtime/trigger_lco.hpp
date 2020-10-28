@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/actions_fwd.hpp>
+#include <hpx/actions/continuation_fwd.hpp>
 #include <hpx/actions_base/action_priority.hpp>
-#include <hpx/actions_base/continuation_fwd.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/lcos_fwd.hpp>

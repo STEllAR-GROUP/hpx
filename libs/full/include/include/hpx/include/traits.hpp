@@ -43,7 +43,8 @@
 #include <hpx/type_support/detail/wrap_int.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/actions_base/traits/action_decorate_continuation.hpp>
+#include <hpx/actions/traits/action_continuation.hpp>
+#include <hpx/actions/traits/action_decorate_continuation.hpp>
 #include <hpx/actions_base/traits/action_does_termination_detection.hpp>
 #include <hpx/actions_base/traits/action_is_target_valid.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>

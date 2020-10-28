@@ -8,9 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions/traits/action_continuation.hpp>
+#include <hpx/actions/traits/action_decorate_continuation.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
-#include <hpx/actions_base/traits/action_continuation.hpp>
-#include <hpx/actions_base/traits/action_decorate_continuation.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/action_schedule_thread.hpp>
 #include <hpx/actions_base/traits/action_select_direct_execution.hpp>
@@ -51,8 +51,8 @@ namespace hpx { namespace applier { namespace detail {
         naming::address::component_type comptype,
         threads::thread_priority priority, Ts&&... vs)
     {
-        typedef typename traits::action_continuation<Action>::type
-            continuation_type;
+        using continuation_type =
+            typename traits::action_continuation<Action>::type;
 
         continuation_type cont;
         if (traits::action_decorate_continuation<Action>::call(cont))    //-V614
