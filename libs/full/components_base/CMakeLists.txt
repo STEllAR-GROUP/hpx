@@ -17,6 +17,7 @@ set(components_base_headers
     hpx/components_base/get_lva.hpp
     hpx/components_base/component_type.hpp
     hpx/components_base/pinned_ptr.hpp
+    hpx/components_base/traits/action_decorate_function.hpp
     hpx/components_base/traits/component_config_data.hpp
     hpx/components_base/traits/component_heap_type.hpp
     hpx/components_base/traits/component_pin_support.hpp
@@ -30,15 +31,16 @@ set(components_base_headers
 # cmake-format: off
 set(components_base_compat_headers
     hpx/runtime/get_lva.hpp => hpx/components_base/get_lva.hpp
-    hpx/runtime/components/component_type.hpp => hpx/components_base/component_type.hpp
-    hpx/runtime/components/pinned_ptr.hpp => hpx/components_base/pinned_ptr.hpp
-    hpx/traits/component_config_data.hpp => hpx/components_base/traits/component_config_data.hpp
-    hpx/traits/component_heap_type.hpp => hpx/components_base/traits/component_heap_type.hpp
-    hpx/traits/component_pin_support.hpp => hpx/components_base/traits/component_pin_support.hpp
-    hpx/traits/component_supports_migration.hpp => hpx/components_base/traits/component_supports_migration.hpp
-    hpx/traits/component_type_is_compatible.hpp => hpx/components_base/traits/component_type_is_compatible.hpp
-    hpx/traits/component_type_database.hpp => hpx/components_base/traits/component_type_database.hpp
-    hpx/traits/is_component.hpp => hpx/components_base/traits/is_component.hpp
+    hpx/runtime/components/component_type.hpp => hpx/modules/components_base.hpp
+    hpx/runtime/components/pinned_ptr.hpp => hpx/modules/components_base.hpp
+    hpx/traits/action_decorate_function.hpp => hpx/modules/components_base.hpp
+    hpx/traits/component_config_data.hpp => hpx/modules/components_base.hpp
+    hpx/traits/component_heap_type.hpp => hpx/modules/components_base.hpp
+    hpx/traits/component_pin_support.hpp => hpx/modules/components_base.hpp
+    hpx/traits/component_supports_migration.hpp => hpx/modules/components_base.hpp
+    hpx/traits/component_type_is_compatible.hpp => hpx/modules/components_base.hpp
+    hpx/traits/component_type_database.hpp => hpx/modules/components_base.hpp
+    hpx/traits/is_component.hpp => hpx/modules/components_base.hpp
 )
 # cmake-format: on
 

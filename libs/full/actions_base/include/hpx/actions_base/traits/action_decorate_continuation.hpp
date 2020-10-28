@@ -9,8 +9,8 @@
 #include <hpx/actions_base/continuation_fwd.hpp>
 #include <hpx/actions_base/traits/action_continuation.hpp>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
+
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for action capabilities
     template <typename Action, typename Enable = void>
@@ -19,11 +19,12 @@ namespace hpx { namespace traits
         using continuation_type =
             typename traits::action_continuation<Action>::type;
 
-        static bool call(continuation_type& /*cont*/)
+        static constexpr bool call(continuation_type&) noexcept
         {
             // by default we do nothing
-            return false; // continuation has not been modified
+            return false;    // continuation has not been modified
         }
     };
-}}
+}}    // namespace hpx::traits
+
 

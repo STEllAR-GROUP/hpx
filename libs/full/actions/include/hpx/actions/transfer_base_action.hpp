@@ -18,8 +18,11 @@
 #include <hpx/actions/register_action.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/detail/invocation_count_registry.hpp>
+#include <hpx/actions_base/traits/action_does_termination_detection.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
+#include <hpx/actions_base/traits/action_schedule_thread.hpp>
 #include <hpx/actions_base/traits/action_stacksize.hpp>
+#include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -27,11 +30,8 @@
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/unique_ptr.hpp>
-#include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/action_message_handler.hpp>
-#include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
-#include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/modules/itt_notify.hpp>

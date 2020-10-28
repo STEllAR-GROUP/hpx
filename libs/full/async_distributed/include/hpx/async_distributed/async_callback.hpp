@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
+#include <hpx/actions_base/traits/is_valid_action.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/async_distributed/async_callback_fwd.hpp>
@@ -18,7 +19,6 @@
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/is_valid_action.hpp>
 
 #include <type_traits>
 #include <utility>

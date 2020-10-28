@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/pointer_category.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -39,15 +40,21 @@
 #include <hpx/serialization/traits/serialization_access_data.hpp>
 #include <hpx/timed_execution/traits/is_timed_executor.hpp>
 #include <hpx/traits/is_continuation.hpp>
-#include <hpx/traits/pointer_category.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/actions_base/traits/action_decorate_continuation.hpp>
+#include <hpx/actions_base/traits/action_does_termination_detection.hpp>
+#include <hpx/actions_base/traits/action_is_target_valid.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
+#include <hpx/actions_base/traits/action_schedule_thread.hpp>
 #include <hpx/actions_base/traits/action_select_direct_execution.hpp>
 #include <hpx/actions_base/traits/action_stacksize.hpp>
+#include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
+#include <hpx/actions_base/traits/is_valid_action.hpp>
+#include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/components_base/traits/component_config_data.hpp>
 #include <hpx/components_base/traits/component_heap_type.hpp>
 #include <hpx/components_base/traits/component_pin_support.hpp>
@@ -58,16 +65,9 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/traits/get_remote_result.hpp>
 #include <hpx/futures/traits/promise_remote_result.hpp>
-#include <hpx/traits/action_decorate_continuation.hpp>
-#include <hpx/traits/action_decorate_function.hpp>
-#include <hpx/traits/action_does_termination_detection.hpp>
-#include <hpx/traits/action_is_target_valid.hpp>
 #include <hpx/traits/action_message_handler.hpp>
-#include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
-#include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/is_valid_action.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
 #endif

@@ -7,16 +7,17 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/actions_base/traits/action_decorate_continuation.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/synchronization/counting_semaphore.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/traits/action_decorate_continuation.hpp>
-#include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/type_support/static.hpp>
 
 #include <cstddef>
@@ -24,14 +25,13 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace actions { namespace detail
-{
+namespace hpx { namespace actions { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Semaphore>
     struct signal_on_exit
     {
         signal_on_exit(Semaphore& sem)
-            : sem_(sem)
+          : sem_(sem)
         {
             sem_.wait();
         }
@@ -49,11 +49,13 @@ namespace hpx { namespace actions { namespace detail
     template <typename Action, int N>
     struct action_decorate_function_semaphore
     {
-        typedef lcos::local::counting_semaphore_var<
-                hpx::lcos::local::spinlock, N>
+        typedef lcos::local::counting_semaphore_var<hpx::lcos::local::spinlock,
+            N>
             semaphore_type;
 
-        struct tag {};
+        struct tag
+        {
+        };
 
         static semaphore_type& get_sem()
         {
@@ -75,8 +77,7 @@ namespace hpx { namespace actions { namespace detail
             typedef typename Action::component_type component_type;
         };
 
-        static_assert(
-            !Action::direct_execution::value,
+        static_assert(!Action::direct_execution::value,
             "explicit decoration of direct actions is not supported");
 
         typedef action_decorate_function_semaphore<Action, N>
@@ -97,14 +98,13 @@ namespace hpx { namespace actions { namespace detail
         }
 
         template <typename F>
-        static threads::thread_function_type
-        call(naming::address::address_type lva, F && f, std::false_type)
+        static threads::thread_function_type call(
+            naming::address::address_type lva, F&& f, std::false_type)
         {
-            return util::one_shot(util::bind_back(
-                &action_decorate_function::thread_function,
-                traits::action_decorate_function<action_wrapper>::call(
-                    lva, std::forward<F>(f))
-            ));
+            return util::one_shot(
+                util::bind_back(&action_decorate_function::thread_function,
+                    traits::action_decorate_function<action_wrapper>::call(
+                        lva, std::forward<F>(f))));
         }
 
         // If the action returns a future we wait on the semaphore as well,
@@ -118,20 +118,19 @@ namespace hpx { namespace actions { namespace detail
         }
 
         template <typename F>
-        static threads::thread_function_type
-        call(naming::address::address_type lva, F && f, std::true_type)
+        static threads::thread_function_type call(
+            naming::address::address_type lva, F&& f, std::true_type)
         {
             return util::one_shot(util::bind_back(
                 &action_decorate_function::thread_function_future,
                 traits::action_decorate_function<action_wrapper>::call(
-                    lva, std::forward<F>(f))
-            ));
+                    lva, std::forward<F>(f))));
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F>
-        static threads::thread_function_type
-        call(naming::address::address_type lva, F&& f)
+        static threads::thread_function_type call(
+            naming::address::address_type lva, F&& f)
         {
             typedef typename Action::result_type result_type;
             typedef traits::is_future<result_type> is_future;
@@ -151,16 +150,17 @@ namespace hpx { namespace actions { namespace detail
         template <typename T>
         void operator()(naming::id_type const& id, T&& t)
         {
-            if (id) {
-                hpx::set_lco_value(id, std::move(addr_),
-                    std::forward<T>(t));
+            if (id)
+            {
+                hpx::set_lco_value(id, std::move(addr_), std::forward<T>(t));
             }
             construct_semaphore_type::get_sem().signal();
         }
 
         void operator()(naming::id_type const& id)
         {
-            if (id) {
+            if (id)
+            {
                 trigger_lco_event(id, std::move(addr_));
             }
             construct_semaphore_type::get_sem().signal();
@@ -169,7 +169,7 @@ namespace hpx { namespace actions { namespace detail
         template <typename Archive>
         void serialize(Archive& ar, unsigned int)
         {
-            ar & addr_;
+            ar& addr_;
         }
     };
 
@@ -177,8 +177,7 @@ namespace hpx { namespace actions { namespace detail
     template <typename Action, int N>
     struct action_decorate_continuation
     {
-        static_assert(
-            !Action::direct_execution::value,
+        static_assert(!Action::direct_execution::value,
             "explicit decoration of direct actions is not supported");
 
         typedef action_decorate_function_semaphore<Action, N>
@@ -213,21 +212,25 @@ namespace hpx { namespace actions { namespace detail
             return call(cont, is_future());
         }
     };
-}}}
+}}}    // namespace hpx::actions::detail
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_ACTION_INVOKE_NO_MORE_THAN(action, maxnum)                        \
-    namespace hpx { namespace traits                                          \
-    {                                                                         \
-        template <>                                                           \
-        struct action_decorate_function< action>                              \
-          : hpx::actions::detail::action_decorate_function< action, maxnum>   \
-        {};                                                                   \
-                                                                              \
-        template <>                                                           \
-        struct action_decorate_continuation< action>                          \
-          : hpx::actions::detail::action_decorate_continuation< action, maxnum>\
-        {};                                                                   \
-    }}                                                                        \
+#define HPX_ACTION_INVOKE_NO_MORE_THAN(action, maxnum)                         \
+    namespace hpx { namespace traits {                                         \
+            template <>                                                        \
+            struct action_decorate_function<action>                            \
+              : hpx::actions::detail::action_decorate_function<action, maxnum> \
+            {                                                                  \
+            };                                                                 \
+                                                                               \
+            template <>                                                        \
+            struct action_decorate_continuation<action>                        \
+              : hpx::actions::detail::action_decorate_continuation<action,     \
+                    maxnum>                                                    \
+            {                                                                  \
+            };                                                                 \
+        }                                                                      \
+    }                                                                          \
 /**/
+
 #endif

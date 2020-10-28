@@ -15,7 +15,7 @@ namespace hpx { namespace traits {
     template <typename Action, typename Enable = void>
     struct action_continuation
     {
-        typedef typename hpx::traits::extract_action<
-            Action>::type::continuation_type type;
+        using type = typename hpx::traits::extract_action<
+            Action>::type::continuation_type;
     };
 }}    // namespace hpx::traits

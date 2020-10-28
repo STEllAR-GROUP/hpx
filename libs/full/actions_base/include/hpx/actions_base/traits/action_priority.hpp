@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +15,7 @@ namespace hpx { namespace traits {
     template <typename Action, typename Enable = void>
     struct action_priority
     {
-        HPX_STATIC_CONSTEXPR threads::thread_priority value =
+        static constexpr threads::thread_priority value =
             threads::thread_priority::default_;
     };
 }}    // namespace hpx::traits

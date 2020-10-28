@@ -24,6 +24,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/sync.hpp>
 #include <hpx/async_local/sync_fwd.hpp>
+#include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke_fused.hpp>
@@ -39,7 +40,6 @@
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>

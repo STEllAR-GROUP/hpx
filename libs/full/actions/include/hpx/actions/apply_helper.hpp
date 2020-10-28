@@ -10,7 +10,9 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/action_continuation.hpp>
+#include <hpx/actions_base/traits/action_decorate_continuation.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
+#include <hpx/actions_base/traits/action_schedule_thread.hpp>
 #include <hpx/actions_base/traits/action_select_direct_execution.hpp>
 #include <hpx/actions_base/traits/action_stacksize.hpp>
 #include <hpx/async_base/launch_policy.hpp>
@@ -19,8 +21,6 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/traits/action_decorate_continuation.hpp>
-#include <hpx/traits/action_schedule_thread.hpp>
 
 #include <chrono>
 #include <exception>
