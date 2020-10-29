@@ -8,7 +8,7 @@
 defaults: &defaults
     working_directory: /hpx/build
     docker:
-      - image: stellargroup/build_env:ubuntu
+      - image: stellargroup/build_env:1
 
 convert_xml: &convert_xml
     name: Converting XML
@@ -74,7 +74,7 @@ version: 2
 jobs:
   checkout_code:
     docker:
-      - image: stellargroup/build_env:ubuntu
+      - image: stellargroup/build_env:1
     working_directory: /hpx
     steps:
       - checkout:
@@ -473,7 +473,7 @@ jobs:
 
   install:
     docker:
-      - image: stellargroup/build_env:ubuntu
+      - image: stellargroup/build_env:1
     environment:
       TARGET_IMAGE_NAME: stellargroup/hpx:dev
     steps:
@@ -545,7 +545,7 @@ jobs:
   # here again to be able to push the new tag.
   push_stable_tag:
     docker:
-      - image: stellargroup/build_env:ubuntu
+      - image: stellargroup/build_env:1
     steps:
       - checkout:
           path: /hpx/source
