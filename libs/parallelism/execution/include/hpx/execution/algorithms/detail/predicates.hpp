@@ -149,7 +149,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr static Iter call(
             Iter iter, Stride offset)
         {
-#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+#if (defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) || defined(HPX_HAVE_HIP)
             hpx::parallel::v1::detail::advance(iter, offset);
 #else
             std::advance(iter, offset);
@@ -187,7 +187,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr static Iter call(
             Iter iter, Stride offset)
         {
-#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+#if (defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) || defined(HPX_HAVE_HIP)
             hpx::parallel::v1::detail::advance(iter, offset);
 #else
             std::advance(iter, offset);
@@ -205,7 +205,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 // NVCC seems to have a bug with std::min...
                 offset = Stride(
                     max_count < std::size_t(offset) ? max_count : offset);
-#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+#if (defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) || defined(HPX_HAVE_HIP)
                 hpx::parallel::v1::detail::advance(iter, offset);
 #else
                 std::advance(iter, offset);
@@ -216,7 +216,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 offset = negate(Stride(
                     // NVCC seems to have a bug with std::min...
                     max_count < negate(offset) ? max_count : negate(offset)));
-#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+#if (defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) || defined(HPX_HAVE_HIP)
                 hpx::parallel::v1::detail::advance(iter, offset);
 #else
                 std::advance(iter, offset);
@@ -233,7 +233,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             // NVCC seems to have a bug with std::min...
             offset =
                 Stride(max_count < std::size_t(offset) ? max_count : offset);
-#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+#if (defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) || defined(HPX_HAVE_HIP)
             hpx::parallel::v1::detail::advance(iter, offset);
 #else
             std::advance(iter, offset);

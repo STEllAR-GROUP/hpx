@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA)
+#if defined(HPX_HAVE_GPU_SUPPORT)
 #include <hpx/execution/traits/executor_traits.hpp>
 
 #include <hpx/async_cuda/target.hpp>

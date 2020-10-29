@@ -11,7 +11,7 @@
 //
 #include <boost/lockfree/stack.hpp>
 //
-#include <cuda_runtime.h>
+#include <hpx/async_cuda/custom_gpu_api.hpp>
 
 namespace hpx { namespace cuda { namespace experimental {
 

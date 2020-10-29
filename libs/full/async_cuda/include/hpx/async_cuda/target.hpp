@@ -25,7 +25,7 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 #endif
 
-#include <cuda_runtime.h>
+#include <hpx/async_cuda/custom_gpu_api.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -46,38 +46,35 @@ namespace hpx { namespace cuda { namespace experimental {
         {
             typedef hpx::lcos::local::spinlock mutex_type;
 
-            HPX_HOST_DEVICE native_handle_type(int device = 0);
+            native_handle_type(int device = 0);
 
-            HPX_HOST_DEVICE ~native_handle_type();
+            ~native_handle_type();
 
-            HPX_HOST_DEVICE native_handle_type(
+            native_handle_type(native_handle_type const& rhs) noexcept;
+            native_handle_type(native_handle_type&& rhs) noexcept;
+
+            native_handle_type& operator=(
                 native_handle_type const& rhs) noexcept;
-            HPX_HOST_DEVICE native_handle_type(
-                native_handle_type&& rhs) noexcept;
+            native_handle_type& operator=(native_handle_type&& rhs) noexcept;
 
-            HPX_HOST_DEVICE native_handle_type& operator=(
-                native_handle_type const& rhs) noexcept;
-            HPX_HOST_DEVICE native_handle_type& operator=(
-                native_handle_type&& rhs) noexcept;
+            cudaStream_t get_stream() const;
 
-            HPX_HOST_DEVICE cudaStream_t get_stream() const;
-
-            HPX_HOST_DEVICE int get_device() const noexcept
+            int get_device() const noexcept
             {
                 return device_;
             }
 
-            HPX_HOST_DEVICE std::size_t processing_units() const
+            std::size_t processing_units() const
             {
                 return processing_units_;
             }
 
-            HPX_HOST_DEVICE std::size_t processor_family() const
+            std::size_t processor_family() const
             {
                 return processor_family_;
             }
 
-            HPX_HOST_DEVICE std::string processor_name() const
+            std::string processor_name() const
             {
                 return processor_name_;
             }
@@ -175,7 +172,7 @@ namespace hpx { namespace cuda { namespace experimental {
             return handle_;
         }
 
-        HPX_HOST_DEVICE void synchronize() const;
+        void synchronize() const;
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         HPX_HOST_DEVICE hpx::id_type const& get_locality() const noexcept

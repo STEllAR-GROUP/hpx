@@ -26,6 +26,8 @@ set(async_cuda_headers
     hpx/async_cuda/cuda_exception.hpp
     hpx/async_cuda/cuda_future.hpp
     hpx/async_cuda/cublas_executor.hpp
+    hpx/async_cuda/custom_blas_api.hpp
+    hpx/async_cuda/custom_gpu_api.hpp
     hpx/async_cuda/get_targets.hpp
     hpx/async_cuda/target.hpp
 )

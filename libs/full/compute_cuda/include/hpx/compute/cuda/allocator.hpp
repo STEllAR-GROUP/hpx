@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA)
+#if defined(HPX_HAVE_GPU_SUPPORT)
 #include <hpx/assert.hpp>
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/compute/cuda/detail/launch.hpp>
@@ -20,7 +20,7 @@
 #include <hpx/statistics/min.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <cuda_runtime.h>
+#include <hpx/async_cuda/custom_gpu_api.hpp>
 
 #include <algorithm>
 #include <cstddef>

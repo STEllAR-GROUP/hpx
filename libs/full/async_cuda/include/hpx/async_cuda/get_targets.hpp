@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
 #include <hpx/modules/futures.hpp>
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/naming_base/id_type.hpp>

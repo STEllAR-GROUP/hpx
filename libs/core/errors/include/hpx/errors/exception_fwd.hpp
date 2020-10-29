@@ -56,7 +56,7 @@ namespace hpx {
     /// \a get_errorcode() member function returns a reference to an
     /// \a hpx::error_code object with the behavior as specified above.
     ///
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_COMPUTE_DEVICE_CODE) && !defined(HPX_HAVE_HIP)
     // We can't actually refer to this in device code. This is only to satisfy
     // the compiler.
     extern HPX_DEVICE error_code throws;

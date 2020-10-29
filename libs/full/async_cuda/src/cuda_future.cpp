@@ -27,7 +27,7 @@
 #include <utility>
 #include <vector>
 
-#include <cuda_runtime.h>
+#include <hpx/async_cuda/custom_gpu_api.hpp>
 
 namespace hpx { namespace cuda { namespace experimental { namespace detail {
 

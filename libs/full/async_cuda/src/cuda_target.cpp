@@ -35,7 +35,7 @@
 #include <string>
 #include <utility>
 
-#include <cuda_runtime.h>
+#include <hpx/async_cuda/custom_gpu_api.hpp>
 
 namespace hpx { namespace cuda { namespace experimental {
     void target::native_handle_type::init_processing_units()

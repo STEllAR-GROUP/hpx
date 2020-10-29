@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA)
+#if defined(HPX_HAVE_GPU_SUPPORT)
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/is_executor.hpp>

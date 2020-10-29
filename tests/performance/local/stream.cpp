@@ -29,7 +29,7 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/version.hpp>
-#if defined(HPX_HAVE_CUDA)
+#if defined(HPX_HAVE_GPU_SUPPORT)
 #include <hpx/async_cuda/cuda_future.hpp>
 #include <hpx/async_cuda/target.hpp>
 #endif
@@ -448,7 +448,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     if (use_accel)
     {
-#if defined(HPX_HAVE_CUDA)
+#if defined(HPX_HAVE_GPU_SUPPORT)
         using executor_type = hpx::cuda::experimental::concurrent_executor<>;
         using allocator_type = hpx::cuda::experimental::allocator<STREAM_TYPE>;
 

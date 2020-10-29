@@ -10,11 +10,11 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA)
+#if defined(HPX_HAVE_GPU_SUPPORT)
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/compute/traits/access_target.hpp>
 
-#include <cuda_runtime.h>
+#include <hpx/async_cuda/custom_gpu_api.hpp>
 
 namespace hpx { namespace compute { namespace traits {
     template <>
