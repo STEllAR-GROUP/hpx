@@ -109,7 +109,7 @@ namespace hpx { namespace lcos { namespace local {
 
         {
             util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
-            cond_.notify_one(std::move(l), threads::thread_priority_boost, ec);
+            cond_.notify_one(std::move(l), threads::thread_priority::boost, ec);
         }
     }
 
@@ -141,7 +141,8 @@ namespace hpx { namespace lcos { namespace local {
                 return false;
             }
 
-            if (reason == threads::wait_timeout)    //-V110
+            if (reason ==
+                threads::thread_state_ex_enum::wait_timeout)    //-V110
             {
                 HPX_ITT_SYNC_CANCEL(this);
                 return false;

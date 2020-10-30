@@ -185,7 +185,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
             this_ctx.suspend();
         }
 
-        return f.ctx_ ? threads::wait_timeout : threads::wait_signaled;
+        return f.ctx_ ? threads::thread_state_ex_enum::wait_timeout :
+                        threads::thread_state_ex_enum::wait_signaled;
     }
 
     threads::thread_state_ex_enum condition_variable::wait_until(
@@ -207,7 +208,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
             this_ctx.sleep_until(abs_time.value());
         }
 
-        return f.ctx_ ? threads::wait_timeout : threads::wait_signaled;
+        return f.ctx_ ? threads::thread_state_ex_enum::wait_timeout :
+                        threads::thread_state_ex_enum::wait_signaled;
     }
 
     template <typename Mutex>

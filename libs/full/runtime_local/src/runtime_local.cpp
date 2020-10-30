@@ -1060,7 +1060,7 @@ namespace hpx { namespace threads {
     // shortcut for runtime_configuration::get_stack_size
     std::ptrdiff_t get_stack_size(threads::thread_stacksize stacksize)
     {
-        if (stacksize == threads::thread_stacksize_current)
+        if (stacksize == threads::thread_stacksize::current)
             return threads::get_self_stacksize();
 
         return get_runtime().get_config().get_stack_size(stacksize);
@@ -1312,7 +1312,7 @@ namespace hpx {
         }
 
         return threads::thread_result_type(
-            threads::terminated, threads::invalid_thread_id);
+            threads::thread_state_enum::terminated, threads::invalid_thread_id);
     }
 
     int runtime::start(
@@ -1360,8 +1360,8 @@ namespace hpx {
 
         threads::thread_init_data data(util::bind(&runtime::run_helper, this,
                                            func, std::ref(result_), true),
-            "run_helper", threads::thread_priority_normal,
-            threads::thread_schedule_hint(0), threads::thread_stacksize_large);
+            "run_helper", threads::thread_priority::normal,
+            threads::thread_schedule_hint(0), threads::thread_stacksize::large);
 
         this->runtime::starting();
         threads::thread_id_type id = threads::invalid_thread_id;
@@ -2029,19 +2029,19 @@ namespace hpx {
     namespace threads {
         char const* get_stack_size_name(std::ptrdiff_t size)
         {
-            thread_stacksize size_enum = thread_stacksize_unknown;
+            thread_stacksize size_enum = thread_stacksize::unknown;
 
             util::runtime_configuration const& rtcfg = hpx::get_config();
-            if (rtcfg.get_stack_size(thread_stacksize_small) == size)
-                size_enum = thread_stacksize_small;
-            else if (rtcfg.get_stack_size(thread_stacksize_medium) == size)
-                size_enum = thread_stacksize_medium;
-            else if (rtcfg.get_stack_size(thread_stacksize_large) == size)
-                size_enum = thread_stacksize_large;
-            else if (rtcfg.get_stack_size(thread_stacksize_huge) == size)
-                size_enum = thread_stacksize_huge;
-            else if (rtcfg.get_stack_size(thread_stacksize_nostack) == size)
-                size_enum = thread_stacksize_nostack;
+            if (rtcfg.get_stack_size(thread_stacksize::small) == size)
+                size_enum = thread_stacksize::small;
+            else if (rtcfg.get_stack_size(thread_stacksize::medium) == size)
+                size_enum = thread_stacksize::medium;
+            else if (rtcfg.get_stack_size(thread_stacksize::large) == size)
+                size_enum = thread_stacksize::large;
+            else if (rtcfg.get_stack_size(thread_stacksize::huge) == size)
+                size_enum = thread_stacksize::huge;
+            else if (rtcfg.get_stack_size(thread_stacksize::nostack) == size)
+                size_enum = thread_stacksize::nostack;
 
             return get_stack_size_enum_name(size_enum);
         }

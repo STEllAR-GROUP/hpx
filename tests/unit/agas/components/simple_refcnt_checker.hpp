@@ -105,11 +105,11 @@ struct simple_refcnt_monitor
         agas::garbage_collect(locality_);
 
         // Schedule a wakeup.
-        threads::set_thread_state(threads::get_self_id(), d, threads::pending);
+        threads::set_thread_state(threads::get_self_id(), d, threads::thread_state_enum::pending);
 
         // Suspend this thread.
         threads::get_self().yield(
-            threads::thread_result_type(threads::suspended,
+            threads::thread_result_type(threads::thread_state_enum::suspended,
                 threads::invalid_thread_id)
         );
 

@@ -326,10 +326,10 @@ namespace hpx { namespace parcelset
                             &parcelport_impl::remove_from_connection_cache,
                             this, loc)),
                     "remove_from_connection_cache_delayed",
-                    threads::thread_priority_normal,
+                    threads::thread_priority::normal,
                     threads::thread_schedule_hint(
                         static_cast<std::int16_t>(get_next_num_thread())),
-                    threads::thread_stacksize_default, threads::pending, true);
+                    threads::thread_stacksize::default_, threads::thread_state_enum::pending, true);
                 hpx::threads::register_thread(data, ec);
                 if (!ec) return;
             }
@@ -344,18 +344,18 @@ namespace hpx { namespace parcelset
                     hpx::threads::make_thread_function_nullary(util::deferred_call(
                         &parcelport_impl::remove_from_connection_cache_delayed,
                         this, loc)),
-                    "remove_from_connection_cache", threads::thread_priority_normal,
+                    "remove_from_connection_cache", threads::thread_priority::normal,
                     threads::thread_schedule_hint(
                         static_cast<std::int16_t>(get_next_num_thread())),
-                    threads::thread_stacksize_default,
-                    threads::suspended, true);
+                    threads::thread_stacksize::default_,
+                    threads::thread_state_enum::suspended, true);
             threads::thread_id_type id =
                 hpx::threads::register_thread(data, ec);
             if (ec) return;
 
             threads::set_thread_state(id, std::chrono::milliseconds(100),
-                threads::pending, threads::wait_signaled,
-                threads::thread_priority_boost, true, ec);
+                threads::thread_state_enum::pending, threads::thread_state_ex_enum::wait_signaled,
+                threads::thread_priority::boost, true, ec);
         }
 
         /// Return the name of this locality

@@ -39,9 +39,9 @@ namespace hpx { namespace parallel { namespace execution {
         restricted_thread_pool_executor(std::size_t first_thread = 0,
             std::size_t num_threads = 1,
             threads::thread_priority priority =
-                threads::thread_priority_default,
+                threads::thread_priority::default_,
             threads::thread_stacksize stacksize =
-                threads::thread_stacksize_default,
+                threads::thread_stacksize::default_,
             threads::thread_schedule_hint schedulehint = {},
             std::size_t hierarchical_threshold =
                 hierarchical_threshold_default_)
@@ -172,9 +172,9 @@ namespace hpx { namespace parallel { namespace execution {
     private:
         threads::thread_pool_base* pool_ = nullptr;
 
-        threads::thread_priority priority_ = threads::thread_priority_default;
+        threads::thread_priority priority_ = threads::thread_priority::default_;
         threads::thread_stacksize stacksize_ =
-            threads::thread_stacksize_default;
+            threads::thread_stacksize::default_;
         threads::thread_schedule_hint schedulehint_ = {};
         std::size_t hierarchical_threshold_ = hierarchical_threshold_default_;
 

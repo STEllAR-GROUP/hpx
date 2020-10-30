@@ -14,13 +14,13 @@
 
 #include <boost/dynamic_bitset.hpp>
 
-#include <cstdint>
 #include <chrono>
+#include <cstdint>
 #include <vector>
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 using std::chrono::milliseconds;
 
@@ -28,28 +28,21 @@ using hpx::naming::id_type;
 
 using hpx::threads::register_thread;
 
-using hpx::lcos::future;
 using hpx::async;
+using hpx::lcos::future;
 
-using hpx::threads::thread_id_type;
 using hpx::this_thread::suspend;
 using hpx::threads::set_thread_state;
-using hpx::threads::thread_state_ex_enum;
-using hpx::threads::pending;
-using hpx::threads::suspended;
-using hpx::threads::wait_signaled;
-using hpx::threads::wait_terminate;
+using hpx::threads::thread_id_type;
 
 using hpx::find_here;
+using hpx::init;
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace detail
-{
+namespace detail {
     template <typename T1>
-    std::uint64_t wait(
-        std::vector<future<T1> > const& lazy_values
-      , std::int32_t suspend_for = 10
-        )
+    std::uint64_t wait(std::vector<future<T1>> const& lazy_values,
+        std::int32_t suspend_for = 10)
     {
         boost::dynamic_bitset<> handled(lazy_values.size());
         std::uint64_t handled_count = 0;
@@ -81,27 +74,22 @@ namespace detail
         }
         return handled.count();
     }
-}
+}    // namespace detail
 
 ///////////////////////////////////////////////////////////////////////////////
-void change_thread_state(
-    thread_id_type thread
-    )
+void change_thread_state(thread_id_type thread)
 {
-    set_thread_state(thread, suspended);
+    set_thread_state(thread, hpx::threads::thread_state_enum::suspended);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void tree_boot(
-    std::uint64_t count
-  , std::uint64_t grain_size
-  , thread_id_type thread
-    )
+    std::uint64_t count, std::uint64_t grain_size, thread_id_type thread)
 {
     HPX_TEST(grain_size);
     HPX_TEST(count);
 
-    std::vector<future<void> > promises;
+    std::vector<future<void>> promises;
 
     std::uint64_t const actors = (count > grain_size) ? grain_size : count;
 
@@ -135,15 +123,14 @@ void tree_boot(
 bool woken = false;
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_dummy_thread(
-    std::uint64_t
-    )
+void test_dummy_thread(std::uint64_t)
 {
     while (true)
     {
-        thread_state_ex_enum statex = suspend(suspended);
+        hpx::threads::thread_state_ex_enum statex =
+            suspend(hpx::threads::thread_state_enum::suspended);
 
-        if (statex == wait_terminate)
+        if (statex == hpx::threads::thread_state_ex_enum::wait_terminate)
         {
             woken = true;
             return;
@@ -169,7 +156,8 @@ int hpx_main(variables_map& vm)
         // attempt.
         future<void> before = async(&tree_boot, futures, grain_size, thread_id);
 
-        set_thread_state(thread_id, pending, wait_signaled);
+        set_thread_state(thread_id, hpx::threads::thread_state_enum::pending,
+            hpx::threads::thread_state_ex_enum::wait_signaled);
 
         // Flood the queues with suspension operations after the rescheduling
         // attempt.
@@ -178,7 +166,8 @@ int hpx_main(variables_map& vm)
         before.get();
         after.get();
 
-        set_thread_state(thread_id, pending, wait_terminate);
+        set_thread_state(thread_id, hpx::threads::thread_state_enum::pending,
+            hpx::threads::thread_state_ex_enum::wait_terminate);
     }
 
     hpx::finalize();
@@ -192,15 +181,11 @@ int main(int argc, char* argv[])
     // Configure application-specific options
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    cmdline.add_options()
-        ( "futures"
-        , value<std::uint64_t>()->default_value(64)
-        , "number of futures to invoke before and after the rescheduling")
+    cmdline.add_options()("futures", value<std::uint64_t>()->default_value(64),
+        "number of futures to invoke before and after the rescheduling")
 
-        ( "grain-size"
-        , value<std::uint64_t>()->default_value(4)
-        , "grain size of the future tree")
-    ;
+        ("grain-size", value<std::uint64_t>()->default_value(4),
+            "grain size of the future tree");
 
     // Initialize and run HPX
     hpx::init_params init_args;
@@ -212,4 +197,5 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
+
 #endif

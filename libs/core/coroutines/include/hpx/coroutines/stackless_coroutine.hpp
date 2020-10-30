@@ -290,7 +290,7 @@ namespace hpx { namespace threads { namespace coroutines {
             result = f_(arg);    // invoke wrapped function
 
             // we always have to run to completion
-            HPX_ASSERT(result.first == threads::terminated);
+            HPX_ASSERT(result.first == threads::thread_state_enum::terminated);
 
             reset_tss();
         }

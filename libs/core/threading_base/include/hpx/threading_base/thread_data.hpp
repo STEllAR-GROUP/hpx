@@ -103,7 +103,7 @@ namespace hpx { namespace threads {
         ///                 scheduling status \a threadmanager#set_state should
         ///                 be used.
         thread_state set_state(thread_state_enum state,
-            thread_state_ex_enum state_ex = wait_unknown,
+            thread_state_ex_enum state_ex = thread_state_ex_enum::wait_unknown,
             std::memory_order load_order = std::memory_order_acquire,
             std::memory_order exchange_order =
                 std::memory_order_seq_cst) noexcept
@@ -119,7 +119,7 @@ namespace hpx { namespace threads {
                 if (state != tmp.state())
                     ++tag;
 
-                if (state_ex == wait_unknown)
+                if (state_ex == thread_state_ex_enum::wait_unknown)
                     state_ex = tmp.state_ex();
 
                 if (HPX_LIKELY(current_state_.compare_exchange_strong(tmp,
@@ -711,7 +711,7 @@ namespace hpx { namespace threads {
     HPX_CORE_EXPORT std::ptrdiff_t get_self_stacksize();
 
     /// The function \a get_self_stacksize_enum returns the stack size of the /
-    //current thread (or thread_stacksize_default if the current thread is not
+    //current thread (or thread_stacksize::default if the current thread is not
     //a HPX thread).
     HPX_CORE_EXPORT thread_stacksize get_self_stacksize_enum();
 

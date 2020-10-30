@@ -27,8 +27,8 @@ int hpx_main(int argc, char* argv[])
     if (!run)
     {
         // This thread should get scheduled last (because of
-        // hpx::threads::pending) and let the function spawned above run.
-        hpx::this_thread::suspend(hpx::threads::pending);
+        // hpx::threads::thread_state_enum::pending) and let the function spawned above run.
+        hpx::this_thread::suspend(hpx::threads::thread_state_enum::pending);
     }
 
     HPX_TEST(run);

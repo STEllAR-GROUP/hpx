@@ -123,7 +123,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
         util::force_error_on_lock();
 
         return threads::thread_result_type(
-            threads::terminated, threads::invalid_thread_id);
+            threads::thread_state_enum::terminated, threads::invalid_thread_id);
     }
 
     // Schedule the specified function for execution in this executor.
@@ -148,7 +148,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             util::one_shot(
                 util::bind(&this_thread_executor::thread_function_nullary, this,
                     std::move(f))),
-            desc, thread_priority_default, thread_schedule_hint(), stacksize,
+            desc, thread_priority::default_, thread_schedule_hint(), stacksize,
             initial_state, run_now);
 
         // update statistics
@@ -190,8 +190,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             util::one_shot(
                 util::bind(&this_thread_executor::thread_function_nullary, this,
                     std::move(f))),
-            desc, thread_priority_default, thread_schedule_hint(), stacksize,
-            suspended, true);
+            desc, thread_priority::default_, thread_schedule_hint(), stacksize,
+            thread_state_enum::suspended, true);
 
         threads::thread_id_type id = threads::invalid_thread_id;
         threads::detail::create_thread(    //-V601
@@ -364,7 +364,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             // the scheduling_loop is allowed to exit only if no more HPX
             // threads exist
             HPX_ASSERT((scheduler_.get_thread_count(
-                            unknown, thread_priority_default, 0) == 0 &&
+                            unknown, thread_priority::default_, 0) == 0 &&
                            scheduler_.get_queue_length(0) == 0) ||
                 state >= state_terminating);
         }

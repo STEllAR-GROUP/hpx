@@ -108,14 +108,14 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
         outp = hpx::parcelset::parcel(
             hpx::parcelset::detail::create_parcel::call(std::move(dest),
                 std::move(addr), hpx::actions::typed_continuation<int>(here),
-                test_action(), hpx::threads::thread_priority_normal, buffer));
+                test_action(), hpx::threads::thread_priority::normal, buffer));
     }
     else
     {
         outp =
             hpx::parcelset::parcel(hpx::parcelset::detail::create_parcel::call(
                 std::move(dest), std::move(addr), test_action(),
-                hpx::threads::thread_priority_normal, buffer));
+                hpx::threads::thread_priority::normal, buffer));
     }
 
     outp.set_source_id(here);

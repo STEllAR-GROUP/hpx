@@ -45,7 +45,7 @@ namespace hpx { namespace components
         // executor
         static void execute(hpx::threads::thread_function_type const& f)
         {
-            f(hpx::threads::wait_signaled);
+            f(hpx::threads::thread_state_ex_enum::wait_signaled);
         }
 
         /// This is the default hook implementation for schedule_thread which

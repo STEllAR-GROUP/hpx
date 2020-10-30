@@ -70,7 +70,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         coroutine_impl(
             functor_type&& f, thread_id_type id, std::ptrdiff_t stack_size)
           : context_base(stack_size, id)
-          , m_result(unknown, invalid_thread_id)
+          , m_result(thread_state_enum::unknown, invalid_thread_id)
           , m_arg(nullptr)
           , m_fun(std::move(f))
         {
@@ -126,10 +126,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         void rebind(functor_type&& f, thread_id_type id)
         {
-            HPX_ASSERT(
-                m_result.first == unknown || m_result.first == terminated);
+            HPX_ASSERT(m_result.first == thread_state_enum::unknown ||
+                m_result.first == thread_state_enum::terminated);
             this->rebind_stack();    // count how often a coroutines object was reused
-            m_result = result_type(unknown, invalid_thread_id);
+            m_result =
+                result_type(thread_state_enum::unknown, invalid_thread_id);
             m_arg = nullptr;
             m_fun = std::move(f);
             this->super_type::rebind_base(id);

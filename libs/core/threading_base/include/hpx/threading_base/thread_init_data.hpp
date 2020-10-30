@@ -39,10 +39,10 @@ namespace hpx { namespace threads {
 #ifdef HPX_HAVE_APEX
           , timer_data(nullptr)
 #endif
-          , priority(thread_priority_normal)
+          , priority(thread_priority::normal)
           , schedulehint()
-          , stacksize(thread_stacksize_default)
-          , initial_state(pending)
+          , stacksize(thread_stacksize::default_)
+          , initial_state(thread_state_enum::pending)
           , run_now(false)
           , scheduler_base(nullptr)
         {
@@ -100,10 +100,11 @@ namespace hpx { namespace threads {
 
         template <typename F>
         thread_init_data(F&& f, util::thread_description const& desc,
-            thread_priority priority_ = thread_priority_normal,
+            thread_priority priority_ = thread_priority::normal,
             thread_schedule_hint os_thread = thread_schedule_hint(),
-            thread_stacksize stacksize_ = thread_stacksize_default,
-            thread_state_enum initial_state_ = pending, bool run_now_ = false,
+            thread_stacksize stacksize_ = thread_stacksize::default_,
+            thread_state_enum initial_state_ = thread_state_enum::pending,
+            bool run_now_ = false,
             policies::scheduler_base* scheduler_base_ = nullptr)
           : func(std::forward<F>(f))
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)

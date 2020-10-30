@@ -19,8 +19,6 @@ using hpx::program_options::value;
 
 using std::chrono::seconds;
 
-using hpx::threads::pending;
-using hpx::threads::suspended;
 using hpx::threads::get_self_id;
 using hpx::threads::get_self;
 using hpx::threads::set_thread_state;
@@ -36,10 +34,11 @@ int hpx_main(variables_map& vm)
         high_resolution_timer t;
 
         // Schedule a wakeup in 5 seconds.
-        set_thread_state(get_self_id(), seconds(5), pending);
+        set_thread_state(get_self_id(), seconds(5),
+            hpx::threads::thread_state_enum::pending);
 
         // Suspend this HPX thread.
-        hpx::this_thread::suspend(suspended);
+        hpx::this_thread::suspend(hpx::threads::thread_state_enum::suspended);
 
         std::cout << "woke up after " << t.elapsed() << " seconds\n";
     }

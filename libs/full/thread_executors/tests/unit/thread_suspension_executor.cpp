@@ -48,7 +48,8 @@ void test_executor_association_yield()
 ///////////////////////////////////////////////////////////////////////////////
 void wakeup_thread(hpx::threads::thread_id_type id)
 {
-    hpx::threads::set_thread_state(id, hpx::threads::pending);
+    hpx::threads::set_thread_state(
+        id, hpx::threads::thread_state_enum::pending);
 }
 
 void test_executor_association_suspend()
@@ -61,7 +62,7 @@ void test_executor_association_suspend()
     {
         hpx::apply(exec_before, &wakeup_thread, id);
 
-        hpx::this_thread::suspend(hpx::threads::suspended);
+        hpx::this_thread::suspend(hpx::threads::thread_state_enum::suspended);
 
         hpx::threads::executors::current_executor exec_after =
             hpx::threads::get_executor(id);

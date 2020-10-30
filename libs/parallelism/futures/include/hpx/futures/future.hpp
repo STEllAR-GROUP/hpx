@@ -40,7 +40,7 @@
 
 namespace hpx { namespace lcos { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
-    enum future_state
+    enum class future_state
     {
         invalid = 0,
         has_value = 1,
@@ -91,7 +91,7 @@ namespace hpx { namespace lcos { namespace detail {
         typedef lcos::detail::future_data<value_type> shared_state;
         typedef typename shared_state::init_no_addref init_no_addref;
 
-        int state = future_state::invalid;
+        future_state state = future_state::invalid;
         ar >> state;
         // NOLINTNEXTLINE(bugprone-branch-clone)
         if (state == future_state::has_value)
@@ -133,7 +133,7 @@ namespace hpx { namespace lcos { namespace detail {
         typedef lcos::detail::future_data<void> shared_state;
         typedef typename shared_state::init_no_addref init_no_addref;
 
-        int state = future_state::invalid;
+        future_state state = future_state::invalid;
         ar >> state;
         if (state == future_state::has_value)
         {
@@ -193,7 +193,7 @@ namespace hpx { namespace lcos { namespace detail {
         typedef
             typename hpx::traits::future_traits<Future>::result_type value_type;
 
-        int state = future_state::invalid;
+        future_state state = future_state::invalid;
         if (f.valid() && !f.is_ready())
         {
             if (ar.is_preprocessing())
@@ -243,7 +243,7 @@ namespace hpx { namespace lcos { namespace detail {
         typename hpx::traits::future_traits<Future>::type>::value>::type
     serialize_future_save(Archive& ar, Future const& f)    //-V659
     {
-        int state = future_state::invalid;
+        future_state state = future_state::invalid;
         if (f.valid() && !f.is_ready())
         {
             if (ar.is_preprocessing())

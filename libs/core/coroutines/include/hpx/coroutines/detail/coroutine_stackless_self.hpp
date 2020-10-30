@@ -38,7 +38,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         {
             // stackless coroutines don't support suspension
             HPX_ASSERT(false);
-            return threads::wait_abort;
+            return threads::thread_state_ex_enum::wait_abort;
         }
 
         thread_id_type get_thread_id() const override

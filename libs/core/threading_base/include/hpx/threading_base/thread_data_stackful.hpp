@@ -65,7 +65,8 @@ namespace hpx { namespace threads {
 
             hpx::execution_base::this_thread::reset_agent ctx(
                 agent_storage, agent_);
-            return coroutine_(set_state_ex(wait_signaled));
+            return coroutine_(
+                set_state_ex(thread_state_ex_enum::wait_signaled));
         }
 
 #if defined(HPX_DEBUG)

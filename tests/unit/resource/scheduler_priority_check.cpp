@@ -81,11 +81,11 @@ int hpx_main(variables_map& vm)
     // setup executors for different task priorities on the pools
     hpx::execution::parallel_executor HP_executor(
         &hpx::resource::get_thread_pool("default"),
-        hpx::threads::thread_priority_high);
+        hpx::threads::thread_priority::high);
 
     hpx::execution::parallel_executor NP_executor(
         &hpx::resource::get_thread_pool("default"),
-        hpx::threads::thread_priority_default);
+        hpx::threads::thread_priority::default_);
 
     // randomly create normal priority tasks
     // and then a set of HP tasks in periodic bursts

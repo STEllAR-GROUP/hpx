@@ -475,10 +475,8 @@ namespace hpx { namespace parcelset
         {
             // If the object was migrated, just route.
             naming::resolver_client& client = hpx::naming::get_agas_client();
-            client.route(
-                std::move(*this),
-                &detail::parcel_route_handler,
-                threads::thread_priority_normal);
+            client.route(std::move(*this), &detail::parcel_route_handler,
+                threads::thread_priority::normal);
             return;
         }
 

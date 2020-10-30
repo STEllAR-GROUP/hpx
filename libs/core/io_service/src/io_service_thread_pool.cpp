@@ -55,8 +55,8 @@ namespace hpx { namespace threads { namespace detail {
         thread_state_ex_enum new_state_ex, thread_priority priority,
         error_code& ec)
     {
-        return threads::thread_state(
-            threads::terminated, threads::wait_unknown);
+        return threads::thread_state(threads::thread_state_enum::terminated,
+            threads::thread_state_ex_enum::wait_unknown);
     }
 
     threads::thread_id_type io_service_thread_pool::set_state(

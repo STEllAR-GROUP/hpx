@@ -75,7 +75,7 @@ namespace hpx { namespace parallel { namespace execution {
         {
             typedef components::server::invoke_function_action<F> action_type;
             policy_.template apply<action_type>(
-                threads::thread_priority_default, std::forward<F>(f),
+                threads::thread_priority::default_, std::forward<F>(f),
                 std::forward<Ts>(ts)...);
         }
 
@@ -84,7 +84,7 @@ namespace hpx { namespace parallel { namespace execution {
         post_impl(Action&& act, Ts&&... ts) const
         {
             policy_.template apply<Action>(
-                threads::thread_priority_default, std::forward<Ts>(ts)...);
+                threads::thread_priority::default_, std::forward<Ts>(ts)...);
         }
 
         // async_execute implementations

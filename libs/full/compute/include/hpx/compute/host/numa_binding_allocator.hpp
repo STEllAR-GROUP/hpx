@@ -443,7 +443,7 @@ namespace hpx { namespace compute { namespace host {
             // to remain on the right queue and be executed on the right domain.
             guided_pool_executor<allocator_hint_type> numa_executor(
                 &hpx::resource::get_thread_pool(binding_helper_->pool_name()),
-                threads::thread_priority_bound);
+                threads::thread_priority::bound);
 
             nba_deb.debug("Launching First-Touch tasks");
             // for each numa domain, we must launch a task to 'touch' the memory

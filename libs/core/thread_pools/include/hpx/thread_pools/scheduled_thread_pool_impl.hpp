@@ -516,8 +516,8 @@ namespace hpx { namespace threads { namespace detail {
                 // the OS thread is allowed to exit only if no more HPX
                 // threads exist or if some other thread has terminated
                 HPX_ASSERT(
-                    (sched_->Scheduler::get_thread_count(
-                         suspended, thread_priority_default, thread_num) == 0 &&
+                    (sched_->Scheduler::get_thread_count(suspended,
+                         thread_priority::default_, thread_num) == 0 &&
                         sched_->Scheduler::get_queue_length(thread_num) == 0) ||
                     sched_->Scheduler::get_state(thread_num) > state_stopping);
             }

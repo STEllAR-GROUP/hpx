@@ -156,7 +156,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
         util::force_error_on_lock();
 
         return threads::thread_result_type(
-            threads::terminated, threads::invalid_thread_id);
+            threads::thread_state_enum::terminated, threads::invalid_thread_id);
     }
 
     // Schedule the specified function for execution in this executor.
@@ -174,7 +174,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             util::one_shot(util::bind(
                 &embedded_thread_pool_executor::thread_function_nullary, this,
                 std::move(f))),
-            desc, thread_priority_default, thread_schedule_hint(), stacksize,
+            desc, thread_priority::default_, thread_schedule_hint(), stacksize,
             initial_state, run_now);
 
         // update statistics
@@ -206,8 +206,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             util::one_shot(util::bind(
                 &embedded_thread_pool_executor::thread_function_nullary, this,
                 std::move(f))),
-            desc, thread_priority_default, thread_schedule_hint(),
-            thread_stacksize_default, suspended, true);
+            desc, thread_priority::default_, thread_schedule_hint(),
+            thread_stacksize::default_, thread_state_enum::suspended, true);
 
         threads::thread_id_type id = threads::invalid_thread_id;
         threads::detail::create_thread(    //-V601
@@ -368,9 +368,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
 
             // the scheduling_loop is allowed to exit only if no more HPX
             // threads exist
-            HPX_ASSERT((scheduler_.get_thread_count(suspended,
-                            thread_priority_default, virt_core) == 0 &&
-                           scheduler_.get_queue_length(virt_core) == 0) ||
+            HPX_ASSERT(
+                (scheduler_.get_thread_count(thread_state_enum::suspended,
+                     thread_priority::default_, virt_core) == 0 &&
+                    scheduler_.get_queue_length(virt_core) == 0) ||
                 state >= state_terminating);
         }
     }
@@ -436,10 +437,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
                     util::deferred_call(&embedded_thread_pool_executor::run,
                         this, virt_core, thread_num)),
                 "embedded_thread_pool_executor thread",
-                threads::thread_priority_normal,
+                threads::thread_priority::normal,
                 threads::thread_schedule_hint(
                     static_cast<std::int16_t>(thread_num)),
-                threads::thread_stacksize_default, threads::pending, true);
+                threads::thread_stacksize::default_,
+                threads::thread_state_enum::pending, true);
             register_thread(data, ec);
         }
     }

@@ -54,7 +54,7 @@ namespace hpx { namespace util { namespace debug {
     std::string suspended_task_backtraces()
     {
         std::vector<hpx::threads::thread_data*> tlist =
-            get_task_data(hpx::threads::suspended);
+            get_task_data(hpx::threads::thread_state_enum::suspended);
         //
         std::stringstream tmp;
         //

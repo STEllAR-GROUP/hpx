@@ -79,7 +79,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     // create an executor with high priority for important tasks
     hpx::execution::parallel_executor high_priority_executor(
-        hpx::this_thread::get_pool(), hpx::threads::thread_priority_critical);
+        hpx::this_thread::get_pool(), hpx::threads::thread_priority::critical);
     hpx::execution::parallel_executor normal_priority_executor;
 
     hpx::execution::parallel_executor mpi_executor;
@@ -195,7 +195,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     thread_set.clear();
 
     //     auto high_priority_async_policy =
-    //         hpx::launch::async_policy(hpx::threads::thread_priority_critical);
+    //         hpx::launch::async_policy(hpx::threads::thread_priority::critical);
     //     auto normal_priority_async_policy = hpx::launch::async_policy();
 
     // test a parallel algorithm on custom pool with high priority

@@ -83,9 +83,9 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
                             util::deferred_call(put_parcel_ptr, pp, dest_,
                                 std::move(messages_), std::move(handlers_))),
                         "parcelhandler::put_parcel",
-                        threads::thread_priority_boost,
+                        threads::thread_priority::boost,
                         threads::thread_schedule_hint(),
-                        threads::thread_stacksize_default, threads::pending,
+                        threads::thread_stacksize::default_, threads::thread_state_enum::pending,
                         true);
                     threads::register_thread(data);
                     return;

@@ -487,10 +487,10 @@ namespace hpx { namespace parcelset
                         util::deferred_call(put_parcel_ptr, this,
                             std::move(p), std::move(f))),
                     "parcelhandler::put_parcel",
-                    threads::thread_priority_boost,
+                    threads::thread_priority::boost,
                     threads::thread_schedule_hint(),
-                    threads::thread_stacksize_medium,
-                    threads::pending, true);
+                    threads::thread_stacksize::medium,
+                    threads::thread_state_enum::pending, true);
                 threads::register_thread(data);
                 return;
             }
@@ -614,10 +614,10 @@ namespace hpx { namespace parcelset
                         util::deferred_call(put_parcels_ptr, this,
                             std::move(parcels), std::move(handlers))),
                     "parcelhandler::put_parcels",
-                    threads::thread_priority_boost,
+                    threads::thread_priority::boost,
                     threads::thread_schedule_hint(),
-                    threads::thread_stacksize_medium,
-                    threads::pending, true);
+                    threads::thread_stacksize::medium,
+                    threads::thread_state_enum::pending, true);
                 threads::register_thread(data);
                 return;
             }

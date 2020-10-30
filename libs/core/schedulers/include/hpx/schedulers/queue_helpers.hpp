@@ -129,12 +129,12 @@ namespace hpx { namespace threads { namespace policies {
                     {
                         switch (state)
                         {
-                        case threads::suspended:
+                        case threads::thread_state_enum::suspended:
                             result = true;    // at least one is suspended
                             break;
 
-                        case threads::pending:
-                        case threads::active:
+                        case threads::thread_state_enum::pending:
+                        case threads::thread_state_enum::active:
                             result =
                                 false;    // one is active, no deadlock (yet)
                             collect_suspended = false;

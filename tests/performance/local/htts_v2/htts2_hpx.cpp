@@ -7,12 +7,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/functional/bind.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/synchronization/barrier.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/modules/format.hpp>
 
 #include "htts2.hpp"
 
@@ -29,18 +29,19 @@ struct hpx_driver : htts2::driver
 {
     hpx_driver(int argc, char** argv)
       : htts2::driver(argc, argv, true)
-//      , count_(0)
-    {}
+    //      , count_(0)
+    {
+    }
 
     void run()
     {
         std::vector<std::string> const cfg = {
             "hpx.os_threads=" + std::to_string(osthreads_),
-            "hpx.run_hpx_main!=0",
-            "hpx.commandline.allow_unknown!=1"
-        };
+            "hpx.run_hpx_main!=0", "hpx.commandline.allow_unknown!=1"};
 
-        hpx::util::function_nonser<int(hpx::program_options::variables_map& vm)> f;
+        hpx::util::function_nonser<int(
+            hpx::program_options::variables_map & vm)>
+            f;
         hpx::program_options::options_description desc;
 
         hpx::init_params init_args;
@@ -52,7 +53,7 @@ struct hpx_driver : htts2::driver
             argc_, argv_, init_args);
     }
 
-  private:
+private:
     int run_impl(hpx::program_options::variables_map&)
     {
         // Cold run
@@ -66,12 +67,13 @@ struct hpx_driver : htts2::driver
     }
 
     hpx::threads::thread_result_type payload_thread_function(
-        hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
-        )
+        hpx::threads::thread_state_ex_enum ex =
+            hpx::threads::thread_state_ex_enum::wait_signaled)
     {
         htts2::payload<BaseClock>(this->payload_duration_ /* = p */);
         //++count_;
-        return hpx::threads::thread_result_type(hpx::threads::terminated,
+        return hpx::threads::thread_result_type(
+            hpx::threads::thread_state_enum::terminated,
             hpx::threads::invalid_thread_id);
     }
 
@@ -86,13 +88,14 @@ struct hpx_driver : htts2::driver
             // Reschedule in an attempt to correct.
             hpx::threads::thread_init_data data(
                 hpx::threads::make_thread_function_nullary(
-                    hpx::util::bind(&hpx_driver::stage_tasks,
-                        std::ref(*this), target_osthread))
-              , nullptr // No HPX-thread name.
-              , hpx::threads::thread_priority_normal
-              // Place in the target OS-thread's queue.
-              , hpx::threads::thread_schedule_hint(target_osthread)
-            );
+                    hpx::util::bind(&hpx_driver::stage_tasks, std::ref(*this),
+                        target_osthread)),
+                nullptr    // No HPX-thread name.
+                ,
+                hpx::threads::thread_priority::normal
+                // Place in the target OS-thread's queue.
+                ,
+                hpx::threads::thread_schedule_hint(target_osthread));
             hpx::threads::register_work(data);
         }
 
@@ -100,13 +103,14 @@ struct hpx_driver : htts2::driver
         {
             using hpx::util::placeholders::_1;
             hpx::threads::thread_init_data data(
-                hpx::util::bind(&hpx_driver::payload_thread_function,
-                    std::ref(*this), _1)
-              , nullptr // No HPX-thread name.
-              , hpx::threads::thread_priority_normal
-              // Place in the target OS-thread's queue.
-              , hpx::threads::thread_schedule_hint(target_osthread)
-            );
+                hpx::util::bind(
+                    &hpx_driver::payload_thread_function, std::ref(*this), _1),
+                nullptr    // No HPX-thread name.
+                ,
+                hpx::threads::thread_priority::normal
+                // Place in the target OS-thread's queue.
+                ,
+                hpx::threads::thread_schedule_hint(target_osthread));
             hpx::threads::register_work(data);
         }
     }
@@ -114,23 +118,21 @@ struct hpx_driver : htts2::driver
     void wait_for_tasks(hpx::lcos::local::barrier& finished)
     {
         std::uint64_t const pending_count =
-            get_thread_count(hpx::threads::thread_priority_normal
-                           , hpx::threads::pending);
+            get_thread_count(hpx::threads::thread_priority::normal,
+                hpx::threads::thread_state_enum::pending);
 
         if (pending_count == 0)
         {
             std::uint64_t const all_count =
-                get_thread_count(hpx::threads::thread_priority_normal);
+                get_thread_count(hpx::threads::thread_priority::normal);
 
             if (all_count != 1)
             {
                 hpx::threads::thread_init_data data(
-                        hpx::threads::make_thread_function_nullary(
-                            hpx::util::bind(&hpx_driver::wait_for_tasks
-                                      , std::ref(*this)
-                                      , std::ref(finished)
-                                       ))
-                      , nullptr, hpx::threads::thread_priority_low);
+                    hpx::threads::make_thread_function_nullary(
+                        hpx::util::bind(&hpx_driver::wait_for_tasks,
+                            std::ref(*this), std::ref(finished))),
+                    nullptr, hpx::threads::thread_priority::low);
                 register_work(data);
                 return;
             }
@@ -157,16 +159,18 @@ struct hpx_driver : htts2::driver
         // Warmup Phase
         for (std::uint64_t i = 0; i < this->osthreads_; ++i)
         {
-            if (this_osthread == i) continue;
+            if (this_osthread == i)
+                continue;
 
             hpx::threads::thread_init_data data(
-                hpx::threads::make_thread_function_nullary(
-                    hpx::util::bind(&hpx_driver::stage_tasks, std::ref(*this), i))
-              , nullptr // No HPX-thread name.
-              , hpx::threads::thread_priority_normal
-              // Place in the target OS-thread's queue.
-              , hpx::threads::thread_schedule_hint(i)
-            );
+                hpx::threads::make_thread_function_nullary(hpx::util::bind(
+                    &hpx_driver::stage_tasks, std::ref(*this), i)),
+                nullptr    // No HPX-thread name.
+                ,
+                hpx::threads::thread_priority::normal
+                // Place in the target OS-thread's queue.
+                ,
+                hpx::threads::thread_schedule_hint(i));
             hpx::threads::register_work(data);
         }
 
@@ -180,9 +184,9 @@ struct hpx_driver : htts2::driver
         // detection method that checks the threadmanager internal counters
         // (I've measured). Using this technique is preferable as it is more
         // comparable to the other implementations (especially qthreads).
-//        do {
-//            hpx::this_thread::suspend();
-//        } while (count_ < (this->tasks_ * this->osthreads_));
+        //        do {
+        //            hpx::this_thread::suspend();
+        //        } while (count_ < (this->tasks_ * this->osthreads_));
 
         // Schedule a low-priority thread; when it is executed, it checks to
         // make sure all the tasks (which are normal priority) have been
@@ -191,12 +195,9 @@ struct hpx_driver : htts2::driver
 
         hpx::threads::thread_init_data data(
             hpx::threads::make_thread_function_nullary(
-                hpx::util::bind(&hpx_driver::wait_for_tasks
-                                , std::ref(*this)
-                                , std::ref(finished)
-                                 ))
-            , nullptr
-            , hpx::threads::thread_priority_low);
+                hpx::util::bind(&hpx_driver::wait_for_tasks, std::ref(*this),
+                    std::ref(finished))),
+            nullptr, hpx::threads::thread_priority::low);
         register_work(data);
 
         finished.wait();
@@ -219,15 +220,11 @@ struct hpx_driver : htts2::driver
                 << "Total Walltime [nanoseconds]"
                 << "\n";
 
-        hpx::util::format_to(std::cout, "{},{},{},{:.14g}\n",
-            this->osthreads_,
-            this->tasks_,
-            this->payload_duration_,
-            results
-        );
+        hpx::util::format_to(std::cout, "{},{},{},{:.14g}\n", this->osthreads_,
+            this->tasks_, this->payload_duration_, results);
     }
 
-//    std::atomic<std::uint64_t> count_;
+    //    std::atomic<std::uint64_t> count_;
 };
 
 int main(int argc, char** argv)

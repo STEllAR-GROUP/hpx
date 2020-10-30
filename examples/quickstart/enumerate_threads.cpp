@@ -46,7 +46,7 @@ int main()
                 << std::endl;
             return true;        // always continue enumeration
         },
-        hpx::threads::suspended);
+        hpx::threads::thread_state_enum::suspended);
 
     // Wait for all threads to reach this point.
     l.count_down_and_wait();
