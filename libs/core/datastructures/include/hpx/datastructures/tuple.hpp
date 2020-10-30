@@ -347,7 +347,8 @@ namespace hpx {
         {
             int const _sequencer[] = {
                 ((_members.template get<Is>() =
-                         hpx::get<Is>(std::forward<UTuple>(other))),
+                         // NOLINTNEXTLINE(bugprone-signed-char-misuse)
+                     hpx::get<Is>(std::forward<UTuple>(other))),
                     0)...};
             (void) _sequencer;
         }

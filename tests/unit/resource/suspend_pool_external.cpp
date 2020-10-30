@@ -13,9 +13,9 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/modules/timing.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -55,6 +55,7 @@ void test_scheduler(
         hpx::threads::suspend_pool_cb(
             default_pool, [&suspended]() { suspended = true; });
 
+        // NOLINTNEXTLINE(bugprone-infinite-loop)
         while (!suspended)
         {
             std::this_thread::yield();
@@ -64,6 +65,7 @@ void test_scheduler(
         hpx::threads::resume_pool_cb(
             default_pool, [&resumed]() { resumed = true; });
 
+        // NOLINTNEXTLINE(bugprone-infinite-loop)
         while (!resumed)
         {
             std::this_thread::yield();
