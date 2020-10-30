@@ -22,12 +22,12 @@
 namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Tag1, typename Tag2, typename T1, typename T2>
-    hpx::future<tagged_pair<Tag1(typename decay<T1>::type),
-        Tag2(typename decay<T2>::type)>>
+    hpx::future<tagged_pair<Tag1(typename std::decay<T1>::type),
+        Tag2(typename std::decay<T2>::type)>>
     make_tagged_pair(hpx::future<std::pair<T1, T2>>&& f)
     {
-        typedef hpx::util::tagged_pair<Tag1(typename decay<T1>::type),
-            Tag2(typename decay<T2>::type)>
+        typedef hpx::util::tagged_pair<Tag1(typename std::decay<T1>::type),
+            Tag2(typename std::decay<T2>::type)>
             result_type;
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
