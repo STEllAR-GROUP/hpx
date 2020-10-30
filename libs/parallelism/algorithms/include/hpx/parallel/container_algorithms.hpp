@@ -22,6 +22,7 @@
 #include <hpx/parallel/container_algorithms/includes.hpp>
 #include <hpx/parallel/container_algorithms/is_heap.hpp>
 #include <hpx/parallel/container_algorithms/is_partitioned.hpp>
+#include <hpx/parallel/container_algorithms/is_sorted.hpp>
 #include <hpx/parallel/container_algorithms/make_heap.hpp>
 #include <hpx/parallel/container_algorithms/merge.hpp>
 #include <hpx/parallel/container_algorithms/minmax.hpp>

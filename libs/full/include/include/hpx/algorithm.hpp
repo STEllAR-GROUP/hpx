@@ -14,8 +14,6 @@
 #endif
 
 namespace hpx {
-    using hpx::parallel::is_sorted;
-    using hpx::parallel::is_sorted_until;
     using hpx::parallel::lexicographical_compare;
     using hpx::parallel::max_element;
     using hpx::parallel::min_element;

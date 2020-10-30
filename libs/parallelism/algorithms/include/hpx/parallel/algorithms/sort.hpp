@@ -47,24 +47,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \cond NOINTERNAL
         static const std::size_t sort_limit_per_task = 65536ul;
 
-        ///////////////////////////////////////////////////////////////////////
-        // std::is_sorted is not available on all supported platforms yet
-        template <typename Iter, typename Compare>
-        inline bool is_sorted_sequential(
-            Iter first, Iter last, Compare const& comp)
-        {
-            bool sorted = true;
-            if (first != last)
-            {
-                for (Iter it1 = first, it2 = first + 1;
-                     it2 != last && (sorted = !comp(*it2, *it1)); it1 = it2++)
-                {
-                    /**/
-                }
-            }
-            return sorted;
-        }
-
         /// Return the iterator to the mid value of the three values
         /// passed as parameters
         ///

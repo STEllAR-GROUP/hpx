@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include "is_sorted_tests.hpp"
+#include "is_sorted_range_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
@@ -32,6 +32,17 @@ void sorted_test1()
 {
     test_sorted1<std::random_access_iterator_tag>();
     test_sorted1<std::forward_iterator_tag>();
+
+    using namespace hpx::execution;
+
+    test_sorted1(seq);
+    test_sorted1(par);
+    test_sorted1(par_unseq);
+
+    test_sorted1_async(seq(task));
+    test_sorted1_async(par(task));
+
+    test_sorted1_seq();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,6 +64,17 @@ void sorted_test2()
 {
     test_sorted2<std::random_access_iterator_tag>();
     test_sorted2<std::forward_iterator_tag>();
+
+    using namespace hpx::execution;
+
+    test_sorted2(seq);
+    test_sorted2(par);
+    test_sorted2(par_unseq);
+
+    test_sorted2_async(seq(task));
+    test_sorted2_async(par(task));
+
+    test_sorted2_seq();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,6 +96,17 @@ void sorted_test3()
 {
     test_sorted3<std::random_access_iterator_tag>();
     test_sorted3<std::forward_iterator_tag>();
+
+    using namespace hpx::execution;
+
+    test_sorted3(seq);
+    test_sorted3(par);
+    test_sorted3(par_unseq);
+
+    test_sorted3_async(seq(task));
+    test_sorted3_async(par(task));
+
+    test_sorted3_seq();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,6 +130,16 @@ void sorted_exception_test()
 {
     test_sorted_exception<std::random_access_iterator_tag>();
     test_sorted_exception<std::forward_iterator_tag>();
+
+    using namespace hpx::execution;
+
+    test_sorted_exception(seq);
+    test_sorted_exception(par);
+
+    test_sorted_exception_async(seq(task));
+    test_sorted_exception_async(par(task));
+
+    test_sorted_exception_seq();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -121,6 +164,16 @@ void sorted_bad_alloc_test()
 {
     test_sorted_bad_alloc<std::random_access_iterator_tag>();
     test_sorted_bad_alloc<std::forward_iterator_tag>();
+
+    using namespace hpx::execution;
+
+    test_sorted_bad_alloc(par);
+    test_sorted_bad_alloc(seq);
+
+    test_sorted_bad_alloc_async(seq(task));
+    test_sorted_bad_alloc_async(par(task));
+
+    test_sorted_bad_alloc_seq();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
