@@ -7,6 +7,7 @@
 
 #include <hpx/modules/config_registry.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <iostream>
 #include <string>
@@ -42,34 +43,68 @@ int report_errors()
 static hpx::config_registry::add_module_config_helper add_config{
     {"static", {"1", "2", "3"}}};
 
+// We have to explicitly reference the config of this module since we are
+// linking statically only to this module.
+namespace hpx { namespace config_registry {
+    extern add_module_config_helper add_config;
+}}    // namespace hpx::config_registry
+
+void* generated_module_configs[] = {&hpx::config_registry::add_config};
+
 int main()
 {
     {
         auto const& configs = hpx::config_registry::get_module_configs();
 
-        TEST(configs.size() == 1);
-        TEST(configs[0].module_name == "static");
-        TEST(configs[0].config_entries.size() == 3);
-        TEST(configs[0].config_entries[0] == "1");
-        TEST(configs[0].config_entries[1] == "2");
-        TEST(configs[0].config_entries[2] == "3");
+        // We already have the configuration of one module, this module, added
+        // through a generated file, so we expect two configs.
+        TEST(configs.size() == 2);
 
-        hpx::config_registry::add_module_config({"dynamic", {"4", "5"}});
+        // The config this file adds statically is not guaranteed to be first
+        // or second. We first find where it is, if we find it at all.
+        auto c = std::find_if(std::begin(configs), std::end(configs),
+            [](auto c) { return c.module_name == "static"; });
+        TEST(c != std::end(configs));
+        if (c != std::end(configs))
+        {
+            TEST(c->module_name == "static");
+            TEST(c->config_entries.size() == 3);
+            TEST(c->config_entries[0] == "1");
+            TEST(c->config_entries[1] == "2");
+            TEST(c->config_entries[2] == "3");
+        }
     }
 
     {
+        hpx::config_registry::add_module_config({"dynamic", {"4", "5"}});
+
         auto const& configs = hpx::config_registry::get_module_configs();
+        TEST(configs.size() == 3);
 
-        TEST(configs[0].module_name == "static");
-        TEST(configs[0].config_entries.size() == 3);
-        TEST(configs[0].config_entries[0] == "1");
-        TEST(configs[0].config_entries[1] == "2");
-        TEST(configs[0].config_entries[2] == "3");
+        // We still expect to find the statically added config.
+        auto c = std::find_if(std::begin(configs), std::end(configs),
+            [](auto c) { return c.module_name == "static"; });
+        TEST(c != std::end(configs));
+        if (c != std::end(configs))
+        {
+            TEST(c->module_name == "static");
+            TEST(c->config_entries.size() == 3);
+            TEST(c->config_entries[0] == "1");
+            TEST(c->config_entries[1] == "2");
+            TEST(c->config_entries[2] == "3");
+        }
 
-        TEST(configs[1].module_name == "dynamic");
-        TEST(configs[1].config_entries.size() == 2);
-        TEST(configs[1].config_entries[0] == "4");
-        TEST(configs[1].config_entries[1] == "5");
+        // We also expect to find the dynamically added config.
+        c = std::find_if(std::begin(configs), std::end(configs),
+            [](auto c) { return c.module_name == "dynamic"; });
+        TEST(c != std::end(configs));
+        if (c != std::end(configs))
+        {
+            TEST(c->module_name == "dynamic");
+            TEST(c->config_entries.size() == 2);
+            TEST(c->config_entries[0] == "4");
+            TEST(c->config_entries[1] == "5");
+        }
     }
 
     return report_errors();
