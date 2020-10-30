@@ -550,9 +550,9 @@ namespace hpx {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value &&
-                hpx::traits::is_invocable<F,
+                hpx::is_invocable_v<F,
                     typename std::iterator_traits<FwdIter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -574,9 +574,9 @@ namespace hpx {
         template <typename FwdIter, typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter>::value &&
-                hpx::traits::is_invocable<F,
+                hpx::is_invocable_v<F,
                     typename std::iterator_traits<FwdIter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend typename std::iterator_traits<FwdIter>::difference_type

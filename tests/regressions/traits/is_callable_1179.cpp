@@ -6,32 +6,40 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
 
-struct s {
-    int f() const { return 42; }
+struct s
+{
+    int f() const
+    {
+        return 42;
+    }
 };
 
-struct p {
+struct p
+{
     s x;
-    s const& operator*() const { return x; }
+    s const& operator*() const
+    {
+        return x;
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    using hpx::traits::is_invocable;
+    using hpx::is_invocable_v;
     using hpx::util::invoke;
 
     typedef int (s::*mem_fun_ptr)();
-    HPX_TEST_MSG((is_invocable<mem_fun_ptr, p>::value == false), "mem-fun-ptr");
+    HPX_TEST_MSG((is_invocable_v<mem_fun_ptr, p> == false), "mem-fun-ptr");
 
     typedef int (s::*const_mem_fun_ptr)() const;
-    HPX_TEST_MSG((is_invocable<const_mem_fun_ptr, p>::value == true),
-        "const-mem-fun-ptr");
+    HPX_TEST_MSG(
+        (is_invocable_v<const_mem_fun_ptr, p> == true), "const-mem-fun-ptr");
 
     HPX_TEST_EQ(invoke(&s::f, p()), 42);
 

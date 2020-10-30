@@ -72,7 +72,7 @@ namespace hpx { namespace util {
         template <typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, function_ref>::value &&
-                traits::is_invocable_r<R, F&, Ts...>::value>::type>
+                is_invocable_r_v<R, F&, Ts...>>::type>
         function_ref(F&& f)
           : object(nullptr)
         {
@@ -88,7 +88,7 @@ namespace hpx { namespace util {
         template <typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, function_ref>::value &&
-                traits::is_invocable_r<R, F&, Ts...>::value>::type>
+                is_invocable_r_v<R, F&, Ts...>>::type>
         function_ref& operator=(F&& f)
         {
             assign(std::forward<F>(f));

@@ -16,8 +16,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace traits {
-    ///////////////////////////////////////////////////////////////////////////
+namespace hpx {
     namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable = void>
@@ -53,32 +52,55 @@ namespace hpx { namespace traits {
         };
     }    // namespace detail
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename R = void>
-    struct HPX_DEPRECATED_V(1, 5,
-        "is_callable is deprecated, use is_invocable instead.") is_callable;
+    namespace traits {
+        ///////////////////////////////////////////////////////////////////////////
+        template <typename T, typename R = void>
+        struct HPX_DEPRECATED_V(1, 5,
+            "is_callable is deprecated, use is_invocable instead.") is_callable;
 
 #if defined(HPX_GCC_VERSION)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-    template <typename F, typename... Ts, typename R>
-    struct is_callable<F(Ts...), R> : detail::is_invocable_impl<F(Ts...), R>
-    {
-    };
+        template <typename F, typename... Ts, typename R>
+        struct is_callable<F(Ts...), R>
+          : hpx::detail::is_invocable_impl<F(Ts...), R>
+        {
+        };
 #if defined(HPX_GCC_VERSION)
 #pragma GCC diagnostic pop
 #endif
+    }    // namespace traits
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
-    struct is_invocable : detail::is_invocable_impl<F && (Ts && ...), void>
+    struct is_invocable : hpx::detail::is_invocable_impl<F && (Ts && ...), void>
     {
     };
 
     template <typename R, typename F, typename... Ts>
-    struct is_invocable_r : detail::is_invocable_r_impl<F && (Ts && ...), R>
+    struct is_invocable_r
+      : hpx::detail::is_invocable_r_impl<F && (Ts && ...), R>
     {
     };
 
-}}    // namespace hpx::traits
+    template <typename F, typename... Ts>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_invocable_v =
+        is_invocable<F, Ts...>::value;
+
+    template <typename R, typename F, typename... Ts>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_invocable_r_v =
+        is_invocable_r<R, F, Ts...>::value;
+
+    namespace traits {
+        template <typename F, typename... Ts>
+        using is_invocable HPX_DEPRECATED_V(1, 6,
+            "hpx::traits::is_invocable is deprecated, use hpx::is_invocable "
+            "instead") = hpx::is_invocable<F, Ts...>;
+
+        template <typename R, typename F, typename... Ts>
+        using is_invocable_r HPX_DEPRECATED_V(1, 6,
+            "hpx::traits::is_invocable_r is deprecated, use "
+            "hpx::is_invocable_r instead") = hpx::is_invocable_r<R, F, Ts...>;
+    }    // namespace traits
+}    // namespace hpx

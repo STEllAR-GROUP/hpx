@@ -1342,7 +1342,7 @@ namespace hpx { namespace lcos {
     hpx::lcos::future<R> make_future(
         hpx::lcos::shared_future<U> const& f, Conv&& conv)
     {
-        static_assert(hpx::traits::is_invocable_r<R, Conv, U>::value,
+        static_assert(hpx::is_invocable_r_v<R, Conv, U>,
             "the argument type must be convertible to the requested "
             "result type by using the supplied conversion function");
 

@@ -149,7 +149,7 @@ namespace hpx { namespace functional {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Tag, typename... Args>
     using is_tag_invocable =
-        hpx::traits::is_invocable<decltype(tag_invoke), Tag, Args...>;
+        hpx::is_invocable<decltype(tag_invoke), Tag, Args...>;
 
     template <typename Tag, typename... Args>
     constexpr bool is_tag_invocable_v = is_tag_invocable<Tag, Args...>::value;

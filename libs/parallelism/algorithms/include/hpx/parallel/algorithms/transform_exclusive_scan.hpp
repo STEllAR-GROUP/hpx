@@ -299,14 +299,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value &&
-            hpx::traits::is_invocable<Conv,
-                typename std::iterator_traits<FwdIter1>::value_type>::value &&
-            hpx::traits::is_invocable<Op,
+            hpx::is_invocable_v<Conv,
+                typename std::iterator_traits<FwdIter1>::value_type> &&
+            hpx::is_invocable_v<Op,
                 typename hpx::util::invoke_result<Conv,
                     typename std::iterator_traits<FwdIter1>::value_type>::type,
                 typename hpx::util::invoke_result<Conv,
                     typename std::iterator_traits<FwdIter1>::value_type>::type
-            >::value
+            >
         )>
     // clang-format on
     typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type

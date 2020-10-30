@@ -120,7 +120,7 @@ namespace hpx { namespace parallel { namespace traits {
         struct is_projected<Proj, Iter,
             typename std::enable_if<
                 hpx::traits::is_iterator<Iter>::value>::type>
-          : hpx::traits::is_invocable<Proj,
+          : hpx::is_invocable<Proj,
                 typename std::iterator_traits<Iter>::reference>
         {
         };
@@ -177,7 +177,7 @@ namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         template <typename F, typename... Args>
-        struct is_indirect_callable_impl : hpx::traits::is_invocable<F, Args...>
+        struct is_indirect_callable_impl : hpx::is_invocable<F, Args...>
         {
         };
 

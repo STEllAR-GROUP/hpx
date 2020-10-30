@@ -738,9 +738,9 @@ namespace hpx { namespace ranges {
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
-                hpx::traits::is_invocable<Pred,
+                hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<Iter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -763,11 +763,11 @@ namespace hpx { namespace ranges {
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-                hpx::traits::is_invocable<Pred,
+                hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<
                         typename hpx::traits::range_iterator<Rng>::type
                     >::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -790,9 +790,9 @@ namespace hpx { namespace ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
-                hpx::traits::is_invocable<Pred,
+                hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<Iter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend Iter tag_invoke(
@@ -809,11 +809,11 @@ namespace hpx { namespace ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-                hpx::traits::is_invocable<Pred,
+                hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<
                         typename hpx::traits::range_iterator<Rng>::type
                     >::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng>::type tag_invoke(
@@ -839,9 +839,9 @@ namespace hpx { namespace ranges {
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
-                hpx::traits::is_invocable<Pred,
+                hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<Iter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -864,11 +864,11 @@ namespace hpx { namespace ranges {
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-                hpx::traits::is_invocable<Pred,
+                hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<
                         typename hpx::traits::range_iterator<Rng>::type
                     >::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -891,9 +891,9 @@ namespace hpx { namespace ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
-                hpx::traits::is_invocable<Pred,
+                hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<Iter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend Iter tag_invoke(find_if_not_t, Iter first, Sent last,
@@ -910,11 +910,11 @@ namespace hpx { namespace ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-                hpx::traits::is_invocable<Pred,
+                hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<
                         typename hpx::traits::range_iterator<Rng>::type
                     >::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng>::type tag_invoke(

@@ -422,10 +422,10 @@ namespace hpx {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<RndIter>::value &&
-                hpx::traits::is_invocable<Comp,
+                hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RndIter>::value_type,
                     typename std::iterator_traits<RndIter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
@@ -476,10 +476,10 @@ namespace hpx {
         template <typename RndIter, typename Comp,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<RndIter>::value &&
-                hpx::traits::is_invocable<Comp,
+                hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RndIter>::value_type,
                     typename std::iterator_traits<RndIter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend void tag_invoke(

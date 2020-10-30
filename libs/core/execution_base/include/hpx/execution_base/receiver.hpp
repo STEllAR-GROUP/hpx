@@ -164,12 +164,12 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename T, typename E>
             struct is_receiver_impl<true, T, E>
               : std::integral_constant<bool,
-                    hpx::traits::is_invocable<
+                    hpx::is_invocable_v<
                         hpx::execution::experimental::set_done_t,
-                            typename std::decay<T>::type&&>::value &&
-                    hpx::traits::is_invocable<
+                            typename std::decay<T>::type&&> &&
+                    hpx::is_invocable_v<
                         hpx::execution::experimental::set_error_t,
-                            typename std::decay<T>::type&&, E>::value>
+                        typename std::decay<T>::type&&, E>>
             {
             };
             // clang-format on
@@ -203,9 +203,9 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename T, typename... As>
             struct is_receiver_of_impl<true, T, As...>
               : std::integral_constant<bool,
-                    hpx::traits::is_invocable<
+                    hpx::is_invocable_v<
                         hpx::execution::experimental::set_value_t,
-                            typename std::decay<T>::type&&, As...>::value>
+                            typename std::decay<T>::type&&, As...>>
             {
             };
             // clang-format on
