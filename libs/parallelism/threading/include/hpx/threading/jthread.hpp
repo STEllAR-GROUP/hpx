@@ -21,7 +21,8 @@ namespace hpx {
     {
     private:
         template <typename F, typename... Ts>
-        static void invoke(std::false_type, F&& f, stop_token&& st, Ts&&... ts)
+        static void invoke(
+            std::false_type, F&& f, stop_token&& /* st */, Ts&&... ts)
         {
             // started thread does not expect a stop token:
             HPX_INVOKE(std::forward<F>(f), std::forward<Ts>(ts)...);

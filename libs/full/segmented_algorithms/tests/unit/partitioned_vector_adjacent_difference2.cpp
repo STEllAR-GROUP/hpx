@@ -20,7 +20,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename T>
 void verify_values(
-    ExPolicy&& policy, hpx::partitioned_vector<T> const& v, T const& val)
+    ExPolicy&&, hpx::partitioned_vector<T> const& v, T const& val)
 {
     typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
 
@@ -36,7 +36,7 @@ void verify_values(
 }
 
 template <typename ExPolicy, typename T>
-void verify_values(ExPolicy&& policy, hpx::partitioned_vector<T> const& v)
+void verify_values(ExPolicy&&, hpx::partitioned_vector<T> const& v)
 {
     typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
     std::size_t size = 0;

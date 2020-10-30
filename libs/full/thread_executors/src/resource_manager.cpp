@@ -16,6 +16,7 @@
 #include <hpx/thread_executors/resource_manager.hpp>
 #include <hpx/thread_executors/thread_executor.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -131,7 +132,7 @@ namespace hpx { namespace threads {
     // release_borrowed_cores - scheduler should release all its borrowed cores
     bool resource_manager::release_scheduler_resources(
         allocation_data_map_type::iterator it, std::size_t number_to_free,
-        std::vector<punit_status>& available_punits)
+        std::vector<punit_status>& /* available_punits */)
     {
         static_allocation_data& st = (*it).second;
         std::size_t borrowed_cores;
@@ -276,7 +277,8 @@ namespace hpx { namespace threads {
     // to each schedulers maximum processing units
     // and reserve any freed cores for the new scheduler.
     std::size_t resource_manager::redistribute_cores_among_all(
-        std::size_t reserved, std::size_t min_punits, std::size_t max_punits,
+        std::size_t reserved, std::size_t min_punits,
+        std::size_t /* max_punits */,
         std::vector<punit_status>& available_punits, std::size_t new_allocation)
     {
         std::size_t available = 0;
@@ -652,6 +654,8 @@ namespace hpx { namespace threads {
             sum_allocation += data.second->second.allocation_;
         }
         HPX_ASSERT(sum_allocation == total_allocated);
+#else
+        HPX_UNUSED(total_allocated);
 #endif
     }
 

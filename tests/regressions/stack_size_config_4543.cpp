@@ -13,7 +13,7 @@
 // slightly change all the stack sizes in the configuration to catch problems
 // with the used stack sizes not matching the configured sizes.
 
-int hpx_main(int argc, char** argv)
+int hpx_main()
 {
     hpx::this_thread::sleep_for(std::chrono::milliseconds(10));
 

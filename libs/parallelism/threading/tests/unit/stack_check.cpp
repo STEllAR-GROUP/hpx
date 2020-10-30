@@ -61,7 +61,7 @@ void stack_waste(int N, info_stack& stack)
 }
 //
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     info_stack my_stack_info;
     // just for curiosity

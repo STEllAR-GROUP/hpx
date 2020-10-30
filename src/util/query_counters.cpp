@@ -6,21 +6,22 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/modules/format.hpp>
-#include <hpx/functional/bind_front.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/performance_counters/apex_sample_value.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/get_thread_name.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/threading_base/external_timer.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/type_support/unused.hpp>
 #include <hpx/util/query_counters.hpp>
 
 #include <cstddef>
@@ -255,7 +256,8 @@ namespace hpx { namespace util
         error_code ec(lightweight);
         double val = value.get_value<double>(ec);
 
-        if(!ec) {
+        if (!ec)
+        {
 #ifdef HPX_HAVE_APEX
             external_timer::sample_value(info, val);
 #elif HPX_HAVE_ITTNOTIFY != 0
@@ -267,13 +269,16 @@ namespace hpx { namespace util
                     (*it).second.set_value(val);
                 }
             }
+#else
+            HPX_UNUSED(info);
 #endif
             if (out == nullptr)
                 return;
 
             *out << val;
         }
-        else {
+        else
+        {
             if (out != nullptr)
                 *out << "invalid";
         }
@@ -281,7 +286,7 @@ namespace hpx { namespace util
 
     template <typename Stream>
     void query_counters::print_value_csv(Stream* out,
-        performance_counters::counter_info const& info,
+        performance_counters::counter_info const& /* info */,
         performance_counters::counter_values_array const& value)
     {
         if (out == nullptr)

@@ -778,8 +778,9 @@ namespace hpx { namespace agas { namespace server {
     ///////////////////////////////////////////////////////////////////////////////
     void primary_namespace::resolve_free_list(std::unique_lock<mutex_type>& l,
         std::list<refcnt_table_type::iterator> const& free_list,
-        free_entry_list_type& free_entry_list, naming::gid_type const& lower,
-        naming::gid_type const& upper, error_code& ec)
+        free_entry_list_type& free_entry_list,
+        naming::gid_type const& /* lower */,
+        naming::gid_type const& /* upper */, error_code& ec)
     {
         HPX_ASSERT_OWNS_LOCK(l);
 

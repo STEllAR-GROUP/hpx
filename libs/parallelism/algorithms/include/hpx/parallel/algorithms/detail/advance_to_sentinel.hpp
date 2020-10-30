@@ -41,7 +41,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     }
 
     template <typename Iter>
-    constexpr inline Iter advance_to_sentinel(Iter first, Iter last)
+    constexpr inline Iter advance_to_sentinel(Iter, Iter last)
     {
         return last;
     }

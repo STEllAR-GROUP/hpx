@@ -71,7 +71,7 @@ namespace hpx { namespace util {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& arch, const unsigned int version)
+        void serialize(Archive& arch, const unsigned int /* version */)
         {
             // clang-format off
             arch & data_;
@@ -396,7 +396,7 @@ namespace hpx { namespace util {
 
     /// \cond NOINTERNAL
     // Same as above, just nullary
-    inline hpx::future<checkpoint> save_checkpoint(hpx::launch p)
+    inline hpx::future<checkpoint> save_checkpoint(hpx::launch)
     {
         return hpx::make_ready_future(checkpoint{});
     }
@@ -451,8 +451,7 @@ namespace hpx { namespace util {
 
     /// \cond NOINTERNAL
     // Same as above, just nullary
-    inline hpx::future<checkpoint> save_checkpoint(
-        hpx::launch p, checkpoint&& c)
+    inline hpx::future<checkpoint> save_checkpoint(hpx::launch, checkpoint&& c)
     {
         return hpx::make_ready_future(std::move(c));
     }
@@ -708,7 +707,7 @@ namespace hpx { namespace util {
     }
 
     // Same as above, just nullary
-    inline hpx::future<checkpoint> prepare_checkpoint(hpx::launch p)
+    inline hpx::future<checkpoint> prepare_checkpoint(hpx::launch)
     {
         return hpx::make_ready_future(checkpoint{});
     }
@@ -765,7 +764,7 @@ namespace hpx { namespace util {
 
     // Same as above, just nullary
     inline hpx::future<checkpoint> prepare_checkpoint(
-        hpx::launch p, checkpoint&& c)
+        hpx::launch, checkpoint&& c)
     {
         return hpx::make_ready_future(std::move(c));
     }
@@ -844,7 +843,7 @@ namespace hpx { namespace util {
 
     /// \cond NOINTERNAL
     // Same as above, just nullary
-    inline void restore_checkpoint(checkpoint const& c) {}
+    inline void restore_checkpoint(checkpoint const&) {}
     /// \endcond
 
 }}    // namespace hpx::util

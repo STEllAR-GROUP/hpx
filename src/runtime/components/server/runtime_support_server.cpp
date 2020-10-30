@@ -864,7 +864,8 @@ namespace hpx { namespace components { namespace server {
     }
 
     namespace detail {
-        void handle_print_bind(hpx::program_options::variables_map const& vm_,
+        void handle_print_bind(
+            hpx::program_options::variables_map const& /* vm_ */,
             std::size_t num_threads)
         {
             threads::topology& top = threads::create_topology();
@@ -1142,7 +1143,7 @@ namespace hpx { namespace components { namespace server {
         }
 
         template <typename... Ts>
-        void operator()(Ts&&... vs)
+        void operator()(Ts&&... /* vs */)
         {
             // This needs to be run on a HPX thread
             hpx::apply(std::move(*pt));
@@ -1396,8 +1397,9 @@ namespace hpx { namespace components { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::load_component_static(util::section& ini,
         std::string const& instance, std::string const& component,
-        filesystem::path const& lib, naming::gid_type const& prefix,
-        naming::resolver_client& agas_client, bool isdefault, bool isenabled,
+        filesystem::path const& lib, naming::gid_type const& /* prefix */,
+        naming::resolver_client& /* agas_client */, bool /* isdefault */,
+        bool /* isenabled */,
         hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
@@ -1885,9 +1887,10 @@ namespace hpx { namespace components { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::load_component(hpx::util::plugin::dll& d,
         util::section& ini, std::string const& instance,
-        std::string const& component, filesystem::path const& lib,
-        naming::gid_type const& prefix, naming::resolver_client& agas_client,
-        bool isdefault, bool isenabled,
+        std::string const& /* component */, filesystem::path const& lib,
+        naming::gid_type const& /* prefix */,
+        naming::resolver_client& /* agas_client */, bool /* isdefault */,
+        bool /* isenabled */,
         hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
@@ -2079,8 +2082,8 @@ namespace hpx { namespace components { namespace server {
 #if !defined(HPX_HAVE_STATIC_LINKING)
     bool runtime_support::load_plugin(hpx::util::plugin::dll& d,
         util::section& ini, std::string const& instance,
-        std::string const& plugin, filesystem::path const& lib, bool isenabled,
-        hpx::program_options::options_description& options,
+        std::string const& /* plugin */, filesystem::path const& lib,
+        bool isenabled, hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
         try

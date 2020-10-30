@@ -252,7 +252,7 @@ public:
   pointer address(reference value) const { return &value; }
   const_pointer address(const_reference value) const { return &value; }
 
-  pointer allocate(size_type n, void const* hint = nullptr)
+  pointer allocate(size_type n, void const* /* hint */ = nullptr)
   {
     HPX_TEST_EQ(n, size_);
     return static_cast<T*>(pointer_);
@@ -268,7 +268,7 @@ private:
   friend class hpx::serialization::access;
 
   template <typename Archive>
-  void load(Archive& ar, unsigned int const version)
+  void load(Archive& ar, unsigned int const)
   {
     std::size_t t = 0;
     ar >> size_ >> t;
@@ -276,7 +276,7 @@ private:
   }
 
   template <typename Archive>
-  void save(Archive& ar, unsigned int const version) const
+  void save(Archive& ar, unsigned int const) const
   {
     std::size_t t = reinterpret_cast<std::size_t>(pointer_);
     ar << size_ << t;
@@ -310,8 +310,8 @@ mutex_type keep_alive_mutex;
 alive_map  keep_alive_buffers;
 
 //
-void async_callback(const uint64_t index, std::error_code const& ec,
-    hpx::parcelset::parcel const& p)
+void async_callback(
+    const uint64_t index, std::error_code const&, hpx::parcelset::parcel const&)
 {
     scoped_lock lock(keep_alive_mutex);
     DEBUG_OUTPUT(7, "Async callback triggered for index " << index);

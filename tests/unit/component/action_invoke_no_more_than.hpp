@@ -190,7 +190,7 @@ namespace hpx { namespace actions { namespace detail
         ///////////////////////////////////////////////////////////////////////
         // If the action returns something which is not a future, we do nothing
         // special.
-        static bool call(continuation_type& cont, std::false_type)
+        static bool call(continuation_type&, std::false_type)
         {
             return false;
         }

@@ -81,7 +81,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename Action, typename... Ts>
         typename std::enable_if<hpx::traits::is_action<Action>::value>::type
-        post_impl(Action&& act, Ts&&... ts) const
+        post_impl(Action&&, Ts&&... ts) const
         {
             policy_.template apply<Action>(
                 threads::thread_priority::default_, std::forward<Ts>(ts)...);
@@ -102,7 +102,7 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Action, typename... Ts>
         typename std::enable_if<hpx::traits::is_action<Action>::value,
             hpx::future<typename Action::local_result_type>>::type
-        async_execute_impl(Action&& act, Ts&&... ts) const
+        async_execute_impl(Action&&, Ts&&... ts) const
         {
             return policy_.template async<Action>(
                 launch::async, std::forward<Ts>(ts)...);

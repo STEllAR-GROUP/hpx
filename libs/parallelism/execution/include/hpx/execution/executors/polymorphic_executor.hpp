@@ -404,8 +404,8 @@ namespace hpx { namespace parallel { namespace execution {
             {
             }
 
-            static hpx::future<R> _empty_async_execute(
-                void* exec, async_execute_function_type&& f, Ts&&... ts)
+            static hpx::future<R> _empty_async_execute(void* /* exec */,
+                async_execute_function_type&& /* f */, Ts&&... /* ts */)
             {
                 throw_bad_polymorphic_executor<R>();
             }

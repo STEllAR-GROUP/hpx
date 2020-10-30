@@ -372,7 +372,7 @@ namespace gc { namespace server {
         HPX_TEST_LT(std::size_t(0), cd->wc);
         check_recover_done();
     }
-    void collectable::done(hpx::id_type child)
+    void collectable::done(hpx::id_type)
     {
         HPX_TEST_LT(std::size_t(0), cd->wc);
         cd->wc--;

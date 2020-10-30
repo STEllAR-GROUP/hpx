@@ -466,14 +466,14 @@ namespace hpx { namespace threads { namespace detail {
     defined(HPX_HAVE_THREAD_IDLE_RATES)
     bool call_background_thread(thread_id_type& background_thread,
         thread_data*& next_thrd, SchedulingPolicy& scheduler,
-        std::size_t num_thread, bool running,
+        std::size_t num_thread, bool /* running */,
         std::int64_t& background_work_exec_time_init,
         hpx::execution_base::this_thread::detail::agent_storage*
             context_storage)
 #else
     bool call_background_thread(thread_id_type& background_thread,
         thread_data*& next_thrd, SchedulingPolicy& scheduler,
-        std::size_t num_thread, bool running,
+        std::size_t num_thread, bool /* running */,
         hpx::execution_base::this_thread::detail::agent_storage*
             context_storage)
 #endif

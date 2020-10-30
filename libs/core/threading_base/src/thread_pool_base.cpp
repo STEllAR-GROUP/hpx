@@ -112,7 +112,7 @@ namespace hpx { namespace threads {
     }
 
     void thread_pool_base::init(
-        std::size_t pool_threads, std::size_t threads_offset)
+        std::size_t /* pool_threads */, std::size_t threads_offset)
     {
         thread_offset_ = threads_offset;
     }

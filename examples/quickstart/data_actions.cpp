@@ -27,7 +27,10 @@ struct plain_data
         hpx::components::set_component_type<plain_data<Action> >(type);
     }
 
-    static bool is_target_valid(hpx::naming::id_type const& id) { return true; }
+    static bool is_target_valid(hpx::naming::id_type const&)
+    {
+        return true;
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -97,7 +100,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(plain_data<get_action>);
 HPX_DEFINE_GET_COMPONENT_TYPE(plain_data<set_action>);
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     data = 0;
 

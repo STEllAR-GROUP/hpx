@@ -34,7 +34,7 @@ struct non_default_ctor
 
     template <typename Archive>
     void friend load_construct_data(
-        Archive& ar, non_default_ctor* p, const unsigned int)
+        Archive&, non_default_ctor* p, const unsigned int)
     {
         ::new (p) non_default_ctor(0);
     }

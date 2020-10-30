@@ -78,7 +78,7 @@ namespace hpx { namespace execution {
         // Estimate a chunk size based on number of cores used.
         template <typename Executor, typename F>
         std::size_t get_chunk_size(
-            Executor& exec, F&& f, std::size_t cores, std::size_t count)
+            Executor& /* exec */, F&& f, std::size_t cores, std::size_t count)
         {
             // by default use 1% of the iterations
             if (num_iters_for_timing_ == 0)
@@ -124,7 +124,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int /* version */)
         {
             // clang-format off
             ar & chunk_size_time_ & min_time_ & num_iters_for_timing_;

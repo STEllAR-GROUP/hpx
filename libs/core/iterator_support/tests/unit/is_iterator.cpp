@@ -1179,7 +1179,7 @@ void is_random_access_iterator()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     {
         addition_result();

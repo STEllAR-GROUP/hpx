@@ -59,7 +59,7 @@ void test_then(Executor& exec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test(int value, std::thread::id tid, int passed_through)
+void bulk_test(int, std::thread::id tid, int passed_through)
 {
     HPX_TEST_NEQ(tid, std::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -101,7 +101,7 @@ void test_bulk_async(Executor& exec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
+void bulk_test_f(int, hpx::shared_future<void> f, hpx::thread::id tid,
     int passed_through)    //-V813
 {
     HPX_TEST(f.is_ready());    // make sure, future is ready
@@ -146,7 +146,7 @@ void test_service_executor(Executor& exec)
     test_bulk_then(exec);
 }
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     using namespace hpx::parallel;
     using hpx::parallel::execution::service_executor_type;

@@ -769,7 +769,7 @@ namespace hpx { namespace threads { namespace policies {
             thread_schedule_state state = thread_schedule_state::unknown,
             thread_priority priority = thread_priority::default_,
             std::size_t num_thread = std::size_t(-1),
-            bool reset = false) const override
+            bool /* reset */ = false) const override
         {
             // Return thread count of one specific queue.
             std::int64_t count = 0;
@@ -1133,6 +1133,8 @@ namespace hpx { namespace threads { namespace policies {
                     }
                 }
             }
+#else
+            HPX_UNUSED(idle_loop_count);
 #endif
 
             if (num_thread == num_queues_ - 1)

@@ -113,7 +113,7 @@ namespace hpx { namespace parallel { namespace execution {
         // ------------------------------------------------------------------------
         // specialize the hint operator for an arbitrary function/args type
         template <typename... Args>
-        int operator()(Args... args) const
+        int operator()(Args...) const
         {
             std::cout << "Variadic hint invoked " << std::endl;
             return 56;
@@ -124,7 +124,7 @@ namespace hpx { namespace parallel { namespace execution {
 using namespace hpx::parallel::execution;
 
 // this is called on an hpx thread after the runtime starts up
-int hpx_main(hpx::program_options::variables_map& vm)
+int hpx_main()
 {
     std::size_t num_threads = hpx::get_num_worker_threads();
     std::cout << "HPX using threads = " << num_threads << std::endl;
@@ -162,7 +162,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // invoke a lambda asynchronously and use the numa executor
     hpx::future<double> gf2 = hpx::async(
         guided_lambda_exec,
-        [](int a, double x, const std::string& msg) mutable -> double {
+        [](int, double, const std::string& msg) mutable -> double {
             std::cout << "inside <int, double, string> async lambda " << msg
                       << std::endl;
             // return a double as an example

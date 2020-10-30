@@ -54,7 +54,7 @@ inline std::size_t st_rand(std::size_t a, std::size_t b)
     return std::size_t(dist(gen));
 }
 
-int hpx_main(int argc, char* /*argv*/[])
+int hpx_main()
 {
     HPX_TEST_EQ(std::size_t(0), hpx::resource::get_pool_index("default"));
     HPX_TEST_EQ(std::size_t(0), hpx::resource::get_pool_index("pool-0"));

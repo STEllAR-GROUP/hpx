@@ -10,7 +10,7 @@
 #include <sstream>
 #include <string>
 
-int main(int argc, char* argv[])
+int main()
 {
     std::stringstream strm;
 

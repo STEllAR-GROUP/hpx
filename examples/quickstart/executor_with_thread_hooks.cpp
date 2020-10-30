@@ -227,7 +227,7 @@ int main()
         hpx::execution::par.executor(), on_start, on_stop);
 
     hpx::for_loop(
-        hpx::execution::par.on(exec), 0, v.size(), [](std::size_t i) {});
+        hpx::execution::par.on(exec), 0, v.size(), [](std::size_t) {});
 
     std::cout << "Executed " << starts.load() << " starts and " << stops.load()
               << " stops\n";

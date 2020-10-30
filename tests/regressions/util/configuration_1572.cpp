@@ -15,7 +15,7 @@
 #include <cstdint>
 #include <string>
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     // check number of localities
     HPX_TEST_EQ(

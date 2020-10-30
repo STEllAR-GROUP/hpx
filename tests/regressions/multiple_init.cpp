@@ -12,7 +12,7 @@
 
 int invoked_init = 0;
 
-int hpx_main(int argc, char ** argv)
+int hpx_main()
 {
     ++invoked_init;
     return hpx::finalize();

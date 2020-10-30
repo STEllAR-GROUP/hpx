@@ -60,7 +60,7 @@ struct indirect_packaged_task
     }
 
     template <typename... Ts>
-    void operator()(Ts&&... vs)
+    void operator()(Ts&&...)
     {
         // This needs to be run on a HPX thread
         hpx::apply(std::move(*pt));

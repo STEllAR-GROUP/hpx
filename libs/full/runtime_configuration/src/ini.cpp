@@ -297,7 +297,7 @@ namespace hpx { namespace util {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    void section::add_section(std::unique_lock<mutex_type>& l,
+    void section::add_section(std::unique_lock<mutex_type>& /* l */,
         std::string const& sec_name, section& sec, section* root)
     {
         // setting name and root
@@ -978,14 +978,14 @@ namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
     void serialize(serialization::output_archive& ar,
-        section::entry_type const& data, unsigned int version)
+        section::entry_type const& data, unsigned int /* version */)
     {
         ar << data.first;
         // do not handle callback function
     }
 
     void serialize(serialization::input_archive& ar, section::entry_type& data,
-        unsigned int version)
+        unsigned int /* version */)
     {
         ar >> data.first;
         // do not handle callback function
@@ -993,7 +993,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////////
     template <typename Archive>
-    void section::save(Archive& ar, const unsigned int version) const
+    void section::save(Archive& ar, const unsigned int /* version */) const
     {
         ar << name_;
         ar << parent_name_;
@@ -1002,7 +1002,7 @@ namespace hpx { namespace util {
     }
 
     template <typename Archive>
-    void section::load(Archive& ar, const unsigned int version)
+    void section::load(Archive& ar, const unsigned int /* version */)
     {
         ar >> name_;
         ar >> parent_name_;

@@ -56,8 +56,8 @@ namespace hpx { namespace parallel { namespace execution {
         // default implementation of the sync_execute() customization point
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto sync_execute_dispatch(
-            hpx::traits::detail::wrap_int, Executor&& exec, F&& f, Ts&&... ts)
-            -> sync_execute_not_callable<Executor, F, Ts...>
+            hpx::traits::detail::wrap_int, Executor&& /* exec */, F&& /* f */,
+            Ts&&... /* ts */) -> sync_execute_not_callable<Executor, F, Ts...>
         {
             return sync_execute_not_callable<Executor, F, Ts...>{};
         }
@@ -248,8 +248,8 @@ namespace hpx { namespace parallel { namespace execution {
         // default implementation of the async_execute() customization point
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto async_execute_dispatch(
-            hpx::traits::detail::wrap_int, Executor&& exec, F&& f, Ts&&... ts)
-            -> async_execute_not_callable<Executor, F, Ts...>
+            hpx::traits::detail::wrap_int, Executor&& /* exec */, F&& /* f */,
+            Ts&&... /* ts */) -> async_execute_not_callable<Executor, F, Ts...>
         {
             return async_execute_not_callable<Executor, F, Ts...>{};
         }
@@ -494,8 +494,8 @@ namespace hpx { namespace parallel { namespace execution {
         struct post_not_callable;
 
         template <typename Executor, typename F, typename... Ts>
-        HPX_FORCEINLINE auto post_dispatch(
-            hpx::traits::detail::wrap_int, Executor&& exec, F&& f, Ts&&... ts)
+        HPX_FORCEINLINE auto post_dispatch(hpx::traits::detail::wrap_int,
+            Executor&& /* exec */, F&& /* f */, Ts&&... /* ts */)
             -> post_not_callable<Executor, F, Ts...>
         {
             return post_not_callable<Executor, F, Ts...>{};
@@ -557,7 +557,8 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename Executor, typename F, typename Shape, typename... Ts>
         auto bulk_async_execute_dispatch(hpx::traits::detail::wrap_int,
-            Executor&& exec, F&& f, Shape const& shape, Ts&&... ts)
+            Executor&& /* exec */, F&& /* f */, Shape const& /* shape */,
+            Ts&&... /* ts */)
             -> bulk_async_execute_not_callable<Executor, F, Shape, Ts...>
         {
             return bulk_async_execute_not_callable<Executor, F, Shape, Ts...>{};
@@ -682,7 +683,8 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename Executor, typename F, typename Shape, typename... Ts>
         auto bulk_sync_execute_dispatch(hpx::traits::detail::wrap_int,
-            Executor&& exec, F&& f, Shape const& shape, Ts&&... ts)
+            Executor&& /* exec */, F&& /* f */, Shape const& /* shape */,
+            Ts&&... /* ts */)
             -> bulk_sync_execute_not_callable<Executor, F, Shape, Ts...>
         {
             return bulk_sync_execute_not_callable<Executor, F, Shape, Ts...>{};
@@ -1095,14 +1097,22 @@ namespace hpx { namespace parallel { namespace execution {
         {
             template <typename BulkExecutor, typename F, typename Shape,
                 typename Future, typename... Ts>
-            static auto call_impl(hpx::traits::detail::wrap_int,
-                BulkExecutor&& exec, F&& f, Shape const& shape,
-                Future&& predecessor, Ts&&... ts) ->
-                typename hpx::traits::executor_future<Executor,
-                    typename bulk_then_execute_result<F, Shape, Future,
-                        Ts...>::type>::type
+            static auto call_impl(
+                hpx::traits::detail::wrap_int, BulkExecutor&& exec, F&& f,
+                Shape const& shape, Future&& predecessor,
+                Ts&&...
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+                ts
+#endif
+                ) -> typename hpx::traits::executor_future<Executor,
+                typename bulk_then_execute_result<F, Shape, Future,
+                    Ts...>::type>::type
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_UNUSED(exec);
+                HPX_UNUSED(f);
+                HPX_UNUSED(shape);
+                HPX_UNUSED(predecessor);
                 HPX_ASSERT(false);
                 return typename hpx::traits::executor_future<Executor,
                     typename bulk_then_execute_result<F, Shape, Future,

@@ -138,8 +138,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename BidirIter, typename F,
                 typename Proj>
-            static BidirIter sequential(ExPolicy&& policy, BidirIter first,
-                BidirIter last, F&& f, Proj&& proj)
+            static BidirIter sequential(
+                ExPolicy&&, BidirIter first, BidirIter last, F&& f, Proj&& proj)
             {
                 return std::stable_partition(first, last,
                     util::invoke_projected<F, Proj>(

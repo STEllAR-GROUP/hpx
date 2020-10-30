@@ -11,7 +11,7 @@
 
 #include <iostream>
 
-int main(int argc, char* argv[])
+int main()
 {
     std::cout << "HPX Resiliency module version: "
               << hpx::resiliency::experimental::full_version_str() << "\n";

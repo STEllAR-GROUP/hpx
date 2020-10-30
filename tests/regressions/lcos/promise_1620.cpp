@@ -17,8 +17,15 @@
 struct test
 {
     test() { ++count; }
-    test(test const & t) { ++count; }
-    test& operator=(test const & t) { ++count; return *this; }
+    test(test const&)
+    {
+        ++count;
+    }
+    test& operator=(test const&)
+    {
+        ++count;
+        return *this;
+    }
     ~test() { --count; }
 
     static std::atomic<int> count;
@@ -51,7 +58,7 @@ void test_leak()
     HPX_TEST_EQ(test::count, 0);
 }
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     {
         test_leak();

@@ -119,7 +119,7 @@ void vector_range()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     {
         array_range();

@@ -32,11 +32,13 @@ struct vector_t {
   std::vector<double> elts;
 
   friend class hpx::serialization::access;
-  template<class Archive>
-  void serialize(Archive& ar, unsigned int version)
+  template <class Archive>
+  void serialize(Archive& ar, unsigned int)
   {
+      // clang-format off
     ar & N;
     ar & elts;
+      // clang-format on
   }
 
   explicit vector_t(std::ptrdiff_t N): N(N), elts(N) {}
@@ -68,11 +70,13 @@ struct matrix_t {
   std::vector<double> elts;
 
   friend class hpx::serialization::access;
-  template<class Archive>
-  void serialize(Archive& ar, unsigned int version)
+  template <class Archive>
+  void serialize(Archive& ar, unsigned int)
   {
+      // clang-format off
     ar & NI & NJ;
     ar & elts;
+      // clang-format on
   }
 
   matrix_t(std::ptrdiff_t NI, std::ptrdiff_t NJ): NI(NI), NJ(NJ), elts(NI*NJ) {}

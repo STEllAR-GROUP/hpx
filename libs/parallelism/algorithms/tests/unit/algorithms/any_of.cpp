@@ -470,7 +470,7 @@ void any_of_bad_alloc_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(hpx::program_options::variables_map& vm)
+int hpx_main()
 {
     any_of_test();
     any_of_exception_test();

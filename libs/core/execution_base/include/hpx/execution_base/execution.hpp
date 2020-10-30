@@ -112,7 +112,7 @@ namespace hpx { namespace parallel { namespace execution {
         struct customization_point
         {
             template <typename Executor, typename... Ts>
-            auto operator()(Executor&& exec, Ts&&... ts) const
+            auto operator()(Executor&& /* exec */, Ts&&... /* ts */) const
                 -> undefined_customization_point<Executor, Ts...>
             {
                 return undefined_customization_point<Executor, Ts...>{};

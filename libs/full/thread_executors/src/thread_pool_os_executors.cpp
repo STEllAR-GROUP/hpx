@@ -171,7 +171,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
         util::thread_description const& desc,
         threads::thread_schedule_state initial_state, bool run_now,
         threads::thread_stacksize stacksize,
-        threads::thread_schedule_hint schedulehint, error_code& ec)
+        threads::thread_schedule_hint /* schedulehint */, error_code& ec)
     {
         // create a new thread
         thread_init_data data(

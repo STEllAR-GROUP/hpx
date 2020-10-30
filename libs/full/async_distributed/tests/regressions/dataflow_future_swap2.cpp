@@ -49,10 +49,8 @@ void future_swap(future_type& f1, future_type& f2)
     //future_type tmp = hpx::dataflow(
     //  unwrapping( []( double x ){ return x; } ) , f1 );
     future_type tmp = f1;
-    f1 = hpx::dataflow(
-        unwrapping([](double x, double sync) { return x; }), f2, f1);
-    f2 = hpx::dataflow(
-        unwrapping([](double x, double sync) { return x; }), tmp, f1);
+    f1 = hpx::dataflow(unwrapping([](double x, double) { return x; }), f2, f1);
+    f2 = hpx::dataflow(unwrapping([](double x, double) { return x; }), tmp, f1);
 }
 
 int main()

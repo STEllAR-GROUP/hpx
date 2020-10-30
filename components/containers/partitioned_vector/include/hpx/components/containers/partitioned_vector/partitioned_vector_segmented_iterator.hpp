@@ -281,12 +281,12 @@ namespace hpx
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void load(Archive& ar, unsigned version)
+        void load(Archive& ar, unsigned /* version */)
         {
             ar & partition_ & local_index_;
         }
         template <typename Archive>
-        void save(Archive& ar, unsigned version) const
+        void save(Archive& ar, unsigned /* version */) const
         {
             ar & partition_ & local_index_;
         }
@@ -435,12 +435,12 @@ namespace hpx
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void load(Archive& ar, unsigned version)
+        void load(Archive& ar, unsigned /* version */)
         {
             ar & partition_ & local_index_;
         }
         template <typename Archive>
-        void save(Archive& ar, unsigned version) const
+        void save(Archive& ar, unsigned /* version */) const
         {
             ar & partition_ & local_index_;
         }

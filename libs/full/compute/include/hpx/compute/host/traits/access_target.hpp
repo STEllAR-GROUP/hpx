@@ -22,13 +22,13 @@ namespace hpx { namespace compute { namespace traits {
         typedef host::target target_type;
 
         template <typename T>
-        static T const& read(target_type const& tgt, T const* t)
+        static T const& read(target_type const& /* tgt */, T const* t)
         {
             return *t;
         }
 
         template <typename T>
-        static void write(target_type const& tgt, T* dst, T const* src)
+        static void write(target_type const& /* tgt */, T* dst, T const* src)
         {
             *dst = *src;
         }
@@ -40,13 +40,13 @@ namespace hpx { namespace compute { namespace traits {
         typedef std::vector<host::target> target_type;
 
         template <typename T>
-        static T const& read(target_type const& tgt, T const* t)
+        static T const& read(target_type const& /* tgt */, T const* t)
         {
             return *t;
         }
 
         template <typename T>
-        static void write(target_type const& tgt, T* dst, T const* src)
+        static void write(target_type const& /* tgt */, T* dst, T const* src)
         {
             *dst = *src;
         }

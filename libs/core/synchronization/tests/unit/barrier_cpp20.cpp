@@ -203,7 +203,7 @@ void test_barrier_oncomplete_split()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     test_barrier_empty_oncomplete();
     test_barrier_oncomplete();

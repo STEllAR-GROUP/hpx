@@ -109,6 +109,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 HPX_ASSERT(impl.port() ==
                     endpoint.port());
             }
+#else
+            HPX_UNUSED(parcel_locality_id);
 #endif
         }
 
@@ -187,7 +189,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
 
         /// handle completed write operation
-        void handle_write(std::error_code const& e, std::size_t bytes)
+        void handle_write(std::error_code const& e, std::size_t /* bytes */)
         {
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             state_ = state_handle_write;

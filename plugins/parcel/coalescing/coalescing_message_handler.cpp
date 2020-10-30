@@ -362,7 +362,8 @@ namespace hpx { namespace plugins { namespace parcel
     }
 
     std::vector<std::int64_t>
-    coalescing_message_handler::get_time_between_parcels_histogram(bool reset)
+    coalescing_message_handler::get_time_between_parcels_histogram(
+        bool /* reset */)
     {
         std::vector<std::int64_t> result;
 

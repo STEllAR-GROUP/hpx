@@ -284,7 +284,7 @@ void channel_as_lco(hpx::id_type const& here, hpx::id_type const& there)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     hpx::id_type here = hpx::find_here();
 

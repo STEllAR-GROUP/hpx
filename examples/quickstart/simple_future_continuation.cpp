@@ -39,7 +39,7 @@ int cont2(hpx::future<int> f)
     return 1;
 }
 
-int main(int argc, char* argv[])
+int main()
 {
     // executing continuation cont1 on same thread as func1
     {

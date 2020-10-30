@@ -120,7 +120,7 @@ void test_variadic()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     test_nullary_void();
     test_nullary();

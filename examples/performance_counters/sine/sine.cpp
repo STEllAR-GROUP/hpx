@@ -30,7 +30,7 @@ namespace performance_counters { namespace sine
 {
     ///////////////////////////////////////////////////////////////////////////
     // This function will be invoked whenever the implicit counter is queried.
-    std::int64_t immediate_sine(bool reset)
+    std::int64_t immediate_sine(bool)
     {
         static std::uint64_t started_at =
             hpx::chrono::high_resolution_clock::now();

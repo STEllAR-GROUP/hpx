@@ -32,6 +32,7 @@
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -135,7 +136,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
         util::thread_description const& desc,
         threads::thread_schedule_state initial_state, bool run_now,
         threads::thread_stacksize stacksize,
-        threads::thread_schedule_hint schedulehint, error_code& ec)
+        threads::thread_schedule_hint /* schedulehint */, error_code& ec)
     {
         HPX_ASSERT(std::size_t(-1) != thread_num_);
 
@@ -416,9 +417,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
     // Provide the given processing unit to the scheduler.
     template <typename Scheduler>
     void this_thread_executor<Scheduler>::add_processing_unit(
-        std::size_t virt_core, std::size_t thread_num, error_code& ec)
+        std::size_t virt_core, std::size_t thread_num, error_code& /* ec */)
     {
         HPX_ASSERT(0 == virt_core);
+        HPX_UNUSED(virt_core);
         HPX_ASSERT(std::size_t(-1) == thread_num_);
         HPX_ASSERT(std::size_t(-1) == orig_thread_num_);
 
@@ -435,9 +437,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
     // Remove the given processing unit from the scheduler.
     template <typename Scheduler>
     void this_thread_executor<Scheduler>::remove_processing_unit(
-        std::size_t virt_core, error_code& ec)
+        std::size_t virt_core, error_code& /* ec */)
     {
         HPX_ASSERT(0 == virt_core);
+        HPX_UNUSED(virt_core);
         HPX_ASSERT(std::size_t(-1) != thread_num_);
 
         // inform the scheduler to stop the virtual core

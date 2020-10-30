@@ -91,9 +91,7 @@ bool null_result_thread()
 HPX_PLAIN_ACTION(null_result_thread, null_result_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(
-    variables_map& vm
-    )
+int hpx_main()
 {
     {
         std::atomic<std::size_t> count(0);

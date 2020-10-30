@@ -118,7 +118,7 @@ inline bool compare_L2_err(const float* reference, const float* data,
 // -------------------------------------------------------------------------
 template <typename T>
 void matrixMultiply(hpx::cuda::experimental::cublas_executor& cublas,
-    sMatrixSize& matrix_size, std::size_t device, std::size_t iterations)
+    sMatrixSize& matrix_size, std::size_t /* device */, std::size_t iterations)
 {
     using hpx::execution::par;
 
@@ -162,7 +162,7 @@ void matrixMultiply(hpx::cuda::experimental::cublas_executor& cublas,
     // we can call get_future multiple times on the cublas helper.
     // Each one returns a new future that will be set ready when the stream event
     // for this point is triggered
-    copy_future.then([](cublas_future&& f) {
+    copy_future.then([](cublas_future&&) {
         std::cout << "The async host->device copy operation completed"
                   << std::endl;
     });
@@ -206,7 +206,7 @@ void matrixMultiply(hpx::cuda::experimental::cublas_executor& cublas,
         d_C, size_C * sizeof(T), cudaMemcpyDeviceToHost);
 
     // attach a continuation to the cublas future
-    auto new_future = matrix_finished.then([&](cublas_future&& f) {
+    auto new_future = matrix_finished.then([&](cublas_future&&) {
         double us2 = t2.elapsed_microseconds();
         std::cout << "actual: elapsed_microseconds " << us2 << " iterations "
                   << iterations << std::endl;
@@ -223,7 +223,7 @@ void matrixMultiply(hpx::cuda::experimental::cublas_executor& cublas,
     });
 
     // wait for the timing to complete, and then do a CPU comparison
-    auto finished = new_future.then([&](cublas_future&& f) {
+    auto finished = new_future.then([&](cublas_future&&) {
         // compute reference solution on the CPU
         std::cout << "\nComputing result using host CPU...\n";
         // just wait for the device->host copy to complete if it hasn't already

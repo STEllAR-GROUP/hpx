@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     std::size_t num_threads = hpx::resource::get_num_threads("default");
     hpx::threads::thread_pool_base& tp =
@@ -34,7 +34,7 @@ int hpx_main(int argc, char* argv[])
     return hpx::finalize();
 }
 
-int main(int argc, char* argv[])
+int main()
 {
     std::vector<std::string> cfg = {"hpx.os_threads=4"};
 

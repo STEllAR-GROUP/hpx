@@ -103,7 +103,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int /* version */)
         {
             // clang-format off
             ar & min_time_ & num_iters_for_timing_;

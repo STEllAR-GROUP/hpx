@@ -118,7 +118,7 @@ namespace hpx { namespace util {
             typename =
                 typename std::enable_if<traits::is_action<Action>::value>::type>
         explicit thread_description(
-            Action, char const* altname = nullptr) noexcept
+            Action, char const* /* altname */ = nullptr) noexcept
           : type_(data_type_description)
         {
             data_.desc_ = hpx::actions::detail::get_action_name<Action>();

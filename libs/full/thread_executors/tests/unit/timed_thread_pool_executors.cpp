@@ -64,7 +64,7 @@ void test_timed_thread_pool_executor(Executor& exec)
     test_timed_apply(exec);
 }
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     std::size_t num_threads = hpx::get_os_thread_count();
 

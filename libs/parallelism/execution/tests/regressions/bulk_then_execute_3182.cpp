@@ -62,7 +62,7 @@ void test_bulk_then_execute(Executor&& exec)
     }
 }
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     {
         void_count.store(0);

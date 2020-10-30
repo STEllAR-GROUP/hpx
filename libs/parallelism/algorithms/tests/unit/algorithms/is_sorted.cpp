@@ -124,7 +124,7 @@ void sorted_bad_alloc_test()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int hpx_main(hpx::program_options::variables_map& vm)
+int hpx_main()
 {
     sorted_test1();
     sorted_test2();

@@ -215,7 +215,7 @@ void test_all_counters_locality(std::size_t locality_id)
     test_all_locality_counters(locality_id);
 }
 
-int main(int argc, char* argv[])
+int main()
 {
     for (auto const& id : hpx::find_all_localities())
         test_all_counters_locality(hpx::naming::get_locality_id_from_id(id));

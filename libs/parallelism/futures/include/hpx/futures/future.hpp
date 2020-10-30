@@ -421,7 +421,8 @@ namespace hpx { namespace lcos { namespace detail {
     struct future_then_dispatch
     {
         template <typename F>
-        HPX_FORCEINLINE static decltype(auto) call(Future&& fut, F&& f)
+        HPX_FORCEINLINE static decltype(auto) call(
+            Future&& /* fut */, F&& /* f */)
         {
             // dummy impl to fail compilation if this function is called
             static_assert(sizeof(Future) == 0, "Cannot use the \
@@ -430,7 +431,8 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         template <typename T0, typename F>
-        HPX_FORCEINLINE static decltype(auto) call(Future&& fut, T0&& t, F&& f)
+        HPX_FORCEINLINE static decltype(auto) call(
+            Future&& /* fut */, T0&& /* t */, F&& /* f */)
         {
             // dummy impl to fail compilation if this function is called
             static_assert(sizeof(Future) == 0, "Cannot use the \
@@ -440,7 +442,7 @@ namespace hpx { namespace lcos { namespace detail {
 
         template <typename Allocator, typename F>
         HPX_FORCEINLINE static decltype(auto) call_alloc(
-            Allocator const& alloc, Future&& fut, F&& f)
+            Allocator const& /* alloc */, Future&& /* fut */, F&& /* f */)
         {
             // dummy impl to fail compilation if this function is called
             static_assert(sizeof(Future) == 0, "Cannot use the \
@@ -1063,7 +1065,7 @@ namespace hpx { namespace lcos {
         typename std::enable_if<
             std::is_convertible<Future, hpx::lcos::future<T>>::value,
             hpx::lcos::future<T>>::type
-        convert_future_helper(Future&& f, Conv&& conv)
+        convert_future_helper(Future&& f, Conv&& /* conv */)
         {
             return std::forward<Future>(f);
         }

@@ -22,7 +22,7 @@ struct iota : public hpx::parallel::v1::detail::algorithm<iota>
 
     template <typename ExPolicy, typename InIter, typename T>
     static hpx::util::unused_type sequential(
-        ExPolicy&& policy, InIter first, InIter last, T&& init)
+        ExPolicy&&, InIter first, InIter last, T&& init)
     {
         std::iota(first, last, init);
         return hpx::util::unused;
@@ -74,8 +74,7 @@ struct verify_
     }
 
     template <typename ExPolicy, typename SegIter, typename InIter>
-    static Value sequential(
-        ExPolicy&& policy, SegIter first, SegIter last, InIter in)
+    static Value sequential(ExPolicy&&, SegIter first, SegIter last, InIter in)
     {
         return std::equal(first, last, in.begin());
     }

@@ -282,6 +282,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest)
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_UNUSED(policy);
+                HPX_UNUSED(first);
+                HPX_UNUSED(last);
+                HPX_UNUSED(dest);
                 HPX_ASSERT(false);
                 typename util::detail::algorithm_result<ExPolicy,
                     util::in_out_result<FwdIter1, FwdIter2>>::type* dummy =

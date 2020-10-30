@@ -433,7 +433,7 @@ void partitioned_bad_alloc_test()
     test_partitioned_bad_alloc<std::forward_iterator_tag>();
 }
 
-int hpx_main(hpx::program_options::variables_map& vm)
+int hpx_main()
 {
     partitioned_test1();
     partitioned_test2();

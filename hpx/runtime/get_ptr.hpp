@@ -56,7 +56,7 @@ namespace hpx
             }
 
             template <typename Component>
-            void operator()(Component* p)
+            void operator()(Component*)
             {
                 id_ = naming::invalid_id;       // release component
             }

@@ -1746,7 +1746,7 @@ namespace hpx { namespace threads { namespace detail {
 
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::get_idle_loop_count(
-        std::size_t num, bool reset)
+        std::size_t num, bool /* reset */)
     {
         if (num == std::size_t(-1))
         {
@@ -1759,7 +1759,7 @@ namespace hpx { namespace threads { namespace detail {
 
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::get_busy_loop_count(
-        std::size_t num, bool reset)
+        std::size_t num, bool /* reset */)
     {
         if (num == std::size_t(-1))
         {

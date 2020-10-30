@@ -37,7 +37,7 @@ struct signed_assert_nonnegative
 template <typename T>
 struct unsigned_assert_nonnegative
 {
-    static void test(T x) {}
+    static void test(T) {}
 };
 
 template <typename T>

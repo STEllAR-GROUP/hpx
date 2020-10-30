@@ -45,7 +45,7 @@ namespace hpx { namespace serialization {
     }
 
     template <typename Archive>
-    void serialize(Archive& ar, std::tuple<>&, unsigned int)
+    void serialize(Archive&, std::tuple<>&, unsigned int)
     {
     }
 

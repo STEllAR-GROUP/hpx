@@ -101,7 +101,7 @@ void test_limit()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     test_limit();
 

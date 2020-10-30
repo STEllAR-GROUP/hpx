@@ -215,20 +215,20 @@ namespace hpx { namespace threads { namespace detail {
         }
 #endif
         std::int64_t get_queue_length(
-            std::size_t num_thread, bool reset) override
+            std::size_t num_thread, bool /* reset */) override
         {
             return sched_->Scheduler::get_queue_length(num_thread);
         }
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         std::int64_t get_average_thread_wait_time(
-            std::size_t num_thread, bool reset) override
+            std::size_t num_thread, bool /* reset */) override
         {
             return sched_->Scheduler::get_average_thread_wait_time(num_thread);
         }
 
         std::int64_t get_average_task_wait_time(
-            std::size_t num_thread, bool reset) override
+            std::size_t num_thread, bool /* reset */) override
         {
             return sched_->Scheduler::get_average_task_wait_time(num_thread);
         }

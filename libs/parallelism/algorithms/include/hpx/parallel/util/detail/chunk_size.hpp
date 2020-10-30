@@ -312,7 +312,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     // requires traits::is_future<Future>
     std::vector<hpx::tuple<FwdIter, std::size_t, std::size_t>>
     get_bulk_iteration_shape_idx(std::true_type /*has_variable_chunk_size*/,
-        ExPolicy&& policy, std::vector<Future>& workitems, F1&& f1,
+        ExPolicy&& policy, std::vector<Future>& /* workitems */, F1&& /* f1 */,
         FwdIter first, std::size_t count, Stride s)
     {
         using tuple_type = hpx::tuple<FwdIter, std::size_t, std::size_t>;

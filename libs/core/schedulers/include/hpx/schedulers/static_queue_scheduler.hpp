@@ -146,6 +146,8 @@ namespace hpx { namespace threads { namespace policies {
                         << "no new work available, are we deadlocked?";
                 }
             }
+#else
+            HPX_UNUSED(idle_loop_count);
 #endif
 
             return result;

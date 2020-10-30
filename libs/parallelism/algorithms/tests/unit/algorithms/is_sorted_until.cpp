@@ -584,7 +584,7 @@ void sorted_until_bad_alloc_test()
     test_sorted_until_bad_alloc<std::forward_iterator_tag>();
 }
 
-int hpx_main(hpx::program_options::variables_map& vm)
+int hpx_main()
 {
     sorted_until_test1();
     sorted_until_test2();

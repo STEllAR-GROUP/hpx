@@ -176,7 +176,7 @@ namespace hpx { namespace serialization {
         // Deleter needs to use deallocator
         template <typename Deallocator, typename Deleter>
         serialize_buffer(T* data, std::size_t size, allocator_type const& alloc,
-            Deallocator const& dealloc, Deleter const& deleter)
+            Deallocator const& /* dealloc */, Deleter const& deleter)
           : data_()
           , size_(size)
           , alloc_(alloc)

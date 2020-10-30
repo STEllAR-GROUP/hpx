@@ -89,7 +89,7 @@ void test_bulk_async()
         .get();
 }
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     test_sync();
     test_async();

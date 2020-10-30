@@ -120,9 +120,11 @@ private:
     // Serialization Definitions
     friend class hpx::serialization::access;
     template <typename Volume>
-    void serialize(Volume& vol, const unsigned int version)
+    void serialize(Volume& vol, const unsigned int)
     {
-        vol& data_& size_;
+        // clang-format off
+        vol & data_ & size_;
+        // clang-format on
     }
 };
 
@@ -350,7 +352,7 @@ struct stepper
             if (t % cp == 0 && t != 0)
             {
                 hpx::future<void> f_print = hpx::when_all(next).then(
-                    [&container, t, cp](hpx::future<space>&& f_s) {
+                    [&container, t, cp](hpx::future<space>&&) {
                         container[(t / cp) - 1].write();
                     });
                 backup_complete.push_back(std::move(f_print));

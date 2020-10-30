@@ -13,7 +13,7 @@
 
 // Our main HPX thread does nothing except for signalling to the runtime to
 // finalize.
-int hpx_main(int argc, char ** argv)
+int hpx_main()
 {
     return hpx::finalize();
 }

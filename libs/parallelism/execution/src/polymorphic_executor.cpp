@@ -28,7 +28,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     polymorphic_executor_base::polymorphic_executor_base(
-        polymorphic_executor_base const& other, vtable const* empty_vtable)
+        polymorphic_executor_base const& other,
+        vtable const* /* empty_vtable */)
       : vptr(other.vptr)
       , object(other.object)
     {
@@ -60,7 +61,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     }
 
     void polymorphic_executor_base::op_assign(
-        polymorphic_executor_base const& other, vtable const* empty_vtable)
+        polymorphic_executor_base const& other,
+        vtable const* /* empty_vtable */)
     {
         if (vptr == other.vptr)
         {

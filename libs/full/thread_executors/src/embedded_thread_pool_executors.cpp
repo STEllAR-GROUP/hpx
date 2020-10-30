@@ -168,7 +168,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
         util::thread_description const& desc,
         threads::thread_schedule_state initial_state, bool run_now,
         threads::thread_stacksize stacksize,
-        threads::thread_schedule_hint schedulehint, error_code& ec)
+        threads::thread_schedule_hint /* schedulehint */, error_code& ec)
     {
         // create a new thread
         thread_init_data data(
@@ -200,7 +200,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
     void embedded_thread_pool_executor<Scheduler>::add_at(
         std::chrono::steady_clock::time_point const& abs_time, closure_type&& f,
         util::thread_description const& desc,
-        threads::thread_stacksize stacksize, error_code& ec)
+        threads::thread_stacksize /* stacksize */, error_code& ec)
     {
         // create a new suspended thread
         thread_init_data data(
@@ -320,7 +320,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
     // execute all work
     template <typename Scheduler>
     void embedded_thread_pool_executor<Scheduler>::run(
-        std::size_t virt_core, std::size_t thread_num)
+        std::size_t virt_core, std::size_t /* thread_num */)
     {
         // Set the state to 'state_running' only if it's still in 'state_starting'
         // state, otherwise our destructor is currently being executed, which
@@ -450,7 +450,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
     // Remove the given processing unit from the scheduler.
     template <typename Scheduler>
     void embedded_thread_pool_executor<Scheduler>::remove_processing_unit(
-        std::size_t virt_core, error_code& ec)
+        std::size_t virt_core, error_code& /* ec */)
     {
         // inform the scheduler to stop the virtual core
         std::atomic<hpx::state>& state = scheduler_.get_state(virt_core);

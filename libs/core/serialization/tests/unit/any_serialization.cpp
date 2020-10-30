@@ -52,7 +52,7 @@ void in(std::vector<char>& in_buffer, A& a)
     archive >> a;
 }
 
-int hpx_main(variables_map& vm)
+int hpx_main()
 {
     typedef basic_any<hpx::serialization::input_archive,
         hpx::serialization::output_archive>

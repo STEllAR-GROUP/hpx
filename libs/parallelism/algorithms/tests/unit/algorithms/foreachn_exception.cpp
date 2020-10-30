@@ -36,7 +36,7 @@ void test_for_each_n_exception_seq(IteratorTag)
     try
     {
         hpx::for_each_n(iterator(std::begin(c)), c.size(),
-            [](std::size_t& v) { throw std::runtime_error("test"); });
+            [](std::size_t&) { throw std::runtime_error("test"); });
 
         HPX_TEST(false);
     }
@@ -68,7 +68,7 @@ void test_for_each_n_exception(ExPolicy policy, IteratorTag)
     try
     {
         hpx::for_each_n(policy, iterator(std::begin(c)), c.size(),
-            [](std::size_t& v) { throw std::runtime_error("test"); });
+            [](std::size_t&) { throw std::runtime_error("test"); });
 
         HPX_TEST(false);
     }
@@ -99,7 +99,7 @@ void test_for_each_n_exception_async(ExPolicy p, IteratorTag)
     try
     {
         hpx::future<iterator> f = hpx::for_each_n(p, iterator(std::begin(c)),
-            c.size(), [](std::size_t& v) { throw std::runtime_error("test"); });
+            c.size(), [](std::size_t&) { throw std::runtime_error("test"); });
         returned_from_algorithm = true;
         f.get();    // rethrow exception
 

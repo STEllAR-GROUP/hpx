@@ -114,11 +114,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
     hpx::future<void> future_1 = hpx::async(mpi_executor, &do_stuff, 5, true);
 
     hpx::future<void> future_2 = future_1.then(
-        mpi_executor, [](hpx::future<void>&& f) { do_stuff(5, true); });
+        mpi_executor, [](hpx::future<void>&&) { do_stuff(5, true); });
 
     hpx::future<void> future_3 = future_2.then(mpi_executor,
         [mpi_executor, high_priority_executor, async_count](
-            hpx::future<void>&& f) mutable {
+            hpx::future<void>&&) mutable {
             hpx::future<void> future_4, future_5;
             for (std::size_t i = 0; i < async_count; i++)
             {

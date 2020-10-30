@@ -37,12 +37,12 @@ struct random_fill
     std::uniform_int_distribution<> dist;
 
     template <typename Archive>
-    void serialize(Archive& ar, unsigned)
+    void serialize(Archive&, unsigned)
     {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(hpx::program_options::variables_map& vm)
+int hpx_main()
 {
     if (hpx::get_locality_id() == 0)
     {

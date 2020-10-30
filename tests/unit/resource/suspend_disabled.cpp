@@ -17,7 +17,7 @@
 #include <utility>
 #include <vector>
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     // Try suspending without elasticity enabled, should throw an exception
     bool exception_thrown = false;

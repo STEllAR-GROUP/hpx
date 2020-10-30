@@ -91,7 +91,7 @@ void receive(hpx::naming::id_type dest, char* send_buffer,
 }
 //----------------------------------------------------------------------------
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     // alloc buffer to send
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)

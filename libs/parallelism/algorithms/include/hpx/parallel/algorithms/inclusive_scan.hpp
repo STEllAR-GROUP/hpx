@@ -208,7 +208,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
         inclusive_scan_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, T&& init, Op&& op, std::false_type, Conv&& conv)
+            FwdIter2 dest, T&& init, Op&& op, std::false_type, Conv&&)
         {
             using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
@@ -221,7 +221,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
         inclusive_scan_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, Op&& op, std::false_type, Conv&& conv)
+            FwdIter2 dest, Op&& op, std::false_type, Conv&&)
         {
             using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 

@@ -30,7 +30,7 @@ struct cout_continuation
     }
 };
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(hpx::program_options::variables_map& vm)
+int hpx_main()
 {
     {
         hpx::future<int> a = hpx::lcos::make_ready_future<int>(17);

@@ -77,7 +77,7 @@ inline bool satisfies_criteria(int d)
     return d > 500 && (d % 7) == 0;
 }
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     using hpx::execution::par;
     using hpx::ranges::for_each;

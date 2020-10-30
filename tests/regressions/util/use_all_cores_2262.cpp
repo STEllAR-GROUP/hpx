@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     HPX_TEST_EQ(
         hpx::threads::hardware_concurrency(),

@@ -13,7 +13,7 @@
 
 #include <cstdint>
 
-int hpx_main(int argc, char ** argv)
+int hpx_main()
 {
 #if defined(HPX_HAVE_PAPI)
     using hpx::performance_counters::performance_counter;

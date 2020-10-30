@@ -46,9 +46,9 @@ namespace hpx { namespace parallel { namespace execution {
             // Check whether the parameter object implements this function
             template <typename AnyParameters, typename Executor, typename F>
             HPX_FORCEINLINE static std::size_t call_param(
-                hpx::traits::detail::wrap_int, AnyParameters&& params,
-                Executor&& exec, F&& f, std::size_t cores,
-                std::size_t num_tasks)
+                hpx::traits::detail::wrap_int, AnyParameters&& /* params */,
+                Executor&& /* exec */, F&& /* f */, std::size_t /* cores */,
+                std::size_t /* num_tasks */)
             {
                 // return zero for the chunk-size which will tell the
                 // implementation to calculate the chunk size either based
@@ -216,8 +216,9 @@ namespace hpx { namespace parallel { namespace execution {
             }
 
             template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static auto call_param(int, AnyParameters&& params,
-                Executor&& exec) -> decltype(params.reset_thread_distribution())
+            HPX_FORCEINLINE static auto call_param(
+                int, AnyParameters&& params, Executor && /* exec */)
+                -> decltype(params.reset_thread_distribution())
             {
                 params.reset_thread_distribution();
             }
@@ -303,7 +304,7 @@ namespace hpx { namespace parallel { namespace execution {
             }
 
             template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static auto call(int, AnyParameters&& params,
+            HPX_FORCEINLINE static auto call(int, AnyParameters&& /* params */,
                 Executor&& exec) -> decltype(exec.processing_units_count())
             {
                 return exec.processing_units_count();
@@ -807,7 +808,7 @@ namespace hpx { namespace parallel { namespace execution {
             friend class hpx::serialization::access;
 
             template <typename Archive>
-            void serialize(Archive& ar, const unsigned int version)
+            void serialize(Archive& ar, const unsigned int /* version */)
             {
                 int const sequencer[] = {
                     (ar & serialization::base_object<Params>(*this), 0)..., 0};

@@ -102,7 +102,7 @@ double ireceive(
         std::size_t const start = 0;
 
         auto range = boost::irange(start, window_size);
-        for_each(par, range, [&](std::uint64_t j) {
+        for_each(par, range, [&](std::uint64_t) {
             send(dest,
                 buffer_type(aligned_send_buffer, size, buffer_type::reference));
         });

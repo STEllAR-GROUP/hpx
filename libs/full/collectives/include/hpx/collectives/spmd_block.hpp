@@ -150,7 +150,8 @@ namespace hpx { namespace lcos {
         }
 
         // Asynchronous versions of sync_images()
-        hpx::future<void> sync_images(hpx::launch::async_policy const& policy,
+        hpx::future<void> sync_images(
+            hpx::launch::async_policy const& /* policy */,
             std::set<std::size_t> const& images) const
         {
             using list_type = std::set<std::size_t>;
@@ -291,7 +292,7 @@ namespace hpx { namespace lcos {
     template <typename F, typename... Args,
         HPX_CONCEPT_REQUIRES_(hpx::traits::is_action<F>::value)>
     hpx::future<void> define_spmd_block(std::string&& name,
-        std::size_t images_per_locality, F&& f, Args&&... args)
+        std::size_t images_per_locality, F&& /* f */, Args&&... args)
     {
         using ftype = typename std::decay<F>::type;
 

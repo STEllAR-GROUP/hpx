@@ -120,6 +120,7 @@
 #  if defined(__clang__)
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wdeprecated-copy"
+#    pragma clang diagnostic ignored "-Wunused-parameter"
 #  endif
    // Not like nvcc, the __device__ __host__ function decorators are not defined
    // by the compiler

@@ -555,6 +555,8 @@ namespace hpx { namespace util {
             check_networking_option(vm, "hpx:localities");
             check_networking_option(vm, "hpx:node");
             check_networking_option(vm, "hpx:expect-connecting-localities");
+#else
+            HPX_UNUSED(vm);
 #endif
         }
     }    // namespace detail

@@ -13,7 +13,7 @@
 
 #include <vector>
 
-hpx::future<void> bcast_void(double bcast)
+hpx::future<void> bcast_void(double)
 {
     return hpx::make_ready_future();
 }

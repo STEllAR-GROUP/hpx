@@ -182,9 +182,9 @@ namespace hpx { namespace actions {
 namespace hpx { namespace serialization {
     template <typename Archive, typename Component, typename R,
         typename... Args, typename Derived>
-    HPX_FORCEINLINE void serialize(Archive& ar,
-        ::hpx::actions::basic_action<Component, R(Args...), Derived>& t,
-        unsigned int const version = 0)
+    HPX_FORCEINLINE void serialize(Archive& /* ar */,
+        ::hpx::actions::basic_action<Component, R(Args...), Derived>& /* t */,
+        unsigned int const /* version */ = 0)
     {
     }
 }}    // namespace hpx::serialization

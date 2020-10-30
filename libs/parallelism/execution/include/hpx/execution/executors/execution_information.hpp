@@ -45,7 +45,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     {
         template <typename AnyExecutor>
         HPX_FORCEINLINE static bool call(
-            hpx::traits::detail::wrap_int, AnyExecutor&& exec)
+            hpx::traits::detail::wrap_int, AnyExecutor&& /* exec */)
         {
             return false;    // assume stateless scheduling
         }
@@ -76,7 +76,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     {
         template <typename AnyExecutor>
         HPX_FORCEINLINE static threads::mask_cref_type call(
-            hpx::traits::detail::wrap_int, AnyExecutor&& exec,
+            hpx::traits::detail::wrap_int, AnyExecutor&& /* exec */,
             threads::topology& topo, std::size_t thread_num)
         {
             return get_pu_mask(topo, thread_num);
@@ -110,8 +110,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             type>
     {
         template <typename AnyExecutor, typename Mode>
-        HPX_FORCEINLINE static void call(
-            hpx::traits::detail::wrap_int, AnyExecutor&& exec, Mode const& mode)
+        HPX_FORCEINLINE static void call(hpx::traits::detail::wrap_int,
+            AnyExecutor&& /* exec */, Mode const& /* mode */)
         {
         }
 

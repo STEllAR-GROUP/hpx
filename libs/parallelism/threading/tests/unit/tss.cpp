@@ -209,7 +209,7 @@ void test_tss_cleanup_not_called_for_null_pointer()
     HPX_TEST(!tss_cleanup_called);
 }
 
-int main(int argc, char** argv)
+int main()
 {
     test_tss();
     test_tss_with_custom_cleanup();

@@ -455,8 +455,7 @@ namespace hpx { namespace lcos {
     template <typename Iterator>
     typename util::always_void<
         typename lcos::detail::future_iterator_traits<Iterator>::type>::type
-    wait_some(
-        std::size_t n, Iterator begin, Iterator end, error_code& ec = throws)
+    wait_some(std::size_t n, Iterator begin, Iterator end, error_code& = throws)
     {
         typedef typename lcos::detail::future_iterator_traits<Iterator>::type
             future_type;
@@ -476,8 +475,8 @@ namespace hpx { namespace lcos {
     }
 
     template <typename Iterator>
-    Iterator wait_some_n(std::size_t n, Iterator begin, std::size_t count,
-        error_code& ec = throws)
+    Iterator wait_some_n(
+        std::size_t n, Iterator begin, std::size_t count, error_code& = throws)
     {
         typedef typename lcos::detail::future_iterator_traits<Iterator>::type
             future_type;

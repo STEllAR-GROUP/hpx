@@ -85,7 +85,7 @@ void consume_numbers(int n, hpx::lcos::local::channel_spsc<bool>& c1,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     hpx::lcos::local::channel_spsc<bool> c1(1);
     hpx::lcos::local::channel_spsc<int> c2(1);

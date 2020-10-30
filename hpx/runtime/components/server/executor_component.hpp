@@ -54,9 +54,9 @@ namespace hpx { namespace components
         static typename std::enable_if<
             traits::is_threads_executor<Executor_>::value>::type
         schedule_thread(hpx::naming::address::address_type lva,
-            naming::address::component_type comptype,
+            naming::address::component_type /* comptype */,
             hpx::threads::thread_init_data& data,
-            hpx::threads::thread_schedule_state initial_state)
+            hpx::threads::thread_schedule_state /* initial_state */)
         {
             hpx::util::thread_description desc(&executor_component::execute);
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
@@ -73,9 +73,9 @@ namespace hpx { namespace components
         static typename std::enable_if<
             !traits::is_threads_executor<Executor_>::value>::type
         schedule_thread(hpx::naming::address::address_type lva,
-            naming::address::component_type comptype,
+            naming::address::component_type /* comptype */,
             hpx::threads::thread_init_data& data,
-            hpx::threads::thread_schedule_state initial_state)
+            hpx::threads::thread_schedule_state /* initial_state */)
         {
             hpx::util::thread_description desc(&executor_component::execute);
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
@@ -94,5 +94,3 @@ namespace hpx { namespace components
         executor_type exec_;
     };
 }}
-
-

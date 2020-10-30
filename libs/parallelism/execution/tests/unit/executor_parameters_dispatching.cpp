@@ -34,8 +34,8 @@ struct test_executor_get_chunk_size : hpx::execution::parallel_executor
     }
 
     template <typename Parameters, typename F>
-    std::size_t get_chunk_size(
-        Parameters&& params, F&& f, std::size_t cores, std::size_t count)
+    std::size_t get_chunk_size(Parameters&& /* params */, F&& /* f */,
+        std::size_t cores, std::size_t count)
     {
         ++exec_count;
         return (count + cores - 1) / cores;
@@ -52,8 +52,8 @@ namespace hpx { namespace parallel { namespace execution {
 struct test_chunk_size
 {
     template <typename Executor, typename F>
-    std::size_t get_chunk_size(
-        Executor&& exec, F&& f, std::size_t cores, std::size_t count)
+    std::size_t get_chunk_size(Executor&& /* exec */, F&& /* f */,
+        std::size_t cores, std::size_t count)
     {
         ++params_count;
         return (count + cores - 1) / cores;

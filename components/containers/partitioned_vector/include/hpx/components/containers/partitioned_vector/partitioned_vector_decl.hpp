@@ -927,7 +927,7 @@ namespace hpx
         /// \param pos   Position of the element in the vector
         /// \param val   The value to be copied
         ///
-        void set_values(launch::sync_policy, size_type part,
+        void set_values(launch::sync_policy, size_type /* part */,
             std::vector<size_type> const& pos, std::vector<T> const& val)
         {
             set_values(pos, val).get();

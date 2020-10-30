@@ -44,7 +44,7 @@ struct matrix_numa_binder : hpx::compute::host::numa_binding_helper<T>
 
     // return the domain that a given page should be bound to
     virtual std::size_t operator()(const T* const base_ptr,
-        const T* const page_ptr, std::size_t const pagesize,
+        const T* const page_ptr, std::size_t const /* pagesize */,
         std::size_t const domains) const override
     {
         std::intptr_t offset = page_ptr - base_ptr;

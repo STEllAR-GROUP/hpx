@@ -29,7 +29,7 @@ namespace hpx { namespace components { namespace process { namespace posix
             {}
 
             template <typename PosixExecutor>
-            void on_fork_success(PosixExecutor &e) const
+            void on_fork_success(PosixExecutor&) const
             {
                 // wait for the newly launched HPX locality to connect back here
                 hpx::lcos::latch l(2);

@@ -161,21 +161,17 @@ namespace hpx { namespace parcelset
             }
 
             std::shared_ptr<sender_connection> create_connection(
-                parcelset::locality const& l, error_code& ec)
+                parcelset::locality const& l, error_code&)
             {
                 int dest_rank = l.get<locality>().rank();
                 return sender_.create_connection(dest_rank, this);
             }
 
             parcelset::locality agas_locality(
-                util::runtime_configuration const & ini) const override
+                util::runtime_configuration const&) const override
             {
-                return
-                    parcelset::locality(
-                        locality(
-                            util::mpi_environment::enabled() ? 0 : -1
-                        )
-                    );
+                return parcelset::locality(
+                    locality(util::mpi_environment::enabled() ? 0 : -1));
             }
 
             parcelset::locality create_locality() const override
@@ -184,7 +180,7 @@ namespace hpx { namespace parcelset
             }
 
             bool background_work(
-                std::size_t num_thread, parcelport_background_mode mode)
+                std::size_t /* num_thread */, parcelport_background_mode mode)
             {
                 if (stopped_)
                     return false;

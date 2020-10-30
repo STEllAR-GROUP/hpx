@@ -73,13 +73,13 @@ void test_then(bool sync)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test_s(int value, hpx::thread::id tid, int passed_through)    //-V813
+void bulk_test_s(int, hpx::thread::id tid, int passed_through)    //-V813
 {
     HPX_TEST_EQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 
-void bulk_test_a(int value, hpx::thread::id tid, int passed_through)    //-V813
+void bulk_test_a(int, hpx::thread::id tid, int passed_through)    //-V813
 {
     HPX_TEST_NEQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -132,7 +132,7 @@ void test_bulk_async(bool sync)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test_f_s(int value, hpx::shared_future<void> f, hpx::thread::id tid,
+void bulk_test_f_s(int, hpx::shared_future<void> f, hpx::thread::id tid,
     int passed_through)    //-V813
 {
     HPX_TEST(f.is_ready());    // make sure, future is ready
@@ -143,7 +143,7 @@ void bulk_test_f_s(int value, hpx::shared_future<void> f, hpx::thread::id tid,
     HPX_TEST_EQ(passed_through, 42);
 }
 
-void bulk_test_f_a(int value, hpx::shared_future<void> f, hpx::thread::id tid,
+void bulk_test_f_a(int, hpx::shared_future<void> f, hpx::thread::id tid,
     int passed_through)    //-V813
 {
     HPX_TEST(f.is_ready());    // make sure, future is ready
@@ -218,7 +218,7 @@ void policy_test(bool sync = false)
     test_bulk_then<Policy>(sync);
 }
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     policy_test<hpx::launch>();
 

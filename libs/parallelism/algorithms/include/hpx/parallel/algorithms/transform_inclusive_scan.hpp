@@ -108,8 +108,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter, typename OutIter,
                 typename Conv, typename Op>
-            static OutIter sequential(ExPolicy&& policy, InIter first,
-                InIter last, OutIter dest, Conv&& conv, Op&& op)
+            static OutIter sequential(ExPolicy&&, InIter first, InIter last,
+                OutIter dest, Conv&& conv, Op&& op)
             {
                 return sequential_transform_inclusive_scan_noinit(first, last,
                     dest, std::forward<Conv>(conv), std::forward<Op>(op));

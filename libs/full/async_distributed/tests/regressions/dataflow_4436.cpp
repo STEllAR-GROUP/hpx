@@ -38,7 +38,7 @@ namespace hpx { namespace traits {
     };
 }}    // namespace hpx::traits
 
-int start(int argc, char** argv)
+int hpx_main()
 {
     custom::vector<hpx::future<int>> values_futures;
 
@@ -59,7 +59,7 @@ int start(int argc, char** argv)
 
 int main(int argc, char** argv)
 {
-    HPX_TEST_EQ(hpx::init(start, argc, argv), 0);
+    HPX_TEST_EQ(hpx::init(argc, argv), 0);
 
     return hpx::util::report_errors();
 }

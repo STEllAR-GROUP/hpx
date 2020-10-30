@@ -2006,10 +2006,6 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # we ignore this warning
     hpx_add_compile_flag_if_available(-Wno-noexcept-type)
 
-    # These are usually benign and can't be suppressed because of interface
-    # requirements
-    hpx_add_compile_flag_if_available(-Wno-unused-parameter)
-
     # Be extra strict about format checks Boost.Logging is built on fprintf,
     # sadly
     hpx_add_compile_flag_if_available(-Wformat=2)

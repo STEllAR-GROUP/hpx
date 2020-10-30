@@ -56,7 +56,7 @@ void send_receive_channel()
 //]
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     minimal_channel();
     send_receive_channel();

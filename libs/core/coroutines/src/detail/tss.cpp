@@ -60,7 +60,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #endif
     }
 
-    std::size_t get_tss_thread_data(tss_storage* storage)
+    std::size_t get_tss_thread_data(tss_storage*)
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         coroutine_self* self = coroutine_self::get_self();
@@ -82,7 +82,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         return node->get_data<std::size_t>();
 #else
-        HPX_UNUSED(storage);
         throw std::runtime_error(
             "thread local storage has been disabled at configuration time, "
             "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake");
@@ -90,7 +89,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #endif
     }
 
-    std::size_t set_tss_thread_data(tss_storage* storage, std::size_t data)
+    std::size_t set_tss_thread_data(tss_storage*, std::size_t data)
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         coroutine_self* self = coroutine_self::get_self();
@@ -121,7 +120,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         return prev_val;
 #else
-        HPX_UNUSED(storage);
         HPX_UNUSED(data);
         throw std::runtime_error(
             "thread local storage has been disabled at configuration time, "

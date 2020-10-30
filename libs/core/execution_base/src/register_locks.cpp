@@ -9,6 +9,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -29,6 +30,9 @@ namespace hpx { namespace util {
           , backtrace_(hpx::util::trace(trace_depth))
 #endif
         {
+#ifndef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+            HPX_UNUSED(trace_depth);
+#endif
         }
 
         lock_data::lock_data(register_lock_data* data, std::size_t trace_depth)
@@ -38,6 +42,9 @@ namespace hpx { namespace util {
           , backtrace_(hpx::detail::trace(trace_depth))
 #endif
         {
+#ifndef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+            HPX_UNUSED(trace_depth);
+#endif
         }
 
         lock_data::~lock_data()

@@ -13,8 +13,15 @@
 struct test
 {
     test() { ++count; }
-    test(test const & t) { ++count; }
-    test& operator=(test const & t) { ++count; return *this; }
+    test(test const&)
+    {
+        ++count;
+    }
+    test& operator=(test const&)
+    {
+        ++count;
+        return *this;
+    }
     ~test() { --count; }
 
     static int count;
@@ -22,7 +29,7 @@ struct test
 
 int test::count = 0;
 
-int hpx_main(hpx::program_options::variables_map & vm)
+int hpx_main()
 {
     {
         HPX_TEST_EQ(test::count, 0);

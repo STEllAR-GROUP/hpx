@@ -105,8 +105,8 @@ namespace hpx { namespace util { namespace detail
         }
     }
 
-    bool pool_timer::start(hpx::chrono::steady_duration const& time_duration,
-        bool evaluate_)
+    bool pool_timer::start(
+        hpx::chrono::steady_duration const& time_duration, bool /* evaluate_ */)
     {
         std::unique_lock<mutex_type> l(mtx_);
         if (is_terminated_)

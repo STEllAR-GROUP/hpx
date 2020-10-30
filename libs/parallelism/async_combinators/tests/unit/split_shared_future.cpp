@@ -152,7 +152,7 @@ void test_split_future_array()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     test_split_future0();
     test_split_future1();

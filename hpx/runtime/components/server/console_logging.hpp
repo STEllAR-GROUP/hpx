@@ -68,9 +68,9 @@ namespace hpx { namespace components { namespace server
 
     public:
         template <typename T>
-        static util::unused_type
-        execute_function(naming::address_type lva,
-            naming::component_type comptype, T&& v)
+        static util::unused_type execute_function(
+            naming::address_type /* lva */,
+            naming::component_type /* comptype */, T&& v)
         {
             try {
                 // call the function, ignoring the return value

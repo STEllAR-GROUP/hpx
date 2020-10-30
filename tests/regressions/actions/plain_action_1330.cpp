@@ -33,7 +33,7 @@ namespace mynamespace
 HPX_REGISTER_ACTION(mynamespace::test_action, mynamespace_test_action);
 
 // hpx_main, is the actual main called by hpx
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     {
         typedef mynamespace::test_action func;

@@ -55,11 +55,13 @@ class sierpinski{
     //Serialization is necessary to transmit objects from one locality to another
     friend class hpx::serialization::access;
     template <class Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    void serialize(Archive& ar, const unsigned int)
     {
+        // clang-format off
         ar & black_triangles;
         ar & white_triangles;
         ar & area;
+        // clang-format on
     }
 };
 

@@ -111,7 +111,7 @@ void test_for_each_async(ExPolicy&& p, IteratorTag)
 struct counter_exception
 {
     std::size_t count = 0;
-    void operator()(std::size_t& v)
+    void operator()(std::size_t&)
     {
         ++count;
         throw std::runtime_error("test");
@@ -168,7 +168,7 @@ void test_for_each_exception(ExPolicy policy, IteratorTag)
         hpx::ranges::for_each(policy,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
-            [](std::size_t& v) { throw std::runtime_error("test"); });
+            [](std::size_t&) { throw std::runtime_error("test"); });
 
         HPX_TEST(false);
     }
@@ -201,7 +201,7 @@ void test_for_each_exception_async(ExPolicy p, IteratorTag)
         hpx::future<iterator> f = hpx::ranges::for_each(p,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
-            [](std::size_t& v) { throw std::runtime_error("test"); });
+            [](std::size_t&) { throw std::runtime_error("test"); });
         returned_from_algorithm = true;
         f.get();
 
@@ -225,7 +225,7 @@ void test_for_each_exception_async(ExPolicy p, IteratorTag)
 struct counter_bad_alloc
 {
     std::size_t count = 0;
-    void operator()(std::size_t& v)
+    void operator()(std::size_t&)
     {
         ++count;
         throw std::bad_alloc();
@@ -282,7 +282,7 @@ void test_for_each_bad_alloc(ExPolicy policy, IteratorTag)
         hpx::ranges::for_each(policy,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
-            [](std::size_t& v) { throw std::bad_alloc(); });
+            [](std::size_t&) { throw std::bad_alloc(); });
 
         HPX_TEST(false);
     }
@@ -314,7 +314,7 @@ void test_for_each_bad_alloc_async(ExPolicy p, IteratorTag)
         hpx::future<iterator> f = hpx::ranges::for_each(p,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
-            [](std::size_t& v) { throw std::bad_alloc(); });
+            [](std::size_t&) { throw std::bad_alloc(); });
         returned_from_algorithm = true;
         f.get();
 

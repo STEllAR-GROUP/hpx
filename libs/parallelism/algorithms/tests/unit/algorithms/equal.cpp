@@ -330,7 +330,7 @@ void test_equal_exception(IteratorTag)
     try
     {
         hpx::equal(iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), [](std::size_t v1, std::size_t v2) {
+            std::begin(c2), [](std::size_t, std::size_t) {
                 return throw std::runtime_error("test"), true;
             });
 
@@ -370,7 +370,7 @@ void test_equal_exception(ExPolicy&& policy, IteratorTag)
     try
     {
         hpx::equal(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), [](std::size_t v1, std::size_t v2) {
+            std::begin(c2), [](std::size_t, std::size_t) {
                 return throw std::runtime_error("test"), true;
             });
 
@@ -408,7 +408,7 @@ void test_equal_exception_async(ExPolicy&& p, IteratorTag)
     {
         hpx::future<bool> f =
             hpx::equal(p, iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2), [](std::size_t v1, std::size_t v2) {
+                std::begin(c2), [](std::size_t, std::size_t) {
                     return throw std::runtime_error("test"), true;
                 });
         returned_from_algorithm = true;
@@ -474,7 +474,7 @@ void test_equal_bad_alloc(ExPolicy&& policy, IteratorTag)
     try
     {
         hpx::equal(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), [](std::size_t v1, std::size_t v2) {
+            std::begin(c2), [](std::size_t, std::size_t) {
                 return throw std::bad_alloc(), true;
             });
 
@@ -511,7 +511,7 @@ void test_equal_bad_alloc_async(ExPolicy&& p, IteratorTag)
     {
         hpx::future<bool> f =
             hpx::equal(p, iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2), [](std::size_t v1, std::size_t v2) {
+                std::begin(c2), [](std::size_t, std::size_t) {
                     return throw std::bad_alloc(), true;
                 });
         returned_from_algorithm = true;

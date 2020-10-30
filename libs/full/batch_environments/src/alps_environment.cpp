@@ -14,7 +14,7 @@
 
 namespace hpx { namespace util { namespace batch_environments {
     alps_environment::alps_environment(
-        std::vector<std::string>& nodelist, bool debug)
+        std::vector<std::string>& /* nodelist */, bool /* debug */)
       : node_num_(0)
       , num_threads_(0)
       , num_localities_(0)

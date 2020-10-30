@@ -56,7 +56,7 @@ void get_env_options()
               << std::endl;
 }
 
-int main(int ac, char* av[])
+int main()
 {
     get_env_options();
 

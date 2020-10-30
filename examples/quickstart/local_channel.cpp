@@ -157,7 +157,7 @@ void channel_range()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     calculate_sum();
     pingpong();

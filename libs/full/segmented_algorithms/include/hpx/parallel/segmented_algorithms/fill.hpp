@@ -44,7 +44,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             template <typename Archive>
-            void serialize(Archive& ar, unsigned version)
+            void serialize(Archive& ar, unsigned /* version */)
             {
                 ar& value_;
             }

@@ -89,7 +89,7 @@ double receive_double(
         std::size_t const start = 0;
 
         auto range = boost::irange(start, window_size);
-        for_each(par, range, [&](std::uint64_t j) {
+        for_each(par, range, [&](std::uint64_t) {
             double d = 0.0;
             msg(dest, d);
         });
@@ -121,7 +121,7 @@ double receive(hpx::naming::id_type dest, char* send_buffer, std::size_t size,
         std::size_t const start = 0;
 
         auto range = boost::irange(start, window_size);
-        for_each(par, std::begin(range), std::end(range), [&](std::uint64_t j) {
+        for_each(par, std::begin(range), std::end(range), [&](std::uint64_t) {
             msg(dest, buffer_type(send_buffer, size, buffer_type::reference));
         });
     }

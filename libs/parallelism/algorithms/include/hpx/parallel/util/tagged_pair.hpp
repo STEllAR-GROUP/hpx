@@ -14,6 +14,7 @@
 #include <hpx/datastructures/tagged_pair.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -31,6 +32,7 @@ namespace hpx { namespace util {
             result_type;
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_UNUSED(f);
         HPX_ASSERT(false);
         return hpx::future<result_type>();
 #else
@@ -56,6 +58,7 @@ namespace hpx { namespace util {
             result_type;
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_UNUSED(f);
         HPX_ASSERT(false);
         return hpx::future<result_type>();
 #else

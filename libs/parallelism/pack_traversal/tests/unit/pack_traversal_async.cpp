@@ -134,7 +134,7 @@ template <std::size_t ArgCount>
 struct async_increasing_int_sync_visitor
   : async_counter_base<async_increasing_int_sync_visitor<ArgCount>>
 {
-    explicit async_increasing_int_sync_visitor(int dummy) {}
+    explicit async_increasing_int_sync_visitor(int) {}
 
     bool operator()(async_traverse_visit_tag, std::size_t i)
     {
@@ -167,7 +167,7 @@ template <std::size_t ArgCount>
 struct async_increasing_int_visitor
   : async_counter_base<async_increasing_int_visitor<ArgCount>>
 {
-    explicit async_increasing_int_visitor(int dummy) {}
+    explicit async_increasing_int_visitor(int) {}
 
     bool operator()(async_traverse_visit_tag, std::size_t i) const
     {
@@ -318,7 +318,7 @@ template <std::size_t ArgCount>
 struct async_unique_sync_visitor
   : async_counter_base<async_unique_sync_visitor<ArgCount>>
 {
-    explicit async_unique_sync_visitor(int dummy) {}
+    explicit async_unique_sync_visitor(int) {}
 
     bool operator()(async_traverse_visit_tag, std::unique_ptr<std::size_t>& i)
     {
@@ -351,7 +351,7 @@ struct async_unique_sync_visitor
 template <std::size_t ArgCount>
 struct async_unique_visitor : async_counter_base<async_unique_visitor<ArgCount>>
 {
-    explicit async_unique_visitor(int dummy) {}
+    explicit async_unique_visitor(int) {}
 
     bool operator()(
         async_traverse_visit_tag, std::unique_ptr<std::size_t>& i) const
@@ -404,7 +404,7 @@ static void test_async_move_only_traversal()
 
 struct invalidate_visitor : async_counter_base<invalidate_visitor>
 {
-    explicit invalidate_visitor(int dummy) {}
+    explicit invalidate_visitor(int) {}
 
     bool operator()(async_traverse_visit_tag, std::shared_ptr<int>& i) const
     {

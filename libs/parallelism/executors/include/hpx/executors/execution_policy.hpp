@@ -173,7 +173,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& /* ar */, const unsigned int /* version */)
         {
         }
 
@@ -225,7 +225,7 @@ namespace hpx { namespace execution {
         /// \returns The new sequenced_task_policy
         ///
         constexpr sequenced_task_policy_shim const& operator()(
-            task_policy_tag tag) const
+            task_policy_tag /* tag */) const
         {
             return *this;
         }
@@ -338,9 +338,11 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int /* version */)
         {
-            ar& exec_& params_;
+            // clang-format off
+            ar & exec_ & params_;
+            // clang-format on
         }
 
     private:
@@ -489,7 +491,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& /* ar */, const unsigned int /* version */)
         {
         }
 
@@ -537,7 +539,7 @@ namespace hpx { namespace execution {
         /// \returns The new sequenced_task_policy_shim
         ///
         constexpr sequenced_task_policy_shim<Executor, Parameters> operator()(
-            task_policy_tag tag) const
+            task_policy_tag /* tag */) const
         {
             return sequenced_task_policy_shim<Executor, Parameters>(
                 exec_, params_);
@@ -649,9 +651,11 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int /* version */)
         {
-            ar& exec_& params_;
+            // clang-format off
+            ar & exec_ & params_;
+            // clang-format on
         }
 
     private:
@@ -797,7 +801,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& /* ar */, const unsigned int /* version */)
         {
         }
 
@@ -844,7 +848,7 @@ namespace hpx { namespace execution {
         /// \returns The new sequenced_task_policy
         ///
         constexpr parallel_task_policy_shim operator()(
-            task_policy_tag tag) const
+            task_policy_tag /* tag */) const
         {
             return *this;
         }
@@ -956,9 +960,11 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int /* version */)
         {
-            ar& exec_& params_;
+            // clang-format off
+            ar & exec_ & params_;
+            // clang-format on
         }
 
     private:
@@ -1099,7 +1105,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& /* ar */, const unsigned int /* version */)
         {
         }
 
@@ -1147,7 +1153,7 @@ namespace hpx { namespace execution {
         /// \returns The new parallel_policy
         ///
         constexpr parallel_task_policy_shim<Executor, Parameters> operator()(
-            task_policy_tag tag) const
+            task_policy_tag /* tag */) const
         {
             return parallel_task_policy_shim<Executor, Parameters>(
                 exec_, params_);
@@ -1258,9 +1264,11 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int /* version */)
         {
-            ar& exec_& params_;
+            // clang-format off
+            ar & exec_ & params_;
+            // clang-format on
         }
 
     private:
@@ -1334,7 +1342,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& /* ar */, const unsigned int /* version */)
         {
         }
 

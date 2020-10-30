@@ -22,9 +22,16 @@ namespace hpx { namespace detail {
     template <typename Action, typename Callback, typename... Ts>
     lcos::future<typename traits::promise_local_result<
         typename hpx::traits::extract_action<Action>::remote_result_type>::type>
-    async_colocated_cb(naming::id_type const& gid, Callback&& cb, Ts&&... vs)
+    async_colocated_cb(naming::id_type const& gid, Callback&& cb,
+        Ts&&...
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        vs
+#endif
+    )
     {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_UNUSED(gid);
+        HPX_UNUSED(cb);
         HPX_ASSERT(false);
 #else
         // Attach the requested action as a continuation to a resolve_async
@@ -64,10 +71,18 @@ namespace hpx { namespace detail {
         typename... Ts>
     lcos::future<typename traits::promise_local_result<
         typename hpx::traits::extract_action<Action>::remote_result_type>::type>
-    async_colocated_cb(Continuation&& cont, naming::id_type const& gid,
-        Callback&& cb, Ts&&... vs)
+    async_colocated_cb(
+        Continuation&& cont, naming::id_type const& gid, Callback&& cb,
+        Ts&&...
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        vs
+#endif
+    )
     {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_UNUSED(cont);
+        HPX_UNUSED(gid);
+        HPX_UNUSED(cb);
         HPX_ASSERT(false);
 #else
         // Attach the requested action as a continuation to a resolve_async

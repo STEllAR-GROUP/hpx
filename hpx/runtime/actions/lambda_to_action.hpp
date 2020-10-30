@@ -49,9 +49,9 @@ namespace hpx { namespace actions
                 return "lambda action()";
             }
 
-            template <typename ...Ts>
+            template <typename... Ts>
             static ReturnType invoke(naming::address::address_type /*lva*/,
-                naming::address::component_type comptype, Ts&&... vs)
+                naming::address::component_type /*comptype*/, Ts&&... vs)
             {
                 int* dummy = nullptr;
                 return reinterpret_cast<const F&>(*dummy)(    // -V522

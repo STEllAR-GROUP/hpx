@@ -15,13 +15,13 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_local/dataflow.hpp>
 #endif
+#include <hpx/compute/detail/target_distribution_policy.hpp>
+#include <hpx/compute/host/target.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/create_component_helpers.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-
-#include <hpx/compute/detail/target_distribution_policy.hpp>
-#include <hpx/compute/host/target.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -143,9 +143,15 @@ namespace hpx { namespace compute { namespace host {
         ///
         template <typename Component, typename... Ts>
         hpx::future<std::vector<bulk_locality_result>> bulk_create(
-            std::size_t count, Ts&&... ts) const
+            std::size_t count,
+            Ts&&...
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+            ts
+#endif
+        ) const
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(count);
             HPX_ASSERT(false);
             return hpx::future<std::vector<bulk_locality_result>>();
 #else

@@ -48,16 +48,14 @@ int main()
     for (std::size_t i = 0; i < (loop*window_size) + skip; ++i)
     {
         // launch a message to the remote node
-        hpx::async(msg, there, 3.5).then(
-            hpx::launch::sync,
-            // when the message completes, increment our semaphore count
-            // so that N are always in flight
-            [&,parcel_count](hpx::future<double> &&f) -> void
-            {
-                ++signal_count;
-                sem.signal(parcel_count);
-            }
-        );
+        hpx::async(msg, there, 3.5)
+            .then(hpx::launch::sync,
+                // when the message completes, increment our semaphore count
+                // so that N are always in flight
+                [&, parcel_count](hpx::future<double> &&) -> void {
+                    ++signal_count;
+                    sem.signal(parcel_count);
+                });
 
         //
         ++parcel_count;

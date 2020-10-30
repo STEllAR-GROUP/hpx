@@ -628,12 +628,27 @@ namespace hpx { namespace threads { namespace policies {
             stolen_to_staged_.fetch_add(num, std::memory_order_relaxed);
         }
 #else
-        constexpr void increment_num_pending_misses(std::size_t num = 1) {}
-        constexpr void increment_num_pending_accesses(std::size_t num = 1) {}
-        constexpr void increment_num_stolen_from_pending(std::size_t num = 1) {}
-        constexpr void increment_num_stolen_from_staged(std::size_t num = 1) {}
-        constexpr void increment_num_stolen_to_pending(std::size_t num = 1) {}
-        constexpr void increment_num_stolen_to_staged(std::size_t num = 1) {}
+        constexpr void increment_num_pending_misses(std::size_t /* num */ = 1)
+        {
+        }
+        constexpr void increment_num_pending_accesses(std::size_t /* num */ = 1)
+        {
+        }
+        constexpr void increment_num_stolen_from_pending(
+            std::size_t /* num */ = 1)
+        {
+        }
+        constexpr void increment_num_stolen_from_staged(
+            std::size_t /* num */ = 1)
+        {
+        }
+        constexpr void increment_num_stolen_to_pending(
+            std::size_t /* num */ = 1)
+        {
+        }
+        constexpr void increment_num_stolen_to_staged(std::size_t /* num */ = 1)
+        {
+        }
 #endif
 
         ///////////////////////////////////////////////////////////////////////
@@ -1049,6 +1064,9 @@ namespace hpx { namespace threads { namespace policies {
             std::size_t num_thread, std::int64_t& idle_loop_count, bool running)
         {
 #if !defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
+            HPX_UNUSED(num_thread);
+            HPX_UNUSED(idle_loop_count);
+            HPX_UNUSED(running);
             return false;
 #else
             if (get_minimal_deadlock_detection_enabled())
@@ -1062,9 +1080,12 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void on_start_thread(std::size_t num_thread) {}
-        void on_stop_thread(std::size_t num_thread) {}
-        void on_error(std::size_t num_thread, std::exception_ptr const& e) {}
+        void on_start_thread(std::size_t /* num_thread */) {}
+        void on_stop_thread(std::size_t /* num_thread */) {}
+        void on_error(
+            std::size_t /* num_thread */, std::exception_ptr const& /* e */)
+        {
+        }
 
     private:
         thread_queue_init_parameters parameters_;

@@ -14,6 +14,7 @@
 #include <hpx/runtime/agas/detail/hosted_component_namespace.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/serialization/vector.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstdint>
 #include <string>
@@ -35,6 +36,8 @@ namespace hpx { namespace agas { namespace detail
         server::component_namespace::bind_prefix_action action;
         return action(gid_, key, prefix);
 #else
+        HPX_UNUSED(key);
+        HPX_UNUSED(prefix);
         HPX_ASSERT(false);
         return components::component_type{};
 #endif
@@ -47,6 +50,7 @@ namespace hpx { namespace agas { namespace detail
         server::component_namespace::bind_name_action action;
         return action(gid_, name);
 #else
+        HPX_UNUSED(name);
         HPX_ASSERT(false);
         return components::component_type{};
 #endif
@@ -59,6 +63,7 @@ namespace hpx { namespace agas { namespace detail
         server::component_namespace::resolve_id_action action;
         return action(gid_, key);
 #else
+        HPX_UNUSED(key);
         HPX_ASSERT(false);
         return std::vector<std::uint32_t>{1, std::uint32_t(0)};
 #endif
@@ -70,6 +75,7 @@ namespace hpx { namespace agas { namespace detail
         server::component_namespace::unbind_action action;
         return action(gid_, key);
 #else
+        HPX_UNUSED(key);
         HPX_ASSERT(false);
         return true;
 #endif
@@ -82,6 +88,7 @@ namespace hpx { namespace agas { namespace detail
         server::component_namespace::iterate_types_action action;
         return action(gid_, f);
 #else
+        HPX_UNUSED(f);
         HPX_ASSERT(false);
 #endif
     }
@@ -94,6 +101,7 @@ namespace hpx { namespace agas { namespace detail
         server::component_namespace::get_component_type_name_action action;
         return action(gid_, type);
 #else
+        HPX_UNUSED(type);
         HPX_ASSERT(false);
         return std::string{};
 #endif
@@ -106,6 +114,7 @@ namespace hpx { namespace agas { namespace detail
         server::component_namespace::get_num_localities_action action;
         return hpx::async(action, gid_, type);
 #else
+        HPX_UNUSED(type);
         HPX_ASSERT(false);
         return hpx::make_ready_future(std::uint32_t(1));
 #endif
@@ -118,6 +127,7 @@ namespace hpx { namespace agas { namespace detail
         server::component_namespace::statistics_counter_action action;
         return action(gid_, name).get_gid();
 #else
+        HPX_UNUSED(name);
         HPX_ASSERT(false);
         return hpx::naming::invalid_gid;
 #endif

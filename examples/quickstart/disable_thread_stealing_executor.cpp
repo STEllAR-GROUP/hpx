@@ -123,7 +123,7 @@ int main()
         hpx::execution::par.executor());
 
     hpx::for_loop(
-        hpx::execution::par.on(exec), 0, v.size(), [](std::size_t i) {});
+        hpx::execution::par.on(exec), 0, v.size(), [](std::size_t) {});
 
     return 0;
 }

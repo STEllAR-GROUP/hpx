@@ -395,7 +395,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter, typename F,
                 typename Proj = util::projection_identity>
-            HPX_HOST_DEVICE static Iter sequential(ExPolicy&& policy,
+            HPX_HOST_DEVICE static Iter sequential(ExPolicy&& /* policy */,
                 InIter first, std::size_t count, F&& f,
                 Proj&& proj /* = Proj()*/)
             {
@@ -517,8 +517,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static typename std::enable_if<
                 hpx::traits::is_random_access_iterator<InIterB>::value,
                 InIterB>::type
-            sequential(ExPolicy&& policy, InIterB first, InIterE last, F&& f,
-                Proj&& proj)
+            sequential(ExPolicy&& /* policy */, InIterB first, InIterE last,
+                F&& f, Proj&& proj)
             {
                 return util::loop_n<typename std::decay<ExPolicy>::type>(first,
                     static_cast<std::size_t>(detail::distance(first, last)),

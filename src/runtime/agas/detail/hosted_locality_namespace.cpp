@@ -18,6 +18,7 @@
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/serialization/vector.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstdint>
 #include <map>
@@ -34,8 +35,9 @@ namespace hpx { namespace agas { namespace detail
     {}
 
     std::uint32_t hosted_locality_namespace::allocate(
-        parcelset::endpoints_type const& endpoints, std::uint64_t count,
-        std::uint32_t num_threads, naming::gid_type const& suggested_prefix)
+        parcelset::endpoints_type const& /* endpoints */,
+        std::uint64_t /* count */, std::uint32_t /* num_threads */,
+        naming::gid_type const& /* suggested_prefix */)
     {
         return 0;
     }
@@ -46,6 +48,7 @@ namespace hpx { namespace agas { namespace detail
         server::locality_namespace::free_action action;
         action(gid_, locality);
 #else
+        HPX_UNUSED(locality);
         HPX_ASSERT(false);
 #endif
     }
@@ -80,6 +83,7 @@ namespace hpx { namespace agas { namespace detail
 
         return endpoints_future.get();
 #else
+        HPX_UNUSED(locality);
         HPX_ASSERT(false);
         return parcelset::endpoints_type{};
 #endif
@@ -159,6 +163,7 @@ namespace hpx { namespace agas { namespace detail
         server::locality_namespace::statistics_counter_action action;
         return action(gid_, name).get_gid();
 #else
+        HPX_UNUSED(name);
         HPX_ASSERT(false);
         return naming::gid_type{};
 #endif

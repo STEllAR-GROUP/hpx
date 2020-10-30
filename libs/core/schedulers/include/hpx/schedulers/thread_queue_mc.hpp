@@ -177,9 +177,9 @@ namespace hpx { namespace threads { namespace policies {
         // ----------------------------------------------------------------
         // This returns the current length of the staged queue
         std::int64_t get_queue_length_staged(
-            std::memory_order order = std::memory_order_seq_cst) const
+            std::memory_order order = std::memory_order_relaxed) const
         {
-            return new_tasks_count_.data_.load(std::memory_order_relaxed);
+            return new_tasks_count_.data_.load(order);
         }
 
         // ----------------------------------------------------------------
@@ -283,9 +283,12 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void on_start_thread(std::size_t num_thread) {}
-        void on_stop_thread(std::size_t num_thread) {}
-        void on_error(std::size_t num_thread, std::exception_ptr const& e) {}
+        void on_start_thread(std::size_t /* num_thread */) {}
+        void on_stop_thread(std::size_t /* num_thread */) {}
+        void on_error(
+            std::size_t /* num_thread */, std::exception_ptr const& /* e */)
+        {
+        }
 
         // pops all tasks off the queue, prints info and pushes them back on
         // just because we can't iterate over the queue/stack in general

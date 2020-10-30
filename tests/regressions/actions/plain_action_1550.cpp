@@ -38,7 +38,7 @@ typedef mynamespace::test_action mynamespace_test_action;
 
 HPX_REGISTER_ACTION(mynamespace_test_action);
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     {
         {

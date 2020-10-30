@@ -22,7 +22,7 @@
 constexpr char const* gather_basename = "/test/gather/";
 constexpr char const* gather_direct_basename = "/test/gather_direct/";
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
 

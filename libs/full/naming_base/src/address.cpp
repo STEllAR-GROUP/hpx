@@ -12,7 +12,7 @@
 namespace hpx { namespace naming {
 
     template <typename Archive>
-    void address::save(Archive& ar, unsigned int version) const
+    void address::save(Archive& ar, unsigned int /* version */) const
     {
         // clang-format off
         ar & locality_ & type_ & address_;
@@ -20,7 +20,7 @@ namespace hpx { namespace naming {
     }
 
     template <typename Archive>
-    void address::load(Archive& ar, unsigned int version)
+    void address::load(Archive& ar, unsigned int /* version */)
     {
         // clang-format off
         ar & locality_ & type_ & address_;

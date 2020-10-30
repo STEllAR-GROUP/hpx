@@ -194,7 +194,7 @@ namespace hpx { namespace parallel { namespace util {
 
             // FIXME: This looks wrong, it should dispatch to the base iterator
             //        instead.
-            inline std::size_t& operator[](std::size_t rhs)
+            inline std::size_t& operator[](std::size_t)
             {
                 return idx_;
             }

@@ -19,8 +19,7 @@ namespace hpx { namespace cuda { namespace experimental {
     struct default_executor_parameters
     {
         template <typename Executor, typename F>
-        std::size_t get_chunk_size(
-            Executor& exec, F&&, std::size_t cores, std::size_t num_tasks)
+        std::size_t get_chunk_size(Executor&, F&&, std::size_t, std::size_t)
         {
             return std::size_t(-1);
         }

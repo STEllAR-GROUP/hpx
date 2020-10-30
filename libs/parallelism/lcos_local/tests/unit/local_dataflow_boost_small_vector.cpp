@@ -213,7 +213,7 @@ void future_function_pointers(std::uint32_t num)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     function_pointers(3);
     function_pointers(3);

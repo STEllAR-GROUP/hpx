@@ -127,8 +127,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Reduce, typename Convert>
-        static T sequential(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, Reduce&& r, Convert&& conv)
+        static T sequential(ExPolicy&& /* policy */, FwdIter1 first1,
+            FwdIter1 last1, FwdIter2 first2, Reduce&& r, Convert&& conv)
         {
             return util::accumulate<T>(first1, last1, first2,
                 std::forward<Reduce>(r), std::forward<Convert>(conv));

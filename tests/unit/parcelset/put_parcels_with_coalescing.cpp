@@ -50,7 +50,7 @@ struct test_server : hpx::components::component_base<test_server>
 {
     typedef hpx::components::component_base<test_server> base_type;
 
-    hpx::id_type test1(std::vector<double> const& data)
+    hpx::id_type test1(std::vector<double> const&)
     {
         return hpx::find_here();
     }
@@ -106,7 +106,7 @@ void test_plain_argument(hpx::id_type const& id)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::id_type test2(hpx::future<double> const& data)
+hpx::id_type test2(hpx::future<double> const&)
 {
     return hpx::find_here();
 }

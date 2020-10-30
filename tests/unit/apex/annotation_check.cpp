@@ -151,15 +151,13 @@ void test_execution(Execution& exec)
         hpx::future<int> f1 = hpx::make_ready_future(5);
         results.emplace_back(f1.then(exec,
             hpx::util::annotated_function(
-                [](auto&& f1) { dummy_task(std::size_t(1000)); },
-                pcs.c_str())));
+                [](auto&&) { dummy_task(std::size_t(1000)); }, pcs.c_str())));
     }
     {
         hpx::future<int> f1 = hpx::make_ready_future(5);
         results.emplace_back(f1.then(exec,
             hpx::util::unwrapping(hpx::util::annotated_function(
-                [](auto&& f1) { dummy_task(std::size_t(1000)); },
-                pcsu.c_str()))));
+                [](auto&&) { dummy_task(std::size_t(1000)); }, pcsu.c_str()))));
     }
     // wait for completion
     hpx::when_all(results).get();
@@ -187,7 +185,7 @@ void test_none()
     {
         hpx::future<int> f1 = hpx::make_ready_future(5);
         results.emplace_back(f1.then(hpx::util::annotated_function(
-            [](auto&& f1) { dummy_task(std::size_t(1000)); }, pcs.c_str())));
+            [](auto&&) { dummy_task(std::size_t(1000)); }, pcs.c_str())));
     }
 
     // wait for completion
@@ -216,7 +214,7 @@ int hpx_main()
     return hpx::finalize();
 }
 
-int main(int argc, char* argv[])
+int main()
 {
     apex::apex_options::use_screen_output(true);
     HPX_TEST_EQ(hpx::init(), 0);

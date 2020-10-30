@@ -9,12 +9,13 @@
 #pragma once
 
 #include <hpx/assert.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/collectives/spmd_block.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view_iterator.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/type_support/pack.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <array>
 #include <cstddef>
@@ -104,6 +105,7 @@ namespace hpx
             HPX_ASSERT_MSG(limit <= std::distance(begin,last), \
                 "Space dedicated to the described partitioned_vector_view " \
                 "is too small");
+            HPX_UNUSED(last);
 
             // Update end_
             end_  += hw_basis_[N-1] * sw_sizes.begin()[N-1];

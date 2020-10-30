@@ -31,7 +31,8 @@ namespace hpx { namespace traits
             return "1";
         }
 
-        static void init(int *argc, char ***argv, util::command_line_handling &cfg)
+        static void init(int* /* argc */, char*** /* argv */,
+            util::command_line_handling& /* cfg */)
         {
         }
 

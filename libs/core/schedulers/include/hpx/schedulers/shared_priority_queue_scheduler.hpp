@@ -272,7 +272,7 @@ namespace hpx { namespace threads { namespace policies {
 
         // ------------------------------------------------------------
         bool cleanup_terminated(
-            std::size_t thread_num, bool delete_all) override
+            std::size_t /* thread_num */, bool delete_all) override
         {
             std::size_t local_num = local_thread_number();
             HPX_ASSERT(local_num < num_workers_);
@@ -614,16 +614,18 @@ namespace hpx { namespace threads { namespace policies {
 
             auto get_next_thread_function_HP =
                 [&](std::size_t domain, std::size_t q_index,
-                    thread_holder_type* receiver, threads::thread_data*& thrd,
-                    bool stealing, bool allow_stealing) {
+                    thread_holder_type* /* receiver */,
+                    threads::thread_data*& thrd, bool stealing,
+                    bool allow_stealing) {
                     return numa_holder_[domain].get_next_thread_HP(
                         q_index, thrd, stealing, allow_stealing);
                 };
 
             auto get_next_thread_function =
                 [&](std::size_t domain, std::size_t q_index,
-                    thread_holder_type* receiver, threads::thread_data*& thrd,
-                    bool stealing, bool allow_stealing) {
+                    thread_holder_type* /* receiver */,
+                    threads::thread_data*& thrd, bool stealing,
+                    bool allow_stealing) {
                     return numa_holder_[domain].get_next_thread(
                         q_index, thrd, stealing, allow_stealing);
                 };
@@ -654,9 +656,9 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         /// Return the next thread to be executed, return false if none available
-        virtual bool wait_or_add_new(std::size_t thread_num, bool running,
-            std::int64_t& idle_loop_count, bool /*enable_stealing*/,
-            std::size_t& added) override
+        virtual bool wait_or_add_new(std::size_t /* thread_num */,
+            bool /* running */, std::int64_t& /* idle_loop_count */,
+            bool /*enable_stealing*/, std::size_t& added) override
         {
             std::size_t this_thread = local_thread_number();
             HPX_ASSERT(this_thread < num_workers_);
@@ -893,7 +895,7 @@ namespace hpx { namespace threads { namespace policies {
             thread_schedule_state state = thread_schedule_state::unknown,
             thread_priority priority = thread_priority::default_,
             std::size_t thread_num = std::size_t(-1),
-            bool reset = false) const override
+            bool /* reset */ = false) const override
         {
             spq_deb.debug(debug::str<>("get_thread_count"), "thread_num ",
                 debug::dec<3>(thread_num));
@@ -1234,7 +1236,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         void on_error(
-            std::size_t thread_num, std::exception_ptr const& e) override
+            std::size_t thread_num, std::exception_ptr const& /* e */) override
         {
             if (thread_num > num_workers_)
             {
@@ -1246,7 +1248,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-        std::uint64_t get_creation_time(bool reset) override
+        std::uint64_t get_creation_time(bool /* reset */) override
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "shared_priority_scheduler::get_creation_time",
@@ -1254,7 +1256,7 @@ namespace hpx { namespace threads { namespace policies {
                 "get_creation_time performance counter");
             return 0;
         }
-        std::uint64_t get_cleanup_time(bool reset) override
+        std::uint64_t get_cleanup_time(bool /* reset */) override
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "shared_priority_scheduler::get_cleanup_time",
@@ -1266,7 +1268,7 @@ namespace hpx { namespace threads { namespace policies {
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
         std::int64_t get_num_pending_misses(
-            std::size_t num, bool reset) override
+            std::size_t /* num */, bool /* reset */) override
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "shared_priority_scheduler::get_num_pending_misses",
@@ -1276,7 +1278,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         std::int64_t get_num_pending_accesses(
-            std::size_t num, bool reset) override
+            std::size_t /* num */, bool /* reset */) override
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "shared_priority_scheduler::get_num_pending_accesses",
@@ -1286,7 +1288,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         std::int64_t get_num_stolen_from_pending(
-            std::size_t num, bool reset) override
+            std::size_t /* num */, bool /* reset */) override
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "shared_priority_scheduler::get_num_stolen_from_pending",
@@ -1296,7 +1298,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         std::int64_t get_num_stolen_to_pending(
-            std::size_t num, bool reset) override
+            std::size_t /* num */, bool /* reset */) override
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "shared_priority_scheduler::get_creation_time",
@@ -1306,7 +1308,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         std::int64_t get_num_stolen_from_staged(
-            std::size_t num, bool reset) override
+            std::size_t /* num */, bool /* reset */) override
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "shared_priority_scheduler::get_num_stolen_from_staged",
@@ -1316,7 +1318,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         std::int64_t get_num_stolen_to_staged(
-            std::size_t num, bool reset) override
+            std::size_t /* num */, bool /* reset */) override
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "shared_priority_scheduler::get_num_stolen_to_staged",
@@ -1328,7 +1330,7 @@ namespace hpx { namespace threads { namespace policies {
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         std::int64_t get_average_thread_wait_time(
-            std::size_t num_thread = std::size_t(-1)) const override
+            std::size_t /* num_thread */ = std::size_t(-1)) const override
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "shared_priority_scheduler::get_average_thread_wait_time",
@@ -1337,7 +1339,7 @@ namespace hpx { namespace threads { namespace policies {
             return 0;
         }
         std::int64_t get_average_task_wait_time(
-            std::size_t num_thread = std::size_t(-1)) const override
+            std::size_t /* num_thread */ = std::size_t(-1)) const override
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "shared_priority_scheduler::get_average_task_wait_time",

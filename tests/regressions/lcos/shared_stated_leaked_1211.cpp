@@ -59,7 +59,7 @@ struct test : hpx::components::client_base<test, test_server>
     }
 };
 
-int main(int argc, char* argv[])
+int main()
 {
     {
         test t(hpx::find_here());

@@ -59,7 +59,7 @@ namespace hpx { namespace execution {
         //         }
 
         template <typename Executor, typename F>
-        constexpr std::size_t get_chunk_size(Executor&& exec, F&&,
+        constexpr std::size_t get_chunk_size(Executor&& /* exec */, F&&,
             std::size_t cores, std::size_t num_tasks) const
         {
             return (std::max)(min_chunk_size_, (num_tasks + cores - 1) / cores);
@@ -71,7 +71,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int /* version */)
         {
             ar& min_chunk_size_;
         }

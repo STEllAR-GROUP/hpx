@@ -69,29 +69,29 @@ struct data_buffer
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-int test_function1(hpx::serialization::serialize_buffer<double> const& b)
+int test_function1(hpx::serialization::serialize_buffer<double> const& /* b */)
 {
     return 42;
 }
 HPX_PLAIN_ACTION(test_function1, test_action1)
 
-int test_function2(hpx::serialization::serialize_buffer<double> const& b1,
-    hpx::serialization::serialize_buffer<int> const& b2)
+int test_function2(hpx::serialization::serialize_buffer<double> const& /* b1 */,
+    hpx::serialization::serialize_buffer<int> const& /* b2 */)
 {
     return 42;
 }
 HPX_PLAIN_ACTION(test_function2, test_action2)
 
-int test_function3(double d,
-    hpx::serialization::serialize_buffer<double> const& b1,
-    std::string const& s, int i,
-    hpx::serialization::serialize_buffer<int> const& b2)
+int test_function3(double /* d */,
+    hpx::serialization::serialize_buffer<double> const& /* b1 */,
+    std::string const& /* s */, int /* i */,
+    hpx::serialization::serialize_buffer<int> const& /* b2 */)
 {
     return 42;
 }
 HPX_PLAIN_ACTION(test_function3, test_action3)
 
-int test_function4(data_buffer<double> const& b)
+int test_function4(data_buffer<double> const& /* b */)
 {
     return 42;
 }
@@ -345,7 +345,7 @@ void test_zero_copy_serialization(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(hpx::program_options::variables_map& vm)
+int hpx_main()
 {
     std::size_t size = 1;
     for (std::size_t i = 0; i != 20; ++i)

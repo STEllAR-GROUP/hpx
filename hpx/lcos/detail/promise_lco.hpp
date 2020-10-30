@@ -209,7 +209,7 @@ namespace traits {
             return value;
         }
 
-        static void set(components::component_type t)
+        static void set(components::component_type /* t */)
         {
             HPX_ASSERT(false);
         }

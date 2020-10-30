@@ -134,7 +134,7 @@ void test_initialization_from_vector(std::size_t max_size)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     std::size_t const max_size = 1 << 22;
     std::unique_ptr<char[]> send_buffer(new char[max_size]);

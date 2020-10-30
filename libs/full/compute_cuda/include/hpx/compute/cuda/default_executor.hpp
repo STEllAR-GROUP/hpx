@@ -41,7 +41,12 @@ namespace hpx { namespace cuda { namespace experimental {
         {
             template <typename F, typename... Ts>
             static void call(hpx::cuda::experimental::target const& target,
-                F&& f, Shape const& shape, Ts&&... ts)
+                F&& f, Shape const& shape,
+                Ts&&...
+#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
+                ts
+#endif
+            )
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
                 std::size_t count = util::size(shape);
@@ -72,6 +77,9 @@ namespace hpx { namespace cuda { namespace experimental {
                     std::forward<F>(f), shape_container.data(), count,
                     std::forward<Ts>(ts)...);
 #else
+                HPX_UNUSED(target);
+                HPX_UNUSED(f);
+                HPX_UNUSED(shape);
                 HPX_THROW_EXCEPTION(hpx::not_implemented,
                     "hpx::cuda::experimental::detail::bulk_launch_helper",
                     "Trying to launch a CUDA kernel, but did not compile in "
@@ -89,7 +97,12 @@ namespace hpx { namespace cuda { namespace experimental {
         {
             template <typename F, typename Shape, typename... Ts>
             static void call(hpx::cuda::experimental::target const& target,
-                F&& f, Shape const& shape, Ts&&... ts)
+                F&& f, Shape const& shape,
+                Ts&&...
+#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
+                ts
+#endif
+            )
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
                 typedef typename hpx::traits::range_traits<Shape>::value_type
@@ -121,6 +134,9 @@ namespace hpx { namespace cuda { namespace experimental {
                         std::forward<F>(f), std::forward<Ts>(ts)...);
                 }
 #else
+                HPX_UNUSED(target);
+                HPX_UNUSED(f);
+                HPX_UNUSED(shape);
                 HPX_THROW_EXCEPTION(hpx::not_implemented,
                     "hpx::cuda::experimental::detail::bulk_launch_helper",
                     "Trying to launch a CUDA kernel, but did not compile in "

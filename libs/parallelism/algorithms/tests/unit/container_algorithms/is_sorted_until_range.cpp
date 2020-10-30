@@ -824,7 +824,7 @@ void test_sorted_until_exception(ExPolicy policy, IteratorTag)
     {
         hpx::ranges::is_sorted_until(policy, iterator(std::begin(c)),
             iterator(std::end(c)),
-            [](int x, int y) -> bool { throw std::runtime_error("test"); });
+            [](int, int) -> bool { throw std::runtime_error("test"); });
     }
     catch (hpx::exception_list const& e)
     {
@@ -843,7 +843,7 @@ void test_sorted_until_exception(ExPolicy policy, IteratorTag)
     {
         hpx::ranges::is_sorted_until(policy, iterator(std::begin(c)),
             iterator(std::end(c)), std::less<int>(),
-            [](int x) -> int { throw std::runtime_error("test"); });
+            [](int) -> int { throw std::runtime_error("test"); });
     }
     catch (hpx::exception_list const& e)
     {
@@ -898,7 +898,7 @@ void test_sorted_until_async_exception(ExPolicy p, IteratorTag)
     {
         hpx::future<iterator> f = hpx::ranges::is_sorted_until(p,
             iterator(std::begin(c)), iterator(std::end(c)),
-            [](int x, int y) -> int { throw std::runtime_error("test"); });
+            [](int, int) -> int { throw std::runtime_error("test"); });
         f.get();
 
         HPX_TEST(false);
@@ -920,7 +920,7 @@ void test_sorted_until_async_exception(ExPolicy p, IteratorTag)
     {
         hpx::future<iterator> f = hpx::ranges::is_sorted_until(p,
             iterator(std::begin(c)), iterator(std::end(c)), std::less<int>(),
-            [](int x) -> bool { throw std::runtime_error("test"); });
+            [](int) -> bool { throw std::runtime_error("test"); });
         f.get();
 
         HPX_TEST(false);
@@ -1029,7 +1029,7 @@ void test_sorted_until_exception(ExPolicy policy)
     try
     {
         hpx::ranges::is_sorted_until(policy, c,
-            [](int x, int y) -> bool { throw std::runtime_error("test"); });
+            [](int, int) -> bool { throw std::runtime_error("test"); });
     }
     catch (hpx::exception_list const& e)
     {
@@ -1047,7 +1047,7 @@ void test_sorted_until_exception(ExPolicy policy)
     try
     {
         hpx::ranges::is_sorted_until(policy, c, std::less<int>(),
-            [](int x) -> int { throw std::runtime_error("test"); });
+            [](int) -> int { throw std::runtime_error("test"); });
     }
     catch (hpx::exception_list const& e)
     {
@@ -1071,8 +1071,8 @@ void test_sorted_until_async_exception(ExPolicy p)
     bool caught_exception = false;
     try
     {
-        auto f = hpx::ranges::is_sorted_until(p, c,
-            [](int x, int y) -> int { throw std::runtime_error("test"); });
+        auto f = hpx::ranges::is_sorted_until(
+            p, c, [](int, int) -> int { throw std::runtime_error("test"); });
         f.get();
 
         HPX_TEST(false);
@@ -1093,7 +1093,7 @@ void test_sorted_until_async_exception(ExPolicy p)
     try
     {
         auto f = hpx::ranges::is_sorted_until(p, c, std::less<int>(),
-            [](int x) -> bool { throw std::runtime_error("test"); });
+            [](int) -> bool { throw std::runtime_error("test"); });
         f.get();
 
         HPX_TEST(false);
@@ -1231,7 +1231,7 @@ void test_sorted_until_bad_alloc(ExPolicy policy, IteratorTag)
     {
         hpx::ranges::is_sorted_until(policy, iterator(std::begin(c)),
             iterator(std::end(c)),
-            [](int x, int y) -> bool { throw std::runtime_error("test"); });
+            [](int, int) -> bool { throw std::runtime_error("test"); });
     }
     catch (hpx::exception_list const& e)
     {
@@ -1249,7 +1249,7 @@ void test_sorted_until_bad_alloc(ExPolicy policy, IteratorTag)
     {
         hpx::ranges::is_sorted_until(policy, iterator(std::begin(c)),
             iterator(std::end(c)), std::less<int>(),
-            [](int x) -> int { throw std::runtime_error("test"); });
+            [](int) -> int { throw std::runtime_error("test"); });
     }
     catch (hpx::exception_list const& e)
     {
@@ -1302,7 +1302,7 @@ void test_sorted_until_async_bad_alloc(ExPolicy p, IteratorTag)
     {
         hpx::future<iterator> f = hpx::ranges::is_sorted_until(p,
             iterator(std::begin(c)), iterator(std::end(c)),
-            [](int x, int y) -> int { throw std::runtime_error("test"); });
+            [](int, int) -> int { throw std::runtime_error("test"); });
         f.get();
 
         HPX_TEST(false);
@@ -1323,7 +1323,7 @@ void test_sorted_until_async_bad_alloc(ExPolicy p, IteratorTag)
     {
         hpx::future<iterator> f = hpx::ranges::is_sorted_until(p,
             iterator(std::begin(c)), iterator(std::end(c)), std::less<int>(),
-            [](int x) -> bool { throw std::runtime_error("test"); });
+            [](int) -> bool { throw std::runtime_error("test"); });
         f.get();
 
         HPX_TEST(false);
@@ -1425,7 +1425,7 @@ void test_sorted_until_bad_alloc(ExPolicy policy)
     try
     {
         hpx::ranges::is_sorted_until(policy, c,
-            [](int x, int y) -> bool { throw std::runtime_error("test"); });
+            [](int, int) -> bool { throw std::runtime_error("test"); });
     }
     catch (hpx::exception_list const& e)
     {
@@ -1442,7 +1442,7 @@ void test_sorted_until_bad_alloc(ExPolicy policy)
     try
     {
         hpx::ranges::is_sorted_until(policy, c, std::less<int>(),
-            [](int x) -> int { throw std::runtime_error("test"); });
+            [](int) -> int { throw std::runtime_error("test"); });
     }
     catch (hpx::exception_list const& e)
     {
@@ -1465,8 +1465,8 @@ void test_sorted_until_async_bad_alloc(ExPolicy p)
     bool caught_bad_alloc = false;
     try
     {
-        auto f = hpx::ranges::is_sorted_until(p, c,
-            [](int x, int y) -> int { throw std::runtime_error("test"); });
+        auto f = hpx::ranges::is_sorted_until(
+            p, c, [](int, int) -> int { throw std::runtime_error("test"); });
         f.get();
 
         HPX_TEST(false);
@@ -1486,7 +1486,7 @@ void test_sorted_until_async_bad_alloc(ExPolicy p)
     try
     {
         auto f = hpx::ranges::is_sorted_until(p, c, std::less<int>(),
-            [](int x) -> bool { throw std::runtime_error("test"); });
+            [](int) -> bool { throw std::runtime_error("test"); });
         f.get();
 
         HPX_TEST(false);
@@ -1578,7 +1578,7 @@ void sorted_until_bad_alloc_test()
     test_sorted_until_seq_bad_alloc();
 }
 
-int hpx_main(hpx::program_options::variables_map& vm)
+int hpx_main()
 {
     sorted_until_test1();
     sorted_until_test2();

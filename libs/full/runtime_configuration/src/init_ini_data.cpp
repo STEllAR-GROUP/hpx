@@ -345,7 +345,8 @@ namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     std::vector<std::shared_ptr<plugins::plugin_registry_base>>
     load_plugin_factory(hpx::util::plugin::dll& d, util::section& ini,
-        std::string const& curr, std::string const& name, error_code& ec)
+        std::string const& /* curr */, std::string const& /* name */,
+        error_code& ec)
     {
         typedef std::vector<std::shared_ptr<plugins::plugin_registry_base>>
             plugin_list_type;

@@ -433,7 +433,7 @@ namespace hpx {
             /// Async traverse a single element, and do nothing.
             /// This function is matched last.
             template <typename Matcher, typename Current>
-            void async_traverse_one_impl(Matcher, Current&& current)
+            void async_traverse_one_impl(Matcher, Current&&)
             {
                 // Do nothing if the visitor doesn't accept the type
             }

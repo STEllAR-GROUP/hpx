@@ -1532,10 +1532,9 @@ void addressing_service::route(
 // if there was a pending decref request at the point when the incref was sent.
 // The pending decref was subtracted from the amount of credits to incref.
 std::int64_t addressing_service::synchronize_with_async_incref(
-    hpx::future<std::int64_t> fut
-  , naming::id_type const& id
-  , std::int64_t compensated_credit
-    )
+    hpx::future<std::int64_t> fut, naming::id_type const& /* id */
+    ,
+    std::int64_t compensated_credit)
 {
     return fut.get() + compensated_credit;
 }
@@ -2234,7 +2233,7 @@ namespace detail
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions to access the current cache statistics
-std::uint64_t addressing_service::get_cache_entries(bool reset)
+std::uint64_t addressing_service::get_cache_entries(bool /* reset */)
 {
     std::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->size();
@@ -2646,6 +2645,8 @@ void addressing_service::send_refcnt_requests_non_blocking(
             "addressing_service::send_refcnt_requests_non_blocking");
     }
 #else
+    HPX_UNUSED(l);
+    HPX_UNUSED(ec);
     HPX_ASSERT(false);
 #endif
 }
@@ -2718,6 +2719,7 @@ addressing_service::send_refcnt_requests_async(
 
     return lazy_results;
 #else
+    HPX_UNUSED(l);
     HPX_ASSERT(false);
     std::vector<hpx::future<std::vector<std::int64_t>>> lazy_results;
     return lazy_results;
@@ -2746,6 +2748,7 @@ hpx::future<void> addressing_service::mark_as_migrated(
   , bool expect_to_be_marked_as_migrating
     )
 {
+    HPX_UNUSED(expect_to_be_marked_as_migrating);
     if (!gid_)
     {
         return hpx::make_exceptional_future<void>(

@@ -34,15 +34,16 @@ void sync_test_void(int passed_through)
     HPX_TEST_EQ(passed_through, 42);
 }
 
-hpx::thread::id sync_bulk_test(int value, hpx::thread::id tid,
+hpx::thread::id sync_bulk_test(int, hpx::thread::id tid,
     int passed_through)    //-V813
 {
+    HPX_TEST_EQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
     return hpx::this_thread::get_id();
 }
 
 void sync_bulk_test_void(
-    int value, hpx::thread::id tid, int passed_through)    //-V813
+    int, hpx::thread::id tid, int passed_through)    //-V813
 {
     HPX_TEST_EQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -67,7 +68,7 @@ void then_test_void(hpx::future<void> f, int passed_through)
     HPX_TEST_EQ(passed_through, 42);
 }
 
-hpx::thread::id then_bulk_test(int value, hpx::shared_future<void> f,
+hpx::thread::id then_bulk_test(int, hpx::shared_future<void> f,
     hpx::thread::id tid, int passed_through)    //-V813
 {
     HPX_TEST(f.is_ready());    // make sure, future is ready
@@ -80,8 +81,8 @@ hpx::thread::id then_bulk_test(int value, hpx::shared_future<void> f,
     return hpx::this_thread::get_id();
 }
 
-void then_bulk_test_void(int value, hpx::shared_future<void> f,
-    hpx::thread::id tid, int passed_through)    //-V813
+void then_bulk_test_void(int, hpx::shared_future<void> f, hpx::thread::id tid,
+    int passed_through)    //-V813
 {
     HPX_TEST(f.is_ready());    // make sure, future is ready
 
@@ -339,7 +340,7 @@ void static_check_executor(B1, B2)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     std::false_type f;
     std::true_type t;

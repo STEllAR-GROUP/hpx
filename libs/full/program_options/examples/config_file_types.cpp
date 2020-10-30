@@ -272,7 +272,7 @@ void check_results(po::variables_map& vm, vector<string> unregistered)
     //    expected_present_no_equal_true);
 }
 
-int main(int ac, char* av[])
+int main(int /* ac */, char* /* av */[])
 {
     auto file = make_file();
     auto opts = set_options();

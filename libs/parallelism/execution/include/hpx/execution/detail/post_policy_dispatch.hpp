@@ -167,9 +167,10 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     {
         template <typename F, typename... Ts>
         static void call(launch::sync_policy const&,
-            hpx::util::thread_description const& desc,
-            threads::thread_pool_base* pool, threads::thread_priority priority,
-            threads::thread_stacksize stacksize,
+            hpx::util::thread_description const& /* desc */,
+            threads::thread_pool_base* /* pool */,
+            threads::thread_priority /* priority */,
+            threads::thread_stacksize /* stacksize */,
             threads::thread_schedule_hint /*hint*/, F&& f, Ts&&... ts)
         {
             using result_type =
@@ -182,11 +183,11 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         }
 
         template <typename F, typename... Ts>
-        static void call(launch::sync_policy const& policy,
-            hpx::util::thread_description const& desc,
-            threads::thread_priority priority,
-            threads::thread_stacksize stacksize,
-            threads::thread_schedule_hint hint, F&& f, Ts&&... ts)
+        static void call(launch::sync_policy const& /* policy */,
+            hpx::util::thread_description const& /* desc */,
+            threads::thread_priority /* priority */,
+            threads::thread_stacksize /* stacksize */,
+            threads::thread_schedule_hint /* hint */, F&& f, Ts&&... ts)
         {
             using result_type =
                 typename hpx::util::detail::invoke_deferred_result<F,
@@ -198,8 +199,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         }
 
         template <typename F, typename... Ts>
-        static void call(launch::sync_policy const& policy,
-            hpx::util::thread_description const& desc, F&& f, Ts&&... ts)
+        static void call(launch::sync_policy const& /* policy */,
+            hpx::util::thread_description const& /* desc */, F&& f, Ts&&... ts)
         {
             using result_type =
                 typename hpx::util::detail::invoke_deferred_result<F,

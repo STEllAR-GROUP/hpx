@@ -12,7 +12,7 @@
 
 bool invoked_main = false;
 
-int my_hpx_main(int argc, char** argv)
+int my_hpx_main(int argc, char**)
 {
     // all HPX command line arguments should have been stripped here
     HPX_TEST_EQ(argc, 1);

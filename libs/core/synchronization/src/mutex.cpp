@@ -66,7 +66,7 @@ namespace hpx { namespace lcos { namespace local {
         owner_id_ = self_id;
     }
 
-    bool mutex::try_lock(char const* description, error_code& ec)
+    bool mutex::try_lock(char const* /* description */, error_code& /* ec */)
     {
         HPX_ASSERT(threads::get_self_ptr() != nullptr);
 
@@ -122,8 +122,8 @@ namespace hpx { namespace lcos { namespace local {
     timed_mutex::~timed_mutex() {}
 
     bool timed_mutex::try_lock_until(
-        hpx::chrono::steady_time_point const& abs_time, char const* description,
-        error_code& ec)
+        hpx::chrono::steady_time_point const& abs_time,
+        char const* /* description */, error_code& ec)
     {
         HPX_ASSERT(threads::get_self_ptr() != nullptr);
 

@@ -74,13 +74,13 @@ namespace hpx { namespace traits {
         }
 
         template <typename Result>
-        Result get(std::size_t which, test::get_connected_to)
+        Result get(std::size_t, test::get_connected_to)
         {
             return communicator_.connect_to_;
         }
 
         template <typename Result>
-        Result get(std::size_t which, test::get_site_number)
+        Result get(std::size_t, test::get_site_number)
         {
             return communicator_.site_;
         }
@@ -258,7 +258,7 @@ void test_communication_set(std::size_t size, std::size_t arity)
     hpx::util::unwrap(futures);
 }
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     for (std::size_t size = 0; size != 64; ++size)
     {

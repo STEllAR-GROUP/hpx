@@ -427,12 +427,9 @@ namespace hpx { namespace parcelset
         }
 
         template <typename ConnectionHandler_>
-        typename std::enable_if<
-            !connection_handler_traits<
-                ConnectionHandler_
-            >::send_early_parcel::value
-        >::type
-        send_early_parcel_impl(locality const & dest, parcel p)
+        typename std::enable_if<!connection_handler_traits<
+            ConnectionHandler_>::send_early_parcel::value>::type
+        send_early_parcel_impl(locality const& /* dest */, parcel /* p */)
         {
             HPX_THROW_EXCEPTION(network_error, "send_early_parcel",
                 "This parcelport does not support sending early parcels");
@@ -568,15 +565,12 @@ namespace hpx { namespace parcelset
         }
 
         template <typename ConnectionHandler_>
-        typename std::enable_if<
-            !connection_handler_traits<
-                ConnectionHandler_
-            >::send_immediate_parcels::value,
-            void
-        >::type
-        send_immediate_impl(
-            parcelport_impl &this_, locality const&dest_,
-            write_handler_type *fs, parcel *ps, std::size_t num_parcels)
+        typename std::enable_if<!connection_handler_traits<ConnectionHandler_>::
+                                    send_immediate_parcels::value,
+            void>::type
+        send_immediate_impl(parcelport_impl& /* this_ */,
+            locality const& /* dest_ */, write_handler_type* /* fs */,
+            parcel* /* ps */, std::size_t /* num_parcels */)
         {
             HPX_ASSERT(false);
         }
@@ -584,7 +578,7 @@ namespace hpx { namespace parcelset
     private:
         ///////////////////////////////////////////////////////////////////////
         std::shared_ptr<connection> get_connection(
-            locality const& l, bool force, error_code& ec)
+            locality const& l, bool /* force */, error_code& ec)
         {
             // Request new connection from connection cache.
             std::shared_ptr<connection> sender_connection;
@@ -787,7 +781,7 @@ namespace hpx { namespace parcelset
     private:
         ///////////////////////////////////////////////////////////////////////
         void get_connection_and_send_parcels(
-            locality const& locality_id, bool background = false)
+            locality const& locality_id, bool /* background */ = false)
         {
 
             if (connection_handler_traits<ConnectionHandler>::

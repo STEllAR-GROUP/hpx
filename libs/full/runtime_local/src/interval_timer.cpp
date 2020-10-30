@@ -287,6 +287,7 @@ namespace hpx { namespace util { namespace detail {
     void interval_timer::schedule_thread(std::unique_lock<mutex_type>& l)
     {
         HPX_ASSERT(l.owns_lock());
+        HPX_UNUSED(l);
 
         using namespace hpx::threads;
 

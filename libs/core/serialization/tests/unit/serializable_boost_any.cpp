@@ -76,7 +76,7 @@ namespace any_tests    // test suite
         static int count;
     };
 
-    bool operator==(copy_counter const& lhs, copy_counter const& rhs)
+    bool operator==(copy_counter const&, copy_counter const&)
     {
         return true;
     }
@@ -86,18 +86,17 @@ namespace any_tests    // test suite
 
 namespace std {
 
-    std::ostream& operator<<(std::ostream& os, std::type_info const& ti)
+    std::ostream& operator<<(std::ostream& os, std::type_info const&)
     {
         return os;
     }
 
-    std::ostream& operator<<(
-        std::ostream& os, any_tests::copy_counter const& cc)
+    std::ostream& operator<<(std::ostream& os, any_tests::copy_counter const&)
     {
         return os;
     }
 
-    std::istream& operator>>(std::istream& is, any_tests::copy_counter& cc)
+    std::istream& operator>>(std::istream& is, any_tests::copy_counter&)
     {
         return is;
     }

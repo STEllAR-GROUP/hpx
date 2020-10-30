@@ -146,7 +146,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         return true;
     }
 
-    bool thread_counters::terminate(std::uint32_t tix)
+    bool thread_counters::terminate(std::uint32_t)
     {
         std::lock_guard<mutex_type> m(mtx_);
         return finalize();

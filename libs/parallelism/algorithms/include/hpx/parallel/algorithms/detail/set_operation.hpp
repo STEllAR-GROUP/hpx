@@ -17,6 +17,7 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>
@@ -125,6 +126,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         auto f1 = [=](set_chunk_data* curr_chunk,
                       std::size_t part_size) -> void {
             HPX_ASSERT(part_size == 1);
+            HPX_UNUSED(part_size);
 
             // find start in sequence 1
             std::size_t start1 = (curr_chunk - chunks.get()) * step;

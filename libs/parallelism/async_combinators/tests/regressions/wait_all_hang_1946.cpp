@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <vector>
 
-void out(std::vector<unsigned int> const& vec)
+void out(std::vector<unsigned int> const&)
 {
     hpx::cout << "out called " << hpx::find_here() << std::endl;
 }
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
     return hpx::init(argc, argv);
 }
 
-int hpx_main(hpx::program_options::variables_map& vm)
+int hpx_main()
 {
     // find locality info
     std::vector<hpx::naming::id_type> locs = hpx::find_all_localities();

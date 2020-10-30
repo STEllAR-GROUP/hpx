@@ -73,7 +73,7 @@ void copy_tests(hpx::partitioned_vector<T> const& v1)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T, typename DistPolicy, typename ExPolicy>
-void copy_algo_tests_with_policy(std::size_t size, std::size_t localities,
+void copy_algo_tests_with_policy(std::size_t size, std::size_t /* localities */,
     DistPolicy const& policy, ExPolicy const& copy_policy)
 {
     hpx::partitioned_vector<T> v1(size, policy);
@@ -86,8 +86,9 @@ void copy_algo_tests_with_policy(std::size_t size, std::size_t localities,
 }
 
 template <typename T, typename DistPolicy, typename ExPolicy>
-void copy_algo_tests_with_policy_async(std::size_t size, std::size_t localities,
-    DistPolicy const& policy, ExPolicy const& copy_policy)
+void copy_algo_tests_with_policy_async(std::size_t size,
+    std::size_t /* localities */, DistPolicy const& policy,
+    ExPolicy const& copy_policy)
 {
     hpx::partitioned_vector<T> v1(size, policy);
     fill_vector(v1, T(43));

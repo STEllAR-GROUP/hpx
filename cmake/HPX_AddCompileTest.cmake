@@ -116,7 +116,7 @@ function(add_hpx_header_tests category)
       # generate the test
       file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}
            "#include <${relpath}>\n" "#ifndef HPX_MAIN_DEFINED\n"
-           "int main(int argc, char** argv) { return 0; }\n" "#endif\n"
+           "int main() { return 0; }\n" "#endif\n"
       )
 
       set(exclude_all_pos -1)
@@ -133,7 +133,8 @@ function(add_hpx_header_tests category)
         SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
         FOLDER "Tests/Headers/${header_dir}"
         COMPONENT_DEPENDENCIES ${${category}_COMPONENT_DEPENDENCIES}
-        DEPENDENCIES ${${category}_DEPENDENCIES} ${_additional_flags}
+        DEPENDENCIES ${${category}_DEPENDENCIES} hpx_private_flags
+                     hpx_public_flags ${_additional_flags}
       )
 
     endif()
@@ -142,8 +143,8 @@ function(add_hpx_header_tests category)
   set(test_name "all_headers")
   set(all_headers_test_file "${CMAKE_CURRENT_BINARY_DIR}/${test_name}.cpp")
   file(WRITE ${all_headers_test_file}
-       ${all_headers} "#ifndef HPX_MAIN_DEFINED\n"
-       "int main(int argc, char** argv) { return 0; }\n" "#endif\n"
+       ${all_headers} "#ifndef HPX_MAIN_DEFINED\n" "int main() { return 0; }\n"
+       "#endif\n"
   )
 
   add_hpx_headers_compile_test(

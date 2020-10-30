@@ -47,7 +47,7 @@ struct random_fill
     std::uniform_int_distribution<> dist;
 
     template <typename Archive>
-    void serialize(Archive& ar, unsigned)
+    void serialize(Archive&, unsigned)
     {
     }
 };

@@ -12,7 +12,7 @@
 
 #define NUMTESTS 100000
 
-int main(int argc, char* argv[])
+int main()
 {
     hpx::util::thread_aware_timer tat;
 

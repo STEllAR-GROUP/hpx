@@ -109,7 +109,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     return hpx::finalize(); // Handles HPX shutdown
 }
 
-bool test_function(apex_context const& context) {
+bool test_function(apex_context const&)
+{
     if (!counters_initialized) return false;
     try {
         performance_counter counter(get_counter());

@@ -36,13 +36,13 @@ namespace hpx { namespace parallel { namespace execution {
 }}}    // namespace hpx::parallel::execution
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     my_executor exec;
 
     std::vector<int> v(100);
 
-    hpx::ranges::for_each(hpx::execution::par.on(exec), v, [](int x) {});
+    hpx::ranges::for_each(hpx::execution::par.on(exec), v, [](int) {});
 
     return hpx::finalize();
 }

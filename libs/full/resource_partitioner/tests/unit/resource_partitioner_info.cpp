@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     HPX_TEST_EQ(std::size_t(4), hpx::resource::get_num_threads());
     HPX_TEST_EQ(std::size_t(4), hpx::resource::get_num_threads(0));
@@ -51,6 +51,6 @@ int main(int argc, char* argv[])
     init_args.cfg = std::move(cfg);
 
     // now run the test
-    HPX_TEST_EQ(hpx::init(init_args), 0);
+    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
     return hpx::util::report_errors();
 }

@@ -27,7 +27,7 @@ void receive_values()
     HPX_TEST_EQ(42, buffer.get(hpx::launch::sync));
 }
 
-int hpx_main(int argc, char** argv)
+int hpx_main()
 {
     {
         hpx::lcos::channel<int> buffer(hpx::find_here());

@@ -14,7 +14,7 @@
 
 #include <iostream>
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     return hpx::finalize();
 }

@@ -73,7 +73,7 @@ namespace hpx { namespace lcos
             typedef typename server_type::abort_pending_action action_type;
             return hpx::async<action_type>(this->get_id(), ec);
         }
-        void abort_pending(launch::sync_policy, error ec = no_success)
+        void abort_pending(launch::sync_policy, error = no_success)
         {
             abort_pending(launch::async).get();
         }
