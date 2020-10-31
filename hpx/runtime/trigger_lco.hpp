@@ -13,7 +13,7 @@
 #include <hpx/actions_base/action_priority.hpp>
 #include <hpx/actions_base/continuation_fwd.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
+#include <hpx/async_distributed/applier/detail/apply_implementations.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/naming_base/address.hpp>

@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
+#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
