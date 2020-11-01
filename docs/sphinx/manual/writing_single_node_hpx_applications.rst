@@ -649,6 +649,10 @@ Parallel algorithms
      * Sorts the elements in a range, maintain sequence of equal elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`stable_sort`
+   * * :cpp:func:`hpx::partial_sort`
+     * Sorts the first elements in a range.
+     * ``<hpx/algorithm.hpp>``
+     * :cppreference-algorithm:`partial_sort`
    * * :cpp:func:`hpx::parallel::v1::sort_by_key`
      * Sorts one range of data using keys supplied in another range.
      * ``<hpx/algorithm.hpp>``

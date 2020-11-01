@@ -67,6 +67,7 @@ Functions
 - :cpp:func:`hpx::parallel::v1::mismatch`
 - :cpp:func:`hpx::move`
 - :cpp:func:`hpx::none_of`
+- :cpp:func:`hpx::partial_sort`
 - :cpp:func:`hpx::parallel::v1::partition`
 - :cpp:func:`hpx::parallel::v1::partition_copy`
 - :cpp:func:`hpx::parallel::v1::remove`
