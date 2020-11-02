@@ -129,7 +129,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
             if (num >= (1ull << 1))
             {
-                nb += 12;
+                nb += 1;
                 num = (num >> 1);
             }
             return nb;
