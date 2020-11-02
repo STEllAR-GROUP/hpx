@@ -91,7 +91,7 @@ namespace hpx { namespace agas { namespace server {
         }
     }
 
-#if defined(HPX_HAVE_NETWORKING)
+#if defined(HPX_HAVE_NETWORKING) && !defined(HPX_COMPUTE_DEVICE_CODE)
     // Parcel routing forwards the message handler request to the routed action
     parcelset::policies::message_handler*
     primary_namespace::get_message_handler(parcelset::parcelhandler* ph,
