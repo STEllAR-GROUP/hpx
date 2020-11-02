@@ -385,17 +385,5 @@ namespace hpx { namespace threads {
 
         thread_schedule_hint_mode mode;
         std::int16_t hint;
-
-        static constexpr bool is_requirable = true;
-        static constexpr bool is_preferable = true;
-
-        template <typename T>
-        struct is_applicable_property : std::false_type
-        {
-        };
-
-        template <typename T>
-        static constexpr bool is_applicable_property_v =
-            is_applicable_property<T>::value;
     };
 }}    // namespace hpx::threads
