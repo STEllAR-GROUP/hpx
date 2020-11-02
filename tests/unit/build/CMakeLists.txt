@@ -156,7 +156,13 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN)
 endif()
 
 # PkgConfig
-if(NOT MSVC AND NOT APPLE)
+if(NOT MSVC
+   AND NOT APPLE
+   AND NOT HPX_WITH_HIP
+)
+  # Disabling test for hipcc since the workaround for one of its bug resulted in
+  # breaking clang-7 CI (with -DHPX_WITH_DYNAMIC_MAIN=OFF)
+  # https://github.com/ROCm-Developer-Tools/HIP/issues/2167#issuecomment-712286173
   find_package(PkgConfig)
   if(PKGCONFIG_FOUND)
     create_pkgconfig_test(
@@ -180,6 +186,7 @@ if(NOT CMAKE_TOOLCHAIN_FILE
    AND PKGCONFIG_FOUND
    AND NOT MSVC
    AND NOT APPLE
+   AND NOT HPX_WITH_HIP
 )
   set(build_systems ${build_systems} pkgconfig)
   set(pkgconfig_tests build_dir install_dir)
