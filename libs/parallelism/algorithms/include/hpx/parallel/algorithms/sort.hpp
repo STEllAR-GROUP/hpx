@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \param iter_1 : iterator to the first value
         /// \param iter_2 : iterator to the second value
         /// \param iter_3 : iterator to the third value
-        /// \param comp : object for to Comp two values
+        /// \param comp : object for comparing two values
         /// \return iterator to mid value
         template <typename Iter, typename Comp>
         inline constexpr Iter mid3(
