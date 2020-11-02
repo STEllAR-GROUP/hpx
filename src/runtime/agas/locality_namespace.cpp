@@ -9,7 +9,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
@@ -63,4 +62,3 @@ HPX_REGISTER_ACTION_ID(locality_namespace::get_num_overall_threads_action,
 HPX_REGISTER_ACTION_ID(locality_namespace::statistics_counter_action,
     locality_namespace_statistics_counter_action,
     hpx::actions::locality_namespace_statistics_counter_action_id)
-#endif

@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/config/detail/compat_error_code.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
@@ -631,4 +630,4 @@ namespace hpx { namespace lcos {
         }
     };
 }}
-#endif
+

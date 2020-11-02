@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 // the module itself should not register any actions which coalesce parcels
 #if defined(HPX_HAVE_PARCEL_COALESCING) && defined(HPX_HAVE_NETWORKING) &&     \
@@ -191,5 +190,4 @@ namespace hpx { namespace parcelset
 #define HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(...)
 #define HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW(...)
 
-#endif
 #endif

@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <cstdint>
 
@@ -25,4 +24,4 @@ namespace hpx { namespace performance_counters { namespace memory
     std::uint64_t read_total_mem_avail(bool);
 #endif
 }}}
-#endif
+

@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_local/async_fwd.hpp>
@@ -20,4 +19,3 @@ namespace hpx { namespace detail {
     async_unwrap_result_impl(
         Launch&& policy, hpx::id_type const& id, Ts&&... vs);
 }}    // namespace hpx::detail
-#endif

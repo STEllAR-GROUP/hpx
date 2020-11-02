@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/components/new.hpp>
 
@@ -25,4 +24,4 @@ namespace hpx { namespace components { namespace process
         return hpx::new_<child>(id, std::forward<Ts>(ts)...);
     }
 }}}
-#endif
+

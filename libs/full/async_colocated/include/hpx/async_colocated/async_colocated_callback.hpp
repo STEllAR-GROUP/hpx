@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/agas/primary_namespace.hpp>
 #include <hpx/agas/server/primary_namespace.hpp>
@@ -106,4 +104,3 @@ namespace hpx { namespace detail {
             gid, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 }}    // namespace hpx::detail
-#endif

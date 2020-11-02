@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/util/wrapper_heap_base.hpp>
@@ -129,4 +128,4 @@ namespace hpx { namespace util
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
-#endif
+

@@ -36,7 +36,7 @@
 #include <hpx/util/thread_aware_timer.hpp>
 #include <hpx/util/to_string.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp>
 #include <hpx/util/activate_counters.hpp>
 #endif

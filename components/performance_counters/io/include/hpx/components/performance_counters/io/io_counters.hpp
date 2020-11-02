@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <cstdint>
 
@@ -29,4 +28,4 @@ namespace hpx { namespace performance_counters { namespace io
     // due to truncation or deletion
     std::uint64_t get_pio_wcanc(bool);
 }}}
-#endif
+

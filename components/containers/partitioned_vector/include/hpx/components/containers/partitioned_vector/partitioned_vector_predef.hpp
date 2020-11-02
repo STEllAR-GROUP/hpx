@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components/containers/partitioned_vector/export_definitions.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp>
@@ -84,4 +82,4 @@ extern template hpx::partitioned_vector<std::string,
     hpx::container_distribution_policy const&, void*);
 
 #endif
-#endif
+

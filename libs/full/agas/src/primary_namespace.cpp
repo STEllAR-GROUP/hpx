@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/agas/primary_namespace.hpp>
 #include <hpx/agas/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
@@ -318,4 +317,3 @@ namespace hpx { namespace agas {
         server_->unregister_server_instance(ec);
     }
 }}    // namespace hpx::agas
-#endif

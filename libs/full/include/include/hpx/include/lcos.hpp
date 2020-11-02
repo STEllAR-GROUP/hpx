@@ -13,7 +13,7 @@
 #include <hpx/include/lcos_local.hpp>
 #include <hpx/modules/async_combinators.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/gather.hpp>
 #include <hpx/collectives/latch.hpp>

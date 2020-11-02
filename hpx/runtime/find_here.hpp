@@ -10,7 +10,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
@@ -45,4 +44,4 @@ namespace hpx
     /// \see      \a hpx::find_all_localities(), \a hpx::find_locality()
     HPX_EXPORT naming::id_type find_here(error_code& ec = throws);
 }
-#endif
+

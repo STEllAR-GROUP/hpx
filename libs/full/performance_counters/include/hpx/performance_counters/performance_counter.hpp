@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/futures/future.hpp>
@@ -133,4 +132,3 @@ namespace hpx { namespace performance_counters {
     HPX_EXPORT std::vector<performance_counter> discover_counters(
         std::string const& name, error_code& ec = throws);
 }}    // namespace hpx::performance_counters
-#endif

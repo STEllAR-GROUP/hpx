@@ -11,7 +11,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/async_distributed/applier_fwd.hpp>
@@ -381,5 +380,4 @@ namespace hpx { namespace parcelset
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
 #endif

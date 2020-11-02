@@ -15,7 +15,7 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/topology/topology.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime/find_here.hpp>
 #endif
 
@@ -61,7 +61,7 @@ namespace hpx { namespace compute { namespace host {
         // Constructs default target
         target()
           : handle_()
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
           , locality_(hpx::find_here())
 #endif
         {
@@ -70,13 +70,13 @@ namespace hpx { namespace compute { namespace host {
         // Constructs target from a given mask of processing units
         explicit target(hpx::threads::mask_type mask)
           : handle_(mask)
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
           , locality_(hpx::find_here())
 #endif
         {
         }
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         explicit target(hpx::id_type const& locality)
           : handle_()
           , locality_(locality)
@@ -99,7 +99,7 @@ namespace hpx { namespace compute { namespace host {
             return handle_;
         }
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         hpx::id_type const& get_locality() const noexcept
         {
             return locality_;
@@ -123,7 +123,7 @@ namespace hpx { namespace compute { namespace host {
             return host::get_local_targets();
         }
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         static hpx::future<std::vector<target>> get_targets(
             hpx::id_type const& locality)
         {
@@ -133,7 +133,7 @@ namespace hpx { namespace compute { namespace host {
 
         friend bool operator==(target const& lhs, target const& rhs)
         {
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             return lhs.handle_.get_device() == rhs.handle_.get_device() &&
                 lhs.locality_ == rhs.locality_;
 #else
@@ -148,7 +148,7 @@ namespace hpx { namespace compute { namespace host {
         void serialize(serialization::output_archive& ar, const unsigned int);
 
         native_handle_type handle_;
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         hpx::id_type locality_;
 #endif
     };

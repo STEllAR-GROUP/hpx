@@ -16,6 +16,6 @@
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/topology/topology.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime/threads/threadmanager_counters.hpp>
 #endif

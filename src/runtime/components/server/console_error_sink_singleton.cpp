@@ -5,7 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 
@@ -21,4 +20,4 @@ namespace hpx { namespace components { namespace server
         return disp.get();
     }
 }}}
-#endif
+

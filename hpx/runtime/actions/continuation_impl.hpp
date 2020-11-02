@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/functional/invoke_result.hpp>
@@ -63,4 +61,4 @@ namespace hpx { namespace actions {
         hpx::naming::id_type target_;
     };
 }}
-#endif
+

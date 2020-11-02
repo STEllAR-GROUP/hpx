@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/basic_action.hpp>
@@ -64,4 +63,4 @@ HPX_REGISTER_UNORDERED_MAP_DECLARATION(
     hpx::naming::gid_type, hpx_component_storage_data_type)
 
 
-#endif
+

@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/actions/continuation2_impl.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
@@ -82,4 +80,4 @@ namespace hpx {
             std::forward<Cont>(cont), target, std::forward<F>(f));
     }
 }
-#endif
+

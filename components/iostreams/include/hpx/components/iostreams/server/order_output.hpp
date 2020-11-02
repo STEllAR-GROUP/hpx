@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 
@@ -74,4 +73,4 @@ namespace hpx { namespace iostreams { namespace detail
 }}}
 
 
-#endif
+

@@ -8,11 +8,8 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/collectives/latch.hpp>
 
 namespace hpx { namespace distributed {
     using hpx::lcos::latch;
 }}    // namespace hpx::distributed
-#endif

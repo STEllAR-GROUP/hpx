@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/itt_notify.hpp>
@@ -170,4 +169,4 @@ namespace hpx { namespace components { namespace detail
 }}} // namespace hpx::components::detail
 
 #include <hpx/config/warnings_suffix.hpp>
-#endif
+

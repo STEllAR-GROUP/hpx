@@ -10,7 +10,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/naming_base/address.hpp>
@@ -109,4 +108,4 @@ namespace hpx { namespace components
     };
 }}
 
-#endif
+

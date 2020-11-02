@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/preassigned_action_id.hpp>
 #include <hpx/functional/traits/get_action_name.hpp>
 
@@ -27,4 +26,3 @@ namespace hpx { namespace actions {
     template <typename Component, typename Signature, typename Derived>
     struct basic_action;
 }}    // namespace hpx::actions
-#endif

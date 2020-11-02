@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/basic_action_fwd.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_local/async_fwd.hpp>
@@ -38,4 +37,3 @@ namespace hpx {
             typename std::decay<F>::type>::call(std::forward<F>(f),
             std::forward<Ts>(ts)...));
 }    // namespace hpx
-#endif

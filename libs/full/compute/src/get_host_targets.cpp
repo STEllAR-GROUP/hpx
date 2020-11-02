@@ -14,7 +14,7 @@
 #include <hpx/serialization/vector.hpp>
 #include <hpx/topology/topology.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -54,7 +54,7 @@ namespace hpx { namespace compute { namespace host {
     }
 }}}    // namespace hpx::compute::host
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 HPX_PLAIN_ACTION(
     hpx::compute::host::get_local_targets, compute_host_get_targets_action);
 

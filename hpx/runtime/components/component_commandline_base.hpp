@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/modules/plugin.hpp>
 #include <hpx/modules/program_options.hpp>
 
@@ -63,4 +62,4 @@ namespace hpx { namespace components
     HPX_PLUGIN_EXPORT_LIST_DYNAMIC(HPX_PLUGIN_COMPONENT_PREFIX,               \
         commandline_options)                                                  \
 /**/
-#endif
+

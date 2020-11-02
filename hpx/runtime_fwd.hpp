@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/runtime/basename_registration_fwd.hpp>
 #include <hpx/runtime/find_all_localities.hpp>

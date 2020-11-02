@@ -11,7 +11,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
@@ -48,5 +47,4 @@ close_fds_<Range> close_fds(const Range &fds)
 
 }}}}
 
-#endif
 #endif

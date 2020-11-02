@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/functional/function.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 
@@ -58,4 +57,4 @@ namespace hpx { namespace components { namespace server
     HPX_EXPORT console_error_dispatcher& get_error_dispatcher();
 }}}
 
-#endif
+

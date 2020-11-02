@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/modules/async_distributed.hpp>
@@ -85,5 +84,4 @@ namespace hpx { namespace agas { namespace detail
     }
 }}}
 
-#endif
 #endif

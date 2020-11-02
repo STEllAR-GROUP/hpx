@@ -5,7 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/components/containers/container_distribution_policy.hpp>
 #include <hpx/components/containers/partitioned_vector/export_definitions.hpp>
@@ -44,4 +43,4 @@ template HPX_PARTITIONED_VECTOR_EXPORT
 #if defined(HPX_MSVC)
 #pragma warning(pop)
 #endif
-#endif
+

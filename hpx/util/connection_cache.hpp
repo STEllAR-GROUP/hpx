@@ -16,7 +16,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/modules/errors.hpp>
@@ -653,4 +652,4 @@ namespace hpx { namespace util
         std::int64_t reclaims_;
     };
 }}
-#endif
+

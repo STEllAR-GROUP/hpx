@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/runtime/components/component_commandline_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -69,4 +68,4 @@ namespace hpx { namespace components
         HPX_DEFINE_COMPONENT_COMMANDLINE_OPTIONS(add_options_function)        \
     /**/
 
-#endif
+

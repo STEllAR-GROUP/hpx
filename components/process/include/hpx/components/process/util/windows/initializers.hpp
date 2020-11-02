@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 // #include <hpx/components/process/util/windows/initializers/bind_stderr.hpp>
 // #include <hpx/components/process/util/windows/initializers/bind_stdin.hpp>
 // #include <hpx/components/process/util/windows/initializers/bind_stdout.hpp>
@@ -32,4 +30,4 @@
 #include <hpx/components/process/util/windows/initializers/start_in_dir.hpp>
 #include <hpx/components/process/util/windows/initializers/throw_on_error.hpp>
 #include <hpx/components/process/util/windows/initializers/wait_on_latch.hpp>
-#endif
+

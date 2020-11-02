@@ -11,7 +11,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
@@ -93,5 +92,4 @@ set_args_<Range> set_args(const Range &range)
 
 }}}}
 
-#endif
 #endif

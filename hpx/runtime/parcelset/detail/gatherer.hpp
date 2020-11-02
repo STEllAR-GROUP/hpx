@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/runtime/parcelset/detail/data_point.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
@@ -134,4 +132,3 @@ namespace hpx { namespace performance_counters { namespace parcels {
     using gatherer = detail::gatherer<lcos::local::spinlock>;
     using gatherer_nolock = detail::gatherer<lcos::local::no_mutex>;
 }}}    // namespace hpx::performance_counters::parcels
-#endif

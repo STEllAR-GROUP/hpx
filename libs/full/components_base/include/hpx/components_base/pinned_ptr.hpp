@@ -6,7 +6,6 @@
 
 #pragma once
 
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components_base/get_lva.hpp>
@@ -144,4 +143,3 @@ namespace hpx { namespace components {
         std::unique_ptr<detail::pinned_ptr_base> data_;
     };
 }}    // namespace hpx::components
-#endif

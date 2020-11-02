@@ -47,7 +47,7 @@ namespace hpx { namespace compute { namespace host {
 
     void target::serialize(serialization::input_archive& ar, const unsigned int)
     {
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         ar >> handle_.mask_ >> locality_;
 #else
         ar >> handle_.mask_;
@@ -57,7 +57,7 @@ namespace hpx { namespace compute { namespace host {
     void target::serialize(
         serialization::output_archive& ar, const unsigned int)
     {
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         ar << handle_.mask_ << locality_;
 #else
         ar << handle_.mask_;

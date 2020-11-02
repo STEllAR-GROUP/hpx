@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/components/containers/partitioned_vector/detail/view_element.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
@@ -153,4 +151,4 @@ namespace hpx {
         BaseIter end_;
     };
 }
-#endif
+

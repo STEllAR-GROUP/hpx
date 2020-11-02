@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
 
@@ -116,5 +115,4 @@ namespace hpx { namespace plugins { namespace parcel
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
 #endif

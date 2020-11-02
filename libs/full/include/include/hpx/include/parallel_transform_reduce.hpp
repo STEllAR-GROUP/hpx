@@ -11,6 +11,6 @@
 #include <hpx/parallel/algorithms/transform_reduce.hpp>
 #include <hpx/parallel/container_algorithms/transform_reduce.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/transform_reduce.hpp>
 #endif

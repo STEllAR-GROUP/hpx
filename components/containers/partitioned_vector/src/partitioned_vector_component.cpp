@@ -11,7 +11,6 @@
 /// required for proper functioning of components in the context of HPX.
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/runtime/components/component_factory.hpp>
 
 #include <hpx/components/containers/partitioned_vector/export_definitions.hpp>
@@ -22,4 +21,4 @@ HPX_DISTRIBUTED_METADATA(hpx::server::partitioned_vector_config_data,
     hpx_server_partitioned_vector_config_data);
 
 HPX_REGISTER_COMPONENT_MODULE();
-#endif
+

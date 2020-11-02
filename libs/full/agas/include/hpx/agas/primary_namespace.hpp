@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/agas/agas_fwd.hpp>
 #include <hpx/agas/gva.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -106,4 +105,3 @@ namespace hpx { namespace agas {
 }}    // namespace hpx::agas
 
 #include <hpx/config/warnings_suffix.hpp>
-#endif

@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_local_view_iterator.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
 
@@ -87,4 +85,4 @@ namespace hpx
         return partitioned_vector_local_view<T, N, Data>(base);
     }
 }
-#endif
+

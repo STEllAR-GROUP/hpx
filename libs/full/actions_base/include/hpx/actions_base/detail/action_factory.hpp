@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions_base/actions_base_fwd.hpp>
@@ -101,5 +100,4 @@ namespace hpx { namespace actions { namespace detail {
 
 #define HPX_REGISTER_ACTION_FACTORY_ID(Name, Id) /**/
 
-#endif
 #endif

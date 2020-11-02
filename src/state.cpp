@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
@@ -30,4 +29,3 @@ namespace hpx
         }
     }
 }
-#endif

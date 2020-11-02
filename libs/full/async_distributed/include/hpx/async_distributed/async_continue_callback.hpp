@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_distributed/applier/apply_callback.hpp>
 #include <hpx/async_distributed/async_callback_fwd.hpp>
@@ -112,4 +110,3 @@ namespace hpx {
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 }    // namespace hpx
-#endif

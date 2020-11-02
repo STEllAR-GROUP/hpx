@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/agas/primary_namespace.hpp>
@@ -154,4 +153,3 @@ namespace hpx { namespace detail {
             std::forward<Continuation>(cont), gid, std::forward<Ts>(vs)...);
     }
 }}    // namespace hpx::detail
-#endif

@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/collectives/spmd_block.hpp>
@@ -300,4 +298,4 @@ namespace hpx { namespace detail
         const_segment_iterator it_;
     };
 }}
-#endif
+

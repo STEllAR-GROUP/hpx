@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/action_continuation.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
@@ -253,4 +252,3 @@ namespace hpx { namespace applier { namespace detail {
         }
     };
 }}}    // namespace hpx::applier::detail
-#endif

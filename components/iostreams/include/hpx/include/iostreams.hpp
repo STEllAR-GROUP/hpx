@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/iostream.hpp>
 
 #if HPX_HAVE_DEPRECATION_WARNINGS
@@ -19,6 +18,5 @@
 #else
 #warning "The header hpx/include/iostreams.hpp is deprecated, \
     please include hpx/iostream.hpp instead"
-#endif
 #endif
 #endif

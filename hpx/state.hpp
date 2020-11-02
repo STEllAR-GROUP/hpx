@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime_local/state.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/threading_base/scheduler_state.hpp>
 
 namespace hpx
@@ -22,4 +21,4 @@ namespace hpx
     }
 }
 
-#endif
+
