@@ -92,6 +92,8 @@ set(tests
     move
     none_of
     parallel_sort
+    partial_sort
+    partial_sort_parallel
     partition
     partition_copy
     reduce_

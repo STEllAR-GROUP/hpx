@@ -10,6 +10,8 @@ set(benchmarks
     benchmark_is_heap
     benchmark_is_heap_until
     benchmark_merge
+    benchmark_partial_sort
+    benchmark_partial_sort_parallel
     benchmark_partition
     benchmark_partition_copy
     benchmark_remove
