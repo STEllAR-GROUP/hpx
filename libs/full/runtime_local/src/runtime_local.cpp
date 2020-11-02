@@ -1486,7 +1486,7 @@ namespace hpx {
 
 #ifdef HPX_HAVE_TIMER_POOL
         LTM_(info) << "stop: stopping timer pool";
-        timer_pool_.stop();    // stop timer pool as well
+        timer_pool_.stop();
         if (blocking)
         {
             timer_pool_.join();
@@ -1494,9 +1494,14 @@ namespace hpx {
         }
 #endif
 #ifdef HPX_HAVE_IO_POOL
-        io_pool_.stop();    // stops io_pool_ as well
+        LTM_(info) << "stop: stopping io pool";
+        io_pool_.stop();
+        if (blocking)
+        {
+            io_pool_.join();
+            io_pool_.clear();
+        }
 #endif
-        //         deinit_tss();
     }
 
     // Second step in termination: shut down all services.
