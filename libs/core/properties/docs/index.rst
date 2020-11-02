@@ -11,11 +11,11 @@
 properties
 ==========
 
-This module implements the ``require_concept``, ``require``, ``prefer``, and
-``query`` customization points for setting and getting properties as defined in
-in |p1393|_. The implementation in this module deviates from the proposal in the
-use of ``tag_invoke`` for the customization points. All functionality is
-experimental and can be accessed in the ``hpx::experimental`` namespace.
+This module implements the ``prefer`` customization point for properties in
+terms of |p2220|_. This differs from |p1393|_ in that it relies fully on
+``tag_invoke`` overloads and fewer base customization points. Actual properties
+are defined in modules. All functionality is experimental and can be accessed
+through the ``hpx::experimental`` namespace.
 
 See the :ref:`API reference <modules_properties_api>` of this module for more
 details.

@@ -443,6 +443,8 @@ rst_prolog += '''
 .. _cpp20_p0443: https://github.com/executors/issaquah_2016
 .. |p1393| replace:: P1393
 .. _p1393: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1393r0.html
+.. |p2220| replace:: P2220
+.. _p2220: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2020/p2220r0.pdf
 
 .. |semver| replace:: semver
 .. _semver: https://semver.org
