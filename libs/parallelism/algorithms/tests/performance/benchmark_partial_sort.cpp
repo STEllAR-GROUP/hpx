@@ -4,11 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-
 #include <hpx/execution.hpp>
-#include <hpx/modules/testing.hpp>
+#include <hpx/hpx.hpp>
+#include <hpx/init.hpp>
 #include <hpx/parallel/algorithms/partial_sort.hpp>
 
 #include <algorithm>
