@@ -73,6 +73,22 @@ def subproc(cmd):
             ssh_subproc(cmd)
             return
 
+    # Support for running from inside a singularity container
+    # on Linux systems
+    if cmd[0] == "ssh" and "SINGULARITY_CONTAINER" in os.environ:
+        if "SING_OPTS" in os.environ:
+            sing = ["singularity","exec"] + re.split(r'\s+',os.environ["SING_OPTS"].strip()) + [os.environ["SINGULARITY_CONTAINER"]]
+        else:
+            sing = ["singularity","exec", os.environ["SINGULARITY_CONTAINER"]]
+        cmd = cmd[0:2] + sing + cmd[2:]
+
+    # Pass environment variables along in Linux
+    if cmd[0] == "ssh":
+        ecmd = []
+        for e in options.environ.split(','):
+            ecmd += ["%s='%s'" % (e,os.environ.get(e,""))]
+        cmd = cmd[0:2] + ecmd + cmd[2:]
+
     proc = Popen(cmd, **kwargs)
     procs.append(proc)
 
@@ -330,6 +346,19 @@ Used by the tcp parcelport only.
       , dest='threads', default=default_env('HPXRUN_THREADS', '1')
       , help='Number of threads per locality (environment variable '
              'HPXRUN_THREADS)')
+
+    # It is helpful to allow the users to
+    # set a defaultport. Re-using 7910 as
+    # the default may lead to hangs.
+    parser.add_option('-d', '--defaultport'
+      , action='store', type='int'
+      , dest='defaultport', default=7910
+      , help='The default port to use')
+
+    parser.add_option('--environ'
+      , action='store', type='str'
+      , dest='environ', default=""
+      , help='The environment to use')
 
     parser.add_option('-p', '--parcelport'
       , action='store', type='string'
