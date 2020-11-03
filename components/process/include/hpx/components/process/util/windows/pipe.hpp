@@ -12,6 +12,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_WINDOWS)
 #include <windows.h>
@@ -33,4 +34,5 @@ inline pipe make_pipe(HANDLE source, HANDLE sink)
 
 }}}}
 
+#endif
 #endif

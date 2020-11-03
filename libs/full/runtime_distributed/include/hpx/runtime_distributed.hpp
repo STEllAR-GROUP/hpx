@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/performance_counters/registry.hpp>
@@ -407,3 +408,4 @@ namespace hpx {
 }    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
+#endif

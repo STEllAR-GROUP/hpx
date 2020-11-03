@@ -7,6 +7,8 @@
 // This test case demonstrates the issue described in #1211:
 // Direct actions cause the future's shared_state to be leaked
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/lcos.hpp>
@@ -72,3 +74,4 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
+#endif

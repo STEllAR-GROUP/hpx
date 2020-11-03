@@ -7,6 +7,7 @@
 
 // This is needed to make everything work with the Intel MPI library header
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/state.hpp>
@@ -295,4 +296,5 @@ namespace hpx { namespace parcelset
 
 }}
 
+#endif
 #endif

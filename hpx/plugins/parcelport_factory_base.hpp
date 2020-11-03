@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/modules/command_line_handling.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 
@@ -42,4 +43,4 @@ namespace hpx { namespace plugins
             threads::policies::callback_notifier const& notifier) = 0;
     };
 }}
-
+#endif

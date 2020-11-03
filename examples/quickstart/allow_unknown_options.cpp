@@ -8,6 +8,8 @@
 // line alias handling and to allow for unknown options to be passed through
 // to hpx_main.
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/iostream.hpp>
 
@@ -32,3 +34,4 @@ int main(int argc, char* argv[])
     return hpx::init(argc, argv, cfg);
 }
 
+#endif

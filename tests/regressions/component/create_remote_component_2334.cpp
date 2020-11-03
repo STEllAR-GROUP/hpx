@@ -7,6 +7,8 @@
 // verify #2334 is fixed (Cannot construct component with large vector on a
 // remote locality)
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/util.hpp>
@@ -59,3 +61,4 @@ int main(int argc, char **argv)
     HPX_TEST_EQ(hpx::init(argc, argv), 0);
     return hpx::util::report_errors();
 }
+#endif

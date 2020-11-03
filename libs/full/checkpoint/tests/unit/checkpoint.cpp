@@ -8,6 +8,8 @@
 // restore_checkpoint.
 //
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 
 #include <hpx/modules/checkpoint.hpp>
@@ -270,3 +272,4 @@ int main()
 
     return hpx::util::report_errors();
 }
+#endif

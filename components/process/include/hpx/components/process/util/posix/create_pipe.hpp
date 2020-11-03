@@ -12,6 +12,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/modules/errors.hpp>
@@ -25,4 +26,5 @@ namespace hpx { namespace components { namespace process { namespace posix
     HPX_PROCESS_EXPORT pipe create_pipe(hpx::error_code &ec);
 }}}}
 
+#endif
 #endif

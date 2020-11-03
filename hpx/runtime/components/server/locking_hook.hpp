@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components_base/get_lva.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/execution_base/register_locks.hpp>
@@ -170,4 +171,4 @@ namespace hpx { namespace components
         mutable mutex_type mtx_;
     };
 }}
-
+#endif

@@ -7,6 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -607,3 +608,4 @@ int main(int argc, char* argv[])
     // Initialize and run HPX.
     return init(cmdline, argc, argv);
 }
+#endif

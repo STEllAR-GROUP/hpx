@@ -32,7 +32,7 @@ int main()
         >::value,
         "std::uses_allocator<local::promise<void>, test_allocator<void> >::value");
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
     // hpx::lcos::promise
     static_assert(
         std::uses_allocator<

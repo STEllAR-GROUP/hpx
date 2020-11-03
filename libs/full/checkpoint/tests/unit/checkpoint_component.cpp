@@ -7,6 +7,8 @@
 // This example tests the interoperability of save_checkpoint and
 // restore_checkpoint with components.
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 
 #include <hpx/include/components.hpp>
@@ -162,3 +164,4 @@ int main()
 
     return hpx::util::report_errors();
 }
+#endif

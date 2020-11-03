@@ -17,9 +17,9 @@
 #include <hpx/futures/future.hpp>
 
 // CUDA runtime
-#include <cuda_runtime.h>
+#include <hpx/async_cuda/custom_gpu_api.hpp>
 // CuBLAS
-#include <cublas_v2.h>
+#include <hpx/async_cuda/custom_blas_api.hpp>
 //
 #include <cstddef>
 #include <exception>
@@ -60,8 +60,13 @@ namespace hpx { namespace cuda { namespace experimental {
                 return "CUBLAS_STATUS_INTERNAL_ERROR";
             case CUBLAS_STATUS_NOT_SUPPORTED:
                 return "CUBLAS_STATUS_NOT_SUPPORTED";
+#ifdef HPX_HAVE_HIP
+            case HIPBLAS_STATUS_HANDLE_IS_NULLPTR:
+                return "HIPBLAS_STATUS_HANDLE_IS_NULLPTR";
+#else
             case CUBLAS_STATUS_LICENSE_ERROR:
                 return "CUBLAS_STATUS_LICENSE_ERROR";
+#endif
             }
             return "<unknown>";
         }
@@ -132,8 +137,13 @@ namespace hpx { namespace cuda { namespace experimental {
     // -------------------------------------------------------------------------
     struct cublas_executor : cuda_executor
     {
+#ifdef HPX_HAVE_HIP
+        // hipblas handle is type : void*
+        using handle_ptr = std::shared_ptr<void>;
+#else
         // cublas handle is type : struct cublasContext *
         using handle_ptr = std::shared_ptr<struct cublasContext>;
+#endif
 
         // construct a cublas stream
         cublas_executor(std::size_t device,

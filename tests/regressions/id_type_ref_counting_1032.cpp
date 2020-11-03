@@ -6,6 +6,8 @@
 //
 // Demonstrating #1032: id_type local reference counting is wrong
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/components.hpp>
@@ -207,3 +209,4 @@ int main(int argc, char **argv)
 
     return hpx::util::report_errors();
 }
+#endif

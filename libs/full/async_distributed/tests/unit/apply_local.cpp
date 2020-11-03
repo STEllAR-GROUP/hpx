@@ -64,7 +64,7 @@ int hpx_main()
     }
 
     {
-        hpx::lcos::promise<std::int32_t> p;
+        hpx::lcos::local::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         using hpx::util::placeholders::_1;

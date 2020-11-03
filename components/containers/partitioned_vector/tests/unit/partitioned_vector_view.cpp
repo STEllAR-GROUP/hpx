@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_local_view.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
@@ -316,3 +318,4 @@ int main()
 
     return 0;
 }
+#endif

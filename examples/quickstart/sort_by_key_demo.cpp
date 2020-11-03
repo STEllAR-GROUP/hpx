@@ -7,6 +7,8 @@
 // This example demonstrates how a parallel::sort_by_key algorithm could be
 // implemented based on the existing algorithm hpx::parallel::sort.
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_sort.hpp>
@@ -65,3 +67,4 @@ int main(int argc, char* argv[])
     return hpx::init(argc, argv);   // Initialize and run HPX
 }
 
+#endif

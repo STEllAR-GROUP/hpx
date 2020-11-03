@@ -11,15 +11,15 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA)
+#if defined(HPX_HAVE_GPU_SUPPORT)
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/compute/cuda/detail/scoped_active_target.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <cuda_runtime.h>
+#include <hpx/async_cuda/custom_gpu_api.hpp>
 
-#if defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 350
+#if __CUDA_ARCH__ >= 350
 #include <cstring>
 #endif
 #include <string>

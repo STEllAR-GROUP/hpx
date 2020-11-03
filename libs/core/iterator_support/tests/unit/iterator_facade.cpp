@@ -56,6 +56,8 @@ public:
 
 struct proxy
 {
+    proxy(proxy const& x) = default;
+
     proxy(int& x)
       : state(x)
     {
@@ -70,6 +72,12 @@ struct proxy
     {
         state = x;
         return state;
+    }
+
+    proxy& operator=(proxy const& other)
+    {
+        state = other.state;
+        return *this;
     }
 
     int& state;

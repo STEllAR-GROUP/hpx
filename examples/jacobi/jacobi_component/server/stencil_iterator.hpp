@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include "../row.hpp"
 #include "../stencil_iterator.hpp"
 
@@ -120,3 +122,4 @@ HPX_REGISTER_ACTION_DECLARATION(
   , jacobi_server_stencil_iterator_get_action
 )
 
+#endif

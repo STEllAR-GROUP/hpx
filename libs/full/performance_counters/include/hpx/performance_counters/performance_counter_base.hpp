@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/performance_counters/counters_fwd.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -47,3 +48,4 @@ namespace hpx { namespace performance_counters {
     };
     //]
 }}    // namespace hpx::performance_counters
+#endif

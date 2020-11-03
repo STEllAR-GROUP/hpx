@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/runtime/components/component_factory.hpp>
 
 #include <hpx/preprocessor/cat.hpp>
@@ -73,3 +75,4 @@
     HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_3(ComponentType,          \
         componentname, state)                                                 \
 /**/
+#endif

@@ -10,6 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/naming.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
@@ -20,3 +21,4 @@ namespace hpx { namespace performance_counters {
     HPX_EXPORT void install_counter(naming::id_type const& id,
         counter_info const& info, error_code& ec = throws);
 }}    // namespace hpx::performance_counters
+#endif

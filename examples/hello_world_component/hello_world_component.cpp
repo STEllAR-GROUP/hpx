@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //[hello_world_cpp_getting_started
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include "hello_world_component.hpp"
 #include <hpx/iostream.hpp>
 
@@ -28,5 +30,5 @@ HPX_REGISTER_COMPONENT(hello_world_type, hello_world);
 
 HPX_REGISTER_ACTION(
     examples::server::hello_world::invoke_action, hello_world_invoke_action);
+#endif
 //]
-

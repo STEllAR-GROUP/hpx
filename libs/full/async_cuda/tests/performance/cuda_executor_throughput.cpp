@@ -40,8 +40,8 @@
 #include <hpx/modules/timing.hpp>
 
 // CUDA runtime
-#include <cublas_v2.h>
-#include <cuda_runtime.h>
+#include <hpx/async_cuda/custom_blas_api.hpp>
+#include <hpx/async_cuda/custom_gpu_api.hpp>
 //
 #include <algorithm>
 #include <cmath>

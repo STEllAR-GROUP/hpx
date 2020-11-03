@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/detail/action_factory.hpp>
@@ -79,3 +81,4 @@ HPX_REGISTER_ACTION_ID(hpx::lcos::server::latch::wait_action,
 HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(bool, std::ptrdiff_t, bool_std_ptrdiff,
     hpx::actions::base_lco_with_value_std_bool_ptrdiff_get,
     hpx::actions::base_lco_with_value_std_bool_ptrdiff_set)
+#endif

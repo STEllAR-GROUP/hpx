@@ -7,6 +7,8 @@
 
 // Bidirectional network bandwidth test
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/hpx.hpp>
@@ -135,3 +137,4 @@ void run_benchmark(hpx::program_options::variables_map& vm)
         std::cout << std::left << std::setw(10) << size << bw << std::endl;
     }
 }
+#endif

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/action_priority.hpp>
 #include <hpx/actions_base/basic_action_fwd.hpp>
 #include <hpx/actions_base/continuation_fwd.hpp>
@@ -434,4 +435,4 @@ namespace hpx { namespace actions
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
-
+#endif

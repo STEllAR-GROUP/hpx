@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/functional/bind_front.hpp>
@@ -252,4 +253,4 @@ namespace hpx { namespace components
         bool was_marked_for_migration_;
     };
 }}
-
+#endif

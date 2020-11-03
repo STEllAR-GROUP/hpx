@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -191,3 +192,4 @@ namespace hpx { namespace naming {
 
     HPX_SERIALIZATION_SPLIT_FREE(id_type);
 }}    // namespace hpx::naming
+#endif

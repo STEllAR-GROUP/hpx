@@ -12,6 +12,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/export_definitions.hpp>
@@ -30,4 +31,5 @@ namespace hpx { namespace components { namespace process { namespace windows
 #endif
 }}}}
 
+#endif
 #endif

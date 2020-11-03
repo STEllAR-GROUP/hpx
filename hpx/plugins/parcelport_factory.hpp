@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/plugin/traits/plugin_config_data.hpp>
 #include <hpx/plugins/parcelport_factory_base.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
@@ -171,3 +172,4 @@ namespace hpx { namespace plugins {
 #define HPX_REGISTER_PARCELPORT(Parcelport, pluginname)                        \
     HPX_REGISTER_PARCELPORT_(                                                  \
         Parcelport, HPX_PP_CAT(parcelport_, pluginname), pluginname)
+#endif

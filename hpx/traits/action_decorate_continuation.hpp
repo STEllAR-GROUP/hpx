@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/continuation_fwd.hpp>
 #include <hpx/actions_base/traits/action_continuation.hpp>
 
@@ -26,4 +28,4 @@ namespace hpx { namespace traits
         }
     };
 }}
-
+#endif

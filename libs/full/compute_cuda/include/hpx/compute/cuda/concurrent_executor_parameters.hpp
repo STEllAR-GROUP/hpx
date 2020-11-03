@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA)    // && defined(__CUDACC__)
+#if defined(HPX_HAVE_GPU_SUPPORT)
 #include <hpx/execution/traits/is_executor_parameters.hpp>
 
 #include <cstddef>

@@ -14,12 +14,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 void test_nullary_void()
 {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
     {
         hpx::lcos::promise<void> p;
         hpx::future<void> f = p.get_future();
         p.set_value();
         HPX_TEST(f.is_ready());
     }
+#endif
 
     {
         hpx::lcos::local::promise<void> p;
@@ -39,6 +41,7 @@ struct A
 
 void test_nullary()
 {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
     {
         hpx::lcos::promise<A> p;
         hpx::future<A> f = p.get_future();
@@ -46,6 +49,7 @@ void test_nullary()
         HPX_TEST(f.is_ready());
         HPX_TEST_EQ(f.get().i_, 42);
     }
+#endif
 
     {
         hpx::lcos::local::promise<A> p;
@@ -58,6 +62,7 @@ void test_nullary()
 
 void test_unary()
 {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
     {
         hpx::lcos::promise<A> p1;
         hpx::future<A> f1 = p1.get_future();
@@ -71,6 +76,7 @@ void test_unary()
         HPX_TEST(f2.is_ready());
         HPX_TEST_EQ(f2.get().i_, 42);
     }
+#endif
 
     {
         hpx::lcos::local::promise<A> p1;
@@ -101,6 +107,7 @@ struct B
 
 void test_variadic()
 {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
     {
         hpx::lcos::promise<B> p1;
         hpx::future<B> f1 = p1.get_future();
@@ -134,6 +141,7 @@ void test_variadic()
         HPX_TEST_EQ(r4.i_, 42);
         HPX_TEST_EQ(r4.j_, 43);
     }
+#endif
 
     {
         hpx::lcos::local::promise<B> p1;

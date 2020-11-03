@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions/base_action.hpp>
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
@@ -51,4 +52,4 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::process::server::child::wait_for_exit_action,
     hpx_components_process_server_child_wait_for_exit);
 
-
+#endif

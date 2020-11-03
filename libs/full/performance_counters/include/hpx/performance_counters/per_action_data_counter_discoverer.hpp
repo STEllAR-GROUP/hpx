@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS) && defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions_base/detail/per_action_data_counter_registry.hpp>
@@ -22,4 +23,5 @@ namespace hpx { namespace performance_counters {
         performance_counters::discover_counters_mode mode, error_code& ec);
 }}    // namespace hpx::performance_counters
 
+#endif
 #endif

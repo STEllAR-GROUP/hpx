@@ -439,7 +439,7 @@ namespace hpx { namespace lcos { namespace detail {
                 alloc, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
         template <typename Allocator, typename P, typename F, typename... Ts>
         HPX_FORCEINLINE static auto call(Allocator const& alloc, P&& p, F&& f,
             typename std::enable_if<

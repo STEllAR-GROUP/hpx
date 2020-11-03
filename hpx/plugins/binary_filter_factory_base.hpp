@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/modules/plugin.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
 #include <hpx/serialization/binary_filter.hpp>
@@ -39,4 +40,4 @@ namespace hpx { namespace plugins
         pluginname, factory)                                                  \
 /**/
 
-
+#endif

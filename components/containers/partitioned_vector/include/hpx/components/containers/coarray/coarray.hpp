@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
 #include <hpx/collectives/spmd_block.hpp>
@@ -250,4 +252,4 @@ namespace hpx
         std::size_t this_image_;
     };
 }
-
+#endif

@@ -7,6 +7,8 @@
 // This test case demonstrates the issue described in #778: swapping futures
 // segfaults.
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 
@@ -72,3 +74,4 @@ int main()
 
     return 0;
 }
+#endif

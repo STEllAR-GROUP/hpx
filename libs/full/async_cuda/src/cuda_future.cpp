@@ -14,7 +14,7 @@
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/errors.hpp>
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/find_here.hpp>
 #endif
@@ -27,7 +27,7 @@
 #include <utility>
 #include <vector>
 
-#include <cuda_runtime.h>
+#include <hpx/async_cuda/custom_gpu_api.hpp>
 
 namespace hpx { namespace cuda { namespace experimental { namespace detail {
 
@@ -42,7 +42,13 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
 
     runtime_registration_wrapper::runtime_registration_wrapper(hpx::runtime* rt)
       : rt_(rt)
+      , registered_(false)
     {
+        if (nullptr != hpx::get_runtime_ptr())
+        {
+            return;
+        }
+
         HPX_ASSERT(rt);
 
         // Register this thread with HPX, this should be done once for
@@ -51,13 +57,19 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         // report an error.
         hpx::error_code ec(hpx::lightweight);    // ignore errors
         hpx::register_thread(rt_, "cuda", ec);
+        registered_ = true;
     }
 
     runtime_registration_wrapper::~runtime_registration_wrapper()
     {
-        // Unregister the thread from HPX, this should be done once in
-        // the end before the external thread exists.
-        hpx::unregister_thread(rt_);
+        // Unregister the thread from HPX, this should be done once in the end
+        // before the external thread exits, if the runtime registration
+        // wrapper actually registered the thread (it may not do so if the
+        // wrapper is constructed on a HPX worker thread).
+        if (registered_)
+        {
+            hpx::unregister_thread(rt_);
+        }
     }
 
     // -------------------------------------------------------------

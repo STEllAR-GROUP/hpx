@@ -8,6 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/functional/bind_back.hpp>
@@ -869,3 +870,4 @@ void component_namespace::counter_data::increment_num_localities_count()
 }
 
 }}}
+#endif

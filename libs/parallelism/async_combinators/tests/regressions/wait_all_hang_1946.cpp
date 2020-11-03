@@ -7,6 +7,8 @@
 // This test case demonstrates the issue described in #1946:
 // Hang in wait_all() in distributed run
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
@@ -62,3 +64,4 @@ int hpx_main(hpx::program_options::variables_map& vm)
     hpx::cout << "program finished!!!" << std::endl;
     return hpx::finalize();
 }
+#endif

@@ -940,6 +940,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     // Not reachable.
                     HPX_ASSERT(false);
+                    return partition_helper::call(
+                        policy, first, last, pred, proj);
                 });
 
             return f;

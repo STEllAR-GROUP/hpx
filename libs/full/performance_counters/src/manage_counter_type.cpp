@@ -8,6 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
@@ -178,3 +179,4 @@ namespace hpx { namespace performance_counters {
         }
     }
 }}    // namespace hpx::performance_counters
+#endif

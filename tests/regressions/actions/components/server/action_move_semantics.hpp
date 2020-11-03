@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 
@@ -87,4 +89,4 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::test::server::action_move_semantics::return_test_non_movable_direct_action,
     action_move_semantics_return_test_non_movable_direct_action)
 
-
+#endif

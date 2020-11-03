@@ -6,6 +6,8 @@
 
 // verify #2338 is fixed (Possible race in sliding semaphore)
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
@@ -70,3 +72,4 @@ int main()
 
     return hpx::util::report_errors();
 }
+#endif

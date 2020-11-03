@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/plugin/traits/plugin_config_data.hpp>
 
@@ -305,4 +306,5 @@ HPX_REGISTER_PARCELPORT(
     hpx::parcelset::policies::mpi::parcelport,
     mpi);
 
+#endif
 #endif

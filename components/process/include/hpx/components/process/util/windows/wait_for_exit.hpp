@@ -12,6 +12,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_WINDOWS)
 #include <hpx/modules/errors.hpp>
@@ -60,4 +61,5 @@ inline int wait_for_exit(const Process &p, hpx::error_code &ec)
 
 }}}}
 
+#endif
 #endif

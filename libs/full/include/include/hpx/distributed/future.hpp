@@ -17,6 +17,6 @@
 #include <hpx/async_distributed/async_continue_callback.hpp>
 #endif
 
-namespace hpx { namespace distribtued {
+namespace hpx { namespace distributed {
     using hpx::lcos::promise;
-}}    // namespace hpx::distribtued
+}}    // namespace hpx::distributed

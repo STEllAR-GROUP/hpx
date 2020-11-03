@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/collectives/spmd_block.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
@@ -226,4 +228,4 @@ namespace hpx
         std::reference_wrapper<const hpx::lcos::spmd_block> block_;
     };
 }
-
+#endif

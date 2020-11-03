@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,4 +44,4 @@
 #define HPX_REGISTER_COMPONENT_MODULE_DYNAMIC()
 #endif
 
-
+#endif

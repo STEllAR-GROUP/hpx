@@ -6,6 +6,8 @@
 //
 // Demonstrating #1737: Uptime problems
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/performance_counters.hpp>
@@ -67,3 +69,4 @@ int main(int argc, char** argv)
     HPX_TEST_EQ(hpx::init(argc, argv), 0);
     return hpx::util::report_errors();
 }
+#endif

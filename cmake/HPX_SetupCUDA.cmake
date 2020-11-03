@@ -4,12 +4,18 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if((HPX_WITH_CUDA_COMPUTE OR HPX_WITH_ASYNC_CUDA) AND NOT TARGET Cuda::cuda)
+if((HPX_WITH_CUDA_COMPUTE OR HPX_WITH_ASYNC_CUDA)
+   AND NOT HPX_WITH_HIP
+   AND NOT TARGET Cuda::cuda
+)
 
   find_package(CUDA REQUIRED)
-  set(HPX_WITH_COMPUTE ON)
-  hpx_add_config_define(HPX_HAVE_CUDA)
-  hpx_add_config_define(HPX_HAVE_COMPUTE)
+  if(NOT HPX_FIND_PACKAGE)
+    # The cmake variables are supposed to be cached no need to redefine them
+    set(HPX_WITH_COMPUTE ON)
+    hpx_add_config_define(HPX_HAVE_CUDA)
+    hpx_add_config_define(HPX_HAVE_COMPUTE)
+  endif()
   # keywords for target_link_libraries (cuda)
   set(CUDA_LINK_LIBRARIES_KEYWORD "PRIVATE")
 

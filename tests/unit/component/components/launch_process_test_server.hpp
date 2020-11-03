@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 
@@ -47,4 +49,4 @@ typedef launch_process::test_server::set_message_action
 
 HPX_REGISTER_ACTION_DECLARATION(launch_process_get_message_action);
 HPX_REGISTER_ACTION_DECLARATION(launch_process_set_message_action);
-
+#endif

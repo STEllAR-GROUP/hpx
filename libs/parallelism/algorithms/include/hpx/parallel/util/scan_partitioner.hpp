@@ -163,7 +163,7 @@ namespace hpx { namespace parallel { namespace util {
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
                 HPX_ASSERT(false);
-                return hpx::future<R>();
+                return R();
 #else
                 // inform parameter traits
                 scoped_executor_parameters scoped_params(

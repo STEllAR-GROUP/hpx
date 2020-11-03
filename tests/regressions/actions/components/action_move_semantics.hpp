@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/include/components.hpp>
 
 #include "server/action_move_semantics.hpp"
@@ -32,4 +34,4 @@ namespace hpx { namespace test
     };
 }}
 
-
+#endif

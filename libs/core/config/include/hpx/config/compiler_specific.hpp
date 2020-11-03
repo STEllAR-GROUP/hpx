@@ -97,24 +97,44 @@
 // Detecting CUDA compilation mode
 // Detecting NVCC
 #if defined(__NVCC__) || defined(__CUDACC__)
-#define HPX_COMPUTE_CODE
-# if defined(__CUDA_ARCH__)
-// nvcc compiling CUDA code, device mode.
-#  define HPX_COMPUTE_DEVICE_CODE
-# else
-// nvcc compiling CUDA code, host mode.
-#  define HPX_COMPUTE_HOST_CODE
-# endif
-// Detecting NVCC
+#  define HPX_COMPUTE_CODE
+#  if defined(__CUDA_ARCH__)
+     // nvcc compiling CUDA code, device mode.
+#    define HPX_COMPUTE_DEVICE_CODE
+#  else
+     // nvcc compiling CUDA code, host mode.
+#    define HPX_COMPUTE_HOST_CODE
+#  endif
+// Detecting Clang CUDA
 #elif defined(__clang__) && defined(__CUDA__)
-#define HPX_COMPUTE_CODE
-# if defined(__CUDA_ARCH__)
-// clang compiling CUDA code, device mode.
-#   define HPX_COMPUTE_DEVICE_CODE
-# else
-// clang compiling CUDA code, host mode.
-#   define HPX_COMPUTE_HOST_CODE
-# endif
+#  define HPX_COMPUTE_CODE
+#  if defined(__CUDA_ARCH__)
+     // clang compiling CUDA code, device mode.
+#    define HPX_COMPUTE_DEVICE_CODE
+#  else
+     // clang compiling CUDA code, host mode.
+#    define HPX_COMPUTE_HOST_CODE
+#  endif
+// Detecting HIPCC
+#elif defined(__HIPCC__)
+#  if defined(__clang__)
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wdeprecated-copy"
+#  endif
+   // Not like nvcc, the __device__ __host__ function decorators are not defined
+   // by the compiler
+#  include <hip/hip_runtime_api.h>
+#  if defined(__clang__)
+#    pragma clang diagnostic pop
+#  endif
+#  define HPX_COMPUTE_CODE
+#  if defined(__HIP_DEVICE_COMPILE__)
+     // hipclang compiling CUDA/HIP code, device mode.
+#    define HPX_COMPUTE_DEVICE_CODE
+#  else
+     // clang compiling CUDA/HIP code, host mode.
+#    define HPX_COMPUTE_HOST_CODE
+#  endif
 #endif
 
 #if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)

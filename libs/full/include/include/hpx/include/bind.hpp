@@ -9,6 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/bind.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/util/bind_action.hpp>
 #endif

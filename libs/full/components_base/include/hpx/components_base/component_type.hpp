@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/components_base/traits/component_type_database.hpp>
 #include <hpx/functional/unique_function.hpp>
@@ -307,3 +308,4 @@ namespace hpx { namespace naming {
         }                                                                      \
     }                                                                          \
     /**/
+#endif

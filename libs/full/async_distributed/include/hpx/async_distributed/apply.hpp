@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_local/apply.hpp>
 #include <hpx/util/bind_action.hpp>
@@ -30,3 +31,4 @@ namespace hpx { namespace detail {
         }
     };
 }}    // namespace hpx::detail
+#endif

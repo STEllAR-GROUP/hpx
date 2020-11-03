@@ -10,6 +10,8 @@
 // task with a waiting HPX thread, and how to wrap all of this into a HPX
 // action.
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/parallel_executors.hpp>
@@ -98,3 +100,4 @@ int main(int argc, char* argv[])
     return hpx::init(argc, argv); // Initialize and run HPX.
 }
 
+#endif

@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //[hello_world_client_getting_started
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include "hello_world_component.hpp"
 #include <hpx/hpx_main.hpp>
 
@@ -21,5 +23,5 @@ int main(int argc, char* argv[])
 
     return 0;
 }
+#endif
 //]
-

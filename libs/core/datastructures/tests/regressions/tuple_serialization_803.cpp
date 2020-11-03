@@ -7,6 +7,8 @@
 // This test verifies that issue #803 is resolved (Create proper serialization
 // support functions for hpx::tuple).
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/util.hpp>
@@ -84,3 +86,4 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
+#endif

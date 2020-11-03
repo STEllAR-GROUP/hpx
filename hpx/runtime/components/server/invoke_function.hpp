@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/type_support/decay.hpp>
@@ -42,4 +43,4 @@ namespace hpx { namespace components { namespace server
     {};
 }}}
 
-
+#endif

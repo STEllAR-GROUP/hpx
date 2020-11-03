@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/server/elapsed_time_counter.hpp>
@@ -106,3 +107,4 @@ namespace hpx { namespace performance_counters { namespace detail {
         }
     }
 }}}    // namespace hpx::performance_counters::detail
+#endif

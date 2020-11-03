@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_NETWORKING)
+#if defined(HPX_HAVE_NETWORKING) && !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 

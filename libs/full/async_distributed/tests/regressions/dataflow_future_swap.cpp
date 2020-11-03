@@ -7,6 +7,8 @@
 // This test case demonstrates the issue described in #775: runtime error with
 // local dataflow (copying futures?).
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 
@@ -60,3 +62,4 @@ int main()
 
     return 0;
 }
+#endif

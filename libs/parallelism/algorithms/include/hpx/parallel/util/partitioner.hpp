@@ -269,6 +269,8 @@ namespace hpx { namespace parallel { namespace util {
                 {
                     // rethrow either bad_alloc or exception_list
                     handle_local_exceptions::call(std::current_exception());
+                    HPX_ASSERT(false);
+                    return f(std::move(workitems));
                 }
             }
         };

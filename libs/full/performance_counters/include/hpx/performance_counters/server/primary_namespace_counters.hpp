@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions/base_action.hpp>
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
@@ -39,3 +40,4 @@ HPX_ACTION_USES_MEDIUM_STACK(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::primary_namespace_statistics_counter_action,
     primary_namespace_statistics_counter_action)
+#endif

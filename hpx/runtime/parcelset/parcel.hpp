@@ -11,6 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions/actions_fwd.hpp>
@@ -191,4 +192,5 @@ HPX_IS_BITWISE_SERIALIZABLE(hpx::parcelset::detail::parcel_data)
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif

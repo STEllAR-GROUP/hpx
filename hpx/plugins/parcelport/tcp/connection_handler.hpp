@@ -11,6 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_HAVE_PARCELPORT_TCP)
 #include <hpx/config/asio.hpp>
@@ -133,4 +134,4 @@ namespace hpx { namespace parcelset
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
-
+#endif

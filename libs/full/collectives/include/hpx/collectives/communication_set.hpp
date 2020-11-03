@@ -38,6 +38,7 @@ namespace hpx { namespace lcos {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
@@ -52,4 +53,5 @@ namespace hpx { namespace lcos {
 
 }}    // namespace hpx::lcos
 
+#endif
 #endif    // DOXYGEN

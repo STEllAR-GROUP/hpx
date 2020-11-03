@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/include/util.hpp>
@@ -163,3 +165,4 @@ namespace boost
     };
 }
 
+#endif

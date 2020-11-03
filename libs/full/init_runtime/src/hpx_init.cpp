@@ -57,7 +57,7 @@
 #ifdef HPX_HAVE_MODULE_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>
 #endif
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/naming.hpp>
@@ -110,7 +110,7 @@ namespace hpx { namespace detail {
     void console_print(std::string const&);
 }}    // namespace hpx::detail
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
 namespace hpx { namespace detail {
     // forward declarations only
     void list_symbolic_name(std::string const&, hpx::id_type const&);
@@ -146,7 +146,7 @@ namespace hpx { namespace detail {
 
     inline void print(std::string const& name, error_code& ec = throws)
     {
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
         naming::id_type console(agas::get_console_locality(ec));
         if (ec)
             return;
@@ -161,7 +161,7 @@ namespace hpx { namespace detail {
             ec = make_success_code();
     }
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
     ///////////////////////////////////////////////////////////////////////////
     // redirect the printing of the given counter name to the console
     bool list_counter(
@@ -275,6 +275,7 @@ namespace hpx { namespace detail {
         }
     }
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
     ///////////////////////////////////////////////////////////////////////////
     void list_component_type(
         std::string const& name, components::component_type ctype)
@@ -295,6 +296,7 @@ namespace hpx { namespace detail {
         naming::get_agas_client().iterate_types(
             hpx::util::bind<list_component_type_action>(console, _1, _2));
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     void start_counters(std::shared_ptr<util::query_counters> const& qc)
@@ -378,7 +380,8 @@ namespace hpx {
             }
 #endif
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) &&                                   \
-    defined(HPX_HAVE_VERIFY_LOCKS_GLOBALLY)
+    defined(HPX_HAVE_VERIFY_LOCKS_GLOBALLY) &&                                 \
+    !defined(HPX_COMPUTE_DEVICE_CODE)
             if (cms.rtcfg_.enable_global_lock_detection())
             {
                 util::enable_global_lock_detection();
@@ -400,12 +403,12 @@ namespace hpx {
 #endif
 
             // initialize logging
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
             util::detail::init_logging(
                 cms.rtcfg_, cms.rtcfg_.mode_ == runtime_mode::console);
 #endif
 
-#if defined(HPX_HAVE_NETWORKING)
+#if defined(HPX_HAVE_NETWORKING) && !defined(HPX_COMPUTE_DEVICE_CODE)
             if (cms.num_localities_ != 1 || cms.node_ != 0 ||
                 cms.rtcfg_.enable_networking())
             {
@@ -415,7 +418,7 @@ namespace hpx {
         }
 
         ///////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
         void handle_list_and_print_options(hpx::runtime& rt,
             hpx::program_options::variables_map& vm,
             bool print_counters_locally)
@@ -614,7 +617,7 @@ namespace hpx {
             if (!!shutdown)
                 rt.add_shutdown_function(std::move(shutdown));
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
             // Add startup function related to listing counter names or counter
             // infos (on console only).
             bool print_counters_locally =
@@ -882,7 +885,7 @@ namespace hpx {
                 }
                 default:
                 {
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
                     LPROGRESS_ << "creating distributed runtime";
                     rt.reset(new hpx::runtime_distributed(cms.rtcfg_));
                     break;
@@ -991,7 +994,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     int disconnect(double shutdown_timeout, double localwait, error_code& ec)
     {
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
         if (!threads::get_self_ptr())
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::disconnect",
@@ -1056,7 +1059,7 @@ namespace hpx {
             std::terminate();
         }
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
         components::server::runtime_support* p =
             reinterpret_cast<components::server::runtime_support*>(
                 get_runtime_distributed().get_runtime_support_lva());

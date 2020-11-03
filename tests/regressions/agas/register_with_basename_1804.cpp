@@ -7,6 +7,8 @@
 // This illustrates the issue as reported by #1804: register_with_basename
 // causes hangs
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
@@ -121,3 +123,4 @@ int main(int argc, char **argv)
     HPX_TEST_EQ(hpx::init(argc, argv, config), 0);
     return hpx::util::report_errors();
 }
+#endif

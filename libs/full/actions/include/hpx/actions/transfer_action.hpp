@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_NETWORKING)
+#if defined(HPX_HAVE_NETWORKING) && !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions/apply_helper.hpp>
 #include <hpx/actions/transfer_base_action.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>

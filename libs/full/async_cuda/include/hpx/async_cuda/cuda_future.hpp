@@ -20,7 +20,7 @@
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
 //
-#include <cuda_runtime.h>
+#include <hpx/async_cuda/custom_gpu_api.hpp>
 //
 #include <cstddef>
 #include <iosfwd>
@@ -60,6 +60,7 @@ namespace hpx { namespace cuda { namespace experimental {
             runtime_registration_wrapper(hpx::runtime* rt);
             ~runtime_registration_wrapper();
             hpx::runtime* rt_;
+            bool registered_;
         };
 
         // -------------------------------------------------------------

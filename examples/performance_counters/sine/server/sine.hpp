@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/include/lcos_local.hpp>
 #include <hpx/include/performance_counters.hpp>
@@ -51,4 +53,4 @@ namespace performance_counters { namespace sine { namespace server
         hpx::util::interval_timer timer_;
     };
 }}}
-
+#endif

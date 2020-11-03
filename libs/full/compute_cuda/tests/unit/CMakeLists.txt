@@ -11,7 +11,7 @@ set(default_executor_CUDA On)
 set(for_each_compute_CUDA On)
 set(for_loop_compute_CUDA On)
 
-if(HPX_WITH_CUDA_CLANG)
+if(HPX_WITH_CUDA_CLANG OR HPX_WITH_HIP)
   set(tests ${tests} transform_compute)
   set(transform_compute_CUDA On)
 endif()

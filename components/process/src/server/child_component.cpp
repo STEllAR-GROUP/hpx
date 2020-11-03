@@ -6,6 +6,8 @@
 
 #include <hpx/runtime_local/run_as_os_thread.hpp>
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components/process/child.hpp>
 #include <hpx/components/process/server/child.hpp>
 
@@ -37,4 +39,4 @@ namespace hpx { namespace components { namespace process { namespace server
         return hpx::threads::run_as_os_thread(f, std::ref(child_)).get();
     }
 }}}}
-
+#endif

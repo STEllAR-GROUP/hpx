@@ -251,7 +251,10 @@ function(add_hpx_module libname modulename)
   endforeach(header_file)
 
   # create library modules
-  if(${name}_CUDA AND HPX_WITH_CUDA_COMPUTE)
+  if(${name}_CUDA
+     AND HPX_WITH_CUDA_COMPUTE
+     AND NOT HPX_WITH_HIP
+  )
     # cmake-format: off
     cuda_add_library(
       hpx_${modulename} STATIC

@@ -9,6 +9,8 @@
 // console - this can be done easily using hpx::cout instead. The purpose of
 // this example is to demonstrate how to use templated plain actions.
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
@@ -67,3 +69,4 @@ int main()
     return 0;
 }
 
+#endif

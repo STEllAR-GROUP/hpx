@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA)
+#if defined(HPX_HAVE_GPU_SUPPORT)
 
 #include <hpx/assert.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>

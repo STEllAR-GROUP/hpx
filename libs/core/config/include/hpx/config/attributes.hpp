@@ -47,7 +47,7 @@
 #if defined(HPX_MSVC)
 #   define HPX_NOINLINE __declspec(noinline)
 #elif defined(__GNUC__)
-#   if defined(__NVCC__) || defined(__CUDACC__)
+#   if defined(__NVCC__) || defined(__CUDACC__) || defined(__HIPCC__)
         // nvcc doesn't always parse __noinline
 #       define HPX_NOINLINE __attribute__ ((noinline))
 #   else

@@ -11,6 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/actions_base_fwd.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/basic_action_fwd.hpp>
@@ -870,4 +871,5 @@ namespace hpx { namespace actions {
     HPX_REGISTER_ACTION_2(action, actionname)                                  \
     HPX_REGISTER_ACTION_FACTORY_ID(actionname, actionid)                       \
 /**/
+#endif
 #endif

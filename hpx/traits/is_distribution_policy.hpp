@@ -30,4 +30,3 @@ namespace hpx { namespace traits
         }
     };
 }}
-

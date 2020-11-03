@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 
@@ -44,3 +46,4 @@ HPX_REGISTER_ACTION_DECLARATION(
     startup_shutdown::server::startup_shutdown_component::init_action,
     startup_shutdown_component_init_action);
 
+#endif

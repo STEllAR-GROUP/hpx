@@ -10,7 +10,7 @@
 #include <hpx/errors/exception.hpp>
 
 // CUDA runtime
-#include <cuda_runtime.h>
+#include <hpx/async_cuda/custom_gpu_api.hpp>
 //
 #include <string>
 

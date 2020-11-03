@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/performance_counters.hpp>
@@ -281,4 +283,4 @@ HPX_REGISTER_STARTUP_MODULE_DYNAMIC(::performance_counters::sine::get_startup);
 // Note that this macro can be used not more than once in one module.
 HPX_REGISTER_COMMANDLINE_MODULE_DYNAMIC(
     ::performance_counters::sine::command_line_options);
-
+#endif

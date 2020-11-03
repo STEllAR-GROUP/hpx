@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions/base_action.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
@@ -173,4 +174,5 @@ namespace hpx { namespace actions {
     }
 }}    // namespace hpx::actions
 
+#endif
 #endif

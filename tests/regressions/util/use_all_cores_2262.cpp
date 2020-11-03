@@ -7,6 +7,8 @@
 // This test verifies that 'hpx.os_threads=all' is equivalent to specifying
 // all of the available cores (see #2262).
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/modules/testing.hpp>
@@ -36,3 +38,4 @@ int main()
     HPX_TEST_EQ(hpx::init(1, argv, cfg), 0);
     return hpx::util::report_errors();
 }
+#endif

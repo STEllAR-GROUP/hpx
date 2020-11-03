@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include "../row_range.hpp"
 
 #include <hpx/assert.hpp>
@@ -59,3 +61,4 @@ HPX_REGISTER_ACTION_DECLARATION(
   , jacobi_server_row_init_action
 )
 
+#endif

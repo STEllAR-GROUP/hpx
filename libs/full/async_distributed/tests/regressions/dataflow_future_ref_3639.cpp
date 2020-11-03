@@ -7,6 +7,8 @@
 // #3639: util::unwrapping does not work well with member functions
 // see also: https://stackoverflow.com/questions/54390555/compilation-error-with-hpxdataflow-and-member-function
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 
@@ -46,3 +48,4 @@ int main()
 
     return 0;
 }
+#endif

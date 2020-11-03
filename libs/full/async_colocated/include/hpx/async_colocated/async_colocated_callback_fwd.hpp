@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_colocated/async_colocated_fwd.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
@@ -48,4 +50,5 @@ namespace hpx { namespace detail {
 namespace hpx {
     using hpx::detail::async_colocated_cb;
 }
+#endif
 #endif

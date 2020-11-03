@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/include/partitioned_vector.hpp>
 
 #include <type_traits>
@@ -122,3 +124,4 @@ void verify_values(hpx::partitioned_vector<T> v1, std::vector<T> v2)
 
     HPX_TEST(final_result);
 }
+#endif

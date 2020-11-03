@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/program_options.hpp>
@@ -85,4 +87,4 @@ int main(int argc, char* argv[])
     // connect to the existing HPX applications
     return hpx::init(desc_commandline, argc, argv, cfg, hpx::runtime_mode::connect);
 }
-
+#endif

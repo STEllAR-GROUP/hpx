@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/functional/function.hpp>
 
 #include <cstdint>
@@ -44,3 +45,4 @@ namespace hpx {
         HPX_EXPORT resolver_client& get_agas_client();
     }    // namespace naming
 }    // namespace hpx
+#endif

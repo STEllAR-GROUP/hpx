@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/config/export_definitions.hpp>
 
 #if defined(HPX_IOSTREAMS_MODULE_EXPORTS)
@@ -15,4 +17,4 @@
 #endif
 
 
-
+#endif

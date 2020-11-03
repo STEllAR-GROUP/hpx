@@ -6,6 +6,8 @@
 
 // Demonstrate the use of hpx::lcos::latch
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
@@ -50,3 +52,4 @@ int main(int argc, char* argv[])
 
     return hpx::init(argc, argv, cfg);
 }
+#endif

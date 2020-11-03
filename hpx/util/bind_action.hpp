@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_local/async_fwd.hpp>
@@ -181,4 +182,4 @@ namespace hpx { namespace serialization {
         bound.serialize(ar, version);
     }
 }}    // namespace hpx::serialization
-
+#endif

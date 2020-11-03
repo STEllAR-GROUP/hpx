@@ -10,6 +10,8 @@
 // This example makes use of LCOS channels to send and receive
 // elements.
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include "communicator.hpp"
 #include "stencil.hpp"
 
@@ -182,3 +184,4 @@ int main(int argc, char* argv[])
 
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
+#endif

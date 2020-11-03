@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/include/client.hpp>
@@ -152,4 +154,4 @@ struct managed_object
 
 }}
 
-
+#endif

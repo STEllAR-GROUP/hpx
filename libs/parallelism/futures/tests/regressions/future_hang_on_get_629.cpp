@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/plain_actions.hpp>
@@ -193,3 +195,4 @@ int main(int argc, char* argv[])
     // Initialize and run HPX.
     return hpx::init(cmdline, argc, argv);
 }
+#endif

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
@@ -79,4 +80,4 @@ namespace hpx { namespace components { namespace server
     }
 }}}
 
-
+#endif

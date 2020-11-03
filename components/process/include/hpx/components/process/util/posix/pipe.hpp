@@ -12,6 +12,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if !defined(HPX_WINDOWS)
 namespace hpx { namespace components { namespace process { namespace posix {
@@ -31,4 +32,5 @@ inline pipe make_pipe(int source, int sink)
 
 }}}}
 
+#endif
 #endif

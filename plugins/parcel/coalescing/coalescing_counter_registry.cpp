@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/modules/format.hpp>
@@ -379,4 +380,5 @@ namespace hpx { namespace plugins { namespace parcel
     }
 }}}
 
+#endif
 #endif

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include "defs.hh"
 
 #include <hpx/serialization/serialize.hpp>
@@ -91,3 +93,4 @@ struct matrix_t {
 };
 
 std::ostream& operator<<(std::ostream& os, const matrix_t& a);
+#endif

@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 
@@ -24,4 +26,4 @@ HPX_REGISTER_COMPONENT_MODULE();
 // enable it explicitly.
 typedef hpx::components::component<launch_process::test_server> server_type;
 HPX_REGISTER_DISABLED_COMPONENT_FACTORY(server_type, launch_process_test_server)
-
+#endif

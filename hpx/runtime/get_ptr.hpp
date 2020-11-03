@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components_base/component_type.hpp>
@@ -310,4 +311,4 @@ namespace hpx
         return get_ptr<component_type>(p, c.get_id(), ec);
     }
 }
-
+#endif

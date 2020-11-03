@@ -7,6 +7,8 @@
 
 // #define HPX_USE_WINDOWS_PERFORMANCE_COUNTERS 1
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/chrono.hpp>
 #include <hpx/exception.hpp>
@@ -150,3 +152,4 @@ int main(int argc, char* argv[])
         empty, hpx::runtime_mode::connect);
 }
 
+#endif

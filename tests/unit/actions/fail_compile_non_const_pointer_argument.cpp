@@ -6,6 +6,8 @@
 
 // This must fail compiling
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 
@@ -22,4 +24,4 @@ int main()
 
     return 0;
 }
-
+#endif

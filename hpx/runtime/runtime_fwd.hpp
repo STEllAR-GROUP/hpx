@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime_local/detail/runtime_local_fwd.hpp>
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 namespace hpx
 {
     class HPX_EXPORT runtime_distributed;
@@ -18,3 +19,4 @@ namespace hpx
     HPX_EXPORT runtime_distributed& get_runtime_distributed();
     HPX_EXPORT runtime_distributed*& get_runtime_distributed_ptr();
 }
+#endif

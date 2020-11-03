@@ -11,6 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/actions_base_fwd.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
@@ -142,3 +143,4 @@ namespace hpx { namespace actions { namespace detail {
 }}}    // namespace hpx::actions::detail
 
 #include <hpx/config/warnings_suffix.hpp>
+#endif

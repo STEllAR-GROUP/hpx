@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components_fwd.hpp>
 
 #include <hpx/futures/future.hpp>
@@ -171,4 +172,4 @@ namespace hpx
             unregister_with_basename(std::move(base_name), sequence_nr));
     }
 }
-
+#endif

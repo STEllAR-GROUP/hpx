@@ -11,6 +11,6 @@
 #include <hpx/parallel/algorithms/minmax.hpp>
 #include <hpx/parallel/container_algorithms/minmax.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/parallel/segmented_algorithms/minmax.hpp>
 #endif

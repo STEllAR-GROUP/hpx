@@ -7,6 +7,8 @@
 // This demonstrates the issue as reported by #1523: Remote async with deferred
 // launch policy never executes
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
@@ -102,3 +104,4 @@ int main()
 
     return 0;
 }
+#endif

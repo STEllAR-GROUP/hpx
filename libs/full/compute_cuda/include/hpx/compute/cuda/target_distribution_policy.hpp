@@ -10,13 +10,14 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA) && defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_GPU_SUPPORT) && defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 
 #include <hpx/assert.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_distributed/dataflow.hpp>
 #endif
 #include <hpx/futures/future.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/components/create_component_helpers.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
@@ -118,10 +119,15 @@ namespace hpx { namespace cuda { namespace experimental {
         template <typename Component, typename... Ts>
         hpx::future<hpx::id_type> create(Ts&&... ts) const
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+            return hpx::future<hpx::id_type>();
+#else
             target_type t = this->get_next_target();
             hpx::id_type target_locality = t.get_locality();
             return components::create_async<Component>(
                 target_locality, std::forward<Ts>(ts)..., std::move(t));
+#endif
         }
 
         /// \cond NOINTERNAL

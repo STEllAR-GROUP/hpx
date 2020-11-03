@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions/base_action.hpp>
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
@@ -31,4 +32,4 @@ HPX_ACTION_HAS_CRITICAL_PRIORITY(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::console_error_sink_action,
     console_error_sink_action)
-
+#endif
