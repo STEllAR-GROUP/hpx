@@ -15,7 +15,9 @@
 
 namespace hpx { namespace util {
     template <typename T>
-    struct decay : std::decay<T>
+    struct HPX_DEPRECATED_V(
+        1, 6, "hpx::util::decay is deprecated, use std::decay instead.") decay
+      : std::decay<T>
     {
     };
 

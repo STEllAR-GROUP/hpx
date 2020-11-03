@@ -16,6 +16,7 @@
 
 #include <cstddef>
 #include <utility>
+#include <type_traits>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -44,7 +45,7 @@ namespace hpx { namespace components {
         }
 
         using action_type = server::create_component_action<Component,
-            typename hpx::util::decay<Ts>::type...>;
+            typename std::decay<Ts>::type...>;
 
         return hpx::async<action_type>(gid, std::forward<Ts>(vs)...);
     }
@@ -63,7 +64,7 @@ namespace hpx { namespace components {
         }
 
         using action_type = server::bulk_create_component_action<Component,
-            typename hpx::util::decay<Ts>::type...>;
+            typename std::decay<Ts>::type...>;
 
         return hpx::async<action_type>(gid, count, std::forward<Ts>(vs)...);
     }
@@ -87,7 +88,7 @@ namespace hpx { namespace components {
         naming::id_type const& gid, Ts&&... vs)
     {
         using action_type = server::create_component_action<Component,
-            typename hpx::util::decay<Ts>::type...>;
+            typename std::decay<Ts>::type...>;
 
         return hpx::detail::async_colocated<action_type>(
             gid, std::forward<Ts>(vs)...);
@@ -105,7 +106,7 @@ namespace hpx { namespace components {
         naming::id_type const& gid, std::size_t count, Ts&&... vs)
     {
         using action_type = server::bulk_create_component_action<Component,
-            typename hpx::util::decay<Ts>::type...>;
+            typename std::decay<Ts>::type...>;
 
         return hpx::detail::async_colocated<action_type>(
             gid, count, std::forward<Ts>(vs)...);

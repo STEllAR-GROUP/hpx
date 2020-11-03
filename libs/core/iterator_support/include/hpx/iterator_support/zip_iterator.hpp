@@ -503,10 +503,10 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename... Ts>
-    HPX_HOST_DEVICE zip_iterator<typename decay<Ts>::type...> make_zip_iterator(
-        Ts&&... vs)
+    HPX_HOST_DEVICE zip_iterator<typename std::decay<Ts>::type...>
+    make_zip_iterator(Ts&&... vs)
     {
-        typedef zip_iterator<typename decay<Ts>::type...> result_type;
+        typedef zip_iterator<typename std::decay<Ts>::type...> result_type;
 
         return result_type(std::forward<Ts>(vs)...);
     }
