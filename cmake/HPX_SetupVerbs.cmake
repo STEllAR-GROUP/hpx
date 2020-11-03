@@ -42,7 +42,8 @@ if(HPX_WITH_PARCELPORT_VERBS AND NOT TARGET Verbs::verbs)
     HPX_PARCELPORT_VERBS_WITH_DEV_MODE BOOL
     "Enables some extra logging and debug features in the verbs parcelport \
      (default: OFF - Warning - severely impacts usability when enabled)" OFF
-    CATEGORY "Parcelport" ADVANCED
+    CATEGORY "Parcelport"
+    ADVANCED
   )
 
   if(HPX_PARCELPORT_VERBS_WITH_DEV_MODE)
@@ -68,13 +69,17 @@ if(HPX_WITH_PARCELPORT_VERBS AND NOT TARGET Verbs::verbs)
   hpx_option(
     HPX_PARCELPORT_VERBS_DEVICE STRING
     "The device name of the ibverbs capable network adapter (default: mlx5_0)"
-    "mlx5_0" CATEGORY "Parcelport" ADVANCED
+    "mlx5_0"
+    CATEGORY "Parcelport"
+    ADVANCED
   )
 
   hpx_option(
     HPX_PARCELPORT_VERBS_INTERFACE STRING
     "The interface name of the ibverbs capable network adapter (default: ib0)"
-    "ib0" CATEGORY "Parcelport" ADVANCED
+    "ib0"
+    CATEGORY "Parcelport"
+    ADVANCED
   )
 
   hpx_add_config_define_namespace(
@@ -95,7 +100,8 @@ if(HPX_WITH_PARCELPORT_VERBS AND NOT TARGET Verbs::verbs)
   hpx_option(
     HPX_PARCELPORT_VERBS_WITH_BOOTSTRAPPING BOOL
     "Configure the parcelport to enable bootstrap capabilities (default: ON)" ON
-    CATEGORY "Parcelport" ADVANCED
+    CATEGORY "Parcelport"
+    ADVANCED
   )
 
   if(HPX_PARCELPORT_VERBS_WITH_BOOTSTRAPPING)
@@ -118,7 +124,8 @@ if(HPX_WITH_PARCELPORT_VERBS AND NOT TARGET Verbs::verbs)
   hpx_option(
     HPX_PARCELPORT_VERBS_WITH_PERFORMANCE_COUNTERS BOOL
     "Enable verbs parcelport performance counters (default: OFF)" OFF
-    CATEGORY "Parcelport" ADVANCED
+    CATEGORY "Parcelport"
+    ADVANCED
   )
 
   if(HPX_PARCELPORT_VERBS_WITH_PERFORMANCE_COUNTERS)
@@ -134,7 +141,9 @@ if(HPX_WITH_PARCELPORT_VERBS AND NOT TARGET Verbs::verbs)
   hpx_option(
     HPX_PARCELPORT_VERBS_THROTTLE_SENDS STRING
     "Threshold of active sends at which throttling is enabled (default: 16)"
-    "16" CATEGORY "Parcelport" ADVANCED
+    "16"
+    CATEGORY "Parcelport"
+    ADVANCED
   )
 
   hpx_add_config_define_namespace(
@@ -152,7 +161,8 @@ if(HPX_WITH_PARCELPORT_VERBS AND NOT TARGET Verbs::verbs)
     "Configure the parcelport to use a custom scheduler \
      (default: OFF - Warning, experimental, may cause serious program errors)"
     OFF
-    CATEGORY "Parcelport" ADVANCED
+    CATEGORY "Parcelport"
+    ADVANCED
   )
 
   if(HPX_PARCELPORT_VERBS_USE_CUSTOM_SCHEDULER)
@@ -168,7 +178,8 @@ if(HPX_WITH_PARCELPORT_VERBS AND NOT TARGET Verbs::verbs)
     HPX_PARCELPORT_VERBS_DEBUG_LOCKS BOOL
     "Turn on extra log messages for lock/unlock \
      (default: OFF - Warning, severely impacts performance when enabled)" OFF
-    CATEGORY "Parcelport" ADVANCED
+    CATEGORY "Parcelport"
+    ADVANCED
   )
 
   if(HPX_PARCELPORT_VERBS_DEBUG_LOCKS)
@@ -183,13 +194,17 @@ if(HPX_WITH_PARCELPORT_VERBS AND NOT TARGET Verbs::verbs)
   hpx_option(
     HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE STRING
     "Number of bytes a default chunk in the memory pool can hold (default: 4K)"
-    "4096" CATEGORY "Parcelport" ADVANCED
+    "4096"
+    CATEGORY "Parcelport"
+    ADVANCED
   )
 
   hpx_option(
     HPX_PARCELPORT_VERBS_64K_PAGES STRING
     "Number of 64K pages we reserve for default message buffers (default: 10)"
-    "10" CATEGORY "Parcelport" ADVANCED
+    "10"
+    CATEGORY "Parcelport"
+    ADVANCED
   )
 
   hpx_option(
@@ -197,7 +212,8 @@ if(HPX_WITH_PARCELPORT_VERBS AND NOT TARGET Verbs::verbs)
     STRING
     "Cutoff size over which data is never copied into existing buffers (default: 4K)"
     "4096"
-    CATEGORY "Parcelport" ADVANCED
+    CATEGORY "Parcelport"
+    ADVANCED
   )
 
   hpx_add_config_define_namespace(
@@ -231,7 +247,8 @@ if(HPX_WITH_PARCELPORT_VERBS AND NOT TARGET Verbs::verbs)
   hpx_option(
     HPX_PARCELPORT_VERBS_MAX_PREPOSTS STRING
     "The number of pre-posted receive buffers (default: 512)" "512"
-    CATEGORY "Parcelport" ADVANCED
+    CATEGORY "Parcelport"
+    ADVANCED
   )
 
   hpx_add_config_define_namespace(

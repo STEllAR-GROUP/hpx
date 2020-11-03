@@ -59,11 +59,31 @@ if(NOT HPX_WITH_TESTS)
     VALUE OFF
     FORCE
   )
-  hpx_set_option(HPX_WITH_TESTS_REGRESSIONS VALUE OFF FORCE)
-  hpx_set_option(HPX_WITH_TESTS_UNIT VALUE OFF FORCE)
-  hpx_set_option(HPX_WITH_TESTS_HEADERS VALUE OFF FORCE)
-  hpx_set_option(HPX_WITH_TESTS_EXTERNAL_BUILD VALUE OFF FORCE)
-  hpx_set_option(HPX_WITH_TESTS_EXAMPLES VALUE OFF FORCE)
+  hpx_set_option(
+    HPX_WITH_TESTS_REGRESSIONS
+    VALUE OFF
+    FORCE
+  )
+  hpx_set_option(
+    HPX_WITH_TESTS_UNIT
+    VALUE OFF
+    FORCE
+  )
+  hpx_set_option(
+    HPX_WITH_TESTS_HEADERS
+    VALUE OFF
+    FORCE
+  )
+  hpx_set_option(
+    HPX_WITH_TESTS_EXTERNAL_BUILD
+    VALUE OFF
+    FORCE
+  )
+  hpx_set_option(
+    HPX_WITH_TESTS_EXAMPLES
+    VALUE OFF
+    FORCE
+  )
 endif()
 
 if(HPX_WITH_TESTS)

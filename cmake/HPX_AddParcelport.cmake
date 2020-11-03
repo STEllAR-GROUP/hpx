@@ -51,7 +51,8 @@ function(add_parcelport name)
   target_compile_options(${parcelport_name} PUBLIC ${${name}_COMPILE_FLAGS})
   set_target_properties(
     ${parcelport_name}
-    PROPERTIES FOLDER "${${name}_FOLDER}" LINK_FLAGS "${${name}_LINK_FLAGS}"
+    PROPERTIES FOLDER "${${name}_FOLDER}"
+               LINK_FLAGS "${${name}_LINK_FLAGS}"
                POSITION_INDEPENDENT_CODE ON
   )
 

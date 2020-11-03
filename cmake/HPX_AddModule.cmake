@@ -126,17 +126,11 @@ function(add_hpx_module libname modulename)
   set(all_headers ${${modulename}_HEADERS})
 
   # Write full path for the sources files
-  list(
-    TRANSFORM ${modulename}_SOURCES
-    PREPEND ${SOURCE_ROOT}/
-            OUTPUT_VARIABLE
-            sources
+  list(TRANSFORM ${modulename}_SOURCES PREPEND ${SOURCE_ROOT}/ OUTPUT_VARIABLE
+                                                               sources
   )
-  list(
-    TRANSFORM ${modulename}_HEADERS
-    PREPEND ${HEADER_ROOT}/
-            OUTPUT_VARIABLE
-            headers
+  list(TRANSFORM ${modulename}_HEADERS PREPEND ${HEADER_ROOT}/ OUTPUT_VARIABLE
+                                                               headers
   )
   if(${_have_compatibility_headers_option}
      AND HPX_${modulename_upper}_WITH_COMPATIBILITY_HEADERS

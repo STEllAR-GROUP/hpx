@@ -77,7 +77,8 @@ foreach(test ${full_tests})
   # add example executable
   add_hpx_executable(
     ${test}_test INTERNAL_FLAGS
-    SOURCES ${sources} ${${test}_FLAGS} EXCLUDE_FROM_ALL
+    SOURCES ${sources} ${${test}_FLAGS}
+    EXCLUDE_FROM_ALL
     FOLDER ${folder_name}
   )
 
