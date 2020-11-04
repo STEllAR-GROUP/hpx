@@ -7,35 +7,26 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution_base/executor.hpp>
+#include <hpx/execution/detail/post_policy_dispatch.hpp>
+#include <hpx/execution_base/receiver.hpp>
+#include <hpx/execution_base/sender.hpp>
+
+#include <exception>
 
 namespace hpx { namespace execution { namespace experimental {
-    struct p0443_executor
+    struct executor
     {
-        constexpr p0443_executor() = default;
-
-        p0443_executor require(hpx::threads::thread_schedule_hint hint)
-        {
-            auto exec = *this;
-            exec.schedulehint_ = hint;
-            return exec;
-        }
-
-        hpx::threads::thread_schedule_hint query(
-            hpx::threads::thread_schedule_hint)
-        {
-            return schedulehint_;
-        }
+        constexpr executor() = default;
 
         /// \cond NOINTERNAL
-        bool operator==(p0443_executor const& rhs) const noexcept
+        bool operator==(executor const& rhs) const noexcept
         {
             return pool_ == rhs.pool_ && priority_ == rhs.priority_ &&
                 stacksize_ == rhs.stacksize_ &&
                 schedulehint_ == rhs.schedulehint_;
         }
 
-        bool operator!=(p0443_executor const& rhs) const noexcept
+        bool operator!=(executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
@@ -64,6 +55,67 @@ namespace hpx { namespace execution { namespace experimental {
                     std::forward<F>(f), i);
             }
         }
+
+        template <typename R>
+        struct operation_state
+        {
+            typename std::decay<R>::type r;
+
+            void start() noexcept
+            {
+                try
+                {
+                    hpx::execution::experimental::execute(
+                        executor{}, [r = std::move(r)]() mutable {
+                            hpx::execution::experimental::set_value(
+                                std::move(r));
+                        });
+                }
+                catch (...)
+                {
+                    hpx::execution::experimental::set_error(
+                        std::move(r), std::current_exception());
+                }
+            }
+        };
+
+        struct sender
+        {
+            template <template <typename...> typename Tuple,
+                template <typename...> typename Variant>
+            using value_types = Variant<Tuple<>>;
+
+            template <template <typename...> typename Variant>
+            using error_types = Variant<std::exception_ptr>;
+
+            static constexpr bool sends_done = false;
+
+            template <typename R>
+            operation_state<R> connect(R&& r)
+            {
+                return {std::forward<R>(r)};
+            }
+        };
+
+        template <template <class...> class Tuple,
+            template <class...> class Variant>
+        using value_types = Variant<Tuple<>>;
+
+        template <template <class...> class Variant>
+        using error_types = Variant<std::exception_ptr>;
+
+        static constexpr bool sends_done = false;
+
+        template <typename R>
+        operation_state<R> connect(R&& r)
+        {
+            return {std::forward<R>(r)};
+        }
+
+        sender schedule()
+        {
+            return {};
+        }
         /// \endcond
 
     private:
@@ -78,11 +130,3 @@ namespace hpx { namespace execution { namespace experimental {
         /// \endcond
     };
 }}}    // namespace hpx::execution::experimental
-
-namespace hpx { namespace threads {
-    template <>
-    struct thread_schedule_hint::is_applicable_property<
-        hpx::execution::experimental::p0443_executor> : std::true_type
-    {
-    };
-}}    // namespace hpx::threads
