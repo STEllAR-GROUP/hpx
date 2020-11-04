@@ -5,7 +5,7 @@ import os
 import platform
 import re
 
-from pyutils import log, runtools
+from pyutils import default_vars as var, log, runtools
 
 env = os.environ.copy()
 
@@ -13,7 +13,7 @@ env = os.environ.copy()
 def load(envfile):
     if not os.path.exists(envfile):
         raise FileNotFoundError(f'Could find environment file "{envfile}"')
-    env['GTCMAKE_PYUTILS_ENVFILE'] = os.path.abspath(envfile)
+    env['HPX_CMAKE_PYUTILS_ENVFILE'] = os.path.abspath(envfile)
 
     envdir, envfile = os.path.split(envfile)
     output = runtools.run(
@@ -68,7 +68,7 @@ def sbatch_options(mpi):
 
 
 def build_command():
-    return env.get('GTRUN_BUILD_COMMAND', 'make').split()
+    return env.get(var._project_name+'_BUILD_COMMAND', var._default_build_system).split()
 
 
 def hostname():

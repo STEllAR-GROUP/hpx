@@ -1,0 +1,22 @@
+{
+  "outputs": [
+    {
+      "name": "future overhead - action - WaitAll",
+      "executor": "no-executor",
+      "series": [
+        0.678135
+      ]
+    }
+  ],
+  "HPX": {
+    "commit": "3a6f93e5208c5f7a7e774e3b29037727578afdfc",
+    "datetime": "2020-09-25T08:14:35+00:00"
+  },
+  "environment": {
+    "hostname": "daint105",
+    "clustername": "daint",
+    "compiler": "/opt/cray/pe/craype/2.7.0/bin/CC 10.0.0 ( )",
+    "datetime": "2020-09-25T10:46:25.829730+02:00",
+    "envfile": ""
+  }
+}

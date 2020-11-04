@@ -3,12 +3,11 @@
 import json
 import os
 
-from pyutils import args, env, log
+from pyutils import args, default_vars as var, env, log
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
-
-@args.command(description='main script for GridTools pyutils')
+@args.command(description='main script for '+ var._project_name +' pyutils')
 @args.arg('--verbose',
           '-v',
           action='count',
@@ -21,16 +20,16 @@ def driver(verbose, logfile):
         log.log_to_file(logfile)
 
 
-@driver.command(description='build GridTools')
-@args.arg('--build-type', '-b', choices=['release', 'debug'], required=True)
-@args.arg('--environment', '-e', help='path to environment file')
-@args.arg('--target', '-t', nargs='+', help='make targets to build')
-@args.arg('--source-dir', help='GridTools source directory')
-@args.arg('--build-dir', '-o', required=True, help='build directory')
-@args.arg('--install-dir', '-i', help='install directory')
+@driver.command(description='build '+ var._project_name)
 @args.arg('--cmake-only',
           action='store_true',
           help='only execute CMake but do not build')
+@args.arg('--build-dir', '-o', required=True, help='build directory')
+@args.arg('--build-type', '-b', choices=['release', 'debug'], required=True)
+@args.arg('--environment', '-e', help='path to environment file')
+@args.arg('--install-dir', '-i', help='install directory')
+@args.arg('--source-dir', help= var._project_name +' source directory')
+@args.arg('--target', '-t', nargs='+', help='make targets to build')
 def build(build_type, environment, target, source_dir, build_dir, install_dir,
           cmake_only):
     import build
@@ -39,6 +38,9 @@ def build(build_type, environment, target, source_dir, build_dir, install_dir,
         source_dir = os.path.abspath(os.path.join(script_dir, os.path.pardir))
 
     env.set_cmake_arg('CMAKE_BUILD_TYPE', build_type.title())
+    # TODO: change back to default tcmalloc when switching to jenkins
+    env.set_cmake_arg('HPX_WITH_MALLOC', 'system')
+    env.set_cmake_arg('HPX_WITH_TESTS_BENCHMARKS', 'ON')
 
     if environment:
         env.load(environment)
@@ -55,7 +57,7 @@ except ImportError:
 
 if buildinfo:
 
-    @driver.command(description='run GridTools tests')
+    @driver.command(description='run '+ var._project_name +' tests')
     @args.arg('--run-mpi-tests',
               '-m',
               action='store_true',
@@ -72,7 +74,7 @@ if buildinfo:
     @args.arg('--build-examples',
               '-b',
               action='store_true',
-              help='enable building of GridTools examples')
+              help='enable building of '+ var._project_name +' examples')
     def test(run_mpi_tests, perftests_only, verbose_ctest, examples_build_dir,
              build_examples):
         import test
@@ -94,28 +96,34 @@ def perftest():
 if buildinfo:
 
     @perftest.command(description='run performance tests')
-    @args.arg('--domain-size',
+    @args.arg('--scheduling-policy',
               '-s',
-              required=True,
+              default='local-priority-fifo',
+              help='scheduling policy (default is local-priority-fifo)')
+    @args.arg('--threads',
+              default='4',
               type=int,
-              nargs=3,
-              metavar=('ISIZE', 'JSIZE', 'KSIZE'),
-              help='domain size (excluding halo)')
-    @args.arg('--runs',
-              default=100,
-              type=int,
-              help='number of runs to do for each stencil')
+              help='number of runs to do for each test')
     @args.arg('--output',
               '-o',
               required=True,
               help='output file path, extension .json is added if not given')
-    def run(domain_size, runs, output):
+    @args.arg('--extra-opts',
+              nargs='+',
+              type=str,
+              help='extra arguments to pass to the test\nWarning prefer = to \
+              space to assign values to hpx options')
+    def run(scheduling_policy, threads, output, extra_opts):
+        # options
+        scheduling_policy='--hpx:queuing=' + scheduling_policy
+        threads='--hpx:threads=' + str(threads)
+        extra_opts = ' '.join(extra_opts).lstrip()
 
         import perftest
         if not output.lower().endswith('.json'):
             output += '.json'
 
-        data = perftest.run(domain_size, runs)
+        data = perftest.run(scheduling_policy, threads, extra_opts)
         with open(output, 'w') as outfile:
             json.dump(data, outfile, indent='  ')
             log.info(f'Successfully saved perftests output to {output}')

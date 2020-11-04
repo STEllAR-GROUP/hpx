@@ -28,7 +28,7 @@ def run(run_mpi_tests, verbose_ctest):
 
 
 def run_perftests():
-    runtools.srun([os.path.join('tests', 'regression', 'perftests')],
+    runtools.srun([os.path.join('tests', 'performance')],
                   log_output=log.info,
                   cwd=buildinfo.binary_dir)
 
@@ -37,7 +37,7 @@ def compile_and_run_examples(build_dir, verbose_ctest):
     import build
     from pyutils import buildinfo
 
-    source_dir = os.path.join(buildinfo.install_dir, 'gridtools_examples')
+    source_dir = os.path.join(buildinfo.install_dir, 'examples')
     build_dir = os.path.abspath(build_dir)
     os.makedirs(build_dir, exist_ok=True)
 

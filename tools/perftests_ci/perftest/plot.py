@@ -18,14 +18,12 @@ plt.style.use('ggplot')
 
 class _OutputKey(typing.NamedTuple):
     name: str
-    backend: str
-    float_type: str
+    executor: str
 
     def __str__(self):
         name = self.name.replace('_', ' ').title()
-        backend = self.backend.upper()
-        float_type = self.float_type
-        return f'{name} ({backend}, {float_type})'
+        executor = self.executor.upper()
+        return f'{name} ({executor})'
 
     @classmethod
     def outputs_by_key(cls, data):
@@ -113,7 +111,7 @@ class _ConfidenceInterval(typing.NamedTuple):
 
 def _add_comparison_table(report, cis):
     names = list(sorted(set(k.name for k in cis.keys())))
-    backends = list(sorted(set(k.backend for k in cis.keys())))
+    executors = list(sorted(set(k.executor for k in cis.keys())))
 
     def css_class(classification):
         if '-' in classification:
@@ -126,20 +124,16 @@ def _add_comparison_table(report, cis):
 
     with report.table('Comparison') as table:
         with table.row() as row:
-            row.fill('BENCHMARK', *(b.upper() for b in backends))
+            row.fill('BENCHMARK', *(b.upper() for b in executors))
 
         for name in names:
             with table.row() as row:
                 name_cell = row.cell(name.replace('_', ' ').title())
                 row_classification = ''
-                for backend in backends:
+                for executor in executors:
                     try:
-                        classification = [
-                            cis[_OutputKey(name=name,
-                                           backend=backend,
-                                           float_type=float_type)].classify()
-                            for float_type in ('float', 'double')
-                        ]
+                        classification = [cis[_OutputKey(name=name,
+                                           executor=executor)].classify()]
                         if classification[0] == classification[1]:
                             classification = classification[0]
                         else:
@@ -229,9 +223,7 @@ def compare(before, after, output):
         for k, v in after_outs.items() if k in before_outs
     }
 
-    assert before['domain'] == after['domain']
-    title = 'GridTools Performance for Domain ' + '×'.join(
-        str(d) for d in after['domain'])
+    title = 'HPX Performance'
     with html.Report(output, title) as report:
         _add_comparison_table(report, cis)
         _add_comparison_plots(report, before_outs, after_outs, cis)
@@ -314,10 +306,7 @@ def _history_plot(title, dates, measurements, output):
 
 
 def history(data, output, key='job', limit=None):
-    assert all(d['domain'] == data[0]['domain'] for d in data)
-
-    title = 'GridTools Performance History for Domain ' + '×'.join(
-        str(d) for d in data[0]['domain'])
+    title = 'GridTools Performance History'
     with html.Report(output, title) as report:
         dates, measurements = _history_data(data, key, limit)
 
@@ -358,7 +347,7 @@ def _bar_plot(title, labels, datas, output):
     plt.close(fig)
 
 
-def _add_backend_comparison_plots(report, data):
+def _add_executor_comparison_plots(report, data):
     outputs = [_OutputKey.outputs_by_key(d) for d in data]
 
     envs = (envfile.stem.replace('_', '-').upper()
@@ -366,30 +355,24 @@ def _add_backend_comparison_plots(report, data):
                             for d in data))
     labels = [f'Configuration {i + 1} ({env})' for i, env in enumerate(envs)]
 
-    float_types = {k.float_type for o in outputs for k in o.keys()}
-    backends = {k.backend for o in outputs for k in o.keys()}
+    executors = {k.executor for o in outputs for k in o.keys()}
     names = {k.name for o in outputs for k in o.keys()}
 
-    for float_type in sorted(float_types):
-        with report.image_grid(float_type.upper()) as grid:
-            for name in sorted(names):
-                key = functools.partial(_OutputKey,
-                                        float_type=float_type,
-                                        name=name)
-                title = name.replace('_', ' ').title()
-                data = [{
-                    backend: np.median(output[key(backend=backend)])
-                    for backend in backends if key(backend=backend) in output
-                } for output in outputs]
-                _bar_plot(title, labels, data, grid.image())
+    for name in sorted(names):
+        key = functools.partial(_OutputKey,
+                                name=name)
+        title = name.replace('_', ' ').title()
+        data = [{
+            executor: np.median(output[key(executor=executor)])
+            for executor in executors if key(executor=executor) in output
+        } for output in outputs]
+        with report.image_grid() as grid:
+            _bar_plot(title, labels, data, grid.image())
 
 
-def compare_backends(data, output):
-    assert all(d['domain'] == data[0]['domain'] for d in data)
-
-    title = 'GridTools Backends Comparison for Domain ' + '×'.join(
-        str(d) for d in data[0]['domain'])
+def compare_executors(data, output):
+    title = 'HPX executors Comparison'
     with html.Report(output, title) as report:
-        _add_backend_comparison_plots(report, data)
+        _add_executor_comparison_plots(report, data)
         _add_info(report, [f'Configuration {i + 1}' for i in range(len(data))],
                   data)

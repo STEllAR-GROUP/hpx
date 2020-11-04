@@ -5,7 +5,7 @@ import json
 import os
 import pprint
 
-from pyutils import env, log, runtools
+from pyutils import default_vars as var, env, log, runtools
 
 
 def _git_commit():
@@ -27,17 +27,19 @@ def _now():
     return datetime.now(timezone.utc).astimezone().isoformat()
 
 
-def run(domain, runs):
+def run(scheduling_policy, threads, extra_opts):
     from pyutils import buildinfo
 
-    binary = os.path.join(buildinfo.binary_dir, 'tests', 'regression',
-                          'perftests')
+    binary = os.path.join(buildinfo.binary_dir, 'bin', 'future_overhead_test')
+    command = [binary] + [str(scheduling_policy)] + [str(threads)]
+    if extra_opts:
+        command += extra_opts.split()
 
-    output = runtools.srun([binary] + [str(d)
-                                       for d in domain] + [str(runs), '-d'])
+    output = runtools.srun(command)
+
     data = json.loads(output)
 
-    data['gridtools'] = {'commit': _git_commit(), 'datetime': _git_datetime()}
+    data[var._project_name] = {'commit': _git_commit(), 'datetime': _git_datetime()}
     data['environment'] = {
         'hostname': env.hostname(),
         'clustername': env.clustername(),
@@ -45,7 +47,6 @@ def run(domain, runs):
         'datetime': _now(),
         'envfile': buildinfo.envfile
     }
-    data['domain'] = list(domain)
     log.debug('Perftests data', pprint.pformat(data))
 
     return data
