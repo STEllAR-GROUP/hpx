@@ -8,8 +8,7 @@
 #pragma once
 
 #include <hpx/config/constexpr.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_priority_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 
 #include <exception>
@@ -107,12 +106,12 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace traits
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct set_value_t
-      : hpx::functional::tag_fallback<set_value_t>
+      : hpx::functional::tag_priority<set_value_t>
     {
     private:
         template <typename R, typename... Args>
         friend constexpr HPX_FORCEINLINE auto
-        tag_fallback_invoke(set_value_t, R&& r, Args&&... args) noexcept(
+        tag_override_invoke(set_value_t, R&& r, Args&&... args) noexcept(
             noexcept(
                 std::declval<R&&>().set_value(std::forward<Args>(args)...)))
             -> decltype(
@@ -123,12 +122,12 @@ namespace hpx { namespace execution { namespace experimental {
     } set_value{};
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct set_error_t
-      : hpx::functional::tag_fallback_noexcept<set_error_t>
+      : hpx::functional::tag_priority_noexcept<set_error_t>
     {
     private:
         template <typename R, typename E>
         friend constexpr HPX_FORCEINLINE auto
-        tag_fallback_invoke(set_error_t, R&& r, E&& e) noexcept(
+        tag_override_invoke(set_error_t, R&& r, E&& e) noexcept(
             noexcept(std::declval<R&&>().set_error(std::forward<E>(e))))
             -> decltype(std::declval<R&&>().set_error(std::forward<E>(e)))
         {
@@ -137,11 +136,11 @@ namespace hpx { namespace execution { namespace experimental {
     } set_error{};
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct set_done_t
-      : hpx::functional::tag_fallback_noexcept<set_done_t>
+      : hpx::functional::tag_priority_noexcept<set_done_t>
     {
     private:
         template <typename R>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(set_done_t,
+        friend constexpr HPX_FORCEINLINE auto tag_override_invoke(set_done_t,
             R&& r) noexcept(noexcept(std::declval<R&&>().set_done()))
             -> decltype(std::declval<R&&>().set_done())
         {

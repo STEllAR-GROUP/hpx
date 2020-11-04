@@ -7,8 +7,7 @@
 #pragma once
 
 #include <hpx/config/constexpr.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_priority_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 
 #include <type_traits>
@@ -49,12 +48,12 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace traits
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct start_t
-      : hpx::functional::tag_fallback_noexcept<start_t>
+      : hpx::functional::tag_priority_noexcept<start_t>
     {
     private:
         template <typename OperationState>
         friend constexpr HPX_FORCEINLINE auto
-        tag_fallback_invoke(start_t, OperationState&& o) noexcept(
+        tag_override_invoke(start_t, OperationState&& o) noexcept(
             noexcept(std::declval<OperationState&&>().start()))
             -> decltype(std::declval<OperationState&&>().start())
         {

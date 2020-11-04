@@ -11,6 +11,7 @@
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_priority_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 
 #include <exception>
@@ -86,13 +87,15 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace traits
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct connect_t
-      : hpx::functional::tag_fallback<connect_t>
+      : hpx::functional::tag_priority<connect_t>
     {
         template <typename S, typename R>
         friend constexpr HPX_FORCEINLINE auto
-        tag_fallback_invoke(connect_t, S&& s, R&& r) noexcept(
-            noexcept(std::declval<S&&>().connect(std::forward<R>(r))))
-            -> decltype(std::declval<S&&>().connect(std::forward<R>(r)))
+        tag_override_invoke(connect_t, S&& s, R&& r) noexcept(
+            noexcept(std::declval<S&&>().connect(std::forward<R>(r)))) ->
+            typename std::enable_if<traits::is_sender_v<S> &&
+                    traits::is_receiver_v<R>,
+                decltype(std::declval<S&&>().connect(std::forward<R>(r)))>::type
         {
             static_assert(
                 hpx::execution::experimental::traits::is_operation_state_v<
