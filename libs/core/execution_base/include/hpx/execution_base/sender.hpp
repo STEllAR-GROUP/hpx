@@ -9,10 +9,10 @@
 #include <hpx/config/constexpr.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/tag_priority_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/type_support/equality.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -84,7 +84,132 @@ namespace hpx { namespace execution { namespace experimental {
         struct sender_traits<Sender&&> : sender_traits<Sender>
         {
         };
-    }    // namespace traits
+
+        template <typename Sender>
+        constexpr bool is_sender_v;
+
+        struct invocable_archetype
+        {
+            void operator()() {}
+        };
+
+        namespace detail {
+            template <typename Executor, typename F, typename Enable = void>
+            struct is_executor_of_base_impl : std::false_type
+            {
+            };
+
+            template <typename Executor, typename F>
+            struct is_executor_of_base_impl<Executor, F,
+                typename std::enable_if<hpx::traits::is_invocable<typename std::
+                                                decay<F>::type&>::value &&
+                    std::is_constructible<typename std::decay<F>::type,
+                        F>::value &&
+                    std::is_destructible<typename std::decay<F>::type>::value &&
+                    std::is_move_constructible<
+                        typename std::decay<F>::type>::value &&
+                    std::is_copy_constructible<Executor>::value &&
+                    hpx::traits::is_equality_comparable<Executor>::value>::type>
+              : std::true_type
+            {
+            };
+
+            template <typename Executor>
+            struct is_executor_base
+              : is_executor_of_base_impl<typename std::decay<Executor>::type,
+                    invocable_archetype>
+            {
+            };
+        }    // namespace detail
+    }        // namespace traits
+
+    HPX_INLINE_CONSTEXPR_VARIABLE struct execute_t
+      : hpx::functional::tag_priority<execute_t>
+    {
+        template <typename Executor, typename F>
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(execute_t,
+            Executor&& executor,
+            F&& f) noexcept(noexcept(std::forward<Executor>(executor)
+                                         .execute(std::forward<F>(f)))) ->
+            typename std::enable_if<hpx::traits::is_invocable<F>::value &&
+                    (traits::is_sender_v<Executor> ||
+                        traits::detail::is_executor_base<Executor>::value),
+                decltype(std::forward<Executor>(executor).execute(
+                    std::forward<F>(f)))>::type
+        {
+            return std::forward<Executor>(executor).execute(std::forward<F>(f));
+        }
+    } execute;
+
+    namespace detail {
+        template <typename R, typename>
+        struct as_invocable
+        {
+            R* r;
+
+            explicit as_invocable(R& r) noexcept
+              : r(std::addressof(r))
+            {
+            }
+
+            as_invocable(as_invocable&& other) noexcept
+              : r(std::exchange(other.r, nullptr))
+            {
+            }
+
+            ~as_invocable()
+            {
+                if (r)
+                {
+                    execution::experimental::set_done(std::move(*r));
+                }
+            }
+
+            void operator()() & noexcept
+            try
+            {
+                execution::experimental::set_value(std::move(*r));
+                r = nullptr;
+            }
+            catch (...)
+            {
+                execution::experimental::set_error(
+                    std::move(*r), std::current_exception());
+                r = nullptr;
+            }
+        };
+
+        template <typename S, typename R>
+        struct as_operation
+        {
+            typename std::decay<S>::type e;
+            typename std::decay<R>::type r;
+
+            void start() noexcept
+            try
+            {
+                hpx::execution::experimental::execute(std::move(e),
+                    as_invocable<typename std::decay<R>::type, S>{r});
+            }
+            catch (...)
+            {
+                hpx::execution::experimental::set_error(
+                    std::move(r), std::current_exception());
+            }
+        };
+
+        template <typename S, typename R, typename Enable = void>
+        struct has_member_connect : std::false_type
+        {
+        };
+
+        template <typename S, typename R>
+        struct has_member_connect<S, R,
+            typename hpx::util::always_void<decltype(std::declval<S>().connect(
+                std::declval<R>()))>::type> : std::true_type
+        {
+        };
+    }    // namespace detail
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct connect_t
       : hpx::functional::tag_priority<connect_t>
@@ -105,7 +230,335 @@ namespace hpx { namespace execution { namespace experimental {
 
             return std::forward<S>(s).connect(std::forward<R>(r));
         }
+
+        template <typename S, typename R>
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(connect_t,
+            S&& s, R&& r) noexcept(noexcept(detail::as_operation<S, R>{
+            std::forward<S>(s), std::forward<R>(r)})) ->
+            typename std::enable_if<!detail::has_member_connect<S, R>::value &&
+                    traits::is_receiver_of_v<R> &&
+                    traits::detail::is_executor_of_base_impl<
+                        typename std::decay<S>::type,
+                        detail::as_invocable<typename std::decay<R>::type,
+                            S>>::value,
+                decltype(detail::as_operation<S, R>{
+                    std::forward<S>(s), std::forward<R>(r)})>::type
+        {
+            return detail::as_operation<S, R>{
+                std::forward<S>(s), std::forward<R>(r)};
+        }
     } connect{};
+
+    namespace detail {
+        template <typename S, typename R>
+        struct submit_state
+        {
+            struct submit_receiver
+            {
+                submit_state* p;
+
+                template <typename... Ts>
+                    void set_value(Ts&&... ts) &&
+                    noexcept(traits::is_nothrow_receiver_of_v<R, Ts...>)
+                {
+                    hpx::execution::experimental::set_value(
+                        std::move(p->r), std::forward<Ts>(ts)...);
+                    delete p;
+                }
+
+                template <typename E>
+                    void set_error(E&& e) && noexcept
+                {
+                    hpx::execution::experimental::set_error(
+                        std::move(p->r), std::forward<E>(e));
+                    delete p;
+                }
+
+                void set_done() && noexcept
+                {
+                    hpx::execution::experimental::set_done(std::move(p->r));
+                    delete p;
+                }
+            };
+
+            typename std::decay<R>::type r;
+            using connect_result_type = typename hpx::util::invoke_result<
+                hpx::execution::experimental::connect_t, S,
+                submit_receiver>::type;
+            connect_result_type state;
+
+            submit_state(S&& s, R&& r)
+              : r(std::forward<R>(r))
+              , state(hpx::execution::experimental::connect(
+                    std::forward<S>(s), submit_receiver{this}))
+            {
+            }
+        };
+
+        template <typename S, typename R, typename Enable = void>
+        struct has_member_submit : std::false_type
+        {
+        };
+
+        template <typename S, typename R>
+        struct has_member_submit<S, R,
+            typename hpx::util::always_void<decltype(std::declval<S>().submit(
+                std::declval<R>()))>::type> : std::true_type
+        {
+        };
+    }    // namespace detail
+
+    HPX_INLINE_CONSTEXPR_VARIABLE struct submit_t
+      : hpx::functional::tag_priority<submit_t>
+    {
+        template <typename S, typename R>
+        friend constexpr HPX_FORCEINLINE auto
+        tag_override_invoke(submit_t, S&& s, R&& r) noexcept(
+            noexcept(std::forward<S>(s).submit(std::forward<R>(r)))) ->
+            typename std::enable_if<traits::is_sender_to<S, R>::value,
+                decltype(std::forward<S>(s).submit(std::forward<R>(r)))>::type
+        {
+            return std::forward<S>(s).submit(std::forward<R>(r));
+        }
+
+        template <typename S, typename R>
+        friend constexpr HPX_FORCEINLINE auto
+        tag_fallback_invoke(submit_t, S&& s, R&& r) noexcept(
+            noexcept(hpx::execution::experimental::start(
+                (new detail::submit_state<S, R>{
+                     std::forward<S>(s), std::forward<R>(r)})
+                    ->state))) ->
+            typename std::enable_if<!detail::has_member_submit<S, R>::value,
+                decltype(hpx::execution::experimental::start(
+                    (new detail::submit_state<S, R>{
+                         std::forward<S>(s), std::forward<R>(r)})
+                        ->state))>::type
+        {
+            return hpx::execution::experimental::start(
+                (new detail::submit_state<S, R>{
+                     std::forward<S>(s), std::forward<R>(r)})
+                    ->state);
+        }
+    } submit;
+
+    namespace detail {
+        template <typename F, typename E>
+        struct as_receiver
+        {
+            F f;
+
+            void set_value() noexcept(noexcept(HPX_INVOKE(f)))
+            {
+                HPX_INVOKE(f);
+            }
+
+            template <typename E_>
+            HPX_NORETURN void set_error(E_&&) noexcept
+            {
+                std::terminate();
+            }
+
+            void set_done() noexcept {}
+        };
+
+        template <typename S, typename R, typename Enable = void>
+        struct has_member_execute : std::false_type
+        {
+        };
+
+        template <typename S, typename R>
+        struct has_member_execute<S, R,
+            typename hpx::util::always_void<decltype(std::declval<S>().execute(
+                std::declval<R>()))>::type> : std::true_type
+        {
+        };
+    }    // namespace detail
+
+    template <typename Executor, typename F>
+    constexpr HPX_FORCEINLINE auto
+    tag_fallback_invoke(execute_t, Executor&& executor, F&& f) noexcept(
+        noexcept(hpx::execution::experimental::submit(
+            std::forward<Executor>(executor),
+            detail::as_receiver<typename std::decay<F>::type, Executor>{
+                std::forward<F>(f)}))) ->
+        typename std::enable_if<hpx::traits::is_invocable<F>::value &&
+                !detail::has_member_execute<Executor, F>::value,
+            decltype(hpx::execution::experimental::submit(
+                std::forward<Executor>(executor),
+                detail::as_receiver<typename std::decay<F>::type, Executor>{
+                    std::forward<F>(f)}))>::type
+    {
+        return hpx::execution::experimental::submit(
+            std::forward<Executor>(executor),
+            detail::as_receiver<typename std::decay<F>::type, Executor>{
+                std::forward<F>(f)});
+    }
+
+    namespace traits {
+        namespace detail {
+            template <typename Executor, typename F, typename Enable = void>
+            struct is_executor_of_impl : std::false_type
+            {
+            };
+
+            template <typename Executor, typename F>
+            struct is_executor_of_impl<Executor, F,
+                typename std::enable_if<hpx::traits::is_invocable<execute_t,
+                    Executor, F>::value>::type>
+              : is_executor_of_base_impl<Executor, F>
+            {
+            };
+        }    // namespace detail
+
+        template <typename Executor>
+        struct is_executor
+          : detail::is_executor_of_base_impl<Executor, invocable_archetype>
+        {
+        };
+
+        template <typename Executor, typename F>
+        struct is_executor_of : detail::is_executor_of_base_impl<Executor, F>
+        {
+        };
+
+        template <typename Executor>
+        constexpr bool is_executor_v = is_executor<Executor>::value;
+
+        template <typename Executor, typename F>
+        constexpr bool is_executor_of_v = is_executor_of<Executor, F>::value;
+    }    // namespace traits
+
+    namespace detail {
+        template <typename Executor, typename F, typename N,
+            typename Enable = void>
+        struct has_member_bulk_execute : std::false_type
+        {
+        };
+
+        template <typename Executor, typename F, typename N>
+        struct has_member_bulk_execute<Executor, F, N,
+            typename hpx::util::always_void<decltype(
+                std::declval<Executor>().bulk_execute(
+                    std::declval<F>(), std::size_t{}))>::type> : std::true_type
+        {
+        };
+    }    // namespace detail
+
+    // TODO: P0443 is conflicting on whether this returns void or a sender.
+    HPX_INLINE_CONSTEXPR_VARIABLE struct bulk_execute_t
+      : hpx::functional::tag_priority<bulk_execute_t>
+    {
+        template <typename Executor, typename F, typename N>
+        friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
+            bulk_execute_t, Executor&& executor, F&& f,
+            N n) noexcept(noexcept(std::forward<Executor>(executor)
+                                       .bulk_execute(std::forward<F>(f)),
+            static_cast<std::size_t>(n))) ->
+            typename std::enable_if<hpx::traits::is_invocable<F, N>::value &&
+                    std::is_convertible<N, std::size_t>::value,
+                decltype(std::forward<Executor>(executor).bulk_execute(
+                    std::forward<F>(f), static_cast<std::size_t>(n)))>::type
+        {
+            return std::forward<Executor>(executor).bulk_execute(
+                std::forward<F>(f), static_cast<std::size_t>(n));
+        }
+
+        template <typename Executor, typename F, typename N>
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+            bulk_execute_t, Executor&& executor, F&& f,
+            N n) noexcept(noexcept(std::forward<Executor>(executor)
+                                       .bulk_execute(std::forward<F>(f)),
+            n)) ->
+            typename std::enable_if<hpx::traits::is_invocable<F, N>::value &&
+                    std::is_convertible<N, std::size_t>::value &&
+                    !detail::has_member_bulk_execute<Executor, F, N>::value,
+                decltype(std::forward<Executor>(executor).bulk_execute(
+                    std::forward<F>(f), n))>::type
+        {
+            for (std::size_t i = 0; i < n; ++i)
+            {
+                hpx::execution::experimental::execute(
+                    executor, [f, n]() { HPX_INVOKE(f, n); });
+            }
+        }
+    } bulk_execute;
+
+    namespace detail {
+        template <typename Executor>
+        struct as_sender
+        {
+        private:
+            Executor exec;
+
+        public:
+            template <template <typename...> typename Tuple,
+                template <typename...> typename Variant>
+            using value_types = Variant<Tuple<>>;
+
+            template <template <typename...> typename Variant>
+            using error_types = Variant<std::exception_ptr>;
+
+            static constexpr bool sends_done = true;
+
+            explicit as_sender(Executor exec) noexcept
+              : exec(exec)
+            {
+            }
+
+            template <typename R>    // TODO: requires receiver_of<R>
+            decltype(auto) connect(R&& r) &&
+            {
+                return hpx::execution::experimental::connect(
+                    std::move(exec), std::forward<R>(r));
+            }
+
+            template <typename R>    // TODO: requires receiver_of<R>
+            decltype(auto) connect(R&& r) const&
+            {
+                return hpx::execution::experimental::connect(
+                    exec, std::forward<R>(r));
+            }
+        };
+
+        template <typename S, typename Enable = void>
+        struct has_member_schedule : std::false_type
+        {
+        };
+
+        template <typename S>
+        struct has_member_schedule<S,
+            typename hpx::util::always_void<decltype(
+                std::declval<S>().schedule())>::type> : std::true_type
+        {
+        };
+    }    // namespace detail
+
+    HPX_INLINE_CONSTEXPR_VARIABLE struct schedule_t
+      : hpx::functional::tag_priority<schedule_t>
+    {
+        template <typename S>
+        friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
+            schedule_t, S&& s) noexcept(noexcept(std::forward<S>(s).schedule()))
+            -> typename std::enable_if<traits::is_sender_v<S>,
+                decltype(std::forward<S>(s).schedule())>::type
+        {
+            return std::forward<S>(s).schedule();
+        }
+
+        template <typename S>
+        friend constexpr HPX_FORCEINLINE auto
+        tag_fallback_invoke(schedule_t, S&& s) noexcept(
+            noexcept(detail::as_sender<typename std::decay<S>::type>{
+                std::forward<S>(s)})) ->
+            typename std::enable_if<!detail::has_member_schedule<S>::value &&
+                    traits::is_executor_v<S>,
+                decltype(detail::as_sender<typename std::decay<S>::type>{
+                    std::forward<S>(s)})>::type
+        {
+            return detail::as_sender<typename std::decay<S>::type>{
+                std::forward<S>(s)};
+        }
+    } schedule{};
 
     namespace traits {
         namespace detail {
@@ -249,23 +702,51 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename Sender>
             struct sender_traits_base<true /* HasSenderTraits */, Sender>
             {
-                template <template <class...> class Tuple,
-                    template <class...> class Variant>
+                template <template <typename...> typename Tuple,
+                    template <typename...> typename Variant>
                 using value_types =
                     typename Sender::template value_types<Tuple, Variant>;
 
-                template <template <class...> class Variant>
+                template <template <typename...> typename Variant>
                 using error_types =
                     typename Sender::template error_types<Variant>;
 
                 static constexpr bool sends_done = Sender::sends_done;
             };
 
+            struct void_receiver
+            {
+                void set_value() noexcept;
+                void set_error(std::exception_ptr) noexcept;
+                void set_done() noexcept;
+            };
+
+            template <typename Sender, typename Enable = void>
+            struct sender_traits_executor_base : std::false_type
+            {
+                using __unspecialized = void;
+            };
+
+            template <typename Sender>
+            struct sender_traits_executor_base<Sender,
+                typename std::enable_if<is_executor_of_base_impl<Sender,
+                    hpx::execution::experimental::detail::as_invocable<
+                        void_receiver, Sender>>::value>::type> : std::false_type
+            {
+                template <template <class...> class Tuple,
+                    template <class...> class Variant>
+                using value_types = Variant<Tuple<>>;
+
+                template <template <class...> class Variant>
+                using error_types = Variant<std::exception_ptr>;
+
+                static constexpr bool sends_done = true;
+            };
+
             template <typename Sender>
             struct sender_traits_base<false /* HasSenderTraits */, Sender>
+              : sender_traits_executor_base<Sender>
             {
-                // TODO: fix once executors are there...
-                using __unspecialized = void;
             };
         }    // namespace detail
 
@@ -276,5 +757,4 @@ namespace hpx { namespace execution { namespace experimental {
         {
         };
     }    // namespace traits
-
-}}}    // namespace hpx::execution::experimental
+}}}      // namespace hpx::execution::experimental
