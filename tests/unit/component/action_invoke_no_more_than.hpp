@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/actions_base/traits/action_decorate_continuation.hpp>
 #include <hpx/actions/continuation.hpp>
 #include <hpx/actions/traits/action_decorate_continuation.hpp>
 #include <hpx/assert.hpp>
