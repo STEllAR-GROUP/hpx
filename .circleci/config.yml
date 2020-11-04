@@ -491,8 +491,6 @@ jobs:
           name: Testing build unit tests
           command: |
               ninja -j2 tests.unit.build
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.build
           working_directory: /hpx/build
           when: always
       - run:
