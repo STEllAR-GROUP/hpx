@@ -18,8 +18,6 @@ set(CMAKE_SYSTEM_NAME Linux)
 
 # Set the gcc Compiler
 set(CMAKE_CXX_COMPILER g++)
-set(CMAKE_C_COMPILER gcc)
-# set(CMAKE_Fortran_COMPILER)
 
 # Add flags we need for BGAS compilation
 set(CMAKE_CXX_FLAGS_INIT
@@ -37,11 +35,6 @@ set(CMAKE_CXX_FLAGS_INIT
 
 set(CMAKE_EXE_LINKER_FLAGS_INIT
     "-L/gpfs/bbp.cscs.ch/apps/bgas/tools/gcc/gcc-4.8.2/install/lib64 -latomic -lrt"
-    CACHE STRING "BGAS flags"
-)
-
-set(CMAKE_C_FLAGS_INIT
-    "-D__powerpc__ -I/gpfs/bbp.cscs.ch/home/biddisco/src/bgas/rdmahelper"
     CACHE STRING "BGAS flags"
 )
 

@@ -32,17 +32,9 @@ set(HPX_CXX_STANDARD "@HPX_CXX_STANDARD@")
 
 set(HPX_GIT_COMMIT "@HPX_WITH_GIT_COMMIT@" CACHE STRING "Revision of HPX from Git" FORCE)
 
-set(HPX_C_COMPILER "@CMAKE_C_COMPILER@" CACHE STRING "C compiler for HPX" FORCE)
-set(HPX_C_COMPILER_ID "@CMAKE_C_COMPILER_ID@" CACHE STRING "C compiler id for HPX" FORCE)
-set(HPX_C_COMPILER_VERSION "@CMAKE_C_COMPILER_VERSION@" CACHE STRING "C compiler version for HPX" FORCE)
-
 set(HPX_CXX_COMPILER "@CMAKE_CXX_COMPILER@" CACHE STRING "CXX compiler for HPX" FORCE)
 set(HPX_CXX_COMPILER_ID "@CMAKE_CXX_COMPILER_ID@" CACHE STRING "CXX compiler id for HPX" FORCE)
 set(HPX_CXX_COMPILER_VERSION "@CMAKE_CXX_COMPILER_VERSION@" CACHE STRING "CXX compiler version for HPX" FORCE)
-
-set(HPX_Fortran_COMPILER "@CMAKE_Fortran_COMPILER@" CACHE STRING "Fortran compiler for HPX" FORCE)
-set(HPX_Fortran_COMPILER_ID "@CMAKE_Fortran_COMPILER_ID@" CACHE STRING "Fortran compiler id for HPX" FORCE)
-set(HPX_Fortran_COMPILER_VERSION "@CMAKE_Fortran_COMPILER_VERSION@" CACHE STRING "Fortran compiler version for HPX" FORCE)
 
 ##################################################
 # Setup the imported libraries (publicly linked) #

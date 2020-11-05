@@ -14,20 +14,10 @@ set(CMAKE_SYSTEM_NAME Linux)
 
 # Set the Intel Compiler
 set(CMAKE_CXX_COMPILER icpc)
-set(CMAKE_C_COMPILER icc)
-set(CMAKE_Fortran_COMPILER ifort)
 
 # Add the -mmic compile flag such that everything will be compiled for the
 # correct platform
 set(CMAKE_CXX_FLAGS_INIT
-    "-mmic"
-    CACHE STRING "Initial compiler flags used to compile for the Xeon Phi"
-)
-set(CMAKE_C_FLAGS_INIT
-    "-mmic"
-    CACHE STRING "Initial compiler flags used to compile for the Xeon Phi"
-)
-set(CMAKE_Fortran_FLAGS_INIT
     "-mmic"
     CACHE STRING "Initial compiler flags used to compile for the Xeon Phi"
 )

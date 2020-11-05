@@ -48,9 +48,6 @@ function(create_cmake_test name using_install_dir hpx_dir setup_type test_dir)
     set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS}
                                  -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
     )
-    set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS}
-                                 -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-    )
   endif()
   set(test_dir "${PROJECT_SOURCE_DIR}/${test_dir}")
   add_custom_target(
