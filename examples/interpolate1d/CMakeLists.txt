@@ -45,7 +45,8 @@ if(HPX_WITH_EXAMPLES_HDF5)
 
   add_hpx_executable(
     create_1d_testdata INTERNAL_FLAGS
-    SOURCES create_testdata.cpp NOLIBS
+    SOURCES create_testdata.cpp
+    NOLIBS
     FOLDER "Examples/Interpolate1D"
   )
 

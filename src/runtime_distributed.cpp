@@ -694,6 +694,7 @@ namespace hpx {
         // wait for the thread to run
         {
             std::unique_lock<std::mutex> lk(mtx);
+            // NOLINTNEXTLINE(bugprone-infinite-loop)
             while (!running)    // -V776 // -V1044
                 cond.wait(lk);
         }

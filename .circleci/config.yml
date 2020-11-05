@@ -8,7 +8,7 @@
 defaults: &defaults
     working_directory: /hpx/build
     docker:
-      - image: stellargroup/build_env:ubuntu
+      - image: stellargroup/build_env:1
 
 convert_xml: &convert_xml
     name: Converting XML
@@ -74,7 +74,7 @@ version: 2
 jobs:
   checkout_code:
     docker:
-      - image: stellargroup/build_env:ubuntu
+      - image: stellargroup/build_env:1
     working_directory: /hpx
     steps:
       - checkout:
@@ -153,8 +153,8 @@ jobs:
           name: Check that the modules are well clang-formatted
           command: |
               cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
-              clang-format --version
-              clang-format -i **/*.{cpp,hpp}
+              clang-format-9 --version
+              clang-format-9 -i **/*.{cpp,hpp}
               git diff --exit-code > /tmp/modified_clang_format_files.txt
       - store_artifacts:
           path: /tmp/modified_clang_format_files.txt
@@ -473,7 +473,7 @@ jobs:
 
   install:
     docker:
-      - image: stellargroup/build_env:ubuntu
+      - image: stellargroup/build_env:1
     environment:
       TARGET_IMAGE_NAME: stellargroup/hpx:dev
     steps:
@@ -491,8 +491,6 @@ jobs:
           name: Testing build unit tests
           command: |
               ninja -j2 tests.unit.build
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.build
           working_directory: /hpx/build
           when: always
       - run:
@@ -545,7 +543,7 @@ jobs:
   # here again to be able to push the new tag.
   push_stable_tag:
     docker:
-      - image: stellargroup/build_env:ubuntu
+      - image: stellargroup/build_env:1
     steps:
       - checkout:
           path: /hpx/source

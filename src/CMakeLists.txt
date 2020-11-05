@@ -391,12 +391,19 @@ endif()
 
 if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   set_target_properties(
-    hpx_full PROPERTIES CLEAN_DIRECT_OUTPUT 1 OUTPUT_NAME hpx FOLDER "Core"
+    hpx_full
+    PROPERTIES CLEAN_DIRECT_OUTPUT 1
+               OUTPUT_NAME hpx
+               FOLDER "Core"
   )
 else()
   set_target_properties(
-    hpx_full PROPERTIES VERSION ${HPX_VERSION} SOVERSION ${HPX_SOVERSION}
-                        CLEAN_DIRECT_OUTPUT 1 OUTPUT_NAME hpx FOLDER "Core"
+    hpx_full
+    PROPERTIES VERSION ${HPX_VERSION}
+               SOVERSION ${HPX_SOVERSION}
+               CLEAN_DIRECT_OUTPUT 1
+               OUTPUT_NAME hpx
+               FOLDER "Core"
   )
 endif()
 

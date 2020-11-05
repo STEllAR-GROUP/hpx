@@ -252,7 +252,8 @@ function(hpx_cpuid target variable)
   add_hpx_config_test(
     ${variable}
     SOURCE cmake/tests/cpuid.cpp
-    COMPILE_DEFINITIONS "${boost_include_dir}" "${include_dir}" FILE EXECUTE
+    COMPILE_DEFINITIONS "${boost_include_dir}" "${include_dir}"
+    FILE EXECUTE
     ARGS "${target}" ${ARGN}
   )
 endfunction()
@@ -260,7 +261,9 @@ endfunction()
 # ##############################################################################
 function(hpx_check_for_unistd_h)
   add_hpx_config_test(
-    HPX_WITH_UNISTD_H SOURCE cmake/tests/unistd_h.cpp FILE ${ARGN}
+    HPX_WITH_UNISTD_H
+    SOURCE cmake/tests/unistd_h.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -268,7 +271,8 @@ endfunction()
 function(hpx_check_for_libfun_std_experimental_optional)
   add_hpx_config_test(
     HPX_WITH_LIBFUN_EXPERIMENTAL_OPTIONAL
-    SOURCE cmake/tests/libfun_std_experimental_optional.cpp FILE ${ARGN}
+    SOURCE cmake/tests/libfun_std_experimental_optional.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -295,7 +299,8 @@ function(hpx_check_for_cxx11_std_atomic)
   add_hpx_config_test(
     HPX_WITH_CXX11_ATOMIC
     SOURCE cmake/tests/cxx11_std_atomic.cpp
-    LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES} FILE ${ARGN}
+    LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -304,7 +309,8 @@ function(hpx_check_for_cxx11_std_atomic_128bit)
   add_hpx_config_test(
     HPX_WITH_CXX11_ATOMIC_128BIT
     SOURCE cmake/tests/cxx11_std_atomic_128bit.cpp
-    LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES} FILE ${ARGN}
+    LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -312,15 +318,17 @@ endfunction()
 function(hpx_check_for_cxx11_std_shared_ptr_lwg3018)
   add_hpx_config_test(
     HPX_WITH_CXX11_SHARED_PTR_LWG3018
-    SOURCE cmake/tests/cxx11_std_shared_ptr_lwg3018.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx11_std_shared_ptr_lwg3018.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
 # ##############################################################################
 function(hpx_check_for_cxx11_std_quick_exit)
   add_hpx_config_test(
-    HPX_WITH_CXX11_STD_QUICK_EXIT SOURCE cmake/tests/cxx11_std_quick_exit.cpp
-                                         FILE ${ARGN}
+    HPX_WITH_CXX11_STD_QUICK_EXIT
+    SOURCE cmake/tests/cxx11_std_quick_exit.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -328,7 +336,8 @@ endfunction()
 function(hpx_check_for_cxx17_aligned_new)
   add_hpx_config_test(
     HPX_WITH_CXX17_ALIGNED_NEW
-    SOURCE cmake/tests/cxx17_aligned_new.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx17_aligned_new.cpp
+    FILE ${ARGN}
     REQUIRED
   )
 endfunction()
@@ -336,8 +345,9 @@ endfunction()
 # ##############################################################################
 function(hpx_check_for_cxx17_filesystem)
   add_hpx_config_test(
-    HPX_WITH_CXX17_FILESYSTEM SOURCE cmake/tests/cxx17_filesystem.cpp FILE
-                                     ${ARGN}
+    HPX_WITH_CXX17_FILESYSTEM
+    SOURCE cmake/tests/cxx17_filesystem.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -345,7 +355,8 @@ endfunction()
 function(hpx_check_for_cxx17_fold_expressions)
   add_hpx_config_test(
     HPX_WITH_CXX17_FOLD_EXPRESSIONS
-    SOURCE cmake/tests/cxx17_fold_expressions.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx17_fold_expressions.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -353,7 +364,8 @@ endfunction()
 function(hpx_check_for_cxx17_fallthrough_attribute)
   add_hpx_config_test(
     HPX_WITH_CXX17_FALLTHROUGH_ATTRIBUTE
-    SOURCE cmake/tests/cxx17_fallthrough_attribute.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx17_fallthrough_attribute.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -361,7 +373,8 @@ endfunction()
 function(hpx_check_for_cxx17_nodiscard_attribute)
   add_hpx_config_test(
     HPX_WITH_CXX17_NODISCARD_ATTRIBUTE
-    SOURCE cmake/tests/cxx17_nodiscard_attribute.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx17_nodiscard_attribute.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -369,8 +382,8 @@ endfunction()
 function(hpx_check_for_cxx17_hardware_destructive_interference_size)
   add_hpx_config_test(
     HPX_WITH_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE
-    SOURCE cmake/tests/cxx17_hardware_destructive_interference_size.cpp FILE
-           ${ARGN}
+    SOURCE cmake/tests/cxx17_hardware_destructive_interference_size.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -378,15 +391,17 @@ endfunction()
 function(hpx_check_for_cxx17_std_in_place_type_t)
   add_hpx_config_test(
     HPX_WITH_CXX17_STD_IN_PLACE_TYPE_T
-    SOURCE cmake/tests/cxx17_std_in_place_type_t.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx17_std_in_place_type_t.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
 # ##############################################################################
 function(hpx_check_for_cxx17_maybe_unused)
   add_hpx_config_test(
-    HPX_WITH_CXX17_MAYBE_UNUSED SOURCE cmake/tests/cxx17_maybe_unused.cpp FILE
-                                       ${ARGN}
+    HPX_WITH_CXX17_MAYBE_UNUSED
+    SOURCE cmake/tests/cxx17_maybe_unused.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -394,7 +409,8 @@ endfunction()
 function(hpx_check_for_cxx17_deduction_guides)
   add_hpx_config_test(
     HPX_WITH_CXX17_DEDUCTION_GUIDES
-    SOURCE cmake/tests/cxx17_deduction_guides.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx17_deduction_guides.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -402,15 +418,17 @@ endfunction()
 function(hpx_check_for_cxx17_structured_bindings)
   add_hpx_config_test(
     HPX_WITH_CXX17_STRUCTURED_BINDINGS
-    SOURCE cmake/tests/cxx17_structured_bindings.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx17_structured_bindings.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
 # ##############################################################################
 function(hpx_check_for_cxx17_if_constexpr)
   add_hpx_config_test(
-    HPX_WITH_CXX17_IF_CONSTEXPR SOURCE cmake/tests/cxx17_if_constexpr.cpp FILE
-                                       ${ARGN}
+    HPX_WITH_CXX17_IF_CONSTEXPR
+    SOURCE cmake/tests/cxx17_if_constexpr.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -418,7 +436,8 @@ endfunction()
 function(hpx_check_for_cxx17_inline_constexpr_variable)
   add_hpx_config_test(
     HPX_WITH_CXX17_INLINE_CONSTEXPR_VALUE
-    SOURCE cmake/tests/cxx17_inline_constexpr_variable.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx17_inline_constexpr_variable.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -426,15 +445,17 @@ endfunction()
 function(hpx_check_for_cxx17_noexcept_functions_as_nontype_template_arguments)
   add_hpx_config_test(
     HPX_WITH_CXX17_NOEXCEPT_FUNCTIONS_AS_NONTYPE_TEMPLATE_ARGUMENTS
-    SOURCE cmake/tests/cxx17_noexcept_function.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx17_noexcept_function.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
 # ##############################################################################
 function(hpx_check_for_cxx17_std_variant)
   add_hpx_config_test(
-    HPX_WITH_CXX17_STD_VARIANT SOURCE cmake/tests/cxx17_std_variant.cpp FILE
-                                      ${ARGN}
+    HPX_WITH_CXX17_STD_VARIANT
+    SOURCE cmake/tests/cxx17_std_variant.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -442,7 +463,8 @@ endfunction()
 function(hpx_check_for_cxx17_std_transform_scan)
   add_hpx_config_test(
     HPX_WITH_CXX17_STD_TRANSFORM_SCAN_ALGORITHMS
-    SOURCE cmake/tests/cxx17_std_transform_scan_algorithms.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx17_std_transform_scan_algorithms.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -450,7 +472,8 @@ endfunction()
 function(hpx_check_for_cxx17_std_scan)
   add_hpx_config_test(
     HPX_WITH_CXX17_STD_SCAN_ALGORITHMS
-    SOURCE cmake/tests/cxx17_std_scan_algorithms.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx17_std_scan_algorithms.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -458,7 +481,8 @@ endfunction()
 function(hpx_check_for_cxx17_shared_ptr_array)
   add_hpx_config_test(
     HPX_WITH_CXX17_SHARED_PTR_ARRAY
-    SOURCE cmake/tests/cxx17_shared_ptr_array.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx17_shared_ptr_array.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -466,16 +490,17 @@ endfunction()
 function(hpx_check_for_cxx17_std_nontype_template_parameter_auto)
   add_hpx_config_test(
     HPX_WITH_CXX17_NONTYPE_TEMPLATE_PARAMETER_AUTO
-    SOURCE cmake/tests/cxx17_std_nontype_template_parameter_auto.cpp FILE
-           ${ARGN}
+    SOURCE cmake/tests/cxx17_std_nontype_template_parameter_auto.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
 # ##############################################################################
 function(hpx_check_for_cxx20_coroutines)
   add_hpx_config_test(
-    HPX_WITH_CXX20_COROUTINES SOURCE cmake/tests/cxx20_coroutines.cpp FILE
-                                     ${ARGN}
+    HPX_WITH_CXX20_COROUTINES
+    SOURCE cmake/tests/cxx20_coroutines.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -483,7 +508,8 @@ endfunction()
 function(hpx_check_for_cxx20_std_disable_sized_sentinel_for)
   add_hpx_config_test(
     HPX_WITH_CXX20_STD_DISABLE_SIZED_SENTINEL_FOR
-    SOURCE cmake/tests/cxx20_std_disable_sized_sentinel_for.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx20_std_disable_sized_sentinel_for.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -491,15 +517,17 @@ endfunction()
 function(hpx_check_for_cxx20_no_unique_address_attribute)
   add_hpx_config_test(
     HPX_WITH_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
-    SOURCE cmake/tests/cxx20_no_unique_address_attribute.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx20_no_unique_address_attribute.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
 # ##############################################################################
 function(hpx_check_for_builtin_integer_pack)
   add_hpx_config_test(
-    HPX_WITH_BUILTIN_INTEGER_PACK SOURCE cmake/tests/builtin_integer_pack.cpp
-                                         FILE ${ARGN}
+    HPX_WITH_BUILTIN_INTEGER_PACK
+    SOURCE cmake/tests/builtin_integer_pack.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -507,7 +535,8 @@ endfunction()
 function(hpx_check_for_builtin_make_integer_seq)
   add_hpx_config_test(
     HPX_WITH_BUILTIN_MAKE_INTEGER_SEQ
-    SOURCE cmake/tests/builtin_make_integer_seq.cpp FILE ${ARGN}
+    SOURCE cmake/tests/builtin_make_integer_seq.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
@@ -515,21 +544,25 @@ endfunction()
 function(hpx_check_for_builtin_type_pack_element)
   add_hpx_config_test(
     HPX_WITH_BUILTIN_TYPE_PACK_ELEMENT
-    SOURCE cmake/tests/builtin_type_pack_element.cpp FILE ${ARGN}
+    SOURCE cmake/tests/builtin_type_pack_element.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
 # ##############################################################################
 function(hpx_check_for_mm_prefetch)
   add_hpx_config_test(
-    HPX_WITH_MM_PREFETCH SOURCE cmake/tests/mm_prefetch.cpp FILE ${ARGN}
+    HPX_WITH_MM_PREFETCH
+    SOURCE cmake/tests/mm_prefetch.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
 # ##############################################################################
 function(hpx_check_for_stable_inplace_merge)
   add_hpx_config_test(
-    HPX_WITH_STABLE_INPLACE_MERGE SOURCE cmake/tests/stable_inplace_merge.cpp
-                                         FILE ${ARGN}
+    HPX_WITH_STABLE_INPLACE_MERGE
+    SOURCE cmake/tests/stable_inplace_merge.cpp
+    FILE ${ARGN}
   )
 endfunction()

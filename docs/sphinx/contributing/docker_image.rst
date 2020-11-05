@@ -24,7 +24,7 @@ environment, run:
 
 .. code-block:: bash
 
-   docker run --interactive --tty stellargroup/build_env:ubuntu bash
+   docker run --interactive --tty stellargroup/build_env:latest bash
 
 You are now in an environment where all the |hpx| build and runtime dependencies
 are present. You can install additional packages according to your own needs.
