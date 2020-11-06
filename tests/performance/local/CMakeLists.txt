@@ -30,7 +30,6 @@ endif()
 
 if(NOT HPX_WITH_SANITIZERS)
   list(APPEND benchmarks start_stop)
-  set(start_stop_FLAGS DEPENDENCIES hpx_timing)
 endif()
 
 if(HPX_WITH_LIBCDS)
@@ -42,9 +41,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME AND (HPX_WITH_DATAPAR_VC
                                      OR HPX_WITH_DATAPAR_BOOST_SIMD)
 )
   list(APPEND benchmarks transform_reduce_binary_scaling)
-  set(transform_reduce_binary_scaling_FLAGS DEPENDENCIES iostreams_component
-                                            hpx_timing
-  )
+  set(transform_reduce_binary_scaling_FLAGS DEPENDENCIES iostreams_component)
 endif()
 
 if(HPX_WITH_EXAMPLES_OPENMP)
@@ -53,16 +50,10 @@ if(HPX_WITH_EXAMPLES_OPENMP)
   )
 
   set(openmp_homogeneous_timed_task_spawn_FLAGS
-      NOLIBS
-      DEPENDENCIES
-      ${boost_library_dependencies}
-      hpx_assertion
-      hpx_config
-      hpx_format
-      hpx_timing
+      NOLIBS DEPENDENCIES ${boost_library_dependencies} hpx_core
   )
-  set(openmp_parallel_region_FLAGS
-      NOLIBS DEPENDENCIES ${boost_library_dependencies} hpx_format hpx_timing
+  set(openmp_parallel_region_FLAGS NOLIBS DEPENDENCIES
+                                   ${boost_library_dependencies} hpx_core
   )
 endif()
 
@@ -72,24 +63,13 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
   )
 
   set(qthreads_homogeneous_timed_task_spawn_FLAGS
-      NOLIBS
-      DEPENDENCIES
-      ${boost_library_dependencies}
-      ${QTHREADS_LIBRARIES}
-      hpx_config
-      hpx_format
-      hpx_preprocessor
-      hpx_timing
+      NOLIBS DEPENDENCIES ${boost_library_dependencies} ${QTHREADS_LIBRARIES}
+      hpx_core
   )
 
   set(qthreads_heterogeneous_timed_task_spawn_FLAGS
-      NOLIBS
-      DEPENDENCIES
-      ${boost_library_dependencies}
-      ${QTHREADS_LIBRARIES}
-      hpx_assertion
-      hpx_format
-      hpx_timing
+      NOLIBS DEPENDENCIES ${boost_library_dependencies} ${QTHREADS_LIBRARIES}
+      hpx_core
   )
 
   set(qthreads_heterogeneous_timed_task_spawn_INCLUDE_DIRECTORIES
@@ -101,14 +81,8 @@ if(HPX_WITH_EXAMPLES_TBB)
   list(APPEND benchmarks tbb_homogeneous_timed_task_spawn)
 
   set(tbb_homogeneous_timed_task_spawn_FLAGS
-      NOLIBS
-      DEPENDENCIES
-      ${boost_library_dependencies}
-      ${TBB_LIBRARIES}
-      hpx_config
-      hpx_format
-      hpx_preprocessor
-      hpx_timing
+      NOLIBS DEPENDENCIES ${boost_library_dependencies} ${TBB_LIBRARIES}
+      hpx_core
   )
 
   set(tbb_homogeneous_timed_task_spawn_INCLUDE_DIRECTORIES ${TBB_INCLUDE_DIR})
@@ -133,15 +107,15 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
 endif()
 
 set(delay_baseline_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies}
-                         hpx_config hpx_format hpx_timing
+                         hpx_core
 )
 
 set(delay_baseline_threaded_FLAGS DEPENDENCIES ${boost_library_dependencies}
-                                  hpx_format hpx_timing
+                                  hpx_core
 )
 
-set(print_heterogeneous_payloads_FLAGS
-    NOLIBS DEPENDENCIES ${boost_library_dependencies} hpx_config hpx_format
+set(print_heterogeneous_payloads_FLAGS NOLIBS DEPENDENCIES
+                                       ${boost_library_dependencies} hpx_core
 )
 set(resume_suspend_FLAGS DEPENDENCIES hpx_timing)
 
@@ -153,24 +127,18 @@ set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES
 set(hpx_heterogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component
                                              hpx_timing
 )
-set(parent_vs_child_stealing_FLAGS DEPENDENCIES iostreams_component hpx_timing)
+set(parent_vs_child_stealing_FLAGS DEPENDENCIES iostreams_component)
 set(skynet_FLAGS DEPENDENCIES iostreams_component)
-set(wait_all_timings_FLAGS DEPENDENCIES iostreams_component hpx_timing)
-set(future_overhead_FLAGS DEPENDENCIES hpx_timing)
+set(wait_all_timings_FLAGS DEPENDENCIES iostreams_component)
+set(future_overhead_FLAGS DEPENDENCIES)
 set(sizeof_FLAGS DEPENDENCIES iostreams_component)
-set(foreach_scaling_FLAGS DEPENDENCIES iostreams_component hpx_timing)
-set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component hpx_timing)
-set(spinlock_overhead2_FLAGS DEPENDENCIES iostreams_component hpx_timing)
+set(foreach_scaling_FLAGS DEPENDENCIES iostreams_component)
+set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component)
+set(spinlock_overhead2_FLAGS DEPENDENCIES iostreams_component)
 set(partitioned_vector_foreach_FLAGS DEPENDENCIES iostreams_component
-                                     partitioned_vector_component hpx_timing
+                                     partitioned_vector_component
 )
 
-set(function_object_wrapper_overhead_FLAGS DEPENDENCIES hpx_timing)
-set(hpx_tls_overhead_FLAGS DEPENDENCIES hpx_timing)
-set(native_tls_overhead_FLAGS DEPENDENCIES hpx_timing)
-set(nonconcurrent_fifo_overhead_FLAGS DEPENDENCIES hpx_timing)
-set(nonconcurrent_lifo_overhead_FLAGS DEPENDENCIES hpx_timing)
-set(transform_reduce_scaling_FLAGS DEPENDENCIES hpx_timing)
 set(future_overhead_PARAMETERS THREADS_PER_LOCALITY 4)
 
 # These tests do not run on hpx threads, so we don't want to pass hpx params
