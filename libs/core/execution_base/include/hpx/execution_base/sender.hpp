@@ -26,11 +26,11 @@ namespace hpx { namespace execution { namespace experimental {
     ///     * `s.connect(r)`, if that expression is valid and returns a type
     ///       satisfying the `operation_state`
     ///       (\see hpx::execution::experimental::traits::is_operation_state)
-    ///       and if `S` satifies the `sender` concept.
+    ///       and if `S` satisfies the `sender` concept.
     ///     * `s.connect(r)`, if that expression is valid and returns a type
     ///       satisfying the `operation_state`
     ///       (\see hpx::execution::experimental::traits::is_operation_state)
-    ///       and if `S` satifies the `sender` concept.
+    ///       and if `S` satisfies the `sender` concept.
     ///       Overload resolution is performed in a context that include the declaration
     ///       `void connect();`
     ///     * Otherwise: TODO once executor is in place...
@@ -146,33 +146,33 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename Sender, typename Receiver>
             struct is_sender_to_impl<true, Sender, Receiver>
               : std::integral_constant<bool,
-                    hpx::traits::is_invocable<
+                    hpx::is_invocable_v<
                         hpx::execution::experimental::connect_t,
-                            Sender&&, Receiver&&>::value ||
-                    hpx::traits::is_invocable<
+                            Sender&&, Receiver&&> ||
+                    hpx::is_invocable_v<
                         hpx::execution::experimental::connect_t,
-                            Sender&&, Receiver&>::value ||
-                    hpx::traits::is_invocable<
+                            Sender&&, Receiver&> ||
+                    hpx::is_invocable_v<
                         hpx::execution::experimental::connect_t,
-                            Sender&&, Receiver const&>::value ||
-                    hpx::traits::is_invocable<
+                            Sender&&, Receiver const&> ||
+                    hpx::is_invocable_v<
                         hpx::execution::experimental::connect_t,
-                            Sender&, Receiver&&>::value ||
-                    hpx::traits::is_invocable<
+                            Sender&, Receiver&&> ||
+                    hpx::is_invocable_v<
                         hpx::execution::experimental::connect_t,
-                            Sender&, Receiver&>::value ||
-                    hpx::traits::is_invocable<
+                            Sender&, Receiver&> ||
+                    hpx::is_invocable_v<
                         hpx::execution::experimental::connect_t,
-                            Sender&, Receiver const&>::value ||
-                    hpx::traits::is_invocable<
+                            Sender&, Receiver const&> ||
+                    hpx::is_invocable_v<
                         hpx::execution::experimental::connect_t,
-                            Sender const&, Receiver&&>::value ||
-                    hpx::traits::is_invocable<
+                            Sender const&, Receiver&&> ||
+                    hpx::is_invocable_v<
                         hpx::execution::experimental::connect_t,
-                            Sender const&, Receiver&>::value ||
-                    hpx::traits::is_invocable<
+                            Sender const&, Receiver&> ||
+                    hpx::is_invocable_v<
                         hpx::execution::experimental::connect_t,
-                            Sender const&, Receiver const&>::value>
+                            Sender const&, Receiver const&>>
             {
             };
             // clang-format on

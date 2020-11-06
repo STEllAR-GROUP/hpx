@@ -286,17 +286,17 @@ namespace hpx { namespace ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
-                hpx::traits::is_invocable<Convert,
+                hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<Iter>::value_type
-                >::value &&
-                hpx::traits::is_invocable<Reduce,
+                > &&
+                hpx::is_invocable_v<Reduce,
                    typename hpx::util::invoke_result<Convert,
                        typename std::iterator_traits<Iter>::value_type
                    >::type,
                    typename hpx::util::invoke_result<Convert,
                        typename std::iterator_traits<Iter>::value_type
                    >::type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -320,17 +320,17 @@ namespace hpx { namespace ranges {
             typename Convert,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
-                hpx::traits::is_invocable<Convert,
+                hpx::is_invocable_v<Convert,
                    typename std::iterator_traits<Iter>::value_type
-                >::value &&
-                hpx::traits::is_invocable<Reduce,
+                > &&
+                hpx::is_invocable_v<Reduce,
                    typename hpx::util::invoke_result<Convert,
                        typename std::iterator_traits<Iter>::value_type
                    >::type,
                    typename hpx::util::invoke_result<Convert,
                        typename std::iterator_traits<Iter>::value_type
                    >::type
-                >::value
+                >
             )>
         // clang-format on
         friend T tag_invoke(transform_reduce_t, Iter first, Sent last, T init,
@@ -394,11 +394,11 @@ namespace hpx { namespace ranges {
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::traits::is_iterator<Iter2>::value &&
-                hpx::traits::is_invocable<Convert,
+                hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<Iter>::value_type,
                     typename std::iterator_traits<Iter2>::value_type
-                >::value &&
-                hpx::traits::is_invocable<Reduce,
+                > &&
+                hpx::is_invocable_v<Reduce,
                     typename hpx::util::invoke_result<Convert,
                         typename std::iterator_traits<Iter>::value_type,
                         typename std::iterator_traits<Iter2>::value_type
@@ -407,7 +407,7 @@ namespace hpx { namespace ranges {
                         typename std::iterator_traits<Iter>::value_type,
                         typename std::iterator_traits<Iter2>::value_type
                     >::type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -429,11 +429,11 @@ namespace hpx { namespace ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::traits::is_iterator<Iter2>::value &&
-                hpx::traits::is_invocable<Convert,
+                hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<Iter>::value_type,
                     typename std::iterator_traits<Iter2>::value_type
-                >::value &&
-                hpx::traits::is_invocable<Reduce,
+                > &&
+                hpx::is_invocable_v<Reduce,
                     typename hpx::util::invoke_result<Convert,
                         typename std::iterator_traits<Iter>::value_type,
                         typename std::iterator_traits<Iter2>::value_type
@@ -442,7 +442,7 @@ namespace hpx { namespace ranges {
                         typename std::iterator_traits<Iter>::value_type,
                         typename std::iterator_traits<Iter2>::value_type
                     >::type
-                >::value
+                >
             )>
         // clang-format on
         friend T tag_invoke(transform_reduce_t, Iter first, Sent last,
@@ -463,17 +463,17 @@ namespace hpx { namespace ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
-                hpx::traits::is_invocable<Convert,
+                hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_iterator<Rng>::type
-                >::value &&
-                hpx::traits::is_invocable<Reduce,
+                > &&
+                hpx::is_invocable_v<Reduce,
                     typename hpx::util::invoke_result<Convert,
                         typename hpx::traits::range_iterator<Rng>::type
                     >::type,
                     typename hpx::util::invoke_result<Convert,
                         typename hpx::traits::range_iterator<Rng>::type
                     >::type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -502,16 +502,16 @@ namespace hpx { namespace ranges {
         template <typename Rng, typename T, typename Reduce, typename Convert,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
-                hpx::traits::is_invocable<Convert,
-                   typename hpx::traits::range_iterator<Rng>::type>::value &&
-                hpx::traits::is_invocable<Reduce,
+                hpx::is_invocable_v<Convert,
+                   typename hpx::traits::range_iterator<Rng>::type> &&
+                hpx::is_invocable_v<Reduce,
                    typename hpx::util::invoke_result<Convert,
                        typename hpx::traits::range_iterator<Rng>::type
                    >::type,
                    typename hpx::util::invoke_result<Convert,
                        typename hpx::traits::range_iterator<Rng>::type
                    >::type
-                >::value
+                >
             )>
         // clang-format on
         friend T tag_invoke(transform_reduce_t, Rng&& rng, T init,
@@ -585,11 +585,11 @@ namespace hpx { namespace ranges {
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::traits::is_iterator<Iter2>::value &&
-                hpx::traits::is_invocable<Convert,
+                hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_iterator<Rng>::type,
                     typename std::iterator_traits<Iter2>::value_type
-                >::value &&
-                hpx::traits::is_invocable<Reduce,
+                > &&
+                hpx::is_invocable_v<Reduce,
                     typename hpx::util::invoke_result<Convert,
                         typename hpx::traits::range_iterator<Rng>::type,
                         typename std::iterator_traits<Iter2>::value_type
@@ -598,7 +598,7 @@ namespace hpx { namespace ranges {
                         typename hpx::traits::range_iterator<Rng>::type,
                         typename std::iterator_traits<Iter2>::value_type
                     >::type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -624,11 +624,11 @@ namespace hpx { namespace ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::traits::is_iterator<Iter2>::value &&
-                hpx::traits::is_invocable<Convert,
+                hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_iterator<Rng>::type,
                     typename std::iterator_traits<Iter2>::value_type
-                >::value &&
-                hpx::traits::is_invocable<Reduce,
+                > &&
+                hpx::is_invocable_v<Reduce,
                     typename hpx::util::invoke_result<Convert,
                         typename hpx::traits::range_iterator<Rng>::type,
                         typename std::iterator_traits<Iter2>::value_type
@@ -637,7 +637,7 @@ namespace hpx { namespace ranges {
                         typename hpx::traits::range_iterator<Rng>::type,
                         typename std::iterator_traits<Iter2>::value_type
                     >::type
-                >::value
+                >
             )>
         // clang-format on
         friend T tag_invoke(transform_reduce_t, Rng&& rng, Iter2 first2, T init,

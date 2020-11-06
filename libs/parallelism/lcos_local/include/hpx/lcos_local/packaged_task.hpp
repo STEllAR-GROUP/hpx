@@ -39,7 +39,7 @@ namespace hpx { namespace lcos { namespace local {
         template <typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, packaged_task>::value &&
-                traits::is_invocable_r<R, FD&, Ts...>::value>::type>
+                is_invocable_r_v<R, FD&, Ts...>>::type>
         explicit packaged_task(F&& f)
           : function_(std::forward<F>(f))
           , promise_()
@@ -50,7 +50,7 @@ namespace hpx { namespace lcos { namespace local {
             typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, packaged_task>::value &&
-                traits::is_invocable_r<R, FD&, Ts...>::value>::type>
+                is_invocable_r_v<R, FD&, Ts...>>::type>
         explicit packaged_task(std::allocator_arg_t, Allocator const& a, F&& f)
           : function_(std::forward<F>(f))
           , promise_(std::allocator_arg, a)

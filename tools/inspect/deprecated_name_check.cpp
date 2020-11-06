@@ -86,7 +86,7 @@ namespace boost
       { "(\\bboost\\s*::\\s*system\\s*::\\s*error_category\\b)", "std::error_category" },
       { "(\\bboost\\s*::\\s*system\\s*::\\s*system_error\\b)", "std::system_error" },
       /////////////////////////////////////////////////////////////////////////
-      { "((\\bhpx::\\b)?\\btraits\\s*::\\bis_callable\\b)", "\\2traits::is_invocable[_r]" },
+      { "((\\bhpx::\\b)?\\btraits\\s*::\\bis_callable\\b)", "\\2is_invocable[_r]" },
       { "((\\bhpx::\\b)?\\butil\\s*::\\bresult_of\\b)", "\\2util::invoke_result" },
       { "((\\bhpx::\\b)?\\butil\\s*::\\bdecay\\b)", "std::decay" },
       { "(\\bNULL\\b)", "nullptr" },

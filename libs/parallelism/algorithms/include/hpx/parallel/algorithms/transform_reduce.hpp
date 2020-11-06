@@ -380,16 +380,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIter>::value &&
-            hpx::traits::is_invocable<Convert,
-                typename std::iterator_traits<FwdIter>::value_type>::value &&
-            hpx::traits::is_invocable<Reduce,
+            hpx::is_invocable_v<Convert,
+                typename std::iterator_traits<FwdIter>::value_type> &&
+            hpx::is_invocable_v<Reduce,
                 typename hpx::util::invoke_result<
                     Convert, typename std::iterator_traits<FwdIter>::value_type
                 >::type,
                 typename hpx::util::invoke_result<
                     Convert, typename std::iterator_traits<FwdIter>::value_type
                 >::type
-            >::value
+            >
         )>
     // clang-format on
     HPX_DEPRECATED_V(1, 6,
@@ -664,11 +664,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value &&
-            hpx::traits::is_invocable<Convert,
+            hpx::is_invocable_v<Convert,
                 typename std::iterator_traits<FwdIter1>::value_type,
                 typename std::iterator_traits<FwdIter2>::value_type
-            >::value &&
-            hpx::traits::is_invocable<Reduce,
+            > &&
+            hpx::is_invocable_v<Reduce,
                 typename hpx::util::invoke_result<Convert,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
@@ -677,7 +677,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
                 >::type
-            >::value
+            >
         )>
     // clang-format on
     HPX_DEPRECATED_V(1, 6,
@@ -709,16 +709,16 @@ namespace hpx {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value &&
-                hpx::traits::is_invocable<Convert,
-                   typename std::iterator_traits<FwdIter>::value_type>::value &&
-                hpx::traits::is_invocable<Reduce,
+                hpx::is_invocable_v<Convert,
+                   typename std::iterator_traits<FwdIter>::value_type> &&
+                hpx::is_invocable_v<Reduce,
                    typename hpx::util::invoke_result<Convert,
                        typename std::iterator_traits<FwdIter>::value_type
                    >::type,
                    typename hpx::util::invoke_result<Convert,
                        typename std::iterator_traits<FwdIter>::value_type
                    >::type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -742,16 +742,16 @@ namespace hpx {
             typename Convert,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter>::value &&
-                hpx::traits::is_invocable<Convert,
-                   typename std::iterator_traits<FwdIter>::value_type>::value &&
-                hpx::traits::is_invocable<Reduce,
+                hpx::is_invocable_v<Convert,
+                   typename std::iterator_traits<FwdIter>::value_type> &&
+                hpx::is_invocable_v<Reduce,
                    typename hpx::util::invoke_result<Convert,
                        typename std::iterator_traits<FwdIter>::value_type
                    >::type,
                    typename hpx::util::invoke_result<Convert,
                        typename std::iterator_traits<FwdIter>::value_type
                    >::type
-                >::value
+                >
             )>
         // clang-format on
         friend T tag_invoke(transform_reduce_t, FwdIter first, FwdIter last,
@@ -815,11 +815,11 @@ namespace hpx {
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value &&
-                hpx::traits::is_invocable<Convert,
+                hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
-                >::value &&
-                hpx::traits::is_invocable<Reduce,
+                > &&
+                hpx::is_invocable_v<Reduce,
                     typename hpx::util::invoke_result<Convert,
                         typename std::iterator_traits<FwdIter1>::value_type,
                         typename std::iterator_traits<FwdIter2>::value_type
@@ -828,7 +828,7 @@ namespace hpx {
                         typename std::iterator_traits<FwdIter1>::value_type,
                         typename std::iterator_traits<FwdIter2>::value_type
                     >::type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -851,11 +851,11 @@ namespace hpx {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value &&
-                hpx::traits::is_invocable<Convert,
+                hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
-                >::value &&
-                hpx::traits::is_invocable<Reduce,
+                > &&
+                hpx::is_invocable_v<Reduce,
                     typename hpx::util::invoke_result<Convert,
                         typename std::iterator_traits<FwdIter1>::value_type,
                         typename std::iterator_traits<FwdIter2>::value_type
@@ -864,7 +864,7 @@ namespace hpx {
                         typename std::iterator_traits<FwdIter1>::value_type,
                         typename std::iterator_traits<FwdIter2>::value_type
                     >::type
-                >::value
+                >
             )>
         // clang-format on
         friend T tag_invoke(transform_reduce_t, FwdIter1 first1, FwdIter1 last1,

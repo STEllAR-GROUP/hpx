@@ -85,9 +85,8 @@ namespace hpx { namespace execution { namespace experimental {
         struct is_operation_state
           : detail::is_operation_state_impl<std::is_destructible<O>::value &&
                     std::is_object<O>::value &&
-                    hpx::traits::is_invocable<
-                        hpx::execution::experimental::start_t,
-                        typename std::decay<O>::type&&>::value,
+                    hpx::is_invocable_v<hpx::execution::experimental::start_t,
+                        typename std::decay<O>::type&&>,
                 O>
         {
         };

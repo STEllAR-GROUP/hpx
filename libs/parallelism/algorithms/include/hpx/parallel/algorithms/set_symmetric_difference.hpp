@@ -274,10 +274,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value &&
             hpx::traits::is_iterator<FwdIter3>::value &&
-            hpx::traits::is_invocable<Pred,
+            hpx::is_invocable_v<Pred,
                 typename std::iterator_traits<FwdIter1>::value_type,
                 typename std::iterator_traits<FwdIter2>::value_type
-            >::value
+            >
         )>
     // clang-format on
     HPX_DEPRECATED_V(1, 6,
@@ -334,10 +334,10 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value &&
                 hpx::traits::is_iterator<FwdIter3>::value &&
-                hpx::traits::is_invocable<Pred,
+                hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -377,10 +377,10 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value &&
                 hpx::traits::is_iterator<FwdIter3>::value &&
-                hpx::traits::is_invocable<Pred,
+                hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend FwdIter3 tag_invoke(set_symmetric_difference_t, FwdIter1 first1,

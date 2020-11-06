@@ -458,11 +458,11 @@ namespace hpx {
             // clang-format off
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_forward_iterator<FwdIter>::value &&
-                hpx::traits::is_invocable<
+                hpx::is_invocable_v<
                     Pred,
                     typename std::iterator_traits<FwdIter>::value_type,
                     typename std::iterator_traits<FwdIter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend bool tag_invoke(
@@ -480,11 +480,11 @@ namespace hpx {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_forward_iterator<FwdIter>::value &&
-                hpx::traits::is_invocable<
+                hpx::is_invocable_v<
                     Pred,
                     typename std::iterator_traits<FwdIter>::value_type,
                     typename std::iterator_traits<FwdIter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -510,11 +510,11 @@ namespace hpx {
             // clang-format off
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_forward_iterator<FwdIter>::value &&
-                hpx::traits::is_invocable<
+                hpx::is_invocable_v<
                     Pred,
                     typename std::iterator_traits<FwdIter>::value_type,
                     typename std::iterator_traits<FwdIter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend FwdIter tag_invoke(hpx::is_sorted_until_t, FwdIter first,
@@ -533,11 +533,11 @@ namespace hpx {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_forward_iterator<FwdIter>::value &&
-                hpx::traits::is_invocable<
+                hpx::is_invocable_v<
                     Pred,
                     typename std::iterator_traits<FwdIter>::value_type,
                     typename std::iterator_traits<FwdIter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,

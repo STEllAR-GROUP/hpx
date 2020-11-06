@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/functional/invoke_result.hpp>
+#include <hpx/functional/traits/is_invocable.hpp>
 
 namespace hpx {
     using hpx::util::invoke_result;

@@ -29,188 +29,177 @@ struct smart_ptr
 
 void nullary_function()
 {
-    using hpx::traits::is_invocable;
-
     typedef void (*f)();
-    HPX_TEST_MSG((is_invocable<f>::value == true), "nullary function");
+    HPX_TEST_MSG((hpx::is_invocable_v<f> == true), "nullary function");
 }
 
 void lambdas()
 {
-    using hpx::traits::is_invocable;
-
     auto lambda = []() {};
 
     typedef decltype(lambda) f;
-    HPX_TEST_MSG((is_invocable<f>::value == true), "lambda");
+    HPX_TEST_MSG((hpx::is_invocable_v<f> == true), "lambda");
 }
 
 void functions_byval_params()
 {
-    using hpx::traits::is_invocable;
-
     typedef void (*f)(int);
-    HPX_TEST_MSG((is_invocable<f,int>::value == true), "fun-value/value");
-    HPX_TEST_MSG((is_invocable<f,int&>::value == true), "fun-value/lvref");
-    HPX_TEST_MSG((is_invocable<f,int const&>::value == true), "fun-value/const-lvref");
-    HPX_TEST_MSG((is_invocable<f,int &&>::value == true), "fun-value/rvref");
-    HPX_TEST_MSG((is_invocable<f,int const &&>::value == true), "fun-value/const-rvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, int> == true), "fun-value/value");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, int&> == true), "fun-value/lvref");
+    HPX_TEST_MSG(
+        (hpx::is_invocable_v<f, int const&> == true), "fun-value/const-lvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, int&&> == true), "fun-value/rvref");
+    HPX_TEST_MSG(
+        (hpx::is_invocable_v<f, int const&&> == true), "fun-value/const-rvref");
 
     typedef void (*fc)(int const);
-    HPX_TEST_MSG((is_invocable<fc,int>::value == true), "fun-const-value/value");
-    HPX_TEST_MSG((is_invocable<fc,int&>::value == true), "fun-const-value/lvref");
-    HPX_TEST_MSG((is_invocable<fc,int const&>::value == true),
+    HPX_TEST_MSG(
+        (hpx::is_invocable_v<fc, int> == true), "fun-const-value/value");
+    HPX_TEST_MSG(
+        (hpx::is_invocable_v<fc, int&> == true), "fun-const-value/lvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<fc, int const&> == true),
         "fun-const-value/const-lvref");
-    HPX_TEST_MSG((is_invocable<fc,int &&>::value == true), "fun-const-value/rvref");
-    HPX_TEST_MSG((is_invocable<fc,int const &&>::value == true),
+    HPX_TEST_MSG(
+        (hpx::is_invocable_v<fc, int&&> == true), "fun-const-value/rvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<fc, int const&&> == true),
         "fun-const-value/const-rvref");
 }
 
 void functions_bylvref_params()
 {
-    using hpx::traits::is_invocable;
-
     typedef void (*f)(int&);
-    HPX_TEST_MSG((is_invocable<f, int>::value == false), "fun-lvref/value");
-    HPX_TEST_MSG((is_invocable<f, int&>::value == true), "fun-lvref/lvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, int> == false), "fun-lvref/value");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, int&> == true), "fun-lvref/lvref");
     HPX_TEST_MSG(
-        (is_invocable<f, int const&>::value == false), "fun-lvref/const-lvref");
-    HPX_TEST_MSG((is_invocable<f, int&&>::value == false), "fun-lvref/rvref");
-    HPX_TEST_MSG((is_invocable<f, int const&&>::value == false),
+        (hpx::is_invocable_v<f, int const&> == false), "fun-lvref/const-lvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, int&&> == false), "fun-lvref/rvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, int const&&> == false),
         "fun-lvref/const-rvref");
 
     typedef void (*fc)(int const&);
     HPX_TEST_MSG(
-        (is_invocable<fc, int>::value == true), "fun-const-lvref/value");
+        (hpx::is_invocable_v<fc, int> == true), "fun-const-lvref/value");
     HPX_TEST_MSG(
-        (is_invocable<fc, int&>::value == true), "fun-const-lvref/lvref");
-    HPX_TEST_MSG((is_invocable<fc, int const&>::value == true),
+        (hpx::is_invocable_v<fc, int&> == true), "fun-const-lvref/lvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<fc, int const&> == true),
         "fun-const-lvref/const-lvref");
     HPX_TEST_MSG(
-        (is_invocable<fc, int&&>::value == true), "fun-const-lvref/rvref");
-    HPX_TEST_MSG((is_invocable<fc, int const&&>::value == true),
+        (hpx::is_invocable_v<fc, int&&> == true), "fun-const-lvref/rvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<fc, int const&&> == true),
         "fun-const-lvref/const-rvref");
 }
 
 void functions_byrvref_params()
 {
-    using hpx::traits::is_invocable;
-
     typedef void (*f)(int&&);
-    HPX_TEST_MSG((is_invocable<f, int>::value == true), "fun-rvref/value");
-    HPX_TEST_MSG((is_invocable<f, int&>::value == false), "fun-rvref/lvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, int> == true), "fun-rvref/value");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, int&> == false), "fun-rvref/lvref");
     HPX_TEST_MSG(
-        (is_invocable<f, int const&>::value == false), "fun-rvref/const-lvref");
-    HPX_TEST_MSG((is_invocable<f, int&&>::value == true), "fun-rvref/rvref");
+        (hpx::is_invocable_v<f, int const&> == false), "fun-rvref/const-lvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, int&&> == true), "fun-rvref/rvref");
 #if !defined(BOOST_INTEL)
-    HPX_TEST_MSG((is_invocable<f, int const&&>::value == false),
+    HPX_TEST_MSG((hpx::is_invocable_v<f, int const&&> == false),
         "fun-rvref/const-rvref");
 #endif
 
     typedef void (*fc)(int const&&);
     HPX_TEST_MSG(
-        (is_invocable<fc, int>::value == true), "fun-const-rvref/value");
+        (hpx::is_invocable_v<fc, int> == true), "fun-const-rvref/value");
     HPX_TEST_MSG(
-        (is_invocable<fc, int&>::value == false), "fun-const-rvref/lvref");
-    HPX_TEST_MSG((is_invocable<fc, int const&>::value == false),
+        (hpx::is_invocable_v<fc, int&> == false), "fun-const-rvref/lvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<fc, int const&> == false),
         "fun-const-rvref/const-lvref");
     HPX_TEST_MSG(
-        (is_invocable<fc, int&&>::value == true), "fun-const-rvref/rvref");
-    HPX_TEST_MSG((is_invocable<fc, int const&&>::value == true),
+        (hpx::is_invocable_v<fc, int&&> == true), "fun-const-rvref/rvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<fc, int const&&> == true),
         "fun-const-rvref/const-rvref");
 }
 
 void member_function_pointers()
 {
-    using hpx::traits::is_invocable;
-
     typedef int (X::*f)(double);
     HPX_TEST_MSG(
-        (is_invocable<f, X*, float>::value == true), "mem-fun-ptr/ptr");
-    HPX_TEST_MSG((is_invocable<f, X const*, float>::value == false),
+        (hpx::is_invocable_v<f, X*, float> == true), "mem-fun-ptr/ptr");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, X const*, float> == false),
         "mem-fun-ptr/const-ptr");
     HPX_TEST_MSG(
-        (is_invocable<f, X&, float>::value == true), "mem-fun-ptr/lvref");
-    HPX_TEST_MSG((is_invocable<f, X const&, float>::value == false),
+        (hpx::is_invocable_v<f, X&, float> == true), "mem-fun-ptr/lvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, X const&, float> == false),
         "mem-fun-ptr/const-lvref");
     HPX_TEST_MSG(
-        (is_invocable<f, X&&, float>::value == true), "mem-fun-ptr/rvref");
-    HPX_TEST_MSG((is_invocable<f, X const&&, float>::value == false),
+        (hpx::is_invocable_v<f, X&&, float> == true), "mem-fun-ptr/rvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, X const&&, float> == false),
         "mem-fun-ptr/const-rvref");
-    HPX_TEST_MSG((is_invocable<f, smart_ptr<X>, float>::value == true),
+    HPX_TEST_MSG((hpx::is_invocable_v<f, smart_ptr<X>, float> == true),
         "mem-fun-ptr/smart-ptr");
-    HPX_TEST_MSG((is_invocable<f, smart_ptr<X const>, float>::value == false),
+    HPX_TEST_MSG((hpx::is_invocable_v<f, smart_ptr<X const>, float> == false),
         "mem-fun-ptr/smart-const-ptr");
 
     typedef int (X::*fc)(double) const;
     HPX_TEST_MSG(
-        (is_invocable<fc, X*, float>::value == true), "const-mem-fun-ptr/ptr");
-    HPX_TEST_MSG((is_invocable<fc, X const*, float>::value == true),
+        (hpx::is_invocable_v<fc, X*, float> == true), "const-mem-fun-ptr/ptr");
+    HPX_TEST_MSG((hpx::is_invocable_v<fc, X const*, float> == true),
         "const-mem-fun-ptr/const-ptr");
-    HPX_TEST_MSG((is_invocable<fc, X&, float>::value == true),
+    HPX_TEST_MSG((hpx::is_invocable_v<fc, X&, float> == true),
         "const-mem-fun-ptr/lvref");
-    HPX_TEST_MSG((is_invocable<fc, X const&, float>::value == true),
+    HPX_TEST_MSG((hpx::is_invocable_v<fc, X const&, float> == true),
         "const-mem-fun-ptr/const-lvref");
-    HPX_TEST_MSG((is_invocable<fc, X&&, float>::value == true),
+    HPX_TEST_MSG((hpx::is_invocable_v<fc, X&&, float> == true),
         "const-mem-fun-ptr/rvref");
-    HPX_TEST_MSG((is_invocable<fc, X const&&, float>::value == true),
+    HPX_TEST_MSG((hpx::is_invocable_v<fc, X const&&, float> == true),
         "const-mem-fun-ptr/const-rvref");
-    HPX_TEST_MSG((is_invocable<fc, smart_ptr<X>, float>::value == true),
+    HPX_TEST_MSG((hpx::is_invocable_v<fc, smart_ptr<X>, float> == true),
         "const-mem-fun-ptr/smart-ptr");
-    HPX_TEST_MSG((is_invocable<fc, smart_ptr<X const>, float>::value == true),
+    HPX_TEST_MSG((hpx::is_invocable_v<fc, smart_ptr<X const>, float> == true),
         "const-mem-fun-ptr/smart-const-ptr");
 }
 
 void member_object_pointers()
 {
-    using hpx::traits::is_invocable;
-
     typedef int(X::*f);
-    HPX_TEST_MSG((is_invocable<f, X*>::value == true), "mem-obj-ptr/ptr");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, X*> == true), "mem-obj-ptr/ptr");
     HPX_TEST_MSG(
-        (is_invocable<f, X const*>::value == true), "mem-obj-ptr/const-ptr");
-    HPX_TEST_MSG((is_invocable<f, X&>::value == true), "mem-obj-ptr/lvref");
+        (hpx::is_invocable_v<f, X const*> == true), "mem-obj-ptr/const-ptr");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, X&> == true), "mem-obj-ptr/lvref");
     HPX_TEST_MSG(
-        (is_invocable<f, X const&>::value == true), "mem-obj-ptr/const-lvref");
-    HPX_TEST_MSG((is_invocable<f, X&&>::value == true), "mem-obj-ptr/rvref");
+        (hpx::is_invocable_v<f, X const&> == true), "mem-obj-ptr/const-lvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, X&&> == true), "mem-obj-ptr/rvref");
     HPX_TEST_MSG(
-        (is_invocable<f, X const&&>::value == true), "mem-obj-ptr/const-rvref");
-    HPX_TEST_MSG((is_invocable<f, smart_ptr<X>>::value == true),
+        (hpx::is_invocable_v<f, X const&&> == true), "mem-obj-ptr/const-rvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<f, smart_ptr<X>> == true),
         "mem-obj-ptr/smart-ptr");
-    HPX_TEST_MSG((is_invocable<f, smart_ptr<X const>>::value == true),
+    HPX_TEST_MSG((hpx::is_invocable_v<f, smart_ptr<X const>> == true),
         "mem-obj-ptr/smart-const-ptr");
 }
 
 void function_objects()
 {
-    using hpx::traits::is_invocable;
+    HPX_TEST_MSG((hpx::is_invocable_v<X, int> == true), "fun-obj/value");
+    HPX_TEST_MSG(
+        (hpx::is_invocable_v<X const, int> == false), "fun-obj/const-value");
+    HPX_TEST_MSG((hpx::is_invocable_v<X*, int> == false), "fun-obj/ptr");
+    HPX_TEST_MSG(
+        (hpx::is_invocable_v<X const*, int> == false), "fun-obj/const-ptr");
+    HPX_TEST_MSG((hpx::is_invocable_v<X&, int> == true), "fun-obj/lvref");
+    HPX_TEST_MSG(
+        (hpx::is_invocable_v<X const&, int> == false), "fun-obj/const-lvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<X&&, int> == true), "fun-obj/rvref");
+    HPX_TEST_MSG(
+        (hpx::is_invocable_v<X const&&, int> == false), "fun-obj/const-rvref");
 
-    HPX_TEST_MSG((is_invocable<X, int>::value == true), "fun-obj/value");
-    HPX_TEST_MSG(
-        (is_invocable<X const, int>::value == false), "fun-obj/const-value");
-    HPX_TEST_MSG((is_invocable<X*, int>::value == false), "fun-obj/ptr");
-    HPX_TEST_MSG(
-        (is_invocable<X const*, int>::value == false), "fun-obj/const-ptr");
-    HPX_TEST_MSG((is_invocable<X&, int>::value == true), "fun-obj/lvref");
-    HPX_TEST_MSG(
-        (is_invocable<X const&, int>::value == false), "fun-obj/const-lvref");
-    HPX_TEST_MSG((is_invocable<X&&, int>::value == true), "fun-obj/rvref");
-    HPX_TEST_MSG(
-        (is_invocable<X const&&, int>::value == false), "fun-obj/const-rvref");
-
-    HPX_TEST_MSG((is_invocable<Xc, int>::value == true), "const-fun-obj/value");
-    HPX_TEST_MSG((is_invocable<Xc const, int>::value == true),
+    HPX_TEST_MSG((hpx::is_invocable_v<Xc, int> == true), "const-fun-obj/value");
+    HPX_TEST_MSG((hpx::is_invocable_v<Xc const, int> == true),
         "const-fun-obj/const-value");
-    HPX_TEST_MSG((is_invocable<Xc*, int>::value == false), "const-fun-obj/ptr");
-    HPX_TEST_MSG((is_invocable<Xc const*, int>::value == false),
+    HPX_TEST_MSG((hpx::is_invocable_v<Xc*, int> == false), "const-fun-obj/ptr");
+    HPX_TEST_MSG((hpx::is_invocable_v<Xc const*, int> == false),
         "const-fun-obj/const-ptr");
     HPX_TEST_MSG(
-        (is_invocable<Xc&, int>::value == true), "const-fun-obj/lvref");
-    HPX_TEST_MSG((is_invocable<Xc const&, int>::value == true),
+        (hpx::is_invocable_v<Xc&, int> == true), "const-fun-obj/lvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<Xc const&, int> == true),
         "const-fun-obj/const-lvref");
     HPX_TEST_MSG(
-        (is_invocable<Xc&&, int>::value == true), "const-fun-obj/rvref");
-    HPX_TEST_MSG((is_invocable<Xc const&&, int>::value == true),
+        (hpx::is_invocable_v<Xc&&, int> == true), "const-fun-obj/rvref");
+    HPX_TEST_MSG((hpx::is_invocable_v<Xc const&&, int> == true),
         "const-fun-obj/const-rvref");
 }
 

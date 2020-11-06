@@ -809,10 +809,10 @@ namespace hpx {
                 hpx::traits::is_iterator<RandIter1>::value &&
                 hpx::traits::is_iterator<RandIter2>::value &&
                 hpx::traits::is_iterator<RandIter3>::value &&
-                hpx::traits::is_invocable<Comp,
+                hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter1>::value_type,
                     typename std::iterator_traits<RandIter2>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -850,10 +850,10 @@ namespace hpx {
                 hpx::traits::is_iterator<RandIter1>::value &&
                 hpx::traits::is_iterator<RandIter2>::value &&
                 hpx::traits::is_iterator<RandIter3>::value &&
-                hpx::traits::is_invocable<Comp,
+                hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter1>::value_type,
                     typename std::iterator_traits<RandIter2>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend RandIter3 tag_invoke(merge_t, RandIter1 first1, RandIter1 last1,
@@ -894,10 +894,10 @@ namespace hpx {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<RandIter>::value &&
-                hpx::traits::is_invocable<Comp,
+                hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
@@ -923,10 +923,10 @@ namespace hpx {
             typename Comp = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<RandIter>::value &&
-                hpx::traits::is_invocable<Comp,
+                hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend void tag_invoke(inplace_merge_t, RandIter first, RandIter middle,

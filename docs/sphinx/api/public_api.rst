@@ -753,14 +753,13 @@ Header ``hpx/type_traits.hpp``
 ==============================
 
 Corresponds to the C++ standard library header
-:cppreference-header:`type_traits`. Provides
-:cpp:class:`hpx::util::invoke_result` as a replacement for
-``std::invoke_result``.
+:cppreference-header:`type_traits`.
 
 Classes
 -------
 
-- :cpp:struct:`hpx::util::invoke_result`
+- :cpp:struct:`hpx::is_invocable`
+- :cpp:struct:`hpx::is_invocable_r`
 
 Header ``hpx/version.hpp``
 ==========================

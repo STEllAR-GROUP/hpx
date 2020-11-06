@@ -46,7 +46,8 @@ echo "= stderr =================================================="
 cat jenkins-hpx-${configuration_name}.err
 
 # Get build status
-if [[ "$(cat jenkins-hpx-${configuration_name}-ctest-status.txt)" -eq "0" ]]; then
+status_file="jenkins-hpx-${configuration_name}-ctest-status.txt"
+if [[ -f "${status_file}" && "$(cat ${status_file})" -eq "0" ]]; then
     github_commit_status="success"
 else
     github_commit_status="failure"
@@ -74,4 +75,4 @@ if [[ -n "${ghprbPullId:-}" ]]; then
 fi
 
 set -e
-exit $(cat jenkins-hpx-${configuration_name}-ctest-status.txt)
+exit $(cat ${status_file})

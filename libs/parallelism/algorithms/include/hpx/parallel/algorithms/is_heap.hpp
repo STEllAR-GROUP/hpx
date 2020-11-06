@@ -465,10 +465,10 @@ namespace hpx {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<RandIter>::value &&
-                hpx::traits::is_invocable<Comp,
+                hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -493,10 +493,10 @@ namespace hpx {
             typename Comp = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<RandIter>::value &&
-                hpx::traits::is_invocable<Comp,
+                hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend bool tag_invoke(
@@ -525,10 +525,10 @@ namespace hpx {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<RandIter>::value &&
-                hpx::traits::is_invocable<Comp,
+                hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -553,10 +553,10 @@ namespace hpx {
             typename Comp = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<RandIter>::value &&
-                hpx::traits::is_invocable<Comp,
+                hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
-                >::value
+                >
             )>
         // clang-format on
         friend RandIter tag_invoke(is_heap_until_t, RandIter first,
