@@ -34,9 +34,7 @@ using hpx::actions::direct_action;
 
 using hpx::async;
 
-using hpx::finalize;
 using hpx::find_here;
-using hpx::init;
 
 using hpx::test::movable_object;
 using hpx::test::non_movable_object;
@@ -833,7 +831,7 @@ int hpx_main(variables_map&)
     test_object_actions();
     test_object_direct_actions();
 
-    finalize();
+    hpx::finalize();
 
     return hpx::util::report_errors();
 }
@@ -846,6 +844,9 @@ int main(int argc, char* argv[])
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX.
-    return init(desc_commandline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = desc_commandline;
+
+    return hpx::init(argc, argv, init_args);
 }
 #endif

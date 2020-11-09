@@ -228,5 +228,8 @@ int main(int argc, char* argv[])
         "Maximum number of repeat launches for a function f");
 
     // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = desc_commandline;
+
+    return hpx::init(argc, argv, init_args);
 }

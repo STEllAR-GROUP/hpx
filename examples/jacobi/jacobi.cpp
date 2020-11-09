@@ -26,9 +26,6 @@ using hpx::program_options::value;
 
 using hpx::chrono::high_resolution_timer;
 
-using hpx::init;
-using hpx::finalize;
-
 using hpx::cout;
 using hpx::flush;
 
@@ -47,7 +44,7 @@ int hpx_main(variables_map & vm)
         solver.run(max_iterations);
     }
 
-    return finalize();
+    return hpx::finalize();
 }
 
 int main(int argc, char **argv)
@@ -83,6 +80,9 @@ int main(int argc, char **argv)
         )
         ;
 
-    return init(desc_commandline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = desc_commandline;
+
+    return hpx::init(argc, argv, init_args);
 }
 #endif

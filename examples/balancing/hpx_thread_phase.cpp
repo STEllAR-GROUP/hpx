@@ -44,9 +44,6 @@ using hpx::threads::pending;
 using hpx::threads::suspended;
 using hpx::threads::set_thread_state;
 
-using hpx::init;
-using hpx::finalize;
-
 typedef std::pair<thread_id_type, std::size_t> value_type;
 typedef std::vector<value_type> fifo_type;
 
@@ -150,7 +147,7 @@ int hpx_main(variables_map& vm)
     }
 
     // Initiate shutdown of the runtime system.
-    finalize();
+    hpx::finalize();
     return 0;
 }
 
@@ -173,6 +170,9 @@ int main(int argc, char* argv[])
         ;
 
     // Initialize and run HPX.
-    return init(desc_commandline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = desc_commandline;
+
+    return hpx::init(argc, argv, init_args);
 }
 

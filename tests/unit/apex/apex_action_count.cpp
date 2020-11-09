@@ -95,7 +95,10 @@ int main(int argc, char* argv[])
         ;
 
     // Initialize and run HPX
-    int status =  hpx::init(desc_commandline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = desc_commandline;
+
+    int status = hpx::init(argc, argv, init_args);
     HPX_TEST_EQ(status, 0);
 
     std::cout << "Calls to fibonacci_action: " << count << std::endl;
