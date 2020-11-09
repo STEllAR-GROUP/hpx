@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2020 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,8 +32,8 @@ void test_transform(IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    auto result = hpx::ranges::transform(
-        c, std::begin(d), [](std::size_t v) { return v + 1; });
+    auto result = hpx::ranges::transform(std::begin(c), std::end(c),
+        std::begin(d), [](std::size_t v) { return v + 1; });
 
     HPX_TEST(result.in == std::end(c));
     HPX_TEST(result.out == std::end(d));
@@ -61,8 +61,8 @@ void test_transform(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    auto result = hpx::ranges::transform(
-        policy, c, std::begin(d), [](std::size_t v) { return v + 1; });
+    auto result = hpx::ranges::transform(policy, std::begin(c), std::end(c),
+        std::begin(d), [](std::size_t v) { return v + 1; });
 
     HPX_TEST(result.in == std::end(c));
     HPX_TEST(result.out == std::end(d));
@@ -88,8 +88,8 @@ void test_transform_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    auto f = hpx::ranges::transform(
-        p, c, std::begin(d), [](std::size_t& v) { return v + 1; });
+    auto f = hpx::ranges::transform(p, std::begin(c), std::end(c),
+        std::begin(d), [](std::size_t& v) { return v + 1; });
     f.wait();
 
     auto result = f.get();
@@ -385,11 +385,7 @@ int main(int argc, char* argv[])
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    hpx::init_params init_args;
-    init_args.desc_cmdline = desc_commandline;
-    init_args.cfg = cfg;
-
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, init_args), 0,
+    HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();

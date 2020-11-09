@@ -8,6 +8,168 @@
 
 #pragma once
 
+#if defined(DOXYGEN)
+namespace hpx {
+
+    /// Applies the given function \a f to the range [first, last) and stores
+    /// the result in another range, beginning at dest.
+    ///
+    /// \note   Complexity: Exactly \a last - \a first applications of \a f
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the invocations of \a f.
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam F           The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a transform requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param f            Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).This is an
+    ///                     unary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     Ret fun(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&.
+    ///                     The type \a Type must be such that an object of
+    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     implicitly converted to \a Type. The type \a Ret
+    ///                     must be such that an object of type \a FwdIter2 can
+    ///                     be dereferenced and assigned a value of type
+    ///                     \a Ret.
+    ///
+    /// The invocations of \a f in the parallel \a transform algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The invocations of \a f in the parallel \a transform algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a transform algorithm returns a
+    /// \a hpx::future<in_out_result<FwdIter1, FwdIter2> >
+    ///           if the execution policy is of type \a parallel_task_policy
+    ///           and returns
+    /// \a in_out_result<FwdIter1, FwdIter2> otherwise.
+    ///           The \a transform algorithm returns a tuple holding an iterator
+    ///           referring to the first element after the input sequence and
+    ///           the output iterator to the
+    ///           element in the destination range, one past the last element
+    ///           copied.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename F>
+    typename util::detail::algorithm_result<ExPolicy,
+        util::in_out_result<FwdIter1, FwdIter2>>::type
+    transform(
+        ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest, F&& f);
+
+    /// Applies the given function \a f to pairs of elements from two ranges:
+    /// one defined by [first1, last1) and the other beginning at first2, and
+    /// stores the result in another range, beginning at dest.
+    ///
+    /// \note   Complexity: Exactly \a last - \a first applications of \a f
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the invocations of \a f.
+    /// \tparam FwdIter1    The type of the source iterators for the first
+    ///                     range used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators for the second
+    ///                     range used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter3    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam F           The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a transform requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first1       Refers to the beginning of the first sequence of
+    ///                     elements the algorithm will be applied to.
+    /// \param last1        Refers to the end of the first sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the second sequence of
+    ///                     elements the algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param f            Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).This is a
+    ///                     binary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&.
+    ///                     The types \a Type1 and \a Type2 must be such that
+    ///                     objects of types FwdIter1 and FwdIter2 can be
+    ///                     dereferenced and then implicitly converted to
+    ///                     \a Type1 and \a Type2 respectively. The type \a Ret
+    ///                     must be such that an object of type \a FwdIter3 can
+    ///                     be dereferenced and assigned a value of type
+    ///                     \a Ret.
+    ///
+    /// The invocations of \a f in the parallel \a transform algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The invocations of \a f in the parallel \a transform algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a transform algorithm returns a
+    /// \a hpx::future<in_in_out_result<FwdIter1, FwdIter2, FwdIter3> >
+    ///           if the execution policy is of type \a parallel_task_policy
+    ///           and returns
+    /// \a in_in_out_result<FwdIter1, FwdIter2, FwdIter3>
+    ///           otherwise.
+    ///           The \a transform algorithm returns a tuple holding an iterator
+    ///           referring to the first element after the first input sequence,
+    ///           an iterator referring to the first element after the second
+    ///           input sequence, and the output iterator referring to the
+    ///           element in the destination range, one past the last element
+    ///           copied.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename FwdIter3, typename F>
+    typename util::detail::algorithm_result<ExPolicy,
+        util::in_in_out_result<FwdIter1, FwdIter2, FwdIter3>>::type
+    transform(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+        FwdIter2 first2, FwdIter3 dest, F&& f);
+
+}    // namespace hpx
+
+#else    // DOXYGEN
+
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
@@ -19,6 +181,7 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/tagged_pair.hpp>
 #include <hpx/parallel/util/tagged_tuple.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
@@ -26,6 +189,7 @@
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
@@ -135,21 +299,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
             }
 
-            template <typename ExPolicy, typename InIter, typename OutIter,
-                typename F, typename Proj>
-            HPX_HOST_DEVICE static std::pair<InIter, OutIter> sequential(
-                ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-                F&& f, Proj&& proj)
+            template <typename ExPolicy, typename InIterB, typename InIterE,
+                typename OutIter, typename F, typename Proj>
+            HPX_HOST_DEVICE static util::in_out_result<InIterB, OutIter>
+            sequential(ExPolicy&& policy, InIterB first, InIterE last,
+                OutIter dest, F&& f, Proj&& proj)
             {
                 return util::transform_loop(std::forward<ExPolicy>(policy),
                     first, last, dest, transform_projected<F, Proj>{f, proj});
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-                typename F, typename Proj>
+            template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+                typename FwdIter2, typename F, typename Proj>
             static typename util::detail::algorithm_result<ExPolicy,
-                std::pair<FwdIter1, FwdIter2>>::type
-            parallel(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+                util::in_out_result<FwdIter1B, FwdIter2>>::type
+            parallel(ExPolicy&& policy, FwdIter1B first, FwdIter1E last,
                 FwdIter2 dest, F&& f, Proj&& proj)
             {
                 if (first != last)
@@ -157,39 +321,40 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     auto f1 = transform_iteration<ExPolicy, F, Proj>(
                         std::forward<F>(f), std::forward<Proj>(proj));
 
-                    return get_iter_pair(
+                    return util::detail::get_in_out_result(
                         util::foreach_partitioner<ExPolicy>::call(
                             std::forward<ExPolicy>(policy),
                             hpx::util::make_zip_iterator(first, dest),
-                            std::distance(first, last), std::move(f1),
+                            detail::distance(first, last), std::move(f1),
                             util::projection_identity()));
                 }
 
+                using result_type = util::in_out_result<FwdIter1B, FwdIter2>;
+
                 return util::detail::algorithm_result<ExPolicy,
-                    std::pair<FwdIter1, FwdIter2>>::
-                    get(std::make_pair(std::move(first), std::move(dest)));
+                    result_type>::get(result_type{
+                    std::move(first), std::move(dest)});
             }
         };
 
         /// non_segmented version
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename F, typename Proj>
+        template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+            typename FwdIter2, typename F, typename Proj>
         typename util::detail::algorithm_result<ExPolicy,
-            hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
-        transform_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            util::in_out_result<FwdIter1B, FwdIter2>>::type
+        transform_(ExPolicy&& policy, FwdIter1B first, FwdIter1E last,
             FwdIter2 dest, F&& f, Proj&& proj, std::false_type)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1B>::value),
                 "Requires at least forward iterator.");
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
 
             typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-            return hpx::util::make_tagged_pair<tag::in, tag::out>(
-                detail::transform<std::pair<FwdIter1, FwdIter2>>().call(
-                    std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
-                    std::forward<F>(f), std::forward<Proj>(proj)));
+            return detail::transform<util::in_out_result<FwdIter1B, FwdIter2>>()
+                .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
+                    dest, std::forward<F>(f), std::forward<Proj>(proj));
         }
 
         /// forward declare the segmented version
@@ -202,89 +367,24 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Applies the given function \a f to the range [first, last) and stores
-    /// the result in another range, beginning at dest.
-    ///
-    /// \note   Complexity: Exactly \a last - \a first applications of \a f
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the invocations of \a f.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a transform requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    /// \param f            Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last).This is an
-    ///                     unary predicate. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     Ret fun(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&.
-    ///                     The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
-    ///                     implicitly converted to \a Type. The type \a Ret
-    ///                     must be such that an object of type \a FwdIter2 can
-    ///                     be dereferenced and assigned a value of type
-    ///                     \a Ret.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a f is invoked.
-    ///
-    /// The invocations of \a f in the parallel \a transform algorithm invoked
-    /// with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The invocations of \a f in the parallel \a transform algorithm invoked
-    /// with an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a transform algorithm returns a
-    /// \a hpx::future<tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)> >
-    ///           if the execution policy is of type \a parallel_task_policy
-    ///           and returns
-    /// \a tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)> otherwise.
-    ///           The \a transform algorithm returns a tuple holding an iterator
-    ///           referring to the first element after the input sequence and
-    ///           the output iterator to the
-    ///           element in the destination range, one past the last element
-    ///           copied.
-    ///
+    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename F, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter1>::value&&
-                    hpx::traits::is_iterator<FwdIter2>::value&&
-                        traits::is_projected<Proj, FwdIter1>::value&&
-                            traits::is_indirect_callable<ExPolicy, F,
-                                traits::projected<Proj, FwdIter1>>::value)>
-    typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
-    transform(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
-        F&& f, Proj&& proj = Proj())
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter1>::value &&
+            hpx::traits::is_iterator<FwdIter2>::value &&
+            traits::is_projected<Proj, FwdIter1>::value &&
+            traits::is_indirect_callable<ExPolicy, F,
+                traits::projected<Proj, FwdIter1>>::value
+        )>
+    // clang-format on
+    HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::transform is deprecated, use hpx::transform instead")
+        typename util::detail::algorithm_result<ExPolicy,
+            hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
+        transform(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest, F&& f, Proj&& proj = Proj())
     {
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
         return detail::transform_(std::forward<ExPolicy>(policy), first, last,
@@ -403,11 +503,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         f, proj1, proj2});
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-                typename FwdIter3, typename F, typename Proj1, typename Proj2>
+            template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+                typename FwdIter2, typename FwdIter3, typename F,
+                typename Proj1, typename Proj2>
             static typename util::detail::algorithm_result<ExPolicy,
-                hpx::tuple<FwdIter1, FwdIter2, FwdIter3>>::type
-            parallel(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+                util::in_in_out_result<FwdIter1B, FwdIter2, FwdIter3>>::type
+            parallel(ExPolicy&& policy, FwdIter1B first1, FwdIter1E last1,
                 FwdIter2 first2, FwdIter3 dest, F&& f, Proj1&& proj1,
                 Proj2&& proj2)
             {
@@ -418,31 +519,33 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             std::forward<F>(f), std::forward<Proj1>(proj1),
                             std::forward<Proj2>(proj2));
 
-                    return get_iter_tuple(
+                    return util::detail::get_in_in_out_result(
                         util::foreach_partitioner<ExPolicy>::call(
                             std::forward<ExPolicy>(policy),
                             hpx::util::make_zip_iterator(first1, first2, dest),
-                            std::distance(first1, last1), std::move(f1),
+                            detail::distance(first1, last1), std::move(f1),
                             util::projection_identity()));
                 }
 
+                using result_type =
+                    util::in_in_out_result<FwdIter1B, FwdIter2, FwdIter3>;
+
                 return util::detail::algorithm_result<ExPolicy,
-                    hpx::tuple<FwdIter1, FwdIter2,
-                        FwdIter3>>::get(hpx::make_tuple(std::move(first1),
-                    std::move(first2), std::move(dest)));
+                    result_type>::get(result_type{
+                    std::move(first1), std::move(first2), std::move(dest)});
             }
         };
 
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename FwdIter3, typename F, typename Proj1, typename Proj2>
+        template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+            typename FwdIter2, typename FwdIter3, typename F, typename Proj1,
+            typename Proj2>
         typename util::detail::algorithm_result<ExPolicy,
-            hpx::util::tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2),
-                tag::out(FwdIter3)>>::type
-        transform_(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            util::in_in_out_result<FwdIter1B, FwdIter2, FwdIter3>>::type
+        transform_(ExPolicy&& policy, FwdIter1B first1, FwdIter1E last1,
             FwdIter2 first2, FwdIter3 dest, F&& f, Proj1&& proj1, Proj2&& proj2,
             std::false_type)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1B>::value),
                 "Requires at least forward iterator.");
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
@@ -450,13 +553,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 "Requires at least forward iterator.");
 
             typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-            typedef hpx::tuple<FwdIter1, FwdIter2, FwdIter3> result_type;
+            typedef util::in_in_out_result<FwdIter1B, FwdIter2, FwdIter3>
+                result_type;
 
-            return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
-                detail::transform_binary<result_type>().call(
-                    std::forward<ExPolicy>(policy), is_seq(), first1, last1,
-                    first2, dest, std::forward<F>(f),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2)));
+            return detail::transform_binary<result_type>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
+                dest, std::forward<F>(f), std::forward<Proj1>(proj1),
+                std::forward<Proj2>(proj2));
         }
 
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
@@ -470,115 +573,30 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Applies the given function \a f to pairs of elements from two ranges:
-    /// one defined by [first1, last1) and the other beginning at first2, and
-    /// stores the result in another range, beginning at dest.
-    ///
-    /// \note   Complexity: Exactly \a last - \a first applications of \a f
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the invocations of \a f.
-    /// \tparam FwdIter1    The type of the source iterators for the first
-    ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the source iterators for the second
-    ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter3    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a transform requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj1       The type of an optional projection function to be
-    ///                     used for elements of the first sequence. This
-    ///                     defaults to \a util::projection_identity
-    /// \tparam Proj2       The type of an optional projection function to be
-    ///                     used for elements of the second sequence. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first1       Refers to the beginning of the first sequence of
-    ///                     elements the algorithm will be applied to.
-    /// \param last1        Refers to the end of the first sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the second sequence of
-    ///                     elements the algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    /// \param f            Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last).This is a
-    ///                     binary predicate. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     Ret fun(const Type1 &a, const Type2 &b);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&.
-    ///                     The types \a Type1 and \a Type2 must be such that
-    ///                     objects of types FwdIter1 and FwdIter2 can be
-    ///                     dereferenced and then implicitly converted to
-    ///                     \a Type1 and \a Type2 respectively. The type \a Ret
-    ///                     must be such that an object of type \a FwdIter3 can
-    ///                     be dereferenced and assigned a value of type
-    ///                     \a Ret.
-    /// \param proj1        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the
-    ///                     first sequence as a projection operation before the
-    ///                     actual predicate \a f is invoked.
-    /// \param proj2        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the
-    ///                     second sequence as a projection operation before
-    ///                     the actual predicate \a f is invoked.
-    ///
-    /// The invocations of \a f in the parallel \a transform algorithm invoked
-    /// with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The invocations of \a f in the parallel \a transform algorithm invoked
-    /// with an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a transform algorithm returns a
-    /// \a hpx::future<tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(FwdIter3)> >
-    ///           if the execution policy is of type \a parallel_task_policy
-    ///           and returns
-    /// \a tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(FwdIter3)>
-    ///           otherwise.
-    ///           The \a transform algorithm returns a tuple holding an iterator
-    ///           referring to the first element after the first input sequence,
-    ///           an iterator referring to the first element after the second
-    ///           input sequence, and the output iterator referring to the
-    ///           element in the destination range, one past the last element
-    ///           copied.
-    ///
+    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename FwdIter3, typename F,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<
-            ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1>::value&&
-                hpx::traits::is_iterator<FwdIter2>::value&&
-                    hpx::traits::is_iterator<FwdIter3>::value&&
-                        traits::is_projected<Proj1, FwdIter1>::value&&
-                            traits::is_projected<Proj2, FwdIter2>::value&&
-                                traits::is_indirect_callable<ExPolicy, F,
-                                    traits::projected<Proj1, FwdIter1>,
-                                    traits::projected<Proj2, FwdIter2>>::value)>
-    typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2),
-            tag::out(FwdIter3)>>::type
-    transform(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, FwdIter3 dest, F&& f, Proj1&& proj1 = Proj1(),
-        Proj2&& proj2 = Proj2())
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<
+                ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1>::value &&
+            hpx::traits::is_iterator<FwdIter2>::value &&
+            hpx::traits::is_iterator<FwdIter3>::value &&
+            traits::is_projected<Proj1, FwdIter1>::value &&
+            traits::is_projected<Proj2, FwdIter2>::value &&
+            traits::is_indirect_callable<ExPolicy, F,
+                traits::projected<Proj1, FwdIter1>,
+                traits::projected<Proj2, FwdIter2>>::value
+        )>
+    // clang-format on
+    HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::transform is deprecated, use hpx::transform instead")
+        typename util::detail::algorithm_result<ExPolicy,
+            hpx::util::tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2),
+                tag::out(FwdIter3)>>::type transform(ExPolicy&& policy,
+            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter3 dest,
+            F&& f, Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
 
@@ -612,12 +630,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         f, proj1, proj2});
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-                typename FwdIter3, typename F, typename Proj1, typename Proj2>
+            template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+                typename FwdIter2B, typename FwdIter2E, typename FwdIter3,
+                typename F, typename Proj1, typename Proj2>
             static typename util::detail::algorithm_result<ExPolicy,
-                hpx::tuple<FwdIter1, FwdIter2, FwdIter3>>::type
-            parallel(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, F&& f,
+                util::in_in_out_result<FwdIter1B, FwdIter2B, FwdIter3>>::type
+            parallel(ExPolicy&& policy, FwdIter1B first1, FwdIter1E last1,
+                FwdIter2B first2, FwdIter2E last2, FwdIter3 dest, F&& f,
                 Proj1&& proj1, Proj2&& proj2)
             {
                 if (first1 != last1 && first2 != last2)
@@ -627,46 +646,48 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             std::forward<F>(f), std::forward<Proj1>(proj1),
                             std::forward<Proj2>(proj2));
 
-                    return get_iter_tuple(
+                    return util::detail::get_in_in_out_result(
                         util::foreach_partitioner<ExPolicy>::call(
                             std::forward<ExPolicy>(policy),
                             hpx::util::make_zip_iterator(first1, first2, dest),
-                            (std::min)(std::distance(first1, last1),
-                                std::distance(first2, last2)),
+                            (std::min)(detail::distance(first1, last1),
+                                detail::distance(first2, last2)),
                             std::move(f1), util::projection_identity()));
                 }
 
+                using result_type =
+                    util::in_in_out_result<FwdIter1B, FwdIter2B, FwdIter3>;
+
                 return util::detail::algorithm_result<ExPolicy,
-                    hpx::tuple<FwdIter1, FwdIter2,
-                        FwdIter3>>::get(hpx::make_tuple(std::move(first1),
-                    std::move(first2), std::move(dest)));
+                    result_type>::get(result_type{
+                    std::move(first1), std::move(first2), std::move(dest)});
             }
         };
 
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename FwdIter3, typename F, typename Proj1, typename Proj2>
+        template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+            typename FwdIter2B, typename FwdIter2E, typename FwdIter3,
+            typename F, typename Proj1, typename Proj2>
         typename util::detail::algorithm_result<ExPolicy,
-            hpx::util::tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2),
-                tag::out(FwdIter3)>>::type
-        transform_(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, F&& f,
+            util::in_in_out_result<FwdIter1B, FwdIter2B, FwdIter3>>::type
+        transform_(ExPolicy&& policy, FwdIter1B first1, FwdIter1E last1,
+            FwdIter2B first2, FwdIter2E last2, FwdIter3 dest, F&& f,
             Proj1&& proj1, Proj2&& proj2, std::false_type)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1B>::value),
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert((hpx::traits::is_forward_iterator<FwdIter2E>::value),
                 "Requires at least forward iterator.");
             static_assert((hpx::traits::is_forward_iterator<FwdIter3>::value),
                 "Requires at least forward iterator.");
 
             typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-            typedef hpx::tuple<FwdIter1, FwdIter2, FwdIter3> result_type;
+            typedef util::in_in_out_result<FwdIter1B, FwdIter2E, FwdIter3>
+                result_type;
 
-            return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
-                detail::transform_binary2<result_type>().call(
-                    std::forward<ExPolicy>(policy), is_seq(), first1, last1,
-                    first2, last2, dest, std::forward<F>(f),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2)));
+            return detail::transform_binary2<result_type>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
+                last2, dest, std::forward<F>(f), std::forward<Proj1>(proj1),
+                std::forward<Proj2>(proj2));
         }
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename FwdIter3, typename F, typename Proj1, typename Proj2>
@@ -679,121 +700,31 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Applies the given function \a f to pairs of elements from two ranges:
-    /// one defined by [first1, last1) and the other beginning at first2, and
-    /// stores the result in another range, beginning at dest.
-    ///
-    /// \note   Complexity: Exactly min(last2-first2, last1-first1)
-    ///         applications of \a f
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the invocations of \a f.
-    /// \tparam FwdIter1    The type of the source iterators for the first
-    ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the source iterators for the second
-    ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter3    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a transform requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj1       The type of an optional projection function to be
-    ///                     used for elements of the first sequence. This
-    ///                     defaults to \a util::projection_identity
-    /// \tparam Proj2       The type of an optional projection function to be
-    ///                     used for elements of the second sequence. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first1       Refers to the beginning of the first sequence of
-    ///                     elements the algorithm will be applied to.
-    /// \param last1        Refers to the end of the first sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the second sequence of
-    ///                     elements the algorithm will be applied to.
-    /// \param last2        Refers to the end of the second sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    /// \param f            Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last).This is a
-    ///                     binary predicate. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     Ret fun(const Type1 &a, const Type2 &b);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&.
-    ///                     The types \a Type1 and \a Type2 must be such that
-    ///                     objects of types FwdIter1 and FwdIter2 can be
-    ///                     dereferenced and then implicitly converted to
-    ///                     \a Type1 and \a Type2 respectively. The type \a Ret
-    ///                     must be such that an object of type \a FwdIter3 can
-    ///                     be dereferenced and assigned a value of type
-    ///                     \a Ret.
-    /// \param proj1        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the
-    ///                     first sequence as a projection operation before the
-    ///                     actual predicate \a f is invoked.
-    /// \param proj2        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the
-    ///                     second sequence as a projection operation before
-    ///                     the actual predicate \a f is invoked.
-    ///
-    /// The invocations of \a f in the parallel \a transform algorithm invoked
-    /// with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The invocations of \a f in the parallel \a transform algorithm invoked
-    /// with an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \note The algorithm will invoke the binary predicate until it reaches
-    ///       the end of the shorter of the two given input sequences
-    ///
-    /// \returns  The \a transform algorithm returns a
-    /// \a hpx::future<tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(FwdIter3)> >
-    ///           if the execution policy is of type \a parallel_task_policy
-    ///           and returns
-    /// \a tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(FwdIter3)>
-    ///           otherwise.
-    ///           The \a transform algorithm returns a tuple holding an iterator
-    ///           referring to the first element after the first input sequence,
-    ///           an iterator referring to the first element after the second
-    ///           input sequence, and the output iterator referring to the
-    ///           element in the destination range, one past the last element
-    ///           copied.
-    ///
+    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename FwdIter3, typename F,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<
-            ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1>::value&&
-                hpx::traits::is_iterator<FwdIter2>::value&&
-                    hpx::traits::is_iterator<FwdIter3>::value&&
-                        traits::is_projected<Proj1, FwdIter1>::value&&
-                            traits::is_projected<Proj2, FwdIter2>::value&&
-                                traits::is_indirect_callable<ExPolicy, F,
-                                    traits::projected<Proj1, FwdIter1>,
-                                    traits::projected<Proj2, FwdIter2>>::value)>
-    typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2),
-            tag::out(FwdIter3)>>::type
-    transform(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, F&& f,
-        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<
+                ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1>::value &&
+            hpx::traits::is_iterator<FwdIter2>::value &&
+            hpx::traits::is_iterator<FwdIter3>::value &&
+            traits::is_projected<Proj1, FwdIter1>::value &&
+            traits::is_projected<Proj2, FwdIter2>::value &&
+            traits::is_indirect_callable<ExPolicy, F,
+                traits::projected<Proj1, FwdIter1>,
+                traits::projected<Proj2, FwdIter2>>::value
+        )>
+    // clang-format on
+    HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::transform is deprecated, use hpx::transform instead")
+        typename util::detail::algorithm_result<ExPolicy,
+            hpx::util::tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2),
+                tag::out(FwdIter3)>>::type
+        transform(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, F&& f,
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
 
@@ -847,3 +778,103 @@ namespace hpx { namespace traits {
 #endif
 }}    // namespace hpx::traits
 #endif
+
+namespace hpx {
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::transform
+    HPX_INLINE_CONSTEXPR_VARIABLE struct transform_t final
+      : hpx::functional::tag<transform_t>
+    {
+    private:
+        // clang-format off
+        template <typename FwdIter1, typename FwdIter2,
+            typename F, HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value
+            )>
+        // clang-format on
+        friend FwdIter2 tag_invoke(hpx::transform_t, FwdIter1 first,
+            FwdIter1 last, FwdIter2 dest, F&& f)
+        {
+            return parallel::util::get_second_element(
+                parallel::v1::detail::transform_(hpx::execution::seq,
+                    first, last, dest, std::forward<F>(f),
+                    hpx::parallel::util::projection_identity(),
+                    std::false_type{}));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename F, HPX_CONCEPT_REQUIRES_(
+                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter2>::type
+        tag_invoke(hpx::transform_t, ExPolicy&& policy, FwdIter1 first,
+            FwdIter1 last, FwdIter2 dest, F&& f)
+        {
+            typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
+
+            return parallel::util::get_second_element(
+                parallel::v1::detail::transform_(std::forward<ExPolicy>(policy),
+                    first, last, dest, std::forward<F>(f),
+                    hpx::parallel::util::projection_identity(),
+                    is_segmented()));
+        }
+
+        // clang-format off
+        template <typename FwdIter1, typename FwdIter2, typename FwdIter3,
+            typename F, HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::traits::is_iterator<FwdIter3>::value
+            )>
+        // clang-format on
+        friend FwdIter3 tag_invoke(hpx::transform_t, FwdIter1 first1,
+            FwdIter1 last1, FwdIter2 first2, FwdIter3 dest, F&& f)
+        {
+            using proj_id = hpx::parallel::util::projection_identity;
+
+            return parallel::util::get_third_element(
+                parallel::v1::detail::transform_(hpx::execution::seq,
+                    first1, last1, first2, dest, std::forward<F>(f),
+                    hpx::parallel::util::projection_identity(),
+                    hpx::parallel::util::projection_identity(),
+                    std::false_type{}));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter1,
+            typename FwdIter2, typename FwdIter3,
+            typename F, HPX_CONCEPT_REQUIRES_(
+                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::traits::is_iterator<FwdIter3>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter3>::type
+        tag_invoke(hpx::transform_t, ExPolicy&& policy, FwdIter1 first1,
+            FwdIter1 last1, FwdIter2 first2, FwdIter3 dest, F&& f)
+        {
+            using is_segmented = std::integral_constant<bool,
+                hpx::traits::is_segmented_iterator<FwdIter1>::value ||
+                    hpx::traits::is_segmented_iterator<FwdIter2>::value>;
+            using proj_id = hpx::parallel::util::projection_identity;
+
+            return parallel::util::get_third_element(
+                parallel::v1::detail::transform_(std::forward<ExPolicy>(policy),
+                    first1, last1, first2, dest, std::forward<F>(f),
+                    hpx::parallel::util::projection_identity(),
+                    hpx::parallel::util::projection_identity(),
+                    is_segmented()));
+        }
+
+    } transform{};
+}    // namespace hpx
+
+#endif    // DOXYGEN

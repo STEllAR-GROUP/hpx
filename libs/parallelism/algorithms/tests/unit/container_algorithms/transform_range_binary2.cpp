@@ -20,6 +20,40 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_transform_binary(IteratorTag)
+{
+    typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
+
+    test_vector c1(10007);
+    test_vector c2(10007);
+    std::vector<std::size_t> d1(c1.size());    //-V656
+    std::iota(std::begin(c1), std::end(c1), std::rand());
+    std::iota(std::begin(c2), std::end(c2), std::rand());
+
+    auto add = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
+
+    auto result = hpx::ranges::transform(c1, c2, std::begin(d1), add);
+
+    HPX_TEST(result.in1 == std::end(c1));
+    HPX_TEST(result.in2 == std::end(c2));
+    HPX_TEST(result.out == std::end(d1));
+
+    // verify values
+    std::vector<std::size_t> d2(c1.size());
+    std::transform(
+        std::begin(c1), std::end(c1), std::begin(c2), std::begin(d2), add);
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(d1), std::end(d1), std::begin(d2),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d2.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_transform_binary(ExPolicy policy, IteratorTag)
 {
@@ -36,11 +70,11 @@ void test_transform_binary(ExPolicy policy, IteratorTag)
 
     auto add = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    auto result = hpx::parallel::transform(policy, c1, c2, std::begin(d1), add);
+    auto result = hpx::ranges::transform(policy, c1, c2, std::begin(d1), add);
 
-    HPX_TEST(hpx::get<0>(result) == std::end(c1));
-    HPX_TEST(hpx::get<1>(result) == std::end(c2));
-    HPX_TEST(hpx::get<2>(result) == std::end(d1));
+    HPX_TEST(result.in1 == std::end(c1));
+    HPX_TEST(result.in2 == std::end(c2));
+    HPX_TEST(result.out == std::end(d1));
 
     // verify values
     std::vector<std::size_t> d2(c1.size());
@@ -70,13 +104,13 @@ void test_transform_binary_async(ExPolicy p, IteratorTag)
 
     auto add = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    auto f = hpx::parallel::transform(p, c1, c2, std::begin(d1), add);
+    auto f = hpx::ranges::transform(p, c1, c2, std::begin(d1), add);
     f.wait();
 
     auto result = f.get();
-    HPX_TEST(hpx::get<0>(result) == std::end(c1));
-    HPX_TEST(hpx::get<1>(result) == std::end(c2));
-    HPX_TEST(hpx::get<2>(result) == std::end(d1));
+    HPX_TEST(result.in1 == std::end(c1));
+    HPX_TEST(result.in2 == std::end(c2));
+    HPX_TEST(result.out == std::end(d1));
 
     // verify values
     std::vector<std::size_t> d2(c1.size());
@@ -98,6 +132,7 @@ void test_transform_binary()
 {
     using namespace hpx::execution;
 
+    test_transform_binary(IteratorTag());
     test_transform_binary(seq, IteratorTag());
     test_transform_binary(par, IteratorTag());
     test_transform_binary(par_unseq, IteratorTag());
@@ -113,6 +148,44 @@ void transform_binary_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_transform_binary_exception(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c1(10007);
+    std::vector<std::size_t> c2(c1.size());
+    std::vector<std::size_t> d1(c1.size());    //-V656
+    std::iota(std::begin(c1), std::end(c1), std::rand());
+    std::iota(std::begin(c2), std::end(c2), std::rand());
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::ranges::transform(
+            hpx::util::make_iterator_range(
+                iterator(std::begin(c1)), iterator(std::end(c1))),
+            c2, std::begin(d1), [](std::size_t v1, std::size_t v2) {
+                return throw std::runtime_error("test"), v1 + v2;
+            });
+
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<hpx::execution::sequenced_policy,
+            IteratorTag>::call(hpx::execution::seq, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_transform_binary_exception(ExPolicy policy, IteratorTag)
 {
@@ -131,7 +204,7 @@ void test_transform_binary_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::transform(policy,
+        hpx::ranges::transform(policy,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c1)), iterator(std::end(c1))),
             hpx::util::make_iterator_range(std::begin(c2), std::end(c2)),
@@ -170,7 +243,7 @@ void test_transform_binary_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::transform(p,
+        auto f = hpx::ranges::transform(p,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c1)), iterator(std::end(c1))),
             hpx::util::make_iterator_range(std::begin(c2), std::end(c2)),
@@ -204,6 +277,7 @@ void test_transform_binary_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_transform_binary_exception(IteratorTag());
     test_transform_binary_exception(seq, IteratorTag());
     test_transform_binary_exception(par, IteratorTag());
 
@@ -236,7 +310,7 @@ void test_transform_binary_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::transform(policy,
+        hpx::ranges::transform(policy,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c1)), iterator(std::end(c1))),
             hpx::util::make_iterator_range(std::begin(c2), std::end(c2)),
@@ -274,7 +348,7 @@ void test_transform_binary_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::transform(p,
+        auto f = hpx::ranges::transform(p,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c1)), iterator(std::end(c1))),
             hpx::util::make_iterator_range(std::begin(c2), std::end(c2)),

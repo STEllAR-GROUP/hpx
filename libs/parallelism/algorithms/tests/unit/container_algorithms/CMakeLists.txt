@@ -85,7 +85,7 @@ set(tests
     sort_range
     stable_sort_range
     transform_range
-    transform_range_binary
+    transform_range2
     transform_range_binary2
     transform_reduce_binary_bad_alloc_range
     transform_reduce_binary_exception_range
