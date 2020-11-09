@@ -30,13 +30,13 @@ namespace hpx { namespace execution { namespace experimental {
         };
 
         template <typename R, typename F>
-        struct then_receiver
+        struct transform_receiver
         {
             typename std::decay<R>::type r;
             typename std::decay<F>::type f;
 
             template <typename R_, typename F_>
-            then_receiver(R_&& r, F_&& f)
+            transform_receiver(R_&& r, F_&& f)
               : r(std::forward<R>(r))
               , f(std::forward<F>(f))
             {
@@ -76,7 +76,7 @@ namespace hpx { namespace execution { namespace experimental {
         };
 
         template <typename S, typename F>
-        struct then_sender
+        struct transform_sender
         {
             typename std::decay<S>::type s;
             typename std::decay<F>::type f;
@@ -112,15 +112,22 @@ namespace hpx { namespace execution { namespace experimental {
             auto connect(R&& r)
             {
                 return hpx::execution::experimental::connect(std::move(s),
-                    then_receiver<R, F>(std::forward<R>(r), std::move(f)));
+                    transform_receiver<R, F>(std::forward<R>(r), std::move(f)));
             }
         };
     }    // namespace detail
 
     template <typename S, typename F>
+    auto transform(S&& s, F&& f)
+    {
+        return detail::transform_sender<S, F>{
+            std::forward<S>(s), std::forward<F>(f)};
+    }
+
+    // TODO: Do we want a then for symmetry with future::then?
+    template <typename S, typename F>
     auto then(S&& s, F&& f)
     {
-        return detail::then_sender<S, F>{
-            std::forward<S>(s), std::forward<F>(f)};
+        return transform(std::forward<S>(s), std::forward<F>(f));
     }
 }}}    // namespace hpx::execution::experimental

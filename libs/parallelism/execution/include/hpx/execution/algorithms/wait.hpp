@@ -50,6 +50,9 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
+    // Variant of sync_wait, which does not return the value from the
+    // predecessor sender. Avoids having to store the return value. TODO: Only
+    // here for symmetry with future::wait. Do we want it?
     template <typename S>
     void wait(S&& s)
     {

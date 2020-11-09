@@ -21,22 +21,23 @@
 
 namespace hpx { namespace execution { namespace experimental {
     template <typename... Variants>
-    struct get_single_result
+    struct sync_wait_single_result
     {
         static_assert(sizeof...(Variants) == 0,
-            "get expects the predecessor sender to have a single variant in "
+            "sync_wait expects the predecessor sender to have a single variant "
+            "in "
             "sender_traits<>::value_types");
     };
 
     template <typename T>
-    struct get_single_result<hpx::util::pack<hpx::util::pack<T>>>
+    struct sync_wait_single_result<hpx::util::pack<hpx::util::pack<T>>>
     {
         using type = T;
     };
 
     namespace detail {
         template <typename T>
-        struct get_receiver
+        struct sync_wait_receiver
         {
             struct state
             {
@@ -78,19 +79,21 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
+    // TODO: Should this work with void results?
     template <typename S>
-    auto get(S&& s)
+    auto sync_wait(S&& s)
     {
         using value_types =
             typename hpx::execution::experimental::traits::sender_traits<
                 S>::template value_types<hpx::util::pack, hpx::util::pack>;
-        using result_type = typename get_single_result<value_types>::type;
-        using state_type = typename detail::get_receiver<result_type>::state;
+        using result_type = typename sync_wait_single_result<value_types>::type;
+        using state_type =
+            typename detail::sync_wait_receiver<result_type>::state;
 
         state_type st{};
         hpx::execution::experimental::start(
-            hpx::execution::experimental::connect(
-                std::forward<S>(s), detail::get_receiver<result_type>{st}));
+            hpx::execution::experimental::connect(std::forward<S>(s),
+                detail::sync_wait_receiver<result_type>{st}));
 
         {
             std::unique_lock<hpx::lcos::local::mutex> l(st.m);
@@ -108,5 +111,12 @@ namespace hpx { namespace execution { namespace experimental {
         {
             return std::move(st.result.value());
         }
+    }
+
+    // TODO: Do we want a get for symmetry with future::get?
+    template <typename S>
+    auto get(S&& s)
+    {
+        return sync_wait(std::forward<S>(s));
     }
 }}}    // namespace hpx::execution::experimental

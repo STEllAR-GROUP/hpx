@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <exception>
+
 namespace hpx { namespace execution { namespace experimental {
     struct sink_receiver
     {
