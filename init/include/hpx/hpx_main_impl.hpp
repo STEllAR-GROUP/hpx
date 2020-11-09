@@ -33,7 +33,10 @@ int HPX_CDECL main(int argc, char** argv)
         "hpx.commandline.aliasing=0"
     };
 
-    return hpx::init(argc, argv, cfg);
+    hpx::init_params init_args;
+    init_args.cfg = cfg;
+
+    return hpx::init(argc, argv, init_args);
 }
 
 // Make sure header testing code does not redefine main()

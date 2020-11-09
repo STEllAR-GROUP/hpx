@@ -31,7 +31,10 @@ int main(int argc, char* argv[])
         "hpx.commandline.allow_unknown=1"   // allow for unknown options
     };
 
-    return hpx::init(argc, argv, cfg);
+    hpx::init_params init_args;
+    init_args.cfg = cfg;
+
+    return hpx::init(argc, argv, init_args);
 }
 
 #endif

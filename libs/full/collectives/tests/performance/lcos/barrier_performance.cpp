@@ -53,7 +53,10 @@ int main(int argc, char* argv[])
         "hpx.run_hpx_main!=1", "hpx.os_threads!=all"};
 
     double startup_start = hpx::chrono::high_resolution_timer::now();
-    return hpx::init(argc, argv, cfg);
+    hpx::init_params init_args;
+    init_args.cfg = cfg;
+
+    return hpx::init(argc, argv, init_args);
     double shutdown_end = hpx::chrono::high_resolution_timer::now();
 
     if (startup_end > 1e-10)

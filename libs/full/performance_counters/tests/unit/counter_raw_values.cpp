@@ -76,7 +76,10 @@ int main(int argc, char* argv[])
 
     // Initialize and run HPX.
     std::vector<std::string> const cfg = {"hpx.os_threads=1"};
-    HPX_TEST_EQ(hpx::init(argc, argv, cfg), 0);
+    hpx::init_params init_args;
+    init_args.cfg = cfg;
+
+    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
 
     return hpx::util::report_errors();
 }
