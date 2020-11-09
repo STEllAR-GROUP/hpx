@@ -36,8 +36,7 @@ int main()
 
     // Enumerate all suspended threads
     hpx::threads::enumerate_threads(
-        [](hpx::threads::thread_id_type id) -> bool
-        {
+        [](hpx::threads::thread_id_type id) -> bool {
             hpx::cout
                 << "thread "
                 << hpx::thread::id(id) << " is "
@@ -46,7 +45,7 @@ int main()
                 << std::endl;
             return true;        // always continue enumeration
         },
-        hpx::threads::thread_state_enum::suspended);
+        hpx::threads::thread_schedule_state::suspended);
 
     // Wait for all threads to reach this point.
     l.count_down_and_wait();

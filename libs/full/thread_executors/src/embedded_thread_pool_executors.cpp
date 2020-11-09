@@ -156,7 +156,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
         util::force_error_on_lock();
 
         return threads::thread_result_type(
-            threads::thread_state_enum::terminated, threads::invalid_thread_id);
+            threads::thread_schedule_state::terminated,
+            threads::invalid_thread_id);
     }
 
     // Schedule the specified function for execution in this executor.
@@ -165,7 +166,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
     template <typename Scheduler>
     void embedded_thread_pool_executor<Scheduler>::add(closure_type&& f,
         util::thread_description const& desc,
-        threads::thread_state_enum initial_state, bool run_now,
+        threads::thread_schedule_state initial_state, bool run_now,
         threads::thread_stacksize stacksize,
         threads::thread_schedule_hint schedulehint, error_code& ec)
     {
@@ -207,7 +208,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
                 &embedded_thread_pool_executor::thread_function_nullary, this,
                 std::move(f))),
             desc, thread_priority::default_, thread_schedule_hint(),
-            thread_stacksize::default_, thread_state_enum::suspended, true);
+            thread_stacksize::default_, thread_schedule_state::suspended, true);
 
         threads::thread_id_type id = threads::invalid_thread_id;
         threads::detail::create_thread(    //-V601
@@ -369,7 +370,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             // the scheduling_loop is allowed to exit only if no more HPX
             // threads exist
             HPX_ASSERT(
-                (scheduler_.get_thread_count(thread_state_enum::suspended,
+                (scheduler_.get_thread_count(thread_schedule_state::suspended,
                      thread_priority::default_, virt_core) == 0 &&
                     scheduler_.get_queue_length(virt_core) == 0) ||
                 state >= state_terminating);
@@ -441,7 +442,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
                 threads::thread_schedule_hint(
                     static_cast<std::int16_t>(thread_num)),
                 threads::thread_stacksize::default_,
-                threads::thread_state_enum::pending, true);
+                threads::thread_schedule_state::pending, true);
             register_thread(data, ec);
         }
     }

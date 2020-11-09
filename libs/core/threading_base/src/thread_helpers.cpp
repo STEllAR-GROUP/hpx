@@ -39,7 +39,7 @@
 namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     thread_state set_thread_state(thread_id_type const& id,
-        thread_state_enum state, thread_state_ex_enum stateex,
+        thread_schedule_state state, thread_restart_state stateex,
         thread_priority priority, bool retry_on_active, error_code& ec)
     {
         if (&ec != &throws)
@@ -52,8 +52,8 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type set_thread_state(thread_id_type const& id,
         hpx::chrono::steady_time_point const& abs_time,
-        std::atomic<bool>* timer_started, thread_state_enum state,
-        thread_state_ex_enum stateex, thread_priority priority,
+        std::atomic<bool>* timer_started, thread_schedule_state state,
+        thread_restart_state stateex, thread_priority priority,
         bool retry_on_active, error_code& ec)
     {
         return detail::set_thread_state_timed(
@@ -66,8 +66,8 @@ namespace hpx { namespace threads {
     thread_state get_thread_state(thread_id_type const& id, error_code& ec)
     {
         return id ? get_thread_id_data(id)->get_state() :
-                    thread_state(thread_state_enum::terminated,
-                        thread_state_ex_enum::wait_unknown);
+                    thread_state(thread_schedule_state::terminated,
+                        thread_restart_state::unknown);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -107,9 +107,8 @@ namespace hpx { namespace threads {
 
         // Set thread state to pending. If the thread is currently active we do
         // not retry. The thread will either exit or hit an interruption_point.
-        set_thread_state(id, thread_state_enum::pending,
-            thread_state_ex_enum::wait_abort, thread_priority::normal, false,
-            ec);
+        set_thread_state(id, thread_schedule_state::pending,
+            thread_restart_state::abort, thread_priority::normal, false, ec);
     }
 
     void interruption_point(thread_id_type const& id, error_code& ec)
@@ -427,7 +426,7 @@ namespace hpx { namespace this_thread {
     ///
     /// If the suspension was aborted, this function will throw a
     /// \a yield_aborted exception.
-    threads::thread_state_ex_enum suspend(threads::thread_state_enum state,
+    threads::thread_restart_state suspend(threads::thread_schedule_state state,
         threads::thread_id_type const& nextid,
         util::thread_description const& description, error_code& ec)
     {
@@ -438,10 +437,10 @@ namespace hpx { namespace this_thread {
         // handle interruption, if needed
         threads::interruption_point(id, ec);
         if (ec)
-            return threads::thread_state_ex_enum::wait_unknown;
+            return threads::thread_restart_state::unknown;
 
-        threads::thread_state_ex_enum statex =
-            threads::thread_state_ex_enum::wait_unknown;
+        threads::thread_restart_state statex =
+            threads::thread_restart_state::unknown;
 
         {
             // verify that there are no more registered locks for this OS-thread
@@ -476,10 +475,10 @@ namespace hpx { namespace this_thread {
         // handle interruption, if needed
         threads::interruption_point(id, ec);
         if (ec)
-            return threads::thread_state_ex_enum::wait_unknown;
+            return threads::thread_restart_state::unknown;
 
         // handle interrupt and abort
-        if (statex == threads::thread_state_ex_enum::wait_abort)
+        if (statex == threads::thread_restart_state::abort)
         {
             std::ostringstream strm;
             strm << "thread(" << threads::get_self_id() << ", "
@@ -494,7 +493,7 @@ namespace hpx { namespace this_thread {
         return statex;
     }
 
-    threads::thread_state_ex_enum suspend(
+    threads::thread_restart_state suspend(
         hpx::chrono::steady_time_point const& abs_time,
         threads::thread_id_type const& nextid,
         util::thread_description const& description, error_code& ec)
@@ -506,11 +505,11 @@ namespace hpx { namespace this_thread {
         // handle interruption, if needed
         threads::interruption_point(id, ec);
         if (ec)
-            return threads::thread_state_ex_enum::wait_unknown;
+            return threads::thread_restart_state::unknown;
 
         // let the thread manager do other things while waiting
-        threads::thread_state_ex_enum statex =
-            threads::thread_state_ex_enum::wait_unknown;
+        threads::thread_restart_state statex =
+            threads::thread_restart_state::unknown;
 
         {
 #ifdef HPX_HAVE_VERIFY_LOCKS
@@ -524,12 +523,13 @@ namespace hpx { namespace this_thread {
             threads::detail::reset_backtrace bt(id, ec);
 #endif
             std::atomic<bool> timer_started(false);
-            threads::thread_id_type timer_id = threads::set_thread_state(id,
-                abs_time, &timer_started, threads::thread_state_enum::pending,
-                threads::thread_state_ex_enum::wait_timeout,
-                threads::thread_priority::boost, true, ec);
+            threads::thread_id_type timer_id =
+                threads::set_thread_state(id, abs_time, &timer_started,
+                    threads::thread_schedule_state::pending,
+                    threads::thread_restart_state::timeout,
+                    threads::thread_priority::boost, true, ec);
             if (ec)
-                return threads::thread_state_ex_enum::wait_unknown;
+                return threads::thread_restart_state::unknown;
 
             // We might need to dispatch 'nextid' to it's correct scheduler
             // only if our current scheduler is the same, we should yield the id
@@ -542,27 +542,26 @@ namespace hpx { namespace this_thread {
                     ->schedule_thread(get_thread_id_data(nextid),
                         threads::thread_schedule_hint());
                 statex = self.yield(threads::thread_result_type(
-                    threads::thread_state_enum::suspended,
+                    threads::thread_schedule_state::suspended,
                     threads::invalid_thread_id));
             }
             else
             {
                 statex = self.yield(threads::thread_result_type(
-                    threads::thread_state_enum::suspended, nextid));
+                    threads::thread_schedule_state::suspended, nextid));
             }
 
-            if (statex != threads::thread_state_ex_enum::wait_timeout)
+            if (statex != threads::thread_restart_state::timeout)
             {
-                HPX_ASSERT(
-                    statex == threads::thread_state_ex_enum::wait_abort ||
-                    statex == threads::thread_state_ex_enum::wait_signaled);
+                HPX_ASSERT(statex == threads::thread_restart_state::abort ||
+                    statex == threads::thread_restart_state::signaled);
                 error_code ec1(lightweight);    // do not throw
                 hpx::util::yield_while(
                     [&timer_started]() { return !timer_started.load(); },
                     "set_thread_state_timed");
                 threads::set_thread_state(timer_id,
-                    threads::thread_state_enum::pending,
-                    threads::thread_state_ex_enum::wait_abort,
+                    threads::thread_schedule_state::pending,
+                    threads::thread_restart_state::abort,
                     threads::thread_priority::boost, true, ec1);
             }
         }
@@ -570,10 +569,10 @@ namespace hpx { namespace this_thread {
         // handle interruption, if needed
         threads::interruption_point(id, ec);
         if (ec)
-            return threads::thread_state_ex_enum::wait_unknown;
+            return threads::thread_restart_state::unknown;
 
         // handle interrupt and abort
-        if (statex == threads::thread_state_ex_enum::wait_abort)
+        if (statex == threads::thread_restart_state::abort)
         {
             std::ostringstream strm;
             strm << "thread(" << threads::get_self_id() << ", "

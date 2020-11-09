@@ -25,13 +25,13 @@ namespace hpx { namespace threads { namespace detail {
         switch (data.initial_state)
         {
         // NOLINTNEXTLINE(bugprone-branch-clone)
-        case thread_state_enum::pending:
+        case thread_schedule_state::pending:
             HPX_FALLTHROUGH;
-        case thread_state_enum::pending_do_not_schedule:
+        case thread_schedule_state::pending_do_not_schedule:
             HPX_FALLTHROUGH;
-        case thread_state_enum::pending_boost:
+        case thread_schedule_state::pending_boost:
             HPX_FALLTHROUGH;
-        case thread_state_enum::suspended:
+        case thread_schedule_state::suspended:
             break;
 
         default:

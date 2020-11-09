@@ -42,7 +42,7 @@ namespace hpx { namespace threads {
           , priority(thread_priority::normal)
           , schedulehint()
           , stacksize(thread_stacksize::default_)
-          , initial_state(thread_state_enum::pending)
+          , initial_state(thread_schedule_state::pending)
           , run_now(false)
           , scheduler_base(nullptr)
         {
@@ -103,7 +103,8 @@ namespace hpx { namespace threads {
             thread_priority priority_ = thread_priority::normal,
             thread_schedule_hint os_thread = thread_schedule_hint(),
             thread_stacksize stacksize_ = thread_stacksize::default_,
-            thread_state_enum initial_state_ = thread_state_enum::pending,
+            thread_schedule_state initial_state_ =
+                thread_schedule_state::pending,
             bool run_now_ = false,
             policies::scheduler_base* scheduler_base_ = nullptr)
           : func(std::forward<F>(f))
@@ -150,7 +151,7 @@ namespace hpx { namespace threads {
         thread_priority priority;
         thread_schedule_hint schedulehint;
         thread_stacksize stacksize;
-        thread_state_enum initial_state;
+        thread_schedule_state initial_state;
         bool run_now;
 
         policies::scheduler_base* scheduler_base;

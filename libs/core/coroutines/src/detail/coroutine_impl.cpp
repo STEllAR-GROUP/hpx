@@ -56,7 +56,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         // yield value once the thread function has finished executing
         result_type result_last(
-            thread_state_enum::terminated, invalid_thread_id);
+            thread_schedule_state::terminated, invalid_thread_id);
 
         // loop as long this coroutine has been rebound
         do
@@ -73,7 +73,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
                 {
                     result_last = m_fun(*this->args());
                     HPX_ASSERT(
-                        result_last.first == thread_state_enum::terminated);
+                        result_last.first == thread_schedule_state::terminated);
                 }
                 catch (...)
                 {

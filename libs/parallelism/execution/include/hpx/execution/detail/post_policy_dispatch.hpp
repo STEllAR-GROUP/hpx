@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 threads::make_thread_function_nullary(hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...)),
                 desc, priority, hint, stacksize,
-                threads::thread_state_enum::pending);
+                threads::thread_schedule_state::pending);
             threads::register_work(data, pool);
         }
 
@@ -75,7 +75,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 threads::make_thread_function_nullary(hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...)),
                 desc, priority, hint, stacksize,
-                threads::thread_state_enum::pending);
+                threads::thread_schedule_state::pending);
             threads::register_work(data);
         }
 
@@ -100,7 +100,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                     std::forward<F>(f), std::forward<Ts>(ts)...)),
                 desc, policy.priority(), threads::thread_schedule_hint(),
                 threads::thread_stacksize::default_,
-                threads::thread_state_enum::pending);
+                threads::thread_schedule_state::pending);
             threads::register_work(data);
         }
     };
@@ -121,8 +121,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 desc, priority,
                 threads::thread_schedule_hint(
                     static_cast<std::int16_t>(get_worker_thread_num())),
-                stacksize, threads::thread_state_enum::pending_do_not_schedule,
-                true);
+                stacksize,
+                threads::thread_schedule_state::pending_do_not_schedule, true);
             threads::thread_id_type tid = threads::register_thread(data, pool);
             threads::thread_id_type tid_self = threads::get_self_id();
 
@@ -132,8 +132,9 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                     get_thread_id_data(tid_self)->get_scheduler_base())
             {
                 // yield_to(tid)
-                hpx::this_thread::suspend(threads::thread_state_enum::pending,
-                    tid, "post_policy_dispatch(suspend)");
+                hpx::this_thread::suspend(
+                    threads::thread_schedule_state::pending, tid,
+                    "post_policy_dispatch(suspend)");
             }
         }
 

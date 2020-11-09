@@ -51,18 +51,18 @@ namespace hpx { namespace threads { namespace detail {
     }
 
     threads::thread_state io_service_thread_pool::set_state(
-        thread_id_type const& id, thread_state_enum new_state,
-        thread_state_ex_enum new_state_ex, thread_priority priority,
+        thread_id_type const& id, thread_schedule_state new_state,
+        thread_restart_state new_state_ex, thread_priority priority,
         error_code& ec)
     {
-        return threads::thread_state(threads::thread_state_enum::terminated,
-            threads::thread_state_ex_enum::wait_unknown);
+        return threads::thread_state(threads::thread_schedule_state::terminated,
+            threads::thread_restart_state::unknown);
     }
 
     threads::thread_id_type io_service_thread_pool::set_state(
         hpx::chrono::steady_time_point const& abs_time,
-        thread_id_type const& id, thread_state_enum newstate,
-        thread_state_ex_enum newstate_ex, thread_priority priority,
+        thread_id_type const& id, thread_schedule_state newstate,
+        thread_restart_state newstate_ex, thread_priority priority,
         error_code& ec)
     {
         return id;

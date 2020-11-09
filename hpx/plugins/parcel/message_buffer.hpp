@@ -85,8 +85,8 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
                         "parcelhandler::put_parcel",
                         threads::thread_priority::boost,
                         threads::thread_schedule_hint(),
-                        threads::thread_stacksize::default_, threads::thread_state_enum::pending,
-                        true);
+                        threads::thread_stacksize::default_,
+                        threads::thread_schedule_state::pending, true);
                     threads::register_thread(data);
                     return;
                 }

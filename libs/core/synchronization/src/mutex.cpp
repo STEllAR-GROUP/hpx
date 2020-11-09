@@ -133,7 +133,7 @@ namespace hpx { namespace lcos { namespace local {
         threads::thread_id_type self_id = threads::get_self_id();
         if (owner_id_ != threads::invalid_thread_id)
         {
-            threads::thread_state_ex_enum const reason =
+            threads::thread_restart_state const reason =
                 cond_.wait_until(l, abs_time, ec);
             if (ec)
             {
@@ -141,8 +141,7 @@ namespace hpx { namespace lcos { namespace local {
                 return false;
             }
 
-            if (reason ==
-                threads::thread_state_ex_enum::wait_timeout)    //-V110
+            if (reason == threads::thread_restart_state::timeout)    //-V110
             {
                 HPX_ITT_SYNC_CANCEL(this);
                 return false;

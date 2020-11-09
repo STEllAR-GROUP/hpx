@@ -191,7 +191,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
                 // wait for a really short amount of time
                 if (hpx::threads::get_self_ptr()) {
-                    this_thread::suspend(hpx::threads::thread_state_enum::pending,
+                    this_thread::suspend(
+                        hpx::threads::thread_schedule_state::pending,
                         "connection_handler(tcp)::create_connection");
                 }
                 else {

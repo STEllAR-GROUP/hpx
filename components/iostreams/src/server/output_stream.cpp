@@ -80,7 +80,8 @@ namespace hpx { namespace iostreams { namespace server
         pending_output_.output(locality_id, count, in, write_f, mtx_);
 
         // Wake up caller.
-        threads::set_thread_state(caller, threads::thread_state_enum::pending);
+        threads::set_thread_state(
+            caller, threads::thread_schedule_state::pending);
     }
 
     void output_stream::write_sync(std::uint32_t locality_id,
@@ -93,6 +94,7 @@ namespace hpx { namespace iostreams { namespace server
                 locality_id, count, std::ref(in), threads::get_self_id()));
 
         // Sleep until the worker thread wakes us up.
-        this_thread::suspend(threads::thread_state_enum::suspended, "output_stream::write_sync");
+        this_thread::suspend(threads::thread_schedule_state::suspended,
+            "output_stream::write_sync");
     } // }}}
 }}}

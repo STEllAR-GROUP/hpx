@@ -400,12 +400,12 @@ namespace verbs
             //
             hpx::error_code ec(hpx::lightweight);
             parcelport_scheduler.register_thread_nullary(
-                    util::deferred_call(
-                        &parcelport::background_work_scheduler_thread, this),
-                    "background_work_scheduler_thread",
-                    threads::pending, true,
-                    threads::thread_priority_high_recursive,
-                    std::size_t(-1), threads::thread_stacksize_default, ec);
+                util::deferred_call(
+                    &parcelport::background_work_scheduler_thread, this),
+                "background_work_scheduler_thread",
+                threads::thread_schedule_state::pending, true,
+                threads::thread_priority_high_recursive, std::size_t(-1),
+                threads::thread_stacksize_default, ec);
 
             FUNC_END_DEBUG_MSG;
             return ec ? false : true;
@@ -1281,7 +1281,8 @@ namespace verbs
         bool can_send_immediate() {
             while (!immediate_send_allowed_) {
                 // We suspend our thread, which will make progress on the network
-                hpx::this_thread::suspend(hpx::threads::pending,
+                hpx::this_thread::suspend(
+                    hpx::threads::thread_schedule_state::pending,
                     "verbs::parcelport::can_send_immediate");
             }
             return true;

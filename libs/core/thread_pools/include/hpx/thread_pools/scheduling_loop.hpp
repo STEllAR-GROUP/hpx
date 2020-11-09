@@ -36,7 +36,7 @@
 namespace hpx { namespace threads { namespace detail {
     ///////////////////////////////////////////////////////////////////////
     inline void write_new_state_log_debug(std::size_t num_thread,
-        thread_data* thrd, thread_state_enum state, char const* info)
+        thread_data* thrd, thread_schedule_state state, char const* info)
     {
         LTM_(debug) << "tfunc(" << num_thread << "): "    //-V128
                     << "thread(" << thrd->get_thread_id() << "), "
@@ -45,7 +45,7 @@ namespace hpx { namespace threads { namespace detail {
                     << info;
     }
     inline void write_new_state_log_warning(std::size_t num_thread,
-        thread_data* thrd, thread_state_enum state, char const* info)
+        thread_data* thrd, thread_schedule_state state, char const* info)
     {
         // log this in any case
         LTM_(warning) << "tfunc(" << num_thread << "): "    //-V128
@@ -55,7 +55,7 @@ namespace hpx { namespace threads { namespace detail {
                       << info;
     }
     inline void write_old_state_log(
-        std::size_t num_thread, thread_data* thrd, thread_state_enum state)
+        std::size_t num_thread, thread_data* thrd, thread_schedule_state state)
     {
         LTM_(debug) << "tfunc(" << num_thread << "): "    //-V128
                     << "thread(" << thrd->get_thread_id() << "), "
@@ -73,7 +73,7 @@ namespace hpx { namespace threads { namespace detail {
           , prev_state_(prev_state)
           , next_thread_id_(nullptr)
           , need_restore_state_(t->set_state_tagged(
-                thread_state_enum::active, prev_state_, orig_state_))
+                thread_schedule_state::active, prev_state_, orig_state_))
         {
         }
 
@@ -103,7 +103,7 @@ namespace hpx { namespace threads { namespace detail {
         // Get the state this thread was in before execution (usually pending),
         // this helps making sure no other worker-thread is started to execute this
         // HPX-thread in the meantime.
-        thread_state_enum get_previous() const
+        thread_schedule_state get_previous() const
         {
             return prev_state_.state();
         }
@@ -151,8 +151,9 @@ namespace hpx { namespace threads { namespace detail {
           : thread_(t)
           , prev_state_(prev_state)
           , next_thread_id_(nullptr)
-          , need_restore_state_(t->set_state_tagged(thread_state_enum::active,
-                prev_state_, orig_state_, std::memory_order_relaxed))
+          , need_restore_state_(
+                t->set_state_tagged(thread_schedule_state::active, prev_state_,
+                    orig_state_, std::memory_order_relaxed))
         {
         }
 
@@ -180,7 +181,7 @@ namespace hpx { namespace threads { namespace detail {
         // Get the state this thread was in before execution (usually pending),
         // this helps making sure no other worker-thread is started to execute this
         // HPX-thread in the meantime.
-        thread_state_enum get_previous() const
+        thread_schedule_state get_previous() const
         {
             return prev_state_.state();
         }
@@ -421,7 +422,7 @@ namespace hpx { namespace threads { namespace detail {
         background_running.reset(new bool(true));
         thread_init_data background_init(
             [&, background_running](
-                thread_state_ex_enum) -> thread_result_type {
+                thread_restart_state) -> thread_result_type {
                 while (*background_running)
                 {
                     if (callbacks.background_())
@@ -437,14 +438,14 @@ namespace hpx { namespace threads { namespace detail {
                 }
 
                 return thread_result_type(
-                    thread_state_enum::terminated, invalid_thread_id);
+                    thread_schedule_state::terminated, invalid_thread_id);
             },
             hpx::util::thread_description("background_work"),
             thread_priority::high_recursive, schedulehint,
             thread_stacksize::large,
             // Create in suspended to prevent the thread from being scheduled
             // directly...
-            thread_state_enum::suspended, true, &scheduler);
+            thread_schedule_state::suspended, true, &scheduler);
 
         scheduler.SchedulingPolicy::create_thread(
             background_init, &background_thread, hpx::throws);
@@ -452,7 +453,7 @@ namespace hpx { namespace threads { namespace detail {
         scheduler.SchedulingPolicy::increment_background_thread_count();
         // We can now set the state to pending
         get_thread_id_data(background_thread)
-            ->set_state(thread_state_enum::pending);
+            ->set_state(thread_schedule_state::pending);
         return background_thread;
     }
 
@@ -481,9 +482,9 @@ namespace hpx { namespace threads { namespace detail {
         {
             thread_state state =
                 get_thread_id_data(background_thread)->get_state();
-            thread_state_enum state_val = state.state();
+            thread_schedule_state state_val = state.state();
 
-            if (HPX_LIKELY(thread_state_enum::pending == state_val))
+            if (HPX_LIKELY(thread_schedule_state::pending == state_val))
             {
                 {
                     // tries to set state to active (only if state is still
@@ -493,7 +494,7 @@ namespace hpx { namespace threads { namespace detail {
 
                     if (HPX_LIKELY(thrd_stat.is_valid() &&
                             thrd_stat.get_previous() ==
-                                thread_state_enum::pending))
+                                thread_schedule_state::pending))
                     {
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
@@ -532,12 +533,12 @@ namespace hpx { namespace threads { namespace detail {
                     state_val = state.state();
 
                     if (HPX_LIKELY(
-                            state_val == thread_state_enum::pending_boost))
+                            state_val == thread_schedule_state::pending_boost))
                     {
                         get_thread_id_data(background_thread)
-                            ->set_state(thread_state_enum::pending);
+                            ->set_state(thread_schedule_state::pending);
                     }
-                    else if (thread_state_enum::terminated == state_val)
+                    else if (thread_schedule_state::terminated == state_val)
                     {
                         scheduler.SchedulingPolicy::
                             decrement_background_thread_count();
@@ -545,7 +546,7 @@ namespace hpx { namespace threads { namespace detail {
                             get_thread_id_data(background_thread));
                         background_thread.reset();
                     }
-                    else if (thread_state_enum::suspended == state_val)
+                    else if (thread_schedule_state::suspended == state_val)
                     {
                         return false;
                     }
@@ -651,11 +652,11 @@ namespace hpx { namespace threads { namespace detail {
                 // Any non-pending HPX threads are leftovers from a set_state()
                 // call for a previously pending HPX thread (see comments above).
                 thread_state state = thrd->get_state();
-                thread_state_enum state_val = state.state();
+                thread_schedule_state state_val = state.state();
 
                 detail::write_old_state_log(num_thread, thrd, state_val);
 
-                if (HPX_LIKELY(thread_state_enum::pending == state_val))
+                if (HPX_LIKELY(thread_schedule_state::pending == state_val))
                 {
                     // switch the state of the thread to active and back to
                     // what the thread reports as its return value
@@ -666,7 +667,7 @@ namespace hpx { namespace threads { namespace detail {
                         detail::switch_status thrd_stat(thrd, state);
                         if (HPX_LIKELY(thrd_stat.is_valid() &&
                                 thrd_stat.get_previous() ==
-                                    thread_state_enum::pending))
+                                    thread_schedule_state::pending))
                         {
                             tfunc_time_wrapper tfunc_time_collector(idle_rate);
 
@@ -703,7 +704,7 @@ namespace hpx { namespace threads { namespace detail {
                                 thrd_stat = (*thrd)(context_storage);
 
                                 if (thrd_stat.get_previous() ==
-                                    thread_state_enum::terminated)
+                                    thread_schedule_state::terminated)
                                 {
                                     profiler.stop();
                                     // just in case, clean up the now dead pointer.
@@ -760,7 +761,8 @@ namespace hpx { namespace threads { namespace detail {
                     // Re-add this work item to our list of work items if the HPX
                     // thread should be re-scheduled. If the HPX thread is suspended
                     // now we just keep it in the map of threads.
-                    if (HPX_UNLIKELY(state_val == thread_state_enum::pending))
+                    if (HPX_UNLIKELY(
+                            state_val == thread_schedule_state::pending))
                     {
                         if (HPX_LIKELY(next_thrd == nullptr))
                         {
@@ -778,10 +780,10 @@ namespace hpx { namespace threads { namespace detail {
                             true);
                         scheduler.SchedulingPolicy::do_some_work(num_thread);
                     }
-                    else if (HPX_UNLIKELY(
-                                 state_val == thread_state_enum::pending_boost))
+                    else if (HPX_UNLIKELY(state_val ==
+                                 thread_schedule_state::pending_boost))
                     {
-                        thrd->set_state(thread_state_enum::pending);
+                        thrd->set_state(thread_schedule_state::pending);
 
                         if (HPX_LIKELY(next_thrd == nullptr))
                         {
@@ -823,7 +825,8 @@ namespace hpx { namespace threads { namespace detail {
                         }
                     }
                 }
-                else if (HPX_UNLIKELY(thread_state_enum::active == state_val))
+                else if (HPX_UNLIKELY(
+                             thread_schedule_state::active == state_val))
                 {
                     LTM_(warning) << "tfunc(" << num_thread
                                   << "): "    //-V128
@@ -849,8 +852,8 @@ namespace hpx { namespace threads { namespace detail {
                 // Remove the mapping from thread_map_ if HPX thread is depleted
                 // or terminated, this will delete the HPX thread.
                 // REVIEW: what has to be done with depleted HPX threads?
-                if (HPX_LIKELY(state_val == thread_state_enum::depleted ||
-                        state_val == thread_state_enum::terminated))
+                if (HPX_LIKELY(state_val == thread_schedule_state::depleted ||
+                        state_val == thread_schedule_state::terminated))
                 {
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
                     ++counters.executed_threads_;
@@ -886,7 +889,7 @@ namespace hpx { namespace threads { namespace detail {
                     {
                         can_exit = can_exit &&
                             scheduler.SchedulingPolicy::get_thread_count(
-                                thread_state_enum::suspended,
+                                thread_schedule_state::suspended,
                                 thread_priority::default_, num_thread) == 0;
 
                         if (can_exit)
@@ -1067,7 +1070,7 @@ namespace hpx { namespace threads { namespace detail {
                             scheduler.SchedulingPolicy::cleanup_terminated(
                                 true) &&
                             scheduler.SchedulingPolicy::get_thread_count(
-                                thread_state_enum::suspended,
+                                thread_schedule_state::suspended,
                                 thread_priority::default_, num_thread) == 0 &&
                             scheduler.SchedulingPolicy::get_queue_length(
                                 num_thread) == 0;

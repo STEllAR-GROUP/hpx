@@ -22,10 +22,10 @@ namespace hpx { namespace threads { namespace detail {
         // verify parameters
         switch (data.initial_state)
         {
-        case thread_state_enum::pending:
-        case thread_state_enum::pending_do_not_schedule:
-        case thread_state_enum::pending_boost:
-        case thread_state_enum::suspended:
+        case thread_schedule_state::pending:
+        case thread_schedule_state::pending_do_not_schedule:
+        case thread_schedule_state::pending_boost:
+        case thread_schedule_state::suspended:
             break;
 
         default:

@@ -70,10 +70,12 @@ void lock_and_wait(
         }
 
         // Schedule a wakeup.
-        set_thread_state(this_, milliseconds(30), hpx::threads::thread_state_enum::pending);
+        set_thread_state(this_, milliseconds(30),
+            hpx::threads::thread_schedule_state::pending);
 
         // Suspend this HPX thread.
-        hpx::this_thread::suspend(hpx::threads::thread_state_enum::suspended);
+        hpx::this_thread::suspend(
+            hpx::threads::thread_schedule_state::suspended);
     }
 
     // Make hpx_main wait for us to finish.

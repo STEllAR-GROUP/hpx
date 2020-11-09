@@ -85,7 +85,7 @@ namespace hpx { namespace actions { namespace detail
         // If the action returns something which is not a future, we inject
         // a semaphore into the call graph.
         static threads::thread_result_type thread_function(
-            threads::thread_state_ex_enum state,
+            threads::thread_restart_state state,
             threads::thread_function_type f)
         {
             typedef typename construct_semaphore_type::semaphore_type
@@ -110,7 +110,7 @@ namespace hpx { namespace actions { namespace detail
         // If the action returns a future we wait on the semaphore as well,
         // however it will be signaled once the future gets ready only.
         static threads::thread_result_type thread_function_future(
-            threads::thread_state_ex_enum state,
+            threads::thread_restart_state state,
             threads::thread_function_type f)
         {
             construct_semaphore_type::get_sem().wait();

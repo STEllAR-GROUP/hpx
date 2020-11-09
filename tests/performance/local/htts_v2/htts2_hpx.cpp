@@ -67,13 +67,13 @@ private:
     }
 
     hpx::threads::thread_result_type payload_thread_function(
-        hpx::threads::thread_state_ex_enum ex =
-            hpx::threads::thread_state_ex_enum::wait_signaled)
+        hpx::threads::thread_restart_state ex =
+            hpx::threads::thread_restart_state::signaled)
     {
         htts2::payload<BaseClock>(this->payload_duration_ /* = p */);
         //++count_;
         return hpx::threads::thread_result_type(
-            hpx::threads::thread_state_enum::terminated,
+            hpx::threads::thread_schedule_state::terminated,
             hpx::threads::invalid_thread_id);
     }
 
@@ -119,7 +119,7 @@ private:
     {
         std::uint64_t const pending_count =
             get_thread_count(hpx::threads::thread_priority::normal,
-                hpx::threads::thread_state_enum::pending);
+                hpx::threads::thread_schedule_state::pending);
 
         if (pending_count == 0)
         {

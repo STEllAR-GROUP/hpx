@@ -47,7 +47,7 @@ namespace hpx { namespace threads {
     thread_data::thread_data(thread_init_data& init_data, void* queue,
         std::ptrdiff_t stacksize, bool is_stackless)
       : current_state_(thread_state(
-            init_data.initial_state, thread_state_ex_enum::wait_signaled))
+            init_data.initial_state, thread_restart_state::signaled))
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
       , description_(init_data.description)
       , lco_description_()
@@ -58,7 +58,7 @@ namespace hpx { namespace threads {
       , parent_thread_phase_(init_data.parent_phase)
 #endif
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-      , marked_state_(unknown)
+      , marked_state_(thread_schedule_state::unknown)
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
       , backtrace_(nullptr)
@@ -130,7 +130,7 @@ namespace hpx { namespace threads {
             spinlock_pool::spinlock_for(this));
 
         if (ran_exit_funcs_ ||
-            get_state().state() == thread_state_enum::terminated)
+            get_state().state() == thread_schedule_state::terminated)
         {
             return false;
         }
@@ -183,7 +183,7 @@ namespace hpx { namespace threads {
         free_thread_exit_callbacks();
 
         current_state_.store(thread_state(
-            init_data.initial_state, thread_state_ex_enum::wait_signaled));
+            init_data.initial_state, thread_restart_state::signaled));
 
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
         description_ = (init_data.description);
@@ -195,7 +195,7 @@ namespace hpx { namespace threads {
         parent_thread_phase_ = init_data.parent_phase;
 #endif
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-        set_marked_state(unknown);
+        set_marked_state(thread_schedule_state::unknown);
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
         backtrace_ = nullptr;

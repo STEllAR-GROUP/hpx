@@ -141,7 +141,7 @@ namespace hpx { namespace lcos { namespace local {
                         threads::thread_schedule_hint(
                             static_cast<std::int16_t>(get_worker_thread_num())),
                         stacksize,
-                        threads::thread_state_enum::pending_do_not_schedule,
+                        threads::thread_schedule_state::pending_do_not_schedule,
                         true);
 
                     return threads::register_thread(data, pool, ec);
@@ -152,7 +152,7 @@ namespace hpx { namespace lcos { namespace local {
                         &base_type::run_impl, std::move(this_))),
                     util::thread_description(f_, annotation), priority,
                     schedulehint, stacksize,
-                    threads::thread_state_enum::pending);
+                    threads::thread_schedule_state::pending);
 
                 threads::register_work(data, pool, ec);
                 return threads::invalid_thread_id;

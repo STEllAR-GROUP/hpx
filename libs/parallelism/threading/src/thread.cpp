@@ -147,7 +147,8 @@ namespace hpx {
         run_thread_exit_callbacks();
 
         return threads::thread_result_type(
-            threads::thread_state_enum::terminated, threads::invalid_thread_id);
+            threads::thread_schedule_state::terminated,
+            threads::invalid_thread_id);
     }
 
     thread::id thread::get_id() const noexcept
@@ -171,7 +172,7 @@ namespace hpx {
             "thread::thread_function_nullary",
             threads::thread_priority::default_, threads::thread_schedule_hint(),
             threads::thread_stacksize::default_,
-            threads::thread_state_enum::pending, true);
+            threads::thread_schedule_state::pending, true);
 
         // create the new thread, note that id_ is guaranteed to be valid
         // before the thread function is executed
@@ -187,7 +188,7 @@ namespace hpx {
 
     static void resume_thread(threads::thread_id_type const& id)
     {
-        threads::set_thread_state(id, threads::thread_state_enum::pending);
+        threads::set_thread_state(id, threads::thread_schedule_state::pending);
     }
 
     void thread::join()
@@ -218,7 +219,7 @@ namespace hpx {
             // wait for thread to be terminated
             util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
             this_thread::suspend(
-                threads::thread_state_enum::suspended, "thread::join");
+                threads::thread_schedule_state::suspended, "thread::join");
         }
 
         detach_locked();    // invalidate this object
@@ -366,14 +367,14 @@ namespace hpx {
     namespace this_thread {
         void yield_to(thread::id id) noexcept
         {
-            this_thread::suspend(threads::thread_state_enum::pending,
+            this_thread::suspend(threads::thread_schedule_state::pending,
                 id.native_handle(), "this_thread::yield_to");
         }
 
         void yield() noexcept
         {
             this_thread::suspend(
-                threads::thread_state_enum::pending, "this_thread::yield");
+                threads::thread_schedule_state::pending, "this_thread::yield");
         }
 
         thread::id get_id() noexcept

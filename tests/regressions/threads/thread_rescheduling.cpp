@@ -79,7 +79,7 @@ namespace detail {
 ///////////////////////////////////////////////////////////////////////////////
 void change_thread_state(thread_id_type thread)
 {
-    set_thread_state(thread, hpx::threads::thread_state_enum::suspended);
+    set_thread_state(thread, hpx::threads::thread_schedule_state::suspended);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -127,10 +127,10 @@ void test_dummy_thread(std::uint64_t)
 {
     while (true)
     {
-        hpx::threads::thread_state_ex_enum statex =
-            suspend(hpx::threads::thread_state_enum::suspended);
+        hpx::threads::thread_restart_state statex =
+            suspend(hpx::threads::thread_schedule_state::suspended);
 
-        if (statex == hpx::threads::thread_state_ex_enum::wait_terminate)
+        if (statex == hpx::threads::thread_restart_state::terminate)
         {
             woken = true;
             return;
@@ -156,8 +156,9 @@ int hpx_main(variables_map& vm)
         // attempt.
         future<void> before = async(&tree_boot, futures, grain_size, thread_id);
 
-        set_thread_state(thread_id, hpx::threads::thread_state_enum::pending,
-            hpx::threads::thread_state_ex_enum::wait_signaled);
+        set_thread_state(thread_id,
+            hpx::threads::thread_schedule_state::pending,
+            hpx::threads::thread_restart_state::signaled);
 
         // Flood the queues with suspension operations after the rescheduling
         // attempt.
@@ -166,8 +167,9 @@ int hpx_main(variables_map& vm)
         before.get();
         after.get();
 
-        set_thread_state(thread_id, hpx::threads::thread_state_enum::pending,
-            hpx::threads::thread_state_ex_enum::wait_terminate);
+        set_thread_state(thread_id,
+            hpx::threads::thread_schedule_state::pending,
+            hpx::threads::thread_restart_state::terminate);
     }
 
     hpx::finalize();

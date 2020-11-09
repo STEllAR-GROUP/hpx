@@ -44,8 +44,8 @@ namespace hpx { namespace threads {
     using coroutine_type = coroutines::coroutine;
     using stackless_coroutine_type = coroutines::stackless_coroutine;
 
-    using thread_result_type = std::pair<thread_state_enum, thread_id_type>;
-    using thread_arg_type = thread_state_ex_enum;
+    using thread_result_type = std::pair<thread_schedule_state, thread_id_type>;
+    using thread_arg_type = thread_restart_state;
 
     using thread_function_sig = thread_result_type(thread_arg_type);
     using thread_function_type =
@@ -54,8 +54,8 @@ namespace hpx { namespace threads {
     using thread_self = coroutines::detail::coroutine_self;
     using thread_self_impl_type = coroutines::detail::coroutine_impl;
 
-    using thread_result_type = std::pair<thread_state_enum, thread_id_type>;
-    using thread_arg_type = thread_state_ex_enum;
+    using thread_result_type = std::pair<thread_schedule_state, thread_id_type>;
+    using thread_arg_type = thread_restart_state;
 
     using thread_function_sig = thread_result_type(thread_arg_type);
     using thread_function_type =

@@ -33,7 +33,7 @@ namespace hpx { namespace threads {
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
     ///                   HPX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex_enum). The thread will be
+    ///                   \a threads#thread_restart_state). The thread will be
     ///                   terminated after the function returns.
     ///
     /// \note All other arguments are equivalent to those of the function
@@ -49,7 +49,7 @@ namespace hpx { namespace threads {
                 threads::thread_arg_type)
             {
                 // execute the actual thread function
-                f(threads::thread_state_ex_enum::wait_signaled);
+                f(threads::thread_restart_state::signaled);
 
                 // Verify that there are no more registered locks for this
                 // OS-thread. This will throw if there are still any locks
@@ -62,7 +62,7 @@ namespace hpx { namespace threads {
                 p->free_thread_exit_callbacks();
 
                 return threads::thread_result_type(
-                    threads::thread_state_enum::terminated,
+                    threads::thread_schedule_state::terminated,
                     threads::invalid_thread_id);
             }
         };
@@ -89,7 +89,7 @@ namespace hpx { namespace threads {
                 p->free_thread_exit_callbacks();
 
                 return threads::thread_result_type(
-                    threads::thread_state_enum::terminated,
+                    threads::thread_schedule_state::terminated,
                     threads::invalid_thread_id);
             }
         };
@@ -226,8 +226,8 @@ namespace hpx { namespace threads {
 #if defined(HPX_HAVE_REGISTER_THREAD_OVERLOADS_COMPATIBILITY)
     inline threads::thread_id_type register_thread_plain(
         threads::thread_pool_base* pool, threads::thread_init_data& data,
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         bool run_now = true, error_code& ec = throws)
     {
         HPX_ASSERT(pool);
@@ -240,8 +240,8 @@ namespace hpx { namespace threads {
 
     inline threads::thread_id_type register_non_suspendable_thread_plain(
         threads::thread_pool_base* pool, threads::thread_init_data& data,
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         bool run_now = true, error_code& ec = throws)
     {
         HPX_ASSERT(pool);
@@ -253,8 +253,8 @@ namespace hpx { namespace threads {
         threads::thread_pool_base* pool, threads::thread_function_type&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint schedulehint =
@@ -278,8 +278,8 @@ namespace hpx { namespace threads {
         threads::thread_pool_base* pool, threads::thread_function_type&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint schedulehint =
@@ -301,8 +301,8 @@ namespace hpx { namespace threads {
     ///
     inline threads::thread_id_type register_thread_plain(
         threads::thread_init_data& data,
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         bool run_now = true, error_code& ec = throws)
     {
         return register_thread_plain(detail::get_self_or_default_pool(), data,
@@ -311,8 +311,8 @@ namespace hpx { namespace threads {
 
     inline threads::thread_id_type register_non_suspendable_thread_plain(
         threads::thread_init_data& data,
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         bool run_now = true, error_code& ec = throws)
     {
         return register_non_suspendable_thread_plain(
@@ -327,8 +327,8 @@ namespace hpx { namespace threads {
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
     ///                   HPX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex_enum) and returns a
-    ///                   \a threads#thread_state_enum.
+    ///                   \a threads#thread_restart_state) and returns a
+    ///                   \a threads#thread_schedule_state.
     /// \param description [in] A optional string describing the newly created
     ///                   thread. This is useful for debugging and logging
     ///                   purposes as this string will be inserted in the logs.
@@ -384,8 +384,8 @@ namespace hpx { namespace threads {
         threads::thread_function_type&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint schedulehint =
@@ -403,8 +403,8 @@ namespace hpx { namespace threads {
         threads::thread_function_type&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint schedulehint =
@@ -420,8 +420,8 @@ namespace hpx { namespace threads {
     threads::thread_id_type register_thread(F&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint os_thread =
@@ -441,8 +441,8 @@ namespace hpx { namespace threads {
     threads::thread_id_type register_non_suspendable_thread(F&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint os_thread =
@@ -472,8 +472,8 @@ namespace hpx { namespace threads {
     threads::thread_id_type register_thread_nullary(F&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint os_thread =
@@ -493,8 +493,8 @@ namespace hpx { namespace threads {
     threads::thread_id_type register_non_suspendable_thread_nullary(F&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint os_thread =
@@ -511,8 +511,8 @@ namespace hpx { namespace threads {
         threads::thread_pool_base* pool, F&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint os_thread =
@@ -533,8 +533,8 @@ namespace hpx { namespace threads {
         threads::thread_pool_base* pool, F&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint os_thread =
@@ -551,8 +551,8 @@ namespace hpx { namespace threads {
 
     inline void register_work_plain(threads::thread_pool_base* pool,
         threads::thread_init_data& data,
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         error_code& ec = throws)
     {
         HPX_ASSERT(pool);
@@ -562,8 +562,8 @@ namespace hpx { namespace threads {
 
     inline void register_non_suspendable_work_plain(
         threads::thread_pool_base* pool, threads::thread_init_data& data,
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         error_code& ec = throws)
     {
         HPX_ASSERT(pool);
@@ -575,8 +575,8 @@ namespace hpx { namespace threads {
         threads::thread_function_type&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint schedulehint =
             threads::thread_schedule_hint(),
@@ -599,8 +599,8 @@ namespace hpx { namespace threads {
         threads::thread_pool_base* pool, threads::thread_function_type&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint schedulehint =
             threads::thread_schedule_hint(),
@@ -621,8 +621,8 @@ namespace hpx { namespace threads {
     ///       object.
     ///
     inline void register_work_plain(threads::thread_init_data& data,
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         error_code& ec = throws)
     {
         register_work_plain(
@@ -631,8 +631,8 @@ namespace hpx { namespace threads {
 
     inline void register_non_suspendable_work_plain(
         threads::thread_init_data& data,
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         error_code& ec = throws)
     {
         register_non_suspendable_work_plain(
@@ -650,8 +650,8 @@ namespace hpx { namespace threads {
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
     ///                   HPX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex_enum) and returns a
-    ///                   \a threads#thread_state_enum.
+    ///                   \a threads#thread_restart_state) and returns a
+    ///                   \a threads#thread_schedule_state.
     /// \param description [in] A optional string describing the newly created
     ///                   thread. This is useful for debugging and logging
     ///                   purposes as this string will be inserted in the logs.
@@ -690,8 +690,8 @@ namespace hpx { namespace threads {
     inline void register_work_plain(threads::thread_function_type&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint schedulehint =
             threads::thread_schedule_hint(),
@@ -707,8 +707,8 @@ namespace hpx { namespace threads {
         threads::thread_function_type&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint schedulehint =
             threads::thread_schedule_hint(),
@@ -726,7 +726,7 @@ namespace hpx { namespace threads {
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
     ///                   HPX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex_enum). The thread will be
+    ///                   \a threads#thread_restart_state). The thread will be
     ///                   terminated after the function returns.
     ///
     /// \note All other arguments are equivalent to those of the function
@@ -736,8 +736,8 @@ namespace hpx { namespace threads {
     void register_work(F&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint os_thread =
             threads::thread_schedule_hint(),
@@ -756,8 +756,8 @@ namespace hpx { namespace threads {
     void register_non_suspendable_work(F&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint os_thread =
             threads::thread_schedule_hint(),
@@ -787,8 +787,8 @@ namespace hpx { namespace threads {
     void register_work_nullary(F&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint os_thread =
             threads::thread_schedule_hint(),
@@ -807,8 +807,8 @@ namespace hpx { namespace threads {
     void register_non_suspendable_work_nullary(F&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint os_thread =
             threads::thread_schedule_hint(),
@@ -826,8 +826,8 @@ namespace hpx { namespace threads {
     void register_work_nullary(threads::thread_pool_base* pool, F&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint os_thread =
             threads::thread_schedule_hint(),
@@ -847,8 +847,8 @@ namespace hpx { namespace threads {
         F&& func,
         util::thread_description const& description =
             util::thread_description(),
-        threads::thread_state_enum initial_state =
-            threads::thread_state_enum::pending,
+        threads::thread_schedule_state initial_state =
+            threads::thread_schedule_state::pending,
         threads::thread_priority priority = threads::thread_priority::normal,
         threads::thread_schedule_hint os_thread =
             threads::thread_schedule_hint(),

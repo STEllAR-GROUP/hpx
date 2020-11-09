@@ -17,7 +17,8 @@ void wait_for(hpx::lcos::shared_future<int> f)
     try
     {
         f.wait_for(std::chrono::nanoseconds(1));
-        hpx::this_thread::suspend(hpx::threads::thread_state_enum::suspended);
+        hpx::this_thread::suspend(
+            hpx::threads::thread_schedule_state::suspended);
     }
     catch (hpx::thread_interrupted const&)
     {
@@ -34,7 +35,8 @@ void wait_until(hpx::lcos::shared_future<int> f)
     {
         f.wait_until(
             std::chrono::system_clock::now() + std::chrono::nanoseconds(1));
-        hpx::this_thread::suspend(hpx::threads::thread_state_enum::suspended);
+        hpx::this_thread::suspend(
+            hpx::threads::thread_schedule_state::suspended);
     }
     catch (hpx::thread_interrupted const&)
     {
@@ -61,7 +63,7 @@ void test_wait_for()
     hpx::threads::thread_state thread_state =
         hpx::threads::get_thread_state(thread.native_handle());
     HPX_TEST_EQ(
-        thread_state.state(), hpx::threads::thread_state_enum::suspended);
+        thread_state.state(), hpx::threads::thread_schedule_state::suspended);
 
     if (thread.joinable())
     {
@@ -86,7 +88,7 @@ void test_wait_until()
     hpx::threads::thread_state thread_state =
         hpx::threads::get_thread_state(thread.native_handle());
     HPX_TEST_EQ(
-        thread_state.state(), hpx::threads::thread_state_enum::suspended);
+        thread_state.state(), hpx::threads::thread_schedule_state::suspended);
 
     if (thread.joinable())
     {

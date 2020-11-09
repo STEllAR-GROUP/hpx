@@ -493,10 +493,10 @@ namespace hpx { namespace threads { namespace policies {
             HPX_ASSERT(heap);
 
             if (data.initial_state ==
-                    thread_state_enum::pending_do_not_schedule ||
-                data.initial_state == thread_state_enum::pending_boost)
+                    thread_schedule_state::pending_do_not_schedule ||
+                data.initial_state == thread_schedule_state::pending_boost)
             {
-                data.initial_state = thread_state_enum::pending;
+                data.initial_state = thread_schedule_state::pending;
             }
 
             // Check for an unused thread object.
@@ -859,20 +859,20 @@ namespace hpx { namespace threads { namespace policies {
 
         // ----------------------------------------------------------------
         inline std::size_t get_thread_count(
-            thread_state_enum state = thread_state_enum::unknown,
+            thread_schedule_state state = thread_schedule_state::unknown,
             thread_priority priority = thread_priority::default_) const
         {
-            if (thread_state_enum::terminated == state)
+            if (thread_schedule_state::terminated == state)
                 return terminated_items_count_.data_.load(
                     std::memory_order_relaxed);
 
-            if (thread_state_enum::staged == state)
+            if (thread_schedule_state::staged == state)
                 return get_thread_count_staged(priority);
 
-            if (thread_state_enum::pending == state)
+            if (thread_schedule_state::pending == state)
                 return get_thread_count_pending(priority);
 
-            if (thread_state_enum::unknown == state)
+            if (thread_schedule_state::unknown == state)
                 return thread_map_count_.data_.load(std::memory_order_relaxed) +
                     get_thread_count_staged(priority) -
                     terminated_items_count_.data_.load(
@@ -922,11 +922,11 @@ namespace hpx { namespace threads { namespace policies {
                  ++it)
             {
                 if (get_thread_id_data(*it)->get_state().state() ==
-                    thread_state_enum::suspended)
+                    thread_schedule_state::suspended)
                 {
                     get_thread_id_data(*it)->set_state(
-                        thread_state_enum::pending,
-                        thread_state_ex_enum::wait_abort);
+                        thread_schedule_state::pending,
+                        thread_restart_state::abort);
                     // np queue always exists so use that as priority doesn't matter
                     np_queue_->schedule_work(get_thread_id_data(*it), true);
                 }
@@ -937,14 +937,14 @@ namespace hpx { namespace threads { namespace policies {
         // ------------------------------------------------------------
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state = thread_state_enum::unknown) const
+            thread_schedule_state state = thread_schedule_state::unknown) const
         {
             std::uint64_t count = thread_map_count_.data_;
-            if (state == thread_state_enum::terminated)
+            if (state == thread_schedule_state::terminated)
             {
                 count = terminated_items_count_.data_;
             }
-            else if (state == thread_state_enum::staged)
+            else if (state == thread_schedule_state::staged)
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "queue_holder_thread::iterate_threads",
@@ -955,7 +955,7 @@ namespace hpx { namespace threads { namespace policies {
             std::vector<thread_id_type> tids;
             tids.reserve(static_cast<std::size_t>(count));
 
-            if (state == thread_state_enum::unknown)
+            if (state == thread_schedule_state::unknown)
             {
                 scoped_lock lk(thread_map_mtx_.data_);
                 thread_map_type::const_iterator end = thread_map_.end();

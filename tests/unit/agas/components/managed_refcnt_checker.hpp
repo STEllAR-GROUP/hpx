@@ -105,14 +105,13 @@ struct managed_refcnt_monitor
         agas::garbage_collect(locality_);
 
         // Schedule a wakeup.
-        threads::set_thread_state(threads::get_self_id(), d,
-            threads::thread_state_enum::pending);
+        threads::set_thread_state(
+            threads::get_self_id(), d, threads::thread_schedule_state::pending);
 
         // Suspend this thread.
-        threads::get_self().yield(
-            threads::thread_result_type(threads::thread_state_enum::suspended,
-                hpx::threads::invalid_thread_id)
-        );
+        threads::get_self().yield(threads::thread_result_type(
+            threads::thread_schedule_state::suspended,
+            hpx::threads::invalid_thread_id));
 
         return flag_.is_ready();
     }

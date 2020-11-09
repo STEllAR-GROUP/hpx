@@ -20,11 +20,11 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     // clang-format off
 
-    /// \enum thread_state_enum
+    /// \enum thread_schedule_state
     ///
-    /// The \a thread_state_enum enumerator encodes the current state of a
+    /// The \a thread_schedule_state enumerator encodes the current state of a
     /// \a thread instance
-    enum class thread_state_enum
+    enum class thread_schedule_state
     {
         unknown = 0,
         active = 1,                   /*!< thread is currently active (running,
@@ -58,34 +58,40 @@ namespace hpx { namespace threads {
 #if defined(HPX_HAVE_UNSCOPED_ENUM_COMPATIBILITY)
 #define HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG                         \
     "The unscoped thread_state_enum names are deprecated. Please use "         \
-    "thread_state_enum::state instead."
+    "thread_schedule_state::state instead."
 
     HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static constexpr thread_state_enum unknown = thread_state_enum::unknown;
+    static constexpr thread_schedule_state unknown =
+        thread_schedule_state::unknown;
     HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static constexpr thread_state_enum active = thread_state_enum::active;
+    static constexpr thread_schedule_state active =
+        thread_schedule_state::active;
     HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static constexpr thread_state_enum pending = thread_state_enum::pending;
+    static constexpr thread_schedule_state pending =
+        thread_schedule_state::pending;
     HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static constexpr thread_state_enum suspended = thread_state_enum::suspended;
+    static constexpr thread_schedule_state suspended =
+        thread_schedule_state::suspended;
     HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static constexpr thread_state_enum depleted = thread_state_enum::depleted;
+    static constexpr thread_schedule_state depleted =
+        thread_schedule_state::depleted;
     HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static constexpr thread_state_enum terminated =
-        thread_state_enum::terminated;
+    static constexpr thread_schedule_state terminated =
+        thread_schedule_state::terminated;
     HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static constexpr thread_state_enum staged = thread_state_enum::staged;
+    static constexpr thread_schedule_state staged =
+        thread_schedule_state::staged;
     HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static constexpr thread_state_enum pending_do_not_schedule =
-        thread_state_enum::pending_do_not_schedule;
+    static constexpr thread_schedule_state pending_do_not_schedule =
+        thread_schedule_state::pending_do_not_schedule;
     HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static constexpr thread_state_enum pending_boost =
-        thread_state_enum::pending_boost;
+    static constexpr thread_schedule_state pending_boost =
+        thread_schedule_state::pending_boost;
 #undef HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG
 #endif
 
     HPX_CORE_EXPORT std::ostream& operator<<(
-        std::ostream& os, thread_state_enum const t);
+        std::ostream& os, thread_schedule_state const t);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Returns the name of the given state
@@ -94,7 +100,8 @@ namespace hpx { namespace threads {
     /// thread_state constant.
     ///
     /// \param state this represents the thread state.
-    HPX_CORE_EXPORT char const* get_thread_state_name(thread_state_enum state);
+    HPX_CORE_EXPORT char const* get_thread_state_name(
+        thread_schedule_state state);
 
     ///////////////////////////////////////////////////////////////////////////
     // clang-format off
@@ -185,56 +192,56 @@ namespace hpx { namespace threads {
         thread_priority priority);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \enum thread_state_ex_enum
+    /// \enum thread_restart_state
     ///
-    /// The \a thread_state_ex_enum enumerator encodes the reason why a
+    /// The \a thread_restart_state enumerator encodes the reason why a
     /// thread is being restarted
-    enum class thread_state_ex_enum
+    enum class thread_restart_state
     {
-        wait_unknown = 0,
-        wait_signaled = 1,     ///< The thread has been signaled
-        wait_timeout = 2,      ///< The thread has been reactivated after a
-                               ///< timeout
-        wait_terminate = 3,    ///< The thread needs to be terminated
-        wait_abort = 4         ///< The thread needs to be aborted
+        unknown = 0,
+        signaled = 1,     ///< The thread has been signaled
+        timeout = 2,      ///< The thread has been reactivated after a
+                          ///< timeout
+        terminate = 3,    ///< The thread needs to be terminated
+        abort = 4         ///< The thread needs to be aborted
     };
 
 #if defined(HPX_HAVE_UNSCOPED_ENUM_COMPATIBILITY)
 #define HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG                      \
     "The unscoped thread_state_ex_enum names are deprecated. Please use "      \
-    "thread_state_ex_enum::state instead."
+    "thread_restart_state::state instead."
 
     HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static constexpr thread_state_ex_enum wait_unknown =
-        thread_state_ex_enum::wait_unknown;
+    static constexpr thread_restart_state wait_unknown =
+        thread_restart_state::unknown;
     HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static constexpr thread_state_ex_enum wait_signaled =
-        thread_state_ex_enum::wait_signaled;
+    static constexpr thread_restart_state wait_signaled =
+        thread_restart_state::signaled;
     HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static constexpr thread_state_ex_enum wait_timeout =
-        thread_state_ex_enum::wait_timeout;
+    static constexpr thread_restart_state wait_timeout =
+        thread_restart_state::timeout;
     HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static constexpr thread_state_ex_enum wait_terminate =
-        thread_state_ex_enum::wait_terminate;
+    static constexpr thread_restart_state wait_terminate =
+        thread_restart_state::terminate;
     HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static constexpr thread_state_ex_enum wait_abort =
-        thread_state_ex_enum::wait_abort;
+    static constexpr thread_restart_state wait_abort =
+        thread_restart_state::abort;
 #undef HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG
 #endif
 
     HPX_CORE_EXPORT std::ostream& operator<<(
-        std::ostream& os, thread_state_ex_enum const t);
+        std::ostream& os, thread_restart_state const t);
 
     /// Get the readable string representing the name of the given
-    /// thread_state_ex_enum constant.
+    /// thread_restart_state constant.
     HPX_CORE_EXPORT char const* get_thread_state_ex_name(
-        thread_state_ex_enum state);
+        thread_restart_state state);
 
     /// \cond NOINTERNAL
     // special type storing both state in one tagged structure
     using thread_state =
-        threads::detail::combined_tagged_state<thread_state_enum,
-            thread_state_ex_enum>;
+        threads::detail::combined_tagged_state<thread_schedule_state,
+            thread_restart_state>;
     /// \endcond
 
     /// Get the readable string representing the name of the given

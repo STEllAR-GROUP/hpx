@@ -1312,7 +1312,8 @@ namespace hpx {
         }
 
         return threads::thread_result_type(
-            threads::thread_state_enum::terminated, threads::invalid_thread_id);
+            threads::thread_schedule_state::terminated,
+            threads::invalid_thread_id);
     }
 
     int runtime::start(

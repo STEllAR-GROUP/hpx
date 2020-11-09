@@ -77,12 +77,12 @@ namespace hpx { namespace threads { namespace detail {
         void create_work(thread_init_data& data, error_code& ec) override;
 
         thread_state set_state(thread_id_type const& id,
-            thread_state_enum new_state, thread_state_ex_enum new_state_ex,
+            thread_schedule_state new_state, thread_restart_state new_state_ex,
             thread_priority priority, error_code& ec) override;
 
         thread_id_type set_state(hpx::chrono::steady_time_point const& abs_time,
-            thread_id_type const& id, thread_state_enum newstate,
-            thread_state_ex_enum newstate_ex, thread_priority priority,
+            thread_id_type const& id, thread_schedule_state newstate,
+            thread_restart_state newstate_ex, thread_priority priority,
             error_code& ec) override;
 
         void report_error(
@@ -98,7 +98,7 @@ namespace hpx { namespace threads { namespace detail {
             return sched_->Scheduler::cleanup_terminated(delete_all);
         }
 
-        std::int64_t get_thread_count(thread_state_enum state,
+        std::int64_t get_thread_count(thread_schedule_state state,
             thread_priority priority, std::size_t num, bool reset) override
         {
             return sched_->Scheduler::get_thread_count(
@@ -116,7 +116,7 @@ namespace hpx { namespace threads { namespace detail {
 
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state) const override
+            thread_schedule_state state) const override
         {
             return sched_->Scheduler::enumerate_threads(f, state);
         }

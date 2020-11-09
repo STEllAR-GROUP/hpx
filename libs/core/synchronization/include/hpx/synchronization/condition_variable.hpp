@@ -123,7 +123,7 @@ namespace hpx { namespace lcos { namespace local {
             std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
-            threads::thread_state_ex_enum const reason =
+            threads::thread_restart_state const reason =
                 data->cond_.wait_until(l, abs_time, ec);
 
             if (ec)
@@ -131,7 +131,7 @@ namespace hpx { namespace lcos { namespace local {
 
             // if the timer has hit, the waiting period timed out
             return (reason ==
-                       threads::thread_state_ex_enum::wait_timeout) ?    //-V110
+                       threads::thread_restart_state::timeout) ?    //-V110
                 cv_status::timeout :
                 cv_status::no_timeout;
         }
@@ -263,7 +263,7 @@ namespace hpx { namespace lcos { namespace local {
             std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
-            threads::thread_state_ex_enum const reason =
+            threads::thread_restart_state const reason =
                 data->cond_.wait_until(l, abs_time, ec);
 
             if (ec)
@@ -271,7 +271,7 @@ namespace hpx { namespace lcos { namespace local {
 
             // if the timer has hit, the waiting period timed out
             return (reason ==
-                       threads::thread_state_ex_enum::wait_timeout) ?    //-V110
+                       threads::thread_restart_state::timeout) ?    //-V110
                 cv_status::timeout :
                 cv_status::no_timeout;
         }
@@ -386,15 +386,14 @@ namespace hpx { namespace lcos { namespace local {
                     std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                         l, std::adopt_lock);
 
-                    threads::thread_state_ex_enum const reason =
+                    threads::thread_restart_state const reason =
                         data->cond_.wait_until(l, abs_time, ec);
 
                     if (ec)
                         return false;
 
                     should_stop =
-                        (reason ==
-                            threads::thread_state_ex_enum::wait_timeout) ||
+                        (reason == threads::thread_restart_state::timeout) ||
                         stoken.stop_requested();
                 }
 

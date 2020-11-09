@@ -766,7 +766,7 @@ namespace hpx { namespace threads { namespace policies {
         ///////////////////////////////////////////////////////////////////////
         // Queries the current thread count of the queues.
         std::int64_t get_thread_count(
-            thread_state_enum state = thread_state_enum::unknown,
+            thread_schedule_state state = thread_schedule_state::unknown,
             thread_priority priority = thread_priority::default_,
             std::size_t num_thread = std::size_t(-1),
             bool reset = false) const override
@@ -905,7 +905,8 @@ namespace hpx { namespace threads { namespace policies {
         // Enumerate matching threads from all queues
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state = thread_state_enum::unknown) const override
+            thread_schedule_state state =
+                thread_schedule_state::unknown) const override
         {
             bool result = true;
             for (std::size_t i = 0; i != num_high_priority_queues_; ++i)

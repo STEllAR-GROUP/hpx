@@ -675,7 +675,7 @@ namespace hpx { namespace threads {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::int64_t threadmanager::get_thread_count(thread_state_enum state,
+    std::int64_t threadmanager::get_thread_count(thread_schedule_state state,
         thread_priority priority, std::size_t num_thread, bool reset)
     {
         std::int64_t total_count = 0;
@@ -735,7 +735,7 @@ namespace hpx { namespace threads {
     // Enumerate all matching threads
     bool threadmanager::enumerate_threads(
         util::function_nonser<bool(thread_id_type)> const& f,
-        thread_state_enum state) const
+        thread_schedule_state state) const
     {
         std::lock_guard<mutex_type> lk(mtx_);
         bool result = true;

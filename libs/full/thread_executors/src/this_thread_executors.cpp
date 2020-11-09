@@ -123,7 +123,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
         util::force_error_on_lock();
 
         return threads::thread_result_type(
-            threads::thread_state_enum::terminated, threads::invalid_thread_id);
+            threads::thread_schedule_state::terminated,
+            threads::invalid_thread_id);
     }
 
     // Schedule the specified function for execution in this executor.
@@ -132,7 +133,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
     template <typename Scheduler>
     void this_thread_executor<Scheduler>::add(closure_type&& f,
         util::thread_description const& desc,
-        threads::thread_state_enum initial_state, bool run_now,
+        threads::thread_schedule_state initial_state, bool run_now,
         threads::thread_stacksize stacksize,
         threads::thread_schedule_hint schedulehint, error_code& ec)
     {
@@ -191,7 +192,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
                 util::bind(&this_thread_executor::thread_function_nullary, this,
                     std::move(f))),
             desc, thread_priority::default_, thread_schedule_hint(), stacksize,
-            thread_state_enum::suspended, true);
+            thread_schedule_state::suspended, true);
 
         threads::thread_id_type id = threads::invalid_thread_id;
         threads::detail::create_thread(    //-V601
@@ -363,9 +364,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
 
             // the scheduling_loop is allowed to exit only if no more HPX
             // threads exist
-            HPX_ASSERT((scheduler_.get_thread_count(
-                            unknown, thread_priority::default_, 0) == 0 &&
-                           scheduler_.get_queue_length(0) == 0) ||
+            HPX_ASSERT(
+                (scheduler_.get_thread_count(thread_schedule_state::unknown,
+                     thread_priority::default_, 0) == 0 &&
+                    scheduler_.get_queue_length(0) == 0) ||
                 state >= state_terminating);
         }
     }

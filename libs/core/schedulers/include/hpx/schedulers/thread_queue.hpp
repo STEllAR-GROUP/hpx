@@ -158,10 +158,10 @@ namespace hpx { namespace threads { namespace policies {
             HPX_ASSERT(heap);
 
             if (data.initial_state ==
-                    thread_state_enum::pending_do_not_schedule ||
-                data.initial_state == thread_state_enum::pending_boost)
+                    thread_schedule_state::pending_do_not_schedule ||
+                data.initial_state == thread_schedule_state::pending_boost)
             {
-                data.initial_state = thread_state_enum::pending;
+                data.initial_state = thread_schedule_state::pending;
             }
 
             // Check for an unused thread object.
@@ -223,7 +223,7 @@ namespace hpx { namespace threads { namespace policies {
                 threads::thread_id_type thrd;
 
                 bool schedule_now =
-                    data.initial_state == thread_state_enum::pending;
+                    data.initial_state == thread_schedule_state::pending;
 
                 create_thread_object(thrd, data, lk);
 
@@ -664,7 +664,7 @@ namespace hpx { namespace threads { namespace policies {
                     std::unique_lock<mutex_type> lk(mtx_);
 
                     bool schedule_now =
-                        data.initial_state == thread_state_enum::pending;
+                        data.initial_state == thread_schedule_state::pending;
 
                     create_thread_object(thrd, data, lk);
 
@@ -852,15 +852,15 @@ namespace hpx { namespace threads { namespace policies {
         ///////////////////////////////////////////////////////////////////////
         /// Return the number of existing threads with the given state.
         std::int64_t get_thread_count(
-            thread_state_enum state = thread_state_enum::unknown) const
+            thread_schedule_state state = thread_schedule_state::unknown) const
         {
-            if (thread_state_enum::terminated == state)
+            if (thread_schedule_state::terminated == state)
                 return terminated_items_count_;
 
-            if (thread_state_enum::staged == state)
+            if (thread_schedule_state::staged == state)
                 return new_tasks_count_.data_;
 
-            if (thread_state_enum::unknown == state)
+            if (thread_schedule_state::unknown == state)
             {
                 return thread_map_count_ + new_tasks_count_.data_ -
                     terminated_items_count_;
@@ -889,10 +889,11 @@ namespace hpx { namespace threads { namespace policies {
                  ++it)
             {
                 auto thrd = get_thread_id_data(*it);
-                if (thrd->get_state().state() == thread_state_enum::suspended)
+                if (thrd->get_state().state() ==
+                    thread_schedule_state::suspended)
                 {
-                    thrd->set_state(thread_state_enum::pending,
-                        thread_state_ex_enum::wait_abort);
+                    thrd->set_state(thread_schedule_state::pending,
+                        thread_restart_state::abort);
                     schedule_thread(thrd);
                 }
             }
@@ -900,14 +901,14 @@ namespace hpx { namespace threads { namespace policies {
 
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state = thread_state_enum::unknown) const
+            thread_schedule_state state = thread_schedule_state::unknown) const
         {
             std::uint64_t count = thread_map_count_;
-            if (state == thread_state_enum::terminated)
+            if (state == thread_schedule_state::terminated)
             {
                 count = terminated_items_count_;
             }
-            else if (state == thread_state_enum::staged)
+            else if (state == thread_schedule_state::staged)
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "thread_queue::iterate_threads",
@@ -918,7 +919,7 @@ namespace hpx { namespace threads { namespace policies {
             std::vector<thread_id_type> ids;
             ids.reserve(static_cast<std::size_t>(count));
 
-            if (state == thread_state_enum::unknown)
+            if (state == thread_schedule_state::unknown)
             {
                 std::lock_guard<mutex_type> lk(mtx_);
                 thread_map_type::const_iterator end = thread_map_.end();

@@ -70,8 +70,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     public:
         using thread_id_type = hpx::threads::thread_id;
 
-        using result_type = std::pair<thread_state_enum, thread_id_type>;
-        using arg_type = thread_state_ex_enum;
+        using result_type = std::pair<thread_schedule_state, thread_id_type>;
+        using arg_type = thread_restart_state;
 
         using yield_decorator_type =
             util::function_nonser<arg_type(result_type)>;

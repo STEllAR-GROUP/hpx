@@ -122,7 +122,7 @@ namespace hpx { namespace threads { namespace policies {
                     debug::threadinfo<threads::thread_id_type*>(&tid));
 
                 // insert the thread into work-items queue if in pending state
-                if (data.initial_state == thread_state_enum::pending)
+                if (data.initial_state == thread_schedule_state::pending)
                 {
                     // pushing the new thread into the pending queue of the
                     // specified thread_queue
@@ -214,7 +214,7 @@ namespace hpx { namespace threads { namespace policies {
                 holder_->add_to_thread_map(tid);
 
                 // push the new thread in the pending queue thread
-                if (data.initial_state == thread_state_enum::pending)
+                if (data.initial_state == thread_schedule_state::pending)
                     schedule_work(get_thread_id_data(tid), false);
 
                 // return the thread_id of the newly created thread

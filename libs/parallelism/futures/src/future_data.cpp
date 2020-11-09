@@ -73,7 +73,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             // make sure this thread is executed last
             this_thread::suspend(
-                threads::thread_state_enum::pending, std::move(tid));
+                threads::thread_schedule_state::pending, std::move(tid));
             return p.get_future().get();
         }
         // If we are not on a HPX thread, we need to return immediately, to
@@ -299,12 +299,12 @@ namespace hpx { namespace lcos { namespace detail {
             std::unique_lock<mutex_type> l(mtx_);
             if (state_.load(std::memory_order_relaxed) == empty)
             {
-                threads::thread_state_ex_enum const reason = cond_.wait_until(
+                threads::thread_restart_state const reason = cond_.wait_until(
                     l, abs_time, "future_data_base::wait_until", ec);
                 if (ec)
                     return future_status::uninitialized;
 
-                if (reason == threads::thread_state_ex_enum::wait_timeout)
+                if (reason == threads::thread_restart_state::timeout)
                     return future_status::timeout;
             }
         }

@@ -182,7 +182,7 @@ namespace hpx { namespace threads { namespace policies {
             std::size_t num_thread = std::size_t(-1)) const = 0;
 
         virtual std::int64_t get_thread_count(
-            thread_state_enum state = thread_state_enum::unknown,
+            thread_schedule_state state = thread_schedule_state::unknown,
             thread_priority priority = thread_priority::default_,
             std::size_t num_thread = std::size_t(-1),
             bool reset = false) const = 0;
@@ -198,7 +198,8 @@ namespace hpx { namespace threads { namespace policies {
         // Enumerate all matching threads
         virtual bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state = thread_state_enum::unknown) const = 0;
+            thread_schedule_state state =
+                thread_schedule_state::unknown) const = 0;
 
         virtual void abort_all_suspended_threads() = 0;
 

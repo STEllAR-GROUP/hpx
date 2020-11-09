@@ -55,7 +55,7 @@ namespace hpx { namespace detail {
                     // make sure this thread is executed last
                     // yield_to
                     hpx::this_thread::suspend(
-                        threads::thread_state_enum::pending, tid,
+                        threads::thread_schedule_state::pending, tid,
                         "sync_launch_policy_dispatch<fork>");
                 }
             }

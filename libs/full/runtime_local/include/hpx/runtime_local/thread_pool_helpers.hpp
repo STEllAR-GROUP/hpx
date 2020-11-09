@@ -67,7 +67,7 @@ namespace hpx { namespace threads {
     ///       of registered task descriptions (which have not been
     ///       converted into threads yet).
     HPX_EXPORT std::int64_t get_thread_count(
-        thread_state_enum state = thread_state_enum::unknown);
+        thread_schedule_state state = thread_schedule_state::unknown);
 
     /// The function \a get_thread_count returns the number of currently
     /// known threads.
@@ -82,7 +82,7 @@ namespace hpx { namespace threads {
     ///       of registered task descriptions (which have not been
     ///       converted into threads yet).
     HPX_EXPORT std::int64_t get_thread_count(thread_priority priority,
-        thread_state_enum state = thread_state_enum::unknown);
+        thread_schedule_state state = thread_schedule_state::unknown);
 
     /// The function \a get_idle_core_count returns the number of currently
     /// idling threads (cores).
@@ -102,5 +102,5 @@ namespace hpx { namespace threads {
     ///                 threads should be enumerated.
     HPX_EXPORT bool enumerate_threads(
         util::function_nonser<bool(thread_id_type)> const& f,
-        thread_state_enum state = thread_state_enum::unknown);
+        thread_schedule_state state = thread_schedule_state::unknown);
 }}    // namespace hpx::threads

@@ -398,7 +398,8 @@ void measure_function_futures_create_thread(std::uint64_t count, bool csv)
     {
         auto init = hpx::threads::thread_init_data(
             hpx::threads::thread_function_type(thread_func), desc, prio, hint,
-            stack_size, hpx::threads::thread_state_enum::pending, false, sched);
+            stack_size, hpx::threads::thread_schedule_state::pending, false,
+            sched);
         sched->create_thread(init, nullptr, ec);
     }
     l.wait();
@@ -455,8 +456,8 @@ void measure_function_futures_create_thread_hierarchical_placement(
             {
                 hpx::threads::thread_init_data init(
                     hpx::threads::thread_function_type(thread_func), desc, prio,
-                    hint, stack_size, hpx::threads::thread_state_enum::pending,
-                    false, sched);
+                    hint, stack_size,
+                    hpx::threads::thread_schedule_state::pending, false, sched);
                 sched->create_thread(init, nullptr, ec);
             }
         };
@@ -466,8 +467,8 @@ void measure_function_futures_create_thread_hierarchical_placement(
 
         hpx::threads::thread_init_data init(
             hpx::threads::thread_function_type(thread_spawn_func), desc, prio,
-            hint, stack_size, hpx::threads::thread_state_enum::pending, false,
-            sched);
+            hint, stack_size, hpx::threads::thread_schedule_state::pending,
+            false, sched);
         sched->create_thread(init, nullptr, ec);
     }
     l.wait();

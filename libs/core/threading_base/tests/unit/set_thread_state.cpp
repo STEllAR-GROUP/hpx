@@ -34,7 +34,6 @@ using hpx::this_thread::suspend;
 using hpx::threads::set_thread_state;
 using hpx::threads::thread_data;
 using hpx::threads::thread_id_type;
-using hpx::threads::thread_state_ex_enum;
 
 using hpx::find_here;
 
@@ -81,12 +80,12 @@ void change_thread_state(std::uint64_t thread)
 {
     //    std::cout << "waking up thread (wait_signaled)\n";
     thread_id_type id(reinterpret_cast<thread_data*>(thread));
-    set_thread_state(id, hpx::threads::thread_state_enum::pending,
-        hpx::threads::thread_state_ex_enum::wait_signaled);
+    set_thread_state(id, hpx::threads::thread_schedule_state::pending,
+        hpx::threads::thread_restart_state::signaled);
 
     //    std::cout << "suspending thread (wait_timeout)\n";
-    set_thread_state(id, hpx::threads::thread_state_enum::suspended,
-        hpx::threads::thread_state_ex_enum::wait_timeout);
+    set_thread_state(id, hpx::threads::thread_schedule_state::suspended,
+        hpx::threads::thread_restart_state::timeout);
 }
 
 HPX_PLAIN_ACTION(change_thread_state, change_thread_state_action)
@@ -146,22 +145,22 @@ void test_dummy_thread(std::uint64_t futures)
 
     while (true)
     {
-        thread_state_ex_enum statex =
-            suspend(hpx::threads::thread_state_enum::suspended);
+        hpx::threads::thread_restart_state statex =
+            suspend(hpx::threads::thread_schedule_state::suspended);
 
-        if (statex == hpx::threads::thread_state_ex_enum::wait_signaled)
+        if (statex == hpx::threads::thread_restart_state::signaled)
         {
             ++signaled;
             ++woken;
         }
 
-        else if (statex == hpx::threads::thread_state_ex_enum::wait_timeout)
+        else if (statex == hpx::threads::thread_restart_state::timeout)
         {
             ++timed_out;
             ++woken;
         }
 
-        else if (statex == hpx::threads::thread_state_ex_enum::wait_terminate)
+        else if (statex == hpx::threads::thread_restart_state::terminate)
         {
             std::cout << "woken:     " << woken << "/" << (futures * 2) << "\n"
                       << "signaled:  " << signaled << "/" << futures << "\n"
@@ -189,8 +188,8 @@ int hpx_main(variables_map& vm)
         tree_boot(futures, grain_size, prefix,
             reinterpret_cast<std::uint64_t>(thread.get()));
 
-        set_thread_state(thread, hpx::threads::thread_state_enum::pending,
-            hpx::threads::thread_state_ex_enum::wait_terminate);
+        set_thread_state(thread, hpx::threads::thread_schedule_state::pending,
+            hpx::threads::thread_restart_state::terminate);
     }
 
     hpx::finalize();

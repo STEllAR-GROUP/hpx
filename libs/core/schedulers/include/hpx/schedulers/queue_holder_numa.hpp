@@ -225,7 +225,7 @@ namespace hpx { namespace threads { namespace policies {
 
         // ----------------------------------------------------------------
         inline std::int64_t get_thread_count(
-            thread_state_enum state = thread_state_enum::unknown,
+            thread_schedule_state state = thread_schedule_state::unknown,
             thread_priority priority = thread_priority::default_) const
         {
             std::size_t len = 0;
@@ -244,7 +244,7 @@ namespace hpx { namespace threads { namespace policies {
         // ----------------------------------------------------------------
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state) const
+            thread_schedule_state state) const
         {
             bool result = true;
             for (auto& q : queues_)

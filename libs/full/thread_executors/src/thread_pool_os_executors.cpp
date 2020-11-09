@@ -137,7 +137,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
         func();
 
         return threads::thread_result_type(
-            threads::thread_state_enum::terminated, threads::invalid_thread_id);
+            threads::thread_schedule_state::terminated,
+            threads::invalid_thread_id);
     }
 
     // Return the requested policy element
@@ -168,7 +169,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
     template <typename Scheduler>
     void thread_pool_os_executor<Scheduler>::add(closure_type&& f,
         util::thread_description const& desc,
-        threads::thread_state_enum initial_state, bool run_now,
+        threads::thread_schedule_state initial_state, bool run_now,
         threads::thread_stacksize stacksize,
         threads::thread_schedule_hint schedulehint, error_code& ec)
     {
@@ -206,7 +207,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
                 util::bind(&thread_pool_os_executor::thread_function_nullary,
                     std::move(f))),
             desc, thread_priority::default_, thread_schedule_hint(), stacksize,
-            thread_state_enum::suspended, true);
+            thread_schedule_state::suspended, true);
 
         threads::thread_id_type id = threads::invalid_thread_id;
         pool_->create_thread(data, id, ec);
@@ -216,8 +217,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
         HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise
 
         // now schedule new thread for execution
-        pool_->set_state(abs_time, id, thread_state_enum::pending,
-            thread_state_ex_enum::wait_timeout, thread_priority::normal, ec);
+        pool_->set_state(abs_time, id, thread_schedule_state::pending,
+            thread_restart_state::timeout, thread_priority::normal, ec);
         if (ec)
             return;
 
@@ -247,7 +248,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             ec = make_success_code();
 
         std::lock_guard<mutex_type> lk(mtx_);
-        return pool_->get_thread_count(thread_state_enum::unknown,
+        return pool_->get_thread_count(thread_schedule_state::unknown,
             thread_priority::default_, std::size_t(-1), false);
     }
 

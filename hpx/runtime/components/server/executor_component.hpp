@@ -45,19 +45,18 @@ namespace hpx { namespace components
         // executor
         static void execute(hpx::threads::thread_function_type const& f)
         {
-            f(hpx::threads::thread_state_ex_enum::wait_signaled);
+            f(hpx::threads::thread_restart_state::signaled);
         }
 
         /// This is the default hook implementation for schedule_thread which
         /// forwards to the executor instance associated with this component.
         template <typename Executor_ = Executor>
         static typename std::enable_if<
-            traits::is_threads_executor<Executor_>::value
-        >::type
+            traits::is_threads_executor<Executor_>::value>::type
         schedule_thread(hpx::naming::address::address_type lva,
             naming::address::component_type comptype,
             hpx::threads::thread_init_data& data,
-            hpx::threads::thread_state_enum initial_state)
+            hpx::threads::thread_schedule_state initial_state)
         {
             hpx::util::thread_description desc(&executor_component::execute);
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
@@ -72,12 +71,11 @@ namespace hpx { namespace components
 
         template <typename Executor_ = Executor>
         static typename std::enable_if<
-            !traits::is_threads_executor<Executor_>::value
-        >::type
+            !traits::is_threads_executor<Executor_>::value>::type
         schedule_thread(hpx::naming::address::address_type lva,
             naming::address::component_type comptype,
             hpx::threads::thread_init_data& data,
-            hpx::threads::thread_state_enum initial_state)
+            hpx::threads::thread_schedule_state initial_state)
         {
             hpx::util::thread_description desc(&executor_component::execute);
 #ifdef HPX_HAVE_THREAD_DESCRIPTION

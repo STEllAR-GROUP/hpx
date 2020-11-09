@@ -101,7 +101,7 @@ namespace hpx { namespace detail {
                     // make sure this thread is executed last
                     // yield_to
                     hpx::this_thread::suspend(
-                        threads::thread_state_enum::pending, tid,
+                        threads::thread_schedule_state::pending, tid,
                         "async_launch_policy_dispatch<launch>");
                 }
             }
@@ -216,8 +216,9 @@ namespace hpx { namespace detail {
                     get_thread_id_data(tid_self)->get_scheduler_base())
             {
                 // yield_to
-                hpx::this_thread::suspend(threads::thread_state_enum::pending,
-                    tid, "async_launch_policy_dispatch<fork>");
+                hpx::this_thread::suspend(
+                    threads::thread_schedule_state::pending, tid,
+                    "async_launch_policy_dispatch<fork>");
             }
             return p.get_future();
         }

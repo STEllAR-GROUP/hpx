@@ -36,7 +36,7 @@ void suspend_test(barrier& b, std::size_t iterations)
     {
         // Enter the 'pending' state and get rescheduled.
         hpx::this_thread::suspend(
-            hpx::threads::thread_state_enum::pending, "suspend_test");
+            hpx::threads::thread_schedule_state::pending, "suspend_test");
     }
 
     // Wait for all hpx-threads to enter the barrier.

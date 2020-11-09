@@ -49,7 +49,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
             // return false if unblocked by timeout expiring
             if (cond_.wait_until(
                     l, abs_time, "counting_semaphore::wait_until") !=
-                threads::thread_state_ex_enum::wait_unknown)
+                threads::thread_restart_state::unknown)
             {
                 return false;
             }

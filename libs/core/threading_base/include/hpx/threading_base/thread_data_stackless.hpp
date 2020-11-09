@@ -57,11 +57,11 @@ namespace hpx { namespace threads {
     public:
         stackless_coroutine_type::result_type call()
         {
-            HPX_ASSERT(get_state().state() == active);
+            HPX_ASSERT(get_state().state() == thread_schedule_state::active);
             HPX_ASSERT(this == coroutine_.get_thread_id().get());
 
             return coroutine_(this->thread_data::set_state_ex(
-                thread_state_ex_enum::wait_signaled));
+                thread_restart_state::signaled));
         }
 
 #if defined(HPX_DEBUG)

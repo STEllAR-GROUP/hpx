@@ -107,7 +107,7 @@ namespace hpx { namespace threads {
             typename std::decay<F>::type>::call(f);
         exec.add(
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
-            annotation, threads::thread_state_enum::pending, true,
+            annotation, threads::thread_schedule_state::pending, true,
             exec.get_stacksize(), threads::thread_schedule_hint(), throws);
     }
     ///////////////////////////////////////////////////////////////////////////
@@ -122,7 +122,7 @@ namespace hpx { namespace threads {
     {
         exec.add(
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
-            annotation, threads::thread_state_enum::pending, true,
+            annotation, threads::thread_schedule_state::pending, true,
             exec.get_stacksize(), std::forward<Hint>(hint), throws);
     }
 

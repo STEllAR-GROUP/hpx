@@ -156,8 +156,9 @@ void print_results(std::uint64_t cores, double walltime, double warmup_estimate,
 void wait_for_tasks(
     hpx::lcos::local::barrier& finished, std::uint64_t suspended_tasks)
 {
-    std::uint64_t const pending_count = get_thread_count(
-        hpx::threads::thread_priority::normal, hpx::threads::pending);
+    std::uint64_t const pending_count =
+        get_thread_count(hpx::threads::thread_priority::normal,
+            hpx::threads::thread_schedule_state::pending);
 
     if (pending_count == 0)
     {
@@ -180,23 +181,28 @@ void wait_for_tasks(
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::threads::thread_result_type invoke_worker_timed_no_suspension(
-    hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled)
+    hpx::threads::thread_restart_state ex =
+        hpx::threads::thread_restart_state::wait_signaled)
 {
     worker_timed(delay * 1000);
     return hpx::threads::thread_result_type(
-        hpx::threads::terminated, hpx::threads::invalid_thread_id);
+        hpx::threads::thread_schedule_state::terminated,
+        hpx::threads::invalid_thread_id);
 }
 
 hpx::threads::thread_result_type invoke_worker_timed_suspension(
-    hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled)
+    hpx::threads::thread_restart_state ex =
+        hpx::threads::thread_restart_state::wait_signaled)
 {
     worker_timed(delay * 1000);
 
     hpx::error_code ec(hpx::lightweight);
-    hpx::this_thread::suspend(hpx::threads::suspended, "suspend", ec);
+    hpx::this_thread::suspend(
+        hpx::threads::thread_schedule_state::suspended, "suspend", ec);
 
     return hpx::threads::thread_result_type(
-        hpx::threads::terminated, hpx::threads::invalid_thread_id);
+        hpx::threads::thread_schedule_state::terminated,
+        hpx::threads::invalid_thread_id);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -476,9 +482,11 @@ int hpx_main(variables_map& vm)
         // executed, and then it
         hpx::lcos::local::barrier finished(2);
 
-        thread_init_data data(make_thread_function_nullary(
-            hpx::util::bind(&wait_for_tasks, std::ref(finished), total_suspended_tasks)),
-            "wait_for_tasks", hpx::threads::pending,
+        thread_init_data data(
+            make_thread_function_nullary(hpx::util::bind(
+                &wait_for_tasks, std::ref(finished), total_suspended_tasks)),
+            "wait_for_tasks",
+            hpx::threads::thread_schedule_state::thread_schedule_state::pending,
             hpx::threads::thread_priority::low);
         register_work(data);
 

@@ -1514,10 +1514,10 @@ void addressing_service::route(
         threads::thread_init_data data(
             threads::make_thread_function_nullary(util::deferred_call(
                 route_ptr, this, std::move(p), std::move(f), local_priority)),
-            "addressing_service::route",
-            threads::thread_priority::normal,
+            "addressing_service::route", threads::thread_priority::normal,
             threads::thread_schedule_hint(),
-            threads::thread_stacksize::default_, threads::thread_state_enum::pending, true);
+            threads::thread_stacksize::default_,
+            threads::thread_schedule_state::pending, true);
         threads::register_thread(data);
         return;
     }
@@ -1665,13 +1665,12 @@ void addressing_service::decref(
     {
         // reschedule this call as an HPX thread
         threads::thread_init_data data(
-            threads::make_thread_function_nullary([=]() -> void {
-                return decref(raw, credit, throws);
-            }),
-            "addressing_service::decref",
-            threads::thread_priority::normal,
+            threads::make_thread_function_nullary(
+                [=]() -> void { return decref(raw, credit, throws); }),
+            "addressing_service::decref", threads::thread_priority::normal,
             threads::thread_schedule_hint(),
-            threads::thread_stacksize::default_, threads::thread_state_enum::pending, true);
+            threads::thread_stacksize::default_,
+            threads::thread_schedule_state::pending, true);
         threads::register_thread(data, ec);
 
         return;
@@ -1930,13 +1929,12 @@ void addressing_service::update_cache_entry(
             return;
         }
         threads::thread_init_data data(
-            threads::make_thread_function_nullary([=]() -> void {
-                return update_cache_entry(id, g, throws);
-            }),
+            threads::make_thread_function_nullary(
+                [=]() -> void { return update_cache_entry(id, g, throws); }),
             "addressing_service::update_cache_entry",
-            threads::thread_priority::normal,
-            threads::thread_schedule_hint(),
-            threads::thread_stacksize::default_, threads::thread_state_enum::pending, true);
+            threads::thread_priority::normal, threads::thread_schedule_hint(),
+            threads::thread_stacksize::default_,
+            threads::thread_schedule_state::pending, true);
         threads::register_thread(data, ec);
     }
 

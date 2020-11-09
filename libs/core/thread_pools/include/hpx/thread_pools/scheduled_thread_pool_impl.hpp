@@ -516,7 +516,8 @@ namespace hpx { namespace threads { namespace detail {
                 // the OS thread is allowed to exit only if no more HPX
                 // threads exist or if some other thread has terminated
                 HPX_ASSERT(
-                    (sched_->Scheduler::get_thread_count(suspended,
+                    (sched_->Scheduler::get_thread_count(
+                         thread_schedule_state::suspended,
                          thread_priority::default_, thread_num) == 0 &&
                         sched_->Scheduler::get_queue_length(thread_num) == 0) ||
                     sched_->Scheduler::get_state(thread_num) > state_stopping);
@@ -614,8 +615,8 @@ namespace hpx { namespace threads { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     thread_state scheduled_thread_pool<Scheduler>::set_state(
-        thread_id_type const& id, thread_state_enum new_state,
-        thread_state_ex_enum new_state_ex, thread_priority priority,
+        thread_id_type const& id, thread_schedule_state new_state,
+        thread_restart_state new_state_ex, thread_priority priority,
         error_code& ec)
     {
         return detail::set_thread_state(id, new_state,    //-V107
@@ -628,8 +629,8 @@ namespace hpx { namespace threads { namespace detail {
     template <typename Scheduler>
     thread_id_type scheduled_thread_pool<Scheduler>::set_state(
         hpx::chrono::steady_time_point const& abs_time,
-        thread_id_type const& id, thread_state_enum newstate,
-        thread_state_ex_enum newstate_ex, thread_priority priority,
+        thread_id_type const& id, thread_schedule_state newstate,
+        thread_restart_state newstate_ex, thread_priority priority,
         error_code& ec)
     {
         return detail::set_thread_state_timed(*sched_, abs_time, id, newstate,

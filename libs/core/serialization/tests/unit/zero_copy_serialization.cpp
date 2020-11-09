@@ -169,7 +169,7 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     //naming::address const* inaddrs = pin.get_destination_addrs();
     //hpx::threads::thread_init_data data;
     //inact->get_thread_init_data(inaddrs[0].address_, data);
-    //data.func(hpx::threads::thread_state_ex_enum::wait_signaled);
+    //data.func(hpx::threads::thread_restart_state::signaled);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

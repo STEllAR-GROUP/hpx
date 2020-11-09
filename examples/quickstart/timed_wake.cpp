@@ -35,10 +35,11 @@ int hpx_main(variables_map& vm)
 
         // Schedule a wakeup in 5 seconds.
         set_thread_state(get_self_id(), seconds(5),
-            hpx::threads::thread_state_enum::pending);
+            hpx::threads::thread_schedule_state::pending);
 
         // Suspend this HPX thread.
-        hpx::this_thread::suspend(hpx::threads::thread_state_enum::suspended);
+        hpx::this_thread::suspend(
+            hpx::threads::thread_schedule_state::suspended);
 
         std::cout << "woke up after " << t.elapsed() << " seconds\n";
     }

@@ -99,7 +99,7 @@ namespace hpx { namespace actions {
             }
 
             threads::thread_result_type operator()(
-                threads::thread_state_ex_enum)
+                threads::thread_restart_state)
             {
                 try
                 {
@@ -138,7 +138,7 @@ namespace hpx { namespace actions {
                 util::force_error_on_lock();
 
                 return threads::thread_result_type(
-                    threads::thread_state_enum::terminated,
+                    threads::thread_schedule_state::terminated,
                     threads::invalid_thread_id);
             }
 
@@ -169,7 +169,7 @@ namespace hpx { namespace actions {
             }
 
             threads::thread_result_type operator()(
-                threads::thread_state_ex_enum)
+                threads::thread_restart_state)
             {
                 LTM_(debug) << "Executing " << Action::get_action_name(lva_)
                             << " with continuation(" << cont_.get_id() << ")";
@@ -179,7 +179,7 @@ namespace hpx { namespace actions {
                     action_invoke<Action>{lva_, comptype_}, std::move(args_));
 
                 return threads::thread_result_type(
-                    threads::thread_state_enum::terminated,
+                    threads::thread_schedule_state::terminated,
                     threads::invalid_thread_id);
             }
 

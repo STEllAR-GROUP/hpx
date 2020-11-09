@@ -143,7 +143,7 @@ namespace hpx { namespace threads {
             // situations.
             virtual void add(closure_type&& f,
                 util::thread_description const& desc,
-                threads::thread_state_enum initial_state, bool run_now,
+                threads::thread_schedule_state initial_state, bool run_now,
                 threads::thread_stacksize stacksize,
                 threads::thread_schedule_hint schedulehint, error_code& ec) = 0;
 
@@ -311,8 +311,8 @@ namespace hpx { namespace threads {
         /// situations.
         void add(closure_type f,
             util::thread_description const& desc = util::thread_description(),
-            threads::thread_state_enum initial_state =
-                threads::thread_state_enum::pending,
+            threads::thread_schedule_state initial_state =
+                threads::thread_schedule_state::pending,
             bool run_now = true,
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize::default_,

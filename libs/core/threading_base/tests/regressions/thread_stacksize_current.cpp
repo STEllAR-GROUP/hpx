@@ -16,6 +16,7 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/threading_base.hpp>
 
+#include <cstddef>
 #include <iostream>
 #include <string>
 #include <vector>
