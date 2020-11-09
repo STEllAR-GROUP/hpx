@@ -96,6 +96,9 @@ def perftest():
 if buildinfo:
 
     @perftest.command(description='run performance tests')
+    @args.arg('--local',
+              default=False,
+              help='run without slurm')
     @args.arg('--scheduling-policy',
               '-s',
               default='local-priority-fifo',
@@ -113,7 +116,7 @@ if buildinfo:
               type=str,
               help='extra arguments to pass to the test\nWarning prefer = to \
               space to assign values to hpx options')
-    def run(scheduling_policy, threads, output, extra_opts):
+    def run(local, scheduling_policy, threads, output, extra_opts):
         # options
         scheduling_policy='--hpx:queuing=' + scheduling_policy
         threads='--hpx:threads=' + str(threads)
@@ -123,7 +126,7 @@ if buildinfo:
         if not output.lower().endswith('.json'):
             output += '.json'
 
-        data = perftest.run(scheduling_policy, threads, extra_opts)
+        data = perftest.run(local, scheduling_policy, threads, extra_opts)
         with open(output, 'w') as outfile:
             json.dump(data, outfile, indent='  ')
             log.info(f'Successfully saved perftests output to {output}')

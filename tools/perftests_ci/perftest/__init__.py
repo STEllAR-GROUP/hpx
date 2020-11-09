@@ -27,7 +27,7 @@ def _now():
     return datetime.now(timezone.utc).astimezone().isoformat()
 
 
-def run(scheduling_policy, threads, extra_opts):
+def run(local, scheduling_policy, threads, extra_opts):
     from pyutils import buildinfo
 
     binary = os.path.join(buildinfo.binary_dir, 'bin', 'future_overhead_test')
@@ -35,14 +35,17 @@ def run(scheduling_policy, threads, extra_opts):
     if extra_opts:
         command += extra_opts.split()
 
-    output = runtools.srun(command)
+    if local:
+        output = runtools.run(command)
+    else:
+        output = runtools.srun(command)
 
     data = json.loads(output)
 
     data[var._project_name] = {'commit': _git_commit(), 'datetime': _git_datetime()}
     data['environment'] = {
         'hostname': env.hostname(),
-        'clustername': env.clustername(),
+        'clustername': env.clustername(local),
         'compiler': buildinfo.compiler,
         'datetime': _now(),
         'envfile': buildinfo.envfile

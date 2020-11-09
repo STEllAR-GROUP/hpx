@@ -82,13 +82,15 @@ def hostname():
 
 
 @functools.lru_cache()
-def clustername():
+def clustername(local):
     """SLURM cluster name of the current machine.
 
     Example:
         >>> clustername()
         'kesch'
     """
+    if local:
+        return 'local'
     try:
         output = runtools.run(['scontrol', 'show', 'config'])
         m = re.compile(r'.*ClusterName\s*=\s*(\S*).*',
