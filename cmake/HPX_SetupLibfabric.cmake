@@ -16,11 +16,7 @@ if(HPX_WITH_PARCELPORT_LIBFABRIC AND NOT TARGET Libfabric::libfabric)
   # ------------------------------------------------------------------------------
   # OFIWG libfabric stack
   # ------------------------------------------------------------------------------
-  if(HPX_PARCELPORT_LIBFABRIC_WITH_HPXC)
-    include(${CMAKE_CURRENT_SOURCE_DIR}/libfabric/CMakeLists.txt)
-  else()
-    find_package(Libfabric REQUIRED)
-  endif()
+  find_package(Libfabric REQUIRED)
   # Setup Libfabric imported target
   add_library(Libfabric::libfabric INTERFACE IMPORTED)
   target_include_directories(
