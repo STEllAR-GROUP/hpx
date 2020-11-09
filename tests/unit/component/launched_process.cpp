@@ -85,6 +85,11 @@ int main(int argc, char* argv[])
 
     // Note: this uses runtime_mode::connect to instruct this locality to
     // connect to the existing HPX applications
-    return hpx::init(desc_commandline, argc, argv, cfg, hpx::runtime_mode::connect);
+    hpx::init_params init_args;
+    init_args.mode = hpx::runtime_mode::connect;
+    init_args.cfg = cfg;
+    init_args.desc_cmdline = desc_commandline;
+
+    return hpx::init(argc, argv, init_args);
 }
 #endif

@@ -147,9 +147,12 @@ int main(int argc, char* argv[])
         "hpx.run_hpx_main!=1"
     };
 
-    hpx::util::function_nonser<void()> const empty;
-    return hpx::init(desc_commandline, argc, argv, cfg, empty,
-        empty, hpx::runtime_mode::connect);
+    hpx::init_params init_args;
+    init_args.mode = hpx::runtime_mode::connect;
+    init_args.cfg = cfg;
+    init_args.desc_cmdline = desc_commandline;
+
+    return hpx::init(argc, argv, init_args);
 }
 
 #endif

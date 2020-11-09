@@ -38,14 +38,18 @@ int main(int argc, char* argv[])
     newargv.push_back(help_option);
     newargv.push_back(nullptr);
 
-    options_description op("Issue #2990\n\nUsage: issue2990 [options]");
+    options_description cmdline("Issue #2990\n\nUsage: issue2990 [options]");
 
     // clang-format off
-    op.add_options()
+    cmdline.add_options()
         ("reqopt1", value<int>()->required(), "Required option 1")
         ("reqopt2", value<double>()->required(), "Required option 2")
         ("reqopt3", value<std::string>()->required(), "Required option 3");
     // clang-format on
 
-    return hpx::init(op, argc + 1, newargv.data(), cfg);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+    init_args.cfg = cfg;
+
+    return hpx::init(argc + 1, newargv.data(), init_args);
 }

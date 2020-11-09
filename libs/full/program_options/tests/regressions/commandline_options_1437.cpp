@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 {
     HPX_TEST_LT(1, argc);
 
-    HPX_TEST_EQ(hpx::init(&my_hpx_main, "testapp", argc, argv), 0);
+    HPX_TEST_EQ(hpx::init(&my_hpx_main, argc, argv), 0);
     HPX_TEST(invoked_main);
 
     return hpx::util::report_errors();
