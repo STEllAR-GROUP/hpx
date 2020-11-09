@@ -20,9 +20,6 @@ using hpx::program_options::options_description;
 
 using hpx::util::function;
 
-using hpx::init;
-using hpx::finalize;
-
 ///////////////////////////////////////////////////////////////////////////////
 struct small_object
 {
@@ -269,7 +266,7 @@ int hpx_main(variables_map& vm)
         }
     }
 
-    finalize();
+    hpx::finalize();
 
     return 0;
 }
@@ -281,6 +278,9 @@ int main(int argc, char* argv[])
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX
-    return init(cmdline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+
+    return hpx::init(argc, argv, init_args);
 }
 

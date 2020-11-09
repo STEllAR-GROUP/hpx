@@ -43,9 +43,7 @@ using hpx::threads::wait_signaled;
 using hpx::threads::wait_terminate;
 using hpx::threads::wait_timeout;
 
-using hpx::finalize;
 using hpx::find_here;
-using hpx::init;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace detail {
@@ -198,7 +196,7 @@ int hpx_main(variables_map& vm)
         set_thread_state(thread, pending, wait_terminate);
     }
 
-    finalize();
+    hpx::finalize();
 
     return 0;
 }
@@ -222,6 +220,9 @@ int main(int argc, char* argv[])
     // clang-format on
 
     // Initialize and run HPX
-    return init(cmdline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+
+    return hpx::init(argc, argv, init_args);
 }
 #endif

@@ -96,7 +96,10 @@ int main(int argc, char* argv[])
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX
-    HPX_TEST_EQ(hpx::init(cmdline, argc, argv), 0);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+
+    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
     return 0;
 }
 #endif

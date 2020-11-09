@@ -29,8 +29,6 @@ using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
 
-using hpx::init;
-using hpx::finalize;
 using hpx::get_os_thread_count;
 
 using hpx::threads::register_work;
@@ -232,7 +230,7 @@ int hpx_main(
         print_results(get_os_thread_count(), t.elapsed());
     }
 
-    finalize();
+    hpx::finalize();
     return 0;
 }
 
@@ -272,6 +270,9 @@ int main(
         ;
 
     // Initialize and run HPX.
-    return init(cmdline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+
+    return hpx::init(argc, argv, init_args);
 }
 #endif

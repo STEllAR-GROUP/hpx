@@ -149,21 +149,24 @@ int main(int argc, char* argv[])
     namespace po = hpx::program_options;
 
     // Configure application-specific options.
-    po::options_description opts("usage: " HPX_APPLICATION_STRING " [options]");
-    opts.add_options()
-        ("samples,s", po::value<std::uint64_t>()->default_value(1000),
-         "number of tasks to concurrently wait for (default: 1000)")
-        ("futures,f", po::value<std::uint64_t>()->default_value(100),
-         "number of tasks to concurrently wait for (default: 100)")
-        ("chunks,c", po::value<std::uint64_t>()->default_value(1),
-         "number of chunks to split tasks into (default: 1)")
-        ("delay,d", po::value<std::uint64_t>()->default_value(0),
-         "number of iterations in the delay loop")
-        ("no-header,n", po::value<bool>()->default_value(true),
-         "do not print out the csv header row")
-        ;
+    po::options_description cmdline(
+        "usage: " HPX_APPLICATION_STRING " [options]");
+    cmdline.add_options()("samples,s",
+        po::value<std::uint64_t>()->default_value(1000),
+        "number of tasks to concurrently wait for (default: 1000)")("futures,f",
+        po::value<std::uint64_t>()->default_value(100),
+        "number of tasks to concurrently wait for (default: 100)")("chunks,c",
+        po::value<std::uint64_t>()->default_value(1),
+        "number of chunks to split tasks into (default: 1)")("delay,d",
+        po::value<std::uint64_t>()->default_value(0),
+        "number of iterations in the delay loop")("no-header,n",
+        po::value<bool>()->default_value(true),
+        "do not print out the csv header row");
 
     // Initialize and run HPX.
-    return hpx::init(opts, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+
+    return hpx::init(argc, argv, init_args);
 }
 #endif

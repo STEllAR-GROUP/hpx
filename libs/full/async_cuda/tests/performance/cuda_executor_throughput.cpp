@@ -209,6 +209,9 @@ int main(int argc, char** argv)
         "iterations");
     // clang-format on
 
-    auto result = hpx::init(cmdline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+
+    auto result = hpx::init(argc, argv, init_args);
     return result || hpx::util::report_errors();
 }

@@ -48,6 +48,9 @@ int main(int argc, char **argv)
     hpx::program_options::options_description desc(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
-    return hpx::init(desc, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = desc;
+
+    return hpx::init(argc, argv, init_args);
 }
 #endif

@@ -209,6 +209,9 @@ int main(int argc, char* argv[])
     // clang-format on
 
     // Initialize and run HPX.
-    return hpx::init(cmdline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+
+    return hpx::init(argc, argv, init_args);
 }
 #endif

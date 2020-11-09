@@ -40,8 +40,6 @@ using hpx::threads::suspended;
 using hpx::threads::wait_signaled;
 using hpx::threads::wait_terminate;
 
-using hpx::init;
-using hpx::finalize;
 using hpx::find_here;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -183,7 +181,7 @@ int hpx_main(variables_map& vm)
         set_thread_state(thread_id, pending, wait_terminate);
     }
 
-    finalize();
+    hpx::finalize();
 
     return 0;
 }
@@ -205,7 +203,10 @@ int main(int argc, char* argv[])
     ;
 
     // Initialize and run HPX
-    HPX_TEST_EQ(0, init(cmdline, argc, argv));
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+
+    HPX_TEST_EQ(0, hpx::init(argc, argv, init_args));
 
     HPX_TEST(woken);
 

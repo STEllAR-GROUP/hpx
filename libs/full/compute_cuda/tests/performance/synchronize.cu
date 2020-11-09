@@ -91,5 +91,8 @@ int main(int argc, char* argv[])
     cmdline.add_options()("iterations",
         hpx::program_options::value<std::size_t>()->default_value(1024),
         "number of iterations (default: 1024)");
-    return hpx::init(cmdline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+
+    return hpx::init(argc, argv, init_args);
 }

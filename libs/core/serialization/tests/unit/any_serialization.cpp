@@ -33,9 +33,6 @@ using hpx::program_options::variables_map;
 
 using hpx::util::basic_any;
 
-using hpx::finalize;
-using hpx::init;
-
 // note: version can be assigned only to objects whose implementation
 // level is object_class_info.  So, doing the following will result in
 // a static assertion
@@ -94,7 +91,7 @@ int hpx_main(variables_map& vm)
             hpx::any_cast<big_object>(any), hpx::any_cast<big_object>(any_in));
     }
 
-    return finalize();
+    return hpx::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -103,7 +100,10 @@ int main(int argc, char* argv[])
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX
-    init(cmdline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+
+    hpx::init(argc, argv, init_args);
 
     return EXIT_SUCCESS;
 }

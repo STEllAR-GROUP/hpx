@@ -262,6 +262,11 @@ int main(int argc, char* argv[])
 {
     // Initialize and run HPX
     hpx::register_startup_function(&init_globals);
-    return hpx::init(get_commandline_options(), argc, argv);
+    hpx::init_params init_args;
+    hpx::program_options::options_description cmdline =
+        get_commandline_options();
+    init_args.desc_cmdline = cmdline;
+
+    return hpx::init(argc, argv, init_args);
 }
 #endif

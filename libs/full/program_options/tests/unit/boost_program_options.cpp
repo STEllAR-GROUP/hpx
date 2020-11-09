@@ -34,5 +34,9 @@ int main(int argc, char* argv[])
     ;
     // clang-format on
 
-    return hpx::init(desc, argc, argv);
+    hpx::program_options::options_description cmdline(desc);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+
+    return hpx::init(argc, argv, init_args);
 }
