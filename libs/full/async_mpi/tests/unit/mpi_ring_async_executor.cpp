@@ -198,7 +198,11 @@ int main(int argc, char* argv[])
     // clang-format on
 
     // Initialize and run HPX.
-    auto result = hpx::init(cmdline, argc, argv, cfg);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+    init_args.cfg = cfg;
+
+    auto result = hpx::init(argc, argv, init_args);
 
     // Finalize MPI
     MPI_Finalize();

@@ -597,7 +597,11 @@ int main(int argc, char* argv[])
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    if (int result = hpx::init(cmdline, argc, argv, cfg))
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+    init_args.cfg = cfg;
+
+    if (int result = hpx::init(argc, argv, init_args))
     {
         return result;
     }
