@@ -163,7 +163,11 @@ int main(int argc, char* argv[])
         "hpx.os_threads!=1"
     };
 
-    return hpx::init(desc_commandline, argc, argv, cfg);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = desc_commandline;
+    init_args.cfg = cfg;
+
+    return hpx::init(argc, argv, init_args);
 }
 
 void transpose(sub_block A, sub_block B, std::uint64_t block_order,
