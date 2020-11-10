@@ -68,14 +68,7 @@ int hpx_main(hpx::program_options::variables_map&)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    // Configure application-specific options.
-    hpx::program_options::options_description cmdline(
-        "Usage: " HPX_APPLICATION_STRING " [options]");
-
     // Initialize and run HPX.
-    hpx::init_params init_args;
-    init_args.desc_cmdline = cmdline;
-
-    return hpx::init(argc, argv, init_args);
+    return hpx::init(argc, argv);
 }
 #endif

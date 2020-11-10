@@ -52,13 +52,7 @@ int main(
   , char* argv[]
     )
 {
-    // Configure application-specific options.
-    options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
-
     // Initialize and run HPX.
-    hpx::init_params init_args;
-    init_args.desc_cmdline = cmdline;
-
-    return hpx::init(argc, argv, init_args);
+    return hpx::init(argc, argv);
 }
 #endif
