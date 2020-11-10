@@ -404,7 +404,7 @@ namespace hpx {
         on_exit_type on_exit_functions_;
         mutable std::mutex mtx_;
 
-        util::runtime_configuration ini_;
+        util::runtime_configuration rtcfg_;
 
         long instance_number_;
         static std::atomic<int> instance_number_counter_;

@@ -14,6 +14,7 @@
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
@@ -56,7 +57,7 @@ namespace hpx { namespace threads {
         typedef threads::policies::scheduler_base scheduler_type;
         typedef std::vector<pool_type> pool_vector;
 
-        threadmanager(
+        threadmanager(util::runtime_configuration& rtcfg_,
 #ifdef HPX_HAVE_TIMER_POOL
             util::io_service_pool& timer_pool,
 #endif
@@ -393,11 +394,7 @@ namespace hpx { namespace threads {
     private:
         mutable mutex_type mtx_;    // mutex protecting the members
 
-        // specified by the user in command line, or all cores by default
-        // represents the total number of OS threads, irrespective of how many
-        // are in which pool.
-        std::size_t num_threads_;
-
+        util::runtime_configuration& rtcfg_;
         std::vector<pool_id_type> threads_lookup_;
 
 #ifdef HPX_HAVE_TIMER_POOL

@@ -562,37 +562,14 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////
-    std::size_t get_num_high_priority_queues(
-        util::command_line_handling const& cfg, std::size_t num_threads)
+    void command_line_handling::check_affinity_domain() const
     {
-        std::size_t num_high_priority_queues = num_threads;
-        if (cfg.vm_.count("hpx:high-priority-threads"))
+        if (affinity_domain_ != "pu")
         {
-            num_high_priority_queues =
-                cfg.vm_["hpx:high-priority-threads"].as<std::size_t>();
-            if (num_high_priority_queues > num_threads)
-            {
-                throw hpx::detail::command_line_error(
-                    "Invalid command line option: "
-                    "number of high priority threads ("
-                    "--hpx:high-priority-threads), should not be larger "
-                    "than number of threads (--hpx:threads)");
-            }
-        }
-        return num_high_priority_queues;
-    }
-
-    ///////////////////////////////////////////////////////////////////////
-    std::string get_affinity_domain(util::command_line_handling const& cfg)
-    {
-        std::string affinity_domain("pu");
-        if (cfg.affinity_domain_ != "pu")
-        {
-            affinity_domain = cfg.affinity_domain_;
-            if (0 != std::string("pu").find(affinity_domain) &&
-                0 != std::string("core").find(affinity_domain) &&
-                0 != std::string("numa").find(affinity_domain) &&
-                0 != std::string("machine").find(affinity_domain))
+            if (0 != std::string("pu").find(affinity_domain_) &&
+                0 != std::string("core").find(affinity_domain_) &&
+                0 != std::string("numa").find(affinity_domain_) &&
+                0 != std::string("machine").find(affinity_domain_))
             {
                 throw hpx::detail::command_line_error(
                     "Invalid command line option "
@@ -600,66 +577,47 @@ namespace hpx { namespace util {
                     "or machine.");
             }
         }
-        return affinity_domain;
     }
 
-    std::size_t get_affinity_description(
-        util::command_line_handling const& cfg, std::string& affinity_desc)
+    void command_line_handling::check_affinity_description() const
     {
-        if (cfg.affinity_bind_.empty())
-            return cfg.numa_sensitive_;
+        if (affinity_bind_.empty())
+        {
+            return;
+        }
 
-        if (!(cfg.pu_offset_ == std::size_t(-1) ||
-                cfg.pu_offset_ == std::size_t(0)) ||
-            cfg.pu_step_ != 1 || cfg.affinity_domain_ != "pu")
+        if (!(pu_offset_ == std::size_t(-1) || pu_offset_ == std::size_t(0)) ||
+            pu_step_ != 1 || affinity_domain_ != "pu")
         {
             throw hpx::detail::command_line_error(
                 "Command line option --hpx:bind "
                 "should not be used with --hpx:pu-step, --hpx:pu-offset, "
                 "or --hpx:affinity.");
         }
-
-        affinity_desc = cfg.affinity_bind_;
-        return cfg.numa_sensitive_;
     }
 
-    std::size_t get_pu_offset(util::command_line_handling const& cfg)
+    void command_line_handling::check_pu_offset() const
     {
-        std::size_t pu_offset = std::size_t(-1);
-
-        if (cfg.pu_offset_ != std::size_t(-1))
+        if (pu_offset_ != std::size_t(-1) &&
+            pu_offset_ >= hpx::threads::hardware_concurrency())
         {
-            pu_offset = cfg.pu_offset_;
-            if (pu_offset >= hpx::threads::hardware_concurrency())
-            {
-                throw hpx::detail::command_line_error(
-                    "Invalid command line option "
-                    "--hpx:pu-offset, value must be smaller than number of "
-                    "available processing units.");
-            }
+            throw hpx::detail::command_line_error(
+                "Invalid command line option "
+                "--hpx:pu-offset, value must be smaller than number of "
+                "available processing units.");
         }
-
-        return pu_offset;
     }
 
-    std::size_t get_pu_step(util::command_line_handling const& cfg)
+    void command_line_handling::check_pu_step() const
     {
-        std::size_t pu_step = 1;
-
-        if (cfg.pu_step_ != 1)
+        if (pu_step_ == 0 || pu_step_ >= hpx::threads::hardware_concurrency())
         {
-            pu_step = cfg.pu_step_;
-            if (pu_step == 0 || pu_step >= hpx::threads::hardware_concurrency())
-            {
-                throw hpx::detail::command_line_error(
-                    "Invalid command line option "
-                    "--hpx:pu-step, value must be non-zero and smaller "
-                    "than "
-                    "number of available processing units.");
-            }
+            throw hpx::detail::command_line_error(
+                "Invalid command line option "
+                "--hpx:pu-step, value must be non-zero and smaller "
+                "than "
+                "number of available processing units.");
         }
-
-        return pu_step;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -793,6 +751,9 @@ namespace hpx { namespace util {
             use_process_mask_ = false;
         }
 #endif
+
+        ini_config.emplace_back(
+            "hpx.use_process_mask!=" + std::to_string(use_process_mask_));
 
 #if defined(HPX_HAVE_MODULE_MPI_BASE)
         bool have_mpi = util::mpi_environment::check_mpi_environment(rtcfg_);
@@ -1021,6 +982,8 @@ namespace hpx { namespace util {
         affinity_domain_ = detail::handle_affinity(cfgmap, vm, "pu");
         ini_config.emplace_back("hpx.affinity=" + affinity_domain_);
 
+        check_affinity_domain();
+
         affinity_bind_ = detail::handle_affinity_bind(cfgmap, vm, "");
         if (!affinity_bind_.empty())
         {
@@ -1048,6 +1011,8 @@ namespace hpx { namespace util {
 #endif
         ini_config.emplace_back("hpx.pu_step=" + std::to_string(pu_step_));
 
+        check_pu_step();
+
         pu_offset_ = detail::handle_pu_offset(cfgmap, vm, std::size_t(-1));
 
         // NOLINTNEXTLINE(bugprone-branch-clone)
@@ -1070,6 +1035,8 @@ namespace hpx { namespace util {
             ini_config.emplace_back("hpx.pu_offset=0");
         }
 
+        check_pu_offset();
+
         numa_sensitive_ = detail::handle_numa_sensitive(
             cfgmap, vm, affinity_bind_.empty() ? 0 : 1);
         ini_config.emplace_back(
@@ -1088,6 +1055,8 @@ namespace hpx { namespace util {
             ini_config.emplace_back("hpx.bind!=" + affinity_bind_);
         }
 
+        check_affinity_description();
+
         // handle number of cores and threads
         num_threads_ = detail::handle_num_threads(cfgmap, rtcfg_, vm, env,
             using_nodelist, initial, use_process_mask_);
@@ -1098,6 +1067,32 @@ namespace hpx { namespace util {
         ini_config.emplace_back(
             "hpx.os_threads=" + std::to_string(num_threads_));
         ini_config.emplace_back("hpx.cores=" + std::to_string(num_cores_));
+
+        if (vm_.count("hpx:high-priority-threads"))
+        {
+            std::size_t num_high_priority_queues =
+                vm_["hpx:high-priority-threads"].as<std::size_t>();
+            if (num_high_priority_queues != std::size_t(-1) &&
+                num_high_priority_queues > num_threads_)
+            {
+                throw hpx::detail::command_line_error(
+                    "Invalid command line option: "
+                    "number of high priority threads ("
+                    "--hpx:high-priority-threads), should not be larger "
+                    "than number of threads (--hpx:threads)");
+            }
+
+            if (!(queuing_ == "local-priority" || queuing_ == "abp-priority"))
+            {
+                throw hpx::detail::command_line_error(
+                    "Invalid command line option --hpx:high-priority-threads, "
+                    "valid for --hpx:queuing=local-priority and "
+                    "--hpx:queuing=abp-priority only");
+            }
+
+            ini_config.emplace_back("hpx.thread_queue.high_priority_queues!=" +
+                std::to_string(num_high_priority_queues));
+        }
 
         // map host names to ip addresses, if requested
         hpx_host = mapnames.map(hpx_host, hpx_port);
@@ -1541,7 +1536,9 @@ namespace hpx { namespace util {
             // handle all --hpx:foo options, determine node
             std::vector<std::string> ini_config;    // discard
             if (!handle_arguments(cfgmap, prevm, ini_config, node_, true))
+            {
                 return -2;
+            }
 
             // re-initialize runtime configuration object
             if (prevm.count("hpx:config"))
@@ -1619,7 +1616,9 @@ namespace hpx { namespace util {
 
         // handle all --hpx:foo and --hpx:*:foo options
         if (!handle_arguments(cfgmap, vm_, ini_config_, node_))
+        {
             return -2;
+        }
 
         // store unregistered command line and arguments
         store_command_line(argc, argv);
@@ -1630,7 +1629,9 @@ namespace hpx { namespace util {
 
         // help can be printed only after the runtime mode has been set
         if (handle_help_options(help))
+        {
             return 1;    // exit application gracefully
+        }
 
         // print version/copyright information
         if (vm_.count("hpx:version"))
@@ -1640,6 +1641,7 @@ namespace hpx { namespace util {
                 detail::print_version(std::cout);
                 version_printed_ = true;
             }
+
             return 1;
         }
 
@@ -1651,6 +1653,7 @@ namespace hpx { namespace util {
                 detail::print_info(std::cout, *this);
                 info_printed_ = true;
             }
+
             return 1;
         }
 

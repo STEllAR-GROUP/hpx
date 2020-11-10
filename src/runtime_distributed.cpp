@@ -14,7 +14,6 @@
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/collectives/latch.hpp>
-#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution_base/this_thread.hpp>
@@ -387,18 +386,18 @@ namespace hpx {
             &detail::network_background_callback,
 #endif
             false)
-      , mode_(rtcfg.mode_)
+      , mode_(rtcfg_.mode_)
 #if defined(HPX_HAVE_NETWORKING)
       , parcel_handler_notifier_(runtime_distributed::get_notification_policy(
             "parcel-thread", runtime_local::os_thread_type::parcel_thread))
-      , parcel_handler_(rtcfg, thread_manager_.get(), parcel_handler_notifier_)
-      , agas_client_(ini_, rtcfg.mode_)
+      , parcel_handler_(rtcfg_, thread_manager_.get(), parcel_handler_notifier_)
+      , agas_client_(rtcfg_)
       , applier_(parcel_handler_, *thread_manager_)
 #else
-      , agas_client_(ini_, rtcfg.mode_)
+      , agas_client_(rtcfg_)
       , applier_(*thread_manager_)
 #endif
-      , runtime_support_(new components::server::runtime_support(ini_))
+      , runtime_support_(new components::server::runtime_support(rtcfg_))
     {
         // This needs to happen first
         runtime::init();
@@ -415,9 +414,9 @@ namespace hpx {
         LPROGRESS_;
 
 #if defined(HPX_HAVE_NETWORKING)
-        agas_client_.bootstrap(parcel_handler_, ini_);
+        agas_client_.bootstrap(parcel_handler_, rtcfg_);
 #else
-        agas_client_.bootstrap(ini_);
+        agas_client_.bootstrap(rtcfg_);
 #endif
 
         components::server::get_error_dispatcher().set_error_sink(

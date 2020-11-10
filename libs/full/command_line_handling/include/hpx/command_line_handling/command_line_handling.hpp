@@ -21,28 +21,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
 
-    struct command_line_handling;
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Helper functions for retrieving command line options (with error
-    // checking)
-    std::size_t get_num_high_priority_queues(
-        util::command_line_handling const& cfg, std::size_t num_threads);
-
-    std::string get_affinity_domain(util::command_line_handling const& cfg);
-
-    std::size_t get_affinity_description(
-        util::command_line_handling const& cfg, std::string& affinity_desc);
-
-    std::size_t get_pu_offset(util::command_line_handling const& cfg);
-
-    std::size_t get_pu_step(util::command_line_handling const& cfg);
-
     ///////////////////////////////////////////////////////////////////////////
     struct command_line_handling
     {
-        command_line_handling()
-          : rtcfg_(nullptr, runtime_mode::default_)
+        command_line_handling(runtime_configuration rtcfg,
+            std::vector<std::string> ini_config,
+            function_nonser<int(hpx::program_options::variables_map& vm)>
+                hpx_main_f)
+          : rtcfg_(rtcfg)
+          , ini_config_(ini_config)
+          , hpx_main_f_(hpx_main_f)
           , node_(std::size_t(-1))
           , num_threads_(1)
           , num_cores_(1)
@@ -54,7 +42,6 @@ namespace hpx { namespace util {
           , cmd_line_parsed_(false)
           , info_printed_(false)
           , version_printed_(false)
-          , parse_result_(0)
         {
         }
 
@@ -84,9 +71,14 @@ namespace hpx { namespace util {
         bool cmd_line_parsed_;
         bool info_printed_;
         bool version_printed_;
-        int parse_result_;
 
     protected:
+        // Helper functions for checking command line options
+        void check_affinity_domain() const;
+        void check_affinity_description() const;
+        void check_pu_offset() const;
+        void check_pu_step() const;
+
         bool handle_arguments(util::manage_config& cfgmap,
             hpx::program_options::variables_map& vm,
             std::vector<std::string>& ini_config, std::size_t& node,

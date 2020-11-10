@@ -139,7 +139,7 @@ namespace hpx { namespace agas
     }; // }}}
 
     addressing_service::addressing_service(
-        util::runtime_configuration const& ini_, runtime_mode runtime_type_)
+        util::runtime_configuration const& ini_)
       : gva_cache_(new gva_cache_type)
       , console_cache_(naming::invalid_locality_id)
       , max_refcnt_requests_(ini_.get_agas_max_pending_refcnt_requests())
@@ -147,7 +147,7 @@ namespace hpx { namespace agas
       , enable_refcnt_caching_(true)
       , refcnt_requests_(new refcnt_requests_type)
       , service_type(ini_.get_agas_service_mode())
-      , runtime_type(runtime_type_)
+      , runtime_type(ini_.mode_)
       , caching_(ini_.get_agas_caching_mode())
       , range_caching_(caching_ ? ini_.get_agas_range_caching_mode() : false)
       , action_priority_(threads::thread_priority::boost)

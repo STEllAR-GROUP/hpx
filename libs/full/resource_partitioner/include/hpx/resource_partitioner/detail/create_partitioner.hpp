@@ -11,6 +11,7 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 
 #include <hpx/modules/program_options.hpp>
@@ -34,13 +35,8 @@ namespace hpx { namespace detail {
 
 namespace hpx { namespace resource { namespace detail {
     HPX_EXPORT partitioner& create_partitioner(
-        util::function_nonser<int(
-            hpx::program_options::variables_map& vm)> const& f,
-        hpx::program_options::options_description const& desc_cmdline, int argc,
-        char** argv, std::vector<std::string> ini_config,
-        resource::partitioner_mode rpmode, runtime_mode mode, bool check,
-        std::vector<std::shared_ptr<components::component_registry_base>>&
-            component_registries,
-        int* result);
+        resource::partitioner_mode rpmode,
+        hpx::util::runtime_configuration rtcfg,
+        hpx::threads::policies::detail::affinity_data affinity_data);
 
 }}}    // namespace hpx::resource::detail
