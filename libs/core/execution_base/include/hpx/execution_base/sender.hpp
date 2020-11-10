@@ -127,7 +127,7 @@ namespace hpx { namespace execution { namespace experimental {
       : hpx::functional::tag_priority<execute_t>
     {
         template <typename Executor, typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(execute_t,
+        friend constexpr HPX_FORCEINLINE auto tag_override_invoke(execute_t,
             Executor&& executor,
             F&& f) noexcept(noexcept(std::forward<Executor>(executor)
                                          .execute(std::forward<F>(f)))) ->
