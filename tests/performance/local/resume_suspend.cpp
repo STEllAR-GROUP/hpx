@@ -38,7 +38,10 @@ int main(int argc, char ** argv)
 
     std::uint64_t repetitions = vm["repetitions"].as<std::uint64_t>();
 
-    hpx::start(nullptr, desc_commandline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = desc_commandline;
+
+    hpx::start(nullptr, argc, argv, init_args);
     hpx::suspend();
 
     std::uint64_t threads = hpx::resource::get_num_threads("default");
@@ -85,5 +88,3 @@ int main(int argc, char ** argv)
     hpx::apply([]() { hpx::finalize(); });
     hpx::stop();
 }
-
-

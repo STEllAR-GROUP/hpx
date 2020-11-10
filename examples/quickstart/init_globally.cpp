@@ -95,8 +95,11 @@ struct manage_global_runtime
         using hpx::util::placeholders::_2;
         hpx::util::function_nonser<int(int, char**)> start_function =
             hpx::util::bind(&manage_global_runtime::hpx_main, this, _1, _2);
+        hpx::init_params init_args;
+        init_args.cfg = cfg;
+        init_args.mode = hpx::runtime_mode::default_;
 
-        if (!hpx::start(start_function, __argc, __argv, cfg, hpx::runtime_mode::default_))
+        if (!hpx::start(start_function, __argc, __argv, init_args))
         {
             // Something went wrong while initializing the runtime.
             // This early we can't generate any output, just bail out.
