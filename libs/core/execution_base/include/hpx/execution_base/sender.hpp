@@ -250,6 +250,24 @@ namespace hpx { namespace execution { namespace experimental {
     } connect{};
 
     namespace detail {
+        template <typename S, typename R, typename Enable = void>
+        struct connect_result_helper
+        {
+            struct dummy_operation_state
+            {
+            };
+            using type = dummy_operation_state;
+        };
+
+        template <typename S, typename R>
+        struct connect_result_helper<S, R,
+            typename std::enable_if<
+                hpx::is_invocable<connect_t, S, R>::value>::type>
+          : hpx::util::invoke_result<hpx::execution::experimental::connect_t, S,
+                R>
+        {
+        };
+
         template <typename S, typename R>
         struct submit_state
         {
@@ -282,10 +300,7 @@ namespace hpx { namespace execution { namespace experimental {
             };
 
             typename std::decay<R>::type r;
-            using connect_result_type = typename hpx::util::invoke_result<
-                hpx::execution::experimental::connect_t, S,
-                submit_receiver>::type;
-            connect_result_type state;
+            typename connect_result_helper<S, submit_receiver>::type state;
 
             submit_state(S&& s, R&& r)
               : r(std::forward<R>(r))
@@ -318,7 +333,7 @@ namespace hpx { namespace execution { namespace experimental {
             typename std::enable_if<traits::is_sender_to<S, R>::value,
                 decltype(std::forward<S>(s).submit(std::forward<R>(r)))>::type
         {
-            return std::forward<S>(s).submit(std::forward<R>(r));
+            std::forward<S>(s).submit(std::forward<R>(r));
         }
 
         template <typename S, typename R>
@@ -329,12 +344,13 @@ namespace hpx { namespace execution { namespace experimental {
                      std::forward<S>(s), std::forward<R>(r)})
                     ->state))) ->
             typename std::enable_if<!detail::has_member_submit<S, R>::value,
-                decltype(hpx::execution::experimental::start(
-                    (new detail::submit_state<S, R>{
-                         std::forward<S>(s), std::forward<R>(r)})
-                        ->state))>::type
+                typename hpx::util::always_void<decltype(
+                    hpx::execution::experimental::start(
+                        (new detail::submit_state<S, R>{
+                             std::forward<S>(s), std::forward<R>(r)})
+                            ->state))>::type>::type
         {
-            return hpx::execution::experimental::start(
+            hpx::execution::experimental::start(
                 (new detail::submit_state<S, R>{
                      std::forward<S>(s), std::forward<R>(r)})
                     ->state);

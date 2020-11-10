@@ -241,7 +241,8 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename T, typename... As>
         struct is_nothrow_receiver_of
-          : detail::is_nothrow_receiver_of_impl<is_receiver_v<T>, T, As...>
+          : detail::is_nothrow_receiver_of_impl<
+                is_receiver_v<T> && is_receiver_of_v<T, As...>, T, As...>
         {
         };
 

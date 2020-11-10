@@ -6,7 +6,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests basic_executor basic_operation_state basic_receiver basic_sender
-          execution_context
+          basic_submit execution_context
 )
 
 foreach(test ${tests})
