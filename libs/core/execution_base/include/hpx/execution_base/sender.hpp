@@ -748,12 +748,35 @@ namespace hpx { namespace execution { namespace experimental {
               : sender_traits_executor_base<Sender>
             {
             };
+
+            template <typename Sender>
+            struct is_typed_sender
+              : std::integral_constant<bool,
+                    is_sender<Sender>::value &&
+                        detail::has_sender_types<Sender>::value>
+            {
+            };
         }    // namespace detail
 
         template <typename Sender>
         struct sender_traits
           : detail::sender_traits_base<detail::has_sender_types<Sender>::value,
                 Sender>
+        {
+        };
+
+        template <typename Scheduler, typename Enable = void>
+        struct is_scheduler : std::false_type
+        {
+        };
+
+        template <typename Scheduler>
+        struct is_scheduler<Scheduler,
+            typename std::enable_if<
+                hpx::traits::is_invocable<schedule_t, Scheduler&&>::value &&
+                std::is_copy_constructible<Scheduler>::value &&
+                hpx::traits::is_equality_comparable<Scheduler>::value>::type>
+          : std::true_type
         {
         };
     }    // namespace traits
