@@ -2033,8 +2033,8 @@ namespace hpx {
             thread_stacksize size_enum = thread_stacksize::unknown;
 
             util::runtime_configuration const& rtcfg = hpx::get_config();
-            if (rtcfg.get_stack_size(thread_stacksize::small) == size)
-                size_enum = thread_stacksize::small;
+            if (rtcfg.get_stack_size(thread_stacksize::small_) == size)
+                size_enum = thread_stacksize::small_;
             else if (rtcfg.get_stack_size(thread_stacksize::medium) == size)
                 size_enum = thread_stacksize::medium;
             else if (rtcfg.get_stack_size(thread_stacksize::large) == size)

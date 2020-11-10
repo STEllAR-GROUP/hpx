@@ -256,7 +256,8 @@ namespace hpx { namespace threads {
     enum class thread_stacksize
     {
         unknown = -1,
-        small = 1,      ///< use small stack size
+        small_ = 1,     ///< use small stack size (the underscore is to work
+                        ///  around small being defined to char on Windows)
         medium = 2,     ///< use medium sized stack size
         large = 3,      ///< use large stack size
         huge = 4,       ///< use very large stack size
@@ -264,9 +265,9 @@ namespace hpx { namespace threads {
                         ///< (does not need a stack)
         current = 6,    ///< use size of current thread's stack
 
-        default_ = small,    ///< use default stack size
-        minimal = small,     ///< use minimally stack size
-        maximal = huge,      ///< use maximally stack size
+        default_ = small_,    ///< use default stack size
+        minimal = small_,     ///< use minimally stack size
+        maximal = huge,       ///< use maximally stack size
     };
 
 #if defined(HPX_HAVE_UNSCOPED_ENUM_COMPATIBILITY)
@@ -279,7 +280,7 @@ namespace hpx { namespace threads {
         thread_stacksize::unknown;
     HPX_DEPRECATED_V(1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_stacksize thread_stacksize_small =
-        thread_stacksize::small;
+        thread_stacksize::small_;
     HPX_DEPRECATED_V(1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_stacksize thread_stacksize_medium =
         thread_stacksize::medium;

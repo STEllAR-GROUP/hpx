@@ -389,7 +389,7 @@ void measure_function_futures_create_thread(std::uint64_t count, bool csv)
     auto const desc = hpx::util::thread_description();
     auto const prio = hpx::threads::thread_priority::normal;
     auto const hint = hpx::threads::thread_schedule_hint();
-    auto const stack_size = hpx::threads::thread_stacksize::small;
+    auto const stack_size = hpx::threads::thread_stacksize::small_;
     hpx::error_code ec;
 
     // start the clock
@@ -437,7 +437,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
         hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
     auto const desc = hpx::util::thread_description();
     auto prio = hpx::threads::thread_priority::normal;
-    auto const stack_size = hpx::threads::thread_stacksize::small;
+    auto const stack_size = hpx::threads::thread_stacksize::small_;
     auto const num_threads = hpx::get_num_worker_threads();
     hpx::error_code ec;
 

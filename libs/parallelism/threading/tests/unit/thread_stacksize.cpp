@@ -30,7 +30,7 @@ void test_small_stacksize()
     // verify that sufficient stack has been allocated
     HPX_TEST(hpx::threads::get_ctx_ptr()->get_stacksize() >=
         hpx::get_runtime().get_config().get_stack_size(
-            hpx::threads::thread_stacksize::small));
+            hpx::threads::thread_stacksize::small_));
 }
 HPX_DECLARE_ACTION(test_small_stacksize, test_small_stacksize_action)
 HPX_ACTION_USES_SMALL_STACK(test_small_stacksize_action)

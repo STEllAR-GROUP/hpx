@@ -369,7 +369,7 @@ namespace hpx { namespace threads { namespace detail {
             util::bind_front(&wake_timer_thread, thrd, newstate, newstate_ex,
                 priority, self_id, triggered, retry_on_active),
             "wake_timer", priority, thread_schedule_hint(),
-            thread_stacksize::small, thread_schedule_state::suspended, true);
+            thread_stacksize::small_, thread_schedule_state::suspended, true);
 
         thread_id_type wake_id = invalid_thread_id;
         create_thread(&scheduler, data, wake_id);
@@ -452,7 +452,7 @@ namespace hpx { namespace threads { namespace detail {
                 abs_time.value(), thrd, newstate, newstate_ex, priority,
                 started, retry_on_active),
             "at_timer (expire at)", priority, schedulehint,
-            thread_stacksize::small, thread_schedule_state::pending, true);
+            thread_stacksize::small_, thread_schedule_state::pending, true);
 
         thread_id_type newid = invalid_thread_id;
         create_thread(&scheduler, data, newid, ec);    //-V601

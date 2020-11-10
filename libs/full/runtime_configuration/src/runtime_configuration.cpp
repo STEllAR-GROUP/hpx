@@ -1317,7 +1317,7 @@ namespace hpx { namespace util {
             return (std::numeric_limits<std::ptrdiff_t>::max)();
 
         default:
-        case threads::thread_stacksize::small:
+        case threads::thread_stacksize::small_:
             break;
         }
         return small_stacksize;

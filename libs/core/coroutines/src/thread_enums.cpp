@@ -134,7 +134,7 @@ namespace hpx { namespace threads {
         if (size == thread_stacksize::unknown)
             return "unknown";
 
-        if (size < thread_stacksize::small || size > thread_stacksize::nostack)
+        if (size < thread_stacksize::small_ || size > thread_stacksize::nostack)
             return "custom";
 
         return strings::stack_size_names[static_cast<std::size_t>(size) - 1];

@@ -656,7 +656,7 @@ namespace hpx { namespace actions {
     /**/
 
 #define HPX_ACTION_USES_SMALL_STACK(action)                                    \
-    HPX_ACTION_USES_STACK(action, threads::thread_stacksize::small)            \
+    HPX_ACTION_USES_STACK(action, threads::thread_stacksize::small_)           \
 /**/
 #define HPX_ACTION_USES_MEDIUM_STACK(action)                                   \
     HPX_ACTION_USES_STACK(action, threads::thread_stacksize::medium)           \

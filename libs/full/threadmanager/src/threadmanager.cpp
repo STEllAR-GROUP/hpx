@@ -168,7 +168,7 @@ namespace hpx { namespace threads {
                 std::to_string(HPX_IDLE_BACKOFF_TIME_MAX)));
 
         std::ptrdiff_t small_stacksize =
-            cfg_.rtcfg_.get_stack_size(thread_stacksize::small);
+            cfg_.rtcfg_.get_stack_size(thread_stacksize::small_);
         std::ptrdiff_t medium_stacksize =
             cfg_.rtcfg_.get_stack_size(thread_stacksize::medium);
         std::ptrdiff_t large_stacksize =
