@@ -816,10 +816,7 @@ required libraries via MacPorts:
       mkdir hpx-build
       pushd hpx-build
       export HPX_ROOT=$HOME/hpx
-      cmake -DCMAKE_C_COMPILER=gcc \
-          -DCMAKE_CXX_COMPILER=g++ \
-          -DCMAKE_FORTRAN_COMPILER=gfortran \
-          -DCMAKE_C_FLAGS="-Wno-unused-local-typedefs" \
+      cmake -DCMAKE_CXX_COMPILER=g++ \
           -DCMAKE_CXX_FLAGS="-Wno-unused-local-typedefs" \
           -DBOOST_ROOT=$BOOST_ROOT \
           -DHWLOC_ROOT=/opt/local \
@@ -845,13 +842,8 @@ required libraries via MacPorts:
    .. code-block:: bash
 
       cmake -DHPX_WITH_PARCELPORT_MPI=ON \
-           -DCMAKE_C_COMPILER=gcc \
            -DCMAKE_CXX_COMPILER=g++ \
-           -DCMAKE_FORTRAN_COMPILER=gfortran \
-           -DMPI_C_COMPILER=openmpicc \
            -DMPI_CXX_COMPILER=openmpic++ \
-           -DMPI_FORTRAN_COMPILER=openmpif90 \
-           -DCMAKE_C_FLAGS="-Wno-unused-local-typedefs" \
            -DCMAKE_CXX_FLAGS="-Wno-unused-local-typedefs" \
            -DBOOST_ROOT=$BOOST_DIR \
            -DHWLOC_ROOT=/opt/local \
@@ -1049,7 +1041,7 @@ How to install |hpx| on Fedora distributions
   .. code-block:: bash
 
      sudo dnf install gcc-c++ cmake boost-build boost boost-devel hwloc-devel \
-       hwloc gcc-gfortran papi-devel gperftools-devel docbook-dtds \
+       hwloc papi-devel gperftools-devel docbook-dtds \
        docbook-style-xsl libsodium-devel doxygen boost-doc hdf5-devel \
        fop boost-devel boost-openmpi-devel boost-mpich-devel
 

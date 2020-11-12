@@ -7,8 +7,8 @@
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(tests block_matrix)
 
-  set(sources algorithms.cc block_matrix.cc main.cc matrix.cc matrix_hpx.cc
-              tests.cc
+  set(sources algorithms.cpp block_matrix.cpp main.cpp matrix.cpp
+              matrix_hpx.cpp tests.cpp
   )
 
   source_group("Source Files" FILES ${sources})

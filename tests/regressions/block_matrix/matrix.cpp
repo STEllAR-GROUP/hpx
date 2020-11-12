@@ -1,13 +1,15 @@
 // Copyright (c) 2013 Erik Schnetter
 //
+// SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
+#include <hpx/assert.hpp>
 
-#include "matrix.hh"
+#include "matrix.hpp"
 
 #include <cstddef>
 
@@ -28,10 +30,10 @@ std::ostream& operator<<(std::ostream& os, const vector_t& x)
 matrix_t::matrix_t(std::initializer_list<std::initializer_list<double>> a):
   NI(a.size()), NJ(a.end()==a.begin() ? 0 : a.begin()->size()), elts(NI*NJ)
 {
-  assert(std::ptrdiff_t(a.size()) == NI);
+  HPX_ASSERT(std::ptrdiff_t(a.size()) == NI);
   std::ptrdiff_t i = 0;
   for (auto row: a) {
-    assert(std::ptrdiff_t(row.size()) == NJ);
+    HPX_ASSERT(std::ptrdiff_t(row.size()) == NJ);
     std::ptrdiff_t j = 0;
     for (auto elt: row) {
       (*this)(i,j) = elt;

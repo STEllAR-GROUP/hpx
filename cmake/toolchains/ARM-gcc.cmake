@@ -10,7 +10,6 @@ set(CMAKE_CROSSCOMPILING ON)
 
 # Set the gcc Compiler
 set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++-4.8)
-set(CMAKE_C_COMPILER arm-linux-gnueabihf-gcc-4.8)
 
 set(HPX_WITH_GENERIC_CONTEXT_COROUTINES
     ON

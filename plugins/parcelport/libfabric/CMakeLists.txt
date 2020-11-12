@@ -27,47 +27,15 @@ if(HPX_WITH_PARCELPORT_LIBFABRIC)
       ""
       CACHE INTERNAL "" FORCE
   )
-  set(_libfabric_C_srcs
-      ""
-      CACHE INTERNAL "" FORCE
-  )
 
-  if(NOT HPX_PARCELPORT_LIBFABRIC_WITH_HPXC)
-    set(_libfabric_libraries Libfabric::libfabric Pmi::pmi)
-  else()
-    add_library(Gni::gni INTERFACE IMPORTED)
-    target_include_directories(Gni::gni INTERFACE ${LIBFABRIC_INCLUDE_DIR})
-    target_link_libraries(Gni::gni INTERFACE ${GNI_LIB})
-    set(_deps Gni::gni Pmi::pmi)
-
-    set(_libfabric_C_srcs ${libfabric_SRCS} ${libfabric_util_SRCS}
-                          ${libfabric_gni_SRCS}
-    )
-
-    set(_hpxc_CXX_srcs
-        ${_parcelport_CXX_srcs}
-        "${PROJECT_SOURCE_DIR}/plugins/parcelport/libfabric/hpxc/src/threads/thread.cpp"
-    )
-
-    set(_parcelport_CXX_srcs ${_parcelport_CXX_srcs} ${_hpxc_CXX_srcs})
-
-    set(_libfabric_include_dirs
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/hpxc
-        ${CMAKE_CURRENT_SOURCE_DIR}/libfabric
-        ${CMAKE_CURRENT_SOURCE_DIR}/libfabric/prov/gni
-        ${CMAKE_CURRENT_SOURCE_DIR}/libfabric/prov/gni/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/libfabric/include
-        ${GNI_INCLUDE}
-    )
-  endif()
+  set(_libfabric_libraries Libfabric::libfabric Pmi::pmi)
 
   hpx_debug("add_parcelport_libfabric_module")
 
   include(HPX_AddParcelport)
   add_parcelport(
     libfabric STATIC
-    SOURCES ${_parcelport_CXX_srcs} ${_libfabric_C_srcs}
+    SOURCES ${_parcelport_CXX_srcs}
     # do we need to declare any headers? HEADERS FIXME : Could this be private
     DEPENDENCIES
       ${_libfabric_libraries}
@@ -82,26 +50,9 @@ if(HPX_WITH_PARCELPORT_LIBFABRIC)
     FOLDER "Core/Plugins/Parcelport/libfabric"
   )
 
-  if(HPX_PARCELPORT_LIBFABRIC_WITH_HPXC)
-    set_source_files_properties(
-      ${_libfabric_C_srcs}
-      PROPERTIES COMPILE_FLAGS "-include \"hpxc/hpxc/pthread_compatibility.h\" \
-            -include \"libfabric/config.h\"                 \
-            -Wsign-compare -Wunused-parameter" LANGUAGE C
-    )
-
-    set_source_files_properties(
-      ${_parcelport_CXX_srcs}
-      PROPERTIES
-        COMPILE_FLAGS
-        "-include \"libfabric/config.h\" -Wno-missing-field-initializers"
-        LANGUAGE CXX
-    )
-  else()
-    set_source_files_properties(
-      ${_parcelport_CXX_srcs}
-      PROPERTIES COMPILE_FLAGS "-Wno-missing-field-initializers" LANGUAGE CXX
-    )
-  endif()
+  set_source_files_properties(
+    ${_parcelport_CXX_srcs}
+    PROPERTIES COMPILE_FLAGS "-Wno-missing-field-initializers" LANGUAGE CXX
+  )
 
 endif()

@@ -1,5 +1,6 @@
 // Copyright (c) 2013 Erik Schnetter
 //
+// SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,8 +8,9 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include "defs.hh"
+#include "defs.hpp"
 
+#include <hpx/assert.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/shared_ptr.hpp>
 #include <hpx/serialization/vector.hpp>
@@ -37,22 +39,22 @@ struct vector_t {
     ar & elts;
   }
 
-  vector_t(std::ptrdiff_t N): N(N), elts(N) {}
-  vector_t(std::initializer_list<double> x): N(x.size()), elts(x) {}
+  explicit vector_t(std::ptrdiff_t N): N(N), elts(N) {}
+  explicit vector_t(std::initializer_list<double> x): N(x.size()), elts(x) {}
   // We don't really want these
   vector_t() = default;
   vector_t(const vector_t&) = default;
-  vector_t& operator=(const vector_t&) { assert(0); return *this; }
+  vector_t& operator=(const vector_t&) { HPX_ASSERT(0); return *this; }
 
   operator std::string() const { return mkstr(*this); }
   const double& operator()(std::ptrdiff_t i) const
   {
-    assert(i>=0 && i<N);
+    HPX_ASSERT(i>=0 && i<N);
     return elts[i];
   }
   double& operator()(std::ptrdiff_t i)
   {
-    assert(i>=0 && i<N);
+    HPX_ASSERT(i>=0 && i<N);
     return elts[i];
   }
 };
@@ -74,7 +76,7 @@ struct matrix_t {
   }
 
   matrix_t(std::ptrdiff_t NI, std::ptrdiff_t NJ): NI(NI), NJ(NJ), elts(NI*NJ) {}
-  matrix_t(std::initializer_list<std::initializer_list<double>> a);
+  explicit matrix_t(std::initializer_list<std::initializer_list<double>> a);
   // We don't really want these
   matrix_t() = default;
   matrix_t(const matrix_t&) = default;
@@ -82,15 +84,16 @@ struct matrix_t {
   operator std::string() const { return mkstr(*this); }
   const double& operator()(std::ptrdiff_t i, std::ptrdiff_t j) const
   {
-    assert(i>=0 && i<NI && j>=0 && j<NJ);
+    HPX_ASSERT(i>=0 && i<NI && j>=0 && j<NJ);
     return elts[i+NI*j];
   }
   double& operator()(std::ptrdiff_t i, std::ptrdiff_t j)
   {
-    assert(i>=0 && i<NI && j>=0 && j<NJ);
+    HPX_ASSERT(i>=0 && i<NI && j>=0 && j<NJ);
     return elts[i+NI*j];
   }
 };
 
 std::ostream& operator<<(std::ostream& os, const matrix_t& a);
+
 #endif

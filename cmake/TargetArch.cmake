@@ -15,7 +15,7 @@
 # Regarding POWER/PowerPC, just as is noted in the Qt source, "There are many
 # more known variants/revisions that we do not handle/detect."
 
-set(archdetect_c_code
+set(archdetect_cpp_code
     "
     #if defined(__arm__) || defined(__TARGET_ARCH_ARM) || defined(__arm64__) || defined(__aarch64__)
         #if defined(__ARM_ARCH_7__) \\
@@ -113,12 +113,10 @@ function(target_architecture output_var)
       list(APPEND ARCH ppc64)
     endif()
   else()
-    file(WRITE "${PROJECT_BINARY_DIR}/arch.c" "${archdetect_c_code}")
-
-    enable_language(C)
+    file(WRITE "${PROJECT_BINARY_DIR}/arch.cpp" "${archdetect_cpp_code}")
 
     # Detect the architecture in a rather creative way... This compiles a small
-    # C program which is a series of ifdefs that selects a particular #error
+    # C++ program which is a series of ifdefs that selects a particular #error
     # preprocessor directive whose message string contains the target
     # architecture. The program will always fail to compile (both because file
     # is not a valid C program, and obviously because of the presence of the
@@ -128,7 +126,7 @@ function(target_architecture output_var)
     # compiler/preprocessor)
     try_run(
       run_result_unused compile_result_unused "${PROJECT_BINARY_DIR}"
-      "${PROJECT_BINARY_DIR}/arch.c"
+      "${PROJECT_BINARY_DIR}/arch.cpp"
       COMPILE_OUTPUT_VARIABLE ARCH
       CMAKE_FLAGS CMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
     )

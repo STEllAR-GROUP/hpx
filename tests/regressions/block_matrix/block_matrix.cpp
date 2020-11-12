@@ -1,15 +1,17 @@
 // Copyright (c) 2013 Erik Schnetter
 //
+// SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
+#include <hpx/assert.hpp>
 
-#include "block_matrix.hh"
+#include "block_matrix.hpp"
 
-#include "matrix.hh"
+#include "matrix.hpp"
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
@@ -37,12 +39,12 @@ bool structure_t::invariant() const
 
 std::ptrdiff_t structure_t::find(std::ptrdiff_t i) const
 {
-  assert(i>=0 && i<N);
+  HPX_ASSERT(i>=0 && i<N);
   if (B == 0) return -1;
   std::ptrdiff_t b0 = 0, b1 = B-1;
   auto loopinv = [&]() { return b0>=0 && b1<B && b0<=b1; };
   auto loopvar = [&]() { return b1 - b0; };
-  assert(loopinv());
+  HPX_ASSERT(loopinv());
   (void)loopinv;
   std::ptrdiff_t old_loopvar = loopvar();
   while (b0 < b1 && i>=begin[b0] && i<end[b1]) {
@@ -52,9 +54,9 @@ std::ptrdiff_t structure_t::find(std::ptrdiff_t i) const
     } else {
       b0 = b + 1;
     }
-    assert(loopinv());
+    HPX_ASSERT(loopinv());
     auto next_loopvar = loopvar();
-    assert(next_loopvar >= 0 && next_loopvar < old_loopvar);
+    HPX_ASSERT(next_loopvar >= 0 && next_loopvar < old_loopvar);
       old_loopvar = next_loopvar;
   }
   if (b0 == b1 && i>=begin[b0] && i<end[b1]) {
@@ -90,14 +92,14 @@ block_vector_t::block_vector_t(std::shared_ptr<structure_t> str,
                                IL<P<int, IL<double>>> x):
   block_vector_t(str)
 {
-  assert(std::ptrdiff_t(x.size()) == str->B);
+  HPX_ASSERT(std::ptrdiff_t(x.size()) == str->B);
   std::ptrdiff_t b = 0;
   for (auto blk: x) {
-    assert(blk.first == str->begin[b]);
-    assert(std::ptrdiff_t(blk.second.size()) == str->size(b));
+    HPX_ASSERT(blk.first == str->begin[b]);
+    HPX_ASSERT(std::ptrdiff_t(blk.second.size()) == str->size(b));
     std::ptrdiff_t i = str->begin[b];
     for (auto elt: blk.second) {
-      assert(str->find(i) >= 0);
+      HPX_ASSERT(str->find(i) >= 0);
       set_elt(i, elt);
       ++i;
     }
@@ -135,19 +137,19 @@ block_matrix_t::block_matrix_t(std::shared_ptr<structure_t> istr,
                                IL<IL<P<P<int,int>, IL<IL<double>>>>> a):
   block_matrix_t(istr, jstr)
 {
-  assert(std::ptrdiff_t(a.size()) == istr->B);
+  HPX_ASSERT(std::ptrdiff_t(a.size()) == istr->B);
   std::ptrdiff_t ib = 0;
   for (auto irow: a) {
-    assert(std::ptrdiff_t(irow.size()) == jstr->B);
+    HPX_ASSERT(std::ptrdiff_t(irow.size()) == jstr->B);
     std::ptrdiff_t jb = 0;
     for (auto blk: irow) {
-      assert(blk.first.first == istr->begin[ib]);
-      assert(blk.first.second == jstr->begin[jb]);
+      HPX_ASSERT(blk.first.first == istr->begin[ib]);
+      HPX_ASSERT(blk.first.second == jstr->begin[jb]);
       std::ptrdiff_t i = istr->begin[ib];
       for (auto row: blk.second) {
         std::ptrdiff_t j = jstr->begin[jb];
         for (auto elt: row) {
-          assert(istr->find(i) >= 0 && jstr->find(j) >= 0);
+          HPX_ASSERT(istr->find(i) >= 0 && jstr->find(j) >= 0);
           set_elt(i,j, elt);
           ++j;
         }
