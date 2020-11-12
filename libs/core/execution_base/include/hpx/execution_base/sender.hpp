@@ -131,7 +131,8 @@ namespace hpx { namespace execution { namespace experimental {
             Executor&& executor,
             F&& f) noexcept(noexcept(std::forward<Executor>(executor)
                                          .execute(std::forward<F>(f)))) ->
-            typename std::enable_if<hpx::traits::is_invocable<F>::value &&
+            typename std::enable_if<hpx::traits::is_invocable<
+                                        typename std::decay<F>::type&>::value &&
                     (traits::is_sender_v<Executor> ||
                         traits::detail::is_executor_base<Executor>::value),
                 decltype(std::forward<Executor>(executor).execute(
@@ -397,7 +398,8 @@ namespace hpx { namespace execution { namespace experimental {
             std::forward<Executor>(executor),
             detail::as_receiver<typename std::decay<F>::type, Executor>{
                 std::forward<F>(f)}))) ->
-        typename std::enable_if<hpx::traits::is_invocable<F>::value &&
+        typename std::enable_if<
+            hpx::traits::is_invocable<typename std::decay<F>::type&>::value &&
                 !detail::has_member_execute<Executor, F>::value,
             decltype(hpx::execution::experimental::submit(
                 std::forward<Executor>(executor),
@@ -521,15 +523,21 @@ namespace hpx { namespace execution { namespace experimental {
             {
             }
 
-            template <typename R>    // TODO: requires receiver_of<R>
-            decltype(auto) connect(R&& r) &&
+            template <typename R>
+            auto connect(R&& r) && ->
+                typename std::enable_if<traits::is_receiver_of_v<R>,
+                    decltype(hpx::execution::experimental::connect(
+                        std::move(exec), std::forward<R>(r)))>::type
             {
                 return hpx::execution::experimental::connect(
                     std::move(exec), std::forward<R>(r));
             }
 
-            template <typename R>    // TODO: requires receiver_of<R>
-            decltype(auto) connect(R&& r) const&
+            template <typename R>
+            auto connect(R&& r) const& ->
+                typename std::enable_if<traits::is_receiver_of_v<R>,
+                    decltype(hpx::execution::experimental::connect(
+                        exec, std::forward<R>(r)))>::type
             {
                 return hpx::execution::experimental::connect(
                     exec, std::forward<R>(r));
