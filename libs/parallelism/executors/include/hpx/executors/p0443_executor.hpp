@@ -81,11 +81,11 @@ namespace hpx { namespace execution { namespace experimental {
 
         struct sender
         {
-            template <template <typename...> typename Tuple,
-                template <typename...> typename Variant>
+            template <template <typename...> class Tuple,
+                template <typename...> class Variant>
             using value_types = Variant<Tuple<>>;
 
-            template <template <typename...> typename Variant>
+            template <template <typename...> class Variant>
             using error_types = Variant<std::exception_ptr>;
 
             static constexpr bool sends_done = false;

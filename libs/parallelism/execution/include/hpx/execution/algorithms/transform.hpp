@@ -84,7 +84,7 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename Tuple>
             struct invoke_result_helper;
 
-            template <template <typename...> typename Tuple, typename... Ts>
+            template <template <typename...> class Tuple, typename... Ts>
             struct invoke_result_helper<Tuple<Ts...>>
             {
                 using result_type =
@@ -94,15 +94,15 @@ namespace hpx { namespace execution { namespace experimental {
                         Tuple<>, Tuple<result_type>>::type;
             };
 
-            template <template <typename...> typename Tuple,
-                template <typename...> typename Variant>
+            template <template <typename...> class Tuple,
+                template <typename...> class Variant>
             using value_types = typename hpx::util::detail::unique<
                 typename hpx::util::detail::transform<
                     typename hpx::execution::experimental::traits::
                         sender_traits<S>::template value_types<Tuple, Variant>,
                     invoke_result_helper>::type>::type;
 
-            template <template <typename...> typename Variant>
+            template <template <typename...> class Variant>
             using error_types = Variant<std::exception_ptr>;
 
             static constexpr bool sends_done = false;

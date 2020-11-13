@@ -509,11 +509,11 @@ namespace hpx { namespace execution { namespace experimental {
             Executor exec;
 
         public:
-            template <template <typename...> typename Tuple,
-                template <typename...> typename Variant>
+            template <template <typename...> class Tuple,
+                template <typename...> class Variant>
             using value_types = Variant<Tuple<>>;
 
-            template <template <typename...> typename Variant>
+            template <template <typename...> class Variant>
             using error_types = Variant<std::exception_ptr>;
 
             static constexpr bool sends_done = true;
@@ -726,12 +726,12 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename Sender>
             struct sender_traits_base<true /* HasSenderTraits */, Sender>
             {
-                template <template <typename...> typename Tuple,
-                    template <typename...> typename Variant>
+                template <template <typename...> class Tuple,
+                    template <typename...> class Variant>
                 using value_types =
                     typename Sender::template value_types<Tuple, Variant>;
 
-                template <template <typename...> typename Variant>
+                template <template <typename...> class Variant>
                 using error_types =
                     typename Sender::template error_types<Variant>;
 
