@@ -81,27 +81,26 @@ namespace hpx { namespace execution { namespace experimental {
             typename std::decay<S>::type s;
             typename std::decay<F>::type f;
 
-            using value_types_predecessor =
-                typename hpx::execution::experimental::traits::sender_traits<
-                    S>::template value_types<hpx::util::pack, hpx::util::pack>;
-            using is_void_predecessor = std::is_same<value_types_predecessor,
-                hpx::util::pack<hpx::util::pack<>>>;
-            using result_type =
-                typename hpx::util::lazy_conditional<is_void_predecessor::value,
-                    hpx::util::invoke_result<F>,
-                    hpx::util::invoke_result<F,
-                        typename value_types_result<
-                            value_types_predecessor>::type>>::type;
-            using is_void_result = std::is_same<result_type, void>;
+            template <typename Tuple>
+            struct invoke_result_helper;
 
-            // TODO: This only considers the first type in value_types. This
-            // should consider the full contents of the predecessor value_types,
-            // and filter out duplicates from the result.
+            template <template <typename...> typename Tuple, typename... Ts>
+            struct invoke_result_helper<Tuple<Ts...>>
+            {
+                using result_type =
+                    typename hpx::util::invoke_result<F, Ts...>::type;
+                using type =
+                    typename std::conditional<std::is_void<result_type>::value,
+                        Tuple<>, Tuple<result_type>>::type;
+            };
+
             template <template <typename...> typename Tuple,
                 template <typename...> typename Variant>
-            using value_types =
-                Variant<typename std::conditional<is_void_result::value,
-                    Tuple<>, Tuple<result_type>>::type>;
+            using value_types = typename hpx::util::detail::unique<
+                typename hpx::util::detail::transform<
+                    typename hpx::execution::experimental::traits::
+                        sender_traits<S>::template value_types<Tuple, Variant>,
+                    invoke_result_helper>::type>::type;
 
             template <template <typename...> typename Variant>
             using error_types = Variant<std::exception_ptr>;
