@@ -85,8 +85,33 @@ namespace hpx { namespace execution { namespace experimental {
         {
         };
 
+        namespace detail {
+            template <typename Sender>
+            constexpr bool specialized(...)
+            {
+                return true;
+            }
+
+            template <typename Sender>
+            constexpr bool specialized(
+                typename hpx::execution::experimental::traits::sender_traits<
+                    Sender>::__unspecialized*)
+            {
+                return false;
+            }
+        }    // namespace detail
+
         template <typename Sender>
-        constexpr bool is_sender_v;
+        struct is_sender
+          : std::integral_constant<bool,
+                std::is_move_constructible<
+                    typename std::decay<Sender>::type>::value &&
+                    detail::specialized<Sender>(nullptr)>
+        {
+        };
+
+        template <typename Sender>
+        constexpr bool is_sender_v = is_sender<Sender>::value;
 
         struct invocable_archetype
         {
@@ -585,34 +610,6 @@ namespace hpx { namespace execution { namespace experimental {
     } schedule{};
 
     namespace traits {
-        namespace detail {
-            template <typename Sender>
-            constexpr bool specialized(...)
-            {
-                return true;
-            }
-
-            template <typename Sender>
-            constexpr bool specialized(
-                typename hpx::execution::experimental::traits::sender_traits<
-                    Sender>::__unspecialized*)
-            {
-                return false;
-            }
-        }    // namespace detail
-
-        template <typename Sender>
-        struct is_sender
-          : std::integral_constant<bool,
-                std::is_move_constructible<
-                    typename std::decay<Sender>::type>::value &&
-                    detail::specialized<Sender>(nullptr)>
-        {
-        };
-
-        template <typename Sender>
-        constexpr bool is_sender_v = is_sender<Sender>::value;
-
         namespace detail {
             template <bool IsSenderReceiver, typename Sender, typename Receiver>
             struct is_sender_to_impl;
