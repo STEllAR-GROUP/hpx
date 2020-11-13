@@ -6,6 +6,8 @@
 
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/type_support/unused.hpp>
+
 #include <type_traits>
 
 static std::size_t member_schedule_calls = 0;
@@ -133,16 +135,19 @@ int main()
 
     scheduler_1 s1;
     sender snd1 = hpx::execution::experimental::schedule(s1);
+    HPX_UNUSED(snd1);
     HPX_TEST_EQ(member_schedule_calls, std::size_t(1));
     HPX_TEST_EQ(tag_invoke_schedule_calls, std::size_t(0));
 
     scheduler_2 s2;
     sender snd2 = hpx::execution::experimental::schedule(s2);
+    HPX_UNUSED(snd2);
     HPX_TEST_EQ(member_schedule_calls, std::size_t(1));
     HPX_TEST_EQ(tag_invoke_schedule_calls, std::size_t(1));
 
     scheduler_3 s3;
     sender snd3 = hpx::execution::experimental::schedule(s3);
+    HPX_UNUSED(snd3);
     HPX_TEST_EQ(member_schedule_calls, std::size_t(2));
     HPX_TEST_EQ(tag_invoke_schedule_calls, std::size_t(1));
 
