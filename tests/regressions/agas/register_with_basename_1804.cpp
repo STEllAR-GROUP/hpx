@@ -120,7 +120,10 @@ int main(int argc, char **argv)
     // all other localities:
     std::vector<std::string> config(1, "hpx.run_hpx_main!=1");
 
-    HPX_TEST_EQ(hpx::init(argc, argv, config), 0);
+    hpx::init_params init_args;
+    init_args.cfg = config;
+
+    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
     return hpx::util::report_errors();
 }
 #endif

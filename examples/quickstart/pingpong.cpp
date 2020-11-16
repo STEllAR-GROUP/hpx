@@ -160,7 +160,10 @@ int main(int argc, char* argv[])
          "verbosity of output,if false output is for awk")
         ;
 
-    return hpx::init(description, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = description;
+
+    return hpx::init(argc, argv, init_args);
 }
 
 #endif

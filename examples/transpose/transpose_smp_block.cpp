@@ -173,7 +173,10 @@ int main(int argc, char* argv[])
     ;
     // clang-format on
 
-    return hpx::init(desc_commandline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = desc_commandline;
+
+    return hpx::init(argc, argv, init_args);
 }
 
 void transpose(sub_block A, sub_block B, std::uint64_t block_order,

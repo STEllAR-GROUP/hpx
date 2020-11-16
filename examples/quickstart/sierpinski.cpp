@@ -135,6 +135,9 @@ int main(int argc, char* argv[])
           "side-length of the original triangle")
         ;
 
-    return hpx::init(desc_commandline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = desc_commandline;
+
+    return hpx::init(argc, argv, init_args);
 }
 #endif

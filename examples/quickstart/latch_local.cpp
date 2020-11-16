@@ -56,5 +56,8 @@ int main(int argc, char* argv[])
           "number of threads to synchronize at a local latch (default: 16)")
         ;
 
-    return hpx::init(desc_commandline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = desc_commandline;
+
+    return hpx::init(argc, argv, init_args);
 }

@@ -51,9 +51,7 @@ using hpx::lcos::wait;
 
 using hpx::chrono::high_resolution_timer;
 
-using hpx::finalize;
 using hpx::find_here;
-using hpx::init;
 
 using hpx::cout;
 using hpx::flush;
@@ -248,7 +246,7 @@ int hpx_main(variables_map& vm)
         hpx::util::format_to(std::cout, fmt, t.elapsed());
     }
 
-    finalize();
+    hpx::finalize();
     return 0;
 }
 
@@ -284,6 +282,9 @@ int main(int argc, char* argv[])
     // clang-format on
 
     // Initialize and run HPX.
-    return init(desc_commandline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = desc_commandline;
+
+    return hpx::init(argc, argv, init_args);
 }
 #endif

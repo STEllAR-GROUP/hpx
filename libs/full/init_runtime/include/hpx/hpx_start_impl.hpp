@@ -161,6 +161,9 @@ namespace hpx {
     /// schedule the function given by \p f as an HPX thread. It will return
     /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(util::function_nonser<int(
                           hpx::program_options::variables_map& vm)> const& f,
         hpx::program_options::options_description const& desc_cmdline, int argc,
@@ -186,6 +189,9 @@ namespace hpx {
     /// schedule the function given by \p f as an HPX thread. It will return
     /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(int (*f)(hpx::program_options::variables_map& vm),
         hpx::program_options::options_description const& desc_cmdline, int argc,
         char** argv, startup_function_type startup,
@@ -210,6 +216,9 @@ namespace hpx {
     /// set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(
         hpx::program_options::options_description const& desc_cmdline, int argc,
         char** argv, startup_function_type startup,
@@ -232,6 +241,9 @@ namespace hpx {
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(
         hpx::program_options::options_description const& desc_cmdline, int argc,
         char** argv, std::vector<std::string> const& cfg,
@@ -256,6 +268,9 @@ namespace hpx {
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(int argc, char** argv,
         std::vector<std::string> const& cfg, hpx::runtime_mode mode)
     {
@@ -272,6 +287,9 @@ namespace hpx {
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(
         hpx::program_options::options_description const& desc_cmdline, int argc,
         char** argv, hpx::runtime_mode mode)
@@ -291,6 +309,9 @@ namespace hpx {
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(
         hpx::program_options::options_description const& desc_cmdline, int argc,
         char** argv, std::vector<std::string> const& cfg,
@@ -312,6 +333,9 @@ namespace hpx {
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
     {
@@ -331,6 +355,9 @@ namespace hpx {
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(int argc, char** argv, hpx::runtime_mode mode)
     {
         hpx::init_params iparams;
@@ -345,6 +372,9 @@ namespace hpx {
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(
         std::vector<std::string> const& cfg, hpx::runtime_mode mode)
     {
@@ -361,6 +391,9 @@ namespace hpx {
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(int (*f)(hpx::program_options::variables_map& vm),
         std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
@@ -383,6 +416,9 @@ namespace hpx {
     }
 
     // Main non-blocking entry point for launching the HPX runtime system.
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(util::function_nonser<int(int, char**)> const& f,
         std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
@@ -399,6 +435,9 @@ namespace hpx {
         return start(f, argc, argv, iparams);
     }
 
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(util::function_nonser<int(int, char**)> const& f,
         int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
@@ -411,6 +450,9 @@ namespace hpx {
         return start(f, argc, argv, iparams);
     }
 
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(util::function_nonser<int(int, char**)> const& f,
         std::vector<std::string> const& cfg, hpx::runtime_mode mode)
     {
@@ -420,6 +462,9 @@ namespace hpx {
         return start(f, detail::dummy_argc, detail::dummy_argv, iparams);
     }
 
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(std::nullptr_t f, std::string const& app_name, int argc,
         char** argv, hpx::runtime_mode mode)
     {
@@ -435,6 +480,9 @@ namespace hpx {
         return start(f, argc, argv, iparams);
     }
 
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(std::nullptr_t f, int argc, char** argv,
         std::vector<std::string> const& cfg, hpx::runtime_mode mode)
     {
@@ -446,6 +494,9 @@ namespace hpx {
         return start(f, argc, argv, iparams);
     }
 
+    HPX_DEPRECATED_V(1, 6,
+        "The start overload used is deprecated. Please use"
+        "the start overloads using the hpx::init_params struct.")
     inline bool start(std::nullptr_t f, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {

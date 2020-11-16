@@ -45,9 +45,6 @@ int hpx_main(hpx::program_options::variables_map & vm)
 
 int main(int argc, char **argv)
 {
-    hpx::program_options::options_description desc(
-        "usage: " HPX_APPLICATION_STRING " [options]");
-
-    return hpx::init(desc, argc, argv);
+    return hpx::init(argc, argv);
 }
 #endif

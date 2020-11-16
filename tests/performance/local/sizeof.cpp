@@ -17,9 +17,6 @@ using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
 
-using hpx::init;
-using hpx::finalize;
-
 using hpx::find_here;
 
 using hpx::cout;
@@ -45,7 +42,7 @@ int hpx_main(
 #       undef HPX_SIZEOF
     }
 
-    finalize();
+    hpx::finalize();
     return 0;
 }
 
@@ -55,10 +52,7 @@ int main(
   , char* argv[]
     )
 {
-    // Configure application-specific options.
-    options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
-
     // Initialize and run HPX.
-    return init(cmdline, argc, argv);
+    return hpx::init(argc, argv);
 }
 #endif

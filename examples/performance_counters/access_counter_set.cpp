@@ -75,15 +75,18 @@ int hpx_main(hpx::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Define application-specific command-line options.
-    hpx::program_options::options_description opts(
+    hpx::program_options::options_description cmdline(
         "usage: access_counter_set [options]");
 
-    opts.add_options()
+    cmdline.add_options()
         ("counter", hpx::program_options::value<std::string>(),
          "name (pattern) representing the of the performance counter(s) to query")
         ;
 
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+
     // Initialize and run HPX.
-    return hpx::init(opts, argc, argv);
+    return hpx::init(argc, argv, init_args);
 }
 #endif

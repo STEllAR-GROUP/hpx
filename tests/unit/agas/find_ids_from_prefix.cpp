@@ -206,7 +206,10 @@ int main(int argc, char* argv[])
     };
 
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
+    hpx::init_params init_args;
+    init_args.cfg = cfg;
+
+    HPX_TEST_EQ_MSG(hpx::init(argc, argv, init_args), 0,
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();

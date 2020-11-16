@@ -241,7 +241,10 @@ int main(int argc, char **argv)
     }
     return hpx_main(vm);
 #else
-    return hpx::init(desc_cmd, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = desc_cmd;
+
+    return hpx::init(argc, argv, init_args);
 #endif
 
 }

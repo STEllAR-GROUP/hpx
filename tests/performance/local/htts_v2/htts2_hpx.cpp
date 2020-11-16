@@ -43,9 +43,13 @@ struct hpx_driver : htts2::driver
         hpx::util::function_nonser<int(hpx::program_options::variables_map& vm)> f;
         hpx::program_options::options_description desc;
 
+        hpx::init_params init_args;
+        init_args.cfg = cfg;
+        init_args.desc_cmdline = desc;
+
         using hpx::util::placeholders::_1;
         hpx::init(hpx::util::bind(&hpx_driver::run_impl, std::ref(*this), _1),
-            desc, argc_, argv_, cfg);
+            argc_, argv_, init_args);
     }
 
   private:

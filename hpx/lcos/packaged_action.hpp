@@ -206,9 +206,8 @@ namespace hpx { namespace lcos {
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
-            using callback_type = typename std::decay<Callback>::type;
-
 #if defined(HPX_HAVE_NETWORKING)
+            using callback_type = typename std::decay<Callback>::type;
             auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
                 this->shared_state_, std::forward<Callback>(cb)};
 #else
@@ -248,9 +247,9 @@ namespace hpx { namespace lcos {
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
-            using callback_type = typename std::decay<Callback>::type;
 
 #if defined(HPX_HAVE_NETWORKING)
+            using callback_type = typename std::decay<Callback>::type;
             auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
                 this->shared_state_, std::forward<Callback>(cb)};
 #else
@@ -382,9 +381,8 @@ namespace hpx { namespace lcos {
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
-            using callback_type = typename std::decay<Callback>::type;
-
 #if defined(HPX_HAVE_NETWORKING)
+            using callback_type = typename std::decay<Callback>::type;
             auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
                 this->shared_state_, std::forward<Callback>(cb)};
 #else

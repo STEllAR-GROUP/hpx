@@ -125,6 +125,10 @@ int main(int argc, char* argv[])
                 hpx::program_options::value<int>()->default_value(100),
                 "number of tests to take average from");
 
-    return hpx::init(cmdline, argc, argv, cfg);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+    init_args.cfg = cfg;
+
+    return hpx::init(argc, argv, init_args);
 }
 #endif

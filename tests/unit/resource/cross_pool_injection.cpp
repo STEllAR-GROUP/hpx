@@ -257,10 +257,10 @@ void init_resource_partitioner_handler(
 void test_scheduler(
     int argc, char* argv[], hpx::resource::scheduling_policy scheduler)
 {
-    hpx::init_params p;
-    p.rp_callback =
+    hpx::init_params init_args;
+    init_args.rp_callback =
         hpx::bind_back(init_resource_partitioner_handler, scheduler);
-    HPX_TEST_EQ(hpx::init(argc, argv, p), 0);
+    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
 }
 
 int main(int argc, char* argv[])

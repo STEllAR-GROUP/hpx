@@ -41,9 +41,7 @@ using hpx::program_options::options_description;
 using hpx::program_options::value;
 using hpx::program_options::variables_map;
 
-using hpx::finalize;
 using hpx::get_os_thread_count;
-using hpx::init;
 
 using hpx::threads::register_work;
 using hpx::threads::thread_init_data;
@@ -505,7 +503,7 @@ int hpx_main(variables_map& vm)
         // Force termination of all suspended tasks.
         hpx::get_runtime().get_thread_manager().abort_all_suspended_threads();
 
-    return finalize();
+    return hpx::finalize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -557,5 +555,8 @@ int main(int argc, char* argv[])
     // clang-format on
 
     // Initialize and run HPX.
-    return init(cmdline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+
+    return hpx::init(argc, argv, init_args);
 }

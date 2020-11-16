@@ -43,6 +43,9 @@ int main(int argc, char* argv[])
     // By default this test should run on all available cores
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
-    HPX_TEST_EQ(hpx::init(argc, argv, cfg), 0);
+    hpx::init_params init_args;
+    init_args.cfg = cfg;
+
+    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
     return hpx::util::report_errors();
 }

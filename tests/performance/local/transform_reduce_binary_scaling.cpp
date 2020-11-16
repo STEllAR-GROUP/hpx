@@ -148,7 +148,10 @@ int main(int argc, char* argv[])
         , "the random number generator seed to use for this run")
         ;
 
-    return hpx::init(cmdline, argc, argv, cfg);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
+    init_args.cfg = cfg;
 
+    return hpx::init(argc, argv, init_args);
 }
 

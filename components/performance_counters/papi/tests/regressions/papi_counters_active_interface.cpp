@@ -124,10 +124,6 @@ int main(int argc, char* argv[])
     if (pipe(pipefd) != 0 || dup2(pipefd[1], STDOUT_FILENO) < 0)
         throw std::runtime_error("could not create pipe to stdout");
 
-    // Configure application-specific options.
-    hpx::program_options::options_description cmdline(
-        "Usage: " HPX_APPLICATION_STRING " [options]");
-
     // Add the required counter command line option.
     char **opt = new char *[argc+2];
     for (int i = 0; i < argc; i++) opt[i] = argv[i];

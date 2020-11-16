@@ -19,9 +19,6 @@ using hpx::program_options::value;
 
 using std::chrono::seconds;
 
-using hpx::init;
-using hpx::finalize;
-
 using hpx::threads::pending;
 using hpx::threads::suspended;
 using hpx::threads::get_self_id;
@@ -47,7 +44,7 @@ int hpx_main(variables_map& vm)
         std::cout << "woke up after " << t.elapsed() << " seconds\n";
     }
 
-    finalize();
+    hpx::finalize();
     return 0;
 }
 
@@ -59,6 +56,9 @@ int main(int argc, char* argv[])
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX.
-    return init(desc_commandline, argc, argv);
+    hpx::init_params init_args;
+    init_args.desc_cmdline = desc_commandline;
+
+    return hpx::init(argc, argv, init_args);
 }
 

@@ -44,6 +44,9 @@ int main(int argc, char** argv)
 {
     std::vector<std::string> const cfg = {"hpx.run_hpx_main!=1"};
 
-    return hpx::init(argc, argv, cfg);
+    hpx::init_params init_args;
+    init_args.cfg = cfg;
+
+    return hpx::init(argc, argv, init_args);
 }
 #endif

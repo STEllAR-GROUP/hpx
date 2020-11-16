@@ -32,7 +32,10 @@ int main(int argc, char **argv)
     hpx::program_options::options_description
         desc_commandline("USAGE: " HPX_APPLICATION_STRING " [options]");
 
-    HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv), 0,
+    hpx::init_params init_args;
+    init_args.desc_cmdline = desc_commandline;
+
+    HPX_TEST_EQ_MSG(hpx::init(argc, argv, init_args), 0,
         "HPX exited with exit status != 0");
 }
 #endif
