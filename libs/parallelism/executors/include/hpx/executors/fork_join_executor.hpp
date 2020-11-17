@@ -8,17 +8,19 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/concurrency/detail/contiguous_index_queue.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
-#include <hpx/modules/async_base.hpp>
-#include <hpx/modules/concurrency.hpp>
-#include <hpx/modules/execution.hpp>
-#include <hpx/modules/functional.hpp>
-#include <hpx/modules/synchronization.hpp>
-#include <hpx/modules/threading.hpp>
-#include <hpx/modules/threading_base.hpp>
-#include <hpx/modules/timing.hpp>
-#include <hpx/modules/type_support.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/static_chunk_size.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/invoke_fused.hpp>
+#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/threading/thread.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 
 #include <atomic>
 #include <chrono>
