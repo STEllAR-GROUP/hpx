@@ -21,28 +21,32 @@ set(benchmarks
     timed_task_spawn
 )
 
+if(NOT HPX_WITH_CUDA)
+  list(APPEND benchmarks stream)
+endif()
+
 if(NOT HPX_WITH_SANITIZERS)
-  set(benchmarks ${benchmarks} start_stop)
+  list(APPEND benchmarks start_stop)
   set(start_stop_FLAGS DEPENDENCIES hpx_timing)
 endif()
 
 if(HPX_WITH_LIBCDS)
-  set(benchmarks ${benchmarks} libcds_hazard_pointer_overhead)
+  list(APPEND benchmarks libcds_hazard_pointer_overhead)
   set(libcds_hazard_pointer_overhead_FLAGS DEPENDENCIES iostreams_component)
 endif()
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME AND (HPX_WITH_DATAPAR_VC
                                      OR HPX_WITH_DATAPAR_BOOST_SIMD)
 )
-  set(benchmarks ${benchmarks} transform_reduce_binary_scaling)
+  list(APPEND benchmarks transform_reduce_binary_scaling)
   set(transform_reduce_binary_scaling_FLAGS DEPENDENCIES iostreams_component
                                             hpx_timing
   )
 endif()
 
 if(HPX_WITH_EXAMPLES_OPENMP)
-  set(benchmarks ${benchmarks} openmp_homogeneous_timed_task_spawn
-                 openmp_parallel_region
+  list(APPEND benchmarks openmp_homogeneous_timed_task_spawn
+       openmp_parallel_region
   )
 
   set(openmp_homogeneous_timed_task_spawn_FLAGS
@@ -60,8 +64,8 @@ if(HPX_WITH_EXAMPLES_OPENMP)
 endif()
 
 if(HPX_WITH_EXAMPLES_QTHREADS)
-  set(benchmarks ${benchmarks} qthreads_homogeneous_timed_task_spawn
-                 qthreads_heterogeneous_timed_task_spawn
+  list(APPEND benchmarks qthreads_homogeneous_timed_task_spawn
+       qthreads_heterogeneous_timed_task_spawn
   )
 
   set(qthreads_homogeneous_timed_task_spawn_FLAGS
@@ -91,7 +95,7 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
 endif()
 
 if(HPX_WITH_EXAMPLES_TBB)
-  set(benchmarks ${benchmarks} tbb_homogeneous_timed_task_spawn)
+  list(APPEND benchmarks tbb_homogeneous_timed_task_spawn)
 
   set(tbb_homogeneous_timed_task_spawn_FLAGS
       NOLIBS
@@ -108,23 +112,21 @@ if(HPX_WITH_EXAMPLES_TBB)
 endif()
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(benchmarks
-      ${benchmarks}
-      agas_cache_timings
-      foreach_scaling
-      hpx_homogeneous_timed_task_spawn_executors
-      hpx_heterogeneous_timed_task_spawn
-      parent_vs_child_stealing
-      partitioned_vector_foreach
-      skynet
-      sizeof
-      spinlock_overhead1
-      spinlock_overhead2
-      wait_all_timings
+  list(
+    APPEND
+    benchmarks
+    agas_cache_timings
+    foreach_scaling
+    hpx_homogeneous_timed_task_spawn_executors
+    hpx_heterogeneous_timed_task_spawn
+    parent_vs_child_stealing
+    partitioned_vector_foreach
+    skynet
+    sizeof
+    spinlock_overhead1
+    spinlock_overhead2
+    wait_all_timings
   )
-  if(NOT HPX_WITH_CUDA_COMPUTE OR HPX_WITH_CUDA_CLANG)
-    set(benchmarks ${benchmarks} stream)
-  endif()
 endif()
 
 set(delay_baseline_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies}
@@ -156,7 +158,6 @@ set(sizeof_FLAGS DEPENDENCIES iostreams_component)
 set(foreach_scaling_FLAGS DEPENDENCIES iostreams_component hpx_timing)
 set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component hpx_timing)
 set(spinlock_overhead2_FLAGS DEPENDENCIES iostreams_component hpx_timing)
-set(stream_FLAGS DEPENDENCIES iostreams_component)
 set(partitioned_vector_foreach_FLAGS DEPENDENCIES iostreams_component
                                      partitioned_vector_component hpx_timing
 )

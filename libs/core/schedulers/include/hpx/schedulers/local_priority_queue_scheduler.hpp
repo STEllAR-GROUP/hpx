@@ -19,6 +19,7 @@
 #include <hpx/schedulers/thread_queue.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/topology/topology.hpp>
 
@@ -1144,6 +1145,10 @@ namespace hpx { namespace threads { namespace policies {
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread) override
         {
+            hpx::threads::detail::set_local_thread_num_tss(num_thread);
+            hpx::threads::detail::set_thread_pool_num_tss(
+                parent_pool_->get_pool_id().index());
+
             if (nullptr == queues_[num_thread].data_)
             {
                 queues_[num_thread].data_ =

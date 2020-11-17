@@ -21,6 +21,7 @@ set(executors_headers
     hpx/executors/exception_list.hpp
     hpx/executors/execution_policy_fwd.hpp
     hpx/executors/execution_policy.hpp
+    hpx/executors/fork_join_executor.hpp
     hpx/executors/limiting_executor.hpp
     hpx/executors/parallel_executor_aggregated.hpp
     hpx/executors/parallel_executor.hpp
@@ -74,6 +75,6 @@ add_hpx_module(
   HEADERS ${executors_headers}
   COMPAT_HEADERS ${executors_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_execution hpx_futures
+  MODULE_DEPENDENCIES hpx_async_base hpx_execution hpx_futures hpx_threading
   CMAKE_SUBDIRS examples tests
 )

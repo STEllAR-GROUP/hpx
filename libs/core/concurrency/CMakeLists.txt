@@ -14,6 +14,7 @@ set(concurrency_headers
     hpx/concurrency/cache_line_data.hpp
     hpx/concurrency/concurrentqueue.hpp
     hpx/concurrency/deque.hpp
+    hpx/concurrency/detail/contiguous_index_queue.hpp
     hpx/concurrency/detail/freelist.hpp
     hpx/concurrency/detail/tagged_ptr_pair.hpp
     hpx/concurrency/spinlock.hpp
@@ -49,6 +50,7 @@ add_hpx_module(
     hpx_assertion
     hpx_concepts
     hpx_config
+    hpx_datastructures
     hpx_execution_base
     hpx_errors
     hpx_hashing
