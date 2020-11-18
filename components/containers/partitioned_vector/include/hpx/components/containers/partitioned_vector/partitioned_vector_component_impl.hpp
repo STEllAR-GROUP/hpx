@@ -366,8 +366,13 @@ namespace hpx
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<std::size_t>
     partitioned_vector_partition<T, Data>::size_async() const
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
         return hpx::async<typename server_type::size_action>(this->get_id());
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future(std::size_t{});
+#endif
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -390,9 +395,14 @@ namespace hpx
     partitioned_vector_partition<T, Data>::resize_async(
         std::size_t n, T const& val /*= T()*/)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
         return hpx::async<typename server_type::resize_action>(
             this->get_id(), n, val);
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future();
+#endif
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -407,9 +417,14 @@ namespace hpx
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<T>
     partitioned_vector_partition<T, Data>::get_value(std::size_t pos) const
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
         return hpx::async<typename server_type::get_value_action>(
             this->get_id(), pos);
+#else
+        HPX_ASSERT(false);
+        return hpx::future<T>{};
+#endif
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -425,9 +440,14 @@ namespace hpx
     partitioned_vector_partition<T, Data>::get_values(
         std::vector<std::size_t> const& pos) const
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
         return hpx::async<typename server_type::get_values_action>(
             this->get_id(), pos);
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future(std::vector<T>{});
+#endif
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -450,18 +470,28 @@ namespace hpx
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>
     partitioned_vector_partition<T, Data>::set_value(std::size_t pos, T&& val)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
         return hpx::async<typename server_type::set_value_action>(
             this->get_id(), pos, std::move(val));
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future();
+#endif
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>
     partitioned_vector_partition<T, Data>::set_value(std::size_t pos, T const& val)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
         return hpx::async<typename server_type::set_value_action>(
             this->get_id(), pos, val);
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future();
+#endif
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -477,9 +507,14 @@ namespace hpx
     partitioned_vector_partition<T, Data>::set_values(
         std::vector<std::size_t> const& pos, std::vector<T> const& val)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
         return hpx::async<typename server_type::set_values_action>(
             this->get_id(), pos, val);
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future();
+#endif
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -496,9 +531,15 @@ namespace hpx
         typename partitioned_vector_partition<T, Data>::server_type::data_type>
     partitioned_vector_partition<T, Data>::get_copied_data() const
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
         return hpx::async<typename server_type::get_copied_data_action>(
             this->get_id());
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future(typename partitioned_vector_partition<T,
+            Data>::server_type::data_type{});
+#endif
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -514,9 +555,14 @@ namespace hpx
     partitioned_vector_partition<T, Data>::set_data(
         typename server_type::data_type&& other) const
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
         return hpx::async<typename server_type::set_data_action>(
             this->get_id(), std::move(other));
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future();
+#endif
     }
 }
 

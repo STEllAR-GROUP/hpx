@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
@@ -502,6 +503,7 @@ namespace hpx { namespace performance_counters {
         {
             naming::gid_type id;
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
             //  get action code from counter type
             agas::namespace_action_code service_code =
                 agas::detail::retrieve_action_service_code(name, ec);
@@ -538,8 +540,11 @@ namespace hpx { namespace performance_counters {
                     "unknown counter agas counter name: " + name);
                 break;
             }
-
             return id;
+#else
+            HPX_ASSERT(false);
+            return id;
+#endif
         }
     }    // namespace detail
 

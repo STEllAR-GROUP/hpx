@@ -97,6 +97,7 @@ namespace hpx
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>
     partitioned_vector<T, Data>::connect_to_helper(id_type id)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef typename components::server::distributed_metadata_base<
             server::partitioned_vector_config_data>::get_action act;
 
@@ -104,6 +105,10 @@ namespace hpx
             [=](future<server::partitioned_vector_config_data>&& f) -> void {
                 return get_data_helper(id, f.get());
             });
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future();
+#endif
     }
 
     template <typename T, typename Data /*= std::vector<T> */>

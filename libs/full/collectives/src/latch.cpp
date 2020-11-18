@@ -31,32 +31,57 @@ namespace hpx { namespace lcos {
 
     hpx::future<void> latch::count_down_and_wait_async()
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         lcos::server::latch::set_event_action act;
         return hpx::async(act, get_id());
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future();
+#endif
     }
 
     hpx::future<void> latch::count_down_async(std::ptrdiff_t n)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         lcos::server::latch::set_value_action act;
         return hpx::async(act, get_id(), std::move(n));
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future();
+#endif
     }
 
     hpx::future<bool> latch::is_ready_async() const
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         lcos::server::latch::get_value_action act;
         return hpx::async(act, get_id());
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future(true);
+#endif
     }
 
     hpx::future<void> latch::wait_async() const
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         lcos::server::latch::wait_action act;
         return hpx::async(act, get_id());
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future();
+#endif
     }
 
     hpx::future<void> latch::set_exception_async(std::exception_ptr const& e)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         lcos::server::latch::set_exception_action act;
         return hpx::async(act, get_id(), e);
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future();
+#endif
     }
 }}    // namespace hpx::lcos
 

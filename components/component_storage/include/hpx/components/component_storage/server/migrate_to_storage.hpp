@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/address.hpp>
@@ -75,6 +76,7 @@ namespace hpx { namespace components { namespace server
             naming::id_type const& to_migrate,
             naming::id_type const& target_storage)
         {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
             using components::stubs::runtime_support;
 
             std::uint32_t pin_count = ptr->pin_count();
@@ -119,6 +121,10 @@ namespace hpx { namespace components { namespace server
                 .then(util::bind_back(
                     &migrate_to_storage_here_cleanup<Component>,
                     ptr, to_migrate));
+#else
+            HPX_ASSERT(false);
+            return hpx::make_ready_future(naming::id_type{});
+#endif
         }
     }
 
@@ -166,6 +172,7 @@ namespace hpx { namespace components { namespace server
         naming::id_type const& to_migrate,
         naming::id_type const& target_storage)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         if (!traits::component_supports_migration<Component>::call())
         {
             HPX_THROW_EXCEPTION(invalid_status,
@@ -199,6 +206,10 @@ namespace hpx { namespace components { namespace server
                     agas::end_migration(to_migrate);
                     return f.get();
                 });
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future(naming::id_type{});
+#endif
     }
 
     template <typename Component>

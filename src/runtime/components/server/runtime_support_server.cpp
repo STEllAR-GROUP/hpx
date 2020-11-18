@@ -277,6 +277,7 @@ namespace hpx { namespace components { namespace server {
     // function to be called to terminate this locality immediately
     void runtime_support::terminate(naming::id_type const& respond_to)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         // push pending logs
         components::cleanup_logging();
 
@@ -303,17 +304,21 @@ namespace hpx { namespace components { namespace server {
             }
 #endif
         }
-
+#else
+        HPX_ASSERT(false);
+#endif
         std::abort();
     }
 }}}    // namespace hpx::components::server
 
 ///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 typedef hpx::components::server::runtime_support::call_shutdown_functions_action
     call_shutdown_functions_action;
 typedef hpx::lcos::detail::make_broadcast_action<
     call_shutdown_functions_action>::type
     call_shutdown_functions_broadcast_action;
+#endif
 
 HPX_ACTION_USES_MEDIUM_STACK(call_shutdown_functions_broadcast_action)
 
@@ -329,8 +334,12 @@ namespace hpx { namespace components { namespace server {
     void invoke_shutdown_functions(
         std::vector<naming::id_type> const& localities, bool pre_shutdown)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         call_shutdown_functions_action act;
         lcos::broadcast(act, localities, pre_shutdown).get();
+#else
+        HPX_ASSERT(false);
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -378,9 +387,13 @@ namespace hpx { namespace components { namespace server {
             dijkstra_color_ = false;
         }
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         naming::id_type id(naming::get_id_from_locality_id(target_locality_id));
         apply<dijkstra_termination_action>(
             id, initiating_locality_id, num_localities, dijkstra_token);
+#else
+        HPX_ASSERT(false);
+#endif
     }
 
     // invoked during termination detection
@@ -764,9 +777,13 @@ namespace hpx { namespace components { namespace server {
 
                 if (respond_to)
                 {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
                     // respond synchronously
                     using void_lco_type = lcos::base_lco_with_value<void>;
                     using action_type = void_lco_type::set_event_action;
+#else
+                    HPX_ASSERT(false);
+#endif
 
                     naming::address addr;
                     if (agas::is_local_address_cached(respond_to, addr))
@@ -777,9 +794,13 @@ namespace hpx { namespace components { namespace server {
 #if defined(HPX_HAVE_NETWORKING)
                     else
                     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
                         // apply remotely, parcel is sent synchronously
                         hpx::applier::detail::apply_r_sync<action_type>(
                             std::move(addr), respond_to);
+#else
+                        HPX_ASSERT(false);
+#endif
                     }
 #endif
                 }
@@ -1133,6 +1154,7 @@ namespace hpx { namespace components { namespace server {
 
     void runtime_support::remove_here_from_connection_cache()
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if defined(HPX_HAVE_NETWORKING)
         runtime_distributed* rtd = get_runtime_distributed_ptr();
         if (rtd == nullptr)
@@ -1161,10 +1183,14 @@ namespace hpx { namespace components { namespace server {
 
         wait_all(callbacks);
 #endif
+#else
+        HPX_ASSERT(false);
+#endif
     }
 
     void runtime_support::remove_here_from_console_connection_cache()
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if defined(HPX_HAVE_NETWORKING)
         runtime_distributed* rtd = get_runtime_distributed_ptr();
         if (rtd == nullptr)
@@ -1183,6 +1209,9 @@ namespace hpx { namespace components { namespace server {
             act, id, std::move(ipt), hpx::get_locality(), rtd->endpoints());
 
         callback.wait();
+#endif
+#else
+        HPX_ASSERT(false);
 #endif
     }
 

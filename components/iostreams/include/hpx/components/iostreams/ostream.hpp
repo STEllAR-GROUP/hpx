@@ -9,11 +9,12 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/assert.hpp>
 #include <hpx/async_distributed/apply.hpp>
-#include <hpx/modules/async_distributed.hpp>
-#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/components/iostreams/manipulators.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
+#include <hpx/execution_base/register_locks.hpp>
+#include <hpx/modules/async_distributed.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
 #include <boost/iostreams/stream.hpp>
@@ -183,7 +184,8 @@ namespace hpx { namespace iostreams
         // Performs an asynchronous streaming operation.
         template <typename T, typename Lock>
         ostream& streaming_operator_async(T const& subject, Lock& l)
-        { // {{{
+        {    // {{{
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
             // apply the subject to the local stream
             *static_cast<stream_base_type*>(this) << subject;
 
@@ -203,14 +205,18 @@ namespace hpx { namespace iostreams
                 hpx::apply<action_type>(this->get_id(), hpx::get_locality_id(),
                     generational_count_++, next);
             }
-
+#else
+            HPX_ASSERT(false);
+#endif
             return *this;
-        } // }}}
+
+        }    // }}}
 
         // Performs a synchronous streaming operation.
         template <typename T, typename Lock>
         ostream& streaming_operator_sync(T const& subject, Lock& l)
-        { // {{{
+        {    // {{{
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
             // apply the subject to the local stream
             *static_cast<stream_base_type*>(this) << subject;
 
@@ -228,14 +234,18 @@ namespace hpx { namespace iostreams
             hpx::async<action_type>(this->get_id(), hpx::get_locality_id(),
                 generational_count_++, next).get();
 
+#else
+            HPX_ASSERT(false);
+#endif
             return *this;
-        } // }}}
+        }    // }}}
 
         ///////////////////////////////////////////////////////////////////////
         friend struct detail::buffer_sink<char>;
 
         bool flush()
         {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
             std::unique_lock<mutex_type> l(*mtx_);
             if (!this->detail::buffer::empty_locked())
             {
@@ -258,6 +268,10 @@ namespace hpx { namespace iostreams
                     generational_count_++, next);
             }
             return true;
+#else
+            HPX_ASSERT(false);
+            return false;
+#endif
         }
 
         ///////////////////////////////////////////////////////////////////////
