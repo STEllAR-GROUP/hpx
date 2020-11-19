@@ -199,6 +199,8 @@ rst_prolog += '''
 .. _stellar_hpx_download: https://hpx.stellar-group.org/downloads/
 .. |stellar_hpx_funding| replace:: |hpx| Funding Acknowledgements
 .. _stellar_hpx_funding: https://hpx.stellar-group.org/funding-acknowledgements/
+.. |stellar_hpx_users| replace:: |hpx| Users
+.. _stellar_hpx_users: https://hpx.stellar-group.org/hpx-users/
 .. |hpx_github| replace:: Github
 .. _hpx_github: https://github.com/STEllAR-GROUP/hpx/
 .. |hpx_github_issues| replace:: |hpx| Issues
