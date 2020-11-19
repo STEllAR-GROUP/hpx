@@ -328,6 +328,8 @@ namespace hpx { namespace server
     };
 }}
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_UNORDERED_MAP_DECLARATION(...)                           \
     HPX_REGISTER_UNORDERED_MAP_DECLARATION_(__VA_ARGS__)                      \
@@ -450,6 +452,12 @@ namespace hpx { namespace server
     > HPX_PP_CAT(__unordered_map_, name);                                     \
     HPX_REGISTER_COMPONENT(HPX_PP_CAT(__unordered_map_, name))                \
 /**/
+#else    // COMPUTE DEVICE CODE
+
+#define HPX_REGISTER_UNORDERED_MAP_DECLARATION(...) /**/
+#define HPX_REGISTER_UNORDERED_MAP(...)             /**/
+
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx

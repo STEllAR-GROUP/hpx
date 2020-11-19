@@ -39,12 +39,13 @@
 #else
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry.hpp>
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 ///////////////////////////////////////////////////////////////////////////////
 // This macro is used create and to register a minimal component factory with
@@ -148,6 +149,29 @@
     HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_3(                        \
         ComponentType, componentname, state)                                  \
 /**/
+
+#else    // COMPUTE DEVICE CODE
+
+#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(...) /**/
+
+#define HPX_REGISTER_COMPONENT(...) /**/
+
+#define HPX_REGISTER_ENABLED_COMPONENT_FACTORY(ComponentType, componentname)
+/**/
+#define HPX_REGISTER_DISABLED_COMPONENT_FACTORY(ComponentType, componentname)
+/**/
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(...)         /**/
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC(...) /**/
+
+#define HPX_REGISTER_COMPONENT_DYNAMIC(...) /**/
+
+#define HPX_REGISTER_ENABLED_COMPONENT_FACTORY_DYNAMIC(                        \
+    ComponentType, componentname) /**/
+
+#define HPX_REGISTER_DISABLED_COMPONENT_FACTORY_DYNAMIC(                       \
+    ComponentType, componentname) /**/
 
 #endif
 #endif

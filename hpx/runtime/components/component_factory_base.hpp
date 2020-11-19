@@ -44,4 +44,10 @@
 #define HPX_REGISTER_COMPONENT_MODULE_DYNAMIC()
 #endif
 
+#else    // COMPUTE DEVICE CODE
+
+#define HPX_REGISTER_COMPONENT_FACTORY(componentname) /**/
+#define HPX_REGISTER_COMPONENT_MODULE()               /**/
+#define HPX_REGISTER_COMPONENT_MODULE_DYNAMIC()       /**/
+
 #endif
