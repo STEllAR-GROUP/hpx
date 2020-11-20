@@ -8,8 +8,6 @@
 // make_ready_future_after to orchestrate timed operations with 'normal'
 // asynchronous work.
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/include/util.hpp>
@@ -43,5 +41,3 @@ int main()
 
     return hpx::finalize();
 }
-
-#endif

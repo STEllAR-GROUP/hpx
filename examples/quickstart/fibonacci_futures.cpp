@@ -7,10 +7,7 @@
 // This is a purely local version demonstrating different versions of making
 // the calculation of a fibonacci asynchronous.
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
 
@@ -490,4 +487,3 @@ int main(int argc, char* argv[])
 
     return hpx::init(argc, argv, init_args);
 }
-#endif
