@@ -98,7 +98,7 @@ void test_transform(ExPolicy&& policy, hpx::partitioned_vector<T>& v,
     verify_values(policy, v, val);
     verify_values_count(policy, v, val);
 
-    hpx::parallel::transform(policy, v.begin(), v.end(), w.begin(), pfo<U>());
+    hpx::transform(policy, v.begin(), v.end(), w.begin(), pfo<U>());
 
     verify_values(policy, w, 2 * val);
     verify_values_count(policy, w, 2 * val);
@@ -123,7 +123,7 @@ void test_transform_async(ExPolicy&& policy, hpx::partitioned_vector<T>& v,
     verify_values(policy, v, val);
     verify_values_count_async(policy, v, val);
 
-    hpx::parallel::transform(policy, v.begin(), v.end(), w.begin(), pfo<U>())
+    hpx::transform(policy, v.begin(), v.end(), w.begin(), pfo<U>())
         .get();
 
     verify_values(policy, w, 2 * val);
@@ -139,14 +139,14 @@ void transform_tests(std::vector<hpx::id_type>& localities)
     {
         hpx::partitioned_vector<T> v;
         hpx::partitioned_vector<U> w;
-        hpx::parallel::transform(
+        hpx::transform(
             hpx::execution::seq, v.begin(), v.end(), w.begin(), pfo<U>());
-        hpx::parallel::transform(
+        hpx::transform(
             hpx::execution::par, v.begin(), v.end(), w.begin(), pfo<U>());
-        hpx::parallel::transform(hpx::execution::seq(hpx::execution::task),
+        hpx::transform(hpx::execution::seq(hpx::execution::task),
             v.begin(), v.end(), w.begin(), pfo<U>())
             .get();
-        hpx::parallel::transform(hpx::execution::par(hpx::execution::task),
+        hpx::transform(hpx::execution::par(hpx::execution::task),
             v.begin(), v.end(), w.begin(), pfo<U>())
             .get();
     }

@@ -84,9 +84,9 @@ namespace hpx {
         typename Proj = util::projection_identity>
     typename util::detail::algorithm_result<ExPolicy,
         ranges::unary_transform_result<
-            typename hpx::traits::range_iterator<Rng>::type,
-            OutIter>>::type
-    transform(ExPolicy&& policy, Rng&& rng, OutIter dest, F&& f, Proj&& proj = Proj());
+            typename hpx::traits::range_iterator<Rng>::type, OutIter>>::type
+    transform(ExPolicy&& policy, Rng&& rng, OutIter dest, F&& f,
+        Proj&& proj = Proj());
 
     /// Applies the given function \a f to the given range \a rng and stores
     /// the result in another range, beginning at dest.
@@ -164,12 +164,12 @@ namespace hpx {
     ///           copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename F,
-            typename Proj = hpx::parallel::util::projection_identity>
+        typename FwdIter2, typename F,
+        typename Proj = hpx::parallel::util::projection_identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-            ranges::unary_transform_result<FwdIter1, FwdIter2>>::type
-    transform(ExPolicy&& policy, FwdIter1 first,
-            Sent1 last, FwdIter2 dest, F&& f, Proj&& proj = Proj());
+        ranges::unary_transform_result<FwdIter1, FwdIter2>>::type
+    transform(ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest,
+        F&& f, Proj&& proj = Proj());
 
     /// Applies the given function \a f to pairs of elements from two ranges:
     /// one defined by \a rng and the other beginning at first2, and
@@ -275,9 +275,9 @@ namespace hpx {
         typename Proj2 = hpx::parallel::util::projection_identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         ranges::binary_transform_result<FwdIter1, FwdIter2, FwdIter3>>::type
-    transform(ExPolicy&& policy, FwdIter1 first1,
-        Sent1 last1, FwdIter2 first2, Sent2 last2, FwdIter3 dest, F&& f,
-        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
+    transform(ExPolicy&& policy, FwdIter1 first1, Sent1 last1, FwdIter2 first2,
+        Sent2 last2, FwdIter3 dest, F&& f, Proj1&& proj1 = Proj1(),
+        Proj2&& proj2 = Proj2());
 
     /// Applies the given function \a f to pairs of elements from two ranges:
     /// one defined by [first1, last1) and the other beginning at first2, and
@@ -382,8 +382,7 @@ namespace hpx {
     typename parallel::util::detail::algorithm_result<ExPolicy,
         ranges::binary_transform_result<
             typename hpx::traits::range_iterator<Rng1>::type,
-            typename hpx::traits::range_iterator<Rng2>::type,
-            FwdIter>>::type
+            typename hpx::traits::range_iterator<Rng2>::type, FwdIter>>::type
     tag_invoke(hpx::ranges::transform_t, ExPolicy&& policy, Rng1&& rng1,
         Rng2&& rng2, FwdIter dest, F&& f, Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2())
@@ -413,14 +412,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang format-off
     template <typename ExPolicy, typename Rng, typename OutIter, typename F,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            hpx::traits::is_iterator<OutIter>::value &&
-            traits::is_projected_range<Proj,Rng>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected_range<Proj, Rng>>::value
-        )>
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
+                    OutIter>::value&& traits::is_projected_range<Proj,
+                    Rng>::value&& traits::is_indirect_callable<ExPolicy, F,
+                    traits::projected_range<Proj, Rng>>::value)>
     // clang format-on
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::transform is deprecated, use hpx::ranges::transform "
@@ -640,9 +636,8 @@ namespace hpx { namespace ranges {
             hpx::ranges::transform_t, FwdIter1 first, Sent1 last, FwdIter2 dest,
             F&& f, Proj&& proj = Proj())
         {
-            return parallel::v1::detail::transform_(
-                hpx::execution::seq, first, last, dest,
-                std::forward<F>(f), std::forward<Proj>(proj),
+            return parallel::v1::detail::transform_(hpx::execution::seq, first,
+                last, dest, std::forward<F>(f), std::forward<Proj>(proj),
                 std::false_type{});
         }
 
@@ -659,10 +654,10 @@ namespace hpx { namespace ranges {
         tag_invoke(hpx::ranges::transform_t, Rng&& rng, FwdIter dest, F&& f,
             Proj&& proj = Proj())
         {
-            return parallel::v1::detail::transform_(
-                hpx::parallel::execution::seq, hpx::util::begin(rng),
-                hpx::util::end(rng), dest, std::forward<F>(f),
-                std::forward<Proj>(proj), std::false_type{});
+            return parallel::v1::detail::transform_(hpx::execution::seq,
+                hpx::util::begin(rng), hpx::util::end(rng), dest,
+                std::forward<F>(f), std::forward<Proj>(proj),
+                std::false_type{});
         }
 
         // clang-format off
@@ -683,10 +678,10 @@ namespace hpx { namespace ranges {
             FwdIter2 first2, Sent2 last2, FwdIter3 dest, F&& f,
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
-            return parallel::v1::detail::transform_(
-                hpx::parallel::execution::seq, first1, last1, first2, last2,
-                dest, std::forward<F>(f), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2), std::false_type{});
+            return parallel::v1::detail::transform_(hpx::execution::seq, first1,
+                last1, first2, last2, dest, std::forward<F>(f),
+                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2),
+                std::false_type{});
         }
 
         // clang-format off
@@ -706,12 +701,11 @@ namespace hpx { namespace ranges {
             FwdIter dest, F&& f, Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
-            return parallel::v1::detail::transform_(
-                hpx::parallel::execution::seq, hpx::util::begin(rng1),
-                hpx::util::end(rng1), hpx::util::begin(rng2),
-                hpx::util::end(rng2), dest, std::forward<F>(f),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2),
-                std::false_type{});
+            return parallel::v1::detail::transform_(hpx::execution::seq,
+                hpx::util::begin(rng1), hpx::util::end(rng1),
+                hpx::util::begin(rng2), hpx::util::end(rng2), dest,
+                std::forward<F>(f), std::forward<Proj1>(proj1),
+                std::forward<Proj2>(proj2), std::false_type{});
         }
 
     } transform{};
