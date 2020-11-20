@@ -64,6 +64,7 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include "tab_check.hpp"
 #include "ascii_check.hpp"
 #include "apple_macro_check.hpp"
+#include "windows_macro_check.hpp"
 #include "assert_macro_check.hpp"
 #include "deprecated_macro_check.hpp"
 #include "minmax_check.hpp"
@@ -825,6 +826,7 @@ int cpp_main( int argc_param, char * argv_param[] )
     bool tab_ck = false;
     bool ascii_ck = false;
     bool apple_ck = false;
+    bool windows_ck = false;
     bool assert_ck = false;
     bool deprecated_ck = false;
     bool minmax_ck = false;
@@ -865,6 +867,8 @@ int cpp_main( int argc_param, char * argv_param[] )
             "check for non-ascii character usage violations (default: off)")
         ("apple_macro", value<bool>(&apple_ck)->implicit_value(true)->zero_tokens(),
             "check for apple macro violations (default: off)")
+        ("windows_macro", value<bool>(&windows_ck)->implicit_value(true)->zero_tokens(),
+            "check for windows macro violations (default: off)")
         ("assert_macro", value<bool>(&assert_ck)->implicit_value(true)->zero_tokens(),
             "check for plain assert usage violations (default: off)")
         ("deprecated_macro", value<bool>(&deprecated_ck)->implicit_value(true)->zero_tokens(),
@@ -959,6 +963,7 @@ int cpp_main( int argc_param, char * argv_param[] )
         tab_ck = true;
         ascii_ck = true;
         apple_ck = true;
+        windows_ck = true;
         assert_ck = true;
         deprecated_ck = true;
         minmax_ck = true;
@@ -1010,6 +1015,9 @@ int cpp_main( int argc_param, char * argv_param[] )
   if ( apple_ck )
       inspectors.push_back( inspector_element(
           new boost::inspect::apple_macro_check ) );
+  if ( windows_ck )
+      inspectors.push_back( inspector_element(
+          new boost::inspect::windows_macro_check ) );
   if ( assert_ck )
       inspectors.push_back( inspector_element(
           new boost::inspect::assert_macro_check ) );
