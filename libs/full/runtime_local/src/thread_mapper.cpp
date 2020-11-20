@@ -75,7 +75,7 @@ namespace hpx { namespace util {
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        std::size_t i = 0;
+        std::uint32_t i = 0;
         for (auto&& tinfo : thread_map_)
         {
             if (tinfo.cleanup_)
@@ -114,7 +114,7 @@ namespace hpx { namespace util {
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        std::size_t i = 0;
+        std::uint32_t i = 0;
         auto tid = detail::get_system_thread_id();
         for (auto&& tinfo : thread_map_)
         {
@@ -127,7 +127,7 @@ namespace hpx { namespace util {
                 }
 
                 std::size_t size = thread_map_.size();
-                if (i == size)
+                if (static_cast<std::size_t>(i) == size)
                 {
                     thread_map_.resize(size - 1);
                 }
@@ -247,7 +247,7 @@ namespace hpx { namespace util {
         {
             return invalid_index;
         }
-        return it->second;
+        return static_cast<std::uint32_t>(it->second);
     }
 
     std::uint32_t thread_mapper::get_thread_count() const
