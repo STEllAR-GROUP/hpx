@@ -16,7 +16,7 @@
 #include <utility>
 #include <variant>
 
-namespace hpx { namespace util {
+namespace hpx {
 
     // This is put into the same embedded namespace as the implementations in
     // tuple.hpp
@@ -55,7 +55,7 @@ namespace hpx { namespace util {
         }
     }    // namespace adl_barrier
 
-    using hpx::util::adl_barrier::get;
-}}    // namespace hpx::util
+    using hpx::adl_barrier::get;
+}    // namespace hpx
 
 #endif
