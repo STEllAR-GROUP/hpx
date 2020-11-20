@@ -39,6 +39,8 @@ sbatch \
     --error="jenkins-hpx-${configuration_name_with_build_type}.err" \
     --wait .jenkins/lsu/batch.sh
 
+echo "last command: $?"
+
 # Print slurm logs
 echo "= stdout =================================================="
 cat jenkins-hpx-${configuration_name_with_build_type}.out
