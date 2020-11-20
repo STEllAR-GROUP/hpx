@@ -61,5 +61,4 @@ int main(int argc, char* argv[])
     return hpx::init(argc, argv, init_args);
 }
 
-
 #endif
