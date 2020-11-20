@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/modules/errors.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/modules/threadmanager.hpp>
@@ -54,4 +53,4 @@ namespace hpx { namespace threads {
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
-#endif
+

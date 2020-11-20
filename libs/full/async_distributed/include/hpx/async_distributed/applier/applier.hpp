@@ -9,7 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier_fwd.hpp>    // this needs to go first
 #include <hpx/components_base/component_type.hpp>

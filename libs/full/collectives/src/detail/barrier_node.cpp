@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/when_all.hpp>
@@ -95,9 +93,13 @@ namespace hpx { namespace lcos { namespace detail {
         {
             if (rank_ != 0)
             {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
                 HPX_ASSERT(children_.size() == 1);
                 hpx::lcos::base_lco::set_event_action action;
                 result = hpx::async(action, children_[0]);
+#else
+                HPX_ASSERT(false);
+#endif
             }
             else
             {
@@ -121,6 +123,7 @@ namespace hpx { namespace lcos { namespace detail {
 
         if (rank_ == 0)
         {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
             // The root process calls the gather action on its children
             // once all those return, we know that everyone entered the
             // barrier
@@ -132,6 +135,9 @@ namespace hpx { namespace lcos { namespace detail {
                 futures.push_back(hpx::async(action, id));
             }
             result = hpx::when_all(futures);
+#else
+            HPX_ASSERT(false);
+#endif
         }
         else
         {
@@ -158,6 +164,7 @@ namespace hpx { namespace lcos { namespace detail {
     {
         if (rank_ == 0)
         {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
             return future.then(hpx::launch::sync,
                 [this_ = std::move(this_)](hpx::future<void>&& f) {
                     // Trigger possible errors...
@@ -177,6 +184,10 @@ namespace hpx { namespace lcos { namespace detail {
 
                     return hpx::when_all(futures);
                 });
+#else
+            HPX_ASSERT(false);
+            return hpx::make_ready_future();
+#endif
         }
 
         return future.then(hpx::launch::sync,
@@ -199,6 +210,7 @@ namespace hpx { namespace lcos { namespace detail {
 
     hpx::future<void> barrier_node::gather()
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         // We recursively gather the information that everyone entered the
         // barrier. The recursion is started from the root node.
         HPX_ASSERT(rank_ != 0);
@@ -225,6 +237,10 @@ namespace hpx { namespace lcos { namespace detail {
             [this_ = std::move(this_)] {});
 
         return result;
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future();
+#endif
     }
 
     void barrier_node::set_event()
@@ -235,6 +251,7 @@ namespace hpx { namespace lcos { namespace detail {
             return;
         }
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         // We recursively broadcast the information that everyone entered the
         // barrier. The recursion is started from the root node.
         HPX_ASSERT(rank_ != 0);
@@ -256,6 +273,8 @@ namespace hpx { namespace lcos { namespace detail {
                     this_->broadcast_promise_.set_value();
                 })
             .get();
+#else
+        HPX_ASSERT(false);
+#endif
     }
 }}}    // namespace hpx::lcos::detail
-#endif

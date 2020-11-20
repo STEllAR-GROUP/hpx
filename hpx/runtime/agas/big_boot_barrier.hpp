@@ -10,7 +10,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assert.hpp>
@@ -149,4 +148,4 @@ HPX_EXPORT big_boot_barrier& get_big_boot_barrier();
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
-#endif
+

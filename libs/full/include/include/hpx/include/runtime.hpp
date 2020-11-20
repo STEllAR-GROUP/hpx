@@ -12,7 +12,7 @@
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/include/actions.hpp>
 #include <hpx/include/applier.hpp>
 #include <hpx/include/components.hpp>

@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/async_colocated/apply_colocated.hpp>
 #include <hpx/async_colocated/apply_colocated_callback.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>

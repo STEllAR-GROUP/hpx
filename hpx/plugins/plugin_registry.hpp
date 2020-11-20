@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/plugins/unique_plugin_name.hpp>
 
@@ -109,4 +108,4 @@ namespace hpx { namespace plugins
         __##pluginname##_string, __##pluginname##_section,                     \
         __##pluginname##_suffix>;                                              \
     /**/
-#endif
+

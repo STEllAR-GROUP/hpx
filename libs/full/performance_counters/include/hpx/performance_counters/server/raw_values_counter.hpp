@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/functional/function.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
@@ -52,4 +51,3 @@ namespace hpx { namespace performance_counters { namespace server {
         bool reset_;
     };
 }}}    // namespace hpx::performance_counters::server
-#endif

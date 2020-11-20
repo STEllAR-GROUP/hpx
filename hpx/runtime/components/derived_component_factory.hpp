@@ -75,4 +75,23 @@
     HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_3(ComponentType,          \
         componentname, state)                                                 \
 /**/
+#else    // COMPUTE DEVICE CODE
+
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY(...) /**/
+
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_(...) /**/
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_3(                              \
+    ComponentType, componentname, basecomponentname) /**/
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_4(                              \
+    ComponentType, componentname, basecomponentname, state) /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC(...) /**/
+
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC_(...) /**/
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC_3(                      \
+    ComponentType, componentname, basecomponentname) /**/
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC_4(                      \
+    ComponentType, componentname, basecomponentname, state) /**/
+
 #endif

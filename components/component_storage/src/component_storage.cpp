@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/assert.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/runtime/components/new.hpp>
 
@@ -30,8 +30,13 @@ namespace hpx { namespace components
         std::vector<char> const& data, naming::id_type const& id,
         naming::address const& addr)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef server::component_storage::migrate_to_here_action action_type;
         return hpx::async<action_type>(this->get_id(), data, id, addr);
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future(naming::id_type{});
+#endif
     }
 
     naming::id_type component_storage::migrate_to_here(
@@ -45,8 +50,13 @@ namespace hpx { namespace components
     hpx::future<std::vector<char> > component_storage::migrate_from_here(
         naming::gid_type const& id)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef server::component_storage::migrate_from_here_action action_type;
         return hpx::async<action_type>(this->get_id(), id);
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future(std::vector<char>{});
+#endif
     }
 
     std::vector<char> component_storage::migrate_from_here(
@@ -57,8 +67,13 @@ namespace hpx { namespace components
 
     hpx::future<std::size_t> component_storage::size() const
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef server::component_storage::size_action action_type;
         return hpx::async<action_type>(this->get_id());
+#else
+        HPX_ASSERT(false);
+        return hpx::make_ready_future(std::size_t{});
+#endif
     }
 
     std::size_t component_storage::size(launch::sync_policy) const
@@ -66,4 +81,3 @@ namespace hpx { namespace components
         return size().get();
     }
 }}
-#endif

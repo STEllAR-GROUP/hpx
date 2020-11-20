@@ -6,7 +6,5 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components_base/component_type.hpp>
-#endif
+

@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components/iostreams/export_definitions.hpp>
 #include <hpx/components/iostreams/ostream.hpp>
 
@@ -23,4 +22,4 @@ namespace hpx
     HPX_IOSTREAMS_EXPORT extern iostreams::ostream<> consolestream;
     HPX_IOSTREAMS_EXPORT std::stringstream const& get_consolestream();
 }
-#endif
+

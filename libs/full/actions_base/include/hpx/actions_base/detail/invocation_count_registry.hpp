@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/type_support/static.hpp>
 
@@ -104,4 +103,3 @@ namespace hpx { namespace actions { namespace detail {
     /**/
 
 #include <hpx/config/warnings_suffix.hpp>
-#endif

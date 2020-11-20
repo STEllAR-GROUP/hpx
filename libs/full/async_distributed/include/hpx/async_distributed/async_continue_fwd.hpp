@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/basic_action_fwd.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
@@ -76,4 +75,3 @@ namespace hpx {
         Cont&& cont, DistPolicy const& policy, Ts&&... vs);
 #endif
 }    // namespace hpx
-#endif

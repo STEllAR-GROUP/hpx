@@ -163,6 +163,7 @@ namespace hpx { namespace lcos {
 #else
 
 #include <hpx/config.hpp>
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/async_base/launch_policy.hpp>

@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/actions_base_fwd.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
@@ -33,4 +31,3 @@ namespace hpx {
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         naming::id_type const& cont, naming::id_type const& gid, Ts&&... vs);
 }    // namespace hpx
-#endif

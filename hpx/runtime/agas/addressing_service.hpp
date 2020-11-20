@@ -12,7 +12,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/agas/agas_fwd.hpp>
 #include <hpx/agas/gva.hpp>
 #include <hpx/agas/primary_namespace.hpp>
@@ -1425,4 +1424,4 @@ public:
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
+

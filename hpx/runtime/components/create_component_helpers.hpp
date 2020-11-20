@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_colocated/async_colocated_fwd.hpp>
 #include <hpx/async_distributed/detail/async_implementations_fwd.hpp>
 #include <hpx/async_local/async_fwd.hpp>
@@ -122,4 +121,3 @@ namespace hpx { namespace components {
             .get();
     }
 }}    // namespace hpx::components
-#endif

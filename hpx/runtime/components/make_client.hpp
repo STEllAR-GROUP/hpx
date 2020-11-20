@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/futures/future.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/traits/is_client.hpp>
@@ -166,5 +165,3 @@ namespace hpx { namespace components
         return result;
     }
 }}
-
-#endif

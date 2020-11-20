@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions/base_action.hpp>
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
@@ -243,4 +242,3 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::performance_counters::counter_value, hpx_counter_value)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::performance_counters::counter_values_array, hpx_counter_values_array)
-#endif

@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/functional/bind_front.hpp>
 
 #include <hpx/runtime_fwd.hpp>
@@ -97,4 +96,3 @@ namespace hpx { namespace iostreams { namespace server
         this_thread::suspend(threads::suspended, "output_stream::write_sync");
     } // }}}
 }}}
-#endif

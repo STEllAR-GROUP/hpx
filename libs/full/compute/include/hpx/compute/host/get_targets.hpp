@@ -18,7 +18,7 @@ namespace hpx { namespace compute { namespace host {
     struct HPX_EXPORT target;
 
     HPX_EXPORT std::vector<target> get_local_targets();
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
     HPX_EXPORT hpx::future<std::vector<target>> get_targets(
         hpx::id_type const& locality);
 #endif

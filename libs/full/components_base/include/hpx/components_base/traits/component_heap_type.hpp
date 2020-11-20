@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 namespace hpx { namespace traits {
 
@@ -15,4 +14,3 @@ namespace hpx { namespace traits {
     template <typename Component, typename Enable = void>
     struct component_heap_type;
 }}    // namespace hpx::traits
-#endif

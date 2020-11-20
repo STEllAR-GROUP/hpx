@@ -11,7 +11,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions/base_action.hpp>
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
@@ -475,4 +474,3 @@ namespace hpx { namespace traits {
 }}    // namespace hpx::traits
 
 #include <hpx/config/warnings_suffix.hpp>
-#endif

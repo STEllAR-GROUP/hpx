@@ -15,8 +15,6 @@
 // #include <hpx/components/process/util/posix/initializers/bind_stderr.hpp>
 // #include <hpx/components/process/util/posix/initializers/bind_stdin.hpp>
 // #include <hpx/components/process/util/posix/initializers/bind_stdout.hpp>
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components/process/util/posix/initializers/close_fd.hpp>
 #include <hpx/components/process/util/posix/initializers/close_fds.hpp>
 #include <hpx/components/process/util/posix/initializers/close_fds_if.hpp>
@@ -38,4 +36,4 @@
 #include <hpx/components/process/util/posix/initializers/start_in_dir.hpp>
 #include <hpx/components/process/util/posix/initializers/throw_on_error.hpp>
 #include <hpx/components/process/util/posix/initializers/wait_on_latch.hpp>
-#endif
+

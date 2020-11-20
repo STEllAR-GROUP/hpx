@@ -7,7 +7,5 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/runtime/agas/addressing_service.hpp>
-#endif
+

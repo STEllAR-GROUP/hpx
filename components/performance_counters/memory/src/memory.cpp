@@ -6,7 +6,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
@@ -67,4 +66,4 @@ namespace hpx { namespace performance_counters { namespace memory
 // Note that this macro can be used not more than once in one module.
 HPX_REGISTER_STARTUP_MODULE_DYNAMIC(
     hpx::performance_counters::memory::get_startup);
-#endif
+

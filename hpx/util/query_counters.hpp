@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
@@ -125,4 +124,3 @@ namespace hpx { namespace util {
 }}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>
-#endif

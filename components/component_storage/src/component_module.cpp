@@ -5,7 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
@@ -33,4 +32,3 @@ HPX_REGISTER_ACTION(
 HPX_REGISTER_ACTION(
     hpx::components::server::component_storage::size_action,
     component_storage_size_action);
-#endif

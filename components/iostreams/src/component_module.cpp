@@ -6,7 +6,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/functional/function.hpp>
@@ -82,4 +81,4 @@ namespace hpx { namespace iostreams { namespace detail
 // Note that this macro can be used not more than once in one module.
 HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(
     hpx::iostreams::detail::get_startup, hpx::iostreams::detail::get_shutdown);
-#endif
+

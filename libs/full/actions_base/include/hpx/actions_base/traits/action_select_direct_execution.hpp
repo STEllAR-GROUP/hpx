@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/modules/naming.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
@@ -57,4 +56,3 @@ namespace hpx { namespace traits {
         }
     };
 }}    // namespace hpx::traits
-#endif

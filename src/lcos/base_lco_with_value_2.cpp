@@ -5,8 +5,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_distributed/apply.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
@@ -29,4 +27,3 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
     std::uint32_t, uint32_t,
     hpx::actions::base_lco_with_value_uint32_get,
     hpx::actions::base_lco_with_value_uint32_set)
-#endif

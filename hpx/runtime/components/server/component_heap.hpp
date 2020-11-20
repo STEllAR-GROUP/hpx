@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/static_reinit/reinitializable_static.hpp>
 
 namespace hpx { namespace components {
@@ -48,4 +47,4 @@ namespace hpx { namespace components { namespace detail {                     \
 }}}                                                                           \
 /**/
 
-#endif
+

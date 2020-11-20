@@ -10,7 +10,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/agas/primary_namespace.hpp>
 #include <hpx/agas/server/primary_namespace.hpp>
@@ -2582,6 +2581,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
   , error_code& ec
     )
 {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
     HPX_ASSERT(l.owns_lock());
 
     try {
@@ -2649,6 +2649,9 @@ void addressing_service::send_refcnt_requests_non_blocking(
         HPX_RETHROWS_IF(ec, e,
             "addressing_service::send_refcnt_requests_non_blocking");
     }
+#else
+    HPX_ASSERT(false);
+#endif
 }
 
 std::vector<hpx::future<std::vector<std::int64_t> > >
@@ -2656,6 +2659,7 @@ addressing_service::send_refcnt_requests_async(
     std::unique_lock<addressing_service::mutex_type>& l
     )
 {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
     HPX_ASSERT(l.owns_lock());
 
     if (refcnt_requests_->empty())
@@ -2717,6 +2721,11 @@ addressing_service::send_refcnt_requests_async(
     }
 
     return lazy_results;
+#else
+    HPX_ASSERT(false);
+    std::vector<hpx::future<std::vector<std::int64_t>>> lazy_results;
+    return lazy_results;
+#endif
 }
 
 void addressing_service::send_refcnt_requests_sync(
@@ -3062,4 +3071,3 @@ namespace hpx
         return agas::unregister_name(std::move(name));
     }
 }
-#endif

@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/futures/future.hpp>
@@ -136,4 +135,3 @@ namespace hpx { namespace performance_counters {
 }}    // namespace hpx::performance_counters
 
 #include <hpx/config/warnings_suffix.hpp>
-#endif

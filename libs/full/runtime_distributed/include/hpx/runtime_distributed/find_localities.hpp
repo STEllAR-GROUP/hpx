@@ -10,7 +10,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/naming_base.hpp>
@@ -129,4 +128,3 @@ namespace hpx {
     HPX_EXPORT naming::id_type find_locality(
         components::component_type type, error_code& ec = throws);
 }    // namespace hpx
-#endif

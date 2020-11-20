@@ -20,7 +20,7 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #endif
@@ -111,10 +111,12 @@ namespace hpx { namespace cuda { namespace experimental {
         {
         }
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         HPX_HOST_DEVICE target(hpx::id_type const& locality, int device)
           : handle_(device)
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
           , locality_(locality)
+#endif
         {
         }
 #endif
@@ -172,7 +174,7 @@ namespace hpx { namespace cuda { namespace experimental {
 
         void synchronize() const;
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         HPX_HOST_DEVICE hpx::id_type const& get_locality() const noexcept
         {
             return locality_;
@@ -211,7 +213,7 @@ namespace hpx { namespace cuda { namespace experimental {
         friend bool operator==(target const& lhs, target const& rhs)
         {
             return lhs.handle_.get_device() == rhs.handle_.get_device()
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
                 && lhs.locality_ == rhs.locality_
 #endif
                 ;
@@ -226,7 +228,7 @@ namespace hpx { namespace cuda { namespace experimental {
 #endif
 
         native_handle_type handle_;
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         hpx::id_type locality_;
 #endif
     };

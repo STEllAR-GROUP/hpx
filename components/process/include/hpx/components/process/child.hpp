@@ -7,11 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/modules/async_distributed.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/futures/future.hpp>
+#include <hpx/modules/async_distributed.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 
 #include <hpx/components/process/server/child.hpp>
 
@@ -32,8 +33,13 @@ namespace hpx { namespace components { namespace process
 
         hpx::future<void> terminate()
         {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
             typedef server::child::terminate_action terminate_action;
             return hpx::async(terminate_action(), this->get_id());
+#else
+            HPX_ASSERT(false);
+            return hpx::make_ready_future();
+#endif
         }
 
         void terminate(launch::sync_policy)
@@ -43,8 +49,13 @@ namespace hpx { namespace components { namespace process
 
         hpx::future<int> wait_for_exit()
         {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
             typedef server::child::wait_for_exit_action wait_for_exit_action;
             return hpx::async(wait_for_exit_action(), this->get_id());
+#else
+            HPX_ASSERT(false);
+            return hpx::make_ready_future(int{});
+#endif
         }
 
         int wait_for_exit(launch::sync_policy)
@@ -53,4 +64,4 @@ namespace hpx { namespace components { namespace process
         }
     };
 }}}
-#endif
+

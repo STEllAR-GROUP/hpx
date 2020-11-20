@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/actions_base/action_priority.hpp>
 #include <hpx/actions_base/continuation_fwd.hpp>
@@ -464,6 +463,7 @@ namespace hpx
     void set_lco_value(naming::id_type const& id, naming::address && addr,
         Result && t, bool move_credits)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef typename std::decay<Result>::type remote_result_type;
         typedef typename traits::promise_local_result<
                 remote_result_type
@@ -494,12 +494,16 @@ namespace hpx
             detail::set_lco_value<set_value_action>(id, std::move(addr),
                 std::forward<Result>(t), move_credits);
         }
+#else
+        HPX_ASSERT(false);
+#endif
     }
 
     template <typename Result>
     void set_lco_value(naming::id_type const& id, naming::address && addr,
         Result && t, naming::id_type const& cont, bool move_credits)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef typename std::decay<Result>::type remote_result_type;
         typedef typename traits::promise_local_result<
                 remote_result_type
@@ -531,7 +535,10 @@ namespace hpx
                     local_result_type, remote_result_type, set_value_action
                 >(id, std::move(addr), std::forward<Result>(t), cont, move_credits);
         }
+#else
+        HPX_ASSERT(false);
+#endif
     }
     /// \endcond
 }
-#endif
+

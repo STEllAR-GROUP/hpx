@@ -5,7 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/detail/invocation_count_registry.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/performance_counters/action_invocation_counter_discoverer.hpp>
@@ -130,4 +129,3 @@ namespace hpx { namespace performance_counters {
     }
 #endif
 }}    // namespace hpx::performance_counters
-#endif

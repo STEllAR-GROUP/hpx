@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -77,4 +76,3 @@ namespace hpx { namespace detail {
     bool apply_cb_impl(hpx::id_type const& id,
         threads::thread_priority priority, Callback&& cb, Ts&&... vs);
 }}    // namespace hpx::detail
-#endif

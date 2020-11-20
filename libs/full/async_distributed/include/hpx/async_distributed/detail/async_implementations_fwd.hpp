@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_local/async_fwd.hpp>
@@ -46,4 +45,3 @@ namespace hpx { namespace detail {
     async_cb_impl(hpx::detail::deferred_policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs);
 }}    // namespace hpx::detail
-#endif

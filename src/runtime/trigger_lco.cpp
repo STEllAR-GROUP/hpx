@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/assert.hpp>
 #include <hpx/async_distributed/apply.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/naming_base/address.hpp>
@@ -23,6 +22,7 @@ namespace hpx
     void trigger_lco_event(naming::id_type const& id, naming::address && addr,
         bool move_credits)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef lcos::base_lco::set_event_action set_action;
         if (move_credits &&
             id.get_management_type() != naming::id_type::unmanaged)
@@ -38,11 +38,15 @@ namespace hpx
             detail::apply_impl<set_action>(
                 id, std::move(addr), actions::action_priority<set_action>());
         }
+#else
+        HPX_ASSERT(false);
+#endif
     }
 
     void trigger_lco_event(naming::id_type const& id, naming::address && addr,
         naming::id_type const& cont, bool move_credits)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef lcos::base_lco::set_event_action set_action;
         typedef
             hpx::traits::extract_action<set_action>::local_result_type
@@ -68,11 +72,15 @@ namespace hpx
                     local_result_type, remote_result_type>(cont),
                 id, std::move(addr), actions::action_priority<set_action>());
         }
+#else
+        HPX_ASSERT(false);
+#endif
     }
 
     void set_lco_error(naming::id_type const& id, naming::address && addr,
         std::exception_ptr const& e, bool move_credits)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef lcos::base_lco::set_exception_action set_action;
         if (move_credits &&
             id.get_management_type() != naming::id_type::unmanaged)
@@ -88,11 +96,15 @@ namespace hpx
             detail::apply_impl<set_action>(
                 id, std::move(addr), actions::action_priority<set_action>(), e);
         }
+#else
+        HPX_ASSERT(false);
+#endif
     }
 
     void set_lco_error(naming::id_type const& id, naming::address && addr, //-V659
         std::exception_ptr && e, bool move_credits)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef lcos::base_lco::set_exception_action set_action;
         if (move_credits &&
             id.get_management_type() != naming::id_type::unmanaged)
@@ -110,12 +122,16 @@ namespace hpx
                 id, std::move(addr), actions::action_priority<set_action>(),
                 std::move(e));
         }
+#else
+        HPX_ASSERT(false);
+#endif
     }
 
     void set_lco_error(naming::id_type const& id, naming::address && addr,
         std::exception_ptr const& e, naming::id_type const& cont,
         bool move_credits)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef lcos::base_lco::set_exception_action set_action;
         typedef
             hpx::traits::extract_action<set_action>::local_result_type
@@ -141,12 +157,16 @@ namespace hpx
                     local_result_type, remote_result_type>(cont),
                 id, std::move(addr), actions::action_priority<set_action>(), e);
         }
+#else
+        HPX_ASSERT(false);
+#endif
     }
 
     void set_lco_error(naming::id_type const& id, naming::address && addr, //-V659
         std::exception_ptr && e, naming::id_type const& cont,
         bool move_credits)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef lcos::base_lco::set_exception_action set_action;
         typedef
             hpx::traits::extract_action<set_action>::local_result_type
@@ -174,6 +194,9 @@ namespace hpx
                 id, std::move(addr),
                 actions::action_priority<set_action>(), std::move(e));
         }
+#else
+        HPX_ASSERT(false);
+#endif
     }
 
 #if defined(HPX_MSVC) && !defined(HPX_DEBUG)
@@ -188,4 +211,4 @@ namespace hpx
     >(naming::id_type const &, util::unused_type &&);
 #endif
 }
-#endif
+

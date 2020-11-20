@@ -12,7 +12,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #if !defined(HPX_WINDOWS)
 #include <sys/types.h>
@@ -29,5 +28,4 @@ struct child
 
 }}}}
 
-#endif
 #endif

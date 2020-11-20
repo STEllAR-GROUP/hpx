@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/agas/gva.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/modules/errors.hpp>
@@ -321,4 +320,4 @@ namespace hpx { namespace util { namespace functional
                 std::forward<Bound>(bound), std::forward<Continuation>(c));
     }
 }}}
-#endif
+

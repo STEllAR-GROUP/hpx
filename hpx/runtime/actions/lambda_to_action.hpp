@@ -8,10 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/include/plain_actions.hpp>
-
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -107,4 +104,4 @@ namespace hpx { namespace actions
             true ? nullptr : hpx::actions::detail::addr_add() + f;
     }
 }}
-#endif
+

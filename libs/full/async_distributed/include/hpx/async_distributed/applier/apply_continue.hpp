@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
@@ -64,4 +63,3 @@ namespace hpx {
         return apply_continue<Derived>(cont, gid, std::forward<Ts>(vs)...);
     }
 }    // namespace hpx
-#endif

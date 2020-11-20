@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/futures/future_fwd.hpp>
 #include <hpx/modules/errors.hpp>
@@ -48,4 +46,3 @@ namespace hpx {
     HPX_EXPORT lcos::future<naming::id_type> get_colocation_id(
         naming::id_type const& id);
 }    // namespace hpx
-#endif

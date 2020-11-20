@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/synchronization/recursive_mutex.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
@@ -128,4 +127,4 @@ namespace hpx { namespace iostreams { namespace detail
         HPX_SERIALIZATION_SPLIT_MEMBER();
     };
 }}}
-#endif
+

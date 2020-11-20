@@ -9,7 +9,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/functional/bind_back.hpp>
@@ -751,4 +750,4 @@ void symbol_namespace::counter_data::increment_on_event_count()
 }
 
 }}}
-#endif
+

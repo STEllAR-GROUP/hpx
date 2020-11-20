@@ -7,8 +7,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -561,4 +559,4 @@ symbol_namespace::iterate_names_return_type find_symbols(
 }
 
 }}
-#endif
+

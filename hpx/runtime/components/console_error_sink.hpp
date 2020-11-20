@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/naming.hpp>
 
@@ -25,4 +24,4 @@ namespace hpx { namespace components
     HPX_EXPORT void console_error_sink(std::exception_ptr const& e);
 }}
 
-#endif
+

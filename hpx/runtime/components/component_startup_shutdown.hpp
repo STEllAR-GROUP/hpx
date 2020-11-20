@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 
@@ -146,4 +145,4 @@ namespace hpx { namespace components
         HPX_PP_CAT(HPX_PLUGIN_COMPONENT_PREFIX, _provider), startup_shutdown) \
     /**/
 
-#endif
+

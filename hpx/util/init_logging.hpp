@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 
@@ -21,4 +19,4 @@ namespace hpx { namespace util { namespace detail
     /// well.
     HPX_EXPORT void init_logging(runtime_configuration& ini, bool isconsole);
 }}}
-#endif
+

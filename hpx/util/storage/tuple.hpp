@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/serialization/serializable_any.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
@@ -127,4 +125,4 @@ namespace hpx { namespace util { namespace storage {
         tuple_holder tuple_;
     };
 }}}    // namespace hpx::util::storage
-#endif
+

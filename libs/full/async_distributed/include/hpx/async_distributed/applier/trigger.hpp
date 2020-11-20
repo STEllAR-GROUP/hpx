@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
 
@@ -41,4 +40,3 @@ namespace hpx { namespace applier {
     }
 
 }}    // namespace hpx::applier
-#endif

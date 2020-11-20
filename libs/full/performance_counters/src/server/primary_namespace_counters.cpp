@@ -7,7 +7,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/agas/agas_fwd.hpp>
 #include <hpx/agas/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
@@ -341,4 +340,3 @@ namespace hpx { namespace agas {
 HPX_REGISTER_ACTION_ID(hpx::agas::primary_namespace_statistics_counter_action,
     primary_namespace_statistics_counter_action,
     hpx::actions::primary_namespace_statistics_counter_action_id)
-#endif

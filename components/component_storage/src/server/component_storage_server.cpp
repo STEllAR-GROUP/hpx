@@ -5,7 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components/component_storage/server/component_storage.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
 
@@ -55,4 +54,3 @@ namespace hpx { namespace components { namespace server
 }}}
 
 HPX_REGISTER_UNORDERED_MAP(hpx::naming::gid_type, hpx_component_storage_data_type)
-#endif

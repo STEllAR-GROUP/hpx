@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/futures/future.hpp>
@@ -137,4 +136,4 @@ namespace hpx { namespace components
         }
     };
 }}
-#endif
+

@@ -27,7 +27,7 @@
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/errors.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #endif

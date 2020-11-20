@@ -9,6 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/async_local/sync.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/async_distributed/sync.hpp>
 #endif

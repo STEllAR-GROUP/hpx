@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/plugins/binary_filter/bzip2_serialization_filter_registration.hpp>
 #include <hpx/plugins/binary_filter/snappy_serialization_filter_registration.hpp>
 #include <hpx/plugins/binary_filter/zlib_serialization_filter_registration.hpp>

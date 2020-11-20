@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/agas/primary_namespace.hpp>
@@ -78,9 +77,7 @@ namespace hpx { namespace detail {
             agas::primary_namespace::get_service_instance(gid.get_gid()),
             naming::id_type::unmanaged);
 
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-        HPX_ASSERT(false);
-#else
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef typename hpx::traits::extract_action<Action>::remote_result_type
             remote_result_type;
         typedef agas::server::primary_namespace::colocate_action action_type;
@@ -91,6 +88,10 @@ namespace hpx { namespace detail {
                 util::bind(util::functional::extract_locality(), _2, gid),
                 std::forward<Ts>(vs)...)),
             service_target, gid.get_gid());
+#else
+        HPX_ASSERT(false);
+        return lcos::future<typename traits::promise_local_result<typename hpx::
+                traits::extract_action<Action>::remote_result_type>::type>{};
 #endif
     }
 
@@ -154,4 +155,3 @@ namespace hpx { namespace detail {
             std::forward<Continuation>(cont), gid, std::forward<Ts>(vs)...);
     }
 }}    // namespace hpx::detail
-#endif

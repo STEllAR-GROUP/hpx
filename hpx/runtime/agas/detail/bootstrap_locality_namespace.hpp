@@ -11,7 +11,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/agas/agas_fwd.hpp>
 #include <hpx/futures/future.hpp>
@@ -72,4 +71,4 @@ namespace hpx { namespace agas { namespace detail
         server::locality_namespace server_;
     };
 }}}
-#endif
+

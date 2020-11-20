@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components/containers/partitioned_vector/detail/view_element.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
@@ -256,4 +254,4 @@ namespace hpx {
         std::array< std::size_t, N+1 > const & hw_basis_;
     };
 }
-#endif
+

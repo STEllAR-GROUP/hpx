@@ -8,6 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/local/future.hpp>
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/distributed/future.hpp>
 #endif

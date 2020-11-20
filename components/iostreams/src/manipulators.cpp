@@ -5,8 +5,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components/iostreams/manipulators.hpp>
 
 namespace hpx { namespace iostreams
@@ -16,4 +14,4 @@ namespace hpx { namespace iostreams
     async_flush_type async_flush = async_flush_type();    // hpx::async_flush
     async_endl_type async_endl = async_endl_type();       // hpx::async_endl
 }}
-#endif
+
