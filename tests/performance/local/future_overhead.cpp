@@ -7,8 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #endif
@@ -126,7 +125,7 @@ struct scratcher
     }
 };
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
 HPX_PLAIN_ACTION(null_function, null_action)
 
 // Time async action execution using wait each on futures vector
@@ -556,7 +555,7 @@ int hpx_main(variables_map& vm)
             if (test_all)
             {
                 measure_function_futures_limiting_executor(count, csv, par);
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
                 measure_action_futures_wait_each(count, csv);
                 measure_action_futures_wait_all(count, csv);
 #endif
@@ -608,4 +607,3 @@ int main(int argc, char* argv[])
 
     return hpx::init(argc, argv, init_args);
 }
-#endif
