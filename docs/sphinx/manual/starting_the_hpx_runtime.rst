@@ -284,6 +284,13 @@ so that they are ready to accept new work. :cpp:func:`hpx::suspend` and
    called. Only call :cpp:func:`hpx::finalize` when you wish to fully stop the
    |hpx| runtime.
 
+.. warning::
+
+   :cpp:func:`hpx::suspend` only waits for local tasks, i.e. tasks on the
+    current locality, to finish executing. When using :cpp:func:`hpx::suspend`
+    in a multi-locality scenario the user is responsible for ensuring that any
+    work required from other localities has also finished.
+
 |hpx| also supports suspending individual thread pools and threads. For details
 on how to do that see the documentation for :cpp:class:`hpx::threads::thread_pool_base`.
 
