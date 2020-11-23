@@ -142,7 +142,7 @@ namespace hpx {
                                         UTuple>::type>::value ==
                 util::pack<Ts...>::size>::type>
           : util::all_of<std::is_convertible<
-                decltype(get<Is>(std::declval<UTuple>())), Ts>...>
+                decltype(hpx::get<Is>(std::declval<UTuple>())), Ts>...>
         {
         };
 
@@ -1072,13 +1072,13 @@ namespace hpx { namespace util {
         return hpx::tuple_cat(std::forward<Ts>(vs)...);
     }
 
-    template <typename... Ts>
+    template <std::size_t I, typename Tuple>
     HPX_DEPRECATED_V(1, 6,
         "hpx::util::get is deprecated. Use hpx::get "
         "instead.")
-    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto get(Ts&&... vs)
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto get(Tuple&& tuple)
     {
-        return hpx::get(std::forward<Ts>(vs)...);
+        return hpx::get<I>(std::forward<Tuple>(tuple));
     }
 }}    // namespace hpx::util
 
