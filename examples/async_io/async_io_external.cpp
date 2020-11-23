@@ -8,8 +8,6 @@
 // schedule an IO task onto an external OS-thread in HPX and how to
 // synchronize the result of this IO task with a waiting HPX thread.
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/iostream.hpp>
@@ -110,5 +108,3 @@ int main(int argc, char* argv[])
 {
     return hpx::init(argc, argv); // Initialize and run HPX.
 }
-
-#endif

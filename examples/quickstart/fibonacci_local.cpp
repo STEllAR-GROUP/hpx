@@ -11,8 +11,6 @@
 // fibonacci_futures.cpp. This example is mainly intended to demonstrate async,
 // futures and get for the documentation.
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/util.hpp>
@@ -80,4 +78,3 @@ int main(int argc, char* argv[])
     return hpx::init(argc, argv, init_args);
 }
 //main]
-#endif

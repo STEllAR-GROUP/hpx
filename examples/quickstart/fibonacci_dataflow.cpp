@@ -10,8 +10,6 @@
 // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3564.pdf). The
 // necessary transformations are performed by hand.
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
@@ -154,4 +152,3 @@ int main(int argc, char* argv[])
 
     return hpx::init(argc, argv, init_args);
 }
-#endif

@@ -6,8 +6,6 @@
 
 // Including 'hpx/hpx_main.hpp' instead of the usual 'hpx/hpx_init.hpp' enables
 // to use the plain C-main below as the direct main HPX entry point.
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 #include <hpx/iostream.hpp>
 #include <hpx/include/util.hpp>
@@ -35,5 +33,3 @@ int main(int argc, char* argv[])
     hpx::cout << "min: " << min_sample << ", max: " << max_sample << "\n" << hpx::flush;
     return 0;
 }
-
-#endif

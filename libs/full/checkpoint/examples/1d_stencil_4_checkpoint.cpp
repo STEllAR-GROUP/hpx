@@ -21,8 +21,6 @@
 // every n time steps.
 //
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
@@ -482,4 +480,3 @@ int main(int argc, char* argv[])
 
     return hpx::init(argc, argv, init_args);
 }
-#endif
