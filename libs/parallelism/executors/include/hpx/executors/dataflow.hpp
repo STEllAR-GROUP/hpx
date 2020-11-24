@@ -106,7 +106,7 @@ namespace hpx { namespace lcos { namespace detail {
         typename Enable = void>
     struct dataflow_return_impl
     {
-        typedef typename dataflow_not_callable<F, Args>::type type;
+        using type = typename dataflow_not_callable<F, Args>::type;
     };
 
     template <typename Policy, typename F, typename Args>
@@ -176,10 +176,10 @@ namespace hpx { namespace lcos { namespace detail {
         using result_type = typename hpx::traits::future_traits<type>::type;
         using base_type = hpx::lcos::detail::future_data<result_type>;
 
-        typedef std::is_void<result_type> is_void;
+        using is_void = std::is_void<result_type>;
 
-        typedef Func function_type;
-        typedef dataflow_frame<Policy, Func, Futures> dataflow_type;
+        using function_type = Func;
+        using dataflow_type = dataflow_frame<Policy, Func, Futures>;
 
         friend struct dataflow_finalization<dataflow_type>;
         friend struct traits::get_function_annotation<
@@ -191,7 +191,7 @@ namespace hpx { namespace lcos { namespace detail {
         dataflow_frame(dataflow_frame const&);
 
     public:
-        typedef typename base_type::init_no_addref init_no_addref;
+        using init_no_addref = typename base_type::init_no_addref;
 
         /// A struct to construct the dataflow_frame in-place
         struct construction_data
