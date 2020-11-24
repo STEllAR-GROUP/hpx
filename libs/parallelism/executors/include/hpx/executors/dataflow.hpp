@@ -225,10 +225,8 @@ namespace hpx { namespace lcos { namespace detail {
 
             try
             {
-                Func func = std::move(func_);
-
                 this->set_data(util::invoke_fused(
-                    std::move(func), std::forward<Futures_>(futures)));
+                    std::move(func_), std::forward<Futures_>(futures)));
                 return;
             }
             catch (...)
@@ -252,10 +250,8 @@ namespace hpx { namespace lcos { namespace detail {
 
             try
             {
-                Func func = std::move(func_);
-
                 util::invoke_fused(
-                    std::move(func), std::forward<Futures_>(futures));
+                    std::move(func_), std::forward<Futures_>(futures));
 
                 this->set_data(util::unused_type());
                 return;
