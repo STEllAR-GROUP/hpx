@@ -16,6 +16,6 @@ namespace hpx { namespace traits {
     struct action_priority
     {
         HPX_STATIC_CONSTEXPR threads::thread_priority value =
-            threads::thread_priority_default;
+            threads::thread_priority::default_;
     };
 }}    // namespace hpx::traits

@@ -215,8 +215,8 @@ void measure_function_futures_create_thread_hierarchical_placement(
     auto const thread_func =
         hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
     auto desc = hpx::util::thread_description();
-    auto prio = hpx::threads::thread_priority_normal;
-    auto stack_size = hpx::threads::thread_stacksize_small;
+    auto prio = hpx::threads::thread_priority::normal;
+    auto stack_size = hpx::threads::thread_stacksize::small_;
     auto num_threads = hpx::get_num_worker_threads();
     hpx::error_code ec;
 
@@ -235,7 +235,8 @@ void measure_function_futures_create_thread_hierarchical_placement(
             {
                 hpx::threads::thread_init_data init(
                     hpx::threads::thread_function_type(thread_func), desc, prio,
-                    hint, stack_size, hpx::threads::pending, false, sched);
+                    hint, stack_size,
+                    hpx::threads::thread_schedule_state::pending, false, sched);
                 sched->create_thread(init, nullptr, ec);
             }
         };
@@ -245,7 +246,8 @@ void measure_function_futures_create_thread_hierarchical_placement(
 
         hpx::threads::thread_init_data init(
             hpx::threads::thread_function_type(thread_spawn_func), desc, prio,
-            hint, stack_size, hpx::threads::pending, false, sched);
+            hint, stack_size, hpx::threads::thread_schedule_state::pending,
+            false, sched);
         sched->create_thread(init, nullptr, ec);
     }
     l.wait();

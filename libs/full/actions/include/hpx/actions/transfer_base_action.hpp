@@ -158,13 +158,13 @@ namespace hpx { namespace actions {
         // This is the priority value this action has been instantiated with
         // (statically). This value might be different from the priority member
         // holding the runtime value an action has been created with
-        HPX_STATIC_CONSTEXPR std::uint32_t priority_value =
+        HPX_STATIC_CONSTEXPR threads::thread_priority priority_value =
             traits::action_priority<Action>::value;
 
         // This is the stacksize value this action has been instantiated with
         // (statically). This value might be different from the stacksize member
         // holding the runtime value an action has been created with
-        HPX_STATIC_CONSTEXPR std::uint32_t stacksize_value =
+        HPX_STATIC_CONSTEXPR threads::thread_stacksize stacksize_value =
             traits::action_stacksize<Action>::value;
 
         typedef typename Action::direct_execution direct_execution;
@@ -175,15 +175,15 @@ namespace hpx { namespace actions {
         // construct an action from its arguments
         template <typename... Ts>
         explicit transfer_base_action(Ts&&... vs)
-          : base_action_data(threads::thread_priority_default,
-                threads::thread_stacksize_default)
+          : base_action_data(threads::thread_priority::default_,
+                threads::thread_stacksize::default_)
           , arguments_(std::forward<Ts>(vs)...)
         {
         }
 
         template <typename... Ts>
         transfer_base_action(threads::thread_priority priority, Ts&&... vs)
-          : base_action_data(priority, threads::thread_stacksize_default)
+          : base_action_data(priority, threads::thread_stacksize::default_)
           , arguments_(std::forward<Ts>(vs)...)
         {
         }

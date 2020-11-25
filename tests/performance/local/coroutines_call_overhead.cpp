@@ -139,11 +139,12 @@ void print_results(
 ///////////////////////////////////////////////////////////////////////////////
 struct kernel
 {
-    hpx::threads::thread_result_type operator()(thread_state_ex_enum) const
+    hpx::threads::thread_result_type operator()(thread_restart_state) const
     {
         worker_timed(payload * 1000);
 
-        return hpx::threads::thread_result_type(hpx::threads::pending,
+        return hpx::threads::thread_result_type(
+            hpx::threads::thread_schedule_state::pending,
             hpx::threads::invalid_thread_id);
     }
 

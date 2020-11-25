@@ -90,9 +90,9 @@ int hpx_main(int argc, char* /*argv*/[])
     {
         std::string pool_name = "pool-" + std::to_string(i);
         HP_executors.emplace_back(&hpx::resource::get_thread_pool(pool_name),
-            hpx::threads::thread_priority_high);
+            hpx::threads::thread_priority::high);
         NP_executors.emplace_back(&hpx::resource::get_thread_pool(pool_name),
-            hpx::threads::thread_priority_default);
+            hpx::threads::thread_priority::default_);
     }
 
     // randomly create tasks that run on a random pool

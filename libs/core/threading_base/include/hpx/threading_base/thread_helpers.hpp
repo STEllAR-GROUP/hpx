@@ -64,9 +64,9 @@ namespace hpx { namespace threads {
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     HPX_CORE_EXPORT thread_state set_thread_state(thread_id_type const& id,
-        thread_state_enum state = pending,
-        thread_state_ex_enum stateex = wait_signaled,
-        thread_priority priority = thread_priority_normal,
+        thread_schedule_state state = thread_schedule_state::pending,
+        thread_restart_state stateex = thread_restart_state::signaled,
+        thread_priority priority = thread_priority::normal,
         bool retry_on_active = true, hpx::error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////
@@ -100,16 +100,17 @@ namespace hpx { namespace threads {
     ///                   of hpx#exception.
     HPX_CORE_EXPORT thread_id_type set_thread_state(thread_id_type const& id,
         hpx::chrono::steady_time_point const& abs_time,
-        std::atomic<bool>* started, thread_state_enum state = pending,
-        thread_state_ex_enum stateex = wait_timeout,
-        thread_priority priority = thread_priority_normal,
+        std::atomic<bool>* started,
+        thread_schedule_state state = thread_schedule_state::pending,
+        thread_restart_state stateex = thread_restart_state::timeout,
+        thread_priority priority = thread_priority::normal,
         bool retry_on_active = true, error_code& ec = throws);
 
     inline thread_id_type set_thread_state(thread_id_type const& id,
         hpx::chrono::steady_time_point const& abs_time,
-        thread_state_enum state = pending,
-        thread_state_ex_enum stateex = wait_timeout,
-        thread_priority priority = thread_priority_normal,
+        thread_schedule_state state = thread_schedule_state::pending,
+        thread_restart_state stateex = thread_restart_state::timeout,
+        thread_priority priority = thread_priority::normal,
         bool retry_on_active = true, error_code& /*ec*/ = throws)
     {
         return set_thread_state(id, abs_time, nullptr, state, stateex, priority,
@@ -145,9 +146,9 @@ namespace hpx { namespace threads {
     ///                   of hpx#exception.
     inline thread_id_type set_thread_state(thread_id_type const& id,
         hpx::chrono::steady_duration const& rel_time,
-        thread_state_enum state = pending,
-        thread_state_ex_enum stateex = wait_timeout,
-        thread_priority priority = thread_priority_normal,
+        thread_schedule_state state = thread_schedule_state::pending,
+        thread_restart_state stateex = thread_restart_state::timeout,
+        thread_priority priority = thread_priority::normal,
         bool retry_on_active = true, error_code& ec = throws)
     {
         return set_thread_state(id, rel_time.from_now(), state, stateex,
@@ -449,8 +450,8 @@ namespace hpx { namespace this_thread {
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_CORE_EXPORT threads::thread_state_ex_enum suspend(
-        threads::thread_state_enum state, threads::thread_id_type const& id,
+    HPX_CORE_EXPORT threads::thread_restart_state suspend(
+        threads::thread_schedule_state state, threads::thread_id_type const& id,
         util::thread_description const& description = util::thread_description(
             "this_thread::suspend"),
         error_code& ec = throws);
@@ -471,8 +472,9 @@ namespace hpx { namespace this_thread {
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    inline threads::thread_state_ex_enum suspend(
-        threads::thread_state_enum state = threads::pending,
+    inline threads::thread_restart_state suspend(
+        threads::thread_schedule_state state =
+            threads::thread_schedule_state::pending,
         util::thread_description const& description = util::thread_description(
             "this_thread::suspend"),
         error_code& ec = throws)
@@ -497,7 +499,7 @@ namespace hpx { namespace this_thread {
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_CORE_EXPORT threads::thread_state_ex_enum suspend(
+    HPX_CORE_EXPORT threads::thread_restart_state suspend(
         hpx::chrono::steady_time_point const& abs_time,
         threads::thread_id_type const& id,
         util::thread_description const& description = util::thread_description(
@@ -521,7 +523,7 @@ namespace hpx { namespace this_thread {
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    inline threads::thread_state_ex_enum suspend(
+    inline threads::thread_restart_state suspend(
         hpx::chrono::steady_time_point const& abs_time,
         util::thread_description const& description = util::thread_description(
             "this_thread::suspend"),
@@ -547,7 +549,7 @@ namespace hpx { namespace this_thread {
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    inline threads::thread_state_ex_enum suspend(
+    inline threads::thread_restart_state suspend(
         hpx::chrono::steady_duration const& rel_time,
         util::thread_description const& description = util::thread_description(
             "this_thread::suspend"),
@@ -574,7 +576,7 @@ namespace hpx { namespace this_thread {
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    inline threads::thread_state_ex_enum suspend(
+    inline threads::thread_restart_state suspend(
         hpx::chrono::steady_duration const& rel_time,
         threads::thread_id_type const& id,
         util::thread_description const& description = util::thread_description(
@@ -601,7 +603,7 @@ namespace hpx { namespace this_thread {
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    inline threads::thread_state_ex_enum suspend(std::uint64_t ms,
+    inline threads::thread_restart_state suspend(std::uint64_t ms,
         util::thread_description const& description = util::thread_description(
             "this_thread::suspend"),
         error_code& ec = throws)

@@ -137,10 +137,12 @@ namespace hpx { namespace lcos { namespace local {
                             util::deferred_call(
                                 &base_type::run_impl, std::move(this_))),
                         util::thread_description(f_, annotation),
-                        threads::thread_priority_boost,
+                        threads::thread_priority::boost,
                         threads::thread_schedule_hint(
                             static_cast<std::int16_t>(get_worker_thread_num())),
-                        stacksize, threads::pending_do_not_schedule, true);
+                        stacksize,
+                        threads::thread_schedule_state::pending_do_not_schedule,
+                        true);
 
                     return threads::register_thread(data, pool, ec);
                 }
@@ -149,7 +151,8 @@ namespace hpx { namespace lcos { namespace local {
                     threads::make_thread_function_nullary(util::deferred_call(
                         &base_type::run_impl, std::move(this_))),
                     util::thread_description(f_, annotation), priority,
-                    schedulehint, stacksize, threads::pending);
+                    schedulehint, stacksize,
+                    threads::thread_schedule_state::pending);
 
                 threads::register_work(data, pool, ec);
                 return threads::invalid_thread_id;
@@ -780,9 +783,9 @@ namespace hpx { namespace lcos { namespace local {
             const char* annotation = "futures_factory::apply",
             launch policy = launch::async,
             threads::thread_priority priority =
-                threads::thread_priority_default,
+                threads::thread_priority::default_,
             threads::thread_stacksize stacksize =
-                threads::thread_stacksize_default,
+                threads::thread_stacksize::default_,
             threads::thread_schedule_hint schedulehint =
                 threads::thread_schedule_hint(),
             error_code& ec = throws) const
@@ -795,9 +798,9 @@ namespace hpx { namespace lcos { namespace local {
             const char* annotation = "futures_factory::apply",
             launch policy = launch::async,
             threads::thread_priority priority =
-                threads::thread_priority_default,
+                threads::thread_priority::default_,
             threads::thread_stacksize stacksize =
-                threads::thread_stacksize_default,
+                threads::thread_stacksize::default_,
             threads::thread_schedule_hint schedulehint =
                 threads::thread_schedule_hint(),
             error_code& ec = throws) const

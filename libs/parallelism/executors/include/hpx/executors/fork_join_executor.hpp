@@ -97,9 +97,9 @@ namespace hpx { namespace execution { namespace experimental {
             // this executor.
             threads::thread_pool_base* pool_ = nullptr;
             threads::thread_priority priority_ =
-                threads::thread_priority_default;
+                threads::thread_priority::default_;
             threads::thread_stacksize stacksize_ =
-                threads::thread_stacksize_small;
+                threads::thread_stacksize::small_;
             loop_schedule schedule_ = loop_schedule::static_;
             std::size_t main_thread_;
             std::size_t num_threads_;
@@ -520,9 +520,9 @@ namespace hpx { namespace execution { namespace experimental {
         ///        other work if it hasn't received any new work for bulk
         ///        execution.
         explicit fork_join_executor(
-            threads::thread_priority priority = threads::thread_priority_high,
+            threads::thread_priority priority = threads::thread_priority::high,
             threads::thread_stacksize stacksize =
-                threads::thread_stacksize_small,
+                threads::thread_stacksize::small_,
             loop_schedule schedule = loop_schedule::static_,
             std::chrono::nanoseconds yield_delay = std::chrono::milliseconds(1))
           : shared_data_(

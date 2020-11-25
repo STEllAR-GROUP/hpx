@@ -43,9 +43,9 @@ namespace hpx { namespace compute { namespace host {
         using executor_parameters_type = hpx::execution::static_chunk_size;
 
         block_executor(std::vector<host::target> const& targets,
-            threads::thread_priority priority = threads::thread_priority_high,
+            threads::thread_priority priority = threads::thread_priority::high,
             threads::thread_stacksize stacksize =
-                threads::thread_stacksize_default,
+                threads::thread_stacksize::default_,
             threads::thread_schedule_hint schedulehint = {})
           : targets_(targets)
           , current_(0)
@@ -245,15 +245,15 @@ namespace hpx { namespace compute { namespace host {
             {
                 auto num_pus = tgt.num_pus();
                 executors_.emplace_back(num_pus.first, num_pus.second,
-                    threads::thread_priority_high);
+                    threads::thread_priority::high);
             }
         }
         std::vector<host::target> targets_;
         std::atomic<std::size_t> current_;
         std::vector<Executor> executors_;
-        threads::thread_priority priority_ = threads::thread_priority_high;
+        threads::thread_priority priority_ = threads::thread_priority::high;
         threads::thread_stacksize stacksize_ =
-            threads::thread_stacksize_default;
+            threads::thread_stacksize::default_;
         threads::thread_schedule_hint schedulehint_ = {};
     };
 }}}    // namespace hpx::compute::host

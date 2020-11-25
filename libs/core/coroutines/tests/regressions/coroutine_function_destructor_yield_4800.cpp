@@ -17,7 +17,8 @@ struct thread_function_yield_destructor
 {
     hpx::threads::thread_result_type operator()(hpx::threads::thread_arg_type)
     {
-        return {hpx::threads::terminated, hpx::threads::invalid_thread_id};
+        return {hpx::threads::thread_schedule_state::terminated,
+            hpx::threads::invalid_thread_id};
     }
 
     ~thread_function_yield_destructor()

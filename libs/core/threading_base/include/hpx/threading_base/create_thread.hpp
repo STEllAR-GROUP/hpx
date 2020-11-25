@@ -25,13 +25,13 @@ namespace hpx { namespace threads { namespace detail {
         switch (data.initial_state)
         {
         // NOLINTNEXTLINE(bugprone-branch-clone)
-        case pending:
+        case thread_schedule_state::pending:
             HPX_FALLTHROUGH;
-        case pending_do_not_schedule:
+        case thread_schedule_state::pending_do_not_schedule:
             HPX_FALLTHROUGH;
-        case pending_boost:
+        case thread_schedule_state::pending_boost:
             HPX_FALLTHROUGH;
-        case suspended:
+        case thread_schedule_state::suspended:
             break;
 
         default:
@@ -76,16 +76,16 @@ namespace hpx { namespace threads { namespace detail {
         // none is explicitly specified).
         if (self)
         {
-            if (data.priority == thread_priority_default &&
-                thread_priority_high_recursive ==
+            if (data.priority == thread_priority::default_ &&
+                thread_priority::high_recursive ==
                     get_thread_id_data(threads::get_self_id())->get_priority())
             {
-                data.priority = thread_priority_high_recursive;
+                data.priority = thread_priority::high_recursive;
             }
         }
 
-        if (data.priority == thread_priority_default)
-            data.priority = thread_priority_normal;
+        if (data.priority == thread_priority::default_)
+            data.priority = thread_priority::normal;
 
         // create the new thread
         scheduler->create_thread(data, &id, ec);

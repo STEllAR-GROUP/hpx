@@ -102,34 +102,34 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
             std::unique_lock<mutex_type> lock, error_code& ec = throws)
         {
             return notify_one(
-                std::move(lock), threads::thread_priority_default, ec);
+                std::move(lock), threads::thread_priority::default_, ec);
         }
 
         void notify_all(
             std::unique_lock<mutex_type> lock, error_code& ec = throws)
         {
             return notify_all(
-                std::move(lock), threads::thread_priority_default, ec);
+                std::move(lock), threads::thread_priority::default_, ec);
         }
 
         HPX_CORE_EXPORT void abort_all(std::unique_lock<mutex_type> lock);
 
-        HPX_CORE_EXPORT threads::thread_state_ex_enum wait(
+        HPX_CORE_EXPORT threads::thread_restart_state wait(
             std::unique_lock<mutex_type>& lock, char const* description,
             error_code& ec = throws);
 
-        threads::thread_state_ex_enum wait(
+        threads::thread_restart_state wait(
             std::unique_lock<mutex_type>& lock, error_code& ec = throws)
         {
             return wait(lock, "condition_variable::wait", ec);
         }
 
-        HPX_CORE_EXPORT threads::thread_state_ex_enum wait_until(
+        HPX_CORE_EXPORT threads::thread_restart_state wait_until(
             std::unique_lock<mutex_type>& lock,
             hpx::chrono::steady_time_point const& abs_time,
             char const* description, error_code& ec = throws);
 
-        threads::thread_state_ex_enum wait_until(
+        threads::thread_restart_state wait_until(
             std::unique_lock<mutex_type>& lock,
             hpx::chrono::steady_time_point const& abs_time,
             error_code& ec = throws)
@@ -138,7 +138,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
                 lock, abs_time, "condition_variable::wait_until", ec);
         }
 
-        threads::thread_state_ex_enum wait_for(
+        threads::thread_restart_state wait_for(
             std::unique_lock<mutex_type>& lock,
             hpx::chrono::steady_duration const& rel_time,
             char const* description, error_code& ec = throws)
@@ -146,7 +146,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
             return wait_until(lock, rel_time.from_now(), description, ec);
         }
 
-        threads::thread_state_ex_enum wait_for(
+        threads::thread_restart_state wait_for(
             std::unique_lock<mutex_type>& lock,
             hpx::chrono::steady_duration const& rel_time,
             error_code& ec = throws)

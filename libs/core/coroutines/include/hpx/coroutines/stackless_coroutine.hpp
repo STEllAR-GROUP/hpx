@@ -51,8 +51,8 @@ namespace hpx { namespace threads { namespace coroutines {
 
         using thread_id_type = hpx::threads::thread_id;
 
-        using result_type = std::pair<thread_state_enum, thread_id_type>;
-        using arg_type = thread_state_ex_enum;
+        using result_type = std::pair<thread_schedule_state, thread_id_type>;
+        using arg_type = thread_restart_state;
 
         using functor_type =
             util::unique_function_nonser<result_type(arg_type)>;
@@ -277,7 +277,8 @@ namespace hpx { namespace threads { namespace coroutines {
     {
         HPX_ASSERT(is_ready());
 
-        result_type result(thread_state_enum::terminated, invalid_thread_id);
+        result_type result(
+            thread_schedule_state::terminated, invalid_thread_id);
 
         {
             detail::coroutine_stackless_self self(this);
@@ -290,7 +291,8 @@ namespace hpx { namespace threads { namespace coroutines {
             result = f_(arg);    // invoke wrapped function
 
             // we always have to run to completion
-            HPX_ASSERT(result.first == threads::terminated);
+            HPX_ASSERT(
+                result.first == threads::thread_schedule_state::terminated);
 
             reset_tss();
         }

@@ -237,13 +237,13 @@ namespace hpx { namespace threads {
         virtual void create_work(thread_init_data& data, error_code& ec) = 0;
 
         virtual thread_state set_state(thread_id_type const& id,
-            thread_state_enum new_state, thread_state_ex_enum new_state_ex,
+            thread_schedule_state new_state, thread_restart_state new_state_ex,
             thread_priority priority, error_code& ec) = 0;
 
         virtual thread_id_type set_state(
             hpx::chrono::steady_time_point const& abs_time,
-            thread_id_type const& id, thread_state_enum newstate,
-            thread_state_ex_enum newstate_ex, thread_priority priority,
+            thread_id_type const& id, thread_schedule_state newstate,
+            thread_restart_state newstate_ex, thread_priority priority,
             error_code& ec) = 0;
 
         std::size_t get_pool_index() const
@@ -431,7 +431,7 @@ namespace hpx { namespace threads {
         }
 #endif
 
-        virtual std::int64_t get_thread_count(thread_state_enum /*state*/,
+        virtual std::int64_t get_thread_count(thread_schedule_state /*state*/,
             thread_priority /*priority*/, std::size_t /*num_thread*/,
             bool /*reset*/)
         {
@@ -453,36 +453,36 @@ namespace hpx { namespace threads {
         std::int64_t get_thread_count_unknown(
             std::size_t num_thread, bool reset)
         {
-            return get_thread_count(
-                unknown, thread_priority_default, num_thread, reset);
+            return get_thread_count(thread_schedule_state::unknown,
+                thread_priority::default_, num_thread, reset);
         }
         std::int64_t get_thread_count_active(std::size_t num_thread, bool reset)
         {
-            return get_thread_count(
-                active, thread_priority_default, num_thread, reset);
+            return get_thread_count(thread_schedule_state::active,
+                thread_priority::default_, num_thread, reset);
         }
         std::int64_t get_thread_count_pending(
             std::size_t num_thread, bool reset)
         {
-            return get_thread_count(
-                pending, thread_priority_default, num_thread, reset);
+            return get_thread_count(thread_schedule_state::pending,
+                thread_priority::default_, num_thread, reset);
         }
         std::int64_t get_thread_count_suspended(
             std::size_t num_thread, bool reset)
         {
-            return get_thread_count(
-                suspended, thread_priority_default, num_thread, reset);
+            return get_thread_count(thread_schedule_state::suspended,
+                thread_priority::default_, num_thread, reset);
         }
         std::int64_t get_thread_count_terminated(
             std::size_t num_thread, bool reset)
         {
-            return get_thread_count(
-                terminated, thread_priority_default, num_thread, reset);
+            return get_thread_count(thread_schedule_state::terminated,
+                thread_priority::default_, num_thread, reset);
         }
         std::int64_t get_thread_count_staged(std::size_t num_thread, bool reset)
         {
-            return get_thread_count(
-                staged, thread_priority_default, num_thread, reset);
+            return get_thread_count(thread_schedule_state::staged,
+                thread_priority::default_, num_thread, reset);
         }
 
         virtual std::int64_t get_scheduler_utilization() const = 0;
@@ -495,7 +495,8 @@ namespace hpx { namespace threads {
         ///////////////////////////////////////////////////////////////////////
         virtual bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& /*f*/,
-            thread_state_enum /*state*/ = unknown) const
+            thread_schedule_state /*state*/ =
+                thread_schedule_state::unknown) const
         {
             return false;
         }

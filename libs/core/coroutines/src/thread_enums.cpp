@@ -11,6 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 
+#include <cstddef>
+
 namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////
     namespace strings {
@@ -31,16 +33,23 @@ namespace hpx { namespace threads {
 
     }    // namespace strings
 
-    char const* get_thread_state_name(thread_state_enum state)
+    char const* get_thread_state_name(thread_schedule_state state)
     {
-        if (state > pending_boost)
+        if (state > thread_schedule_state::pending_boost)
             return "unknown";
-        return strings::thread_state_names[state];
+        return strings::thread_state_names[static_cast<std::size_t>(state)];
     }
 
     char const* get_thread_state_name(thread_state state)
     {
         return get_thread_state_name(state.state());
+    }
+
+    std::ostream& operator<<(std::ostream& os, thread_schedule_state const t)
+    {
+        os << get_thread_state_name(t) << " (" << static_cast<std::size_t>(t)
+           << ")";
+        return os;
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -58,11 +67,19 @@ namespace hpx { namespace threads {
 
     }    // namespace strings
 
-    char const* get_thread_state_ex_name(thread_state_ex_enum state_ex)
+    char const* get_thread_state_ex_name(thread_restart_state state_ex)
     {
-        if (state_ex > wait_abort)
+        if (state_ex > thread_restart_state::abort)
             return "wait_unknown";
-        return strings::thread_state_ex_names[state_ex];
+        return strings::thread_state_ex_names[static_cast<std::size_t>(
+            state_ex)];
+    }
+
+    std::ostream& operator<<(std::ostream& os, thread_restart_state const t)
+    {
+        os << get_thread_state_ex_name(t) << " (" << static_cast<std::size_t>(t)
+           << ")";
+        return os;
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -82,12 +99,20 @@ namespace hpx { namespace threads {
 
     char const* get_thread_priority_name(thread_priority priority)
     {
-        if (priority < thread_priority_default ||
-            priority > thread_priority_high)
+        if (priority < thread_priority::default_ ||
+            priority > thread_priority::high)
         {
             return "unknown";
         }
-        return strings::thread_priority_names[priority];
+        return strings::thread_priority_names[static_cast<std::size_t>(
+            priority)];
+    }
+
+    std::ostream& operator<<(std::ostream& os, thread_priority const t)
+    {
+        os << get_thread_priority_name(t) << " (" << static_cast<std::size_t>(t)
+           << ")";
+        return os;
     }
 
     namespace strings {
@@ -106,12 +131,19 @@ namespace hpx { namespace threads {
 
     char const* get_stack_size_enum_name(thread_stacksize size)
     {
-        if (size == thread_stacksize_unknown)
+        if (size == thread_stacksize::unknown)
             return "unknown";
 
-        if (size < thread_stacksize_small || size > thread_stacksize_nostack)
+        if (size < thread_stacksize::small_ || size > thread_stacksize::nostack)
             return "custom";
 
-        return strings::stack_size_names[size - 1];
+        return strings::stack_size_names[static_cast<std::size_t>(size) - 1];
+    }
+
+    std::ostream& operator<<(std::ostream& os, thread_stacksize const t)
+    {
+        os << get_stack_size_enum_name(t) << " (" << static_cast<std::size_t>(t)
+           << ")";
+        return os;
     }
 }}    // namespace hpx::threads

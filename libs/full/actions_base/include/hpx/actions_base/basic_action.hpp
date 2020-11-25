@@ -99,7 +99,7 @@ namespace hpx { namespace actions {
             }
 
             threads::thread_result_type operator()(
-                threads::thread_state_ex_enum)
+                threads::thread_restart_state)
             {
                 try
                 {
@@ -138,7 +138,8 @@ namespace hpx { namespace actions {
                 util::force_error_on_lock();
 
                 return threads::thread_result_type(
-                    threads::terminated, threads::invalid_thread_id);
+                    threads::thread_schedule_state::terminated,
+                    threads::invalid_thread_id);
             }
 
         private:
@@ -168,7 +169,7 @@ namespace hpx { namespace actions {
             }
 
             threads::thread_result_type operator()(
-                threads::thread_state_ex_enum)
+                threads::thread_restart_state)
             {
                 LTM_(debug) << "Executing " << Action::get_action_name(lva_)
                             << " with continuation(" << cont_.get_id() << ")";
@@ -178,7 +179,8 @@ namespace hpx { namespace actions {
                     action_invoke<Action>{lva_, comptype_}, std::move(args_));
 
                 return threads::thread_result_type(
-                    threads::terminated, threads::invalid_thread_id);
+                    threads::thread_schedule_state::terminated,
+                    threads::invalid_thread_id);
             }
 
         private:
@@ -654,16 +656,16 @@ namespace hpx { namespace actions {
     /**/
 
 #define HPX_ACTION_USES_SMALL_STACK(action)                                    \
-    HPX_ACTION_USES_STACK(action, threads::thread_stacksize_small)             \
+    HPX_ACTION_USES_STACK(action, threads::thread_stacksize::small_)           \
 /**/
 #define HPX_ACTION_USES_MEDIUM_STACK(action)                                   \
-    HPX_ACTION_USES_STACK(action, threads::thread_stacksize_medium)            \
+    HPX_ACTION_USES_STACK(action, threads::thread_stacksize::medium)           \
 /**/
 #define HPX_ACTION_USES_LARGE_STACK(action)                                    \
-    HPX_ACTION_USES_STACK(action, threads::thread_stacksize_large)             \
+    HPX_ACTION_USES_STACK(action, threads::thread_stacksize::large)            \
 /**/
 #define HPX_ACTION_USES_HUGE_STACK(action)                                     \
-    HPX_ACTION_USES_STACK(action, threads::thread_stacksize_huge)              \
+    HPX_ACTION_USES_STACK(action, threads::thread_stacksize::huge)             \
 /**/
 #endif
 
@@ -713,21 +715,21 @@ namespace hpx { namespace actions {
     /**/
 
 #define HPX_ACTION_HAS_LOW_PRIORITY(action)                                    \
-    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_low)              \
+    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority::low)             \
 /**/
 #define HPX_ACTION_HAS_NORMAL_PRIORITY(action)                                 \
-    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_normal)           \
+    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority::normal)          \
 /**/
 #define HPX_ACTION_HAS_HIGH_PRIORITY(action)                                   \
-    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_high)             \
+    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority::high)            \
 /**/
 #define HPX_ACTION_HAS_HIGH_RECURSIVE_PRIORITY(action)                         \
-    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_high_recursive)   \
+    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority::high_recursive)  \
 /**/
 
 // obsolete, kept for compatibility
 #define HPX_ACTION_HAS_CRITICAL_PRIORITY(action)                               \
-    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_high_recursive)   \
+    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority::high_recursive)  \
 /**/
 #endif
 

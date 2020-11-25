@@ -58,8 +58,8 @@ void test_fn(atype& acnt, atype& atot, atype& amax)
 
 void test_limit()
 {
-    auto exec1 =
-        hpx::execution::parallel_executor(hpx::threads::thread_stacksize_small);
+    auto exec1 = hpx::execution::parallel_executor(
+        hpx::threads::thread_stacksize::small_);
     //
     const bool block_on_exit = true;
     std::vector<hpx::future<void>> futures;

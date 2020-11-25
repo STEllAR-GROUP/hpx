@@ -55,7 +55,7 @@ namespace hpx { namespace threads {
 
     void execution_agent::yield(const char* desc)
     {
-        do_yield(desc, hpx::threads::pending);
+        do_yield(desc, hpx::threads::thread_schedule_state::pending);
     }
 
     void execution_agent::yield_k(std::size_t k, const char* desc)
@@ -71,27 +71,27 @@ namespace hpx { namespace threads {
 #endif
         else if (k < 32 || k & 1)    //-V112
         {
-            do_yield(desc, hpx::threads::pending_boost);
+            do_yield(desc, hpx::threads::thread_schedule_state::pending_boost);
         }
         else
         {
-            do_yield(desc, hpx::threads::pending);
+            do_yield(desc, hpx::threads::thread_schedule_state::pending);
         }
     }
 
     void execution_agent::resume(const char* desc)
     {
-        do_resume(desc, wait_signaled);
+        do_resume(desc, threads::thread_restart_state::signaled);
     }
 
     void execution_agent::abort(const char* desc)
     {
-        do_resume(desc, wait_abort);
+        do_resume(desc, threads::thread_restart_state::abort);
     }
 
     void execution_agent::suspend(const char* desc)
     {
-        do_yield(desc, suspended);
+        do_yield(desc, threads::thread_schedule_state::suspended);
     }
 
     void execution_agent::sleep_for(
@@ -134,8 +134,8 @@ namespace hpx { namespace threads {
     };
 #endif
 
-    hpx::threads::thread_state_ex_enum execution_agent::do_yield(
-        const char* desc, threads::thread_state_enum state)
+    hpx::threads::thread_restart_state execution_agent::do_yield(
+        const char* desc, threads::thread_schedule_state state)
     {
         thread_id_type id = self_.get_thread_id();
         if (HPX_UNLIKELY(!id))
@@ -153,7 +153,8 @@ namespace hpx { namespace threads {
         thrd_data->set_last_worker_thread_num(
             hpx::get_local_worker_thread_num());
 
-        threads::thread_state_ex_enum statex = threads::wait_unknown;
+        threads::thread_restart_state statex =
+            threads::thread_restart_state::unknown;
 
         {
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
@@ -166,18 +167,20 @@ namespace hpx { namespace threads {
             on_exit_reset_held_lock_data held_locks;
             HPX_UNUSED(held_locks);
 
-            HPX_ASSERT(thrd_data->get_state().state() == active);
-            HPX_ASSERT(state != active);
+            HPX_ASSERT(thrd_data->get_state().state() ==
+                thread_schedule_state::active);
+            HPX_ASSERT(state != thread_schedule_state::active);
             statex = self_.yield(
                 threads::thread_result_type(state, threads::invalid_thread_id));
-            HPX_ASSERT(get_thread_id_data(id)->get_state().state() == active);
+            HPX_ASSERT(get_thread_id_data(id)->get_state().state() ==
+                thread_schedule_state::active);
         }
 
         // handle interruption, if needed
         thrd_data->interruption_point();
 
         // handle interrupt and abort
-        if (statex == threads::wait_abort)
+        if (statex == threads::thread_restart_state::abort)
         {
             HPX_THROW_EXCEPTION(yield_aborted, desc,
                 hpx::util::format(
@@ -189,7 +192,7 @@ namespace hpx { namespace threads {
     }
 
     void execution_agent::do_resume(
-        const char* /* desc */, hpx::threads::thread_state_ex_enum statex)
+        const char* /* desc */, hpx::threads::thread_restart_state statex)
     {
         thread_id_type id = self_.get_thread_id();
 
@@ -198,10 +201,11 @@ namespace hpx { namespace threads {
         do
         {
             previous_state = get_thread_id_data(id)->get_state();
-            thread_state_enum previous_state_val = previous_state.state();
+            thread_schedule_state previous_state_val = previous_state.state();
 
             // nothing to do here if the state doesn't change
-            if (previous_state_val == hpx::threads::pending)
+            if (previous_state_val ==
+                hpx::threads::thread_schedule_state::pending)
             {
                 LTM_(warning)
                     << "resume: old thread state is already pending "
@@ -214,7 +218,7 @@ namespace hpx { namespace threads {
             {
             // The thread is still running... we yield our current context
             // and retry..
-            case active:
+            case thread_schedule_state::active:
             {
                 hpx::execution_base::this_thread::yield_k(
                     k, "hpx::threads::execution_agent::resume");
@@ -226,7 +230,7 @@ namespace hpx { namespace threads {
                     << get_thread_id_data(id)->get_description() << ")";
                 continue;
             }
-            case terminated:
+            case thread_schedule_state::terminated:
             {
                 LTM_(warning)
                     << "resume: thread is terminated, aborting state "
@@ -235,12 +239,12 @@ namespace hpx { namespace threads {
                     << get_thread_id_data(id)->get_description() << ")";
                 return;
             }
-            case pending:
-            case pending_boost:
-            case suspended:
+            case thread_schedule_state::pending:
+            case thread_schedule_state::pending_boost:
+            case thread_schedule_state::suspended:
                 // We can now safely set the new state...
                 break;
-            case pending_do_not_schedule:
+            case thread_schedule_state::pending_do_not_schedule:
             default:
             {
                 // should not happen...
@@ -266,7 +270,7 @@ namespace hpx { namespace threads {
 
             // So all what we do here is to set the new state.
             if (get_thread_id_data(id)->restore_state(
-                    pending, statex, previous_state))
+                    thread_schedule_state::pending, statex, previous_state))
             {
                 break;
             }
@@ -281,9 +285,9 @@ namespace hpx { namespace threads {
 
         } while (true);
 
-        thread_state_enum previous_state_val = previous_state.state();
-        if (!(previous_state_val == pending ||
-                previous_state_val == pending_boost))
+        thread_schedule_state previous_state_val = previous_state.state();
+        if (!(previous_state_val == thread_schedule_state::pending ||
+                previous_state_val == thread_schedule_state::pending_boost))
         {
             auto* data = get_thread_id_data(id);
             auto scheduler = data->get_scheduler_base();

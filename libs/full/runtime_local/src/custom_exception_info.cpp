@@ -204,8 +204,8 @@ namespace hpx { namespace util {
 
         error_code ec(lightweight);
         threads::thread_id_type tid = p.apply("hpx::util::trace_on_new_stack",
-            launch::fork, threads::thread_priority_default,
-            threads::thread_stacksize_medium, threads::thread_schedule_hint(),
+            launch::fork, threads::thread_priority::default_,
+            threads::thread_stacksize::medium, threads::thread_schedule_hint(),
             ec);
         if (ec)
             return "<couldn't retrieve stack backtrace>";

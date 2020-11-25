@@ -16,6 +16,6 @@ namespace hpx { namespace traits {
     struct action_stacksize
     {
         HPX_STATIC_CONSTEXPR threads::thread_stacksize value =
-            threads::thread_stacksize_default;
+            threads::thread_stacksize::default_;
     };
 }}    // namespace hpx::traits

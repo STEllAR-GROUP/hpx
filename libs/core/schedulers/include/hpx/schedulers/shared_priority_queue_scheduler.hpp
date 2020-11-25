@@ -315,7 +315,7 @@ namespace hpx { namespace threads { namespace policies {
             using threads::thread_schedule_hint_mode;
             switch (data.schedulehint.mode)
             {
-            case thread_schedule_hint_mode::thread_schedule_hint_mode_none:
+            case thread_schedule_hint_mode::none:
             {
                 spq_deb.set(msg, "HINT_NONE  ");
                 // Create thread on this worker thread if possible
@@ -371,7 +371,7 @@ namespace hpx { namespace threads { namespace policies {
                 q_index = q_lookup_[thread_num];
                 break;
             }
-            case thread_schedule_hint_mode::thread_schedule_hint_mode_thread:
+            case thread_schedule_hint_mode::thread:
             {
                 spq_deb.set(msg, "HINT_THREAD");
                 // @TODO. We should check that the thread num is valid
@@ -381,7 +381,7 @@ namespace hpx { namespace threads { namespace policies {
                 q_index = q_lookup_[thread_num];
                 break;
             }
-            case thread_schedule_hint_mode::thread_schedule_hint_mode_numa:
+            case thread_schedule_hint_mode::numa:
             {
                 // Create thread on requested NUMA domain
                 spq_deb.set(msg, "HINT_NUMA  ");
@@ -411,7 +411,8 @@ namespace hpx { namespace threads { namespace policies {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "shared_priority_queue_scheduler::create_thread",
                     "Invalid schedule hint mode: " +
-                        std::to_string(data.schedulehint.mode));
+                        std::to_string(
+                            static_cast<std::size_t>(data.schedulehint.mode)));
             }
             // we do not allow threads created on other queues to 'run now'
             // as this causes cross-thread allocations and map accesses
@@ -706,7 +707,7 @@ namespace hpx { namespace threads { namespace policies {
         /// Schedule the passed thread
         void schedule_thread(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint, bool allow_fallback,
-            thread_priority priority = thread_priority_normal) override
+            thread_priority priority = thread_priority::normal) override
         {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
 
@@ -723,7 +724,7 @@ namespace hpx { namespace threads { namespace policies {
 
             switch (schedulehint.mode)
             {
-            case thread_schedule_hint_mode::thread_schedule_hint_mode_none:
+            case thread_schedule_hint_mode::none:
             {
                 // Create thread on this worker thread if possible
                 spq_deb.set(msg, "HINT_NONE  ");
@@ -770,7 +771,7 @@ namespace hpx { namespace threads { namespace policies {
                 thread_num = select_active_pu(l, thread_num, allow_fallback);
                 break;
             }
-            case thread_schedule_hint_mode::thread_schedule_hint_mode_thread:
+            case thread_schedule_hint_mode::thread:
             {
                 // @TODO. We should check that the thread num is valid
                 // Create thread on requested worker thread
@@ -783,12 +784,12 @@ namespace hpx { namespace threads { namespace policies {
                 q_index = q_lookup_[thread_num];
                 break;
             }
-            case thread_schedule_hint_mode::thread_schedule_hint_mode_numa:
+            case thread_schedule_hint_mode::numa:
             {
                 // Create thread on requested NUMA domain
                 spq_deb.set(msg, "HINT_NUMA  ");
                 // TODO: This case does not handle suspended PUs.
-                domain_num = fast_mod(schedulehint.mode, num_domains_);
+                domain_num = fast_mod(schedulehint.hint, num_domains_);
                 // if the thread creating the new task is on the domain
                 // assigned to the new task - try to reuse the core as well
                 if (d_lookup_[thread_num] == domain_num)
@@ -807,7 +808,8 @@ namespace hpx { namespace threads { namespace policies {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "shared_priority_queue_scheduler::schedule_thread",
                     "Invalid schedule hint mode: " +
-                        std::to_string(schedulehint.mode));
+                        std::to_string(
+                            static_cast<std::size_t>(schedulehint.mode)));
             }
 
             spq_deb.debug(debug::str<>("thread scheduled"), msg, "Thread",
@@ -822,7 +824,7 @@ namespace hpx { namespace threads { namespace policies {
         /// just put it on the normal queue for now
         void schedule_thread_last(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint, bool allow_fallback,
-            thread_priority priority = thread_priority_normal) override
+            thread_priority priority = thread_priority::normal) override
         {
             spq_deb.debug(debug::str<>("schedule_thread_last"));
             schedule_thread(thrd, schedulehint, allow_fallback, priority);
@@ -887,8 +889,9 @@ namespace hpx { namespace threads { namespace policies {
         //---------------------------------------------------------------------
         // Queries the current thread count of the queues.
         //---------------------------------------------------------------------
-        std::int64_t get_thread_count(thread_state_enum state = unknown,
-            thread_priority priority = thread_priority_default,
+        std::int64_t get_thread_count(
+            thread_schedule_state state = thread_schedule_state::unknown,
+            thread_priority priority = thread_priority::default_,
             std::size_t thread_num = std::size_t(-1),
             bool reset = false) const override
         {
@@ -930,7 +933,8 @@ namespace hpx { namespace threads { namespace policies {
         // Enumerate matching threads from all queues
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state = unknown) const override
+            thread_schedule_state state =
+                thread_schedule_state::unknown) const override
         {
             bool result = true;
 

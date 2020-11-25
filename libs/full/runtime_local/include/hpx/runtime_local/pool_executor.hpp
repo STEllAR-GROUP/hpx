@@ -25,17 +25,17 @@ namespace hpx { namespace parallel { namespace execution {
     public:
         explicit pool_executor(std::string const& pool_name = "default",
             threads::thread_stacksize stacksize =
-                threads::thread_stacksize_default)
+                threads::thread_stacksize::default_)
           : thread_pool_executor(
                 &threads::get_thread_manager().get_pool(pool_name),
-                threads::thread_priority_default, stacksize)
+                threads::thread_priority::default_, stacksize)
         {
         }
 
         pool_executor(std::string const& pool_name,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize =
-                threads::thread_stacksize_default)
+                threads::thread_stacksize::default_)
           : thread_pool_executor(
                 &hpx::threads::get_thread_manager().get_pool(pool_name),
                 priority, stacksize)

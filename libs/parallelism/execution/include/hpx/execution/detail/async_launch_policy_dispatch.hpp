@@ -100,7 +100,8 @@ namespace hpx { namespace detail {
                 {
                     // make sure this thread is executed last
                     // yield_to
-                    hpx::this_thread::suspend(threads::pending, tid,
+                    hpx::this_thread::suspend(
+                        threads::thread_schedule_state::pending, tid,
                         "async_launch_policy_dispatch<launch>");
                 }
             }
@@ -129,7 +130,7 @@ namespace hpx { namespace detail {
         call(launch policy, F&& f, Ts&&... ts)
         {
             return call(policy, threads::detail::get_self_or_default_pool(),
-                policy.priority(), threads::thread_stacksize_default,
+                policy.priority(), threads::thread_stacksize::default_,
                 threads::thread_schedule_hint{}, std::forward<F>(f),
                 std::forward<Ts>(ts)...);
         }
@@ -181,8 +182,8 @@ namespace hpx { namespace detail {
         call(hpx::detail::async_policy policy, F&& f, Ts&&... ts)
         {
             return call(policy, threads::detail::get_self_or_default_pool(),
-                threads::thread_priority_default,
-                threads::thread_stacksize_default,
+                threads::thread_priority::default_,
+                threads::thread_stacksize::default_,
                 threads::thread_schedule_hint{}, std::forward<F>(f),
                 std::forward<Ts>(ts)...);
         }
@@ -215,7 +216,8 @@ namespace hpx { namespace detail {
                     get_thread_id_data(tid_self)->get_scheduler_base())
             {
                 // yield_to
-                hpx::this_thread::suspend(threads::pending, tid,
+                hpx::this_thread::suspend(
+                    threads::thread_schedule_state::pending, tid,
                     "async_launch_policy_dispatch<fork>");
             }
             return p.get_future();
@@ -229,8 +231,8 @@ namespace hpx { namespace detail {
         call(hpx::detail::fork_policy policy, F&& f, Ts&&... ts)
         {
             return call(policy, threads::detail::get_self_or_default_pool(),
-                threads::thread_priority_default,
-                threads::thread_stacksize_default,
+                threads::thread_priority::default_,
+                threads::thread_stacksize::default_,
                 threads::thread_schedule_hint{}, std::forward<F>(f),
                 std::forward<Ts>(ts)...);
         }

@@ -451,7 +451,7 @@ namespace hpx { namespace lcos { namespace detail {
             //       which avoids suspension of this thread when it tries to
             //       re-lock the mutex while exiting from condition_variable::wait
             while (
-                cond_.notify_one(std::move(l), threads::thread_priority_boost))
+                cond_.notify_one(std::move(l), threads::thread_priority::boost))
             {
                 l = std::unique_lock<mutex_type>(mtx_);
             }
@@ -508,7 +508,7 @@ namespace hpx { namespace lcos { namespace detail {
             //       which avoids suspension of this thread when it tries to
             //       re-lock the mutex while exiting from condition_variable::wait
             while (
-                cond_.notify_one(std::move(l), threads::thread_priority_boost))
+                cond_.notify_one(std::move(l), threads::thread_priority::boost))
             {
                 l = std::unique_lock<mutex_type>(mtx_);
             }
@@ -775,8 +775,10 @@ namespace hpx { namespace lcos { namespace detail {
                         this_->set_value(init);
                     }),
                 "timed_future_data<Result>::timed_future_data",
-                threads::thread_priority_boost, threads::thread_schedule_hint(),
-                threads::thread_stacksize_current, threads::suspended, true);
+                threads::thread_priority::boost,
+                threads::thread_schedule_hint(),
+                threads::thread_stacksize::current,
+                threads::thread_schedule_state::suspended, true);
             threads::thread_id_type id = threads::register_thread(data, ec);
             if (ec)
             {
@@ -786,9 +788,10 @@ namespace hpx { namespace lcos { namespace detail {
             }
 
             // start new thread at given point in time
-            threads::set_thread_state(id, abs_time, threads::pending,
-                threads::wait_timeout, threads::thread_priority_boost, true,
-                ec);
+            threads::set_thread_state(id, abs_time,
+                threads::thread_schedule_state::pending,
+                threads::thread_restart_state::timeout,
+                threads::thread_priority::boost, true, ec);
             if (ec)
             {
                 // thread scheduling failed, report error to the new future

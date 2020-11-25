@@ -50,8 +50,12 @@ namespace hpx { namespace threads { namespace detail {
         }
 
         static tagged_state_type pack_state(
-            tagged_state_type state, tagged_state_type state_ex, tag_type tag)
+            T1 state_, T2 state_ex_, tag_type tag)
         {
+            tagged_state_type state = static_cast<tagged_state_type>(state_);
+            tagged_state_type state_ex =
+                static_cast<tagged_state_type>(state_ex_);
+
             HPX_ASSERT(!(state & ~state_mask));
             HPX_ASSERT(!(state_ex & ~state_ex_mask));
             HPX_ASSERT(!(state & ~tag_mask));

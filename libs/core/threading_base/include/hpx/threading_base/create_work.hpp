@@ -22,10 +22,10 @@ namespace hpx { namespace threads { namespace detail {
         // verify parameters
         switch (data.initial_state)
         {
-        case pending:
-        case pending_do_not_schedule:
-        case pending_boost:
-        case suspended:
+        case thread_schedule_state::pending:
+        case thread_schedule_state::pending_do_not_schedule:
+        case thread_schedule_state::pending_boost:
+        case thread_schedule_state::suspended:
             break;
 
         default:
@@ -78,21 +78,21 @@ namespace hpx { namespace threads { namespace detail {
         // Pass critical priority from parent to child.
         if (self)
         {
-            if (data.priority == thread_priority_default &&
-                thread_priority_high_recursive ==
+            if (data.priority == thread_priority::default_ &&
+                thread_priority::high_recursive ==
                     threads::get_self_id_data()->get_priority())
             {
-                data.priority = thread_priority_high_recursive;
+                data.priority = thread_priority::high_recursive;
             }
         }
 
         // create the new thread
-        if (data.priority == thread_priority_default)
-            data.priority = thread_priority_normal;
+        if (data.priority == thread_priority::default_)
+            data.priority = thread_priority::normal;
 
-        data.run_now = (thread_priority_high == data.priority ||
-            thread_priority_high_recursive == data.priority ||
-            thread_priority_boost == data.priority);
+        data.run_now = (thread_priority::high == data.priority ||
+            thread_priority::high_recursive == data.priority ||
+            thread_priority::boost == data.priority);
 
         scheduler->create_thread(data, nullptr, ec);
 

@@ -143,7 +143,7 @@ namespace hpx { namespace threads {
             // situations.
             virtual void add(closure_type&& f,
                 util::thread_description const& desc,
-                threads::thread_state_enum initial_state, bool run_now,
+                threads::thread_schedule_state initial_state, bool run_now,
                 threads::thread_stacksize stacksize,
                 threads::thread_schedule_hint schedulehint, error_code& ec) = 0;
 
@@ -211,8 +211,8 @@ namespace hpx { namespace threads {
         {
         public:
             scheduled_executor_base()
-              : stacksize_(thread_stacksize_default)
-              , priority_(thread_priority_default)
+              : stacksize_(thread_stacksize::default_)
+              , priority_(thread_priority::default_)
               , schedulehint_(thread_schedule_hint())
             {
             }
@@ -311,10 +311,11 @@ namespace hpx { namespace threads {
         /// situations.
         void add(closure_type f,
             util::thread_description const& desc = util::thread_description(),
-            threads::thread_state_enum initial_state = threads::pending,
+            threads::thread_schedule_state initial_state =
+                threads::thread_schedule_state::pending,
             bool run_now = true,
             threads::thread_stacksize stacksize =
-                threads::thread_stacksize_default,
+                threads::thread_stacksize::default_,
             threads::thread_schedule_hint schedulehint =
                 threads::thread_schedule_hint(),
             error_code& ec = throws)
@@ -411,7 +412,7 @@ namespace hpx { namespace threads {
         void add_at(std::chrono::steady_clock::time_point const& abs_time,
             closure_type f, char const* desc = "",
             threads::thread_stacksize stacksize =
-                threads::thread_stacksize_default,
+                threads::thread_stacksize::default_,
             error_code& ec = throws)
         {
             hpx::static_pointer_cast<detail::scheduled_executor_base>(
@@ -422,7 +423,7 @@ namespace hpx { namespace threads {
         void add_at(hpx::chrono::steady_time_point const& abs_time,
             closure_type f, char const* desc = "",
             threads::thread_stacksize stacksize =
-                threads::thread_stacksize_default,
+                threads::thread_stacksize::default_,
             error_code& ec = throws)
         {
             return add_at(abs_time.value(), std::move(f), desc, stacksize, ec);
@@ -439,7 +440,7 @@ namespace hpx { namespace threads {
         void add_after(std::chrono::steady_clock::duration const& rel_time,
             closure_type f, char const* desc = "",
             threads::thread_stacksize stacksize =
-                threads::thread_stacksize_default,
+                threads::thread_stacksize::default_,
             error_code& ec = throws)
         {
             hpx::static_pointer_cast<detail::scheduled_executor_base>(
@@ -450,7 +451,7 @@ namespace hpx { namespace threads {
         void add_after(hpx::chrono::steady_duration const& rel_time,
             closure_type f, char const* desc = "",
             threads::thread_stacksize stacksize =
-                threads::thread_stacksize_default,
+                threads::thread_stacksize::default_,
             error_code& ec = throws)
         {
             return add_after(

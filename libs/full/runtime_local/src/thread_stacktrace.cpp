@@ -19,7 +19,7 @@ namespace hpx { namespace util { namespace debug {
     // ------------------------------------------------------------------------
     // return a vector of suspended/other task Ids
     std::vector<hpx::threads::thread_id_type> get_task_ids(
-        hpx::threads::thread_state_enum state)
+        hpx::threads::thread_schedule_state state)
     {
         std::vector<hpx::threads::thread_id_type> thread_ids_vector;
         //
@@ -35,7 +35,7 @@ namespace hpx { namespace util { namespace debug {
     // ------------------------------------------------------------------------
     // return a vector of thread data structure pointers for suspended tasks
     std::vector<hpx::threads::thread_data*> get_task_data(
-        hpx::threads::thread_state_enum state)
+        hpx::threads::thread_schedule_state state)
     {
         std::vector<hpx::threads::thread_data*> thread_data_vector;
         //
@@ -54,7 +54,7 @@ namespace hpx { namespace util { namespace debug {
     std::string suspended_task_backtraces()
     {
         std::vector<hpx::threads::thread_data*> tlist =
-            get_task_data(hpx::threads::suspended);
+            get_task_data(hpx::threads::thread_schedule_state::suspended);
         //
         std::stringstream tmp;
         //

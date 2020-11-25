@@ -195,10 +195,9 @@ namespace hpx { namespace parcelset
                         {
                             naming::resolver_client& client =
                                 hpx::naming::get_agas_client();
-                            client.route(
-                                std::move(p),
+                            client.route(std::move(p),
                                 &parcelset::detail::parcel_route_handler,
-                                threads::thread_priority_normal);
+                                threads::thread_priority::normal);
                         }
                         // If we got a direct action,
                         else if (deferred_schedule)
@@ -226,11 +225,11 @@ namespace hpx { namespace parcelset
                                         },
                                         std::move(deferred_parcels[i]))),
                                 "schedule_parcel",
-                                threads::thread_priority_boost,
+                                threads::thread_priority::boost,
                                 threads::thread_schedule_hint(
                                     static_cast<std::int16_t>(num_thread)),
-                                threads::thread_stacksize_default,
-                                threads::pending, true);
+                                threads::thread_stacksize::default_,
+                                threads::thread_schedule_state::pending, true);
                             hpx::threads::register_thread(data);
                         }
                         // If we are the first deferred parcel, we don't need to spin
@@ -297,17 +296,18 @@ namespace hpx { namespace parcelset
     template <typename Parcelport, typename Buffer>
     void decode_parcel(Parcelport & parcelport, Buffer buffer, std::size_t num_thread)
     {
-//         if(hpx::is_running() && parcelport.async_serialization())
-//         {
-//             hpx::threads::register_thread_nullary(
-//                 util::deferred_call(
-//                     &decode_message<Parcelport, Buffer>,
-//                     std::ref(parcelport), std::move(buffer), 1, num_thread),
-//                 "decode_parcels",
-//                 threads::pending, true, threads::thread_priority_boost,
-//                 parcelport.get_next_num_thread());
-//         }
-//         else
+        // if(hpx::is_running() && parcelport.async_serialization())
+        // {
+        //     hpx::threads::register_thread_nullary(
+        //         util::deferred_call(
+        //             &decode_message<Parcelport, Buffer>,
+        //             std::ref(parcelport), std::move(buffer), 1, num_thread),
+        //         "decode_parcels",
+        //         threads::thread_schedule_state::pending, true,
+        //         threads::thread_priority::boost,
+        //         parcelport.get_next_num_thread());
+        // }
+        // else
         {
             decode_message(parcelport, std::move(buffer), 1, num_thread);
         }
@@ -316,17 +316,18 @@ namespace hpx { namespace parcelset
     template <typename Parcelport, typename Buffer>
     void decode_parcels(Parcelport & parcelport, Buffer buffer, std::size_t num_thread)
     {
-//         if(hpx::is_running() && parcelport.async_serialization())
-//         {
-//             hpx::threads::register_thread_nullary(
-//                 util::deferred_call(
-//                     &decode_message<Parcelport, Buffer>,
-//                     std::ref(parcelport), std::move(buffer), 0, num_thread),
-//                 "decode_parcels",
-//                 threads::pending, true, threads::thread_priority_boost,
-//                 parcelport.get_next_num_thread());
-//         }
-//         else
+        // if(hpx::is_running() && parcelport.async_serialization())
+        // {
+        //     hpx::threads::register_thread_nullary(
+        //         util::deferred_call(
+        //             &decode_message<Parcelport, Buffer>,
+        //             std::ref(parcelport), std::move(buffer), 0, num_thread),
+        //         "decode_parcels",
+        //         threads::thread_schedule_state::pending, true,
+        //         threads::thread_priority::boost,
+        //         parcelport.get_next_num_thread());
+        // }
+        // else
         {
             decode_message(parcelport, std::move(buffer), 0, num_thread);
         }

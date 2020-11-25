@@ -105,12 +105,12 @@ namespace hpx { namespace parallel { namespace execution {
                 gpx_deb.debug(
                     debug::str<>("triggering apply"), "domain ", domain);
                 if (hp_sync_ &&
-                    executor_.priority_ == hpx::threads::thread_priority_high)
+                    executor_.priority_ == hpx::threads::thread_priority::high)
                 {
                     p.apply(executor_.pool_, "guided async", hpx::launch::sync,
                         executor_.priority_, executor_.stacksize_,
                         hpx::threads::thread_schedule_hint(
-                            hpx::threads::thread_schedule_hint_mode_numa,
+                            hpx::threads::thread_schedule_hint_mode::numa,
                             domain));
                 }
                 else
@@ -118,7 +118,7 @@ namespace hpx { namespace parallel { namespace execution {
                     p.apply(executor_.pool_, "guided async", hpx::launch::async,
                         executor_.priority_, executor_.stacksize_,
                         hpx::threads::thread_schedule_hint(
-                            hpx::threads::thread_schedule_hint_mode_numa,
+                            hpx::threads::thread_schedule_hint_mode::numa,
                             domain));
                 }
 
@@ -163,12 +163,12 @@ namespace hpx { namespace parallel { namespace execution {
                         std::forward<Ts>(ts)...));
 
                 if (hp_sync_ &&
-                    executor_.priority_ == hpx::threads::thread_priority_high)
+                    executor_.priority_ == hpx::threads::thread_priority::high)
                 {
                     p.apply(executor_.pool_, "guided then", hpx::launch::sync,
                         executor_.priority_, executor_.stacksize_,
                         hpx::threads::thread_schedule_hint(
-                            hpx::threads::thread_schedule_hint_mode_numa,
+                            hpx::threads::thread_schedule_hint_mode::numa,
                             domain));
                 }
                 else
@@ -176,7 +176,7 @@ namespace hpx { namespace parallel { namespace execution {
                     p.apply(executor_.pool_, "guided then", hpx::launch::async,
                         executor_.priority_, executor_.stacksize_,
                         hpx::threads::thread_schedule_hint(
-                            hpx::threads::thread_schedule_hint_mode_numa,
+                            hpx::threads::thread_schedule_hint_mode::numa,
                             domain));
                 }
 
@@ -226,8 +226,8 @@ namespace hpx { namespace parallel { namespace execution {
         guided_pool_executor(
             threads::thread_pool_base* pool, bool hp_sync = false)
           : pool_(pool)
-          , priority_(threads::thread_priority_default)
-          , stacksize_(threads::thread_stacksize_default)
+          , priority_(threads::thread_priority::default_)
+          , stacksize_(threads::thread_stacksize::default_)
           , hp_sync_(hp_sync)
         {
         }
@@ -235,7 +235,7 @@ namespace hpx { namespace parallel { namespace execution {
         guided_pool_executor(threads::thread_pool_base* pool,
             threads::thread_stacksize stacksize, bool hp_sync = false)
           : pool_(pool)
-          , priority_(threads::thread_priority_default)
+          , priority_(threads::thread_priority::default_)
           , stacksize_(stacksize)
           , hp_sync_(hp_sync)
         {
@@ -244,7 +244,7 @@ namespace hpx { namespace parallel { namespace execution {
         guided_pool_executor(threads::thread_pool_base* pool,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize =
-                threads::thread_stacksize_default,
+                threads::thread_stacksize::default_,
             bool hp_sync = false)
           : pool_(pool)
           , priority_(priority)
@@ -454,19 +454,19 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::util::deferred_call(std::forward<F>(f),
                     std::forward<hpx::tuple<InnerFutures...>>(predecessor)));
 
-            if (hp_sync_ && priority_ == hpx::threads::thread_priority_high)
+            if (hp_sync_ && priority_ == hpx::threads::thread_priority::high)
             {
                 p.apply(pool_, "guided async", hpx::launch::sync, priority_,
                     stacksize_,
                     hpx::threads::thread_schedule_hint(
-                        hpx::threads::thread_schedule_hint_mode_numa, domain));
+                        hpx::threads::thread_schedule_hint_mode::numa, domain));
             }
             else
             {
                 p.apply(pool_, "guided async", hpx::launch::async, priority_,
                     stacksize_,
                     hpx::threads::thread_schedule_hint(
-                        hpx::threads::thread_schedule_hint_mode_numa, domain));
+                        hpx::threads::thread_schedule_hint_mode::numa, domain));
             }
             return p.get_future();
         }
@@ -504,7 +504,7 @@ namespace hpx { namespace parallel { namespace execution {
         guided_pool_executor_shim(bool guided, threads::thread_pool_base* pool,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize =
-                threads::thread_stacksize_default,
+                threads::thread_stacksize::default_,
             bool hp_sync = false)
           : guided_(guided)
           , guided_exec_(pool, priority, stacksize, hp_sync)

@@ -59,8 +59,8 @@ namespace hpx { namespace parcelset
     private:
         void parcel_sink(parcel const& p);
 
-        threads::thread_state_enum decode_parcel(
-            parcelport& pp, std::shared_ptr<std::vector<char> > parcel_data,
+        threads::thread_schedule_state decode_parcel(parcelport& pp,
+            std::shared_ptr<std::vector<char>> parcel_data,
             performance_counters::parcels::data_point receive_data);
 
         // make sure the parcel has been properly initialized

@@ -102,7 +102,8 @@ namespace hpx { namespace components
         threads::thread_result_type thread_function(
             threads::thread_function_type f, threads::thread_arg_type state)
         {
-            threads::thread_result_type result(threads::unknown,
+            threads::thread_result_type result(
+                threads::thread_schedule_state::unknown,
                 threads::invalid_thread_id);
 
             // now lock the mutex and execute the action
@@ -151,7 +152,8 @@ namespace hpx { namespace components
             // We un-decorate the yield function as the lock handling may
             // suspend, which causes an infinite recursion otherwise.
             undecorate_wrapper yield_decorator;
-            threads::thread_arg_type result = threads::wait_unknown;
+            threads::thread_arg_type result =
+                threads::thread_restart_state::unknown;
 
             {
                 util::unlock_guard<mutex_type> ul(mtx_);

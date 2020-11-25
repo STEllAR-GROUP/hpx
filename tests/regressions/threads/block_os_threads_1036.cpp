@@ -33,11 +33,9 @@ void blocker(
     if (worker != hpx::get_worker_thread_num())
     {
         hpx::threads::thread_init_data data(
-            hpx::threads::make_thread_function_nullary(
-                hpx::util::bind(
-                    &blocker, entered, started, blocked_threads, worker)),
-            "blocker",
-            hpx::threads::thread_priority_normal,
+            hpx::threads::make_thread_function_nullary(hpx::util::bind(
+                &blocker, entered, started, blocked_threads, worker)),
+            "blocker", hpx::threads::thread_priority::normal,
             hpx::threads::thread_schedule_hint(worker));
         hpx::threads::register_work(data);
         return;
@@ -81,11 +79,9 @@ int hpx_main()
                 continue;
 
             hpx::threads::thread_init_data data(
-                hpx::threads::make_thread_function_nullary(
-                    hpx::util::bind(
-                        &blocker, &entered, &started, &blocked_threads, i)),
-                "blocker",
-                hpx::threads::thread_priority_normal,
+                hpx::threads::make_thread_function_nullary(hpx::util::bind(
+                    &blocker, &entered, &started, &blocked_threads, i)),
+                "blocker", hpx::threads::thread_priority::normal,
                 hpx::threads::thread_schedule_hint(i));
             hpx::threads::register_work(data);
             ++scheduled;

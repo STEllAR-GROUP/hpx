@@ -223,7 +223,7 @@ int hpx_main(
             // should be resumed after most of the null HPX-threads have been
             // executed. If we haven't, we just reschedule ourselves again.
             suspend();
-        } while (get_thread_count(hpx::threads::thread_priority_normal) > 1);
+        } while (get_thread_count(hpx::threads::thread_priority::normal) > 1);
 
         ///////////////////////////////////////////////////////////////////////
         // Print the results.

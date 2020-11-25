@@ -199,7 +199,7 @@ int hpx_main()
     // setup executors
     hpx::parallel::execution::pool_executor NP_executor =
         hpx::parallel::execution::pool_executor(
-            "default", hpx::threads::thread_priority_default);
+            "default", hpx::threads::thread_priority::default_);
     hpx::execution::parallel_executor par_exec{};
 
     test_none();

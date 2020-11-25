@@ -511,7 +511,7 @@ namespace hpx { namespace threads { namespace policies {
         {
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread =
-                data.schedulehint.mode == thread_schedule_hint_mode_thread ?
+                data.schedulehint.mode == thread_schedule_hint_mode::thread ?
                 data.schedulehint.hint :
                 std::size_t(-1);
 
@@ -527,17 +527,17 @@ namespace hpx { namespace threads { namespace policies {
             std::unique_lock<pu_mutex_type> l;
             num_thread = select_active_pu(l, num_thread);
 
-            data.schedulehint.mode = thread_schedule_hint_mode_thread;
+            data.schedulehint.mode = thread_schedule_hint_mode::thread;
             data.schedulehint.hint = static_cast<std::int16_t>(num_thread);
 
             // now create the thread
-            if (data.priority == thread_priority_high_recursive ||
-                data.priority == thread_priority_high ||
-                data.priority == thread_priority_boost)
+            if (data.priority == thread_priority::high_recursive ||
+                data.priority == thread_priority::high ||
+                data.priority == thread_priority::boost)
             {
-                if (data.priority == thread_priority_boost)
+                if (data.priority == thread_priority::boost)
                 {
-                    data.priority = thread_priority_normal;
+                    data.priority = thread_priority::normal;
                 }
                 std::size_t num = num_thread % num_high_priority_queues_;
 
@@ -545,7 +545,7 @@ namespace hpx { namespace threads { namespace policies {
                 return;
             }
 
-            if (data.priority == thread_priority_low)
+            if (data.priority == thread_priority::low)
             {
                 low_priority_queue_.create_thread(data, id, ec);
                 return;
@@ -632,11 +632,11 @@ namespace hpx { namespace threads { namespace policies {
         void schedule_thread(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
-            thread_priority priority = thread_priority_normal) override
+            thread_priority priority = thread_priority::normal) override
         {
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread = std::size_t(-1);
-            if (schedulehint.mode == thread_schedule_hint_mode_thread)
+            if (schedulehint.mode == thread_schedule_hint_mode::thread)
             {
                 num_thread = schedulehint.hint;
             }
@@ -657,14 +657,14 @@ namespace hpx { namespace threads { namespace policies {
             std::unique_lock<pu_mutex_type> l;
             num_thread = select_active_pu(l, num_thread, allow_fallback);
 
-            if (priority == thread_priority_high_recursive ||
-                priority == thread_priority_high ||
-                priority == thread_priority_boost)
+            if (priority == thread_priority::high_recursive ||
+                priority == thread_priority::high ||
+                priority == thread_priority::boost)
             {
                 std::size_t num = num_thread % num_high_priority_queues_;
                 high_priority_queues_[num].data_->schedule_thread(thrd);
             }
-            else if (priority == thread_priority_low)
+            else if (priority == thread_priority::low)
             {
                 low_priority_queue_.schedule_thread(thrd);
             }
@@ -678,11 +678,11 @@ namespace hpx { namespace threads { namespace policies {
         void schedule_thread_last(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
-            thread_priority priority = thread_priority_normal) override
+            thread_priority priority = thread_priority::normal) override
         {
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread = std::size_t(-1);
-            if (schedulehint.mode == thread_schedule_hint_mode_thread)
+            if (schedulehint.mode == thread_schedule_hint_mode::thread)
             {
                 num_thread = schedulehint.hint;
             }
@@ -703,14 +703,14 @@ namespace hpx { namespace threads { namespace policies {
             std::unique_lock<pu_mutex_type> l;
             num_thread = select_active_pu(l, num_thread, allow_fallback);
 
-            if (priority == thread_priority_high_recursive ||
-                priority == thread_priority_high ||
-                priority == thread_priority_boost)
+            if (priority == thread_priority::high_recursive ||
+                priority == thread_priority::high ||
+                priority == thread_priority::boost)
             {
                 std::size_t num = num_thread % num_high_priority_queues_;
                 high_priority_queues_[num].data_->schedule_thread(thrd, true);
             }
-            else if (priority == thread_priority_low)
+            else if (priority == thread_priority::low)
             {
                 low_priority_queue_.schedule_thread(thrd, true);
             }
@@ -765,8 +765,9 @@ namespace hpx { namespace threads { namespace policies {
 
         ///////////////////////////////////////////////////////////////////////
         // Queries the current thread count of the queues.
-        std::int64_t get_thread_count(thread_state_enum state = unknown,
-            thread_priority priority = thread_priority_default,
+        std::int64_t get_thread_count(
+            thread_schedule_state state = thread_schedule_state::unknown,
+            thread_priority priority = thread_priority::default_,
             std::size_t num_thread = std::size_t(-1),
             bool reset = false) const override
         {
@@ -778,7 +779,7 @@ namespace hpx { namespace threads { namespace policies {
 
                 switch (priority)
                 {
-                case thread_priority_default:
+                case thread_priority::default_:
                 {
                     if (num_thread < num_high_priority_queues_)
                     {
@@ -792,19 +793,19 @@ namespace hpx { namespace threads { namespace policies {
                         queues_[num_thread].data_->get_thread_count(state);
                 }
 
-                case thread_priority_low:
+                case thread_priority::low:
                 {
                     if (num_queues_ - 1 == num_thread)
                         return low_priority_queue_.get_thread_count(state);
                     break;
                 }
 
-                case thread_priority_normal:
+                case thread_priority::normal:
                     return queues_[num_thread].data_->get_thread_count(state);
 
-                case thread_priority_boost:
-                case thread_priority_high:
-                case thread_priority_high_recursive:
+                case thread_priority::boost:
+                case thread_priority::high:
+                case thread_priority::high_recursive:
                 {
                     if (num_thread < num_high_priority_queues_)
                     {
@@ -815,12 +816,12 @@ namespace hpx { namespace threads { namespace policies {
                 }
 
                 default:
-                case thread_priority_unknown:
+                case thread_priority::unknown:
                 {
                     HPX_THROW_EXCEPTION(bad_parameter,
                         "local_priority_queue_scheduler::get_thread_count",
                         "unknown thread priority value "
-                        "(thread_priority_unknown)");
+                        "(thread_priority::unknown)");
                     return 0;
                 }
                 }
@@ -830,7 +831,7 @@ namespace hpx { namespace threads { namespace policies {
             // Return the cumulative count for all queues.
             switch (priority)
             {
-            case thread_priority_default:
+            case thread_priority::default_:
             {
                 for (std::size_t i = 0; i != num_high_priority_queues_; ++i)
                 {
@@ -846,10 +847,10 @@ namespace hpx { namespace threads { namespace policies {
                 break;
             }
 
-            case thread_priority_low:
+            case thread_priority::low:
                 return low_priority_queue_.get_thread_count(state);
 
-            case thread_priority_normal:
+            case thread_priority::normal:
             {
                 for (std::size_t i = 0; i != num_queues_; ++i)
                 {
@@ -858,9 +859,9 @@ namespace hpx { namespace threads { namespace policies {
                 break;
             }
 
-            case thread_priority_boost:
-            case thread_priority_high:
-            case thread_priority_high_recursive:
+            case thread_priority::boost:
+            case thread_priority::high:
+            case thread_priority::high_recursive:
             {
                 for (std::size_t i = 0; i != num_high_priority_queues_; ++i)
                 {
@@ -871,12 +872,12 @@ namespace hpx { namespace threads { namespace policies {
             }
 
             default:
-            case thread_priority_unknown:
+            case thread_priority::unknown:
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "local_priority_queue_scheduler::get_thread_count",
                     "unknown thread priority value "
-                    "(thread_priority_unknown)");
+                    "(thread_priority::unknown)");
                 return 0;
             }
             }
@@ -904,7 +905,8 @@ namespace hpx { namespace threads { namespace policies {
         // Enumerate matching threads from all queues
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state = unknown) const override
+            thread_schedule_state state =
+                thread_schedule_state::unknown) const override
         {
             bool result = true;
             for (std::size_t i = 0; i != num_high_priority_queues_; ++i)

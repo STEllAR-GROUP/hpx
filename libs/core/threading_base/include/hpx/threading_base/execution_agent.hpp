@@ -58,11 +58,11 @@ namespace hpx { namespace threads {
     private:
         coroutines::detail::coroutine_stackful_self self_;
 
-        hpx::threads::thread_state_ex_enum do_yield(
-            char const* desc, threads::thread_state_enum state);
+        hpx::threads::thread_restart_state do_yield(
+            char const* desc, threads::thread_schedule_state state);
 
         void do_resume(
-            char const* desc, hpx::threads::thread_state_ex_enum statex);
+            char const* desc, hpx::threads::thread_restart_state statex);
 
         execution_context context_;
     };

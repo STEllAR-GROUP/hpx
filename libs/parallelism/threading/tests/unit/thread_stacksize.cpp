@@ -30,7 +30,7 @@ void test_small_stacksize()
     // verify that sufficient stack has been allocated
     HPX_TEST(hpx::threads::get_ctx_ptr()->get_stacksize() >=
         hpx::get_runtime().get_config().get_stack_size(
-            hpx::threads::thread_stacksize_small));
+            hpx::threads::thread_stacksize::small_));
 }
 HPX_DECLARE_ACTION(test_small_stacksize, test_small_stacksize_action)
 HPX_ACTION_USES_SMALL_STACK(test_small_stacksize_action)
@@ -50,7 +50,7 @@ void test_medium_stacksize()
     // verify that sufficient stack has been allocated
     HPX_TEST(hpx::threads::get_ctx_ptr()->get_stacksize() >=
         hpx::get_runtime().get_config().get_stack_size(
-            hpx::threads::thread_stacksize_medium));
+            hpx::threads::thread_stacksize::medium));
 }
 HPX_DECLARE_ACTION(test_medium_stacksize, test_medium_stacksize_action)
 HPX_ACTION_USES_MEDIUM_STACK(test_medium_stacksize_action)
@@ -70,7 +70,7 @@ void test_large_stacksize()
     // verify that sufficient stack has been allocated
     HPX_TEST(hpx::threads::get_ctx_ptr()->get_stacksize() >=
         hpx::get_runtime().get_config().get_stack_size(
-            hpx::threads::thread_stacksize_large));
+            hpx::threads::thread_stacksize::large));
 }
 HPX_DECLARE_ACTION(test_large_stacksize, test_large_stacksize_action)
 HPX_ACTION_USES_LARGE_STACK(test_large_stacksize_action)
@@ -91,7 +91,7 @@ void test_huge_stacksize()
     // verify that sufficient stack has been allocated
     HPX_TEST(hpx::threads::get_ctx_ptr()->get_stacksize() >=
         hpx::get_runtime().get_config().get_stack_size(
-            hpx::threads::thread_stacksize_huge));
+            hpx::threads::thread_stacksize::huge));
 }
 HPX_DECLARE_ACTION(test_huge_stacksize, test_huge_stacksize_action)
 HPX_ACTION_USES_HUGE_STACK(test_huge_stacksize_action)

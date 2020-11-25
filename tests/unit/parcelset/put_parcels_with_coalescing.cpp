@@ -36,9 +36,8 @@ generate_parcel(hpx::id_type const& dest_id, hpx::id_type const& cont, T && data
     hpx::naming::detail::strip_credits_from_gid(dest);
     hpx::parcelset::parcel p(hpx::parcelset::detail::create_parcel::call(
         std::move(dest), std::move(addr),
-        hpx::actions::typed_continuation<hpx::id_type>(cont),
-        Action(), hpx::threads::thread_priority_normal,
-        std::forward<T>(data)));
+        hpx::actions::typed_continuation<hpx::id_type>(cont), Action(),
+        hpx::threads::thread_priority::normal, std::forward<T>(data)));
 
     p.set_source_id(hpx::find_here());
     p.size() = 4096;

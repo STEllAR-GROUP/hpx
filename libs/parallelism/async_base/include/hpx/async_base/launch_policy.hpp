@@ -37,7 +37,7 @@ namespace hpx {
         {
             constexpr explicit policy_holder_base(launch_policy p,
                 threads::thread_priority priority =
-                    threads::thread_priority_default) noexcept
+                    threads::thread_priority::default_) noexcept
               : policy_(p)
               , priority_(priority)
             {
@@ -83,7 +83,7 @@ namespace hpx {
         {
             constexpr explicit policy_holder(launch_policy p,
                 threads::thread_priority priority =
-                    threads::thread_priority_default) noexcept
+                    threads::thread_priority::default_) noexcept
               : policy_holder_base(p, priority)
             {
             }
@@ -118,7 +118,7 @@ namespace hpx {
         {
             constexpr explicit policy_holder(launch_policy p,
                 threads::thread_priority priority =
-                    threads::thread_priority_default) noexcept
+                    threads::thread_priority::default_) noexcept
               : policy_holder_base(p, priority)
             {
             }
@@ -153,7 +153,7 @@ namespace hpx {
         {
             constexpr explicit async_policy(
                 threads::thread_priority priority =
-                    threads::thread_priority_default) noexcept
+                    threads::thread_priority::default_) noexcept
               : policy_holder<async_policy>(launch_policy::async, priority)
             {
             }
@@ -169,7 +169,7 @@ namespace hpx {
         {
             constexpr explicit fork_policy(
                 threads::thread_priority priority =
-                    threads::thread_priority_boost) noexcept
+                    threads::thread_priority::boost) noexcept
               : policy_holder<fork_policy>(launch_policy::fork, priority)
             {
             }
@@ -214,7 +214,7 @@ namespace hpx {
                         typename std::decay<F>::type>::value>::type>
             explicit select_policy(F&& f,
                 threads::thread_priority priority =
-                    threads::thread_priority_default)    // NOLINT
+                    threads::thread_priority::default_)    // NOLINT
               : policy_holder<select_policy<Pred>>(
                     launch_policy::async, priority)
               , pred_(std::forward<F>(f))
@@ -246,7 +246,7 @@ namespace hpx {
             template <typename F>
             select_policy<typename std::decay<F>::type> operator()(F&& f,
                 threads::thread_priority priority =
-                    threads::thread_priority_default) const
+                    threads::thread_priority::default_) const
             {
                 return select_policy<typename std::decay<F>::type>(
                     std::forward<F>(f), priority);

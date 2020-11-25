@@ -102,8 +102,8 @@ namespace hpx { namespace threads {
         ///                 thread's status word. To change the thread's
         ///                 scheduling status \a threadmanager#set_state should
         ///                 be used.
-        thread_state set_state(thread_state_enum state,
-            thread_state_ex_enum state_ex = wait_unknown,
+        thread_state set_state(thread_schedule_state state,
+            thread_restart_state state_ex = thread_restart_state::unknown,
             std::memory_order load_order = std::memory_order_acquire,
             std::memory_order exchange_order =
                 std::memory_order_seq_cst) noexcept
@@ -119,7 +119,7 @@ namespace hpx { namespace threads {
                 if (state != tmp.state())
                     ++tag;
 
-                if (state_ex == wait_unknown)
+                if (state_ex == thread_restart_state::unknown)
                     state_ex = tmp.state_ex();
 
                 if (HPX_LIKELY(current_state_.compare_exchange_strong(tmp,
@@ -132,13 +132,13 @@ namespace hpx { namespace threads {
             }
         }
 
-        bool set_state_tagged(thread_state_enum newstate,
+        bool set_state_tagged(thread_schedule_state newstate,
             thread_state& prev_state, thread_state& new_tagged_state,
             std::memory_order exchange_order =
                 std::memory_order_seq_cst) noexcept
         {
             thread_state tmp = prev_state;
-            thread_state_ex_enum state_ex = tmp.state_ex();
+            thread_restart_state state_ex = tmp.state_ex();
 
             new_tagged_state =
                 thread_state(newstate, state_ex, prev_state.tag() + 1);
@@ -185,7 +185,7 @@ namespace hpx { namespace threads {
                 ++tag;
 
             // ignore the state_ex while compare-exchanging
-            thread_state_ex_enum state_ex =
+            thread_restart_state state_ex =
                 current_state_.load(load_order).state_ex();
 
             thread_state old_tmp(old_state.state(), state_ex, old_state.tag());
@@ -195,8 +195,8 @@ namespace hpx { namespace threads {
                 old_tmp, new_tmp, load_exchange);
         }
 
-        bool restore_state(thread_state_enum new_state,
-            thread_state_ex_enum state_ex, thread_state old_state,
+        bool restore_state(thread_schedule_state new_state,
+            thread_restart_state state_ex, thread_state old_state,
             std::memory_order load_exchange =
                 std::memory_order_seq_cst) noexcept
         {
@@ -219,8 +219,8 @@ namespace hpx { namespace threads {
         /// \note           This function will be seldom used directly. Most of
         ///                 the time the state of a thread will have to be
         ///                 changed using the threadmanager.
-        thread_state_ex_enum set_state_ex(
-            thread_state_ex_enum new_state) noexcept
+        thread_restart_state set_state_ex(
+            thread_restart_state new_state) noexcept
         {
             thread_state prev_state =
                 current_state_.load(std::memory_order_acquire);
@@ -353,11 +353,11 @@ namespace hpx { namespace threads {
 #endif
 
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-        void set_marked_state(thread_state_enum mark) const noexcept
+        void set_marked_state(thread_schedule_state mark) const noexcept
         {
             marked_state_ = mark;
         }
-        thread_state_enum get_marked_state() const noexcept
+        thread_schedule_state get_marked_state() const noexcept
         {
             return marked_state_;
         }
@@ -617,7 +617,7 @@ namespace hpx { namespace threads {
 #endif
 
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-        mutable thread_state_enum marked_state_;
+        mutable thread_schedule_state marked_state_;
 #endif
 
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
@@ -711,7 +711,7 @@ namespace hpx { namespace threads {
     HPX_CORE_EXPORT std::ptrdiff_t get_self_stacksize();
 
     /// The function \a get_self_stacksize_enum returns the stack size of the /
-    //current thread (or thread_stacksize_default if the current thread is not
+    //current thread (or thread_stacksize::default if the current thread is not
     //a HPX thread).
     HPX_CORE_EXPORT thread_stacksize get_self_stacksize_enum();
 

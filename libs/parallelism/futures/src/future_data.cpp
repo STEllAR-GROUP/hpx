@@ -64,14 +64,16 @@ namespace hpx { namespace lcos { namespace detail {
 
         // launch a new thread executing the given function
         threads::thread_id_type tid = p.apply("run_on_completed_on_new_thread",
-            policy, threads::thread_priority_boost,
-            threads::thread_stacksize_current, threads::thread_schedule_hint());
+            policy, threads::thread_priority::boost,
+            threads::thread_stacksize::current,
+            threads::thread_schedule_hint());
 
         // wait for the task to run
         if (is_hpx_thread)
         {
             // make sure this thread is executed last
-            this_thread::suspend(threads::pending, std::move(tid));
+            this_thread::suspend(
+                threads::thread_schedule_state::pending, std::move(tid));
             return p.get_future().get();
         }
         // If we are not on a HPX thread, we need to return immediately, to
@@ -297,12 +299,12 @@ namespace hpx { namespace lcos { namespace detail {
             std::unique_lock<mutex_type> l(mtx_);
             if (state_.load(std::memory_order_relaxed) == empty)
             {
-                threads::thread_state_ex_enum const reason = cond_.wait_until(
+                threads::thread_restart_state const reason = cond_.wait_until(
                     l, abs_time, "future_data_base::wait_until", ec);
                 if (ec)
                     return future_status::uninitialized;
 
-                if (reason == threads::wait_timeout)
+                if (reason == threads::thread_restart_state::timeout)
                     return future_status::timeout;
             }
         }

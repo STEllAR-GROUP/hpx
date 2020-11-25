@@ -1304,20 +1304,20 @@ namespace hpx { namespace util {
     {
         switch (stacksize)
         {
-        case threads::thread_stacksize_medium:
+        case threads::thread_stacksize::medium:
             return medium_stacksize;
 
-        case threads::thread_stacksize_large:
+        case threads::thread_stacksize::large:
             return large_stacksize;
 
-        case threads::thread_stacksize_huge:
+        case threads::thread_stacksize::huge:
             return huge_stacksize;
 
-        case threads::thread_stacksize_nostack:
+        case threads::thread_stacksize::nostack:
             return (std::numeric_limits<std::ptrdiff_t>::max)();
 
         default:
-        case threads::thread_stacksize_small:
+        case threads::thread_stacksize::small_:
             break;
         }
         return small_stacksize;

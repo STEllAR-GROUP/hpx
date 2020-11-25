@@ -181,8 +181,9 @@ namespace hpx { namespace threads { namespace policies {
         virtual std::int64_t get_queue_length(
             std::size_t num_thread = std::size_t(-1)) const = 0;
 
-        virtual std::int64_t get_thread_count(thread_state_enum state = unknown,
-            thread_priority priority = thread_priority_default,
+        virtual std::int64_t get_thread_count(
+            thread_schedule_state state = thread_schedule_state::unknown,
+            thread_priority priority = thread_priority::default_,
             std::size_t num_thread = std::size_t(-1),
             bool reset = false) const = 0;
 
@@ -197,7 +198,8 @@ namespace hpx { namespace threads { namespace policies {
         // Enumerate all matching threads
         virtual bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state = unknown) const = 0;
+            thread_schedule_state state =
+                thread_schedule_state::unknown) const = 0;
 
         virtual void abort_all_suspended_threads() = 0;
 
@@ -214,12 +216,12 @@ namespace hpx { namespace threads { namespace policies {
         virtual void schedule_thread(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
-            thread_priority priority = thread_priority_normal) = 0;
+            thread_priority priority = thread_priority::normal) = 0;
 
         virtual void schedule_thread_last(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
-            thread_priority priority = thread_priority_normal) = 0;
+            thread_priority priority = thread_priority::normal) = 0;
 
         virtual void destroy_thread(threads::thread_data* thrd) = 0;
 
@@ -243,28 +245,28 @@ namespace hpx { namespace threads { namespace policies {
 
         std::ptrdiff_t get_stack_size(threads::thread_stacksize stacksize) const
         {
-            if (stacksize == thread_stacksize_current)
+            if (stacksize == thread_stacksize::current)
             {
                 stacksize = get_self_stacksize_enum();
             }
 
-            HPX_ASSERT(stacksize != thread_stacksize_current);
+            HPX_ASSERT(stacksize != thread_stacksize::current);
 
             switch (stacksize)
             {
-            case thread_stacksize_small:
+            case thread_stacksize::small_:
                 return thread_queue_init_.small_stacksize_;
 
-            case thread_stacksize_medium:
+            case thread_stacksize::medium:
                 return thread_queue_init_.medium_stacksize_;
 
-            case thread_stacksize_large:
+            case thread_stacksize::large:
                 return thread_queue_init_.large_stacksize_;
 
-            case thread_stacksize_huge:
+            case thread_stacksize::huge:
                 return thread_queue_init_.huge_stacksize_;
 
-            case thread_stacksize_nostack:
+            case thread_stacksize::nostack:
                 return (std::numeric_limits<std::ptrdiff_t>::max)();
 
             default:

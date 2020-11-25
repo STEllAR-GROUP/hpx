@@ -475,7 +475,8 @@ namespace hpx {
                 lbt_ << "runtime_distributed::run_helper: bootstrap "
                         "aborted, bailing out";
                 return threads::thread_result_type(
-                    threads::terminated, threads::invalid_thread_id);
+                    threads::thread_schedule_state::terminated,
+                    threads::invalid_thread_id);
             }
 
             lbt_ << "(4th stage) runtime_distributed::run_helper: bootstrap "
@@ -597,8 +598,8 @@ namespace hpx {
         threads::thread_init_data data(
             util::bind(&runtime_distributed::run_helper, this, func,
                 std::ref(result_)),
-            "run_helper", threads::thread_priority_normal,
-            threads::thread_schedule_hint(0), threads::thread_stacksize_large);
+            "run_helper", threads::thread_priority::normal,
+            threads::thread_schedule_hint(0), threads::thread_stacksize::large);
 
         this->runtime::starting();
         threads::thread_id_type id = threads::invalid_thread_id;

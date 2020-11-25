@@ -138,27 +138,25 @@ namespace hpx { namespace agas
         }
     }; // }}}
 
-addressing_service::addressing_service(
-    util::runtime_configuration const& ini_
-  , runtime_mode runtime_type_
-    )
-  : gva_cache_(new gva_cache_type)
-  , console_cache_(naming::invalid_locality_id)
-  , max_refcnt_requests_(ini_.get_agas_max_pending_refcnt_requests())
-  , refcnt_requests_count_(0)
-  , enable_refcnt_caching_(true)
-  , refcnt_requests_(new refcnt_requests_type)
-  , service_type(ini_.get_agas_service_mode())
-  , runtime_type(runtime_type_)
-  , caching_(ini_.get_agas_caching_mode())
-  , range_caching_(caching_ ? ini_.get_agas_range_caching_mode() : false)
-  , action_priority_(threads::thread_priority_boost)
-  , rts_lva_(0)
-  , state_(state_starting)
-  , locality_()
-{
-    if (caching_)
-        gva_cache_->reserve(ini_.get_agas_local_cache_size());
+    addressing_service::addressing_service(
+        util::runtime_configuration const& ini_, runtime_mode runtime_type_)
+      : gva_cache_(new gva_cache_type)
+      , console_cache_(naming::invalid_locality_id)
+      , max_refcnt_requests_(ini_.get_agas_max_pending_refcnt_requests())
+      , refcnt_requests_count_(0)
+      , enable_refcnt_caching_(true)
+      , refcnt_requests_(new refcnt_requests_type)
+      , service_type(ini_.get_agas_service_mode())
+      , runtime_type(runtime_type_)
+      , caching_(ini_.get_agas_caching_mode())
+      , range_caching_(caching_ ? ini_.get_agas_range_caching_mode() : false)
+      , action_priority_(threads::thread_priority::boost)
+      , rts_lva_(0)
+      , state_(state_starting)
+      , locality_()
+    {
+        if (caching_)
+            gva_cache_->reserve(ini_.get_agas_local_cache_size());
 }
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -1516,10 +1514,10 @@ void addressing_service::route(
         threads::thread_init_data data(
             threads::make_thread_function_nullary(util::deferred_call(
                 route_ptr, this, std::move(p), std::move(f), local_priority)),
-            "addressing_service::route",
-            threads::thread_priority_normal,
+            "addressing_service::route", threads::thread_priority::normal,
             threads::thread_schedule_hint(),
-            threads::thread_stacksize_default, threads::pending, true);
+            threads::thread_stacksize::default_,
+            threads::thread_schedule_state::pending, true);
         threads::register_thread(data);
         return;
     }
@@ -1667,13 +1665,12 @@ void addressing_service::decref(
     {
         // reschedule this call as an HPX thread
         threads::thread_init_data data(
-            threads::make_thread_function_nullary([=]() -> void {
-                return decref(raw, credit, throws);
-            }),
-            "addressing_service::decref",
-            threads::thread_priority_normal,
+            threads::make_thread_function_nullary(
+                [=]() -> void { return decref(raw, credit, throws); }),
+            "addressing_service::decref", threads::thread_priority::normal,
             threads::thread_schedule_hint(),
-            threads::thread_stacksize_default, threads::pending, true);
+            threads::thread_stacksize::default_,
+            threads::thread_schedule_state::pending, true);
         threads::register_thread(data, ec);
 
         return;
@@ -1932,13 +1929,12 @@ void addressing_service::update_cache_entry(
             return;
         }
         threads::thread_init_data data(
-            threads::make_thread_function_nullary([=]() -> void {
-                return update_cache_entry(id, g, throws);
-            }),
+            threads::make_thread_function_nullary(
+                [=]() -> void { return update_cache_entry(id, g, throws); }),
             "addressing_service::update_cache_entry",
-            threads::thread_priority_normal,
-            threads::thread_schedule_hint(),
-            threads::thread_stacksize_default, threads::pending, true);
+            threads::thread_priority::normal, threads::thread_schedule_hint(),
+            threads::thread_stacksize::default_,
+            threads::thread_schedule_state::pending, true);
         threads::register_thread(data, ec);
     }
 

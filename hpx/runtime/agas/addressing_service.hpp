@@ -1134,12 +1134,11 @@ public:
     /// \note             The route operation is asynchronous, thus it returns
     ///                   before the parcel has been delivered to its
     ///                   destination.
-    void route(
-        parcelset::parcel p
-      , util::function_nonser<void(std::error_code const&,
-            parcelset::parcel const&)> &&
-      , threads::thread_priority local_priority =
-            threads::thread_priority_default);
+    void route(parcelset::parcel p,
+        util::function_nonser<void(
+            std::error_code const&, parcelset::parcel const&)>&&,
+        threads::thread_priority local_priority =
+            threads::thread_priority::default_);
 #endif
 
     /// \brief Increment the global reference count for the given id

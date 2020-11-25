@@ -146,7 +146,8 @@ namespace hpx { namespace parcelset
                 while(do_background_work(0, parcelport_background_mode_all))
                 {
                     if(threads::get_self_ptr())
-                        hpx::this_thread::suspend(hpx::threads::pending,
+                        hpx::this_thread::suspend(
+                            hpx::threads::thread_schedule_state::pending,
                             "mpi::parcelport::do_stop");
                 }
                 stopped_ = true;

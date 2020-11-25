@@ -301,31 +301,31 @@ namespace hpx { namespace threads { namespace policies {
         void schedule_thread(threads::thread_data* thrd,
             thread_priority priority, bool other_end = false)
         {
-            if (bp_queue_ && (priority == thread_priority_bound))
+            if (bp_queue_ && (priority == thread_priority::bound))
             {
                 tq_deb.debug(debug::str<>("schedule_thread"),
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_data*>(thrd),
-                    "queueing thread_priority_bound");
+                    "queueing thread_priority::bound");
                 bp_queue_->schedule_work(thrd, other_end);
             }
             else if (hp_queue_ &&
-                (priority == thread_priority_high ||
-                    priority == thread_priority_high_recursive ||
-                    priority == thread_priority_boost))
+                (priority == thread_priority::high ||
+                    priority == thread_priority::high_recursive ||
+                    priority == thread_priority::boost))
             {
                 tq_deb.debug(debug::str<>("schedule_thread"),
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_data*>(thrd),
-                    "queueing thread_priority_high");
+                    "queueing thread_priority::high");
                 hp_queue_->schedule_work(thrd, other_end);
             }
-            else if (lp_queue_ && (priority == thread_priority_low))
+            else if (lp_queue_ && (priority == thread_priority::low))
             {
                 tq_deb.debug(debug::str<>("schedule_thread"),
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_data*>(thrd),
-                    "queueing thread_priority_low");
+                    "queueing thread_priority::low");
                 lp_queue_->schedule_work(thrd, other_end);
             }
             else
@@ -333,7 +333,7 @@ namespace hpx { namespace threads { namespace policies {
                 tq_deb.debug(debug::str<>("schedule_thread"),
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_data*>(thrd),
-                    "queueing thread_priority_normal");
+                    "queueing thread_priority::normal");
                 np_queue_->schedule_work(thrd, other_end);
             }
         }
@@ -411,39 +411,39 @@ namespace hpx { namespace threads { namespace policies {
             }
 
             // create the thread using priority to select queue
-            if (data.priority == thread_priority_normal)
+            if (data.priority == thread_priority::normal)
             {
                 tq_deb.debug(debug::str<>("create_thread "),
-                    queue_data_print(this), "thread_priority_normal",
+                    queue_data_print(this), "thread_priority::normal",
                     "run_now ", data.run_now);
                 return np_queue_->create_thread(data, tid, ec);
             }
-            else if (bp_queue_ && (data.priority == thread_priority_bound))
+            else if (bp_queue_ && (data.priority == thread_priority::bound))
             {
                 tq_deb.debug(debug::str<>("create_thread "),
-                    queue_data_print(this), "thread_priority_bound", "run_now ",
-                    data.run_now);
+                    queue_data_print(this), "thread_priority::bound",
+                    "run_now ", data.run_now);
                 return bp_queue_->create_thread(data, tid, ec);
             }
             else if (hp_queue_ &&
-                (data.priority == thread_priority_high ||
-                    data.priority == thread_priority_high_recursive ||
-                    data.priority == thread_priority_boost))
+                (data.priority == thread_priority::high ||
+                    data.priority == thread_priority::high_recursive ||
+                    data.priority == thread_priority::boost))
             {
                 // boosted threads return to normal after being queued
-                if (data.priority == thread_priority_boost)
+                if (data.priority == thread_priority::boost)
                 {
-                    data.priority = thread_priority_normal;
+                    data.priority = thread_priority::normal;
                 }
                 tq_deb.debug(debug::str<>("create_thread "),
-                    queue_data_print(this), "thread_priority_high", "run_now ",
+                    queue_data_print(this), "thread_priority::high", "run_now ",
                     data.run_now);
                 return hp_queue_->create_thread(data, tid, ec);
             }
-            else if (lp_queue_ && (data.priority == thread_priority_low))
+            else if (lp_queue_ && (data.priority == thread_priority::low))
             {
                 tq_deb.debug(debug::str<>("create_thread "),
-                    queue_data_print(this), "thread_priority_low", "run_now ",
+                    queue_data_print(this), "thread_priority::low", "run_now ",
                     data.run_now);
                 return lp_queue_->create_thread(data, tid, ec);
             }
@@ -463,7 +463,8 @@ namespace hpx { namespace threads { namespace policies {
         void create_thread_object(
             threads::thread_id_type& tid, threads::thread_init_data& data)
         {
-            HPX_ASSERT(data.stacksize != 0);
+            HPX_ASSERT(data.stacksize >= thread_stacksize::minimal);
+            HPX_ASSERT(data.stacksize <= thread_stacksize::maximal);
 
             std::ptrdiff_t const stacksize =
                 data.scheduler_base->get_stack_size(data.stacksize);
@@ -491,10 +492,11 @@ namespace hpx { namespace threads { namespace policies {
             }
             HPX_ASSERT(heap);
 
-            if (data.initial_state == pending_do_not_schedule ||
-                data.initial_state == pending_boost)
+            if (data.initial_state ==
+                    thread_schedule_state::pending_do_not_schedule ||
+                data.initial_state == thread_schedule_state::pending_boost)
             {
-                data.initial_state = pending;
+                data.initial_state = thread_schedule_state::pending;
             }
 
             // Check for an unused thread object.
@@ -642,7 +644,7 @@ namespace hpx { namespace threads { namespace policies {
                 tq_deb.debug(debug::str<>("next_thread_BP"),
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_data*>(thrd),
-                    "thread_priority_bound");
+                    "thread_priority::bound");
                 return true;
             }
 
@@ -652,7 +654,7 @@ namespace hpx { namespace threads { namespace policies {
                 tq_deb.debug(debug::str<>("get_next_thread_HP"),
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_data*>(thrd),
-                    "thread_priority_high");
+                    "thread_priority::high");
                 return true;
             }
             // if we're out of work in the main queues,
@@ -668,7 +670,7 @@ namespace hpx { namespace threads { namespace policies {
                 tq_deb.debug(debug::str<>("next_thread_NP"),
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_data*>(thrd),
-                    "thread_priority_normal");
+                    "thread_priority::normal");
                 return true;
             }
 
@@ -677,7 +679,7 @@ namespace hpx { namespace threads { namespace policies {
                 tq_deb.debug(debug::str<>("next_thread_LP"),
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_data*>(thrd),
-                    "thread_priority_low");
+                    "thread_priority::low");
                 return true;
             }
             // if we're out of work in the main queues,
@@ -758,7 +760,7 @@ namespace hpx { namespace threads { namespace policies {
             // Return thread count of one specific queue.
             switch (priority)
             {
-            case thread_priority_default:
+            case thread_priority::default_:
             {
                 std::int64_t count = 0;
                 count +=
@@ -771,34 +773,34 @@ namespace hpx { namespace threads { namespace policies {
                     owns_lp_queue() ? lp_queue_->get_queue_length_staged() : 0;
                 return count;
             }
-            case thread_priority_bound:
+            case thread_priority::bound:
             {
                 return owns_bp_queue() ? bp_queue_->get_queue_length_staged() :
                                          0;
             }
-            case thread_priority_low:
+            case thread_priority::low:
             {
                 return owns_lp_queue() ? lp_queue_->get_queue_length_staged() :
                                          0;
             }
-            case thread_priority_normal:
+            case thread_priority::normal:
             {
                 return owns_np_queue() ? np_queue_->get_queue_length_staged() :
                                          0;
             }
-            case thread_priority_boost:
-            case thread_priority_high:
-            case thread_priority_high_recursive:
+            case thread_priority::boost:
+            case thread_priority::high:
+            case thread_priority::high_recursive:
             {
                 return owns_hp_queue() ? hp_queue_->get_queue_length_staged() :
                                          0;
             }
             default:
-            case thread_priority_unknown:
+            case thread_priority::unknown:
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "queue_holder_thread::get_thread_count_staged",
-                    "unknown thread priority value (thread_priority_unknown)");
+                    "unknown thread priority value (thread_priority::unknown)");
             }
             }
             return 0;
@@ -811,7 +813,7 @@ namespace hpx { namespace threads { namespace policies {
             // Return thread count of one specific queue.
             switch (priority)
             {
-            case thread_priority_default:
+            case thread_priority::default_:
             {
                 std::int64_t count = 0;
                 count +=
@@ -822,54 +824,55 @@ namespace hpx { namespace threads { namespace policies {
                     owns_lp_queue() ? lp_queue_->get_queue_length_pending() : 0;
                 return count;
             }
-            case thread_priority_bound:
+            case thread_priority::bound:
             {
                 return owns_bp_queue() ? bp_queue_->get_queue_length_pending() :
                                          0;
             }
-            case thread_priority_low:
+            case thread_priority::low:
             {
                 return owns_lp_queue() ? lp_queue_->get_queue_length_pending() :
                                          0;
             }
-            case thread_priority_normal:
+            case thread_priority::normal:
             {
                 return owns_np_queue() ? np_queue_->get_queue_length_pending() :
                                          0;
             }
-            case thread_priority_boost:
-            case thread_priority_high:
-            case thread_priority_high_recursive:
+            case thread_priority::boost:
+            case thread_priority::high:
+            case thread_priority::high_recursive:
             {
                 return owns_hp_queue() ? hp_queue_->get_queue_length_pending() :
                                          0;
             }
             default:
-            case thread_priority_unknown:
+            case thread_priority::unknown:
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "queue_holder_thread::get_thread_count_pending",
-                    "unknown thread priority value (thread_priority_unknown)");
+                    "unknown thread priority value (thread_priority::unknown)");
             }
             }
             return 0;
         }
 
         // ----------------------------------------------------------------
-        inline std::size_t get_thread_count(thread_state_enum state = unknown,
-            thread_priority priority = thread_priority_default) const
+        inline std::size_t get_thread_count(
+            thread_schedule_state state = thread_schedule_state::unknown,
+            thread_priority priority = thread_priority::default_) const
         {
-            if (terminated == state)
+            if (thread_schedule_state::terminated == state)
                 return terminated_items_count_.data_.load(
                     std::memory_order_relaxed);
 
-            if (staged == state)
+            if (thread_schedule_state::staged == state)
                 return get_thread_count_staged(priority);
 
-            if (pending == state)
+            if (thread_schedule_state::pending == state)
                 return get_thread_count_pending(priority);
 
-            if (unknown == state)
+            if (thread_schedule_state::unknown == state)
                 return thread_map_count_.data_.load(std::memory_order_relaxed) +
                     get_thread_count_staged(priority) -
                     terminated_items_count_.data_.load(
@@ -918,9 +921,12 @@ namespace hpx { namespace threads { namespace policies {
             for (thread_map_type::iterator it = thread_map_.begin(); it != end;
                  ++it)
             {
-                if (get_thread_id_data(*it)->get_state().state() == suspended)
+                if (get_thread_id_data(*it)->get_state().state() ==
+                    thread_schedule_state::suspended)
                 {
-                    get_thread_id_data(*it)->set_state(pending, wait_abort);
+                    get_thread_id_data(*it)->set_state(
+                        thread_schedule_state::pending,
+                        thread_restart_state::abort);
                     // np queue always exists so use that as priority doesn't matter
                     np_queue_->schedule_work(get_thread_id_data(*it), true);
                 }
@@ -931,14 +937,14 @@ namespace hpx { namespace threads { namespace policies {
         // ------------------------------------------------------------
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state = unknown) const
+            thread_schedule_state state = thread_schedule_state::unknown) const
         {
             std::uint64_t count = thread_map_count_.data_;
-            if (state == terminated)
+            if (state == thread_schedule_state::terminated)
             {
                 count = terminated_items_count_.data_;
             }
-            else if (state == staged)
+            else if (state == thread_schedule_state::staged)
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "queue_holder_thread::iterate_threads",
@@ -949,7 +955,7 @@ namespace hpx { namespace threads { namespace policies {
             std::vector<thread_id_type> tids;
             tids.reserve(static_cast<std::size_t>(count));
 
-            if (state == unknown)
+            if (state == thread_schedule_state::unknown)
             {
                 scoped_lock lk(thread_map_mtx_.data_);
                 thread_map_type::const_iterator end = thread_map_.end();

@@ -73,13 +73,13 @@ namespace hpx { namespace resource {
 }}    // namespace hpx::resource
 
 namespace hpx { namespace threads {
-    std::int64_t get_thread_count(thread_state_enum state)
+    std::int64_t get_thread_count(thread_schedule_state state)
     {
         return get_thread_manager().get_thread_count(state);
     }
 
     std::int64_t get_thread_count(
-        thread_priority priority, thread_state_enum state)
+        thread_priority priority, thread_schedule_state state)
     {
         return get_thread_manager().get_thread_count(state, priority);
     }
@@ -95,7 +95,7 @@ namespace hpx { namespace threads {
     }
 
     bool enumerate_threads(util::function_nonser<bool(thread_id_type)> const& f,
-        thread_state_enum state)
+        thread_schedule_state state)
     {
         return get_thread_manager().enumerate_threads(f, state);
     }

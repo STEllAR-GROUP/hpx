@@ -99,7 +99,7 @@ namespace hpx { namespace util { namespace detail {
             if (evaluate_)
             {
                 l.unlock();
-                evaluate(threads::wait_signaled);
+                evaluate(threads::thread_restart_state::signaled);
             }
             else
             {
@@ -128,7 +128,7 @@ namespace hpx { namespace util { namespace detail {
         if (evaluate_)
         {
             l.unlock();
-            evaluate(threads::wait_signaled);
+            evaluate(threads::thread_restart_state::signaled);
         }
         else
         {
@@ -159,17 +159,19 @@ namespace hpx { namespace util { namespace detail {
             if (timerid_)
             {
                 error_code ec(lightweight);    // avoid throwing on error
-                threads::set_thread_state(timerid_, threads::pending,
-                    threads::wait_abort, threads::thread_priority_boost, true,
-                    ec);
+                threads::set_thread_state(timerid_,
+                    threads::thread_schedule_state::pending,
+                    threads::thread_restart_state::abort,
+                    threads::thread_priority::boost, true, ec);
                 timerid_.reset();
             }
             if (id_)
             {
                 error_code ec(lightweight);    // avoid throwing on error
-                threads::set_thread_state(id_, threads::pending,
-                    threads::wait_abort, threads::thread_priority_boost, true,
-                    ec);
+                threads::set_thread_state(id_,
+                    threads::thread_schedule_state::pending,
+                    threads::thread_restart_state::abort,
+                    threads::thread_priority::boost, true, ec);
                 id_.reset();
             }
             return true;
@@ -223,25 +225,28 @@ namespace hpx { namespace util { namespace detail {
     }
 
     threads::thread_result_type interval_timer::evaluate(
-        threads::thread_state_ex_enum statex)
+        threads::thread_restart_state statex)
     {
         try
         {
             std::unique_lock<mutex_type> l(mtx_);
 
             if (is_stopped_ || is_terminated_ ||
-                statex == threads::wait_abort || 0 == microsecs_)
+                statex == threads::thread_restart_state::abort ||
+                0 == microsecs_)
             {
                 // object has been finalized, exit
                 return threads::thread_result_type(
-                    threads::terminated, threads::invalid_thread_id);
+                    threads::thread_schedule_state::terminated,
+                    threads::invalid_thread_id);
             }
 
             if (id_ != nullptr && id_ != threads::get_self_id())
             {
                 // obsolete timer thread
                 return threads::thread_result_type(
-                    threads::terminated, threads::invalid_thread_id);
+                    threads::thread_schedule_state::terminated,
+                    threads::invalid_thread_id);
             }
 
             id_.reset();
@@ -274,7 +279,8 @@ namespace hpx { namespace util { namespace detail {
 
         // do not re-schedule this thread
         return threads::thread_result_type(
-            threads::terminated, threads::invalid_thread_id);
+            threads::thread_schedule_state::terminated,
+            threads::invalid_thread_id);
     }
 
     // schedule a high priority task after a given time interval
@@ -297,9 +303,10 @@ namespace hpx { namespace util { namespace detail {
             hpx::threads::thread_init_data data(
                 hpx::threads::make_thread_function(util::bind_front(
                     &interval_timer::evaluate, this->shared_from_this())),
-                description_.c_str(), threads::thread_priority_boost,
+                description_.c_str(), threads::thread_priority::boost,
                 threads::thread_schedule_hint(),
-                threads::thread_stacksize_default, threads::suspended, true);
+                threads::thread_stacksize::default_,
+                threads::thread_schedule_state::suspended, true);
             id = hpx::threads::register_thread(data, ec);
         }
 
@@ -311,9 +318,11 @@ namespace hpx { namespace util { namespace detail {
         }
 
         // schedule this thread to be run after the given amount of seconds
-        threads::thread_id_type timerid = threads::set_thread_state(id,
-            std::chrono::microseconds(microsecs_), threads::pending,
-            threads::wait_signaled, threads::thread_priority_boost, true, ec);
+        threads::thread_id_type timerid =
+            threads::set_thread_state(id, std::chrono::microseconds(microsecs_),
+                threads::thread_schedule_state::pending,
+                threads::thread_restart_state::signaled,
+                threads::thread_priority::boost, true, ec);
 
         if (ec)
         {
@@ -321,8 +330,10 @@ namespace hpx { namespace util { namespace detail {
             is_started_ = false;
 
             // abort the newly created thread
-            threads::set_thread_state(id, threads::pending, threads::wait_abort,
-                threads::thread_priority_boost, true, ec);
+            threads::set_thread_state(id,
+                threads::thread_schedule_state::pending,
+                threads::thread_restart_state::abort,
+                threads::thread_priority::boost, true, ec);
 
             return;
         }

@@ -65,11 +65,11 @@ int hpx_main(int argc, char* argv[])
     // the test to fail
     hpx::execution::parallel_executor exec_0_hp(
         &hpx::resource::get_thread_pool("default"),
-        hpx::threads::thread_priority_high);
+        hpx::threads::thread_priority::high);
 
     hpx::execution::parallel_executor exec_0(
         &hpx::resource::get_thread_pool("default"),
-        hpx::threads::thread_priority_default);
+        hpx::threads::thread_priority::default_);
 
     std::vector<hpx::future<void>> lotsa_futures;
 
@@ -88,10 +88,10 @@ int hpx_main(int argc, char* argv[])
         std::string pool_name = "pool-" + std::to_string(i);
         execs.push_back(hpx::execution::parallel_executor(
             &hpx::resource::get_thread_pool(pool_name),
-            hpx::threads::thread_priority_default));
+            hpx::threads::thread_priority::default_));
         execs_hp.push_back(hpx::execution::parallel_executor(
             &hpx::resource::get_thread_pool(pool_name),
-            hpx::threads::thread_priority_high));
+            hpx::threads::thread_priority::high));
     }
 
     for (int i = 0; i < max_threads; ++i)
@@ -105,7 +105,7 @@ int hpx_main(int argc, char* argv[])
 
     // check that the default executor still works
     hpx::parallel::execution::default_executor large_stack_executor(
-        hpx::threads::thread_stacksize_large);
+        hpx::threads::thread_stacksize::large);
 
     lotsa_futures.push_back(hpx::async(
         large_stack_executor, &dummy_task, 3, "true default + large stack"));

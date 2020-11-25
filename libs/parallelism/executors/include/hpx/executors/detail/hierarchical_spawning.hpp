@@ -72,7 +72,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             if (part_size > hierarchical_threshold)
             {
                 detail::post_policy_dispatch<decltype(policy)>::call(policy,
-                    desc, pool, priority, threads::thread_stacksize_small, hint,
+                    desc, pool, priority, threads::thread_stacksize::small_,
+                    hint,
                     [&, hint, part_begin, part_end, part_size, f,
                         it]() mutable {
                         for (std::size_t part_i = part_begin; part_i < part_end;

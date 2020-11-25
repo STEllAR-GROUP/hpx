@@ -168,13 +168,13 @@ namespace hpx { namespace threads {
                 std::to_string(HPX_IDLE_BACKOFF_TIME_MAX)));
 
         std::ptrdiff_t small_stacksize =
-            cfg_.rtcfg_.get_stack_size(thread_stacksize_small);
+            cfg_.rtcfg_.get_stack_size(thread_stacksize::small_);
         std::ptrdiff_t medium_stacksize =
-            cfg_.rtcfg_.get_stack_size(thread_stacksize_medium);
+            cfg_.rtcfg_.get_stack_size(thread_stacksize::medium);
         std::ptrdiff_t large_stacksize =
-            cfg_.rtcfg_.get_stack_size(thread_stacksize_large);
+            cfg_.rtcfg_.get_stack_size(thread_stacksize::large);
         std::ptrdiff_t huge_stacksize =
-            cfg_.rtcfg_.get_stack_size(thread_stacksize_huge);
+            cfg_.rtcfg_.get_stack_size(thread_stacksize::huge);
 
         policies::thread_queue_init_parameters thread_queue_init(
             max_thread_count, min_tasks_to_steal_pending,
@@ -675,7 +675,7 @@ namespace hpx { namespace threads {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::int64_t threadmanager::get_thread_count(thread_state_enum state,
+    std::int64_t threadmanager::get_thread_count(thread_schedule_state state,
         thread_priority priority, std::size_t num_thread, bool reset)
     {
         std::int64_t total_count = 0;
@@ -735,7 +735,7 @@ namespace hpx { namespace threads {
     // Enumerate all matching threads
     bool threadmanager::enumerate_threads(
         util::function_nonser<bool(thread_id_type)> const& f,
-        thread_state_enum state) const
+        thread_schedule_state state) const
     {
         std::lock_guard<mutex_type> lk(mtx_);
         bool result = true;

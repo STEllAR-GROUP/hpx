@@ -44,12 +44,12 @@ namespace hpx { namespace threads { namespace detail {
         void create_work(thread_init_data& data, error_code& ec);
 
         thread_state set_state(thread_id_type const& id,
-            thread_state_enum new_state, thread_state_ex_enum new_state_ex,
+            thread_schedule_state new_state, thread_restart_state new_state_ex,
             thread_priority priority, error_code& ec);
 
         thread_id_type set_state(hpx::chrono::steady_time_point const& abs_time,
-            thread_id_type const& id, thread_state_enum newstate,
-            thread_state_ex_enum newstate_ex, thread_priority priority,
+            thread_id_type const& id, thread_schedule_state newstate,
+            thread_restart_state newstate_ex, thread_priority priority,
             error_code& ec);
 
         void report_error(std::size_t num, std::exception_ptr const& e);

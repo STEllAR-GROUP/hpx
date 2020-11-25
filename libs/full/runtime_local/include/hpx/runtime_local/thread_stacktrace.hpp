@@ -18,12 +18,14 @@ namespace hpx { namespace util { namespace debug {
     // ------------------------------------------------------------------------
     // return a vector of suspended/other task Ids
     HPX_EXPORT std::vector<hpx::threads::thread_id_type> get_task_ids(
-        hpx::threads::thread_state_enum state = hpx::threads::suspended);
+        hpx::threads::thread_schedule_state state =
+            hpx::threads::thread_schedule_state::suspended);
 
     // ------------------------------------------------------------------------
     // return a vector of thread data structure pointers for suspended tasks
     HPX_EXPORT std::vector<hpx::threads::thread_data*> get_task_data(
-        hpx::threads::thread_state_enum state = hpx::threads::suspended);
+        hpx::threads::thread_schedule_state state =
+            hpx::threads::thread_schedule_state::suspended);
 
     // ------------------------------------------------------------------------
     // return string containing the stack backtrace for suspended tasks

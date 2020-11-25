@@ -114,10 +114,9 @@ namespace throttle { namespace server
             std::to_string(shepherd) + ")");
 
         hpx::threads::thread_init_data data(
-            hpx::threads::make_thread_function_nullary(
-                hpx::util::bind(&throttle::throttle_controller, this, shepherd)),
-            description.c_str(),
-            hpx::threads::thread_priority_high,
+            hpx::threads::make_thread_function_nullary(hpx::util::bind(
+                &throttle::throttle_controller, this, shepherd)),
+            description.c_str(), hpx::threads::thread_priority::high,
             hpx::threads::thread_schedule_hint(shepherd));
         hpx::threads::register_thread(data);
     }
@@ -131,8 +130,7 @@ namespace throttle { namespace server
         hpx::threads::thread_init_data data(
             hpx::threads::make_thread_function_nullary(
                 hpx::util::bind(&throttle::suspend, this, shepherd)),
-            description.c_str(),
-            hpx::threads::thread_priority_high,
+            description.c_str(), hpx::threads::thread_priority::high,
             hpx::threads::thread_schedule_hint(shepherd));
         hpx::threads::register_thread(data);
     }

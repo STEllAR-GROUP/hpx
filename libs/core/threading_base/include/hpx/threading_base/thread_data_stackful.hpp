@@ -60,12 +60,12 @@ namespace hpx { namespace threads {
             hpx::execution_base::this_thread::detail::agent_storage*
                 agent_storage)
         {
-            HPX_ASSERT(get_state().state() == active);
+            HPX_ASSERT(get_state().state() == thread_schedule_state::active);
             HPX_ASSERT(this == coroutine_.get_thread_id().get());
 
             hpx::execution_base::this_thread::reset_agent ctx(
                 agent_storage, agent_);
-            return coroutine_(set_state_ex(wait_signaled));
+            return coroutine_(set_state_ex(thread_restart_state::signaled));
         }
 
 #if defined(HPX_DEBUG)
