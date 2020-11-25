@@ -30,7 +30,7 @@ def _now():
 def run(local, scheduling_policy, threads, extra_opts):
     from pyutils import buildinfo
 
-    binary = os.path.join(buildinfo.binary_dir, 'bin', 'future_overhead_test')
+    binary = os.path.join(buildinfo.binary_dir, 'bin', 'future_overhead_report_test')
     command = [binary] + [str(scheduling_policy)] + [str(threads)]
     if extra_opts:
         command += extra_opts.split()
