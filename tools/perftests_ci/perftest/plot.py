@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
+'''
+Copyright (c) 2020 ETH Zurich
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+'''
 
 import functools
-import itertools
 import pathlib
 import typing
 
@@ -315,14 +321,14 @@ def history(data, output, key='job', limit=None):
                 _history_plot(str(k), dates, m, grid.image())
 
 
-def _bar_plot(title, labels, datas, output):
+def _bar_plot(title, labels, full_data, output):
     def fmt(seconds, *args):
         return f'{seconds * 1000:.2f} ms'
 
     fig, ax = plt.subplots(figsize=(10, 5))
     x0 = 0
     xticklabels = []
-    for label, data in zip(labels, datas):
+    for label, data in zip(labels, full_data):
         if data:
             x = x0 + np.arange(len(data))
             x0 += len(data)

@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+'''
+Copyright (c) 2020 ETH Zurich
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+'''
 
 import functools
 import os
@@ -22,7 +29,7 @@ def load(envfile):
     env.update(line.split('=', 1) for line in output.split('\0'))
 
     log.info(f'Loaded environment from {os.path.join(envdir, envfile)}')
-    log.debug(f'New environment',
+    log.debug(f'{"New environment"}',
               '\n'.join(f'{k}={v}' for k, v in sorted(env.items())))
 
 
@@ -72,7 +79,8 @@ def build_command():
 
 
 def hostname():
-    """Host name of the current machine.
+    """
+    Host name of the current machine.
 
     Example:
         >>> hostname()
@@ -83,7 +91,8 @@ def hostname():
 
 @functools.lru_cache()
 def clustername(local):
-    """SLURM cluster name of the current machine.
+    """
+    SLURM cluster name of the current machine.
 
     Example:
         >>> clustername()

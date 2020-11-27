@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+'''
+Copyright (c) 2020 ETH Zurich
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+'''
 
 import json
 import os
@@ -116,20 +123,20 @@ if buildinfo:
               type=str,
               help='extra arguments to pass to the test\nWarning prefer = to \
               space to assign values to hpx options')
-    def run(local, scheduling_policy, threads, output, extra_opts):
+    def run(local, scheduling_policy, threads, r_output, extra_opts):
         # options
         scheduling_policy='--hpx:queuing=' + scheduling_policy
         threads='--hpx:threads=' + str(threads)
         extra_opts = ' '.join(extra_opts).lstrip()
 
         import perftest
-        if not output.lower().endswith('.json'):
-            output += '.json'
+        if not r_output.lower().endswith('.json'):
+            r_output += '.json'
 
         data = perftest.run(local, scheduling_policy, threads, extra_opts)
-        with open(output, 'w') as outfile:
+        with open(r_output, 'w') as outfile:
             json.dump(data, outfile, indent='  ')
-            log.info(f'Successfully saved perftests output to {output}')
+            log.info(f'Successfully saved perftests output to {r_output}')
 
 
 @perftest.command(description='plot performance results')
@@ -145,10 +152,10 @@ def _load_json(filename):
 @plot.command(description='plot performance comparison')
 @args.arg('--output', '-o', required=True, help='output directory')
 @args.arg('--input', '-i', required=True, nargs=2, help='two input files')
-def compare(output, input):
+def compare(c_output, c_input):
     from perftest import plot
 
-    plot.compare(*(_load_json(i) for i in input), output)
+    plot.compare(*(_load_json(i) for i in c_input), c_output)
 
 
 @plot.command(description='plot performance history')
@@ -168,10 +175,10 @@ def compare(output, input):
           '-l',
           type=int,
           help='limit the history size to the given number of results')
-def history(output, input, date, limit):
+def history(h_output, h_input, date, limit):
     from perftest import plot
 
-    plot.history([_load_json(i) for i in input], output, date, limit)
+    plot.history([_load_json(i) for i in h_input], h_output, date, limit)
 
 
 @plot.command(description='plot backends comparison')
@@ -181,11 +188,13 @@ def history(output, input, date, limit):
           required=True,
           nargs='+',
           help='any number of input files')
-def compare_backends(output, input):
+def compare_backends(cb_output, cb_input):
     from perftest import plot
 
-    plot.compare_backends([_load_json(i) for i in input], output)
+    plot.compare_backends([_load_json(i) for i in cb_input], cb_output)
 
 
+# We disable this warning as the parameter has a default value (see argparse)
+# pylint: disable=no-value-for-parameter
 with log.exception_logging():
     driver()
