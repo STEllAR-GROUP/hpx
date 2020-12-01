@@ -72,8 +72,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter, typename Op,
                 typename Conv>
-            static T sequential(ExPolicy&& policy, InIter first, InIter last,
-                Op&& op, Conv&& conv)
+            static T sequential(
+                ExPolicy&&, InIter first, InIter last, Op&& op, Conv&& conv)
             {
                 return sequential_segmented_scan_T<T>(first, last,
                     std::forward<Op>(op), std::forward<Conv>(conv));
@@ -171,7 +171,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         template <typename SegIter, typename OutIter>
         static bool is_segmented_the_same(
-            SegIter first, SegIter last, OutIter dest, std::false_type)
+            SegIter, SegIter, OutIter, std::false_type)
         {
             return false;
         }
@@ -656,9 +656,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             // wait for all tasks to finish
             return result::get(hpx::dataflow(
-                [final_dest](std::vector<hpx::shared_future<T>>&& r,
-                    std::vector<hpx::shared_future<T>>&& wi,
-                    std::vector<hpx::future<void>>&& fi) mutable -> OutIter {
+                [final_dest](std::vector<hpx::shared_future<T>>&&,
+                    std::vector<hpx::shared_future<T>>&&,
+                    std::vector<hpx::future<void>>&&) mutable -> OutIter {
                     return final_dest;
                 },
                 std::move(results), std::move(workitems),
@@ -787,9 +787,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             // wait for all tasks to finish
             return result::get(hpx::dataflow(
-                [final_dest](std::vector<hpx::shared_future<vector_type>>&& r,
-                    std::vector<hpx::shared_future<T>>&& wi,
-                    std::vector<hpx::future<void>>&& fi) mutable -> OutIter {
+                [final_dest](std::vector<hpx::shared_future<vector_type>>&&,
+                    std::vector<hpx::shared_future<T>>&&,
+                    std::vector<hpx::future<void>>&&) mutable -> OutIter {
                     return final_dest;
                 },
                 std::move(results), std::move(workitems),

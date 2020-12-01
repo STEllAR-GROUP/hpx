@@ -16,7 +16,7 @@ namespace foo {
     {
         friend class hpx::serialization::access;
         template <typename Archive>
-        void serialize(Archive& ar, unsigned)
+        void serialize(Archive&, unsigned)
         {
             std::cout << "serialize bar\n";
         }
@@ -27,7 +27,7 @@ namespace foo {
     };
 
     template <typename Archive>
-    void serialize(Archive& ar, baz&, unsigned)
+    void serialize(Archive&, baz&, unsigned)
     {
         std::cout << "serialize baz\n";
     }
@@ -35,13 +35,13 @@ namespace foo {
     struct baq
     {
         template <typename Archive>
-        void save(Archive& ar, unsigned) const
+        void save(Archive&, unsigned) const
         {
             std::cout << "saving baq\n";
         }
 
         template <typename Archive>
-        void load(Archive& ar, unsigned)
+        void load(Archive&, unsigned)
         {
             std::cout << "loading baq\n";
         }
@@ -53,13 +53,13 @@ namespace foo {
     };
 
     template <typename Archive>
-    void save(Archive& ar, bap const&, unsigned)
+    void save(Archive&, bap const&, unsigned)
     {
         std::cout << "saving bap\n";
     }
 
     template <typename Archive>
-    void load(Archive& ar, bap&, unsigned)
+    void load(Archive&, bap&, unsigned)
     {
         std::cout << "loading bap\n";
     }

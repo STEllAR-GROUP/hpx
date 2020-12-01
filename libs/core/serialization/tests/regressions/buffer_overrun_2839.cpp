@@ -37,13 +37,13 @@ struct my_struct
     }
     template <class Archive>
     inline void friend load_construct_data(
-        Archive& ar, my_struct* b, const unsigned int)
+        Archive&, my_struct* b, const unsigned int)
     {
         ::new (b) my_struct(0);
     }
 };
 
-int main(int argc, char** argv)
+int main()
 {
     std::vector<char> buf;
 

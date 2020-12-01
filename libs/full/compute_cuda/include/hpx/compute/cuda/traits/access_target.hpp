@@ -27,6 +27,7 @@ namespace hpx { namespace compute { namespace traits {
             hpx::cuda::experimental::target const& tgt, T const* t)
         {
 #if defined(__CUDA_ARCH__)
+            HPX_UNUSED(tgt);
             return *t;
 #else
             T tmp;
@@ -42,6 +43,7 @@ namespace hpx { namespace compute { namespace traits {
             hpx::cuda::experimental::target const& tgt, T* dst, T const* src)
         {
 #if defined(__CUDA_ARCH__)
+            HPX_UNUSED(tgt);
             *dst = *src;
 #else
             cudaMemcpyAsync(dst, src, sizeof(T), cudaMemcpyHostToDevice,

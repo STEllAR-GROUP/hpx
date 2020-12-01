@@ -93,7 +93,7 @@ void test_for_each_prefetching_exception(ExPolicy policy, IteratorTag)
     try
     {
         hpx::for_each(policy, ctx.begin(), ctx.end(),
-            [](std::size_t i) { throw std::runtime_error("test"); });
+            [](std::size_t) { throw std::runtime_error("test"); });
 
         HPX_TEST(false);
     }
@@ -127,7 +127,7 @@ void test_for_each_prefetching_exception_async(ExPolicy p, IteratorTag)
     try
     {
         auto f = hpx::for_each(p, ctx.begin(), ctx.end(),
-            [](std::size_t i) { throw std::runtime_error("test"); });
+            [](std::size_t) { throw std::runtime_error("test"); });
         returned_from_algorithm = true;
         f.get();
 
@@ -167,7 +167,7 @@ void test_for_each_prefetching_bad_alloc(ExPolicy policy, IteratorTag)
     try
     {
         hpx::for_each(policy, ctx.begin(), ctx.end(),
-            [](std::size_t i) { throw std::bad_alloc(); });
+            [](std::size_t) { throw std::bad_alloc(); });
 
         HPX_TEST(false);
     }
@@ -201,7 +201,7 @@ void test_for_each_prefetching_bad_alloc_async(ExPolicy p, IteratorTag)
     try
     {
         auto f = hpx::for_each(p, ctx.begin(), ctx.end(),
-            [](std::size_t i) { throw std::bad_alloc(); });
+            [](std::size_t) { throw std::bad_alloc(); });
         returned_from_algorithm = true;
         f.get();
 

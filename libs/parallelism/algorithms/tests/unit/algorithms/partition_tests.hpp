@@ -421,11 +421,11 @@ void test_partition()
 
     ////////// Corner test cases.
     test_partition(
-        par, IteratorTag(), int(), [](const int n) -> bool { return true; },
+        par, IteratorTag(), int(), [](const int) -> bool { return true; },
         rand_base);
     test_partition(
         par_unseq, IteratorTag(), user_defined_type(),
-        [](user_defined_type const& t) -> bool { return false; }, rand_base);
+        [](user_defined_type const&) -> bool { return false; }, rand_base);
 
     ////////// Many test cases for meticulous tests.
 #if !defined(HPX_DEBUG) && !defined(HPX_HAVE_SANITIZERS)

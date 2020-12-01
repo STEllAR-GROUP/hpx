@@ -502,6 +502,8 @@ namespace hpx { namespace util
                 // the connection itself will go out of scope on return
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
                 conn->set_state(Connection::state_deleting);
+#else
+                HPX_UNUSED(conn);
 #endif
             }
 

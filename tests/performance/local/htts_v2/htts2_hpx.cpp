@@ -67,7 +67,7 @@ private:
     }
 
     hpx::threads::thread_result_type payload_thread_function(
-        hpx::threads::thread_restart_state ex =
+        hpx::threads::thread_restart_state =
             hpx::threads::thread_restart_state::signaled)
     {
         htts2::payload<BaseClock>(this->payload_duration_ /* = p */);

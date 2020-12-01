@@ -8,6 +8,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <hpx/program_options/option.hpp>
 #include <hpx/program_options/options_description.hpp>
@@ -272,6 +273,8 @@ void test_config_file(const char* config_file)
     check_value(a2[4], "m1.v1", "1");
     check_value(a2[5], "m1.v2", "2");
     check_value(a2[6], "m1.v3", "3");
+#else
+    HPX_UNUSED(config_file);
 #endif
 }
 
@@ -358,7 +361,7 @@ v2 = 2
 v3 = 3
 )";
 
-int main(int, char* av[])
+int main()
 {
     test_command_line();
     test_environment();

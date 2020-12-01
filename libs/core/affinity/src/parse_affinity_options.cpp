@@ -526,7 +526,7 @@ namespace hpx { namespace threads { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // sanity checks
-    void mappings_sanity_checks(full_mapping_type& fmt, std::size_t size,
+    void mappings_sanity_checks(full_mapping_type& fmt, std::size_t /* size */,
         bounds_type const& b, error_code& ec)
     {
         mapping_type& m = fmt.second;

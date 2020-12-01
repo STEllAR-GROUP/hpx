@@ -46,13 +46,10 @@ typedef std::pair<thread_id_type, std::size_t> value_type;
 typedef std::vector<value_type> fifo_type;
 
 ///////////////////////////////////////////////////////////////////////////////
-void lock_and_wait(
-    mutex& m
-  , barrier& b0
-  , barrier& b1
-  , value_type& entry
-  , std::size_t wait
-) {
+void lock_and_wait(mutex& m, barrier& b0, barrier& b1, value_type& entry,
+    std::size_t /* wait */
+)
+{
     // Wait for all hpxthreads in this iteration to be created.
     b0.wait();
 

@@ -200,6 +200,12 @@ namespace hpx { namespace parallel { namespace util {
                 std::list<std::exception_ptr>&& errors, F&& f, FwdIter last)
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_UNUSED(scoped_params);
+                HPX_UNUSED(inititems);
+                HPX_UNUSED(workitems);
+                HPX_UNUSED(errors);
+                HPX_UNUSED(f);
+                HPX_UNUSED(last);
                 HPX_ASSERT(false);
                 return hpx::future<FwdIter>();
 #else

@@ -28,7 +28,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         ///////////////////////////////////////////////////////////////////////
         // std::bad_alloc has to be handled separately
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-        static void call(std::exception_ptr const& e)
+        static void call(std::exception_ptr const&)
         {
             HPX_ASSERT(false);
         }
@@ -54,6 +54,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::exception_ptr const& e, std::list<std::exception_ptr>& errors)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(e);
+            HPX_UNUSED(errors);
             HPX_ASSERT(false);
 #else
             try
@@ -76,6 +78,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::list<std::exception_ptr>& errors, bool throw_errors = true)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
+            HPX_UNUSED(errors);
+            HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
             for (hpx::future<T> const& f : workitems)
@@ -95,6 +100,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::list<std::exception_ptr>& errors, bool throw_errors = true)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
+            HPX_UNUSED(errors);
+            HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
             for (hpx::shared_future<T> const& f : workitems)
@@ -114,6 +122,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             bool throw_errors = true)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
+            HPX_UNUSED(errors);
+            HPX_UNUSED(cleanup);
+            HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
             bool has_exception = false;
@@ -195,6 +207,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::list<std::exception_ptr>&, bool = true)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
             HPX_ASSERT(false);
 #else
             for (hpx::future<T> const& f : workitems)
@@ -210,6 +223,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::list<std::exception_ptr>&, bool = true)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
             HPX_ASSERT(false);
 #else
             for (hpx::shared_future<T> const& f : workitems)
@@ -226,6 +240,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::list<std::exception_ptr>&, Cleanup&&, bool = true)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
             HPX_ASSERT(false);
 #else
             for (hpx::future<T> const& f : workitems)

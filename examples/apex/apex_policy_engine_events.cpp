@@ -89,8 +89,7 @@ int main(int argc, char* argv[])
         ;
 
     const apex_event_type when = APEX_START_EVENT;
-    policy_handle = apex::register_policy(when,
-        [](apex_context const& context){
+    policy_handle = apex::register_policy(when, [](apex_context const&) {
         std::cout << "Start event!" << std::endl;
         return APEX_NOERROR;
     });

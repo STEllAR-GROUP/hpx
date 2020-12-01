@@ -109,7 +109,7 @@ void matrixMultiply(
 
     // print out somethine when copy completes and wait for it
     copy_future
-        .then([](cublas_future&& f) {
+        .then([](cublas_future&&) {
             std::cout << "Async host->device copy operation completed"
                       << std::endl
                       << std::endl;

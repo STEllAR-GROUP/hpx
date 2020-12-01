@@ -64,13 +64,8 @@ inline id_type split_credits(id_type const& id)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template <
-    typename Client
->
-void hpx_test_main(
-    variables_map& vm
-  , hpx::id_type const& locality
-    )
+template <typename Client>
+void hpx_test_main(variables_map&, hpx::id_type const& locality)
 {
     std::int64_t const hpx_globalcredit_initial =
         static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL);

@@ -156,7 +156,7 @@ namespace hpx { namespace threads {
     }
 
     void resume_pool_cb(thread_pool_base& pool,
-        util::function_nonser<void(void)> callback, error_code& ec)
+        util::function_nonser<void(void)> callback, error_code& /* ec */)
     {
         auto resume_direct_wrapper =
             [&pool, callback = std::move(callback)]() -> void {

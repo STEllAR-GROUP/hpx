@@ -13,7 +13,7 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/modules/testing.hpp>
 
-int hpx_main(int argc, char** argv)
+int hpx_main()
 {
     using hpx::performance_counters::performance_counter;
 

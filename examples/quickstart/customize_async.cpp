@@ -47,7 +47,7 @@ void run_with_high_priority()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     // run a thread on a large stack
     {

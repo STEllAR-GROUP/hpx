@@ -16,13 +16,13 @@
 #include <iostream>
 
 bool discover_callback(
-    hpx::performance_counters::counter_info const& c, hpx::error_code& ec)
+    hpx::performance_counters::counter_info const& c, hpx::error_code&)
 {
     std::cout << "counter: " << c.fullname_ << std::endl;
     return true;
 }
 
-int hpx_main(int argc, char** argv)
+int hpx_main()
 {
     std::cout << "Counters:" << std::endl;
 

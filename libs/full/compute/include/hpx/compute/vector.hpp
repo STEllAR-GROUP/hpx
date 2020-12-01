@@ -292,7 +292,7 @@ namespace hpx { namespace compute {
         /// Remarks: If an exception is thrown other than by the move constructor
         /// of a non-CopyInsertable T there are no effects.
         ///
-        void resize(size_type size)
+        void resize(size_type /* size */)
         {
             // TODO: implement this
         }
@@ -305,7 +305,7 @@ namespace hpx { namespace compute {
         ///
         /// Remarks: If an exception is thrown there are no effects.
         ///
-        void resize(size_type size, T const& val)
+        void resize(size_type /* size */, T const& /* val */)
         {
             // TODO: implement this
         }

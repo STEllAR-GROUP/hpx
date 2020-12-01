@@ -61,9 +61,8 @@ namespace hpx { namespace components { namespace server
         // clean up (source) memory of migrated object
         template <typename Component>
         naming::id_type migrate_to_storage_here_cleanup(
-            future<naming::id_type> f,
-            std::shared_ptr<Component> ptr,
-            naming::id_type const& to_migrate)
+            future<naming::id_type> f, std::shared_ptr<Component> ptr,
+            naming::id_type const& /* to_migrate */)
         {
             ptr->mark_as_migrated();
             return f.get();

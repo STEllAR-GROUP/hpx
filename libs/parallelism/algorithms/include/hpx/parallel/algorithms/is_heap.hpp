@@ -247,8 +247,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            static bool sequential(ExPolicy&& policy, Iter first, Sent last,
-                Comp&& comp, Proj&& proj)
+            static bool sequential(
+                ExPolicy&&, Iter first, Sent last, Comp&& comp, Proj&& proj)
             {
                 return sequential_is_heap(first, last, std::forward<Comp>(comp),
                     std::forward<Proj>(proj));
@@ -393,8 +393,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            static Iter sequential(ExPolicy&& policy, Iter first, Sent last,
-                Comp&& comp, Proj&& proj)
+            static Iter sequential(
+                ExPolicy&&, Iter first, Sent last, Comp&& comp, Proj&& proj)
             {
                 return sequential_is_heap_until(first, last,
                     std::forward<Comp>(comp), std::forward<Proj>(proj));

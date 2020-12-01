@@ -12,6 +12,7 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
+#include <hpx/type_support/unused.hpp>
 #include <hpx/util/ios_flags_saver.hpp>
 
 #include <cstddef>
@@ -1375,6 +1376,7 @@ namespace hpx { namespace threads {
         threads::mask_type mask = bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
         return static_cast<int>(threads::find_first(mask));
 #else
+        HPX_UNUSED(addr);
         return 0;
 #endif
     }

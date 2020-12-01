@@ -126,7 +126,7 @@ void test_find_if_exception(IteratorTag)
     {
         hpx::ranges::find_if(decorated_iterator(std::begin(c),
                                  []() { throw std::runtime_error("test"); }),
-            decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
+            decorated_iterator(std::end(c)), [](std::size_t) { return 1; });
         HPX_TEST(false);
     }
     catch (hpx::exception_list const& e)
@@ -162,7 +162,7 @@ void test_find_if_exception(ExPolicy&& policy, IteratorTag)
         hpx::ranges::find_if(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
-            decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
+            decorated_iterator(std::end(c)), [](std::size_t) { return 1; });
         HPX_TEST(false);
     }
     catch (hpx::exception_list const& e)
@@ -196,7 +196,7 @@ void test_find_if_exception_async(ExPolicy&& p, IteratorTag)
         hpx::future<decorated_iterator> f = hpx::ranges::find_if(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
-            decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
+            decorated_iterator(std::end(c)), [](std::size_t) { return 1; });
         returned_from_algorithm = true;
         f.get();
 
@@ -259,7 +259,7 @@ void test_find_if_bad_alloc(ExPolicy&& policy, IteratorTag)
     {
         hpx::ranges::find_if(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
-            decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
+            decorated_iterator(std::end(c)), [](std::size_t) { return 1; });
         HPX_TEST(false);
     }
     catch (std::bad_alloc const&)
@@ -291,7 +291,7 @@ void test_find_if_bad_alloc_async(ExPolicy&& p, IteratorTag)
     {
         hpx::future<decorated_iterator> f = hpx::ranges::find_if(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
-            decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
+            decorated_iterator(std::end(c)), [](std::size_t) { return 1; });
         returned_from_algorithm = true;
         f.get();
 

@@ -18,6 +18,7 @@
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstdint>
 #include <map>
@@ -147,6 +148,8 @@ namespace hpx { namespace agas
         server::symbol_namespace::bind_action action;
         return hpx::async(action, std::move(dest), std::move(key), std::move(gid));
 #else
+        HPX_UNUSED(key);
+        HPX_UNUSED(gid);
         HPX_ASSERT(false);
         return hpx::make_ready_future(true);
 #endif
@@ -163,6 +166,8 @@ namespace hpx { namespace agas
         server::symbol_namespace::bind_action action;
         return action(std::move(dest), std::move(key), std::move(gid));
 #else
+        HPX_UNUSED(key);
+        HPX_UNUSED(gid);
         HPX_ASSERT(false);
         return true;
 #endif
@@ -296,6 +301,7 @@ namespace hpx { namespace agas
                 return result;
             });
 #else
+        HPX_UNUSED(pattern);
         HPX_ASSERT(false);
         return hpx::make_ready_future(
             symbol_namespace::iterate_names_return_type{});

@@ -88,7 +88,7 @@ double thread_func_1(hpx::lcos::local::channel_spsc<data>& c)
     return static_cast<double>(end - start) / 1e9;
 }
 
-int main(int argc, char* argv[])
+int main()
 {
     hpx::lcos::local::channel_spsc<data> c(10000);
 

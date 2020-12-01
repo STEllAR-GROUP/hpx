@@ -119,6 +119,10 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
             cudaLaunchDevice(reinterpret_cast<void*>(launcher), param_buffer,
                 dim3(grid_dim), dim3(block_dim), 0,
                 tgt.native_handle().get_stream());
+#else
+            HPX_UNUSED(tgt);
+            HPX_UNUSED(grid_dim);
+            HPX_UNUSED(block_dim);
 #endif
         }
     };

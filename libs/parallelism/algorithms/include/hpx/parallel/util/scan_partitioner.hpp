@@ -69,6 +69,14 @@ namespace hpx { namespace parallel { namespace util {
                 F3&& f3, F4&& f4)
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_UNUSED(policy);
+                HPX_UNUSED(first);
+                HPX_UNUSED(count);
+                HPX_UNUSED(init);
+                HPX_UNUSED(f1);
+                HPX_UNUSED(f2);
+                HPX_UNUSED(f3);
+                HPX_UNUSED(f4);
                 HPX_ASSERT(false);
                 return R();
 #else
@@ -162,6 +170,14 @@ namespace hpx { namespace parallel { namespace util {
                 F3&& f3, F4&& f4)
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_UNUSED(policy);
+                HPX_UNUSED(first);
+                HPX_UNUSED(count);
+                HPX_UNUSED(init);
+                HPX_UNUSED(f1);
+                HPX_UNUSED(f2);
+                HPX_UNUSED(f3);
+                HPX_UNUSED(f4);
                 HPX_ASSERT(false);
                 return R();
 #else
@@ -300,6 +316,10 @@ namespace hpx { namespace parallel { namespace util {
                 std::list<std::exception_ptr>&& errors, F&& f)
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_UNUSED(workitems);
+                HPX_UNUSED(finalitems);
+                HPX_UNUSED(errors);
+                HPX_UNUSED(f);
                 HPX_ASSERT(false);
                 return R();
 #else

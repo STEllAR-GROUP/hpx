@@ -577,7 +577,7 @@ void tuple_structured_binding_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     {
         construction_test();

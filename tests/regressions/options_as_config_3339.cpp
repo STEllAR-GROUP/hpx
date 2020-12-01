@@ -8,7 +8,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/modules/testing.hpp>
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     HPX_TEST_EQ(hpx::get_config_entry("hpx.cores", "1"), std::string("3"));
     return hpx::finalize();

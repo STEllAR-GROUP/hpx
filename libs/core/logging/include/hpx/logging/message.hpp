@@ -18,6 +18,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <boost/utility/string_ref.hpp>
 
@@ -60,6 +61,9 @@ namespace hpx { namespace util { namespace logging {
 #endif
           m_full_msg_computed(false)
         {
+#if defined(HPX_COMPUTE_HOST_CODE)
+            HPX_UNUSED(msg);
+#endif
         }
 
         message(message&& other) noexcept
@@ -123,5 +127,4 @@ namespace hpx { namespace util { namespace logging {
         mutable bool m_full_msg_computed;
         mutable std::string m_full_msg;
     };
-
 }}}    // namespace hpx::util::logging

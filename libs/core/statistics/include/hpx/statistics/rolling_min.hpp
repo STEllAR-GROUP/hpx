@@ -26,7 +26,7 @@ namespace hpx { namespace util { namespace detail {
         typedef float_type result_type;
 
         template <typename Args>
-        rolling_min_impl(Args const& args)
+        rolling_min_impl(Args const& /* args */)
           : min_(boost::numeric::as_max(Sample()))
           , is_dirty_(false)
         {

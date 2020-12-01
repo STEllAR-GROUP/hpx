@@ -15,7 +15,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-void test(hpx::naming::id_type id) {}
+void test(hpx::naming::id_type) {}
 HPX_PLAIN_ACTION(test, test_action);
 
 hpx::naming::id_type test_return() { return hpx::find_here(); }

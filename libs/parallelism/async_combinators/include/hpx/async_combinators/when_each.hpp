@@ -166,7 +166,7 @@ namespace hpx { namespace lcos {
 
             template <typename F, typename IndexType, typename FutureType>
             inline static void call(
-                F&& f, IndexType index, FutureType&& future, std::false_type)
+                F&& f, IndexType, FutureType&& future, std::false_type)
             {
                 f(std::forward<FutureType>(future));
             }
@@ -425,7 +425,7 @@ namespace hpx { namespace lcos {
     }
 
     template <typename F>
-    inline lcos::future<void> when_each(F&& f)
+    inline lcos::future<void> when_each(F&&)
     {
         return lcos::make_ready_future();
     }

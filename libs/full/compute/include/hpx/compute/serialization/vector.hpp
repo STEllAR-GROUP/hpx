@@ -138,14 +138,13 @@ namespace hpx { namespace serialization {
     }
 #else
     template <typename T, typename Allocator>
-    void serialize(
-        input_archive& ar, compute::vector<T, Allocator>& v, unsigned)
+    void serialize(input_archive&, compute::vector<T, Allocator>&, unsigned)
     {
     }
 
     template <typename T, typename Allocator>
     void serialize(
-        output_archive& ar, compute::vector<T, Allocator> const& v, unsigned)
+        output_archive&, compute::vector<T, Allocator> const&, unsigned)
     {
     }
 #endif

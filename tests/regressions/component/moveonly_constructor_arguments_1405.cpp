@@ -44,11 +44,11 @@ struct test_server
 {
     test_server() {}
 
-    test_server(moveonly && arg)
+    test_server(moveonly&&)
     {
         ++constructed_from_moveonly;
     }
-    test_server(moveable const& arg)
+    test_server(moveable const&)
     {
         ++constructed_from_moveable;
     }
@@ -58,7 +58,7 @@ typedef hpx::components::managed_component<test_server> server_type;
 HPX_REGISTER_COMPONENT(server_type, test_server);
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argc, char** argv_init)
+int hpx_main()
 {
     hpx::new_<test_server>(hpx::find_here(), moveonly()).get();
     HPX_TEST_EQ(constructed_from_moveonly.load(), 1);

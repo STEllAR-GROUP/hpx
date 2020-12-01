@@ -65,7 +65,7 @@ void test_bulk_async(Executor& exec)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     hpx::execution::sequenced_executor seq_exec;
     test_bulk_sync(seq_exec);

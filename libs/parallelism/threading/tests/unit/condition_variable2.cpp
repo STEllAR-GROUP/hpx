@@ -24,7 +24,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // helper to call wait()
-void cv_wait(hpx::stop_token stoken, int id, bool& ready,
+void cv_wait(hpx::stop_token stoken, int /* id */, bool& ready,
     hpx::lcos::local::mutex& ready_mtx,
     hpx::lcos::local::condition_variable_any& ready_cv, bool notify_called)
 {
@@ -316,7 +316,7 @@ void test_minimal_wait_for(int sec1, int sec2)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Dur>
-void test_timed_cv(bool call_notify, bool call_interrupt, Dur dur)
+void test_timed_cv(bool call_notify, bool /* call_interrupt */, Dur dur)
 {
     // test the basic jthread API
     bool ready = false;

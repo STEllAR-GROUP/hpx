@@ -123,9 +123,11 @@ struct test_server_base
     }
 
     template <typename Archive>
-    void serialize(Archive& ar, unsigned version)
+    void serialize(Archive& ar, unsigned)
     {
+        // clang-format off
         ar & base_data_;
+        // clang-format on
     }
 
 private:
@@ -215,10 +217,12 @@ struct test_server
     }
 
     template <typename Archive>
-    void serialize(Archive& ar, unsigned version)
+    void serialize(Archive& ar, unsigned)
     {
+        // clang-format off
         ar & hpx::serialization::base_object<test_server_base>(*this);
         ar & data_;
+        // clang-format on
     }
 
 private:

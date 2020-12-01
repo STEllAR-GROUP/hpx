@@ -55,7 +55,7 @@ void test_set_entry()
     HPX_TEST(invoked_callback.load());
 }
 
-int main(int argc, char* argv[])
+int main()
 {
     test_get_entry();
     test_set_entry();

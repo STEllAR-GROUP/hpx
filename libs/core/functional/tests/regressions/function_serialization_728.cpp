@@ -65,7 +65,7 @@ void worker(hpx::util::function<int()> const& f)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm)
+int hpx_main()
 {
     hpx::chrono::high_resolution_timer t;
 

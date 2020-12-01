@@ -32,7 +32,7 @@ struct linear_numa_binder : hpx::compute::host::numa_binding_helper<T>
 
     // return the domain that a given page should be bound to
     virtual std::size_t operator()(const T* const base_ptr,
-        const T* const page_ptr, std::size_t const pagesize,
+        const T* const page_ptr, std::size_t const /* pagesize */,
         std::size_t const domains) const override
     {
         std::intptr_t offset = page_ptr - base_ptr;
@@ -72,13 +72,13 @@ struct linear_numa_binder : hpx::compute::host::numa_binding_helper<T>
     // When counting along elements in a given dimension,
     // how large a step should be taken in units of elements.
     // This should include padding along an axis
-    virtual std::size_t memory_step(std::size_t axis) const override
+    virtual std::size_t memory_step(std::size_t) const override
     {
         return 1;
     }
 
     // When displaying the data, what step size should be used
-    virtual std::size_t display_step(std::size_t axis) const override
+    virtual std::size_t display_step(std::size_t) const override
     {
         return elements_page_;
     }

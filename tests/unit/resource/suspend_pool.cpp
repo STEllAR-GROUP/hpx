@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     bool exception_thrown = false;
 

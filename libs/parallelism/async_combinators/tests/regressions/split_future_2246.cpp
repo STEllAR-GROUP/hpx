@@ -15,7 +15,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     using pair_type = std::pair<std::map<int, int>, std::set<int>>;
     using pair_fut_type =

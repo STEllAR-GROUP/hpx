@@ -31,7 +31,7 @@ void tuple_like_false()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     {
         tuple_like_true();

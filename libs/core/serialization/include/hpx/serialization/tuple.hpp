@@ -90,7 +90,7 @@ namespace hpx { namespace serialization {
     }
 
     template <typename Archive>
-    void serialize(Archive& ar, hpx::tuple<>&, unsigned)
+    void serialize(Archive&, hpx::tuple<>&, unsigned)
     {
     }
 

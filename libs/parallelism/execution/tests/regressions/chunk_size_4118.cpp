@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { namespace execution {
     };
 }}}    // namespace hpx::parallel::execution
 
-int hpx_main(int argc, char** argv)
+int hpx_main()
 {
     using namespace hpx::util;
 

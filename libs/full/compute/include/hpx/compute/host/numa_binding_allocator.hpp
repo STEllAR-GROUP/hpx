@@ -111,7 +111,7 @@ namespace hpx { namespace compute { namespace host {
 
         // The number of elements along dimension x=0,y=1,z=2,...
         // This function is only required for debug purposes
-        virtual std::size_t array_size(std::size_t axis) const
+        virtual std::size_t array_size(std::size_t /* axis */) const
         {
             return memory_bytes() / sizeof(T);
         };
@@ -120,14 +120,14 @@ namespace hpx { namespace compute { namespace host {
         // how large a step should be taken in units of elements.
         // This should include padding along an axis
         // This function is only required for debug purposes
-        virtual std::size_t memory_step(std::size_t axis) const
+        virtual std::size_t memory_step(std::size_t /* axis */) const
         {
             return 1;
         };
 
         // When displaying the data, what step size should be used
         // This function is only required for debug purposes
-        virtual std::size_t display_step(std::size_t axis) const
+        virtual std::size_t display_step(std::size_t /* axis */) const
         {
             return 1;
         };

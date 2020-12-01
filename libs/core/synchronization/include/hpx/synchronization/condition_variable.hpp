@@ -235,7 +235,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         template <typename Lock, typename Predicate>
-        void wait(Lock& lock, Predicate pred, error_code& ec = throws)
+        void wait(Lock& lock, Predicate pred, error_code& /* ec */ = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 

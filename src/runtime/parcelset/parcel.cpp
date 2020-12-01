@@ -276,6 +276,8 @@ namespace hpx { namespace parcelset
     {
 #if defined(HPX_HAVE_PARCEL_PROFILING)
         data_.start_time_ = time;
+#else
+        HPX_UNUSED(time);
 #endif
     }
 

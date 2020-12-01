@@ -69,7 +69,7 @@ void test_then(Executor& exec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test(int value, hpx::thread::id tid, int passed_through)    //-V813
+void bulk_test(int, hpx::thread::id tid, int passed_through)    //-V813
 {
     HPX_TEST_NEQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -111,7 +111,7 @@ void test_bulk_async(Executor& exec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
+void bulk_test_f(int, hpx::shared_future<void> f, hpx::thread::id tid,
     int passed_through)    //-V813
 {
     HPX_TEST(f.is_ready());    // make sure, future is ready
@@ -180,7 +180,7 @@ void spawn_test()
         [exec]() { return exec.num_pending_closures() != 0; });
 }
 
-int main(int argc, char* argv[])
+int main()
 {
     using namespace hpx::parallel;
 

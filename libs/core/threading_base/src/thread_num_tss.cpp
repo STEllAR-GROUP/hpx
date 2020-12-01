@@ -69,7 +69,7 @@ namespace hpx { namespace threads { namespace detail {
 }}}    // namespace hpx::threads::detail
 
 namespace hpx {
-    std::size_t get_worker_thread_num(error_code& ec)
+    std::size_t get_worker_thread_num(error_code& /* ec */)
     {
         return threads::detail::thread_nums_tss().global_thread_num;
     }
@@ -79,7 +79,7 @@ namespace hpx {
         return get_worker_thread_num(throws);
     }
 
-    std::size_t get_local_worker_thread_num(error_code& ec)
+    std::size_t get_local_worker_thread_num(error_code& /* ec */)
     {
         return threads::detail::thread_nums_tss().local_thread_num;
     }
@@ -89,7 +89,7 @@ namespace hpx {
         return get_local_worker_thread_num(throws);
     }
 
-    std::size_t get_thread_pool_num(error_code& ec)
+    std::size_t get_thread_pool_num(error_code& /* ec */)
     {
         return threads::detail::thread_nums_tss().thread_pool_num;
     }

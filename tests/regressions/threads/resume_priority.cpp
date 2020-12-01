@@ -58,7 +58,7 @@ HPX_DECLARE_ACTION(high_recursive_priority);
 HPX_ACTION_HAS_HIGH_RECURSIVE_PRIORITY(high_recursive_priority_action);
 HPX_PLAIN_ACTION(high_recursive_priority);
 
-int hpx_main(int argc, char ** argv)
+int hpx_main()
 {
     low_priority_action()(hpx::find_here());
     normal_priority_action()(hpx::find_here());

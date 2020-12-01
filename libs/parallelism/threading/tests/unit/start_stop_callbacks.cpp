@@ -62,7 +62,7 @@ void on_thread_stop(std::size_t global_thread_num,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     // verify that all kernel threads were registered
     std::lock_guard<std::mutex> l(mtx);

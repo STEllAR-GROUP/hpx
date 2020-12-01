@@ -38,7 +38,7 @@ struct throw_always
 {
     std::size_t count = 0;
     template <typename T>
-    void operator()(T v)
+    void operator()(T)
     {
         ++count;
         throw std::runtime_error("test");
@@ -49,7 +49,7 @@ struct throw_bad_alloc
 {
     std::size_t count = 0;
     template <typename T>
-    void operator()(T v)
+    void operator()(T)
     {
         ++count;
         throw std::bad_alloc();

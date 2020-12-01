@@ -47,7 +47,7 @@ void test_scan_non_commutative()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int hpx_main(hpx::program_options::variables_map& vm)
+int hpx_main()
 {
     test_scan_non_commutative();
 

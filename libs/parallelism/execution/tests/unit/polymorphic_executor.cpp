@@ -63,7 +63,7 @@ void test_then(executor const& exec)
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<std::size_t> count(0);
 
-int bulk_test(std::size_t value, int passed_through)
+int bulk_test(std::size_t, int passed_through)
 {
     ++count;
     HPX_TEST_EQ(passed_through, 42);
@@ -112,7 +112,7 @@ void test_bulk_async(executor const& exec)
 
 ///////////////////////////////////////////////////////////////////////////////
 int bulk_test_f(
-    std::size_t value, hpx::shared_future<void> const& f, int passed_through)
+    std::size_t, hpx::shared_future<void> const& f, int passed_through)
 {
     HPX_TEST(f.is_ready());    // make sure, future is ready
 
@@ -178,7 +178,7 @@ void test_executor(executor const& exec)
     test_bulk_then(exec);
 }
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     static_check_executor();
 

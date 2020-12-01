@@ -11,6 +11,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/static_reinit/static_reinit.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <memory>    // for placement new
@@ -111,6 +112,8 @@ namespace hpx { namespace util {
                 util::bind_front(
                     &reinitializable_static::template value_constructor<U>,
                     const_cast<U const*>(std::addressof(val))));
+#else
+            HPX_UNUSED(val);
 #endif
         }
 

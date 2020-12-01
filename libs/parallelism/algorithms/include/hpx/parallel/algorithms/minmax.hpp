@@ -42,7 +42,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \cond NOINTERNAL
         template <typename ExPolicy, typename FwdIter, typename F,
             typename Proj>
-        FwdIter sequential_min_element(ExPolicy&& policy, FwdIter it,
+        FwdIter sequential_min_element(ExPolicy&&, FwdIter it,
             std::size_t count, F const& f, Proj const& proj)
         {
             if (count == 0 || count == 1)
@@ -70,7 +70,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename FwdIter, typename F,
                 typename Proj>
             static typename std::iterator_traits<FwdIter>::value_type
-            sequential_minmax_element_ind(ExPolicy&& policy, FwdIter it,
+            sequential_minmax_element_ind(ExPolicy&&, FwdIter it,
                 std::size_t count, F const& f, Proj const& proj)
             {
                 HPX_ASSERT(count != 0);
@@ -257,7 +257,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \cond NOINTERNAL
         template <typename ExPolicy, typename FwdIter, typename F,
             typename Proj>
-        FwdIter sequential_max_element(ExPolicy&& policy, FwdIter it,
+        FwdIter sequential_max_element(ExPolicy&&, FwdIter it,
             std::size_t count, F const& f, Proj const& proj)
         {
             if (count == 0 || count == 1)
@@ -285,7 +285,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename FwdIter, typename F,
                 typename Proj>
             static typename std::iterator_traits<FwdIter>::value_type
-            sequential_minmax_element_ind(ExPolicy&& policy, FwdIter it,
+            sequential_minmax_element_ind(ExPolicy&&, FwdIter it,
                 std::size_t count, F const& f, Proj const& proj)
             {
                 HPX_ASSERT(count != 0);
@@ -473,7 +473,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \cond NOINTERNAL
         template <typename ExPolicy, typename FwdIter, typename F,
             typename Proj>
-        std::pair<FwdIter, FwdIter> sequential_minmax_element(ExPolicy&& policy,
+        std::pair<FwdIter, FwdIter> sequential_minmax_element(ExPolicy&&,
             FwdIter it, std::size_t count, F const& f, Proj const& proj)
         {
             std::pair<FwdIter, FwdIter> result(it, it);
@@ -509,7 +509,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename PairIter, typename F,
                 typename Proj>
             static typename std::iterator_traits<PairIter>::value_type
-            sequential_minmax_element_ind(ExPolicy&& policy, PairIter it,
+            sequential_minmax_element_ind(ExPolicy&&, PairIter it,
                 std::size_t count, F const& f, Proj const& proj)
             {
                 HPX_ASSERT(count != 0);

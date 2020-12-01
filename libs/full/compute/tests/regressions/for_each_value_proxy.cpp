@@ -85,12 +85,12 @@ struct test_allocator
     test_allocator() {}
 
     template <typename U>
-    test_allocator(test_allocator<U> const& alloc)
+    test_allocator(test_allocator<U> const&)
     {
     }
 
     template <typename U>
-    test_allocator(test_allocator<U>&& alloc)
+    test_allocator(test_allocator<U>&&)
     {
     }
 
@@ -110,7 +110,7 @@ struct test_allocator
     // topo.allocate(). The pointer hint may be used to provide locality of
     // reference: the allocator, if supported by the implementation, will
     // attempt to allocate the new memory block as close as possible to hint.
-    pointer allocate(size_type n, const void* hint = nullptr)
+    pointer allocate(size_type n, const void* /* hint */ = nullptr)
     {
         return new T[n];
     }
@@ -119,7 +119,7 @@ struct test_allocator
     // pointer obtained by an earlier call to allocate(). The argument n
     // must be equal to the first argument of the call to allocate() that
     // originally produced p; otherwise, the behavior is undefined.
-    void deallocate(pointer p, size_type n)
+    void deallocate(pointer p, size_type /* n */)
     {
         delete[] p;
     }
@@ -138,7 +138,7 @@ public:
     // underlying executors to distribute the memory according to
     // first touch memory placement.
     template <typename U, typename... Args>
-    void bulk_construct(U* p, std::size_t count, Args&&... args)
+    void bulk_construct(U*, std::size_t, Args&&...)
     {
     }
 
@@ -152,7 +152,7 @@ public:
 
     // Calls the destructor of count objects pointed to by p
     template <typename U>
-    void bulk_destroy(U* p, std::size_t count)
+    void bulk_destroy(U*, std::size_t)
     {
     }
 

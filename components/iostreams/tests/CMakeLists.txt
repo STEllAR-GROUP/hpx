@@ -34,5 +34,6 @@ if(HPX_WITH_TESTS_HEADERS)
     HEADERS ${iostreams_headers}
     HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
     COMPONENT_DEPENDENCIES iostreams
+    EXCLUDE hpx/include/iostreams.hpp
   )
 endif()

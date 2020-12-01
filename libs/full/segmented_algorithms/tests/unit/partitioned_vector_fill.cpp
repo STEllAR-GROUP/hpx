@@ -50,7 +50,7 @@ void verify_values(
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 void verify_vector(hpx::partitioned_vector<T> const& v, T const& val,
-    bool must_be_equal = true)
+    bool /* must_be_equal */ = true)
 {
     typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
 
@@ -109,7 +109,7 @@ void fill_algo_tests_with_policy_async(
 
 template <typename T, typename DistPolicy>
 void fill_tests_with_policy(
-    std::size_t size, std::size_t localities, DistPolicy const& policy)
+    std::size_t size, std::size_t /* localities */, DistPolicy const& policy)
 {
     using namespace hpx::execution;
 

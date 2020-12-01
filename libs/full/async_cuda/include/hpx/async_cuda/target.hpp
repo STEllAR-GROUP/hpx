@@ -19,6 +19,7 @@
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime/find_here.hpp>
@@ -118,6 +119,7 @@ namespace hpx { namespace cuda { namespace experimental {
           , locality_(locality)
 #endif
         {
+            HPX_UNUSED(locality);
         }
 #endif
 

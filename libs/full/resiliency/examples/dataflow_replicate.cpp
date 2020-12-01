@@ -45,7 +45,7 @@ int moody_add(int a, int b)
         return c;
 }
 
-int bad_add(int a, int b)
+int bad_add(int, int)
 {
     throw bad_calc_exception();
 }

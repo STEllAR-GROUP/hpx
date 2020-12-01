@@ -58,7 +58,7 @@ public:
         return value;
     }
 
-    void reinit(bool reset) override
+    void reinit(bool) override
     {
         value_count_ = std::rand() % 100;
     }

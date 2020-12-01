@@ -33,7 +33,7 @@ void is_sentinel_for()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     {
         is_sentinel_for();

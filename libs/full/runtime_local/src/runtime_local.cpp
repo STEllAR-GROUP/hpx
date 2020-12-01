@@ -334,19 +334,19 @@ namespace hpx {
       , on_stop_func_(global_on_stop_func)
       , on_error_func_(global_on_error_func)
       , result_(0)
-      , main_pool_notifier_()
+      , main_pool_notifier_(std::move(main_pool_notifier))
       , main_pool_(1, main_pool_notifier_, "main_pool")
 #ifdef HPX_HAVE_IO_POOL
-      , io_pool_notifier_(io_pool_notifier)
+      , io_pool_notifier_(std::move(io_pool_notifier))
       , io_pool_(
             rtcfg.get_thread_pool_size("io_pool"), io_pool_notifier_, "io_pool")
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
-      , timer_pool_notifier_(timer_pool_notifier)
+      , timer_pool_notifier_(std::move(timer_pool_notifier))
       , timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
             timer_pool_notifier_, "timer_pool")
 #endif
-      , notifier_(notifier)
+      , notifier_(std::move(notifier))
       , thread_manager_(new hpx::threads::threadmanager(
 #ifdef HPX_HAVE_TIMER_POOL
             timer_pool_,
@@ -578,7 +578,7 @@ namespace hpx {
         return newf;
     }
 
-    std::uint32_t runtime::get_locality_id(error_code& ec) const
+    std::uint32_t runtime::get_locality_id(error_code& /* ec */) const
     {
         return 0;
     }
@@ -590,7 +590,7 @@ namespace hpx {
     }
 
     std::uint32_t runtime::get_num_localities(
-        hpx::launch::sync_policy, error_code& ec) const
+        hpx::launch::sync_policy, error_code& /* ec */) const
     {
         return 1;
     }

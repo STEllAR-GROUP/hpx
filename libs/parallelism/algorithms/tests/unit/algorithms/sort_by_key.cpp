@@ -10,6 +10,7 @@
 #include <hpx/parallel/algorithm.hpp>
 #include <hpx/parallel/algorithms/generate.hpp>
 #include <hpx/parallel/algorithms/sort_by_key.hpp>
+#include <hpx/type_support/unused.hpp>
 //
 #include <iostream>
 #include <numeric>
@@ -37,6 +38,9 @@ namespace debug {
         std::copy(std::begin(v), std::end(v),
             std::ostream_iterator<T>(std::cout, ", "));
         std::cout << "\n";
+#else
+        HPX_UNUSED(name);
+        HPX_UNUSED(v);
 #endif
     }
 
@@ -51,6 +55,10 @@ namespace debug {
                 typename std::iterator_traits<Iter>::value_type>(
                 std::cout, ", "));
         std::cout << "\n";
+#else
+        HPX_UNUSED(name);
+        HPX_UNUSED(begin);
+        HPX_UNUSED(end);
 #endif
     }
 
@@ -117,7 +125,7 @@ void sort_by_key_benchmark()
 template <typename ExPolicy, typename Tkey, typename Tval, typename Op,
     typename HelperOp>
 void test_sort_by_key1(
-    ExPolicy&& policy, Tkey, Tval, const Op& op, const HelperOp& ho)
+    ExPolicy&& policy, Tkey, Tval, const Op&, const HelperOp&)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -170,7 +178,7 @@ void test_sort_by_key1(
 template <typename ExPolicy, typename Tkey, typename Tval, typename Op,
     typename HelperOp>
 void test_sort_by_key_async(
-    ExPolicy&& policy, Tkey, Tval, const Op& op, const HelperOp& ho)
+    ExPolicy&& policy, Tkey, Tval, const Op&, const HelperOp&)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");

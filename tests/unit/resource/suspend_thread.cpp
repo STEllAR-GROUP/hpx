@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     std::size_t const num_threads = hpx::resource::get_num_threads("default");
 

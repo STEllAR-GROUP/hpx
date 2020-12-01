@@ -33,7 +33,7 @@ namespace hpx { namespace runtime_local { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     // TODO: This is not scalable, and painful to update.
     void save_custom_exception(hpx::serialization::output_archive& ar,
-        std::exception_ptr const& ep, unsigned int version)
+        std::exception_ptr const& ep, unsigned int /* version */)
     {
         hpx::util::exception_type type(hpx::util::unknown_exception);
         std::string what;

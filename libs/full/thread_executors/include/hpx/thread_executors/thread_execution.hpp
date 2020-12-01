@@ -28,6 +28,7 @@
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/type_support/pack.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <type_traits>
@@ -178,10 +179,19 @@ namespace hpx { namespace threads {
         hpx::traits::is_threads_executor<Executor>::value,
         hpx::future<typename parallel::execution::detail::
                 bulk_then_execute_result<F, Shape, Future, Ts...>::type>>::type
-    bulk_then_execute(Executor&& exec, F&& f, Shape const& shape,
-        Future&& predecessor, Ts&&... ts)
+    bulk_then_execute(
+        Executor&& exec, F&& f, Shape const& shape, Future&& predecessor,
+        Ts&&...
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        ts
+#endif
+    )
     {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_UNUSED(exec);
+        HPX_UNUSED(f);
+        HPX_UNUSED(shape);
+        HPX_UNUSED(predecessor);
         HPX_ASSERT(false);
         return hpx::make_ready_future();
 #else

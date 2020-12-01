@@ -45,7 +45,9 @@ struct test_server
     HPX_DEFINE_COMPONENT_ACTION(test_server, call, call_action);
 
     template <typename Archive>
-    void serialize(Archive&ar, unsigned version) {}
+    void serialize(Archive&, unsigned)
+    {
+    }
 };
 
 typedef hpx::components::simple_component<test_server> server_type;

@@ -19,7 +19,7 @@
 
 namespace po = boost::program_options;
 
-int hpx_main(po::variables_map& vm)
+int hpx_main(po::variables_map&)
 {
     return hpx::finalize();
 }

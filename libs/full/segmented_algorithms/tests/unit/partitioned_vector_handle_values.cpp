@@ -110,7 +110,7 @@ void handle_values_tests_distributed_access(hpx::partitioned_vector<T>& v)
 
 template <typename T, typename DistPolicy>
 void handle_values_tests_with_policy(
-    std::size_t size, std::size_t localities, DistPolicy const& policy)
+    std::size_t size, std::size_t /* localities */, DistPolicy const& policy)
 {
     {
         hpx::partitioned_vector<T> v(size, policy);

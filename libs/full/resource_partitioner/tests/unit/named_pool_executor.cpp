@@ -34,7 +34,7 @@ void dummy_task(std::size_t n, std::string const& text)
     }
 }
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     HPX_TEST_EQ(std::size_t(4), hpx::resource::get_num_threads());
     HPX_TEST_EQ(std::size_t(4), hpx::resource::get_num_thread_pools());

@@ -325,7 +325,7 @@ namespace hpx { namespace parallel { namespace execution {
             return dataflow(
                 launch::sync,
                 [f = std::forward<F>(f), this](
-                    Future&& predecessor, Ts&&... ts) {
+                    Future&& predecessor, Ts&&... /* ts */) {
                     detail::pre_execution_then_domain_schedule<
                         typename std::decay<typename std::remove_pointer<
                             decltype(this)>::type>::type,
@@ -389,7 +389,7 @@ namespace hpx { namespace parallel { namespace execution {
                 launch::sync,
                 [f = std::forward<F>(f), this](
                     OuterFuture<hpx::tuple<InnerFutures...>>&& predecessor,
-                    Ts&&... ts) {
+                    Ts&&... /* ts */) {
                     detail::pre_execution_then_domain_schedule<
                         typename std::decay<typename std::remove_pointer<
                             decltype(this)>::type>::type,

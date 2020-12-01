@@ -19,7 +19,7 @@
 #include <utility>
 #include <vector>
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     bool run = false;
     hpx::future<void> f1 = hpx::async([&run]() { run = true; });

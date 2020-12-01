@@ -24,7 +24,7 @@ bool operator==(Elem lhs, Elem rhs)
     return lhs.value == rhs.value;
 }
 
-int main(int argc, char* argv[])
+int main()
 {
     std::vector<Elem> test{
         Elem{1, true}, Elem{3, false}, Elem{2, true}, Elem{4, false}};

@@ -77,7 +77,7 @@ void threadLoop()
     return;
 }
 
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main()
 {
     auto const current = hpx::threads::get_self_id_data()->get_scheduler_base();
     std::cout << "Scheduler is " << current->get_description() << std::endl;

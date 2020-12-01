@@ -20,7 +20,7 @@ struct vogon_exception : std::exception
 {
 };
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     try
     {
@@ -33,7 +33,7 @@ int hpx_main(int argc, char* argv[])
 
         std::atomic<std::size_t> count(0);
         hpx::for_each(hpx::execution::par.on(exec), data.begin(), data.end(),
-            [&](std::size_t i) {
+            [&](std::size_t) {
                 if (++count == 42)
                 {
                     throw vogon_exception();

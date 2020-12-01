@@ -157,7 +157,7 @@ namespace hpx { namespace detail {
     }
 
     threads::mask_cref_type get_pu_mask(
-        threads::topology& topo, std::size_t thread_num)
+        threads::topology& /* topo */, std::size_t thread_num)
     {
         auto& rp = hpx::resource::get_partitioner();
         return rp.get_pu_mask(thread_num);

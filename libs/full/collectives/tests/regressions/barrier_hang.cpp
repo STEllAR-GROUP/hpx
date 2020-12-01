@@ -28,7 +28,7 @@ struct spmd_block_helper
     std::size_t num_images_;
 
     template <typename... Ts>
-    void operator()(std::size_t image_id, Ts&&... ts) const
+    void operator()(std::size_t image_id, Ts&&...) const
     {
         // Ensure that other images reaches that point
         hpx::lcos::barrier barrier(name_ + "_barrier", num_images_, image_id);

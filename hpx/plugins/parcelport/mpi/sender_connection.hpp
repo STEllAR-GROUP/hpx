@@ -82,7 +82,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             return there_;
         }
 
-        void verify_(parcelset::locality const & parcel_locality_id) const
+        void verify_(parcelset::locality const& /* parcel_locality_id */) const
         {
         }
 

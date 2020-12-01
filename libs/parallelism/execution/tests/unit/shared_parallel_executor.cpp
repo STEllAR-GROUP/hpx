@@ -65,7 +65,7 @@ void test_async()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test(int value, hpx::thread::id tid, int passed_through)    //-V813
+void bulk_test(int, hpx::thread::id tid, int passed_through)    //-V813
 {
     HPX_TEST_NEQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -137,7 +137,7 @@ void test_async_void()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     test_sync();
     test_async();

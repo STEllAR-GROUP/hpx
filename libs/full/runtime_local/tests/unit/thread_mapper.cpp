@@ -79,7 +79,7 @@ void enumerate_threads(std::size_t num_custom_threads)
         num_custom_threads);
 }
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     enumerate_threads(0);
 

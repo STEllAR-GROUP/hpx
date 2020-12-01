@@ -79,16 +79,16 @@ struct decrement
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void do_nothing(additional_argument, std::int32_t i) {}
+void do_nothing(additional_argument, std::int32_t) {}
 
 struct do_nothing_obj
 {
-    void operator()(additional_argument, std::int32_t i) const {}
+    void operator()(additional_argument, std::int32_t) const {}
 };
 
 struct do_nothing_member
 {
-    void call(additional_argument, std::int32_t i) const {}
+    void call(additional_argument, std::int32_t) const {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////

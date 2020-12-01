@@ -31,7 +31,7 @@ bool operator==(Integer lhs, Integer rhs)
     return lhs.integer == rhs.integer;
 }
 
-int main(int argc, char* argv[])
+int main()
 {
     std::vector<int> test{1, 10, 100, 1000};
     std::vector<Integer> output(test.size());

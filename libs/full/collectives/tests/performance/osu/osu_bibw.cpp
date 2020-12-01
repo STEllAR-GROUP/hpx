@@ -44,7 +44,7 @@
 char send_buffer[SEND_BUFSIZE];
 
 ///////////////////////////////////////////////////////////////////////////////
-void isend(hpx::serialization::serialize_buffer<char> const& receive_buffer) {}
+void isend(hpx::serialization::serialize_buffer<char> const&) {}
 HPX_PLAIN_DIRECT_ACTION(isend);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ hpx::future<void> send_async(
     using hpx::execution::par;
     using hpx::execution::task;
 
-    return for_loop(par(task), 0, window_size, [dest, size](std::uint64_t j) {
+    return for_loop(par(task), 0, window_size, [dest, size](std::uint64_t) {
         // Note: The original benchmark uses MPI_Isend which does not
         //       create a copy of the passed buffer.
         isend_action send;
@@ -79,7 +79,7 @@ void recv_async(hpx::id_type dest, std::size_t size, std::size_t window_size)
     using hpx::for_loop;
     using hpx::execution::par;
 
-    for_loop(par, 0, window_size, [dest, size](std::uint64_t j) {
+    for_loop(par, 0, window_size, [dest, size](std::uint64_t) {
         irecv_action recv;
         recv(dest, size);
     });
@@ -93,7 +93,7 @@ void print_header()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void run_benchmark(hpx::program_options::variables_map& vm)
+void run_benchmark(hpx::program_options::variables_map&)
 {
     // use the first remote locality to bounce messages, if possible
     hpx::id_type here = hpx::find_here();

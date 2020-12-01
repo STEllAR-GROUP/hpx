@@ -238,9 +238,11 @@ namespace hpx { namespace parallel { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int /* version */)
         {
-            ar& num_spread_& num_tasks_;
+            // clang-format off
+            ar & num_spread_ & num_tasks_;
+            // clang-format on
         }
         /// \endcond
 
@@ -460,9 +462,11 @@ namespace hpx { namespace parallel { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int /* version */)
         {
-            ar& policy_& num_spread_& num_tasks_;
+            // clang-format off
+            ar& policy_ & num_spread_ & num_tasks_;
+            // clang-format on
         }
         /// \endcond
 

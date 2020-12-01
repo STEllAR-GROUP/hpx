@@ -22,7 +22,7 @@
 constexpr char const* scatter_basename = "/test/scatter/";
 constexpr char const* scatter_direct_basename = "/test/scatter_direct/";
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
     HPX_TEST_LTE(std::uint32_t(2), num_localities);

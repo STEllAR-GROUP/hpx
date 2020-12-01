@@ -27,8 +27,8 @@ namespace jacobi
         {}
 
         value_holder(std::size_t n, double init = 0.0)
-            : v_(n, 0.0)
-            , count_(0)
+          : v_(n, init)
+          , count_(0)
         {}
 
         double & operator[](std::size_t i)

@@ -94,7 +94,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename FwdIter, typename Op>
             static typename util::detail::algorithm_result<ExPolicy,
                 vector_type>::type
-            parallel(ExPolicy&& policy, FwdIter first, FwdIter last, Op&& op)
+            parallel(
+                ExPolicy&& /* policy */, FwdIter first, FwdIter last, Op&& op)
             {
                 typedef typename std::iterator_traits<FwdIter>::value_type
                     value_type;
@@ -143,7 +144,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_exclusive_scan_seq(ExPolicy&& policy, SegIter first,
             SegIter last, OutIter dest, T const& init, Op&& op, std::false_type,
-            Conv&& conv)
+            Conv&& /* conv */)
         {
             typedef std::vector<T> vector_type;
 
@@ -181,7 +182,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_exclusive_scan_par(ExPolicy&& policy, SegIter first,
             SegIter last, OutIter dest, T const& init, Op&& op, std::false_type,
-            Conv&& conv)
+            Conv&& /* conv */)
         {
             typedef std::vector<T> vector_type;
             return segmented_scan_par_non<

@@ -18,6 +18,7 @@
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -495,6 +496,10 @@ namespace hpx
                 std::forward<Result>(t), move_credits);
         }
 #else
+        HPX_UNUSED(id);
+        HPX_UNUSED(addr);
+        HPX_UNUSED(t);
+        HPX_UNUSED(move_credits);
         HPX_ASSERT(false);
 #endif
     }
@@ -536,6 +541,11 @@ namespace hpx
                 >(id, std::move(addr), std::forward<Result>(t), cont, move_credits);
         }
 #else
+        HPX_UNUSED(id);
+        HPX_UNUSED(addr);
+        HPX_UNUSED(t);
+        HPX_UNUSED(cont);
+        HPX_UNUSED(move_credits);
         HPX_ASSERT(false);
 #endif
     }

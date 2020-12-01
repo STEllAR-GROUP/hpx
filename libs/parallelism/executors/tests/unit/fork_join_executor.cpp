@@ -21,7 +21,7 @@
 static std::atomic<std::size_t> count{0};
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test(int value, int passed_through)    //-V813
+void bulk_test(int, int passed_through)    //-V813
 {
     ++count;
     HPX_TEST_EQ(passed_through, 42);
@@ -73,7 +73,7 @@ void test_bulk_async()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test_exception(int value, int passed_through)    //-V813
+void bulk_test_exception(int, int passed_through)    //-V813
 {
     HPX_TEST_EQ(passed_through, 42);
     throw std::runtime_error("test");
@@ -163,7 +163,7 @@ void static_check_executor()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     static_check_executor();
 

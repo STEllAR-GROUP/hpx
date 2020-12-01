@@ -52,7 +52,7 @@ struct my_mapper
 struct all_map
 {
     template <typename T>
-    int operator()(T el) const
+    int operator()(T) const
     {
         return 0;
     }
@@ -300,7 +300,7 @@ public:
     }
 
     template <typename T>
-    void operator()(T el) const
+    void operator()(T) const
     {
         ++counter_.get();
     }
@@ -593,7 +593,7 @@ static void test_strategic_container_traverse()
     // - Plain container
     {
         std::vector<int> container(100, 1);
-        auto res = map_pack([](int i) { return 2; }, std::move(container));
+        auto res = map_pack([](int) { return 2; }, std::move(container));
 
         HPX_TEST((
             std::all_of(res.begin(), res.end(), [](int i) { return i == 2; })));
@@ -608,7 +608,7 @@ static void test_strategic_container_traverse()
             container.push_back(nested);
         }
 
-        auto res = map_pack([](int i) { return 2; }, std::move(container));
+        auto res = map_pack([](int) { return 2; }, std::move(container));
         HPX_TEST((std::all_of(
             res.begin(), res.end(), [](std::list<int> const& nested) {
                 return std::all_of(
@@ -745,7 +745,7 @@ struct duplicate_mapper
 struct zero_mapper
 {
     template <typename T>
-    decltype(auto) operator()(T arg)
+    decltype(auto) operator()(T)
     {
         return hpx::util::spread_this();
     }

@@ -30,7 +30,7 @@ std::string to_string(std::int32_t i)
 }
 HPX_PLAIN_ACTION(to_string);    // defines to_string_action
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     {
         std::string result = hpx::async_continue(

@@ -35,7 +35,7 @@ void on_shutdown(std::string const& expected)
     on_shutdown_executed = true;
 }
 
-int hpx_main(hpx::program_options::variables_map& vm)
+int hpx_main()
 {
     typedef hpx::future<void> wait_for_worker;
     std::vector<wait_for_worker> futures;

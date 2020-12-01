@@ -336,7 +336,7 @@ void closed_channel_set1()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     calculate_sum();
     pingpong();

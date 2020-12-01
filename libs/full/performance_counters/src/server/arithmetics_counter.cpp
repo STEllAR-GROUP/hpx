@@ -102,7 +102,7 @@ namespace hpx { namespace performance_counters { namespace server {
 
     template <typename Operation>
     hpx::performance_counters::counter_value
-    arithmetics_counter<Operation>::get_counter_value(bool reset)
+    arithmetics_counter<Operation>::get_counter_value(bool /* reset */)
     {
         std::vector<counter_value> base_values =
             counters_.get_counter_values(hpx::launch::sync);

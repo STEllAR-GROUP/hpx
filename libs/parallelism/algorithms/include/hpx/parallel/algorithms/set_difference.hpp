@@ -223,7 +223,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 // calculate approximate destination index
                 auto f1 = [](difference_type1 idx1,
-                              difference_type2 idx2) -> difference_type1 {
+                              difference_type2 /* idx2 */) -> difference_type1 {
                     return idx1;
                 };
 

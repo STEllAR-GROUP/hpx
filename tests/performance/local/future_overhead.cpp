@@ -82,13 +82,13 @@ void print_stats(const char* title, const char* wait, const char* exec,
     //hpx::util::print_cdash_timing(title, duration);
 }
 
-const char* exec_name(hpx::execution::parallel_executor const& exec)
+const char* exec_name(hpx::execution::parallel_executor const&)
 {
     return "parallel_executor";
 }
 
 const char* exec_name(
-    hpx::parallel::execution::parallel_executor_aggregated const& exec)
+    hpx::parallel::execution::parallel_executor_aggregated const&)
 {
     return "parallel_executor_aggregated";
 }

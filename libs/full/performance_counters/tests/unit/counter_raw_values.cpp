@@ -44,7 +44,7 @@ void register_counter_type()
         "returns an array of linearly increasing counter values");
 }
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     for (int i = 0; i != 10; ++i)
     {

@@ -40,6 +40,7 @@ namespace hpx { namespace threads { namespace policies {
             std::int64_t& idle_loop_count, bool running)
         {
 #if !defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
+            HPX_UNUSED(num_thread);
             HPX_UNUSED(tm);
             HPX_UNUSED(idle_loop_count);
             HPX_UNUSED(running);    //-V601

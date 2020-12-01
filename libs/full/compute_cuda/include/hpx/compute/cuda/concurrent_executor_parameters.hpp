@@ -19,7 +19,7 @@ namespace hpx { namespace cuda { namespace experimental {
     {
         template <typename Executor, typename F>
         std::size_t get_chunk_size(
-            Executor& exec, F&&, std::size_t cores, std::size_t num_tasks)
+            Executor&, F&&, std::size_t cores, std::size_t num_tasks)
         {
             return (num_tasks + cores - 1) / cores;
         }

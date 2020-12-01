@@ -224,18 +224,19 @@ class fixed_component : public Component
     typedef detail::fixed_heap heap_type;
 
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-    static constexpr Component* create(std::size_t count)
+    static constexpr Component* create(std::size_t /* count */)
     {
         return nullptr;
     }
 
-    static constexpr void destroy(Component* p, std::size_t count = 1)
+    static constexpr void destroy(
+        Component* /* p */, std::size_t /* count */ = 1)
     {
     }
 #else
     /// \brief  The function \a create is used for allocation and
     ///         initialization of instances of the derived components.
-    static Component* create(std::size_t count)
+    static Component* create(std::size_t /* count */)
     {
         HPX_ASSERT(false);        // this shouldn't ever be called
         return nullptr;
@@ -243,7 +244,7 @@ class fixed_component : public Component
 
     /// \brief  The function \a destroy is used for destruction and
     ///         de-allocation of instances of the derived components.
-    static void destroy(Component* p, std::size_t count = 1)
+    static void destroy(Component* /* p */, std::size_t /* count */ = 1)
     {
         HPX_ASSERT(false);        // this shouldn't ever be called
     }

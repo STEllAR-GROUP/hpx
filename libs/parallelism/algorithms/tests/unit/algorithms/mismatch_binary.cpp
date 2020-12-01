@@ -348,7 +348,7 @@ void test_mismatch_binary_exception(IteratorTag)
     try
     {
         hpx::mismatch(iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), std::end(c2), [](std::size_t v1, std::size_t v2) {
+            std::begin(c2), std::end(c2), [](std::size_t, std::size_t) {
                 return throw std::runtime_error("test"), true;
             });
 
@@ -388,7 +388,7 @@ void test_mismatch_binary_exception(ExPolicy&& policy, IteratorTag)
     try
     {
         hpx::mismatch(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), std::end(c2), [](std::size_t v1, std::size_t v2) {
+            std::begin(c2), std::end(c2), [](std::size_t, std::size_t) {
                 return throw std::runtime_error("test"), true;
             });
 
@@ -424,11 +424,11 @@ void test_mismatch_binary_exception_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::mismatch(p, iterator(std::begin(c1)),
-            iterator(std::end(c1)), std::begin(c2), std::end(c2),
-            [](std::size_t v1, std::size_t v2) {
-                return throw std::runtime_error("test"), true;
-            });
+        auto f =
+            hpx::mismatch(p, iterator(std::begin(c1)), iterator(std::end(c1)),
+                std::begin(c2), std::end(c2), [](std::size_t, std::size_t) {
+                    return throw std::runtime_error("test"), true;
+                });
         returned_from_algorithm = true;
         f.get();
 
@@ -492,7 +492,7 @@ void test_mismatch_binary_bad_alloc(ExPolicy&& policy, IteratorTag)
     try
     {
         hpx::mismatch(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), std::end(c2), [](std::size_t v1, std::size_t v2) {
+            std::begin(c2), std::end(c2), [](std::size_t, std::size_t) {
                 return throw std::bad_alloc(), true;
             });
 
@@ -527,11 +527,11 @@ void test_mismatch_binary_bad_alloc_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::mismatch(p, iterator(std::begin(c1)),
-            iterator(std::end(c1)), std::begin(c2), std::end(c2),
-            [](std::size_t v1, std::size_t v2) {
-                return throw std::bad_alloc(), true;
-            });
+        auto f =
+            hpx::mismatch(p, iterator(std::begin(c1)), iterator(std::end(c1)),
+                std::begin(c2), std::end(c2), [](std::size_t, std::size_t) {
+                    return throw std::bad_alloc(), true;
+                });
         returned_from_algorithm = true;
         f.get();
 

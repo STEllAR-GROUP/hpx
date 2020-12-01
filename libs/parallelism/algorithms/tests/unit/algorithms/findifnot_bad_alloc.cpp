@@ -42,7 +42,7 @@ void test_find_if_not_bad_alloc(ExPolicy&& policy, IteratorTag)
     {
         hpx::find_if_not(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
-            decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
+            decorated_iterator(std::end(c)), [](std::size_t) { return 1; });
         HPX_TEST(false);
     }
     catch (std::bad_alloc const&)
@@ -74,7 +74,7 @@ void test_find_if_not_bad_alloc_async(ExPolicy&& p, IteratorTag)
     {
         hpx::future<decorated_iterator> f = hpx::find_if_not(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
-            decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
+            decorated_iterator(std::end(c)), [](std::size_t) { return 1; });
         returned_from_algorithm = true;
         f.get();
 

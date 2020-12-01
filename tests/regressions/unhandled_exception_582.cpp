@@ -10,7 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
 
-int hpx_main(int argc, char** argv)
+int hpx_main()
 {
     HPX_THROW_EXCEPTION(hpx::invalid_status, "hpx_main", "testing");
     return hpx::finalize();

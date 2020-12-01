@@ -660,7 +660,7 @@ void partitioned_test3()
     test_partitioned3_async(par(task));
 }
 
-int hpx_main(hpx::program_options::variables_map& vm)
+int hpx_main()
 {
     partitioned_test1();
     partitioned_test2();

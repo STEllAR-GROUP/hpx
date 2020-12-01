@@ -93,7 +93,9 @@ private:
     friend class hpx::serialization::access;
 
     template <typename Archive>
-    void serialize(Archive& ar, const unsigned int version) const {}
+    void serialize(Archive&, const unsigned int) const
+    {
+    }
 
 private:
     buffer_type data_;

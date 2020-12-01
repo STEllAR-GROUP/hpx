@@ -106,9 +106,10 @@ namespace hpx { namespace cuda { namespace experimental {
         // called. The pointer hint may be used to provide locality of
         // reference: the allocator, if supported by the implementation, will
         // attempt to allocate the new memory block as close as possible to hint.
-        pointer allocate(size_type n, const void* hint = nullptr)
+        pointer allocate(size_type n, const void* /* hint */ = nullptr)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(n);
             pointer result;
 #else
             value_type* p = nullptr;
@@ -134,6 +135,7 @@ namespace hpx { namespace cuda { namespace experimental {
         // originally produced p; otherwise, the behavior is undefined.
         void deallocate(pointer p, size_type n)
         {
+            HPX_UNUSED(n);
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
             detail::scoped_active_target active(target_);
 
@@ -145,6 +147,8 @@ namespace hpx { namespace cuda { namespace experimental {
                     std::string("cudaFree failed: ") +
                         cudaGetErrorString(error));
             }
+#else
+            HPX_UNUSED(p);
 #endif
         }
 
@@ -172,8 +176,12 @@ namespace hpx { namespace cuda { namespace experimental {
         // Constructs count objects of type T in allocated uninitialized
         // storage pointed to by p, using placement-new
         template <typename... Args>
-        HPX_HOST_DEVICE void bulk_construct(
-            pointer p, std::size_t count, Args&&... args)
+        HPX_HOST_DEVICE void bulk_construct(pointer p, std::size_t count,
+            Args&&...
+#if defined(HPX_COMPUTE_CODE)
+            args
+#endif
+        )
         {
 #if defined(HPX_COMPUTE_CODE)
             int threads_per_block = (hpx::util::min)(1024, int(count));
@@ -191,13 +199,21 @@ namespace hpx { namespace cuda { namespace experimental {
                 },
                 p.device_ptr(), count, std::forward<Args>(args)...);
             target_.synchronize();
+#else
+            HPX_UNUSED(p);
+            HPX_UNUSED(count);
 #endif
         }
 
         // Constructs an object of type T in allocated uninitialized storage
         // pointed to by p, using placement-new
         template <typename... Args>
-        HPX_HOST_DEVICE void construct(pointer p, Args&&... args)
+        HPX_HOST_DEVICE void construct(pointer p,
+            Args&&...
+#if defined(HPX_COMPUTE_HOST_CODE) || defined(HPX_COMPUTE_DEVICE_CODE)
+            args
+#endif
+        )
         {
 #if defined(HPX_COMPUTE_HOST_CODE) || defined(HPX_COMPUTE_DEVICE_CODE)
             detail::launch(
@@ -207,6 +223,8 @@ namespace hpx { namespace cuda { namespace experimental {
                 },
                 p.device_ptr(), std::forward<Args>(args)...);
             target_.synchronize();
+#else
+            HPX_UNUSED(p);
 #endif
         }
 
@@ -229,6 +247,9 @@ namespace hpx { namespace cuda { namespace experimental {
                 },
                 p.device_ptr(), count);
             target_.synchronize();
+#else
+            HPX_UNUSED(p);
+            HPX_UNUSED(count);
 #endif
         }
 

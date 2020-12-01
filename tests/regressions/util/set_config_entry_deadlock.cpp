@@ -26,7 +26,7 @@ void config_entry_callback()
     invoked_callback = true;
 }
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     std::string val = hpx::get_config_entry("hpx.config.entry.test", "");
     HPX_TEST(val.empty());

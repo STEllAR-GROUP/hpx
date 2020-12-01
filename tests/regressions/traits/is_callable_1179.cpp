@@ -29,7 +29,7 @@ struct p
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     using hpx::is_invocable_v;
     using hpx::util::invoke;

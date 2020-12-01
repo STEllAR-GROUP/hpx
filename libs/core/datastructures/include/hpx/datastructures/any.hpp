@@ -185,14 +185,14 @@ namespace hpx { namespace util { namespace detail { namespace any {
     {
         template <typename Char_>
         static std::basic_istream<Char_>& stream_in(
-            std::basic_istream<Char_>& i, void** obj)
+            std::basic_istream<Char_>& i, void** /* obj */)
         {
             return i;
         }
 
         template <typename Char_>
         static std::basic_ostream<Char_>& stream_out(
-            std::basic_ostream<Char_>& o, void* const* obj)
+            std::basic_ostream<Char_>& o, void* const* /* obj */)
         {
             return o;
         }

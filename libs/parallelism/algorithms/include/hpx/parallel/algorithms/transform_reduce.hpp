@@ -462,8 +462,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Iter2, typename T_, typename Op1, typename Op2>
-            static T sequential(ExPolicy&& policy, Iter first1, Sent last1,
-                Iter2 first2, T_ init, Op1&& op1, Op2&& op2)
+            static T sequential(ExPolicy&& /* policy */, Iter first1,
+                Sent last1, Iter2 first2, T_ init, Op1&& op1, Op2&& op2)
             {
                 if (first1 == last1)
                 {

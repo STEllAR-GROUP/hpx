@@ -12,7 +12,7 @@
 /Dockerfile
 /.dockerignore
 .ycm_extra_conf.py
-apex
+/apex
 packages
 .vscode
 .ccls-cache

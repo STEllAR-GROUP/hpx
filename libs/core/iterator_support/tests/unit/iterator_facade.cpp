@@ -102,7 +102,7 @@ public:
         return value();
     }
 
-    bool equal(input_iter const& y) const
+    bool equal(input_iter const&) const
     {
         return false;
     }

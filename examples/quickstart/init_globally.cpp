@@ -34,7 +34,7 @@
 int __argc = 0;
 char** __argv = nullptr;
 
-void set_argc_argv(int argc, char* argv[], char* env[])
+void set_argc_argv(int argc, char* argv[], char*[])
 {
     __argc = argc;
     __argv = argv;
@@ -138,7 +138,7 @@ struct manage_global_runtime
 
 protected:
     // Main HPX thread, does nothing but wait for the application to exit
-    int hpx_main(int argc, char* argv[])
+    int hpx_main(int, char*[])
     {
         // Store a pointer to the runtime here.
         rts_ = hpx::get_runtime_ptr();

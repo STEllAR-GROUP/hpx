@@ -21,6 +21,7 @@
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/debugging/backtrace.hpp>
@@ -63,7 +64,8 @@ namespace hpx { namespace threads {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_state get_thread_state(thread_id_type const& id, error_code& ec)
+    thread_state get_thread_state(
+        thread_id_type const& id, error_code& /* ec */)
     {
         return id ? get_thread_id_data(id)->get_state() :
                     thread_state(thread_schedule_state::terminated,
@@ -71,7 +73,7 @@ namespace hpx { namespace threads {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::size_t get_thread_phase(thread_id_type const& id, error_code& ec)
+    std::size_t get_thread_phase(thread_id_type const& id, error_code& /* ec */)
     {
         return id ? get_thread_id_data(id)->get_thread_phase() :
                     std::size_t(~0);
@@ -79,13 +81,14 @@ namespace hpx { namespace threads {
 
     ///////////////////////////////////////////////////////////////////////////
     threads::thread_priority get_thread_priority(
-        thread_id_type const& id, error_code& ec)
+        thread_id_type const& id, error_code& /* ec */)
     {
         return id ? get_thread_id_data(id)->get_priority() :
                     thread_priority::unknown;
     }
 
-    std::ptrdiff_t get_stack_size(thread_id_type const& id, error_code& ec)
+    std::ptrdiff_t get_stack_size(
+        thread_id_type const& id, error_code& /* ec */)
     {
         return id ? get_thread_id_data(id)->get_stack_size() :
                     static_cast<std::ptrdiff_t>(thread_stacksize::unknown);
@@ -449,6 +452,8 @@ namespace hpx { namespace this_thread {
 #endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             threads::detail::reset_lco_description desc(id, description, ec);
+#else
+            HPX_UNUSED(description);
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             threads::detail::reset_backtrace bt(id, ec);
@@ -518,6 +523,8 @@ namespace hpx { namespace this_thread {
 #endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             threads::detail::reset_lco_description desc(id, description, ec);
+#else
+            HPX_UNUSED(description);
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             threads::detail::reset_backtrace bt(id, ec);

@@ -15,11 +15,11 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 void async_callback(
-    uint64_t index, std::error_code const& ec, hpx::parcelset::parcel const& p)
+    uint64_t, std::error_code const&, hpx::parcelset::parcel const&)
 {
 }
 #else
-void async_callback(uint64_t index) {}
+void async_callback(uint64_t) {}
 #endif
 
 void func() {}

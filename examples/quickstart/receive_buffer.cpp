@@ -221,7 +221,7 @@ hpx::future<void> partition_server::do_work(std::size_t nt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     // Initial conditions: f(0, i) = i
     hpx::id_type here = hpx::find_here();

@@ -73,7 +73,7 @@ namespace hpx { namespace execution { namespace experimental {
         struct throttling_wrapper
         {
             throttling_wrapper(
-                limiting_executor& lim, BaseExecutor const& base, F&& f)
+                limiting_executor& lim, BaseExecutor const& /* base */, F&& f)
               : limiting_(lim)
               , f_(std::forward<F>(f))
             {
@@ -249,6 +249,7 @@ namespace hpx { namespace execution { namespace experimental {
         decltype(auto) bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
         {
             return hpx::parallel::execution::bulk_async_execute(executor_,
+                shape,
                 throttling_wrapper<F>(*this, executor_, std::forward<F>(f)),
                 std::forward<Ts>(ts)...);
         }
@@ -258,7 +259,7 @@ namespace hpx { namespace execution { namespace experimental {
         decltype(auto) bulk_then_execute(
             F&& f, S const& shape, Future&& predecessor, Ts&&... ts)
         {
-            return hpx::parallel::execution::bulk_then_execute(executor_,
+            return hpx::parallel::execution::bulk_then_execute(executor_, shape,
                 throttling_wrapper<F>(*this, executor_, std::forward<F>(f)),
                 std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
         }

@@ -23,7 +23,7 @@ using hpx::naming::id_type;
 using hpx::naming::get_locality_id_from_gid;
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm)
+int hpx_main()
 {
     {
         std::cout << "commands: localities, help, quit\n";

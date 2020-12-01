@@ -575,7 +575,7 @@ namespace hpx { namespace performance_counters {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         bool discover_counters(std::vector<counter_info>& counters,
-            counter_info const& info, error_code& ec)
+            counter_info const& info, error_code& /* ec */)
         {
             counters.push_back(info);
             return true;

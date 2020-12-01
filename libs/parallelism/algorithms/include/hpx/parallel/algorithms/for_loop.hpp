@@ -926,8 +926,8 @@ namespace hpx {
                 template <typename ExPolicy, typename InIter, typename Size,
                     typename S, typename F, typename... Args>
                 HPX_HOST_DEVICE static hpx::util::unused_type sequential(
-                    ExPolicy policy, InIter first, Size size, S stride, F&& f,
-                    Args&&... args)
+                    ExPolicy /* policy */, InIter first, Size size, S stride,
+                    F&& f, Args&&... args)
                 {
                     std::size_t part_index = 0;
                     int const init_sequencer[] = {

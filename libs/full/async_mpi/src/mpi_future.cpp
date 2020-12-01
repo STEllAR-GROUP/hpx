@@ -57,7 +57,7 @@ namespace hpx { namespace mpi { namespace experimental {
         }
 
         // stream operator to display debug mpi_info
-        HPX_EXPORT std::ostream& operator<<(std::ostream& os, mpi_info const& i)
+        HPX_EXPORT std::ostream& operator<<(std::ostream& os, mpi_info const&)
         {
             os << "R " << debug::dec<3>(get_mpi_info().rank_) << "/"
                << debug::dec<3>(get_mpi_info().size_);

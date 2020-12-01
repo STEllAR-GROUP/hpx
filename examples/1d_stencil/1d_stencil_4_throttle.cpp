@@ -76,7 +76,7 @@ void setup_counters()
     counters_initialized = true;
 }
 
-bool test_function(apex_context const& context)
+bool test_function(apex_context const&)
 {
     if (!counters_initialized)
         return false;

@@ -20,7 +20,7 @@ hpx::future<double> foo()
 
 HPX_DEFINE_PLAIN_ACTION(foo);
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     hpx::future<hpx::future<double>> f =
         hpx::dataflow(foo_action(), hpx::find_here());

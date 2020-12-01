@@ -31,14 +31,14 @@ namespace hpx { namespace util {
 
         template <typename T, std::size_t N>
         HPX_HOST_DEVICE constexpr HPX_FORCEINLINE std::size_t size_impl(
-            T const (&array)[N], long) noexcept
+            T const (&)[N], long) noexcept
         {
             return N;
         }
 
         template <typename T, std::size_t N>
         HPX_HOST_DEVICE constexpr HPX_FORCEINLINE bool empty_impl(
-            T const (&array)[N], long) noexcept
+            T const (&)[N], long) noexcept
         {
             return false;
         }

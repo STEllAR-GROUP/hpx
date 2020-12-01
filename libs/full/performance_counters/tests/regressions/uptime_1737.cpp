@@ -15,7 +15,7 @@
 
 #include <chrono>
 
-int hpx_main(int argc, char** argv)
+int hpx_main()
 {
     using hpx::performance_counters::performance_counter;
 

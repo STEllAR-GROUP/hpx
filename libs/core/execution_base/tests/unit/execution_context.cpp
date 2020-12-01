@@ -38,20 +38,17 @@ struct dummy_agent : hpx::execution_base::agent_base
         return context_;
     }
 
-    void yield(char const* desc) override
+    void yield(char const*) override
     {
         ++dummy_called;
     }
-    void yield_k(std::size_t k, char const* desc) override {}
-    void suspend(char const* desc) override {}
-    void resume(char const* desc) override {}
-    void abort(char const* desc) override {}
-    void sleep_for(hpx::chrono::steady_duration const& sleep_duration,
-        char const* desc) override
-    {
-    }
-    void sleep_until(hpx::chrono::steady_time_point const& sleep_time,
-        char const* desc) override
+    void yield_k(std::size_t, char const*) override {}
+    void suspend(char const*) override {}
+    void resume(char const*) override {}
+    void abort(char const*) override {}
+    void sleep_for(hpx::chrono::steady_duration const&, char const*) override {}
+    void sleep_until(
+        hpx::chrono::steady_time_point const&, char const*) override
     {
     }
 

@@ -41,7 +41,7 @@ generate_parcel(hpx::id_type const& dest_id, hpx::id_type const& cont, T && data
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::id_type test1(std::vector<double> const& data)
+hpx::id_type test1(std::vector<double> const&)
 {
     return hpx::find_here();
 }
@@ -81,7 +81,7 @@ void test_plain_argument(hpx::id_type const& id)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::id_type test2(hpx::future<double> const& data)
+hpx::id_type test2(hpx::future<double> const&)
 {
     return hpx::find_here();
 }

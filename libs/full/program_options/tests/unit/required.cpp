@@ -135,7 +135,7 @@ constexpr char const config_file_content[] = R"(
 cfgfile = file.cfg
 )";
 
-int main(int argc, char* argv[])
+int main()
 {
     required_throw_test();
     multiname_required_test();

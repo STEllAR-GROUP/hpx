@@ -18,7 +18,7 @@
 
 unsigned long num_cores = 0;
 
-int hpx_main(int argc, char ** argv)
+int hpx_main()
 {
     std::size_t const os_threads = hpx::get_os_thread_count();
 

@@ -41,7 +41,7 @@ int hpx_main()
 
         // Do some work, once we have acquired resources
         hpx::shared_future<int> result = target.then(
-            [](hpx::shared_future<locality_id_t> t) -> hpx::shared_future<int> {
+            [](hpx::shared_future<locality_id_t>) -> hpx::shared_future<int> {
                 --count;
                 return hpx::make_ready_future(0);
             });

@@ -204,7 +204,7 @@ void function_objects()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     {
         nullary_function();

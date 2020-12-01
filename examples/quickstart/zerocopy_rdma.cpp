@@ -6,8 +6,9 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_main.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <hpx/serialization.hpp>
 
@@ -49,15 +50,18 @@ public:
     pointer address(reference value) const { return &value; }
     const_pointer address(const_reference value) const { return &value; }
 
-    pointer allocate(size_type n, void const* hint = nullptr)
+    pointer allocate(size_type n, void const* = nullptr)
     {
         HPX_ASSERT(n == size_);
+        HPX_UNUSED(n);
         return static_cast<T*>(pointer_);
     }
 
     void deallocate(pointer p, size_type n)
     {
         HPX_ASSERT(p == pointer_ && n == size_);
+        HPX_UNUSED(p);
+        HPX_UNUSED(n);
     }
 
 private:
@@ -65,7 +69,7 @@ private:
     friend class hpx::serialization::access;
 
     template <typename Archive>
-    void load(Archive& ar, unsigned int const version)
+    void load(Archive& ar, unsigned int const)
     {
         std::size_t t = 0;
         ar >> size_ >> t;
@@ -73,7 +77,7 @@ private:
     }
 
     template <typename Archive>
-    void save(Archive& ar, unsigned int const version) const
+    void save(Archive& ar, unsigned int const) const
     {
         std::size_t t = reinterpret_cast<std::size_t>(pointer_);
         ar << size_ << t;
@@ -211,7 +215,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 

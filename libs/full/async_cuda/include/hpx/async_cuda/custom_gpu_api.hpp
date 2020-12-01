@@ -13,8 +13,10 @@
 
     #if defined(__clang__)
     #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdeprecated-copy"
     #pragma clang diagnostic ignored "-Wdouble-promotion"
     #pragma clang diagnostic ignored "-Wsign-compare"
+    #pragma clang diagnostic ignored "-Wunused-parameter"
     #pragma clang diagnostic ignored "-Wunused-variable"
     #endif
 

@@ -165,7 +165,7 @@ void tagged_tuple_test()
     }
 }
 
-int main(int argc, char* argv[])
+int main()
 {
     tagged_pair_test();
     tagged_tuple_test();

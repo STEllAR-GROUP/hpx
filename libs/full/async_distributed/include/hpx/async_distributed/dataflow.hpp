@@ -63,7 +63,7 @@ namespace hpx { namespace lcos { namespace detail {
         HPX_FORCEINLINE static decltype(auto) call(Allocator const& alloc,
             Policy_&& policy,
             hpx::actions::basic_action<Component, Signature, Derived> const&
-                act,
+            /* act */,
             naming::id_type const& id, Ts&&... ts)
         {
             return detail::create_dataflow_alloc(alloc,

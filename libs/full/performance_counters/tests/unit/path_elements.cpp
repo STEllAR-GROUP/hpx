@@ -528,7 +528,7 @@ namespace test {
     }
 }    // namespace test
 
-int hpx_main(hpx::program_options::variables_map& vm)
+int hpx_main()
 {
     {
         test::good();

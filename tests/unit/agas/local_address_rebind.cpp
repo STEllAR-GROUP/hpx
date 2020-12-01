@@ -32,7 +32,7 @@ using hpx::naming::address;
 using hpx::util::report_errors;
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm)
+int hpx_main()
 {
     {
         hpx::test::simple_mobile_object a =

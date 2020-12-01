@@ -21,7 +21,7 @@
 constexpr char const* broadcast_basename = "/test/broadcast/";
 constexpr char const* broadcast_direct_basename = "/test/broadcast_direct/";
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
     HPX_TEST_LTE(std::uint32_t(2), num_localities);

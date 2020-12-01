@@ -16,7 +16,7 @@
 // separate translation unit to ensure the linker can pick or ignore this
 // function, depending on whether the main executable defines this symbol
 // or not.
-int hpx_startup::user_main(int argc, char** argv)
+int hpx_startup::user_main(int /* argc */, char** /* argv */)
 {
     // If we have seen unknown command line options we can throw here as we
     // know that the user is not going to look at the arguments.

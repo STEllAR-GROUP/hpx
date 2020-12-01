@@ -167,11 +167,11 @@ struct foo
 };
 
 template <typename Archive>
-void serialize(Archive & ar, foo & f, unsigned)
+void serialize(Archive&, foo&, unsigned)
 {}
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm)
+int hpx_main()
 {
     {
         {

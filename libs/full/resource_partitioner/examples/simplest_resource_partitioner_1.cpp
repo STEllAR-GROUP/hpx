@@ -11,7 +11,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     return hpx::finalize();
 }

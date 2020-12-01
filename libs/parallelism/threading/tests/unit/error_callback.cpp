@@ -15,14 +15,14 @@
 std::atomic<std::size_t> count_error_handler(0);
 
 ///////////////////////////////////////////////////////////////////////////////
-bool on_thread_error(std::size_t num, std::exception_ptr const& e)
+bool on_thread_error(std::size_t, std::exception_ptr const&)
 {
     ++count_error_handler;
     return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     HPX_THROW_EXCEPTION(hpx::invalid_status, "test", "test");
     return hpx::finalize();

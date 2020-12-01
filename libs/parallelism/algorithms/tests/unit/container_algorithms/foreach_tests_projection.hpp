@@ -109,7 +109,7 @@ void test_for_each_async(ExPolicy&& p, IteratorTag, Proj&& proj)
 struct counter_exception
 {
     std::size_t count = 0;
-    void operator()(std::size_t v)
+    void operator()(std::size_t)
     {
         ++count;
         throw std::runtime_error("test");
@@ -167,7 +167,7 @@ void test_for_each_exception(ExPolicy policy, IteratorTag, Proj&& proj)
             policy,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
-            [](std::size_t v) { throw std::runtime_error("test"); }, proj);
+            [](std::size_t) { throw std::runtime_error("test"); }, proj);
 
         HPX_TEST(false);
     }
@@ -201,7 +201,7 @@ void test_for_each_exception_async(ExPolicy p, IteratorTag, Proj&& proj)
             p,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
-            [](std::size_t v) { throw std::runtime_error("test"); }, proj);
+            [](std::size_t) { throw std::runtime_error("test"); }, proj);
         returned_from_algorithm = true;
         f.get();
 
@@ -225,7 +225,7 @@ void test_for_each_exception_async(ExPolicy p, IteratorTag, Proj&& proj)
 struct counter_bad_alloc
 {
     std::size_t count = 0;
-    void operator()(std::size_t v)
+    void operator()(std::size_t)
     {
         ++count;
         throw std::bad_alloc();
@@ -283,7 +283,7 @@ void test_for_each_bad_alloc(ExPolicy policy, IteratorTag, Proj&& proj)
             policy,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
-            [](std::size_t v) { throw std::bad_alloc(); }, proj);
+            [](std::size_t) { throw std::bad_alloc(); }, proj);
 
         HPX_TEST(false);
     }
@@ -316,7 +316,7 @@ void test_for_each_bad_alloc_async(ExPolicy p, IteratorTag, Proj&& proj)
             p,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
-            [](std::size_t v) { throw std::bad_alloc(); }, proj);
+            [](std::size_t) { throw std::bad_alloc(); }, proj);
         returned_from_algorithm = true;
         f.get();
 

@@ -152,7 +152,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         /// message header.
         template <typename Handler>
         void handle_read_header(std::error_code const& e,
-            std::size_t bytes_transferred, Handler handler)
+            std::size_t /* bytes_transferred */, Handler handler)
         {
             HPX_ASSERT(operation_in_flight_ == 0);
             if (e) {

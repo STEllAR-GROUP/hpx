@@ -452,7 +452,7 @@ void test_includes_exception(IteratorTag)
     try
     {
         hpx::includes(iterator(std::begin(c1)), iterator(std::end(c1)),
-            start_it, end_it, [](std::size_t v1, std::size_t v2) {
+            start_it, end_it, [](std::size_t, std::size_t) {
                 return throw std::runtime_error("test"), true;
             });
 
@@ -504,7 +504,7 @@ void test_includes_exception(ExPolicy&& policy, IteratorTag)
     try
     {
         hpx::includes(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
-            start_it, end_it, [](std::size_t v1, std::size_t v2) {
+            start_it, end_it, [](std::size_t, std::size_t) {
                 return throw std::runtime_error("test"), true;
             });
 
@@ -554,7 +554,7 @@ void test_includes_exception_async(ExPolicy&& p, IteratorTag)
     {
         hpx::future<bool> f =
             hpx::includes(p, iterator(std::begin(c1)), iterator(std::end(c1)),
-                start_it, end_it, [](std::size_t v1, std::size_t v2) {
+                start_it, end_it, [](std::size_t, std::size_t) {
                     return throw std::runtime_error("test"), true;
                 });
         returned_from_algorithm = true;
@@ -629,7 +629,7 @@ void test_includes_bad_alloc(IteratorTag)
     try
     {
         hpx::includes(iterator(std::begin(c1)), iterator(std::end(c1)),
-            start_it, end_it, [](std::size_t v1, std::size_t v2) {
+            start_it, end_it, [](std::size_t, std::size_t) {
                 return throw std::bad_alloc(), true;
             });
 
@@ -679,7 +679,7 @@ void test_includes_bad_alloc(ExPolicy&& policy, IteratorTag)
     try
     {
         hpx::includes(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
-            start_it, end_it, [](std::size_t v1, std::size_t v2) {
+            start_it, end_it, [](std::size_t, std::size_t) {
                 return throw std::bad_alloc(), true;
             });
 
@@ -728,7 +728,7 @@ void test_includes_bad_alloc_async(ExPolicy&& p, IteratorTag)
     {
         hpx::future<bool> f =
             hpx::includes(p, iterator(std::begin(c1)), iterator(std::end(c1)),
-                start_it, end_it, [](std::size_t v1, std::size_t v2) {
+                start_it, end_it, [](std::size_t, std::size_t) {
                     return throw std::bad_alloc(), true;
                 });
         returned_from_algorithm = true;

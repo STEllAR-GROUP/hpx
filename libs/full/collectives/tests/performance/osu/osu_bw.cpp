@@ -51,7 +51,7 @@ unsigned long getpagesize()
 #define MAX_ALIGNMENT 65536
 
 ///////////////////////////////////////////////////////////////////////////////
-void isend(hpx::serialization::serialize_buffer<char> const& receive_buffer) {}
+void isend(hpx::serialization::serialize_buffer<char> const&) {}
 HPX_PLAIN_ACTION(isend);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t loop, std::size_t size,
         std::size_t const start = 0;
 
         auto range = boost::irange(start, window_size);
-        for_each(par, range, [&](std::uint64_t j) {
+        for_each(par, range, [&](std::uint64_t) {
             send(dest,
                 buffer_type(send_buffer.get(), size, buffer_type::reference));
         });

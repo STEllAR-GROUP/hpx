@@ -91,8 +91,8 @@ namespace hpx { namespace util {
     int mpi_environment::is_initialized_ = -1;
 
     ///////////////////////////////////////////////////////////////////////////
-    int mpi_environment::init(int* argc, char*** argv, const int required,
-        const int minimal, int& provided)
+    int mpi_environment::init(
+        int*, char***, const int required, const int minimal, int& provided)
     {
         has_called_init_ = false;
 

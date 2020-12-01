@@ -103,7 +103,7 @@ namespace hpx { namespace traits
     };
 }}
 
-int main(int argc, char* argv[])
+int main()
 {
     std::size_t size = 0;
     std::vector<double> os;

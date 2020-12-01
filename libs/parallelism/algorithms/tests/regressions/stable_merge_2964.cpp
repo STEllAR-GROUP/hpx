@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
     return hpx::init(argc, argv, init_args);
 }
 
-int hpx_main(int argc, char** argv)
+int hpx_main()
 {
     using ElemType = std::tuple<int, char>;
 

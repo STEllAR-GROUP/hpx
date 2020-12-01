@@ -149,8 +149,7 @@ namespace tests {
     }
 
     template <typename Iterator, typename T>
-    void readable_iterator_traversal_test(
-        const Iterator i1, T v, std::false_type)
+    void readable_iterator_traversal_test(const Iterator, T, std::false_type)
     {
     }
 
@@ -440,8 +439,7 @@ namespace tests {
     }
 
     template <class Iterator, class T>
-    void writable_iterator_traversal_test(
-        const Iterator i1, T v, std::false_type)
+    void writable_iterator_traversal_test(const Iterator, T, std::false_type)
     {
     }
 

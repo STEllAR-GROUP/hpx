@@ -103,7 +103,7 @@ void test()
     std::cout << "all done " << rank << "\n";
 }
 
-int hpx_main(int argc, char **argv)
+int hpx_main()
 {
     // this test must run using 2 localities
     HPX_TEST_EQ(hpx::get_num_localities().get(), 2u);

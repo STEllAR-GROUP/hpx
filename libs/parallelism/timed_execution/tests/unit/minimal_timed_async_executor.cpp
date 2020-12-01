@@ -273,7 +273,7 @@ namespace hpx { namespace parallel { namespace execution {
 }}}    // namespace hpx::parallel::execution
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     test_timed_executor<test_async_executor1>({{0, 0, 6, 0, 0, 0}});
     test_timed_executor<test_timed_async_executor1>({{0, 0, 4, 0, 0, 2}});

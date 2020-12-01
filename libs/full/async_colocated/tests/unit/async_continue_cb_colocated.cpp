@@ -66,7 +66,7 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 std::atomic<int> callback_called(0);
 
 #if defined(HPX_HAVE_NETWORKING)
-void cb(std::error_code const& ec, hpx::parcelset::parcel const& p)
+void cb(std::error_code const&, hpx::parcelset::parcel const&)
 {
     ++callback_called;
 }

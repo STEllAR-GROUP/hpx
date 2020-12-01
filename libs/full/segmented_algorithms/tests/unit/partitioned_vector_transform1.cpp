@@ -54,16 +54,18 @@ struct cmp
     T value_;
 
     template <typename Archive>
-    void serialize(Archive& ar, unsigned version)
+    void serialize(Archive& ar, unsigned)
     {
-        ar& value_;
+        // clang-format off
+        ar & value_;
+        // clang-format on
     }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename T, typename U = T>
 void verify_values(
-    ExPolicy&& policy, hpx::partitioned_vector<T> const& v, U const& val)
+    ExPolicy&&, hpx::partitioned_vector<T> const& v, U const& val)
 {
     typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
 

@@ -100,9 +100,11 @@ struct sub_block
         return data_[i];
     }
 
-    void load(hpx::serialization::input_archive& ar, unsigned version)
+    void load(hpx::serialization::input_archive& ar, unsigned)
     {
-        ar& size_;
+        // clang-format off
+        ar & size_;
+        // clang-format on
         if (size_ > 0)
         {
             data_ = new double[size_];
@@ -112,9 +114,11 @@ struct sub_block
         }
     }
 
-    void save(hpx::serialization::output_archive& ar, unsigned version) const
+    void save(hpx::serialization::output_archive& ar, unsigned) const
     {
-        ar& size_;
+        // clang-format off
+        ar & size_;
+        // clang-format on
         if (size_ > 0)
         {
             hpx::serialization::array<double> arr(data_, size_);
@@ -159,7 +163,8 @@ struct block : hpx::components::client_base<block, block_component>
     {
     }
 
-    block(std::uint64_t id, std::uint64_t size, const char* base_name)
+    block(
+        std::uint64_t /* id */, std::uint64_t size, const char* /* base_name */)
       : base_type(hpx::new_<block_component>(hpx::find_here(), size))
     {
     }

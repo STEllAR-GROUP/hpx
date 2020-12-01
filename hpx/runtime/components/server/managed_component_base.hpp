@@ -46,8 +46,8 @@ namespace hpx { namespace components
         struct init<traits::construct_with_back_ptr>
         {
             template <typename Component, typename Managed>
-            static constexpr void call(Component* component,
-                Managed* this_)
+            static constexpr void call(
+                Component* /* component */, Managed* /* this_ */)
             {
             }
 

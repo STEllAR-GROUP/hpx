@@ -95,7 +95,7 @@ namespace hpx { namespace compute { namespace traits {
         {
             template <typename Allocator>
             HPX_HOST_DEVICE static compute::host::target call(
-                hpx::traits::detail::wrap_int, Allocator const& alloc)
+                hpx::traits::detail::wrap_int, Allocator const& /* alloc */)
             {
                 return compute::host::target();
             }

@@ -36,7 +36,7 @@ void test_for_each_n_bad_alloc_seq(IteratorTag)
     try
     {
         hpx::for_each_n(iterator(std::begin(c)), c.size(),
-            [](std::size_t& v) { throw std::bad_alloc(); });
+            [](std::size_t&) { throw std::bad_alloc(); });
 
         HPX_TEST(false);
     }
@@ -68,7 +68,7 @@ void test_for_each_n_bad_alloc(ExPolicy policy, IteratorTag)
     try
     {
         hpx::for_each_n(policy, iterator(std::begin(c)), c.size(),
-            [](std::size_t& v) { throw std::bad_alloc(); });
+            [](std::size_t&) { throw std::bad_alloc(); });
 
         HPX_TEST(false);
     }
@@ -98,7 +98,7 @@ void test_for_each_n_bad_alloc_async(ExPolicy p, IteratorTag)
     try
     {
         hpx::future<iterator> f = hpx::for_each_n(p, iterator(std::begin(c)),
-            c.size(), [](std::size_t& v) { throw std::bad_alloc(); });
+            c.size(), [](std::size_t&) { throw std::bad_alloc(); });
         returned_from_algorithm = true;
         f.get();    // rethrow bad_alloc
 

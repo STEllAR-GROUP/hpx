@@ -62,7 +62,7 @@ void test_timed_apply()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     test_timed_sync();
     test_timed_async();

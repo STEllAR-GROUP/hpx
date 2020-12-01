@@ -447,7 +447,7 @@ namespace hpx { namespace threads { namespace policies {
         /// Schedule the passed thread
         void schedule_thread(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint, bool allow_fallback,
-            thread_priority priority = thread_priority::normal) override
+            thread_priority /* priority */ = thread_priority::normal) override
         {
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread = std::size_t(-1);
@@ -482,7 +482,7 @@ namespace hpx { namespace threads { namespace policies {
 
         void schedule_thread_last(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint, bool allow_fallback,
-            thread_priority priority = thread_priority::normal) override
+            thread_priority /* priority */ = thread_priority::normal) override
         {
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread = std::size_t(-1);
@@ -548,7 +548,7 @@ namespace hpx { namespace threads { namespace policies {
             thread_schedule_state state = thread_schedule_state::unknown,
             thread_priority priority = thread_priority::default_,
             std::size_t num_thread = std::size_t(-1),
-            bool reset = false) const override
+            bool /* reset */ = false) const override
         {
             // Return thread count of one specific queue.
             std::int64_t count = 0;
@@ -686,7 +686,7 @@ namespace hpx { namespace threads { namespace policies {
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count, bool /*enable_stealing*/,
+            std::int64_t& idle_loop_count, bool /* enable_stealing */,
             std::size_t& added) override
         {
             std::size_t queues_size = queues_.size();
@@ -842,6 +842,8 @@ namespace hpx { namespace threads { namespace policies {
                     }
                 }
             }
+#else
+            HPX_UNUSED(idle_loop_count);
 #endif
 
             return result;

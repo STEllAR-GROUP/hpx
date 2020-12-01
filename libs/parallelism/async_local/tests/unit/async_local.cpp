@@ -44,16 +44,16 @@ struct decrement
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void do_nothing(std::int32_t i) {}
+void do_nothing(std::int32_t) {}
 
 struct do_nothing_obj
 {
-    void operator()(std::int32_t i) const {}
+    void operator()(std::int32_t) const {}
 };
 
 struct do_nothing_member
 {
-    void call(std::int32_t i) const {}
+    void call(std::int32_t) const {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////

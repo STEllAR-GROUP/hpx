@@ -169,9 +169,11 @@ struct test_server
         test_server, lazy_get_client, lazy_get_client_action);
 
     template <typename Archive>
-    void serialize(Archive& ar, unsigned version)
+    void serialize(Archive& ar, unsigned)
     {
+        // clang-format off
         ar & data_;
+        // clang-format on
     }
 
 private:

@@ -26,7 +26,7 @@ using hpx::threads::set_thread_state;
 using hpx::chrono::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm)
+int hpx_main()
 {
     {
         std::cout << "waiting for 5 seconds\n";

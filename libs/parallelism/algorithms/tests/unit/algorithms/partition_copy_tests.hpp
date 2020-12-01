@@ -374,14 +374,14 @@ void test_partition_copy()
     ////////// Corner test cases.
     test_partition_copy(
         par, IteratorTag(), int(),
-        [rand_base](const int n) -> bool {
+        [rand_base](const int) -> bool {
             HPX_UNUSED(rand_base);
             return true;
         },
         rand_base);
     test_partition_copy(
         par_unseq, IteratorTag(), user_defined_type(),
-        [rand_base](user_defined_type const& t) -> bool {
+        [rand_base](user_defined_type const&) -> bool {
             HPX_UNUSED(rand_base);
             return false;
         },

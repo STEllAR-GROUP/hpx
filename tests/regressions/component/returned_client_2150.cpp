@@ -44,7 +44,7 @@ hpx::future<hpx::id_type> get_future_id()
 
 HPX_PLAIN_ACTION(get_future_id, get_future_id_action);
 
-int hpx_main(int, char*[])
+int hpx_main()
 {
     {
         auto result1 = get_foo_action()(hpx::find_here());

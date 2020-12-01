@@ -33,11 +33,13 @@ class FracInfo
   private:
     friend class hpx::serialization::access;
     template <class Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    void serialize(Archive& ar, const unsigned int)
     {
+        // clang-format off
         ar & x0;
         ar & y0;
         ar & max_iteration;
+        // clang-format on
     }
 };
 

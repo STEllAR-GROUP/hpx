@@ -48,7 +48,7 @@ int thread_func(int i, hpx::lcos::local::channel_mpsc<int>& channel,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
     std::vector<hpx::lcos::local::channel_mpsc<int>> channels;
     channels.reserve(NUM_WORKERS);
