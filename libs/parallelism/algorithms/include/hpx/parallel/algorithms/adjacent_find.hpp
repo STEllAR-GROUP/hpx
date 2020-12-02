@@ -144,36 +144,36 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // adjacent_find
     namespace detail {
         /// \cond NOINTERNAL
-        template <typename Iter>
+        template <typename Iter, typename Sent>
         struct adjacent_find
-          : public detail::algorithm<adjacent_find<Iter>, Iter>
+          : public detail::algorithm<adjacent_find<Iter, Sent>, Iter>
         {
             adjacent_find()
               : adjacent_find::algorithm("adjacent_find")
             {
             }
 
-            template <typename ExPolicy, typename InIter, typename Pred,
-                typename Proj>
+            template <typename ExPolicy, typename InIter, typename Sent_,
+                typename Pred, typename Proj>
             static InIter sequential(
-                ExPolicy, InIter first, InIter last, Pred&& pred, Proj&& proj)
+                ExPolicy, InIter first, Sent_ last, Pred&& pred, Proj&& proj)
             {
                 return std::adjacent_find(first, last,
                     util::invoke_projected<Pred, Proj>(
                         std::forward<Pred>(pred), std::forward<Proj>(proj)));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename Pred,
-                typename Proj>
+            template <typename ExPolicy, typename FwdIter, typename Sent_,
+                typename Pred, typename Proj>
             static
                 typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-                parallel(ExPolicy&& policy, FwdIter first, FwdIter last,
+                parallel(ExPolicy&& policy, FwdIter first, Sent_ last,
                     Pred&& pred, Proj&& proj)
             {
-                typedef hpx::util::zip_iterator<FwdIter, FwdIter> zip_iterator;
-                typedef typename zip_iterator::reference reference;
-                typedef typename std::iterator_traits<FwdIter>::difference_type
-                    difference_type;
+                using zip_iterator = hpx::util::zip_iterator<FwdIter, FwdIter>;
+                using reference = typename zip_iterator::reference;
+                using difference_type =
+                    typename std::iterator_traits<FwdIter>::difference_type;
 
                 if (first == last)
                 {
@@ -218,21 +218,23 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::move(f1), std::move(f2));
             }
         };
-        template <typename ExPolicy, typename FwdIter, typename Pred,
-            typename Proj>
+
+        template <typename ExPolicy, typename FwdIter, typename Sent,
+            typename Pred, typename Proj>
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        adjacent_find_(ExPolicy&& policy, FwdIter first, FwdIter last,
-            Pred&& pred, Proj&& proj, std::false_type)
+        adjacent_find_(ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred,
+            Proj&& proj, std::false_type)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least a forward iterator");
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-            return detail::adjacent_find<FwdIter>().call(
+            return detail::adjacent_find<FwdIter, Sent>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last,
                 std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
+
         template <typename ExPolicy, typename FwdIter, typename Pred,
             typename Proj>
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type

@@ -283,29 +283,30 @@ namespace hpx { namespace parallel { inline namespace v1 {
         adjacent_find_(ExPolicy&& policy, FwdIter first, FwdIter last,
             Pred&& pred, Proj&& proj, std::true_type)
         {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-            typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+            using result = util::detail::algorithm_result<ExPolicy, FwdIter>;
 
             if (first == last)
             {
                 return result::get(std::move(last));
             }
 
-            typedef hpx::traits::segmented_iterator_traits<FwdIter>
-                iterator_traits;
+            using iterator_traits =
+                hpx::traits::segmented_iterator_traits<FwdIter>;
 
             return segmented_adjacent_find(
-                adjacent_find<typename iterator_traits::local_iterator>(),
+                adjacent_find<typename iterator_traits::local_iterator,
+                    typename iterator_traits::local_iterator>(),
                 std::forward<ExPolicy>(policy), first, last,
                 std::forward<Pred>(pred), std::forward<Proj>(proj), is_seq());
         }
 
         // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename FwdIter, typename Pred,
-            typename Proj>
+        template <typename ExPolicy, typename FwdIter, typename Sent,
+            typename Pred, typename Proj>
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        adjacent_find_(ExPolicy&& policy, FwdIter first, FwdIter last,
-            Pred&& pred, Proj&& proj, std::false_type);
+        adjacent_find_(ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred,
+            Proj&& proj, std::false_type);
         /// \endcond
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1
