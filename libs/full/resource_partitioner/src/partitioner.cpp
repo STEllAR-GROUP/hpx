@@ -9,8 +9,6 @@
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 
-#include <hpx/modules/program_options.hpp>
-
 #include <cstddef>
 #include <memory>
 #include <mutex>

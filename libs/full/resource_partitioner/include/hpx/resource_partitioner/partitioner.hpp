@@ -14,8 +14,6 @@
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 
-#include <hpx/modules/program_options.hpp>
-
 #include <cstddef>
 #include <memory>
 #include <string>

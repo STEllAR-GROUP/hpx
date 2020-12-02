@@ -10,7 +10,6 @@
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/modules/program_options.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>

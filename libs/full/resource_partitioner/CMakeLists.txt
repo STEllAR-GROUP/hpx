@@ -39,7 +39,7 @@ add_hpx_module(
   HEADERS ${resource_partitioner_headers}
   COMPAT_HEADERS ${resource_partitioner_compat_headers}
   DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES hpx_command_line_handling hpx_program_options
-                      hpx_runtime_configuration ${MPI_DEPS}
+  MODULE_DEPENDENCIES hpx_command_line_handling hpx_runtime_configuration
+                      ${MPI_DEPS}
   CMAKE_SUBDIRS examples tests
 )
