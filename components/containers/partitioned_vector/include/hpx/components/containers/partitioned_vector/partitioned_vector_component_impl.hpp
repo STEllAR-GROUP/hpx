@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -18,7 +19,7 @@
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/runtime/get_ptr.hpp>
-#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>
 
@@ -401,6 +402,8 @@ namespace hpx
             this->get_id(), n, val);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(n);
+        HPX_UNUSED(val);
         return hpx::make_ready_future();
 #endif
     }
@@ -423,6 +426,7 @@ namespace hpx
             this->get_id(), pos);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(pos);
         return hpx::future<T>{};
 #endif
     }
@@ -446,6 +450,7 @@ namespace hpx
             this->get_id(), pos);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(pos);
         return hpx::make_ready_future(std::vector<T>{});
 #endif
     }
@@ -476,6 +481,8 @@ namespace hpx
             this->get_id(), pos, std::move(val));
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(pos);
+        HPX_UNUSED(val);
         return hpx::make_ready_future();
 #endif
     }
@@ -490,6 +497,8 @@ namespace hpx
             this->get_id(), pos, val);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(pos);
+        HPX_UNUSED(val);
         return hpx::make_ready_future();
 #endif
     }
@@ -513,6 +522,8 @@ namespace hpx
             this->get_id(), pos, val);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(pos);
+        HPX_UNUSED(val);
         return hpx::make_ready_future();
 #endif
     }
@@ -561,6 +572,7 @@ namespace hpx
             this->get_id(), std::move(other));
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(other);
         return hpx::make_ready_future();
 #endif
     }

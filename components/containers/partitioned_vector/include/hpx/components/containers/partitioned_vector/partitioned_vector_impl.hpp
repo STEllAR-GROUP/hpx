@@ -22,6 +22,7 @@
 #include <hpx/runtime/components/server/distributed_metadata_base.hpp>
 #include <hpx/runtime/get_ptr.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>
@@ -107,6 +108,7 @@ namespace hpx
             });
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(id);
         return hpx::make_ready_future();
 #endif
     }

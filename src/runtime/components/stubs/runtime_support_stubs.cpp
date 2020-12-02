@@ -19,6 +19,7 @@
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -35,6 +36,7 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(gid);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(gid);
         return hpx::make_ready_future(0);
 #endif
     }
@@ -53,6 +55,8 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(gid, pre_startup);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(gid);
+        HPX_UNUSED(pre_startup);
         return ::hpx::make_ready_future();
 #endif
     }
@@ -84,6 +88,8 @@ namespace hpx { namespace components { namespace stubs
         return f;
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
+        HPX_UNUSED(timeout);
         return ::hpx::make_ready_future();
 #endif
     }
@@ -105,6 +111,8 @@ namespace hpx { namespace components { namespace stubs
             targetgid, timeout);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
+        HPX_UNUSED(timeout);
 #endif
     }
 
@@ -117,6 +125,7 @@ namespace hpx { namespace components { namespace stubs
                 hpx::naming::id_type::unmanaged), timeout);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(timeout);
 #endif
     }
 
@@ -139,6 +148,7 @@ namespace hpx { namespace components { namespace stubs
         return f;
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
         return ::hpx::make_ready_future();
 #endif
     }
@@ -158,6 +168,7 @@ namespace hpx { namespace components { namespace stubs
             targetgid);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
 #endif
     }
 
@@ -183,6 +194,7 @@ namespace hpx { namespace components { namespace stubs
         hpx::apply<action_type>(targetgid);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
 #endif
     }
 
@@ -195,6 +207,7 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(targetgid);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
         return ::hpx::make_ready_future();
 #endif
     }
@@ -207,6 +220,7 @@ namespace hpx { namespace components { namespace stubs
         hpx::async<action_type>(targetgid).get();
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
 #endif
     }
 
@@ -230,6 +244,8 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(targetgid, info);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
+        HPX_UNUSED(info);
         return ::hpx::make_ready_future(naming::invalid_id);
 #endif
     }
@@ -255,6 +271,7 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(targetgid);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
         return ::hpx::make_ready_future(util::section{});
 #endif
     }
@@ -278,6 +295,9 @@ namespace hpx { namespace components { namespace stubs
         hpx::apply<action_type>(target, gid, endpoints);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(target);
+        HPX_UNUSED(gid);
+        HPX_UNUSED(endpoints);
 #endif
     }
 }}}

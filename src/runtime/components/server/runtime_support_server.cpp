@@ -43,6 +43,7 @@
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <hpx/lcos_local/packaged_task.hpp>
 #include <hpx/modules/collectives.hpp>
@@ -306,6 +307,7 @@ namespace hpx { namespace components { namespace server {
         }
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(respond_to);
 #endif
         std::abort();
     }
@@ -339,6 +341,8 @@ namespace hpx { namespace components { namespace server {
         lcos::broadcast(act, localities, pre_shutdown).get();
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(localities);
+        HPX_UNUSED(pre_shutdown);
 #endif
     }
 
@@ -393,6 +397,10 @@ namespace hpx { namespace components { namespace server {
             id, initiating_locality_id, num_localities, dijkstra_token);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(target_locality_id);
+        HPX_UNUSED(initiating_locality_id);
+        HPX_UNUSED(num_localities);
+        HPX_UNUSED(dijkstra_token);
 #endif
     }
 
@@ -778,9 +786,11 @@ namespace hpx { namespace components { namespace server {
                 if (respond_to)
                 {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_NETWORKING)
                     // respond synchronously
                     using void_lco_type = lcos::base_lco_with_value<void>;
                     using action_type = void_lco_type::set_event_action;
+#endif
 #else
                     HPX_ASSERT(false);
 #endif

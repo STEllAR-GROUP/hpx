@@ -17,6 +17,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/serialization/vector.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstdint>
 #include <string>
@@ -167,6 +168,7 @@ namespace hpx { namespace agas {
         return hpx::async(action, std::move(dest), id);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(id);
         return hpx::make_ready_future(
             std::pair<naming::id_type, naming::address>{});
 #endif

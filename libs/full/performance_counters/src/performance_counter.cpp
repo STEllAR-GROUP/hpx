@@ -10,6 +10,7 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
@@ -69,6 +70,7 @@ namespace hpx { namespace performance_counters {
         return hpx::async<action_type>(get_id(), reset);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(reset);
         return hpx::make_ready_future(counter_value{});
 #endif
     }
@@ -104,6 +106,7 @@ namespace hpx { namespace performance_counters {
         return hpx::async<action_type>(get_id(), reset);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(reset);
         return hpx::make_ready_future(counter_values_array{});
 #endif
     }
@@ -185,6 +188,7 @@ namespace hpx { namespace performance_counters {
         return hpx::async<action_type>(get_id(), reset);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(reset);
         return hpx::make_ready_future();
 #endif
     }

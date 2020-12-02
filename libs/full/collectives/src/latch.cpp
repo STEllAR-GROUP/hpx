@@ -17,6 +17,7 @@
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime_local/detail/serialize_exception.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -47,6 +48,7 @@ namespace hpx { namespace lcos {
         return hpx::async(act, get_id(), std::move(n));
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(n);
         return hpx::make_ready_future();
 #endif
     }
@@ -80,6 +82,7 @@ namespace hpx { namespace lcos {
         return hpx::async(act, get_id(), e);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(e);
         return hpx::make_ready_future();
 #endif
     }

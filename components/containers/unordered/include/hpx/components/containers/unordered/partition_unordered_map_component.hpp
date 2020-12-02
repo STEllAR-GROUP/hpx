@@ -35,6 +35,7 @@
 #include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/get_ptr.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -549,6 +550,8 @@ namespace hpx
                 this->get_id(), pos, erase);
 #else
             HPX_ASSERT(false);
+            HPX_UNUSED(pos);
+            HPX_UNUSED(erase);
             return hpx::future<T>{};
 #endif
         }
@@ -610,6 +613,8 @@ namespace hpx
                 this->get_id(), pos, std::forward<T_>(val));
 #else
             HPX_ASSERT(false);
+            HPX_UNUSED(pos);
+            HPX_UNUSED(val);
             return hpx::make_ready_future();
 #endif
         }

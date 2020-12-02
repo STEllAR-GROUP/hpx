@@ -8,6 +8,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/runtime/components/new.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <hpx/components/component_storage/component_storage.hpp>
 
@@ -35,6 +36,9 @@ namespace hpx { namespace components
         return hpx::async<action_type>(this->get_id(), data, id, addr);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(data);
+        HPX_UNUSED(id);
+        HPX_UNUSED(addr);
         return hpx::make_ready_future(naming::id_type{});
 #endif
     }
@@ -55,6 +59,7 @@ namespace hpx { namespace components
         return hpx::async<action_type>(this->get_id(), id);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(id);
         return hpx::make_ready_future(std::vector<char>{});
 #endif
     }

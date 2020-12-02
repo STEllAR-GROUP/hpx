@@ -12,6 +12,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>
@@ -122,6 +123,9 @@ namespace hpx { namespace components { namespace server
                     ptr, to_migrate));
 #else
             HPX_ASSERT(false);
+            HPX_UNUSED(ptr);
+            HPX_UNUSED(to_migrate);
+            HPX_UNUSED(target_storage);
             return hpx::make_ready_future(naming::id_type{});
 #endif
         }
@@ -207,6 +211,8 @@ namespace hpx { namespace components { namespace server
                 });
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(to_migrate);
+        HPX_UNUSED(target_storage);
         return hpx::make_ready_future(naming::id_type{});
 #endif
     }

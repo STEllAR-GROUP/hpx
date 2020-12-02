@@ -22,6 +22,7 @@
 #include <hpx/serialization/unordered_map.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>
@@ -305,6 +306,7 @@ namespace hpx
                 return hpx::async<action_type>(this->partition_.get(), std::move(d));
 #else
                 HPX_ASSERT(false);
+                HPX_UNUSED(d);
                 return hpx::make_ready_future();
 #endif
             }
