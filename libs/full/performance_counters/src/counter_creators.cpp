@@ -17,6 +17,7 @@
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstdint>
 #include <string>
@@ -543,6 +544,9 @@ namespace hpx { namespace performance_counters {
             return id;
 #else
             HPX_ASSERT(false);
+            HPX_UNUSED(name);
+            HPX_UNUSED(agas_id);
+            HPX_UNUSED(ec);
             return id;
 #endif
         }

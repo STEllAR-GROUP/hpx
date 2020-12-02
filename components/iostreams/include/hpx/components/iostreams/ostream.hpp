@@ -16,6 +16,7 @@
 #include <hpx/execution_base/register_locks.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/runtime/components/client_base.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <boost/iostreams/stream.hpp>
 
@@ -207,6 +208,8 @@ namespace hpx { namespace iostreams
             }
 #else
             HPX_ASSERT(false);
+            HPX_UNUSED(subject);
+            HPX_UNUSED(l);
 #endif
             return *this;
 
@@ -236,6 +239,8 @@ namespace hpx { namespace iostreams
 
 #else
             HPX_ASSERT(false);
+            HPX_UNUSED(subject);
+            HPX_UNUSED(l);
 #endif
             return *this;
         }    // }}}

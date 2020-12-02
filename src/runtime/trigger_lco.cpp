@@ -10,6 +10,7 @@
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
+#include <hpx/type_support/unused.hpp>
 #if defined(HPX_MSVC) && !defined(HPX_DEBUG)
 #include <hpx/lcos/base_lco_with_value.hpp>
 #endif
@@ -19,7 +20,7 @@
 
 namespace hpx
 {
-    void trigger_lco_event(naming::id_type const& id, naming::address && addr,
+    void trigger_lco_event(naming::id_type const& id, naming::address&& addr,
         bool move_credits)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -40,6 +41,9 @@ namespace hpx
         }
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(id);
+        HPX_UNUSED(addr);
+        HPX_UNUSED(move_credits);
 #endif
     }
 
@@ -74,6 +78,10 @@ namespace hpx
         }
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(id);
+        HPX_UNUSED(cont);
+        HPX_UNUSED(addr);
+        HPX_UNUSED(move_credits);
 #endif
     }
 
@@ -98,6 +106,10 @@ namespace hpx
         }
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(id);
+        HPX_UNUSED(addr);
+        HPX_UNUSED(e);
+        HPX_UNUSED(move_credits);
 #endif
     }
 
@@ -124,6 +136,10 @@ namespace hpx
         }
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(id);
+        HPX_UNUSED(addr);
+        HPX_UNUSED(e);
+        HPX_UNUSED(move_credits);
 #endif
     }
 
@@ -159,6 +175,11 @@ namespace hpx
         }
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(id);
+        HPX_UNUSED(addr);
+        HPX_UNUSED(e);
+        HPX_UNUSED(cont);
+        HPX_UNUSED(move_credits);
 #endif
     }
 
@@ -196,6 +217,11 @@ namespace hpx
         }
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(id);
+        HPX_UNUSED(addr);
+        HPX_UNUSED(e);
+        HPX_UNUSED(cont);
+        HPX_UNUSED(move_credits);
 #endif
     }
 

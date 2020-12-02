@@ -60,6 +60,7 @@
 #include <hpx/threading_base/external_timer.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/version.hpp>
@@ -782,8 +783,10 @@ namespace hpx {
         // will be ignored
         apply<components::server::runtime_support::shutdown_all_action>(
             hpx::find_root_locality(), shutdown_timeout);
+#else
+        HPX_ASSERT(false);
+        HPX_UNUSED(shutdown_timeout);
 #endif
-
         return 0;
     }
 
