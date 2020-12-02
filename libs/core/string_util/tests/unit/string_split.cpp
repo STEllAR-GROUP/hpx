@@ -15,16 +15,6 @@
 #include <string>
 #include <vector>
 
-template <typename T1, typename T2>
-void deep_compare(const T1& X, const T2& Y)
-{
-    HPX_TEST_EQ(X.size(), Y.size());
-    for (unsigned int nIndex = 0; nIndex < X.size(); ++nIndex)
-    {
-        HPX_TEST_EQ(X[nIndex], Y[nIndex]);
-    }
-}
-
 int main()
 {
     std::string str2("Xx-abc--xX-abb-xx");
