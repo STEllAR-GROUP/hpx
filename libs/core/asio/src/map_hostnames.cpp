@@ -8,6 +8,7 @@
 #include <hpx/asio/asio_util.hpp>
 #include <hpx/asio/map_hostnames.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstdint>
 #include <iostream>
@@ -58,6 +59,7 @@ namespace hpx { namespace util {
         }
         return resolved_addr;
 #else
+        HPX_UNUSED(port);
         return "127.0.0.1";
 #endif
     }

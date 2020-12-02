@@ -21,6 +21,7 @@
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/string_util/case_conv.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <hpx/actions_base/plain_action.hpp>
@@ -465,6 +466,7 @@ namespace hpx { namespace components { namespace server {
                 },
                 "runtime_support::dijkstra_termination", false);
 
+            HPX_UNUSED(locality_ids);
             return 0;
         }
 
@@ -679,6 +681,9 @@ namespace hpx { namespace components { namespace server {
 #if defined(HPX_HAVE_NETWORKING)
         // instruct our connection cache to drop all connections it is holding
         rt->get_parcel_handler().remove_from_connection_cache(gid, eps);
+#else
+        HPX_UNUSED(gid);
+        HPX_UNUSED(eps);
 #endif
     }
 

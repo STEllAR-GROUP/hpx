@@ -16,6 +16,7 @@
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
@@ -86,6 +87,9 @@ namespace hpx { namespace applier {
 #if defined(HPX_HAVE_NETWORKING)
         return parcel_handler_.get_raw_remote_localities(prefixes, type, ec);
 #else
+        HPX_UNUSED(prefixes);
+        HPX_UNUSED(type);
+        HPX_UNUSED(ec);
         return true;
 #endif
     }
@@ -101,6 +105,9 @@ namespace hpx { namespace applier {
         for (naming::gid_type& gid : raw_prefixes)
             prefixes.emplace_back(gid, naming::id_type::unmanaged);
 #endif
+        HPX_UNUSED(prefixes);
+        HPX_UNUSED(type);
+        HPX_UNUSED(ec);
         return true;
     }
 
@@ -113,6 +120,8 @@ namespace hpx { namespace applier {
         naming::gid_type id;
         naming::get_agas_client().get_console_locality(id);
         prefixes.emplace_back(id);
+        HPX_UNUSED(prefixes);
+        HPX_UNUSED(type);
         return true;
 #endif
     }
@@ -131,6 +140,8 @@ namespace hpx { namespace applier {
 #else
         prefixes.emplace_back(agas::get_console_locality());
 #endif
+        HPX_UNUSED(prefixes);
+        HPX_UNUSED(ec);
         return true;
     }
 
@@ -147,6 +158,9 @@ namespace hpx { namespace applier {
 #else
         prefixes.emplace_back(agas::get_console_locality());
 #endif
+        HPX_UNUSED(prefixes);
+        HPX_UNUSED(type);
+        HPX_UNUSED(ec);
         return true;
     }
 
