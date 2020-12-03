@@ -59,7 +59,7 @@ namespace hpx { namespace string_util {
             if (compress_mode == token_compress_mode::on)
             {
                 // Skip contiguous separators
-                while (token_end != std::end(str) && pred(int(*token_begin)))
+                while (token_begin != std::end(str) && pred(int(*token_begin)))
                 {
                     ++token_begin;
                 }
