@@ -12,6 +12,7 @@
 #include <hpx/batch_environments/pbs_environment.hpp>
 #include <hpx/batch_environments/slurm_environment.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/host_name.hpp>
@@ -144,6 +145,7 @@ namespace hpx { namespace util {
                           << " (" << (*it).first << ")" << std::endl;
             }
         }
+        HPX_UNUSED(nodes);
         return nodes_list;
     }
 

@@ -48,6 +48,7 @@
 #include <hpx/string_util/split.hpp>
 #include <hpx/threading/thread.hpp>
 #include <hpx/type_support/pack.hpp>
+#include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <hpx/program_options/options_description.hpp>
@@ -412,6 +413,8 @@ namespace hpx {
                 parcelset::parcelhandler::init(&argc, &argv, cms);
             }
 #endif
+            HPX_UNUSED(argc);
+            HPX_UNUSED(argv);
         }
 
         ///////////////////////////////////////////////////////////////////////

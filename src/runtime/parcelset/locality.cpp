@@ -14,6 +14,7 @@
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/string.hpp>
+#include <hpx/type_support/unused.hpp>
 #include <hpx/util/ios_flags_saver.hpp>
 
 #include <string>
@@ -32,6 +33,7 @@ namespace hpx { namespace parcelset
         HPX_THROW_EXCEPTION(invalid_status,
             "locality::save",
             "this shouldn't be called if networking is disabled");
+        HPX_UNUSED(ar);
 #endif
     }
 
@@ -52,6 +54,7 @@ namespace hpx { namespace parcelset
         HPX_THROW_EXCEPTION(invalid_status,
             "locality::load",
             "this shouldn't be called if networking is disabled");
+        HPX_UNUSED(ar);
 #endif
     }
 
