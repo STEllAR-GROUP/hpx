@@ -87,7 +87,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             difference_type count =
                 hpx::parallel::v1::detail::distance(first, last);
             if (diff > count)
-                return result::get(std::move(last));
+            {
+                std::advance(first,
+                    hpx::parallel::v1::detail::distance(first, last) - 1);
+                return result::get(std::move(first));
+            }
 
             using partitioner =
                 hpx::parallel::util::partitioner<ExPolicy, FwdIter, void>;
@@ -135,7 +139,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 if (search_res != count)
                     std::advance(first, search_res);
                 else
-                    first = last;
+                    std::advance(first,
+                        hpx::parallel::v1::detail::distance(first, last) - 1);
 
                 return std::move(first);
             };
