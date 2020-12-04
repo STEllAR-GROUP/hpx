@@ -314,18 +314,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // search
     namespace detail {
         /// \cond NOINTERNAL
-        template <typename FwdIter>
-        struct search : public detail::algorithm<search<FwdIter>, FwdIter>
+        template <typename FwdIter, typename Sent>
+        struct search : public detail::algorithm<search<FwdIter, Sent>, FwdIter>
         {
             search()
               : search::algorithm("search")
             {
             }
 
-            template <typename ExPolicy, typename FwdIter2, typename Pred,
-                typename Proj1, typename Proj2>
-            static FwdIter sequential(ExPolicy, FwdIter first, FwdIter last,
-                FwdIter2 s_first, FwdIter2 s_last, Pred&& op, Proj1&& proj1,
+            template <typename ExPolicy, typename FwdIter2, typename Sent2,
+                typename Pred, typename Proj1, typename Proj2>
+            static FwdIter sequential(ExPolicy, FwdIter first, Sent last,
+                FwdIter2 s_first, Sent2 s_last, Pred&& op, Proj1&& proj1,
                 Proj2&& proj2)
             {
                 return std::search(first, last, s_first, s_last,
@@ -333,12 +333,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         op, proj1, proj2));
             }
 
-            template <typename ExPolicy, typename FwdIter2, typename Pred,
-                typename Proj1, typename Proj2>
+            template <typename ExPolicy, typename FwdIter2, typename Sent2,
+                typename Pred, typename Proj1, typename Proj2>
             static
                 typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-                parallel(ExPolicy&& policy, FwdIter first, FwdIter last,
-                    FwdIter2 s_first, FwdIter2 s_last, Pred&& op, Proj1&& proj1,
+                parallel(ExPolicy&& policy, FwdIter first, Sent last,
+                    FwdIter2 s_first, Sent2 s_last, Pred&& op, Proj1&& proj1,
                     Proj2&& proj2)
             {
                 using reference =
@@ -450,17 +450,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-        return detail::search<FwdIter>().call(std::forward<ExPolicy>(policy),
-            is_seq(), first, last, s_first, s_last, std::forward<Pred>(op),
-            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+        return detail::search<FwdIter, FwdIter>().call(
+            std::forward<ExPolicy>(policy), is_seq(), first, last, s_first,
+            s_last, std::forward<Pred>(op), std::forward<Proj1>(proj1),
+            std::forward<Proj2>(proj2));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // search_n
     namespace detail {
         /// \cond NOINTERNAL
-        template <typename FwdIter>
-        struct search_n : public detail::algorithm<search_n<FwdIter>, FwdIter>
+        template <typename FwdIter, typename Sent>
+        struct search_n
+          : public detail::algorithm<search_n<FwdIter, Sent>, FwdIter>
         {
             search_n()
               : search_n::algorithm("search_n")
@@ -591,9 +593,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-        return detail::search_n<FwdIter>().call(std::forward<ExPolicy>(policy),
-            is_seq(), first, count, s_first, s_last, std::forward<Pred>(op),
-            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+        return detail::search_n<FwdIter, FwdIter>().call(
+            std::forward<ExPolicy>(policy), is_seq(), first, count, s_first,
+            s_last, std::forward<Pred>(op), std::forward<Proj1>(proj1),
+            std::forward<Proj2>(proj2));
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -618,7 +621,7 @@ namespace hpx {
         friend FwdIter tag_invoke(hpx::search_t, FwdIter first, FwdIter last,
             FwdIter2 s_first, FwdIter2 s_last, Pred&& op = Pred())
         {
-            return hpx::parallel::v1::detail::search<FwdIter>().call(
+            return hpx::parallel::v1::detail::search<FwdIter, FwdIter>().call(
                 hpx::execution::seq, std::true_type{}, first, last, s_first,
                 s_last, std::forward<Pred>(op),
                 hpx::parallel::util::projection_identity{},
@@ -645,7 +648,7 @@ namespace hpx {
         {
             using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-            return hpx::parallel::v1::detail::search<FwdIter>().call(
+            return hpx::parallel::v1::detail::search<FwdIter, FwdIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last, s_first,
                 s_last, std::forward<Pred>(op),
                 hpx::parallel::util::projection_identity{},
@@ -674,7 +677,7 @@ namespace hpx {
             std::size_t count, FwdIter2 s_first, FwdIter2 s_last,
             Pred&& op = Pred())
         {
-            return hpx::parallel::v1::detail::search_n<FwdIter>().call(
+            return hpx::parallel::v1::detail::search_n<FwdIter, FwdIter>().call(
                 hpx::execution::seq, std::true_type{}, first, count, s_first,
                 s_last, std::forward<Pred>(op),
                 hpx::parallel::util::projection_identity{},
@@ -702,7 +705,7 @@ namespace hpx {
         {
             using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-            return hpx::parallel::v1::detail::search_n<FwdIter>().call(
+            return hpx::parallel::v1::detail::search_n<FwdIter, FwdIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, count, s_first,
                 s_last, std::forward<Pred>(op),
                 hpx::parallel::util::projection_identity{},
