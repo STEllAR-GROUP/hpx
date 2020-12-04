@@ -32,8 +32,6 @@ namespace hpx {
     using hpx::parallel::reverse_copy;
     using hpx::parallel::rotate;
     using hpx::parallel::rotate_copy;
-    using hpx::parallel::search;
-    using hpx::parallel::search_n;
     using hpx::parallel::sort;
     using hpx::parallel::stable_partition;
     using hpx::parallel::stable_sort;

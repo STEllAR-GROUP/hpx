@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
@@ -21,7 +22,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+#if defined(DOXYGEN)
+
+namespace hpx { namespace ranges {
+
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
     /// Uses a provided predicate to compare elements.
     ///
@@ -99,26 +103,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           returned. If no subsequence is found, \a last is returned.
     ///
     template <typename ExPolicy, typename Rng1, typename Rng2,
-        typename Pred = detail::equal_to,
-        typename Proj1 = util::projection_identity,
-        typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&& hpx::traits::is_range<
-                Rng1>::value&& traits::is_projected_range<Proj1, Rng1>::value&&
-                hpx::traits::is_range<Rng2>::value&& traits::is_projected_range<
-                    Proj2, Rng2>::value&& traits::is_indirect_callable<ExPolicy,
-                    Pred, traits::projected_range<Proj1, Rng1>,
-                    traits::projected_range<Proj2, Rng2>>::value)>
-    typename util::detail::algorithm_result<ExPolicy,
+        typename Pred = hpx::ranges::equal_to,
+        typename Proj1 = hpx::parallel::util::projection_identity,
+        typename Proj2 = hpx::parallel::util::projection_identity>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng1>::type>::type
     search(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
-        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
-    {
-        return search(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
-            hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
-            std::forward<Pred>(op), std::forward<Proj1>(proj1),
-            std::forward<Proj2>(proj2));
-    }
+        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
     /// Uses a provided predicate to compare elements.
@@ -198,24 +189,153 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           returned. If no subsequence is found, \a last is returned.
     ///
     template <typename ExPolicy, typename Rng1, typename Rng2,
-        typename Pred = detail::equal_to,
-        typename Proj1 = util::projection_identity,
-        typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&& hpx::traits::is_range<
-                Rng1>::value&& traits::is_projected_range<Proj1, Rng1>::value&&
-                hpx::traits::is_range<Rng2>::value&& traits::is_projected_range<
-                    Proj2, Rng2>::value&& traits::is_indirect_callable<ExPolicy,
-                    Pred, traits::projected_range<Proj1, Rng1>,
-                    traits::projected_range<Proj2, Rng2>>::value)>
-    typename util::detail::algorithm_result<ExPolicy,
+        typename Pred = hpx::ranges::equal_to,
+        typename Proj1 = hpx::parallel::util::projection_identity,
+        typename Proj2 = hpx::parallel::util::projection_identity>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng1>::type>::type
     search_n(ExPolicy&& policy, Rng1&& rng1, std::size_t count, Rng2&& rng2,
-        Pred&& op = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+        Pred&& op = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
+
+}}    // namespace hpx::ranges
+
+#else
+
+namespace hpx { namespace parallel { inline namespace v1 {
+
+    // clang-format off
+    template <typename ExPolicy, typename Rng1, typename Rng2,
+        typename Pred = hpx::ranges::equal_to,
+        typename Proj1 = parallel::util::projection_identity,
+        typename Proj2 = parallel::util::projection_identity,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_range<Rng1>::value &&
+            traits::is_projected_range<Proj1, Rng1>::value &&
+            hpx::traits::is_range<Rng2>::value &&
+            traits::is_projected_range<Proj2, Rng2>::value &&
+            traits::is_indirect_callable<ExPolicy,
+                Pred, traits::projected_range<Proj1, Rng1>,
+                traits::projected_range<Proj2, Rng2>
+            >::value
+        )>
+    HPX_DEPRECATED_V(1, 6, "Please use hpx::ranges::search instead.")
+    // clang-format on
+    typename util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_iterator<Rng1>::type>::type
+        search(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+    {
+        return search(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+            hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
+            std::forward<Pred>(op), std::forward<Proj1>(proj1),
+            std::forward<Proj2>(proj2));
+    }
+
+    // clang-format off
+    template <typename ExPolicy, typename Rng1, typename Rng2,
+        typename Pred = hpx::ranges::equal_to,
+        typename Proj1 = parallel::util::projection_identity,
+        typename Proj2 = parallel::util::projection_identity,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_range<Rng1>::value &&
+            traits::is_projected_range<Proj1, Rng1>::value &&
+            hpx::traits::is_range<Rng2>::value &&
+            traits::is_projected_range<Proj2, Rng2>::value &&
+            traits::is_indirect_callable<ExPolicy,
+                Pred, traits::projected_range<Proj1, Rng1>,
+                traits::projected_range<Proj2, Rng2>
+            >::value
+        )>
+    HPX_DEPRECATED_V(1, 6, "Please use hpx::ranges::search_n instead.")
+    // clang-format on
+    typename util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_iterator<Rng1>::type>::type
+        search_n(ExPolicy&& policy, Rng1&& rng1, std::size_t count, Rng2&& rng2,
+            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+            Proj2&& proj2 = Proj2())
     {
         return search_n(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
             count, hpx::util::begin(rng2), hpx::util::end(rng2),
             std::forward<Pred>(op), std::forward<Proj1>(proj1),
             std::forward<Proj2>(proj2));
     }
+
 }}}    // namespace hpx::parallel::v1
+
+namespace hpx { namespace ranges {
+
+    HPX_INLINE_CONSTEXPR_VARIABLE struct search_t final
+      : hpx::functional::tag<search_t>
+    {
+    private:
+        // clang-format off
+        template <typename ExPolicy, typename Rng1, typename Rng2,
+            typename Pred = hpx::ranges::equal_to,
+            typename Proj1 = hpx::parallel::util::projection_identity,
+            typename Proj2 = hpx::parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_range<Rng1>::value &&
+                hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
+                hpx::traits::is_range<Rng2>::value &&
+                hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
+                hpx::parallel::traits::is_indirect_callable<ExPolicy,
+                    Pred, hpx::parallel::traits::projected_range<Proj1, Rng1>,
+                    hpx::parallel::traits::projected_range<Proj2, Rng2>
+                >::value
+            )>
+        // clang-format on
+        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+            typename hpx::traits::range_iterator<Rng1>::type>::type
+        tag_invoke(hpx::ranges::search_t, ExPolicy&& policy, Rng1&& rng1,
+            Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+            Proj2&& proj2 = Proj2())
+        {
+            return hpx::search(std::forward<ExPolicy>(policy),
+                hpx::util::begin(rng1), hpx::util::end(rng1),
+                hpx::util::begin(rng2), hpx::util::end(rng2),
+                std::forward<Pred>(op), std::forward<Proj1>(proj1),
+                std::forward<Proj2>(proj2));
+        }
+
+    } search{};
+
+    HPX_INLINE_CONSTEXPR_VARIABLE struct search_n_t final
+      : hpx::functional::tag<search_n_t>
+    {
+    private:
+        // clang-format off
+        template <typename ExPolicy, typename Rng1, typename Rng2,
+            typename Pred = hpx::ranges::equal_to,
+            typename Proj1 = hpx::parallel::util::projection_identity,
+            typename Proj2 = hpx::parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_range<Rng1>::value &&
+                hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
+                hpx::traits::is_range<Rng2>::value &&
+                hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
+                hpx::parallel::traits::is_indirect_callable<ExPolicy,
+                    Pred, hpx::parallel::traits::projected_range<Proj1, Rng1>,
+                    hpx::parallel::traits::projected_range<Proj2, Rng2>
+                >::value
+            )>
+        // clang-format on
+        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+            typename hpx::traits::range_iterator<Rng1>::type>::type
+        tag_invoke(hpx::ranges::search_n_t, ExPolicy&& policy, Rng1&& rng1,
+            std::size_t count, Rng2&& rng2, Pred&& op = Pred(),
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+        {
+            return hpx::search_n(std::forward<ExPolicy>(policy),
+                hpx::util::begin(rng1), count, hpx::util::begin(rng2),
+                hpx::util::end(rng2), std::forward<Pred>(op),
+                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+        }
+
+    } search_n{};
+
+}}    // namespace hpx::ranges
+#endif
