@@ -26,8 +26,8 @@ namespace hpx { namespace parallel { namespace util {
 
         template <typename II1, typename II2,
             typename Enable = typename std::enable_if<
-                std::is_convertible<I1 const&, II1&>::value &&
-                std::is_convertible<I2 const&, II2&>::value>::type>
+                std::is_convertible<I1 const&, II1>::value &&
+                std::is_convertible<I2 const&, II2>::value>::type>
         constexpr operator in_in_result<II1, II2>() const&
         {
             return {in1, in2};
@@ -60,8 +60,8 @@ namespace hpx { namespace parallel { namespace util {
 
         template <typename I2, typename O2,
             typename Enable = typename std::enable_if<
-                std::is_convertible<I const&, I2&>::value &&
-                std::is_convertible<O const&, O2&>::value>::type>
+                std::is_convertible<I const&, I2>::value &&
+                std::is_convertible<O const&, O2>::value>::type>
         constexpr operator in_out_result<I2, O2>() const&
         {
             return {in, out};
@@ -110,9 +110,9 @@ namespace hpx { namespace parallel { namespace util {
 
         template <typename II1, typename II2, typename O1,
             typename Enable = typename std::enable_if<
-                std::is_convertible<I1 const&, II1&>::value &&
-                std::is_convertible<I2 const&, II2&>::value &&
-                std::is_convertible<O const&, O1&>::value>::type>
+                std::is_convertible<I1 const&, II1>::value &&
+                std::is_convertible<I2 const&, II2>::value &&
+                std::is_convertible<O const&, O1>::value>::type>
         constexpr operator in_in_out_result<II1, II2, O1>() const&
         {
             return {in1, in2, out};
@@ -161,8 +161,8 @@ namespace hpx { namespace parallel { namespace util {
 
         template <typename I2, typename F2,
             typename Enable = typename std::enable_if<
-                std::is_convertible<I const&, I2&>::value &&
-                std::is_convertible<F const&, F2&>::value>::type>
+                std::is_convertible<I const&, I2>::value &&
+                std::is_convertible<F const&, F2>::value>::type>
         constexpr operator in_fun_result<I2, F2>() const&
         {
             return {in, fun};
