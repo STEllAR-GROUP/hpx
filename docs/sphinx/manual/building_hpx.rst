@@ -657,7 +657,7 @@ How to install |hpx| on Unix variants
 
   .. code-block:: bash
 
-     cmake -DBOOST_ROOT=~/packages/boost -DHWLOC_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_1.5.0
+     cmake -DBOOST_ROOT=~/packages/boost -DHWLOC_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_1.5.1
 
 * Invoke GNU make. If you are on a machine with multiple cores, add the -jN flag
   to your make invocation, where N is the number of parallel processes |hpx|

@@ -127,6 +127,9 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     spinlock_overhead2
     wait_all_timings
   )
+  if(NOT HPX_WITH_CUDA_COMPUTE OR HPX_WITH_CUDA_CLANG)
+    set(benchmarks ${benchmarks} stream)
+  endif()
 endif()
 
 set(delay_baseline_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies}
