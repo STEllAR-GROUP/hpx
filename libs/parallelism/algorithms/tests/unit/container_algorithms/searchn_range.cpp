@@ -39,6 +39,24 @@ struct user_defined_type_2
 };
 
 ////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_search_n1_without_expolicy(IteratorTag)
+{
+    std::vector<std::size_t> c(10007);
+    // fill vector with random values above 2
+    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    // create subsequence in middle of vector
+    c[c.size() / 2] = 1;
+    c[c.size() / 2 + 1] = 2;
+
+    std::size_t h[] = {1, 2};
+
+    auto index = hpx::ranges::search_n(c, c.size(), h);
+    auto test_index = std::begin(c) + c.size() / 2;
+
+    HPX_TEST(index == test_index);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_search_n1(ExPolicy policy, IteratorTag)
 {
@@ -85,6 +103,8 @@ template <typename IteratorTag>
 void test_search_n1()
 {
     using namespace hpx::execution;
+    test_search_n1_without_expolicy(IteratorTag());
+
     test_search_n1(seq, IteratorTag());
     test_search_n1(par, IteratorTag());
     test_search_n1(par_unseq, IteratorTag());

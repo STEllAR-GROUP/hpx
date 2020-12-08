@@ -19,6 +19,29 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_search1_without_expolicy(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    // fill vector with random values above 2
+    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    // create subsequence in middle of vector
+    c[c.size() / 2] = 1;
+    c[c.size() / 2 + 1] = 2;
+
+    std::size_t h[] = {1, 2};
+
+    iterator index = hpx::search(iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(h), std::end(h));
+
+    base_iterator test_index = std::begin(c) + c.size() / 2;
+
+    HPX_TEST(index == iterator(test_index));
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_search1(ExPolicy policy, IteratorTag)
 {
@@ -74,6 +97,8 @@ template <typename IteratorTag>
 void test_search1()
 {
     using namespace hpx::execution;
+    test_search1_without_expolicy(IteratorTag());
+
     test_search1(seq, IteratorTag());
     test_search1(par, IteratorTag());
     test_search1(par_unseq, IteratorTag());
@@ -86,6 +111,31 @@ void search_test1()
 {
     test_search1<std::random_access_iterator_tag>();
     test_search1<std::forward_iterator_tag>();
+}
+
+template <typename IteratorTag>
+void test_search2_without_expolicy(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    // fill vector with random values about 2
+    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    // create subsequence at start and end
+    c[0] = 1;
+    c[1] = 2;
+    c[c.size() - 1] = 2;
+    c[c.size() - 2] = 1;
+
+    std::size_t h[] = {1, 2};
+
+    iterator index = hpx::search(iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(h), std::end(h));
+
+    base_iterator test_index = std::begin(c);
+
+    HPX_TEST(index == iterator(test_index));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -147,6 +197,8 @@ template <typename IteratorTag>
 void test_search2()
 {
     using namespace hpx::execution;
+    test_search2_without_expolicy(IteratorTag());
+
     test_search2(seq, IteratorTag());
     test_search2(par, IteratorTag());
     test_search2(par_unseq, IteratorTag());

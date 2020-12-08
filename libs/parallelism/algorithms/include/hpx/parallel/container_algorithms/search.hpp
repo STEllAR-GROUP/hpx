@@ -1,3 +1,4 @@
+//  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2018 Christopher Ogle
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -25,6 +26,77 @@
 #if defined(DOXYGEN)
 
 namespace hpx { namespace ranges {
+
+    /// Searches the range [first, last) for any elements in the range [s_first, s_last).
+    /// Uses a provided predicate to compare elements.
+    ///
+    /// \note   Complexity: at most (S*N) comparisons where
+    ///         \a S = distance(s_first, s_last) and
+    ///         \a N = distance(first, last).
+    ///
+    /// \tparam Rng1        The type of the examine range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam Rng2        The type of the search range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a adjacent_find requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::equal_to<>
+    /// \tparam Proj1       The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity and is applied
+    ///                     to the elements of \a Rng1.
+    /// \tparam Proj2       The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity and is applied
+    ///                     to the elements of \a Rng2.
+    ///
+    /// \param rng1         Refers to the sequence of elements the algorithm
+    ///                     will be examining.
+    /// \param rng2         Refers to the sequence of elements the algorithm
+    ///                     will be searching for.
+    /// \param op           Refers to the binary predicate which returns true if the
+    ///                     elements should be treated as equal. the signature of
+    ///                     the function should be equivalent to
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type1 and \a Type2 respectively
+    /// \param proj1        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements of \a rng1
+    ///                     as a projection operation before the actual
+    ///                     predicate \a is invoked.
+    /// \param proj2        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements of \a rng2
+    ///                     as a projection operation before the actual
+    ///                     predicate \a is invoked.
+    ///
+    /// The comparison operations in the parallel \a search algorithm execute
+    /// in sequential order in the calling thread.
+    ///
+    /// \returns  The \a search algorithm returns a \a hpx::future<FwdIter> if the
+    ///           execution policy is of type \a task_execution_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a search algorithm returns an iterator to the beginning of
+    ///           the first subsequence [s_first, s_last) in range [first, last).
+    ///           If the length of the subsequence [s_first, s_last) is greater
+    ///           than the length of the range [first, last), \a last is returned.
+    ///           Additionally if the size of the subsequence is empty \a first is
+    ///           returned. If no subsequence is found, \a last is returned.
+    ///
+    template <typename Rng1, typename Rng2,
+        typename Pred = hpx::ranges::equal_to,
+        typename Proj1 = hpx::parallel::util::projection_identity,
+        typename Proj2 = hpx::parallel::util::projection_identity>
+    typename hpx::traits::range_iterator<Rng1>::type search(Rng1&& rng1,
+        Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+        Proj2&& proj2 = Proj2());
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
     /// Uses a provided predicate to compare elements.
@@ -109,6 +181,78 @@ namespace hpx { namespace ranges {
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng1>::type>::type
     search(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
+        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
+
+    /// Searches the range [first, last) for any elements in the range [s_first, s_last).
+    /// Uses a provided predicate to compare elements.
+    ///
+    /// \note   Complexity: at most (S*N) comparisons where
+    ///         \a S = distance(s_first, s_last) and
+    ///         \a N = distance(first, last).
+    ///
+    /// \tparam Rng1        The type of the examine range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam Rng2        The type of the search range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a adjacent_find requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::equal_to<>
+    /// \tparam Proj1       The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity and is applied
+    ///                     to the elements of \a Rng1.
+    /// \tparam Proj2       The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity and is applied
+    ///                     to the elements of \a Rng2.
+    ///
+    /// \param rng1         Refers to the sequence of elements the algorithm
+    ///                     will be examining.
+    /// \param count        The number of elements to apply the algorithm on.
+    /// \param rng2         Refers to the sequence of elements the algorithm
+    ///                     will be searching for.
+    /// \param op           Refers to the binary predicate which returns true if the
+    ///                     elements should be treated as equal. the signature of
+    ///                     the function should be equivalent to
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type1 and \a Type2 respectively
+    /// \param proj1        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements of \a rng1
+    ///                     as a projection operation before the actual
+    ///                     predicate \a is invoked.
+    /// \param proj2        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements of \a rng2
+    ///                     as a projection operation before the actual
+    ///                     predicate \a is invoked.
+    ///
+    /// The comparison operations in the parallel \a search algorithm execute
+    /// in sequential order in the calling thread.
+    ///
+    /// \returns  The \a search algorithm returns a \a hpx::future<FwdIter> if the
+    ///           execution policy is of type \a task_execution_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a search algorithm returns an iterator to the beginning of
+    ///           the first subsequence [s_first, s_last) in range [first, last).
+    ///           If the length of the subsequence [s_first, s_last) is greater
+    ///           than the length of the range [first, last), \a last is returned.
+    ///           Additionally if the size of the subsequence is empty \a first is
+    ///           returned. If no subsequence is found, \a last is returned.
+    ///
+    template <typename Rng1, typename Rng2,
+        typename Pred = hpx::ranges::equal_to,
+        typename Proj1 = hpx::parallel::util::projection_identity,
+        typename Proj2 = hpx::parallel::util::projection_identity>
+    typename hpx::traits::range_iterator<Rng1>::type search_n(Rng1&& rng1,
+        std::size_t count, Rng2&& rng2, Pred&& op = Pred(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
@@ -271,6 +415,33 @@ namespace hpx { namespace ranges {
     {
     private:
         // clang-format off
+        template <typename Rng1, typename Rng2,
+            typename Pred = hpx::ranges::equal_to,
+            typename Proj1 = hpx::parallel::util::projection_identity,
+            typename Proj2 = hpx::parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_range<Rng1>::value &&
+                hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
+                hpx::traits::is_range<Rng2>::value &&
+                hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
+                hpx::parallel::traits::is_indirect_callable<
+                    hpx::execution::sequenced_policy,
+                    Pred, hpx::parallel::traits::projected_range<Proj1, Rng1>,
+                    hpx::parallel::traits::projected_range<Proj2, Rng2>
+                >::value
+            )>
+        // clang-format on
+        friend typename hpx::traits::range_iterator<Rng1>::type tag_invoke(
+            hpx::ranges::search_t, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+        {
+            return hpx::search(hpx::execution::seq, hpx::util::begin(rng1),
+                hpx::util::end(rng1), hpx::util::begin(rng2),
+                hpx::util::end(rng2), std::forward<Pred>(op),
+                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+        }
+
+        // clang-format off
         template <typename ExPolicy, typename Rng1, typename Rng2,
             typename Pred = hpx::ranges::equal_to,
             typename Proj1 = hpx::parallel::util::projection_identity,
@@ -306,6 +477,34 @@ namespace hpx { namespace ranges {
       : hpx::functional::tag<search_n_t>
     {
     private:
+        // clang-format off
+        template <typename Rng1, typename Rng2,
+            typename Pred = hpx::ranges::equal_to,
+            typename Proj1 = hpx::parallel::util::projection_identity,
+            typename Proj2 = hpx::parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_range<Rng1>::value &&
+                hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
+                hpx::traits::is_range<Rng2>::value &&
+                hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
+                hpx::parallel::traits::is_indirect_callable<
+                    hpx::execution::sequenced_policy,
+                    Pred, hpx::parallel::traits::projected_range<Proj1, Rng1>,
+                    hpx::parallel::traits::projected_range<Proj2, Rng2>
+                >::value
+            )>
+        // clang-format on
+        friend typename hpx::traits::range_iterator<Rng1>::type tag_invoke(
+            hpx::ranges::search_n_t, Rng1&& rng1, std::size_t count,
+            Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+            Proj2&& proj2 = Proj2())
+        {
+            return hpx::search_n(hpx::execution::seq, hpx::util::begin(rng1),
+                count, hpx::util::begin(rng2), hpx::util::end(rng2),
+                std::forward<Pred>(op), std::forward<Proj1>(proj1),
+                std::forward<Proj2>(proj2));
+        }
+
         // clang-format off
         template <typename ExPolicy, typename Rng1, typename Rng2,
             typename Pred = hpx::ranges::equal_to,
