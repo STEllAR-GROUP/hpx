@@ -252,10 +252,10 @@ namespace hpx { namespace execution { namespace experimental {
                 std::size_t thread_index, std::size_t num_threads,
                 std::size_t size)
             {
-                std::size_t const part_begin =
-                    (thread_index * size) / num_threads;
-                std::size_t const part_end =
-                    ((thread_index + 1) * size) / num_threads;
+                auto const part_begin = static_cast<std::uint32_t>(
+                    (thread_index * size) / num_threads);
+                auto const part_end = static_cast<std::uint32_t>(
+                    ((thread_index + 1) * size) / num_threads);
                 queue.reset(part_begin, part_end);
             }
 
