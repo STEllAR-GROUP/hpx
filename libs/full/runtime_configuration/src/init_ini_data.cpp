@@ -201,11 +201,14 @@ namespace hpx { namespace util {
                 fs::directory_iterator nodir;
                 fs::path this_path(*it);
 
+                boost::system::error_code dir_ec;
                 std::error_code ec;
+
                 if (!fs::exists(this_path, ec) || ec)
                     continue;
 
-                for (fs::directory_iterator dir(this_path); dir != nodir; ++dir)
+                for (fs::directory_iterator dir(this_path, dir_ec);
+                     dir != nodir; ++dir)
                 {
                     if ((*dir).path().extension() != ".ini")
                         continue;
@@ -422,7 +425,9 @@ namespace hpx { namespace util {
             fs::directory_iterator nodir;
             fs::path libs_path(libs);
 
+            boost::system::error_code dir_ec;
             std::error_code ec;
+
             if (!fs::exists(libs_path, ec) || ec)
                 return plugin_registries;    // given directory doesn't exist
 
@@ -439,7 +444,8 @@ namespace hpx { namespace util {
             // generate component sections for all found shared libraries
             // this will create too many sections, but the non-components will
             // be filtered out during loading
-            for (fs::directory_iterator dir(libs_path); dir != nodir; ++dir)
+            for (fs::directory_iterator dir(libs_path, dir_ec); dir != nodir;
+                 ++dir)
             {
                 fs::path curr(*dir);
                 if (curr.extension() != HPX_SHARED_LIB_EXTENSION)
@@ -452,7 +458,7 @@ namespace hpx { namespace util {
                 if (0 == name.find("lib"))
                     name = name.substr(3);
 #endif
-#if defined(__APPLE__)    // shared library version is added berfore extension
+#if defined(__APPLE__)    // shared library version is added before extension
                 const std::string version = hpx::full_version_as_string();
                 std::string::size_type i = name.find(version);
                 if (i != std::string::npos)
