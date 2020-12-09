@@ -21,6 +21,7 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <memory>
 #include <string>
@@ -30,9 +31,6 @@
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 
 namespace hpx { namespace cuda { namespace experimental { namespace detail {
-
-    HPX_EXPORT void register_polling(hpx::threads::thread_pool_base&);
-    HPX_EXPORT void unregister_polling(hpx::threads::thread_pool_base&);
 
     mutex_type& get_list_mtx()
     {
@@ -80,10 +78,21 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
             hpx::util::internal_allocator<>{}, stream);
     }
 
+#if defined(HPX_DEBUG)
+    std::atomic<std::size_t>& get_register_polling_count()
+    {
+        static std::atomic<std::size_t> register_polling_count{0};
+        return register_polling_count;
+    }
+#endif
+
     // -------------------------------------------------------------
     // main API call to get a future from a stream
     hpx::future<void> get_future_with_event(cudaStream_t stream)
     {
+        HPX_ASSERT_MSG(get_register_polling_count() != 0,
+            "CUDA event polling has not been enabled on any pool. Make sure "
+            "that CUDA event polling is enabled on at least one thread pool.");
         return get_future_with_event(hpx::util::internal_allocator<>{}, stream);
     }
 
@@ -256,6 +265,9 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
     // -------------------------------------------------------------
     void register_polling(hpx::threads::thread_pool_base& pool)
     {
+#if defined(HPX_DEBUG)
+        ++get_register_polling_count();
+#endif
         cud_debug.debug(debug::str<>("enable polling"));
         auto* sched = pool.get_scheduler();
         sched->set_cuda_polling_function(
@@ -265,9 +277,25 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
     // -------------------------------------------------------------
     void unregister_polling(hpx::threads::thread_pool_base& pool)
     {
+#if defined(HPX_DEBUG)
+        {
+            std::unique_lock<hpx::cuda::experimental::detail::mutex_type> lk(
+                detail::get_list_mtx());
+            bool event_queue_empty = get_event_queue().size_approx() == 0;
+            bool active_futures_empty = get_active_futures().empty();
+            lk.unlock();
+            HPX_ASSERT_MSG(event_queue_empty,
+                "CUDA event polling was disabled while there are unprocessed "
+                "CUDA events. Make sure CUDA event polling is not disabled too "
+                "early.");
+            HPX_ASSERT_MSG(active_futures_empty,
+                "CUDA event polling was disabled while there are active CUDA "
+                "futures. Make sure CUDA event polling is not disabled too "
+                "early.");
+        }
+#endif
         cud_debug.debug(debug::str<>("disable polling"));
         auto* sched = pool.get_scheduler();
         sched->clear_cuda_polling_function();
     }
-
 }}}}    // namespace hpx::cuda::experimental::detail

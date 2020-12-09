@@ -302,8 +302,9 @@ namespace hpx { namespace cuda { namespace experimental {
         HPX_EXPORT hpx::future<void> get_future_with_event(cudaStream_t);
 
         // -------------------------------------------------------------
-        void register_polling(hpx::threads::thread_pool_base& pool);
-        void unregister_polling(hpx::threads::thread_pool_base& pool);
+        HPX_EXPORT void register_polling(hpx::threads::thread_pool_base& pool);
+        HPX_EXPORT void unregister_polling(
+            hpx::threads::thread_pool_base& pool);
 
         // -------------------------------------------------------------
     }    // namespace detail

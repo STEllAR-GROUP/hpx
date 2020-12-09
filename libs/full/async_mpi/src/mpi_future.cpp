@@ -12,6 +12,7 @@
 #include <hpx/mpi_base/mpi_environment.hpp>
 #include <hpx/synchronization/mutex.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <memory>
 #include <ostream>
@@ -132,6 +133,13 @@ namespace hpx { namespace mpi { namespace experimental {
                 [](MPI_Request r) { return r != MPI_REQUEST_NULL; });
         }
 
+#if defined(HPX_DEBUG)
+        std::atomic<std::size_t>& get_register_polling_count()
+        {
+            static std::atomic<std::size_t> register_polling_count{0};
+            return register_polling_count;
+        }
+#endif
     }    // namespace detail
 
     // return a future object from a user supplied MPI_Request
@@ -139,6 +147,11 @@ namespace hpx { namespace mpi { namespace experimental {
     {
         if (request != MPI_REQUEST_NULL)
         {
+            HPX_ASSERT_MSG(detail::get_register_polling_count() != 0,
+                "MPI event polling has not been enabled on any pool. Make sure "
+                "that MPI event polling is enabled on at least one thread "
+                "pool.");
+
             // create a future data shared state with the request Id
             detail::future_data_ptr data(new detail::future_data(
                 detail::future_data::init_no_addref{}, request));
@@ -326,6 +339,9 @@ namespace hpx { namespace mpi { namespace experimental {
         // -------------------------------------------------------------
         void register_polling(hpx::threads::thread_pool_base& pool)
         {
+#if defined(HPX_DEBUG)
+            ++get_register_polling_count();
+#endif
             mpi_debug.debug(debug::str<>("enable polling"));
             auto* sched = pool.get_scheduler();
             sched->set_mpi_polling_function(&hpx::mpi::experimental::poll);
@@ -334,6 +350,23 @@ namespace hpx { namespace mpi { namespace experimental {
         // -------------------------------------------------------------
         void unregister_polling(hpx::threads::thread_pool_base& pool)
         {
+#if defined(HPX_DEBUG)
+            {
+                std::unique_lock<hpx::mpi::experimental::detail::mutex_type> lk(
+                    detail::get_vector_mtx());
+                bool active_requests_empty = get_active_requests().empty();
+                bool active_futures_empty = get_active_futures().empty();
+                lk.unlock();
+                HPX_ASSERT_MSG(active_requests_empty,
+                    "MPI request polling was disabled while there are "
+                    "unprocessed MPI requests. Make sure MPI request polling "
+                    "is not disabled too early.");
+                HPX_ASSERT_MSG(active_futures_empty,
+                    "MPI request polling was disabled while there are active "
+                    "MPI futures. Make sure MPI request polling is not "
+                    "disabled too early.");
+            }
+#endif
             mpi_debug.debug(debug::str<>("disable polling"));
             auto* sched = pool.get_scheduler();
             sched->clear_mpi_polling_function();
