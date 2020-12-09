@@ -666,7 +666,7 @@ namespace hpx { namespace util { namespace detail {
     struct mapping_strategy_base
     {
         template <typename T>
-        auto may_void(T&& element) const -> typename std::decay<T>::type
+        decltype(auto) may_void(T&& element) const
         {
             return std::forward<T>(element);
         }
