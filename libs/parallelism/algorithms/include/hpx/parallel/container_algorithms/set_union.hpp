@@ -399,10 +399,10 @@ namespace hpx { namespace ranges {
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
-            static_assert((hpx::traits::is_forward_iterator<Iter1>::value),
-                "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<Iter2>::value),
-                "Requires at least forward iterator.");
+            static_assert((hpx::traits::is_input_iterator<Iter1>::value),
+                "Requires at least input iterator.");
+            static_assert((hpx::traits::is_input_iterator<Iter2>::value),
+                "Requires at least input iterator.");
             static_assert((hpx::traits::is_output_iterator<Iter3>::value),
                 "Requires at least output iterator.");
 
@@ -445,11 +445,11 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_iterator<Rng2>::type;
 
             static_assert(
-                (hpx::traits::is_forward_iterator<iterator_type1>::value),
-                "Requires at least forward iterator.");
+                (hpx::traits::is_input_iterator<iterator_type1>::value),
+                "Requires at least input iterator.");
             static_assert(
-                (hpx::traits::is_forward_iterator<iterator_type2>::value),
-                "Requires at least forward iterator.");
+                (hpx::traits::is_input_iterator<iterator_type2>::value),
+                "Requires at least input iterator.");
             static_assert((hpx::traits::is_output_iterator<Iter3>::value),
                 "Requires at least output iterator.");
 

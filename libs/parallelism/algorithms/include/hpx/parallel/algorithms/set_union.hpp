@@ -374,10 +374,10 @@ namespace hpx {
         friend FwdIter3 tag_invoke(set_union_t, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, Pred&& op = Pred())
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
-                "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-                "Requires at least forward iterator.");
+            static_assert((hpx::traits::is_input_iterator<FwdIter1>::value),
+                "Requires at least input iterator.");
+            static_assert((hpx::traits::is_input_iterator<FwdIter2>::value),
+                "Requires at least input iterator.");
             static_assert((hpx::traits::is_output_iterator<FwdIter3>::value),
                 "Requires at least output iterator.");
 
