@@ -17,6 +17,9 @@
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
+// Still need to include the non-range header since we don't have search_n
+// sequential implementation supporting sentinels yet
+#include <hpx/parallel/algorithms/detail/search.hpp>
 #include <hpx/parallel/algorithms/search.hpp>
 
 #include <cstddef>
