@@ -502,10 +502,10 @@ namespace hpx { namespace ranges {
         template <typename Rng, typename T, typename Reduce, typename Convert,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
-                hpx::traits::is_invocable<Convert,
+                hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_traits<Rng>::value_type
-                >::value &&
-                hpx::traits::is_invocable<Reduce,
+                > &&
+                hpx::is_invocable_v<Reduce,
                     typename hpx::util::invoke_result<Convert,
                         typename hpx::traits::range_traits<Rng>::value_type
                     >::type,

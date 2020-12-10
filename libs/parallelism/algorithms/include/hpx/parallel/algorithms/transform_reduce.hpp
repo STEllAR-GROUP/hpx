@@ -304,7 +304,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     typename std::iterator_traits<Iter>::value_type;
 
                 return detail::accumulate(first, last, std::forward<T_>(init),
-                    [&r, &conv](T const& res, value_type&& next) -> T {
+                    [&r, &conv](T const& res, value_type const& next) -> T {
                         return hpx::util::invoke(
                             r, res, hpx::util::invoke(conv, next));
                     });
