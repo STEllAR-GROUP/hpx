@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2015 Hartmut Kaiser
 //  Copyright (c)      2018 Taeguk Kwon
+//  Copyright (c)      2020 ETH Zurich
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +8,7 @@
 
 #pragma once
 
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/include/parallel_execution_policy.hpp>
 #include <hpx/include/util.hpp>
 
@@ -19,6 +21,47 @@
 #include <vector>
 
 namespace test {
+    ///////////////////////////////////////////////////////////////////////////
+    // Sentinel constructed from an Iterator just for the purpose of the
+    // overloads tests
+    template <typename IterType,
+        HPX_CONCEPT_REQUIRES_(hpx::traits::is_iterator<IterType>::value)>
+    struct sentinel_from_iterator
+    {
+        explicit sentinel_from_iterator(IterType end_iter)
+          : end(end_iter)
+        {
+        }
+
+        IterType get()
+        {
+            return end;
+        }
+
+        friend bool operator==(IterType i, sentinel_from_iterator<IterType> s)
+        {
+            return i == s.get();
+        }
+
+        friend bool operator==(sentinel_from_iterator<IterType> s, IterType i)
+        {
+            return i == s.get();
+        }
+
+        friend bool operator!=(IterType i, sentinel_from_iterator<IterType> s)
+        {
+            return i != s.get();
+        }
+
+        friend bool operator!=(sentinel_from_iterator<IterType> s, IterType i)
+        {
+            return i != s.get();
+        }
+
+    private:
+        IterType end;
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename BaseIterator, typename IteratorTag>
     struct test_iterator
