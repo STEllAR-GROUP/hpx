@@ -227,11 +227,18 @@ namespace hpx { namespace resiliency { namespace experimental {
     // on error exactly \a n times (except if abort_replay_exception is thrown).
     // clang-format off
     template <typename Executor, typename Pred, typename F, typename... Ts,
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
         HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_one_way_executor<Executor>::value ||
             hpx::traits::is_two_way_executor<Executor>::value ||
             hpx::traits::is_threads_executor<Executor>::value
         )>
+#else
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_one_way_executor<Executor>::value ||
+            hpx::traits::is_two_way_executor<Executor>::value
+        )>
+#endif
     // clang-format on
     decltype(auto) tag_invoke(async_replay_validate_t, Executor&& exec,
         std::size_t n, Pred&& pred, F&& f, Ts&&... ts)
@@ -251,11 +258,18 @@ namespace hpx { namespace resiliency { namespace experimental {
     // on error exactly \a n times (except if abort_replay_exception is thrown).
     // clang-format off
     template <typename Executor, typename F, typename... Ts,
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
         HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_one_way_executor<Executor>::value ||
             hpx::traits::is_two_way_executor<Executor>::value ||
             hpx::traits::is_threads_executor<Executor>::value
         )>
+#else
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_one_way_executor<Executor>::value ||
+            hpx::traits::is_two_way_executor<Executor>::value
+        )>
+#endif
     // clang-format on
     decltype(auto) tag_invoke(
         async_replay_t, Executor&& exec, std::size_t n, F&& f, Ts&&... ts)

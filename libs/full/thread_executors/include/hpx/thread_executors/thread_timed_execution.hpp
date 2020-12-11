@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/future.hpp>
@@ -116,3 +117,4 @@ namespace hpx { namespace threads {
             .get();
     }
 }}    // namespace hpx::threads
+#endif

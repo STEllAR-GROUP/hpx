@@ -96,8 +96,11 @@ namespace hpx { namespace lcos { namespace detail {
     template <typename Future, typename Executor>
     struct future_then_dispatch<Future, Executor,
         typename std::enable_if<traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value ||
-            traits::is_threads_executor<Executor>::value>::type>
+            traits::is_two_way_executor<Executor>::value
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+            || traits::is_threads_executor<Executor>::value
+#endif
+            >::type>
     {
         template <typename Executor_, typename F>
         HPX_FORCEINLINE static
@@ -126,8 +129,11 @@ namespace hpx { namespace lcos { namespace detail {
     struct future_then_dispatch<Future, FD,
         typename std::enable_if<!traits::is_launch_policy<FD>::value &&
             !(traits::is_one_way_executor<FD>::value ||
-                traits::is_two_way_executor<FD>::value ||
-                traits::is_threads_executor<FD>::value)>::type>
+                traits::is_two_way_executor<FD>::value
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+                || traits::is_threads_executor<FD>::value
+#endif
+                )>::type>
     {
         template <typename F>
         HPX_FORCEINLINE static auto call(Future&& fut, F&& f)

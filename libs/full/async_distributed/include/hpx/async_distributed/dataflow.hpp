@@ -76,8 +76,11 @@ namespace hpx { namespace lcos { namespace detail {
     struct dataflow_dispatch_impl<true, FD,
         typename std::enable_if<!traits::is_launch_policy<FD>::value &&
             !(traits::is_one_way_executor<FD>::value ||
-                traits::is_two_way_executor<FD>::value ||
-                traits::is_threads_executor<FD>::value)>::type>
+                traits::is_two_way_executor<FD>::value
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+                || traits::is_threads_executor<FD>::value
+#endif
+                )>::type>
     {
         template <typename Allocator, typename Component, typename Signature,
             typename Derived, typename... Ts>

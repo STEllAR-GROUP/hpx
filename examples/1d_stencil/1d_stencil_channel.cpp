@@ -36,7 +36,7 @@ using communication_type = double;
 HPX_REGISTER_CHANNEL_DECLARATION(communication_type);
 HPX_REGISTER_CHANNEL(communication_type, stencil_communication);
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::size_t Nx_global = vm["Nx"].as<std::size_t>();
     std::size_t steps = vm["steps"].as<std::size_t>();

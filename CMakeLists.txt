@@ -1569,7 +1569,7 @@ endif()
 # HPX_WITH_ACTION_BASE_COMPATIBILITY: introduced in V1.4.0
 hpx_option(
   HPX_WITH_ACTION_BASE_COMPATIBILITY BOOL
-  "Enable deprecated action bases (default: ON)" ON ADVANCED
+  "Enable deprecated action bases (default: OFF)" OFF ADVANCED
 )
 if(HPX_WITH_ACTION_BASE_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_ACTION_BASE_COMPATIBILITY)
@@ -1579,8 +1579,8 @@ endif()
 hpx_option(
   HPX_WITH_REGISTER_THREAD_COMPATIBILITY
   BOOL
-  "Enable deprecated register_thread/work functions in the hpx::applier namespace (default: ON)"
-  ON
+  "Enable deprecated register_thread/work functions in the hpx::applier namespace (default: OFF)"
+  OFF
   ADVANCED
 )
 if(HPX_WITH_REGISTER_THREAD_COMPATIBILITY)
@@ -1609,8 +1609,8 @@ endif()
 # HPX_WITH_PROMISE_ALIAS_COMPATIBILITY : introduced in V1.5.0?
 hpx_option(
   HPX_WITH_PROMISE_ALIAS_COMPATIBILITY BOOL
-  "Enable deprecated alias of hpx::promise to hpx::lcos::promise (default: ON)"
-  ON ADVANCED
+  "Enable deprecated alias of hpx::promise to hpx::lcos::promise (default: OFF)"
+  OFF ADVANCED
 )
 if(HPX_WITH_PROMISE_ALIAS_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_PROMISE_ALIAS_COMPATIBILITY)
@@ -1619,7 +1619,7 @@ endif()
 # HPX_WITH_UNSCOPED_ENUM_COMPATIBILITY : introduced in V1.5.0
 hpx_option(
   HPX_WITH_UNSCOPED_ENUM_COMPATIBILITY BOOL
-  "Enable deprecated unscoped enums (default: ON)" ON ADVANCED
+  "Enable deprecated unscoped enums (default: OFF)" OFF ADVANCED
 )
 if(HPX_WITH_UNSCOPED_ENUM_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_UNSCOPED_ENUM_COMPATIBILITY)
@@ -2151,7 +2151,7 @@ set(HPX_WITH_TARGET_ARCHITECTURE
 # Compatibility with using Boost.ProgramOptions, introduced in V1.4.0
 hpx_option(
   HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY BOOL
-  "Enable Boost.ProgramOptions compatibility. (default: ON)" ON ADVANCED
+  "Enable Boost.ProgramOptions compatibility. (default: OFF)" OFF ADVANCED
   CATEGORY "Modules"
 )
 
@@ -2172,7 +2172,7 @@ hpx_option(
 # Compatibility for embedded thread pools, introduced in V1.5.0
 hpx_option(
   HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY BOOL
-  "Enable deprecated embedded thread pools (default: ON)" ON ADVANCED
+  "Enable deprecated embedded thread pools (default: OFF)" OFF ADVANCED
 )
 if(HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
@@ -2181,7 +2181,7 @@ endif()
 # Compatibility for thread pool os executors, introduced in V1.5.0
 hpx_option(
   HPX_WITH_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY BOOL
-  "Enable deprecated thread pool executors (default: ON)" ON ADVANCED
+  "Enable deprecated thread pool executors (default: OFF)" OFF ADVANCED
 )
 if(HPX_WITH_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
@@ -2190,7 +2190,7 @@ endif()
 # Compatibility for thread executors, introduced in V1.5.0
 hpx_option(
   HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY BOOL
-  "Enable deprecated thread executors (default: ON)" ON ADVANCED
+  "Enable deprecated thread executors (default: OFF)" OFF ADVANCED
 )
 if(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
@@ -2199,7 +2199,7 @@ endif()
 # Compatibility for thread aware timer, introduced in V1.5.0
 hpx_option(
   HPX_WITH_THREAD_AWARE_TIMER_COMPATIBILITY BOOL
-  "Enable deprecated thread_aware_timer (default: ON)" ON ADVANCED
+  "Enable deprecated thread_aware_timer (default: OFF)" OFF ADVANCED
 )
 if(HPX_WITH_THREAD_AWARE_TIMER_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_THREAD_AWARE_TIMER_COMPATIBILITY)
@@ -2208,7 +2208,7 @@ endif()
 # Compatibility for pool executor, introduced in V1.5.0
 hpx_option(
   HPX_WITH_POOL_EXECUTOR_COMPATIBILITY BOOL
-  "Enable deprecated pool executor (default: ON)" ON ADVANCED
+  "Enable deprecated pool executor (default: OFF)" OFF ADVANCED
 )
 if(HPX_WITH_POOL_EXECUTOR_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_POOL_EXECUTOR_COMPATIBILITY)

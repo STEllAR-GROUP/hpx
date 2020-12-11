@@ -11,18 +11,22 @@ set(tests
     run_as_os_thread_lockup_2991
     stackless_self_4155
     thread_data_1111
-    thread_pool_executor_1112
     thread_suspend_pending
     thread_suspend_duration
     threads_all_1422
 )
 
-if(HPX_WITH_LOCAL_SCHEDULER OR HPX_WITH_ALL_SCHEDULERS)
+if((HPX_WITH_LOCAL_SCHEDULER OR HPX_WITH_ALL_SCHEDULERS) AND
+    HPX_WITH_THREAD_POOL_OS_EXECUTORS_COMPATIBILITY)
   set(tests ${tests} thread_pool_executor_1114)
 endif()
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(tests ${tests} resume_priority thread_rescheduling)
+endif()
+
+if(HPX_WITH_THREAD_POOL_OS_EXECUTORS_COMPATIBILITY)
+  set(tests ${tests} thread_pool_executor_1112)
 endif()
 
 set(block_os_threads_1036_PARAMETERS THREADS_PER_LOCALITY 4)
