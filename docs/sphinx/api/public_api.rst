@@ -82,8 +82,8 @@ Functions
 - :cpp:func:`hpx::parallel::v1::reverse_copy`
 - :cpp:func:`hpx::parallel::v1::rotate`
 - :cpp:func:`hpx::parallel::v1::rotate_copy`
-- :cpp:func:`hpx::parallel::v1::search`
-- :cpp:func:`hpx::parallel::v1::search_n`
+- :cpp:func:`hpx::search`
+- :cpp:func:`hpx::search_n`
 - :cpp:func:`hpx::set_difference`
 - :cpp:func:`hpx::set_intersection`
 - :cpp:func:`hpx::set_symmetric_difference`

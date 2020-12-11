@@ -19,6 +19,29 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_search1_without_expolicy(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    // fill vector with random values above 2
+    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    // create subsequence in middle of vector
+    c[c.size() / 2] = 1;
+    c[c.size() / 2 + 1] = 2;
+
+    std::size_t h[] = {1, 2};
+
+    iterator index = hpx::search(iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(h), std::end(h));
+
+    base_iterator test_index = std::begin(c) + c.size() / 2;
+
+    HPX_TEST(index == iterator(test_index));
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_search1(ExPolicy policy, IteratorTag)
 {
@@ -37,7 +60,7 @@ void test_search1(ExPolicy policy, IteratorTag)
 
     std::size_t h[] = {1, 2};
 
-    iterator index = hpx::parallel::search(policy, iterator(std::begin(c)),
+    iterator index = hpx::search(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
 
     base_iterator test_index = std::begin(c) + c.size() / 2;
@@ -60,7 +83,7 @@ void test_search1_async(ExPolicy p, IteratorTag)
 
     std::size_t h[] = {1, 2};
 
-    hpx::future<iterator> f = hpx::parallel::search(p, iterator(std::begin(c)),
+    hpx::future<iterator> f = hpx::search(p, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
     f.wait();
 
@@ -74,6 +97,8 @@ template <typename IteratorTag>
 void test_search1()
 {
     using namespace hpx::execution;
+    test_search1_without_expolicy(IteratorTag());
+
     test_search1(seq, IteratorTag());
     test_search1(par, IteratorTag());
     test_search1(par_unseq, IteratorTag());
@@ -86,6 +111,31 @@ void search_test1()
 {
     test_search1<std::random_access_iterator_tag>();
     test_search1<std::forward_iterator_tag>();
+}
+
+template <typename IteratorTag>
+void test_search2_without_expolicy(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    // fill vector with random values about 2
+    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    // create subsequence at start and end
+    c[0] = 1;
+    c[1] = 2;
+    c[c.size() - 1] = 2;
+    c[c.size() - 2] = 1;
+
+    std::size_t h[] = {1, 2};
+
+    iterator index = hpx::search(iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(h), std::end(h));
+
+    base_iterator test_index = std::begin(c);
+
+    HPX_TEST(index == iterator(test_index));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -108,7 +158,7 @@ void test_search2(ExPolicy policy, IteratorTag)
 
     std::size_t h[] = {1, 2};
 
-    iterator index = hpx::parallel::search(policy, iterator(std::begin(c)),
+    iterator index = hpx::search(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
 
     base_iterator test_index = std::begin(c);
@@ -133,7 +183,7 @@ void test_search2_async(ExPolicy p, IteratorTag)
 
     std::size_t h[] = {1, 2};
 
-    hpx::future<iterator> f = hpx::parallel::search(p, iterator(std::begin(c)),
+    hpx::future<iterator> f = hpx::search(p, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
     f.wait();
 
@@ -147,6 +197,8 @@ template <typename IteratorTag>
 void test_search2()
 {
     using namespace hpx::execution;
+    test_search2_without_expolicy(IteratorTag());
+
     test_search2(seq, IteratorTag());
     test_search2(par, IteratorTag());
     test_search2(par_unseq, IteratorTag());
@@ -179,7 +231,7 @@ void test_search3(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> h(sub_size);
     std::iota(std::begin(h), std::end(h), 1);
 
-    iterator index = hpx::parallel::search(policy, iterator(std::begin(c)),
+    iterator index = hpx::search(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
 
     base_iterator test_index = std::begin(c);
@@ -204,7 +256,7 @@ void test_search3_async(ExPolicy p, IteratorTag)
 
     // create only two partitions, splitting the desired sub sequence into
     // separate partitions.
-    hpx::future<iterator> f = hpx::parallel::search(p, iterator(std::begin(c)),
+    hpx::future<iterator> f = hpx::search(p, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
     f.wait();
 
@@ -252,7 +304,7 @@ void test_search4(ExPolicy policy, IteratorTag)
 
     auto op = [](std::size_t a, std::size_t b) { return !(a != b); };
 
-    iterator index = hpx::parallel::search(policy, iterator(std::begin(c)),
+    iterator index = hpx::search(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h), op);
 
     base_iterator test_index = std::begin(c) + c.size() / 2;
@@ -278,7 +330,7 @@ void test_search4_async(ExPolicy p, IteratorTag)
 
     auto op = [](std::size_t a, std::size_t b) { return !(a != b); };
 
-    hpx::future<iterator> f = hpx::parallel::search(p, iterator(std::begin(c)),
+    hpx::future<iterator> f = hpx::search(p, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h), op);
     f.wait();
 
@@ -328,7 +380,7 @@ void test_search_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::search(policy,
+        hpx::search(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(
@@ -366,7 +418,7 @@ void test_search_async_exception(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::future<decorated_iterator> f = hpx::parallel::search(p,
+        hpx::future<decorated_iterator> f = hpx::search(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(
@@ -429,7 +481,7 @@ void test_search_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::search(policy,
+        hpx::search(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c), []() { throw std::bad_alloc(); }),
             std::begin(h), std::end(h));
@@ -463,7 +515,7 @@ void test_search_async_bad_alloc(ExPolicy p, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::future<decorated_iterator> f = hpx::parallel::search(p,
+        hpx::future<decorated_iterator> f = hpx::search(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c), []() { throw std::bad_alloc(); }),
             std::begin(h), std::end(h));

@@ -39,6 +39,25 @@ struct user_defined_type_2
 };
 
 ////////////////////////////////////////////////////////////////////////////
+
+template <typename IteratorTag>
+void test_search1(IteratorTag)
+{
+    std::vector<std::size_t> c(10007);
+    // fill vector with random values above 2
+    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    // create subsequence in middle of vector
+    c[c.size() / 2] = 1;
+    c[c.size() / 2 + 1] = 2;
+
+    std::size_t h[] = {1, 2};
+
+    auto index = hpx::ranges::search(c, h);
+    auto test_index = std::begin(c) + c.size() / 2;
+
+    HPX_TEST(index == test_index);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_search1(ExPolicy policy, IteratorTag)
 {
@@ -54,7 +73,7 @@ void test_search1(ExPolicy policy, IteratorTag)
 
     std::size_t h[] = {1, 2};
 
-    auto index = hpx::parallel::search(policy, c, h);
+    auto index = hpx::ranges::search(policy, c, h);
     auto test_index = std::begin(c) + c.size() / 2;
 
     HPX_TEST(index == test_index);
@@ -72,7 +91,7 @@ void test_search1_async(ExPolicy p, IteratorTag)
 
     std::size_t h[] = {1, 2};
 
-    auto f = hpx::parallel::search(p, c, h);
+    auto f = hpx::ranges::search(p, c, h);
     f.wait();
 
     // create iterator at position of value to be found
@@ -85,6 +104,8 @@ template <typename IteratorTag>
 void test_search1()
 {
     using namespace hpx::execution;
+    test_search1(IteratorTag());
+
     test_search1(seq, IteratorTag());
     test_search1(par, IteratorTag());
     test_search1(par_unseq, IteratorTag());
@@ -116,7 +137,7 @@ void test_search2(ExPolicy policy, IteratorTag)
 
     std::size_t h[] = {1, 2};
 
-    auto index = hpx::parallel::search(policy, c, h);
+    auto index = hpx::ranges::search(policy, c, h);
 
     auto test_index = std::begin(c);
 
@@ -137,7 +158,7 @@ void test_search2_async(ExPolicy p, IteratorTag)
 
     std::size_t h[] = {1, 2};
 
-    auto f = hpx::parallel::search(p, c, h);
+    auto f = hpx::ranges::search(p, c, h);
     f.wait();
 
     // create iterator at position of value to be found
@@ -179,7 +200,7 @@ void test_search3(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> h(sub_size);
     std::iota(std::begin(h), std::end(h), 1);
 
-    auto index = hpx::parallel::search(policy, c, h);
+    auto index = hpx::ranges::search(policy, c, h);
 
     auto test_index = std::begin(c);
 
@@ -200,7 +221,7 @@ void test_search3_async(ExPolicy p, IteratorTag)
 
     // create only two partitions, splitting the desired sub sequence into
     // separate partitions.
-    auto f = hpx::parallel::search(p, c, h);
+    auto f = hpx::ranges::search(p, c, h);
     f.wait();
 
     //create iterator at position of value to be found
@@ -227,6 +248,65 @@ void search_test3()
     test_search3<std::forward_iterator_tag>();
 }
 
+template <typename IteratorTag>
+void test_search4_sentinel(IteratorTag)
+{
+    // Using iter_sent for the iterator and sentinel types
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+    using sentinel = test::sentinel_from_iterator<iterator>;
+
+    std::vector<std::size_t> c(10007);
+    // fill vector with random values above 2
+    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    // create subsequence in middle of vector
+    c[c.size() / 2] = 1;
+    c[c.size() / 2 + 1] = 2;
+
+    std::vector<std::size_t> h = {1, 2};
+
+    auto op = [](std::size_t a, std::size_t b) { return !(a != b); };
+
+    iterator index =
+        hpx::ranges::search(iterator(std::begin(c)), sentinel(std::end(c)),
+            iterator(std::begin(h)), sentinel(std::end(h)), op);
+
+    base_iterator test_index = std::begin(c) + c.size() / 2;
+
+    HPX_TEST(index == iterator(test_index));
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_search4_sentinel(ExPolicy policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+    using sentinel = test::sentinel_from_iterator<iterator>;
+
+    std::vector<std::size_t> c(10007);
+    // fill vector with random values above 2
+    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    // create subsequence in middle of vector
+    c[c.size() / 2] = 1;
+    c[c.size() / 2 + 1] = 2;
+
+    //std::size_t h[] = {1, 2};
+    std::vector<std::size_t> h = {1, 2};
+
+    auto op = [](std::size_t a, std::size_t b) { return !(a != b); };
+
+    iterator index = hpx::ranges::search(policy, iterator(std::begin(c)),
+        sentinel(std::end(c)), iterator(std::begin(h)), sentinel(std::end(h)),
+        op);
+
+    base_iterator test_index = std::begin(c) + c.size() / 2;
+
+    HPX_TEST(index == iterator(test_index));
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_search4(ExPolicy policy, IteratorTag)
 {
@@ -244,7 +324,7 @@ void test_search4(ExPolicy policy, IteratorTag)
 
     auto op = [](std::size_t a, std::size_t b) { return !(a != b); };
 
-    auto index = hpx::parallel::search(policy, c, h, op);
+    auto index = hpx::ranges::search(policy, c, h, op);
 
     auto test_index = std::begin(c) + c.size() / 2;
 
@@ -266,7 +346,7 @@ void test_search4_async(ExPolicy p, IteratorTag)
 
     auto op = [](std::size_t a, std::size_t b) { return !(a != b); };
 
-    auto f = hpx::parallel::search(p, c, h, op);
+    auto f = hpx::ranges::search(p, c, h, op);
     f.wait();
 
     // create iterator at position of value to be found
@@ -279,6 +359,12 @@ template <typename IteratorTag>
 void test_search4()
 {
     using namespace hpx::execution;
+    test_search4_sentinel(IteratorTag());
+
+    test_search4_sentinel(seq, IteratorTag());
+    test_search4_sentinel(par, IteratorTag());
+    test_search4_sentinel(par_unseq, IteratorTag());
+
     test_search4(seq, IteratorTag());
     test_search4(par, IteratorTag());
     test_search4(par_unseq, IteratorTag());
@@ -317,7 +403,7 @@ void test_search5(ExPolicy policy, IteratorTag)
 
     auto proj2 = [](const user_defined_type_2& ut2) { return ut2.val; };
 
-    auto index = hpx::parallel::search(policy, c, h, op, proj1, proj2);
+    auto index = hpx::ranges::search(policy, c, h, op, proj1, proj2);
     auto test_index = std::begin(c) + c.size() / 2;
 
     HPX_TEST(index == test_index);
@@ -343,7 +429,7 @@ void test_search5_async(ExPolicy p, IteratorTag)
 
     auto proj2 = [](const user_defined_type_2& ut2) { return ut2.val; };
 
-    auto f = hpx::parallel::search(p, c, h, op, proj1, proj2);
+    auto f = hpx::ranges::search(p, c, h, op, proj1, proj2);
     f.wait();
 
     // create iterator at position of value to be found

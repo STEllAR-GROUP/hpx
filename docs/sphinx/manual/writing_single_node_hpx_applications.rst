@@ -419,11 +419,11 @@ Parallel algorithms
      * Checks if a predicate is ``true`` for none of the elements in a range.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`all_any_none_of`
-   * * :cpp:func:`hpx::parallel::v1::search`
+   * * :cpp:func:`hpx::search`
      * Searches for a range of elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`search`
-   * * :cpp:func:`hpx::parallel::v1::search_n`
+   * * :cpp:func:`hpx::search_n`
      * Searches for a number consecutive copies of an element in a range.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`search_n`
