@@ -552,7 +552,6 @@ int hpx_main(variables_map& vm)
 
         for (int i = 0; i < repetitions; i++)
         {
-            measure_function_futures_limiting_executor(count, csv, par);
             measure_function_futures_create_thread_hierarchical_placement(
                 count, csv);
             if (test_all)
