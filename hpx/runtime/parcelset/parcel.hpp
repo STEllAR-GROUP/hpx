@@ -69,7 +69,7 @@ namespace hpx { namespace parcelset
         };
     }
 
-    class HPX_EXPORT parcel
+    class parcel
     {
     private:
         using split_gids_type =

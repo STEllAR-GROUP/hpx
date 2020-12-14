@@ -20,7 +20,7 @@
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/actions/trigger.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/trigger_lco.hpp>
+#include <hpx/runtime/trigger_lco_fwd.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/is_continuation.hpp>
@@ -434,4 +434,8 @@ namespace hpx { namespace actions
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
+
+// this file is intentionally #included last as it refers to functions defined
+// here
+#include <hpx/runtime/trigger_lco.hpp>
 

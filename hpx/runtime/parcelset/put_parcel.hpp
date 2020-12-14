@@ -24,6 +24,7 @@
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/runtime/parcelset/put_parcel_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
@@ -80,44 +81,34 @@ namespace hpx { namespace parcelset
                 std::forward<Arg0>(arg0), std::forward<Args>(args)...);
         }
 
-        struct create_parcel
+        template <typename... Args>
+        parcel create_parcel::call(
+            naming::gid_type&& dest, naming::address&& addr,
+            Args&&... args)
         {
-            template <typename... Args>
-            static parcel call(
-                naming::gid_type&& dest, naming::address&& addr,
-                Args&&... args)
-            {
-                return parcel(
-                    std::move(dest), std::move(addr),
-                    detail::make_parcel_action(std::forward<Args>(args)...));
-            }
+            return parcel(
+                std::move(dest), std::move(addr),
+                detail::make_parcel_action(std::forward<Args>(args)...));
+        }
 
-            static parcel call_with_action(
-                naming::gid_type&& dest, naming::address&& addr,
-                std::unique_ptr<actions::base_action>&& action)
-            {
-                return parcel(
-                    std::move(dest), std::move(addr),
-                    std::move(action));
-            }
-        };
+        parcel create_parcel::call_with_action(
+            naming::gid_type&& dest, naming::address&& addr,
+            std::unique_ptr<actions::base_action>&& action)
+        {
+            return parcel(
+                std::move(dest), std::move(addr),
+                std::move(action));
+        }
 
         template <typename PutParcel>
-        struct put_parcel_cont
+        void put_parcel_cont<PutParcel>::operator()(
+            hpx::future<naming::gid_type> f)
         {
-            typename std::decay<PutParcel>::type pp;
-            naming::id_type dest;
-            naming::address addr;
-            std::unique_ptr<actions::base_action> action;
-
-            void operator()(hpx::future<naming::gid_type> f)
-            {
-                pp(detail::create_parcel::call_with_action(
-                    f.get(), std::move(addr),
-                    std::move(action)
-                ));
-            }
-        };
+            pp(detail::create_parcel::call_with_action(
+                f.get(), std::move(addr),
+                std::move(action)
+            ));
+        }
 
         template <typename PutParcel>
         void put_parcel_impl(PutParcel&& pp,
