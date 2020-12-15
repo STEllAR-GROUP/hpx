@@ -696,8 +696,10 @@ namespace hpx {
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-                "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value ||
+                    (hpx::is_sequenced_execution_policy<ExPolicy>::value &&
+                        hpx::traits::is_output_iterator<FwdIter2>::value),
+                "Requires at least forward iterator or sequential execution.");
 
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::v1::detail::is_negative(count))
@@ -727,8 +729,8 @@ namespace hpx {
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-                "Requires at least forward iterator.");
+            static_assert((hpx::traits::is_output_iterator<FwdIter2>::value),
+                "Requires at least output iterator.");
 
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::v1::detail::is_negative(count))
@@ -771,8 +773,10 @@ namespace hpx {
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-                "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value ||
+                    (hpx::is_sequenced_execution_policy<ExPolicy>::value &&
+                        hpx::traits::is_output_iterator<FwdIter2>::value),
+                "Requires at least forward iterator or sequential execution.");
 
             using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
@@ -799,8 +803,8 @@ namespace hpx {
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-                "Requires at least forward iterator.");
+            static_assert((hpx::traits::is_output_iterator<FwdIter2>::value),
+                "Requires at least output iterator.");
 
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::copy_if<

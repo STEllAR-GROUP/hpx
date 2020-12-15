@@ -392,9 +392,11 @@ namespace hpx { namespace traits {
     template <typename Iter, typename Enable = void>
     struct is_output_iterator
       : std::integral_constant<bool,
-            detail::has_category<typename std::decay<Iter>::type,
+            detail::belongs_to_iterator_category<
+                typename std::decay<Iter>::type,
                 std::output_iterator_tag>::value ||
-                detail::has_traversal<typename std::decay<Iter>::type,
+                detail::belongs_to_iterator_traversal<
+                    typename std::decay<Iter>::type,
                     boost::incrementable_traversal_tag>::value>
     {
     };
