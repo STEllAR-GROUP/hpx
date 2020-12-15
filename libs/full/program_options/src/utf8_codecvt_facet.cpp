@@ -63,7 +63,8 @@ namespace hpx { namespace program_options { namespace detail {
 
             // The first octet is   adjusted by a value dependent upon
             // the number   of "continuing octets" encoding the character
-            const int cont_octet_count = get_cont_octet_count(*from);
+            const int cont_octet_count =
+                static_cast<int>(get_cont_octet_count(*from));
             const wchar_t octet1_modifier_table[] = {
                 0x00, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc};
 

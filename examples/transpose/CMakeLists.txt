@@ -10,7 +10,9 @@ set(example_programs transpose_serial transpose_serial_block transpose_smp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(example_programs ${example_programs} transpose_block transpose_serial_vector)
+  set(example_programs ${example_programs} transpose_block
+                       transpose_serial_vector
+  )
   if(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY)
     set(example_programs ${example_programs} transpose_block_numa)
   endif()
