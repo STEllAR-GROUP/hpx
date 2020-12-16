@@ -9,13 +9,13 @@
 // Tasks should always report the right core number when they run.
 
 #include <hpx/debugging/print.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/threads.hpp>
-#include <hpx/modules/async_local.hpp>
-#include <hpx/schedulers/shared_priority_queue_scheduler.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
+#include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/thread_executors/default_executor.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/thread.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -62,7 +62,7 @@ void threadLoop()
     // launch tasks on threads using numbering 0,1,2,3...0,1,2,3
     for (std::size_t i = 0; i < iterations; ++i)
     {
-        auto exec = hpx::threads::executors::default_executor(
+        auto exec = hpx::execution::parallel_executor(
             hpx::threads::thread_priority::bound,
             hpx::threads::thread_stacksize::default_,
             hpx::threads::thread_schedule_hint(std::int16_t(i % threads)));
