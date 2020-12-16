@@ -10,8 +10,8 @@
 #include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace experimental {
     HPX_INLINE_CONSTEXPR_VARIABLE struct prefer_t
