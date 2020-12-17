@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2018 Hartmut Kaiser
+//  Copyright (c) 2014-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +15,7 @@
 #include <hpx/async_colocated/apply_colocated_fwd.hpp>
 #include <hpx/async_colocated/async_colocated.hpp>
 #include <hpx/async_colocated/async_colocated_callback.hpp>
-#include <hpx/async_distributed/applier/detail/apply_implementations.hpp>
+#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/detail/async_implementations.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
