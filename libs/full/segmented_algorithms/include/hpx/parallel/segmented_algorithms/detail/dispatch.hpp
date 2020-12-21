@@ -141,9 +141,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             typename traits2::local_raw_iterator,
             typename traits3::local_raw_iterator>&& p)
         {
-            return util::in_in_out_result<typename traits1::local_raw_iterator,
-                typename traits2::local_raw_iterator, 
-                typename traits3::local_raw_iterator>{
+            return util::in_in_out_result<typename traits1::local_iterator,
+                typename traits2::local_iterator,
+                typename traits3::local_iterator>{
                 traits1::remote(std::move(p.in1)),
                 traits2::remote(std::move(p.in2)),
                 traits3::remote(std::move(p.out))};
@@ -303,9 +303,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                     return  util::in_in_out_result<typename traits1::local_iterator,
                         typename traits2::local_iterator,
                         typename traits3::local_iterator>{
-                        traits1::remote(p.in1),
-                        traits2::remote(p.in2),
-                        traits3::remote(p.out)};
+                        traits1::remote(std::move(p.in1)),
+                        traits2::remote(std::move(p.in2)),
+                        traits3::remote(std::move(p.out))};
                 });
             // clang-format on
         }
