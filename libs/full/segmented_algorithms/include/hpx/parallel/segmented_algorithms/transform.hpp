@@ -10,8 +10,6 @@
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/parallel/util/tagged_pair.hpp>
-#include <hpx/parallel/util/tagged_tuple.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

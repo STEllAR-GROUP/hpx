@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -396,8 +397,6 @@ namespace hpx {
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/parallel/util/tagged_pair.hpp>
-#include <hpx/parallel/util/tagged_tuple.hpp>
 
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/transform.hpp>

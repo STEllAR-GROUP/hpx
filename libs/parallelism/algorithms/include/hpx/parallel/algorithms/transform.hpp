@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -182,8 +183,6 @@ namespace hpx {
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/parallel/util/tagged_pair.hpp>
-#include <hpx/parallel/util/tagged_tuple.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
@@ -382,7 +381,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::transform is deprecated, use hpx::transform instead")
         typename util::detail::algorithm_result<ExPolicy,
-            hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
+            util::in_out_result<FwdIter1, FwdIter2>>::type
         transform(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
             FwdIter2 dest, F&& f, Proj&& proj = Proj())
     {
@@ -493,9 +492,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename OutIter, typename F, typename Proj1, typename Proj2>
-            static util::in_in_out_result<InIter1, InIter2, OutIter> sequential(ExPolicy&&,
-                InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest,
-                F&& f, Proj1&& proj1, Proj2&& proj2)
+            static util::in_in_out_result<InIter1, InIter2, OutIter> sequential(
+                ExPolicy&&, InIter1 first1, InIter1 last1, InIter2 first2,
+                OutIter dest, F&& f, Proj1&& proj1, Proj2&& proj2)
             {
                 return util::transform_binary_loop<ExPolicy>(first1, last1,
                     first2, dest,
@@ -592,10 +591,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::transform is deprecated, use hpx::transform instead")
         typename util::detail::algorithm_result<ExPolicy,
-            hpx::util::tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2),
-                tag::out(FwdIter3)>>::type transform(ExPolicy&& policy,
-            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter3 dest,
-            F&& f, Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+            util::in_in_out_result<FwdIter1, FwdIter2, FwdIter3>>::type
+        transform(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, FwdIter3 dest, F&& f, Proj1&& proj1 = Proj1(),
+            Proj2&& proj2 = Proj2())
     {
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
 
@@ -619,9 +618,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename OutIter, typename F, typename Proj1, typename Proj2>
-            static util::in_in_out_result<InIter1, InIter2, OutIter> sequential(ExPolicy&&,
-                InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
-                OutIter dest, F&& f, Proj1&& proj1, Proj2&& proj2)
+            static util::in_in_out_result<InIter1, InIter2, OutIter> sequential(
+                ExPolicy&&, InIter1 first1, InIter1 last1, InIter2 first2,
+                InIter2 last2, OutIter dest, F&& f, Proj1&& proj1,
+                Proj2&& proj2)
             {
                 return util::transform_binary_loop<ExPolicy>(first1, last1,
                     first2, last2, dest,
@@ -718,8 +718,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::transform is deprecated, use hpx::transform instead")
         typename util::detail::algorithm_result<ExPolicy,
-            hpx::util::tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2),
-                tag::out(FwdIter3)>>::type
+            util::in_in_out_result<FwdIter1, FwdIter2, FwdIter3>>::type
         transform(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, F&& f,
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
@@ -795,8 +794,8 @@ namespace hpx {
             FwdIter1 last, FwdIter2 dest, F&& f)
         {
             return parallel::util::get_second_element(
-                parallel::v1::detail::transform_(hpx::execution::seq,
-                    first, last, dest, std::forward<F>(f),
+                parallel::v1::detail::transform_(hpx::execution::seq, first,
+                    last, dest, std::forward<F>(f),
                     hpx::parallel::util::projection_identity(),
                     std::false_type{}));
         }
@@ -837,11 +836,9 @@ namespace hpx {
             using proj_id = hpx::parallel::util::projection_identity;
 
             return parallel::util::get_third_element(
-                parallel::v1::detail::transform_(hpx::execution::seq,
-                    first1, last1, first2, dest, std::forward<F>(f),
-                    proj_id(),
-                    proj_id(),
-                    std::false_type{}));
+                parallel::v1::detail::transform_(hpx::execution::seq, first1,
+                    last1, first2, dest, std::forward<F>(f), proj_id(),
+                    proj_id(), std::false_type{}));
         }
 
         // clang-format off
@@ -866,10 +863,8 @@ namespace hpx {
 
             return parallel::util::get_third_element(
                 parallel::v1::detail::transform_(std::forward<ExPolicy>(policy),
-                    first1, last1, first2, dest, std::forward<F>(f),
-                    proj_id(),
-                    proj_id(),
-                    is_segmented()));
+                    first1, last1, first2, dest, std::forward<F>(f), proj_id(),
+                    proj_id(), is_segmented()));
         }
 
     } transform{};
