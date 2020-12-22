@@ -23,9 +23,6 @@
 template <typename IteratorTag>
 void test_transform(IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
     typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
 
     test_vector c(10007);

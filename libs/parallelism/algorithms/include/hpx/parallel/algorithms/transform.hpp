@@ -839,8 +839,8 @@ namespace hpx {
             return parallel::util::get_third_element(
                 parallel::v1::detail::transform_(hpx::execution::seq,
                     first1, last1, first2, dest, std::forward<F>(f),
-                    hpx::parallel::util::projection_identity(),
-                    hpx::parallel::util::projection_identity(),
+                    proj_id(),
+                    proj_id(),
                     std::false_type{}));
         }
 
@@ -867,8 +867,8 @@ namespace hpx {
             return parallel::util::get_third_element(
                 parallel::v1::detail::transform_(std::forward<ExPolicy>(policy),
                     first1, last1, first2, dest, std::forward<F>(f),
-                    hpx::parallel::util::projection_identity(),
-                    hpx::parallel::util::projection_identity(),
+                    proj_id(),
+                    proj_id(),
                     is_segmented()));
         }
 
