@@ -505,6 +505,15 @@ function(hpx_check_for_cxx20_coroutines)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_cxx20_no_unique_address_attribute)
+  add_hpx_config_test(
+    HPX_WITH_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
+    SOURCE cmake/tests/cxx20_no_unique_address_attribute.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_cxx20_std_disable_sized_sentinel_for)
   add_hpx_config_test(
     HPX_WITH_CXX20_STD_DISABLE_SIZED_SENTINEL_FOR
@@ -514,10 +523,10 @@ function(hpx_check_for_cxx20_std_disable_sized_sentinel_for)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx20_no_unique_address_attribute)
+function(hpx_check_for_cxx20_std_endian)
   add_hpx_config_test(
-    HPX_WITH_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
-    SOURCE cmake/tests/cxx20_no_unique_address_attribute.cpp
+    HPX_WITH_CXX20_STD_ENDIAN
+    SOURCE cmake/tests/cxx20_std_endian.cpp
     FILE ${ARGN}
   )
 endfunction()

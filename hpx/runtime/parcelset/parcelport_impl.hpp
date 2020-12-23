@@ -13,25 +13,24 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/config/endian.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/modules/errors.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/threading.hpp>
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/modules/threading.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/execution_base/this_thread.hpp>
-
-#include <boost/predef/other/endian.h>
 
 #include <atomic>
 #include <chrono>
@@ -123,11 +122,8 @@ namespace hpx { namespace parcelset
                 hpx::get_config_entry("hpx.max_background_threads",
                     (std::numeric_limits<std::size_t>::max)())))
         {
-#if BOOST_ENDIAN_BIG_BYTE
-            std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
-#else
-            std::string endian_out = get_config_entry("hpx.parcel.endian_out", "little");
-#endif
+            std::string endian_out = get_config_entry("hpx.parcel.endian_out",
+                endian::native == endian::big ? "big" : "little");
             if (endian_out == "little")
                 archive_flags_ |= serialization::endian_little;
             else if (endian_out == "big")
