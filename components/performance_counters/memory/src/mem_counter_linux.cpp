@@ -15,13 +15,13 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_uint.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
 #include <boost/fusion/include/define_struct.hpp>
 #include <boost/fusion/include/io.hpp>
+#include <boost/spirit/home/support/iterators/istream_iterator.hpp>
+#include <boost/spirit/home/x3/char.hpp>
+#include <boost/spirit/home/x3/core.hpp>
+#include <boost/spirit/home/x3/numeric.hpp>
+#include <boost/spirit/home/x3/operator.hpp>
 
 #include <algorithm>
 #include <cstdint>
@@ -31,50 +31,31 @@
 #include <string>
 #include <vector>
 
-BOOST_FUSION_DEFINE_STRUCT(
-    (hpx)(performance_counters)(memory),
-    proc_statm,
-    (std::uint64_t,   size)
-    (std::uint64_t,   resident)
-    (std::uint64_t,   share)
-    (std::uint64_t,   text)
-    (std::uint64_t,   lib)
-    (std::uint64_t,   data)
-    (std::uint64_t,   dt)
-    )
+// clang-format off
+BOOST_FUSION_DEFINE_STRUCT((hpx)(performance_counters)(memory), proc_statm,
+    (std::uint64_t, size)
+    (std::uint64_t, resident)
+    (std::uint64_t, share)
+    (std::uint64_t, text)
+    (std::uint64_t, lib)
+    (std::uint64_t, data)
+    (std::uint64_t, dt)
+)
+// clang-format on
 
-namespace hpx { namespace performance_counters { namespace memory
-{
-    namespace qi = boost::spirit::qi;
-    namespace ascii = boost::spirit::ascii;
+namespace hpx { namespace performance_counters { namespace memory {
+    namespace x3 = boost::spirit::x3;
+    namespace ascii = boost::spirit::x3::ascii;
 
-    template <typename Iterator>
-    struct proc_statm_grammar
-      : qi::grammar<Iterator, proc_statm(), ascii::space_type>
-    {
-        proc_statm_grammar()
-          : proc_statm_grammar::base_type(start)
-        {
-            start =  uint64_t_
-                  >> uint64_t_
-                  >> uint64_t_
-                  >> uint64_t_
-                  >> uint64_t_
-                  >> uint64_t_
-                  >> uint64_t_
-                  ;
-        }
-
-        qi::rule<Iterator, proc_statm(), ascii::space_type> start;
-
-        qi::uint_parser<std::uint64_t> uint64_t_;
-    };
+    auto const proc_statm_grammar = x3::uint64 >> x3::uint64 >> x3::uint64 >>
+        x3::uint64 >> x3::uint64 >> x3::uint64 >> x3::uint64;
 
     struct ifstream_raii
     {
         ifstream_raii(char const* file, std::ios_base::openmode mode)
-            : stm(file, mode)
-        {}
+          : stm(file, mode)
+        {
+        }
 
         ~ifstream_raii()
         {
@@ -87,32 +68,26 @@ namespace hpx { namespace performance_counters { namespace memory
             return stm;
         }
 
-      private:
+    private:
         std::ifstream stm;
     };
 
     bool read_proc_statm(proc_statm& ps, std::int32_t pid)
     {
-        std::string filename
-            = hpx::util::format("/proc/{1}/statm", pid);
+        std::string filename = hpx::util::format("/proc/{1}/statm", pid);
 
         ifstream_raii in(filename.c_str(), std::ios_base::in);
 
         if (!in.get())
             return false;
 
-        in.get().unsetf(std::ios::skipws); // No white space skipping!
+        in.get().unsetf(std::ios::skipws);    // No white space skipping!
 
         typedef boost::spirit::basic_istream_iterator<char> iterator;
 
         iterator it(in.get()), end;
 
-        proc_statm_grammar<iterator> p;
-
-        if (!qi::phrase_parse(it, end, p, ascii::space, ps))
-            return false;
-        else
-            return true;
+        return x3::phrase_parse(it, end, proc_statm_grammar, ascii::space, ps);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -123,11 +98,10 @@ namespace hpx { namespace performance_counters { namespace memory
 
         if (!read_proc_statm(ps, getpid()))
         {
-            HPX_THROW_EXCEPTION(
-                hpx::invalid_data,
+            HPX_THROW_EXCEPTION(hpx::invalid_data,
                 "hpx::performance_counters::memory::read_psm_virtual",
-                hpx::util::format("failed to parse '/proc/{1}/statm'",
-                    getpid()));
+                hpx::util::format(
+                    "failed to parse '/proc/{1}/statm'", getpid()));
             return std::uint64_t(-1);
         }
 
@@ -142,11 +116,10 @@ namespace hpx { namespace performance_counters { namespace memory
 
         if (!read_proc_statm(ps, getpid()))
         {
-            HPX_THROW_EXCEPTION(
-                hpx::invalid_data,
+            HPX_THROW_EXCEPTION(hpx::invalid_data,
                 "hpx::performance_counters::memory::read_psm_resident",
-                hpx::util::format("failed to parse '/proc/{1}/statm'",
-                    getpid()));
+                hpx::util::format(
+                    "failed to parse '/proc/{1}/statm'", getpid()));
             return std::uint64_t(-1);
         }
 
@@ -164,8 +137,9 @@ namespace hpx { namespace performance_counters { namespace memory
         in.open(file.c_str());
 
         //Available Memory is on 3rd line
-        for (int k = 0; k < 3; k++) {
-          in.getline(buffer, 1024);
+        for (int k = 0; k < 3; k++)
+        {
+            in.getline(buffer, 1024);
         }
         in.close();
         std::string tbuf = buffer;
@@ -173,7 +147,6 @@ namespace hpx { namespace performance_counters { namespace memory
         return atol(buffer);
     }
 
-}}}
+}}}    // namespace hpx::performance_counters::memory
 
 #endif
-

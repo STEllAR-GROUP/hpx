@@ -39,13 +39,12 @@
 #pragma warning(pop)
 #endif
 
-#include <boost/version.hpp>
+#include <boost/spirit/home/x3/char.hpp>
+#include <boost/spirit/home/x3/core.hpp>
+#include <boost/spirit/home/x3/numeric.hpp>
+#include <boost/spirit/home/x3/operator.hpp>
 
-#define BOOST_SPIRIT_USE_PHOENIX_V3
-#include <boost/spirit/include/qi_char.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/qi_operator.hpp>
-#include <boost/spirit/include/qi_parse.hpp>
+#include <boost/version.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -752,9 +751,9 @@ namespace hpx { namespace performance_counters { namespace detail {
             if (!paths.parameters_.empty())
             {
                 // try to interpret the additional parameters
-                namespace qi = boost::spirit::qi;
-                if (!qi::parse(paths.parameters_.begin(),
-                        paths.parameters_.end(), qi::uint_ % ',', parameters))
+                namespace x3 = boost::spirit::x3;
+                if (!x3::parse(paths.parameters_.begin(),
+                        paths.parameters_.end(), x3::uint_ % ',', parameters))
                 {
                     HPX_THROWS_IF(ec, bad_parameter,
                         "statistics_counter_creator",

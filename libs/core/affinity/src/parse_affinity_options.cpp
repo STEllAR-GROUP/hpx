@@ -11,21 +11,19 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/topology/topology.hpp>
 
+#include <hpx/affinity/detail/partlit.hpp>
+
 #include <hwloc.h>
 
-// #define BOOST_SPIRIT_DEBUG
-#define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
-#include <boost/spirit/include/qi_auxiliary.hpp>
-#include <boost/spirit/include/qi_char.hpp>
-#include <boost/spirit/include/qi_nonterminal.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/qi_operator.hpp>
-#include <boost/spirit/include/qi_parse.hpp>
-#include <boost/spirit/include/qi_string.hpp>
-
-#include <hpx/affinity/detail/partlit.hpp>
+#include <boost/spirit/home/x3/auxiliary.hpp>
+#include <boost/spirit/home/x3/char.hpp>
+#include <boost/spirit/home/x3/core.hpp>
+#include <boost/spirit/home/x3/nonterminal.hpp>
+#include <boost/spirit/home/x3/numeric.hpp>
+#include <boost/spirit/home/x3/operator.hpp>
+#include <boost/spirit/home/x3/string.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -37,21 +35,12 @@
 // clang-format off
 BOOST_FUSION_ADAPT_STRUCT(
     hpx::threads::detail::spec_type,
-    (hpx::threads::detail::bounds_type, index_bounds_)
-    (hpx::threads::detail::spec_type::type, type_)
+    type_,
+    index_bounds_
 )
 // clang-format on
 
-namespace hpx { namespace threads { namespace detail {
-    static char const* const type_names[] = {
-        "unknown", "thread", "socket", "numanode", "core", "pu"};
-
-    char const* spec_type::type_name(spec_type::type t)
-    {
-        if (t < spec_type::unknown || t > spec_type::pu)
-            return type_names[0];
-        return type_names[t];
-    }
+namespace {
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -93,91 +82,86 @@ namespace hpx { namespace threads { namespace detail {
     //        core
     //        pu
     //
-    namespace qi = boost::spirit::qi;
+    namespace x3 = boost::spirit::x3;
+    using namespace hpx::threads::detail;
 
-    // parser for affinity options
-    template <typename Iterator>
-    struct mappings_parser : qi::grammar<Iterator, mappings_type()>
+    x3::rule<class mappings, mappings_type> mappings = "mappings";
+    x3::rule<class distribution, distribution_type> distribution =
+        "distribution";
+    x3::rule<class mapping, full_mapping_type> mapping = "mapping";
+    x3::rule<class thread_spec, spec_type> thread_spec = "thread_spec";
+    x3::rule<class pu_specs, mapping_type> pu_specs = "pu_specs";
+    x3::rule<class socket_spec, spec_type> socket_spec = "socket_spec";
+    x3::rule<class core_spec, spec_type> core_spec = "core_spec";
+    x3::rule<class pu_spec, spec_type> pu_spec = "pu_spec";
+    x3::rule<class specs, bounds_type> specs = "specs";
+    x3::rule<class spec, bounds_type> spec = "spec";
+
+    auto mappings_def = distribution | (mapping % ';');
+
+    auto mapping_def = thread_spec >> '=' >> pu_specs;
+
+    // clang-format off
+    auto distribution_def =
+            partlit("compact", compact)
+        |   partlit("scatter", scatter)
+        |   partlit("balanced", balanced)
+        |   partlit("numa-balanced", numa_balanced)
+        ;
+
+    auto thread_spec_def =
+            partlit("thread", spec_type::thread) >> ':' >>  specs
+        ;
+
+    auto pu_specs_def =
+            (socket_spec >> core_spec >> pu_spec)
+//        |   ('~' >> pu_spec)
+        ;
+
+    auto socket_spec_def =
+            (partlit("socket", spec_type::socket) >> ':' >> specs)
+        |   (partlit("numanode", spec_type::numanode) >> ':' >> specs)
+        |   x3::attr(spec_type(spec_type::unknown))
+        ;
+
+    auto core_spec_def =
+           (-x3::lit('.') >> partlit("core", spec_type::core) >> ':' >> specs)
+        |   x3::attr(spec_type(spec_type::unknown))
+        ;
+
+    auto pu_spec_def =
+           (-x3::lit('.') >> partlit("pu", spec_type::pu) >> ':' >> specs)
+        |   x3::attr(spec_type(spec_type::unknown))
+        ;
+
+    auto specs_def = spec % ',';
+
+    auto spec_def =
+            (x3::uint_ >> -(x3::int_))
+        |   partlit("all", bounds_type{spec_type::all_entities()})
+        ;
+    // clang-format on
+
+    BOOST_SPIRIT_DEFINE(mappings, distribution, mapping, thread_spec, pu_specs,
+        socket_spec, core_spec, pu_spec, specs, spec)
+
+}    // namespace
+
+namespace hpx { namespace threads { namespace detail {
+    static char const* const type_names[] = {
+        "unknown", "thread", "socket", "numanode", "core", "pu"};
+
+    char const* spec_type::type_name(spec_type::type t)
     {
-        mappings_parser()
-          : mappings_parser::base_type(start)
-        {
-            using detail::partlit;
-            using detail::spec_type;
-
-            start = distribution | (mapping % ';');
-
-            mapping = thread_spec >> '=' >> pu_spec;
-
-            // clang-format off
-            distribution =
-                    partlit("compact") >> qi::attr(compact)
-                |   partlit("scatter") >> qi::attr(scatter)
-                |   partlit("balanced") >> qi::attr(balanced)
-                |   partlit("numa-balanced") >> qi::attr(numa_balanced)
-                ;
-
-            thread_spec =
-                    partlit("thread") >> ':'
-                    >>  specs >> qi::attr(spec_type::thread)
-                ;
-
-            pu_spec =
-                    socket_spec >> core_spec >> processing_unit_spec
-//                 |   '~' >> pu_spec
-                ;
-
-            socket_spec =
-                    partlit("socket") >> ':'
-                    >> specs >> qi::attr(spec_type::socket)
-                |   partlit("numanode") >> ':'
-                    >> specs >> qi::attr(spec_type::numanode)
-                |   qi::attr(spec_type::unknown)
-                ;
-
-            core_spec =
-                   -qi::lit('.') >> partlit("core") >> ':'
-                    >> specs >> qi::attr(spec_type::core)
-                |   qi::attr(spec_type::unknown)
-                ;
-
-            processing_unit_spec =
-                   -qi::lit('.') >> partlit("pu") >> ':'
-                    >> specs >> qi::attr(spec_type::pu)
-                |   qi::attr(spec_type::unknown)
-                ;
-
-            specs = spec % ',';
-
-            spec =
-                    qi::uint_ >> -(qi::int_)
-                |   partlit("all") >> qi::attr(spec_type::all_entities())
-                ;
-
-            BOOST_SPIRIT_DEBUG_NODES(
-                (start)(mapping)(distribution)(thread_spec)(pu_spec)(specs)
-                (spec)(socket_spec)(core_spec)(processing_unit_spec)
-            );
-            // clang-format on
-        }
-
-        qi::rule<Iterator, mappings_type()> start;
-        qi::rule<Iterator, distribution_type()> distribution;
-        qi::rule<Iterator, full_mapping_type()> mapping;
-        qi::rule<Iterator, spec_type()> thread_spec;
-        qi::rule<Iterator, mapping_type()> pu_spec;
-        qi::rule<Iterator, spec_type()> socket_spec;
-        qi::rule<Iterator, spec_type()> core_spec;
-        qi::rule<Iterator, bounds_type()> specs;
-        qi::rule<Iterator, bounds_type()> spec;
-        qi::rule<Iterator, spec_type()> processing_unit_spec;
-    };
+        if (t < spec_type::unknown || t > spec_type::pu)
+            return type_names[0];
+        return type_names[t];
+    }
 
     template <typename Iterator>
     inline bool parse(Iterator& begin, Iterator end, mappings_type& m)
     {
-        mappings_parser<Iterator> p;
-        return qi::parse(begin, end, p, m);
+        return x3::parse(begin, end, mappings, m);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -229,8 +213,8 @@ namespace hpx { namespace threads { namespace detail {
                     {
                         result.clear();
                         HPX_THROWS_IF(ec, bad_parameter, "extract_bounds",
-                            "the resource id given is larger than the number "
-                            "of existing resources");
+                            "the resource id given is larger than the "
+                            "number of existing resources");
                         return result;
                     }
                     result.push_back(*first);
@@ -242,8 +226,8 @@ namespace hpx { namespace threads { namespace detail {
                     {
                         result.clear();
                         HPX_THROWS_IF(ec, bad_parameter, "extract_bounds",
-                            "the upper limit given is larger than the number "
-                            "of existing resources");
+                            "the upper limit given is larger than the "
+                            "number of existing resources");
                         return result;
                     }
                     for (std::int64_t i = *first; i <= -*second; ++i)
@@ -256,8 +240,8 @@ namespace hpx { namespace threads { namespace detail {
                     {
                         result.clear();
                         HPX_THROWS_IF(ec, bad_parameter, "extract_bounds",
-                            "the upper limit given is larger than the number "
-                            "of existing resources");
+                            "the upper limit given is larger than the "
+                            "number of existing resources");
                         return result;
                     }
                     result.push_back(*first);
