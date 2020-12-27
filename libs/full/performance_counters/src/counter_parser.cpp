@@ -10,6 +10,19 @@
 #include <hpx/performance_counters/counters.hpp>
 
 #include <boost/fusion/include/adapt_struct.hpp>
+
+#if BOOST_VERSION == 107000
+// X3 can't be used (https://github.com/boostorg/spirit/issues/511)
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/spirit/home/qi/auxiliary.hpp>
+#include <boost/spirit/home/qi/char.hpp>
+#include <boost/spirit/home/qi/directive.hpp>
+#include <boost/spirit/home/qi/nonterminal.hpp>
+#include <boost/spirit/home/qi/numeric.hpp>
+#include <boost/spirit/home/qi/operator.hpp>
+#include <boost/spirit/home/qi/parse.hpp>
+#include <boost/spirit/home/qi/string.hpp>
+#else
 #include <boost/spirit/home/x3/auxiliary.hpp>
 #include <boost/spirit/home/x3/char.hpp>
 #include <boost/spirit/home/x3/core.hpp>
@@ -18,6 +31,7 @@
 #include <boost/spirit/home/x3/numeric.hpp>
 #include <boost/spirit/home/x3/operator.hpp>
 #include <boost/spirit/home/x3/string.hpp>
+#endif
 
 #include <string>
 
@@ -37,6 +51,53 @@ namespace {
     ///    /objectname{parentinstancename#*/instancename#*}/countername#parameters
     ///    /objectname{/basecounter}/countername,parameters
     ///
+#if BOOST_VERSION == 107000
+    namespace qi = boost::spirit::qi;
+
+    template <typename Iterator>
+    struct path_parser
+      : qi::grammar<Iterator, hpx::performance_counters::path_elements()>
+    {
+        path_parser()
+          : path_parser::base_type(start)
+        {
+            start = -qi::lit(hpx::performance_counters::counter_prefix) >>
+                '/' >> +~qi::char_("/{#@") >> -instance >>
+                -('/' >> +~qi::char_("#}@")) >> -('@' >> +qi::char_);
+            instance =
+                '{' >> parent >> -('/' >> child) >> -('/' >> subchild) >> '}';
+            parent = &qi::lit('/') >> qi::raw[start] >> qi::attr(-1) >>
+                    qi::attr(true)
+                // base counter
+                | +~qi::char_("#/}") >>
+                    ('#' >> raw_uint    // counter parent-instance name
+                        | -qi::string(
+                              "#*")    // counter parent-instance skeleton name
+                        ) >>
+                    qi::attr(false);
+            child = +~qi::char_("#/}") >>
+                (qi::char_('#') >> +~qi::char_("/}")    // counter instance name
+                    | -qi::string("#*")    // counter instance skeleton name
+                    ) >>
+                qi::attr(false);
+            subchild = +~qi::char_("#}") >>
+                ('#' >> raw_uint    // counter (sub-)instance name
+                    |
+                    -qi::string("#*")    // counter (sub-)instance skeleton name
+                    ) >>
+                qi::attr(false);
+            raw_uint = qi::raw[qi::uint_];
+        }
+
+        qi::rule<Iterator, hpx::performance_counters::path_elements()> start;
+        qi::rule<Iterator, hpx::performance_counters::instance_elements()>
+            instance;
+        qi::rule<Iterator, hpx::performance_counters::instance_name()> parent;
+        qi::rule<Iterator, hpx::performance_counters::instance_name()> child;
+        qi::rule<Iterator, hpx::performance_counters::instance_name()> subchild;
+        qi::rule<Iterator, std::string()> raw_uint;
+    };
+#else
     namespace x3 = boost::spirit::x3;
 
     x3::rule<class path_parser, hpx::performance_counters::path_elements> const
@@ -84,6 +145,7 @@ namespace {
 
     BOOST_SPIRIT_DEFINE(
         path_parser, instance, parent, child, subchild, raw_uint);
+#endif
 
 }    // namespace
 
@@ -92,7 +154,13 @@ namespace hpx { namespace performance_counters {
     {
         // parse the full name
         std::string::const_iterator begin = name.begin();
+#if BOOST_VERSION == 107000
+        path_parser<std::string::const_iterator> path_parser;
+        return qi::parse(begin, name.end(), path_parser, elements) &&
+            begin == name.end();
+#else
         return x3::parse(begin, name.end(), path_parser, elements) &&
             begin == name.end();
+#endif
     }
 }}    // namespace hpx::performance_counters
