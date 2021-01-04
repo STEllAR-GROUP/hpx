@@ -11,6 +11,7 @@
 #include <hpx/debugging/print.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/future.hpp>
+#include <hpx/include/resource_partitioner.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
