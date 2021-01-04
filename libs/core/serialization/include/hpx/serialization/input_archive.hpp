@@ -8,14 +8,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/config/endian.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/serialization/basic_archive.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/serialization/detail/raw_ptr.hpp>
 #include <hpx/serialization/input_container.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
-
-#include <boost/predef/other/endian.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -183,13 +182,10 @@ namespace hpx { namespace serialization {
             char* cptr = reinterpret_cast<char*>(&l);    //-V206
             load_binary(cptr, static_cast<std::size_t>(size));
 
-#if BOOST_ENDIAN_BIG_BYTE
-            if (endian_little())
+            const bool endianess_differs =
+                endian::native == endian::big ? endian_little() : endian_big();
+            if (endianess_differs)
                 reverse_bytes(size, cptr);
-#else
-            if (endian_big())
-                reverse_bytes(size, cptr);
-#endif
         }
 
         void load_binary(void* address, std::size_t count)

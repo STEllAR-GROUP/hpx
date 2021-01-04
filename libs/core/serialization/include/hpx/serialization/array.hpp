@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/config/endian.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
@@ -16,7 +17,6 @@
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 #include <boost/array.hpp>
 #endif
-#include <boost/predef/other/endian.h>
 
 #include <array>
 #include <cstddef>
@@ -75,11 +75,9 @@ namespace hpx { namespace serialization {
                 hpx::traits::is_bitwise_serializable<
                     typename std::remove_const<T>::type>::value>;
 
-#if BOOST_ENDIAN_BIG_BYTE
-            bool archive_endianess_differs = ar.endian_little();
-#else
-            bool archive_endianess_differs = ar.endian_big();
-#endif
+            bool archive_endianess_differs = endian::native == endian::big ?
+                ar.endian_little() :
+                ar.endian_big();
 
             // NOLINTNEXTLINE(bugprone-branch-clone)
             if (ar.disable_array_optimization() || archive_endianess_differs)

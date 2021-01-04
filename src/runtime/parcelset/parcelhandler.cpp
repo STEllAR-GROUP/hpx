@@ -11,6 +11,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/config/asio.hpp>
+#include <hpx/config/endian.hpp>
 #include <hpx/config/detail/compat_error_code.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
@@ -48,7 +49,6 @@
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
 #include <boost/asio/error.hpp>
-#include <boost/predef/other/endian.h>
 
 #include <algorithm>
 #include <cstddef>
@@ -1672,11 +1672,9 @@ namespace hpx { namespace parcelset
             "max_outbound_message_size = "
             "${HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE:" HPX_PP_STRINGIZE(
                 HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE) "}");
-#if BOOST_ENDIAN_BIG_BYTE
-        ini_defs.push_back("endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}");
-#else
-        ini_defs.push_back("endian_out = ${HPX_PARCEL_ENDIAN_OUT:little}");
-#endif
+        ini_defs.push_back(endian::native == endian::big ?
+                "endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}" :
+                "endian_out = ${HPX_PARCEL_ENDIAN_OUT:little}");
         ini_defs.push_back(
             "array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}");
         ini_defs.push_back(
