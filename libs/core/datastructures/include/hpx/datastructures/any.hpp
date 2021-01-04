@@ -516,8 +516,13 @@ namespace hpx { namespace util { namespace detail { namespace any {
 
         static Vtable* call()
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+            return nullptr;
+#else
             static Vtable instance{};
             return &instance;
+#endif
         }
     };
 
