@@ -45,9 +45,7 @@ if(NOT TARGET hpx_dependencies_boost)
   endif()
 
   set(__boost_libraries "")
-  if(HPX_PARCELPORT_VERBS_WITH_LOGGING
-     OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE
-     OR HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING
+  if(HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING
      OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE
   )
     set(__boost_libraries ${__boost_libraries} log log_setup date_time chrono

@@ -46,9 +46,6 @@ set(CMAKE_CROSSCOMPILING ON)
 # Set our platform name
 set(HPX_PLATFORM "BlueGeneQ")
 
-# Always disable the ibverbs parcelport as it is non-functional on the BGQ.
-set(HPX_WITH_PARCELPORT_VERBS OFF)
-
 # Always disable the tcp parcelport as it is non-functional on the BGQ.
 set(HPX_WITH_PARCELPORT_TCP OFF)
 

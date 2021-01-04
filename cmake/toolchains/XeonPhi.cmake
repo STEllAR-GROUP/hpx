@@ -35,14 +35,6 @@ set(CMAKE_CROSSCOMPILING ON)
 # Set our platform name
 set(HPX_PLATFORM "XeonPhi")
 
-# Always disable the ibverbs parcelport as it is non-functional on the BGQ.
-set(HPX_WITH_PARCELPORT_VERBS
-    OFF
-    CACHE
-      BOOL
-      "Enable the ibverbs based parcelport. This is currently an experimental feature"
-)
-
 set(HPX_WITH_PARCELPORT_MPI
     ON
     CACHE BOOL "Enable the MPI based parcelport."
