@@ -44,8 +44,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       fibonacci
       fibonacci_futures_distributed
       fibonacci_one
-      fractals
-      fractals_struct
       hello_world_1
       hello_world_2
       hello_world_distributed
@@ -86,7 +84,6 @@ set(customize_async_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(enumerate_threads_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(event_synchronization_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(error_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(fractals_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(hello_world_1_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(hello_world_2_FLAGS COMPONENT_DEPENDENCIES iostreams)
 if(HPX_HAVE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
@@ -124,7 +121,6 @@ set(customize_async_PARAMETERS THREADS_PER_LOCALITY 4)
 set(enumerate_threads_PARAMETERS THREADS_PER_LOCALITY 4)
 set(event_synchronization_PARAMETERS THREADS_PER_LOCALITY 4)
 set(error_handling_PARAMETERS THREADS_PER_LOCALITY 4)
-set(fractals_PARAMETERS THREADS_PER_LOCALITY 4)
 set(hello_world_1_PARAMETERS THREADS_PER_LOCALITY 4)
 set(hello_world_2_PARAMETERS THREADS_PER_LOCALITY 4)
 set(hello_world_distributed_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -137,15 +133,6 @@ set(simple_future_continuation_PARAMETERS THREADS_PER_LOCALITY 4)
 set(timed_futures_PARAMETERS THREADS_PER_LOCALITY 4)
 set(vector_counting_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
 set(vector_zip_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
-
-if((HPX_WITH_LOCAL_SCHEDULER OR HPX_WITH_ALL_SCHEDULERS)
-   AND HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY
-   AND HPX_WITH_DISTRIBUTED_RUNTIME
-)
-  set(example_programs ${example_programs} fractals_executor)
-  set(fractals_executor_FLAGS COMPONENT_DEPENDENCIES iostreams)
-  set(fractals_executor_PARAMETERS THREADS_PER_LOCALITY 4)
-endif()
 
 # the following example fails compiling on someversions of MSVC
 if(HPX_WITH_TUPLE_RVALUE_SWAP
