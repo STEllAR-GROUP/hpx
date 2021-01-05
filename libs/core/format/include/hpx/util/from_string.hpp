@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/bad_lexical_cast.hpp>
 
+#include <algorithm>
 #include <limits>
 #include <sstream>
 #include <stdexcept>
@@ -41,6 +42,42 @@ namespace hpx { namespace util {
             return static_cast<T>(value);
         }
 
+        template <typename Char>
+        void check_single_token(std::basic_string<Char> const& s)
+        {
+            if (s.empty())
+            {
+                throw std::invalid_argument("from_string: empty string");
+            }
+
+            auto isspace = [](int c) { return std::isspace(c); };
+            auto isnotspace = [](int c) { return !std::isspace(c); };
+
+            // Skip leading whitespace
+            auto pos = std::find_if(s.begin(), s.end(), isnotspace);
+            if (pos == s.end())
+            {
+                throw std::invalid_argument("from_string: no tokens");
+            }
+
+            // Skip first token
+            pos = std::find_if(pos, s.end(), isspace);
+            if (pos == s.end())
+            {
+                return;
+            }
+
+            // Skip trailing whitespace
+            pos = std::find_if(pos, s.end(), isnotspace);
+            if (pos == s.end())
+            {
+                return;
+            }
+
+            // There are at least two tokens in the string
+            throw std::invalid_argument("from_string: multiple tokens");
+        }
+
         template <typename T>
         struct from_string<T,
             typename std::enable_if<std::is_integral<T>::value>::type>
@@ -48,12 +85,14 @@ namespace hpx { namespace util {
             template <typename Char>
             static void call(std::basic_string<Char> const& value, int& target)
             {
+                check_single_token(value);
                 target = std::stoi(value);
             }
 
             template <typename Char>
             static void call(std::basic_string<Char> const& value, long& target)
             {
+                check_single_token(value);
                 target = std::stol(value);
             }
 
@@ -61,6 +100,7 @@ namespace hpx { namespace util {
             static void call(
                 std::basic_string<Char> const& value, long long& target)
             {
+                check_single_token(value);
                 target = std::stoll(value);
             }
 
@@ -69,6 +109,7 @@ namespace hpx { namespace util {
                 std::basic_string<Char> const& value, unsigned int& target)
             {
                 // there is no std::stoui
+                check_single_token(value);
                 unsigned long target_long;
                 call(value, target_long);
                 target = check_out_of_range<T>(target_long);
@@ -78,6 +119,7 @@ namespace hpx { namespace util {
             static void call(
                 std::basic_string<Char> const& value, unsigned long& target)
             {
+                check_single_token(value);
                 target = std::stoul(value);
             }
 
@@ -85,12 +127,15 @@ namespace hpx { namespace util {
             static void call(std::basic_string<Char> const& value,
                 unsigned long long& target)
             {
+                check_single_token(value);
                 target = std::stoull(value);
             }
 
             template <typename Char, typename U>
             static void call(std::basic_string<Char> const& value, U& target)
             {
+                check_single_token(value);
+
                 using promoted_t = decltype(+std::declval<U>());
                 static_assert(!std::is_same<promoted_t, U>::value, "");
 
@@ -108,6 +153,7 @@ namespace hpx { namespace util {
             static void call(
                 std::basic_string<Char> const& value, float& target)
             {
+                check_single_token(value);
                 target = std::stof(value);
             }
 
@@ -115,6 +161,7 @@ namespace hpx { namespace util {
             static void call(
                 std::basic_string<Char> const& value, double& target)
             {
+                check_single_token(value);
                 target = std::stod(value);
             }
 
@@ -122,6 +169,7 @@ namespace hpx { namespace util {
             static void call(
                 std::basic_string<Char> const& value, long double& target)
             {
+                check_single_token(value);
                 target = std::stold(value);
             }
         };
