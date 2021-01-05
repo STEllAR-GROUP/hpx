@@ -31,7 +31,8 @@ jobs:
               -GNinja \
               -DCMAKE_BUILD_TYPE=Debug \
               -DHPX_WITH_EXAMPLES=ON \
-              -DHPX_WITH_TESTS=ON
+              -DHPX_WITH_TESTS=ON \
+              -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2
     - name: Build
       shell: bash
       run: |
