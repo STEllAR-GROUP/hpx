@@ -9,10 +9,9 @@
 #include <hpx/config.hpp>
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/modules/program_options.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
@@ -117,7 +116,6 @@ namespace hpx { namespace resource { namespace detail {
         void add_resource(const std::vector<hpx::resource::numa_domain>& ndv,
             std::string const& pool_name, bool exclusive = true);
 
-        // called by constructor of scheduler_base
         threads::policies::detail::affinity_data const& get_affinity_data()
             const
         {
@@ -141,9 +139,6 @@ namespace hpx { namespace resource { namespace detail {
         ////////////////////////////////////////////////////////////////////////
         scheduling_policy which_scheduler(std::string const& pool_name);
         threads::topology& get_topology() const;
-        util::command_line_handling& get_command_line_switches();
-
-        std::size_t get_num_distinct_pus() const;
 
         std::size_t get_num_pools() const;
 
@@ -161,26 +156,15 @@ namespace hpx { namespace resource { namespace detail {
         threads::mask_cref_type get_pu_mask(
             std::size_t global_thread_num) const;
 
-        bool cmd_line_parsed() const;
-        int parse(util::function_nonser<int(
-                      hpx::program_options::variables_map& vm)> const& f,
-            hpx::program_options::options_description desc_cmdline, int argc,
-            char** argv, std::vector<std::string> ini_config,
-            resource::partitioner_mode rpmode, runtime_mode mode,
-            std::vector<std::shared_ptr<components::component_registry_base>>&
-                component_registries,
-            bool fill_internal_topology);
+        void init(resource::partitioner_mode rpmode,
+            hpx::util::runtime_configuration cfg,
+            hpx::threads::policies::detail::affinity_data affinity_data);
 
         scheduler_function get_pool_creator(size_t index) const;
 
         std::vector<numa_domain> const& numa_domains() const
         {
             return numa_domains_;
-        }
-
-        int parse_result() const
-        {
-            return cfg_.parse_result_;
         }
 
         std::size_t assign_cores(std::size_t first_core);
@@ -237,7 +221,7 @@ namespace hpx { namespace resource { namespace detail {
         static std::atomic<int> instance_number_counter_;
 
         // holds all of the command line switches
-        util::command_line_handling cfg_;
+        util::runtime_configuration rtcfg_;
         std::size_t first_core_;
         std::size_t pus_needed_;
 

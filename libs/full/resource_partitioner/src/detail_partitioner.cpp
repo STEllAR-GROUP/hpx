@@ -6,18 +6,19 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/type_support/static.hpp>
 #include <hpx/util/from_string.hpp>
+#include <hpx/util/get_entry_as.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -205,8 +206,8 @@ namespace hpx { namespace resource { namespace detail {
 
     ////////////////////////////////////////////////////////////////////////
     partitioner::partitioner()
-      : first_core_(std::size_t(-1))
-      , pus_needed_(std::size_t(-1))
+      : rtcfg_(nullptr, runtime_mode::default_)
+      , first_core_(std::size_t(-1))
       , mode_(mode_default)
       , topo_(threads::create_topology())
       , default_scheduler_mode_(threads::policies::scheduler_mode::default_mode)
@@ -233,7 +234,7 @@ namespace hpx { namespace resource { namespace detail {
 #endif
 
         std::string default_scheduler_mode_str =
-            cfg_.rtcfg_.get_entry("hpx.default_scheduler_mode", std::string());
+            rtcfg_.get_entry("hpx.default_scheduler_mode", std::string());
         if (!default_scheduler_mode_str.empty())
         {
             default_scheduler_mode_ = threads::policies::scheduler_mode(
@@ -367,9 +368,8 @@ namespace hpx { namespace resource { namespace detail {
             reconfigure_affinities_locked();
         }
 
-        // should have been initialized by now
-        HPX_ASSERT(pus_needed_ != std::size_t(-1));
-        return pus_needed_;
+        HPX_ASSERT(affinity_data_.get_num_pus_needed() != std::size_t(-1));
+        return affinity_data_.get_num_pus_needed();
     }
 
     // This function is called in hpx_init, before the instantiation of the
@@ -434,35 +434,44 @@ namespace hpx { namespace resource { namespace detail {
         // select the default scheduler
         scheduling_policy default_scheduler;
 
-        if (0 == std::string("local").find(cfg_.queuing_))
+        std::string default_scheduler_str =
+            rtcfg_.get_entry("hpx.scheduler", std::string());
+
+        if (0 == std::string("local").find(default_scheduler_str))
         {
             default_scheduler = scheduling_policy::local;
         }
-        else if (0 == std::string("local-priority-fifo").find(cfg_.queuing_))
+        else if (0 ==
+            std::string("local-priority-fifo").find(default_scheduler_str))
         {
             default_scheduler = scheduling_policy::local_priority_fifo;
         }
-        else if (0 == std::string("local-priority-lifo").find(cfg_.queuing_))
+        else if (0 ==
+            std::string("local-priority-lifo").find(default_scheduler_str))
         {
             default_scheduler = scheduling_policy::local_priority_lifo;
         }
-        else if (0 == std::string("static").find(cfg_.queuing_))
+        else if (0 == std::string("static").find(default_scheduler_str))
         {
             default_scheduler = scheduling_policy::static_;
         }
-        else if (0 == std::string("static-priority").find(cfg_.queuing_))
+        else if (0 ==
+            std::string("static-priority").find(default_scheduler_str))
         {
             default_scheduler = scheduling_policy::static_priority;
         }
-        else if (0 == std::string("abp-priority-fifo").find(cfg_.queuing_))
+        else if (0 ==
+            std::string("abp-priority-fifo").find(default_scheduler_str))
         {
             default_scheduler = scheduling_policy::abp_priority_fifo;
         }
-        else if (0 == std::string("abp-priority-lifo").find(cfg_.queuing_))
+        else if (0 ==
+            std::string("abp-priority-lifo").find(default_scheduler_str))
         {
             default_scheduler = scheduling_policy::abp_priority_lifo;
         }
-        else if (0 == std::string("shared-priority").find(cfg_.queuing_))
+        else if (0 ==
+            std::string("shared-priority").find(default_scheduler_str))
         {
             default_scheduler = scheduling_policy::shared_priority;
         }
@@ -667,13 +676,12 @@ namespace hpx { namespace resource { namespace detail {
 
             // Make sure the total number of requested threads does not exceed
             // the number of threads requested on the command line
-            if (detail::init_pool_data::num_threads_overall > cfg_.num_threads_)
+            std::size_t num_threads =
+                util::get_entry_as<std::size_t>(rtcfg_, "hpx.os_threads", 0);
+            HPX_ASSERT(num_threads != 0);
+
+            if (detail::init_pool_data::num_threads_overall > num_threads)
             {
-                //! FIXME add allow_empty_default_pool policy
-                /*                if (rp-policy == allow_empty_default_pool
-                    && detail::init_pool_data::num_threads_overall == cfg_.num_threads_) {
-                    // then it's all fine
-                } else {*/
                 l.unlock();
                 throw std::runtime_error("partitioner::add_resource: "
                                          "Creation of " +
@@ -681,9 +689,8 @@ namespace hpx { namespace resource { namespace detail {
                         detail::init_pool_data::num_threads_overall) +
                     " threads requested by the resource partitioner, but "
                     "only " +
-                    std::to_string(cfg_.num_threads_) +
+                    std::to_string(num_threads) +
                     " provided on the command-line.");
-                //                }
             }
         }
         else
@@ -775,16 +782,6 @@ namespace hpx { namespace resource { namespace detail {
         return topo_;
     }
 
-    util::command_line_handling& partitioner::get_command_line_switches()
-    {
-        return cfg_;
-    }
-
-    std::size_t partitioner::get_num_distinct_pus() const
-    {
-        return cfg_.num_threads_;
-    }
-
     std::size_t partitioner::get_num_threads() const
     {
         std::size_t num_threads = 0;
@@ -801,7 +798,9 @@ namespace hpx { namespace resource { namespace detail {
         // the number of allocated threads should be the same as the number of
         // threads to create (if no over-subscription is allowed)
         HPX_ASSERT(mode_ & mode_allow_oversubscription ||
-            num_threads == cfg_.num_threads_);
+            num_threads ==
+                util::get_entry_as<std::size_t>(
+                    rtcfg_, "hpx.os_threads", std::size_t(-1)));
 
         return num_threads;
     }
@@ -870,52 +869,15 @@ namespace hpx { namespace resource { namespace detail {
         return affinity_data_.get_pu_mask(topo_, global_thread_num);
     }
 
-    bool partitioner::cmd_line_parsed() const
-    {
-        return (cfg_.cmd_line_parsed_ == true);
-    }
-
-    int partitioner::parse(
-        util::function_nonser<int(
-            hpx::program_options::variables_map& vm)> const& f,
-        hpx::program_options::options_description desc_cmdline, int argc,
-        char** argv, std::vector<std::string> ini_config,    // -V813
-        resource::partitioner_mode rpmode, runtime_mode mode,
-        std::vector<std::shared_ptr<components::component_registry_base>>&
-            component_registries,
-        bool fill_internal_topology)
+    void partitioner::init(resource::partitioner_mode rpmode,
+        hpx::util::runtime_configuration rtcfg,
+        hpx::threads::policies::detail::affinity_data affinity_data)
     {
         mode_ = rpmode;
+        rtcfg_ = rtcfg;
+        affinity_data_ = affinity_data;
 
-        // set internal parameters of runtime configuration
-        cfg_.rtcfg_ = util::runtime_configuration(argv[0], mode);
-        cfg_.ini_config_ = std::move(ini_config);
-        cfg_.hpx_main_f_ = f;
-
-        // parse command line and set options
-        // terminate set if program options contain --hpx:help or --hpx:version ...
-        cfg_.parse_result_ =
-            cfg_.call(desc_cmdline, argc, argv, component_registries);
-
-        // set all parameters related to affinity data
-        std::string affinity_description;
-        get_affinity_description(cfg_, affinity_description);
-
-        pus_needed_ = affinity_data_.init(cfg_.num_threads_,
-            hpx::util::from_string<std::size_t>(
-                cfg_.rtcfg_.get_entry("hpx.cores", 0), 0),
-            get_pu_offset(cfg_), get_pu_step(cfg_),
-            static_cast<std::size_t>(cfg_.rtcfg_.get_first_used_core()),
-            get_affinity_domain(cfg_), affinity_description,
-            cfg_.use_process_mask_);
-
-        if (fill_internal_topology)
-        {
-            // set data describing internal topology back-end
-            fill_topology_vectors();
-        }
-
-        return cfg_.parse_result_;
+        fill_topology_vectors();
     }
 
     scheduler_function partitioner::get_pool_creator(std::size_t index) const

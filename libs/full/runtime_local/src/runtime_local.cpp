@@ -7,13 +7,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/command_line_handling/parse_command_line.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/debugging/backtrace.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
-#include <hpx/modules/command_line_handling.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threadmanager.hpp>
@@ -260,7 +260,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(util::runtime_configuration& rtcfg, bool initialize)
-      : ini_(rtcfg)
+      : rtcfg_(rtcfg)
       , instance_number_(++instance_number_counter_)
       , thread_support_(new util::thread_mapper)
       , topology_(resource::get_partitioner().get_topology())
@@ -274,18 +274,18 @@ namespace hpx {
 #ifdef HPX_HAVE_IO_POOL
       , io_pool_notifier_(runtime::get_notification_policy(
             "io-thread", runtime_local::os_thread_type::io_thread))
-      , io_pool_(
-            rtcfg.get_thread_pool_size("io_pool"), io_pool_notifier_, "io_pool")
+      , io_pool_(rtcfg_.get_thread_pool_size("io_pool"), io_pool_notifier_,
+            "io_pool")
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
       , timer_pool_notifier_(runtime::get_notification_policy(
             "timer-thread", runtime_local::os_thread_type::timer_thread))
-      , timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
+      , timer_pool_(rtcfg_.get_thread_pool_size("timer_pool"),
             timer_pool_notifier_, "timer_pool")
 #endif
       , notifier_(runtime::get_notification_policy(
             "worker-thread", runtime_local::os_thread_type::worker_thread))
-      , thread_manager_(new hpx::threads::threadmanager(
+      , thread_manager_(new hpx::threads::threadmanager(rtcfg_,
 #ifdef HPX_HAVE_TIMER_POOL
             timer_pool_,
 #endif
@@ -325,7 +325,7 @@ namespace hpx {
 #endif
         ,
         bool initialize)
-      : ini_(rtcfg)
+      : rtcfg_(rtcfg)
       , instance_number_(++instance_number_counter_)
       , thread_support_(new util::thread_mapper)
       , topology_(resource::get_partitioner().get_topology())
@@ -338,16 +338,16 @@ namespace hpx {
       , main_pool_(1, main_pool_notifier_, "main_pool")
 #ifdef HPX_HAVE_IO_POOL
       , io_pool_notifier_(std::move(io_pool_notifier))
-      , io_pool_(
-            rtcfg.get_thread_pool_size("io_pool"), io_pool_notifier_, "io_pool")
+      , io_pool_(rtcfg_.get_thread_pool_size("io_pool"), io_pool_notifier_,
+            "io_pool")
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
       , timer_pool_notifier_(std::move(timer_pool_notifier))
-      , timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
+      , timer_pool_(rtcfg_.get_thread_pool_size("timer_pool"),
             timer_pool_notifier_, "timer_pool")
 #endif
       , notifier_(std::move(notifier))
-      , thread_manager_(new hpx::threads::threadmanager(
+      , thread_manager_(new hpx::threads::threadmanager(rtcfg_,
 #ifdef HPX_HAVE_TIMER_POOL
             timer_pool_,
 #endif
@@ -463,12 +463,12 @@ namespace hpx {
 
     util::runtime_configuration& runtime::get_config()
     {
-        return ini_;
+        return rtcfg_;
     }
 
     util::runtime_configuration const& runtime::get_config() const
     {
-        return ini_;
+        return rtcfg_;
     }
 
     std::size_t runtime::get_instance_number() const
@@ -803,20 +803,12 @@ namespace hpx {
     std::string get_config_entry(
         std::string const& key, std::string const& dflt)
     {
-        //! FIXME runtime_configuration should probs be a member of
-        // hpx::runtime only, not command_line_handling
-        //! FIXME change functions in this section accordingly
         if (get_runtime_ptr() != nullptr)
         {
             return get_runtime().get_config().get_entry(key, dflt);
         }
-        if (!resource::is_partitioner_valid())
-        {
-            return dflt;
-        }
-        return resource::get_partitioner()
-            .get_command_line_switches()
-            .rtcfg_.get_entry(key, dflt);
+
+        return dflt;
     }
 
     std::string get_config_entry(std::string const& key, std::size_t dflt)
@@ -825,13 +817,8 @@ namespace hpx {
         {
             return get_runtime().get_config().get_entry(key, dflt);
         }
-        if (!resource::is_partitioner_valid())
-        {
-            return std::to_string(dflt);
-        }
-        return resource::get_partitioner()
-            .get_command_line_switches()
-            .rtcfg_.get_entry(key, dflt);
+
+        return std::to_string(dflt);
     }
 
     // set entries
@@ -842,30 +829,11 @@ namespace hpx {
             get_runtime_ptr()->get_config().add_entry(key, value);
             return;
         }
-        if (resource::is_partitioner_valid())
-        {
-            resource::get_partitioner()
-                .get_command_line_switches()
-                .rtcfg_.add_entry(key, value);
-            return;
-        }
     }
 
     void set_config_entry(std::string const& key, std::size_t value)
     {
-        if (get_runtime_ptr() != nullptr)
-        {
-            get_runtime_ptr()->get_config().add_entry(
-                key, std::to_string(value));
-            return;
-        }
-        if (resource::is_partitioner_valid())
-        {
-            resource::get_partitioner()
-                .get_command_line_switches()
-                .rtcfg_.add_entry(key, std::to_string(value));
-            return;
-        }
+        set_config_entry(key, std::to_string(value));
     }
 
     void set_config_entry_callback(std::string const& key,
@@ -876,13 +844,6 @@ namespace hpx {
         {
             get_runtime_ptr()->get_config().add_notification_callback(
                 key, callback);
-            return;
-        }
-        if (resource::is_partitioner_valid())
-        {
-            resource::get_partitioner()
-                .get_command_line_switches()
-                .rtcfg_.add_notification_callback(key, callback);
             return;
         }
     }

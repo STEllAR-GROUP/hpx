@@ -8,13 +8,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/modules/command_line_handling.hpp>
 #include <hpx/resource_partitioner/detail/create_partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
-
-#include <hpx/modules/program_options.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -129,40 +127,24 @@ namespace hpx { namespace resource {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         inline ::hpx::resource::partitioner make_partitioner(
-            util::function_nonser<int(
-                hpx::program_options::variables_map& vm)> const& f,
-            hpx::program_options::options_description const& desc_cmdline,
-            int argc, char** argv, std::vector<std::string> ini_config,
-            resource::partitioner_mode rpmode, runtime_mode mode, bool check,
-            std::vector<std::shared_ptr<components::component_registry_base>>&
-                component_registries,
-            int* result);
+            resource::partitioner_mode rpmode,
+            hpx::util::runtime_configuration rtcfg,
+            hpx::threads::policies::detail::affinity_data affinity_data);
     }
 
     class partitioner
     {
     private:
         friend ::hpx::resource::partitioner detail::make_partitioner(
-            util::function_nonser<int(
-                hpx::program_options::variables_map& vm)> const& f,
-            hpx::program_options::options_description const& desc_cmdline,
-            int argc, char** argv, std::vector<std::string> ini_config,
-            resource::partitioner_mode rpmode, runtime_mode mode, bool check,
-            std::vector<std::shared_ptr<components::component_registry_base>>&
-                component_registries,
-            int* result);
+            resource::partitioner_mode rpmode,
+            hpx::util::runtime_configuration rtcfg,
+            hpx::threads::policies::detail::affinity_data affinity_data);
 
-        partitioner(util::function_nonser<int(
-                        hpx::program_options::variables_map& vm)> const& f,
-            hpx::program_options::options_description const& desc_cmdline,
-            int argc, char** argv, std::vector<std::string> ini_config,
-            resource::partitioner_mode rpmode, runtime_mode mode, bool check,
-            std::vector<std::shared_ptr<components::component_registry_base>>&
-                component_registries,
-            int* result)
-          : partitioner_(detail::create_partitioner(f, desc_cmdline, argc, argv,
-                std::move(ini_config), rpmode, mode, check,
-                component_registries, result))
+        partitioner(resource::partitioner_mode rpmode,
+            hpx::util::runtime_configuration rtcfg,
+            hpx::threads::policies::detail::affinity_data affinity_data)
+          : partitioner_(
+                detail::create_partitioner(rpmode, rtcfg, affinity_data))
         {
         }
 
@@ -216,15 +198,9 @@ namespace hpx { namespace resource {
         // return the topology object managed by the internal partitioner
         HPX_EXPORT hpx::threads::topology const& get_topology() const;
 
-        // access the command line options
-        HPX_EXPORT util::command_line_handling& get_command_line_switches();
-
         // Does initialization of all resources and internal data of the
         // resource partitioner called in hpx_init
         HPX_EXPORT void configure_pools();
-
-        // Return the initialization result for this resource_partitioner
-        HPX_EXPORT int parse_result() const;
 
     private:
         detail::partitioner& partitioner_;
@@ -232,17 +208,11 @@ namespace hpx { namespace resource {
 
     namespace detail {
         ::hpx::resource::partitioner make_partitioner(
-            util::function_nonser<int(
-                hpx::program_options::variables_map& vm)> const& f,
-            hpx::program_options::options_description const& desc_cmdline,
-            int argc, char** argv, std::vector<std::string> ini_config,
-            resource::partitioner_mode rpmode, runtime_mode mode, bool check,
-            std::vector<std::shared_ptr<components::component_registry_base>>&
-                component_registries,
-            int* result)
+            resource::partitioner_mode rpmode,
+            hpx::util::runtime_configuration rtcfg,
+            hpx::threads::policies::detail::affinity_data affinity_data)
         {
-            return ::hpx::resource::partitioner(f, desc_cmdline, argc, argv,
-                ini_config, rpmode, mode, check, component_registries, result);
+            return ::hpx::resource::partitioner(rpmode, rtcfg, affinity_data);
         }
     }    // namespace detail
 }}       // namespace hpx::resource

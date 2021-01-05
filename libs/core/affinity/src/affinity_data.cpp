@@ -41,6 +41,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
       , pu_nums_()
       , no_affinity_()
       , use_process_mask_(false)
+      , num_pus_needed_(0)
     {
         threads::resize(no_affinity_, hardware_concurrency());
     }
@@ -50,9 +51,9 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
         --instance_number_counter_;
     }
 
-    std::size_t affinity_data::init(std::size_t num_threads,
-        std::size_t max_cores, std::size_t pu_offset, std::size_t pu_step,
-        std::size_t used_cores, std::string affinity_domain,    // -V813
+    void affinity_data::init(std::size_t num_threads, std::size_t max_cores,
+        std::size_t pu_offset, std::size_t pu_step, std::size_t used_cores,
+        std::string affinity_domain,    // -V813
         std::string const& affinity_description, bool use_process_mask)
     {
         num_threads_ = num_threads;
@@ -143,7 +144,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
         cores.erase(it, cores.end());
 
         std::size_t num_unique_cores = cores.size();
-        return (std::max)(num_unique_cores, max_cores);
+
+        num_pus_needed_ = (std::max)(num_unique_cores, max_cores);
     }
 
     mask_cref_type affinity_data::get_pu_mask(

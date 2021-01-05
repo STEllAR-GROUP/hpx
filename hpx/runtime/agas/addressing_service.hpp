@@ -124,10 +124,7 @@ public:
         resolved_localities_type;
     resolved_localities_type resolved_localities_;
 
-    addressing_service(
-        util::runtime_configuration const& ini_
-      , runtime_mode runtime_type_
-        );
+    explicit addressing_service(util::runtime_configuration const& ini_);
 
 #if defined(HPX_HAVE_NETWORKING)
     ~addressing_service()

@@ -360,18 +360,18 @@ namespace hpx {
 
         ///////////////////////////////////////////////////////////////////////
         void activate_global_options(
-            util::command_line_handling& cms, int argc, char** argv)
+            util::command_line_handling& cmdline, int argc, char** argv)
         {
 #if defined(__linux) || defined(linux) || defined(__linux__) ||                \
     defined(__FreeBSD__)
             threads::coroutines::detail::posix::use_guard_pages =
-                cms.rtcfg_.use_stack_guard_pages();
+                cmdline.rtcfg_.use_stack_guard_pages();
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS
-            if (cms.rtcfg_.enable_lock_detection())
+            if (cmdline.rtcfg_.enable_lock_detection())
             {
                 util::enable_lock_detection();
-                util::trace_depth_lock_detection(cms.rtcfg_.trace_depth());
+                util::trace_depth_lock_detection(cmdline.rtcfg_.trace_depth());
             }
             else
             {
@@ -380,7 +380,7 @@ namespace hpx {
 #endif
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) &&                                   \
     defined(HPX_HAVE_VERIFY_LOCKS_GLOBALLY)
-            if (cms.rtcfg_.enable_global_lock_detection())
+            if (cmdline.rtcfg_.enable_global_lock_detection())
             {
                 util::enable_global_lock_detection();
             }
@@ -391,26 +391,26 @@ namespace hpx {
 #endif
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             threads::policies::set_minimal_deadlock_detection_enabled(
-                cms.rtcfg_.enable_minimal_deadlock_detection());
+                cmdline.rtcfg_.enable_minimal_deadlock_detection());
 #endif
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
             util::detail::set_spinlock_break_on_deadlock_enabled(
-                cms.rtcfg_.enable_spinlock_deadlock_detection());
+                cmdline.rtcfg_.enable_spinlock_deadlock_detection());
             util::detail::set_spinlock_deadlock_detection_limit(
-                cms.rtcfg_.get_spinlock_deadlock_detection_limit());
+                cmdline.rtcfg_.get_spinlock_deadlock_detection_limit());
 #endif
 
             // initialize logging
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             util::detail::init_logging(
-                cms.rtcfg_, cms.rtcfg_.mode_ == runtime_mode::console);
+                cmdline.rtcfg_, cmdline.rtcfg_.mode_ == runtime_mode::console);
 #endif
 
 #if defined(HPX_HAVE_NETWORKING)
-            if (cms.num_localities_ != 1 || cms.node_ != 0 ||
-                cms.rtcfg_.enable_networking())
+            if (cmdline.num_localities_ != 1 || cmdline.node_ != 0 ||
+                cmdline.rtcfg_.enable_networking())
             {
-                parcelset::parcelhandler::init(&argc, &argv, cms);
+                parcelset::parcelhandler::init(&argc, &argv, cmdline);
             }
 #endif
             HPX_UNUSED(argc);
@@ -810,23 +810,42 @@ namespace hpx {
                     return result;
                 }
 
+                hpx::util::command_line_handling cmdline{
+                    hpx::util::runtime_configuration(argv[0], params.mode),
+                    hpx_startup::user_main_config(params.cfg), f};
+
                 // scope exception handling to resource partitioner initialization
                 // any exception thrown during run_or_start below are handled
                 // separately
                 try
                 {
-                    // Construct resource partitioner if this has not been done
-                    // yet and get a handle to it (if the command-line parsing
-                    // has not yet been done, do it now)
                     std::vector<
                         std::shared_ptr<components::component_registry_base>>
                         component_registries;
+
+                    result = cmdline.call(
+                        params.desc_cmdline, argc, argv, component_registries);
+
+                    hpx::threads::policies::detail::affinity_data
+                        affinity_data{};
+                    affinity_data.init(hpx::util::get_entry_as<std::size_t>(
+                                           cmdline.rtcfg_, "hpx.os_threads", 0),
+                        hpx::util::get_entry_as<std::size_t>(
+                            cmdline.rtcfg_, "hpx.cores", 0),
+                        hpx::util::get_entry_as<std::size_t>(
+                            cmdline.rtcfg_, "hpx.pu_offset", 0),
+                        hpx::util::get_entry_as<std::size_t>(
+                            cmdline.rtcfg_, "hpx.pu_step", 0),
+                        static_cast<std::size_t>(
+                            cmdline.rtcfg_.get_first_used_core()),
+                        cmdline.rtcfg_.get_entry("hpx.affinity", ""),
+                        cmdline.rtcfg_.get_entry("hpx.bind", ""),
+                        hpx::util::get_entry_as<bool>(
+                            cmdline.rtcfg_, "hpx.use_process_mask", 0));
+
                     hpx::resource::partitioner rp =
-                        hpx::resource::detail::make_partitioner(f,
-                            params.desc_cmdline, argc, argv,
-                            hpx_startup::user_main_config(params.cfg),
-                            params.rp_mode, params.mode, false,
-                            component_registries, &result);
+                        hpx::resource::detail::make_partitioner(
+                            params.rp_mode, cmdline.rtcfg_, affinity_data);
 
                     for (auto& registry : component_registries)
                     {
@@ -835,8 +854,7 @@ namespace hpx {
                         });
                     }
 
-                    activate_global_options(
-                        rp.get_command_line_switches(), argc, argv);
+                    activate_global_options(cmdline, argc, argv);
 
                     // check whether HPX should be exited at this point
                     // (parse_result is returning a result > 0, if the program options
@@ -867,31 +885,28 @@ namespace hpx {
                 // Initialize and start the HPX runtime.
                 LPROGRESS_ << "run_local: create runtime";
 
-                util::command_line_handling& cms =
-                    resource::get_partitioner().get_command_line_switches();
-
                 // Build and configure this runtime instance.
                 std::unique_ptr<hpx::runtime> rt;
 
                 // Command line handling should have updated this by now.
-                HPX_ASSERT(cms.rtcfg_.mode_ != runtime_mode::default_);
-                switch (cms.rtcfg_.mode_)
+                HPX_ASSERT(cmdline.rtcfg_.mode_ != runtime_mode::default_);
+                switch (cmdline.rtcfg_.mode_)
                 {
                 case runtime_mode::local:
                 {
                     LPROGRESS_ << "creating local runtime";
-                    rt.reset(new hpx::runtime(cms.rtcfg_));
+                    rt.reset(new hpx::runtime(cmdline.rtcfg_));
                     break;
                 }
                 default:
                 {
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
                     LPROGRESS_ << "creating distributed runtime";
-                    rt.reset(new hpx::runtime_distributed(cms.rtcfg_));
+                    rt.reset(new hpx::runtime_distributed(cmdline.rtcfg_));
                     break;
 #else
                     char const* mode_name =
-                        get_runtime_mode_name(cms.rtcfg_.mode_);
+                        get_runtime_mode_name(cmdline.rtcfg_.mode_);
                     std::ostringstream s;
                     s << "Attempted to start the runtime in the mode \""
                       << mode_name
@@ -908,7 +923,7 @@ namespace hpx {
                 }
                 }
 
-                result = run_or_start(blocking, std::move(rt), cms,
+                result = run_or_start(blocking, std::move(rt), cmdline,
                     std::move(params.startup), std::move(params.shutdown));
             }
             catch (detail::command_line_error const& e)

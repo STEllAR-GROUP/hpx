@@ -9,8 +9,6 @@
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 
-#include <hpx/modules/program_options.hpp>
-
 #include <cstddef>
 #include <memory>
 #include <mutex>
@@ -103,10 +101,6 @@ namespace hpx { namespace resource {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    struct partitioner_tag
-    {
-    };
-
     detail::partitioner& get_partitioner()
     {
         std::unique_ptr<detail::partitioner>& rp = detail::get_partitioner();
@@ -121,14 +115,6 @@ namespace hpx { namespace resource {
                 "been initialized and before it has been deleted.");
         }
 
-        if (!rp->cmd_line_parsed())
-        {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "hpx::resource::get_partitioner",
-                "can be called only after the resource partitioner has "
-                "been allowed to parse the command line options.");
-        }
-
         return *rp;
     }
 
@@ -139,48 +125,15 @@ namespace hpx { namespace resource {
 
     namespace detail {
         detail::partitioner& create_partitioner(
-            util::function_nonser<int(
-                hpx::program_options::variables_map& vm)> const& f,
-            hpx::program_options::options_description const& desc_cmdline,
-            int argc, char** argv, std::vector<std::string> ini_config,
-            resource::partitioner_mode rpmode, runtime_mode mode, bool check,
-            std::vector<std::shared_ptr<components::component_registry_base>>&
-                component_registries,
-            int* result)
+            resource::partitioner_mode rpmode,
+            hpx::util::runtime_configuration rtcfg,
+            hpx::threads::policies::detail::affinity_data affinity_data)
         {
             std::unique_ptr<detail::partitioner>& rp =
                 detail::get_partitioner();
 
-            if (rp->cmd_line_parsed())
-            {
-                if (check)
-                {
-                    // if the resource partitioner is not accessed for the
-                    // first time if the command-line parsing has not yet
-                    // been done
-                    HPX_THROW_EXCEPTION(invalid_status,
-                        "hpx::resource::get_partitioner",
-                        "can be called only after the resource partitioner "
-                        "has been allowed to parse the command line "
-                        "options.");
-                }
+            rp->init(rpmode, rtcfg, affinity_data);
 
-                // no need to parse a second time
-                if (result != nullptr)
-                {
-                    *result = 0;
-                }
-            }
-            else
-            {
-                int r = rp->parse(f, desc_cmdline, argc, argv,
-                    std::move(ini_config), rpmode, mode, component_registries,
-                    true);
-                if (result != nullptr)
-                {
-                    *result = r;
-                }
-            }
             return *rp;
         }
     }    // namespace detail
@@ -260,22 +213,10 @@ namespace hpx { namespace resource {
         return partitioner_.threads_needed();
     }
 
-    util::command_line_handling& partitioner::get_command_line_switches()
-    {
-        return partitioner_.get_command_line_switches();
-    }
-
     // Does initialization of all resources and internal data of the
     // resource partitioner called in hpx_init
     void partitioner::configure_pools()
     {
         partitioner_.configure_pools();
     }
-
-    // Return the initialization result for this resource_partitioner
-    int partitioner::parse_result() const
-    {
-        return partitioner_.parse_result();
-    }
-
 }}    // namespace hpx::resource
