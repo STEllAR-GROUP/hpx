@@ -72,13 +72,12 @@ namespace hpx { namespace components
 #endif
 
         template <typename Executor_ = Executor>
-        static typename std::enable_if<
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-            !traits::is_threads_executor<Executor_>::value
+        static typename std::enable_if<
+            !traits::is_threads_executor<Executor_>::value>::type
 #else
-            true
+        static void
 #endif
-            >::type
         schedule_thread(hpx::naming::address::address_type lva,
             naming::address::component_type /* comptype */,
             hpx::threads::thread_init_data& data,
