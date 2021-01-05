@@ -1048,33 +1048,6 @@ hpx_option(
   HPX_WITH_ITTNOTIFY BOOL "Enable Amplifier (ITT) instrumentation support." OFF
   CATEGORY "Profiling"
 )
-# ##############################################################################
-# enable OpenMP emulation
-# ##############################################################################
-# Deprecated in 1.5.0
-hpx_option(
-  HPX_WITH_HPXMP BOOL "Enable hpxMP OpenMP emulation." OFF CATEGORY "OpenMP"
-)
-if(HPX_WITH_HPXMP)
-  hpx_warn(
-    "HPXMP support is deprecated. This option will be removed in a future release."
-  )
-  if(NOT MSVC AND (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-                   OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
-  )
-    hpx_option(
-      HPX_WITH_HPXMP_NO_UPDATE BOOL
-      "Do not update code from remote hpxMP repository." OFF CATEGORY "OpenMP"
-    )
-    hpx_option(
-      HPX_WITH_HPXMP_TAG STRING "hpxMP repository tag or branch" "v0.3.0"
-      CATEGORY "OpenMP"
-    )
-  else()
-    hpx_warn("hpxMP can be used only when compiling with clang or gcc")
-    set(HPX_WITH_HPXMP OFF)
-  endif()
-endif()
 
 # ##############################################################################
 # Scheduler configuration
@@ -2269,7 +2242,6 @@ include(HPX_SetupCUDA) # CUDA needs to come before Apex, to have
                        # cuda_add_library available
 include(HPX_SetupApex)
 include(HPX_SetupPapi)
-include(HPX_SetupHpxmp)
 include(HPX_SetupGooglePerfTools)
 include(HPX_SetupValgrind)
 if(HPX_WITH_CUDA OR HPX_WITH_HIP)
