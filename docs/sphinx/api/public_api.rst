@@ -141,7 +141,7 @@ Header ``hpx/any.hpp``
 ======================
 
 Corresponds to the C++ standard library header :cppreference-header:`any`.
-:cpp:type:`hpx::util::any` is compatible with ``std::any``.
+:cpp:type:`hpx::any` is compatible with ``std::any``.
 
 Classes
 -------
@@ -247,9 +247,9 @@ The following replacements and extensions are provided compared to
 Classes
 -------
 
-- :cpp:class:`hpx::util::high_resolution_clock`
-- :cpp:class:`hpx::util::high_resolution_timer`
-- :cpp:class:`hpx::util::steady_time_point`
+- :cpp:class:`hpx::chrono::high_resolution_clock`
+- :cpp:class:`hpx::chrono::high_resolution_timer`
+- :cpp:class:`hpx::chrono::steady_time_point`
 
 Header ``hpx/condition_variable.hpp``
 =====================================
