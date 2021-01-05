@@ -5,12 +5,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We explicitly disable ibverbs and ipc for now as they don't work currently
-
 set(parcelport_plugins)
 
 if(HPX_WITH_NETWORKING)
-  set(parcelport_plugins ${parcelport_plugins} libfabric verbs mpi tcp)
+  set(parcelport_plugins ${parcelport_plugins} libfabric mpi tcp)
 endif()
 
 set(HPX_STATIC_PARCELPORT_PLUGINS

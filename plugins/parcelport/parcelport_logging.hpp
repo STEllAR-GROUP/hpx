@@ -30,8 +30,7 @@
 // ------------------------------------------------------------------
 
 // full logging support, we want everything
-#if defined(HPX_PARCELPORT_VERBS_HAVE_LOGGING) ||                              \
-    defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING)
+#if defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING)
 #define HPX_PARCELPORT_LOGGING_INCLUDE_FILES
 #define HPX_PARCELPORT_LOGGING_HAVE_TRACE_LOG
 #define HPX_PARCELPORT_LOGGING_HAVE_DEBUG_LOG
@@ -39,8 +38,7 @@
 #define HPX_PARCELPORT_LOGGING_HAVE_DEVEL_LOG
 
 // just a subset of logging for dev mode enabled
-#elif defined(HPX_PARCELPORT_VERBS_HAVE_DEV_MODE) ||                           \
-    defined(HPX_PARCELPORT_LIBFABRIC_HAVE_DEV_MODE)
+#elif defined(HPX_PARCELPORT_LIBFABRIC_HAVE_DEV_MODE)
 #define HPX_PARCELPORT_LOGGING_INCLUDE_FILES
 #define HPX_PARCELPORT_LOGGING_HAVE_TIMED_LOG
 #define HPX_PARCELPORT_LOGGING_HAVE_DEVEL_LOG

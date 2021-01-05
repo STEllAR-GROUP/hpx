@@ -73,7 +73,7 @@ CLIENTS_PERNODE=0
 SERVERS_PERNODE=1
 
 # Loop through all the parameter combinations generating jobs for each
-# "tcp" "mpi" "ibverbs"
+# "tcp" "mpi"
 for NODES in 1 2 4 8 16
 do
   for PARCELTYPE in "mpi"

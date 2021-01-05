@@ -119,9 +119,6 @@
 #define DEBUG_LEVEL 0
 
 //----------------------------------------------------------------------------
-// if we have access to boost logging via the verbs aprcelport include this
-// #include "plugins/parcelport/verbs/rdmahelper/include/RdmaLogging.h"
-// otherwise use this
 #if DEBUG_LEVEL>0
 # define LOG_DEBUG_MSG(x) std::cout << "Network storage " << x << std::endl
 # define DEBUG_OUTPUT(level,x)   \
