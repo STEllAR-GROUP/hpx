@@ -125,7 +125,7 @@ namespace hpx { namespace execution { namespace experimental {
         hpx::threads::thread_priority priority_ =
             hpx::threads::thread_priority::normal;
         hpx::threads::thread_stacksize stacksize_ =
-            hpx::threads::thread_stacksize::small;
+            hpx::threads::thread_stacksize::small_;
         hpx::threads::thread_schedule_hint schedulehint_{};
         /// \endcond
     };
