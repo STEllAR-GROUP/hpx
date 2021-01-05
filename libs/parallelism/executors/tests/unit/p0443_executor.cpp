@@ -147,38 +147,6 @@ void test_sender_receiver_transform_arguments()
     HPX_TEST_EQ(result, std::size_t(12));
 }
 
-// void test_sender_receiver_change_context()
-// {
-//     hpx::execution::experimental::executor exec{};
-//     hpx::thread::id parent_id = hpx::this_thread::get_id();
-
-//     auto begin = hpx::execution::experimental::schedule(exec);
-//     auto work1 = hpx::execution::experimental::transform(begin, [=]() {
-//         sender_receiver_transform_thread_id = hpx::this_thread::get_id();
-//         HPX_TEST_NEQ(sender_receiver_transform_thread_id, parent_id);
-//     });
-//     auto work2 = hpx::execution::experimental::transform(work1, []() {
-//         HPX_TEST_EQ(sender_receiver_transform_thread_id, hpx::this_thread::get_id());
-//     });
-//     auto work3 = hpx::execution::experimental::transform(work2, []() {
-//         HPX_TEST_EQ(sender_receiver_transform_thread_id, hpx::this_thread::get_id());
-//     });
-//     auto new_context = hpx::execution::experimental::via(exec, work3);
-//     auto work4 = hpx::execution::experimental::transform(new_context, []() {
-//         hpx::thread::id this_thread_id = hpx::this_thread::get_id();
-//         HPX_TEST_NEQ(parent_id, this_thread_id);
-//         HPX_TEST_NEQ(sender_receiver_transform_thread_id, this_thread_id);
-//         sender_receiver_transform_thread_id = this_thread_id;
-//     });
-//     auto work5 = hpx::execution::experimental::transform(new_context, []() {
-//         HPX_TEST_EQ(sender_receiver_transform_thread_id, hpx::this_thread::get_id());
-//     });
-//     auto work6 = hpx::execution::experimental::transform(new_context, []() {
-//         HPX_TEST_EQ(sender_receiver_transform_thread_id, hpx::this_thread::get_id());
-//     });
-//     hpx::execution::experimental::wait(work6);
-// }
-
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
@@ -189,7 +157,6 @@ int hpx_main(int argc, char* argv[])
     test_sender_receiver_transform_wait();
     test_sender_receiver_transform_sync_wait();
     test_sender_receiver_transform_arguments();
-    // test_sender_receiver_then_change_context();
 
     return hpx::finalize();
 }
