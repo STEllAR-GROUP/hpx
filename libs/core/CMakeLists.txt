@@ -38,6 +38,7 @@ set(_hpx_core_modules
     plugin
     prefix
     preprocessor
+    properties
     schedulers
     serialization
     static_reinit

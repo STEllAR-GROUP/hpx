@@ -16,6 +16,7 @@
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
+#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
@@ -163,6 +164,23 @@ namespace hpx { namespace execution {
           , policy_(l)
           , hierarchical_threshold_(hierarchical_threshold)
         {
+        }
+
+        friend parallel_policy_executor tag_invoke(
+            hpx::execution::experimental::make_with_hint_t,
+            parallel_policy_executor const& exec,
+            hpx::threads::thread_schedule_hint hint)
+        {
+            auto exec_with_hint = exec;
+            exec_with_hint.schedulehint_ = hint;
+            return exec_with_hint;
+        }
+
+        friend hpx::threads::thread_schedule_hint tag_invoke(
+            hpx::execution::experimental::get_hint_t,
+            parallel_policy_executor const& exec)
+        {
+            return exec.schedulehint_;
         }
 
         /// \cond NOINTERNAL

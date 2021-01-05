@@ -13,6 +13,7 @@
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/execution/traits/is_executor_parameters.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/serialization/base_object.hpp>
@@ -855,3 +856,15 @@ namespace hpx { namespace parallel { namespace execution {
         return std::forward<Param>(param);
     }
 }}}    // namespace hpx::parallel::execution
+
+namespace hpx { namespace execution { namespace experimental {
+    HPX_INLINE_CONSTEXPR_VARIABLE struct make_with_hint_t
+      : hpx::functional::tag<make_with_hint_t>
+    {
+    } make_with_hint;
+
+    HPX_INLINE_CONSTEXPR_VARIABLE struct get_hint_t
+      : hpx::functional::tag<get_hint_t>
+    {
+    } get_hint;
+}}}    // namespace hpx::execution::experimental
