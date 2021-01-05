@@ -84,19 +84,11 @@ namespace hpx { namespace actions {
                 return *data_;
             }
 
-#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) ||          \
-    defined(NDEBUG)
-            constexpr HPX_HOST_DEVICE HPX_FORCEINLINE Args const& data() const
-            {
-                return *data_;
-            }
-#else
             HPX_HOST_DEVICE HPX_FORCEINLINE Args const& data() const
             {
                 HPX_ASSERT(!!data_);
                 return *data_;
             }
-#endif
 
         private:
             std::unique_ptr<Args> data_;

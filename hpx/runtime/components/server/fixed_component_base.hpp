@@ -156,14 +156,6 @@ public:
         }
     }
 
-#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-    static constexpr void mark_as_migrated()
-    {
-    }
-    static constexpr void on_migrated()
-    {
-    }
-#else
     void mark_as_migrated()
     {
         // If this assertion is triggered then this component instance is being
@@ -179,7 +171,6 @@ public:
         // migration.
         HPX_ASSERT(false);
     }
-#endif
 
 private:
     mutable naming::gid_type gid_;
@@ -192,15 +183,6 @@ namespace detail
     ///////////////////////////////////////////////////////////////////////
     struct fixed_heap
     {
-#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-        static constexpr void* alloc(std::size_t /*count*/)
-        {
-            return nullptr;
-        }
-        static constexpr void free(void* /*p*/, std::size_t /*count*/)
-        {
-        }
-#else
         static void* alloc(std::size_t /*count*/)
         {
             HPX_ASSERT(false);        // this shouldn't ever be called
@@ -210,7 +192,6 @@ namespace detail
         {
             HPX_ASSERT(false);        // this shouldn't ever be called
         }
-#endif
     };
 }
 
@@ -224,17 +205,6 @@ class fixed_component : public Component
     typedef component_type derived_type;
     typedef detail::fixed_heap heap_type;
 
-#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-    static constexpr Component* create(std::size_t /* count */)
-    {
-        return nullptr;
-    }
-
-    static constexpr void destroy(
-        Component* /* p */, std::size_t /* count */ = 1)
-    {
-    }
-#else
     /// \brief  The function \a create is used for allocation and
     ///         initialization of instances of the derived components.
     static Component* create(std::size_t /* count */)
@@ -249,9 +219,6 @@ class fixed_component : public Component
     {
         HPX_ASSERT(false);        // this shouldn't ever be called
     }
-#endif
 };
 
 }}
-
-

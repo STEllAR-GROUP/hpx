@@ -15,7 +15,6 @@ if(EXISTS "${HPX_DIR}")
 
   add_executable(hello_world_client hello_world_client.cpp)
   target_include_directories(hello_world_client PRIVATE ${test_SOURCE_DIR})
-  target_include_directories(hello_world_client PRIVATE HPX_DEBUG)
 
   if("${SETUP_TYPE}" STREQUAL "TARGETS")
     target_link_libraries(
@@ -35,9 +34,6 @@ if(EXISTS "${HPX_DIR}")
       add_executable(hello_world_client_only_hpx_init hello_world_client.cpp)
       target_include_directories(
         hello_world_client_only_hpx_init PRIVATE ${test_SOURCE_DIR}
-      )
-      target_include_directories(
-        hello_world_client_only_hpx_init PRIVATE HPX_DEBUG
       )
 
       target_link_libraries(

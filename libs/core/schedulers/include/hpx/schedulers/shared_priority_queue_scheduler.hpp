@@ -6,7 +6,7 @@
 
 #pragma once
 
-#if !defined(NDEBUG)
+#if defined(HPX_DEBUG)
 //# define SHARED_PRIORITY_SCHEDULER_DEBUG 1
 #endif
 

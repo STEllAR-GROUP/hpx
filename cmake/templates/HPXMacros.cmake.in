@@ -95,25 +95,3 @@ function(hpx_check_allocator_compatibility)
       "informational purposes to dependent projects and should not be changed.")
   endif()
 endfunction()
-
-# Check we are using the same build type as HPX
-function(hpx_check_cmake_build_type)
-  get_property(_GENERATOR_IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-  if (NOT _GENERATOR_IS_MULTI_CONFIG AND
-      NOT "${HPX_BUILD_TYPE}" STREQUAL "${CMAKE_BUILD_TYPE}" AND
-      ("${HPX_BUILD_TYPE}" STREQUAL "Debug" OR "${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
-    if(HPX_IGNORE_CMAKE_BUILD_TYPE_COMPATIBILITY)
-      hpx_warn("CMAKE_BUILD_TYPE does not match ${HPX_BUILD_TYPE}: "
-        "this project uses '${CMAKE_BUILD_TYPE}', HPX uses '${HPX_BUILD_TYPE}'. "
-        "HPX is not ABI compatible between release and debug modes and it is "
-        "recommended that you use the same build type for HPX and your project.")
-    else()
-      hpx_error("CMAKE_BUILD_TYPE does not match ${HPX_BUILD_TYPE}: "
-        "this project uses '${CMAKE_BUILD_TYPE}', HPX uses '${HPX_BUILD_TYPE}'. "
-        "Please add -DCMAKE_BUILD_TYPE=${HPX_BUILD_TYPE} to your cmake command "
-        "or add -DHPX_IGNORE_CMAKE_BUILD_TYPE_COMPATIBILITY=ON to ignore this "
-        "check (not recommended; HPX is not ABI compatible between release and "
-        "debug modes).")
-    endif()
-  endif()
-endfunction()

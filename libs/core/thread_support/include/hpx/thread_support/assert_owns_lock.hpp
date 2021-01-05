@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <type_traits>
 
@@ -26,14 +27,12 @@ namespace hpx { namespace util { namespace detail {
     {
     }
 
-#if !defined(HPX_DISABLE_ASSERTS) && !defined(BOOST_DISABLE_ASSERTS) &&        \
-    !defined(NDEBUG)
-
     template <typename Lock>
     typename std::enable_if<has_owns_lock<Lock>::value>::type assert_owns_lock(
         Lock const& l, long)
     {
         HPX_ASSERT(l.owns_lock());
+        HPX_UNUSED(l);
     }
 
     template <typename Lock>
@@ -41,9 +40,8 @@ namespace hpx { namespace util { namespace detail {
     assert_doesnt_own_lock(Lock const& l, long)
     {
         HPX_ASSERT(!l.owns_lock());
+        HPX_UNUSED(l);
     }
-
-#endif
 }}}    // namespace hpx::util::detail
 
 #define HPX_ASSERT_OWNS_LOCK(l) ::hpx::util::detail::assert_owns_lock(l, 0L)

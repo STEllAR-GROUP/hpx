@@ -1731,23 +1731,6 @@ hpx_option(
 )
 
 # ##############################################################################
-# Add necessary compiler flags. Flags added here include flags to disable/enable
-# certain warnings, enabling C++11 mode and disabling asserts. Setting of
-# optimization flags is not handled here and is left to the responsibility of
-# the user to avoid conflicts in the resulting binaries
-
-hpx_add_target_compile_definition(_DEBUG PUBLIC CONFIGURATIONS Debug)
-hpx_add_target_compile_definition(DEBUG PUBLIC CONFIGURATIONS Debug)
-hpx_add_target_compile_definition(
-  HPX_DISABLE_ASSERTS PUBLIC CONFIGURATIONS Release RelWithDebInfo
-                                            MinSizeRelease
-)
-hpx_add_target_compile_definition(
-  BOOST_DISABLE_ASSERTS PUBLIC CONFIGURATIONS Release RelWithDebInfo
-                                              MinSizeRelease
-)
-
-# ##############################################################################
 # C++ feature tests
 # ##############################################################################
 include(HPX_PerformCxxFeatureTests)
@@ -1853,7 +1836,7 @@ if(WIN32)
     # non-referenced functions and data (-Zc:inline)
     hpx_add_target_compile_option(-Zc:inline PUBLIC)
     hpx_add_target_compile_option(
-      -Gw PUBLIC CONFIGURATIONS Release RelWithDebInfo MinSizeRelease
+      -Gw PUBLIC CONFIGURATIONS Release RelWithDebInfo MinSizeRel
     )
     hpx_add_target_compile_option(-Zo PUBLIC CONFIGURATIONS RelWithDebInfo)
     if(HPX_WITH_DATAPAR_VC)

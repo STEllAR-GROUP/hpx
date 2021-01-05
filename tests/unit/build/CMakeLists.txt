@@ -15,7 +15,15 @@ if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
 endif()
 
 # Try building an external cmake based project ...
-function(create_cmake_test name using_install_dir hpx_dir setup_type test_dir)
+function(
+  create_cmake_test
+  name
+  using_install_dir
+  hpx_dir
+  setup_type
+  build_type
+  test_dir
+)
   set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/${name}")
   add_custom_target(
     ${name}.make_build_dir
@@ -56,7 +64,7 @@ function(create_cmake_test name using_install_dir hpx_dir setup_type test_dir)
       "${CMAKE_COMMAND}" -E chdir "${build_dir}" "${CMAKE_COMMAND}" ${test_dir}
       -DHPX_DIR=${hpx_dir} -DBOOST_ROOT=${BOOST_ROOT}
       ${ADDITIONAL_CMAKE_OPTIONS} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
-      -DCMAKE_BUILD_TYPE=$<CONFIGURATION>
+      -DCMAKE_BUILD_TYPE=${build_type}
     VERBATIM
   )
   add_dependencies(
@@ -65,7 +73,7 @@ function(create_cmake_test name using_install_dir hpx_dir setup_type test_dir)
   )
   add_custom_target(
     ${name}.make_compile
-    COMMAND "${CMAKE_COMMAND}" --build "${build_dir}" --config $<CONFIGURATION>
+    COMMAND "${CMAKE_COMMAND}" --build "${build_dir}" --config ${build_type}
     VERBATIM
   )
   add_dependencies(${name}.make_compile ${name}.make_configure)
@@ -113,44 +121,60 @@ function(create_pkgconfig_test name hpx_dir)
 
 endfunction()
 
-create_cmake_test(
-  cmake_build_dir_targets_test FALSE
-  "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" TARGETS
-  "examples/hello_world_component"
-)
-
-create_cmake_test(
-  cmake_build_dir_macros_test FALSE
-  "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" MACROS
-  "examples/hello_world_component"
-)
-
-create_cmake_test(
-  cmake_install_dir_targets_test TRUE
-  "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
-  "examples/hello_world_component"
-)
-
-create_cmake_test(
-  cmake_install_dir_macros_test TRUE
-  "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" MACROS
-  "examples/hello_world_component"
-)
-
-if(HPX_WITH_DYNAMIC_HPX_MAIN)
-  # Google test emulation
-  create_cmake_test(
-    cmake_build_dir_gtest_emulation_test FALSE
-    "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" TARGETS
-    "examples/gtest_emulation"
-  )
-
-  create_cmake_test(
-    cmake_install_dir_gtest_emulation_test TRUE
-    "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
-    "examples/gtest_emulation"
-  )
+if(MSVC)
+  set(build_types ${CMAKE_BUILD_TYPE})
+else()
+  set(build_types Debug Release RelWithDebInfo)
+  # lld (which HIP uses) does not support the -Os flags in older versions. We do
+  # not attempt to detect the linker in the general case, but disable the
+  # MinSizeRel test here since we know that HIP only uses lld.
+  if(NOT HPX_WITH_HIP OR (HIP_VERSION VERSION_GREATER_EQUAL "4.0.0"))
+    list(APPEND build_types MinSizeRel)
+  endif()
 endif()
+
+foreach(build_type ${build_types})
+  string(TOLOWER "${build_type}" build_type_lc)
+
+  create_cmake_test(
+    cmake_${build_type_lc}_build_dir_targets_test FALSE
+    "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" TARGETS ${build_type}
+    "examples/hello_world_component"
+  )
+
+  create_cmake_test(
+    cmake_${build_type_lc}_build_dir_macros_test FALSE
+    "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" MACROS ${build_type}
+    "examples/hello_world_component"
+  )
+
+  create_cmake_test(
+    cmake_${build_type_lc}_install_dir_targets_test TRUE
+    "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
+    ${build_type} "examples/hello_world_component"
+  )
+
+  create_cmake_test(
+    cmake_${build_type_lc}_install_dir_macros_test TRUE
+    "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" MACROS
+    ${build_type} "examples/hello_world_component"
+  )
+
+  if(HPX_WITH_DYNAMIC_HPX_MAIN)
+    # Google test emulation
+    create_cmake_test(
+      cmake_${build_type_lc}_build_dir_gtest_emulation_test FALSE
+      "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" TARGETS
+      ${build_type} "examples/gtest_emulation"
+    )
+
+    create_cmake_test(
+      cmake_${build_type_lc}_install_dir_gtest_emulation_test TRUE
+      "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
+      ${build_type} "examples/gtest_emulation"
+    )
+  endif()
+endforeach()
 
 # PkgConfig
 if(NOT MSVC
@@ -189,17 +213,37 @@ if(NOT CMAKE_TOOLCHAIN_FILE
   set(pkgconfig_tests build_dir install_dir)
 endif()
 
-foreach(system ${build_systems})
-  add_hpx_pseudo_target(tests.unit.build.${system})
+set(system cmake)
+add_hpx_pseudo_target(tests.unit.build.${system})
+foreach(build_type ${build_types})
+  string(TOLOWER "${build_type}" build_type_lc)
+  add_hpx_pseudo_target(tests.unit.build.${system}.${build_type_lc})
   foreach(test ${${system}_tests})
-    add_hpx_pseudo_target(tests.unit.build.${system}.${test})
+    add_hpx_pseudo_target(tests.unit.build.${system}.${build_type_lc}.${test})
     add_hpx_pseudo_dependencies(
-      tests.unit.build.${system}.${test} ${system}_${test}_test
+      tests.unit.build.${system}.${build_type_lc}.${test}
+      ${system}_${build_type_lc}_${test}_test
     )
     add_hpx_pseudo_dependencies(
-      tests.unit.build.${system} tests.unit.build.${system}.${test}
+      tests.unit.build.${system}.${build_type_lc}
+      tests.unit.build.${system}.${build_type_lc}.${test}
     )
   endforeach()
-
-  add_hpx_pseudo_dependencies(tests.unit.build tests.unit.build.${system})
+  add_hpx_pseudo_dependencies(
+    tests.unit.build.${system} tests.unit.build.${system}.${build_type_lc}
+  )
 endforeach()
+add_hpx_pseudo_dependencies(tests.unit.build tests.unit.build.${system})
+
+set(system pkgconfig)
+add_hpx_pseudo_target(tests.unit.build.${system})
+foreach(test ${${system}_tests})
+  add_hpx_pseudo_target(tests.unit.build.${system}.${test})
+  add_hpx_pseudo_dependencies(
+    tests.unit.build.${system}.${test} ${system}_${test}_test
+  )
+  add_hpx_pseudo_dependencies(
+    tests.unit.build.${system} tests.unit.build.${system}.${test}
+  )
+endforeach()
+add_hpx_pseudo_dependencies(tests.unit.build tests.unit.build.${system})
