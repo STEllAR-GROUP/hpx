@@ -32,7 +32,7 @@ namespace hpx { namespace execution { namespace experimental {
                 st.cv.notify_one();
             }
 
-            void set_error(std::exception_ptr ep) noexcept
+            void set_error(std::exception_ptr) noexcept
             {
                 signal_done();
             }
@@ -43,7 +43,7 @@ namespace hpx { namespace execution { namespace experimental {
             };
 
             template <typename... Ts>
-            void set_value(Ts&&... ts)
+            void set_value(Ts&&...)
             {
                 signal_done();
             }
