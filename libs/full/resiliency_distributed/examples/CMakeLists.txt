@@ -6,39 +6,45 @@
 
 if(HPX_WITH_EXAMPLES)
 
-    add_hpx_pseudo_target(examples.modules.resiliency_distributed)
-    add_hpx_pseudo_dependencies(examples.modules examples.modules.resiliency_distributed)
-    if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES AND HPX_RESILIENCY_DISTRIBUTED_WITH_TESTS)
-        add_hpx_pseudo_target(tests.examples.modules.resiliency_distributed)
-        add_hpx_pseudo_dependencies(tests.examples.modules tests.examples.modules.resiliency_distributed)
-    endif()
+  add_hpx_pseudo_target(examples.modules.resiliency_distributed)
+  add_hpx_pseudo_dependencies(
+    examples.modules examples.modules.resiliency_distributed
+  )
+  if(HPX_WITH_TESTS
+     AND HPX_WITH_TESTS_EXAMPLES
+     AND HPX_RESILIENCY_DISTRIBUTED_WITH_TESTS
+  )
+    add_hpx_pseudo_target(tests.examples.modules.resiliency_distributed)
+    add_hpx_pseudo_dependencies(
+      tests.examples.modules tests.examples.modules.resiliency_distributed
+    )
+  endif()
 
-    set(example_programs
-        async_replay_distributed
-        async_replicate_distributed
+  set(example_programs async_replay_distributed async_replicate_distributed)
+
+  foreach(example_program ${example_programs})
+
+    set(sources ${example_program}.cpp)
+
+    source_group("Source Files" FILES ${sources})
+
+    # add example executable
+    add_hpx_executable(
+      ${example_program} INTERNAL_FLAGS
+      SOURCES ${sources} ${${example_program}_FLAGS}
+      FOLDER "Examples/Modules/Full/Resiliency"
     )
 
-    foreach(example_program ${example_programs})
+    add_hpx_example_target_dependencies(
+      "modules.resiliency_distributed" ${example_program}
+    )
 
-        set(sources ${example_program}.cpp)
+    if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
+      add_hpx_example_test(
+        "modules.resiliency_distributed" ${example_program}
+        ${${example_program}_PARAMETERS}
+      )
+    endif()
 
-        source_group("Source Files" FILES ${sources})
-
-        # add example executable
-        add_hpx_executable(
-        ${example_program} INTERNAL_FLAGS
-        SOURCES ${sources} ${${example_program}_FLAGS}
-        FOLDER "Examples/Modules/ResiliencyDistributed"
-        )
-
-        add_hpx_example_target_dependencies("modules.resiliency_distributed" ${example_program})
-
-        if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-        add_hpx_example_test(
-            "modules.resiliency_distributed" ${example_program}
-            ${${example_program}_PARAMETERS}
-        )
-        endif()
-
-    endforeach()
+  endforeach()
 endif()

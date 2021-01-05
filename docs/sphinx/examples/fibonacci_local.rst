@@ -123,7 +123,7 @@ program is encoded.
 The :cpp:func:`hpx::init` function in ``main()`` starts the runtime system, and
 invokes ``hpx_main()`` as the first |hpx|-thread. Below we can see that the
 basic program is simple. The command line option ``--n-value`` is read in, a
-timer (:cpp:class:`hpx::util::high_resolution_timer`) is set up to record the
+timer (:cpp:class:`hpx::chrono::high_resolution_timer`) is set up to record the
 time it takes to do the computation, the ``fibonacci`` function is invoked
 synchronously, and the answer is printed out.
 

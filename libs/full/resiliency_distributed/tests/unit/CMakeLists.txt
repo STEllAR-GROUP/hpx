@@ -4,17 +4,14 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests
-    async_replay_distributed_plain
-    async_replicate_distributed_plain
-)
+set(tests async_replay_distributed_plain async_replicate_distributed_plain)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
-  set(folder_name "Tests/Unit/Modules/Resiliency")
+  set(folder_name "Tests/Unit/Modules/Full/Resiliency")
 
   # add test executable
   add_hpx_executable(
@@ -24,5 +21,7 @@ foreach(test ${tests})
     FOLDER ${folder_name}
   )
 
-  add_hpx_unit_test("modules.resiliency" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test(
+    "modules.resiliency_distributed" ${test} ${${test}_PARAMETERS}
+  )
 endforeach()

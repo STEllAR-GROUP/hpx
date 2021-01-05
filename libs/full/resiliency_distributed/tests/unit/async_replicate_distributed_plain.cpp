@@ -9,6 +9,7 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/resiliency.hpp>
+#include <hpx/modules/resiliency_distributed.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -43,9 +44,11 @@ int hpx_main()
 {
     std::vector<hpx::naming::id_type> locals = hpx::find_all_localities();
 
-    // Allow a task to replicate on the same locality if it only 1 locality
+    // Allow a task to replicate on the same locality if there is only 1 locality
     if (locals.size() == 1)
+    {
         locals.insert(locals.end(), 9, hpx::find_here());
+    }
 
     {
         universal_action action;

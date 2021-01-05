@@ -12,6 +12,7 @@
 
 #include <hpx/resiliency/config.hpp>
 #include <hpx/resiliency/resiliency_cpos.hpp>
+#include <hpx/resiliency/util.hpp>
 
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/futures/future.hpp>
@@ -26,51 +27,7 @@
 namespace hpx { namespace resiliency { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_ALWAYS_EXPORT abort_replicate_exception : std::exception
-    {
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-
-        ///////////////////////////////////////////////////////////////////////
-        struct replicate_voter
-        {
-            template <typename T>
-            constexpr T operator()(std::vector<T>&& vect) const
-            {
-                return std::move(vect.at(0));
-            }
-        };
-
-        struct replicate_validator
-        {
-            template <typename T>
-            constexpr bool operator()(T&&) const
-            {
-                return true;
-            }
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Future>
-        std::exception_ptr rethrow_on_abort_replicate(Future& f)
-        {
-            std::exception_ptr ex;
-            try
-            {
-                f.get();
-            }
-            catch (abort_replicate_exception const&)
-            {
-                throw;
-            }
-            catch (...)
-            {
-                ex = std::current_exception();
-            }
-            return ex;
-        }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Vote, typename Pred, typename F, typename... Ts>

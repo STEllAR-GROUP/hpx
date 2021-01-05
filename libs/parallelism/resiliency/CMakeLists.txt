@@ -19,6 +19,7 @@ set(resiliency_headers
     hpx/resiliency/replicate_executor.hpp
     hpx/resiliency/resiliency.hpp
     hpx/resiliency/resiliency_cpos.hpp
+    hpx/resiliency/util.hpp
     hpx/resiliency/version.hpp
 )
 
@@ -27,10 +28,11 @@ set(resiliency_sources resiliency.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
-  full resiliency
+  parallelism resiliency
   GLOBAL_HEADER_GEN ON
   SOURCES ${resiliency_sources}
   HEADERS ${resiliency_headers}
-  DEPENDENCIES hpx_core hpx_parallelism
+  DEPENDENCIES hpx_core
+  MODULE_DEPENDENCIES hpx_async_local hpx_execution hpx_futures
   CMAKE_SUBDIRS examples tests
 )

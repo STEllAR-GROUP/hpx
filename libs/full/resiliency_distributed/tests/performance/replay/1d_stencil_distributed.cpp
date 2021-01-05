@@ -25,8 +25,10 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <functional>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -178,7 +180,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::size_t num_localities = hpx::get_num_localities(hpx::launch::sync);
     std::size_t rank = hpx::get_locality_id();
 
-    hpx::util::high_resolution_timer t_main;
+    hpx::chrono::high_resolution_timer t_main;
 
     // Define the two grids
     std::array<stencil, 2> U;

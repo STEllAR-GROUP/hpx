@@ -8,6 +8,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/actions_base/plain_action.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/modules/futures.hpp>
@@ -20,9 +21,8 @@
 #include <ctime>
 #include <iostream>
 #include <random>
+#include <string>
 #include <vector>
-
-
 
 int universal_ans(
     std::vector<hpx::id_type> f_locales, std::size_t err, std::size_t size)
@@ -33,10 +33,10 @@ int universal_ans(
     {
         local_tasks.push_back(hpx::async([size]() {
             // Pretending to do some useful work
-            std::size_t start = hpx::util::high_resolution_clock::now();
+            std::size_t start = hpx::chrono::high_resolution_clock::now();
 
-            while ((hpx::util::high_resolution_clock::now() - start) <
-                (size * 1e3))
+            while ((hpx::chrono::high_resolution_clock::now() - start) <
+                (size * 1000))
             {
             }
 
@@ -95,7 +95,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     // Make sure that the number of faulty nodes are less than the number of
     // localities we work on.
-    assert(f_nodes < locales.size());
+    HPX_ASSERT(f_nodes < locales.size());
 
     // List of faulty nodes
     std::vector<hpx::id_type> f_locales;
@@ -114,7 +114,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     }
 
     {
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         std::vector<hpx::future<int>> tasks;
         for (std::size_t i = 0; i < num_tasks; ++i)

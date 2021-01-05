@@ -26,7 +26,9 @@
 #include <array>
 #include <cstddef>
 #include <iostream>
+#include <random>
 #include <string>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -301,7 +303,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
     }
 
-    hpx::util::high_resolution_timer t_main;
+    hpx::chrono::high_resolution_timer t_main;
 
     // Define the two grids
     std::array<stencil, 2> U;

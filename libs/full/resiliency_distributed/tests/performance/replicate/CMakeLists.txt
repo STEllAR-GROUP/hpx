@@ -7,11 +7,9 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(benchmarks
-    async_replicate_distributed
-    async_replicate_distributed_validate
-    async_replicate_distributed_vote
-    async_replicate_distributed_vote_validate
-    plain_async_replicate_distributed
+    async_replicate_distributed async_replicate_distributed_validate
+    async_replicate_distributed_vote async_replicate_distributed_vote_validate
+    pure_async_for_replicate_distributed
 )
 
 foreach(benchmark ${benchmarks})
@@ -25,12 +23,13 @@ foreach(benchmark ${benchmarks})
     ${benchmark}_test INTERNAL_FLAGS
     SOURCES ${sources}
     EXCLUDE_FROM_ALL ${${benchmark}_FLAGS}
-    FOLDER "Benchmarks/Modules/Resiliency/Replicate"
+    FOLDER "Benchmarks/Modules/Full/Resiliency/Replicate"
   )
 
   # add a custom target for this benchmark
   add_hpx_performance_test(
-    "modules.resiliency.replicate" ${benchmark} ${${benchmark}_PARAMETERS}
+    "modules.resiliency_distributed.replicate" ${benchmark}
+    ${${benchmark}_PARAMETERS}
   )
 
 endforeach()

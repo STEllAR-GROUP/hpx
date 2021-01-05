@@ -1,6 +1,7 @@
 # Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 #                    LLC (NTESS).
 # Copyright (c) 2019 Nikunj Gupta
+# Copyright (c) 2021 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,7 +30,7 @@ foreach(benchmark ${benchmarks})
     ${benchmark}_test INTERNAL_FLAGS
     SOURCES ${sources}
     EXCLUDE_FROM_ALL ${${benchmark}_FLAGS}
-    FOLDER "Benchmarks/Modules/Full/Resiliency/Replay"
+    FOLDER "Benchmarks/Modules/Parallelism/Resiliency/Replay"
   )
 
   # add a custom target for this benchmark

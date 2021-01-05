@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-20 Nikunj Gupta
+//  Copyright (c) 2019-2020 Nikunj Gupta
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/resiliency.hpp>
+#include <hpx/modules/resiliency_distributed.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -37,9 +38,11 @@ int hpx_main()
 {
     std::vector<hpx::id_type> locals = hpx::find_all_localities();
 
-    // Allow a task to replay on the same locality if it only 1 locality
+    // Allow a task to replay on the same locality if there is only 1 locality
     if (locals.size() == 1)
+    {
         locals.insert(locals.end(), 9, hpx::find_here());
+    }
 
     {
         universal_action our_action;

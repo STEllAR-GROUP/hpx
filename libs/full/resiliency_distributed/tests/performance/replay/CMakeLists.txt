@@ -7,10 +7,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(benchmarks
-    1d_stencil_distributed
-    1d_stencil_replay_distributed
-    async_replay_distributed
-    async_replay_distributed_validate
+    1d_stencil_distributed 1d_stencil_replay_distributed
+    async_replay_distributed async_replay_distributed_validate
     plain_async_distributed
 )
 
@@ -25,12 +23,13 @@ foreach(benchmark ${benchmarks})
     ${benchmark}_test INTERNAL_FLAGS
     SOURCES ${sources}
     EXCLUDE_FROM_ALL ${${benchmark}_FLAGS}
-    FOLDER "Benchmarks/Modules/Resiliency/Replay"
+    FOLDER "Benchmarks/Modules/Full/Resiliency/Replay"
   )
 
   # add a custom target for this benchmark
   add_hpx_performance_test(
-    "modules.resiliency.replay" ${benchmark} ${${benchmark}_PARAMETERS}
+    "modules.resiliency_distributed.replay" ${benchmark}
+    ${${benchmark}_PARAMETERS}
   )
 
 endforeach()

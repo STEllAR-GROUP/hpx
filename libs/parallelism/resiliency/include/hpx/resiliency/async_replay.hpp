@@ -12,6 +12,7 @@
 
 #include <hpx/resiliency/config.hpp>
 #include <hpx/resiliency/resiliency_cpos.hpp>
+#include <hpx/resiliency/util.hpp>
 
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/futures/future.hpp>
@@ -30,42 +31,7 @@
 namespace hpx { namespace resiliency { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_ALWAYS_EXPORT abort_replay_exception : std::exception
-    {
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-
-        ///////////////////////////////////////////////////////////////////////
-        struct replay_validator
-        {
-            template <typename T>
-            constexpr bool operator()(T&&) const
-            {
-                return true;
-            }
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Future>
-        std::exception_ptr rethrow_on_abort_replay(Future& f)
-        {
-            std::exception_ptr ex;
-            try
-            {
-                f.get();
-            }
-            catch (abort_replay_exception const&)
-            {
-                throw;
-            }
-            catch (...)
-            {
-                ex = std::current_exception();
-            }
-            return ex;
-        }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Result, typename Pred, typename F, typename Tuple>

@@ -12,7 +12,6 @@ set(resiliency_distributed_headers
     hpx/resiliency_distributed/async_replay_distributed.hpp
     hpx/resiliency_distributed/async_replicate_distributed.hpp
     hpx/resiliency_distributed/resiliency_distributed.hpp
-    hpx/resiliency_distributed/util.hpp
 )
 
 include(HPX_AddModule)
@@ -22,4 +21,6 @@ add_hpx_module(
   SOURCES ${resiliency_distributed_sources}
   HEADERS ${resiliency_distributed_headers}
   DEPENDENCIES hpx_core hpx_parallelism
+  MODULE_DEPENDENCIES hpx_naming
+  CMAKE_SUBDIRS examples tests
 )

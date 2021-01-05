@@ -12,6 +12,7 @@
 #include <hpx/modules/timing.hpp>
 
 #include <atomic>
+#include <cstddef>
 #include <cstdint>
 #include <ctime>
 #include <exception>
@@ -42,12 +43,12 @@ std::size_t universal_ans(std::size_t delay_ns, std::size_t error)
 {
     std::uniform_int_distribution<std::size_t> dist(1, 100);
 
-    std::size_t start = hpx::util::high_resolution_clock::now();
+    std::size_t start = hpx::chrono::high_resolution_clock::now();
 
     while (true)
     {
         // Check if we've reached the specified delay.
-        if ((hpx::util::high_resolution_clock::now() - start) >=
+        if ((hpx::chrono::high_resolution_clock::now() - start) >=
             (delay_ns * 1e3))
         {
             // Re-run the thread if the thread was meant to re-run
@@ -74,7 +75,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::vector<hpx::future<std::size_t>> vect;
         vect.reserve(num_iterations);
 
-        hpx::util::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer t;
 
         for (std::size_t i = 0; i < num_iterations; ++i)
         {

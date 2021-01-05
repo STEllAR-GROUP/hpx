@@ -32,7 +32,7 @@ namespace hpx { namespace resiliency { namespace experimental {
         struct replicate_voter
         {
             template <typename T>
-            T operator()(std::vector<T>&& vect) const
+            constexpr T operator()(std::vector<T>&& vect) const
             {
                 return std::move(vect.at(0));
             }
@@ -41,7 +41,7 @@ namespace hpx { namespace resiliency { namespace experimental {
         struct replicate_validator
         {
             template <typename T>
-            bool operator()(T&& result) const
+            constexpr bool operator()(T&&) const noexcept
             {
                 return true;
             }
@@ -51,7 +51,7 @@ namespace hpx { namespace resiliency { namespace experimental {
         struct replay_validator
         {
             template <typename T>
-            bool operator()(T&& result) const
+            constexpr bool operator()(T&&) const noexcept
             {
                 return true;
             }
