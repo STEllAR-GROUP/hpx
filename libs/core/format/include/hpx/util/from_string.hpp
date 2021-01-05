@@ -43,39 +43,19 @@ namespace hpx { namespace util {
         }
 
         template <typename Char>
-        void check_single_token(std::basic_string<Char> const& s)
+        void check_only_whitespace(
+            std::basic_string<Char> const& s, std::size_t pos)
         {
-            if (s.empty())
+            auto i = s.begin();
+            std::advance(i, pos);
+            i = std::find_if(
+                i, s.end(), [](int c) { return !std::isspace(c); });
+
+            if (i != s.end())
             {
-                throw std::invalid_argument("from_string: empty string");
+                throw std::invalid_argument(
+                    "from_string: found non-whitespace after token");
             }
-
-            auto isspace = [](int c) { return std::isspace(c); };
-            auto isnotspace = [](int c) { return !std::isspace(c); };
-
-            // Skip leading whitespace
-            auto pos = std::find_if(s.begin(), s.end(), isnotspace);
-            if (pos == s.end())
-            {
-                throw std::invalid_argument("from_string: no tokens");
-            }
-
-            // Skip first token
-            pos = std::find_if(pos, s.end(), isspace);
-            if (pos == s.end())
-            {
-                return;
-            }
-
-            // Skip trailing whitespace
-            pos = std::find_if(pos, s.end(), isnotspace);
-            if (pos == s.end())
-            {
-                return;
-            }
-
-            // There are at least two tokens in the string
-            throw std::invalid_argument("from_string: multiple tokens");
         }
 
         template <typename T>
@@ -85,23 +65,26 @@ namespace hpx { namespace util {
             template <typename Char>
             static void call(std::basic_string<Char> const& value, int& target)
             {
-                check_single_token(value);
-                target = std::stoi(value);
+                std::size_t pos = 0;
+                target = std::stoi(value, &pos);
+                check_only_whitespace(value, pos);
             }
 
             template <typename Char>
             static void call(std::basic_string<Char> const& value, long& target)
             {
-                check_single_token(value);
-                target = std::stol(value);
+                std::size_t pos = 0;
+                target = std::stol(value, &pos);
+                check_only_whitespace(value, pos);
             }
 
             template <typename Char>
             static void call(
                 std::basic_string<Char> const& value, long long& target)
             {
-                check_single_token(value);
-                target = std::stoll(value);
+                std::size_t pos = 0;
+                target = std::stoll(value, &pos);
+                check_only_whitespace(value, pos);
             }
 
             template <typename Char>
@@ -109,7 +92,6 @@ namespace hpx { namespace util {
                 std::basic_string<Char> const& value, unsigned int& target)
             {
                 // there is no std::stoui
-                check_single_token(value);
                 unsigned long target_long;
                 call(value, target_long);
                 target = check_out_of_range<T>(target_long);
@@ -119,23 +101,23 @@ namespace hpx { namespace util {
             static void call(
                 std::basic_string<Char> const& value, unsigned long& target)
             {
-                check_single_token(value);
-                target = std::stoul(value);
+                std::size_t pos = 0;
+                target = std::stoul(value, &pos);
+                check_only_whitespace(value, pos);
             }
 
             template <typename Char>
             static void call(std::basic_string<Char> const& value,
                 unsigned long long& target)
             {
-                check_single_token(value);
-                target = std::stoull(value);
+                std::size_t pos = 0;
+                target = std::stoull(value, &pos);
+                check_only_whitespace(value, pos);
             }
 
             template <typename Char, typename U>
             static void call(std::basic_string<Char> const& value, U& target)
             {
-                check_single_token(value);
-
                 using promoted_t = decltype(+std::declval<U>());
                 static_assert(!std::is_same<promoted_t, U>::value, "");
 
@@ -153,24 +135,27 @@ namespace hpx { namespace util {
             static void call(
                 std::basic_string<Char> const& value, float& target)
             {
-                check_single_token(value);
-                target = std::stof(value);
+                std::size_t pos = 0;
+                target = std::stof(value, &pos);
+                check_only_whitespace(value, pos);
             }
 
             template <typename Char>
             static void call(
                 std::basic_string<Char> const& value, double& target)
             {
-                check_single_token(value);
-                target = std::stod(value);
+                std::size_t pos = 0;
+                target = std::stod(value, &pos);
+                check_only_whitespace(value, pos);
             }
 
             template <typename Char>
             static void call(
                 std::basic_string<Char> const& value, long double& target)
             {
-                check_single_token(value);
-                target = std::stold(value);
+                std::size_t pos = 0;
+                target = std::stold(value, &pos);
+                check_only_whitespace(value, pos);
             }
         };
     }    // namespace detail
