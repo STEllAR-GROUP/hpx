@@ -18,6 +18,7 @@
 
 #include <exception>
 #include <tuple>
+#include <utility>
 
 namespace hpx { namespace execution { namespace experimental {
     template <typename... Variants>

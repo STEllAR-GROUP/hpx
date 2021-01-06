@@ -12,6 +12,9 @@
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
 
+#include <exception>
+#include <utility>
+
 namespace hpx { namespace execution { namespace experimental {
     namespace detail {
         struct wait_receiver

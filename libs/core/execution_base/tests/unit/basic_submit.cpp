@@ -8,6 +8,10 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <cstddef>
+#include <exception>
+#include <utility>
+
 static std::size_t start_calls = 0;
 static std::size_t connect_calls = 0;
 static std::size_t member_submit_calls = 0;

@@ -11,6 +11,10 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/type_support/pack.hpp>
 
+#include <exception>
+#include <type_traits>
+#include <utility>
+
 namespace hpx { namespace execution { namespace experimental {
     namespace detail {
         template <typename Variant>

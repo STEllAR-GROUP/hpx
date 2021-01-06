@@ -14,7 +14,9 @@
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/type_support/equality.hpp>
 
+#include <cstddef>
 #include <exception>
+#include <memory>
 #include <type_traits>
 #include <utility>
 

@@ -11,7 +11,10 @@
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 
+#include <cstddef>
 #include <exception>
+#include <type_traits>
+#include <utility>
 
 namespace hpx { namespace execution { namespace experimental {
     struct executor

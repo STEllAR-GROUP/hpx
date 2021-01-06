@@ -8,6 +8,8 @@
 #include <hpx/modules/testing.hpp>
 #include <type_traits>
 
+#include <cstddef>
+
 static std::size_t member_execute_calls = 0;
 static std::size_t tag_invoke_execute_calls = 0;
 

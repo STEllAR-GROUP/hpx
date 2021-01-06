@@ -8,6 +8,7 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <cstddef>
 #include <exception>
 #include <string>
 #include <type_traits>

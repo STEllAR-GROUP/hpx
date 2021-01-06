@@ -8,6 +8,8 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/type_support/unused.hpp>
 
+#include <cstddef>
+#include <exception>
 #include <type_traits>
 
 static std::size_t member_schedule_calls = 0;

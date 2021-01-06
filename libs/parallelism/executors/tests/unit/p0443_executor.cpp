@@ -11,6 +11,7 @@
 #include <hpx/thread.hpp>
 
 #include <atomic>
+#include <cstddef>
 #include <string>
 #include <type_traits>
 
