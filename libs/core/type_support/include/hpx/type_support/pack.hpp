@@ -213,7 +213,8 @@ namespace hpx { namespace util {
             using type = Pack<Ts...>;
         };
 
-        template <template <typename...> class Pack, typename... Ts, typename U, typename... Us>
+        template <template <typename...> class Pack, typename... Ts, typename U,
+            typename... Us>
         struct unique_helper<Pack<Ts...>, Pack<U, Us...>>
           : std::conditional<contains<Ts..., U>::value,
                 unique_helper<Pack<Ts...>, Pack<Us...>>,
@@ -221,7 +222,8 @@ namespace hpx { namespace util {
         {
         };
 
-        template <template <typename...> class Pack, typename... Ts, typename... Us>
+        template <template <typename...> class Pack, typename... Ts,
+            typename... Us>
         struct unique_helper<Pack<Ts...>, Pack<Us...>>
           : unique_helper<Pack<>, Pack<Ts...>>
         {

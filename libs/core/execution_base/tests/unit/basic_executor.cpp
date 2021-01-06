@@ -57,8 +57,9 @@ struct executor_2
 };
 
 template <typename F>
-void tag_invoke(hpx::execution::experimental::execute_t, executor_2, F&&) {
-        ++tag_invoke_execute_calls;
+void tag_invoke(hpx::execution::experimental::execute_t, executor_2, F&&)
+{
+    ++tag_invoke_execute_calls;
 }
 
 struct executor_3
@@ -81,7 +82,8 @@ struct executor_3
 };
 
 template <typename F>
-void tag_invoke(hpx::execution::experimental::execute_t, executor_3, F&&) {
+void tag_invoke(hpx::execution::experimental::execute_t, executor_3, F&&)
+{
     ++tag_invoke_execute_calls;
 }
 
@@ -109,41 +111,68 @@ int main()
     using hpx::execution::experimental::traits::is_executor;
     using hpx::execution::experimental::traits::is_executor_of;
 
-    static_assert(!is_executor<non_executor_1>::value, "non_executor_1 is not an executor");
-    static_assert(!is_executor<non_executor_2>::value, "non_executor_2 is not an executor");
+    static_assert(!is_executor<non_executor_1>::value,
+        "non_executor_1 is not an executor");
+    static_assert(!is_executor<non_executor_2>::value,
+        "non_executor_2 is not an executor");
     static_assert(is_executor<executor_1>::value, "executor_1 is an executor");
     static_assert(is_executor<executor_2>::value, "executor_2 is an executor");
     static_assert(is_executor<executor_3>::value, "executor_3 is an executor");
 
-    static_assert(!is_executor_of<non_executor_1, f_struct_1>::value, "non_executor_1 is not an executor of f_struct_1");
-    static_assert(!is_executor_of<non_executor_2, f_struct_1>::value, "non_executor_2 is not an executor of f_struct_1");
-    static_assert(is_executor_of<executor_1, f_struct_1>::value, "executor_1 is an executor of f_struct_1");
-    static_assert(is_executor_of<executor_2, f_struct_1>::value, "executor_2 is an executor of f_struct_1");
-    static_assert(is_executor_of<executor_3, f_struct_1>::value, "executor_3 is an executor of f_struct_1");
+    static_assert(!is_executor_of<non_executor_1, f_struct_1>::value,
+        "non_executor_1 is not an executor of f_struct_1");
+    static_assert(!is_executor_of<non_executor_2, f_struct_1>::value,
+        "non_executor_2 is not an executor of f_struct_1");
+    static_assert(is_executor_of<executor_1, f_struct_1>::value,
+        "executor_1 is an executor of f_struct_1");
+    static_assert(is_executor_of<executor_2, f_struct_1>::value,
+        "executor_2 is an executor of f_struct_1");
+    static_assert(is_executor_of<executor_3, f_struct_1>::value,
+        "executor_3 is an executor of f_struct_1");
 
-    static_assert(!is_executor_of<non_executor_1, f_struct_2>::value, "non_executor_1 is not an executor of f_struct");
-    static_assert(!is_executor_of<non_executor_2, f_struct_2>::value, "non_executor_2 is not an executor of f_struct");
-    static_assert(!is_executor_of<executor_1, f_struct_2>::value, "executor_1 is not an executor of f_struct_nonarchetypical");
-    static_assert(!is_executor_of<executor_2, f_struct_2>::value, "executor_2 is not an executor of f_struct_nonarchetypical");
-    static_assert(!is_executor_of<executor_3, f_struct_2>::value, "executor_3 is not an executor of f_struct_nonarchetypical");
+    static_assert(!is_executor_of<non_executor_1, f_struct_2>::value,
+        "non_executor_1 is not an executor of f_struct");
+    static_assert(!is_executor_of<non_executor_2, f_struct_2>::value,
+        "non_executor_2 is not an executor of f_struct");
+    static_assert(!is_executor_of<executor_1, f_struct_2>::value,
+        "executor_1 is not an executor of f_struct_nonarchetypical");
+    static_assert(!is_executor_of<executor_2, f_struct_2>::value,
+        "executor_2 is not an executor of f_struct_nonarchetypical");
+    static_assert(!is_executor_of<executor_3, f_struct_2>::value,
+        "executor_3 is not an executor of f_struct_nonarchetypical");
 
-    static_assert(!is_executor_of<non_executor_1, f_struct_3>::value, "non_executor_1 is not an executor of f_struct_2");
-    static_assert(!is_executor_of<non_executor_2, f_struct_3>::value, "non_executor_2 is not an executor of f_struct_2");
-    static_assert(is_executor_of<executor_1, f_struct_3>::value, "executor_1 is an executor of f_struct_2");
-    static_assert(is_executor_of<executor_2, f_struct_3>::value, "executor_2 is an executor of f_struct_2");
-    static_assert(is_executor_of<executor_3, f_struct_3>::value, "executor_3 is an executor of f_struct_2");
+    static_assert(!is_executor_of<non_executor_1, f_struct_3>::value,
+        "non_executor_1 is not an executor of f_struct_2");
+    static_assert(!is_executor_of<non_executor_2, f_struct_3>::value,
+        "non_executor_2 is not an executor of f_struct_2");
+    static_assert(is_executor_of<executor_1, f_struct_3>::value,
+        "executor_1 is an executor of f_struct_2");
+    static_assert(is_executor_of<executor_2, f_struct_3>::value,
+        "executor_2 is an executor of f_struct_2");
+    static_assert(is_executor_of<executor_3, f_struct_3>::value,
+        "executor_3 is an executor of f_struct_2");
 
-    static_assert(!is_executor_of<non_executor_1, decltype(f_fun_1)>::value, "non_executor_1 is not an executor of f_fun_1");
-    static_assert(!is_executor_of<non_executor_2, decltype(f_fun_1)>::value, "non_executor_2 is not an executor of f_fun_1");
-    static_assert(is_executor_of<executor_1, decltype(f_fun_1)>::value, "executor_1 is an executor of f_fun_1");
-    static_assert(is_executor_of<executor_2, decltype(f_fun_1)>::value, "executor_2 is an executor of f_fun_1");
-    static_assert(is_executor_of<executor_3, decltype(f_fun_1)>::value, "executor_3 is an executor of f_fun_1");
+    static_assert(!is_executor_of<non_executor_1, decltype(f_fun_1)>::value,
+        "non_executor_1 is not an executor of f_fun_1");
+    static_assert(!is_executor_of<non_executor_2, decltype(f_fun_1)>::value,
+        "non_executor_2 is not an executor of f_fun_1");
+    static_assert(is_executor_of<executor_1, decltype(f_fun_1)>::value,
+        "executor_1 is an executor of f_fun_1");
+    static_assert(is_executor_of<executor_2, decltype(f_fun_1)>::value,
+        "executor_2 is an executor of f_fun_1");
+    static_assert(is_executor_of<executor_3, decltype(f_fun_1)>::value,
+        "executor_3 is an executor of f_fun_1");
 
-    static_assert(!is_executor_of<non_executor_1, decltype(f_fun_2)>::value, "non_executor_1 is not an executor of f_fun_2");
-    static_assert(!is_executor_of<non_executor_2, decltype(f_fun_2)>::value, "non_executor_2 is not an executor of f_fun_2");
-    static_assert(!is_executor_of<executor_1, decltype(f_fun_2)>::value, "executor_1 is an executor of f_fun_2");
-    static_assert(!is_executor_of<executor_2, decltype(f_fun_2)>::value, "executor_2 is an executor of f_fun_2");
-    static_assert(!is_executor_of<executor_3, decltype(f_fun_2)>::value, "executor_3 is an executor of f_fun_2");
+    static_assert(!is_executor_of<non_executor_1, decltype(f_fun_2)>::value,
+        "non_executor_1 is not an executor of f_fun_2");
+    static_assert(!is_executor_of<non_executor_2, decltype(f_fun_2)>::value,
+        "non_executor_2 is not an executor of f_fun_2");
+    static_assert(!is_executor_of<executor_1, decltype(f_fun_2)>::value,
+        "executor_1 is an executor of f_fun_2");
+    static_assert(!is_executor_of<executor_2, decltype(f_fun_2)>::value,
+        "executor_2 is an executor of f_fun_2");
+    static_assert(!is_executor_of<executor_3, decltype(f_fun_2)>::value,
+        "executor_3 is an executor of f_fun_2");
 
     executor_1 e1;
     hpx::execution::experimental::execute(e1, f_struct_1{});
