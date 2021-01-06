@@ -148,7 +148,7 @@ void test_sender_receiver_transform_arguments()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(int argc, char* argv[])
+int hpx_main()
 {
     test_execute();
     test_sender_receiver_basic();

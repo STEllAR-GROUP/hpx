@@ -132,7 +132,7 @@ struct sender_2
 };
 
 sender_2::operation_state tag_invoke(
-    hpx::execution::experimental::connect_t, sender_2 s, receiver& r)
+    hpx::execution::experimental::connect_t, sender_2, receiver& r)
 {
     ++tag_invoke_connect_calls;
     return {r};
@@ -160,7 +160,7 @@ struct sender_3
 };
 
 sender_3::operation_state tag_invoke(
-    hpx::execution::experimental::connect_t, sender_3 s, receiver& r)
+    hpx::execution::experimental::connect_t, sender_3, receiver& r)
 {
     ++tag_invoke_connect_calls;
     return {r};
@@ -222,7 +222,7 @@ struct executor_2
 };
 
 template <typename F>
-void tag_invoke(hpx::execution::experimental::execute_t, executor_2 ex, F&& f)
+void tag_invoke(hpx::execution::experimental::execute_t, executor_2, F&& f)
 {
     ++tag_invoke_execute_calls;
     hpx::util::invoke(f);
@@ -242,7 +242,7 @@ struct executor_3
 };
 
 template <typename F>
-void tag_invoke(hpx::execution::experimental::execute_t, executor_3 ex, F&& f)
+void tag_invoke(hpx::execution::experimental::execute_t, executor_3, F&& f)
 {
     ++tag_invoke_execute_calls;
     hpx::util::invoke(f);
