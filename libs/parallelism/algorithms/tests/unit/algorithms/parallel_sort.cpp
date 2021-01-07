@@ -369,7 +369,7 @@ void test6()
     }
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))

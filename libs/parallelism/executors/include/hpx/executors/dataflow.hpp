@@ -135,9 +135,11 @@ namespace hpx { namespace lcos { namespace detail {
     struct dataflow_return_impl<
         /*IsAction=*/false, Policy, F, Args,
         typename std::enable_if<traits::is_one_way_executor<Policy>::value ||
-            traits::is_two_way_executor<Policy>::value ||
-            traits::is_threads_executor<Policy>::value>::type>
-      : dataflow_return_impl_executor<Policy, F, Args>
+            traits::is_two_way_executor<Policy>::value
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+            || traits::is_threads_executor<Policy>::value
+#endif
+            >::type> : dataflow_return_impl_executor<Policy, F, Args>
     {
     };
 
@@ -352,8 +354,11 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename Executor, typename Futures_>
         HPX_FORCEINLINE typename std::enable_if<
             (traits::is_one_way_executor<Executor>::value ||
-                traits::is_two_way_executor<Executor>::value ||
-                traits::is_threads_executor<Executor>::value) &&
+                traits::is_two_way_executor<Executor>::value
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+                || traits::is_threads_executor<Executor>::value
+#endif
+                ) &&
             !has_dataflow_finalize<Executor, dataflow_frame, Func,
                 Futures_>::value>::type
         finalize(Executor&& exec, Futures_&& futures)
@@ -367,8 +372,11 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename Executor, typename Futures_>
         HPX_FORCEINLINE typename std::enable_if<
             (traits::is_one_way_executor<Executor>::value ||
-                traits::is_two_way_executor<Executor>::value ||
-                traits::is_threads_executor<Executor>::value) &&
+                traits::is_two_way_executor<Executor>::value
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+                || traits::is_threads_executor<Executor>::value
+#endif
+                ) &&
             has_dataflow_finalize<Executor, dataflow_frame, Func,
                 Futures_>::value>::type
         finalize(Executor&& exec, Futures_&& futures)
@@ -513,8 +521,11 @@ namespace hpx { namespace lcos { namespace detail {
     template <typename Executor>
     struct dataflow_dispatch<Executor,
         typename std::enable_if<traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value ||
-            traits::is_threads_executor<Executor>::value>::type>
+            traits::is_two_way_executor<Executor>::value
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+            || traits::is_threads_executor<Executor>::value
+#endif
+            >::type>
     {
         template <typename Allocator, typename Executor_, typename F,
             typename... Ts>
@@ -532,8 +543,11 @@ namespace hpx { namespace lcos { namespace detail {
     struct dataflow_dispatch_impl<false, FD,
         typename std::enable_if<!traits::is_launch_policy<FD>::value &&
             !(traits::is_one_way_executor<FD>::value ||
-                traits::is_two_way_executor<FD>::value ||
-                traits::is_threads_executor<FD>::value)>::type>
+                traits::is_two_way_executor<FD>::value
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+                || traits::is_threads_executor<FD>::value
+#endif
+                )>::type>
     {
         template <typename Allocator, typename F, typename... Ts,
             typename Enable = typename std::enable_if<
@@ -551,8 +565,11 @@ namespace hpx { namespace lcos { namespace detail {
     struct dataflow_dispatch<FD,
         typename std::enable_if<!traits::is_launch_policy<FD>::value &&
             !(traits::is_one_way_executor<FD>::value ||
-                traits::is_two_way_executor<FD>::value ||
-                traits::is_threads_executor<FD>::value)>::type>
+                traits::is_two_way_executor<FD>::value
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+                || traits::is_threads_executor<FD>::value
+#endif
+                )>::type>
     {
         template <typename Allocator, typename F, typename... Ts>
         HPX_FORCEINLINE static auto call(

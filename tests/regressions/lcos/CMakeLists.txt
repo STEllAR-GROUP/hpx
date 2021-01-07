@@ -16,7 +16,6 @@ set(tests
     receive_buffer_1733
     set_hpx_limit_798
     shared_stated_leaked_1211
-    shared_future_then_with_executor_3634
     sliding_semaphore_2338
     wait_for_1751
     wait_for_action_2796
@@ -31,6 +30,10 @@ set(receive_buffer_1733_PARAMETERS LOCALITIES 2)
 set(safely_destroy_cv_1481_PARAMETERS THREADS_PER_LOCALITY 2)
 set(sliding_semaphore_2338_PARAMETERS THREADS_PER_LOCALITY 2)
 set(wait_for_1751_PARAMETERS THREADS_PER_LOCALITY 4)
+
+if(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY)
+  list(APPEND tests shared_future_then_with_executor_3634)
+endif()
 
 # Create test cases
 foreach(test ${tests})

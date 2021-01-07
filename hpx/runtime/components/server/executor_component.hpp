@@ -50,6 +50,7 @@ namespace hpx { namespace components
 
         /// This is the default hook implementation for schedule_thread which
         /// forwards to the executor instance associated with this component.
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
         template <typename Executor_ = Executor>
         static typename std::enable_if<
             traits::is_threads_executor<Executor_>::value>::type
@@ -68,10 +69,15 @@ namespace hpx { namespace components
                     &executor_component::execute, desc.get_description()),
                 std::move(data.func));
         }
+#endif
 
         template <typename Executor_ = Executor>
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
         static typename std::enable_if<
             !traits::is_threads_executor<Executor_>::value>::type
+#else
+        static void
+#endif
         schedule_thread(hpx::naming::address::address_type lva,
             naming::address::component_type /* comptype */,
             hpx::threads::thread_init_data& data,

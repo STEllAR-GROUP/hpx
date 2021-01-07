@@ -184,11 +184,18 @@ namespace hpx { namespace resiliency { namespace experimental {
     // clang-format off
     template <typename Executor, typename Vote, typename Pred, typename F,
         typename... Ts,
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
         HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_one_way_executor<Executor>::value ||
             hpx::traits::is_two_way_executor<Executor>::value ||
             hpx::traits::is_threads_executor<Executor>::value
         )>
+#else
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_one_way_executor<Executor>::value ||
+            hpx::traits::is_two_way_executor<Executor>::value
+        )>
+#endif
     // clang-format on
     decltype(auto) tag_invoke(async_replicate_vote_validate_t, Executor&& exec,
         std::size_t n, Vote&& vote, Pred&& pred, F&& f, Ts&&... ts)
@@ -209,11 +216,18 @@ namespace hpx { namespace resiliency { namespace experimental {
     // Return the valid output.
     // clang-format off
     template <typename Executor, typename Vote, typename F, typename... Ts,
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
         HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_one_way_executor<Executor>::value ||
             hpx::traits::is_two_way_executor<Executor>::value ||
             hpx::traits::is_threads_executor<Executor>::value
         )>
+#else
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_one_way_executor<Executor>::value ||
+            hpx::traits::is_two_way_executor<Executor>::value
+        )>
+#endif
     // clang-format on
     decltype(auto) tag_invoke(async_replicate_vote_t, Executor&& exec,
         std::size_t n, Vote&& vote, F&& f, Ts&&... ts)
@@ -233,11 +247,18 @@ namespace hpx { namespace resiliency { namespace experimental {
     // Return the first valid result.
     // clang-format off
     template <typename Executor, typename Pred, typename F, typename... Ts,
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
         HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_one_way_executor<Executor>::value ||
             hpx::traits::is_two_way_executor<Executor>::value ||
             hpx::traits::is_threads_executor<Executor>::value
         )>
+#else
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_one_way_executor<Executor>::value ||
+            hpx::traits::is_two_way_executor<Executor>::value
+        )>
+#endif
     // clang-format on
     decltype(auto) tag_invoke(async_replicate_validate_t, Executor&& exec,
         std::size_t n, Pred&& pred, F&& f, Ts&&... ts)
@@ -257,11 +278,18 @@ namespace hpx { namespace resiliency { namespace experimental {
     // Return the first valid result.
     // clang-format off
     template <typename Executor, typename F, typename... Ts,
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
         HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_one_way_executor<Executor>::value ||
             hpx::traits::is_two_way_executor<Executor>::value ||
             hpx::traits::is_threads_executor<Executor>::value
         )>
+#else
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_one_way_executor<Executor>::value ||
+            hpx::traits::is_two_way_executor<Executor>::value
+        )>
+#endif
     // clang-format on
     decltype(auto) tag_invoke(
         async_replicate_t, Executor&& exec, std::size_t n, F&& f, Ts&&... ts)

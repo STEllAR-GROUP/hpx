@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/topology/topology.hpp>
 
@@ -63,3 +64,4 @@ namespace hpx { namespace threads {
             static_cast<threads::policies::scheduler_mode>(mode));
     }
 }}    // namespace hpx::threads
+#endif

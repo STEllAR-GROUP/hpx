@@ -412,7 +412,7 @@ void make_heap_bad_alloc_test()
     test_make_heap_bad_alloc<std::random_access_iterator_tag>();
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();

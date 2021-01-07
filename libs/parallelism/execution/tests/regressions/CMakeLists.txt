@@ -4,8 +4,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests annotated_minmax_2593 bulk_then_execute_3182 chunk_size_4118
-          future_then_async_executor is_executor_1691 parallel_executor_1781
+set(tests annotated_minmax_2593 chunk_size_4118 future_then_async_executor
+          is_executor_1691 parallel_executor_1781
 )
 
 if(HPX_WITH_DATAPAR)
@@ -14,6 +14,10 @@ endif()
 
 if(HPX_WITH_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
   set(tests ${tests} handled_exception_2959)
+endif()
+
+if(HPX_WITH_POOL_EXECUTOR_COMPATIBILITY)
+  set(tests ${tests} bulk_then_execute_3182)
 endif()
 
 foreach(test ${tests})

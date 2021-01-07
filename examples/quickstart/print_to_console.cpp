@@ -28,16 +28,19 @@ void print(T const& t)
 // define a plain action encapsulating the print function above
 template <typename T>
 struct print_action
-  : hpx::actions::make_action<void (*)(T const&), &print<T>, print_action<T> >::type
-{};
+  : hpx::actions::make_action<void (*)(T const&), &print<T>,
+        print_action<T>>::type
+{
+};
 
 // define a direct action which is semantically equivalent to the plain action
 // above
 template <typename T>
 struct print_direct_action
-  : hpx::actions::make_direct_action<
-        void (*)(T const&), &print<T>, print_direct_action<T> >
-{};
+  : hpx::actions::make_direct_action<void (*)(T const&), &print<T>,
+        print_direct_action<T>>::type
+{
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
