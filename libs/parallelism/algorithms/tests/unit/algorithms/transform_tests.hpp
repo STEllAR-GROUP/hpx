@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2016 Hartmut Kaiser
+//  Copyright (c) 2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -46,6 +47,31 @@ struct throw_bad_alloc
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_transform(IteratorTag)
+{
+    typedef std::vector<int>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<int> c(10007);
+    std::vector<int> d(c.size());
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    auto result = hpx::transform(iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(d), add_one());
+    HPX_TEST(result == std::end(d));
+
+    // verify values
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1 + 1, v2);
+            ++count;
+            return v1 + 1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_transform(ExPolicy policy, IteratorTag)
 {
@@ -59,11 +85,10 @@ void test_transform(ExPolicy policy, IteratorTag)
     std::vector<int> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    auto result = hpx::parallel::transform(policy, iterator(std::begin(c)),
+    auto result = hpx::transform(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(d), add_one());
 
-    HPX_TEST(hpx::get<0>(result) == iterator(std::end(c)));
-    HPX_TEST(hpx::get<1>(result) == std::end(d));
+    HPX_TEST(result == std::end(d));
 
     // verify values
     std::size_t count = 0;
@@ -86,13 +111,12 @@ void test_transform_async(ExPolicy p, IteratorTag)
     std::vector<int> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    auto f = hpx::parallel::transform(p, iterator(std::begin(c)),
-        iterator(std::end(c)), std::begin(d), add_one());
+    auto f = hpx::transform(p, iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(d), add_one());
     f.wait();
 
-    hpx::tuple<iterator, base_iterator> result = f.get();
-    HPX_TEST(hpx::get<0>(result) == iterator(std::end(c)));
-    HPX_TEST(hpx::get<1>(result) == std::end(d));
+    auto result = f.get();
+    HPX_TEST(result == std::end(d));
 
     // verify values
     std::size_t count = 0;
@@ -106,6 +130,38 @@ void test_transform_async(ExPolicy p, IteratorTag)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_transform_exception(IteratorTag)
+{
+    typedef std::vector<int>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<int> c(10007);
+    std::vector<int> d(c.size());
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::transform(iterator(std::begin(c)), iterator(std::end(c)),
+            std::begin(d), throw_always());
+
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<hpx::execution::sequenced_policy,
+            IteratorTag>::call(hpx::execution::seq, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_transform_exception(ExPolicy policy, IteratorTag)
 {
@@ -122,8 +178,8 @@ void test_transform_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::transform(policy, iterator(std::begin(c)),
-            iterator(std::end(c)), std::begin(d), throw_always());
+        hpx::transform(policy, iterator(std::begin(c)), iterator(std::end(c)),
+            std::begin(d), throw_always());
 
         HPX_TEST(false);
     }
@@ -154,7 +210,7 @@ void test_transform_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::transform(p, iterator(std::begin(c)),
+        auto f = hpx::transform(p, iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(d), throw_always());
         returned_from_algorithm = true;
         f.get();
@@ -192,8 +248,8 @@ void test_transform_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::transform(policy, iterator(std::begin(c)),
-            iterator(std::end(c)), std::begin(d), throw_bad_alloc());
+        hpx::transform(policy, iterator(std::begin(c)), iterator(std::end(c)),
+            std::begin(d), throw_bad_alloc());
 
         HPX_TEST(false);
     }
@@ -223,7 +279,7 @@ void test_transform_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::transform(p, iterator(std::begin(c)),
+        auto f = hpx::transform(p, iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(d), throw_bad_alloc());
         returned_from_algorithm = true;
         f.get();

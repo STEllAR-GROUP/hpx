@@ -86,6 +86,7 @@ set(tests
     stable_sort_range
     transform_range
     transform_range_binary
+    transform_range2
     transform_range_binary2
     transform_reduce_binary_bad_alloc_range
     transform_reduce_binary_exception_range
@@ -95,11 +96,13 @@ set(tests
     unique_copy_range
 )
 
+set(transform_range_binary_FLAGS COMPILE_FLAGS
+                                 -DHPX_HAVE_DEPRECATION_WARNINGS_V1_6=0
+)
 foreach(test ${tests})
   set(sources ${test}.cpp)
 
   set(${test}_PARAMETERS THREADS_PER_LOCALITY 4)
-
   source_group("Source Files" FILES ${sources})
 
   # add example executable

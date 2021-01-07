@@ -111,7 +111,7 @@ void test_transform_binary2(ExPolicy&& policy, hpx::partitioned_vector<T>& v,
     verify_values(policy, w, val);
     verify_values_count(policy, w, val);
 
-    hpx::parallel::transform(
+    hpx::ranges::transform(
         policy, v.begin(), v.end(), w.begin(), w.end(), x.begin(), add<V>());
 
     verify_values(policy, x, 2 * val);
@@ -128,7 +128,7 @@ void test_transform_binary2_async(ExPolicy&& policy,
     verify_values(policy, w, val);
     verify_values_count_async(policy, w, val);
 
-    hpx::parallel::transform(
+    hpx::ranges::transform(
         policy, v.begin(), v.end(), w.begin(), w.end(), x.begin(), add<V>())
         .get();
 
@@ -144,14 +144,14 @@ void transform_binary2_tests(std::vector<hpx::id_type>& localities)
         hpx::partitioned_vector<T> v;
         hpx::partitioned_vector<U> w;
         hpx::partitioned_vector<V> x;
-        hpx::parallel::transform(hpx::execution::seq, v.begin(), v.end(),
+        hpx::ranges::transform(hpx::execution::seq, v.begin(), v.end(),
             w.begin(), w.end(), x.begin(), add<V>());
-        hpx::parallel::transform(hpx::execution::par, v.begin(), v.end(),
+        hpx::ranges::transform(hpx::execution::par, v.begin(), v.end(),
             w.begin(), w.end(), x.begin(), add<V>());
-        hpx::parallel::transform(hpx::execution::seq(hpx::execution::task),
+        hpx::ranges::transform(hpx::execution::seq(hpx::execution::task),
             v.begin(), v.end(), w.begin(), w.end(), x.begin(), add<V>())
             .get();
-        hpx::parallel::transform(hpx::execution::par(hpx::execution::task),
+        hpx::ranges::transform(hpx::execution::par(hpx::execution::task),
             v.begin(), v.end(), w.begin(), w.end(), x.begin(), add<V>())
             .get();
     }

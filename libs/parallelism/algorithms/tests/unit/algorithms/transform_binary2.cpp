@@ -19,6 +19,7 @@ void test_transform_binary2()
 {
     using namespace hpx::execution;
 
+    test_transform_binary2(IteratorTag());
     test_transform_binary2(seq, IteratorTag());
     test_transform_binary2(par, IteratorTag());
     test_transform_binary2(par_unseq, IteratorTag());
@@ -42,6 +43,7 @@ void test_transform_binary2_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_transform_binary2_exception(IteratorTag());
     test_transform_binary2_exception(seq, IteratorTag());
     test_transform_binary2_exception(par, IteratorTag());
 

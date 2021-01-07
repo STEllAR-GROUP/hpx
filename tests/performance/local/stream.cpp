@@ -327,7 +327,7 @@ std::vector<std::vector<double>> run_benchmark(std::size_t iterations,
 
     // Check clock ticks ...
     double t = mysecond();
-    hpx::parallel::transform(
+    hpx::transform(
         policy, a.begin(), a.end(), a.begin(), multiply_step<STREAM_TYPE>(2.0));
     t = 1.0E6 * (mysecond() - t);
 
@@ -387,19 +387,19 @@ std::vector<std::vector<double>> run_benchmark(std::size_t iterations,
 
         // Scale
         timing[1][iteration] = mysecond();
-        hpx::parallel::transform(policy, c.begin(), c.end(), b.begin(),
+        hpx::transform(policy, c.begin(), c.end(), b.begin(),
             multiply_step<STREAM_TYPE>(scalar));
         timing[1][iteration] = mysecond() - timing[1][iteration];
 
         // Add
         timing[2][iteration] = mysecond();
-        hpx::parallel::transform(policy, a.begin(), a.end(), b.begin(), b.end(),
+        hpx::ranges::transform(policy, a.begin(), a.end(), b.begin(), b.end(),
             c.begin(), add_step<STREAM_TYPE>());
         timing[2][iteration] = mysecond() - timing[2][iteration];
 
         // Triad
         timing[3][iteration] = mysecond();
-        hpx::parallel::transform(policy, b.begin(), b.end(), c.begin(), c.end(),
+        hpx::ranges::transform(policy, b.begin(), b.end(), c.begin(), c.end(),
             a.begin(), triad_step<STREAM_TYPE>(scalar));
         timing[3][iteration] = mysecond() - timing[3][iteration];
     }
