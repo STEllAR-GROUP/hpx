@@ -354,3 +354,54 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
+
+namespace hpx {
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::remove
+    HPX_INLINE_CONSTEXPR_VARIABLE struct remove_t final
+      : hpx::functional::tag<remove_t>
+    {
+        // clang-format off
+        template <typename FwdIter,
+            typename T, HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<FwdIter1>::value
+            )>
+        // clang-format on
+        friend FwdIter tag_invoke(
+            hpx::remove_t, FwdIter first, FwdIter last, const T& val)
+        {
+            static_assert(std::is_move_assignable<*FwdIter>::value,
+                "the type of *first must meet the Cpp17MoveAssignable "
+                "requirements");
+
+            typedef typename std::iterator_traits<FwdIter>::value_type Type;
+
+            return parallel::detail::remove_if(
+                hpx::execution::seq, first, last,
+                [value](Type const& a) -> bool { return value == a; },
+                hpx::parallel::util::projection_identity());
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter,
+            typename T, HPX_CONCEPT_REQUIRES_(
+                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value
+            )>
+        // clang-format on
+        friend FwdIter tag_invoke(hpx::remove_t, typename ExPolicy,
+            FwdIter first, FwdIter last, const T& val)
+        {
+            static_assert(std::is_move_assignable<*FwdIter>::value,
+                "the type of *first must meet the Cpp17MoveAssignable "
+                "requirements");
+
+            typedef typename std::iterator_traits<FwdIter>::value_type Type;
+
+            return parallel::detail::remove_if(
+                std::forward<ExPolicy>(policy), first, last,
+                [value](Type const& a) -> bool { return value == a; },
+                hpx::parallel::util::projection_identity());
+        }
+    }
+}    // namespace hpx

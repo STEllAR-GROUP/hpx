@@ -127,7 +127,7 @@ void test_remove(
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
     d = c;
 
-    auto result = hpx::parallel::remove(
+    auto result = hpx::remove(
         policy, iterator(std::begin(c)), iterator(std::end(c)), value);
     auto solution = std::remove(std::begin(d), std::end(d), value);
 
@@ -153,7 +153,7 @@ void test_remove_async(
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
     d = c;
 
-    auto f = hpx::parallel::remove(
+    auto f = hpx::remove(
         policy, iterator(std::begin(c)), iterator(std::end(c)), value);
     auto result = f.get();
     auto solution = std::remove(std::begin(d), std::end(d), value);
