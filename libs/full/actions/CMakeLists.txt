@@ -16,6 +16,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(actions_headers
     hpx/actions/action_support.hpp
     hpx/actions/actions_fwd.hpp
+    hpx/actions/apply_helper_fwd.hpp
     hpx/actions/apply_helper.hpp
     hpx/actions/base_action.hpp
     hpx/actions/continuation_fwd.hpp

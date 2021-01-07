@@ -17,7 +17,7 @@ namespace hpx { namespace traits {
     struct action_decorate_continuation
     {
         using continuation_type =
-            typename traits::action_continuation<Action>::type;
+            typename hpx::traits::action_continuation<Action>::type;
 
         static constexpr bool call(continuation_type&) noexcept
         {
@@ -26,5 +26,3 @@ namespace hpx { namespace traits {
         }
     };
 }}    // namespace hpx::traits
-
-

@@ -7,6 +7,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/continuation.hpp>
+#include <hpx/actions/transfer_action.hpp>
+#include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/modules/errors.hpp>

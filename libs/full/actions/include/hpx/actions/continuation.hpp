@@ -11,6 +11,7 @@
 #include <hpx/actions/continuation_fwd.hpp>
 #include <hpx/actions_base/action_priority.hpp>
 #include <hpx/actions_base/basic_action_fwd.hpp>
+#include <hpx/actions_base/traits/action_continuation_fwd.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
 #include <hpx/functional/serialization/serializable_unique_function.hpp>
 #include <hpx/futures/traits/future_traits.hpp>

@@ -52,5 +52,3 @@ namespace hpx { namespace actions {
         }
     }
 }}    // namespace hpx::actions
-
-

@@ -13,7 +13,8 @@
 #include <hpx/actions/continuation_fwd.hpp>
 #include <hpx/actions_base/action_priority.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
+#include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
+#include <hpx/components_base/component_type.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -260,3 +261,4 @@ namespace hpx
     /// \endcond
 }
 
+#include <hpx/async_distributed/applier/apply.hpp>

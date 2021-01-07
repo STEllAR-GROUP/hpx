@@ -18,5 +18,3 @@ namespace hpx { namespace traits {
         }
     };
 }}    // namespace hpx::traits
-
-

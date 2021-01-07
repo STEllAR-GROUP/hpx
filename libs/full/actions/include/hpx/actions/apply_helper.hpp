@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions/apply_helper_fwd.hpp>
 #include <hpx/actions/traits/action_continuation.hpp>
 #include <hpx/actions/traits/action_decorate_continuation.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
@@ -149,10 +150,6 @@ namespace hpx { namespace applier { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action,
-        bool DirectExecute = Action::direct_execution::value>
-    struct apply_helper;
-
     template <typename Action>
     struct apply_helper<Action, /*DirectExecute=*/false>
     {

@@ -13,10 +13,12 @@
 namespace hpx { namespace actions {
 
     /// \cond NOINTERNAL
+
+#if defined(HPX_HAVE_NETWORKING)
     struct base_action;
+    struct HPX_EXPORT base_action_data;
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_NETWORKING)
     template <typename Action>
     struct transfer_action;
 

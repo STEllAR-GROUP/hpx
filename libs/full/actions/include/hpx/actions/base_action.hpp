@@ -136,7 +136,7 @@ namespace hpx { namespace actions {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_EXPORT base_action_data : base_action
+    struct base_action_data : base_action
     {
         base_action_data() = default;
 
