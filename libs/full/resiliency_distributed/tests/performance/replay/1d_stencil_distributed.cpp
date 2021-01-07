@@ -16,11 +16,10 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/include/compute.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/modules/resiliency.hpp>
-#include <hpx/program_options/options_description.hpp>
 
 #include <algorithm>
 #include <array>
@@ -123,10 +122,12 @@ private:
     friend class hpx::serialization::access;
 
     template <typename Archive>
-    void serialize(Archive& ar, const unsigned int version)
+    void serialize(Archive& ar, const unsigned int)
     {
-        ar& data_;
-        ar& size_;
+        // clang-format off
+        ar & data_;
+        ar & size_;
+        // clang-format on
     }
 };
 
@@ -165,7 +166,7 @@ partition_data stencil_update(std::size_t sti, partition_data const& center,
     return workspace;
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::size_t num_subdomains =
         vm["subdomains"].as<std::size_t>();    // Number of partitions.
@@ -187,12 +188,10 @@ int hpx_main(boost::program_options::variables_map& vm)
     for (stencil& s : U)
         s.resize(num_subdomains);
 
-    std::size_t b = 0;
-    auto range = boost::irange(b, num_subdomains);
-    hpx::ranges::for_each(hpx::parallel::execution::par, range,
+    hpx::for_loop(hpx::execution::par, 0, num_subdomains,
         [&U, subdomain_width, num_subdomains](std::size_t i) {
-            U[0][i] = std::move(
-                partition_data(subdomain_width, double(i), num_subdomains));
+            U[0][i] =
+                partition_data(subdomain_width, double(i), num_subdomains);
         });
 
     // Setup communicator
@@ -229,7 +228,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                     .then(hpx::launch::async,
                         [sti, &current, &next, &comm, t](
                             hpx::future<partition_data>&& gg) {
-                            partition_data left = std::move(gg.get());
+                            partition_data&& left = gg.get();
                             next[0] = stencil_update(
                                 sti, current[0], left, current[1]);
                             comm.set(communicator_type::left, next[0], t + 1);
@@ -242,7 +241,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                     .then(hpx::launch::async,
                         [sti, num_subdomains, &current, &next, &comm, t](
                             hpx::future<partition_data>&& gg) {
-                            partition_data right = std::move(gg.get());
+                            partition_data&& right = gg.get();
                             next[num_subdomains - 1] =
                                 stencil_update(sti, current[num_subdomains - 1],
                                     current[num_subdomains - 2], right);
@@ -261,11 +260,9 @@ int hpx_main(boost::program_options::variables_map& vm)
                     std::ref(current[i - 1]), std::ref(current[i + 1]));
         }
 
-        b = 1;
-        auto range = boost::irange(b, num_subdomains - 1);
-        hpx::ranges::for_each(hpx::parallel::execution::par, range,
+        hpx::for_loop(hpx::execution::par, 1, num_subdomains - 1,
             [&next, &futures](
-                std::size_t i) { next[i] = std::move(futures[i - 1].get()); });
+                std::size_t i) { next[i] = futures[i - 1].get(); });
 
         hpx::wait_all(l, r);
     }
@@ -285,25 +282,27 @@ int main(int argc, char* argv[])
     // Configure application-specific options.
     options_description desc_commandline;
 
-    desc_commandline.add_options()("subdomain-width",
-        value<std::size_t>()->default_value(8000),
-        "Local x dimension (of each partition)");
-
-    desc_commandline.add_options()("iterations",
-        value<std::size_t>()->default_value(256), "Number of time steps");
-
-    desc_commandline.add_options()("steps-per-iteration",
-        value<std::size_t>()->default_value(512),
-        "Number of time steps per iterations");
-
-    desc_commandline.add_options()("subdomains",
-        value<std::size_t>()->default_value(384), "Number of partitions");
+    // clang-format off
+    desc_commandline.add_options()
+        ("subdomain-width", value<std::size_t>()->default_value(8000),
+            "Local x dimension (of each partition)")
+        ("iterations", value<std::size_t>()->default_value(256),
+            "Number of time steps")
+        ("steps-per-iteration", value<std::size_t>()->default_value(512),
+            "Number of time steps per iterations")
+        ("subdomains", value<std::size_t>()->default_value(384),
+            "Number of partitions")
+    ;
+    // clang-format on
 
     // Initialize and run HPX, this example requires to run hpx_main on all
     // localities
-    std::vector<std::string> const cfg = {
+    std::vector<std::string> cfg = {
         "hpx.run_hpx_main!=1",
     };
 
-    return hpx::init(desc_commandline, argc, argv, cfg);
+    hpx::init_params params;
+    params.desc_cmdline = desc_commandline;
+    params.cfg = std::move(cfg);
+    return hpx::init(argc, argv, params);
 }

@@ -9,6 +9,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/future.hpp>
 #include <hpx/modules/resiliency.hpp>
+#include <hpx/modules/resiliency_distributed.hpp>
 #include <hpx/modules/timing.hpp>
 
 #include <atomic>
@@ -49,7 +50,7 @@ std::size_t universal_ans(std::size_t delay_ns, std::size_t error)
     {
         // Check if we've reached the specified delay.
         if ((hpx::chrono::high_resolution_clock::now() - start) >=
-            (delay_ns * 1e3))
+            (delay_ns * 1000))
         {
             // Re-run the thread if the thread was meant to re-run
             if (dist(gen) < error)
@@ -64,8 +65,6 @@ std::size_t universal_ans(std::size_t delay_ns, std::size_t error)
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    std::size_t n = vm["n-value"].as<std::size_t>();
-    std::size_t error = vm["error"].as<std::size_t>();
     std::size_t delay = vm["size"].as<std::size_t>();
     std::size_t num_iterations = vm["num-iterations"].as<std::size_t>();
 
@@ -102,21 +101,15 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()("n-value",
-        value<std::size_t>()->default_value(3),
-        "Number of asynchronous launches for async replicate");
-
-    desc_commandline.add_options()("error",
-        value<std::size_t>()->default_value(2),
-        "Percentage error to inject in the code");
-
     desc_commandline.add_options()("size",
         value<std::size_t>()->default_value(1000),
         "Time in us taken by a thread to execute before it terminates");
 
     desc_commandline.add_options()("num-iterations",
-        value<std::size_t>()->default_value(1e6), "Number of tasks");
+        value<std::size_t>()->default_value(1000000), "Number of tasks");
 
     // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv);
+    hpx::init_params params;
+    params.desc_cmdline = desc_commandline;
+    return hpx::init(argc, argv, params);
 }

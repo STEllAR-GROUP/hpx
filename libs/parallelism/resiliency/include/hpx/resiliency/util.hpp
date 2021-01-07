@@ -6,8 +6,7 @@
 
 #pragma once
 
-// Todo: Find the right header to use for HPX_ALWAYS_EXPORT
-#include <hpx/include/util.hpp>
+#include <hpx/config/export_definitions.hpp>
 
 #include <exception>
 #include <stdexcept>

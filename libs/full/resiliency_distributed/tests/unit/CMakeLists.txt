@@ -6,6 +6,9 @@
 
 set(tests async_replay_distributed_plain async_replicate_distributed_plain)
 
+set(async_replay_distributed_plain_PARAMETERS LOCALITIES 2)
+set(async_replicate_distributed_plain_PARAMETERS LOCALITIES 2)
+
 foreach(test ${tests})
   set(sources ${test}.cpp)
 

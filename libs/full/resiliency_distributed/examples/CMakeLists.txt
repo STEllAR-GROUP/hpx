@@ -22,6 +22,9 @@ if(HPX_WITH_EXAMPLES)
 
   set(example_programs async_replay_distributed async_replicate_distributed)
 
+  set(async_replay_distributed_PARAMETERS LOCALITIES 2)
+  set(async_replicate_distributed_PARAMETERS LOCALITIES 2)
+
   foreach(example_program ${example_programs})
 
     set(sources ${example_program}.cpp)

@@ -408,15 +408,18 @@ namespace hpx {
 
 namespace hpx { namespace parallel { inline namespace v1 {
 
-    // clang format-off
+    // clang-format off
     template <typename ExPolicy, typename Rng, typename OutIter, typename F,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
-                    OutIter>::value&& traits::is_projected_range<Proj,
-                    Rng>::value&& traits::is_indirect_callable<ExPolicy, F,
-                    traits::projected_range<Proj, Rng>>::value)>
-    // clang format-on
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_range<Rng>::value &&
+            hpx::traits::is_iterator<OutIter>::value &&
+            traits::is_projected_range<Proj, Rng>::value &&
+            traits::is_indirect_callable<ExPolicy, F,
+                traits::projected_range<Proj, Rng>>::value
+        )>
+    // clang-format on
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::transform is deprecated, use hpx::ranges::transform "
         "instead") typename util::detail::algorithm_result<ExPolicy,
@@ -435,7 +438,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
                 InIter2>::value &&
             hpx::traits::is_iterator<OutIter>::value &&
@@ -465,7 +468,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename F, typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_range<Rng1>::value &&
             hpx::traits::is_range<Rng2>::value &&
             hpx::traits::is_iterator<OutIter>::value &&
@@ -510,7 +513,7 @@ namespace hpx { namespace ranges {
             typename FwdIter2, typename F,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_sentinel_for<Sent1, FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value
@@ -532,7 +535,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Rng, typename FwdIter,
             typename F, typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
             )>
@@ -560,7 +563,7 @@ namespace hpx { namespace ranges {
             typename Proj1 = hpx::parallel::util::projection_identity,
             typename Proj2 = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_sentinel_for<Sent1, FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value &&
@@ -589,7 +592,7 @@ namespace hpx { namespace ranges {
             typename F, typename Proj1 = hpx::parallel::util::projection_identity,
             typename Proj2 = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng1>::value &&
                 hpx::traits::is_range<Rng2>::value &&
                 hpx::traits::is_iterator<FwdIter>::value

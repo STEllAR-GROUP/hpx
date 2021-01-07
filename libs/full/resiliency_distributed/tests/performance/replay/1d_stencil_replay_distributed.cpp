@@ -16,15 +16,16 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/include/compute.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/modules/resiliency.hpp>
-#include <hpx/program_options/options_description.hpp>
+#include <hpx/modules/resiliency_distributed.hpp>
 
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <random>
 #include <string>
@@ -39,6 +40,7 @@ double const checksum_tol = 1.0e-10;
 std::random_device randomizer;
 std::mt19937 gen(randomizer());
 std::uniform_int_distribution<std::size_t> dis(1, 100);
+
 ///////////////////////////////////////////////////////////////////////////////
 // Our partition data type
 class partition_data
@@ -161,12 +163,14 @@ private:
     friend class hpx::serialization::access;
 
     template <typename Archive>
-    void serialize(Archive& ar, const unsigned int version)
+    void serialize(Archive& ar, const unsigned int)
     {
-        ar& data_;
-        ar& size_;
-        ar& checksum_;
-        ar& test_value_;
+        // clang-format off
+        ar & data_;
+        ar & size_;
+        ar & checksum_;
+        ar & test_value_;
+        // clang-format ons
     }
 };
 
@@ -257,7 +261,7 @@ partition_data stencil_update_distributed(std::size_t sti,
 }
 HPX_PLAIN_ACTION(stencil_update_distributed, stencil_action);
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::size_t n_value =
         vm["n-value"].as<std::size_t>();    // Number of partitions.
@@ -296,7 +300,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         for (std::size_t i = 1; i < (num_localities / faults); ++i)
         {
             hpx::id_type id_1 = hpx::naming::get_id_from_locality_id(
-                (rank + i) % num_localities);
+                static_cast<std::uint32_t>((rank + i) % num_localities));
 
             std::vector<hpx::id_type> local{id_1};
             locales.push_back(local);
@@ -310,12 +314,10 @@ int hpx_main(boost::program_options::variables_map& vm)
     for (stencil& s : U)
         s.resize(num_subdomains);
 
-    std::size_t b = 0;
-    auto range = boost::irange(b, num_subdomains);
-    hpx::ranges::for_each(hpx::parallel::execution::par, range,
+    hpx::for_loop(hpx::execution::par, 0, num_subdomains,
         [&U, subdomain_width, num_subdomains](std::size_t i) {
-            U[0][i] = std::move(
-                partition_data(subdomain_width, double(i), num_subdomains));
+            U[0][i] =
+                partition_data(subdomain_width, double(i), num_subdomains);
         });
 
     // Setup communicator
@@ -352,7 +354,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                     .then(hpx::launch::async,
                         [sti, &current, &next, &comm, t](
                             hpx::future<partition_data>&& gg) {
-                            partition_data left = std::move(gg.get());
+                            partition_data&& left = gg.get();
                             next[0] = stencil_update(
                                 sti, current[0], left, current[1], 0, false);
                             comm.set(communicator_type::left, next[0], t + 1);
@@ -365,7 +367,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                     .then(hpx::launch::async,
                         [sti, num_subdomains, &current, &next, &comm, t](
                             hpx::future<partition_data>&& gg) {
-                            partition_data right = std::move(gg.get());
+                            partition_data&& right = gg.get();
                             next[num_subdomains - 1] = stencil_update(sti,
                                 current[num_subdomains - 1],
                                 current[num_subdomains - 2], right, 0, false);
@@ -384,9 +386,9 @@ int hpx_main(boost::program_options::variables_map& vm)
                     validate_result, stencil_update, sti, current[i],
                     current[i - 1], current[i + 1], errors, is_faulty_node)
                     .then(hpx::launch::async,
-                        [sti, &current, errors, i, is_faulty_node, &locales,
-                            &counter, num_localities,
-                            faults](hpx::future<partition_data>&& gg) {
+                        [sti, &current, errors, i, &locales, &counter,
+                            num_localities, faults](
+                            hpx::future<partition_data>&& gg) {
                             if (gg.has_exception())
                             {
                                 if (faults != 0)
@@ -400,16 +402,13 @@ int hpx_main(boost::program_options::variables_map& vm)
                                         false)
                                         .get();
                             }
-                            else
-                                return gg.get();
+                            return gg.get();
                         });
         }
 
-        b = 1;
-        auto range = boost::irange(b, num_subdomains - 1);
-        hpx::ranges::for_each(hpx::parallel::execution::par, range,
+        hpx::for_loop(hpx::execution::par, 1, num_subdomains - 1,
             [&next, &futures](
-                std::size_t i) { next[i] = std::move(futures[i - 1].get()); });
+                std::size_t i) { next[i] = futures[i - 1].get(); });
 
         hpx::wait_all(l, r);
     }
@@ -429,34 +428,33 @@ int main(int argc, char* argv[])
     // Configure application-specific options.
     options_description desc_commandline;
 
-    desc_commandline.add_options()("n-value",
-        value<std::size_t>()->default_value(5), "Number of allowed replays");
-
-    desc_commandline.add_options()("errors",
-        value<std::size_t>()->default_value(2), "Number of faulty nodes");
-
-    desc_commandline.add_options()("faults",
-        value<std::size_t>()->default_value(1), "Number of faulty nodes");
-
-    desc_commandline.add_options()("subdomain-width",
-        value<std::size_t>()->default_value(8000),
-        "Local x dimension (of each partition)");
-
-    desc_commandline.add_options()("iterations",
-        value<std::size_t>()->default_value(256), "Number of time steps");
-
-    desc_commandline.add_options()("steps-per-iteration",
-        value<std::size_t>()->default_value(512),
-        "Number of time steps per iterations");
-
-    desc_commandline.add_options()("subdomains",
-        value<std::size_t>()->default_value(384), "Number of partitions");
+    // clang-format off
+    desc_commandline.add_options()
+        ("n-value", value<std::size_t>()->default_value(5),
+            "Number of allowed replays")
+        ("errors", value<std::size_t>()->default_value(2),
+            "Number of faulty nodes")
+        ("faults", value<std::size_t>()->default_value(1),
+            "Number of faulty nodes")
+        ("subdomain-width", value<std::size_t>()->default_value(8000),
+            "Local x dimension (of each partition)")
+        ("iterations", value<std::size_t>()->default_value(256),
+            "Number of time steps")
+        ("steps-per-iteration", value<std::size_t>()->default_value(512),
+            "Number of time steps per iterations")
+        ("subdomains", value<std::size_t>()->default_value(384),
+            "Number of partitions")
+    ;
+    // clang-format on
 
     // Initialize and run HPX, this example requires to run hpx_main on all
     // localities
-    std::vector<std::string> const cfg = {
+    std::vector<std::string> cfg = {
         "hpx.run_hpx_main!=1",
     };
 
-    return hpx::init(desc_commandline, argc, argv, cfg);
+    hpx::init_params params;
+    params.desc_cmdline = desc_commandline;
+    params.cfg = std::move(cfg);
+    return hpx::init(argc, argv, params);
 }

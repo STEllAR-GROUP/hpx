@@ -122,8 +122,6 @@ namespace hpx { namespace resiliency { namespace experimental {
         make_distributed_async_replay_helper(
             Pred&& pred, Action&& action, Ts&&... ts)
         {
-            using tuple_type = std::tuple<typename std::decay<Ts>::type...>;
-
             using return_type = distributed_async_replay_helper<Result,
                 typename std::decay<Pred>::type,
                 typename std::decay<Action>::type,

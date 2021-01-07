@@ -3,6 +3,7 @@
 //  Copyright (c) 2018-2019 Hartmut Kaiser
 //  Copyright (c) 2018-2019 Adrian Serio
 //  Copyright (c) 2019-2020 Nikunj Gupta
+//
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,6 +14,7 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/resiliency.hpp>
+#include <hpx/modules/resiliency_distributed.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
@@ -22,6 +24,7 @@
 #include <iostream>
 #include <random>
 #include <string>
+#include <utility>
 #include <vector>
 
 int universal_ans(
@@ -138,25 +141,33 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    // Configure application-specific options
-    hpx::program_options::options_description desc_commandline;
+    namespace po = hpx::program_options;
 
-    desc_commandline.add_options()("f-nodes",
-        hpx::program_options::value<std::size_t>()->default_value(1),
-        "Number of faulty nodes to be injected")("error",
-        hpx::program_options::value<std::size_t>()->default_value(5),
-        "Error rates for all nodes. Faulty nodes will have 10x error rates.")(
-        "size", hpx::program_options::value<std::size_t>()->default_value(200),
-        "Grain size of a task")("num-tasks",
-        hpx::program_options::value<std::size_t>()->default_value(10000),
-        "Number of tasks to invoke");
+    // Configure application-specific options
+    po::options_description desc_commandline;
+
+    // clang-format off
+    desc_commandline.add_options()
+        ("f-nodes", po::value<std::size_t>()->default_value(1),
+            "Number of faulty nodes to be injected")
+        ("error", po::value<std::size_t>()->default_value(5),
+            "Error rates for all nodes. Faulty nodes will have 10x error rates.")
+        ("size", po::value<std::size_t>()->default_value(200),
+            "Grain size of a task")
+        ("num-tasks", po::value<std::size_t>()->default_value(10000),
+            "Number of tasks to invoke")
+    ;
+    // clang-format on
 
     // Initialize and run HPX, this example requires to run hpx_main on all
     // localities
-    std::vector<std::string> const cfg = {
+    std::vector<std::string> cfg = {
         "hpx.run_hpx_main!=1",
     };
 
     // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv, cfg);
+    hpx::init_params params;
+    params.desc_cmdline = desc_commandline;
+    params.cfg = std::move(cfg);
+    return hpx::init(argc, argv, params);
 }
