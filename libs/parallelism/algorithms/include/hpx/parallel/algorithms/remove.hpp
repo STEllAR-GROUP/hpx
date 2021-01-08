@@ -357,6 +357,54 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::remove_if
+    HPX_INLINE_CONSTEXPR_VARIABLE struct remove_if_t final
+      : hpx::functional::tag<remove_if_t>
+    {
+        // clang-format off
+        template <typename FwdIter,
+            typename Pred, HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<FwdIter>::value
+            )>
+        // clang-format on
+        friend FwdIter tag_invoke(
+            hpx::remove_if_t, FwdIter first, FwdIter last, Pred&& pred)
+        {
+            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+                "Required at least forward iterator.");
+
+            return hpx::parallel::v1::detail::remove_if<FwdIter>().call(
+                hpx::execution::sequenced_policy{}, std::true_type{}, first,
+                last, std::forward<Pred>(pred),
+                hpx::parallel::util::projection_identity());
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter,
+            typename Pred, HPX_CONCEPT_REQUIRES_(
+                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter>::type
+        tag_invoke(hpx::remove_if_t, ExPolicy&& policy, FwdIter first,
+            FwdIter last, Pred&& pred)
+        {
+            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+                "Required at least forward iterator.");
+
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+
+            return hpx::parallel::v1::detail::remove_if<FwdIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first, last,
+                std::forward<Pred>(pred),
+                hpx::parallel::util::projection_identity());
+        }
+
+    } remove_if{};
+
+    ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::remove
     HPX_INLINE_CONSTEXPR_VARIABLE struct remove_t final
       : hpx::functional::tag<remove_t>
@@ -364,44 +412,34 @@ namespace hpx {
         // clang-format off
         template <typename FwdIter,
             typename T, HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value
+                hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
         friend FwdIter tag_invoke(
-            hpx::remove_t, FwdIter first, FwdIter last, const T& val)
+            hpx::remove_t, FwdIter first, FwdIter last, const T& value)
         {
-            static_assert(std::is_move_assignable<*FwdIter>::value,
-                "the type of *first must meet the Cpp17MoveAssignable "
-                "requirements");
-
             typedef typename std::iterator_traits<FwdIter>::value_type Type;
 
-            return parallel::detail::remove_if(
-                hpx::execution::seq, first, last,
-                [value](Type const& a) -> bool { return value == a; },
-                hpx::parallel::util::projection_identity());
+            return remove_if(hpx::execution::seq, first, last,
+                [value](Type const& a) -> bool { return value == a; });
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter,
             typename T, HPX_CONCEPT_REQUIRES_(
                 parallel::execution::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter1>::value
+                hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_invoke(hpx::remove_t, typename ExPolicy,
-            FwdIter first, FwdIter last, const T& val)
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter>::type
+        tag_invoke(hpx::remove_t, ExPolicy&& policy, FwdIter first,
+            FwdIter last, const T& value)
         {
-            static_assert(std::is_move_assignable<*FwdIter>::value,
-                "the type of *first must meet the Cpp17MoveAssignable "
-                "requirements");
-
             typedef typename std::iterator_traits<FwdIter>::value_type Type;
 
-            return parallel::detail::remove_if(
-                std::forward<ExPolicy>(policy), first, last,
-                [value](Type const& a) -> bool { return value == a; },
-                hpx::parallel::util::projection_identity());
+            return remove_if(std::forward<ExPolicy>(policy), first, last,
+                [value](Type const& a) -> bool { return value == a; });
         }
-    }
+    } remove{};
 }    // namespace hpx

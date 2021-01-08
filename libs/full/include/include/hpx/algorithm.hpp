@@ -20,10 +20,8 @@ namespace hpx {
     using hpx::parallel::minmax_element;
     using hpx::parallel::partition;
     using hpx::parallel::partition_copy;
-    using hpx::parallel::remove;
     using hpx::parallel::remove_copy;
     using hpx::parallel::remove_copy_if;
-    using hpx::parallel::remove_if;
     using hpx::parallel::replace;
     using hpx::parallel::replace_copy;
     using hpx::parallel::replace_copy_if;

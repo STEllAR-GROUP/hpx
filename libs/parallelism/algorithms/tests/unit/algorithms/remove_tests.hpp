@@ -181,7 +181,7 @@ void test_remove_if(
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
     d = c;
 
-    auto result = hpx::parallel::remove_if(
+    auto result = hpx::remove_if(
         policy, iterator(std::begin(c)), iterator(std::end(c)), pred);
     auto solution = std::remove_if(std::begin(d), std::end(d), pred);
 
@@ -207,7 +207,7 @@ void test_remove_if_async(
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
     d = c;
 
-    auto f = hpx::parallel::remove_if(
+    auto f = hpx::remove_if(
         policy, iterator(std::begin(c)), iterator(std::end(c)), pred);
     auto result = f.get();
     auto solution = std::remove_if(std::begin(d), std::end(d), pred);
@@ -239,12 +239,12 @@ void test_remove_exception(
     {
         if (test_for_remove_if)
         {
-            hpx::parallel::remove_if(policy, decorated_iterator(std::begin(c)),
+            hpx::remove_if(policy, decorated_iterator(std::begin(c)),
                 decorated_iterator(std::end(c)), throw_always());
         }
         else
         {
-            hpx::parallel::remove(policy,
+            hpx::remove(policy,
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(std::end(c)), int(10));
@@ -285,13 +285,12 @@ void test_remove_exception_async(
 
         if (test_for_remove_if)
         {
-            f = hpx::parallel::remove_if(policy,
-                decorated_iterator(std::begin(c)),
+            f = hpx::remove_if(policy, decorated_iterator(std::begin(c)),
                 decorated_iterator(std::end(c)), throw_always());
         }
         else
         {
-            f = hpx::parallel::remove(policy,
+            f = hpx::remove(policy,
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(std::end(c)), int(10));
@@ -337,12 +336,12 @@ void test_remove_bad_alloc(
     {
         if (test_for_remove_if)
         {
-            hpx::parallel::remove_if(policy, decorated_iterator(std::begin(c)),
+            hpx::remove_if(policy, decorated_iterator(std::begin(c)),
                 decorated_iterator(std::end(c)), throw_bad_alloc());
         }
         else
         {
-            hpx::parallel::remove(policy,
+            hpx::remove(policy,
                 decorated_iterator(
                     std::begin(c), []() { throw std::bad_alloc(); }),
                 decorated_iterator(std::end(c)), int(10));
@@ -382,13 +381,12 @@ void test_remove_bad_alloc_async(
 
         if (test_for_remove_if)
         {
-            f = hpx::parallel::remove_if(policy,
-                decorated_iterator(std::begin(c)),
+            f = hpx::remove_if(policy, decorated_iterator(std::begin(c)),
                 decorated_iterator(std::end(c)), throw_bad_alloc());
         }
         else
         {
-            f = hpx::parallel::remove(policy,
+            f = hpx::remove(policy,
                 decorated_iterator(
                     std::begin(c), []() { throw std::bad_alloc(); }),
                 decorated_iterator(std::end(c)), int(10));
