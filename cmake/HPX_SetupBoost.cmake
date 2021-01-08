@@ -26,12 +26,11 @@ if(NOT TARGET hpx_dependencies_boost)
       "1.68.0" "1.68"
       "1.67.0" "1.67"
       "1.66.0" "1.66"
-      "1.65.0" "1.65" "1.65.1"
   )
   # cmake-format: on
   set(Boost_MINIMUM_VERSION
-      "1.65"
-      CACHE INTERNAL "1.65" FORCE
+      "1.66"
+      CACHE INTERNAL "1.66" FORCE
   )
 
   set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
