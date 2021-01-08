@@ -988,7 +988,7 @@ if(HPX_WITH_APEX)
     "Do not update code from remote APEX repository." OFF CATEGORY "Profiling"
   )
   hpx_option(
-    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.2.0"
+    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.3.0"
     CATEGORY "Profiling"
   )
 endif()
