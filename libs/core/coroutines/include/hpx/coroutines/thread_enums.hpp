@@ -55,7 +55,6 @@ namespace hpx { namespace threads {
     };
     // clang-format on
 
-#if defined(HPX_HAVE_UNSCOPED_ENUM_COMPATIBILITY)
 #define HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG                         \
     "The unscoped thread_state_enum names are deprecated. Please use "         \
     "thread_schedule_state::state instead."
@@ -88,7 +87,6 @@ namespace hpx { namespace threads {
     static constexpr thread_schedule_state pending_boost =
         thread_schedule_state::pending_boost;
 #undef HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG
-#endif
 
     HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, thread_schedule_state const t);
@@ -144,7 +142,6 @@ namespace hpx { namespace threads {
     };
     // clang-format on
 
-#if defined(HPX_HAVE_UNSCOPED_ENUM_COMPATIBILITY)
 #define HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG                      \
     "The unscoped thread_priority names are deprecated. Please use "           \
     "thread_priority::priority instead."
@@ -176,7 +173,6 @@ namespace hpx { namespace threads {
     static constexpr thread_priority thread_priority_critical =
         thread_priority::critical;
 #undef HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG
-#endif
 
     HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, thread_priority const t);
@@ -206,7 +202,6 @@ namespace hpx { namespace threads {
         abort = 4         ///< The thread needs to be aborted
     };
 
-#if defined(HPX_HAVE_UNSCOPED_ENUM_COMPATIBILITY)
 #define HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG                      \
     "The unscoped thread_state_ex_enum names are deprecated. Please use "      \
     "thread_restart_state::state instead."
@@ -227,7 +222,6 @@ namespace hpx { namespace threads {
     static constexpr thread_restart_state wait_abort =
         thread_restart_state::abort;
 #undef HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG
-#endif
 
     HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, thread_restart_state const t);
@@ -270,7 +264,6 @@ namespace hpx { namespace threads {
         maximal = huge,       ///< use maximally stack size
     };
 
-#if defined(HPX_HAVE_UNSCOPED_ENUM_COMPATIBILITY)
 #define HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG                     \
     "The unscoped thread_stacksize names are deprecated. Please use "          \
     "thread_stacksize::size instead."
@@ -306,7 +299,6 @@ namespace hpx { namespace threads {
     static constexpr thread_stacksize thread_stacksize_maximal =
         thread_stacksize::maximal;
 #undef HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG
-#endif
 
     HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, thread_stacksize const t);
@@ -331,7 +323,6 @@ namespace hpx { namespace threads {
         numa = 2,
     };
 
-#if defined(HPX_HAVE_UNSCOPED_ENUM_COMPATIBILITY)
 #define HPX_THREAD_SCHEDULE_HINT_UNSCOPED_ENUM_DEPRECATION_MSG                 \
     "The unscoped thread_schedule_hint_mode names are deprecated. Please use " \
     "thread_schedule_hint_mode::hint instead."
@@ -349,7 +340,6 @@ namespace hpx { namespace threads {
     static constexpr thread_schedule_hint_mode thread_schedule_hint_mode_numa =
         thread_schedule_hint_mode::numa;
 #undef HPX_THREAD_SCHEDULE_HINT_UNSCOPED_ENUM_DEPRECATION_MSG
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     struct thread_schedule_hint
