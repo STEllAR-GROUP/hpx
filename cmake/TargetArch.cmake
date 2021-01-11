@@ -113,18 +113,18 @@ function(target_architecture output_var)
       list(APPEND ARCH ppc64)
     endif()
   else()
-    if (NOT HPX_INTERNAL_ARCH_DETECT)
+    if(NOT HPX_INTERNAL_ARCH_DETECT)
       file(WRITE "${PROJECT_BINARY_DIR}/arch.cpp" "${archdetect_cpp_code}")
 
-      # Detect the architecture in a rather creative way... This compiles a small
-      # C++ program which is a series of ifdefs that selects a particular #error
-      # preprocessor directive whose message string contains the target
+      # Detect the architecture in a rather creative way... This compiles a
+      # small C++ program which is a series of ifdefs that selects a particular
+      # #error preprocessor directive whose message string contains the target
       # architecture. The program will always fail to compile (both because file
       # is not a valid C program, and obviously because of the presence of the
       # #error preprocessor directives... but by exploiting the preprocessor in
       # this way, we can detect the correct target architecture even when
-      # cross-compiling, since the program itself never needs to be run (only the
-      # compiler/preprocessor)
+      # cross-compiling, since the program itself never needs to be run (only
+      # the compiler/preprocessor)
       try_run(
         run_result_unused compile_result_unused "${PROJECT_BINARY_DIR}"
         "${PROJECT_BINARY_DIR}/arch.cpp"
@@ -139,12 +139,15 @@ function(target_architecture output_var)
       string(REPLACE "cmake_ARCH " "" ARCH "${ARCH}")
 
       # If we are compiling with an unknown architecture this variable should
-      # already be set to "unknown" but in the case that it's empty (i.e. due to a
-      # typo in the code), then set it to unknown
+      # already be set to "unknown" but in the case that it's empty (i.e. due to
+      # a typo in the code), then set it to unknown
       if(NOT ARCH)
         set(ARCH unknown)
       endif()
-      set(HPX_INTERNAL_ARCH_DETECT ${ARCH} CACHE INTERNAL "")
+      set(HPX_INTERNAL_ARCH_DETECT
+          ${ARCH}
+          CACHE INTERNAL ""
+      )
     else()
       set(ARCH ${HPX_INTERNAL_ARCH_DETECT})
     endif()
