@@ -27,14 +27,14 @@ int universal_ans(
 {
     std::vector<hpx::future<int>> local_tasks;
 
-    for (std::size_t i = 0; i < 1000; ++i)
+    for (std::size_t i = 0; i < 100; ++i)
     {
         local_tasks.push_back(hpx::async([size]() {
             // Pretending to do some useful work
             std::size_t start = hpx::chrono::high_resolution_clock::now();
 
             while ((hpx::chrono::high_resolution_clock::now() - start) <
-                (size * 1000))
+                (size * 100))
             {
             }
 
@@ -117,8 +117,23 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::vector<hpx::future<int>> tasks;
         for (std::size_t i = 0; i < num_tasks; ++i)
         {
-            std::vector<hpx::id_type> ids(
-                locales.begin(), locales.begin() + num_replications);
+            std::vector<hpx::id_type> ids;
+            ids.reserve(num_replications);
+            if (num_replications < locales.size())
+            {
+                for (auto& locale : locales)
+                    ids.push_back(locale);
+            }
+            else
+            {
+                for (auto& locale : locales)
+                    ids.push_back(locale);
+
+                for (std::size_t i = 0; i < num_replications - ids.size(); ++i)
+                {
+                    ids.emplace_back(locales.at(i));
+                }
+            }
 
             tasks.push_back(
                 hpx::resiliency::experimental::async_replicate_validate(
@@ -147,11 +162,11 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()
         ("f-nodes", po::value<std::size_t>()->default_value(1),
             "Number of faulty nodes to be injected")
-        ("error", po::value<std::size_t>()->default_value(5),
+        ("error", po::value<std::size_t>()->default_value(1),
             "Error rates for all nodes. Faulty nodes will have 10x error rates.")
         ("size", po::value<std::size_t>()->default_value(200),
             "Grain size of a task")
-        ("num-tasks", po::value<std::size_t>()->default_value(10000),
+        ("num-tasks", po::value<std::size_t>()->default_value(1000),
             "Number of tasks to invoke")
         ("num-replications", po::value<std::size_t>()->default_value(3),
             "Total number of replicates for a task (including the task itself)")

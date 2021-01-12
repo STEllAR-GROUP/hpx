@@ -28,7 +28,7 @@ int universal_ans(std::vector<hpx::id_type> f_locales, std::size_t size)
     // Pretending to do some useful work
     std::size_t start = hpx::chrono::high_resolution_clock::now();
 
-    while ((hpx::chrono::high_resolution_clock::now() - start) < (size * 1000))
+    while ((hpx::chrono::high_resolution_clock::now() - start) < (size * 100))
     {
     }
 
@@ -130,9 +130,9 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()
         ("f-nodes", po::value<std::size_t>()->default_value(1),
             "Number of faulty nodes to be injected")
-        ("size", po::value<std::size_t>()->default_value(2000),
+        ("size", po::value<std::size_t>()->default_value(200),
             "Grain size of a task")
-        ("num-tasks", po::value<std::size_t>()->default_value(1000000),
+        ("num-tasks", po::value<std::size_t>()->default_value(1000),
             "Number of tasks to invoke")
     ;
     // clang-format on
