@@ -15,7 +15,7 @@
 void is_sentinel_for()
 {
     HPX_TEST_MSG((hpx::traits::is_sentinel_for<Sentinel<int64_t>,
-                      Iterator<std::int64_t>>::value == true),
+                      iterator<std::int64_t>>::value == true),
         "Sentinel value is not proper for given iterator");
 
     HPX_TEST_MSG(

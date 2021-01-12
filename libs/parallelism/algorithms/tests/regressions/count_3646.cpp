@@ -16,7 +16,7 @@
 
 #include "iter_sent.hpp"
 
-struct BitCountingIterator : public Iterator<std::int64_t>
+struct BitCountingIterator : public iterator<std::int64_t>
 {
     using difference_type = std::ptrdiff_t;
     using value_type = std::int64_t;
@@ -25,7 +25,7 @@ struct BitCountingIterator : public Iterator<std::int64_t>
     using reference = std::int64_t const&;
 
     explicit BitCountingIterator(int64_t initialState)
-      : Iterator<int64_t>(initialState)
+      : iterator<int64_t>(initialState)
     {
     }
 
