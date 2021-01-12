@@ -17,12 +17,12 @@
 int main()
 {
     std::int64_t result = hpx::ranges::reduce(hpx::execution::seq,
-        iterator<std::int64_t>{0}, Sentinel<int64_t>{100}, std::int64_t(0));
+        iterator<std::int64_t>{0}, sentinel<int64_t>{100}, std::int64_t(0));
 
     HPX_TEST_EQ(result, std::int64_t(4950));
 
     result = hpx::ranges::reduce(hpx::execution::par, iterator<std::int64_t>{0},
-        Sentinel<int64_t>{100}, std::int64_t(0));
+        sentinel<int64_t>{100}, std::int64_t(0));
 
     HPX_TEST_EQ(result, std::int64_t(4950));
 

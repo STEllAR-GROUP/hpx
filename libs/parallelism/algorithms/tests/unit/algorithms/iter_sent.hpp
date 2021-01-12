@@ -12,9 +12,9 @@
 #include <iterator>
 
 template <typename ValueType>
-struct Sentinel
+struct sentinel
 {
-    explicit Sentinel(ValueType stop_value)
+    explicit sentinel(ValueType stop_value)
       : stop(stop_value)
     {
     }
@@ -109,11 +109,11 @@ struct iterator
         return this->state == that.state;
     }
 
-    friend bool operator==(iterator i, Sentinel<Value> s)
+    friend bool operator==(iterator i, sentinel<Value> s)
     {
         return i.state == s.get_stop();
     }
-    friend bool operator==(Sentinel<Value> s, iterator i)
+    friend bool operator==(sentinel<Value> s, iterator i)
     {
         return i.state == s.get_stop();
     }
@@ -123,11 +123,11 @@ struct iterator
         return this->state != that.state;
     }
 
-    friend bool operator!=(iterator i, Sentinel<Value> s)
+    friend bool operator!=(iterator i, sentinel<Value> s)
     {
         return i.state != s.get_stop();
     }
-    friend bool operator!=(Sentinel<Value> s, iterator i)
+    friend bool operator!=(sentinel<Value> s, iterator i)
     {
         return i.state != s.get_stop();
     }

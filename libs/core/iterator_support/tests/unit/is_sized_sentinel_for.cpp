@@ -14,7 +14,7 @@
 
 void is_sized_sentinel_for()
 {
-    HPX_TEST_MSG((hpx::traits::is_sized_sentinel_for<Sentinel<int64_t>,
+    HPX_TEST_MSG((hpx::traits::is_sized_sentinel_for<sentinel<int64_t>,
                       iterator<std::int64_t>>::value == false),
         "Sentinel falsely marked as sized for particular iterator");
 

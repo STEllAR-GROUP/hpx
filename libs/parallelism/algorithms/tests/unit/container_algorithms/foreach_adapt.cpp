@@ -19,12 +19,12 @@ void myfunction(int i)
 void test_invoke_projected()
 {
     iterator<std::int64_t> iter = hpx::ranges::for_each(hpx::execution::seq,
-        iterator<std::int64_t>{0}, Sentinel<int64_t>{100}, myfunction);
+        iterator<std::int64_t>{0}, sentinel<int64_t>{100}, myfunction);
 
     HPX_TEST_EQ(*iter, std::int64_t(100));
 
     iter = hpx::ranges::for_each(hpx::execution::par, iterator<std::int64_t>{0},
-        Sentinel<int64_t>{100}, myfunction);
+        sentinel<int64_t>{100}, myfunction);
 
     HPX_TEST_EQ(*iter, std::int64_t(100));
 }
@@ -32,12 +32,12 @@ void test_invoke_projected()
 void test_begin_end_iterator()
 {
     iterator<std::int64_t> iter = hpx::ranges::for_each(hpx::execution::seq,
-        iterator<std::int64_t>{0}, Sentinel<int64_t>{100}, &myfunction);
+        iterator<std::int64_t>{0}, sentinel<int64_t>{100}, &myfunction);
 
     HPX_TEST_EQ(*iter, std::int64_t(100));
 
     iter = hpx::ranges::for_each(hpx::execution::par, iterator<std::int64_t>{0},
-        Sentinel<int64_t>{100}, &myfunction);
+        sentinel<int64_t>{100}, &myfunction);
 
     HPX_TEST_EQ(*iter, std::int64_t(100));
 }
