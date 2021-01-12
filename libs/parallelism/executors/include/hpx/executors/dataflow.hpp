@@ -112,9 +112,7 @@ namespace hpx { namespace lcos { namespace detail {
     template <typename Policy, typename F, typename Args>
     struct dataflow_return_impl<
         /*IsAction=*/false, Policy, F, Args,
-        typename std::enable_if<traits::is_launch_policy<Policy>::value,
-            typename hpx::util::always_void<typename hpx::util::detail::
-                    invoke_fused_result<F, Args>::type>::type>::type>
+        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
     {
         using type = hpx::lcos::future<
             typename util::detail::invoke_fused_result<F, Args>::type>;
