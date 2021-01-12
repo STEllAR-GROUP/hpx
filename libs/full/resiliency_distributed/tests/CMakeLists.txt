@@ -48,7 +48,6 @@ if(HPX_RESILIENCY_DISTRIBUTED_WITH_TESTS)
       modules.resiliency_distributed
       HEADERS ${resiliency_distributed_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-      NOLIBS
       DEPENDENCIES hpx_resiliency_distributed
     )
   endif()
