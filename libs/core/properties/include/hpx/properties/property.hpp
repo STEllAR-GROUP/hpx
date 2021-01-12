@@ -39,5 +39,5 @@ namespace hpx { namespace experimental {
         {
             return std::forward<T0>(t0);
         }
-    } prefer;
+    } prefer{};
 }}    // namespace hpx::experimental
