@@ -356,6 +356,25 @@ void plain_deferred_arguments(Executor& exec)
     }
 }
 
+HPX_INLINE_CONSTEXPR_VARIABLE struct void_f_wrapper
+{
+    // This should not be instantiated by the dataflow internals for launch
+    // policies, since that would not add an additional argument and compilation
+    // would fail.
+    template <typename... Ts>
+    auto operator()(Ts&&... ts)
+    {
+        return void_f(std::forward<Ts>(ts)...);
+    }
+} void_f_wrapper_instance{};
+
+template <typename Executor>
+void function_wrapper(Executor& exec)
+{
+    hpx::dataflow(exec, void_f_wrapper{});
+    hpx::dataflow(exec, void_f_wrapper_instance);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map&)
 {
@@ -365,6 +384,7 @@ int hpx_main(variables_map&)
         future_function_pointers(exec);
         plain_arguments(exec);
         plain_deferred_arguments(exec);
+        function_wrapper(exec);
     }
 
     return hpx::finalize();
