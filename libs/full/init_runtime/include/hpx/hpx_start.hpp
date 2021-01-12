@@ -693,7 +693,7 @@ namespace hpx {
     ///                     command line arguments passed in `argc`/`argv`.
     inline bool start(int (*f)(hpx::program_options::variables_map& vm),
         std::string const& app_name, int argc, char** argv,
-        hpx::runtime_mode mode = hpx::runtime_mode::default_);
+        hpx::runtime_mode mode);
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
