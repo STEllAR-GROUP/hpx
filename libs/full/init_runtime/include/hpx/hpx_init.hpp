@@ -705,7 +705,7 @@ namespace hpx {
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
     inline int init(int (*f)(hpx::program_options::variables_map& vm), int argc,
-        char** argv, hpx::runtime_mode mode = hpx::runtime_mode::default_);
+        char** argv, hpx::runtime_mode mode);
 
     /// \brief Main entry point for launching the HPX runtime system.
     ///
