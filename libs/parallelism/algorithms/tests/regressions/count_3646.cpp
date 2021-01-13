@@ -16,7 +16,7 @@
 
 #include "iter_sent.hpp"
 
-struct BitCountingIterator : public iterator<std::int64_t>
+struct bit_counting_iterator : public iterator<std::int64_t>
 {
     using difference_type = std::ptrdiff_t;
     using value_type = std::int64_t;
@@ -24,7 +24,7 @@ struct BitCountingIterator : public iterator<std::int64_t>
     using pointer = std::int64_t const*;
     using reference = std::int64_t const&;
 
-    explicit BitCountingIterator(int64_t initialState)
+    explicit bit_counting_iterator(int64_t initialState)
       : iterator<int64_t>(initialState)
     {
     }
@@ -39,26 +39,26 @@ struct BitCountingIterator : public iterator<std::int64_t>
         return countBits(this->state + n);
     }
 
-    BitCountingIterator& operator++()
+    bit_counting_iterator& operator++()
     {
         ++(this->state);
         return *this;
     }
 
-    BitCountingIterator operator++(int)
+    bit_counting_iterator operator++(int)
     {
         auto copy = *this;
         ++(*this);
         return copy;
     }
 
-    BitCountingIterator& operator--()
+    bit_counting_iterator& operator--()
     {
         --(this->state);
         return *this;
     }
 
-    BitCountingIterator operator--(int)
+    bit_counting_iterator operator--(int)
     {
         auto copy = *this;
         --(*this);
@@ -81,7 +81,7 @@ private:
 
 void test_count()
 {
-    using Iter = BitCountingIterator;
+    using Iter = bit_counting_iterator;
     using Sent = sentinel<std::int64_t>;
 
     auto stdResult = std::count(Iter{0}, Iter{33}, std::int64_t{1});
@@ -99,7 +99,7 @@ void test_count()
 
 void test_count_if()
 {
-    using Iter = BitCountingIterator;
+    using Iter = bit_counting_iterator;
     using Sent = sentinel<std::int64_t>;
 
     auto predicate = [](std::int64_t v) { return v == 1; };
