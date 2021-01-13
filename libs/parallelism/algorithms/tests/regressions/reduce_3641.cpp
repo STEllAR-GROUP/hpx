@@ -8,6 +8,7 @@
 // #3641: Trouble with using ranges-v3 and hpx::parallel::reduce
 // #3646: Parallel algorithms should accept iterator/sentinel pairs
 
+#include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_reduce.hpp>
 #include <hpx/modules/testing.hpp>
 #include "iter_sent.hpp"
