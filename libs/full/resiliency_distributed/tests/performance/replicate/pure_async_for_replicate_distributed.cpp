@@ -102,11 +102,11 @@ int main(int argc, char* argv[])
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()("size",
-        value<std::size_t>()->default_value(1000),
+        value<std::size_t>()->default_value(100),
         "Time in us taken by a thread to execute before it terminates");
 
     desc_commandline.add_options()("num-iterations",
-        value<std::size_t>()->default_value(1000000), "Number of tasks");
+        value<std::size_t>()->default_value(100), "Number of tasks");
 
     // Initialize and run HPX
     hpx::init_params params;

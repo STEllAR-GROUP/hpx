@@ -33,10 +33,10 @@
 namespace hpx { namespace resiliency { namespace experimental {
 
     // return version of this library
-    HPX_EXPORT unsigned int major_version();
-    HPX_EXPORT unsigned int minor_version();
-    HPX_EXPORT unsigned int subminor_version();
-    HPX_EXPORT unsigned long full_version();
-    HPX_EXPORT std::string full_version_str();
+    HPX_PARALLELISM_EXPORT unsigned int major_version();
+    HPX_PARALLELISM_EXPORT unsigned int minor_version();
+    HPX_PARALLELISM_EXPORT unsigned int subminor_version();
+    HPX_PARALLELISM_EXPORT unsigned long full_version();
+    HPX_PARALLELISM_EXPORT std::string full_version_str();
 
 }}}    // namespace hpx::resiliency::experimental

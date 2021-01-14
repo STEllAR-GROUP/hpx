@@ -11,6 +11,7 @@
 
 #include <array>
 #include <cstddef>
+#include <utility>
 
 template <typename T>
 struct communicator
@@ -134,7 +135,7 @@ struct communicator
     {
         // Send our data to the neighbor n using fire and forget semantics
         // Synchronization happens when receiving values.
-        send[n].set(t, step);
+        send[n].set(std::move(t), step);
     }
 
     hpx::future<T> get(neighbor n, std::size_t step)
@@ -153,7 +154,7 @@ struct communicator
         if (num > 1)
         {
             // We have an left neighbor if our rank is greater than zero.
-            if (rank > 0)
+            if (rank >= 0)
             {
                 // Create the channel we use to send our first row to our
                 // left neighbor
@@ -162,7 +163,7 @@ struct communicator
                 // find it.
                 hpx::register_with_basename(left_name, send[left], rank);
             }
-            if (rank < num - 1)
+            if (rank <= num - 1)
             {
                 // Create the channel we use to send our last row to our
                 // neighbor below

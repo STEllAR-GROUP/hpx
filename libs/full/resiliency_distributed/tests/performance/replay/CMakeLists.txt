@@ -6,17 +6,21 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(benchmarks
-    1d_stencil_distributed 1d_stencil_replay_distributed
-    async_replay_distributed async_replay_distributed_validate
-    plain_async_distributed
-)
+set(benchmarks)
 
-set(1d_stencil_distributed_PARAMETERS LOCALITIES 2)
-set(1d_stencil_replay_distributed_PARAMETERS LOCALITIES 2)
-set(async_replay_distributed_PARAMETERS LOCALITIES 2)
-set(async_replay_distributed_validate_PARAMETERS LOCALITIES 2)
-set(plain_async_distributed_PARAMETERS LOCALITIES 2)
+if(HPX_WITH_NETWORKING)
+  set(benchmarks
+      1d_stencil_distributed 1d_stencil_replay_distributed
+      async_replay_distributed async_replay_distributed_validate
+      plain_async_distributed
+  )
+
+  set(1d_stencil_distributed_PARAMETERS LOCALITIES 2)
+  set(1d_stencil_replay_distributed_PARAMETERS LOCALITIES 2)
+  set(async_replay_distributed_PARAMETERS LOCALITIES 2)
+  set(async_replay_distributed_validate_PARAMETERS LOCALITIES 2)
+  set(plain_async_distributed_PARAMETERS LOCALITIES 2)
+endif()
 
 foreach(benchmark ${benchmarks})
 

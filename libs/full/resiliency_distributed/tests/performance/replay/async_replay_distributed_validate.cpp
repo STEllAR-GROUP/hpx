@@ -30,7 +30,7 @@ int universal_ans(std::vector<hpx::id_type> const& f_locales, std::size_t err,
 {
     std::vector<hpx::future<int>> local_tasks;
 
-    for (std::size_t i = 0; i < 1000; ++i)
+    for (std::size_t i = 0; i < 10; ++i)
     {
         local_tasks.push_back(hpx::async([size]() {
             // Pretending to do some useful work
@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
             "Error rates for all nodes. Faulty nodes will have 10x error rates.")
         ("size", po::value<std::size_t>()->default_value(200),
             "Grain size of a task")
-        ("num-tasks", po::value<std::size_t>()->default_value(10000),
+        ("num-tasks", po::value<std::size_t>()->default_value(100),
             "Number of tasks to invoke")
         ;
     // clang-format on

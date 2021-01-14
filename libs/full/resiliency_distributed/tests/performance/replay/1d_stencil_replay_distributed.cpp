@@ -436,13 +436,13 @@ int main(int argc, char* argv[])
             "Number of faulty nodes")
         ("faults", value<std::size_t>()->default_value(1),
             "Number of faulty nodes")
-        ("subdomain-width", value<std::size_t>()->default_value(8000),
+        ("subdomain-width", value<std::size_t>()->default_value(100),
             "Local x dimension (of each partition)")
-        ("iterations", value<std::size_t>()->default_value(256),
+        ("iterations", value<std::size_t>()->default_value(4),
             "Number of time steps")
-        ("steps-per-iteration", value<std::size_t>()->default_value(512),
+        ("steps-per-iteration", value<std::size_t>()->default_value(4),
             "Number of time steps per iterations")
-        ("subdomains", value<std::size_t>()->default_value(384),
+        ("subdomains", value<std::size_t>()->default_value(4),
             "Number of partitions")
     ;
     // clang-format on

@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
             "Error rates for all nodes. Faulty nodes will have 10x error rates.")
         ("size", po::value<std::size_t>()->default_value(200),
             "Grain size of a task")
-        ("num-tasks", po::value<std::size_t>()->default_value(1000),
+        ("num-tasks", po::value<std::size_t>()->default_value(100),
             "Number of tasks to invoke")
         ("num-replications", po::value<std::size_t>()->default_value(3),
             "Total number of replicates for a task (including the task itself)")

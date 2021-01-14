@@ -67,6 +67,8 @@ jobs:
           tests.examples.modules.program_options.real|\
           tests.examples.modules.program_options.regex|\
           tests.examples.modules.program_options.response_file|\
+          tests.examples.modules.resiliency_distributed.distributed.tcp.async_replay_distributed|\
+          tests.examples.modules.resiliency_distributed.distributed.tcp.async_replicate_distributed|\
           tests.examples.modules.resiliency.1d_stencil_replay_exception|\
           tests.examples.modules.resiliency.1d_stencil_replay_validate|\
           tests.examples.modules.resiliency.async_replay|\

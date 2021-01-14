@@ -211,7 +211,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (comm.has_neighbor(communicator_type::right))
     {
         // Send initial value to the right neighbor
-        comm.set(communicator_type::right, U[0][0], 0);
+        comm.set(communicator_type::right, U[0][num_subdomains - 1], 0);
     }
 
     for (std::size_t t = 0; t < iterations; ++t)
@@ -284,13 +284,13 @@ int main(int argc, char* argv[])
 
     // clang-format off
     desc_commandline.add_options()
-        ("subdomain-width", value<std::size_t>()->default_value(8000),
+        ("subdomain-width", value<std::size_t>()->default_value(100),
             "Local x dimension (of each partition)")
-        ("iterations", value<std::size_t>()->default_value(256),
+        ("iterations", value<std::size_t>()->default_value(4),
             "Number of time steps")
-        ("steps-per-iteration", value<std::size_t>()->default_value(512),
+        ("steps-per-iteration", value<std::size_t>()->default_value(4),
             "Number of time steps per iterations")
-        ("subdomains", value<std::size_t>()->default_value(384),
+        ("subdomains", value<std::size_t>()->default_value(4),
             "Number of partitions")
     ;
     // clang-format on

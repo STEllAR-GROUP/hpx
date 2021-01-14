@@ -6,17 +6,23 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(benchmarks
-    async_replicate_distributed async_replicate_distributed_validate
-    async_replicate_distributed_vote async_replicate_distributed_vote_validate
-    pure_async_for_replicate_distributed
-)
+set(benchmarks)
 
-set(async_replicate_distributed_PARAMETERS LOCALITIES 2)
-set(async_replicate_distributed_validate_PARAMETERS LOCALITIES 2)
-set(async_replicate_distributed_vote_PARAMETERS LOCALITIES 2)
-set(async_replicate_distributed_vote_validate_PARAMETERS LOCALITIES 2)
-set(pure_async_for_replicate_distributed_PARAMETERS LOCALITIES 2)
+if(HPX_WITH_NETWORKING)
+  set(benchmarks
+      async_replicate_distributed
+      async_replicate_distributed_validate
+      async_replicate_distributed_vote
+      async_replicate_distributed_vote_validate
+      pure_async_for_replicate_distributed
+  )
+
+  set(async_replicate_distributed_PARAMETERS LOCALITIES 2)
+  set(async_replicate_distributed_validate_PARAMETERS LOCALITIES 2)
+  set(async_replicate_distributed_vote_PARAMETERS LOCALITIES 2)
+  set(async_replicate_distributed_vote_validate_PARAMETERS LOCALITIES 2)
+  set(pure_async_for_replicate_distributed_PARAMETERS LOCALITIES 2)
+endif()
 
 foreach(benchmark ${benchmarks})
 

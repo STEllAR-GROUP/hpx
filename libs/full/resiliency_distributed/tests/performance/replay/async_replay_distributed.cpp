@@ -63,12 +63,12 @@ int universal_ans(
         {
             is_faulty = true;
             if (dist(gen) < err * 10)
-                throw std::runtime_error("runtime error occured.");
+                throw std::runtime_error("runtime error occurred.");
         }
     }
 
     if (!is_faulty && dist(gen) < err)
-        throw std::runtime_error("runtime error occured.");
+        throw std::runtime_error("runtime error occurred.");
 
     return 42;
 }
@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
             "Error rates for all nodes. Faulty nodes will have 10x error rates.")
         ("size", po::value<std::size_t>()->default_value(200),
             "Grain size of a task")
-        ("num-tasks", po::value<std::size_t>()->default_value(10000),
+        ("num-tasks", po::value<std::size_t>()->default_value(100),
             "Number of tasks to invoke")
     ;
     // clang-format on

@@ -20,10 +20,14 @@ if(HPX_WITH_EXAMPLES)
     )
   endif()
 
-  set(example_programs async_replay_distributed async_replicate_distributed)
+  set(example_programs)
 
-  set(async_replay_distributed_PARAMETERS LOCALITIES 2)
-  set(async_replicate_distributed_PARAMETERS LOCALITIES 2)
+  if(HPX_WITH_NETWORKING)
+    set(example_programs async_replay_distributed async_replicate_distributed)
+
+    set(async_replay_distributed_PARAMETERS LOCALITIES 2)
+    set(async_replicate_distributed_PARAMETERS LOCALITIES 2)
+  endif()
 
   foreach(example_program ${example_programs})
 

@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
             "Number of faulty nodes to be injected")
         ("size", po::value<std::size_t>()->default_value(200),
             "Grain size of a task")
-        ("num-tasks", po::value<std::size_t>()->default_value(10000),
+        ("num-tasks", po::value<std::size_t>()->default_value(100),
             "Number of tasks to invoke")
     ;
     // clang-format on

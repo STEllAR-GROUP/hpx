@@ -4,10 +4,15 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests async_replay_distributed_plain async_replicate_distributed_plain)
+set(tests)
 
-set(async_replay_distributed_plain_PARAMETERS LOCALITIES 2)
-set(async_replicate_distributed_plain_PARAMETERS LOCALITIES 2)
+if(HPX_WITH_NETWORKING)
+  set(tests ${tests} async_replay_distributed_plain
+            async_replicate_distributed_plain
+  )
+  set(async_replay_distributed_plain_PARAMETERS LOCALITIES 2)
+  set(async_replicate_distributed_plain_PARAMETERS LOCALITIES 2)
+endif()
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
