@@ -12,6 +12,12 @@ set(benchmarks
     pure_async_for_replicate_distributed
 )
 
+set(async_replicate_distributed_PARAMETERS LOCALITIES 2)
+set(async_replicate_distributed_validate_PARAMETERS LOCALITIES 2)
+set(async_replicate_distributed_vote_PARAMETERS LOCALITIES 2)
+set(async_replicate_distributed_vote_validate_PARAMETERS LOCALITIES 2)
+set(pure_async_for_replicate_distributed_PARAMETERS LOCALITIES 2)
+
 foreach(benchmark ${benchmarks})
 
   set(sources ${benchmark}.cpp)

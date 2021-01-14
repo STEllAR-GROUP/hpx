@@ -12,6 +12,12 @@ set(benchmarks
     plain_async_distributed
 )
 
+set(1d_stencil_distributed_PARAMETERS LOCALITIES 2)
+set(1d_stencil_replay_distributed_PARAMETERS LOCALITIES 2)
+set(async_replay_distributed_PARAMETERS LOCALITIES 2)
+set(async_replay_distributed_validate_PARAMETERS LOCALITIES 2)
+set(plain_async_distributed_PARAMETERS LOCALITIES 2)
+
 foreach(benchmark ${benchmarks})
 
   set(sources ${benchmark}.cpp)
