@@ -12,9 +12,9 @@
 #include <iterator>
 
 template <typename ValueType>
-struct Sentinel
+struct sentinel
 {
-    explicit Sentinel(ValueType stop_value)
+    explicit sentinel(ValueType stop_value)
       : stop(stop_value)
     {
     }
@@ -29,7 +29,7 @@ private:
 };
 
 template <typename Value>
-struct Iterator
+struct iterator
 {
     using difference_type = std::ptrdiff_t;
     using value_type = Value;
@@ -37,7 +37,7 @@ struct Iterator
     using pointer = Value const*;
     using reference = Value const&;
 
-    explicit Iterator(Value initialState)
+    explicit iterator(Value initialState)
       : state(initialState)
     {
     }
@@ -49,26 +49,26 @@ struct Iterator
 
     virtual Value operator->() const = delete;
 
-    Iterator& operator++()
+    iterator& operator++()
     {
         ++(this->state);
         return *this;
     }
 
-    Iterator operator++(int)
+    iterator operator++(int)
     {
         auto copy = *this;
         ++(*this);
         return copy;
     }
 
-    Iterator& operator--()
+    iterator& operator--()
     {
         --(this->state);
         return *this;
     }
 
-    Iterator operator--(int)
+    iterator operator--(int)
     {
         auto copy = *this;
         --(*this);
@@ -80,74 +80,74 @@ struct Iterator
         return this->state + n;
     }
 
-    Iterator& operator+=(difference_type n)
+    iterator& operator+=(difference_type n)
     {
         this->state += n;
         return *this;
     }
 
-    Iterator operator+(difference_type n) const
+    iterator operator+(difference_type n) const
     {
-        Iterator copy = *this;
+        iterator copy = *this;
         return copy += n;
     }
 
-    Iterator& operator-=(difference_type n)
+    iterator& operator-=(difference_type n)
     {
         this->state -= n;
         return *this;
     }
 
-    Iterator operator-(difference_type n) const
+    iterator operator-(difference_type n) const
     {
-        Iterator copy = *this;
+        iterator copy = *this;
         return copy -= n;
     }
 
-    bool operator==(const Iterator& that) const
+    bool operator==(const iterator& that) const
     {
         return this->state == that.state;
     }
 
-    friend bool operator==(Iterator i, Sentinel<Value> s)
+    friend bool operator==(iterator i, sentinel<Value> s)
     {
         return i.state == s.get_stop();
     }
-    friend bool operator==(Sentinel<Value> s, Iterator i)
+    friend bool operator==(sentinel<Value> s, iterator i)
     {
         return i.state == s.get_stop();
     }
 
-    bool operator!=(const Iterator& that) const
+    bool operator!=(const iterator& that) const
     {
         return this->state != that.state;
     }
 
-    friend bool operator!=(Iterator i, Sentinel<Value> s)
+    friend bool operator!=(iterator i, sentinel<Value> s)
     {
         return i.state != s.get_stop();
     }
-    friend bool operator!=(Sentinel<Value> s, Iterator i)
+    friend bool operator!=(sentinel<Value> s, iterator i)
     {
         return i.state != s.get_stop();
     }
 
-    bool operator<(const Iterator& that) const
+    bool operator<(const iterator& that) const
     {
         return this->state < that.state;
     }
 
-    bool operator<=(const Iterator& that) const
+    bool operator<=(const iterator& that) const
     {
         return this->state <= that.state;
     }
 
-    bool operator>(const Iterator& that) const
+    bool operator>(const iterator& that) const
     {
         return this->state > that.state;
     }
 
-    bool operator>=(const Iterator& that) const
+    bool operator>=(const iterator& that) const
     {
         return this->state >= that.state;
     }
