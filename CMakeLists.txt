@@ -1784,8 +1784,8 @@ if(NOT WIN32)
   # ############################################################################
   if(NOT MSVC)
     hpx_add_compile_flag_if_available(-pthread)
-    if(HPX_HAVE_LIBATOMIC)
-      target_link_libraries(hpx_base_libraries INTERFACE atomic)
+    if(HPX_CXX11_STD_ATOMIC_LIBRARIES)
+      target_link_libraries(hpx_base_libraries INTERFACE ${HPX_CXX11_STD_ATOMIC_LIBRARIES})
     endif()
   endif()
 

@@ -280,28 +280,34 @@ endfunction()
 function(hpx_check_for_cxx11_std_atomic)
   # Make sure HPX_HAVE_LIBATOMIC is removed from the cache if necessary
   if(NOT HPX_WITH_CXX11_ATOMIC)
-    unset(HPX_HAVE_LIBATOMIC CACHE)
+    unset(HPX_CXX11_STD_ATOMIC_LIBRARIES CACHE)
   endif()
 
-  if(NOT MSVC)
-    # Sometimes linking against libatomic is required for atomic ops, if the
-    # platform doesn't support lock-free atomics. We know, it's not needed for
-    # MSVC
-    check_library_exists(atomic __atomic_fetch_add_4 "" HPX_HAVE_LIBATOMIC)
-    if(HPX_HAVE_LIBATOMIC)
-      set(HPX_CXX11_STD_ATOMIC_LIBRARIES
-          atomic
-          CACHE BOOL "std::atomics need separate library" FORCE
-      )
-    endif()
-  endif()
-
+  # first see if we can build atomics with no -latomics
   add_hpx_config_test(
     HPX_WITH_CXX11_ATOMIC
     SOURCE cmake/tests/cxx11_std_atomic.cpp
     LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
     FILE ${ARGN}
   )
+
+  if(NOT MSVC)
+    # Sometimes linking against libatomic is required, if the platform doesn't
+    # support lock-free atomics. We already know that MSVC works
+    if(NOT HPX_WITH_CXX11_ATOMIC)
+      set(HPX_CXX11_STD_ATOMIC_LIBRARIES
+          atomic
+          CACHE BOOL "std::atomics need separate library" FORCE
+      )
+      unset(HPX_WITH_CXX11_ATOMIC CACHE)
+      add_hpx_config_test(
+        HPX_WITH_CXX11_ATOMIC
+        SOURCE cmake/tests/cxx11_std_atomic.cpp
+        LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
+        FILE ${ARGN}
+      )
+    endif()
+  endif()
 endfunction()
 
 # Separately check for 128 bit atomics
@@ -312,6 +318,23 @@ function(hpx_check_for_cxx11_std_atomic_128bit)
     LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
     FILE ${ARGN}
   )
+  if(NOT MSVC)
+    # Sometimes linking against libatomic is required, if the platform doesn't
+    # support lock-free atomics. We already know that MSVC works
+    if(NOT HPX_WITH_CXX11_ATOMIC_128BIT)
+      set(HPX_CXX11_STD_ATOMIC_LIBRARIES
+          atomic
+          CACHE BOOL "std::atomics need separate library" FORCE
+      )
+      unset(HPX_WITH_CXX11_ATOMIC_128BIT CACHE)
+      add_hpx_config_test(
+        HPX_WITH_CXX11_ATOMIC_128BIT
+        SOURCE cmake/tests/cxx11_std_atomic_128bit.cpp
+        LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
+        FILE ${ARGN}
+      )
+    endif()
+  endif()
 endfunction()
 
 # ##############################################################################
