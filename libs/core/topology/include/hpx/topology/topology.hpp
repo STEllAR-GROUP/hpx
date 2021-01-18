@@ -407,7 +407,7 @@ namespace hpx { namespace threads {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT topology& create_topology();
+    HPX_CORE_EXPORT topology& create_topology();
 
     HPX_NODISCARD HPX_CORE_EXPORT unsigned int hardware_concurrency();
 

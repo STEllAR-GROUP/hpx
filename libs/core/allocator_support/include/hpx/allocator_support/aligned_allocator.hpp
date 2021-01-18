@@ -140,7 +140,7 @@ namespace hpx { namespace util {
             return &x;
         }
 
-        HPX_NODISCARD pointer allocate(size_type n, void const* hint = nullptr)
+        HPX_NODISCARD pointer allocate(size_type n, void const* = nullptr)
         {
             if (max_size() < n)
             {
@@ -158,7 +158,7 @@ namespace hpx { namespace util {
             return p;
         }
 
-        void deallocate(pointer p, size_type n)
+        void deallocate(pointer p, size_type)
         {
             __aligned_free(p);
         }

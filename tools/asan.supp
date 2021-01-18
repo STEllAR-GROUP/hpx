@@ -4,7 +4,13 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# ASAN is reporting a memory leak from hwloc_topology_init, but we're 100% sure 
-# that the corresponding hwloc_topology_destroy is being called. The reported 
+# ASAN is reporting a memory leak from hwloc_topology_init, but we're 100% sure
+# that the corresponding hwloc_topology_destroy is being called. The reported
 # leak could be caused by HWLOC itself.
 leak:hwloc_topology_init
+
+# The performance counter leak reported in some cases is benign as analysis has
+# shown that the counter is allocated once and is supposed to be free at the end
+# of execution only. No 'repeating' leak can happen.
+leak:*simple_heap<hpx::performance_counters::server::raw_counter>::alloc*
+leak:*hpx::performance_counters::detail::create_raw_counter*

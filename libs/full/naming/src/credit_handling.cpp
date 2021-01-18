@@ -112,7 +112,7 @@ namespace hpx { namespace naming {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        void decrement_refcnt(gid_type* p)
+        void decrement_refcnt(id_type_impl* p)
         {
             // do nothing if it's too late in the game
             if (!get_runtime_ptr())
@@ -148,7 +148,7 @@ namespace hpx { namespace naming {
                 catch (hpx::exception const& e)
                 {
                     LTM_(error) << "Unhandled exception while executing "
-                                   "decrement_refcnt:"
+                                   "decrement_refcnt: "
                                 << e.what();
                 }
             }

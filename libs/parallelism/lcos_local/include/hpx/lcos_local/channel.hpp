@@ -309,6 +309,9 @@ namespace hpx { namespace lcos { namespace local {
                 set(std::forward<T1>(val));
                 if (pop_active_)
                 {
+                    // avoid lock-being-held errors
+                    util::ignore_while_checking<Lock> il(&l);
+
                     pop_();    // trigger waiting pop
                 }
                 return hpx::make_ready_future();
@@ -351,6 +354,9 @@ namespace hpx { namespace lcos { namespace local {
                 T val = get();
                 if (push_active_)
                 {
+                    // avoid lock-being-held errors
+                    util::ignore_while_checking<Lock> il(&l);
+
                     push_();    // trigger waiting push
                 }
                 return hpx::make_ready_future(val);
