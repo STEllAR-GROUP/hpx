@@ -879,10 +879,10 @@ namespace hpx { namespace execution { namespace experimental {
     HPX_INLINE_CONSTEXPR_VARIABLE struct make_with_hint_t
       : hpx::functional::tag<make_with_hint_t>
     {
-    } make_with_hint;
+    } make_with_hint{};
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct get_hint_t
       : hpx::functional::tag<get_hint_t>
     {
-    } get_hint;
+    } get_hint{};
 }}}    // namespace hpx::execution::experimental
