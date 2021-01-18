@@ -297,7 +297,7 @@ function(hpx_check_for_cxx11_std_atomic)
     if(NOT HPX_WITH_CXX11_ATOMIC)
       set(HPX_CXX11_STD_ATOMIC_LIBRARIES
           atomic
-          CACHE BOOL "std::atomics need separate library" FORCE
+          CACHE STRING "std::atomics need separate library" FORCE
       )
       unset(HPX_WITH_CXX11_ATOMIC CACHE)
       add_hpx_config_test(
@@ -306,6 +306,9 @@ function(hpx_check_for_cxx11_std_atomic)
         LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
         FILE ${ARGN}
       )
+      if(NOT HPX_WITH_CXX11_ATOMIC_128BIT)
+        unset(HPX_WITH_CXX11_ATOMIC_128BIT CACHE)
+      endif()
     endif()
   endif()
 endfunction()
@@ -324,7 +327,7 @@ function(hpx_check_for_cxx11_std_atomic_128bit)
     if(NOT HPX_WITH_CXX11_ATOMIC_128BIT)
       set(HPX_CXX11_STD_ATOMIC_LIBRARIES
           atomic
-          CACHE BOOL "std::atomics need separate library" FORCE
+          CACHE STRING "std::atomics need separate library" FORCE
       )
       unset(HPX_WITH_CXX11_ATOMIC_128BIT CACHE)
       add_hpx_config_test(
@@ -333,6 +336,9 @@ function(hpx_check_for_cxx11_std_atomic_128bit)
         LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
         FILE ${ARGN}
       )
+      if(NOT HPX_WITH_CXX11_ATOMIC_128BIT)
+        unset(HPX_WITH_CXX11_ATOMIC_128BIT CACHE)
+      endif()
     endif()
   endif()
 endfunction()
