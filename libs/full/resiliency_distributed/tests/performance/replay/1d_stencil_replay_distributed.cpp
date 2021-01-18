@@ -297,7 +297,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     {
         locales.reserve((num_localities / faults));
 
-        for (std::size_t i = 1; i < (num_localities / faults); ++i)
+        for (std::size_t i = 0; i < (num_localities / faults); ++i)
         {
             hpx::id_type id_1 = hpx::naming::get_id_from_locality_id(
                 static_cast<std::uint32_t>((rank + i) % num_localities));

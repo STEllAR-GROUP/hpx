@@ -50,7 +50,7 @@ std::size_t universal_ans(std::size_t delay_ns, std::size_t error)
     {
         // Check if we've reached the specified delay.
         if ((hpx::chrono::high_resolution_clock::now() - start) >=
-            (delay_ns * 1000))
+            (delay_ns * 100))
         {
             // Re-run the thread if the thread was meant to re-run
             if (dist(gen) < error)

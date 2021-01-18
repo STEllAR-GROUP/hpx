@@ -28,14 +28,14 @@ int universal_ans(std::vector<hpx::id_type> const&, std::size_t size)
 {
     std::vector<hpx::future<int>> local_tasks;
 
-    for (std::size_t i = 0; i < 192; ++i)
+    for (std::size_t i = 0; i < 10; ++i)
     {
         local_tasks.push_back(hpx::async([size]() {
             // Pretending to do some useful work
             std::size_t start = hpx::chrono::high_resolution_clock::now();
 
             while ((hpx::chrono::high_resolution_clock::now() - start) <
-                (size * 1000))
+                (size * 100))
             {
             }
 

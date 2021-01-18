@@ -37,7 +37,7 @@ int universal_ans(std::vector<hpx::id_type> const& f_locales, std::size_t err,
             std::size_t start = hpx::chrono::high_resolution_clock::now();
 
             while ((hpx::chrono::high_resolution_clock::now() - start) <
-                (size * 1000))
+                (size * 100))
             {
             }
 
