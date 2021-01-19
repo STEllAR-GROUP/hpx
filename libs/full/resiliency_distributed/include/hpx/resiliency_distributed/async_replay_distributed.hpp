@@ -71,7 +71,7 @@ namespace hpx { namespace resiliency { namespace experimental {
 
                             // execute the task again if an error occurred and
                             // this was not the last attempt
-                            if (iteration != ids.size())
+                            if (iteration != ids.size() - 1)
                             {
                                 return this_->call(ids, iteration + 1);
                             }
@@ -87,7 +87,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                         {
                             // execute the task again if an error occurred and
                             // this was not the last attempt
-                            if (iteration != ids.size())
+                            if (iteration != ids.size() - 1)
                             {
                                 return this_->call(ids, iteration + 1);
                             }
@@ -143,6 +143,8 @@ namespace hpx { namespace resiliency { namespace experimental {
     tag_invoke(async_replay_t, const std::vector<hpx::naming::id_type>& ids,
         Action&& action, Ts&&... ts)
     {
+        HPX_ASSERT(ids.size() > 0);
+
         using result_type =
             typename hpx::util::detail::invoke_deferred_result<Action,
                 hpx::naming::id_type, Ts...>::type;
@@ -165,6 +167,8 @@ namespace hpx { namespace resiliency { namespace experimental {
         const std::vector<hpx::naming::id_type>& ids, Pred&& pred,
         Action&& action, Ts&&... ts)
     {
+        HPX_ASSERT(ids.size() > 0);
+
         using result_type =
             typename hpx::util::detail::invoke_deferred_result<Action,
                 hpx::naming::id_type, Ts...>::type;
