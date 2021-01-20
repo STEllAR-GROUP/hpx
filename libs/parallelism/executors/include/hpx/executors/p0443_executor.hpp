@@ -7,7 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
+#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 
@@ -32,6 +34,51 @@ namespace hpx { namespace execution { namespace experimental {
         bool operator!=(executor const& rhs) const noexcept
         {
             return !(*this == rhs);
+        }
+
+        friend executor tag_invoke(
+            hpx::execution::experimental::make_with_priority_t,
+            executor const& exec, hpx::threads::thread_priority priority)
+        {
+            auto exec_with_priority = exec;
+            exec_with_priority.priority_ = priority;
+            return exec_with_priority;
+        }
+
+        friend hpx::threads::thread_priority tag_invoke(
+            hpx::execution::experimental::get_priority_t, executor const& exec)
+        {
+            return exec.priority_;
+        }
+
+        friend executor tag_invoke(
+            hpx::execution::experimental::make_with_stacksize_t,
+            executor const& exec, hpx::threads::thread_stacksize stacksize)
+        {
+            auto exec_with_stacksize = exec;
+            exec_with_stacksize.stacksize_ = stacksize;
+            return exec_with_stacksize;
+        }
+
+        friend hpx::threads::thread_stacksize tag_invoke(
+            hpx::execution::experimental::get_stacksize_t, executor const& exec)
+        {
+            return exec.stacksize_;
+        }
+
+        friend executor tag_invoke(
+            hpx::execution::experimental::make_with_hint_t,
+            executor const& exec, hpx::threads::thread_schedule_hint hint)
+        {
+            auto exec_with_hint = exec;
+            exec_with_hint.schedulehint_ = hint;
+            return exec_with_hint;
+        }
+
+        friend hpx::threads::thread_schedule_hint tag_invoke(
+            hpx::execution::experimental::get_hint_t, executor const& exec)
+        {
+            return exec.schedulehint_;
         }
 
         template <typename F>
