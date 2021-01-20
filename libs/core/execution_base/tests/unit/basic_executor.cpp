@@ -110,8 +110,8 @@ void f_fun_2(int){};
 
 int main()
 {
-    using hpx::execution::experimental::traits::is_executor;
-    using hpx::execution::experimental::traits::is_executor_of;
+    using hpx::execution::experimental::is_executor;
+    using hpx::execution::experimental::is_executor_of;
 
     static_assert(!is_executor<non_executor_1>::value,
         "non_executor_1 is not an executor");

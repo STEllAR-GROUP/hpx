@@ -102,8 +102,8 @@ namespace hpx { namespace execution { namespace experimental {
                 template <typename...> class Variant>
             using value_types = typename hpx::util::detail::unique<
                 typename hpx::util::detail::transform<
-                    typename hpx::execution::experimental::traits::
-                        sender_traits<S>::template value_types<Tuple, Variant>,
+                    typename hpx::execution::experimental::sender_traits<
+                        S>::template value_types<Tuple, Variant>,
                     invoke_result_helper>::type>::type;
 
             template <template <typename...> class Variant>

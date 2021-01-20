@@ -120,7 +120,7 @@ sender tag_invoke(hpx::execution::experimental::schedule_t, scheduler_3)
 
 int main()
 {
-    using hpx::execution::experimental::traits::is_scheduler;
+    using hpx::execution::experimental::is_scheduler;
 
     static_assert(!is_scheduler<non_scheduler_1>::value,
         "non_scheduler_1 is not a scheduler");

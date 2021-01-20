@@ -50,7 +50,7 @@ namespace mylib {
 
 int main()
 {
-    using hpx::execution::experimental::traits::is_operation_state;
+    using hpx::execution::experimental::is_operation_state;
 
     static_assert(!is_operation_state<mylib::state_1>::value,
         "mylib::state_1 is not an operation state");

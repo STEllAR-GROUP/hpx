@@ -152,7 +152,7 @@ namespace hpx { namespace execution { namespace experimental {
         auto sync_wait_impl(std::false_type, S&& s)
         {
             using value_types =
-                typename hpx::execution::experimental::traits::sender_traits<
+                typename hpx::execution::experimental::sender_traits<
                     S>::template value_types<hpx::util::pack, hpx::util::pack>;
             using result_type =
                 typename sync_wait_single_result<value_types>::type;
@@ -187,7 +187,7 @@ namespace hpx { namespace execution { namespace experimental {
     decltype(auto) sync_wait(S&& s)
     {
         using value_types =
-            typename hpx::execution::experimental::traits::sender_traits<
+            typename hpx::execution::experimental::sender_traits<
                 S>::template value_types<hpx::util::pack, hpx::util::pack>;
         using result_type = typename sync_wait_single_result<value_types>::type;
 

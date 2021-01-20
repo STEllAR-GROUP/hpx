@@ -30,22 +30,20 @@ namespace hpx { namespace execution { namespace experimental {
     void start(O&& o);
 #endif
 
-    namespace traits {
-        /// An `operation_state` is an object representing the asynchronous operation
-        /// that has been returned from calling `hpx::execution::experimental::connect` with
-        /// a `sender` and a `receiver`. The only operation on an `operation_state`
-        /// is:
-        ///     * `hpx::execution::experimental::start`
-        ///
-        /// `hpx::execution::experimental::start` can be called exactly once. Once it has
-        /// been invoked, the caller needs to ensure that the receiver's completion
-        /// signaling operations strongly happen before the destructor of the state
-        /// is called. The call to `hpx::basic_exceution::start` needs to happen
-        /// strongly before the completion signaling operations.
-        ///
-        template <typename O>
-        struct is_operation_state;
-    }    // namespace traits
+    /// An `operation_state` is an object representing the asynchronous operation
+    /// that has been returned from calling `hpx::execution::experimental::connect` with
+    /// a `sender` and a `receiver`. The only operation on an `operation_state`
+    /// is:
+    ///     * `hpx::execution::experimental::start`
+    ///
+    /// `hpx::execution::experimental::start` can be called exactly once. Once it has
+    /// been invoked, the caller needs to ensure that the receiver's completion
+    /// signaling operations strongly happen before the destructor of the state
+    /// is called. The call to `hpx::basic_exceution::start` needs to happen
+    /// strongly before the completion signaling operations.
+    ///
+    template <typename O>
+    struct is_operation_state;
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct start_t
       : hpx::functional::tag_priority_noexcept<start_t>
@@ -61,36 +59,34 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } start{};
 
-    namespace traits {
-        namespace detail {
-            template <bool IsOperationState, typename O>
-            struct is_operation_state_impl;
-
-            template <typename O>
-            struct is_operation_state_impl<false, O> : std::false_type
-            {
-            };
-
-            template <typename O>
-            struct is_operation_state_impl<true, O>
-              : std::integral_constant<bool,
-                    noexcept(hpx::execution::experimental::start(
-                        std::declval<O&>()))>
-            {
-            };
-        }    // namespace detail
+    namespace detail {
+        template <bool IsOperationState, typename O>
+        struct is_operation_state_impl;
 
         template <typename O>
-        struct is_operation_state
-          : detail::is_operation_state_impl<std::is_destructible<O>::value &&
-                    std::is_object<O>::value &&
-                    hpx::is_invocable_v<hpx::execution::experimental::start_t,
-                        typename std::decay<O>::type&>,
-                O>
+        struct is_operation_state_impl<false, O> : std::false_type
         {
         };
 
         template <typename O>
-        constexpr bool is_operation_state_v = is_operation_state<O>::value;
-    }    // namespace traits
-}}}      // namespace hpx::execution::experimental
+        struct is_operation_state_impl<true, O>
+          : std::integral_constant<bool,
+                noexcept(
+                    hpx::execution::experimental::start(std::declval<O&>()))>
+        {
+        };
+    }    // namespace detail
+
+    template <typename O>
+    struct is_operation_state
+      : detail::is_operation_state_impl<std::is_destructible<O>::value &&
+                std::is_object<O>::value &&
+                hpx::is_invocable_v<hpx::execution::experimental::start_t,
+                    typename std::decay<O>::type&>,
+            O>
+    {
+    };
+
+    template <typename O>
+    constexpr bool is_operation_state_v = is_operation_state<O>::value;
+}}}    // namespace hpx::execution::experimental

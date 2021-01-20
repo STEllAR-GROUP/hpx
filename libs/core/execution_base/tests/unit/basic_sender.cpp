@@ -257,7 +257,7 @@ constexpr bool unspecialized(...)
 
 template <typename Sender>
 constexpr bool unspecialized(
-    typename hpx::execution::experimental::traits::sender_traits<
+    typename hpx::execution::experimental::sender_traits<
         Sender>::__unspecialized*)
 {
     return true;
@@ -286,8 +286,8 @@ int main()
     static_assert(!unspecialized<sender_3>(nullptr),
         "sender_3 should have sender_traits");
 
-    using hpx::execution::experimental::traits::is_sender;
-    using hpx::execution::experimental::traits::is_sender_to;
+    using hpx::execution::experimental::is_sender;
+    using hpx::execution::experimental::is_sender_to;
 
     static_assert(
         !is_sender<non_sender_1>::value, "non_sender_1 is not a sender");

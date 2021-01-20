@@ -44,111 +44,108 @@ namespace hpx { namespace execution { namespace experimental {
     void connect(S&& s, R&& r);
 #endif
 
-    namespace traits {
-        /// A sender is a type that is describing an asynchronous operation. The
-        /// operation itself might not have started yet. In order to get the result
-        /// of this asynchronous operation, a sender needs to be connected to a
-        /// receiver with the corresponding value, error and done channels:
-        ///     * `hpx::execution::experimental::connect`
-        ///
-        /// In addition, `hpx::execution::experimental::::sender_traits ` needs to
-        /// be specialized in some form.
-        ///
-        /// A sender's destructor shall not block pending completion of submitted
-        /// operations.
-        template <typename Sender>
-        struct is_sender;
+    /// A sender is a type that is describing an asynchronous operation. The
+    /// operation itself might not have started yet. In order to get the result
+    /// of this asynchronous operation, a sender needs to be connected to a
+    /// receiver with the corresponding value, error and done channels:
+    ///     * `hpx::execution::experimental::connect`
+    ///
+    /// In addition, `hpx::execution::experimental::::sender_traits ` needs to
+    /// be specialized in some form.
+    ///
+    /// A sender's destructor shall not block pending completion of submitted
+    /// operations.
+    template <typename Sender>
+    struct is_sender;
 
-        /// \see is_sender
-        template <typename Sender, typename Receiver>
-        struct is_sender_to;
+    /// \see is_sender
+    template <typename Sender, typename Receiver>
+    struct is_sender_to;
 
-        /// `sender_traits` expose the different value and error types exposed
-        /// by a sender. This can be either specialized directly for user defined
-        /// sender types or embedded value_types, error_types and sends_done
-        /// inside the sender type can be provided.
+    /// `sender_traits` expose the different value and error types exposed
+    /// by a sender. This can be either specialized directly for user defined
+    /// sender types or embedded value_types, error_types and sends_done
+    /// inside the sender type can be provided.
+    template <typename Sender>
+    struct sender_traits;
+
+    template <typename Sender>
+    struct sender_traits<Sender volatile> : sender_traits<Sender>
+    {
+    };
+    template <typename Sender>
+    struct sender_traits<Sender const> : sender_traits<Sender>
+    {
+    };
+    template <typename Sender>
+    struct sender_traits<Sender&> : sender_traits<Sender>
+    {
+    };
+    template <typename Sender>
+    struct sender_traits<Sender&&> : sender_traits<Sender>
+    {
+    };
+
+    namespace detail {
         template <typename Sender>
-        struct sender_traits;
+        constexpr bool specialized(...)
+        {
+            return true;
+        }
 
         template <typename Sender>
-        struct sender_traits<Sender volatile> : sender_traits<Sender>
+        constexpr bool specialized(
+            typename hpx::execution::experimental::sender_traits<
+                Sender>::__unspecialized*)
+        {
+            return false;
+        }
+    }    // namespace detail
+
+    template <typename Sender>
+    struct is_sender
+      : std::integral_constant<bool,
+            std::is_move_constructible<
+                typename std::decay<Sender>::type>::value &&
+                detail::specialized<Sender>(nullptr)>
+    {
+    };
+
+    template <typename Sender>
+    constexpr bool is_sender_v = is_sender<Sender>::value;
+
+    struct invocable_archetype
+    {
+        void operator()() {}
+    };
+
+    namespace detail {
+        template <typename Executor, typename F, typename Enable = void>
+        struct is_executor_of_base_impl : std::false_type
         {
         };
-        template <typename Sender>
-        struct sender_traits<Sender const> : sender_traits<Sender>
-        {
-        };
-        template <typename Sender>
-        struct sender_traits<Sender&> : sender_traits<Sender>
-        {
-        };
-        template <typename Sender>
-        struct sender_traits<Sender&&> : sender_traits<Sender>
-        {
-        };
 
-        namespace detail {
-            template <typename Sender>
-            constexpr bool specialized(...)
-            {
-                return true;
-            }
-
-            template <typename Sender>
-            constexpr bool specialized(
-                typename hpx::execution::experimental::traits::sender_traits<
-                    Sender>::__unspecialized*)
-            {
-                return false;
-            }
-        }    // namespace detail
-
-        template <typename Sender>
-        struct is_sender
-          : std::integral_constant<bool,
+        template <typename Executor, typename F>
+        struct is_executor_of_base_impl<Executor, F,
+            typename std::enable_if<hpx::traits::is_invocable<
+                                        typename std::decay<F>::type&>::value &&
+                std::is_constructible<typename std::decay<F>::type, F>::value &&
+                std::is_destructible<typename std::decay<F>::type>::value &&
                 std::is_move_constructible<
-                    typename std::decay<Sender>::type>::value &&
-                    detail::specialized<Sender>(nullptr)>
+                    typename std::decay<F>::type>::value &&
+                std::is_copy_constructible<Executor>::value &&
+                hpx::traits::is_equality_comparable<Executor>::value>::type>
+          : std::true_type
         {
         };
 
-        template <typename Sender>
-        constexpr bool is_sender_v = is_sender<Sender>::value;
-
-        struct invocable_archetype
+        template <typename Executor>
+        struct is_executor_base
+          : is_executor_of_base_impl<typename std::decay<Executor>::type,
+                invocable_archetype>
         {
-            void operator()() {}
         };
-
-        namespace detail {
-            template <typename Executor, typename F, typename Enable = void>
-            struct is_executor_of_base_impl : std::false_type
-            {
-            };
-
-            template <typename Executor, typename F>
-            struct is_executor_of_base_impl<Executor, F,
-                typename std::enable_if<hpx::traits::is_invocable<typename std::
-                                                decay<F>::type&>::value &&
-                    std::is_constructible<typename std::decay<F>::type,
-                        F>::value &&
-                    std::is_destructible<typename std::decay<F>::type>::value &&
-                    std::is_move_constructible<
-                        typename std::decay<F>::type>::value &&
-                    std::is_copy_constructible<Executor>::value &&
-                    hpx::traits::is_equality_comparable<Executor>::value>::type>
-              : std::true_type
-            {
-            };
-
-            template <typename Executor>
-            struct is_executor_base
-              : is_executor_of_base_impl<typename std::decay<Executor>::type,
-                    invocable_archetype>
-            {
-            };
-        }    // namespace detail
-    }        // namespace traits
+    }    // namespace detail
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct execute_t
       : hpx::functional::tag_priority<execute_t>
@@ -160,8 +157,8 @@ namespace hpx { namespace execution { namespace experimental {
                                          .execute(std::forward<F>(f)))) ->
             typename std::enable_if<hpx::traits::is_invocable<
                                         typename std::decay<F>::type&>::value &&
-                    (traits::is_sender_v<Executor> ||
-                        traits::detail::is_executor_base<Executor>::value),
+                    (is_sender_v<Executor> ||
+                        detail::is_executor_base<Executor>::value),
                 decltype(std::forward<Executor>(executor).execute(
                     std::forward<F>(f)))>::type
         {
@@ -246,13 +243,12 @@ namespace hpx { namespace execution { namespace experimental {
         friend constexpr HPX_FORCEINLINE auto
         tag_override_invoke(connect_t, S&& s, R&& r) noexcept(
             noexcept(std::declval<S&&>().connect(std::forward<R>(r)))) ->
-            typename std::enable_if<traits::is_sender_v<S> &&
-                    traits::is_receiver_v<R>,
+            typename std::enable_if<is_sender_v<S> && is_receiver_v<R>,
                 decltype(std::declval<S&&>().connect(std::forward<R>(r)))>::type
         {
             static_assert(
-                hpx::execution::experimental::traits::is_operation_state_v<
-                    decltype(std::declval<S&&>().connect(std::forward<R>(r)))>,
+                hpx::execution::experimental::is_operation_state_v<decltype(
+                    std::declval<S&&>().connect(std::forward<R>(r)))>,
                 "hpx::execution::experimental::connect needs to return a "
                 "type satisfying the operation_state concept");
 
@@ -264,8 +260,8 @@ namespace hpx { namespace execution { namespace experimental {
             S&& s, R&& r) noexcept(noexcept(detail::as_operation<S, R>{
             std::forward<S>(s), std::forward<R>(r)})) ->
             typename std::enable_if<!detail::has_member_connect<S, R>::value &&
-                    traits::is_receiver_of_v<R> &&
-                    traits::detail::is_executor_of_base_impl<
+                    is_receiver_of_v<R> &&
+                    detail::is_executor_of_base_impl<
                         typename std::decay<S>::type,
                         detail::as_invocable<typename std::decay<R>::type,
                             S>>::value,
@@ -305,7 +301,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                 template <typename... Ts>
                     void set_value(Ts&&... ts) &&
-                    noexcept(traits::is_nothrow_receiver_of_v<R, Ts...>)
+                    noexcept(is_nothrow_receiver_of_v<R, Ts...>)
                 {
                     hpx::execution::experimental::set_value(
                         std::move(p->r), std::forward<Ts>(ts)...);
@@ -358,7 +354,7 @@ namespace hpx { namespace execution { namespace experimental {
         friend constexpr HPX_FORCEINLINE auto
         tag_override_invoke(submit_t, S&& s, R&& r) noexcept(
             noexcept(std::forward<S>(s).submit(std::forward<R>(r)))) ->
-            typename std::enable_if<traits::is_sender_to<S, R>::value,
+            typename std::enable_if<is_sender_to<S, R>::value,
                 decltype(std::forward<S>(s).submit(std::forward<R>(r)))>::type
         {
             std::forward<S>(s).submit(std::forward<R>(r));
@@ -439,39 +435,37 @@ namespace hpx { namespace execution { namespace experimental {
                 std::forward<F>(f)});
     }
 
-    namespace traits {
-        namespace detail {
-            template <typename Executor, typename F, typename Enable = void>
-            struct is_executor_of_impl : std::false_type
-            {
-            };
-
-            template <typename Executor, typename F>
-            struct is_executor_of_impl<Executor, F,
-                typename std::enable_if<hpx::traits::is_invocable<execute_t,
-                    Executor, F>::value>::type>
-              : is_executor_of_base_impl<Executor, F>
-            {
-            };
-        }    // namespace detail
-
-        template <typename Executor>
-        struct is_executor
-          : detail::is_executor_of_base_impl<Executor, invocable_archetype>
+    namespace detail {
+        template <typename Executor, typename F, typename Enable = void>
+        struct is_executor_of_impl : std::false_type
         {
         };
 
         template <typename Executor, typename F>
-        struct is_executor_of : detail::is_executor_of_base_impl<Executor, F>
+        struct is_executor_of_impl<Executor, F,
+            typename std::enable_if<
+                hpx::traits::is_invocable<execute_t, Executor, F>::value>::type>
+          : is_executor_of_base_impl<Executor, F>
         {
         };
+    }    // namespace detail
 
-        template <typename Executor>
-        constexpr bool is_executor_v = is_executor<Executor>::value;
+    template <typename Executor>
+    struct is_executor
+      : detail::is_executor_of_base_impl<Executor, invocable_archetype>
+    {
+    };
 
-        template <typename Executor, typename F>
-        constexpr bool is_executor_of_v = is_executor_of<Executor, F>::value;
-    }    // namespace traits
+    template <typename Executor, typename F>
+    struct is_executor_of : detail::is_executor_of_base_impl<Executor, F>
+    {
+    };
+
+    template <typename Executor>
+    constexpr bool is_executor_v = is_executor<Executor>::value;
+
+    template <typename Executor, typename F>
+    constexpr bool is_executor_of_v = is_executor_of<Executor, F>::value;
 
     namespace detail {
         template <typename Executor>
@@ -497,7 +491,7 @@ namespace hpx { namespace execution { namespace experimental {
 
             template <typename R>
             auto connect(R&& r) && ->
-                typename std::enable_if<traits::is_receiver_of_v<R>,
+                typename std::enable_if<is_receiver_of_v<R>,
                     decltype(hpx::execution::experimental::connect(
                         std::move(exec), std::forward<R>(r)))>::type
             {
@@ -507,7 +501,7 @@ namespace hpx { namespace execution { namespace experimental {
 
             template <typename R>
             auto connect(R&& r) const& ->
-                typename std::enable_if<traits::is_receiver_of_v<R>,
+                typename std::enable_if<is_receiver_of_v<R>,
                     decltype(hpx::execution::experimental::connect(
                         exec, std::forward<R>(r)))>::type
             {
@@ -535,7 +529,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename S>
         friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
             schedule_t, S&& s) noexcept(noexcept(std::forward<S>(s).schedule()))
-            -> typename std::enable_if<traits::is_sender_v<S>,
+            -> typename std::enable_if<is_sender_v<S>,
                 decltype(std::forward<S>(s).schedule())>::type
         {
             return std::forward<S>(s).schedule();
@@ -547,7 +541,7 @@ namespace hpx { namespace execution { namespace experimental {
             noexcept(detail::as_sender<typename std::decay<S>::type>{
                 std::forward<S>(s)})) ->
             typename std::enable_if<!detail::has_member_schedule<S>::value &&
-                    traits::is_executor_v<S>,
+                    is_executor_v<S>,
                 decltype(detail::as_sender<typename std::decay<S>::type>{
                     std::forward<S>(s)})>::type
         {
@@ -556,17 +550,16 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } schedule{};
 
-    namespace traits {
-        namespace detail {
-            template <bool IsSenderReceiver, typename Sender, typename Receiver>
-            struct is_sender_to_impl;
+    namespace detail {
+        template <bool IsSenderReceiver, typename Sender, typename Receiver>
+        struct is_sender_to_impl;
 
-            template <typename Sender, typename Receiver>
-            struct is_sender_to_impl<false, Sender, Receiver> : std::false_type
-            {
-            };
+        template <typename Sender, typename Receiver>
+        struct is_sender_to_impl<false, Sender, Receiver> : std::false_type
+        {
+        };
 
-            // clang-format off
+        // clang-format off
             template <typename Sender, typename Receiver>
             struct is_sender_to_impl<true, Sender, Receiver>
               : std::integral_constant<bool,
@@ -599,153 +592,149 @@ namespace hpx { namespace execution { namespace experimental {
                             Sender const&, Receiver const&>>
             {
             };
-            // clang-format on
-        }    // namespace detail
+        // clang-format on
+    }    // namespace detail
 
-        template <typename Sender, typename Receiver>
-        struct is_sender_to
-          : detail::is_sender_to_impl<is_sender_v<Sender> &&
-                    is_receiver_v<Receiver>,
-                Sender, Receiver>
-        {
-        };
+    template <typename Sender, typename Receiver>
+    struct is_sender_to
+      : detail::is_sender_to_impl<
+            is_sender_v<Sender> && is_receiver_v<Receiver>, Sender, Receiver>
+    {
+    };
 
-        namespace detail {
-            template <typename... As>
-            struct tuple_mock;
-            template <typename... As>
-            struct variant_mock;
-
-            template <typename Sender>
-            constexpr bool has_value_types(
-                typename Sender::template value_types<tuple_mock,
-                    variant_mock>*)
-            {
-                return true;
-            }
-
-            template <typename Sender>
-            constexpr bool has_value_types(...)
-            {
-                return false;
-            }
-
-            template <typename Sender>
-            constexpr bool has_error_types(
-                typename Sender::template error_types<variant_mock>*)
-            {
-                return true;
-            }
-
-            template <typename Sender>
-            constexpr bool has_error_types(...)
-            {
-                return false;
-            }
-
-            template <typename Sender>
-            constexpr bool has_sends_done(decltype(Sender::sends_done)*)
-            {
-                return true;
-            }
-
-            template <typename Sender>
-            constexpr bool has_sends_done(...)
-            {
-                return false;
-            }
-
-            template <typename Sender>
-            struct has_sender_types
-              : std::integral_constant<bool,
-                    has_value_types<Sender>(nullptr) &&
-                        has_error_types<Sender>(nullptr) &&
-                        has_sends_done<Sender>(nullptr)>
-            {
-            };
-
-            template <bool HasSenderTraits, typename Sender>
-            struct sender_traits_base;
-
-            template <typename Sender>
-            struct sender_traits_base<true /* HasSenderTraits */, Sender>
-            {
-                template <template <typename...> class Tuple,
-                    template <typename...> class Variant>
-                using value_types =
-                    typename Sender::template value_types<Tuple, Variant>;
-
-                template <template <typename...> class Variant>
-                using error_types =
-                    typename Sender::template error_types<Variant>;
-
-                static constexpr bool sends_done = Sender::sends_done;
-            };
-
-            struct void_receiver
-            {
-                void set_value() noexcept;
-                void set_error(std::exception_ptr) noexcept;
-                void set_done() noexcept;
-            };
-
-            template <typename Sender, typename Enable = void>
-            struct sender_traits_executor_base : std::false_type
-            {
-                using __unspecialized = void;
-            };
-
-            template <typename Sender>
-            struct sender_traits_executor_base<Sender,
-                typename std::enable_if<is_executor_of_base_impl<Sender,
-                    hpx::execution::experimental::detail::as_invocable<
-                        void_receiver, Sender>>::value>::type> : std::false_type
-            {
-                template <template <class...> class Tuple,
-                    template <class...> class Variant>
-                using value_types = Variant<Tuple<>>;
-
-                template <template <class...> class Variant>
-                using error_types = Variant<std::exception_ptr>;
-
-                static constexpr bool sends_done = true;
-            };
-
-            template <typename Sender>
-            struct sender_traits_base<false /* HasSenderTraits */, Sender>
-              : sender_traits_executor_base<Sender>
-            {
-            };
-
-            template <typename Sender>
-            struct is_typed_sender
-              : std::integral_constant<bool,
-                    is_sender<Sender>::value &&
-                        detail::has_sender_types<Sender>::value>
-            {
-            };
-        }    // namespace detail
+    namespace detail {
+        template <typename... As>
+        struct tuple_mock;
+        template <typename... As>
+        struct variant_mock;
 
         template <typename Sender>
-        struct sender_traits
-          : detail::sender_traits_base<detail::has_sender_types<Sender>::value,
-                Sender>
+        constexpr bool has_value_types(
+            typename Sender::template value_types<tuple_mock, variant_mock>*)
+        {
+            return true;
+        }
+
+        template <typename Sender>
+        constexpr bool has_value_types(...)
+        {
+            return false;
+        }
+
+        template <typename Sender>
+        constexpr bool has_error_types(
+            typename Sender::template error_types<variant_mock>*)
+        {
+            return true;
+        }
+
+        template <typename Sender>
+        constexpr bool has_error_types(...)
+        {
+            return false;
+        }
+
+        template <typename Sender>
+        constexpr bool has_sends_done(decltype(Sender::sends_done)*)
+        {
+            return true;
+        }
+
+        template <typename Sender>
+        constexpr bool has_sends_done(...)
+        {
+            return false;
+        }
+
+        template <typename Sender>
+        struct has_sender_types
+          : std::integral_constant<bool,
+                has_value_types<Sender>(nullptr) &&
+                    has_error_types<Sender>(nullptr) &&
+                    has_sends_done<Sender>(nullptr)>
         {
         };
 
-        template <typename Scheduler, typename Enable = void>
-        struct is_scheduler : std::false_type
+        template <bool HasSenderTraits, typename Sender>
+        struct sender_traits_base;
+
+        template <typename Sender>
+        struct sender_traits_base<true /* HasSenderTraits */, Sender>
+        {
+            template <template <typename...> class Tuple,
+                template <typename...> class Variant>
+            using value_types =
+                typename Sender::template value_types<Tuple, Variant>;
+
+            template <template <typename...> class Variant>
+            using error_types = typename Sender::template error_types<Variant>;
+
+            static constexpr bool sends_done = Sender::sends_done;
+        };
+
+        struct void_receiver
+        {
+            void set_value() noexcept;
+            void set_error(std::exception_ptr) noexcept;
+            void set_done() noexcept;
+        };
+
+        template <typename Sender, typename Enable = void>
+        struct sender_traits_executor_base : std::false_type
+        {
+            using __unspecialized = void;
+        };
+
+        template <typename Sender>
+        struct sender_traits_executor_base<Sender,
+            typename std::enable_if<is_executor_of_base_impl<Sender,
+                hpx::execution::experimental::detail::as_invocable<
+                    void_receiver, Sender>>::value>::type> : std::false_type
+        {
+            template <template <class...> class Tuple,
+                template <class...> class Variant>
+            using value_types = Variant<Tuple<>>;
+
+            template <template <class...> class Variant>
+            using error_types = Variant<std::exception_ptr>;
+
+            static constexpr bool sends_done = true;
+        };
+
+        template <typename Sender>
+        struct sender_traits_base<false /* HasSenderTraits */, Sender>
+          : sender_traits_executor_base<Sender>
         {
         };
 
-        template <typename Scheduler>
-        struct is_scheduler<Scheduler,
-            typename std::enable_if<
-                hpx::traits::is_invocable<schedule_t, Scheduler&&>::value &&
-                std::is_copy_constructible<Scheduler>::value &&
-                hpx::traits::is_equality_comparable<Scheduler>::value>::type>
-          : std::true_type
+        template <typename Sender>
+        struct is_typed_sender
+          : std::integral_constant<bool,
+                is_sender<Sender>::value &&
+                    detail::has_sender_types<Sender>::value>
         {
         };
-    }    // namespace traits
-}}}      // namespace hpx::execution::experimental
+    }    // namespace detail
+
+    template <typename Sender>
+    struct sender_traits
+      : detail::sender_traits_base<detail::has_sender_types<Sender>::value,
+            Sender>
+    {
+    };
+
+    template <typename Scheduler, typename Enable = void>
+    struct is_scheduler : std::false_type
+    {
+    };
+
+    template <typename Scheduler>
+    struct is_scheduler<Scheduler,
+        typename std::enable_if<
+            hpx::traits::is_invocable<schedule_t, Scheduler&&>::value &&
+            std::is_copy_constructible<Scheduler>::value &&
+            hpx::traits::is_equality_comparable<Scheduler>::value>::type>
+      : std::true_type
+    {
+    };
+}}}    // namespace hpx::execution::experimental
