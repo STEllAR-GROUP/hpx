@@ -76,6 +76,7 @@ namespace hpx { namespace lcos { namespace local {
         private:
             void do_run_impl(/*is_void=*/std::false_type)
             {
+                hpx::intrusive_ptr<base_type> this_(this);
                 hpx::detail::try_catch_exception_ptr(
                     [&]() { this->set_value(f_()); },
                     [&](std::exception_ptr ep) {
@@ -85,6 +86,7 @@ namespace hpx { namespace lcos { namespace local {
 
             void do_run_impl(/*is_void=*/std::true_type)
             {
+                hpx::intrusive_ptr<base_type> this_(this);
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
                         f_();
@@ -106,9 +108,7 @@ namespace hpx { namespace lcos { namespace local {
             {
                 this->check_started();
 
-                typedef typename Base::future_base_type future_base_type;
-                future_base_type this_(this);
-
+                hpx::intrusive_ptr<base_type> this_(this);
                 if (policy == launch::fork)
                 {
                     threads::thread_init_data data(
@@ -259,9 +259,7 @@ namespace hpx { namespace lcos { namespace local {
                 {
                     this->check_started();
 
-                    typedef typename Base::future_base_type future_base_type;
-                    future_base_type this_(this);
-
+                    hpx::intrusive_ptr<base_type> this_(this);
                     parallel::execution::post(*exec_,
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
