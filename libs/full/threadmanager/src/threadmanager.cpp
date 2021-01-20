@@ -67,9 +67,8 @@ namespace hpx { namespace threads {
         notification_policy_type& notifier,
         detail::network_background_callback_type network_background_callback)
       : rtcfg_(rtcfg)
-      ,
 #ifdef HPX_HAVE_TIMER_POOL
-      timer_pool_(timer_pool)
+      , timer_pool_(timer_pool)
 #endif
       , notifier_(notifier)
       , network_background_callback_(network_background_callback)
