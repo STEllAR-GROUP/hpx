@@ -45,20 +45,6 @@ namespace hpx { namespace execution { namespace experimental {
                 std::forward<F>(f));
         }
 
-        template <typename F, typename N>
-        void bulk_execute(F&& f, N n) const
-        {
-            hpx::util::thread_description desc(f);
-
-            for (std::size_t i = 0; i < static_cast<std::size_t>(n); ++i)
-            {
-                hpx::parallel::execution::detail::post_policy_dispatch<
-                    hpx::launch::async_policy>::call(hpx::launch::async, desc,
-                    pool_, priority_, stacksize_, schedulehint_,
-                    std::forward<F>(f), i);
-            }
-        }
-
         template <typename R>
         struct operation_state
         {

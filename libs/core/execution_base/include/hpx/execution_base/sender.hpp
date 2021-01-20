@@ -474,61 +474,6 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace traits
 
     namespace detail {
-        template <typename Executor, typename F, typename N,
-            typename Enable = void>
-        struct has_member_bulk_execute : std::false_type
-        {
-        };
-
-        template <typename Executor, typename F, typename N>
-        struct has_member_bulk_execute<Executor, F, N,
-            typename hpx::util::always_void<decltype(
-                std::declval<Executor>().bulk_execute(
-                    std::declval<F>(), std::size_t{}))>::type> : std::true_type
-        {
-        };
-    }    // namespace detail
-
-    // TODO: P0443 is conflicting on whether this returns void or a sender.
-    HPX_INLINE_CONSTEXPR_VARIABLE struct bulk_execute_t
-      : hpx::functional::tag_priority<bulk_execute_t>
-    {
-        template <typename Executor, typename F, typename N>
-        friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
-            bulk_execute_t, Executor&& executor, F&& f,
-            N n) noexcept(noexcept(std::forward<Executor>(executor)
-                                       .bulk_execute(std::forward<F>(f)),
-            static_cast<std::size_t>(n))) ->
-            typename std::enable_if<hpx::traits::is_invocable<F, N>::value &&
-                    std::is_convertible<N, std::size_t>::value,
-                decltype(std::forward<Executor>(executor).bulk_execute(
-                    std::forward<F>(f), static_cast<std::size_t>(n)))>::type
-        {
-            return std::forward<Executor>(executor).bulk_execute(
-                std::forward<F>(f), static_cast<std::size_t>(n));
-        }
-
-        template <typename Executor, typename F, typename N>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            bulk_execute_t, Executor&& executor, F&& f,
-            N n) noexcept(noexcept(std::forward<Executor>(executor)
-                                       .bulk_execute(std::forward<F>(f)),
-            n)) ->
-            typename std::enable_if<hpx::traits::is_invocable<F, N>::value &&
-                    std::is_convertible<N, std::size_t>::value &&
-                    !detail::has_member_bulk_execute<Executor, F, N>::value,
-                decltype(std::forward<Executor>(executor).bulk_execute(
-                    std::forward<F>(f), n))>::type
-        {
-            for (std::size_t i = 0; i < n; ++i)
-            {
-                hpx::execution::experimental::execute(
-                    executor, [f, n]() { HPX_INVOKE(f, n); });
-            }
-        }
-    } bulk_execute;
-
-    namespace detail {
         template <typename Executor>
         struct as_sender
         {
