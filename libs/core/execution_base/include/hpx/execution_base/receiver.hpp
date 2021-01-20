@@ -21,14 +21,14 @@ namespace hpx { namespace execution { namespace experimental {
     /// set_value is a customization point object. The expression
     /// `hpx::execution::set_value(r, as...)` is equivalent to:
     ///     * `r.set_value(as...)`, if that expression is valid. If the function selected
-    ///       does not send to value(s) `as...` to the Receiver `r`'s value channel,
+    ///       does not send the value(s) `as...` to the Receiver `r`'s value channel,
     ///       the program is ill-formed (no diagnostic required).
     ///     * Otherwise, `set_value(r, as...), if that expression is valid, with
     ///       overload resolution performed in a context that include the declaration
     ///       `void set_value();`
     ///     * Otherwise, the expression is ill-formed.
     ///
-    /// The customization is implemented in terms of `hpx::function::tag_invoke`
+    /// The customization is implemented in terms of `hpx::functional::tag_invoke`.
     template <typename R, typename... As>
     void set_value(R&& r, As&&... as);
 
@@ -42,21 +42,21 @@ namespace hpx { namespace execution { namespace experimental {
     ///       `void set_done();`
     ///     * Otherwise, the expression is ill-formed.
     ///
-    /// The customization is implemented in terms of `hpx::function::tag_invoke`
+    /// The customization is implemented in terms of `hpx::functional::tag_invoke`.
     template <typename R>
     void set_done(R&& r);
 
     /// set_error is a customization point object. The expression
     /// `hpx::execution::set_error(r, e)` is equivalent to:
     ///     * `r.set_done(e)`, if that expression is valid. If the function selected
-    ///       does not send the error e the Receiver `r`'s error channel,
+    ///       does not send the error `e` the Receiver `r`'s error channel,
     ///       the program is ill-formed (no diagnostic required).
     ///     * Otherwise, `set_error(r, e), if that expression is valid, with
     ///       overload resolution performed in a context that include the declaration
     ///       `void set_error();`
     ///     * Otherwise, the expression is ill-formed.
     ///
-    /// The customization is implemented in terms of `hpx::function::tag_invoke`
+    /// The customization is implemented in terms of `hpx::functional::tag_invoke`.
     template <typename R, typename E>
     void set_error(R&& r, E&& e);
 #endif
@@ -83,7 +83,7 @@ namespace hpx { namespace execution { namespace experimental {
     /// without throwing an exception, the Receiver contract has been satisfied.
     /// In other words: The asynchronous operation has been completed.
     ///
-    /// \see hpx::execution::traits::is_receiver_of
+    /// \see hpx::execution::experimental::is_receiver_of
     template <typename T, typename E = std::exception_ptr>
     struct is_receiver;
 

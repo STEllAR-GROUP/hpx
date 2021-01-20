@@ -22,8 +22,52 @@
 
 namespace hpx { namespace execution { namespace experimental {
 #if defined(DOXYGEN)
+    /// execute is a customization point object.  For some subexpression `e` and
+    /// `f`, let `E` be `decltype((e))` and let `F` be `decltype((F))`. The
+    /// expression `execute(e, f)` is ill-formed if `F` does not model
+    /// `invocable`, or if `E` does not model either `executor` or `sender`. The
+    /// result of the expression `hpx::execution::experimental::execute(e, f)`
+    /// is then equivalent to:
+    ///     * `e.execute(f)`, if that expression is valid. If the function
+    ///       selected does not execute the function object `f` on the executor
+    ///       `e`, the program is ill-formed with no diagnostic required.
+    ///     * Otherwise, `execute(e, f)`, if that expression is valid, with
+    ///       overload resolution performed in a context that includes the
+    ///       declaration `void execute();` and that does not include a
+    ///       declaration of `hpx::execution::experimental::execute`. If the
+    ///       function selected by overload resolution does not execute the
+    ///       function object `f` on the executor `e`, the program is ill-formed
+    ///       with no diagnostic required.
+    ///     * Otherwise, execution::submit(e, as-receiver<remove_cvref_t<F>,
+    ///       E>{forward<F>(f)}) if
+    ///       * F is not an instance of as-invocable<R,E'> for some type R where
+    ///         E and E' name the same type ignoring cv and reference
+    ///         qualifiers, and
+    ///       * invocable<remove_cvref_t<F>&> && sender_to<E,
+    ///         as-receiver<remove_cvref_t<F>, E>> is true
+    ///
+    ///       where as-receiver is some implementation-defined class template
+    ///       equivalent to:
+    ///
+    ///           template<class F, class>
+    ///           struct as-receiver {
+    ///             F f_;
+    ///             void set_value() noexcept(is_nothrow_invocable_v<F&>) {
+    ///               invoke(f_);
+    ///             }
+    ///             template<class E>
+    ///             [[noreturn]] void set_error(E&&) noexcept {
+    ///               terminate();
+    ///             }
+    ///             void set_done() noexcept {}
+    ///           };
+    ///
+    /// The customization is implemented in terms of `hpx::functional::tag_invoke`.
+    template <typename E, typename F>
+    void execute(E&& e, F&& f);
+
     /// connect is a customization point object.
-    /// From some subexpression `s` and `r`, let `S` be the type such that `decltype((s))`
+    /// For some subexpression `s` and `r`, let `S` be the type such that `decltype((s))`
     /// is `S` and let `R` be the type such that `decltype((r))` is `R`. The result of
     /// the expression `hpx::execution::experimental::connect(s, r)` is then equivalent to:
     ///     * `s.connect(r)`, if that expression is valid and returns a type
@@ -36,12 +80,160 @@ namespace hpx { namespace execution { namespace experimental {
     ///       and if `S` satisfies the `sender` concept.
     ///       Overload resolution is performed in a context that include the declaration
     ///       `void connect();`
-    ///     * Otherwise: TODO once executor is in place...
+    ///     * Otherwise, as-operation{s, r}, if
+    ///       * r is not an instance of as-receiver<F, S'> for some type F where
+    ///         S and S' name the same type ignoring cv and reference
+    ///         qualifiers, and
+    ///       * receiver_of<R> && executor-of-impl<remove_cvref_t<S>,
+    ///         as-invocable<remove_cvref_t<R>, S>> is true,
+    ///
+    ///       where as-operation is an implementation-defined class equivalent
+    ///       to:
+    ///
+    ///           struct as-operation {
+    ///             remove_cvref_t<S> e_;
+    ///             remove_cvref_t<R> r_;
+    ///             void start() noexcept try {
+    ///               execution::execute(std::move(e_), as-invocable<remove_cvref_t<R>, S>{r_});
+    ///             } catch(...) {
+    ///               execution::set_error(std::move(r_), current_exception());
+    ///             }
+    ///           };
+    ///
+    ///       and as-invocable is a class template equivalent to the following:
+    ///
+    ///           template<class R, class>
+    ///           struct as-invocable {
+    ///             R* r_;
+    ///             explicit as-invocable(R& r) noexcept
+    ///               : r_(std::addressof(r)) {}
+    ///             as-invocable(as-invocable && other) noexcept
+    ///               : r_(std::exchange(other.r_, nullptr)) {}
+    ///             ~as-invocable() {
+    ///               if(r_)
+    ///                 execution::set_done(std::move(*r_));
+    ///             }
+    ///             void operator()() & noexcept try {
+    ///               execution::set_value(std::move(*r_));
+    ///               r_ = nullptr;
+    ///             } catch(...) {
+    ///               execution::set_error(std::move(*r_), current_exception());
+    ///               r_ = nullptr;
+    ///             }
+    ///           };
     ///     * Otherwise, the expression is ill-formed.
     ///
-    /// The customization is implemented in terms of `hpx::function::tag_invoke`
+    /// The customization is implemented in terms of
+    /// `hpx::functional::tag_invoke`.
     template <typename S, typename R>
     void connect(S&& s, R&& r);
+
+    /// The name submit denotes a customization point object.
+    ///
+    /// For some subexpressions s and r, let S be decltype((s)) and let R be
+    /// decltype((r)). The expression submit(s, r) is ill-formed if
+    /// sender_to<S, R> is not true. Otherwise, it is expression-equivalent to:
+    ///
+    ///     * s.submit(r), if that expression is valid and S models sender. If the
+    ///       function selected does not submit the receiver object r via the
+    ///       sender s, the program is ill-formed with no diagnostic required.
+    ///
+    ///     * Otherwise, submit(s, r), if that expression is valid and S models
+    ///       sender, with overload resolution performed in a context that
+    ///       includes the declaration
+    ///
+    ///           void submit();
+    ///
+    ///       and that does not include a declaration of execution::submit. If
+    ///       the function selected by overload resolution does not submit the
+    ///       receiver object r via the sender s, the program is ill-formed with
+    ///       no diagnostic required.
+    ///
+    ///     * Otherwise, start((newsubmit-state<S, R>{s,r})->state_),
+    ///       where submit-state is an implementation-defined class template
+    ///       equivalent to
+    ///
+    ///           template<class S, class R>
+    ///           struct submit-state {
+    ///             struct submit-receiver {
+    ///               submit-state * p_;
+    ///               template<class...As>
+    ///                 requires receiver_of<R, As...>
+    ///               void set_value(As&&... as) && noexcept(is_nothrow_receiver_of_v<R, As...>) {
+    ///                 set_value(std::move(p_->r_), (As&&) as...);
+    ///                 delete p_;
+    ///               }
+    ///               template<class E>
+    ///                 requires receiver<R, E>
+    ///               void set_error(E&& e) && noexcept {
+    ///                 set_error(std::move(p_->r_), (E&&) e);
+    ///                 delete p_;
+    ///               }
+    ///               void set_done() && noexcept {
+    ///                 set_done(std::move(p_->r_));
+    ///                 delete p_;
+    ///               }
+    ///             };
+    ///             remove_cvref_t<R> r_;
+    ///             connect_result_t<S, submit-receiver> state_;
+    ///             submit-state(S&& s, R&& r)
+    ///               : r_((R&&) r)
+    ///               , state_(connect((S&&) s, submit-receiver{this})) {}
+    ///           };
+    ///
+    /// The customization is implemented in terms of
+    /// `hpx::functional::tag_invoke`.
+    template <typename S, typename R>
+    auto submit(S&& s, R&& r);
+
+    /// The name schedule denotes a customization point object. For some
+    /// subexpression s, let S be decltype((s)). The expression schedule(s) is
+    /// expression-equivalent to:
+    ///
+    ///     * s.schedule(), if that expression is valid and its type models
+    ///       sender.
+    ///     * Otherwise, schedule(s), if that expression is valid and its type
+    ///       models sender with overload resolution performed in a context that
+    ///       includes the declaration
+    ///
+    ///           void schedule();
+    ///
+    ///       and that does not include a declaration of schedule.
+    ///
+    ///     * Otherwise, as-sender<remove_cvref_t<S>>{s} if S satisfies
+    ///       executor, where as-sender is an implementation-defined class
+    ///       template equivalent to
+    ///
+    ///           template<class E>
+    ///           struct as-sender {
+    ///           private:
+    ///             E ex_;
+    ///           public:
+    ///             template<template<class...> class Tuple, template<class...> class Variant>
+    ///               using value_types = Variant<Tuple<>>;
+    ///             template<template<class...> class Variant>
+    ///               using error_types = Variant<std::exception_ptr>;
+    ///             static constexpr bool sends_done = true;
+    ///
+    ///             explicit as-sender(E e) noexcept
+    ///               : ex_((E&&) e) {}
+    ///             template<class R>
+    ///               requires receiver_of<R>
+    ///             connect_result_t<E, R> connect(R&& r) && {
+    ///               return connect((E&&) ex_, (R&&) r);
+    ///             }
+    ///             template<class R>
+    ///               requires receiver_of<R>
+    ///             connect_result_t<const E &, R> connect(R&& r) const & {
+    ///               return connect(ex_, (R&&) r);
+    ///             }
+    ///           };
+    ///
+    ///      * Otherwise, schedule(s) is ill-formed.
+    ///
+    /// The customization is implemented in terms of
+    /// `hpx::functional::tag_invoke`.
+
 #endif
 
     /// A sender is a type that is describing an asynchronous operation. The
