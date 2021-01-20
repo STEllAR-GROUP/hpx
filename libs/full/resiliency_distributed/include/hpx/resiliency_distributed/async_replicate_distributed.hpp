@@ -13,6 +13,7 @@
 #include <hpx/resiliency/resiliency_cpos.hpp>
 #include <hpx/resiliency/util.hpp>
 
+#include <hpx/assert.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/async_local.hpp>
@@ -110,6 +111,8 @@ namespace hpx { namespace resiliency { namespace experimental {
         const std::vector<hpx::naming::id_type>& ids, Vote&& vote, Pred&& pred,
         Action&& action, Ts&&... ts)
     {
+        HPX_ASSERT(ids.size() > 0);
+
         return detail::async_replicate_vote_validate(ids,
             std::forward<Vote>(vote), std::forward<Pred>(pred),
             std::forward<Action>(action), std::forward<Ts>(ts)...);
@@ -128,6 +131,8 @@ namespace hpx { namespace resiliency { namespace experimental {
         const std::vector<hpx::naming::id_type>& ids, Vote&& vote,
         Action&& action, Ts&&... ts)
     {
+        HPX_ASSERT(ids.size() > 0);
+
         return detail::async_replicate_vote_validate(ids,
             std::forward<Vote>(vote), detail::replicate_validator{},
             std::forward<Action>(action), std::forward<Ts>(ts)...);
@@ -146,6 +151,8 @@ namespace hpx { namespace resiliency { namespace experimental {
         const std::vector<hpx::naming::id_type>& ids, Pred&& pred,
         Action&& action, Ts&&... ts)
     {
+        HPX_ASSERT(ids.size() > 0);
+
         return detail::async_replicate_vote_validate(ids,
             detail::replicate_voter{}, std::forward<Pred>(pred),
             std::forward<Action>(action), std::forward<Ts>(ts)...);
@@ -163,6 +170,8 @@ namespace hpx { namespace resiliency { namespace experimental {
     tag_invoke(async_replicate_t, const std::vector<hpx::naming::id_type>& ids,
         Action&& action, Ts&&... ts)
     {
+        HPX_ASSERT(ids.size() > 0);
+
         return detail::async_replicate_vote_validate(ids,
             detail::replicate_voter{}, detail::replicate_validator{},
             std::forward<Action>(action), std::forward<Ts>(ts)...);

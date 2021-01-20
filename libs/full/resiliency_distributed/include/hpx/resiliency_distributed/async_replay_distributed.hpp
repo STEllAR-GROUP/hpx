@@ -9,6 +9,7 @@
 #include <hpx/resiliency/resiliency_cpos.hpp>
 #include <hpx/resiliency/util.hpp>
 
+#include <hpx/assert.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/type_support/pack.hpp>
