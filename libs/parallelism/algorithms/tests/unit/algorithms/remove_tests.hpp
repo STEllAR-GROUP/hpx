@@ -111,6 +111,27 @@ struct random_fill
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag, typename DataType, typename ValueType>
+void test_remove(IteratorTag, DataType, ValueType value, int rand_base)
+{
+    typedef typename std::vector<DataType>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::size_t const size = 10007;
+    std::vector<DataType> c(size), d;
+    std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
+    d = c;
+
+    auto result =
+        hpx::remove(iterator(std::begin(c)), iterator(std::end(c)), value);
+    auto solution = std::remove(std::begin(d), std::end(d), value);
+
+    bool equality =
+        test::equal(std::begin(c), result.base(), std::begin(d), solution);
+
+    HPX_TEST(equality);
+}
+
 template <typename ExPolicy, typename IteratorTag, typename DataType,
     typename ValueType>
 void test_remove(
@@ -165,6 +186,27 @@ void test_remove_async(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag, typename DataType, typename Pred>
+void test_remove_if(IteratorTag, DataType, Pred pred, int rand_base)
+{
+    typedef typename std::vector<DataType>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::size_t const size = 10007;
+    std::vector<DataType> c(size), d;
+    std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
+    d = c;
+
+    auto result =
+        hpx::remove_if(iterator(std::begin(c)), iterator(std::end(c)), pred);
+    auto solution = std::remove_if(std::begin(d), std::end(d), pred);
+
+    bool equality =
+        test::equal(std::begin(c), result.base(), std::begin(d), solution);
+
+    HPX_TEST(equality);
+}
+
 template <typename ExPolicy, typename IteratorTag, typename DataType,
     typename Pred>
 void test_remove_if(
@@ -219,6 +261,47 @@ void test_remove_if_async(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_remove_exception(IteratorTag, bool test_for_remove_if = false)
+{
+    typedef std::vector<int>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::size_t const size = 10007;
+    std::vector<int> c(size);
+    std::generate(std::begin(c), std::end(c), random_fill());
+
+    bool caught_exception = false;
+    try
+    {
+        if (test_for_remove_if)
+        {
+            hpx::remove_if(decorated_iterator(std::begin(c)),
+                decorated_iterator(std::end(c)), throw_always());
+        }
+        else
+        {
+            hpx::remove(decorated_iterator(std::begin(c),
+                            []() { throw std::runtime_error("test"); }),
+                decorated_iterator(std::end(c)), int(10));
+        }
+
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const&)
+    {
+        caught_exception = true;
+        //test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_remove_exception(
     ExPolicy policy, IteratorTag, bool test_for_remove_if = false)
@@ -316,6 +399,46 @@ void test_remove_exception_async(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_remove_bad_alloc(IteratorTag, bool test_for_remove_if = false)
+{
+    typedef std::vector<int>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::size_t const size = 10007;
+    std::vector<int> c(size);
+    std::generate(std::begin(c), std::end(c), random_fill());
+
+    bool caught_bad_alloc = false;
+    try
+    {
+        if (test_for_remove_if)
+        {
+            hpx::remove_if(decorated_iterator(std::begin(c)),
+                decorated_iterator(std::end(c)), throw_bad_alloc());
+        }
+        else
+        {
+            hpx::remove(decorated_iterator(
+                            std::begin(c), []() { throw std::bad_alloc(); }),
+                decorated_iterator(std::end(c)), int(10));
+        }
+
+        HPX_TEST(false);
+    }
+    catch (std::bad_alloc const&)
+    {
+        caught_bad_alloc = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_bad_alloc);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_remove_bad_alloc(
     ExPolicy policy, IteratorTag, bool test_for_remove_if = false)
@@ -437,6 +560,8 @@ void test_remove_etc(ExPolicy policy, IteratorTag, DataType, int rand_base,
 
         if (test_for_remove_if)
         {
+            // The new overloads do not accept projections.
+            // We use the deprecated version instead.
             result = hpx::parallel::remove_if(
                 policy, iterator(std::begin(c)), iterator(std::end(c)),
                 [&value](DataType const& a) -> bool { return a == value; },
@@ -447,6 +572,8 @@ void test_remove_etc(ExPolicy policy, IteratorTag, DataType, int rand_base,
         }
         else
         {
+            // The new overloads do not accept projections.
+            // We use the deprecated version instead.
             result = hpx::parallel::remove(policy, iterator(std::begin(c)),
                 iterator(std::end(c)), value,
                 [&value](DataType const&) -> DataType& {
@@ -467,11 +594,14 @@ void test_remove(IteratorTag, int rand_base)
     using namespace hpx::execution;
 
     ////////// Test cases for 'int' type.
+    test_remove(IteratorTag(), int(), int(rand_base + 2), rand_base);
     test_remove(seq, IteratorTag(), int(), int(rand_base + 1), rand_base);
     test_remove(par, IteratorTag(), int(), int(rand_base), rand_base);
     test_remove(par_unseq, IteratorTag(), int(), int(rand_base - 1), rand_base);
 
     ////////// Test cases for user defined type.
+    test_remove(IteratorTag(), user_defined_type(),
+        user_defined_type(rand_base), rand_base);
     test_remove(seq, IteratorTag(), user_defined_type(),
         user_defined_type(rand_base), rand_base);
     test_remove(par, IteratorTag(), user_defined_type(),
@@ -498,6 +628,9 @@ void test_remove_if(IteratorTag, int rand_base)
 
     ////////// Test cases for 'int' type.
     test_remove_if(
+        IteratorTag(), int(),
+        [rand_base](const int a) -> bool { return a == rand_base; }, rand_base);
+    test_remove_if(
         seq, IteratorTag(), int(),
         [rand_base](const int a) -> bool { return a == rand_base; }, rand_base);
     test_remove_if(
@@ -509,6 +642,11 @@ void test_remove_if(IteratorTag, int rand_base)
         [rand_base](const int a) -> bool { return a == rand_base; }, rand_base);
 
     ////////// Test cases for user defined type.
+    test_remove_if(
+        IteratorTag(), user_defined_type(),
+        [rand_base](
+            user_defined_type const& a) -> bool { return !(a == rand_base); },
+        rand_base);
     test_remove_if(
         seq, IteratorTag(), user_defined_type(),
         [rand_base](
@@ -584,6 +722,7 @@ void test_remove_exception(bool test_for_remove_if = false)
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_remove_exception(IteratorTag(), test_for_remove_if);
     test_remove_exception(seq, IteratorTag(), test_for_remove_if);
     test_remove_exception(par, IteratorTag(), test_for_remove_if);
 
@@ -600,6 +739,7 @@ void test_remove_bad_alloc(bool test_for_remove_if = false)
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_remove_bad_alloc(IteratorTag(), test_for_remove_if);
     test_remove_bad_alloc(seq, IteratorTag(), test_for_remove_if);
     test_remove_bad_alloc(par, IteratorTag(), test_for_remove_if);
 

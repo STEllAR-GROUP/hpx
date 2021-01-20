@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include "iter_sent.hpp"
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
@@ -67,6 +68,55 @@ struct random_fill
 };
 
 ////////////////////////////////////////////////////////////////////////////
+// test case for Iter - Sent (not complete)
+template <typename ExPolicy, typename DataType>
+void test_remove_if_2(ExPolicy policy, DataType)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    using hpx::get;
+
+    std::size_t const size = 10007;
+    std::vector<DataType> c(size), d;
+    std::generate(std::begin(c), std::end(c), random_fill(0, 6));
+    d = c;
+
+    auto pred = [](DataType const& a) -> bool { return a == 0; };
+
+    auto iter = Iterator<std::int16_t>{-5};
+    auto sent = Sentinel<std::int16_t>{4};
+
+    auto result = hpx::ranges::remove_if(policy, iter, sent, pred);
+    auto solution = std::remove_if(std::begin(d), std::end(d), pred);
+
+    bool equality =
+        test::equal(std::begin(c), result.begin(), std::begin(d), solution);
+
+    HPX_TEST(equality);
+}
+
+template <typename DataType>
+void test_remove_if(DataType)
+{
+    using hpx::get;
+
+    std::size_t const size = 10007;
+    std::vector<DataType> c(size), d;
+    std::generate(std::begin(c), std::end(c), random_fill(0, 6));
+    d = c;
+
+    auto pred = [](DataType const& a) -> bool { return a == 0; };
+
+    auto result = hpx::ranges::remove_if(c, pred);
+    auto solution = std::remove_if(std::begin(d), std::end(d), pred);
+
+    bool equality =
+        test::equal(std::begin(c), result.begin(), std::begin(d), solution);
+
+    HPX_TEST(equality);
+}
+
 template <typename ExPolicy, typename DataType>
 void test_remove_if(ExPolicy policy, DataType)
 {
@@ -82,10 +132,11 @@ void test_remove_if(ExPolicy policy, DataType)
 
     auto pred = [](DataType const& a) -> bool { return a == 0; };
 
-    auto result = hpx::parallel::remove_if(policy, c, pred);
+    auto result = hpx::ranges::remove_if(policy, c, pred);
     auto solution = std::remove_if(std::begin(d), std::end(d), pred);
 
-    bool equality = test::equal(std::begin(c), result, std::begin(d), solution);
+    bool equality =
+        test::equal(std::begin(c), result.begin(), std::begin(d), solution);
 
     HPX_TEST(equality);
 }
@@ -105,11 +156,12 @@ void test_remove_if_async(ExPolicy policy, DataType)
 
     auto pred = [](DataType const& a) -> bool { return a == 0; };
 
-    auto f = hpx::parallel::remove_if(policy, c, pred);
+    auto f = hpx::ranges::remove_if(policy, c, pred);
     auto result = f.get();
     auto solution = std::remove_if(std::begin(d), std::end(d), pred);
 
-    bool equality = test::equal(std::begin(c), result, std::begin(d), solution);
+    bool equality =
+        test::equal(std::begin(c), std::begin(result), std::begin(d), solution);
 
     HPX_TEST(equality);
 }
@@ -119,12 +171,15 @@ void test_remove_if()
 {
     using namespace hpx::execution;
 
+    test_remove_if(DataType());
     test_remove_if(seq, DataType());
     test_remove_if(par, DataType());
     test_remove_if(par_unseq, DataType());
 
     test_remove_if_async(seq(task), DataType());
     test_remove_if_async(par(task), DataType());
+
+    // test_remove_if_2(par, DataType());
 }
 
 void test_remove_if()

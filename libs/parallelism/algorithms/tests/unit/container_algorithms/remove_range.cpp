@@ -82,10 +82,10 @@ void test_remove(ExPolicy policy, DataType)
 
     auto value = DataType(0);
 
-    auto result = hpx::parallel::remove(policy, c, value);
+    auto result = hpx::ranges::remove(policy, c, value);
     auto solution = std::remove(std::begin(d), std::end(d), value);
 
-    bool equality = test::equal(std::begin(c), result, std::begin(d), solution);
+    bool equality = test::equal(std::begin(c), std::begin(result), std::begin(d), solution);
 
     HPX_TEST(equality);
 }
@@ -105,11 +105,11 @@ void test_remove_async(ExPolicy policy, DataType)
 
     auto value = DataType(0);
 
-    auto f = hpx::parallel::remove(policy, c, value);
+    auto f = hpx::ranges::remove(policy, c, value);
     auto result = f.get();
     auto solution = std::remove(std::begin(d), std::end(d), value);
 
-    bool equality = test::equal(std::begin(c), result, std::begin(d), solution);
+    bool equality = test::equal(std::begin(c), std::begin(result), std::begin(d), solution);
 
     HPX_TEST(equality);
 }
