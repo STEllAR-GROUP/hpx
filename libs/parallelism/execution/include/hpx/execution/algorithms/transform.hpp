@@ -126,11 +126,4 @@ namespace hpx { namespace execution { namespace experimental {
         return detail::transform_sender<S, F>{
             std::forward<S>(s), std::forward<F>(f)};
     }
-
-    // TODO: Do we want a then for symmetry with future::then?
-    template <typename S, typename F>
-    auto then(S&& s, F&& f)
-    {
-        return transform(std::forward<S>(s), std::forward<F>(f));
-    }
 }}}    // namespace hpx::execution::experimental

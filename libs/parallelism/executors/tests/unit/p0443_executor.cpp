@@ -82,12 +82,8 @@ void test_sender_receiver_transform_wait()
                 hpx::this_thread::get_id());
             ++transform_count;
         });
-    hpx::execution::experimental::wait(work2);
+    hpx::execution::experimental::sync_wait(work2);
     HPX_TEST_EQ(transform_count, std::size_t(2));
-
-    static_assert(hpx::execution::experimental::traits::is_receiver_v<
-                      hpx::execution::experimental::detail::wait_receiver>,
-        "asd");
 }
 
 void test_sender_receiver_transform_sync_wait()

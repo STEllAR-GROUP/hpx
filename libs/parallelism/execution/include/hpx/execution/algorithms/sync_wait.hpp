@@ -113,11 +113,4 @@ namespace hpx { namespace execution { namespace experimental {
             return std::move(st.result.value());
         }
     }
-
-    // TODO: Do we want a get for symmetry with future::get?
-    template <typename S>
-    auto get(S&& s)
-    {
-        return sync_wait(std::forward<S>(s));
-    }
 }}}    // namespace hpx::execution::experimental

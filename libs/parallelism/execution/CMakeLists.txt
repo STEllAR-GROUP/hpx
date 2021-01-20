@@ -14,7 +14,6 @@ set(execution_headers
     hpx/execution/algorithms/sink_receiver.hpp
     hpx/execution/algorithms/sync_wait.hpp
     hpx/execution/algorithms/transform.hpp
-    hpx/execution/algorithms/wait.hpp
     hpx/execution/detail/async_launch_policy_dispatch.hpp
     hpx/execution/detail/future_exec.hpp
     hpx/execution/detail/execution_parameter_callbacks.hpp
