@@ -355,15 +355,17 @@ endfunction()
 # ##############################################################################
 function(hpx_check_for_c11_aligned_alloc)
   add_hpx_config_test(
-    HPX_WITH_C11_ALIGNED_ALLOC SOURCE cmake/tests/c11_aligned_alloc.cpp FILE
-                                      ${ARGN}
+    HPX_WITH_C11_ALIGNED_ALLOC
+    SOURCE cmake/tests/c11_aligned_alloc.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
 function(hpx_check_for_cxx17_std_aligned_alloc)
   add_hpx_config_test(
     HPX_WITH_CXX17_STD_ALIGNED_ALLOC
-    SOURCE cmake/tests/cxx17_std_aligned_alloc.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx17_std_aligned_alloc.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
