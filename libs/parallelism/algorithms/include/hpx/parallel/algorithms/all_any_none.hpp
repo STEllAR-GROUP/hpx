@@ -507,8 +507,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy, Iter first, Sent last, F&& f, Proj&& proj)
             {
                 return detail::sequential_find_if_not(first, last,
-                           util::invoke_projected<F, Proj>(std::forward<F>(f),
-                               std::forward<Proj>(proj))) == last;
+                           std::forward<F>(f),
+                           std::forward<Proj>(proj)) == last;
             }
 
             template <typename ExPolicy, typename FwdIter, typename Sent,

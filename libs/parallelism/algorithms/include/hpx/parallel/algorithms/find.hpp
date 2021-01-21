@@ -383,6 +383,7 @@ namespace hpx {
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
+#include <hpx/parallel/algorithms/detail/find.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
@@ -404,20 +405,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // find
     namespace detail {
-
-        template <typename Iter, typename Sent, typename T, typename Proj>
-        constexpr Iter sequential_find(
-            Iter first, Sent last, T const& value, Proj&& proj)
-        {
-            for (/**/; first != last; ++first)
-            {
-                if (hpx::util::invoke(proj, *first) == value)
-                {
-                    break;
-                }
-            }
-            return first;
-        }
 
         template <typename FwdIter>
         struct find : public detail::algorithm<find<FwdIter>, FwdIter>
@@ -538,20 +525,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // find_if
     namespace detail {
-
-        template <typename Iter, typename Sent, typename Pred, typename Proj>
-        constexpr Iter sequential_find_if(
-            Iter first, Sent last, Pred&& pred, Proj&& proj)
-        {
-            for (/**/; first != last; ++first)
-            {
-                if (hpx::util::invoke(pred, hpx::util::invoke(proj, *first)))
-                {
-                    break;
-                }
-            }
-            return first;
-        }
 
         template <typename FwdIter>
         struct find_if : public detail::algorithm<find_if<FwdIter>, FwdIter>
@@ -678,20 +651,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // find_if_not
     namespace detail {
-
-        template <typename Iter, typename Sent, typename Pred, typename Proj>
-        constexpr Iter sequential_find_if_not(
-            Iter first, Sent last, Pred&& pred, Proj&& proj)
-        {
-            for (/**/; first != last; ++first)
-            {
-                if (!hpx::util::invoke(pred, hpx::util::invoke(proj, *first)))
-                {
-                    break;
-                }
-            }
-            return first;
-        }
 
         template <typename FwdIter>
         struct find_if_not
