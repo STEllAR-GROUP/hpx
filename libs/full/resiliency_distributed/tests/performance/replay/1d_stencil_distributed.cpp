@@ -10,6 +10,9 @@
 // This example makes use of LCOS channels to send and receive
 // elements.
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+
 #include "communicator.hpp"
 
 #include <hpx/algorithm.hpp>
@@ -306,3 +309,5 @@ int main(int argc, char* argv[])
     params.cfg = std::move(cfg);
     return hpx::init(argc, argv, params);
 }
+
+#endif

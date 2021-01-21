@@ -8,7 +8,7 @@
 .. _full_modules:
 
 ==================
-full modules
+Main |hpx| modules
 ==================
 
 .. toctree::

@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+
 #include <hpx/include/lcos.hpp>
 
 #include <array>
@@ -178,3 +181,5 @@ struct communicator
     std::array<hpx::lcos::channel<T>, 2> recv;
     std::array<hpx::lcos::channel<T>, 2> send;
 };
+
+#endif
