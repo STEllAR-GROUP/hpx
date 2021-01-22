@@ -204,11 +204,8 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
    * * |gcc|_
      * 7.0
      *
-   * * |icpc|_
-     * 2014
-     *
    * * |clang|_
-     * 5.0
+     * 7.0
      *
    * * **Build System**
      *

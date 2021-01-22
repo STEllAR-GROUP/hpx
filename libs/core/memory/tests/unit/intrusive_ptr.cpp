@@ -261,12 +261,12 @@ namespace n_assignment {
         {
             hpx::intrusive_ptr<X> p1;
 
-#if defined(__clang__) && (HPX_CLANG_VERSION >= 70000)
+#if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wself-assign-overloaded"
 #endif
             p1 = p1;
-#if defined(__clang__) && (HPX_CLANG_VERSION >= 70000)
+#if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
 
