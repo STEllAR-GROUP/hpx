@@ -35,7 +35,7 @@ set(_hpx_full_modules
     naming_base
     performance_counters
     program_options
-    resiliency
+    resiliency_distributed
     resource_partitioner
     runtime_configuration
     runtime_distributed

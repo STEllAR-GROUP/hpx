@@ -20,6 +20,7 @@ set(_hpx_parallelism_modules
     futures
     lcos_local
     pack_traversal
+    resiliency
     threading
     timed_execution
 )
