@@ -35,7 +35,7 @@ pipeline {
                 axes {
                     axis {
                         name 'configuration_name'
-                        values 'gcc-8', 'gcc-9', 'clang-7', 'clang-8', 'clang-9', 'gcc-9-cuda-11', 'hipcc'
+                        values 'gcc-8', 'gcc-9', 'clang-9', 'gcc-9-cuda-11', 'hipcc'
                     }
                     axis {
                          name 'build_type'

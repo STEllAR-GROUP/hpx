@@ -26,12 +26,11 @@ if(NOT TARGET hpx_dependencies_boost)
       "1.68.0" "1.68"
       "1.67.0" "1.67"
       "1.66.0" "1.66"
-      "1.65.0" "1.65" "1.65.1"
   )
   # cmake-format: on
   set(Boost_MINIMUM_VERSION
-      "1.65"
-      CACHE INTERNAL "1.65" FORCE
+      "1.66"
+      CACHE INTERNAL "1.66" FORCE
   )
 
   set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
@@ -120,6 +119,12 @@ if(NOT TARGET hpx_dependencies_boost)
   # Disable concepts support in Asio as a workaround to
   # https://github.com/boostorg/asio/issues/312
   hpx_add_config_cond_define(BOOST_ASIO_DISABLE_CONCEPTS)
+  # Disable experimental std::string_view support as a workaround to
+  # https://github.com/chriskohlhoff/asio/issues/597
+  hpx_add_config_cond_define(BOOST_ASIO_DISABLE_STD_EXPERIMENTAL_STRING_VIEW)
+  if(Boost_VERSION_STRING VERSION_LESS 1.67)
+    hpx_add_config_cond_define(BOOST_ASIO_DISABLE_STD_STRING_VIEW)
+  endif()
 
   find_package(Threads QUIET REQUIRED)
   target_link_libraries(hpx_dependencies_boost INTERFACE Threads::Threads)
