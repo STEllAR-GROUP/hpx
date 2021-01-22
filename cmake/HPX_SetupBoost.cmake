@@ -122,6 +122,9 @@ if(NOT TARGET hpx_dependencies_boost)
   # Disable experimental std::string_view support as a workaround to
   # https://github.com/chriskohlhoff/asio/issues/597
   hpx_add_config_cond_define(BOOST_ASIO_DISABLE_STD_EXPERIMENTAL_STRING_VIEW)
+  if(Boost_VERSION_STRING VERSION_LESS 1.67)
+    hpx_add_config_cond_define(BOOST_ASIO_DISABLE_STD_STRING_VIEW)
+  endif()
 
   find_package(Threads QUIET REQUIRED)
   target_link_libraries(hpx_dependencies_boost INTERFACE Threads::Threads)
