@@ -205,6 +205,7 @@ namespace hpx { namespace threads {
 
     topology::topology()
       : topo(nullptr)
+      , use_pus_as_cores_(false)
       , machine_affinity_mask_(0)
     {    // {{{
         int err = hwloc_topology_init(&topo);
@@ -339,26 +340,41 @@ namespace hpx { namespace threads {
         std::unique_lock<mutex_type> lk(topo_mtx);
 
         int num_cores = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
+        bool use_pus = false;
 
         // If num_cores is smaller 0, we have an error, it should never be zero
         // either to avoid division by zero, we should always have at least one
         // core
         if (num_cores <= 0)
         {
-            HPX_THROWS_IF(ec, no_success, "topology::hwloc_get_nobjs_by_type",
-                "Failed to get number of cores");
-            return std::size_t(-1);
+            // on some platforms, hwloc can't report the number of cores (BSD),
+            // fall back to report the number of PUs instead
+            num_cores = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
+            if (num_cores <= 0)
+            {
+                HPX_THROWS_IF(ec, no_success,
+                    "topology::hwloc_get_nobjs_by_type",
+                    "Failed to get number of cores");
+                return std::size_t(-1);
+            }
+            use_pus = true;
         }
         num_core %= num_cores;    //-V101 //-V104 //-V107
 
         hwloc_obj_t core_obj;
+        if (!use_pus)
+        {
+            core_obj = hwloc_get_obj_by_type(
+                topo, HWLOC_OBJ_CORE, static_cast<unsigned>(num_core));
+
+            num_pu %= core_obj->arity;    //-V101 //-V104
+            return std::size_t(core_obj->children[num_pu]->logical_index);
+        }
 
         core_obj = hwloc_get_obj_by_type(
-            topo, HWLOC_OBJ_CORE, static_cast<unsigned>(num_core));
+            topo, HWLOC_OBJ_PU, static_cast<unsigned>(num_core));
 
-        num_pu %= core_obj->arity;    //-V101 //-V104
-
-        return std::size_t(core_obj->children[num_pu]->logical_index);
+        return std::size_t(core_obj->logical_index);
     }    // }}}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -729,6 +745,7 @@ namespace hpx { namespace threads {
     std::size_t topology::get_number_of_cores() const
     {
         int nobjs = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
+
         // If num_cores is smaller 0, we have an error
         if (0 > nobjs)
         {
@@ -812,8 +829,9 @@ namespace hpx { namespace threads {
 
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
-            core_obj = hwloc_get_obj_by_type(
-                topo, HWLOC_OBJ_CORE, static_cast<unsigned>(core));
+            core_obj = hwloc_get_obj_by_type(topo,
+                use_pus_as_cores_ ? HWLOC_OBJ_PU : HWLOC_OBJ_CORE,
+                static_cast<unsigned>(core));
         }
 
         if (core_obj)
@@ -841,7 +859,8 @@ namespace hpx { namespace threads {
         {
             HPX_ASSERT(num_socket == detail::get_index(socket_obj));
             std::size_t pu_count = 0;
-            return extract_node_count(socket_obj, HWLOC_OBJ_CORE, pu_count);
+            return extract_node_count(socket_obj,
+                use_pus_as_cores_ ? HWLOC_OBJ_PU : HWLOC_OBJ_CORE, pu_count);
         }
 
         return get_number_of_cores();
@@ -862,7 +881,8 @@ namespace hpx { namespace threads {
             HPX_ASSERT(numa_node == detail::get_index(node_obj));
             std::size_t pu_count = 0;
             node_obj = detail::adjust_node_obj(node_obj);
-            return extract_node_count(node_obj, HWLOC_OBJ_CORE, pu_count);
+            return extract_node_count(node_obj,
+                use_pus_as_cores_ ? HWLOC_OBJ_PU : HWLOC_OBJ_CORE, pu_count);
         }
 
         return get_number_of_cores();
@@ -1063,8 +1083,9 @@ namespace hpx { namespace threads {
 
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
-            core_obj = hwloc_get_obj_by_type(
-                topo, HWLOC_OBJ_CORE, static_cast<unsigned>(num_core));
+            core_obj = hwloc_get_obj_by_type(topo,
+                use_pus_as_cores_ ? HWLOC_OBJ_PU : HWLOC_OBJ_CORE,
+                static_cast<unsigned>(num_core));
         }
 
         if (core_obj)
@@ -1119,7 +1140,9 @@ namespace hpx { namespace threads {
 
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
-            int num_cores = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
+            int num_cores = hwloc_get_nbobjs_by_type(
+                topo, use_pus_as_cores_ ? HWLOC_OBJ_PU : HWLOC_OBJ_CORE);
+
             // If num_cores is smaller 0, we have an error, it should never be zero
             // either to avoid division by zero, we should always have at least one
             // core
@@ -1132,8 +1155,9 @@ namespace hpx { namespace threads {
             }
 
             num_core = (num_core + core_offset) % std::size_t(num_cores);
-            obj = hwloc_get_obj_by_type(
-                topo, HWLOC_OBJ_CORE, static_cast<unsigned>(num_core));
+            obj = hwloc_get_obj_by_type(topo,
+                use_pus_as_cores_ ? HWLOC_OBJ_PU : HWLOC_OBJ_CORE,
+                static_cast<unsigned>(num_core));
         }
 
         if (!obj)
@@ -1155,10 +1179,19 @@ namespace hpx { namespace threads {
     void topology::init_num_of_pus()
     {
         num_of_pus_ = 1;
+        use_pus_as_cores_ = false;
+
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
-            int num_of_pus = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
 
+            // on some platforms, hwloc can't report the number of cores (BSD),
+            // in this case we use PUs as cores
+            if (hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE) <= 0)
+            {
+                use_pus_as_cores_ = true;
+            }
+
+            int num_of_pus = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
             if (num_of_pus > 0)
             {
                 num_of_pus_ = static_cast<std::size_t>(num_of_pus);
