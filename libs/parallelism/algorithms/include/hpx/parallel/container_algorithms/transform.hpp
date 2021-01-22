@@ -417,7 +417,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<OutIter>::value &&
             traits::is_projected_range<Proj, Rng>::value &&
             traits::is_indirect_callable<ExPolicy, F,
-                traits::projected_range<Proj, Rng>>::value
+                traits::projected_range<Proj, Rng>
+            >::value
         )>
     // clang-format on
     HPX_DEPRECATED_V(1, 6,

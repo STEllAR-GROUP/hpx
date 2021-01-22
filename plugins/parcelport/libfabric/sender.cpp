@@ -52,7 +52,7 @@ namespace libfabric
                     << " index " << decnumber(c.data_.index_));
             if (c.type_ == serialization::chunk_type_pointer)
             {
-                LOG_EXCLUSIVE(util::high_resolution_timer regtimer);
+                LOG_EXCLUSIVE(chrono::high_resolution_timer regtimer);
 
                 // create a new memory region from the user supplied pointer
                 region_type *zero_copy_region =
