@@ -438,7 +438,7 @@ namespace hpx {
     std::string get_error_function_name(E const& e)
     {
         return invoke_with_exception_info(e, [](exception_info const* xi) {
-            return xi ? get_error_function_name(*xi) : std::string();
+            return xi ? get_error_function_name(*xi) : std::string("<unknown>");
         });
     }
     /// \endcond
