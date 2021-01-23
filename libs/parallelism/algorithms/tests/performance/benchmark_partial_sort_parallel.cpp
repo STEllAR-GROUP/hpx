@@ -30,7 +30,6 @@ void function01()
     constexpr std::uint32_t NELEM = 10000;
 #endif
 
-
     std::vector<std::uint64_t> A, B;
     A.reserve(NELEM);
     B.reserve(NELEM);
