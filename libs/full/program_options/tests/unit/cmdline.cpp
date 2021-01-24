@@ -584,11 +584,8 @@ void test_implicit_value()
     style = cmdline::style_t(allow_long | long_allow_adjacent);
 
     test_case test_cases1[] = {
-#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
-    (defined(BOOST_VERSION) && BOOST_VERSION >= 106500)
         // 'bar' does not even look like option, so is consumed
         {"--foo bar", s_success, "foo:bar"},
-#endif
         // '--bar' looks like option, and such option exists, so we don't
         // consume this token
         {"--foo --bar", s_success, "foo: bar:"},
@@ -600,9 +597,7 @@ void test_implicit_value()
         //     options
         // For --biz, an exception is thrown between 1 and 2.
         // We might want to fix that in future.
-        {"--foo --biz", s_unknown_option, ""},
-        {nullptr, 0, nullptr}
-    };
+        {"--foo --biz", s_unknown_option, ""}, {nullptr, 0, nullptr}};
 
     test_cmdline("foo? bar?", style, test_cases1);
 }

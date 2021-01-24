@@ -24,7 +24,11 @@ std::mt19937 gen(seed);
 void function01(void)
 {
     typedef std::less<std::uint64_t> compare_t;
+#if defined(HPX_DEBUG)
+    constexpr std::uint32_t NELEM = 100;
+#else
     constexpr std::uint32_t NELEM = 10000;
+#endif
 
     std::vector<uint64_t> A, B;
     A.reserve(NELEM);
@@ -62,7 +66,11 @@ void function01(void)
 
 void function02(void)
 {
+#if defined(HPX_DEBUG)
+    constexpr std::uint32_t NELEM = 100000;
+#else
     constexpr std::uint32_t NELEM = 10000000;
+#endif
 
     std::less<std::uint64_t> comp;
     std::vector<std::uint64_t> A, B;
