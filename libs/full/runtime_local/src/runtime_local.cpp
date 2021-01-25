@@ -378,36 +378,51 @@ namespace hpx {
     {
         LPROGRESS_;
 
-        // now create all threadmanager pools
-        thread_manager_->create_pools();
-
-        // this initializes the used_processing_units_ mask
-        thread_manager_->init();
-
-        // copy over all startup functions registered so far
-        for (startup_function_type& f : detail::global_pre_startup_functions)
+        try
         {
-            add_pre_startup_function(std::move(f));
-        }
-        detail::global_pre_startup_functions.clear();
+            // now create all threadmanager pools
+            thread_manager_->create_pools();
 
-        for (startup_function_type& f : detail::global_startup_functions)
-        {
-            add_startup_function(std::move(f));
-        }
-        detail::global_startup_functions.clear();
+            // this initializes the used_processing_units_ mask
+            thread_manager_->init();
 
-        for (shutdown_function_type& f : detail::global_pre_shutdown_functions)
-        {
-            add_pre_shutdown_function(std::move(f));
-        }
-        detail::global_pre_shutdown_functions.clear();
+            // copy over all startup functions registered so far
+            for (startup_function_type& f :
+                detail::global_pre_startup_functions)
+            {
+                add_pre_startup_function(std::move(f));
+            }
+            detail::global_pre_startup_functions.clear();
 
-        for (shutdown_function_type& f : detail::global_shutdown_functions)
-        {
-            add_shutdown_function(std::move(f));
+            for (startup_function_type& f : detail::global_startup_functions)
+            {
+                add_startup_function(std::move(f));
+            }
+            detail::global_startup_functions.clear();
+
+            for (shutdown_function_type& f :
+                detail::global_pre_shutdown_functions)
+            {
+                add_pre_shutdown_function(std::move(f));
+            }
+            detail::global_pre_shutdown_functions.clear();
+
+            for (shutdown_function_type& f : detail::global_shutdown_functions)
+            {
+                add_shutdown_function(std::move(f));
+            }
+            detail::global_shutdown_functions.clear();
         }
-        detail::global_shutdown_functions.clear();
+        catch (std::exception const& e)
+        {
+            // errors at this point need to be reported directly
+            detail::report_exception_and_terminate(e);
+        }
+        catch (...)
+        {
+            // errors at this point need to be reported directly
+            detail::report_exception_and_terminate(std::current_exception());
+        }
 
         // set state to initialized
         set_state(state_initialized);

@@ -89,6 +89,8 @@ namespace hpx {
         // Report an early or late exception and locally abort execution. There
         // isn't anything more we could do.
         HPX_NORETURN HPX_EXPORT void report_exception_and_terminate(
+            std::exception const&);
+        HPX_NORETURN HPX_EXPORT void report_exception_and_terminate(
             std::exception_ptr const&);
         HPX_NORETURN HPX_EXPORT void report_exception_and_terminate(
             hpx::exception const&);
@@ -96,6 +98,7 @@ namespace hpx {
         // Report an early or late exception and locally exit execution. There
         // isn't anything more we could do. The exception will be re-thrown
         // from hpx::init
+        HPX_EXPORT void report_exception_and_continue(std::exception const&);
         HPX_EXPORT void report_exception_and_continue(
             std::exception_ptr const&);
         HPX_EXPORT void report_exception_and_continue(hpx::exception const&);

@@ -231,6 +231,13 @@ namespace hpx { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // report an early or late exception and abort
+    void report_exception_and_continue(std::exception const& e)
+    {
+        pre_exception_handler();
+
+        std::cerr << e.what() << std::endl;
+    }
+
     void report_exception_and_continue(std::exception_ptr const& e)
     {
         pre_exception_handler();
@@ -243,6 +250,12 @@ namespace hpx { namespace detail {
         pre_exception_handler();
 
         std::cerr << diagnostic_information(e) << std::endl;
+    }
+
+    void report_exception_and_terminate(std::exception const& e)
+    {
+        report_exception_and_continue(e);
+        std::abort();
     }
 
     void report_exception_and_terminate(std::exception_ptr const& e)
