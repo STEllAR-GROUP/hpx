@@ -139,7 +139,7 @@ asynchronous. To understand what is happening we have to look inside the
    :start-after: //[fibonacci
    :end-before: //fibonacci]
 
-This block of code is looks similar to regular C++ code. First, ``if (n < 2)``,
+This block of code looks similar to regular C++ code. First, ``if (n < 2)``,
 meaning n is 0 or 1, then we return 0 or 1 (recall the first element of the
 Fibonacci sequence is 0 and the second is 1). If n is larger than 1 we spawn two
 new tasks whose results are contained in ``n1`` and ``n2``. This is done using
