@@ -154,7 +154,6 @@ if(NOT TARGET hpx_dependencies_allocator)
       hpx_add_config_define(
         HPX_HAVE_JEMALLOC_PREFIX ${HPX_WITH_JEMALLOC_PREFIX}
       )
-      hpx_add_config_define(HPX_HAVE_INTERNAL_ALLOCATOR)
     endif()
 
   endif()

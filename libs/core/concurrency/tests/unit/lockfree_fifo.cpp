@@ -8,6 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/allocator_support/aligned_allocator.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -19,7 +20,10 @@
 #include <thread>
 #include <vector>
 
-std::vector<boost::lockfree::queue<std::uint64_t>*> queues;
+using queue = boost::lockfree::queue<std::uint64_t,
+    hpx::util::aligned_allocator<std::uint64_t>>;
+
+std::vector<queue*> queues;
 std::vector<std::uint64_t> stolen;
 
 std::uint64_t threads = 2;
@@ -104,7 +108,7 @@ int main(int argc, char** argv)
 
     for (std::uint64_t i = 0; i < threads; ++i)
     {
-        queues.push_back(new boost::lockfree::queue<std::uint64_t>(items));
+        queues.push_back(new queue(items));
 
         for (std::uint64_t j = 0; j < items; ++j)
             (*queues[i]).push(j);

@@ -1871,6 +1871,13 @@ if(WIN32)
 
       # Silence C++17 deprecation warnings
       hpx_add_config_cond_define(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+
+      # ASan is available in Visual Studion starting V16.8
+      if((MSVC_VERSION GREATER_EQUAL 1928) AND HPX_WITH_SANITIZERS)
+        hpx_add_target_compile_option(
+          -fsanitize=address PUBLIC CONFIGURATIONS RelWithDebInfo Debug
+        )
+      endif()
     endif()
 
     # Runtime type information

@@ -758,11 +758,11 @@ namespace hpx {
 
         // stop the rest of the system
 #if defined(HPX_HAVE_NETWORKING)
-        parcel_handler_.stop(blocking);    // stops parcel pools as well
+        parcel_handler_.stop(blocking);
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
         LTM_(info) << "stop: stopping timer pool";
-        timer_pool_.stop();    // stop timer pool as well
+        timer_pool_.stop();
         if (blocking)
         {
             timer_pool_.join();
@@ -770,9 +770,14 @@ namespace hpx {
         }
 #endif
 #ifdef HPX_HAVE_IO_POOL
-        io_pool_.stop();    // stops io_pool_ as well
+        LTM_(info) << "stop: stopping io pool";
+        io_pool_.stop();
+        if (blocking)
+        {
+            io_pool_.join();
+            io_pool_.clear();
+        }
 #endif
-        // deinit_tss();
     }
 
     int runtime_distributed::finalize(double shutdown_timeout)
