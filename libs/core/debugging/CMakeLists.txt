@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 set(debugging_headers
     hpx/debugging/attach_debugger.hpp hpx/debugging/backtrace.hpp
     hpx/debugging/backtrace/backtrace.hpp hpx/debugging/demangle_helper.hpp
-    hpx/debugging/print.hpp
+    hpx/debugging/environ.hpp hpx/debugging/print.hpp
 )
 
 # cmake-format: off

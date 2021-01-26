@@ -5,6 +5,7 @@
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
+#include <hpx/debugging/environ.hpp>
 
 #if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
 #include <hpx/program_options/detail/cmdline.hpp>
@@ -27,34 +28,6 @@
 #include <stdlib.h>
 #else
 #include <unistd.h>
-#endif
-
-// The 'environ' should be declared in some cases. E.g. Linux man page says:
-// (This variable must be declared in the user program, but is declared in
-// the header file unistd.h in case the header files came from libc4 or libc5,
-// and in case they came from glibc and _GNU_SOURCE was defined.)
-// To be safe, declare it here.
-
-// It appears that on Mac OS X the 'environ' variable is not
-// available to dynamically linked libraries.
-// See: http://article.gmane.org/gmane.comp.lib.boost.devel/103843
-// See: http://lists.gnu.org/archive/html/bug-guile/2004-01/msg00013.html
-#if defined(__APPLE__) && defined(__DYNAMIC__)
-// The proper include for this is crt_externs.h, however it's not
-// available on iOS. The right replacement is not known. See
-// https://svn.boost.org/trac/boost/ticket/5053
-extern "C" {
-extern char*** _NSGetEnviron(void);
-}
-#define environ (*_NSGetEnviron())
-#else
-#if defined(__MWERKS__)
-#include <crtl.h>
-#else
-#if !defined(_WIN32) || defined(__COMO_VERSION__)
-extern char** environ;
-#endif
-#endif
 #endif
 
 using namespace std;
@@ -163,7 +136,12 @@ namespace hpx { namespace program_options {
     {
         parsed_options result(&desc);
 
-        for (environment_iterator i(environ), e; i != e; ++i)
+#if defined(__FreeBSD__)
+        char** env = freebsd_environ;
+#else
+        char** env = environ;
+#endif
+        for (environment_iterator i(env), e; i != e; ++i)
         {
             string option_name = name_mapper(i->first);
 
