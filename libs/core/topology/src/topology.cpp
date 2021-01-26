@@ -1320,6 +1320,7 @@ namespace hpx { namespace threads {
 #if !defined(__APPLE__)
         hwloc_membind_policy_t policy = ::HWLOC_MEMBIND_BIND;
         hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
+
         int ret =
 #if HWLOC_API_VERSION >= 0x00010b06
             hwloc_set_area_membind(
@@ -1362,6 +1363,7 @@ namespace hpx { namespace threads {
         {
             nodeset.reset(hwloc_bitmap_alloc());
         }
+
         //
         hwloc_membind_policy_t policy;
         hwloc_nodeset_t ns =
@@ -1381,6 +1383,7 @@ namespace hpx { namespace threads {
                 "hwloc_get_area_membind_nodeset failed");
             return bitmap_to_mask(ns, HWLOC_OBJ_MACHINE);
         }
+
         return bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
     }
 
@@ -1392,6 +1395,7 @@ namespace hpx { namespace threads {
         {
             nodeset.reset(hwloc_bitmap_alloc());
         }
+
         //
         hwloc_nodeset_t ns =
             reinterpret_cast<hwloc_nodeset_t>(nodeset.get_bmp());
@@ -1400,12 +1404,18 @@ namespace hpx { namespace threads {
             topo, addr, 1, ns, HWLOC_MEMBIND_BYNODESET);
         if (ret < 0)
         {
+#if defined(__FreeBSD__)
+            // on some platforms this API is not supported (e.g. FreeBSD)
+            return 0;
+#else
             std::string msg(strerror(errno));
             HPX_THROW_EXCEPTION(kernel_error,
                 "hpx::threads::topology::get_numa_domain",
                 "hwloc_get_area_memlocation failed " + msg);
             return -1;
+#endif
         }
+
         threads::mask_type mask = bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
         return static_cast<int>(threads::find_first(mask));
 #else
