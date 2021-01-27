@@ -21,6 +21,7 @@
 
 #include <cstddef>
 #include <exception>
+#include <functional>
 #include <iosfwd>
 #include <mutex>
 #include <type_traits>
@@ -309,5 +310,19 @@ namespace hpx {
         };
     }    // namespace this_thread
 }    // namespace hpx
+
+namespace std {
+
+    // specialize std::hash for hpx::thread::id
+    template <>
+    struct hash<::hpx::thread::id>
+    {
+        std::size_t operator()(::hpx::thread::id const& id) const
+        {
+            std::hash<::hpx::threads::thread_id_type> hasher_;
+            return hasher_(id.native_handle());
+        }
+    };
+}    // namespace std
 
 #include <hpx/config/warnings_suffix.hpp>
