@@ -116,7 +116,8 @@ int hpx_main()
     return hpx::finalize();
 }
 
-void init_resource_partitioner_handler(hpx::resource::partitioner& rp)
+void init_resource_partitioner_handler(
+    hpx::resource::partitioner& rp, const hpx::program_options::variables_map&)
 {
     // before adding pools - set the default pool name to "pool-0"
     rp.set_default_pool_name("pool-0");

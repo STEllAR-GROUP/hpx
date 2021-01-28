@@ -216,7 +216,8 @@ using high_priority_sched =
     hpx::threads::policies::shared_priority_queue_scheduler<>;
 using hpx::threads::policies::scheduler_mode;
 
-void init_resource_partitioner_handler(hpx::resource::partitioner& rp)
+void init_resource_partitioner_handler(
+    hpx::resource::partitioner& rp, const hpx::program_options::variables_map&)
 {
     using numa_scheduler =
         hpx::threads::policies::shared_priority_queue_scheduler<>;

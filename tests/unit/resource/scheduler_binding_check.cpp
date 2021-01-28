@@ -50,12 +50,14 @@ void threadLoop()
     const unsigned iterations = 2048;
     std::atomic<int> count_down(iterations);
 
-    auto f = [&count_down](std::size_t thread_expected) {
+    auto f = [&count_down](std::size_t iteration, std::size_t thread_expected) {
         dec_counter dec(count_down);
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         std::size_t thread_actual = hpx::get_worker_thread_num();
-        hpx::deb_schbin.debug(hpx::debug::str<>("Running on thread"),
-            thread_actual, "Expected", thread_expected);
+        hpx::deb_schbin.debug(hpx::debug::str<10>("Iteration"),
+            hpx::debug::dec<4>(iteration),
+            hpx::debug::str<20>("Running on thread"), thread_actual,
+            hpx::debug::str<10>("Expected"), thread_expected);
         HPX_TEST_EQ(thread_actual, thread_expected);
     };
 
@@ -67,15 +69,19 @@ void threadLoop()
             hpx::threads::thread_priority::bound,
             hpx::threads::thread_stacksize::default_,
             hpx::threads::thread_schedule_hint(std::int16_t(i % threads)));
-        hpx::async(exec, f, (i % threads)).get();
+        hpx::async(exec, f, i, (i % threads)).get();
     }
 
     do
     {
         hpx::this_thread::yield();
+        hpx::deb_schbin.debug(
+            hpx::debug::str<15>("count_down"), hpx::debug::dec<4>(count_down));
     } while (count_down > 0);
 
-    return;
+    hpx::deb_schbin.debug(
+        hpx::debug::str<15>("complete"), hpx::debug::dec<4>(count_down));
+    HPX_TEST_EQ(count_down, 0);
 }
 
 int hpx_main()
@@ -89,7 +95,9 @@ int hpx_main()
     }
 
     threadLoop();
+
     hpx::finalize();
+    hpx::deb_schbin.debug(hpx::debug::str<15>("Finalized"));
     return hpx::util::report_errors();
 }
 
@@ -97,7 +105,8 @@ int main(int argc, char* argv[])
 {
     hpx::init_params init_args;
 
-    init_args.rp_callback = [](auto& rp) {
+    init_args.rp_callback = [](auto& rp,
+                                const hpx::program_options::variables_map&) {
         // setup the default pool with a numa/binding aware scheduler
         rp.create_thread_pool("default",
             hpx::resource::scheduling_policy::shared_priority,

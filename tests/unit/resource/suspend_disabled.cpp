@@ -48,7 +48,8 @@ int main(int argc, char* argv[])
     hpx::init_params init_args;
 
     init_args.cfg = {"hpx.os_threads=4"};
-    init_args.rp_callback = [](auto& rp) {
+    init_args.rp_callback = [](auto& rp,
+                                const hpx::program_options::variables_map&) {
         // Explicitly disable elasticity if it is in defaults
         rp.create_thread_pool("default",
             hpx::resource::scheduling_policy::local_priority_fifo,

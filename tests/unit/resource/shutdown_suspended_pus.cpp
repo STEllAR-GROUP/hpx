@@ -53,7 +53,8 @@ void test_scheduler(
     hpx::init_params init_args;
 
     init_args.cfg = {"hpx.os_threads=4"};
-    init_args.rp_callback = [scheduler](auto& rp) {
+    init_args.rp_callback = [scheduler](auto& rp,
+                                const hpx::program_options::variables_map&) {
         rp.create_thread_pool("default", scheduler,
             hpx::threads::policies::scheduler_mode(
                 hpx::threads::policies::default_mode |

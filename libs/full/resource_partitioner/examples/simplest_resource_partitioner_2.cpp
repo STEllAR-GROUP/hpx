@@ -19,7 +19,8 @@ int hpx_main()
     return hpx::finalize();
 }
 
-void init_resource_partitioner_handler(hpx::resource::partitioner& rp)
+void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
+    const hpx::program_options::variables_map& /*vm*/)
 {
     rp.create_thread_pool("my-thread-pool");
 

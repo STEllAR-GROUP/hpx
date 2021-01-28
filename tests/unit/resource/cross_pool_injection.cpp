@@ -207,8 +207,9 @@ int hpx_main()
     return hpx::finalize();
 }
 
-void init_resource_partitioner_handler(
-    hpx::resource::partitioner& rp, hpx::resource::scheduling_policy policy)
+void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
+    const hpx::program_options::variables_map& vm,
+    hpx::resource::scheduling_policy policy)
 {
     num_pools = 0;
 
