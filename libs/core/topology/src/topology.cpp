@@ -1,10 +1,13 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2012-2013 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include <hpx/config.hpp>
+#include <hpx/topology/config/defines.hpp>
 
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
@@ -214,6 +217,21 @@ namespace hpx { namespace threads {
             HPX_THROW_EXCEPTION(no_success, "topology::topology",
                 "Failed to init hwloc topology");
         }
+
+#if HWLOC_API_VERSION >= 0x00020000
+#if defined(HPX_TOPOLOGY_HAVE_ADDITIONAL_HWLOC_TESTING)
+        // Enable HWLOC filtering that makes it report no cores. This is purely
+        // an option allowing to test whether things work properly on systems
+        // that may not report cores in the topology at all (e.g. FreeBSD).
+        err = hwloc_topology_set_type_filter(
+            topo, HWLOC_OBJ_CORE, HWLOC_TYPE_FILTER_KEEP_NONE);
+        if (err != 0)
+        {
+            HPX_THROW_EXCEPTION(no_success, "topology::topology",
+                "Failed to set core filter for hwloc topology");
+        }
+#endif
+#endif
 
         err = hwloc_topology_load(topo);
         if (err != 0)
@@ -683,7 +701,14 @@ namespace hpx { namespace threads {
         hwloc_obj_t obj;
 
         if (parent == nullptr)
+        {
             return count;
+        }
+
+        if (hwloc_compare_types(type, parent->type) == 0)
+        {
+            return count;
+        }
 
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
@@ -829,19 +854,18 @@ namespace hpx { namespace threads {
 
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
-            core_obj = hwloc_get_obj_by_type(topo,
-                use_pus_as_cores_ ? HWLOC_OBJ_PU : HWLOC_OBJ_CORE,
-                static_cast<unsigned>(core));
+            core_obj = hwloc_get_obj_by_type(
+                topo, HWLOC_OBJ_CORE, static_cast<unsigned>(core));
         }
 
-        if (core_obj)
+        if (!use_pus_as_cores_ && core_obj)
         {
             HPX_ASSERT(core == detail::get_index(core_obj));
             std::size_t pu_count = 0;
             return extract_node_count(core_obj, HWLOC_OBJ_PU, pu_count);
         }
 
-        return num_of_pus_;
+        return std::size_t(1);
     }
 
     std::size_t topology::get_number_of_socket_cores(
@@ -1165,12 +1189,18 @@ namespace hpx { namespace threads {
 
         HPX_ASSERT(num_core == detail::get_index(obj));
 
-        num_pu %= obj->arity;    //-V101 //-V104
-
         mask_type mask = mask_type();
         resize(mask, get_number_of_pus());
 
-        set(mask, detail::get_index(obj->children[num_pu]));    //-V106
+        if (use_pus_as_cores_)
+        {
+            set(mask, detail::get_index(obj));    //-V106
+        }
+        else
+        {
+            num_pu %= obj->arity;    //-V101 //-V104
+            set(mask, detail::get_index(obj->children[num_pu]));    //-V106
+        }
 
         return mask;
     }    // }}}
