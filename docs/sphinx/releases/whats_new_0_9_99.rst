@@ -179,7 +179,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-pr:`2205` - The indirect_packaged_task::operator() needs to be run on a
   HPX thread
 * :hpx-pr:`2204` - Variadic executor parameters
-* :hpx-pr:`2203` - Delay-initialize members of partitoned iterator
+* :hpx-pr:`2203` - Delay-initialize members of partitioned iterator
 * :hpx-pr:`2202` - Added segmented fill for hpx::vector
 * :hpx-issue:`2201` - Null Thread id encountered on partitioned_vector
 * :hpx-pr:`2200` - Fix hangs

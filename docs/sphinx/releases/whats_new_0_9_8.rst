@@ -170,7 +170,7 @@ Here is a list of the important tickets we closed for this release.
   to non-thread safe writes
 * :hpx-issue:`1011` - After installation, running applications from the
   build/staging directory no longer works
-* :hpx-issue:`1010` - Mergable decrement requests are not being merged
+* :hpx-issue:`1010` - Mergeable decrement requests are not being merged
 * :hpx-issue:`1009` - ``--hpx:list-symbolic-names`` crashes
 * :hpx-issue:`1007` - Components are not properly destroyed
 * :hpx-issue:`1006` - Segfault/hang in set_data

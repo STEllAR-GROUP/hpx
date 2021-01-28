@@ -64,12 +64,12 @@ int universal_ans(std::vector<hpx::id_type> const& f_locales, std::size_t err,
         {
             is_faulty = true;
             if (dist(gen) < err * 10)
-                throw std::runtime_error("runtime error occured.");
+                throw std::runtime_error("runtime error occurred.");
         }
     }
 
     if (!is_faulty && dist(gen) < err)
-        throw std::runtime_error("runtime error occured.");
+        throw std::runtime_error("runtime error occurred.");
 
     return 42;
 }
