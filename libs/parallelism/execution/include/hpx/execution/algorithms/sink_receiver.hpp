@@ -11,8 +11,14 @@
 namespace hpx { namespace execution { namespace experimental {
     struct sink_receiver
     {
-        void set_error(std::exception_ptr) noexcept {}
+        template <typename E>
+        void set_error(E&&) noexcept
+        {
+        }
         void set_done() noexcept {};
-        void set_value() noexcept {}
+        template <typename... Ts>
+        void set_value(Ts&&...) noexcept
+        {
+        }
     };
 }}}    // namespace hpx::execution::experimental
