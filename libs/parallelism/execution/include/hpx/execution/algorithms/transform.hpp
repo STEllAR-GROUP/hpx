@@ -46,9 +46,11 @@ namespace hpx { namespace execution { namespace experimental {
             {
             }
 
-            void set_error(std::exception_ptr ep) noexcept
+            template <typename E>
+            void set_error(E&& e) noexcept
             {
-                hpx::execution::experimental::set_error(std::move(r), ep);
+                hpx::execution::experimental::set_error(
+                    std::move(r), std::forward<E>(e));
             }
 
             void set_done() noexcept
@@ -107,7 +109,9 @@ namespace hpx { namespace execution { namespace experimental {
                     invoke_result_helper>::type>::type;
 
             template <template <typename...> class Variant>
-            using error_types = Variant<std::exception_ptr>;
+            using error_types =
+                typename hpx::execution::experimental::sender_traits<
+                    S>::template error_types<Variant>;
 
             static constexpr bool sends_done = false;
 
