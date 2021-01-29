@@ -201,8 +201,8 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     {
         // collect available events and print their descriptions
         avail_preset_info_gen gen;
-        hpx::util::generator_iterator_generator<avail_preset_info_gen>::type it;
-        for (it = hpx::util::make_generator_iterator(gen); *it != nullptr; ++it)
+        for (auto it = hpx::util::make_generator_iterator(gen); *it != nullptr;
+             ++it)
         {
             hpx::util::format_to(std::cout,
                 "Event        : {}\n"
@@ -270,10 +270,11 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         for (int ci = 0; ci < PAPI_num_components(); ++ci)
         {
             native_info_gen gen(ci);
-            hpx::util::generator_iterator_generator<native_info_gen>::type it =
-                hpx::util::make_generator_iterator(gen);
-            for ( ; *it != nullptr; ++it)
+            for (auto it = hpx::util::make_generator_iterator(gen);
+                 *it != nullptr; ++it)
+            {
                 print_native_info(**it);
+            }
         }
     }
 

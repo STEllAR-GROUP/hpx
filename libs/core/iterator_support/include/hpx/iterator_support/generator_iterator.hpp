@@ -57,12 +57,6 @@ namespace hpx { namespace util {
     };
 
     template <typename Generator>
-    struct generator_iterator_generator
-    {
-        using type = generator_iterator<Generator>;
-    };
-
-    template <typename Generator>
     inline generator_iterator<Generator> make_generator_iterator(Generator& gen)
     {
         using result_type = generator_iterator<Generator>;

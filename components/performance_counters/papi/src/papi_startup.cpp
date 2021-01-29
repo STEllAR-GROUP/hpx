@@ -11,7 +11,9 @@
 
 #include <hpx/components/performance_counters/papi/server/papi.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
+#include <hpx/functional/bind_back.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
@@ -19,7 +21,6 @@
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
-#include <hpx/functional/bind_back.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
 
 #include <hpx/modules/program_options.hpp>
@@ -129,9 +130,8 @@ namespace hpx { namespace performance_counters { namespace papi
         hpx::performance_counters::discover_counter_func const& f,
         hpx::error_code& ec)
     {
-        typename boost::generator_iterator_generator<T>::type gi =
-            boost::make_generator_iterator(gen);
-        for ( ; *gi != nullptr; ++gi)
+        for (auto gi = hpx::util::make_generator_iterator(gen); *gi != nullptr;
+             ++gi)
         {
             std::set<std::string>::const_iterator it;
             // iterate over known thread names

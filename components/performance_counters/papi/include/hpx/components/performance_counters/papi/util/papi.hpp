@@ -152,8 +152,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     class native_enumerator: public event_info_generator
     {
         native_umask_enumerator umask_gen_;
-        hpx::util::generator_iterator_generator<native_umask_enumerator>::type
-            umask_iter_;
+        hpx::util::generator_iterator<native_umask_enumerator> umask_iter_;
         unsigned const component_index_;
         bool umasks_present_, umask_seq_;
 
@@ -182,7 +181,8 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
                 else
                 {
                     umask_gen_.reset(event_);
-                    umask_iter_ = boost::make_generator_iterator(umask_gen_);
+                    umask_iter_ =
+                        hpx::util::make_generator_iterator(umask_gen_);
                     if (*umask_iter_)
                         return umask_seq_ = true; // not ==
                 }
