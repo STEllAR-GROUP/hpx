@@ -33,7 +33,7 @@ jobs:
               -DHPX_WITH_DEPRECATION_WARNINGS=OFF \
               -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
               -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On \
-              -DCMAKE_CXX_FLAGS='-permissive-'
+              -DCMAKE_CXX_FLAGS='-DWIN32 -D_WINDOWS -W3 -GR -EHsc -permissive-'
     - name: Build
       shell: bash
       run: |
