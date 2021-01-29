@@ -60,12 +60,12 @@ int universal_ans(
         {
             is_faulty = true;
             if (dist(gen) < err * 10)
-                throw std::runtime_error("runtime error occured.");
+                throw std::runtime_error("runtime error occurred.");
         }
     }
 
     if (!is_faulty && dist(gen) < err)
-        throw std::runtime_error("runtime error occured.");
+        throw std::runtime_error("runtime error occurred.");
 
     return 42;
 }

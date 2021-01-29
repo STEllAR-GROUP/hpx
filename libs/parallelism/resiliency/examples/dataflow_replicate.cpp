@@ -70,7 +70,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
         catch (bad_calc_exception const&)
         {
-            std::cout << "Bad Calcuation!" << std::endl;
+            std::cout << "Bad Calculation!" << std::endl;
         }
 
         // Unsuccessful replicate
@@ -86,7 +86,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
         catch (bad_calc_exception const&)
         {
-            std::cout << "Bad Calcuation!" << std::endl;
+            std::cout << "Bad Calculation!" << std::endl;
         }
 
         // Aborted replicate
@@ -101,7 +101,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
         catch (bad_calc_exception const&)
         {
-            std::cout << "Bad Calcuation!" << std::endl;
+            std::cout << "Bad Calculation!" << std::endl;
         }
     }
 

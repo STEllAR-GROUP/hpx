@@ -47,7 +47,7 @@ namespace hpx { namespace lcos {
     // calculated by counting the nodes that have a given node as its parent.
     //
     // The node some other node connects to is calculated by clearing the lowest
-    // significant bit set (for arities == 2, simular for other arities).
+    // significant bit set (for arities == 2, similar for other arities).
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::future<hpx::id_type> create_communication_set(char const* name,

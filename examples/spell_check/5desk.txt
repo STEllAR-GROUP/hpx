@@ -55436,7 +55436,7 @@ transfer
 transferable
 transferal
 transference
-transferrable
+transferable
 transferrer
 Transfiguration
 transfiguration

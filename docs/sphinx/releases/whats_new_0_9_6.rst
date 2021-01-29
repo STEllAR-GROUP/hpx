@@ -127,7 +127,7 @@ again a very long list of newly implemented features and fixed issues.
 * :hpx-issue:`741` - assertion 'px != 0' failed: HPX(assertion_failure) for low
   numbers of OS threads
 * :hpx-issue:`739` - Performance counters do not count to the end of the program
-  or evalution
+  or evaluation
 * :hpx-issue:`738` - Dedicated AGAS server runs don't work; console ignores -a
   option.
 * :hpx-issue:`737` - Missing bind overloads
