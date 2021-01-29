@@ -102,13 +102,13 @@ namespace hpx { namespace util {
         counting_iterator() = default;
         counting_iterator(counting_iterator const& rhs) = default;
 
-        explicit counting_iterator(Incrementable x)
+        HPX_HOST_DEVICE explicit counting_iterator(Incrementable x)
           : base_type(x)
         {
         }
 
     private:
-        typename base_type::reference dereference() const
+        HPX_HOST_DEVICE typename base_type::reference dereference() const
         {
             return this->base_reference();
         }
@@ -131,42 +131,42 @@ namespace hpx { namespace util {
         counting_iterator() = default;
         counting_iterator(counting_iterator const& rhs) = default;
 
-        explicit counting_iterator(Incrementable x)
+        HPX_HOST_DEVICE explicit counting_iterator(Incrementable x)
           : base_type(x)
         {
         }
 
     private:
         template <typename Iterator>
-        bool equal(Iterator const& rhs) const
+        HPX_HOST_DEVICE bool equal(Iterator const& rhs) const
         {
             return this->base() == rhs.base();
         }
 
-        void increment()
+        HPX_HOST_DEVICE void increment()
         {
             ++this->base_reference();
         }
 
-        void decrement()
+        HPX_HOST_DEVICE void decrement()
         {
             --this->base_reference();
         }
 
         template <typename Distance>
-        void advance(Distance n)
+        HPX_HOST_DEVICE void advance(Distance n)
         {
             this->base_reference() +=
                 static_cast<typename base_type::base_type>(n);
         }
 
-        typename base_type::reference dereference() const
+        HPX_HOST_DEVICE typename base_type::reference dereference() const
         {
             return this->base_reference();
         }
 
         template <typename OtherIncrementable>
-        typename base_type::difference_type distance_to(
+        HPX_HOST_DEVICE typename base_type::difference_type distance_to(
             counting_iterator<OtherIncrementable, CategoryOrTraversal,
                 Difference> const& y) const
         {
@@ -178,8 +178,8 @@ namespace hpx { namespace util {
 
     // Manufacture a counting iterator for an arbitrary incrementable type
     template <typename Incrementable>
-    inline counting_iterator<Incrementable> make_counting_iterator(
-        Incrementable x)
+    HPX_HOST_DEVICE inline counting_iterator<Incrementable>
+    make_counting_iterator(Incrementable x)
     {
         return counting_iterator<Incrementable>(x);
     }
