@@ -37,7 +37,7 @@ namespace hpx { namespace util {
     {
         HPX_NON_COPYABLE(annotate_function);
 
-        explicit annotate_function(char const*) {}
+        explicit annotate_function(std::string const&) {}
         template <typename F>
         explicit HPX_HOST_DEVICE annotate_function(F&&)
         {
@@ -51,8 +51,9 @@ namespace hpx { namespace util {
     {
         HPX_NON_COPYABLE(annotate_function);
 
-        explicit annotate_function(char const* name)
-          : task_(thread_domain_, hpx::util::itt::string_handle(name))
+        explicit annotate_function(std::string const& name)
+          : name_(name)
+          , task_(thread_domain_, hpx::util::itt::string_handle(name))
         {
         }
         template <typename F>
@@ -64,6 +65,7 @@ namespace hpx { namespace util {
         }
 
     private:
+        std::string name_;
         hpx::util::itt::thread_domain thread_domain_;
         hpx::util::itt::task task_;
     };
@@ -72,16 +74,17 @@ namespace hpx { namespace util {
     {
         HPX_NON_COPYABLE(annotate_function);
 
-        explicit annotate_function(char const* name)
-          : desc_(hpx::threads::get_self_ptr() ?
+        explicit annotate_function(std::string const& name)
+          : name_(name)
+          , desc_(hpx::threads::get_self_ptr() ?
                     hpx::threads::set_thread_description(
-                        hpx::threads::get_self_id(), name) :
+                        hpx::threads::get_self_id(), name_.c_str()) :
                     nullptr)
         {
 #if defined(HPX_HAVE_APEX)
             /* update the task wrapper in APEX to use the specified name */
             threads::set_self_timer_data(external_timer::update_task(
-                threads::get_self_timer_data(), std::string(name)));
+                threads::get_self_timer_data(), name_));
 #endif
         }
 
@@ -108,6 +111,7 @@ namespace hpx { namespace util {
             }
         }
 
+        std::string name_;
         hpx::util::thread_description desc_;
     };
 #endif
@@ -117,17 +121,17 @@ namespace hpx { namespace util {
         struct annotated_function
         {
             annotated_function() noexcept
-              : name_(nullptr)
+              : name_("")
             {
             }
 
-            annotated_function(F const& f, char const* name)
+            annotated_function(F const& f, std::string const& name)
               : f_(f)
               , name_(name)
             {
             }
 
-            annotated_function(F&& f, char const* name)
+            annotated_function(F&& f, std::string const& name)
               : f_(std::move(f))
               , name_(name)
             {
@@ -172,18 +176,18 @@ namespace hpx { namespace util {
             /// \param none
             char const* get_function_annotation() const noexcept
             {
-                return name_ ? name_ : typeid(f_).name();
+                return !name_.empty() ? name_.c_str() : typeid(f_).name();
             }
 
         private:
             typename util::decay_unwrap<F>::type f_;
-            char const* name_;
+            std::string name_;
         };
     }    // namespace detail
 
     template <typename F>
     detail::annotated_function<typename std::decay<F>::type> annotated_function(
-        F&& f, char const* name = nullptr)
+        F&& f, std::string const& name = "")
     {
         typedef detail::annotated_function<typename std::decay<F>::type>
             result_type;
@@ -197,7 +201,7 @@ namespace hpx { namespace util {
     {
         HPX_NON_COPYABLE(annotate_function);
 
-        explicit annotate_function(char const* /*name*/) {}
+        explicit annotate_function(std::string const& /*name*/) {}
         template <typename F>
         explicit HPX_HOST_DEVICE annotate_function(F&& /*f*/)
         {
@@ -214,7 +218,7 @@ namespace hpx { namespace util {
     ///
     /// \param function
     template <typename F>
-    F&& annotated_function(F&& f, char const* = nullptr)
+    F&& annotated_function(F&& f, std::string const& = "")
     {
         return std::forward<F>(f);
     }
