@@ -18,3 +18,7 @@ configure_extra_options+=" -DHPX_WITH_MALLOC=system"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_MPI=ON"
+
+# Make sure HWLOC does not report 'cores'. This is purely an option to enable
+# testing the topology code under conditions close to those on FreeBSD.
+configure_extra_options+=" -DHPX_TOPOLOGY_WITH_ADDITIONAL_HWLOC_TESTING=ON"
