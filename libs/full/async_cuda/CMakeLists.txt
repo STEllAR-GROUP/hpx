@@ -51,7 +51,7 @@ endif()
 
 if(HPX_WITH_HIP AND TARGET roc::hipblas)
   set(async_cuda_extra_deps ${async_cuda_extra_deps} roc::hipblas)
-elseif(HPX_WITH_CUDA AND TARGET Cuda::cuda)
+elseif(HPX_WITH_ASYNC_CUDA AND TARGET Cuda::cuda)
   set(async_cuda_extra_deps ${async_cuda_extra_deps} Cuda::cuda
                             ${CUDA_CUBLAS_LIBRARIES}
   )
@@ -71,3 +71,6 @@ add_hpx_module(
   DEPENDENCIES hpx_core hpx_parallelism ${async_cuda_extra_deps}
   CMAKE_SUBDIRS examples tests
 )
+
+# if(HPX_WITH_ASYNC_CUDA AND TARGET Cuda::cuda)
+# CUDA_ADD_CUBLAS_TO_TARGET(hpx_async_cuda) endif()
