@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-const int max_threads = 4;
+int const max_threads = 4;
 
 // dummy function we will call using async
 void dummy_task(std::size_t n, std::string const& text)
@@ -117,7 +117,7 @@ int hpx_main()
 }
 
 void init_resource_partitioner_handler(
-    hpx::resource::partitioner& rp, const hpx::program_options::variables_map&)
+    hpx::resource::partitioner& rp, hpx::program_options::variables_map const&)
 {
     // before adding pools - set the default pool name to "pool-0"
     rp.set_default_pool_name("pool-0");
@@ -132,11 +132,11 @@ void init_resource_partitioner_handler(
 
     // add one PU to each pool
     int thread_count = 0;
-    for (const hpx::resource::numa_domain& d : rp.numa_domains())
+    for (hpx::resource::numa_domain const& d : rp.numa_domains())
     {
-        for (const hpx::resource::core& c : d.cores())
+        for (hpx::resource::core const& c : d.cores())
         {
-            for (const hpx::resource::pu& p : c.pus())
+            for (hpx::resource::pu const& p : c.pus())
             {
                 if (thread_count < max_threads)
                 {

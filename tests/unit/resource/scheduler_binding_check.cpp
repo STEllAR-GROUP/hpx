@@ -47,7 +47,7 @@ struct dec_counter
 
 void threadLoop()
 {
-    const unsigned iterations = 2048;
+    unsigned const iterations = 2048;
     std::atomic<int> count_down(iterations);
 
     auto f = [&count_down](std::size_t iteration, std::size_t thread_expected) {
@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
     hpx::init_params init_args;
 
     init_args.rp_callback = [](auto& rp,
-                                const hpx::program_options::variables_map&) {
+                                hpx::program_options::variables_map const&) {
         // setup the default pool with a numa/binding aware scheduler
         rp.create_thread_pool("default",
             hpx::resource::scheduling_policy::shared_priority,

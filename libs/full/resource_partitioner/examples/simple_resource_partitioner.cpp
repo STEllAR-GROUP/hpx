@@ -33,7 +33,7 @@
 // ------------------------------------------------------------------------
 static bool use_pools = false;
 static int pool_threads = 1;
-static const std::string pool_name = "mpi";
+static std::string const pool_name = "mpi";
 
 // ------------------------------------------------------------------------
 // this is our custom scheduler type
@@ -212,7 +212,7 @@ int hpx_main(hpx::program_options::variables_map&)
 
 // -------------------------------------------------------------------------
 void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
-    const hpx::program_options::variables_map& vm)
+    hpx::program_options::variables_map const& vm)
 {
     use_pools = vm.count("use-pools") != 0;
     pool_threads = vm["pool-threads"].as<int>();
@@ -232,11 +232,11 @@ void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
             hpx::threads::policies::scheduler_mode(deft));
         // add N pus to network pool
         int count = 0;
-        for (const hpx::resource::numa_domain& d : rp.numa_domains())
+        for (hpx::resource::numa_domain const& d : rp.numa_domains())
         {
-            for (const hpx::resource::core& c : d.cores())
+            for (hpx::resource::core const& c : d.cores())
             {
-                for (const hpx::resource::pu& p : c.pus())
+                for (hpx::resource::pu const& p : c.pus())
                 {
                     if (count < pool_threads)
                     {

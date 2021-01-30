@@ -140,17 +140,17 @@ void test_scheduler(
 
     init_args.cfg = {"hpx.os_threads=4"};
     init_args.rp_callback = [scheduler](auto& rp,
-                                const hpx::program_options::variables_map&) {
+                                hpx::program_options::variables_map const&) {
         rp.create_thread_pool("worker", scheduler);
 
         int const worker_pool_threads = 3;
         int worker_pool_threads_added = 0;
 
-        for (const hpx::resource::numa_domain& d : rp.numa_domains())
+        for (hpx::resource::numa_domain const& d : rp.numa_domains())
         {
-            for (const hpx::resource::core& c : d.cores())
+            for (hpx::resource::core const& c : d.cores())
             {
-                for (const hpx::resource::pu& p : c.pus())
+                for (hpx::resource::pu const& p : c.pus())
                 {
                     if (worker_pool_threads_added < worker_pool_threads)
                     {
