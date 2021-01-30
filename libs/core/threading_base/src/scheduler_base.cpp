@@ -103,7 +103,11 @@ namespace hpx { namespace threads { namespace policies {
     void scheduler_base::do_some_work(std::size_t)
     {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-        cond_.notify_all();
+        if (mode_.data_.load(std::memory_order_relaxed) &
+            policies::enable_idle_backoff)
+        {
+            cond_.notify_all();
+        }
 #endif
     }
 
