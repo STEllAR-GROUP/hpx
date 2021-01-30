@@ -223,7 +223,7 @@ int hpx_main()
 }
 
 void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
-    hpx::program_options::variables_map const& vm)
+    hpx::program_options::variables_map const&)
 {
     // create a thread pool and supply a lambda that returns a new pool with
     // a user supplied scheduler attached
