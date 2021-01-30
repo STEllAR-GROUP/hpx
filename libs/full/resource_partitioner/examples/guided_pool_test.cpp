@@ -39,7 +39,7 @@ using hpx::threads::policies::scheduler_mode;
 // template class hpx::threads::detail::scheduled_thread_pool<high_priority_sched>;
 
 // dummy function we will call using async
-void async_guided(std::size_t n, bool printout, const std::string& message)
+void async_guided(std::size_t n, bool printout, std::string const& message)
 {
     if (printout)
     {
@@ -84,7 +84,7 @@ namespace hpx { namespace parallel { namespace execution {
     {
         // ------------------------------------------------------------------------
         // specialize the hint operator for params
-        int operator()(std::size_t i, bool b, const std::string& msg) const
+        int operator()(std::size_t i, bool b, std::string const& msg) const
         {
             std::cout << "<std::size_t, bool, const std::string> hint "
                       << "invoked with : " << i << " " << b << " " << msg
@@ -94,7 +94,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         // ------------------------------------------------------------------------
         // specialize the hint operator for params
-        int operator()(int i, double d, const std::string& msg) const
+        int operator()(int i, double d, std::string const& msg) const
         {
             std::cout << "<int, double, const std::string> hint "
                       << "invoked with : " << i << " " << d << " " << msg
@@ -162,7 +162,7 @@ int hpx_main()
     // invoke a lambda asynchronously and use the numa executor
     hpx::future<double> gf2 = hpx::async(
         guided_lambda_exec,
-        [](int, double, const std::string& msg) mutable -> double {
+        [](int, double, std::string const& msg) mutable -> double {
             std::cout << "inside <int, double, string> async lambda " << msg
                       << std::endl;
             // return a double as an example
@@ -222,7 +222,8 @@ int hpx_main()
     return hpx::finalize();
 }
 
-void init_resource_partitioner_handler(hpx::resource::partitioner& rp)
+void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
+    hpx::program_options::variables_map const&)
 {
     // create a thread pool and supply a lambda that returns a new pool with
     // a user supplied scheduler attached
@@ -250,11 +251,11 @@ void init_resource_partitioner_handler(hpx::resource::partitioner& rp)
     // rp.add_resource(rp.numa_domains()[0].cores()[0].pus(), CUSTOM_POOL_NAME);
     // add N cores to Custom pool
     int count = 0;
-    for (const hpx::resource::numa_domain& d : rp.numa_domains())
+    for (hpx::resource::numa_domain const& d : rp.numa_domains())
     {
-        for (const hpx::resource::core& c : d.cores())
+        for (hpx::resource::core const& c : d.cores())
         {
-            for (const hpx::resource::pu& p : c.pus())
+            for (hpx::resource::pu const& p : c.pus())
             {
                 if (count < pool_threads)
                 {

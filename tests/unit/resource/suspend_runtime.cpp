@@ -27,7 +27,8 @@ void test_scheduler(
     hpx::init_params init_args;
 
     init_args.cfg = {"hpx.os_threads=4"};
-    init_args.rp_callback = [scheduler](auto& rp) {
+    init_args.rp_callback = [scheduler](auto& rp,
+                                hpx::program_options::variables_map const&) {
         rp.create_thread_pool("default", scheduler);
     };
 

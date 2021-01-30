@@ -98,7 +98,7 @@ int hpx_main()
     // randomly create tasks that run on a random pool
     // attach continuations to them that run on different
     // random pools
-    const int loops = 1000;
+    int const loops = 1000;
     //
     std::cout << "1: Starting HP " << loops << std::endl;
     std::atomic<int> counter(loops);
@@ -207,8 +207,9 @@ int hpx_main()
     return hpx::finalize();
 }
 
-void init_resource_partitioner_handler(
-    hpx::resource::partitioner& rp, hpx::resource::scheduling_policy policy)
+void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
+    hpx::program_options::variables_map const&,
+    hpx::resource::scheduling_policy policy)
 {
     num_pools = 0;
 
@@ -225,11 +226,11 @@ void init_resource_partitioner_handler(
     std::size_t threads_remaining = max_threads;
     std::size_t threads_in_pool = 0;
     // create pools randomly and add a random number of PUs to each pool
-    for (const hpx::resource::numa_domain& d : rp.numa_domains())
+    for (hpx::resource::numa_domain const& d : rp.numa_domains())
     {
-        for (const hpx::resource::core& c : d.cores())
+        for (hpx::resource::core const& c : d.cores())
         {
-            for (const hpx::resource::pu& p : c.pus())
+            for (hpx::resource::pu const& p : c.pus())
             {
                 if (threads_in_pool == 0)
                 {

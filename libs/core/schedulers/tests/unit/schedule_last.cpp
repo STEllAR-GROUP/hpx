@@ -43,7 +43,8 @@ void test_scheduler(int argc, char* argv[])
     hpx::init_params init_args;
 
     init_args.cfg = {"hpx.os_threads=1"};
-    init_args.rp_callback = [](auto& rp) {
+    init_args.rp_callback = [](auto& rp,
+                                hpx::program_options::variables_map const&) {
         rp.create_thread_pool("default",
             [](hpx::threads::thread_pool_init_parameters thread_pool_init,
                 hpx::threads::policies::thread_queue_init_parameters
