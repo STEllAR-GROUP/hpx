@@ -13,10 +13,13 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # may not report cores in the topology at all (e.g. FreeBSD). There is no need
 # for a user to every enable this.
 hpx_option(
-  HPX_TOPOLOGY_WITH_ADDITIONAL_HWLOC_TESTING BOOL
+  HPX_TOPOLOGY_WITH_ADDITIONAL_HWLOC_TESTING
+  BOOL
   "Enable HWLOC filtering that makes it report no cores, this is purely an "
   "option supporting better testing - do not enable under normal circumstances. "
-  "(default: OFF)" OFF ADVANCED
+  "(default: OFF)"
+  OFF
+  ADVANCED
   CATEGORY "Modules"
   MODULE TOPOLOGY
 )
