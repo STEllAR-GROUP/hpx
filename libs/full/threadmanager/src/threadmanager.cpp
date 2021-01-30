@@ -224,7 +224,7 @@ namespace hpx { namespace threads {
                     new local_sched_type(init));
 
                 // set the default scheduler flags
-                sched->add_scheduler_mode(thread_pool_init.mode_);
+                sched->set_scheduler_mode(thread_pool_init.mode_);
                 // conditionally set/unset this flag
                 sched->update_scheduler_mode(
                     policies::enable_stealing_numa, !numa_sensitive);
@@ -268,7 +268,7 @@ namespace hpx { namespace threads {
                     new local_sched_type(init));
 
                 // set the default scheduler flags
-                sched->add_scheduler_mode(thread_pool_init.mode_);
+                sched->set_scheduler_mode(thread_pool_init.mode_);
                 // conditionally set/unset this flag
                 sched->update_scheduler_mode(
                     policies::enable_stealing_numa, !numa_sensitive);
@@ -308,7 +308,7 @@ namespace hpx { namespace threads {
                     new local_sched_type(init));
 
                 // set the default scheduler flags
-                sched->add_scheduler_mode(thread_pool_init.mode_);
+                sched->set_scheduler_mode(thread_pool_init.mode_);
                 // conditionally set/unset this flag
                 sched->update_scheduler_mode(
                     policies::enable_stealing_numa, !numa_sensitive);
@@ -345,7 +345,7 @@ namespace hpx { namespace threads {
                     new local_sched_type(init));
 
                 // set the default scheduler flags
-                sched->add_scheduler_mode(thread_pool_init.mode_);
+                sched->set_scheduler_mode(thread_pool_init.mode_);
                 // conditionally set/unset this flag
                 sched->update_scheduler_mode(
                     policies::enable_stealing_numa, !numa_sensitive);
@@ -389,7 +389,7 @@ namespace hpx { namespace threads {
                     new local_sched_type(init));
 
                 // set the default scheduler flags
-                sched->add_scheduler_mode(thread_pool_init.mode_);
+                sched->set_scheduler_mode(thread_pool_init.mode_);
                 // conditionally set/unset this flag
                 sched->update_scheduler_mode(
                     policies::enable_stealing_numa, !numa_sensitive);
@@ -436,7 +436,7 @@ namespace hpx { namespace threads {
                     new local_sched_type(init));
 
                 // set the default scheduler flags
-                sched->add_scheduler_mode(thread_pool_init.mode_);
+                sched->set_scheduler_mode(thread_pool_init.mode_);
                 // conditionally set/unset this flag
                 sched->update_scheduler_mode(
                     policies::enable_stealing_numa, !numa_sensitive);
@@ -484,7 +484,7 @@ namespace hpx { namespace threads {
                     new local_sched_type(init));
 
                 // set the default scheduler flags
-                sched->add_scheduler_mode(thread_pool_init.mode_);
+                sched->set_scheduler_mode(thread_pool_init.mode_);
                 // conditionally set/unset this flag
                 sched->update_scheduler_mode(
                     policies::enable_stealing_numa, !numa_sensitive);
@@ -519,7 +519,7 @@ namespace hpx { namespace threads {
                     new local_sched_type(init));
 
                 // set the default scheduler flags
-                sched->add_scheduler_mode(thread_pool_init.mode_);
+                sched->set_scheduler_mode(thread_pool_init.mode_);
                 // conditionally set/unset this flag
                 sched->update_scheduler_mode(
                     policies::enable_stealing_numa, !numa_sensitive);
