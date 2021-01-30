@@ -7,7 +7,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # ----------------------------------------------------------------
-# simple pre commit hook script to check that *.cpp and *.hpp files 
+# simple pre commit hook script to check that *.cpp and *.hpp files
 # are correctly clang-formatted and that CMakeLists.txt and *.cmake
 # files are cmake-formatted
 
@@ -68,7 +68,7 @@ if [ -n "${cmakefiles}" ]; then
 fi
 
 if [ ! -z "$full_list" ]; then
-    printf "\n# ${red}To commmit the corrected files, run\n${normal}\ngit add ${full_list}\n"
+    printf "\n# ${red}To commit the corrected files, run\n${normal}\ngit add ${full_list}\n"
 fi
 
 exit $returncode
