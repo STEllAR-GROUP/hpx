@@ -7,7 +7,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # ----------------------------------------------------------------
-# simple pre commit hook script to check that *.cpp and *.hpp files 
+# simple pre commit hook script to check that *.cpp and *.hpp files
 # are correctly clang-formatted and that CMakeLists.txt and *.cmake
 # files are cmake-formatted
 
@@ -45,12 +45,14 @@ for file in `git diff --cached --name-only --diff-filter=ACMRT | grep -E "(CMake
 done
 
 returncode=0
+full_list=
 
 if [ -n "${cxxfiles}" ]; then
     printf "# ${blue}clang-format ${red}error pre-commit${normal} : To fix run the following (use git commit ${yellow}--no-verify${normal} to bypass)\n"
     for f in "${cxxfiles[@]}" ; do
-        rel=$(realpath --relative-to $GIT_PREFIX $f)
+        rel=$(realpath --relative-to "./$GIT_PREFIX" $f)
         printf "clang-format -i %s\n" "$rel"
+        full_list="${rel} ${full_list}"
     done
     returncode=1
 fi
@@ -58,10 +60,15 @@ fi
 if [ -n "${cmakefiles}" ]; then
     printf "# ${green}cmake-format ${red}error pre-commit${normal} : To fix run the following (use git commit ${yellow}--no-verify${normal} to bypass)\n"
     for f in "${cmakefiles[@]}" ; do
-        rel=$(realpath --relative-to $GIT_PREFIX $f)
+        rel=$(realpath --relative-to "./$GIT_PREFIX" $f)
         printf "cmake-format -i %s\n" "$rel"
+        full_list="${rel} ${full_list}"
     done
     returncode=1
+fi
+
+if [ ! -z "$full_list" ]; then
+    printf "\n# ${red}To commit the corrected files, run\n${normal}\ngit add ${full_list}\n"
 fi
 
 exit $returncode
