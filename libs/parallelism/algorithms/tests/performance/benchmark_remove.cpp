@@ -121,7 +121,7 @@ double run_remove_benchmark_hpx(int test_count, ExPolicy policy,
         hpx::copy(hpx::execution::par, org_first, org_last, first);
 
         std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now();
-        hpx::parallel::remove(policy, first, last, value);
+        hpx::remove(policy, first, last, value);
         time += hpx::chrono::high_resolution_clock::now() - elapsed;
     }
 

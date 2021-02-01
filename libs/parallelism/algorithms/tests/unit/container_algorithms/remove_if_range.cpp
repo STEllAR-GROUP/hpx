@@ -68,32 +68,44 @@ struct random_fill
 };
 
 ////////////////////////////////////////////////////////////////////////////
-// test case for Iter - Sent (not complete)
-template <typename ExPolicy, typename DataType>
-void test_remove_if_2(ExPolicy policy, DataType)
+// test case for iterator - sentinel_value
+void test_remove_if_sent()
+{
+    using hpx::get;
+
+    std::size_t const size = 100;
+    std::vector<std::int16_t> c(size);
+    std::iota(std::begin(c), std::end(c), 1);
+
+    auto pred = [](std::int16_t const& a) -> bool { return a % 42 == 0; };
+
+    auto pre_result = std::count_if(std::begin(c), std::end(c), pred);
+    hpx::ranges::remove_if(std::begin(c), Sentinel<std::int16_t>{50}, pred);
+    auto post_result = std::count_if(std::begin(c), std::end(c), pred);
+
+    HPX_TEST(pre_result == 2 && post_result == 1);
+}
+
+template <typename ExPolicy>
+void test_remove_if_sent(ExPolicy policy)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     using hpx::get;
 
-    std::size_t const size = 10007;
-    std::vector<DataType> c(size), d;
-    std::generate(std::begin(c), std::end(c), random_fill(0, 6));
-    d = c;
+    std::size_t const size = 100;
+    std::vector<std::int16_t> c(size);
+    std::iota(std::begin(c), std::end(c), 1);
 
-    auto pred = [](DataType const& a) -> bool { return a == 0; };
+    auto pred = [](std::int16_t const& a) -> bool { return a % 42 == 0; };
 
-    auto iter = Iterator<std::int16_t>{-5};
-    auto sent = Sentinel<std::int16_t>{4};
+    auto pre_result = std::count_if(std::begin(c), std::end(c), pred);
+    hpx::ranges::remove_if(
+        policy, std::begin(c), Sentinel<std::int16_t>{50}, pred);
+    auto post_result = std::count_if(std::begin(c), std::end(c), pred);
 
-    auto result = hpx::ranges::remove_if(policy, iter, sent, pred);
-    auto solution = std::remove_if(std::begin(d), std::end(d), pred);
-
-    bool equality =
-        test::equal(std::begin(c), result.begin(), std::begin(d), solution);
-
-    HPX_TEST(equality);
+    HPX_TEST(pre_result == 2 && post_result == 1);
 }
 
 template <typename DataType>
@@ -179,7 +191,9 @@ void test_remove_if()
     test_remove_if_async(seq(task), DataType());
     test_remove_if_async(par(task), DataType());
 
-    // test_remove_if_2(par, DataType());
+    test_remove_if_sent();
+    test_remove_if_sent(par);
+    test_remove_if_sent(par_unseq);
 }
 
 void test_remove_if()

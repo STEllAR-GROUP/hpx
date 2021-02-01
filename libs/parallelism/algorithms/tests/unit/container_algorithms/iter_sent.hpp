@@ -31,7 +31,7 @@ private:
 template <typename Iter, typename ValueType,
     typename Enable =
         std::enable_if_t<hpx::traits::is_forward_iterator<Iter>::value>>
-bool operator==(Iter it, Sentinel<ValueType> s)
+bool operator==(Iter it, sentinel<ValueType> s)
 {
     return *it == s.get_stop();
 }
@@ -39,7 +39,7 @@ bool operator==(Iter it, Sentinel<ValueType> s)
 template <typename Iter, typename ValueType,
     typename Enable =
         std::enable_if_t<hpx::traits::is_forward_iterator<Iter>::value>>
-bool operator==(Sentinel<ValueType> s, Iter it)
+bool operator==(sentinel<ValueType> s, Iter it)
 {
     return *it == s.get_stop();
 }
@@ -47,7 +47,7 @@ bool operator==(Sentinel<ValueType> s, Iter it)
 template <typename Iter, typename ValueType,
     typename Enable =
         std::enable_if_t<hpx::traits::is_forward_iterator<Iter>::value>>
-bool operator!=(Iter it, Sentinel<ValueType> s)
+bool operator!=(Iter it, sentinel<ValueType> s)
 {
     return *it != s.get_stop();
 }
@@ -55,7 +55,7 @@ bool operator!=(Iter it, Sentinel<ValueType> s)
 template <typename Iter, typename ValueType,
     typename Enable =
         std::enable_if_t<hpx::traits::is_forward_iterator<Iter>::value>>
-bool operator!=(Sentinel<ValueType> s, Iter it)
+bool operator!=(sentinel<ValueType> s, Iter it)
 {
     return *it != s.get_stop();
 }
