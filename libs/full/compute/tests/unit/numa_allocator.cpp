@@ -85,9 +85,9 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator& allocator)
     std::string domain_string = allocator.get_page_numa_domains(M, num_bytes);
 
     // now generate the 'correct' string of numa domains per page
-    const std::size_t pagesize = hpx::threads::get_memory_page_size();
-    const std::size_t pageN = pagesize / sizeof(T);
-    const std::size_t num_pages = (num_bytes + pagesize - 1) / pagesize;
+    std::size_t const pagesize = hpx::threads::get_memory_page_size();
+    std::size_t const pageN = pagesize / sizeof(T);
+    std::size_t const num_pages = (num_bytes + pagesize - 1) / pagesize;
     T* page_ptr = M;
 
     std::stringstream temp;
@@ -216,7 +216,8 @@ using high_priority_sched =
     hpx::threads::policies::shared_priority_queue_scheduler<>;
 using hpx::threads::policies::scheduler_mode;
 
-void init_resource_partitioner_handler(hpx::resource::partitioner& rp)
+void init_resource_partitioner_handler(
+    hpx::resource::partitioner& rp, hpx::program_options::variables_map const&)
 {
     using numa_scheduler =
         hpx::threads::policies::shared_priority_queue_scheduler<>;
