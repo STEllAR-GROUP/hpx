@@ -14,7 +14,6 @@ set(example_programs
     fibonacci_futures
     fibonacci_local
     file_serialization
-    init_globally
     latch_local
     pipeline1
     safe_object
@@ -22,6 +21,10 @@ set(example_programs
     use_main_thread
     wait_composition
 )
+
+if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+  set(example_programs ${example_programs} init_globally)
+endif()
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(example_programs

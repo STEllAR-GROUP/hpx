@@ -5,11 +5,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests discover_counters_1787 dynamic_counters_loaded_1508 statistics_2666
-          uptime_1737
-)
+set(tests discover_counters_1787 statistics_2666 uptime_1737)
 
-set(dynamic_counters_loaded_1508_FLAGS DEPENDENCIES memory_component)
+if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+  set(tests ${tests} dynamic_counters_loaded_1508)
+  set(dynamic_counters_loaded_1508_FLAGS DEPENDENCIES memory_component)
+endif()
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

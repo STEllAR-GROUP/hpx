@@ -304,7 +304,7 @@ jobs:
       - run:
           name: Running codespell
           command: |
-              if [ "$CIRCLE_PR_NUMBER" ]; then
+              if [[ -n "$CIRCLE_PULL_REQUEST" ]]; then
                   cd /hpx/source
                   codespell --version
                   codespell --ignore-words tools/.codespell_whitelist --skip='*.h5,*.png' $(git diff --name-only origin/master...) > /tmp/spelling_suggestions.txt

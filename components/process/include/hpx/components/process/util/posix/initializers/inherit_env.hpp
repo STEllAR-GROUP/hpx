@@ -11,17 +11,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/debugging/environ.hpp>
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
-
-// From <https://svn.boost.org/trac/boost/changeset/67768>
-#if defined(__APPLE__) && defined(__DYNAMIC__)
-extern "C" { extern char ***_NSGetEnviron(void); }
-#   define environ (*_NSGetEnviron())
-#else
-#   include <unistd.h>
-#endif
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
@@ -33,7 +26,11 @@ public:
     template <class PosixExecutor>
     void on_fork_setup(PosixExecutor &e) const
     {
+#if defined(__FreeBSD__)
+        e.env = freebsd_environ;
+#else
         e.env = environ;
+#endif
     }
 };
 

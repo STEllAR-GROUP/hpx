@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/debugging/environ.hpp>
 #include <hpx/debugging/print.hpp>
 
 #include <algorithm>
@@ -28,18 +29,8 @@
 #include <utility>
 #include <vector>
 
-#if defined(__linux) || defined(linux) || defined(__linux__)
-#include <sys/mman.h>
-#include <unistd.h>
-#elif defined(__APPLE__)
-#include <crt_externs.h>
-#include <unistd.h>
-#define environ (*_NSGetEnviron())
-#elif defined(HPX_WINDOWS)
-#include <winsock2.h>
-#define environ _environ
-#else
-extern char** environ;
+#if defined(__FreeBSD__)
+HPX_CORE_EXPORT char** freebsd_environ = nullptr;
 #endif
 
 // ------------------------------------------------------------
@@ -257,11 +248,13 @@ namespace hpx { namespace debug {
         char const* hostname_print_helper::get_hostname() const
         {
             static bool initialized = false;
-            static char hostname_[20];
+            static char hostname_[20] = {'\0'};
             if (!initialized)
             {
                 initialized = true;
+#if !defined(__FreeBSD__)
                 gethostname(hostname_, std::size_t(12));
+#endif
                 std::string temp = "(" + std::to_string(guess_rank()) + ")";
                 std::strcat(hostname_, temp.c_str());
             }
@@ -270,8 +263,13 @@ namespace hpx { namespace debug {
 
         int hostname_print_helper::guess_rank() const
         {
+#if defined(__FreeBSD__)
+            char** env = freebsd_environ;
+#else
+            char** env = environ;
+#endif
             std::vector<std::string> env_strings{"_RANK=", "_NODEID="};
-            for (char** current = environ; *current; current++)
+            for (char** current = env; *current; current++)
             {
                 auto e = std::string(*current);
                 for (auto s : env_strings)

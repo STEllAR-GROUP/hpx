@@ -869,7 +869,7 @@ namespace hpx {
                     // If thread_pools initialization in user main
                     if (params.rp_callback)
                     {
-                        params.rp_callback(rp);
+                        params.rp_callback(rp, cmdline.vm_);
                     }
 
                     // Setup all internal parameters of the resource_partitioner
