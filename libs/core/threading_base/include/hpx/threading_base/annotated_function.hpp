@@ -37,7 +37,7 @@ namespace hpx { namespace util {
     {
         HPX_NON_COPYABLE(annotate_function);
 
-        explicit annotate_function(std::string const&) {}
+        explicit annotate_function(std::string) {}
         template <typename F>
         explicit HPX_HOST_DEVICE annotate_function(F&&)
         {
@@ -51,9 +51,9 @@ namespace hpx { namespace util {
     {
         HPX_NON_COPYABLE(annotate_function);
 
-        explicit annotate_function(std::string const& name)
-          : name_(name)
-          , task_(thread_domain_, hpx::util::itt::string_handle(name))
+        explicit annotate_function(std::string name)
+          : name_(std::move(name))
+          , task_(thread_domain_, hpx::util::itt::string_handle(name.c_str()))
         {
         }
         template <typename F>
@@ -74,8 +74,8 @@ namespace hpx { namespace util {
     {
         HPX_NON_COPYABLE(annotate_function);
 
-        explicit annotate_function(std::string const& name)
-          : name_(name)
+        explicit annotate_function(std::string name)
+          : name_(std::move(name))
           , desc_(hpx::threads::get_self_ptr() ?
                     hpx::threads::set_thread_description(
                         hpx::threads::get_self_id(), name_.c_str()) :
@@ -125,15 +125,15 @@ namespace hpx { namespace util {
             {
             }
 
-            annotated_function(F const& f, std::string const& name)
+            annotated_function(F const& f, std::string name)
               : f_(f)
-              , name_(name)
+              , name_(std::move(name))
             {
             }
 
-            annotated_function(F&& f, std::string const& name)
+            annotated_function(F&& f, std::string name)
               : f_(std::move(f))
-              , name_(name)
+              , name_(std::move(name))
             {
             }
 
@@ -187,12 +187,12 @@ namespace hpx { namespace util {
 
     template <typename F>
     detail::annotated_function<typename std::decay<F>::type> annotated_function(
-        F&& f, std::string const& name = "")
+        F&& f, std::string name = "")
     {
         typedef detail::annotated_function<typename std::decay<F>::type>
             result_type;
 
-        return result_type(std::forward<F>(f), name);
+        return result_type(std::forward<F>(f), std::move(name));
     }
 
 #else
@@ -201,7 +201,7 @@ namespace hpx { namespace util {
     {
         HPX_NON_COPYABLE(annotate_function);
 
-        explicit annotate_function(std::string const& /*name*/) {}
+        explicit annotate_function(std::string /*name*/) {}
         template <typename F>
         explicit HPX_HOST_DEVICE annotate_function(F&& /*f*/)
         {
@@ -218,7 +218,7 @@ namespace hpx { namespace util {
     ///
     /// \param function
     template <typename F>
-    F&& annotated_function(F&& f, std::string const& = "")
+    F&& annotated_function(F&& f, std::string = "")
     {
         return std::forward<F>(f);
     }
