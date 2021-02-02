@@ -26,7 +26,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 return first;
             }
         }
-        return last;
+        return first;
     }
 
     // provide implementation of std::find_if supporting iterators/sentinels
@@ -42,7 +42,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 return first;
             }
         }
-        return last;
+        return first;
     }
 
     // provide implementation of std::find_if supporting iterators/sentinels
@@ -58,6 +58,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 return first;
             }
         }
-        return last;
+        return first;
     }
 }}}}    // namespace hpx::parallel::v1::detail

@@ -81,7 +81,7 @@ void test_remove_sent()
     int value = 42;
 
     auto pre_result = std::count(std::begin(c), std::end(c), value);
-    hpx::ranges::remove(std::begin(c), Sentinel<std::int16_t>{50}, value);
+    hpx::ranges::remove(std::begin(c), sentinel<std::int16_t>{50}, value);
     auto post_result = std::count(std::begin(c), std::end(c), value);
 
     HPX_TEST(pre_result == 2 && post_result == 1);
@@ -104,7 +104,7 @@ void test_remove_sent(ExPolicy policy)
 
     auto pre_result = std::count(std::begin(c), std::end(c), value);
     hpx::ranges::remove(
-        policy, std::begin(c), Sentinel<std::int16_t>{50}, value);
+        policy, std::begin(c), sentinel<std::int16_t>{50}, value);
     auto post_result = std::count(std::begin(c), std::end(c), value);
 
     HPX_TEST(pre_result == 2 && post_result == 1);

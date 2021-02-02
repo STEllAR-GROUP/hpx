@@ -12,6 +12,89 @@
 #if defined(DOXYGEN)
 namespace hpx {
 
+    /////////////////////////////////////////////////////////////////////////////
+    /// Removes all elements satisfying specific criteria from the range
+    /// [first, last) and returns a past-the-end iterator for the new
+    /// end of the range. This version removes all elements that are
+    /// equal to \a value.
+    ///
+    /// \note   Complexity: Performs not more than \a last - \a first
+    ///         assignments, exactly \a last - \a first applications of
+    ///         the operator==().
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam T           The type of the value to remove (deduced).
+    ///                     This value type must meet the requirements of
+    ///                     \a CopyConstructible.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param value        Specifies the value of elements to remove.
+    ///
+    /// The assignments in the parallel \a remove algorithm
+    /// execute in sequential order in the calling thread.
+    ///
+    /// \returns  The \a remove algorithm returns a \a FwdIter.
+    ///           The \a remove algorithm returns the iterator to the new end
+    ///           of the range.
+    ///
+    template <typename FwdIter, typename T>
+    FwdIter remove(FwdIter first, FwdIter last, T const& value);
+
+    /////////////////////////////////////////////////////////////////////////////
+    /// Removes all elements satisfying specific criteria from the range
+    /// [first, last) and returns a past-the-end iterator for the new
+    /// end of the range. This version removes all elements that are
+    /// equal to \a value.
+    ///
+    /// \note   Complexity: Performs not more than \a last - \a first
+    ///         assignments, exactly \a last - \a first applications of
+    ///         the operator==().
+    ///
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam T           The type of the value to remove (deduced).
+    ///                     This value type must meet the requirements of
+    ///                     \a CopyConstructible.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param value        Specifies the value of elements to remove.
+    ///
+    /// The assignments in the parallel \a remove algorithm invoked with
+    /// an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a remove algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a remove algorithm returns a \a hpx::future<FwdIter>
+    ///           if the execution policy is of type
+    ///           \a sequenced_task_policy or \a parallel_task_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a remove algorithm returns the iterator to the new end
+    ///           of the range.
+    ///
+    template <typename ExPolicy, typename FwdIter, typename T>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type remove(
+        ExPolicy&& policy, FwdIter first, FwdIter last, T const& value);
+
     /// Removes all elements satisfying specific criteria from the range
     /// [first, last) and returns a past-the-end iterator for the new
     /// end of the range. This version removes all elements for which predicate
@@ -19,7 +102,53 @@ namespace hpx {
     ///
     /// \note   Complexity: Performs not more than \a last - \a first
     ///         assignments, exactly \a last - \a first applications of
-    ///         the predicate \a pred and the projection \a proj.
+    ///         the predicate \a pred.
+    ///
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a remove_if requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param pred         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).This is an
+    ///                     unary predicate which returns \a true for the
+    ///                     required elements. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// The assignments in the parallel \a remove_if algorithm
+    /// execute in sequential order in the calling thread.
+    ///
+    /// \returns  The \a remove_if algorithm returns a \a FwdIter.
+    ///           The \a remove_if algorithm returns the iterator to the new end
+    ///           of the range.
+    ///
+    template <typename FwdIter, typename Pred>
+    FwdIter remove_if(FwdIter first, FwdIter last, Pred&& pred);
+
+    /// Removes all elements satisfying specific criteria from the range
+    /// [first, last) and returns a past-the-end iterator for the new
+    /// end of the range. This version removes all elements for which predicate
+    /// \a pred returns true.
+    ///
+    /// \note   Complexity: Performs not more than \a last - \a first
+    ///         assignments, exactly \a last - \a first applications of
+    ///         the predicate \a pred.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -71,61 +200,9 @@ namespace hpx {
     ///           The \a remove_if algorithm returns the iterator to the new end
     ///           of the range.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Pred,
-        typename Proj = util::projection_identity>
+    template <typename ExPolicy, typename FwdIter, typename Pred>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type remove_if(
         ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred);
-
-    /////////////////////////////////////////////////////////////////////////////
-    /// Removes all elements satisfying specific criteria from the range
-    /// [first, last) and returns a past-the-end iterator for the new
-    /// end of the range. This version removes all elements that are
-    /// equal to \a value.
-    ///
-    /// \note   Complexity: Performs not more than \a last - \a first
-    ///         assignments, exactly \a last - \a first applications of
-    ///         the operator==().
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam T           The type of the value to remove (deduced).
-    ///                     This value type must meet the requirements of
-    ///                     \a CopyConstructible.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param value        Specifies the value of elements to remove.
-    ///
-    /// The assignments in the parallel \a remove algorithm invoked with
-    /// an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a remove algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a remove algorithm returns a \a hpx::future<FwdIter>
-    ///           if the execution policy is of type
-    ///           \a sequenced_task_policy or \a parallel_task_policy and
-    ///           returns \a FwdIter otherwise.
-    ///           The \a remove algorithm returns the iterator to the new end
-    ///           of the range.
-    ///
-    template <typename ExPolicy, typename FwdIter, typename T,
-        typename Proj = util::projection_identity>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type remove(
-        ExPolicy&& policy, FwdIter first, FwdIter last, T const& value);
 
 }    // namespace hpx
 
@@ -175,17 +252,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {
         /// \cond NOINTERNAL
 
-        template <typename Iter, typename Sent, typename UnaryPredicate,
-            typename Proj>
-        Iter sequential_remove_if(
-            Iter first, Sent last, UnaryPredicate p, Proj proj)
+        template <typename Iter, typename Sent, typename Pred, typename Proj>
+        Iter sequential_remove_if(Iter first, Sent last, Pred pred, Proj proj)
         {
             first = hpx::parallel::v1::detail::sequential_find_if(
-                first, last, p, proj);
+                first, last, pred, proj);
+
             if (first != last)
                 for (Iter i = first; ++i != last;)
-                    if (!p(*i))
+                    if (!hpx::util::invoke(pred, hpx::util::invoke(proj, *i)))
+                    {
                         *first++ = std::move(*i);
+                    }
             return first;
         }
 
@@ -441,7 +519,7 @@ namespace hpx {
             )>
         // clang-format on
         friend FwdIter tag_invoke(
-            hpx::remove_t, FwdIter first, FwdIter last, const T& value)
+            hpx::remove_t, FwdIter first, FwdIter last, T const& value)
         {
             typedef typename std::iterator_traits<FwdIter>::value_type Type;
 
@@ -459,7 +537,7 @@ namespace hpx {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
         tag_invoke(hpx::remove_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, const T& value)
+            FwdIter last, T const& value)
         {
             typedef typename std::iterator_traits<FwdIter>::value_type Type;
 
