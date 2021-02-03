@@ -9,14 +9,13 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
+#include <hpx/config/endian.hpp>
 #include <hpx/iostream.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/serialization/detail/preprocess_container.hpp>
 #include <hpx/util/from_string.hpp>
-
-#include <boost/predef/other/endian.h>
 
 #include <algorithm>
 #include <cstddef>
@@ -56,13 +55,8 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
         reinterpret_cast<std::uint64_t>(&test_function));
 
     // compose archive flags
-#if BOOST_ENDIAN_BIG_BYTE
-    std::string endian_out =
-        hpx::get_config_entry("hpx.parcel.endian_out", "big");
-#else
-    std::string endian_out =
-        hpx::get_config_entry("hpx.parcel.endian_out", "little");
-#endif
+    std::string endian_out = hpx::get_config_entry("hpx.parcel.endian_out",
+        hpx::endian::native == hpx::endian::big ? "big" : "little");
 
     unsigned int out_archive_flags = 0U;
     if (endian_out == "little")

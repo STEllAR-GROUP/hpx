@@ -29,7 +29,6 @@
 
 #if !(defined(__linux) || defined(linux) || defined(__linux__) ||              \
     defined(__FreeBSD__) || defined(__APPLE__) || defined(HPX_MSVC))
-#include <boost/smart_ptr/detail/spinlock.hpp>
 #include <mutex>
 #endif
 
