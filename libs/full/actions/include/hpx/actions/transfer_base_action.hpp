@@ -12,7 +12,6 @@
 
 #include <hpx/config/defines.hpp>
 
-#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/actions/base_action.hpp>
 #include <hpx/actions/register_action.hpp>
@@ -25,8 +24,10 @@
 #include <hpx/actions_base/traits/action_schedule_thread.hpp>
 #include <hpx/actions_base/traits/action_stacksize.hpp>
 #include <hpx/actions_base/traits/action_was_object_migrated.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
+#include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/runtime_local/detail/serialize_exception.hpp>
 #include <hpx/serialization/input_archive.hpp>
