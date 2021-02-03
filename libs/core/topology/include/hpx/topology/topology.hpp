@@ -333,7 +333,8 @@ namespace hpx { namespace threads {
 
         std::size_t init_core_number(std::size_t num_thread)
         {
-            return init_node_number(num_thread, HWLOC_OBJ_CORE);
+            return init_node_number(
+                num_thread, use_pus_as_cores_ ? HWLOC_OBJ_PU : HWLOC_OBJ_CORE);
         }
 
         void extract_node_mask(hwloc_obj_t parent, mask_type& mask) const;
@@ -369,14 +370,15 @@ namespace hpx { namespace threads {
         // This is mainly to skip the first Core on the Xeon Phi
         // which is reserved for OS related tasks
 #if !defined(HPX_NATIVE_MIC)
-        static const std::size_t pu_offset = 0;
-        static const std::size_t core_offset = 0;
+        static constexpr std::size_t pu_offset = 0;
+        static constexpr std::size_t core_offset = 0;
 #else
-        static const std::size_t pu_offset = 4;
-        static const std::size_t core_offset = 1;
+        static constexpr std::size_t pu_offset = 4;
+        static constexpr std::size_t core_offset = 1;
 #endif
 
         std::size_t num_of_pus_;
+        bool use_pus_as_cores_;
 
         using mutex_type = hpx::util::spinlock;
         mutable mutex_type topo_mtx;

@@ -173,7 +173,7 @@ private:
         ar & size_;
         ar & checksum_;
         ar & test_value_;
-        // clang-format ons
+        // clang-format on
     }
 };
 
@@ -235,12 +235,12 @@ partition_data stencil_update(std::size_t sti, partition_data const& center,
     if (is_faulty_node)
     {
         if (dis(gen) < (error * 10))
-            throw std::runtime_error("Error occured");
+            throw std::runtime_error("Error occurred");
     }
     else
     {
         if (dis(gen) < error)
-            throw std::runtime_error("Error occured");
+            throw std::runtime_error("Error occurred");
     }
 
     return workspace;
@@ -390,8 +390,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
                     current[i - 1], current[i + 1], errors, is_faulty_node)
                     .then(hpx::launch::async,
                         [sti, &current, errors, i, &locales, &counter,
-                            num_localities, faults](
-                            hpx::future<partition_data>&& gg) {
+                            num_localities,
+                            faults](hpx::future<partition_data>&& gg) {
                             if (gg.has_exception())
                             {
                                 if (faults != 0)

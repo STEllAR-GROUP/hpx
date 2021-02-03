@@ -68,7 +68,7 @@ namespace libfabric
 
         // --------------------------------------------------------------------
         // The cleanup call deletes resources and sums counters from internals
-        // once cleanup is done, the recevier should not be used, other than
+        // once cleanup is done, the receiver should not be used, other than
         // dumping counters
         void cleanup();
 

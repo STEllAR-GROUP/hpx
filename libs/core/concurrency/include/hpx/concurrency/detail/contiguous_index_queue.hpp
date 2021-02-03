@@ -79,7 +79,7 @@ namespace hpx { namespace concurrency { namespace detail {
 
         /// \brief Construct a new contiguous_index_queue.
         ///
-        /// Constrct a new queue with an empty range.
+        /// Construct a new queue with an empty range.
         constexpr contiguous_index_queue() noexcept
           : initial_range{}
           , current_range{}
@@ -88,7 +88,7 @@ namespace hpx { namespace concurrency { namespace detail {
 
         /// \brief Construct a new contiguous_index_queue with the given range.
         ///
-        /// Constrct a new queue with the given range as the initial range.
+        /// Construct a new queue with the given range as the initial range.
         constexpr contiguous_index_queue(T first, T last) noexcept
           : initial_range{}
           , current_range{}

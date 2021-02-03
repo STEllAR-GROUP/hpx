@@ -249,7 +249,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-issue:`1109` - More tests adjustments
 * :hpx-issue:`1108` - Clarify build rules for "libboost_atomic-mt.so"?
 * :hpx-issue:`1107` - Remove unnecessary null pointer checks
-* :hpx-issue:`1106` - network_storage benchmark imporvements, adding legends to
+* :hpx-issue:`1106` - network_storage benchmark improvements, adding legends to
   plots and tidying layout
 * :hpx-issue:`1105` - Add more plot outputs and improve instructions doc
 * :hpx-issue:`1104` - Complete quoting for parameters of some CMake commands

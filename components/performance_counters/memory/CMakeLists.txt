@@ -8,6 +8,11 @@ if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
   return()
 endif()
 
+# The memory counters are not supported on FreeBSD
+if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+  return()
+endif()
+
 set(HPX_COMPONENTS
     ${HPX_COMPONENTS} memory
     CACHE INTERNAL "list of HPX components"

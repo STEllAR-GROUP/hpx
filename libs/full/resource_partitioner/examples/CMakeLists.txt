@@ -46,10 +46,10 @@ set(oversubscribing_resource_partitioner_FLAGS DEPENDENCIES iostreams_component)
 set(simple_resource_partitioner_FLAGS DEPENDENCIES iostreams_component)
 
 set(oversubscribing_resource_partitioner_PARAMETERS
-    THREADS_PER_LOCALITY 4 "--use-pools" "--use-scheduler"
+    THREADS_PER_LOCALITY 4 "--use-pools" "--pool-threads" 1
 )
 set(simple_resource_partitioner_PARAMETERS THREADS_PER_LOCALITY 4 "--use-pools"
-                                           "--use-scheduler"
+                                           "--pool-threads" 1
 )
 set(simplest_resource_partitioner_1_PARAMETERS THREADS_PER_LOCALITY 4)
 set(simplest_resource_partitioner_2_PARAMETERS THREADS_PER_LOCALITY 4)

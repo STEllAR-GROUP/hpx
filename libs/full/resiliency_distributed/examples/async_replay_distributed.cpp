@@ -40,7 +40,7 @@ int universal_ans(std::vector<hpx::id_type> f_locales, std::size_t size)
     {
         // Throw a runtime error in case the node is faulty
         if (locale == hpx::find_here())
-            throw std::runtime_error("runtime error occured.");
+            throw std::runtime_error("runtime error occurred.");
     }
 
     return 42;

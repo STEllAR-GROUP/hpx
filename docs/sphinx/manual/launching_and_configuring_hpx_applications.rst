@@ -489,12 +489,12 @@ The ``hpx.parcel`` configuration section
        ``HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY`` (``4``).
    * * ``hpx.parcel.max_message_size``
      * This property defines the maximum allowed message size which will be
-       transferrable through the :term:`parcel` layer. The default depends on the
+       transferable through the :term:`parcel` layer. The default depends on the
        compile time preprocessor constant ``HPX_PARCEL_MAX_MESSAGE_SIZE``
        (``1000000000`` bytes).
    * * ``hpx.parcel.max_outbound_message_size``
      * This property defines the maximum allowed outbound coalesced message size
-       which will be transferrable through the parcel layer. The default depends
+       which will be transferable through the parcel layer. The default depends
        on the compile time preprocessor constant
        ``HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE`` (``1000000`` bytes).
    * * ``hpx.parcel.array_optimization``
@@ -568,11 +568,11 @@ The following settings relate to the TCP/IP parcelport.
        taken from ``hpx.parcel.max_connections_per_locality``.
    * * ``hpx.parcel.tcp.max_message_size``
      * This property defines the maximum allowed message size which will be
-       transferrable through the :term:`parcel` layer. The default is taken from
+       transferable through the :term:`parcel` layer. The default is taken from
        ``hpx.parcel.max_message_size``.
    * * ``hpx.parcel.tcp.max_outbound_message_size``
      * This property defines the maximum allowed outbound coalesced message size
-       which will be transferrable through the :term:`parcel` layer. The default is
+       which will be transferable through the :term:`parcel` layer. The default is
        taken from ``hpx.parcel.max_outbound_connections``.
 
 The following settings relate to the MPI parcelport. These settings take effect
@@ -657,11 +657,11 @@ equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
        taken from ``hpx.parcel.max_connections_per_locality``.
    * * ``hpx.parcel.mpi.max_message_size``
      * This property defines the maximum allowed message size which will be
-       transferrable through the :term:`parcel` layer. The default is taken from
+       transferable through the :term:`parcel` layer. The default is taken from
        ``hpx.parcel.max_message_size``.
    * * ``hpx.parcel.mpi.max_outbound_message_size``
      * This property defines the maximum allowed outbound coalesced message size
-       which will be transferrable through the :term:`parcel` layer. The default is
+       which will be transferable through the :term:`parcel` layer. The default is
        taken from ``hpx.parcel.max_outbound_connections``.
 
 The ``hpx.agas`` configuration section

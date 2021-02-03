@@ -11,9 +11,9 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/debugging/backtrace.hpp>
 #include <hpx/execution_base/register_locks.hpp>
 #include <hpx/futures/futures_factory.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
@@ -50,15 +50,6 @@
 #include <system_error>
 #include <utility>
 #include <vector>
-
-#ifdef __APPLE__
-#include <crt_externs.h>
-#define environ (*_NSGetEnviron())
-#elif defined(__FreeBSD__)
-HPX_EXPORT char** freebsd_environ = nullptr;
-#elif !defined(HPX_WINDOWS)
-extern char** environ;
-#endif
 
 namespace hpx {
     char const* get_runtime_state_name(state st);

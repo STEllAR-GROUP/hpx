@@ -335,7 +335,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-issue:`2376` - Boost trunk's spinlock initializer fails to compile
 * :hpx-pr:`2375` - Add support for minimal thread local data
 * :hpx-pr:`2374` - Adding API functions set_config_entry_callback
-* :hpx-pr:`2373` - Add a simple utility for debugging that gives supended task
+* :hpx-pr:`2373` - Add a simple utility for debugging that gives suspended task
   backtraces
 * :hpx-pr:`2372` - Barrier Fixes
 * :hpx-issue:`2370` - Can't wait on a wrapped future

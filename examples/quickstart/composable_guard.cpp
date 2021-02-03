@@ -23,7 +23,7 @@
 //
 // Because guards don't add locking structures to the current environment
 // during a calculation, they can never deadlock. Guards use only a
-// few atomic operations to perform their operaions, and never cause a
+// few atomic operations to perform their operations, and never cause a
 // task to block, so they should be quite fast.
 //
 // To use guards, call the run_guarded() method, supplying it with

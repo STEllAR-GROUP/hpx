@@ -240,7 +240,7 @@ namespace hpx { namespace program_options {
     /** Collects the original tokens for all named options with
         'unregistered' flag set. If 'mode' is 'include_positional'
         also collects all positional options.
-        Returns the vector of origianl tokens for all collected
+        Returns the vector of original tokens for all collected
         options.
     */
     template <class Char>
