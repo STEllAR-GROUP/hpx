@@ -12,11 +12,11 @@
 #include <hpx/modules/command_line_handling.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
 
 #include <boost/asio/ip/host_name.hpp>
-#include <boost/generator_iterator.hpp>
 
 #include <cstdint>
 #include <iostream>
@@ -201,8 +201,8 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     {
         // collect available events and print their descriptions
         avail_preset_info_gen gen;
-        boost::generator_iterator_generator<avail_preset_info_gen>::type it;
-        for (it = boost::make_generator_iterator(gen); *it != nullptr; ++it)
+        for (auto it = hpx::util::make_generator_iterator(gen); *it != nullptr;
+             ++it)
         {
             hpx::util::format_to(std::cout,
                 "Event        : {}\n"
@@ -270,10 +270,11 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         for (int ci = 0; ci < PAPI_num_components(); ++ci)
         {
             native_info_gen gen(ci);
-            boost::generator_iterator_generator<native_info_gen>::type it =
-                boost::make_generator_iterator(gen);
-            for ( ; *it != nullptr; ++it)
+            for (auto it = hpx::util::make_generator_iterator(gen);
+                 *it != nullptr; ++it)
+            {
                 print_native_info(**it);
+            }
         }
     }
 

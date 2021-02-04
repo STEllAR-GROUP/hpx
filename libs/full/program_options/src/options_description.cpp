@@ -383,7 +383,7 @@ namespace hpx { namespace program_options {
             }
         }
         if (full_matches.size() > 1)
-            boost::throw_exception(ambiguous_option(full_matches));
+            throw ambiguous_option(full_matches);
 
         // If we have a full match, and an approximate match,
         // ignore approximate match instead of reporting error.
@@ -391,7 +391,7 @@ namespace hpx { namespace program_options {
         // "--all" on the command line should select the first one,
         // without ambiguity.
         if (full_matches.empty() && approximate_matches.size() > 1)
-            boost::throw_exception(ambiguous_option(approximate_matches));
+            throw ambiguous_option(approximate_matches);
 
         return found.get();
     }
@@ -437,9 +437,9 @@ namespace hpx { namespace program_options {
                 // only one tab per paragraph allowed
                 if (count(par.begin(), par.end(), '\t') > 1)
                 {
-                    boost::throw_exception(program_options::error(
+                    throw program_options::error(
                         "Only one tab per paragraph is allowed in the options "
-                        "description"));
+                        "description");
                 }
 
                 // erase tab from string

@@ -12,15 +12,14 @@
 
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/program_options.hpp>
+#include <hpx/performance_counters/counters.hpp>
 
 #include <cstdint>
 #include <cstring>
 #include <string>
 #include <vector>
-
-#include <boost/generator_iterator.hpp>
 
 #include <papi.h>
 
@@ -153,7 +152,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     class native_enumerator: public event_info_generator
     {
         native_umask_enumerator umask_gen_;
-        boost::generator_iterator_generator<native_umask_enumerator>::type umask_iter_;
+        hpx::util::generator_iterator<native_umask_enumerator> umask_iter_;
         unsigned const component_index_;
         bool umasks_present_, umask_seq_;
 
@@ -182,7 +181,8 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
                 else
                 {
                     umask_gen_.reset(event_);
-                    umask_iter_ = boost::make_generator_iterator(umask_gen_);
+                    umask_iter_ =
+                        hpx::util::make_generator_iterator(umask_gen_);
                     if (*umask_iter_)
                         return umask_seq_ = true; // not ==
                 }

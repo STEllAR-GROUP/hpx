@@ -16,7 +16,6 @@
 #include <hpx/components/performance_counters/io/io_counters.hpp>
 
 #include <hpx/modules/errors.hpp>
-#include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_uint.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>

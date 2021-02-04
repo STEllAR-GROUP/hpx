@@ -8,6 +8,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 
+#include <hpx/config/endian.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
@@ -18,8 +19,6 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/serialize_buffer.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
-
-#include <boost/predef/other/endian.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -183,11 +182,14 @@ void test_normal_serialization(T& arg)
 
     // compose archive flags
     std::uint32_t out_archive_flags = hpx::serialization::disable_data_chunking;
-#if BOOST_ENDIAN_BIG_BYTE
-    out_archive_flags |= hpx::serialization::endian_big;
-#else
-    out_archive_flags |= hpx::serialization::endian_little;
-#endif
+    if (hpx::endian::native == hpx::endian::big)
+    {
+        out_archive_flags |= hpx::serialization::endian_big;
+    }
+    else
+    {
+        out_archive_flags |= hpx::serialization::endian_little;
+    }
 
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
@@ -211,11 +213,14 @@ void test_normal_serialization(T1& arg1, T2& arg2)
 
     // compose archive flags
     std::uint32_t out_archive_flags = hpx::serialization::disable_data_chunking;
-#if BOOST_ENDIAN_BIG_BYTE
-    out_archive_flags |= hpx::serialization::endian_big;
-#else
-    out_archive_flags |= hpx::serialization::endian_little;
-#endif
+    if (hpx::endian::native == hpx::endian::big)
+    {
+        out_archive_flags |= hpx::serialization::endian_big;
+    }
+    else
+    {
+        out_archive_flags |= hpx::serialization::endian_little;
+    }
 
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
@@ -240,11 +245,14 @@ void test_normal_serialization(
 
     // compose archive flags
     std::uint32_t out_archive_flags = hpx::serialization::disable_data_chunking;
-#if BOOST_ENDIAN_BIG_BYTE
-    out_archive_flags |= hpx::serialization::endian_big;
-#else
-    out_archive_flags |= hpx::serialization::endian_little;
-#endif
+    if (hpx::endian::native == hpx::endian::big)
+    {
+        out_archive_flags |= hpx::serialization::endian_big;
+    }
+    else
+    {
+        out_archive_flags |= hpx::serialization::endian_little;
+    }
 
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
@@ -269,11 +277,14 @@ void test_zero_copy_serialization(T& arg)
 
     // compose archive flags
     std::uint32_t out_archive_flags = 0U;
-#if BOOST_ENDIAN_BIG_BYTE
-    out_archive_flags |= hpx::serialization::endian_big;
-#else
-    out_archive_flags |= hpx::serialization::endian_little;
-#endif
+    if (hpx::endian::native == hpx::endian::big)
+    {
+        out_archive_flags |= hpx::serialization::endian_big;
+    }
+    else
+    {
+        out_archive_flags |= hpx::serialization::endian_little;
+    }
 
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
@@ -297,11 +308,14 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
 
     // compose archive flags
     std::uint32_t out_archive_flags = 0U;
-#if BOOST_ENDIAN_BIG_BYTE
-    out_archive_flags |= hpx::serialization::endian_big;
-#else
-    out_archive_flags |= hpx::serialization::endian_little;
-#endif
+    if (hpx::endian::native == hpx::endian::big)
+    {
+        out_archive_flags |= hpx::serialization::endian_big;
+    }
+    else
+    {
+        out_archive_flags |= hpx::serialization::endian_little;
+    }
 
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
@@ -326,11 +340,14 @@ void test_zero_copy_serialization(
 
     // compose archive flags
     std::uint32_t out_archive_flags = 0U;
-#if BOOST_ENDIAN_BIG_BYTE
-    out_archive_flags |= hpx::serialization::endian_big;
-#else
-    out_archive_flags |= hpx::serialization::endian_little;
-#endif
+    if (hpx::endian::native == hpx::endian::big)
+    {
+        out_archive_flags |= hpx::serialization::endian_big;
+    }
+    else
+    {
+        out_archive_flags |= hpx::serialization::endian_little;
+    }
 
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
