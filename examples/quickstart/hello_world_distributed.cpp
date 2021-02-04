@@ -20,6 +20,7 @@
 #include <hpx/include/util.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <list>
 #include <mutex>
 #include <set>

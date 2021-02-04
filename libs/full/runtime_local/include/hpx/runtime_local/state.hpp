@@ -13,6 +13,7 @@
 #include <hpx/threading_base/scheduler_state.hpp>
 
 namespace hpx { namespace threads {
+
     // return whether thread manager is in the state described by 'mask'
     HPX_EXPORT bool threadmanager_is(state st);
     HPX_EXPORT bool threadmanager_is_at_least(state st);

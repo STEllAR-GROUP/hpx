@@ -12,17 +12,11 @@
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/plain_action.hpp>
-#include <hpx/modules/errors.hpp>
-#include <hpx/modules/naming.hpp>
 
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace agas {
-
-    // Register all performance counter types exposed by the locality_namespace
-    HPX_EXPORT void locality_namespace_register_counter_types(
-        error_code& ec = throws);
 
     // Create statistics counter for locality namespace on this locality
     HPX_EXPORT naming::gid_type locality_namespace_statistics_counter(

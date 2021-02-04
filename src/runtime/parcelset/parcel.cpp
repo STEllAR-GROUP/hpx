@@ -11,12 +11,12 @@
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/detail/action_factory.hpp>
+#include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/naming/detail/preprocess_gid_types.hpp>
-#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>

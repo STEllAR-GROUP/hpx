@@ -8,12 +8,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
+#include <hpx/agas/addressing_service.hpp>
 #include <hpx/logging/format/named_write.hpp>
 #include <hpx/logging/manipulator.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/naming.hpp>
 #include <hpx/modules/threadmanager.hpp>
-#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>

@@ -15,7 +15,7 @@
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_local/run_as_hpx_thread.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/state.hpp>
+#include <hpx/runtime_local/state.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>

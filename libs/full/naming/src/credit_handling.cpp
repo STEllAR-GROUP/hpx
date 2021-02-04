@@ -8,6 +8,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/lcos_local/detail/preprocess_future.hpp>
 #include <hpx/memory/serialization/intrusive_ptr.hpp>
@@ -21,7 +22,6 @@
 #include <hpx/naming/split_gid.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>

@@ -10,12 +10,12 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/threading_base/external_timer.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>

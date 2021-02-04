@@ -8,10 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/agas/addressing_service.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
@@ -259,10 +259,11 @@ namespace hpx {
         /// \brief Returns a string of the locality endpoints (usable in debug output)
         std::string here() const override;
 
-        std::uint64_t get_runtime_support_lva() const;
+        std::uint64_t get_runtime_support_lva() const override;
 
         naming::gid_type get_next_id(std::size_t count = 1);
 
+        void init_id_pool_range() override;
         util::unique_id_ranges& get_id_pool();
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -354,10 +355,10 @@ namespace hpx {
         lcos::future<std::uint32_t> get_num_localities(
             components::component_type type) const;
 
-        std::uint32_t assign_cores(
-            std::string const& locality_basename, std::uint32_t num_threads);
+        std::uint32_t assign_cores(std::string const& locality_basename,
+            std::uint32_t num_threads) override;
 
-        std::uint32_t assign_cores();
+        std::uint32_t assign_cores() override;
 
     private:
         // avoid warnings about usage of this in member initializer list

@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/future.hpp>
@@ -19,7 +20,6 @@
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/make_client.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/serialization/serialize.hpp>

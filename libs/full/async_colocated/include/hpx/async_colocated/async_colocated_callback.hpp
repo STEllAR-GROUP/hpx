@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/actions_base/traits/extract_action.hpp>
-#include <hpx/agas/primary_namespace.hpp>
-#include <hpx/agas/server/primary_namespace.hpp>
+#include <hpx/agas_base/primary_namespace.hpp>
+#include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_colocated/async_colocated.hpp>
 #include <hpx/async_colocated/async_colocated_callback_fwd.hpp>

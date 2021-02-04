@@ -9,12 +9,12 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/performance_counters/apex_sample_value.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/get_thread_name.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>

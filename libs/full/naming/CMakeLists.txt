@@ -35,7 +35,7 @@ add_hpx_module(
   SOURCES ${naming_sources}
   HEADERS ${naming_headers}
   COMPAT_HEADERS ${naming_compat_headers}
-  DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_agas hpx_checkpoint_base hpx_naming_base
+  DEPENDENCIES hpx_core hpx_parallelism
+  MODULE_DEPENDENCIES hpx_agas_base hpx_checkpoint_base hpx_naming_base
   CMAKE_SUBDIRS examples tests
 )

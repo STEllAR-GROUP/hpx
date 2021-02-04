@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
@@ -19,7 +20,6 @@
 #include <hpx/performance_counters/server/raw_counter.hpp>
 #include <hpx/performance_counters/server/raw_values_counter.hpp>
 #include <hpx/performance_counters/server/statistics_counter.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/statistics/rolling_max.hpp>
 #include <hpx/statistics/rolling_min.hpp>

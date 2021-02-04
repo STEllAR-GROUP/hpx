@@ -14,6 +14,7 @@
 #include <hpx/config/detail/compat_error_code.hpp>
 #include <hpx/config/endian.hpp>
 #include <hpx/actions/continuation.hpp>
+#include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/functional/bind.hpp>
@@ -31,14 +32,13 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/message_handler_fwd.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/runtime/parcelset/static_parcelports.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
-#include <hpx/state.hpp>
+#include <hpx/runtime_local/state.hpp>
 #include <hpx/synchronization/counting_semaphore.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/external_timer.hpp>

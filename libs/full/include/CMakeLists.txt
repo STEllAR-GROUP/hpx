@@ -119,8 +119,8 @@ set(include_headers
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(include_optional_module_dependencies
-      hpx_async_distributed hpx_lcos_distributed hpx_performance_counters
-      hpx_segmented_algorithms
+      hpx_agas hpx_async_distributed hpx_lcos_distributed
+      hpx_performance_counters hpx_segmented_algorithms
   )
 endif()
 

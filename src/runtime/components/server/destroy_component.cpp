@@ -7,9 +7,9 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/async_colocated/get_colocation_id.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 
 #include <hpx/modules/logging.hpp>

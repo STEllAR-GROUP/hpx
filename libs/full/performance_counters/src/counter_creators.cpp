@@ -5,9 +5,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/actions/transfer_action.hpp>
+#include <hpx/actions/transfer_continuation_action.hpp>
+#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/agas/agas_fwd.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/async.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -18,7 +22,6 @@
 #include <hpx/performance_counters/server/locality_namespace_counters.hpp>
 #include <hpx/performance_counters/server/primary_namespace_counters.hpp>
 #include <hpx/performance_counters/server/symbol_namespace_counters.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstdint>

@@ -13,8 +13,8 @@
 #include <cstddef>
 #include <string>
 
-namespace hpx
-{
+namespace hpx {
+
     enum logging_destination
     {
         destination_hpx = 0,
@@ -26,13 +26,14 @@ namespace hpx
     };
 
     /// \namespace components
-    namespace components
-    {
+    namespace components {
+
         /// \ cond NODETAIL
-        namespace detail
-        {
-            struct this_type {};
-        }
+        namespace detail {
+            struct this_type
+            {
+            };
+        }    // namespace detail
         /// \ endcond
 
         ///////////////////////////////////////////////////////////////////////
@@ -78,24 +79,21 @@ namespace hpx
 
         class pinned_ptr;
 
-        namespace stubs
-        {
+        namespace stubs {
             struct runtime_support;
             struct memory;
-        }
+        }    // namespace stubs
 
-        namespace server
-        {
+        namespace server {
             class HPX_EXPORT runtime_support;
             class HPX_EXPORT memory;
-        }
+        }    // namespace server
 
         HPX_EXPORT void console_logging(logging_destination dest,
             std::size_t level, std::string const& msg);
         HPX_EXPORT void cleanup_logging();
         HPX_EXPORT void activate_logging();
-    }
+    }    // namespace components
 
     HPX_EXPORT components::server::runtime_support* get_runtime_support_ptr();
-}
-
+}    // namespace hpx

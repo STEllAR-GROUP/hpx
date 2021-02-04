@@ -1,5 +1,5 @@
 ..
-    Copyright (c) 2018-2020 The STE||AR-Group
+    Copyright (c) 2018-2021 The STE||AR-Group
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,7 @@ Main |hpx| modules
    /libs/full/actions/docs/index.rst
    /libs/full/actions_base/docs/index.rst
    /libs/full/agas/docs/index.rst
+   /libs/full/agas_base/docs/index.rst
    /libs/full/async_colocated/docs/index.rst
    /libs/full/async_cuda/docs/index.rst
    /libs/full/async_distributed/docs/index.rst
@@ -35,6 +36,7 @@ Main |hpx| modules
    /libs/full/lcos_distributed/docs/index.rst
    /libs/full/mpi_base/docs/index.rst
    /libs/full/naming/docs/index.rst
+   /libs/full/naming_base/docs/index.rst
    /libs/full/performance_counters/docs/index.rst
    /libs/full/program_options/docs/index.rst
    /libs/full/resiliency_distributed/docs/index.rst

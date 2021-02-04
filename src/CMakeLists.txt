@@ -21,9 +21,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     lcos/base_lco_with_value_3.cpp
     lcos/base_lco_with_value.cpp
     lcos/promise.cpp
-    runtime/agas/addressing_service.cpp
-    runtime/agas/big_boot_barrier.cpp
-    runtime/agas/interface.cpp
     runtime/agas/server/route.cpp
     runtime/applier/applier.cpp
     runtime/applier/bind_naming_wrappers.cpp
@@ -54,7 +51,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/threads/threadmanager_counters.cpp
     runtime/trigger_lco.cpp
     runtime_distributed.cpp
-    state.cpp
     util/activate_counters.cpp
     util/generate_unique_ids.cpp
     util/init_logging.cpp
@@ -138,9 +134,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/actions/continuation_impl.hpp
     hpx/runtime/actions/lambda_to_action.hpp
     hpx/runtime/actions/make_continuation.hpp
-    hpx/runtime/agas/addressing_service.hpp
-    hpx/runtime/agas/big_boot_barrier.hpp
-    hpx/runtime/agas/interface.hpp
     hpx/runtime/basename_registration_fwd.hpp
     hpx/runtime/basename_registration.hpp
     hpx/runtime/components/binpacking_distribution_policy.hpp
@@ -221,7 +214,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/set_parcel_write_handler.hpp
     hpx/runtime/threads/threadmanager_counters.hpp
     hpx/runtime/trigger_lco.hpp
-    hpx/state.hpp
+    hpx/runtime/trigger_lco_fwd.hpp
     hpx/traits/action_message_handler.hpp
     hpx/traits/action_serialization_filter.hpp
     hpx/traits/is_client.hpp

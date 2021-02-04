@@ -14,6 +14,7 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/runtime/components_fwd.hpp>
 #include <hpx/serialization/vector.hpp>
 
 #include <cstddef>

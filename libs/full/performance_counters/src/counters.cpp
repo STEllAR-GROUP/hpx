@@ -10,6 +10,7 @@
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/packaged_continuation.hpp>
@@ -21,7 +22,6 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_local/get_num_all_localities.hpp>
