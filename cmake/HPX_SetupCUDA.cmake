@@ -4,10 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if((HPX_WITH_CUDA_COMPUTE OR HPX_WITH_ASYNC_CUDA)
-   AND NOT HPX_WITH_HIP
-   AND NOT TARGET Cuda::cuda
-)
+if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
 
   find_package(CUDA REQUIRED)
   if(NOT HPX_FIND_PACKAGE)

@@ -194,10 +194,7 @@ function(add_hpx_executable name)
     endforeach()
   endif()
 
-  if(HPX_WITH_CUDA
-     AND (HPX_WITH_CUDA_COMPUTE OR HPX_WITH_ASYNC_CUDA)
-     AND NOT HPX_WITH_CUDA_CLANG
-  )
+  if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
     cuda_add_executable(
       ${name} ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY}
     )
