@@ -59,6 +59,7 @@ set(threading_base_compat_headers
 # cmake-format: on
 
 set(threading_base_sources
+    annotated_function.cpp
     execution_agent.cpp
     external_timer.cpp
     print.cpp

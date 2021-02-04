@@ -33,11 +33,11 @@ namespace hpx { namespace util {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-    struct annotate_function
+    struct HPX_NODISCARD annotate_function
     {
         HPX_NON_COPYABLE(annotate_function);
 
-        explicit annotate_function(std::string) {}
+        explicit annotate_function(char const*) {}
         template <typename F>
         explicit HPX_HOST_DEVICE annotate_function(F&&)
         {
@@ -47,13 +47,12 @@ namespace hpx { namespace util {
         HPX_HOST_DEVICE ~annotate_function() {}
     };
 #elif HPX_HAVE_ITTNOTIFY != 0
-    struct annotate_function
+    struct HPX_NODISCARD annotate_function
     {
         HPX_NON_COPYABLE(annotate_function);
 
-        explicit annotate_function(std::string name)
-          : name_(std::move(name))
-          , task_(thread_domain_, hpx::util::itt::string_handle(name.c_str()))
+        explicit annotate_function(char const* name)
+          : task_(thread_domain_, hpx::util::itt::string_handle(name))
         {
         }
         template <typename F>
@@ -65,26 +64,24 @@ namespace hpx { namespace util {
         }
 
     private:
-        std::string name_;
         hpx::util::itt::thread_domain thread_domain_;
         hpx::util::itt::task task_;
     };
 #else
-    struct annotate_function
+    struct HPX_NODISCARD annotate_function
     {
         HPX_NON_COPYABLE(annotate_function);
 
-        explicit annotate_function(std::string name)
-          : name_(std::move(name))
-          , desc_(hpx::threads::get_self_ptr() ?
+        explicit annotate_function(char const* name)
+          : desc_(hpx::threads::get_self_ptr() ?
                     hpx::threads::set_thread_description(
-                        hpx::threads::get_self_id(), name_.c_str()) :
+                        hpx::threads::get_self_id(), name) :
                     nullptr)
         {
 #if defined(HPX_HAVE_APEX)
             /* update the task wrapper in APEX to use the specified name */
             threads::set_self_timer_data(external_timer::update_task(
-                threads::get_self_timer_data(), name_));
+                threads::get_self_timer_data(), std::string(name)));
 #endif
         }
 
@@ -111,7 +108,6 @@ namespace hpx { namespace util {
             }
         }
 
-        std::string name_;
         hpx::util::thread_description desc_;
     };
 #endif
@@ -121,19 +117,19 @@ namespace hpx { namespace util {
         struct annotated_function
         {
             annotated_function() noexcept
-              : name_("")
+              : name_(nullptr)
             {
             }
 
-            annotated_function(F const& f, std::string name)
+            annotated_function(F const& f, char const* name)
               : f_(f)
-              , name_(std::move(name))
+              , name_(name)
             {
             }
 
-            annotated_function(F&& f, std::string name)
+            annotated_function(F&& f, char const* name)
               : f_(std::move(f))
-              , name_(std::move(name))
+              , name_(name)
             {
             }
 
@@ -176,32 +172,48 @@ namespace hpx { namespace util {
             /// \param none
             char const* get_function_annotation() const noexcept
             {
-                return !name_.empty() ? name_.c_str() : typeid(f_).name();
+                return name_ ? name_ : typeid(f_).name();
             }
 
         private:
             typename util::decay_unwrap<F>::type f_;
-            std::string name_;
+            char const* name_;
         };
+
+        HPX_CORE_EXPORT char const* store_function_annotation(std::string&& name);
     }    // namespace detail
 
     template <typename F>
     detail::annotated_function<typename std::decay<F>::type> annotated_function(
-        F&& f, std::string name = "")
+        F&& f, char const* name = nullptr)
     {
         typedef detail::annotated_function<typename std::decay<F>::type>
             result_type;
 
-        return result_type(std::forward<F>(f), std::move(name));
+        return result_type(std::forward<F>(f), name);
+    }
+
+    template <typename F>
+    detail::annotated_function<typename std::decay<F>::type> annotated_function(
+        F&& f, std::string name)
+    {
+        typedef detail::annotated_function<typename std::decay<F>::type>
+            result_type;
+
+        // Store string in a set to ensure it lives for the entire duration of
+        // the task.
+        char const* name_c_str =
+            detail::store_function_annotation(std::move(name));
+        return result_type(std::forward<F>(f), name_c_str);
     }
 
 #else
     ///////////////////////////////////////////////////////////////////////////
-    struct annotate_function
+    struct HPX_NODISCARD annotate_function
     {
         HPX_NON_COPYABLE(annotate_function);
 
-        explicit annotate_function(std::string /*name*/) {}
+        explicit annotate_function(char const* /*name*/) {}
         template <typename F>
         explicit HPX_HOST_DEVICE annotate_function(F&& /*f*/)
         {
@@ -218,7 +230,13 @@ namespace hpx { namespace util {
     ///
     /// \param function
     template <typename F>
-    F&& annotated_function(F&& f, std::string = "")
+    F&& annotated_function(F&& f, char const* = nullptr)
+    {
+        return std::forward<F>(f);
+    }
+
+    template <typename F>
+    F&& annotated_function(F&& f, std::string const&)
     {
         return std::forward<F>(f);
     }
