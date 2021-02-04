@@ -109,24 +109,23 @@ namespace hpx { namespace agas {
 namespace hpx { namespace agas { namespace server {
 
     // Base name used to register the component
-    constexpr char const* const primary_namespace_service_name = "primary/";
+    static constexpr char const* const primary_namespace_service_name =
+        "primary/";
 
     struct HPX_EXPORT primary_namespace
       : components::fixed_component_base<primary_namespace>
     {
-        // {{{ nested types
-        typedef lcos::local::spinlock mutex_type;
-        typedef components::fixed_component_base<primary_namespace> base_type;
+        using mutex_type = lcos::local::spinlock;
+        using base_type = components::fixed_component_base<primary_namespace>;
 
-        typedef std::int32_t component_type;
+        using component_type = std::int32_t;
 
-        typedef std::pair<gva, naming::gid_type> gva_table_data_type;
-        typedef std::map<naming::gid_type, gva_table_data_type> gva_table_type;
-        typedef std::map<naming::gid_type, std::int64_t> refcnt_table_type;
+        using gva_table_data_type = std::pair<gva, naming::gid_type>;
+        using gva_table_type = std::map<naming::gid_type, gva_table_data_type>;
+        using refcnt_table_type = std::map<naming::gid_type, std::int64_t>;
 
-        typedef hpx::tuple<naming::gid_type, gva, naming::gid_type>
-            resolved_type;
-        // }}}
+        using resolved_type =
+            hpx::tuple<naming::gid_type, gva, naming::gid_type>;
 
     private:
         // REVIEW: Separate mutexes might reduce contention here. This has to be
@@ -135,10 +134,10 @@ namespace hpx { namespace agas { namespace server {
 
         gva_table_type gvas_;
         refcnt_table_type refcnts_;
-        typedef std::map<naming::gid_type,
+
+        using migration_table_type = std::map<naming::gid_type,
             hpx::tuple<bool, std::size_t,
-                lcos::local::detail::condition_variable>>
-            migration_table_type;
+                lcos::local::detail::condition_variable>>;
 
         std::string instance_name_;
         naming::gid_type next_id_;     // next available gid
@@ -173,7 +172,6 @@ namespace hpx { namespace agas { namespace server {
 
         public:
             // access current counter values
-            std::int64_t get_route_count(bool);
             std::int64_t get_bind_gid_count(bool);
             std::int64_t get_resolve_gid_count(bool);
             std::int64_t get_unbind_gid_count(bool);
@@ -184,7 +182,6 @@ namespace hpx { namespace agas { namespace server {
             std::int64_t get_end_migration_count(bool);
             std::int64_t get_overall_count(bool);
 
-            std::int64_t get_route_time(bool);
             std::int64_t get_bind_gid_time(bool);
             std::int64_t get_resolve_gid_time(bool);
             std::int64_t get_unbind_gid_time(bool);
@@ -196,7 +193,6 @@ namespace hpx { namespace agas { namespace server {
             std::int64_t get_overall_time(bool);
 
             // increment counter values
-            void increment_route_count();
             void increment_bind_gid_count();
             void increment_resolve_gid_count();
             void increment_unbind_gid_count();
@@ -208,7 +204,13 @@ namespace hpx { namespace agas { namespace server {
 
             void enable_all();
 
-            api_counter_data route_;          // primary_ns_
+#if defined(HPX_HAVE_NETWORKING)
+            std::int64_t get_route_count(bool);
+            std::int64_t get_route_time(bool);
+            void increment_route_count();
+            api_counter_data route_;    // primary_ns_
+#endif
+
             api_counter_data bind_gid_;       // primary_ns_bind_gid
             api_counter_data resolve_gid_;    // primary_ns_resolve_gid
             api_counter_data unbind_gid_;     // primary_ns_unbind_gid
@@ -239,7 +241,7 @@ namespace hpx { namespace agas { namespace server {
 
     public:
         primary_namespace()
-          : base_type(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB)
+          : base_type(agas::primary_ns_msb, agas::primary_ns_lsb)
           , mutex_()
           , instance_name_()
           , next_id_(naming::invalid_gid)
@@ -444,8 +446,9 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<std::int64_t>, vector_std_int64_type)
 
-namespace hpx { namespace traits {
 #if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_NETWORKING)
+namespace hpx { namespace traits {
+
     // Parcel routing forwards the message handler request to the routed action
     template <>
     struct action_message_handler<agas::server::primary_namespace::route_action>
@@ -469,7 +472,7 @@ namespace hpx { namespace traits {
             return agas::server::primary_namespace::get_serialization_filter(p);
         }
     };
-#endif
 }}    // namespace hpx::traits
+#endif
 
 #include <hpx/config/warnings_suffix.hpp>

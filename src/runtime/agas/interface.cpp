@@ -9,9 +9,9 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/util/generate_unique_ids.hpp>

@@ -12,8 +12,16 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/action_was_object_migrated.hpp>
+#include <hpx/agas/component_namespace.hpp>
+#include <hpx/agas/detail/bootstrap_component_namespace.hpp>
+#include <hpx/agas/detail/bootstrap_locality_namespace.hpp>
+#include <hpx/agas/locality_namespace.hpp>
 #include <hpx/agas/primary_namespace.hpp>
+#include <hpx/agas/server/component_namespace.hpp>
+#include <hpx/agas/server/locality_namespace.hpp>
 #include <hpx/agas/server/primary_namespace.hpp>
+#include <hpx/agas/server/symbol_namespace.hpp>
+#include <hpx/agas/symbol_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
@@ -33,18 +41,12 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
+#include <hpx/performance_counters/server/component_namespace_counters.hpp>
+#include <hpx/performance_counters/server/locality_namespace_counters.hpp>
 #include <hpx/performance_counters/server/primary_namespace_counters.hpp>
+#include <hpx/performance_counters/server/symbol_namespace_counters.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
-#include <hpx/runtime/agas/component_namespace.hpp>
-#include <hpx/runtime/agas/detail/bootstrap_component_namespace.hpp>
-#include <hpx/runtime/agas/detail/bootstrap_locality_namespace.hpp>
-#include <hpx/runtime/agas/locality_namespace.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
-#include <hpx/runtime/agas/server/component_namespace.hpp>
-#include <hpx/runtime/agas/server/locality_namespace.hpp>
-#include <hpx/runtime/agas/server/symbol_namespace.hpp>
-#include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
@@ -240,7 +242,7 @@ void addressing_service::launch_bootstrap(
     runtime_distributed& rtd = get_runtime_distributed();
 
     naming::gid_type const here =
-        naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
+        naming::get_gid_from_locality_id(agas::booststrap_prefix);
     set_local_locality(here);
 
     // store number of cores used by other processes
@@ -315,7 +317,7 @@ void addressing_service::launch_bootstrap(
     runtime_distributed& rtd = get_runtime_distributed();
 
     naming::gid_type const here =
-        naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
+        naming::get_gid_from_locality_id(agas::booststrap_prefix);
     set_local_locality(here);
 
     // store number of cores used by other processes
@@ -1076,19 +1078,19 @@ bool addressing_service::resolve_locally_known_addresses(
     }
 
     // authoritative AGAS component address resolution
-    if (HPX_AGAS_LOCALITY_NS_MSB == msb && HPX_AGAS_LOCALITY_NS_LSB == lsb)
+    if (agas::locality_ns_msb == msb && agas::locality_ns_lsb == lsb)
     {
         addr = locality_ns_->addr();
         return true;
     }
-    if (HPX_AGAS_COMPONENT_NS_MSB == msb && HPX_AGAS_COMPONENT_NS_LSB == lsb)
+    if (agas::component_ns_msb == msb && agas::component_ns_lsb == lsb)
     {
         addr = component_ns_->addr();
         return true;
     }
 
     naming::gid_type dest = naming::get_locality_from_gid(id);
-    if (HPX_AGAS_PRIMARY_NS_LSB == lsb)
+    if (agas::primary_ns_lsb == lsb)
     {
         // primary AGAS service on locality 0?
         if(dest == get_local_locality())
@@ -1105,7 +1107,7 @@ bool addressing_service::resolve_locally_known_addresses(
         return true;
     }
 
-    if (HPX_AGAS_SYMBOL_NS_LSB == lsb)
+    if (agas::symbol_ns_lsb == lsb)
     {
         // symbol AGAS service on this locality?
         if(dest == get_local_locality())
@@ -2112,125 +2114,6 @@ void addressing_service::start_shutdown(error_code& ec)
     send_refcnt_requests_sync(l, ec);
 }
 
-namespace detail
-{
-    // get action code from counter type
-    namespace_action_code retrieve_action_code(
-        std::string const& name
-      , error_code& ec
-        )
-    {
-        performance_counters::counter_path_elements p;
-        performance_counters::get_counter_path_elements(name, p, ec);
-        if (ec) return invalid_request;
-
-        if (p.objectname_ != "agas")
-        {
-            HPX_THROWS_IF(ec, bad_parameter, "retrieve_action_code",
-                "unknown performance counter (unrelated to AGAS)");
-            return invalid_request;
-        }
-
-        // component_ns
-        for (std::size_t i = 0;
-             i != num_component_namespace_services;
-             ++i)
-        {
-            if (p.countername_ == component_namespace_services[i].name_)
-                return component_namespace_services[i].code_;
-        }
-
-        // locality_ns
-        for (std::size_t i = 0;
-             i != num_locality_namespace_services;
-             ++i)
-        {
-            if (p.countername_ == locality_namespace_services[i].name_)
-                return locality_namespace_services[i].code_;
-        }
-
-        // primary_ns
-        for (std::size_t i = 0;
-             i != num_primary_namespace_services;
-             ++i)
-        {
-            if (p.countername_ == primary_namespace_services[i].name_)
-                return primary_namespace_services[i].code_;
-        }
-
-        // symbol_ns
-        for (std::size_t i = 0;
-             i != num_symbol_namespace_services;
-             ++i)
-        {
-            if (p.countername_ == symbol_namespace_services[i].name_)
-                return symbol_namespace_services[i].code_;
-        }
-
-        HPX_THROWS_IF(ec, bad_parameter, "retrieve_action_code",
-            "unknown performance counter (unrelated to AGAS)");
-        return invalid_request;
-    }
-
-    // get service action code from counter type
-    namespace_action_code retrieve_action_service_code(
-        std::string const& name
-      , error_code& ec
-        )
-    {
-        performance_counters::counter_path_elements p;
-        performance_counters::get_counter_path_elements(name, p, ec);
-        if (ec) return invalid_request;
-
-        if (p.objectname_ != "agas")
-        {
-            HPX_THROWS_IF(ec, bad_parameter, "retrieve_action_service_code",
-                "unknown performance counter (unrelated to AGAS)");
-            return invalid_request;
-        }
-
-        // component_ns
-        for (std::size_t i = 0;
-             i != num_component_namespace_services;
-             ++i)
-        {
-            if (p.countername_ == component_namespace_services[i].name_)
-                return component_namespace_services[i].service_code_;
-        }
-
-        // locality_ns
-        for (std::size_t i = 0;
-             i != num_locality_namespace_services;
-             ++i)
-        {
-            if (p.countername_ == locality_namespace_services[i].name_)
-                return locality_namespace_services[i].service_code_;
-        }
-
-        // primary_ns
-        for (std::size_t i = 0;
-             i != num_primary_namespace_services;
-             ++i)
-        {
-            if (p.countername_ == primary_namespace_services[i].name_)
-                return primary_namespace_services[i].service_code_;
-        }
-
-        // symbol_ns
-        for (std::size_t i = 0;
-             i != num_symbol_namespace_services;
-             ++i)
-        {
-            if (p.countername_ == symbol_namespace_services[i].name_)
-                return symbol_namespace_services[i].service_code_;
-        }
-
-        HPX_THROWS_IF(ec, bad_parameter, "retrieve_action_service_code",
-            "unknown performance counter (unrelated to AGAS)");
-        return invalid_request;
-    }
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions to access the current cache statistics
 std::uint64_t addressing_service::get_cache_entries(bool /* reset */)
@@ -2487,9 +2370,12 @@ void addressing_service::register_counter_types()
 
     // install counters for services
     primary_namespace_register_counter_types();
-    component_ns_->register_counter_types();
-    locality_ns_->register_counter_types();
-    symbol_ns_.register_counter_types();
+    if (service_type == service_mode_bootstrap)
+    {
+        component_namespace_register_counter_types();
+        locality_namespace_register_counter_types();
+    }
+    symbol_namespace_register_counter_types();
 
     // register root server
     std::uint32_t locality_id =

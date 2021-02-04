@@ -9,7 +9,7 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/address.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/synchronization/spinlock.hpp>

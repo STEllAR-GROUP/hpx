@@ -1,33 +1,28 @@
-////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/agas/detail/bootstrap_component_namespace.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/runtime/agas/detail/bootstrap_component_namespace.hpp>
 
 #include <cstdint>
 #include <string>
 #include <vector>
 
-namespace hpx { namespace agas { namespace detail
-{
+namespace hpx { namespace agas { namespace detail {
+
     naming::address bootstrap_component_namespace::addr() const
     {
-        return naming::address(
-            hpx::get_locality(),
-            components::component_agas_component_namespace,
-            this->ptr()
-        );
+        return naming::address(hpx::get_locality(),
+            components::component_agas_component_namespace, this->ptr());
     }
 
     naming::id_type bootstrap_component_namespace::gid() const
     {
         return naming::id_type(
-            naming::gid_type(HPX_AGAS_COMPONENT_NS_MSB, HPX_AGAS_COMPONENT_NS_LSB),
+            naming::gid_type(agas::component_ns_msb, agas::component_ns_lsb),
             naming::id_type::unmanaged);
     }
 
@@ -37,14 +32,14 @@ namespace hpx { namespace agas { namespace detail
         return server_.bind_prefix(key, prefix);
     }
 
-    components::component_type
-    bootstrap_component_namespace::bind_name(std::string const& name)
+    components::component_type bootstrap_component_namespace::bind_name(
+        std::string const& name)
     {
         return server_.bind_name(name);
     }
 
-    std::vector<std::uint32_t>
-    bootstrap_component_namespace::resolve_id(components::component_type key)
+    std::vector<std::uint32_t> bootstrap_component_namespace::resolve_id(
+        components::component_type key)
     {
         return server_.resolve_id(key);
     }
@@ -54,40 +49,27 @@ namespace hpx { namespace agas { namespace detail
         return server_.unbind(key);
     }
 
-    void
-    bootstrap_component_namespace::iterate_types(
+    void bootstrap_component_namespace::iterate_types(
         iterate_types_function_type const& f)
     {
         return server_.iterate_types(f);
     }
 
-    std::string
-    bootstrap_component_namespace::get_component_type_name(
+    std::string bootstrap_component_namespace::get_component_type_name(
         components::component_type type)
     {
         return server_.get_component_type_name(type);
     }
 
-    lcos::future<std::uint32_t> bootstrap_component_namespace::get_num_localities(
+    lcos::future<std::uint32_t>
+    bootstrap_component_namespace::get_num_localities(
         components::component_type type)
     {
         return hpx::make_ready_future(server_.get_num_localities(type));
     }
 
-    naming::gid_type bootstrap_component_namespace::statistics_counter(
-        std::string const& name)
-    {
-        return server_.statistics_counter(name);
-    }
-
-    void bootstrap_component_namespace::register_counter_types()
-    {
-        server::component_namespace::register_counter_types();
-        server::component_namespace::register_global_counter_types();
-    }
-
-    void
-    bootstrap_component_namespace::register_server_instance(std::uint32_t locality_id)
+    void bootstrap_component_namespace::register_server_instance(
+        std::uint32_t locality_id)
     {
         HPX_ASSERT(locality_id == 0);
         HPX_UNUSED(locality_id);
@@ -95,8 +77,9 @@ namespace hpx { namespace agas { namespace detail
         server_.register_server_instance(servicename);
     }
 
-    void bootstrap_component_namespace::unregister_server_instance(error_code& ec)
+    void bootstrap_component_namespace::unregister_server_instance(
+        error_code& ec)
     {
         server_.unregister_server_instance(ec);
     }
-}}}
+}}}    // namespace hpx::agas::detail

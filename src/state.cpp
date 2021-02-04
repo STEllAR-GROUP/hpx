@@ -7,9 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/runtime_distributed.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/runtime_distributed.hpp>
 #include <hpx/state.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

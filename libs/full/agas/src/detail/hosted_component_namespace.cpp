@@ -1,18 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
 
-#include <hpx/assert.hpp>
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/agas/detail/hosted_component_namespace.hpp>
+#include <hpx/agas/server/component_namespace.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/async_distributed.hpp>
-#include <hpx/runtime/agas/detail/hosted_component_namespace.hpp>
-#include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -20,10 +18,10 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace agas { namespace detail
-{
+namespace hpx { namespace agas { namespace detail {
+
     hosted_component_namespace::hosted_component_namespace(naming::address addr)
-      : gid_(naming::gid_type(HPX_AGAS_COMPONENT_NS_MSB, HPX_AGAS_COMPONENT_NS_LSB),
+      : gid_(naming::gid_type(agas::component_ns_msb, agas::component_ns_lsb),
             naming::id_type::unmanaged)
       , addr_(addr)
     {
@@ -43,8 +41,8 @@ namespace hpx { namespace agas { namespace detail
 #endif
     }
 
-    components::component_type
-    hosted_component_namespace::bind_name(std::string const& name)
+    components::component_type hosted_component_namespace::bind_name(
+        std::string const& name)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         server::component_namespace::bind_name_action action;
@@ -56,8 +54,8 @@ namespace hpx { namespace agas { namespace detail
 #endif
     }
 
-    std::vector<std::uint32_t>
-    hosted_component_namespace::resolve_id(components::component_type key)
+    std::vector<std::uint32_t> hosted_component_namespace::resolve_id(
+        components::component_type key)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         server::component_namespace::resolve_id_action action;
@@ -81,8 +79,8 @@ namespace hpx { namespace agas { namespace detail
 #endif
     }
 
-    void
-    hosted_component_namespace::iterate_types(iterate_types_function_type const& f)
+    void hosted_component_namespace::iterate_types(
+        iterate_types_function_type const& f)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         server::component_namespace::iterate_types_action action;
@@ -93,8 +91,7 @@ namespace hpx { namespace agas { namespace detail
 #endif
     }
 
-    std::string
-    hosted_component_namespace::get_component_type_name(
+    std::string hosted_component_namespace::get_component_type_name(
         components::component_type type)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -119,19 +116,6 @@ namespace hpx { namespace agas { namespace detail
         return hpx::make_ready_future(std::uint32_t(1));
 #endif
     }
-
-    naming::gid_type hosted_component_namespace::statistics_counter(
-        std::string const& name)
-    {
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-        server::component_namespace::statistics_counter_action action;
-        return action(gid_, name).get_gid();
-#else
-        HPX_UNUSED(name);
-        HPX_ASSERT(false);
-        return hpx::naming::invalid_gid;
-#endif
-    }
-}}}
+}}}    // namespace hpx::agas::detail
 
 #endif

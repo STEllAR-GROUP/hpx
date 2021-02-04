@@ -14,6 +14,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(performance_counters_headers
     hpx/performance_counters/action_invocation_counter_discoverer.hpp
+    hpx/performance_counters/agas_namespace_action_code.hpp
     hpx/performance_counters/apex_sample_value.hpp
     hpx/performance_counters/base_performance_counter.hpp
     hpx/performance_counters/counter_creators.hpp
@@ -31,14 +32,18 @@ set(performance_counters_headers
     hpx/performance_counters/server/arithmetics_counter_extended.hpp
     hpx/performance_counters/server/base_performance_counter.hpp
     hpx/performance_counters/server/elapsed_time_counter.hpp
+    hpx/performance_counters/server/component_namespace_counters.hpp
+    hpx/performance_counters/server/locality_namespace_counters.hpp
     hpx/performance_counters/server/primary_namespace_counters.hpp
     hpx/performance_counters/server/raw_counter.hpp
     hpx/performance_counters/server/raw_values_counter.hpp
     hpx/performance_counters/server/statistics_counter.hpp
+    hpx/performance_counters/server/symbol_namespace_counters.hpp
 )
 
 set(performance_counters_sources
     action_invocation_counter_discoverer.cpp
+    agas_namespace_action_code.cpp
     counter_creators.cpp
     counter_parser.cpp
     counters.cpp
@@ -54,10 +59,13 @@ set(performance_counters_sources
     server/component_instance_counter.cpp
     server/elapsed_time_counter.cpp
     server/per_action_data_counters.cpp
+    server/component_namespace_counters.cpp
+    server/locality_namespace_counters.cpp
     server/primary_namespace_counters.cpp
     server/raw_values_counter.cpp
     server/raw_counter.cpp
     server/statistics_counter.cpp
+    server/symbol_namespace_counters.cpp
 )
 
 include(HPX_AddModule)

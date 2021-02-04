@@ -15,12 +15,12 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming/credit_handling.hpp>
+#include <hpx/performance_counters/agas_namespace_action_code.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/server/primary_namespace_counters.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -101,15 +101,13 @@ namespace hpx { namespace agas { namespace server {
                 agas::detail::counter_target_count)
             {
                 help = "returns the overall number of invocations of all "
-                       "primary "
-                       "AGAS services";
+                       "primary AGAS services";
                 type = performance_counters::counter_monotonically_increasing;
             }
             else
             {
                 help = "returns the overall execution time of all primary "
-                       "AGAS "
-                       "services";
+                       "AGAS services";
                 type = performance_counters::counter_elapsed_time;
             }
 
@@ -133,12 +131,14 @@ namespace hpx { namespace agas { namespace server {
     {    // statistics_counter implementation
         LAGAS_(info) << "primary_namespace_statistics_counter";
 
-        hpx::error_code ec = hpx::throws;
+        hpx::error_code ec;
 
         performance_counters::counter_path_elements p;
         performance_counters::get_counter_path_elements(name, p, ec);
         if (ec)
+        {
             return naming::invalid_gid;
+        }
 
         if (p.objectname_ != "agas")
         {
@@ -176,11 +176,13 @@ namespace hpx { namespace agas { namespace server {
         {
             switch (code)
             {
+#if defined(HPX_HAVE_NETWORKING)
             case primary_ns_route:
                 get_data_func = util::bind_front(
                     &cd::get_route_count, &service.counter_data_);
                 service.counter_data_.route_.enabled_ = true;
                 break;
+#endif
             case primary_ns_bind_gid:
                 get_data_func = util::bind_front(
                     &cd::get_bind_gid_count, &service.counter_data_);
@@ -237,11 +239,13 @@ namespace hpx { namespace agas { namespace server {
             HPX_ASSERT(agas::detail::counter_target_time == target);
             switch (code)
             {
+#if defined(HPX_HAVE_NETWORKING)
             case primary_ns_route:
                 get_data_func = util::bind_front(
                     &cd::get_route_time, &service.counter_data_);
                 service.counter_data_.route_.enabled_ = true;
                 break;
+#endif
             case primary_ns_bind_gid:
                 get_data_func = util::bind_front(
                     &cd::get_bind_gid_time, &service.counter_data_);

@@ -38,7 +38,6 @@
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
@@ -272,7 +271,7 @@ namespace hpx {
             // If load_components returns false, shutdown the system. This
             // essentially only happens if the command line contained --exit.
             runtime_support::shutdown_all(
-                naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX),
+                naming::get_id_from_locality_id(agas::booststrap_prefix),
                 -1.0);
             return exit_code;
         }
@@ -880,7 +879,7 @@ namespace hpx {
         if (terminate_all)
         {
             components::stubs::runtime_support::terminate_all(
-                naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
+                naming::get_id_from_locality_id(agas::booststrap_prefix));
         }
 
         return report_exception;

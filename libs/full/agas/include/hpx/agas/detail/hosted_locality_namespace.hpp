@@ -1,42 +1,48 @@
-////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2012-2013 Hartmut Kaiser
+//  Copyright (c) 2012-2021 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
 #include <hpx/config.hpp>
 
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/agas/agas_fwd.hpp>
+#include <hpx/agas/locality_namespace.hpp>
+#include <hpx/agas/server/locality_namespace.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/agas/locality_namespace.hpp>
-#include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 
 #include <cstdint>
+#include <map>
 #include <string>
 #include <vector>
 
-namespace hpx { namespace agas { namespace detail
-{
-    struct bootstrap_locality_namespace : locality_namespace
+namespace hpx { namespace agas { namespace detail {
+
+    struct hosted_locality_namespace : locality_namespace
     {
-        explicit bootstrap_locality_namespace(
-            server::primary_namespace* primary);
+        explicit hosted_locality_namespace(naming::address addr);
 
         naming::address::address_type ptr() const override
         {
-            return reinterpret_cast<naming::address::address_type>(&server_);
+            return addr_.address_;
         }
-        naming::address addr() const override;
-        naming::id_type gid() const override;
+        naming::address addr() const override
+        {
+            return addr_;
+        }
+        naming::id_type gid() const override
+        {
+            return gid_;
+        }
 
         std::uint32_t allocate(parcelset::endpoints_type const& endpoints,
             std::uint64_t count, std::uint32_t num_threads,
@@ -59,16 +65,13 @@ namespace hpx { namespace agas { namespace detail
         std::uint32_t get_num_overall_threads() override;
         hpx::future<std::uint32_t> get_num_overall_threads_async() override;
 
-        naming::gid_type statistics_counter(std::string name) override;
-
-        void register_counter_types() override;
-
-        void register_server_instance(std::uint32_t locality_id) override;
-
-        void unregister_server_instance(error_code& ec) override;
-
     private:
-        server::locality_namespace server_;
+        naming::id_type gid_;
+        naming::address addr_;
     };
-}}}
+}}}    // namespace hpx::agas::detail
 
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::parcelset::endpoints_type, parcelset_endpoints_type)
+
+#endif

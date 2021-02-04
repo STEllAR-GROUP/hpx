@@ -13,8 +13,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/agas/agas_fwd.hpp>
+#include <hpx/agas/component_namespace.hpp>
 #include <hpx/agas/gva.hpp>
+#include <hpx/agas/locality_namespace.hpp>
 #include <hpx/agas/primary_namespace.hpp>
+#include <hpx/agas/symbol_namespace.hpp>
 #include <hpx/cache/lru_cache.hpp>
 #include <hpx/cache/statistics/local_full_statistics.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
@@ -23,9 +26,6 @@
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/agas/component_namespace.hpp>
-#include <hpx/runtime/agas/locality_namespace.hpp>
-#include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/synchronization/spinlock.hpp>
@@ -224,6 +224,21 @@ public:
     naming::address::address_type get_symbol_ns_lva() const
     {
         return symbol_ns_.ptr();
+    }
+
+    server::component_namespace* get_local_component_namespace_service()
+    {
+        return component_ns_->get_service();
+    }
+
+    server::locality_namespace* get_local_locality_namespace_service()
+    {
+        return locality_ns_->get_service();
+    }
+
+    server::symbol_namespace& get_local_symbol_namespace_service()
+    {
+        return symbol_ns_.get_service();
     }
 
 protected:

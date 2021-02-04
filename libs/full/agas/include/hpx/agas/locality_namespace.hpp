@@ -1,4 +1,3 @@
-////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2012-2013 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
@@ -6,12 +5,11 @@
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
 #include <hpx/config.hpp>
-
+#include <hpx/agas/server/locality_namespace.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -21,8 +19,8 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace agas
-{
+namespace hpx { namespace agas {
+
     struct locality_namespace
     {
         virtual ~locality_namespace() = default;
@@ -47,19 +45,19 @@ namespace hpx { namespace agas
         virtual hpx::future<std::uint32_t> get_num_localities_async() = 0;
 
         virtual std::vector<std::uint32_t> get_num_threads() = 0;
-        virtual hpx::future<std::vector<std::uint32_t> > get_num_threads_async() = 0;
+        virtual hpx::future<std::vector<std::uint32_t>>
+        get_num_threads_async() = 0;
 
         virtual std::uint32_t get_num_overall_threads() = 0;
         virtual hpx::future<std::uint32_t> get_num_overall_threads_async() = 0;
 
-        virtual naming::gid_type statistics_counter(std::string name) = 0;
-
-        virtual void register_counter_types() {}
-
         virtual void register_server_instance(std::uint32_t /*locality_id*/) {}
 
         virtual void unregister_server_instance(error_code& /*ec*/) {}
+
+        virtual server::locality_namespace* get_service()
+        {
+            return nullptr;
+        }
     };
-}}
-
-
+}}    // namespace hpx::agas

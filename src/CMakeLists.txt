@@ -23,18 +23,8 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     lcos/promise.cpp
     runtime/agas/addressing_service.cpp
     runtime/agas/big_boot_barrier.cpp
-    runtime/agas/component_namespace.cpp
-    runtime/agas/detail/bootstrap_component_namespace.cpp
-    runtime/agas/detail/bootstrap_locality_namespace.cpp
-    runtime/agas/detail/hosted_component_namespace.cpp
-    runtime/agas/detail/hosted_locality_namespace.cpp
     runtime/agas/interface.cpp
-    runtime/agas/locality_namespace.cpp
-    runtime/agas/server/component_namespace_server.cpp
-    runtime/agas/server/locality_namespace_server.cpp
     runtime/agas/server/route.cpp
-    runtime/agas/server/symbol_namespace_server.cpp
-    runtime/agas/symbol_namespace.cpp
     runtime/applier/applier.cpp
     runtime/applier/bind_naming_wrappers.cpp
     runtime/components/binpacking_distribution_policy.cpp
@@ -150,18 +140,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/actions/make_continuation.hpp
     hpx/runtime/agas/addressing_service.hpp
     hpx/runtime/agas/big_boot_barrier.hpp
-    hpx/runtime/agas/component_namespace.hpp
-    hpx/runtime/agas/detail/bootstrap_component_namespace.hpp
-    hpx/runtime/agas/detail/bootstrap_locality_namespace.hpp
-    hpx/runtime/agas/detail/hosted_component_namespace.hpp
-    hpx/runtime/agas/detail/hosted_locality_namespace.hpp
     hpx/runtime/agas/interface.hpp
-    hpx/runtime/agas/locality_namespace.hpp
-    hpx/runtime/agas/namespace_action_code.hpp
-    hpx/runtime/agas/server/component_namespace.hpp
-    hpx/runtime/agas/server/locality_namespace.hpp
-    hpx/runtime/agas/server/symbol_namespace.hpp
-    hpx/runtime/agas/symbol_namespace.hpp
     hpx/runtime/basename_registration_fwd.hpp
     hpx/runtime/basename_registration.hpp
     hpx/runtime/components/binpacking_distribution_policy.hpp
@@ -220,7 +199,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/get_locality_name.hpp
     hpx/runtime/get_ptr.hpp
     hpx/runtime/message_handler_fwd.hpp
-    hpx/runtime/naming/resolver_client.hpp
     hpx/runtime/parcelset/decode_parcels.hpp
     hpx/runtime/parcelset/detail/call_for_each.hpp
     hpx/runtime/parcelset/detail/data_point.hpp

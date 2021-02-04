@@ -13,8 +13,8 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/naming.hpp>
 #include <hpx/modules/threadmanager.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/threading_base/thread_data.hpp>

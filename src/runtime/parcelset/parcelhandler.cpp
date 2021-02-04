@@ -11,8 +11,8 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/config/asio.hpp>
-#include <hpx/config/endian.hpp>
 #include <hpx/config/detail/compat_error_code.hpp>
+#include <hpx/config/endian.hpp>
 #include <hpx/actions/continuation.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
@@ -31,8 +31,8 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/preprocessor/stringize.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/message_handler_fwd.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/runtime/parcelset/static_parcelports.hpp>

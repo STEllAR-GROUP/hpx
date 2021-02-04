@@ -18,7 +18,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/parcelset/detail/data_point.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>

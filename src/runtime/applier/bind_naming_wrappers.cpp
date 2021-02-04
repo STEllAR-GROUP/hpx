@@ -12,7 +12,7 @@
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/gid_type.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 
 #include <cstddef>
 

@@ -1,21 +1,19 @@
-////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2012-2017 Hartmut Kaiser
+//  Copyright (c) 2012-2021 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/agas/detail/hosted_locality_namespace.hpp>
+#include <hpx/agas/server/locality_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/agas/detail/hosted_locality_namespace.hpp>
-#include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -25,14 +23,14 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace agas { namespace detail
-{
+namespace hpx { namespace agas { namespace detail {
+
     hosted_locality_namespace::hosted_locality_namespace(naming::address addr)
-      : gid_(
-            naming::gid_type(HPX_AGAS_LOCALITY_NS_MSB, HPX_AGAS_LOCALITY_NS_LSB),
+      : gid_(naming::gid_type(agas::locality_ns_msb, agas::locality_ns_lsb),
             naming::id_type::unmanaged)
       , addr_(addr)
-    {}
+    {
+    }
 
     std::uint32_t hosted_locality_namespace::allocate(
         parcelset::endpoints_type const& /* endpoints */,
@@ -77,7 +75,7 @@ namespace hpx { namespace agas { namespace detail
             // this should happen only during bootstrap
             HPX_ASSERT(hpx::is_starting());
 
-            while(!endpoints_future.is_ready())
+            while (!endpoints_future.is_ready())
                 /**/;
         }
 
@@ -100,7 +98,8 @@ namespace hpx { namespace agas { namespace detail
 #endif
     }
 
-    hpx::future<std::uint32_t> hosted_locality_namespace::get_num_localities_async()
+    hpx::future<std::uint32_t>
+    hosted_locality_namespace::get_num_localities_async()
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         server::locality_namespace::get_num_localities_action action;
@@ -156,18 +155,6 @@ namespace hpx { namespace agas { namespace detail
         return hpx::make_ready_future(std::uint32_t{});
 #endif
     }
-
-    naming::gid_type hosted_locality_namespace::statistics_counter(std::string name)
-    {
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-        server::locality_namespace::statistics_counter_action action;
-        return action(gid_, name).get_gid();
-#else
-        HPX_UNUSED(name);
-        HPX_ASSERT(false);
-        return naming::gid_type{};
-#endif
-    }
-}}}
+}}}    // namespace hpx::agas::detail
 
 #endif

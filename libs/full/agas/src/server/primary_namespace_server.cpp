@@ -1,12 +1,10 @@
-////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2019 Hartmut Kaiser
+//  Copyright (c) 2012-2021 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
 #include <hpx/actions/continuation.hpp>
@@ -16,12 +14,10 @@
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/execution_base/register_locks.hpp>
 #include <hpx/format.hpp>
-#include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/timing/scoped_timer.hpp>
@@ -43,13 +39,12 @@ namespace hpx { namespace agas {
 
     naming::gid_type bootstrap_primary_namespace_gid()
     {
-        return naming::gid_type(
-            HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB);
+        return naming::gid_type(agas::primary_ns_msb, agas::primary_ns_lsb);
     }
 
     naming::id_type bootstrap_primary_namespace_id()
     {
-        return naming::id_type(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB,
+        return naming::id_type(agas::primary_ns_msb, agas::primary_ns_lsb,
             naming::id_type::unmanaged);
     }
 }}    // namespace hpx::agas
@@ -1146,11 +1141,6 @@ namespace hpx { namespace agas { namespace server {
     }    // }}}
 
     // access current counter values
-    std::int64_t primary_namespace::counter_data::get_route_count(bool reset)
-    {
-        return util::get_and_reset_value(route_.count_, reset);
-    }
-
     std::int64_t primary_namespace::counter_data::get_bind_gid_count(bool reset)
     {
         return util::get_and_reset_value(bind_gid_.count_, reset);
@@ -1199,7 +1189,10 @@ namespace hpx { namespace agas { namespace server {
 
     std::int64_t primary_namespace::counter_data::get_overall_count(bool reset)
     {
-        return util::get_and_reset_value(route_.count_, reset) +
+        return
+#if defined(HPX_HAVE_NETWORKING)
+            util::get_and_reset_value(route_.count_, reset) +
+#endif
             util::get_and_reset_value(bind_gid_.count_, reset) +
             util::get_and_reset_value(resolve_gid_.count_, reset) +
             util::get_and_reset_value(unbind_gid_.count_, reset) +
@@ -1211,11 +1204,6 @@ namespace hpx { namespace agas { namespace server {
     }
 
     // access execution time counters
-    std::int64_t primary_namespace::counter_data::get_route_time(bool reset)
-    {
-        return util::get_and_reset_value(route_.time_, reset);
-    }
-
     std::int64_t primary_namespace::counter_data::get_bind_gid_time(bool reset)
     {
         return util::get_and_reset_value(bind_gid_.time_, reset);
@@ -1264,7 +1252,10 @@ namespace hpx { namespace agas { namespace server {
 
     std::int64_t primary_namespace::counter_data::get_overall_time(bool reset)
     {
-        return util::get_and_reset_value(route_.time_, reset) +
+        return
+#if defined(HPX_HAVE_NETWORKING)
+            util::get_and_reset_value(route_.time_, reset) +
+#endif
             util::get_and_reset_value(bind_gid_.time_, reset) +
             util::get_and_reset_value(resolve_gid_.time_, reset) +
             util::get_and_reset_value(unbind_gid_.time_, reset) +
@@ -1277,7 +1268,9 @@ namespace hpx { namespace agas { namespace server {
 
     void primary_namespace::counter_data::enable_all()
     {
+#if defined(HPX_HAVE_NETWORKING)
         route_.enabled_ = true;
+#endif
         bind_gid_.enabled_ = true;
         resolve_gid_.enabled_ = true;
         unbind_gid_.enabled_ = true;
@@ -1289,14 +1282,6 @@ namespace hpx { namespace agas { namespace server {
     }
 
     // increment counter values
-    void primary_namespace::counter_data::increment_route_count()
-    {
-        if (route_.enabled_)
-        {
-            ++route_.count_;
-        }
-    }
-
     void primary_namespace::counter_data::increment_bind_gid_count()
     {
         if (bind_gid_.enabled_)
@@ -1360,5 +1345,25 @@ namespace hpx { namespace agas { namespace server {
             ++end_migration_.count_;
         }
     }
+
+#if defined(HPX_HAVE_NETWORKING)
+    std::int64_t primary_namespace::counter_data::get_route_count(bool reset)
+    {
+        return util::get_and_reset_value(route_.count_, reset);
+    }
+
+    std::int64_t primary_namespace::counter_data::get_route_time(bool reset)
+    {
+        return util::get_and_reset_value(route_.time_, reset);
+    }
+
+    void primary_namespace::counter_data::increment_route_count()
+    {
+        if (route_.enabled_)
+        {
+            ++route_.count_;
+        }
+    }
+#endif
 
 }}}    // namespace hpx::agas::server

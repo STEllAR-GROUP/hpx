@@ -1,40 +1,43 @@
-////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
+#include <hpx/agas/component_namespace.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/agas/component_namespace.hpp>
-#include <hpx/runtime/agas/server/component_namespace.hpp>
 
 #include <cstdint>
 #include <string>
 #include <vector>
 
-namespace hpx { namespace agas { namespace detail
-{
-    struct bootstrap_component_namespace
-        : component_namespace
+namespace hpx { namespace agas { namespace detail {
+
+    struct hosted_component_namespace : component_namespace
     {
-        typedef hpx::util::function<
-            void(std::string const&, components::component_type)
-        > iterate_types_function_type;
+        explicit hosted_component_namespace(naming::address addr);
+        hosted_component_namespace();
 
         naming::address::address_type ptr() const
         {
-            return reinterpret_cast<naming::address::address_type>(&server_);
+            return addr_.address_;
         }
-        naming::address addr() const;
-        naming::id_type gid() const;
+        naming::address addr() const
+        {
+            return addr_;
+        }
+        naming::id_type gid() const
+        {
+            return gid_;
+        }
 
         components::component_type bind_prefix(
             std::string const& key, std::uint32_t prefix);
@@ -52,18 +55,11 @@ namespace hpx { namespace agas { namespace detail
         lcos::future<std::uint32_t> get_num_localities(
             components::component_type type);
 
-        naming::gid_type statistics_counter(std::string const& name);
-
-        void register_counter_types();
-
-        void register_server_instance(std::uint32_t locality_id);
-
-        void unregister_server_instance(error_code& ec);
-
     private:
-        server::component_namespace server_;
+        naming::id_type gid_;
+        naming::address addr_;
     };
 
-}}}
+}}}    // namespace hpx::agas::detail
 
-
+#endif

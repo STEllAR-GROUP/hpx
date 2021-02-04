@@ -98,8 +98,7 @@ namespace hpx { namespace agas {
     naming::gid_type primary_namespace::get_service_instance(
         std::uint32_t service_locality_id)
     {
-        naming::gid_type service(
-            HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB);
+        naming::gid_type service(agas::primary_ns_msb, agas::primary_ns_lsb);
         return naming::replace_locality_id(service, service_locality_id);
     }
 
@@ -122,9 +121,9 @@ namespace hpx { namespace agas {
 
     bool primary_namespace::is_service_instance(naming::gid_type const& gid)
     {
-        return gid.get_lsb() == HPX_AGAS_PRIMARY_NS_LSB &&
+        return gid.get_lsb() == agas::primary_ns_lsb &&
             (gid.get_msb() & ~naming::gid_type::locality_id_mask) ==
-            HPX_AGAS_PRIMARY_NS_MSB;
+            agas::primary_ns_msb;
     }
 
     primary_namespace::primary_namespace()
