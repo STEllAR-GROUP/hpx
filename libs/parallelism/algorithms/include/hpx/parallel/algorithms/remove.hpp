@@ -466,7 +466,10 @@ namespace hpx {
         // clang-format off
         template <typename FwdIter,
             typename Pred, HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter>::value
+                hpx::traits::is_iterator<FwdIter>::value &&
+                hpx::is_invocable_v<Pred,
+                    typename std::iterator_traits<FwdIter>::value_type
+                >
             )>
         // clang-format on
         friend FwdIter tag_invoke(
@@ -485,7 +488,10 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter,
             typename Pred, HPX_CONCEPT_REQUIRES_(
                 parallel::execution::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter>::value
+                hpx::traits::is_iterator<FwdIter>::value &&
+                hpx::is_invocable_v<Pred,
+                    typename std::iterator_traits<FwdIter>::value_type
+                >
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,

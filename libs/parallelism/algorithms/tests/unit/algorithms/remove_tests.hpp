@@ -534,60 +534,6 @@ void test_remove_bad_alloc_async(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag, typename DataType>
-void test_remove_etc(ExPolicy policy, IteratorTag, DataType, int rand_base,
-    bool test_for_remove_if = false)
-{
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
-
-    typedef typename std::vector<DataType>::iterator base_iterator;
-
-    std::size_t const size = 10007;
-    std::vector<DataType> c(size), org;
-    std::generate(
-        std::begin(c), std::end(c), random_fill(rand_base, size / 10));
-    org = c;
-
-    // Test projection.
-    {
-        typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-        c = org;
-
-        DataType value(rand_base);
-        iterator result;
-
-        if (test_for_remove_if)
-        {
-            // The new overloads do not accept projections.
-            // We use the deprecated version instead.
-            result = hpx::parallel::remove_if(
-                policy, iterator(std::begin(c)), iterator(std::end(c)),
-                [&value](DataType const& a) -> bool { return a == value; },
-                [&value](DataType const&) -> DataType& {
-                    // This is projection.
-                    return value;
-                });
-        }
-        else
-        {
-            // The new overloads do not accept projections.
-            // We use the deprecated version instead.
-            result = hpx::parallel::remove(policy, iterator(std::begin(c)),
-                iterator(std::end(c)), value,
-                [&value](DataType const&) -> DataType& {
-                    // This is projection.
-                    return value;
-                });
-        }
-
-        auto dist = std::distance(std::begin(c), result.base());
-        HPX_TEST_EQ(dist, 0);
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_remove(IteratorTag, int rand_base)
 {
@@ -707,10 +653,6 @@ void test_remove(bool test_for_remove_if = false)
     {
         test_remove(IteratorTag(), rand_base);
     }
-
-    ////////// Another test cases for justifying the implementation.
-    test_remove_etc(hpx::execution::seq, IteratorTag(), user_defined_type(),
-        rand_base, test_for_remove_if);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

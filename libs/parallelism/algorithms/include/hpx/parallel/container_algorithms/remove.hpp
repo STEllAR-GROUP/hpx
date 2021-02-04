@@ -485,15 +485,18 @@ namespace hpx {
 
 namespace hpx { namespace parallel { inline namespace v1 {
 
+    // clang-format off
     template <typename ExPolicy, typename Rng, typename T,
         typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&& hpx::traits::is_range<
-                Rng>::value&& traits::is_projected_range<Proj, Rng>::value)>
+            hpx::is_execution_policy<ExPolicy>::value&&
+            hpx::traits::is_range<Rng>::value&&
+            traits::is_projected_range<Proj, Rng>::value
+        )>
+    // clang-format on
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::remove is deprecated, use hpx::ranges::remove "
-        "instead")
-    typename util::detail::algorithm_result<ExPolicy,
+        "instead") typename util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng>::type>::type
         remove(
             ExPolicy&& policy, Rng&& rng, T const& value, Proj&& proj = Proj())
@@ -502,12 +505,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::util::end(rng), value, std::forward<Proj>(proj));
     }
 
+    // clang-format off
     template <typename ExPolicy, typename Rng, typename Pred,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
-                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
-                    Pred, traits::projected_range<Proj, Rng>>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value&&
+            hpx::traits::is_range<Rng>::value&&
+            traits::is_projected_range<Proj, Rng>::value&&
+            traits::is_indirect_callable<ExPolicy,
+                Pred, traits::projected_range<Proj, Rng>>::value
+        )>
+    // clang-format on
     typename util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng>::type>::type
     remove_if(ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj())
@@ -534,7 +542,10 @@ namespace hpx { namespace ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter>::value &&
                 hpx::parallel::traits::is_projected<Proj, FwdIter>::value &&
-                hpx::traits::is_sentinel_for<Sent, FwdIter>::value
+                hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
+                hpx::is_invocable_v<Pred,
+                    typename std::iterator_traits<FwdIter>::value_type
+                >
             )>
         // clang-format on
         friend subrange_t<FwdIter, Sent> tag_invoke(hpx::ranges::remove_if_t,
@@ -555,7 +566,12 @@ namespace hpx { namespace ranges {
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
-                hpx::parallel::traits::is_projected_range<Proj, Rng>::value
+                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
+                hpx::is_invocable_v<Pred,
+                    typename std::iterator_traits<
+                        typename hpx::traits::range_iterator<Rng>::type
+                    >::value_type
+                >
             )>
         // clang-format on
         friend subrange_t<typename hpx::traits::range_iterator<Rng>::type>

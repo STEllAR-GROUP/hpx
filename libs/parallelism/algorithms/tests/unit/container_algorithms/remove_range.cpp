@@ -21,6 +21,9 @@
 #include "iter_sent.hpp"
 #include "test_utils.hpp"
 
+unsigned int seed = std::random_device{}();
+std::mt19937 g(seed);
+
 ////////////////////////////////////////////////////////////////////////////
 struct user_defined_type
 {
@@ -180,6 +183,47 @@ void test_remove_async(ExPolicy policy, DataType)
     HPX_TEST(equality);
 }
 
+template <typename ExPolicy, typename DataType>
+void test_remove_proj(
+    ExPolicy policy, DataType, int rand_base, bool test_for_remove_if = false)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    std::size_t const size = 10007;
+    std::vector<DataType> c(size);
+    std::generate(
+        std::begin(c), std::end(c), random_fill(rand_base, size / 10));
+
+    // Test projection.
+    {
+        DataType value(rand_base);
+
+        if (test_for_remove_if)
+        {
+            auto result = hpx::ranges::remove_if(
+                policy, std::begin(c), std::end(c),
+                [&value](DataType const& a) -> bool { return a == value; },
+                [&value](DataType const&) -> DataType& {
+                    // This is the projection.
+                    return value;
+                });
+            auto dist = std::distance(std::begin(c), std::begin(result));
+            HPX_TEST_EQ(dist, 0);
+        }
+        else
+        {
+            auto result = hpx::ranges::remove(policy, std::begin(c),
+                std::end(c), value, [&value](DataType const&) -> DataType& {
+                    // This is the projection.
+                    return value;
+                });
+            auto dist = std::distance(std::begin(c), std::begin(result));
+            HPX_TEST_EQ(dist, 0);
+        }
+    }
+}
+
 template <typename DataType>
 void test_remove()
 {
@@ -196,6 +240,15 @@ void test_remove()
     test_remove_sent();
     test_remove_sent(par);
     test_remove_sent(par_unseq);
+
+    // test projection
+    int rand_base = g();
+    test_remove_proj(seq, DataType(), rand_base);
+    test_remove_proj(seq, DataType(), rand_base, true);
+    test_remove_proj(par, DataType(), rand_base);
+    test_remove_proj(par, DataType(), rand_base, true);
+    test_remove_proj(par_unseq, DataType(), rand_base);
+    test_remove_proj(par_unseq, DataType(), rand_base, true);
 }
 
 void test_remove()
