@@ -11,15 +11,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions/actions_fwd.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
-
+#include <hpx/actions/traits/action_continuation.hpp>
 #include <hpx/actions_base/actions_base_fwd.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/detail/action_factory.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
+#include <hpx/runtime/parcelset_fwd.hpp>
+
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -135,7 +136,7 @@ namespace hpx { namespace actions {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_EXPORT base_action_data : base_action
+    struct base_action_data : base_action
     {
         base_action_data() = default;
 

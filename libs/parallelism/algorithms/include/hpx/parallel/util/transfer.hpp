@@ -7,8 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/traits/pointer_category.hpp>
-
+#include <hpx/algorithms/traits/pointer_category.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 

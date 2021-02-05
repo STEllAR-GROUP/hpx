@@ -7,16 +7,18 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions/continuation_fwd.hpp>
 #include <hpx/actions_base/actions_base_fwd.hpp>
-#include <hpx/actions_base/continuation_fwd.hpp>
 
 namespace hpx { namespace actions {
 
     /// \cond NOINTERNAL
+
+#if defined(HPX_HAVE_NETWORKING)
     struct base_action;
+    struct HPX_EXPORT base_action_data;
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_NETWORKING)
     template <typename Action>
     struct transfer_action;
 

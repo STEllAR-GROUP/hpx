@@ -7,7 +7,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/actions/base_action.hpp>
+#include <hpx/actions/transfer_action.hpp>
+#include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
@@ -52,8 +53,10 @@ namespace hpx { namespace actions { namespace detail {
         template <typename Archive>
         void serialize(Archive& ar, unsigned)
         {
-            ar& parent_id_& parent_phase_& parent_locality_& priority_&
+            // clang-format off
+            ar & parent_id_ & parent_phase_ & parent_locality_ & priority_ &
                 stacksize_;
+            // clang-format on
         }
     };
 }}}    // namespace hpx::actions::detail

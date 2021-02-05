@@ -11,7 +11,6 @@
 #if defined(HPX_HAVE_NETWORKING)
 
 #include <hpx/actions/actions_fwd.hpp>
-#include <hpx/actions/base_action.hpp>
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/assert.hpp>

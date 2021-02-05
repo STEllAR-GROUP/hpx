@@ -8,11 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/detail/action_factory.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 
 namespace hpx { namespace actions { namespace detail {
 

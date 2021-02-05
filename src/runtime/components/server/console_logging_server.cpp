@@ -6,18 +6,16 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-// This is needed to get rid of an undefined reference to
-// hpx::actions::detail::register_remote_action_invocation_count
+#include <hpx/actions/continuation.hpp>
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/modules/logging.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
-#include <hpx/type_support/static.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
+#include <hpx/type_support/static.hpp>
 
 #include <cstddef>
 #include <mutex>

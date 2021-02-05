@@ -7,6 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_colocated/apply_colocated.hpp>
 #include <hpx/async_distributed/apply.hpp>
@@ -18,7 +19,6 @@
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
@@ -26,10 +26,9 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace components { namespace stubs
-{
-    lcos::future<int>
-    runtime_support::load_components_async(naming::id_type const& gid)
+namespace hpx { namespace components { namespace stubs {
+    lcos::future<int> runtime_support::load_components_async(
+        naming::id_type const& gid)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef server::runtime_support::load_components_action action_type;
@@ -46,9 +45,8 @@ namespace hpx { namespace components { namespace stubs
         return load_components_async(gid).get();
     }
 
-    lcos::future<void>
-    runtime_support::call_startup_functions_async(naming::id_type const& gid,
-        bool pre_startup)
+    lcos::future<void> runtime_support::call_startup_functions_async(
+        naming::id_type const& gid, bool pre_startup)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef server::runtime_support::call_startup_functions_action action_type;
@@ -61,16 +59,15 @@ namespace hpx { namespace components { namespace stubs
 #endif
     }
 
-    void runtime_support::call_startup_functions(naming::id_type const& gid,
-        bool pre_startup)
+    void runtime_support::call_startup_functions(
+        naming::id_type const& gid, bool pre_startup)
     {
         call_startup_functions_async(gid, pre_startup).get();
     }
 
     /// \brief Shutdown the given runtime system
-    lcos::future<void>
-    runtime_support::shutdown_async(naming::id_type const& targetgid,
-        double timeout)
+    lcos::future<void> runtime_support::shutdown_async(
+        naming::id_type const& targetgid, double timeout)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         // Create a promise directly and execute the required action.
@@ -94,8 +91,8 @@ namespace hpx { namespace components { namespace stubs
 #endif
     }
 
-    void runtime_support::shutdown(naming::id_type const& targetgid,
-        double timeout)
+    void runtime_support::shutdown(
+        naming::id_type const& targetgid, double timeout)
     {
         // The following get yields control while the action above
         // is executed and the result is returned to the future
@@ -103,8 +100,8 @@ namespace hpx { namespace components { namespace stubs
     }
 
     /// \brief Shutdown the runtime systems of all localities
-    void runtime_support::shutdown_all(naming::id_type const& targetgid,
-        double timeout)
+    void runtime_support::shutdown_all(
+        naming::id_type const& targetgid, double timeout)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         hpx::apply<server::runtime_support::shutdown_all_action>(
@@ -122,7 +119,8 @@ namespace hpx { namespace components { namespace stubs
         hpx::apply<server::runtime_support::shutdown_all_action>(
             hpx::naming::id_type(
                 hpx::applier::get_applier().get_runtime_support_raw_gid(),
-                hpx::naming::id_type::unmanaged), timeout);
+                hpx::naming::id_type::unmanaged),
+            timeout);
 #else
         HPX_ASSERT(false);
         HPX_UNUSED(timeout);
@@ -132,8 +130,8 @@ namespace hpx { namespace components { namespace stubs
     ///////////////////////////////////////////////////////////////////////
     /// \brief Retrieve configuration information
     /// \brief Terminate the given runtime system
-    lcos::future<void>
-    runtime_support::terminate_async(naming::id_type const& targetgid)
+    lcos::future<void> runtime_support::terminate_async(
+        naming::id_type const& targetgid)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         // Create a future directly and execute the required action.
@@ -235,7 +233,7 @@ namespace hpx { namespace components { namespace stubs
             HPX_THROW_EXCEPTION(bad_parameter,
                 "stubs::runtime_support::create_performance_counter_async",
                 "The id passed as the first argument is not representing"
-                    " a locality");
+                " a locality");
             return make_ready_future(naming::invalid_id);
         }
 
@@ -250,10 +248,9 @@ namespace hpx { namespace components { namespace stubs
 #endif
     }
 
-    naming::id_type
-    runtime_support::create_performance_counter(naming::id_type targetgid,
-        performance_counters::counter_info const& info,
-        error_code& ec)
+    naming::id_type runtime_support::create_performance_counter(
+        naming::id_type targetgid,
+        performance_counters::counter_info const& info, error_code& ec)
     {
         return create_performance_counter_async(targetgid, info).get(ec);
     }
@@ -276,8 +273,8 @@ namespace hpx { namespace components { namespace stubs
 #endif
     }
 
-    void runtime_support::get_config(naming::id_type const& targetgid,
-        util::section& ini)
+    void runtime_support::get_config(
+        naming::id_type const& targetgid, util::section& ini)
     {
         // The following get yields control while the action above
         // is executed and the result is returned to the future
@@ -300,5 +297,6 @@ namespace hpx { namespace components { namespace stubs
         HPX_UNUSED(endpoints);
 #endif
     }
-}}}
+}}}    // namespace hpx::components::stubs
+
 

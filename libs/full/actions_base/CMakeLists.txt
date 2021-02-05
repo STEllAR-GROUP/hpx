@@ -20,18 +20,23 @@ set(actions_base_headers
     hpx/actions_base/basic_action.hpp
     hpx/actions_base/basic_action_fwd.hpp
     hpx/actions_base/component_action.hpp
-    hpx/actions_base/continuation_fwd.hpp
     hpx/actions_base/detail/action_factory.hpp
     hpx/actions_base/detail/invocation_count_registry.hpp
     hpx/actions_base/detail/per_action_data_counter_registry.hpp
     hpx/actions_base/plain_action.hpp
     hpx/actions_base/preassigned_action_id.hpp
-    hpx/actions_base/traits/action_continuation.hpp
+    hpx/actions_base/traits/action_continuation_fwd.hpp
+    hpx/actions_base/traits/action_does_termination_detection.hpp
+    hpx/actions_base/traits/action_is_target_valid.hpp
     hpx/actions_base/traits/action_priority.hpp
+    hpx/actions_base/traits/action_remote_result.hpp
+    hpx/actions_base/traits/action_schedule_thread.hpp
     hpx/actions_base/traits/action_select_direct_execution.hpp
     hpx/actions_base/traits/action_stacksize.hpp
-    hpx/actions_base/traits/action_remote_result.hpp
+    hpx/actions_base/traits/action_trigger_continuation_fwd.hpp
+    hpx/actions_base/traits/action_was_object_migrated.hpp
     hpx/actions_base/traits/extract_action.hpp
+    hpx/actions_base/traits/is_valid_action.hpp
 )
 
 # Default location is $HPX_ROOT/libs/actions_base/include_compatibility
@@ -43,18 +48,21 @@ set(actions_base_compat_headers
     hpx/runtime/actions/basic_action.hpp => hpx/modules/actions_base.hpp
     hpx/runtime/actions/basic_action_fwd.hpp => hpx/modules/actions_base.hpp
     hpx/runtime/actions/component_action.hpp => hpx/modules/actions_base.hpp
-    hpx/runtime/actions/continuation_fwd.hpp => hpx/modules/actions_base.hpp
     hpx/runtime/actions/detail/action_factory.hpp => hpx/modules/actions_base.hpp
     hpx/runtime/actions/detail/invocation_count_registry.hpp => hpx/actions_base/detail/invocation_count_registry.hpp
     hpx/runtime/actions/plain_action.hpp => hpx/modules/actions_base.hpp
     hpx/runtime/actions/preassigned_action_id.hpp => hpx/modules/actions_base.hpp
     hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp => hpx/actions_base/detail/per_action_data_counter_registry.hpp
-    hpx/traits/action_continuation.hpp => hpx/modules/actions_base.hpp
+    hpx/traits/action_does_termination_detection.hpp => hpx/modules/actions_base.hpp
+    hpx/traits/action_is_target_valid.hpp => hpx/modules/actions_base.hpp
     hpx/traits/action_priority.hpp => hpx/modules/actions_base.hpp
-    hpx/traits/action_select_direct_execution.hpp => hpx/modules/actions_base.hpp
     hpx/traits/action_remote_result.hpp => hpx/modules/actions_base.hpp
+    hpx/traits/action_schedule_thread.hpp => hpx/modules/actions_base.hpp
+    hpx/traits/action_select_direct_execution.hpp => hpx/modules/actions_base.hpp
     hpx/traits/action_stacksize.hpp => hpx/modules/actions_base.hpp
+    hpx/traits/action_was_object_migrated.hpp => hpx/modules/actions_base.hpp
     hpx/traits/extract_action.hpp => hpx/modules/actions_base.hpp
+    hpx/traits/is_valid_action.hpp => hpx/modules/actions_base.hpp
 )
 # cmake-format: on
 
