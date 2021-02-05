@@ -9,6 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/actions/continuation.hpp>
 #include <hpx/agas/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
@@ -19,7 +20,6 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>

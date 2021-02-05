@@ -12,6 +12,7 @@
 #include <hpx/actions_base/action_priority.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
+#include <hpx/actions_base/traits/is_valid_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/async_local/apply.hpp>
@@ -29,7 +30,6 @@
 #include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/is_valid_action.hpp>
 
 #include <type_traits>
 #include <utility>

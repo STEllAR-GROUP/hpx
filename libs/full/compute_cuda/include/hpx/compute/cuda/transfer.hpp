@@ -11,8 +11,7 @@
 
 #if (defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) || defined(HPX_HAVE_HIP)
 
-#include <hpx/traits/pointer_category.hpp>
-
+#include <hpx/algorithms/traits/pointer_category.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/transfer.hpp>
 

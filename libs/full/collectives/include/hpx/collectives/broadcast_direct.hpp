@@ -128,7 +128,6 @@ namespace hpx { namespace lcos {
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/actions/base_action.hpp>
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/plain_action.hpp>

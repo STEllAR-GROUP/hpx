@@ -10,7 +10,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/future.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/include/client.hpp>
 
 #include "stubs/throttle.hpp"

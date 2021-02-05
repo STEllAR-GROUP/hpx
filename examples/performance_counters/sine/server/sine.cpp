@@ -7,10 +7,10 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
+#include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 
 #include <cstdint>
 #include <mutex>

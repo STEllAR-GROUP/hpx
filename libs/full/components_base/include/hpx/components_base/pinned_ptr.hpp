@@ -9,9 +9,9 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components_base/get_lva.hpp>
+#include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/components_base/traits/component_pin_support.hpp>
 #include <hpx/modules/naming_base.hpp>
-#include <hpx/traits/action_decorate_function.hpp>
 
 #include <memory>
 #include <type_traits>

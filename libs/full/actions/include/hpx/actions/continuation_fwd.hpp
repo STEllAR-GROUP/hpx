@@ -18,5 +18,5 @@ namespace hpx { namespace actions {
     template <typename Result, typename RemoteResult, typename F,
         typename... Ts>
     void trigger(
-        typed_continuation<Result, RemoteResult>&& cont, F&& f, Ts&&... vs);
+        typed_continuation<Result, RemoteResult>&&, F&&, Ts&&...) noexcept;
 }}    // namespace hpx::actions

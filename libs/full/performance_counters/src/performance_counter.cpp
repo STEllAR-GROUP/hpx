@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/actions/continuation.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/apply.hpp>
 #include <hpx/functional/bind.hpp>
@@ -14,7 +15,6 @@
 
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 
 #include <string>
 #include <vector>

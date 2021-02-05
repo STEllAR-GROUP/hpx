@@ -11,6 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
+#include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/agas/primary_namespace.hpp>
 #include <hpx/agas/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
@@ -53,7 +54,6 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/insert_checked.hpp>

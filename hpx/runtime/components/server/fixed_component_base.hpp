@@ -15,6 +15,7 @@
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/naming/credit_handling.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/components/server/create_component_fwd.hpp>

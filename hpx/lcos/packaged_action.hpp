@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/config/detail/compat_error_code.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
+#include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
@@ -22,7 +23,6 @@
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/traits/action_was_object_migrated.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <boost/asio/error.hpp>

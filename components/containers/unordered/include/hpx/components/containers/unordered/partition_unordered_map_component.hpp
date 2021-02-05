@@ -17,7 +17,6 @@
 /// classes are asynchronous API which return the futures.
 
 #include <hpx/config.hpp>
-#include <hpx/actions/base_action.hpp>
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/basic_action.hpp>

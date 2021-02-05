@@ -21,7 +21,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     lcos/base_lco_with_value_3.cpp
     lcos/base_lco_with_value.cpp
     lcos/promise.cpp
-    runtime/actions/continuation.cpp
     runtime/agas/addressing_service.cpp
     runtime/agas/big_boot_barrier.cpp
     runtime/agas/component_namespace.cpp
@@ -102,9 +101,8 @@ endif()
 # gather headers
 
 # List all headers (local and distributed)
-set(hpx_HEADERS
-    hpx/lcos_fwd.hpp hpx/traits/managed_component_policies.hpp
-    hpx/traits/pointer_category.hpp hpx/traits/rma_memory_region_traits.hpp
+set(hpx_HEADERS hpx/lcos_fwd.hpp hpx/traits/managed_component_policies.hpp
+                hpx/traits/rma_memory_region_traits.hpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
@@ -147,12 +145,9 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/plugins/unique_plugin_name.hpp
     hpx/runtime_fwd.hpp
     hpx/runtime/actions/continuation2_impl.hpp
-    hpx/runtime/actions/continuation.hpp
     hpx/runtime/actions/continuation_impl.hpp
     hpx/runtime/actions/lambda_to_action.hpp
     hpx/runtime/actions/make_continuation.hpp
-    hpx/runtime/actions/set_lco_value_continuation.hpp
-    hpx/runtime/actions/trigger.hpp
     hpx/runtime/agas/addressing_service.hpp
     hpx/runtime/agas/big_boot_barrier.hpp
     hpx/runtime/agas/component_namespace.hpp
@@ -249,18 +244,11 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/threads/threadmanager_counters.hpp
     hpx/runtime/trigger_lco.hpp
     hpx/state.hpp
-    hpx/traits/action_decorate_continuation.hpp
-    hpx/traits/action_decorate_function.hpp
-    hpx/traits/action_does_termination_detection.hpp
-    hpx/traits/action_is_target_valid.hpp
     hpx/traits/action_message_handler.hpp
-    hpx/traits/action_schedule_thread.hpp
     hpx/traits/action_serialization_filter.hpp
-    hpx/traits/action_was_object_migrated.hpp
     hpx/traits/is_client.hpp
     hpx/traits/is_continuation.hpp
     hpx/traits/is_distribution_policy.hpp
-    hpx/traits/is_valid_action.hpp
     hpx/util/activate_counters.hpp
     hpx/util/bind_action.hpp
     hpx/util/connection_cache.hpp
