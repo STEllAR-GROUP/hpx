@@ -128,12 +128,12 @@ namespace hpx_test {
         Integers ids;
         Strings strings;
 
-        bool operator==(const Record& other)
+        bool operator==(const Record& other) const
         {
             return (ids == other.ids && strings == other.strings);
         }
 
-        bool operator!=(const Record& other)
+        bool operator!=(const Record& other) const
         {
             return !(*this == other);
         }

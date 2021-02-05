@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#if HPX_HAVE_CXX20_STD_ENDIAN
+#if defined(HPX_HAVE_CXX20_STD_ENDIAN)
 #include <bit>
 #endif
 
@@ -16,7 +16,7 @@
 /// \cond NODETAIL
 namespace hpx {
 
-#if HPX_HAVE_CXX20_STD_ENDIAN
+#if defined(HPX_HAVE_CXX20_STD_ENDIAN)
     using std::endian;
 #else
     enum class endian
