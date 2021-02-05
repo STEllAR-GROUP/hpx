@@ -41,8 +41,8 @@ void test_remove_copy(ExPolicy policy, IteratorTag)
     std::fill(std::begin(c), middle, 1);
     std::fill(middle, std::end(c), 2);
 
-    hpx::parallel::remove_copy(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), std::begin(d), std::size_t(2));
+    hpx::remove_copy(policy, iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(d), std::size_t(2));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), middle, std::begin(d),
@@ -69,8 +69,8 @@ void test_remove_copy_async(ExPolicy p, IteratorTag)
     std::fill(std::begin(c), middle, 1);
     std::fill(middle, std::end(c), 2);
 
-    auto f = hpx::parallel::remove_copy(p, iterator(std::begin(c)),
-        iterator(std::end(c)), std::begin(d), std::size_t(2));
+    auto f = hpx::remove_copy(p, iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(d), std::size_t(2));
 
     f.wait();
 
@@ -97,8 +97,8 @@ void test_remove_copy_outiter(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d(0);
     std::iota(std::begin(c), std::end(c), 0);
 
-    hpx::parallel::remove_copy(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), std::back_inserter(d), std::size_t(3000));
+    hpx::remove_copy(policy, iterator(std::begin(c)), iterator(std::end(c)),
+        std::back_inserter(d), std::size_t(3000));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::begin(c) + 3000, std::begin(d),
@@ -126,8 +126,8 @@ void test_remove_copy_outiter_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(0);
     std::iota(std::begin(c), std::end(c), 0);
 
-    auto f = hpx::parallel::remove_copy(p, iterator(std::begin(c)),
-        iterator(std::end(c)), std::back_inserter(d), std::size_t(3000));
+    auto f = hpx::remove_copy(p, iterator(std::begin(c)), iterator(std::end(c)),
+        std::back_inserter(d), std::size_t(3000));
     f.wait();
 
     std::size_t count = 0;
@@ -182,7 +182,7 @@ void test_remove_copy_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::remove_copy(policy,
+        hpx::remove_copy(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), std::begin(d), std::size_t(3000));
@@ -216,7 +216,7 @@ void test_remove_copy_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::remove_copy(p,
+        auto f = hpx::remove_copy(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), std::begin(d), std::size_t(3000));
@@ -278,7 +278,7 @@ void test_remove_copy_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::remove_copy(policy,
+        hpx::remove_copy(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::begin(d), std::size_t(3000));
         HPX_TEST(false);
@@ -310,7 +310,7 @@ void test_remove_copy_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::remove_copy(p,
+        auto f = hpx::remove_copy(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::begin(d), std::size_t(3000));
         returned_from_algorithm = true;

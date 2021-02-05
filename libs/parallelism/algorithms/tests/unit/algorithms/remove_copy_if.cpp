@@ -42,8 +42,8 @@ void test_remove_copy_if(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), middle, static_cast<int>(dist(gen)));
     std::fill(middle, std::end(c), -1);
 
-    hpx::parallel::remove_copy_if(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), std::begin(d), [](int i) { return i < 0; });
+    hpx::remove_copy_if(policy, iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(d), [](int i) { return i < 0; });
 
     std::size_t count = 0;
     HPX_TEST(std::equal(
@@ -79,7 +79,7 @@ void test_remove_copy_if_async(ExPolicy p, IteratorTag)
     std::iota(std::begin(c), middle, static_cast<int>(dist(gen)));
     std::fill(middle, std::end(c), -1);
 
-    auto f = hpx::parallel::remove_copy_if(p, iterator(std::begin(c)),
+    auto f = hpx::remove_copy_if(p, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(d), [](int i) { return i < 0; });
     f.wait();
 
@@ -120,9 +120,8 @@ void test_remove_copy_if_outiter(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), middle, static_cast<int>(dist(gen)));
     std::fill(middle, std::end(c), -1);
 
-    hpx::parallel::remove_copy_if(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), std::back_inserter(d),
-        [](int i) { return i < 0; });
+    hpx::remove_copy_if(policy, iterator(std::begin(c)), iterator(std::end(c)),
+        std::back_inserter(d), [](int i) { return i < 0; });
 
     HPX_TEST(std::equal(
         std::begin(c), middle, std::begin(d), [](int v1, int v2) -> bool {
@@ -149,9 +148,9 @@ void test_remove_copy_if_outiter_async(ExPolicy p, IteratorTag)
     std::iota(std::begin(c), middle, static_cast<int>(dist(gen)));
     std::fill(middle, std::end(c), -1);
 
-    auto f = hpx::parallel::remove_copy_if(p, iterator(std::begin(c)),
-        iterator(std::end(c)), std::back_inserter(d),
-        [](int i) { return i < 0; });
+    auto f =
+        hpx::remove_copy_if(p, iterator(std::begin(c)), iterator(std::end(c)),
+            std::back_inserter(d), [](int i) { return i < 0; });
     f.wait();
 
     HPX_TEST(std::equal(
@@ -199,7 +198,7 @@ void test_remove_copy_if_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::remove_copy_if(policy, iterator(std::begin(c)),
+        hpx::remove_copy_if(policy, iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(d), [](std::size_t v) {
                 return throw std::runtime_error("test"), v == 0;
             });
@@ -232,7 +231,7 @@ void test_remove_copy_if_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::remove_copy_if(p, iterator(std::begin(c)),
+        auto f = hpx::remove_copy_if(p, iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(d), [](std::size_t v) {
                 return throw std::runtime_error("test"), v == 0;
             });
@@ -294,7 +293,7 @@ void test_remove_copy_if_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::remove_copy_if(policy, iterator(std::begin(c)),
+        hpx::remove_copy_if(policy, iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(d),
             [](std::size_t v) { return throw std::bad_alloc(), v; });
 
@@ -326,7 +325,7 @@ void test_remove_copy_if_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::remove_copy_if(p, iterator(std::begin(c)),
+        auto f = hpx::remove_copy_if(p, iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(d),
             [](std::size_t v) { return throw std::bad_alloc(), v; });
 

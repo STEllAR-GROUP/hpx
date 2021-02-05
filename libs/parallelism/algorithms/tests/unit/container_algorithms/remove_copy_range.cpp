@@ -20,6 +20,32 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_remove_copy(IteratorTag)
+{
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag>
+        test_vector;
+
+    test_vector c(10007);
+    std::vector<std::size_t> d(c.size() / 2);
+    std::size_t middle_idx = std::rand() % (c.size() / 2);
+    auto middle =
+        hpx::parallel::v1::detail::next(std::begin(c.base()), middle_idx);
+    std::fill(std::begin(c.base()), middle, 1);
+    std::fill(middle, std::end(c.base()), 2);
+
+    hpx::ranges::remove_copy(c, std::begin(d), std::size_t(2));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c.base()), middle, std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, middle_idx);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_remove_copy(ExPolicy policy, IteratorTag)
 {
@@ -37,7 +63,33 @@ void test_remove_copy(ExPolicy policy, IteratorTag)
     std::fill(std::begin(c.base()), middle, 1);
     std::fill(middle, std::end(c.base()), 2);
 
-    hpx::parallel::remove_copy(policy, c, std::begin(d), std::size_t(2));
+    hpx::ranges::remove_copy(policy, c, std::begin(d), std::size_t(2));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c.base()), middle, std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, middle_idx);
+}
+
+template <typename IteratorTag>
+void test_remove_copy_async(IteratorTag)
+{
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag>
+        test_vector;
+
+    test_vector c(10007);
+    std::vector<std::size_t> d(c.size() / 2);
+    std::size_t middle_idx = std::rand() % (c.size() / 2);
+    auto middle =
+        hpx::parallel::v1::detail::next(std::begin(c.base()), middle_idx);
+    std::fill(std::begin(c.base()), middle, 1);
+    std::fill(middle, std::end(c.base()), 2);
+
+    hpx::ranges::remove_copy(c, std::begin(d), std::size_t(2));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c.base()), middle, std::begin(d),
@@ -63,7 +115,7 @@ void test_remove_copy_async(ExPolicy p, IteratorTag)
     std::fill(std::begin(c.base()), middle, 1);
     std::fill(middle, std::end(c.base()), 2);
 
-    auto f = hpx::parallel::remove_copy(p, c, std::begin(d), std::size_t(2));
+    auto f = hpx::ranges::remove_copy(p, c, std::begin(d), std::size_t(2));
     f.wait();
 
     std::size_t count = 0;
@@ -89,7 +141,7 @@ void test_remove_copy_outiter(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d(0);
     std::iota(std::begin(c), std::end(c), 0);
 
-    hpx::parallel::remove_copy(
+    hpx::ranges::remove_copy(
         policy, c, std::back_inserter(d), std::size_t(3000));
 
     std::size_t count = 0;
@@ -118,7 +170,7 @@ void test_remove_copy_outiter_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(0);
     std::iota(std::begin(c), std::end(c), 0);
 
-    auto f = hpx::parallel::remove_copy(
+    auto f = hpx::ranges::remove_copy(
         p, c, std::back_inserter(d), std::size_t(3000));
     f.wait();
 
@@ -142,10 +194,12 @@ template <typename IteratorTag>
 void test_remove_copy()
 {
     using namespace hpx::execution;
+    test_remove_copy(IteratorTag());
     test_remove_copy(seq, IteratorTag());
     test_remove_copy(par, IteratorTag());
     test_remove_copy(par_unseq, IteratorTag());
 
+    test_remove_copy_async(IteratorTag());
     test_remove_copy_async(seq(task), IteratorTag());
     test_remove_copy_async(par(task), IteratorTag());
 }
@@ -174,7 +228,7 @@ void test_remove_copy_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::remove_copy(policy,
+        hpx::ranges::remove_copy(policy,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
@@ -210,7 +264,7 @@ void test_remove_copy_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::remove_copy(p,
+        auto f = hpx::ranges::remove_copy(p,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
@@ -274,7 +328,7 @@ void test_remove_copy_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::remove_copy(policy,
+        hpx::ranges::remove_copy(policy,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::bad_alloc(); }),
@@ -309,7 +363,7 @@ void test_remove_copy_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::remove_copy(p,
+        auto f = hpx::ranges::remove_copy(p,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::bad_alloc(); }),
