@@ -17,10 +17,10 @@
 #include <hpx/async_colocated/async_colocated_callback.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/detail/async_implementations.hpp>
+#include <hpx/components/client_base.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/create_component_helpers.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>

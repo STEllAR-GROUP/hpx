@@ -11,10 +11,10 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/apply.hpp>
+#include <hpx/components/client_base.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos_distributed/server/channel.hpp>
 #include <hpx/modules/naming.hpp>
-#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/new.hpp>
 
 #include <cstddef>

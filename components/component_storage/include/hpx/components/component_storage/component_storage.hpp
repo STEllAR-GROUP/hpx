@@ -8,10 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/components/client_base.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/components/client_base.hpp>
 
 #include <hpx/components/component_storage/server/component_storage.hpp>
 

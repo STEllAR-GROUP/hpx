@@ -12,18 +12,18 @@
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/applier/apply_continue_fwd.hpp>
-#include <hpx/runtime/actions/make_continuation.hpp>
+#include <hpx/async_distributed/make_continuation.hpp>
 
 #include <utility>
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Cont, typename... Ts>
-    bool apply_continue(Cont&& cont, naming::id_type const& gid, Ts&&... vs)
+    bool apply_continue(Cont&& cont, id_type const& gid, Ts&&... vs)
     {
-        typedef typename hpx::traits::extract_action<Action>::type action_type;
-        typedef typename action_type::remote_result_type remote_result_type;
-        typedef typename action_type::local_result_type local_result_type;
+        using action_type = typename hpx::traits::extract_action<Action>::type;
+        using remote_result_type = typename action_type::remote_result_type;
+        using local_result_type = typename action_type::local_result_type;
 
         return apply<Action>(hpx::actions::typed_continuation<local_result_type,
                                  remote_result_type>(std::forward<Cont>(cont)),
@@ -34,7 +34,7 @@ namespace hpx {
         typename Cont, typename... Ts>
     bool apply_continue(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        Cont&& cont, naming::id_type const& gid, Ts&&... vs)
+        Cont&& cont, id_type const& gid, Ts&&... vs)
     {
         return apply_continue<Derived>(
             std::forward<Cont>(cont), gid, std::forward<Ts>(vs)...);
@@ -42,12 +42,11 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
-    bool apply_continue(
-        naming::id_type const& cont, naming::id_type const& gid, Ts&&... vs)
+    bool apply_continue(id_type const& cont, id_type const& gid, Ts&&... vs)
     {
-        typedef typename hpx::traits::extract_action<Action>::type action_type;
-        typedef typename action_type::remote_result_type remote_result_type;
-        typedef typename action_type::local_result_type local_result_type;
+        using action_type = typename hpx::traits::extract_action<Action>::type;
+        using remote_result_type = typename action_type::remote_result_type;
+        using local_result_type = typename action_type::local_result_type;
 
         return apply<Action>(hpx::actions::typed_continuation<local_result_type,
                                  remote_result_type>(cont, make_continuation()),
@@ -58,7 +57,7 @@ namespace hpx {
         typename... Ts>
     bool apply_continue(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& cont, naming::id_type const& gid, Ts&&... vs)
+        id_type const& cont, id_type const& gid, Ts&&... vs)
     {
         return apply_continue<Derived>(cont, gid, std::forward<Ts>(vs)...);
     }

@@ -17,7 +17,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-struct test_server : hpx::components::simple_component_base<test_server>
+struct test_server : hpx::components::component_base<test_server>
 {
     test_server() = delete;
     explicit test_server(int i) : i_(i) {}
@@ -29,7 +29,7 @@ struct test_server : hpx::components::simple_component_base<test_server>
     int i_;
 };
 
-typedef hpx::components::simple_component<test_server> server_type;
+typedef hpx::components::component<test_server> server_type;
 HPX_REGISTER_COMPONENT(server_type, test_server);
 
 typedef test_server::call_action call_action;

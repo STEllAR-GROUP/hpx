@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/components_base/server/component.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/runtime/components/server/component.hpp>
 
 #include <hpx/components/process/process.hpp>
 #include <hpx/components/process/server/child.hpp>

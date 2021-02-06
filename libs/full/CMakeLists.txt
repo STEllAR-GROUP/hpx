@@ -24,6 +24,7 @@ set(_hpx_full_modules
     checkpoint_base
     collectives
     command_line_handling
+    components
     components_base
     compute
     compute_cuda

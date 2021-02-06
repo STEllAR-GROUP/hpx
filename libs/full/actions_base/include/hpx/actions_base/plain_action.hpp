@@ -125,8 +125,8 @@ namespace hpx { namespace traits {
 
     /// \cond NOINTERNAL
     template <>
-    HPX_ALWAYS_EXPORT inline components::component_type
-    component_type_database<hpx::actions::detail::plain_function>::get()
+    HPX_ALWAYS_EXPORT inline components::component_type component_type_database<
+        hpx::actions::detail::plain_function>::get() noexcept
     {
         return hpx::components::component_plain_function;
     }

@@ -19,7 +19,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server
-  : hpx::components::simple_component_base<test_server>
+  : hpx::components::component_base<test_server>
 {
     std::size_t check_ptr() const
     {
@@ -29,7 +29,7 @@ struct test_server
     HPX_DEFINE_COMPONENT_ACTION(test_server, check_ptr, check_ptr_action);
 };
 
-typedef hpx::components::simple_component<test_server> server_type;
+typedef hpx::components::component<test_server> server_type;
 HPX_REGISTER_COMPONENT(server_type, test_server);
 
 typedef test_server::check_ptr_action check_ptr_action;

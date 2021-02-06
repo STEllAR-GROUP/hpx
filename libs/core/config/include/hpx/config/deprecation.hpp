@@ -75,7 +75,7 @@
 #define HPX_HAVE_DEPRECATION_WARNINGS_V1_7 1
 #endif
 
-#if (HPX_VERSION_FULL >= 010600) && (HPX_HAVE_DEPRECATION_WARNINGS_V1_7 != 0)
+#if (HPX_VERSION_FULL >= 010700) && (HPX_HAVE_DEPRECATION_WARNINGS_V1_7 != 0)
 #define HPX_DEPRECATED_MSG_V1_7                                                \
     "This functionality is deprecated starting HPX V1.7 and will be removed "  \
     "in the future. You can define HPX_HAVE_DEPRECATION_WARNINGS_V1_7=0 to "   \

@@ -12,7 +12,7 @@
 
 namespace hpx { namespace components {
 
-    typedef std::int32_t component_type;
+    using component_type = std::int32_t;
 }}    // namespace hpx::components
 
 namespace hpx { namespace traits {
@@ -23,7 +23,7 @@ namespace hpx { namespace traits {
     {
         static components::component_type value;
 
-        HPX_ALWAYS_EXPORT static components::component_type get();
+        HPX_ALWAYS_EXPORT static components::component_type get() noexcept;
         HPX_ALWAYS_EXPORT static void set(components::component_type);
     };
 

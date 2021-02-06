@@ -12,11 +12,11 @@
 
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/components_base/server/component_base.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/lcos_local/and_gate.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>

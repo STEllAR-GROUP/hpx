@@ -27,6 +27,7 @@ Main |hpx| modules
    /libs/full/checkpoint_base/docs/index.rst
    /libs/full/collectives/docs/index.rst
    /libs/full/command_line_handling/docs/index.rst
+   /libs/full/components/docs/index.rst
    /libs/full/components_base/docs/index.rst
    /libs/full/compute/docs/index.rst
    /libs/full/compute_cuda/docs/index.rst

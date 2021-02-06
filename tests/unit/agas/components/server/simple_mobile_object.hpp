@@ -10,9 +10,10 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/components_base/server/component.hpp>
+#include <hpx/components_base/server/component_base.hpp>
 #include <hpx/modules/actions.hpp>
 #include <hpx/modules/actions_base.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
 
 #include <cstdint>
 
@@ -20,7 +21,7 @@ namespace hpx { namespace test { namespace server
 {
 
 struct HPX_COMPONENT_EXPORT simple_mobile_object
-  : components::simple_component_base<simple_mobile_object>
+  : components::component_base<simple_mobile_object>
 {
   public:
     simple_mobile_object() {}

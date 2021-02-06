@@ -762,7 +762,7 @@ namespace hpx { namespace actions {
 ///      {
 ///          // Define a simple component exposing one action 'print_greeting'
 ///          class HPX_COMPONENT_EXPORT server
-///            : public hpx::components::simple_component_base<server>
+///            : public hpx::components::component_base<server>
 ///          {
 ///              void print_greeting ()
 ///              {

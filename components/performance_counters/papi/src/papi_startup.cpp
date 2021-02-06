@@ -11,6 +11,7 @@
 
 #include <hpx/components/performance_counters/papi/server/papi.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
+#include <hpx/components_base/server/create_component.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/iterator_support.hpp>
@@ -20,7 +21,6 @@
 #include <hpx/runtime/components/component_commandline.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
-#include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
 
 #include <hpx/modules/program_options.hpp>

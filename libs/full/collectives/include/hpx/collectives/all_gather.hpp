@@ -100,10 +100,10 @@ namespace hpx { namespace lcos {
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
+#include <hpx/components/basename_registration.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/modules/execution_base.hpp>
-#include <hpx/runtime/basename_registration.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_distributed/get_num_localities.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>

@@ -123,6 +123,12 @@ namespace hpx { namespace agas {
     HPX_EXPORT naming::address resolve(launch::sync_policy,
         naming::id_type const& id, error_code& ec = throws);
 
+    HPX_EXPORT bool resolve_local(naming::gid_type const& gid,
+        naming::address& addr, error_code& ec = throws);
+
+    HPX_EXPORT bool resolve_cached(
+        naming::gid_type const& gid, naming::address& addr);
+
     HPX_EXPORT hpx::future<bool> bind(naming::gid_type const& gid,
         naming::address const& addr, std::uint32_t locality_id);
 
@@ -143,6 +149,20 @@ namespace hpx { namespace agas {
     HPX_EXPORT naming::address unbind(launch::sync_policy,
         naming::gid_type const& gid, std::uint64_t count = 1,
         error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // helper functions allowing to locally bind and unbind a GID to a given
+    // address
+    HPX_EXPORT bool bind_gid_local(naming::gid_type const& gid,
+        naming::address const& addr, error_code& ec = throws);
+    HPX_EXPORT void unbind_gid_local(
+        naming::gid_type const& gid, error_code& ec = throws);
+
+    HPX_EXPORT bool bind_range_local(naming::gid_type const& gid,
+        std::size_t count, naming::address const& addr, std::size_t offset,
+        error_code& ec = throws);
+    HPX_EXPORT void unbind_range_local(naming::gid_type const& gid,
+        std::size_t count, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT void garbage_collect_non_blocking(error_code& ec = throws);
@@ -183,6 +203,9 @@ namespace hpx { namespace agas {
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT std::int64_t replenish_credits(naming::gid_type& gid);
+
+    ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT hpx::future<naming::id_type> get_colocation_id(
         naming::id_type const& id);
 
@@ -214,4 +237,15 @@ namespace hpx { namespace agas {
 
     HPX_EXPORT std::map<std::string, hpx::id_type> find_symbols(
         hpx::launch::sync_policy, std::string const& pattern = "*");
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT naming::component_type register_factory(
+        std::uint32_t prefix, std::string const& name, error_code& ec = throws);
+
+    HPX_EXPORT naming::component_type get_component_id(
+        std::string const& name, error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT void destroy_component(
+        naming::gid_type const& gid, naming::address const& addr);
 }}    // namespace hpx::agas

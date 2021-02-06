@@ -16,7 +16,7 @@ HPX_REGISTER_COMPONENT_MODULE()
 
 using hpx::test::server::action_move_semantics;
 
-typedef hpx::components::simple_component<action_move_semantics>
+typedef hpx::components::component<action_move_semantics>
     action_move_semantics_type;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@ typedef hpx::components::simple_component<action_move_semantics>
 // disabled by default. All tests requiring this component to be active will
 // enable it explicitly.
 HPX_REGISTER_COMPONENT(
-    hpx::components::simple_component<action_move_semantics>,
+    hpx::components::component<action_move_semantics>,
     action_move_semantics,
     hpx::components::factory_disabled)
 

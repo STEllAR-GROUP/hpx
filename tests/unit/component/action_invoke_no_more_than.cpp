@@ -27,7 +27,7 @@ std::atomic<int> count_active_call_void(0);
 std::atomic<int> count_active_call_future_void(0);
 
 struct test_server
-  : hpx::components::simple_component_base<test_server>
+  : hpx::components::component_base<test_server>
 {
     void call_void()
     {
@@ -61,7 +61,7 @@ struct test_server
     HPX_DEFINE_COMPONENT_ACTION(test_server, call_future_void, call_future_void_action);
 };
 
-typedef hpx::components::simple_component<test_server> server_type;
+typedef hpx::components::component<test_server> server_type;
 HPX_REGISTER_COMPONENT(server_type, test_server);
 
 typedef test_server::call_void_action call_void_action;

@@ -9,6 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/components_base/server/component_heap.hpp>
+#include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
@@ -19,8 +21,6 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/components/server/component_heap.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 
 #include <exception>

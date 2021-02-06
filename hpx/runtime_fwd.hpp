@@ -13,8 +13,8 @@
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/components/basename_registration_fwd.hpp>
 #include <hpx/modules/naming_base.hpp>
-#include <hpx/runtime/basename_registration_fwd.hpp>
 #include <hpx/runtime/find_all_localities.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>

@@ -9,15 +9,15 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions_base/traits/is_client.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/components/client_base.hpp>
+#include <hpx/components_base/server/create_component.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/create_component_helpers.hpp>
 #include <hpx/runtime/components/default_distribution_policy.hpp>
-#include <hpx/runtime/components/server/create_component.hpp>
-#include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/type_support/lazy_enable_if.hpp>
 

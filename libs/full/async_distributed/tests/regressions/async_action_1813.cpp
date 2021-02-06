@@ -27,7 +27,7 @@ HPX_PLAIN_ACTION(get_locality);
 
 ///////////////////////////////////////////////////////////////////////////////
 struct get_locality_server
-  : hpx::components::simple_component_base<get_locality_server>
+  : hpx::components::component_base<get_locality_server>
 {
     hpx::id_type call()
     {
@@ -37,7 +37,7 @@ struct get_locality_server
     HPX_DEFINE_COMPONENT_ACTION(get_locality_server, call);
 };
 
-typedef hpx::components::simple_component<get_locality_server> server_type;
+typedef hpx::components::component<get_locality_server> server_type;
 HPX_REGISTER_COMPONENT(server_type, get_locality_server);
 
 typedef get_locality_server::call_action call_action;

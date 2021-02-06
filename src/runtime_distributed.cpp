@@ -17,6 +17,8 @@
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/collectives/latch.hpp>
 #include <hpx/components_base/agas_interface.hpp>
+#include <hpx/components_base/server/component.hpp>
+#include <hpx/components_base/server/component_base.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution_base/this_thread.hpp>
@@ -40,7 +42,6 @@
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>

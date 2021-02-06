@@ -22,11 +22,10 @@ namespace hpx {
         using component_type = std::int32_t;
         using address_type = std::uint64_t;
 
-        constexpr std::uint32_t invalid_locality_id =
+        HPX_INLINE_CONSTEXPR_VARIABLE std::uint32_t invalid_locality_id =
             ~static_cast<std::uint32_t>(0);
 
-        constexpr std::uint32_t component_invalid =
-            ~static_cast<std::uint32_t>(0);
+        HPX_INLINE_CONSTEXPR_VARIABLE std::int32_t component_invalid = -1;
 
         struct HPX_EXPORT gid_type;
         struct HPX_EXPORT id_type;

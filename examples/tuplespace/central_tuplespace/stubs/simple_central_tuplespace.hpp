@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/components_base/stub_base.hpp>
 #include <hpx/include/applier.hpp>
 #include <hpx/include/async.hpp>
 

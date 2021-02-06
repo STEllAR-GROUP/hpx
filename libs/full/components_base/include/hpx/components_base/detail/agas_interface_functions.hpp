@@ -93,6 +93,12 @@ namespace hpx { namespace agas { namespace detail {
     extern HPX_EXPORT naming::address (*resolve)(
         hpx::id_type const& id, error_code& ec);
 
+    extern HPX_EXPORT bool (*resolve_local)(
+        naming::gid_type const& gid, naming::address& addr, error_code& ec);
+
+    extern HPX_EXPORT bool (*resolve_cached)(
+        naming::gid_type const& gid, naming::address& addr);
+
     ///////////////////////////////////////////////////////////////////////////
     extern HPX_EXPORT hpx::future<bool> (*bind_async)(
         naming::gid_type const& gid, naming::address const& addr,
@@ -114,6 +120,18 @@ namespace hpx { namespace agas { namespace detail {
 
     extern HPX_EXPORT naming::address (*unbind)(
         naming::gid_type const& gid, std::uint64_t count, error_code& ec);
+
+    ///////////////////////////////////////////////////////////////////////////
+    extern HPX_EXPORT bool (*bind_gid_local)(naming::gid_type const& gid,
+        naming::address const& addr, error_code& ec);
+    extern HPX_EXPORT void (*unbind_gid_local)(
+        naming::gid_type const& gid, error_code& ec);
+
+    extern HPX_EXPORT bool (*bind_range_local)(naming::gid_type const& gid,
+        std::size_t count, naming::address const& addr, std::size_t offset,
+        error_code& ec);
+    extern HPX_EXPORT void (*unbind_range_local)(
+        naming::gid_type const& gid, std::size_t count, error_code& ec);
 
     ///////////////////////////////////////////////////////////////////////////
     extern HPX_EXPORT void (*garbage_collect_non_blocking)(error_code& ec);
@@ -144,6 +162,9 @@ namespace hpx { namespace agas { namespace detail {
 
     extern HPX_EXPORT std::int64_t (*incref)(naming::gid_type const& gid,
         std::int64_t credits, hpx::id_type const& keep_alive, error_code& ec);
+
+    ///////////////////////////////////////////////////////////////////////////
+    extern HPX_EXPORT std::int64_t (*replenish_credits)(naming::gid_type& gid);
 
     ///////////////////////////////////////////////////////////////////////////
     extern HPX_EXPORT hpx::future<hpx::id_type> (*get_colocation_id_async)(
@@ -179,4 +200,15 @@ namespace hpx { namespace agas { namespace detail {
 
     extern HPX_EXPORT std::map<std::string, hpx::id_type> (*find_symbols)(
         std::string const& pattern);
+
+    ///////////////////////////////////////////////////////////////////////////
+    extern HPX_EXPORT naming::component_type (*register_factory)(
+        std::uint32_t prefix, std::string const& name, error_code& ec);
+
+    extern HPX_EXPORT naming::component_type (*get_component_id)(
+        std::string const& name, error_code& ec);
+
+    ///////////////////////////////////////////////////////////////////////////
+    extern HPX_EXPORT void (*destroy_component)(
+        naming::gid_type const& gid, naming::address const& addr);
 }}}    // namespace hpx::agas::detail

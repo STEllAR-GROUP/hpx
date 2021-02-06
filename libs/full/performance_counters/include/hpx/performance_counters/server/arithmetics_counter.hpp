@@ -7,9 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/components_base/server/component_base.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
-#include <hpx/runtime/components/server/component_base.hpp>
 
 #include <cstdint>
 #include <string>
@@ -25,12 +25,12 @@ namespace hpx { namespace performance_counters { namespace server {
       : public base_performance_counter
       , public components::component_base<arithmetics_counter<Operation>>
     {
-        typedef components::component_base<arithmetics_counter<Operation>>
-            base_type;
+        using base_type =
+            components::component_base<arithmetics_counter<Operation>>;
 
     public:
-        typedef arithmetics_counter type_holder;
-        typedef base_performance_counter base_type_holder;
+        using type_holder = arithmetics_counter;
+        using base_type_holder = base_performance_counter;
 
         arithmetics_counter() = default;
 
@@ -39,11 +39,11 @@ namespace hpx { namespace performance_counters { namespace server {
 
         /// Overloads from the base_counter base class.
         hpx::performance_counters::counter_value get_counter_value(
-            bool reset = false);
+            bool reset = false) override;
 
-        bool start();
-        bool stop();
-        void reset_counter_value();
+        bool start() override;
+        bool stop() override;
+        void reset_counter_value() override;
 
         void finalize()
         {

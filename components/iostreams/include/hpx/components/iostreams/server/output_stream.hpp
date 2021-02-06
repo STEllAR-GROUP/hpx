@@ -11,7 +11,7 @@
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
-#include <hpx/runtime/components/server/component_base.hpp>
+#include <hpx/components_base/server/component_base.hpp>
 #include <hpx/serialization/vector.hpp>
 
 #include <hpx/components/iostreams/export_definitions.hpp>

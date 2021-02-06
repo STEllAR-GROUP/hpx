@@ -19,6 +19,8 @@
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/components_base/agas_interface.hpp>
+#include <hpx/components_base/component_type.hpp>
+#include <hpx/components_base/server/create_component.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
@@ -26,8 +28,6 @@
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime/components/component_commandline_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
-#include <hpx/runtime/components/server/component_database.hpp>
-#include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>

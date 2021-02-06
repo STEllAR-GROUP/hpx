@@ -16,7 +16,7 @@ HPX_REGISTER_COMPONENT_MODULE();
 
 using hpx::test::server::simple_mobile_object;
 
-typedef hpx::components::simple_component<simple_mobile_object>
+typedef hpx::components::component<simple_mobile_object>
     mobile_component_type;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@ typedef hpx::components::simple_component<simple_mobile_object>
 // disabled by default. All tests requiring this component to be active will
 // enable it explicitly.
 HPX_REGISTER_DISABLED_COMPONENT_FACTORY(
-    hpx::components::simple_component<simple_mobile_object>,
+    hpx::components::component<simple_mobile_object>,
     simple_mobile_object)
 
 ///////////////////////////////////////////////////////////////////////////////

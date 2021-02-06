@@ -29,7 +29,7 @@
 struct matrix_t_client;
 
 struct vector_t_server:
-  public hpx::components::simple_component_base<vector_t_server>
+  public hpx::components::component_base<vector_t_server>
 {
   std::shared_ptr<vector_t> data;
 
@@ -115,7 +115,7 @@ struct vector_t_client:
 
 
 struct matrix_t_server:
-  public hpx::components::simple_component_base<matrix_t_server>
+  public hpx::components::component_base<matrix_t_server>
 {
   std::shared_ptr<matrix_t> data;
 

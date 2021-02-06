@@ -140,6 +140,17 @@ namespace hpx { namespace agas {
         return detail::resolve(id, ec);
     }
 
+    bool resolve_local(
+        naming::gid_type const& gid, naming::address& addr, error_code& ec)
+    {
+        return detail::resolve_local(gid, addr, ec);
+    }
+
+    bool resolve_cached(naming::gid_type const& gid, naming::address& addr)
+    {
+        return detail::resolve_cached(gid, addr);
+    }
+
     hpx::future<bool> bind(naming::gid_type const& gid,
         naming::address const& addr, std::uint32_t locality_id)
     {
@@ -175,6 +186,30 @@ namespace hpx { namespace agas {
         std::uint64_t type, error_code& ec)
     {
         return detail::unbind(id, type, ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool bind_gid_local(naming::gid_type const& gid,
+        naming::address const& addr, error_code& ec)
+    {
+        return detail::bind_gid_local(gid, addr, ec);
+    }
+
+    void unbind_gid_local(naming::gid_type const& gid, error_code& ec)
+    {
+        return detail::unbind_gid_local(gid, ec);
+    }
+
+    bool bind_range_local(naming::gid_type const& gid, std::size_t count,
+        naming::address const& addr, std::size_t offset, error_code& ec)
+    {
+        return detail::bind_range_local(gid, count, addr, offset, ec);
+    }
+
+    void unbind_range_local(
+        naming::gid_type const& gid, std::size_t count, error_code& ec)
+    {
+        return detail::unbind_range_local(gid, count, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -240,6 +275,12 @@ namespace hpx { namespace agas {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    std::int64_t replenish_credits(naming::gid_type& gid)
+    {
+        return detail::replenish_credits(gid);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     hpx::future<naming::id_type> get_colocation_id(naming::id_type const& id)
     {
         return detail::get_colocation_id_async(id);
@@ -300,6 +341,26 @@ namespace hpx { namespace agas {
         hpx::launch::sync_policy, std::string const& pattern)
     {
         return detail::find_symbols(pattern);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    naming::component_type register_factory(
+        std::uint32_t prefix, std::string const& name, error_code& ec)
+    {
+        return detail::register_factory(prefix, name, ec);
+    }
+
+    naming::component_type get_component_id(
+        std::string const& name, error_code& ec)
+    {
+        return detail::get_component_id(name, ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void destroy_component(
+        naming::gid_type const& gid, naming::address const& addr)
+    {
+        return detail::destroy_component(gid, addr);
     }
 
 }}    // namespace hpx::agas

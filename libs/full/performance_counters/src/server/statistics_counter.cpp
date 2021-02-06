@@ -71,17 +71,17 @@ namespace hpx { namespace performance_counters { namespace server {
 
             counter_type_from_statistic(std::size_t /*parameter2*/) {}
 
-            double get_value()
+            double get_value() override
             {
                 return boost::accumulators::mean(accum_);
             }
 
-            void add_value(double value)
+            void add_value(double value) override
             {
                 accum_(value);
             }
 
-            bool need_reset() const
+            bool need_reset() const override
             {
                 return false;
             }
@@ -101,17 +101,17 @@ namespace hpx { namespace performance_counters { namespace server {
 
             counter_type_from_statistic(std::size_t /*parameter2*/) {}
 
-            double get_value()
+            double get_value() override
             {
                 return sqrt(boost::accumulators::variance(accum_));
             }
 
-            void add_value(double value)
+            void add_value(double value) override
             {
                 accum_(value);
             }
 
-            bool need_reset() const
+            bool need_reset() const override
             {
                 return false;
             }
@@ -134,17 +134,17 @@ namespace hpx { namespace performance_counters { namespace server {
 
             counter_type_from_statistic(std::size_t /*parameter2*/) {}
 
-            double get_value()
+            double get_value() override
             {
                 return boost::accumulators::median(accum_);
             }
 
-            void add_value(double value)
+            void add_value(double value) override
             {
                 accum_(value);
             }
 
-            bool need_reset() const
+            bool need_reset() const override
             {
                 return false;
             }
@@ -175,17 +175,17 @@ namespace hpx { namespace performance_counters { namespace server {
                 }
             }
 
-            double get_value()
+            double get_value() override
             {
                 return boost::accumulators::rolling_mean(accum_);
             }
 
-            void add_value(double value)
+            void add_value(double value) override
             {
                 accum_(value);
             }
 
-            bool need_reset() const
+            bool need_reset() const override
             {
                 return false;
             }
@@ -216,17 +216,17 @@ namespace hpx { namespace performance_counters { namespace server {
                 }
             }
 
-            double get_value()
+            double get_value() override
             {
                 return sqrt(boost::accumulators::rolling_variance(accum_));
             }
 
-            void add_value(double value)
+            void add_value(double value) override
             {
                 accum_(value);
             }
 
-            bool need_reset() const
+            bool need_reset() const override
             {
                 return false;
             }
@@ -246,17 +246,17 @@ namespace hpx { namespace performance_counters { namespace server {
 
             counter_type_from_statistic(std::size_t /*parameter2*/) {}
 
-            double get_value()
+            double get_value() override
             {
                 return (boost::accumulators::max)(accum_);
             }
 
-            void add_value(double value)
+            void add_value(double value) override
             {
                 accum_(value);
             }
 
-            bool need_reset() const
+            bool need_reset() const override
             {
                 return true;
             }
@@ -276,17 +276,17 @@ namespace hpx { namespace performance_counters { namespace server {
 
             counter_type_from_statistic(std::size_t /*parameter2*/) {}
 
-            double get_value()
+            double get_value() override
             {
                 return (boost::accumulators::min)(accum_);
             }
 
-            void add_value(double value)
+            void add_value(double value) override
             {
                 accum_(value);
             }
 
-            bool need_reset() const
+            bool need_reset() const override
             {
                 return true;
             }
@@ -316,17 +316,17 @@ namespace hpx { namespace performance_counters { namespace server {
                 }
             }
 
-            double get_value()
+            double get_value() override
             {
                 return hpx::util::rolling_min(accum_);
             }
 
-            void add_value(double value)
+            void add_value(double value) override
             {
                 accum_(value);
             }
 
-            bool need_reset() const
+            bool need_reset() const override
             {
                 return false;
             }
@@ -356,17 +356,17 @@ namespace hpx { namespace performance_counters { namespace server {
                 }
             }
 
-            double get_value()
+            double get_value() override
             {
                 return hpx::util::rolling_max(accum_);
             }
 
-            void add_value(double value)
+            void add_value(double value) override
             {
                 accum_(value);
             }
 
-            bool need_reset() const
+            bool need_reset() const override
             {
                 return false;
             }

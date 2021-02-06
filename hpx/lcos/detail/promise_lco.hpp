@@ -11,12 +11,12 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components_base/component_type.hpp>
+#include <hpx/components_base/server/component_heap.hpp>
+#include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/components_base/traits/component_type_database.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/runtime/components/server/component_heap.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/type_support/unused.hpp>
 

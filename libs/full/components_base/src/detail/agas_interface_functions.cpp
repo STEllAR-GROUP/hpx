@@ -92,6 +92,12 @@ namespace hpx { namespace agas { namespace detail {
     naming::address (*resolve)(
         hpx::id_type const& id, error_code& ec) = nullptr;
 
+    bool (*resolve_local)(naming::gid_type const& gid, naming::address& addr,
+        error_code& ec) = nullptr;
+
+    bool (*resolve_cached)(
+        naming::gid_type const& gid, naming::address& addr) = nullptr;
+
     ///////////////////////////////////////////////////////////////////////////
     hpx::future<bool> (*bind_async)(naming::gid_type const& gid,
         naming::address const& addr, std::uint32_t locality_id) = nullptr;
@@ -111,6 +117,18 @@ namespace hpx { namespace agas { namespace detail {
         naming::gid_type const& gid, std::uint64_t count) = nullptr;
 
     naming::address (*unbind)(naming::gid_type const& gid, std::uint64_t count,
+        error_code& ec) = nullptr;
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool (*bind_gid_local)(naming::gid_type const& gid,
+        naming::address const& addr, error_code& ec) = nullptr;
+    void (*unbind_gid_local)(
+        naming::gid_type const& gid, error_code& ec) = nullptr;
+
+    bool (*bind_range_local)(naming::gid_type const& gid, std::size_t count,
+        naming::address const& addr, std::size_t offset,
+        error_code& ec) = nullptr;
+    void (*unbind_range_local)(naming::gid_type const& gid, std::size_t count,
         error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -141,6 +159,9 @@ namespace hpx { namespace agas { namespace detail {
 
     std::int64_t (*incref)(naming::gid_type const& gid, std::int64_t credits,
         hpx::id_type const& keep_alive, error_code& ec) = nullptr;
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::int64_t (*replenish_credits)(naming::gid_type& gid) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::future<hpx::id_type> (*get_colocation_id_async)(
@@ -175,4 +196,15 @@ namespace hpx { namespace agas { namespace detail {
 
     std::map<std::string, hpx::id_type> (*find_symbols)(
         std::string const& pattern) = nullptr;
+
+    ///////////////////////////////////////////////////////////////////////////
+    naming::component_type (*register_factory)(std::uint32_t prefix,
+        std::string const& name, error_code& ec) = nullptr;
+
+    naming::component_type (*get_component_id)(
+        std::string const& name, error_code& ec) = nullptr;
+
+    ///////////////////////////////////////////////////////////////////////////
+    void (*destroy_component)(
+        naming::gid_type const& gid, naming::address const& addr) = nullptr;
 }}}    // namespace hpx::agas::detail

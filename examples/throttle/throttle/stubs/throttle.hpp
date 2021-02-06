@@ -7,8 +7,9 @@
 #pragma once
 
 #include <hpx/hpx.hpp>
+
+#include <hpx/components_base/stub_base.hpp>
 #include <hpx/future.hpp>
-#include <hpx/runtime/components/stubs/stub_base.hpp>
 
 #include "../server/throttle.hpp"
 

@@ -10,6 +10,8 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/collectives/detail/communication_set_node.hpp>
+#include <hpx/components/basename_registration.hpp>
+#include <hpx/components_base/server/component.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/iterator_support/counting_iterator.hpp>
@@ -17,10 +19,8 @@
 #include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parallel/container_algorithms/count.hpp>
-#include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/new.hpp>
-#include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime_distributed/get_num_localities.hpp>
 
 #include <climits>

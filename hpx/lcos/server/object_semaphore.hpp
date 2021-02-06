@@ -11,9 +11,9 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/trigger.hpp>
 #include <hpx/components_base/component_type.hpp>
+#include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 

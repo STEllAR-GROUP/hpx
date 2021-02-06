@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,6 +9,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components_base/agas_interface.hpp>
+#include <hpx/components_base/detail/agas_interface_functions.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/lcos_local/detail/preprocess_future.hpp>
 #include <hpx/memory/serialization/intrusive_ptr.hpp>
@@ -22,7 +23,8 @@
 #include <hpx/naming/split_gid.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/components/server/destroy_component.hpp>
+#include <hpx/runtime_local/runtime_local_fwd.hpp>
+#include <hpx/runtime_local/state.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
@@ -128,8 +130,7 @@ namespace hpx { namespace naming {
             // resolved, which means we don't know anything about the component
             // type.
             naming::address addr;
-            if (gid_was_split(*p) ||
-                !naming::get_agas_client().resolve_cached(*p, addr))
+            if (gid_was_split(*p) || !agas::resolve_cached(*p, addr))
             {
                 // guard for wait_abort and other shutdown issues
                 try
@@ -156,7 +157,7 @@ namespace hpx { namespace naming {
             {
                 // If the gid was not split at any point in time we can assume
                 // that the referenced object is fully local.
-                HPX_ASSERT(addr.type_ != components::component_invalid);
+                HPX_ASSERT(addr.type_ != naming::address::component_invalid);
 
                 // Third parameter is the count of how many components to destroy.
                 // FIXME: The address should still be in the cache, but it could
@@ -164,7 +165,7 @@ namespace hpx { namespace naming {
                 // directly to destroy_component.
                 try
                 {
-                    components::server::destroy_component(*p, addr);
+                    agas::destroy_component(*p, addr);
                 }
                 catch (hpx::exception const& e)
                 {
@@ -174,6 +175,8 @@ namespace hpx { namespace naming {
                     if (e.get_error() != invalid_status ||
                         !threads::threadmanager_is(hpx::state_stopping))
                     {
+                        // delete local gid representation in any case
+                        delete p;
                         throw;
                     }
                 }
@@ -620,4 +623,17 @@ namespace hpx { namespace naming {
     {
         ar >> id.impl();
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // initialize AGAS interface function pointers in components_base module
+    struct HPX_EXPORT init_interface_functions
+    {
+        init_interface_functions()
+        {
+            agas::detail::replenish_credits = &detail::replenish_credits;
+        }
+    };
+
+    init_interface_functions init;
+
 }}    // namespace hpx::naming

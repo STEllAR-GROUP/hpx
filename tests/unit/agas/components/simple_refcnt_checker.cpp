@@ -16,7 +16,7 @@ HPX_REGISTER_COMPONENT_MODULE();
 
 using hpx::test::server::simple_refcnt_checker;
 
-typedef hpx::components::simple_component<simple_refcnt_checker>
+typedef hpx::components::component<simple_refcnt_checker>
     refcnt_checker_type;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@ typedef hpx::components::simple_component<simple_refcnt_checker>
 // disabled by default. All tests requiring this component to be active will
 // enable it explicitly.
 HPX_REGISTER_DISABLED_COMPONENT_FACTORY(
-    hpx::components::simple_component<simple_refcnt_checker>,
+    hpx::components::component<simple_refcnt_checker>,
     simple_refcnt_checker)
 
 ///////////////////////////////////////////////////////////////////////////////

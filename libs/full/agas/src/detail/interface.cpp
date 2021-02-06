@@ -162,6 +162,19 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
         return agas_.resolve_async(id).get(ec);
     }
 
+    bool resolve_local(
+        naming::gid_type const& gid, naming::address& addr, error_code& ec)
+    {
+        naming::resolver_client* agas_ = naming::get_agas_client_ptr();
+        return (agas_ != nullptr) ? agas_->resolve_local(gid, addr, ec) : false;
+    }
+
+    bool resolve_cached(naming::gid_type const& gid, naming::address& addr)
+    {
+        naming::resolver_client* agas_ = naming::get_agas_client_ptr();
+        return (agas_ != nullptr) ? agas_->resolve_cached(gid, addr) : false;
+    }
+
     hpx::future<bool> bind_async(naming::gid_type const& gid,
         naming::address const& addr, std::uint32_t locality_id)
     {
@@ -202,6 +215,72 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
     {
         naming::resolver_client& agas_ = naming::get_agas_client();
         return agas_.unbind_range_async(id).get(ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // helper functions allowing to bind and unbind a GID to a given address
+    // without having to directly refer to the resolver_client
+    bool bind_gid_local(naming::gid_type const& gid_,
+        naming::address const& addr, error_code& ec)
+    {
+        auto* client = naming::get_agas_client_ptr();
+        if (nullptr == client)
+        {
+            HPX_THROWS_IF(ec, invalid_status, "agas::bind_gid_local",
+                "addressing_service is not valid");
+            return false;
+        }
+        return client->bind_local(gid_, addr, ec);
+    }
+
+    void unbind_gid_local(naming::gid_type const& gid, error_code& ec)
+    {
+        if (gid)
+        {
+            auto* client = naming::get_agas_client_ptr();
+            if (nullptr == client)
+            {
+                HPX_THROWS_IF(ec, invalid_status, "agas::unbind_gid_local",
+                    "addressing_service is not valid");
+            }
+            else
+            {
+                client->unbind_local(gid, ec);
+            }
+        }
+        else
+        {
+            HPX_THROWS_IF(ec, bad_parameter, "agas::unbind_gid",
+                "cannot dereference invalid GID");
+        }
+    }
+
+    bool bind_range_local(naming::gid_type const& gid, std::size_t count,
+        naming::address const& addr, std::size_t offset, error_code& ec)
+    {
+        auto* client = naming::get_agas_client_ptr();
+        if (nullptr == client)
+        {
+            HPX_THROWS_IF(ec, invalid_status, "agas::bind_range_local",
+                "addressing_service is not valid");
+            return false;
+        }
+        return client->bind_range_local(gid, count, addr, offset, ec);
+    }
+
+    void unbind_range_local(
+        naming::gid_type const& gid, std::size_t count, error_code& ec)
+    {
+        auto* client = naming::get_agas_client_ptr();
+        if (nullptr == client)
+        {
+            HPX_THROWS_IF(ec, invalid_status, "agas::unbind_range_local",
+                "addressing_service is not valid");
+        }
+        else
+        {
+            client->unbind_range_local(gid, count, ec);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -417,11 +496,25 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
         return find_symbols_async(pattern).get();
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    naming::component_type register_factory(
+        std::uint32_t prefix, std::string const& name, error_code& ec)
+    {
+        naming::resolver_client& resolver = naming::get_agas_client();
+        return resolver.register_factory(prefix, name, ec);
+    }
+
+    naming::component_type get_component_id(
+        std::string const& name, error_code& ec)
+    {
+        naming::resolver_client& resolver = naming::get_agas_client();
+        return resolver.get_component_id(name, ec);
+    }
 }}}}    // namespace hpx::agas::detail::impl
 
 namespace hpx { namespace agas {
 
-    // initialize AGAS interface function pointers in agas_base module
+    // initialize AGAS interface function pointers in components_base module
     struct HPX_EXPORT init_interface_functions
     {
         init_interface_functions()
@@ -464,6 +557,7 @@ namespace hpx { namespace agas {
 
             detail::resolve_async = &detail::impl::resolve_async;
             detail::resolve = &detail::impl::resolve;
+            detail::resolve_cached = &detail::impl::resolve_cached;
 
             detail::bind_async = &detail::impl::bind_async;
             detail::bind = &detail::impl::bind;
@@ -472,6 +566,11 @@ namespace hpx { namespace agas {
 
             detail::unbind_async = &detail::impl::unbind_async;
             detail::unbind = &detail::impl::unbind;
+
+            detail::bind_gid_local = &detail::impl::bind_gid_local;
+            detail::unbind_gid_local = &detail::impl::unbind_gid_local;
+            detail::bind_range_local = &detail::impl::bind_range_local;
+            detail::unbind_range_local = &detail::impl::unbind_range_local;
 
             detail::garbage_collect_non_blocking =
                 &detail::impl::garbage_collect_non_blocking;
@@ -503,6 +602,9 @@ namespace hpx { namespace agas {
 
             detail::find_symbols_async = &detail::impl::find_symbols_async;
             detail::find_symbols = &detail::impl::find_symbols;
+
+            detail::register_factory = &detail::impl::register_factory;
+            detail::get_component_id = &detail::impl::get_component_id;
         }
     };
 

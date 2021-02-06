@@ -11,11 +11,11 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/apply.hpp>
+#include <hpx/components/client_base.hpp>
 #include <hpx/components/iostreams/manipulators.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
 #include <hpx/execution_base/register_locks.hpp>
 #include <hpx/modules/async_distributed.hpp>
-#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <boost/iostreams/stream.hpp>
