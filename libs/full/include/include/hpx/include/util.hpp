@@ -38,7 +38,6 @@
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp>
-#include <hpx/util/activate_counters.hpp>
 #endif
 
 #if defined(HPX_HAVE_MODULE_STRING_UTIL)

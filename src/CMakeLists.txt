@@ -48,15 +48,12 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/parcelset/parcelport.cpp
     runtime/parcelset/put_parcel.cpp
     runtime/set_parcel_write_handler.cpp
-    runtime/threads/threadmanager_counters.cpp
     runtime/trigger_lco.cpp
     runtime_distributed.cpp
-    util/activate_counters.cpp
     util/generate_unique_ids.cpp
     util/init_logging.cpp
     util/one_size_heap_list.cpp
     util/pool_timer.cpp
-    util/query_counters.cpp
     util/register_locks_globally.cpp
   )
 endif()
@@ -212,7 +209,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/parcelset/put_parcel.hpp
     hpx/runtime/runtime_fwd.hpp
     hpx/runtime/set_parcel_write_handler.hpp
-    hpx/runtime/threads/threadmanager_counters.hpp
     hpx/runtime/trigger_lco.hpp
     hpx/runtime/trigger_lco_fwd.hpp
     hpx/traits/action_message_handler.hpp
@@ -220,7 +216,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/traits/is_client.hpp
     hpx/traits/is_continuation.hpp
     hpx/traits/is_distribution_policy.hpp
-    hpx/util/activate_counters.hpp
     hpx/util/bind_action.hpp
     hpx/util/connection_cache.hpp
     hpx/util/functional/colocated_helpers.hpp
@@ -229,7 +224,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/util/init_logging.hpp
     hpx/util/one_size_heap_list.hpp
     hpx/util/pool_timer.hpp
-    hpx/util/query_counters.hpp
     hpx/util/register_locks_globally.hpp
     hpx/util/remove_local_destinations.hpp
     hpx/util/storage/tuple.hpp

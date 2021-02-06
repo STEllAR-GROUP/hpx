@@ -31,8 +31,10 @@ set(performance_counters_headers
     hpx/performance_counters/performance_counter_base.hpp
     hpx/performance_counters/performance_counter_set.hpp
     hpx/performance_counters/primary_namespace_counters.hpp
+    hpx/performance_counters/query_counters.hpp
     hpx/performance_counters/registry.hpp
     hpx/performance_counters/symbol_namespace_counters.hpp
+    hpx/performance_counters/threadmanager_counter_types.hpp
     hpx/performance_counters/server/arithmetics_counter.hpp
     hpx/performance_counters/server/arithmetics_counter_extended.hpp
     hpx/performance_counters/server/base_performance_counter.hpp
@@ -61,8 +63,10 @@ set(performance_counters_sources
     performance_counter.cpp
     performance_counter_set.cpp
     primary_namespace_counters.cpp
+    query_counters.cpp
     registry.cpp
     symbol_namespace_counters.cpp
+    threadmanager_counter_types.cpp
     server/action_invocation_counter.cpp
     server/arithmetics_counter.cpp
     server/arithmetics_counter_extended.cpp
@@ -89,5 +93,6 @@ add_hpx_module(
     hpx_naming
     hpx_runtime_local
     hpx_runtime_distributed
+    hpx_threadmanager
   CMAKE_SUBDIRS examples tests
 )

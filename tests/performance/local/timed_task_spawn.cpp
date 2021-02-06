@@ -1,5 +1,5 @@
 //  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2013 Thomas Heller
 //  Copyright (c)      2013 Patricia Grubel
 //
@@ -13,8 +13,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/modules/format.hpp>
 #include <hpx/functional/bind.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>
@@ -33,6 +33,7 @@
 #include <string>
 #include <vector>
 
+#include "activate_counters.hpp"
 #include "worker_timed.hpp"
 
 char const* benchmark_name = "Homogeneous Timed Task Spawn - HPX";
@@ -43,9 +44,9 @@ using hpx::program_options::variables_map;
 
 using hpx::get_os_thread_count;
 
+using hpx::threads::make_thread_function_nullary;
 using hpx::threads::register_work;
 using hpx::threads::thread_init_data;
-using hpx::threads::make_thread_function_nullary;
 
 using hpx::this_thread::suspend;
 using hpx::threads::get_thread_count;
@@ -99,7 +100,7 @@ void print_results(std::uint64_t cores, double walltime, double warmup_estimate,
         header = false;
         cout << "Delay,Tasks,STasks,OS_Threads,Execution_Time_sec,Warmup_sec";
 
-        for (const auto & counter_shortname : counter_shortnames)
+        for (const auto& counter_shortname : counter_shortnames)
         {
             cout << "," << counter_shortname;
         }
@@ -182,7 +183,7 @@ void wait_for_tasks(
 ///////////////////////////////////////////////////////////////////////////////
 hpx::threads::thread_result_type invoke_worker_timed_no_suspension(
     hpx::threads::thread_restart_state ex =
-        hpx::threads::thread_restart_state::wait_signaled)
+        hpx::threads::thread_restart_state::signaled)
 {
     worker_timed(delay * 1000);
     return hpx::threads::thread_result_type(
@@ -192,7 +193,7 @@ hpx::threads::thread_result_type invoke_worker_timed_no_suspension(
 
 hpx::threads::thread_result_type invoke_worker_timed_suspension(
     hpx::threads::thread_restart_state ex =
-        hpx::threads::thread_restart_state::wait_signaled)
+        hpx::threads::thread_restart_state::signaled)
 {
     worker_timed(delay * 1000);
 
@@ -236,21 +237,23 @@ void stage_worker_static_balanced_stackless(
 {
     if (suspend)
     {
-        hpx::threads::register_work(&invoke_worker_timed_suspension,
+        hpx::threads::thread_init_data data(&invoke_worker_timed_suspension,
             "invoke_worker_timed_suspension",
             hpx::threads::thread_priority::normal,
             hpx::threads::thread_schedule_hint(
                 static_cast<std::int16_t>(target_thread)),
             hpx::threads::thread_stacksize::nostack);
+        hpx::threads::register_work(data);
     }
     else
     {
-        hpx::threads::register_work(&invoke_worker_timed_no_suspension,
+        hpx::threads::thread_init_data data(&invoke_worker_timed_no_suspension,
             "invoke_worker_timed_no_suspension",
             hpx::threads::thread_priority::normal,
             hpx::threads::thread_schedule_hint(
                 static_cast<std::int16_t>(target_thread)),
             hpx::threads::thread_stacksize::nostack);
+        hpx::threads::register_work(data);
     }
 }
 
@@ -278,8 +281,8 @@ void stage_worker_round_robin(std::uint64_t target_thread, bool suspend)
 {
     if (suspend)
     {
-        hpx::threads::thread_init_data data(&invoke_worker_timed_suspension,
-            "invoke_worker_timed_suspension");
+        hpx::threads::thread_init_data data(
+            &invoke_worker_timed_suspension, "invoke_worker_timed_suspension");
         hpx::threads::register_work(data);
     }
     else
@@ -485,9 +488,7 @@ int hpx_main(variables_map& vm)
         thread_init_data data(
             make_thread_function_nullary(hpx::util::bind(
                 &wait_for_tasks, std::ref(finished), total_suspended_tasks)),
-            "wait_for_tasks",
-            hpx::threads::thread_schedule_state::thread_schedule_state::pending,
-            hpx::threads::thread_priority::low);
+            "wait_for_tasks", hpx::threads::thread_priority::low);
         register_work(data);
 
         finished.wait();
@@ -500,9 +501,10 @@ int hpx_main(variables_map& vm)
     }
 
     if (suspended_tasks != 0)
+    {
         // Force termination of all suspended tasks.
         hpx::get_runtime().get_thread_manager().abort_all_suspended_threads();
-
+    }
     return hpx::finalize();
 }
 

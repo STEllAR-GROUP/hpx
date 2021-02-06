@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2013      Bryce Adelstein-Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,7 +19,8 @@
 #include <hpx/threading_base/external_timer.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/util/activate_counters.hpp>
+
+#include "activate_counters.hpp"
 
 #include <cstddef>
 #include <fstream>
@@ -29,8 +30,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
+
     activate_counters::activate_counters(std::vector<std::string> const& names)
       : names_(names)
     {
@@ -45,13 +46,12 @@ namespace hpx { namespace util
     bool activate_counters::find_counter(
         performance_counters::counter_info const& info, error_code& ec)
     {
-        naming::id_type id = performance_counters::get_counter(info.fullname_, ec);
+        naming::id_type id =
+            performance_counters::get_counter(info.fullname_, ec);
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, bad_parameter,
-                "activate_counters::find_counter",
-                hpx::util::format(
-                    "unknown performance counter: '{1}' ({2})",
+            HPX_THROWS_IF(ec, bad_parameter, "activate_counters::find_counter",
+                hpx::util::format("unknown performance counter: '{1}' ({2})",
                     info.fullname_, ec.get_message()));
             return false;
         }
@@ -81,8 +81,8 @@ namespace hpx { namespace util
                 util::expand(name);
 
                 // find matching counter type
-                performance_counters::discover_counter_type(name, func,
-                    performance_counters::discover_counters_full);
+                performance_counters::discover_counter_type(
+                    name, func, performance_counters::discover_counters_full);
             }
         }
 
@@ -102,7 +102,7 @@ namespace hpx { namespace util
         find_counters();
 
         // Query the performance counters.
-        std::vector<future<bool> > started;
+        std::vector<future<bool>> started;
 
         started.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
@@ -144,7 +144,7 @@ namespace hpx { namespace util
 
         // Query the performance counters.
         using performance_counters::performance_counter;
-        std::vector<future<bool> > stopped;
+        std::vector<future<bool>> stopped;
 
         stopped.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
@@ -156,7 +156,7 @@ namespace hpx { namespace util
         // wait for all counters to be started
         wait_all(stopped);
 
-        ids_.clear();      // give up control over all performance counters
+        ids_.clear();    // give up control over all performance counters
 
         for (future<bool>& f : stopped)
         {
@@ -180,14 +180,15 @@ namespace hpx { namespace util
         if (ids_.empty())
         {
             // start has not been called yet
-            HPX_THROWS_IF(ec, invalid_status, "activate_counters::reset_counters",
+            HPX_THROWS_IF(ec, invalid_status,
+                "activate_counters::reset_counters",
                 "The counters to be evaluated have not been initialized yet");
             return;
         }
 
         // Query the performance counters.
         using performance_counters::performance_counter;
-        std::vector<future<void> > reset;
+        std::vector<future<void>> reset;
 
         reset.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
@@ -216,11 +217,11 @@ namespace hpx { namespace util
         }
     }
 
-    std::vector<future<performance_counters::counter_value> >
-    activate_counters::evaluate_counters(launch::async_policy, bool reset,
-        error_code& ec)
+    std::vector<future<performance_counters::counter_value>>
+    activate_counters::evaluate_counters(
+        launch::async_policy, bool reset, error_code& ec)
     {
-        std::vector<future<performance_counters::counter_value> > values;
+        std::vector<future<performance_counters::counter_value>> values;
 
         if (ids_.empty())
         {
@@ -242,13 +243,12 @@ namespace hpx { namespace util
     }
 
     std::vector<performance_counters::counter_value>
-    activate_counters::evaluate_counters(launch::sync_policy, bool reset,
-        error_code& ec)
+    activate_counters::evaluate_counters(
+        launch::sync_policy, bool reset, error_code& ec)
     {
-        std::vector<future<performance_counters::counter_value> >
-            futures = evaluate_counters(launch::async, reset, ec);
+        std::vector<future<performance_counters::counter_value>> futures =
+            evaluate_counters(launch::async, reset, ec);
 
         return util::unwrap(futures);
     }
-}}
-
+}}    // namespace hpx::util
