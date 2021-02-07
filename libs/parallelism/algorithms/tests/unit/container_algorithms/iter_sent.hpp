@@ -28,6 +28,38 @@ private:
     ValueType stop;
 };
 
+template <typename Iter, typename ValueType,
+    typename Enable =
+        std::enable_if_t<hpx::traits::is_forward_iterator<Iter>::value>>
+bool operator==(Iter it, sentinel<ValueType> s)
+{
+    return *it == s.get_stop();
+}
+
+template <typename Iter, typename ValueType,
+    typename Enable =
+        std::enable_if_t<hpx::traits::is_forward_iterator<Iter>::value>>
+bool operator==(sentinel<ValueType> s, Iter it)
+{
+    return *it == s.get_stop();
+}
+
+template <typename Iter, typename ValueType,
+    typename Enable =
+        std::enable_if_t<hpx::traits::is_forward_iterator<Iter>::value>>
+bool operator!=(Iter it, sentinel<ValueType> s)
+{
+    return *it != s.get_stop();
+}
+
+template <typename Iter, typename ValueType,
+    typename Enable =
+        std::enable_if_t<hpx::traits::is_forward_iterator<Iter>::value>>
+bool operator!=(sentinel<ValueType> s, Iter it)
+{
+    return *it != s.get_stop();
+}
+
 template <typename Value>
 struct iterator
 {

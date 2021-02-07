@@ -18,7 +18,11 @@
 #include <string>
 #include <vector>
 
+#include "iter_sent.hpp"
 #include "test_utils.hpp"
+
+unsigned int seed = std::random_device{}();
+std::mt19937 g(seed);
 
 ////////////////////////////////////////////////////////////////////////////
 struct user_defined_type
@@ -67,6 +71,69 @@ struct random_fill
 };
 
 ////////////////////////////////////////////////////////////////////////////
+// test case for iterator - sentinel_value
+void test_remove_sent()
+{
+    using hpx::get;
+
+    std::size_t const size = 100;
+    std::vector<std::int16_t> c(size);
+    std::iota(std::begin(c), std::end(c), 0);
+    c[99] = 42;    //both c[99] and c[42] equal 42
+
+    int value = 42;
+
+    auto pre_result = std::count(std::begin(c), std::end(c), value);
+    hpx::ranges::remove(std::begin(c), sentinel<std::int16_t>{50}, value);
+    auto post_result = std::count(std::begin(c), std::end(c), value);
+
+    HPX_TEST(pre_result == 2 && post_result == 1);
+}
+
+template <typename ExPolicy>
+void test_remove_sent(ExPolicy policy)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    using hpx::get;
+
+    std::size_t const size = 100;
+    std::vector<std::int16_t> c(size);
+    std::iota(std::begin(c), std::end(c), 0);
+    c[99] = 42;    //both c[99] and c[42] equal 42
+
+    int value = 42;
+
+    auto pre_result = std::count(std::begin(c), std::end(c), value);
+    hpx::ranges::remove(
+        policy, std::begin(c), sentinel<std::int16_t>{50}, value);
+    auto post_result = std::count(std::begin(c), std::end(c), value);
+
+    HPX_TEST(pre_result == 2 && post_result == 1);
+}
+
+template <typename DataType>
+void test_remove(DataType)
+{
+    using hpx::get;
+
+    std::size_t const size = 10007;
+    std::vector<DataType> c(size), d;
+    std::generate(std::begin(c), std::end(c), random_fill(0, 6));
+    d = c;
+
+    auto value = DataType(0);
+
+    auto result = hpx::ranges::remove(c, value);
+    auto solution = std::remove(std::begin(d), std::end(d), value);
+
+    bool equality =
+        test::equal(std::begin(c), std::begin(result), std::begin(d), solution);
+
+    HPX_TEST(equality);
+}
+
 template <typename ExPolicy, typename DataType>
 void test_remove(ExPolicy policy, DataType)
 {
@@ -82,10 +149,11 @@ void test_remove(ExPolicy policy, DataType)
 
     auto value = DataType(0);
 
-    auto result = hpx::parallel::remove(policy, c, value);
+    auto result = hpx::ranges::remove(policy, c, value);
     auto solution = std::remove(std::begin(d), std::end(d), value);
 
-    bool equality = test::equal(std::begin(c), result, std::begin(d), solution);
+    bool equality =
+        test::equal(std::begin(c), std::begin(result), std::begin(d), solution);
 
     HPX_TEST(equality);
 }
@@ -105,13 +173,55 @@ void test_remove_async(ExPolicy policy, DataType)
 
     auto value = DataType(0);
 
-    auto f = hpx::parallel::remove(policy, c, value);
+    auto f = hpx::ranges::remove(policy, c, value);
     auto result = f.get();
     auto solution = std::remove(std::begin(d), std::end(d), value);
 
-    bool equality = test::equal(std::begin(c), result, std::begin(d), solution);
+    bool equality =
+        test::equal(std::begin(c), std::begin(result), std::begin(d), solution);
 
     HPX_TEST(equality);
+}
+
+template <typename ExPolicy, typename DataType>
+void test_remove_proj(
+    ExPolicy policy, DataType, int rand_base, bool test_for_remove_if = false)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    std::size_t const size = 10007;
+    std::vector<DataType> c(size);
+    std::generate(
+        std::begin(c), std::end(c), random_fill(rand_base, size / 10));
+
+    // Test projection.
+    {
+        DataType value(rand_base);
+
+        if (test_for_remove_if)
+        {
+            auto result = hpx::ranges::remove_if(
+                policy, std::begin(c), std::end(c),
+                [&value](DataType const& a) -> bool { return a == value; },
+                [&value](DataType const&) -> DataType& {
+                    // This is the projection.
+                    return value;
+                });
+            auto dist = std::distance(std::begin(c), std::begin(result));
+            HPX_TEST_EQ(dist, 0);
+        }
+        else
+        {
+            auto result = hpx::ranges::remove(policy, std::begin(c),
+                std::end(c), value, [&value](DataType const&) -> DataType& {
+                    // This is the projection.
+                    return value;
+                });
+            auto dist = std::distance(std::begin(c), std::begin(result));
+            HPX_TEST_EQ(dist, 0);
+        }
+    }
 }
 
 template <typename DataType>
@@ -119,12 +229,26 @@ void test_remove()
 {
     using namespace hpx::execution;
 
+    test_remove(DataType());
     test_remove(seq, DataType());
     test_remove(par, DataType());
     test_remove(par_unseq, DataType());
 
     test_remove_async(seq(task), DataType());
     test_remove_async(par(task), DataType());
+
+    test_remove_sent();
+    test_remove_sent(par);
+    test_remove_sent(par_unseq);
+
+    // test projection
+    int rand_base = g();
+    test_remove_proj(seq, DataType(), rand_base);
+    test_remove_proj(seq, DataType(), rand_base, true);
+    test_remove_proj(par, DataType(), rand_base);
+    test_remove_proj(par, DataType(), rand_base, true);
+    test_remove_proj(par_unseq, DataType(), rand_base);
+    test_remove_proj(par_unseq, DataType(), rand_base, true);
 }
 
 void test_remove()
