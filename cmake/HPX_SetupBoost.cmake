@@ -17,6 +17,7 @@ if(NOT TARGET hpx_dependencies_boost)
   # cmake-format: off
   set(Boost_ADDITIONAL_VERSIONS
       ${Boost_ADDITIONAL_VERSIONS}
+      "1.75.0" "1.75"
       "1.74.0" "1.74"
       "1.73.0" "1.73"
       "1.72.0" "1.72"
