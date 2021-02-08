@@ -22,10 +22,17 @@ namespace examples { namespace server
     ///////////////////////////////////////////////////////////////////////////
     inline void delay(int c)
     {
+#if defined(HPX_CLANG_VERSION) && (HPX_CLANG_VERSION >= 100000)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
         double volatile d = 0.;
         for (int i = 0; i < c; ++i)
             d += 1 / (2. * i + 1);
         (void) d;
+#if defined(HPX_CLANG_VERSION) && (HPX_CLANG_VERSION >= 100000)
+#pragma clang diagnostic pop
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
