@@ -6,15 +6,8 @@
 
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
-if(NOT HPX_WITH_ASYNC_CUDA)
+if(NOT (HPX_WITH_CUDA OR HPX_WITH_HIP) OR NOT HPX_WITH_ASYNC_CUDA)
   return()
-endif()
-
-if(NOT TARGET Cuda::cuda AND NOT HPX_WITH_HIP)
-  message(
-    FATAL_ERROR
-      "CUDA/HIP future support has been enabled, but the CUDA or HIP installation is not setup"
-  )
 endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")

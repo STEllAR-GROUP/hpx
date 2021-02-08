@@ -52,7 +52,6 @@ void blocker(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-volatile int i = 0;
 std::uint64_t delay = 100;
 
 int hpx_main()
@@ -100,8 +99,6 @@ int hpx_main()
             {
                 if (td.elapsed() > delay_sec)
                     break;
-                else
-                    ++i;
             }
         }
 

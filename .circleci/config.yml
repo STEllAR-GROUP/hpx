@@ -512,6 +512,7 @@ jobs:
               ninja -j2 install
           working_directory: /hpx/build
           when: always
+          no_output_timeout: 30m
       - run:
           name: Testing build unit tests
           command: |

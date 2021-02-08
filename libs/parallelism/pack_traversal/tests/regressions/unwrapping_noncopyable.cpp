@@ -11,7 +11,11 @@
 
 struct noncopyable
 {
+    noncopyable() = default;
+    noncopyable(noncopyable&&) = default;
+    noncopyable& operator=(noncopyable&&) = default;
     noncopyable(noncopyable const&) = delete;
+    noncopyable& operator=(noncopyable const&) = delete;
 };
 
 int main()

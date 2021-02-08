@@ -28,6 +28,7 @@
 #include <hpx/topology/topology.hpp>
 
 #include <array>
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -1398,10 +1399,10 @@ namespace hpx { namespace threads { namespace policies {
 
         // used to make sure the scheduler is only initialized once on a thread
         std::mutex init_mutex;
-        volatile bool initialized_;
+        bool initialized_;
         // a flag to ensure startup debug info is only printed on one thread
-        volatile bool debug_init_;
-        volatile std::size_t thread_init_counter_;
+        bool debug_init_;
+        std::atomic<std::size_t> thread_init_counter_;
         // used in thread pool checks
         std::size_t pool_index_;
     };
