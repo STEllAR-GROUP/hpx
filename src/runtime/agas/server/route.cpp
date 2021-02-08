@@ -28,12 +28,12 @@
 #include <vector>
 
 namespace hpx { namespace detail {
+
     void update_agas_cache(hpx::naming::gid_type const& gid,
         hpx::naming::address const& addr, std::uint64_t count,
         std::uint64_t offset)
     {
-        hpx::naming::get_agas_client().update_cache_entry(
-            gid, addr, count, offset);
+        hpx::agas::update_cache_entry(gid, addr, count, offset);
     }
 }}    // namespace hpx::detail
 

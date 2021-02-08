@@ -15,7 +15,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos_distributed/server/channel.hpp>
 #include <hpx/modules/naming.hpp>
-#include <hpx/runtime/components/new.hpp>
+#include <hpx/runtime_components/new.hpp>
 
 #include <cstddef>
 #include <type_traits>

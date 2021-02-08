@@ -129,22 +129,16 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/components/component_startup_shutdown.hpp
     hpx/runtime/components/console_error_sink.hpp
     hpx/runtime/components/console_logging.hpp
-    hpx/runtime/components/copy_component.hpp
-    hpx/runtime/components/create_component_helpers.hpp
     hpx/runtime/components/default_distribution_policy.hpp
     hpx/runtime/components/derived_component_factory.hpp
     hpx/runtime/components_fwd.hpp
-    hpx/runtime/components/migrate_component.hpp
-    hpx/runtime/components/new.hpp
     hpx/runtime/components/runtime_support.hpp
     hpx/runtime/components/server/console_error_sink.hpp
     hpx/runtime/components/server/console_error_sink_singleton.hpp
     hpx/runtime/components/server/console_logging.hpp
-    hpx/runtime/components/server/copy_component.hpp
     hpx/runtime/components/server/distributed_metadata_base.hpp
     hpx/runtime/components/server/executor_component.hpp
     hpx/runtime/components/server/invoke_function.hpp
-    hpx/runtime/components/server/migrate_component.hpp
     hpx/runtime/components/server/runtime_support.hpp
     hpx/runtime/components/stubs/runtime_support.hpp
     hpx/runtime/components/target_distribution_policy.hpp
@@ -178,7 +172,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/traits/action_message_handler.hpp
     hpx/traits/action_serialization_filter.hpp
     hpx/traits/is_continuation.hpp
-    hpx/traits/is_distribution_policy.hpp
     hpx/util/bind_action.hpp
     hpx/util/connection_cache.hpp
     hpx/util/functional/colocated_helpers.hpp

@@ -39,6 +39,7 @@ set(_hpx_full_modules
     program_options
     resiliency_distributed
     resource_partitioner
+    runtime_components
     runtime_configuration
     runtime_distributed
     runtime_local

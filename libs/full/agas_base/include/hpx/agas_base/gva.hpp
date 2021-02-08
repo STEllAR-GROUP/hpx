@@ -22,8 +22,8 @@ namespace hpx { namespace agas {
 
     struct gva
     {
-        typedef std::int32_t component_type;
-        typedef std::uint64_t lva_type;
+        using component_type = std::int32_t;
+        using lva_type = std::uint64_t;
 
         gva()
           : type(components::component_invalid)

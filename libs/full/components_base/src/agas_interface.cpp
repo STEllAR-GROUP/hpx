@@ -123,6 +123,13 @@ namespace hpx { namespace agas {
         return detail::is_local_address_cached_addr(gid, addr, ec);
     }
 
+    void update_cache_entry(naming::gid_type const& gid,
+        naming::address const& addr, std::uint64_t count, std::uint64_t offset,
+        error_code& ec)
+    {
+        return detail::update_cache_entry(gid, addr, count, offset, ec);
+    }
+
     bool is_local_lva_encoded_address(naming::gid_type const& gid)
     {
         return detail::is_local_lva_encoded_address(gid);

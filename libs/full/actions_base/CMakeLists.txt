@@ -37,6 +37,7 @@ set(actions_base_headers
     hpx/actions_base/traits/action_was_object_migrated.hpp
     hpx/actions_base/traits/extract_action.hpp
     hpx/actions_base/traits/is_client.hpp
+    hpx/actions_base/traits/is_distribution_policy.hpp
     hpx/actions_base/traits/is_valid_action.hpp
 )
 
@@ -64,6 +65,7 @@ set(actions_base_compat_headers
     hpx/traits/action_was_object_migrated.hpp => hpx/modules/actions_base.hpp
     hpx/traits/extract_action.hpp => hpx/modules/actions_base.hpp
     hpx/traits/is_client.hpp => hpx/modules/actions_base.hpp
+    hpx/traits/is_distribution_policy.hpp => hpx/modules/actions_base.hpp
     hpx/traits/is_valid_action.hpp => hpx/modules/actions_base.hpp
 )
 # cmake-format: on

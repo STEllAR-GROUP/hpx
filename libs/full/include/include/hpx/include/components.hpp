@@ -46,9 +46,9 @@
 #include <hpx/components_base/server/migration_support.hpp>
 #include <hpx/runtime/components/server/executor_component.hpp>
 
-#include <hpx/runtime/components/copy_component.hpp>
-#include <hpx/runtime/components/migrate_component.hpp>
-#include <hpx/runtime/components/new.hpp>
+#include <hpx/runtime_components/copy_component.hpp>
+#include <hpx/runtime_components/migrate_component.hpp>
+#include <hpx/runtime_components/new.hpp>
 
 #include <hpx/runtime/components/binpacking_distribution_policy.hpp>
 #include <hpx/runtime/components/colocating_distribution_policy.hpp>

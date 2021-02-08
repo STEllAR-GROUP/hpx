@@ -109,6 +109,10 @@ namespace hpx { namespace agas {
         return is_local_address_cached(id.get_gid(), addr, ec);
     }
 
+    HPX_EXPORT void update_cache_entry(naming::gid_type const& gid,
+        naming::address const& addr, std::uint64_t count = 0,
+        std::uint64_t offset = 0, error_code& ec = throws);
+
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT bool is_local_lva_encoded_address(naming::gid_type const& gid);
 

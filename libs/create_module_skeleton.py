@@ -152,8 +152,8 @@ if(HPX_WITH_TESTS)
   if(HPX_WITH_TESTS_HEADERS)
     add_hpx_header_tests(
       modules.{module_name}
-      HEADERS ${{module_name}_headers}
-      HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+      HEADERS ${{{module_name}_headers}}
+      HEADER_ROOT ${{PROJECT_SOURCE_DIR}}/include
       DEPENDENCIES hpx_{module_name}
     )
   endif()

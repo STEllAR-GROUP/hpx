@@ -16,8 +16,8 @@
 #include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime_components/new.hpp>
 
 #include <cstddef>
 #include <string>

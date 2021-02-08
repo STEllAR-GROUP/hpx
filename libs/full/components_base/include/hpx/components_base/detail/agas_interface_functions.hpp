@@ -82,6 +82,10 @@ namespace hpx { namespace agas { namespace detail {
     extern HPX_EXPORT bool (*is_local_address_cached_addr)(
         naming::gid_type const& gid, naming::address& addr, error_code& ec);
 
+    extern HPX_EXPORT void (*update_cache_entry)(naming::gid_type const& gid,
+        naming::address const& addr, std::uint64_t count, std::uint64_t offset,
+        error_code& ec);
+
     ///////////////////////////////////////////////////////////////////////////
     extern HPX_EXPORT bool (*is_local_lva_encoded_address)(
         naming::gid_type const& gid);

@@ -10,6 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_colocated/apply_colocated.hpp>
+#include <hpx/async_distributed/applier_fwd.hpp>
 #include <hpx/async_distributed/apply.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>

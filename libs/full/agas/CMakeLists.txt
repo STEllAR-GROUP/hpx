@@ -31,7 +31,7 @@ set(agas_sources addressing_service.cpp big_boot_barrier.cpp
 include(HPX_AddModule)
 add_hpx_module(
   full agas
-  COMPATIBILITY_HEADERS OFF
+  COMPATIBILITY_HEADERS ON # Added in 1.6.0
   GLOBAL_HEADER_GEN ON
   SOURCES ${agas_sources}
   HEADERS ${agas_headers}

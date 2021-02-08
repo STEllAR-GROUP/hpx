@@ -17,8 +17,6 @@
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 #include <hpx/serialization/string.hpp>
 
-#include <boost/shared_array.hpp>
-
 #include <memory>
 #include <string>
 

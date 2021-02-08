@@ -55,6 +55,7 @@
 #include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/actions_base/traits/is_client.hpp>
+#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/actions_base/traits/is_valid_action.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/components_base/traits/component_config_data.hpp>
@@ -70,5 +71,4 @@
 #include <hpx/futures/traits/promise_remote_result.hpp>
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
 #endif

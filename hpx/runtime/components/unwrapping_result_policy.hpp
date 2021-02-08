@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
+#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/async_distributed/detail/async_implementations.hpp>
@@ -18,7 +19,6 @@
 #include <hpx/components/client_base.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
 
 #include <type_traits>
 #include <utility>

@@ -143,6 +143,14 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
         return naming::get_agas_client().is_local_address_cached(gid, addr, ec);
     }
 
+    void update_cache_entry(naming::gid_type const& gid,
+        naming::address const& addr, std::uint64_t count, std::uint64_t offset,
+        error_code& ec)
+    {
+        return naming::get_agas_client().update_cache_entry(
+            gid, addr, count, offset, ec);
+    }
+
     bool is_local_lva_encoded_address(naming::gid_type const& gid)
     {
         return naming::get_agas_client().is_local_lva_encoded_address(
@@ -552,12 +560,15 @@ namespace hpx { namespace agas {
                 &detail::impl::is_local_address_cached;
             detail::is_local_address_cached_addr =
                 &detail::impl::is_local_address_cached_addr;
+            detail::update_cache_entry = &detail::impl::update_cache_entry;
+
             detail::is_local_lva_encoded_address =
                 &detail::impl::is_local_lva_encoded_address;
 
             detail::resolve_async = &detail::impl::resolve_async;
             detail::resolve = &detail::impl::resolve;
             detail::resolve_cached = &detail::impl::resolve_cached;
+            detail::resolve_local = &detail::impl::resolve_local;
 
             detail::bind_async = &detail::impl::bind_async;
             detail::bind = &detail::impl::bind;

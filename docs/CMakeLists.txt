@@ -17,10 +17,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/components/binpacking_distribution_policy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/components/colocating_distribution_policy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/components/component_factory.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/components/copy_component.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/components/default_distribution_policy.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/components/migrate_component.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/components/new.hpp"
 )
 
 # Definitions for autodoc.doxy.in

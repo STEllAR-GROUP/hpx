@@ -39,13 +39,13 @@ set(components_sources basename_registration.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   full components
-  COMPATIBILITY_HEADERS OFF
+  COMPATIBILITY_HEADERS ON # Added in 1.7.0
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${components_sources}
   HEADERS ${components_headers}
   COMPAT_HEADERS ${components_compat_headers}
-  DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_actions_base hpx_async_base hpx_components_base
+  DEPENDENCIES hpx_core hpx_parallelism
+  MODULE_DEPENDENCIES hpx_actions_base hpx_components_base
   CMAKE_SUBDIRS examples tests
 )

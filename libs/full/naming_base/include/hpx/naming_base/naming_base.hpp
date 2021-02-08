@@ -27,9 +27,9 @@ namespace hpx {
 
         HPX_INLINE_CONSTEXPR_VARIABLE std::int32_t component_invalid = -1;
 
+        struct HPX_EXPORT address;
         struct HPX_EXPORT gid_type;
         struct HPX_EXPORT id_type;
-        struct HPX_EXPORT address;
     }    // namespace naming
 
     // Pulling important types into the main namespace

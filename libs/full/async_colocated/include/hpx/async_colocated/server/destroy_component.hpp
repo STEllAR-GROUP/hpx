@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/server/component_heap.hpp>
 #include <hpx/components_base/component_type.hpp>
+#include <hpx/components_base/server/component_heap.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/naming_base/address.hpp>

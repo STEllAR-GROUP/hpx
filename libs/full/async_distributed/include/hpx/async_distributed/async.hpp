@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/actions_base/traits/is_client.hpp>
+#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/actions_base/traits/is_valid_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
@@ -27,7 +28,6 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/type_support/lazy_enable_if.hpp>
 #include <hpx/util/bind_action.hpp>
 
