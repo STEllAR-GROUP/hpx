@@ -247,8 +247,8 @@ function(add_hpx_module libname modulename)
 
   # create library modules
   if(${name}_CUDA
-     AND HPX_WITH_CUDA_COMPUTE
-     AND NOT HPX_WITH_HIP
+     AND HPX_WITH_CUDA
+     AND NOT HPX_WITH_CUDA_CLANG
   )
     # cmake-format: off
     cuda_add_library(

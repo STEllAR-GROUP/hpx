@@ -522,19 +522,31 @@ hpx_option(
 set(CUDA_OPTION_STRING "Enable HPX_WITH_ASYNC_CUDA (CUDA or HIP futures) and\
  HPX_WITH_CUDA_COMPUTE (CUDA/HIP enabled parallel algorithms) (default: OFF)"
 )
-set(CUDA_COMPUTE_STRING
-    "Enable HPX CUDA/HIP compute capability (parallel algorithms) module (default: OFF) -\
- note: enabling this also enables CUDA/HIP futures via HPX_WITH_ASYNC_CUDA"
-)
 set(ASYNC_CUDA_STRING
-    "Enable HPX CUDA/HIP compute capability (parallel algorithms) module (default: OFF) -\
+    "Enable HPX CUDA/HIP compute capability (parallel algorithms) module\
+ (default: ON, dependent on HPX_WITH_CUDA or HPX_WITH_HIP) -\
  note: CUDA/HIP futures may be used without CUDA/HIP Compute"
+)
+set(CUDA_COMPUTE_STRING
+    "Enable HPX CUDA/HIP compute capability (parallel algorithms) module\
+ (default: ON, dependent on HPX_WITH_CUDA or HPX_WITH_HIP, and HPX_WITH_ASYNC_CUDA) -\
+ note: enabling this also enables CUDA/HIP futures via HPX_WITH_ASYNC_CUDA"
 )
 set(HIP_OPTION_STRING "Enable compilation with HIPCC (default: OFF)")
 hpx_option(HPX_WITH_CUDA BOOL "${CUDA_OPTION_STRING}" OFF ADVANCED)
+
 # Those two will be renamed replacing CUDA with GPU
-hpx_option(HPX_WITH_CUDA_COMPUTE BOOL "${CUDA_COMPUTE_STRING}" OFF ADVANCED)
-hpx_option(HPX_WITH_ASYNC_CUDA BOOL "${ASYNC_CUDA_STRING}" OFF ADVANCED)
+hpx_option(HPX_WITH_CUDA_COMPUTE BOOL "${CUDA_COMPUTE_STRING}" ON ADVANCED)
+hpx_option(HPX_WITH_ASYNC_CUDA BOOL "${ASYNC_CUDA_STRING}" ON ADVANCED)
+
+# HPX_WITH_CUDA_COMPUTE requires HPX_WITH_ASYNC_CUDA
+if(HPX_WITH_CUDA_COMPUTE)
+  set(HPX_WITH_ASYNC_CUDA
+      ON
+      CACHE BOOL "${HPX_WITH_ASYNC_CUDA}" FORCE
+  )
+endif()
+
 # No need for the user to specify the option explicitly
 hpx_option(HPX_WITH_HIP BOOL "${HIP_OPTION_STRING}" OFF ADVANCED)
 if("${CMAKE_CXX_COMPILER}" MATCHES "hipcc$")
@@ -543,15 +555,11 @@ if("${CMAKE_CXX_COMPILER}" MATCHES "hipcc$")
       CACHE BOOL "${HIP_OPTION_STRING}" FORCE
   )
 endif()
-# if HPX_WITH_CUDA is ON, then enable both (sub) options
-if(HPX_WITH_CUDA OR HPX_WITH_HIP)
-  set(HPX_WITH_CUDA_COMPUTE
-      ON
-      CACHE BOOL "${CUDA_COMPUTE_STRING}" FORCE
-  )
-  set(HPX_WITH_ASYNC_CUDA
-      ON
-      CACHE BOOL "${ASYNC_CUDA_STRING}" FORCE
+
+if(HPX_WITH_CUDA AND HPX_WITH_HIP)
+  hpx_error(
+    "HPX_WITH_CUDA=ON and HPX_WITH_HIP=ON. Only one of them can be on at the same time.\
+ Note: HPX_WITH_HIP is automatically enabled when compiling with hipcc."
   )
 endif()
 

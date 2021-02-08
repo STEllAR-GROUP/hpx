@@ -28,7 +28,7 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/version.hpp>
-#if defined(HPX_HAVE_GPU_SUPPORT)
+#if defined(HPX_HAVE_MODULE_ASYNC_CUDA)
 #include <hpx/async_cuda/cuda_future.hpp>
 #include <hpx/async_cuda/target.hpp>
 #endif
@@ -466,14 +466,13 @@ int hpx_main(hpx::program_options::variables_map& vm)
     double time_total = mysecond();
     std::vector<std::vector<double>> timing;
 
-#if defined(HPX_HAVE_COMPUTE)
+#if defined(HPX_HAVE_MODULE_COMPUTE_CUDA)
     bool use_accel = false;
     if (vm.count("use-accelerator"))
         use_accel = true;
 
     if (use_accel)
     {
-#if defined(HPX_HAVE_GPU_SUPPORT)
         using executor_type = hpx::cuda::experimental::concurrent_executor<>;
         using allocator_type = hpx::cuda::experimental::allocator<STREAM_TYPE>;
 
@@ -487,9 +486,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
         executor_type exec(target, host_targets);
         auto policy = hpx::execution::par.on(exec);
 
-#else
-#error "The STREAM benchmark currently requires CUDA to run on an accelerator"
-#endif
         // perform benchmark
         timing = run_benchmark<>(
             iterations, vector_size, std::move(alloc), std::move(policy));
