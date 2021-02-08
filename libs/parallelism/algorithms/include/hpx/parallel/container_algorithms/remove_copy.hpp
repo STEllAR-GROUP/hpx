@@ -257,7 +257,10 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value&&
                 hpx::parallel::traits::is_projected_range<Proj,Rng>::value &&
                 hpx::is_invocable_v<Pred,
-                    typename hpx::traits::range_iterator<Rng>::type>
+                    typename std::iterator_traits<
+                        typename hpx::traits::range_iterator<Rng>::type
+                    >::value_type
+                >
             )>
         // clang-format on
         friend remove_copy_if_result<
@@ -265,6 +268,11 @@ namespace hpx { namespace ranges {
         tag_invoke(hpx::ranges::remove_copy_if_t, Rng&& rng, O dest,
             Pred&& pred, Proj&& proj = Proj())
         {
+            static_assert(
+                (hpx::traits::is_input_iterator<
+                    typename hpx::traits::range_iterator<Rng>::type>::value),
+                "Required at least input iterator.");
+
             return hpx::parallel::v1::detail::remove_copy_if<
                 hpx::parallel::util::in_out_result<
                     typename hpx::traits::range_iterator<Rng>::type, O>>()
@@ -326,6 +334,11 @@ namespace hpx { namespace ranges {
         tag_invoke(hpx::ranges::remove_copy_if_t, ExPolicy&& policy, Rng&& rng,
             O dest, Pred&& pred, Proj&& proj = Proj())
         {
+            static_assert(
+                (hpx::traits::is_forward_iterator<
+                    typename hpx::traits::range_iterator<Rng>::type>::value),
+                "Required at least forward iterator.");
+
             typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             return hpx::parallel::v1::detail::remove_copy_if<
@@ -395,7 +408,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<I>::value &&
                 hpx::traits::is_sentinel_for<Sent, I>::value &&
                 hpx::traits::is_iterator<O>::value &&
-                hpx::parallel::traits::is_projected<Proj, I>::value                
+                hpx::parallel::traits::is_projected<Proj, I>::value
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,

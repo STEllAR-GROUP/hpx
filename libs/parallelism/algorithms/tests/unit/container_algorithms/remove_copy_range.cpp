@@ -17,7 +17,54 @@
 #include <string>
 #include <vector>
 
+#include "iter_sent.hpp"
 #include "test_utils.hpp"
+
+////////////////////////////////////////////////////////////////////////////////
+void test_remove_copy_sent()
+{
+    using hpx::get;
+
+    std::size_t const size = 100;
+    std::vector<std::int16_t> c(size), d(size, -1);
+    std::iota(std::begin(c), std::end(c), 1);
+    c[99] = 42;    //both c[99] and c[42] are equal to 42
+
+    int value = 42;
+
+    auto pred = [](const int& n) -> bool { return n > 0; };
+
+    hpx::ranges::remove_copy(
+        std::begin(c), sentinel<std::int16_t>{50}, std::begin(d), value);
+    auto result = std::count_if(std::begin(d), std::end(d), pred);
+
+    HPX_TEST(result == 48);
+}
+
+template <typename ExPolicy>
+void test_remove_copy_sent(ExPolicy policy)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    using hpx::get;
+
+    std::size_t const size = 100;
+    std::vector<std::int16_t> c(size), d(size, -1);
+    std::iota(std::begin(c), std::end(c), 1);
+
+    c[99] = 42;    //both c[99] and c[42] are equal to 42
+
+    int value = 42;
+
+    auto pred = [](const int& n) -> bool { return n > 0; };
+
+    hpx::ranges::remove_copy(policy, std::begin(c), sentinel<std::int16_t>{50},
+        std::begin(d), value);
+    auto result = std::count_if(std::begin(d), std::end(d), pred);
+
+    HPX_TEST(result == 48);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
@@ -202,6 +249,11 @@ void test_remove_copy()
     test_remove_copy_async(IteratorTag());
     test_remove_copy_async(seq(task), IteratorTag());
     test_remove_copy_async(par(task), IteratorTag());
+
+    test_remove_copy_sent();
+    test_remove_copy_sent(seq);
+    test_remove_copy_sent(par);
+    test_remove_copy_sent(par_unseq);
 }
 
 void remove_copy_test()

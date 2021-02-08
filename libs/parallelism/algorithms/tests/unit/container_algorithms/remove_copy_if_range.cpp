@@ -20,30 +20,51 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
-// This test should be valid once remove_adapt is accepted and
-// iter_sent implements a valid sentinel
+void test_remove_copy_if_sent()
+{
+    using hpx::get;
 
-// template <typename ExPolicy>
-// void test_remove_copy_if_sent(ExPolicy policy)
-// {
-//     static_assert(hpx::is_execution_policy<ExPolicy>::value,
-//         "hpx::is_execution_policy<ExPolicy>::value");
+    std::size_t const size = 100;
+    std::vector<std::int16_t> c(size), d(size, 1), e(size, 1);
+    std::iota(std::begin(c), std::end(c), 1);
 
-//     using hpx::get;
+    auto pred1 = [](std::int16_t const& a) -> bool { return a % 42 != 0; };
+    auto pred2 = [](std::int16_t const& a) -> bool { return a % 42 == 0; };
 
-//     std::size_t const size = 100;
-//     std::vector<std::int16_t> c(size), d(size);
-//     std::iota(std::begin(c), std::end(c), 1);
+    hpx::ranges::remove_copy_if(c, std::begin(e), pred1);
+    auto result_e = std::count_if(std::begin(e), std::end(e), pred2);
 
-//     auto pred = [](std::int16_t const& a) -> bool { return a % 42 == 0; };
+    hpx::ranges::remove_copy_if(
+        std::begin(c), sentinel<std::int16_t>{50}, std::begin(d), pred1);
+    auto result_d = std::count_if(std::begin(d), std::end(d), pred2);
 
-//     auto pre_result = std::count_if(std::begin(c), std::end(c), pred);
-//     hpx::ranges::remove_copy_if(
-//         std::begin(c), sentinel<std::int16_t>{50}, std::begin(d), pred);
-//     auto post_result = std::count_if(std::begin(c), std::end(c), pred);
+    HPX_TEST(result_e == 2 && result_d == 1);
+}
 
-//     HPX_TEST(pre_result == 2 && post_result == 1);
-// }
+template <typename ExPolicy>
+void test_remove_copy_if_sent(ExPolicy policy)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    using hpx::get;
+
+    std::size_t const size = 100;
+    std::vector<std::int16_t> c(size), d(size, 1), e(size, 1);
+    std::iota(std::begin(c), std::end(c), 1);
+
+    auto pred1 = [](std::int16_t const& a) -> bool { return a % 42 != 0; };
+    auto pred2 = [](std::int16_t const& a) -> bool { return a % 42 == 0; };
+
+    hpx::ranges::remove_copy_if(c, std::begin(e), pred1);
+    auto result_e = std::count_if(std::begin(e), std::end(e), pred2);
+
+    hpx::ranges::remove_copy_if(policy, std::begin(c),
+        sentinel<std::int16_t>{50}, std::begin(d), pred1);
+    auto result_d = std::count_if(std::begin(d), std::end(d), pred2);
+
+    HPX_TEST(result_e == 2 && result_d == 1);
+}
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
@@ -258,7 +279,10 @@ void test_remove_copy_if()
     test_remove_copy_if_async(seq(task), IteratorTag());
     test_remove_copy_if_async(par(task), IteratorTag());
 
-    // test_remove_copy_if_sent(seq);
+    test_remove_copy_if_sent();
+    test_remove_copy_if_sent(seq);
+    test_remove_copy_if_sent(par);
+    test_remove_copy_if_sent(par_unseq);
 }
 
 void remove_copy_if_test()
