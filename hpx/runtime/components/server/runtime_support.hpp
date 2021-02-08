@@ -296,10 +296,10 @@ namespace hpx { namespace components { namespace server
             bool isdefault, bool isenabled,
             hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
-        bool load_startup_shutdown_functions_static(std::string const& module,
+        bool load_startup_shutdown_functions_static(std::string const& mod,
             error_code& ec);
         bool load_commandline_options_static(
-            std::string const& module,
+            std::string const& mod,
             hpx::program_options::options_description& options,
             error_code& ec);
 

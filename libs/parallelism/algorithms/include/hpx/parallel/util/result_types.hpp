@@ -187,6 +187,25 @@ namespace hpx { namespace parallel { namespace util {
         }
     };
 
+    template <typename Iterator, typename Sentinel = Iterator>
+    hpx::util::iterator_range<Iterator, Sentinel> make_subrange(
+        Iterator iterator, Sentinel sentinel)
+    {
+        return hpx::util::make_iterator_range<Iterator, Sentinel>(
+            iterator, sentinel);
+    }
+
+    template <typename Iterator, typename Sentinel = Iterator>
+    hpx::future<hpx::util::iterator_range<Iterator, Sentinel>> make_subrange(
+        hpx::future<Iterator>&& iterator, Sentinel sentinel)
+    {
+        return lcos::make_future<hpx::util::iterator_range<Iterator, Sentinel>>(
+            std::move(iterator), [sentinel](Iterator&& it) {
+                return hpx::util::iterator_range<Iterator, Sentinel>(
+                    it, sentinel);
+            });
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         template <typename ZipIter>

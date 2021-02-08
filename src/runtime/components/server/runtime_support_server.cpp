@@ -1617,17 +1617,17 @@ namespace hpx { namespace components { namespace server {
 
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::load_startup_shutdown_functions_static(
-        std::string const& module, error_code& ec)
+        std::string const& mod, error_code& ec)
     {
         try
         {
             // get the factory, may fail
             util::plugin::get_plugins_list_type f;
-            if (!components::get_static_startup_shutdown(module, f))
+            if (!components::get_static_startup_shutdown(mod, f))
             {
                 LRT_(debug) << "static loading of startup/shutdown functions "
                                "failed: "
-                            << module << ": couldn't find module in global "
+                            << mod << ": couldn't find module in global "
                             << "static startup/shutdown functions data map";
                 return false;
             }
@@ -1642,7 +1642,7 @@ namespace hpx { namespace components { namespace server {
             {
                 LRT_(debug) << "static loading of startup/shutdown functions "
                                "failed: "
-                            << module << ": " << get_error_what(ec);
+                            << mod << ": " << get_error_what(ec);
                 return false;
             }
 
@@ -1688,14 +1688,14 @@ namespace hpx { namespace components { namespace server {
         {
             LRT_(debug)
                 << "static loading of startup/shutdown functions failed: "
-                << module << ": " << e.what();
+                << mod << ": " << e.what();
             return false;
         }
         catch (std::exception const& e)
         {
             LRT_(debug)
                 << "static loading of startup/shutdown functions failed: "
-                << module << ": " << e.what();
+                << mod << ": " << e.what();
             return false;
         }
         return true;    // startup/shutdown functions got registered
@@ -1703,16 +1703,16 @@ namespace hpx { namespace components { namespace server {
 
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::load_commandline_options_static(
-        std::string const& module,
+        std::string const& mod,
         hpx::program_options::options_description& options, error_code& ec)
     {
         try
         {
             util::plugin::get_plugins_list_type f;
-            if (!components::get_static_commandline(module, f))
+            if (!components::get_static_commandline(mod, f))
             {
                 LRT_(debug) << "static loading of command-line options failed: "
-                            << module << ": couldn't find module in global "
+                            << mod << ": couldn't find module in global "
                             << "static command line data map";
                 return false;
             }
@@ -1727,7 +1727,7 @@ namespace hpx { namespace components { namespace server {
             if (ec)
             {
                 LRT_(debug) << "static loading of command-line options failed: "
-                            << module << ": " << get_error_what(ec);
+                            << mod << ": " << get_error_what(ec);
                 return false;
             }
 
@@ -1740,13 +1740,13 @@ namespace hpx { namespace components { namespace server {
         catch (std::logic_error const& e)
         {
             LRT_(debug) << "static loading of command-line options failed: "
-                        << module << ": " << e.what();
+                        << mod << ": " << e.what();
             return false;
         }
         catch (std::exception const& e)
         {
             LRT_(debug) << "static loading of command-line options failed: "
-                        << module << ": " << e.what();
+                        << mod << ": " << e.what();
             return false;
         }
         return true;    // startup/shutdown functions got registered
