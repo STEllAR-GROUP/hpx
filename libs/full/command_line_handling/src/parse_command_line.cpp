@@ -560,26 +560,26 @@ namespace hpx { namespace util {
                 ("hpx:dump-config", "print the final runtime configuration")
                 // enable debug output from command line handling
                 ("hpx:debug-clp", "debug command line processing")
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-                ("hpx:list-symbolic-names", "list all registered symbolic "
-                  "names after startup")
-                ("hpx:list-component-types", "list all dynamic component types "
-                  "after startup")
                 ("hpx:debug-hpx-log", value<std::string>()->implicit_value("cout"),
                   "enable all messages on the HPX log channel and send all "
                   "HPX logs to the target destination")
-                ("hpx:debug-agas-log", value<std::string>()->implicit_value("cout"),
-                  "enable all messages on the AGAS log channel and send all "
-                  "AGAS logs to the target destination")
-                ("hpx:debug-parcel-log", value<std::string>()->implicit_value("cout"),
-                  "enable all messages on the parcel transport log channel and send all "
-                  "parcel transport logs to the target destination")
                 ("hpx:debug-timing-log", value<std::string>()->implicit_value("cout"),
                   "enable all messages on the timing log channel and send all "
                   "timing logs to the target destination")
                 ("hpx:debug-app-log", value<std::string>()->implicit_value("cout"),
                   "enable all messages on the application log channel and send all "
                   "application logs to the target destination")
+                ("hpx:debug-agas-log", value<std::string>()->implicit_value("cout"),
+                  "enable all messages on the AGAS log channel and send all "
+                  "AGAS logs to the target destination")
+                ("hpx:debug-parcel-log", value<std::string>()->implicit_value("cout"),
+                  "enable all messages on the parcel transport log channel and send all "
+                  "parcel transport logs to the target destination")
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+                ("hpx:list-symbolic-names", "list all registered symbolic "
+                  "names after startup")
+                ("hpx:list-component-types", "list all dynamic component types "
+                  "after startup")
 #endif
 #if defined(_POSIX_VERSION) || defined(HPX_WINDOWS)
                 ("hpx:attach-debugger",

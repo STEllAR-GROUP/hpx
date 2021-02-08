@@ -50,6 +50,7 @@
 #include <hpx/type_support/pack.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
+#include <hpx/util/init_logging.hpp>
 
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>
@@ -69,7 +70,6 @@
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/util/bind_action.hpp>
-#include <hpx/util/init_logging.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 #endif
 
@@ -400,11 +400,8 @@ namespace hpx {
                 cmdline.rtcfg_.get_spinlock_deadlock_detection_limit());
 #endif
 
-            // initialize logging
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             util::detail::init_logging(
                 cmdline.rtcfg_, cmdline.rtcfg_.mode_ == runtime_mode::console);
-#endif
 
 #if defined(HPX_HAVE_NETWORKING)
             if (cmdline.num_localities_ != 1 || cmdline.node_ != 0 ||

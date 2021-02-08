@@ -9,7 +9,7 @@
 # ##############################################################################
 # gather sources
 
-set(hpx_SOURCES "")
+set(hpx_SOURCES util/init_logging.cpp)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   list(
@@ -51,7 +51,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/trigger_lco.cpp
     runtime_distributed.cpp
     util/generate_unique_ids.cpp
-    util/init_logging.cpp
     util/one_size_heap_list.cpp
     util/pool_timer.cpp
     util/register_locks_globally.cpp
@@ -84,8 +83,9 @@ endif()
 # gather headers
 
 # List all headers (local and distributed)
-set(hpx_HEADERS hpx/lcos_fwd.hpp hpx/traits/managed_component_policies.hpp
-                hpx/traits/rma_memory_region_traits.hpp
+set(hpx_HEADERS
+    hpx/lcos_fwd.hpp hpx/traits/managed_component_policies.hpp
+    hpx/traits/rma_memory_region_traits.hpp hpx/util/init_logging.hpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
@@ -221,7 +221,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/util/functional/colocated_helpers.hpp
     hpx/util/functional/segmented_iterator_helpers.hpp
     hpx/util/generate_unique_ids.hpp
-    hpx/util/init_logging.hpp
     hpx/util/one_size_heap_list.hpp
     hpx/util/pool_timer.hpp
     hpx/util/register_locks_globally.hpp
