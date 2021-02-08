@@ -621,6 +621,8 @@ namespace hpx {
                 vm.count("hpx:print-counters-locally") != 0;
             if (mode == runtime_mode::console || print_counters_locally)
                 handle_list_and_print_options(rt, vm, print_counters_locally);
+#else
+            HPX_UNUSED(mode);
 #endif
 
             // Dump the configuration before all components have been loaded.
@@ -1057,6 +1059,10 @@ namespace hpx {
         p->call_shutdown_functions(false);
 
         p->stop(shutdown_timeout, naming::invalid_id, true);
+#else
+        HPX_UNUSED(shutdown_timeout);
+        HPX_UNUSED(localwait);
+        HPX_UNUSED(ec);
 #endif
 
         return 0;
