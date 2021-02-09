@@ -21,6 +21,7 @@
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/hpx_user_main_config.hpp>
+#include <hpx/init_runtime/detail/init_logging.hpp>
 #include <hpx/init_runtime/detail/run_or_start.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
@@ -50,7 +51,6 @@
 #include <hpx/type_support/pack.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/util/init_logging.hpp>
 
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>

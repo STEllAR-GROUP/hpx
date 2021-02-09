@@ -9,7 +9,7 @@
 # ##############################################################################
 # gather sources
 
-set(hpx_SOURCES util/init_logging.cpp)
+set(hpx_SOURCES "")
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   list(
@@ -83,9 +83,8 @@ endif()
 # gather headers
 
 # List all headers (local and distributed)
-set(hpx_HEADERS
-    hpx/lcos_fwd.hpp hpx/traits/managed_component_policies.hpp
-    hpx/traits/rma_memory_region_traits.hpp hpx/util/init_logging.hpp
+set(hpx_HEADERS hpx/lcos_fwd.hpp hpx/traits/managed_component_policies.hpp
+                hpx/traits/rma_memory_region_traits.hpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)

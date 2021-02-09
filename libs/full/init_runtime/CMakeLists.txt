@@ -20,9 +20,10 @@ set(init_runtime_headers
     hpx/hpx_suspend.hpp
     hpx/hpx_user_main_config.hpp
     hpx/init_runtime/detail/run_or_start.hpp
+    hpx/init_runtime/detail/init_logging.hpp
 )
 
-set(init_runtime_sources hpx_init.cpp hpx_main_winsocket.cpp)
+set(init_runtime_sources hpx_init.cpp hpx_main_winsocket.cpp init_logging.cpp)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(init_runtime_optional_module_dependencies
@@ -41,7 +42,7 @@ add_hpx_module(
   SOURCES ${init_runtime_sources}
   HEADERS ${init_runtime_headers}
   DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES hpx_program_options hpx_runtime_local
+  MODULE_DEPENDENCIES hpx_program_options hpx_runtime_local hpx_threadmanager
                       ${init_runtime_optional_module_dependencies}
   CMAKE_SUBDIRS examples tests
 )

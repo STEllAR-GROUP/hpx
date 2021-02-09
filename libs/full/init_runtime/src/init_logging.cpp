@@ -8,7 +8,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
-#include <hpx/agas/addressing_service.hpp>
+#include <hpx/init_runtime/detail/init_logging.hpp>
 #include <hpx/logging/format/named_write.hpp>
 #include <hpx/logging/manipulator.hpp>
 #include <hpx/modules/logging.hpp>
@@ -18,7 +18,6 @@
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/type_support/static.hpp>
 #include <hpx/util/get_entry_as.hpp>
-#include <hpx/util/init_logging.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/agas/addressing_service.hpp>
@@ -1044,10 +1043,10 @@ namespace hpx { namespace util { namespace detail {
 
 #else    // HPX_HAVE_LOGGING
 
+#include <hpx/init_runtime/detail/init_logging.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/util/get_entry_as.hpp>
-#include <hpx/util/init_logging.hpp>
 
 #include <iostream>
 #include <string>
