@@ -16,7 +16,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 
-#include <boost/asio/io_service.hpp>
+#include <asio/io_service.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -54,8 +54,8 @@ namespace hpx { namespace util {
         // will not exit until they are explicitly stopped.
         for (std::size_t i = 0; i < pool_size; ++i)
         {
-            std::unique_ptr<boost::asio::io_service> p(
-                new boost::asio::io_service);
+            std::unique_ptr<asio::io_service> p(
+                new asio::io_service);
             io_services_.emplace_back(std::move(p));
             work_.emplace_back(initialize_work(*io_services_[i]));
         }
@@ -172,8 +172,8 @@ namespace hpx { namespace util {
 
             for (std::size_t i = 0; i < num_threads; ++i)
             {
-                std::unique_ptr<boost::asio::io_service> p(
-                    new boost::asio::io_service);
+                std::unique_ptr<asio::io_service> p(
+                    new asio::io_service);
                 io_services_.emplace_back(std::move(p));
                 work_.emplace_back(initialize_work(*io_services_[i]));
             }
@@ -283,7 +283,7 @@ namespace hpx { namespace util {
         return stopped_;
     }
 
-    boost::asio::io_service& io_service_pool::get_io_service(int index)
+    asio::io_service& io_service_pool::get_io_service(int index)
     {
         // use this function for single group io_service pools only
         std::lock_guard<std::mutex> l(mtx_);

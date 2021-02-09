@@ -15,11 +15,12 @@
 #include <string>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/ip/tcp.hpp>
+#include <asio/io_service.hpp>
+#include <asio/ip/tcp.hpp>
 #endif
 
 namespace hpx { namespace util {
+
     std::string map_hostnames::map(
         std::string host_name, std::uint16_t port) const
     {
@@ -47,8 +48,8 @@ namespace hpx { namespace util {
         }
 
         // do full host name resolution
-        boost::asio::io_service io_service;
-        boost::asio::ip::tcp::endpoint ep = util::resolve_hostname(
+        asio::io_service io_service;
+        asio::ip::tcp::endpoint ep = util::resolve_hostname(
             prefix_ + host_name + suffix_, port, io_service);
 
         std::string resolved_addr(util::get_endpoint_name(ep));

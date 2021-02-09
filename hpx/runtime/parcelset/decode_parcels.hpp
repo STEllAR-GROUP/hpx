@@ -5,9 +5,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/system/system_error.hpp
-// hpxinspect:nodeprecatedname:boost::system::system_error
-
 #pragma once
 
 #include <hpx/config.hpp>
@@ -26,16 +23,16 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 
-#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
+#if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
 #include <boost/exception/exception.hpp>
 #endif
-#include <boost/system/system_error.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <functional>
 #include <sstream>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -250,13 +247,13 @@ namespace hpx { namespace parcelset
                     << e.what();
                 hpx::report_error(std::current_exception());
             }
-            catch (boost::system::system_error const& e) {
+            catch (std::system_error const& e) {
                 LPT_(error)
-                    << "decode_message: caught boost::system::error: "
+                    << "decode_message: caught std::system_error: "
                     << e.what();
                 hpx::report_error(std::current_exception());
             }
-#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
+#if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
             catch (boost::exception const&) {
                 LPT_(error)
                     << "decode_message: caught boost::exception.";

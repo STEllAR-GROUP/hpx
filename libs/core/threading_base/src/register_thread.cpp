@@ -99,9 +99,9 @@ namespace hpx { namespace threads { namespace detail {
                 get_default_timer_service_f = f;
             }
 
-            boost::asio::io_service* get_default_timer_service()
+            asio::io_service* get_default_timer_service()
             {
-                boost::asio::io_service* timer_service = nullptr;
+                asio::io_service* timer_service = nullptr;
                 if (detail::get_default_timer_service_f)
                 {
                     timer_service = detail::get_default_timer_service_f();

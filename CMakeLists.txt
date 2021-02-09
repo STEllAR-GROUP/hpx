@@ -1747,6 +1747,11 @@ hpx_option(
 )
 
 # ##############################################################################
+# Setup standalone Asio
+include(HPX_SetupAsio)
+target_link_libraries(hpx_base_libraries INTERFACE ASIO::standalone_asio)
+
+# ##############################################################################
 # C++ feature tests
 # ##############################################################################
 include(HPX_PerformCxxFeatureTests)

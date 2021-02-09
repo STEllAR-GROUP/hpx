@@ -7,9 +7,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/system/error_code.hpp
-// hpxinspect:nodeprecatedname:boost::system::error_code
-
 #pragma once
 
 #include <hpx/config.hpp>
@@ -32,14 +29,13 @@
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 
-#include <boost/asio/buffer.hpp>
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/placeholders.hpp>
-#include <boost/asio/read.hpp>
-#include <boost/asio/write.hpp>
-#include <boost/system/error_code.hpp>
-/* The boost asio support includes termios.h.
+#include <asio/buffer.hpp>
+#include <asio/io_service.hpp>
+#include <asio/ip/tcp.hpp>
+#include <asio/placeholders.hpp>
+#include <asio/read.hpp>
+#include <asio/write.hpp>
+/* The asio support includes termios.h.
  * The termios.h file on ppc64le defines these macros, which
  * are also used by blaze, blaze_tensor as Template names.
  * Make sure we undefine them before continuing. */
@@ -62,7 +58,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
     public:
         /// Construct a sending parcelport_connection with the given io_service.
-        sender(boost::asio::io_service& io_service,
+        sender(asio::io_service& io_service,
                 parcelset::locality const& locality_id,
                 parcelset::parcelport* pp)
           : socket_(io_service)
@@ -77,14 +73,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         {
             // gracefully and portably shutdown the socket
             if (socket_.is_open()) {
-                boost::system::error_code ec;
-                socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+                std::error_code ec;
+                socket_.shutdown(asio::ip::tcp::socket::shutdown_both, ec);
                 socket_.close(ec);    // close the socket to give it back to the OS
             }
         }
 
         /// Get the socket associated with the parcelport_connection.
-        boost::asio::ip::tcp::socket& socket() { return socket_; }
+        asio::ip::tcp::socket& socket() { return socket_; }
 
         parcelset::locality const& destination() const
         {
@@ -94,8 +90,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         void verify_(parcelset::locality const & parcel_locality_id) const
         {
 #if defined(HPX_DEBUG)
-            boost::system::error_code ec;
-            boost::asio::ip::tcp::socket::endpoint_type endpoint
+            std::error_code ec;
+            asio::ip::tcp::socket::endpoint_type endpoint
                 = socket_.remote_endpoint(ec);
 
             locality const & impl = parcel_locality_id.get<locality>();
@@ -138,36 +134,36 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
             // Write the serialized data to the socket. We use "gather-write"
             // to send both the header and the data in a single write operation.
-            std::vector<boost::asio::const_buffer> buffers;
-            buffers.push_back(boost::asio::buffer(&buffer_.size_,
+            std::vector<asio::const_buffer> buffers;
+            buffers.push_back(asio::buffer(&buffer_.size_,
                 sizeof(buffer_.size_)));
-            buffers.push_back(boost::asio::buffer(&buffer_.data_size_,
+            buffers.push_back(asio::buffer(&buffer_.data_size_,
                 sizeof(buffer_.data_size_)));
 
             // add chunk description
-            buffers.push_back(boost::asio::buffer(&buffer_.num_chunks_,
+            buffers.push_back(asio::buffer(&buffer_.num_chunks_,
                 sizeof(buffer_.num_chunks_)));
 
             std::vector<parcel_buffer_type::transmission_chunk_type>& chunks =
                 buffer_.transmission_chunks_;
             if (!chunks.empty()) {
                 buffers.push_back(
-                    boost::asio::buffer(chunks.data(), chunks.size() *
+                    asio::buffer(chunks.data(), chunks.size() *
                         sizeof(parcel_buffer_type::transmission_chunk_type)));
 
                 // add main buffer holding data which was serialized normally
-                buffers.push_back(boost::asio::buffer(buffer_.data_));
+                buffers.push_back(asio::buffer(buffer_.data_));
 
                 // now add chunks themselves, those hold zero-copy serialized chunks
                 for (serialization::serialization_chunk& c : buffer_.chunks_)
                 {
                     if (c.type_ == serialization::chunk_type_pointer)
-                        buffers.push_back(boost::asio::buffer(c.data_.cpos_, c.size_));
+                        buffers.push_back(asio::buffer(c.data_.cpos_, c.size_));
                 }
             }
             else {
                 // add main buffer holding data which was serialized normally
-                buffers.push_back(boost::asio::buffer(buffer_.data_));
+                buffers.push_back(asio::buffer(buffer_.data_));
             }
 
             // this additional wrapping of the handler into a bind object is
@@ -178,7 +174,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
             using util::placeholders::_1;
             using util::placeholders::_2;
-            boost::asio::async_write(socket_, buffers,
+            asio::async_write(socket_, buffers,
                 util::bind(f, shared_from_this(), _1, _2));
         }
 
@@ -237,7 +233,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
             // now handle the acknowledgment byte which is sent by the receiver
 #if defined(__linux) || defined(linux) || defined(__linux__)
-            boost::asio::detail::socket_option::boolean<
+            asio::detail::socket_option::boolean<
                 IPPROTO_TCP, TCP_QUICKACK> quickack(true);
             socket_.set_option(quickack);
 #endif
@@ -246,8 +242,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 = &sender::handle_read_ack;
 
             using util::placeholders::_1;
-            boost::asio::async_read(socket_,
-                boost::asio::buffer(&ack_, sizeof(ack_)),
+            asio::async_read(socket_,
+                asio::buffer(&ack_, sizeof(ack_)),
                 util::bind(f, shared_from_this(), _1));
         }
 
@@ -272,7 +268,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
 
         /// Socket for the parcelport_connection.
-        boost::asio::ip::tcp::socket socket_;
+        asio::ip::tcp::socket socket_;
 
         bool ack_;
 

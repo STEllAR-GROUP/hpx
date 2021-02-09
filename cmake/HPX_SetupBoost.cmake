@@ -116,16 +116,13 @@ if(NOT TARGET hpx_dependencies_boost)
   include(HPX_AddDefinitions)
 
   # Boost Asio should not use Boost exceptions
-  hpx_add_config_cond_define(BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION 0)
+  hpx_add_config_cond_define(ASIO_HAS_BOOST_THROW_EXCEPTION 0)
   # Disable concepts support in Asio as a workaround to
   # https://github.com/boostorg/asio/issues/312
-  hpx_add_config_cond_define(BOOST_ASIO_DISABLE_CONCEPTS)
+  hpx_add_config_cond_define(ASIO_DISABLE_CONCEPTS)
   # Disable experimental std::string_view support as a workaround to
   # https://github.com/chriskohlhoff/asio/issues/597
-  hpx_add_config_cond_define(BOOST_ASIO_DISABLE_STD_EXPERIMENTAL_STRING_VIEW)
-  if(Boost_VERSION_STRING VERSION_LESS 1.67)
-    hpx_add_config_cond_define(BOOST_ASIO_DISABLE_STD_STRING_VIEW)
-  endif()
+  hpx_add_config_cond_define(ASIO_DISABLE_STD_EXPERIMENTAL_STRING_VIEW)
 
   find_package(Threads QUIET REQUIRED)
   target_link_libraries(hpx_dependencies_boost INTERFACE Threads::Threads)

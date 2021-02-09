@@ -5,20 +5,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/system/system_error.hpp
-// hpxinspect:nodeprecatedname:boost::system::system_error
-
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/serialization/exception_ptr.hpp>
 #include <hpx/serialization/serialize.hpp>
 
-#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
+#if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/exception/exception.hpp>
 #endif
-
-#include <boost/system/system_error.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -82,13 +77,6 @@ namespace hpx { namespace serialization {
                 type = hpx::util::hpx_exception;
                 what = e.what();
                 err_value = e.get_error();
-            }
-            catch (boost::system::system_error const& e)
-            {
-                type = hpx::util::boost_system_error;
-                what = e.what();
-                err_value = e.code().value();
-                err_message = e.code().message();
             }
             catch (std::system_error const& e)
             {
@@ -255,7 +243,7 @@ namespace hpx { namespace serialization {
                     throw_function_, throw_file_, throw_line_);
                 break;
 
-#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
+#if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
             // boost exceptions
             case hpx::util::boost_exception:
                 HPX_ASSERT(false);    // shouldn't happen
@@ -265,8 +253,8 @@ namespace hpx { namespace serialization {
             // boost::system::system_error
             case hpx::util::boost_system_error:
                 e = hpx::detail::get_exception(
-                    boost::system::system_error(err_value,
-                        boost::system::system_category(), err_message),
+                    std::system_error(
+                        err_value, std::system_category(), err_message),
                     throw_function_, throw_file_, throw_line_);
                 break;
 

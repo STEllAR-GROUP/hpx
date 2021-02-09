@@ -4,21 +4,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/system/system_error.hpp
-// hpxinspect:nodeprecatedname:boost::system::system_error
-
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime_local/detail/serialize_exception.hpp>
 #include <hpx/serialization/serialize.hpp>
 
-#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
+#if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/exception/exception.hpp>
 #endif
-
-#include <boost/system/system_error.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -145,13 +140,6 @@ namespace hpx { namespace runtime_local { namespace detail {
             what = e.what();
             err_value = e.get_error();
         }
-        catch (boost::system::system_error const& e)
-        {
-            type = hpx::util::boost_system_error;
-            what = e.what();
-            err_value = e.code().value();
-            err_message = e.code().message();
-        }
         catch (std::system_error const& e)
         {
             type = hpx::util::std_system_error;
@@ -204,7 +192,7 @@ namespace hpx { namespace runtime_local { namespace detail {
             type = hpx::util::std_exception;
             what = e.what();
         }
-#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
+#if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
         catch (boost::exception const& e)
         {
             type = hpx::util::boost_exception;
@@ -230,8 +218,7 @@ namespace hpx { namespace runtime_local { namespace detail {
             ar & err_value;
             // clang-format on
         }
-        else if (hpx::util::boost_system_error == type ||
-            hpx::util::std_system_error == type)
+        else if (hpx::util::std_system_error == type)
         {
             // clang-format off
             ar & err_value & err_message;
@@ -277,8 +264,7 @@ namespace hpx { namespace runtime_local { namespace detail {
             ar & err_value;
             // clang-format on
         }
-        else if (hpx::util::boost_system_error == type ||
-            hpx::util::std_system_error == type)
+        else if (hpx::util::std_system_error == type)
         {
             // clang-format off
             ar & err_value & err_message;
@@ -372,7 +358,7 @@ namespace hpx { namespace runtime_local { namespace detail {
                     throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
-#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
+#if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
         // boost exceptions
         case hpx::util::boost_exception:
             HPX_ASSERT(false);    // shouldn't happen
@@ -381,15 +367,7 @@ namespace hpx { namespace runtime_local { namespace detail {
 
         // boost::system::system_error
         case hpx::util::boost_system_error:
-            e = hpx::detail::construct_exception(
-                boost::system::system_error(
-                    err_value, boost::system::system_category(), err_message),
-                hpx::detail::construct_exception_info(throw_function_,
-                    throw_file_, throw_line_, throw_back_trace_,
-                    throw_locality_, throw_hostname_, throw_pid_,
-                    throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_, throw_state_, throw_auxinfo_));
-            break;
+            HPX_FALLTHROUGH;
 
         // std::system_error
         case hpx::util::std_system_error:
