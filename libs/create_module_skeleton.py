@@ -24,7 +24,7 @@ module_name = sys.argv[2]
 header_str = '=' * len(module_name)
 
 # CMake minimum version
-cmake_version = '3.13'
+cmake_version = '3.17'
 
 cmake_root_header = f'''# Copyright (c) 2019-2021 The STE||AR-Group
 #

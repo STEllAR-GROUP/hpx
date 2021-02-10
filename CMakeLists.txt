@@ -14,7 +14,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
 
 # Overrides must go before the project() statement, otherwise they are ignored.
 
@@ -82,7 +82,7 @@ include(GNUInstallDirs)
 include(HPX_Utils)
 
 # explicitly set certain policies
-cmake_policy(VERSION 3.13)
+cmake_policy(VERSION 3.17)
 hpx_set_cmake_policy(CMP0042 NEW)
 hpx_set_cmake_policy(CMP0060 NEW)
 hpx_set_cmake_policy(CMP0074 NEW)
@@ -301,14 +301,11 @@ endif()
 hpx_option(
   HPX_WITH_UNITY_BUILD
   BOOL
-  "Enable unity build for certain build targets (experimental, requires CMake 3.16 or newer) (default OFF)"
+  "Enable unity build for certain build targets (default OFF)"
   OFF
   ADVANCED
 )
 if(HPX_WITH_UNITY_BUILD)
-  if(CMAKE_VERSION VERSION_LESS "3.16")
-    hpx_error("HPX_WITH_UNITY_BUILD=ON but this requires CMake 3.16 or newer.")
-  endif()
   set(HPX_WITH_UNITY_BUILD_OPTION UNITY_BUILD)
 endif()
 

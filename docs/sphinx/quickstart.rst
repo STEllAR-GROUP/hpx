@@ -175,7 +175,7 @@ build an executable using |cmake| and |hpx|:
 
 .. code-block:: cmake
 
-   cmake_minimum_required(VERSION 3.13)
+   cmake_minimum_required(VERSION 3.17)
    project(my_hpx_project CXX)
    find_package(HPX REQUIRED)
    add_executable(my_hpx_program main.cpp)

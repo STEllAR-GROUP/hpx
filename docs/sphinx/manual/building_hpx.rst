@@ -71,7 +71,7 @@ Quick start
 
 Here, you will use the command-line, non-interactive CMake interface.
 
-#. Download and install CMake here: |cmake_download|_. Version 3.13 is the
+#. Download and install CMake here: |cmake_download|_. Version 3.17 is the
    minimum required version for |hpx|.
 
 #. Open a shell. Your development tools must be reachable from this shell
