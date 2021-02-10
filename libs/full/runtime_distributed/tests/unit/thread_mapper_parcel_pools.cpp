@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/local/runtime.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/util/from_string.hpp>
 
@@ -35,25 +35,23 @@ void enumerate_threads(std::size_t num_custom_threads)
         });
     HPX_TEST(result);
 
-    HPX_TEST_EQ(
-        counts[std::size_t(hpx::os_thread_type::main_thread)], std::size_t(1));
-
-    std::size_t num_workers = hpx::get_num_worker_threads();
-    HPX_TEST_EQ(
-        counts[std::size_t(hpx::os_thread_type::worker_thread)], num_workers);
-
-#ifdef HPX_HAVE_IO_POOL
-    std::size_t num_io_threads = hpx::util::from_string<std::size_t>(
-        hpx::get_config_entry("hpx.threadpools.io_pool_size", "0"));
-    HPX_TEST_EQ(
-        counts[std::size_t(hpx::os_thread_type::io_thread)], num_io_threads);
-#endif
-
-#ifdef HPX_HAVE_TIMER_POOL
-    std::size_t num_timer_threads = hpx::util::from_string<std::size_t>(
-        hpx::get_config_entry("hpx.threadpools.timer_pool_size", "0"));
-    HPX_TEST_EQ(counts[std::size_t(hpx::os_thread_type::timer_thread)],
-        num_timer_threads);
+#ifdef HPX_HAVE_NETWORKING
+    std::size_t num_parcel_threads = 0;
+    std::vector<std::string> const parcelport_names = {
+        "tcp", "mpi", "libfabric"};
+    for (auto parcelport_name : parcelport_names)
+    {
+        if (hpx::get_config_entry(
+                "hpx.parcel." + parcelport_name + ".enable", "0") != "0")
+        {
+            num_parcel_threads +=
+                hpx::util::from_string<std::size_t>(hpx::get_config_entry(
+                    "hpx.parcel." + parcelport_name + ".parcel_pool_size",
+                    "0"));
+        }
+    }
+    HPX_TEST_EQ(counts[std::size_t(hpx::os_thread_type::parcel_thread)],
+        num_parcel_threads);
 #endif
 
     HPX_TEST_EQ(counts[std::size_t(hpx::os_thread_type::custom_thread)],
@@ -78,6 +76,9 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
+    // make sure networking is enabled
+    std::vector<std::string> cfg = {"hpx.expect_connecting_localities=1"};
+
     hpx::init_params init_args;
     init_args.cfg = cfg;
 
@@ -85,3 +86,4 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
+

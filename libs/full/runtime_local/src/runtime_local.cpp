@@ -309,21 +309,15 @@ namespace hpx {
 
     runtime::runtime(util::runtime_configuration& rtcfg,
         notification_policy_type&& notifier,
-        notification_policy_type&& main_pool_notifier
+        notification_policy_type&& main_pool_notifier,
 #ifdef HPX_HAVE_IO_POOL
-        ,
-        notification_policy_type&& io_pool_notifier
+        notification_policy_type&& io_pool_notifier,
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
-        ,
-        notification_policy_type&& timer_pool_notifier
+        notification_policy_type&& timer_pool_notifier,
 #endif
-#ifdef HPX_HAVE_NETWORKING
-        ,
         threads::detail::network_background_callback_type
-            network_background_callback
-#endif
-        ,
+            network_background_callback,
         bool initialize)
       : rtcfg_(rtcfg)
       , instance_number_(++instance_number_counter_)
@@ -351,11 +345,8 @@ namespace hpx {
 #ifdef HPX_HAVE_TIMER_POOL
             timer_pool_,
 #endif
-            notifier_
-#ifdef HPX_HAVE_NETWORKING
-            ,
+            notifier_,
             network_background_callback
-#endif
             ))
       , stop_called_(false)
       , stop_done_(false)
@@ -1111,16 +1102,12 @@ namespace hpx {
     /// Return true if networking is enabled.
     bool is_networking_enabled()
     {
-#if defined(HPX_HAVE_NETWORKING)
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt)
         {
             return rt->is_networking_enabled();
         }
         return true;    // be on the safe side, enable networking
-#else
-        return false;
-#endif
     }
 }    // namespace hpx
 

@@ -87,10 +87,8 @@ namespace hpx {
 #ifdef HPX_HAVE_TIMER_POOL
             notification_policy_type&& timer_pool_notifier,
 #endif
-#ifdef HPX_HAVE_NETWORKING
             threads::detail::network_background_callback_type
                 network_background_callback,
-#endif
             bool initialize);
 
         /// Common initialization for different constructors

@@ -14,10 +14,8 @@
 #include <iostream>
 #include <string>
 
-#if defined(HPX_HAVE_NETWORKING)
 #include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
-#endif
 
 namespace hpx { namespace util {
 
@@ -36,7 +34,6 @@ namespace hpx { namespace util {
             return "127.0.0.1";
         }
 
-#if defined(HPX_HAVE_NETWORKING)
         if (!!transform_)
         {    // If the transform is not empty
             host_name = transform_(host_name);
@@ -59,9 +56,5 @@ namespace hpx { namespace util {
                       << "' to: " << resolved_addr << std::endl;
         }
         return resolved_addr;
-#else
-        HPX_UNUSED(port);
-        return "127.0.0.1";
-#endif
     }
 }}    // namespace hpx::util

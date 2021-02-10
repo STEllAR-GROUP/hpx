@@ -18,12 +18,8 @@ set(benchmarks
     benchmark_remove_if
     benchmark_unique
     benchmark_unique_copy
+    transform_reduce_scaling
 )
-
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(benchmarks ${benchmarks} transform_reduce_scaling)
-  set(transform_reduce_scaling_FLAGS DEPENDENCIES iostreams_component)
-endif()
 
 foreach(benchmark ${benchmarks})
   set(sources ${benchmark}.cpp)

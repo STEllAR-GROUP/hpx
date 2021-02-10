@@ -36,11 +36,9 @@ endif()
 
 set(full_tests any_serialization serializable_boost_any)
 
-if(HPX_WITH_NETWORKING AND HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(full_tests ${full_tests} serializable_any serialize_buffer
-                 zero_copy_serialization
-  )
-endif()
+set(full_tests ${full_tests} serializable_any serialize_buffer
+               zero_copy_serialization
+)
 
 add_subdirectory(polymorphic)
 

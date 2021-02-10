@@ -9,21 +9,6 @@ set(tests future_2667 future_790 future_unwrap_878 future_unwrap_1182
           shared_future_continuation_order shared_future_then_2166
 )
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  list(
-    APPEND
-    tests
-    future_hang_on_get_629
-    future_hang_on_then_629
-    future_hang_on_wait_with_callback_629
-    future_serialization_1898
-    future_timed_wait_1025
-  )
-endif()
-
-set(future_hang_on_get_629_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
-set(future_hang_on_wait_with_callback_629_PARAMETERS THREADS_PER_LOCALITY 4)
-
 foreach(test ${tests})
   set(sources ${test}.cpp)
 

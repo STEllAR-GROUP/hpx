@@ -9,10 +9,6 @@
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/testing.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
-#endif
-
 #include <cstddef>
 #include <forward_list>
 #include <iterator>
@@ -842,7 +838,7 @@ void is_iterator()
             "random access traversal input iterator");
     }
     {
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         using iterator = hpx::segmented::vector_iterator<int, std::vector<int>>;
         HPX_TEST_MSG((is_iterator<iterator>::value), "hpx-specific iterator");
 #endif
@@ -992,7 +988,7 @@ void is_forward_iterator()
             "random access traversal input iterator");
     }
     {
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         using iterator = hpx::segmented::vector_iterator<int, std::vector<int>>;
         HPX_TEST_MSG(
             (is_forward_iterator<iterator>::value), "hpx-specific iterator");

@@ -12,7 +12,6 @@
 #include <cstdint>
 #include <string>
 
-#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/config/asio.hpp>
 
 #include <asio/io_context.hpp>
@@ -88,8 +87,6 @@ namespace hpx { namespace util {
         return endpoint_iterator_type();
     }
 }}    // namespace hpx::util
-
-#endif
 
 namespace hpx { namespace util {
 

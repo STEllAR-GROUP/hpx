@@ -25,6 +25,11 @@ set(tests
     plain_action_1550
     return_future_2847
     shared_future_serialization_1402
+    future_hang_on_get_629
+    future_hang_on_then_629
+    future_hang_on_wait_with_callback_629
+    future_serialization_1898
+    future_timed_wait_1025
 )
 
 set(async_action_1813_PARAMETERS LOCALITIES 2)
@@ -37,6 +42,8 @@ set(dataflow_launch_775_PARAMETERS THREADS_PER_LOCALITY 2)
 set(dataflow_recursion_1613_PARAMETERS THREADS_PER_LOCALITY 2)
 set(plain_action_1330_FLAGS DEPENDENCIES iostreams_component)
 set(return_future_2847_PARAMETERS LOCALITIES 2)
+set(future_hang_on_get_629_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
+set(future_hang_on_wait_with_callback_629_PARAMETERS THREADS_PER_LOCALITY 4)
 
 # Create test cases
 foreach(test ${tests})

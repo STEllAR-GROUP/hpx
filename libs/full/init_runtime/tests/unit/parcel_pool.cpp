@@ -152,25 +152,14 @@ int hpx_main()
     using namespace hpx::parallel;
     using hpx::parallel::execution::service_executor_type;
 
-#if defined(HPX_HAVE_IO_POOL)
-    {
-        execution::service_executor exec(service_executor_type::io_thread_pool);
-        test_service_executor(exec);
-    }
-#endif
-
-#if defined(HPX_HAVE_TIMER_POOL)
+#if defined(HPX_HAVE_NETWORKING)
+    if (hpx::is_networking_enabled())
     {
         execution::service_executor exec(
-            service_executor_type::timer_thread_pool);
+            service_executor_type::parcel_thread_pool);
         test_service_executor(exec);
     }
 #endif
-
-    {
-        execution::service_executor exec(service_executor_type::main_thread);
-        test_service_executor(exec);
-    }
 
     return hpx::finalize();
 }

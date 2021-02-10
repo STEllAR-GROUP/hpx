@@ -171,7 +171,11 @@ namespace hpx { namespace util {
             "pu_offset = 0",
             "numa_sensitive = 0",
             "max_background_threads = "
+#if defined(HPX_HAVE_NETWORKING)
             "${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
+#else
+            "0",
+#endif
 
             "max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:" HPX_PP_STRINGIZE(
                 HPX_PP_EXPAND(HPX_IDLE_LOOP_COUNT_MAX)) "}",
