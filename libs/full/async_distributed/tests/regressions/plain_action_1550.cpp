@@ -12,13 +12,13 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/modules/testing.hpp>
+
 #include <utility>
 
 bool called_test_action = false;
 bool called_t = false;
 
-namespace mynamespace
-{
+namespace mynamespace {
     void test()
     {
         called_test_action = true;
@@ -26,15 +26,10 @@ namespace mynamespace
 
     HPX_DEFINE_PLAIN_ACTION(test);
 
-    static auto t =
-        hpx::actions::lambda_to_action(
-        []()
-        {
-            called_t = true;
-        });
-}
+    static auto t = hpx::actions::lambda_to_action([]() { called_t = true; });
+}    // namespace mynamespace
 
-typedef mynamespace::test_action mynamespace_test_action;
+using mynamespace_test_action = mynamespace::test_action;
 
 HPX_REGISTER_ACTION(mynamespace_test_action);
 
@@ -42,7 +37,7 @@ int hpx_main()
 {
     {
         {
-            typedef mynamespace_test_action func;
+            using func = mynamespace_test_action;
             hpx::async<func>(hpx::find_here()).get();
         }
 
@@ -54,7 +49,7 @@ int hpx_main()
 #if !defined(HPX_HAVE_SANITIZERS)
     {
         {
-            hpx::async(std::move(mynamespace::t),hpx::find_here()).get();
+            hpx::async(std::move(mynamespace::t), hpx::find_here()).get();
         }
 
         HPX_TEST(called_t);

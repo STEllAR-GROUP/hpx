@@ -10,18 +10,17 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/apply.hpp>
 
-void test (int const (&ptr)[20]) {}
+void test(int& ref) {}
 HPX_PLAIN_ACTION(test);
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    int const arr[20] = { 0 };
+    int val = 0;
 
     test_action act;
-    hpx::apply(act, hpx::find_here(), arr);
+    hpx::apply(act, hpx::find_here(), val);
 
     return 0;
 }

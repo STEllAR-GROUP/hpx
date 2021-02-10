@@ -9,6 +9,7 @@ set(tests
     async_action_1813
     async_callback_with_bound_callback
     async_callback_non_deduced_context
+    async_deferred_1523
     async_unwrap_1037
     dataflow_791
     dataflow_4436
@@ -19,16 +20,23 @@ set(tests
     dataflow_launch_775
     dataflow_recursion_1613
     dataflow_using_774
+    missing_include_2958
+    plain_action_1330
+    plain_action_1550
+    return_future_2847
+    shared_future_serialization_1402
 )
 
-set(dataflow_future_swap_FLAGS DEPENDENCIES iostreams_component)
-set(dataflow_future_swap_PARAMETERS THREADS_PER_LOCALITY 4)
 set(async_action_1813_PARAMETERS LOCALITIES 2)
 set(async_callback_with_bound_callback_PARAMETERS LOCALITIES 2)
 set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
+set(dataflow_future_swap_FLAGS DEPENDENCIES iostreams_component)
+set(dataflow_future_swap_PARAMETERS THREADS_PER_LOCALITY 4)
 set(dataflow_future_swap2_FLAGS DEPENDENCIES iostreams_component)
 set(dataflow_launch_775_PARAMETERS THREADS_PER_LOCALITY 2)
 set(dataflow_recursion_1613_PARAMETERS THREADS_PER_LOCALITY 2)
+set(plain_action_1330_FLAGS DEPENDENCIES iostreams_component)
+set(return_future_2847_PARAMETERS LOCALITIES 2)
 
 # Create test cases
 foreach(test ${tests})

@@ -7,28 +7,27 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/futures/future.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/iostream.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/include/async.hpp>
+#include <hpx/modules/testing.hpp>
+
 #include <utility>
 
-namespace mynamespace
-{
+bool called_test_action = false;
+bool called_t = false;
+
+namespace mynamespace {
     void test()
     {
-        hpx::cout << "test" << hpx::endl;
+        called_test_action = true;
     }
 
     HPX_DEFINE_PLAIN_ACTION(test, test_action);
 
-    static auto t =
-        hpx::actions::lambda_to_action(
-        []()
-        {
-            hpx::cout << "test" << hpx::endl;
-        });
-}
+    static auto t = hpx::actions::lambda_to_action([]() { called_t = true; });
+}    // namespace mynamespace
 
 HPX_REGISTER_ACTION(mynamespace::test_action, mynamespace_test_action);
 
@@ -36,15 +35,17 @@ HPX_REGISTER_ACTION(mynamespace::test_action, mynamespace_test_action);
 int hpx_main()
 {
     {
-        typedef mynamespace::test_action func;
-        hpx::async<func>(hpx::find_here());
+        using func = mynamespace::test_action;
+        hpx::async<func>(hpx::find_here()).get();
+        HPX_TEST(called_test_action);
     }
 
     // Same test with lambdas
     // action lambdas inhibit undefined behavior...
 #if !defined(HPX_HAVE_SANITIZERS)
     {
-        hpx::async(std::move(mynamespace::t), hpx::find_here());
+        hpx::async(std::move(mynamespace::t), hpx::find_here()).get();
+        HPX_TEST(called_t);
     }
 #endif
 
@@ -53,12 +54,13 @@ int hpx_main()
 }
 
 // Main, initializes HPX
-int main(int argc, char* argv[]){
-
+int main(int argc, char* argv[])
+{
     // initialize HPX, run hpx_main
     hpx::start(argc, argv);
 
     // wait for hpx::finalize being called
-    return hpx::stop();
+    HPX_TEST_EQ(hpx::stop(), 0);
+    return hpx::util::report_errors();
 }
 #endif

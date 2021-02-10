@@ -10,24 +10,9 @@ endif()
 
 add_subdirectory(components)
 
-set(tests
-    async_deferred_1523
-    component_action_move_semantics
-    make_continuation_1615
-    missing_include_2958
-    plain_action_1330
-    plain_action_1550
-    plain_action_move_semantics
-    return_future_2847
-    return_non_default_constructible_2847
+set(tests component_action_move_semantics make_continuation_1615
+          plain_action_move_semantics return_non_default_constructible_2847
 )
-
-set(plain_action_1330_FLAGS DEPENDENCIES iostreams_component)
-
-set(plain_action_move_semantics_FLAGS DEPENDENCIES
-                                      action_move_semantics_component
-)
-set(plain_action_move_semantics_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 1)
 
 set(component_action_move_semantics_FLAGS DEPENDENCIES
                                           action_move_semantics_component
@@ -35,8 +20,10 @@ set(component_action_move_semantics_FLAGS DEPENDENCIES
 set(component_action_move_semantics_PARAMETERS LOCALITIES 2
                                                THREADS_PER_LOCALITY 1
 )
-
-set(return_future_2847_PARAMETERS LOCALITIES 2)
+set(plain_action_move_semantics_FLAGS DEPENDENCIES
+                                      action_move_semantics_component
+)
+set(plain_action_move_semantics_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 1)
 set(return_non_default_constructible_2847_PARAMETERS LOCALITIES 2)
 
 foreach(test ${tests})
@@ -54,5 +41,4 @@ foreach(test ${tests})
   )
 
   add_hpx_regression_test("actions" ${test} ${${test}_PARAMETERS})
-
 endforeach()

@@ -108,7 +108,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/plugins/plugin_registry.hpp
     hpx/plugins/unique_plugin_name.hpp
     hpx/runtime_fwd.hpp
-    hpx/runtime/actions/lambda_to_action.hpp
     hpx/runtime/components/binpacking_distribution_policy.hpp
     hpx/runtime/components/colocating_distribution_policy.hpp
     hpx/runtime/components/default_distribution_policy.hpp

@@ -5,6 +5,18 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# add subdirectories
+set(subdirs actions)
+
+foreach(subdir ${subdirs})
+  add_hpx_pseudo_target(tests.unit.modules.async_distributed.${subdir})
+  add_subdirectory(${subdir})
+  add_hpx_pseudo_dependencies(
+    tests.unit.modules.async_distributed
+    tests.unit.modules.async_distributed.${subdir}
+  )
+endforeach()
+
 set(tests
     apply_remote
     apply_remote_client

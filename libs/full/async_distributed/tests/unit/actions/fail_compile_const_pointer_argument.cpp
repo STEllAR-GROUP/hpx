@@ -11,16 +11,16 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 
-void test (int (&ptr)[20]) {}
+void test(int const* ptr) {}
 HPX_PLAIN_ACTION(test);
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    int arr[20] = { 0 };
+    int const* ptr = nullptr;
 
     test_action act;
-    hpx::apply(act, hpx::find_here(), arr);
+    hpx::apply(act, hpx::find_here(), ptr);
 
     return 0;
 }
