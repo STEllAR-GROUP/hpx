@@ -12,13 +12,18 @@ cmake_policy(VERSION 3.13)
 include("${CMAKE_CURRENT_LIST_DIR}/HPXCacheVariables.cmake")
 
 # include exported targets
+if(HPX_WITH_CLONED_ASIO)
+  include("${CMAKE_CURRENT_LIST_DIR}/HPXAsioTarget.cmake")
+endif()
 include("${CMAKE_CURRENT_LIST_DIR}/HPXInternalTargets.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/HPXTargets.cmake")
 
 # include HPX cmake utilities
 include("${CMAKE_CURRENT_LIST_DIR}/HPXMacros.cmake")
 
-get_filename_component(_hpx_root_dir "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+get_filename_component(
+  _hpx_root_dir "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE
+)
 
 set(HPX_VERSION_STRING "@HPX_VERSION@")
 set(HPX_VERSION_MAJOR @HPX_VERSION_MAJOR@)
@@ -30,13 +35,25 @@ set(HPX_DEBUG_POSTFIX "@HPX_DEBUG_POSTFIX@")
 set(HPX_BUILD_TYPE "@CMAKE_BUILD_TYPE@")
 set(HPX_CXX_STANDARD "@HPX_CXX_STANDARD@")
 
-set(HPX_GIT_COMMIT "@HPX_WITH_GIT_COMMIT@" CACHE STRING "Revision of HPX from Git" FORCE)
+set(HPX_GIT_COMMIT
+    "@HPX_WITH_GIT_COMMIT@"
+    CACHE STRING "Revision of HPX from Git" FORCE
+)
 
-set(HPX_CXX_COMPILER "@CMAKE_CXX_COMPILER@" CACHE STRING "CXX compiler for HPX" FORCE)
-set(HPX_CXX_COMPILER_ID "@CMAKE_CXX_COMPILER_ID@" CACHE STRING "CXX compiler id for HPX" FORCE)
-set(HPX_CXX_COMPILER_VERSION "@CMAKE_CXX_COMPILER_VERSION@" CACHE STRING "CXX compiler version for HPX" FORCE)
+set(HPX_CXX_COMPILER
+    "@CMAKE_CXX_COMPILER@"
+    CACHE STRING "CXX compiler for HPX" FORCE
+)
+set(HPX_CXX_COMPILER_ID
+    "@CMAKE_CXX_COMPILER_ID@"
+    CACHE STRING "CXX compiler id for HPX" FORCE
+)
+set(HPX_CXX_COMPILER_VERSION
+    "@CMAKE_CXX_COMPILER_VERSION@"
+    CACHE STRING "CXX compiler version for HPX" FORCE
+)
 
-##################################################
+# ##############################################################################
 # Setup the imported libraries (publicly linked) #
 
 # Allocator
@@ -46,22 +63,28 @@ set(HPX_TBBMALLOC_ROOT "@TBBMALLOC_ROOT@")
 # Special handle for mimalloc cause we can't specify HPX_MIMALLOC_ROOT as a HINT
 # to find_package
 set(HPX_MIMALLOC_ROOT "@MIMALLOC_ROOT@")
-if (NOT MIMALLOC_ROOT AND NOT "$ENV{MIMALLOC_ROOT}")
+if(NOT MIMALLOC_ROOT AND NOT "$ENV{MIMALLOC_ROOT}")
   set(MIMALLOC_ROOT ${HPX_MIMALLOC_ROOT})
 endif()
 include(HPX_SetupAllocator)
 
-# Boost
-# Separate boost targets to be unarily linked to some modules
+# Boost Separate boost targets to be unarily linked to some modules
 set(HPX_BOOST_ROOT "@BOOST_ROOT@")
 # By default BOOST_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
 # HWLOC cause we are specifying HPX_<lib>_ROOT as an HINT to find_package)
-if (NOT BOOST_ROOT AND NOT "$ENV{BOOST_ROOT}")
+if(NOT BOOST_ROOT AND NOT "$ENV{BOOST_ROOT}")
   set(BOOST_ROOT ${HPX_BOOST_ROOT})
 endif()
 include(HPX_SetupBoost)
 include(HPX_SetupBoostFilesystem)
 include(HPX_SetupBoostProgramOptions)
+include(HPX_SetupBoostProgramOptions)
+
+# Asio
+if(NOT HPX_WITH_CLONED_ASIO)
+  set(HPX_ASIO_ROOT "@ASIO_ROOT@")
+  include(HPX_SetupAsio)
+endif()
 
 # HIP
 include(HPX_SetupHIP)
@@ -85,7 +108,7 @@ set(ACTIVEHARMONY_ROOT "@ACTIVEHARMONY_ROOT@")
 set(APEX_WITH_OTF2 "@APEX_WITH_OTF2@")
 set(OTF2_ROOT "@OTF2_ROOT@")
 include(HPX_SetupApex)
-##################################################
+# ##############################################################################
 
 set(HPX_WITH_MALLOC_DEFAULT @HPX_WITH_MALLOC@)
 

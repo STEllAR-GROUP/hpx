@@ -1747,11 +1747,6 @@ hpx_option(
 )
 
 # ##############################################################################
-# Setup standalone Asio
-include(HPX_SetupAsio)
-target_link_libraries(hpx_base_libraries INTERFACE ASIO::standalone_asio)
-
-# ##############################################################################
 # C++ feature tests
 # ##############################################################################
 include(HPX_PerformCxxFeatureTests)
@@ -2255,6 +2250,10 @@ include(HPX_SetupBoost)
 include(HPX_SetupBoostFilesystem)
 include(HPX_SetupBoostIostreams)
 include(HPX_SetupBoostProgramOptions)
+
+# Set up standalone Asio
+include(HPX_SetupAsio)
+
 # Find all allocators which are currently supported.
 include(HPX_SetupAllocator)
 include(HPX_SetupHwloc)

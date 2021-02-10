@@ -6,17 +6,34 @@
 
 if(NOT TARGET ASIO::standalone_asio)
   if(NOT HPX_FIND_PACKAGE)
-    set(_hpx_asio_no_update)
-    if(HPX_WITH_ASAIO_NO_UPDATE)
-      set(_hpx_asio_no_update NO_UPDATE)
-    endif()
-    if(NOT HPX_WITH_ASIO_TAG)
-      set(HPX_WITH_ASIO_TAG "asio-1-18-1")
+    if(NOT "${ASIO_ROOT}" AND "$ENV{ASIO_ROOT}")
+      set(ASIO_ROOT "$ENV{ASIO_ROOT}")
     endif()
 
-    # If APEX_ROOT not specified, local clone into hpx source dir
-    if(NOT ASIO_ROOT)
-      # handle APEX library
+    if(ASIO_ROOT)
+      set(HPX_WITH_CLONED_ASIO
+          FALSE
+          CACHE INTERNAL ""
+      )
+      set(HPX_ASIO_ROOT ${ASIO_ROOT})
+    else()
+      set(HPX_WITH_CLONED_ASIO
+          TRUE
+          CACHE INTERNAL ""
+      )
+
+      hpx_info(
+        "ASIO_ROOT is not set. Cloning Asio into ${CMAKE_CURRENT_SOURCE_DIR}/asio."
+      )
+
+      set(_hpx_asio_no_update)
+      if(HPX_WITH_ASIO_NO_UPDATE)
+        set(_hpx_asio_no_update NO_UPDATE)
+      endif()
+      if(NOT HPX_WITH_ASIO_TAG)
+        set(HPX_WITH_ASIO_TAG "asio-1-18-1")
+      endif()
+
       include(GitExternal)
       git_external(
         asio https://github.com/chriskohlhoff/asio.git ${HPX_WITH_ASIO_TAG}
@@ -25,32 +42,75 @@ if(NOT TARGET ASIO::standalone_asio)
       if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/asio)
         set(ASIO_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/asio)
       else()
-        hpx_error("ASIO could not be found")
+        hpx_error(
+          "ASIO was not correctly cloned (${CMAKE_CURRENT_SOURCE_DIR}/asio does not exist)"
+        )
       endif()
+
+      add_library(standalone_asio INTERFACE)
+      target_include_directories(
+        standalone_asio
+        INTERFACE $<BUILD_INTERFACE:${ASIO_ROOT}/asio/include>
+                  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+      )
+
+      install(
+        TARGETS standalone_asio
+        EXPORT HPXAsioTarget
+        COMPONENT core
+      )
+
+      install(
+        DIRECTORY ${ASIO_ROOT}/asio/include/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT core
+        FILES_MATCHING
+        PATTERN "*.hpp"
+        PATTERN "*.ipp"
+      )
+
+      export(
+        TARGETS standalone_asio
+        NAMESPACE ASIO::
+        FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/HPXAsioTarget.cmake"
+      )
+
+      install(
+        EXPORT HPXAsioTarget
+        NAMESPACE ASIO::
+        FILE HPXAsioTarget.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+      )
+
+      add_library(ASIO::standalone_asio ALIAS standalone_asio)
     endif()
 
-    # copy over a minimal CMakeLists.txt usable to integrate asio
-    file(
-      WRITE ${CMAKE_CURRENT_SOURCE_DIR}/asio/CMakeLists.txt
-      "cmake_minimum_required(VERSION 3.8)\n"
-      "project(asio CXX)\n"
-      "add_library(asio INTERFACE)\n"
-      "install(TARGETS asio EXPORT asio INCLUDES DESTINATION include/)\n"
-      "install(DIRECTORY asio/include/asio DESTINATION include/ FILES_MATCHING PATTERN \"*.hpp\" PATTERN \"*.ipp\")\n"
-      "install(FILES asio/include/asio.hpp DESTINATION include/)\n"
-    )
-
-    add_subdirectory(${ASIO_ROOT})
+    # Asio should not use Boost exceptions
+    hpx_add_config_cond_define(ASIO_HAS_BOOST_THROW_EXCEPTION 0)
+    # Disable concepts support in Asio as a workaround to
+    # https://github.com/boostorg/asio/issues/312
+    hpx_add_config_cond_define(ASIO_DISABLE_CONCEPTS)
+    # Disable experimental std::string_view support as a workaround to
+    # https://github.com/chriskohlhoff/asio/issues/597
+    hpx_add_config_cond_define(ASIO_DISABLE_STD_EXPERIMENTAL_STRING_VIEW)
   endif()
 
-  add_library(ASIO::standalone_asio INTERFACE IMPORTED)
-  if(HPX_FIND_PACKAGE)
-    target_link_libraries(ASIO::standalone_asio INTERFACE HPX::standalone_asio)
-  else()
-    target_include_directories(
-      ASIO::standalone_asio
-      INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/asio/asio/include
+  if(NOT HPX_WITH_CLONED_ASIO)
+    find_path(
+      ASIO_INCLUDE_DIR asio.hpp
+      HINTS "${HPX_ASIO_ROOT}" "${HPX_ASIO_ROOT}/asio"
+      PATH_SUFFIXES include
     )
-    target_link_libraries(ASIO::standalone_asio INTERFACE asio)
+
+    if(NOT ASIO_INCLUDE_DIR)
+      hpx_error("Could not find ASIO at ASIO_ROOT=${HPX_ASIO_ROOT}")
+    endif()
+
+    add_library(ASIO::standalone_asio INTERFACE IMPORTED)
+    target_include_directories(
+      ASIO::standalone_asio INTERFACE ${ASIO_INCLUDE_DIR}
+    )
+
+    mark_as_advanced(ASIO_INCLUDE_DIR)
   endif()
 endif()
