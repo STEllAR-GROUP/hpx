@@ -267,7 +267,7 @@ function(add_hpx_module libname modulename)
     # cmake-format: on
   endif()
 
-  if(${modulename}_MODULE_DEPENDENCIES)
+  if(HPX_WITH_CHECK_MODULE_DEPENDENCIES)
     # verify that all dependencies are from the same module category
     foreach(dep ${${modulename}_MODULE_DEPENDENCIES})
       # consider only module dependencies, not other targets
@@ -283,16 +283,12 @@ function(add_hpx_module libname modulename)
         endif()
       endif()
     endforeach()
+  endif()
 
-    target_link_libraries(
-      hpx_${modulename} PUBLIC ${${modulename}_MODULE_DEPENDENCIES}
-    )
-  endif()
-  if(${modulename}_DEPENDENCIES)
-    target_link_libraries(
-      hpx_${modulename} PUBLIC ${${modulename}_DEPENDENCIES}
-    )
-  endif()
+  target_link_libraries(
+    hpx_${modulename} PUBLIC ${${modulename}_MODULE_DEPENDENCIES}
+  )
+  target_link_libraries(hpx_${modulename} PUBLIC ${${modulename}_DEPENDENCIES})
   target_include_directories(
     hpx_${modulename}
     PUBLIC $<BUILD_INTERFACE:${HEADER_ROOT}>

@@ -1634,6 +1634,16 @@ if(HPX_WITH_UNSCOPED_ENUM_COMPATIBILITY)
 endif()
 
 # ##############################################################################
+# Special diagnostic flags, do not enable by default, only if needed
+hpx_option(
+  HPX_WITH_CHECK_MODULE_DEPENDENCIES
+  BOOL
+  "Verify that no modules are cross-referenced from a different module category \
+  (default: OFF)"
+  OFF
+  ADVANCED
+)
+
 # Check for compiler compatibility
 #
 

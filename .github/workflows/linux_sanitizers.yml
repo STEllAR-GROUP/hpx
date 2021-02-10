@@ -29,7 +29,8 @@ jobs:
               -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
               -DHPX_WITH_SANITIZERS=On \
               -DCMAKE_CXX_FLAGS="-fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer" \
-              -DHPX_WITH_STACKOVERFLOW_DETECTION=Off
+              -DHPX_WITH_STACKOVERFLOW_DETECTION=Off \
+              -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On
     - name: Build
       shell: bash
       run: |
