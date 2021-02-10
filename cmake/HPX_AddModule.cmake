@@ -189,6 +189,14 @@ function(add_hpx_module libname modulename)
     hpx_debug(${header_file})
   endforeach(header_file)
 
+  # NOTE: the modules belonging to libhpx still have cyclic dependencies. We
+  # keep those as static libraries.
+  if("${libname}" STREQUAL "full")
+    set(module_library_type STATIC)
+  else()
+    set(module_library_type OBJECT)
+  endif()
+
   # create library modules
   if(${name}_CUDA
      AND HPX_WITH_CUDA
@@ -196,7 +204,7 @@ function(add_hpx_module libname modulename)
   )
     # cmake-format: off
     cuda_add_library(
-      hpx_${modulename} OBJECT
+      hpx_${modulename} ${module_library_type}
       ${sources} ${config_entries_source} ${${modulename}_OBJECTS}
       ${headers} ${generated_headers} ${compat_headers}
     )
@@ -204,7 +212,7 @@ function(add_hpx_module libname modulename)
   else()
     # cmake-format: off
     add_library(
-      hpx_${modulename} OBJECT
+      hpx_${modulename} ${module_library_type}
       ${sources} ${config_entries_source} ${${modulename}_OBJECTS}
       ${headers} ${generated_headers} ${compat_headers}
     )
@@ -385,7 +393,34 @@ function(add_hpx_module libname modulename)
   endif()
 
   # Link modules to their higher-level libraries
-  target_link_libraries(hpx_${libname} PUBLIC hpx_${modulename})
+  if("${libname}" STREQUAL "full")
+    set(_module_target hpx_${modulename})
+    if(UNIX)
+      if(APPLE)
+        set(_module_target "-Wl,-all_load" "hpx_${modulename}")
+      else(APPLE) # not apple, regular linux
+        set(_module_target "-Wl,--whole-archive" "hpx_${modulename}"
+                           "-Wl,--no-whole-archive"
+        )
+      endif(APPLE)
+    elseif(MSVC)
+      target_link_libraries(
+        hpx_${libname} PRIVATE -WHOLEARCHIVE:$<TARGET_FILE:hpx_${modulename}>
+      )
+    endif()
+
+    target_link_libraries(hpx_${libname} PRIVATE ${_module_target})
+
+    get_target_property(
+      _module_interface_include_directories hpx_${modulename}
+      INTERFACE_INCLUDE_DIRECTORIES
+    )
+    target_include_directories(
+      hpx_${libname} INTERFACE ${_module_interface_include_directories}
+    )
+  else()
+    target_link_libraries(hpx_${libname} PUBLIC hpx_${modulename})
+  endif()
 
   foreach(dir ${${modulename}_CMAKE_SUBDIRS})
     add_subdirectory(${dir})
