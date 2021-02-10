@@ -1,0 +1,28 @@
+# Copyright (c) 2019-2020 The STE||AR-Group
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+set(thread_pool_util_headers
+    hpx/thread_pool_util/thread_pool_suspension_helpers.hpp
+)
+
+set(thread_pool_util_compat_headers)
+
+set(thread_pool_util_sources thread_pool_suspension_helpers.cpp)
+
+include(HPX_AddModule)
+add_hpx_module(
+  parallelism thread_pool_util
+  GLOBAL_HEADER_GEN ON
+  SOURCES ${thread_pool_util_sources}
+  HEADERS ${thread_pool_util_headers}
+  DEPENDENCIES hpx_core
+  MODULE_DEPENDENCIES hpx_async_local hpx_futures
+  CMAKE_SUBDIRS examples tests
+)
