@@ -486,7 +486,7 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter,
             typename Pred, HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type
@@ -535,7 +535,7 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter,
             typename T, HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on

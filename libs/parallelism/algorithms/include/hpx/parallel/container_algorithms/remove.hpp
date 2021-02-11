@@ -593,7 +593,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename FwdIter, typename Sent, typename Pred,
         typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
                 hpx::parallel::traits::is_projected<Proj, FwdIter>::value &&
@@ -622,7 +622,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Rng, typename Pred,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy,
@@ -700,7 +700,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename T, typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
                 hpx::parallel::traits::is_projected<Proj, FwdIter>::value
@@ -723,7 +723,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Rng, typename T,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value
             )>
