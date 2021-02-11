@@ -139,6 +139,7 @@ namespace hpx { namespace lcos {
         void do_apply(naming::address&& addr, naming::id_type const& id,
             threads::thread_priority priority, Ts&&... vs)
         {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LLCO_(info) << "packaged_action::do_apply("    //-V128
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
@@ -177,6 +178,7 @@ namespace hpx { namespace lcos {
         void do_apply(naming::id_type const& id,
             threads::thread_priority priority, Ts&&... vs)
         {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LLCO_(info) << "packaged_action::do_apply("    //-V128
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
@@ -205,6 +207,7 @@ namespace hpx { namespace lcos {
         void do_apply_cb(naming::address&& addr, naming::id_type const& id,
             threads::thread_priority priority, Callback&& cb, Ts&&... vs)
         {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LLCO_(info) << "packaged_action::do_apply_cb("    //-V128
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
@@ -246,6 +249,7 @@ namespace hpx { namespace lcos {
         void do_apply_cb(naming::id_type const& id,
             threads::thread_priority priority, Callback&& cb, Ts&&... vs)
         {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LLCO_(info) << "packaged_action::do_apply_cb("    //-V128
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
@@ -354,6 +358,7 @@ namespace hpx { namespace lcos {
         void apply_deferred(
             naming::address&& addr, naming::id_type const& id, Ts&&... vs)
         {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LLCO_(info) << "packaged_action::apply_deferred("    //-V128
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
@@ -380,6 +385,7 @@ namespace hpx { namespace lcos {
         void apply_deferred_cb(naming::address&& addr,
             naming::id_type const& id, Callback&& cb, Ts&&... vs)
         {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LLCO_(info) << "packaged_action::apply_deferred("    //-V128
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";

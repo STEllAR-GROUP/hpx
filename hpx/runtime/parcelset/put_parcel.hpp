@@ -141,6 +141,7 @@ namespace hpx { namespace parcelset
             {
                 future<naming::gid_type> split_gid =
                     naming::detail::split_gid_if_needed(dest.get_gid());
+                // NOLINTNEXTLINE(bugprone-branch-clone)
                 if (split_gid.is_ready())
                 {
                     pp(detail::create_parcel::call_with_action(

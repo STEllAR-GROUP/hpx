@@ -27,8 +27,7 @@ namespace hpx { namespace util {
     {
 #if defined(_POSIX_VERSION)
         volatile int i = 0;
-        std::cerr << "PID: " << getpid() << " on "
-                  << asio::ip::host_name()
+        std::cerr << "PID: " << getpid() << " on " << asio::ip::host_name()
                   << " ready for attaching debugger. Once attached set i = 1 "
                      "and continue"
                   << std::endl;

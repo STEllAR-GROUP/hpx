@@ -286,12 +286,12 @@ namespace hpx { namespace detail {
             return async_remote_impl<Action>(
                 launch::sync, id, std::move(addr), std::forward<Ts>(vs)...);
         }
-        else if (hpx::detail::has_async_policy(policy))
+        if (hpx::detail::has_async_policy(policy))
         {
             return async_remote_impl<Action>(
                 launch::async, id, std::move(addr), std::forward<Ts>(vs)...);
         }
-        else if (policy == launch::deferred)
+        if (policy == launch::deferred)
         {
             return async_remote_impl<Action>(
                 launch::deferred, id, std::move(addr), std::forward<Ts>(vs)...);
@@ -338,7 +338,7 @@ namespace hpx { namespace detail {
                 result_type>::call(id, std::move(addr),
                 std::forward<Ts>(vs)...);
         }
-        else if (hpx::detail::has_async_policy(policy))
+        if (hpx::detail::has_async_policy(policy))
         {
             return keep_alive(
                 hpx::async(action_invoker<action_type>(), addr.address_,

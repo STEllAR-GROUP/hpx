@@ -54,8 +54,7 @@ namespace hpx { namespace util {
         // will not exit until they are explicitly stopped.
         for (std::size_t i = 0; i < pool_size; ++i)
         {
-            std::unique_ptr<asio::io_service> p(
-                new asio::io_service);
+            std::unique_ptr<asio::io_service> p(new asio::io_service);
             io_services_.emplace_back(std::move(p));
             work_.emplace_back(initialize_work(*io_services_[i]));
         }
@@ -172,8 +171,7 @@ namespace hpx { namespace util {
 
             for (std::size_t i = 0; i < num_threads; ++i)
             {
-                std::unique_ptr<asio::io_service> p(
-                    new asio::io_service);
+                std::unique_ptr<asio::io_service> p(new asio::io_service);
                 io_services_.emplace_back(std::move(p));
                 work_.emplace_back(initialize_work(*io_services_[i]));
             }
@@ -207,8 +205,8 @@ namespace hpx { namespace util {
     void io_service_pool::join_locked()
     {
         // Wait for all threads in the pool to exit.
-        for (std::size_t i = 0; i < threads_.size(); ++i)
-            threads_[i].join();
+        for (auto& thread : threads_)
+            thread.join();
         threads_.clear();
     }
 

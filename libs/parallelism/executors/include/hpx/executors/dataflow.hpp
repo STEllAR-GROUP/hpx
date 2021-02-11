@@ -319,6 +319,7 @@ namespace hpx { namespace lcos { namespace detail {
             recurse_asynchronously = recurse_asynchronously ||
                 cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
 #endif
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             if (!recurse_asynchronously)
             {
                 hpx::util::annotate_function annotate(func_);

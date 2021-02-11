@@ -48,6 +48,7 @@ namespace hpx { namespace threads { namespace detail {
         }
 #endif
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LTM_(info) << "create_work: initial_state("
                    << get_thread_state_name(data.initial_state)
                    << "), thread_priority("

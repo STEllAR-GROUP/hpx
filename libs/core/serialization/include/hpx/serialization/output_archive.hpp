@@ -36,8 +36,10 @@ namespace hpx { namespace serialization {
             binary_filter* filter, std::false_type)
         {
             std::unique_ptr<erased_output_container> res;
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             if (filter == nullptr)
             {
+                // NOLINTNEXTLINE(bugprone-branch-clone)
                 if (chunks == nullptr)
                 {
                     res.reset(
@@ -51,6 +53,7 @@ namespace hpx { namespace serialization {
             }
             else
             {
+                // NOLINTNEXTLINE(bugprone-branch-clone)
                 if (chunks == nullptr)
                 {
                     res.reset(
@@ -72,6 +75,7 @@ namespace hpx { namespace serialization {
             binary_filter* filter, std::true_type)
         {
             std::unique_ptr<erased_output_container> res;
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             if (filter == nullptr)
             {
                 res.reset(new output_container<Container, counting_chunker>(

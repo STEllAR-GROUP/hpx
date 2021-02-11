@@ -227,7 +227,7 @@ namespace hpx { namespace parallel { namespace execution {
 
             template <typename AnyParameters, typename Executor>
             HPX_FORCEINLINE static auto call_param(
-                int, AnyParameters&& params, Executor && /* exec */)
+                int, AnyParameters&& params, Executor&& /* exec */)
                 -> decltype(params.reset_thread_distribution())
             {
                 params.reset_thread_distribution();
@@ -596,6 +596,7 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename U,
                 typename Enable = typename std::enable_if<!std::is_same<
                     typename std::decay<U>::type, unwrapper>::value>::type>
+            // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
             unwrapper(U&& u)
               : T(std::forward<U>(u))
             {

@@ -635,6 +635,7 @@ namespace hpx { namespace util {
         template <typename T,
             typename Enable = typename std::enable_if<!std::is_same<basic_any,
                 typename std::decay<T>::type>::value>::type>
+        // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
         basic_any(T&& x,
             typename std::enable_if<std::is_copy_constructible<
                 typename std::decay<T>::type>::value>::type* = nullptr)
@@ -855,6 +856,7 @@ namespace hpx { namespace util {
         template <typename T,
             typename Enable = typename std::enable_if<!std::is_same<basic_any,
                 typename std::decay<T>::type>::value>::type>
+        // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
         basic_any(T&& x,
             typename std::enable_if<std::is_copy_constructible<
                 typename std::decay<T>::type>::value>::type* = nullptr)
@@ -1071,6 +1073,7 @@ namespace hpx { namespace util {
         template <typename T,
             typename Enable = typename std::enable_if<!std::is_same<basic_any,
                 typename std::decay<T>::type>::value>::type>
+        // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
         basic_any(T&& x,
             typename std::enable_if<std::is_move_constructible<
                 typename std::decay<T>::type>::value>::type* = nullptr)
@@ -1258,6 +1261,7 @@ namespace hpx { namespace util {
         template <typename T,
             typename Enable = typename std::enable_if<!std::is_same<basic_any,
                 typename std::decay<T>::type>::value>::type>
+        // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
         basic_any(T&& x,
             typename std::enable_if<std::is_move_constructible<
                 typename std::decay<T>::type>::value>::type* = nullptr)

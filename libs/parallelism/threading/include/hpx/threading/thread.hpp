@@ -51,6 +51,7 @@ namespace hpx {
         template <typename F,
             typename Enable = typename std::enable_if<!std::is_same<
                 typename std::decay<F>::type, thread>::value>::type>
+        // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
         explicit thread(F&& f)
         {
             auto thrd_data = threads::get_self_id_data();
