@@ -39,33 +39,29 @@ jobs:
       run: |
           cmake --build build --config Debug \
           --target ALL_BUILD \
-            cmake_debug_build_dir_targets_test \
-            cmake_minsizerel_build_dir_targets_test \
-            cmake_release_build_dir_targets_test \
-            cmake_relwithdebinfo_build_dir_targets_test \
-            cmake_debug_build_dir_macros_test \
-            cmake_minsizerel_build_dir_macros_test \
-            cmake_release_build_dir_macros_test \
-            cmake_relwithdebinfo_build_dir_macros_test \
-          -- -maxcpucount -verbosity:detailed -nologo
+            cmake_debug_build_dir_targets_test.make_build_dir \
+            cmake_debug_build_dir_targets_test.make_configure \
+            cmake_debug_build_dir_targets_test.make_compile   \
+            cmake_debug_build_dir_macros_test.make_build_dir \
+            cmake_debug_build_dir_macros_test.make_configure \
+            cmake_debug_build_dir_macros_test.make_compile   \
+          -- -maxcpucount -verbosity:minimal -nologo
     - name: Install
       shell: bash
       run: |
-          cmake --install build
+          cmake --install build --config Debug
     - name: Build External
       shell: bash
       run: |
-          cmake --build build --config Release \
+          cmake --build build --config Debug \
             --target \
-              cmake_debug_install_dir_targets_test \
-              cmake_minsizerel_install_dir_targets_test \
-              cmake_release_install_dir_targets_test \
-              cmake_relwithdebinfo_install_dir_targets_test \
-              cmake_debug_install_dir_macros_test \
-              cmake_minsizerel_install_dir_macros_test \
-              cmake_release_install_dir_macros_test \
-              cmake_relwithdebinfo_install_dir_macros_test \
-            -- -maxcpucount -verbosity:detailed -nologo
+              cmake_debug_install_dir_targets_test.make_build_dir \
+              cmake_debug_install_dir_targets_test.make_configure \
+              cmake_debug_install_dir_targets_test.make_compile   \
+              cmake_debug_install_dir_macros_test.make_build_dir \
+              cmake_debug_install_dir_macros_test.make_configure \
+              cmake_debug_install_dir_macros_test.make_compile   \
+            -- -maxcpucount -verbosity:minimal -nologo
     - name: Test
       shell: bash
       run: |
