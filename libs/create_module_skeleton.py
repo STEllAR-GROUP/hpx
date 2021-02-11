@@ -23,8 +23,6 @@ lib_name_upper = lib_name.upper()
 module_name = sys.argv[2]
 header_str = '=' * len(module_name)
 
-# CMake minimum version
-cmake_version = '3.17'
 
 cmake_root_header = f'''# Copyright (c) 2019-2021 The STE||AR-Group
 #
@@ -79,8 +77,6 @@ details.
 '''
 
 root_cmakelists_template = cmake_root_header + f'''
-cmake_minimum_required(VERSION {cmake_version} FATAL_ERROR)
-
 list(APPEND CMAKE_MODULE_PATH "${{CMAKE_CURRENT_SOURCE_DIR}}/cmake")
 
 set({module_name}_headers)

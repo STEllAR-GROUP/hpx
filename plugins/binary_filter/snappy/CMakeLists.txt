@@ -36,7 +36,6 @@ if(HPX_WITH_COMPRESSION_SNAPPY)
     compression_snappy PUBLIC $<BUILD_INTERFACE:${HEADER_ROOT}>
   )
 
-  # FIXME: target_link_directories only exists for CMake >= 3.13
   if(MSVC)
     target_link_directories(compression_snappy PRIVATE ${SNAPPY_LIBRARY_DIR})
   endif()
