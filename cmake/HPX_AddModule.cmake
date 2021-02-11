@@ -280,7 +280,9 @@ function(add_hpx_module libname modulename)
 
   # This is a temporary solution until all of HPX has been modularized as it
   # enables using header files from HPX for compiling this module.
-  target_include_directories(hpx_${modulename} PRIVATE ${HPX_SOURCE_DIR})
+  if("${libname}" STREQUAL "full")
+    target_include_directories(hpx_${modulename} PRIVATE ${HPX_SOURCE_DIR})
+  endif()
 
   add_hpx_source_group(
     NAME hpx_${modulename}
