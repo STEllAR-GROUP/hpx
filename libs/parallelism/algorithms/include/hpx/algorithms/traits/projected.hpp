@@ -26,7 +26,7 @@ namespace hpx { namespace traits {
     template <typename T, typename Enable = void>
     struct projected_iterator
     {
-        typedef typename std::decay<T>::type type;
+        using type = typename std::decay<T>::type;
     };
 
     // For segmented iterators, we consider the local_raw_iterator instead of
@@ -35,11 +35,11 @@ namespace hpx { namespace traits {
     struct projected_iterator<Iterator,
         typename std::enable_if<is_segmented_iterator<Iterator>::value>::type>
     {
-        typedef typename segmented_iterator_traits<Iterator>::local_iterator
-            local_iterator;
+        using local_iterator =
+            typename segmented_iterator_traits<Iterator>::local_iterator;
 
-        typedef typename segmented_local_iterator_traits<
-            local_iterator>::local_raw_iterator type;
+        using type = typename segmented_local_iterator_traits<
+            local_iterator>::local_raw_iterator;
     };
 
     template <typename Iterator>
@@ -47,7 +47,7 @@ namespace hpx { namespace traits {
         typename hpx::util::always_void<
             typename std::decay<Iterator>::type::proxy_type>::type>
     {
-        typedef typename std::decay<Iterator>::type::proxy_type type;
+        using type = typename std::decay<Iterator>::type::proxy_type;
     };
 }}    // namespace hpx::traits
 
@@ -116,14 +116,25 @@ namespace hpx { namespace parallel { namespace traits {
         {
         };
 
+        // the given projection function is valid, if it can be invoked using
+        // the dereferenced iterator type and if the projection does not return
+        // void
+
+        // clang-format off
         template <typename Proj, typename Iter>
         struct is_projected<Proj, Iter,
             typename std::enable_if<
-                hpx::traits::is_iterator<Iter>::value>::type>
-          : hpx::is_invocable<Proj,
-                typename std::iterator_traits<Iter>::reference>
+                hpx::traits::is_iterator<Iter>::value &&
+                hpx::is_invocable<Proj,
+                    typename std::iterator_traits<Iter>::reference>::value
+             >::type>
+          : std::integral_constant<bool,
+                !std::is_void<typename hpx::util::invoke_result<Proj,
+                    typename std::iterator_traits<Iter>::reference>::type
+                >::value>
         {
         };
+        // clang-format on
 
         template <typename Projected, typename Enable = void>
         struct is_projected_indirect : std::false_type
@@ -151,9 +162,9 @@ namespace hpx { namespace parallel { namespace traits {
     template <typename Proj, typename Iter>
     struct projected
     {
-        typedef typename std::decay<Proj>::type projector_type;
-        typedef
-            typename hpx::traits::projected_iterator<Iter>::type iterator_type;
+        using projector_type = typename std::decay<Proj>::type;
+        using iterator_type =
+            typename hpx::traits::projected_iterator<Iter>::type;
     };
 
     template <typename Projected, typename Enable = void>
