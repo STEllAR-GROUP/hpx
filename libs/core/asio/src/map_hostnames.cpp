@@ -15,7 +15,7 @@
 #include <string>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <asio/io_service.hpp>
+#include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
 #endif
 
@@ -48,7 +48,7 @@ namespace hpx { namespace util {
         }
 
         // do full host name resolution
-        asio::io_service io_service;
+        asio::io_context io_service;
         asio::ip::tcp::endpoint ep = util::resolve_hostname(
             prefix_ + host_name + suffix_, port, io_service);
 

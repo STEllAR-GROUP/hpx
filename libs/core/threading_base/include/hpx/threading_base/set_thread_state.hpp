@@ -20,7 +20,7 @@
 #include <hpx/threading_base/thread_data.hpp>
 
 #include <asio/basic_waitable_timer.hpp>
-#include <asio/io_service.hpp>
+#include <asio/io_context.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -378,7 +378,7 @@ namespace hpx { namespace threads { namespace detail {
         using deadline_timer =
             asio::basic_waitable_timer<std::chrono::steady_clock>;
 
-        asio::io_service* s = get_default_timer_service();
+        asio::io_context* s = get_default_timer_service();
         HPX_ASSERT(s);
         deadline_timer t(*s, abs_time);
 

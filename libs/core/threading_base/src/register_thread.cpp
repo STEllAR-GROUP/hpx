@@ -12,6 +12,8 @@
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
+#include <asio/io_context.hpp>
+
 #include <cstddef>
 #include <limits>
 #include <string>
@@ -63,30 +65,24 @@ namespace hpx { namespace threads { namespace detail {
 
                     // hpx_main.hpp is included but not linked to libhpx_wrap
                     if (!hpx_start::is_linked && hpx_start::include_libhpx_wrap)
+                    {
                         HPX_THROW_EXCEPTION(invalid_status,
                             "hpx::threads::detail::get_self_or_default_pool",
                             "Attempting to use hpx_main.hpp functionality "
-                            "without "
-                            "linking to libhpx_wrap. If you're using "
-                            "CMakeLists, make "
-                            "sure to add HPX::wrap_main to "
+                            "without linking to libhpx_wrap. If you're using "
+                            "CMakeLists, make sure to add HPX::wrap_main to "
                             "target_link_libraries. "
                             "If you're using Makefile, make sure to link to "
                             "libhpx_wrap when generating the executable. If "
-                            "you're "
-                            "linking explicitly, consult the HPX docs for "
-                            "library "
-                            "link order and other subtle nuances.");
-
+                            "you're linking explicitly, consult the HPX docs "
+                            "for library link order and other subtle nuances.");
+                    }
 #endif
-
                     HPX_THROW_EXCEPTION(invalid_status,
                         "hpx::threads::detail::get_self_or_default_pool",
                         "Attempting to register a thread outside the HPX "
-                        "runtime and "
-                        "no default pool handler is installed. Did you mean to "
-                        "run "
-                        "this on an HPX thread?");
+                        "runtime and no default pool handler is installed. "
+                        "Did you mean to run this on an HPX thread?");
                 }
 
                 return pool;
@@ -99,9 +95,9 @@ namespace hpx { namespace threads { namespace detail {
                 get_default_timer_service_f = f;
             }
 
-            asio::io_service* get_default_timer_service()
+            asio::io_context* get_default_timer_service()
             {
-                asio::io_service* timer_service = nullptr;
+                asio::io_context* timer_service = nullptr;
                 if (detail::get_default_timer_service_f)
                 {
                     timer_service = detail::get_default_timer_service_f();
@@ -113,17 +109,15 @@ namespace hpx { namespace threads { namespace detail {
                     HPX_THROW_EXCEPTION(invalid_status,
                         "hpx::threads::detail::get_default_timer_service",
                         "No timer service installed. When running timed "
-                        "threads "
-                        "without a runtime a timer service has to be installed "
-                        "manually using "
+                        "threads without a runtime a timer service has to be "
+                        "installed manually using "
                         "hpx::threads::detail::set_get_default_timer_service.");
 #else
                     HPX_THROW_EXCEPTION(invalid_status,
                         "hpx::threads::detail::get_default_timer_service",
                         "No timer service installed. Rebuild HPX with "
                         "HPX_WITH_TIMER_POOL=ON or provide a timer service "
-                        "manually "
-                        "using "
+                        "manually using "
                         "hpx::threads::detail::set_get_default_timer_service.");
 #endif
                 }

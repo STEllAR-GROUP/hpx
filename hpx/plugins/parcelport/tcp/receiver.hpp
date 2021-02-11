@@ -28,7 +28,7 @@
 #include <hpx/timing/high_resolution_timer.hpp>
 
 #include <asio/buffer.hpp>
-#include <asio/io_service.hpp>
+#include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
 #include <asio/read.hpp>
 #include <asio/write.hpp>
@@ -55,9 +55,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     class receiver
       : public parcelport_connection<receiver, std::vector<char>, std::vector<char> >
     {
-        typedef hpx::lcos::local::spinlock mutex_type;
+        using mutex_type = hpx::lcos::local::spinlock;
+
     public:
-        receiver(asio::io_service& io_service, std::uint64_t max_inbound_size,
+        receiver(asio::io_context& io_service, std::uint64_t max_inbound_size,
             connection_handler& parcelport)
           : socket_(io_service)
           , max_inbound_size_(max_inbound_size)

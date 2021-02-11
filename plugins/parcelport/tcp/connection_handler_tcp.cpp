@@ -24,6 +24,7 @@
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/util/get_entry_as.hpp>
 
+#include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
 
 #include <thread>
@@ -84,7 +85,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     bool connection_handler::do_run()
     {
         using asio::ip::tcp;
-        asio::io_service& io_service = io_service_pool_.get_io_service();
+        asio::io_context& io_service = io_service_pool_.get_io_service();
         if (nullptr == acceptor_)
             acceptor_ = new tcp::acceptor(io_service);
 
@@ -151,7 +152,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     std::shared_ptr<sender> connection_handler::create_connection(
         parcelset::locality const& l, error_code& ec)
     {
-        asio::io_service& io_service = io_service_pool_.get_io_service();
+        asio::io_context& io_service = io_service_pool_.get_io_service();
 
         // The parcel gets serialized inside the connection constructor, no
         // need to keep the original parcel alive after this call returned.
@@ -288,7 +289,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // handle this incoming connection
             std::shared_ptr<receiver> c(receiver_conn);
 
-            asio::io_service& io_service = io_service_pool_.get_io_service();
+            asio::io_context& io_service = io_service_pool_.get_io_service();
             receiver_conn.reset(new receiver(io_service, get_max_inbound_message_size(),
                 *this));
             acceptor_->async_accept(receiver_conn->socket(),

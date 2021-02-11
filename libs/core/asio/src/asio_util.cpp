@@ -22,7 +22,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 
-#include <asio/io_service.hpp>
+#include <asio/io_context.hpp>
 #include <asio/ip/address_v4.hpp>
 #include <asio/ip/address_v6.hpp>
 #include <asio/ip/host_name.hpp>
@@ -83,7 +83,7 @@ namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     // properly resolve a give host name to the corresponding IP address
     asio::ip::tcp::endpoint resolve_hostname(std::string const& hostname,
-        std::uint16_t port, asio::io_service& io_service)
+        std::uint16_t port, asio::io_context& io_service)
     {
         using asio::ip::tcp;
 
@@ -138,7 +138,7 @@ namespace hpx { namespace util {
 
         try
         {
-            asio::io_service io_service;
+            asio::io_context io_service;
             tcp::resolver resolver(io_service);
             tcp::resolver::query query(asio::ip::host_name(), "");
             tcp::resolver::iterator it = resolver.resolve(query);
@@ -208,7 +208,7 @@ namespace hpx { namespace util {
     }
 
     endpoint_iterator_type connect_begin(std::string const& address,
-        std::uint16_t port, asio::io_service& io_service)
+        std::uint16_t port, asio::io_context& io_service)
     {
         using asio::ip::tcp;
 
@@ -259,7 +259,7 @@ namespace hpx { namespace util {
     }
 
     endpoint_iterator_type accept_begin(std::string const& address,
-        std::uint16_t port, asio::io_service& io_service)
+        std::uint16_t port, asio::io_context& io_service)
     {
         using asio::ip::tcp;
 

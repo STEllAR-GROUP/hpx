@@ -14,7 +14,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
-#include <asio/io_service.hpp>
+#include <asio/io_context.hpp>
 
 #include <cstddef>
 #include <string>
@@ -34,5 +34,5 @@ namespace hpx { namespace detail {
     threads::thread_pool_base* get_default_pool();
     threads::mask_cref_type get_pu_mask(
         threads::topology& topo, std::size_t thread_num);
-    asio::io_service* get_default_timer_service();
+    asio::io_context* get_default_timer_service();
 }}    // namespace hpx::detail

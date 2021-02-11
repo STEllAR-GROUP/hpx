@@ -30,7 +30,7 @@
 #include <hpx/timing/high_resolution_timer.hpp>
 
 #include <asio/buffer.hpp>
-#include <asio/io_service.hpp>
+#include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
 #include <asio/placeholders.hpp>
 #include <asio/read.hpp>
@@ -57,8 +57,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             std::error_code const&)>;
 
     public:
-        /// Construct a sending parcelport_connection with the given io_service.
-        sender(asio::io_service& io_service,
+        /// Construct a sending parcelport_connection with the given io_context.
+        sender(asio::io_context& io_service,
                 parcelset::locality const& locality_id,
                 parcelset::parcelport* pp)
           : socket_(io_service)

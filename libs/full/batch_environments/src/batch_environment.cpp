@@ -14,7 +14,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <asio/io_service.hpp>
+#include <asio/io_context.hpp>
 #include <asio/ip/host_name.hpp>
 
 #include <cstddef>
@@ -81,7 +81,7 @@ namespace hpx { namespace util {
         bool found_agas_host = false;
 
 #if defined(HPX_HAVE_NETWORKING)
-        asio::io_service io_service;
+        asio::io_context io_service;
 
         std::size_t agas_node_num = 0;
         for (std::string const& s : nodes)

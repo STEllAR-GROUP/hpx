@@ -18,7 +18,7 @@
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
-#include <asio/io_service.hpp>
+#include <asio/io_context.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -116,10 +116,10 @@ namespace hpx { namespace threads {
         HPX_CORE_EXPORT thread_pool_base* get_self_or_default_pool();
 
         using get_default_timer_service_type =
-            util::function_nonser<asio::io_service*()>;
+            util::function_nonser<asio::io_context*()>;
         HPX_CORE_EXPORT void set_get_default_timer_service(
             get_default_timer_service_type f);
-        HPX_CORE_EXPORT asio::io_service* get_default_timer_service();
+        HPX_CORE_EXPORT asio::io_context* get_default_timer_service();
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////

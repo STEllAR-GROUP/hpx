@@ -21,7 +21,7 @@
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
-#include <asio/io_service.hpp>
+#include <asio/io_context.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -145,7 +145,7 @@ namespace hpx { namespace detail {
         return &rt->get_thread_manager().default_pool();
     }
 
-    asio::io_service* get_default_timer_service()
+    asio::io_context* get_default_timer_service()
     {
         hpx::runtime* rt = get_runtime_ptr();
         if (rt == nullptr)
