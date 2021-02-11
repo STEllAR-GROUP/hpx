@@ -47,7 +47,7 @@ jobs:
             cmake_minsizerel_build_dir_macros_test \
             cmake_release_build_dir_macros_test \
             cmake_relwithdebinfo_build_dir_macros_test \
-          -- -maxcpucount -verbosity:minimal -nologo
+          -- -maxcpucount -verbosity:detailed -nologo
     - name: Install
       shell: bash
       run: |
@@ -65,7 +65,7 @@ jobs:
               cmake_minsizerel_install_dir_macros_test \
               cmake_release_install_dir_macros_test \
               cmake_relwithdebinfo_install_dir_macros_test \
-            -- -maxcpucount -verbosity:minimal -nologo
+            -- -maxcpucount -verbosity:detailed -nologo
     - name: Test
       shell: bash
       run: |
