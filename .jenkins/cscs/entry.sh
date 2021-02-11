@@ -23,7 +23,7 @@ else
 
     # Cancel currently running builds on the same branch, but only for pull
     # requests
-    scancel --jobname="${job_name}"
+    scancel --account="djenkssl" --jobname="${job_name}"
 fi
 
 # Start the actual build
@@ -33,6 +33,7 @@ sbatch \
     --nodes="1" \
     --constraint="${configuration_slurm_constraint}" \
     --partition="cscsci" \
+    --account="djenkssl" \
     --time="01:30:00" \
     --output="jenkins-hpx-${configuration_name}.out" \
     --error="jenkins-hpx-${configuration_name}.err" \
