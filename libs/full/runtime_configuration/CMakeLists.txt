@@ -11,7 +11,6 @@ set(runtime_configuration_headers
     hpx/runtime_configuration/component_commandline_base.hpp
     hpx/runtime_configuration/component_factory_base.hpp
     hpx/runtime_configuration/component_registry_base.hpp
-    hpx/runtime_configuration/ini.hpp
     hpx/runtime_configuration/init_ini_data.hpp
     hpx/runtime_configuration/plugin_registry_base.hpp
     hpx/runtime_configuration/runtime_configuration.hpp
@@ -34,8 +33,8 @@ set(runtime_configuration_compat_headers
 )
 # cmake-format: on
 
-set(runtime_configuration_sources ini.cpp init_ini_data.cpp
-                                  runtime_configuration.cpp runtime_mode.cpp
+set(runtime_configuration_sources init_ini_data.cpp runtime_configuration.cpp
+                                  runtime_mode.cpp
 )
 
 include(HPX_AddModule)
@@ -45,6 +44,7 @@ add_hpx_module(
   SOURCES ${runtime_configuration_sources}
   HEADERS ${runtime_configuration_headers}
   COMPAT_HEADERS ${runtime_configuration_compat_headers}
-  DEPENDENCIES hpx_core hpx_parallelism hpx_program_options
+  DEPENDENCIES hpx_core
+  MODULE_DEPENDENCIES hpx_runtime_configuration_local
   CMAKE_SUBDIRS examples tests
 )

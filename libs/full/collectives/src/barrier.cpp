@@ -13,6 +13,7 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
+#include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_local/run_as_hpx_thread.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/state.hpp>
@@ -182,8 +183,8 @@ namespace hpx { namespace lcos {
 
     barrier barrier::create_global_barrier()
     {
-        runtime& rt = get_runtime();
-        util::runtime_configuration const& cfg = rt.get_config();
+        runtime_distributed& rtd = get_runtime_distributed();
+        util::runtime_configuration const& cfg = rtd.get_config();
         return barrier("/0/hpx/global_barrier",
             static_cast<std::size_t>(cfg.get_num_localities()));
     }

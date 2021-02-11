@@ -6,10 +6,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
+#include <hpx/command_line_handling/parse_command_line.hpp>
 #include <hpx/functional/detail/reset_function.hpp>
 #include <hpx/modules/asio.hpp>
 #include <hpx/modules/batch_environments.hpp>
-#include <hpx/modules/command_line_handling.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/format.hpp>
 #if defined(HPX_HAVE_MODULE_MPI_BASE)
@@ -1381,7 +1382,7 @@ namespace hpx { namespace util {
         ini_config_.emplace_back("hpx.program_name!=" + cmd_name);
         ini_config_.emplace_back("hpx.reconstructed_cmd_line!=" +
             detail::encode_and_enquote(cmd_name) + " " +
-            util::reconstruct_command_line(vm_) + " " +
+            local::detail::reconstruct_command_line(vm_) + " " +
             unregistered_options_cmd_line);
     }
 

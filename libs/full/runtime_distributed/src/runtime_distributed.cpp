@@ -202,6 +202,7 @@ namespace hpx {
             &detail::network_background_callback,
 #endif
             false)
+      , rtcfg_(rtcfg)
       , mode_(rtcfg_.mode_)
 #if defined(HPX_HAVE_NETWORKING)
       , parcel_handler_notifier_(runtime_distributed::get_notification_policy(
@@ -667,6 +668,17 @@ namespace hpx {
     int runtime_distributed::resume()
     {
         return runtime::resume();
+    }
+
+    hpx::util::runtime_configuration& runtime_distributed::get_config()
+    {
+        return rtcfg_;
+    }
+
+    hpx::util::runtime_configuration const& runtime_distributed::get_config()
+        const
+    {
+        return rtcfg_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1823,6 +1835,11 @@ namespace hpx {
         }
 
         return rt->get_num_localities(type);
+    }
+
+    hpx::util::runtime_configuration const& get_config()
+    {
+        return get_runtime_distributed().get_config();
     }
 }    // namespace hpx
 

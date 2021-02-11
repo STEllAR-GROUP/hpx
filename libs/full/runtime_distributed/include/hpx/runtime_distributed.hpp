@@ -140,6 +140,11 @@ namespace hpx {
         ///
         int resume() override;
 
+        /// \brief access configuration information
+        hpx::util::runtime_configuration& get_config();
+
+        hpx::util::runtime_configuration const& get_config() const;
+
         /// \brief Report a non-recoverable error to the runtime system
         ///
         /// \param num_thread [in] The number of the operating system thread
@@ -402,6 +407,7 @@ namespace hpx {
 
         static void default_errorsink(std::string const&);
 
+        util::runtime_configuration rtcfg_;
         runtime_mode mode_;
         util::unique_id_ranges id_pool_;
 #if defined(HPX_HAVE_NETWORKING)

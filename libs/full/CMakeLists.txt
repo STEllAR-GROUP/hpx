@@ -24,6 +24,7 @@ set(_hpx_full_modules
     checkpoint_base
     collectives
     command_line_handling
+    command_line_handling_local
     components
     components_base
     compute
@@ -31,7 +32,9 @@ set(_hpx_full_modules
     distribution_policies
     executors_distributed
     include
+    ini
     init_runtime
+    init_runtime_local
     lcos_distributed
     mpi_base
     naming
@@ -42,6 +45,7 @@ set(_hpx_full_modules
     resource_partitioner
     runtime_components
     runtime_configuration
+    runtime_configuration_local
     runtime_distributed
     runtime_local
     segmented_algorithms

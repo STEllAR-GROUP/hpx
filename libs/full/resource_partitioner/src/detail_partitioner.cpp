@@ -7,11 +7,11 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -206,7 +206,7 @@ namespace hpx { namespace resource { namespace detail {
 
     ////////////////////////////////////////////////////////////////////////
     partitioner::partitioner()
-      : rtcfg_(nullptr, runtime_mode::default_)
+      : rtcfg_()
       , first_core_(std::size_t(-1))
       , mode_(mode_default)
       , topo_(threads::create_topology())
@@ -870,7 +870,7 @@ namespace hpx { namespace resource { namespace detail {
     }
 
     void partitioner::init(resource::partitioner_mode rpmode,
-        hpx::util::runtime_configuration rtcfg,
+        hpx::util::section rtcfg,
         hpx::threads::policies::detail::affinity_data affinity_data)
     {
         mode_ = rpmode;

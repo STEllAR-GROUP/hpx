@@ -7,11 +7,13 @@
 
 #pragma once
 
+#include <hpx/ini/ini.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
-#include <hpx/runtime_configuration/ini.hpp>
+#include <hpx/runtime_configuration/init_ini_data.hpp>
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
+#include <hpx/runtime_configuration_local/init_ini_data_local.hpp>
 
 #include <map>
 #include <memory>
@@ -20,18 +22,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
-    ///////////////////////////////////////////////////////////////////////////
-    bool handle_ini_file(section& ini, std::string const& loc);
-    bool handle_ini_file_env(
-        section& ini, char const* env_var, char const* file_suffix = nullptr);
-
-    ///////////////////////////////////////////////////////////////////////////
-    // read system and user specified ini files
-    //
-    // returns true if at least one alternative location has been read
-    // successfully
-    bool init_ini_data_base(section& ini, std::string& hpx_ini_file);
-
     ///////////////////////////////////////////////////////////////////////////
     // load registry information for all statically registered modules
     std::vector<std::shared_ptr<components::component_registry_base>>

@@ -837,12 +837,6 @@ void is_iterator()
         HPX_TEST_MSG((is_iterator<iterator>::value),
             "random access traversal input iterator");
     }
-    {
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-        using iterator = hpx::segmented::vector_iterator<int, std::vector<int>>;
-        HPX_TEST_MSG((is_iterator<iterator>::value), "hpx-specific iterator");
-#endif
-    }
 }
 
 void is_output_iterator()
@@ -986,13 +980,6 @@ void is_forward_iterator()
         using iterator = random_access_traversal_iterator;
         HPX_TEST_MSG((is_forward_iterator<iterator>::value),
             "random access traversal input iterator");
-    }
-    {
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-        using iterator = hpx::segmented::vector_iterator<int, std::vector<int>>;
-        HPX_TEST_MSG(
-            (is_forward_iterator<iterator>::value), "hpx-specific iterator");
-#endif
     }
     {
         using base_iterator = std::vector<std::size_t>::iterator;

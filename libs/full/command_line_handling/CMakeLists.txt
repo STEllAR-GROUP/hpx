@@ -33,8 +33,8 @@ add_hpx_module(
   SOURCES ${command_line_handling_sources}
   HEADERS ${command_line_handling_headers}
   COMPAT_HEADERS ${command_line_handling_compat_headers}
-  DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES hpx_batch_environments hpx_program_options
-                      hpx_runtime_configuration ${MPI_DEPS}
+  DEPENDENCIES hpx_core hpx_parallelism ${MPI_DEPS}
+  MODULE_DEPENDENCIES hpx_batch_environments hpx_command_line_handling_local
+                      hpx_program_options hpx_runtime_configuration
   CMAKE_SUBDIRS
 )

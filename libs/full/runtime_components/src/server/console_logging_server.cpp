@@ -11,10 +11,10 @@
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/ini/ini.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_components/server/console_logging.hpp>
-#include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/type_support/static.hpp>
 
 #include <cstddef>

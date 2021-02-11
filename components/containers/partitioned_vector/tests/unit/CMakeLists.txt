@@ -6,10 +6,17 @@
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    partitioned_vector_view partitioned_vector_view_iterator
-    partitioned_vector_subview coarray coarray_all_reduce
+    is_iterator_partitioned_vector
+    partitioned_vector_view
+    partitioned_vector_view_iterator
+    partitioned_vector_subview
+    coarray
+    coarray_all_reduce
     serialization_partitioned_vector
 )
+
+set(is_iterator_partitioned_vector_FLAGS COMPONENT_DEPENDENCIES partitioned_vector)
+set(is_iterator_partitioned_vector_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(partitioned_vector_view_FLAGS COMPONENT_DEPENDENCIES partitioned_vector)
 set(partitioned_vector_view_PARAMETERS THREADS_PER_LOCALITY 4)

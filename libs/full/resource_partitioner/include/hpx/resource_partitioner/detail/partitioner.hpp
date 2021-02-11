@@ -10,9 +10,8 @@
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/ini/ini.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/topology/cpu_mask.hpp>
@@ -156,8 +155,7 @@ namespace hpx { namespace resource { namespace detail {
         threads::mask_cref_type get_pu_mask(
             std::size_t global_thread_num) const;
 
-        void init(resource::partitioner_mode rpmode,
-            hpx::util::runtime_configuration cfg,
+        void init(resource::partitioner_mode rpmode, hpx::util::section cfg,
             hpx::threads::policies::detail::affinity_data affinity_data);
 
         scheduler_function get_pool_creator(size_t index) const;
@@ -221,7 +219,7 @@ namespace hpx { namespace resource { namespace detail {
         static std::atomic<int> instance_number_counter_;
 
         // holds all of the command line switches
-        util::runtime_configuration rtcfg_;
+        util::section rtcfg_;
         std::size_t first_core_;
         std::size_t pus_needed_;
 

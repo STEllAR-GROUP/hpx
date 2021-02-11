@@ -79,7 +79,6 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     hpx::init_params init_args;
-    init_args.cfg = cfg;
 
     HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
 

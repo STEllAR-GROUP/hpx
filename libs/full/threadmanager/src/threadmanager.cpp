@@ -60,7 +60,8 @@ namespace hpx { namespace threads {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    threadmanager::threadmanager(util::runtime_configuration& rtcfg,
+    threadmanager::threadmanager(
+        hpx::local::detail::runtime_configuration& rtcfg,
 #ifdef HPX_HAVE_TIMER_POOL
         util::io_service_pool& timer_pool,
 #endif
@@ -156,11 +157,6 @@ namespace hpx { namespace threads {
             min_delete_count, max_delete_count, max_terminated_threads,
             max_idle_backoff_time, small_stacksize, medium_stacksize,
             large_stacksize, huge_stacksize);
-
-        if (!rtcfg_.enable_networking())
-        {
-            max_background_threads = 0;
-        }
 
         // instantiate the pools
         for (size_t i = 0; i != num_pools; i++)

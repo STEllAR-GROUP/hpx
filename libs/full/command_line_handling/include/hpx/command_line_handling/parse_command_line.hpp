@@ -7,7 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/runtime_configuration/ini.hpp>
+#include <hpx/command_line_handling_local/parse_command_line_local.hpp>
+#include <hpx/ini/ini.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 
 #include <hpx/modules/program_options.hpp>
@@ -18,14 +19,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
-    enum commandline_error_mode
-    {
-        return_on_error,
-        rethrow_on_error,
-        allow_unregistered,
-        report_missing_config_file = 0x80
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     // parse the command line
     HPX_EXPORT bool parse_commandline(hpx::util::section const& rtcfg,
@@ -44,18 +37,4 @@ namespace hpx { namespace util {
         hpx::runtime_mode mode = runtime_mode::default_,
         hpx::program_options::options_description* visible = nullptr,
         std::vector<std::string>* unregistered_options = nullptr);
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT std::string reconstruct_command_line(
-        hpx::program_options::variables_map const& vm);
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail {
-        inline std::string enquote(std::string const& arg)
-        {
-            if (arg.find_first_of(" \t\"") != std::string::npos)
-                return std::string("\"") + arg + "\"";
-            return arg;
-        }
-    }    // namespace detail
-}}       // namespace hpx::util
+}}    // namespace hpx::util

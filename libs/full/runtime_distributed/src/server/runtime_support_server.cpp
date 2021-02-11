@@ -18,6 +18,7 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/create_component.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/ini/ini.hpp>
 #include <hpx/lcos_local/packaged_task.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/collectives.hpp>
@@ -33,7 +34,6 @@
 #include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_configuration/component_commandline_base.hpp>
 #include <hpx/runtime_configuration/component_factory_base.hpp>
-#include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
@@ -632,7 +632,8 @@ namespace hpx { namespace components { namespace server {
     // Retrieve configuration information
     util::section runtime_support::get_config()
     {
-        return *(get_runtime().get_config().get_section("application"));
+        return *(
+            get_runtime_distributed().get_config().get_section("application"));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -960,7 +961,8 @@ namespace hpx { namespace components { namespace server {
     int runtime_support::load_components()
     {
         // load components now that AGAS is up
-        util::runtime_configuration& ini = get_runtime().get_config();
+        util::runtime_configuration& ini =
+            get_runtime_distributed().get_config();
 
         // first static components
         ini.load_components_static(components::get_static_module_data());

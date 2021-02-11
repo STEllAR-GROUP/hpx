@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/runtime_configuration/ini.hpp>
+#include <hpx/ini/ini.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 
 #include <string>
