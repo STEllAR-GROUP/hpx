@@ -8,7 +8,6 @@
 #include <hpx/config.hpp>
 
 #include <hpx/agas/addressing_service.hpp>
-#include <hpx/agas/big_boot_barrier.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
@@ -47,6 +46,7 @@
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime_distributed/big_boot_barrier.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
@@ -416,24 +416,66 @@ namespace hpx {
 
         LPROGRESS_;
 
-#if defined(HPX_HAVE_NETWORKING)
-        agas_client_.bootstrap(parcel_handler_, rtcfg_);
-#else
-        agas_client_.bootstrap(rtcfg_);
-#endif
-
         components::server::get_error_dispatcher().set_error_sink(
             &runtime_distributed::default_errorsink);
 
         // now, launch AGAS and register all nodes, launch all other components
+        initialize_agas();
+
+        applier_.initialize(std::uint64_t(runtime_support_.get()));
+    }
+
+    void runtime_distributed::initialize_agas()
+    {
 #if defined(HPX_HAVE_NETWORKING)
-        agas_client_.initialize(
-            parcel_handler_, std::uint64_t(runtime_support_.get()));
+        std::shared_ptr<parcelset::parcelport> pp =
+            parcel_handler_.get_bootstrap_parcelport();
+
+        agas::create_big_boot_barrier(
+            pp ? pp.get() : nullptr, parcel_handler_.endpoints(), rtcfg_);
+
+        if (agas_client_.is_bootstrap())
+        {
+            // store number of cores used by other processes
+            std::uint32_t cores_needed = assign_cores();
+            std::uint32_t first_used_core = assign_cores(
+                pp ? pp->get_locality_name() : "<console>", cores_needed);
+
+            rtcfg_.set_first_used_core(first_used_core);
+            HPX_ASSERT(pp ? pp->here() == pp->agas_locality(rtcfg_) : true);
+
+            agas_client_.bootstrap(parcel_handler_.endpoints(), rtcfg_);
+
+            init_id_pool_range();
+
+            if (pp)
+                pp->run(false);
+
+            agas::get_big_boot_barrier().wait_bootstrap();
+        }
+        else
+        {
+            if (pp)
+                pp->run(false);
+
+            agas::get_big_boot_barrier().wait_hosted(
+                pp ? pp->get_locality_name() : "<console>",
+                agas_client_.get_primary_ns_lva(),
+                agas_client_.get_symbol_ns_lva());
+        }
+
+        agas_client_.initialize(std::uint64_t(runtime_support_.get()));
         parcel_handler_.initialize(agas_client_, &applier_);
 #else
+        if (agas_client_.is_bootstrap())
+        {
+            parcelset::endpoints_type endpoints;
+            endpoints.insert(parcelset::endpoints_type::value_type(
+                "local-loopback", parcelset::locality{}));
+            agas_client_.bootstrap(endpoints, rtcfg_);
+        }
         agas_client_.initialize(std::uint64_t(runtime_support_.get()));
 #endif
-        applier_.initialize(std::uint64_t(runtime_support_.get()));
     }
 
     ///////////////////////////////////////////////////////////////////////////

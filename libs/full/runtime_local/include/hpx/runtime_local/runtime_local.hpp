@@ -235,12 +235,6 @@ namespace hpx {
         /// \brief Returns a string of the locality endpoints (usable in debug output)
         virtual std::string here() const;
 
-        virtual std::uint64_t get_runtime_support_lva() const
-        {
-            return 0;
-        }
-        virtual void init_id_pool_range() {}
-
         /// \brief Report a non-recoverable error to the runtime system
         ///
         /// \param num_thread [in] The number of the operating system thread

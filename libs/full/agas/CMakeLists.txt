@@ -13,20 +13,17 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(agas_headers hpx/agas/addressing_service.hpp hpx/agas/agas_fwd.hpp
-                 hpx/agas/big_boot_barrier.hpp hpx/agas/state.hpp
+                 hpx/agas/state.hpp
 )
 
 # cmake-format: off
 set(agas_compat_headers
     hpx/runtime/agas_fwd.hpp => hpx/modules/agas.hpp
     hpx/runtime/agas/addressing_service.hpp => hpx/modules/agas.hpp
-    hpx/runtime/agas/big_boot_barrier.hpp => hpx/modules/agas.hpp
 )
 # cmake-format: on
 
-set(agas_sources addressing_service.cpp big_boot_barrier.cpp
-                 detail/interface.cpp state.cpp
-)
+set(agas_sources addressing_service.cpp detail/interface.cpp state.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(

@@ -12,7 +12,6 @@
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/agas/addressing_service.hpp>
-#include <hpx/agas/big_boot_barrier.hpp>
 #include <hpx/agas_base/detail/hosted_component_namespace.hpp>
 #include <hpx/agas_base/detail/hosted_locality_namespace.hpp>
 #include <hpx/assert.hpp>
@@ -27,7 +26,8 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/put_parcel.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
+#include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime_distributed/big_boot_barrier.hpp>
 #include <hpx/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
@@ -491,7 +491,7 @@ namespace hpx { namespace agas {
             agas_client.symbol_ns_.ptr());
 
         // assign cores to the new locality
-        runtime& rt = get_runtime();
+        runtime& rt = get_runtime_distributed();
         std::uint32_t first_core =
             rt.assign_cores(header.hostname, header.cores_needed);
 
@@ -557,7 +557,7 @@ namespace hpx { namespace agas {
         // register all ids with this locality
         header.ids.register_ids_on_worker_loc();
 
-        runtime& rt = get_runtime();
+        runtime_distributed& rt = get_runtime_distributed();
         naming::resolver_client& agas_client = naming::get_agas_client();
 
         if (HPX_UNLIKELY(agas_client.get_status() != state_starting))
@@ -721,7 +721,7 @@ namespace hpx { namespace agas {
         HPX_ASSERT(0 != primary_ns_server);
         HPX_ASSERT(0 != symbol_ns_server);
 
-        runtime& rt = get_runtime();
+        runtime& rt = get_runtime_distributed();
 
         // get the number of cores we need for our locality. This respects the
         // affinity description. Cores that are partially used are counted as well

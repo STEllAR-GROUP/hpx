@@ -45,11 +45,11 @@ static hpx::config_registry::add_module_config_helper add_config{
 
 // We have to explicitly reference the config of this module since we are
 // linking statically only to this module.
-namespace hpx { namespace config_registry {
-    extern add_module_config_helper add_config;
+namespace hpx { namespace __config_registry {
+    extern config_registry::add_module_config_helper add_config;
 }}    // namespace hpx::config_registry
 
-void* generated_module_configs[] = {&hpx::config_registry::add_config};
+void* generated_module_configs[] = {&hpx::__config_registry::add_config};
 
 int main()
 {

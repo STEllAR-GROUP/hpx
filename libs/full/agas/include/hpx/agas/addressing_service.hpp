@@ -105,8 +105,8 @@ namespace hpx { namespace agas {
         naming::gid_type locality_;
 
         mutable mutex_type resolved_localities_mtx_;
-        typedef std::map<naming::gid_type, parcelset::endpoints_type>
-            resolved_localities_type;
+        using resolved_localities_type =
+            std::map<naming::gid_type, parcelset::endpoints_type>;
         resolved_localities_type resolved_localities_;
 
         explicit addressing_service(util::runtime_configuration const& ini_);
@@ -121,15 +121,9 @@ namespace hpx { namespace agas {
         ~addressing_service() = default;
 #endif
 
-#if defined(HPX_HAVE_NETWORKING)
-        void bootstrap(parcelset::parcelhandler& ph,
-            util::runtime_configuration const& ini);
-
-        void initialize(parcelset::parcelhandler& ph, std::uint64_t rts_lva);
-#else
-        void bootstrap(util::runtime_configuration const& ini);
+        void bootstrap(parcelset::endpoints_type const& endpoints,
+            util::runtime_configuration& rtcfg);
         void initialize(std::uint64_t rts_lva);
-#endif
 
         /// \brief Adjust the size of the local AGAS Address resolution cache
         void adjust_local_cache_size(std::size_t);
@@ -218,16 +212,8 @@ namespace hpx { namespace agas {
         }
 
     protected:
-#if defined(HPX_HAVE_NETWORKING)
-        void launch_bootstrap(std::shared_ptr<parcelset::parcelport> const& pp,
-            parcelset::endpoints_type const& endpoints,
-            util::runtime_configuration const& ini_);
-#else
         void launch_bootstrap(parcelset::endpoints_type const& endpoints,
-            util::runtime_configuration const& ini_);
-#endif
-
-        void launch_hosted();
+            util::runtime_configuration& rtcfg);
 
         naming::address resolve_full_postproc(naming::gid_type const& id,
             future<primary_namespace::resolved_type> f);

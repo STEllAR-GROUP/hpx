@@ -90,7 +90,7 @@ foreach(test ${tests})
 
   add_hpx_executable(
     ${test}_test INTERNAL_FLAGS
-    SOURCES ${sources} ${${test}_FLAGS} 
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
     FOLDER ${folder_name}

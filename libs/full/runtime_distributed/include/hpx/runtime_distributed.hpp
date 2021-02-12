@@ -259,11 +259,11 @@ namespace hpx {
         /// \brief Returns a string of the locality endpoints (usable in debug output)
         std::string here() const override;
 
-        std::uint64_t get_runtime_support_lva() const override;
+        std::uint64_t get_runtime_support_lva() const;
 
         naming::gid_type get_next_id(std::size_t count = 1);
 
-        void init_id_pool_range() override;
+        void init_id_pool_range();
         util::unique_id_ranges& get_id_pool();
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -277,6 +277,9 @@ namespace hpx {
             char const* binary_filter_type, bool compress,
             serialization::binary_filter* next_filter, error_code& ec = throws);
 #endif
+
+        /// Initialize AGAS operation
+        void initialize_agas();
 
         /// Add a function to be executed inside a HPX thread before hpx_main
         /// but guaranteed to be executed before any startup function registered
