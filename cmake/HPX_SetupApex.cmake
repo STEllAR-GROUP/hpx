@@ -16,34 +16,50 @@
 
 if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
   if(NOT HPX_FIND_PACKAGE)
-    set(_hpx_apex_no_update)
-    if(HPX_WITH_APEX_NO_UPDATE)
-      set(_hpx_apex_no_update NO_UPDATE)
+    if(NOT "${APEX_ROOT}" AND "$ENV{APEX_ROOT}")
+      set(APEX_ROOT "$ENV{APEX_ROOT}")
     endif()
 
     # We want to track parent dependencies
     hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
 
-    # If APEX_ROOT not specified, local clone into hpx source dir
-    if(NOT APEX_ROOT)
-      # handle APEX library
-      include(GitExternal)
-      git_external(
-        apex https://github.com/khuck/xpress-apex.git ${HPX_WITH_APEX_TAG}
-        ${_hpx_apex_no_update} VERBOSE
+    if(APEX_ROOT)
+      # Use given (external) APEX
+      set(HPX_APEX_ROOT ${APEX_ROOT})
+
+    else()
+      # If APEX_ROOT not specified, local clone into hpx source dir
+      include(FetchContent)
+      fetchcontent_declare(
+        apex
+        GIT_REPOSITORY https://github.com/khuck/xpress-apex.git
+        GIT_TAG ${HPX_WITH_APEX_TAG}
       )
-      if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/apex)
-        set(APEX_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/apex)
-      else()
-        hpx_error("APEX could not be found and HPX_WITH_APEX=On")
+
+      fetchcontent_getproperties(apex)
+      if(NOT apex_POPULATED)
+        # maintain compatibility
+        if(HPX_WITH_APEX_NO_UPDATE)
+          set(FETCHCONTENT_UPDATES_DISCONNECTED_APEX ON)
+        endif()
+        fetchcontent_populate(apex)
       endif()
-    endif(NOT APEX_ROOT)
+
+      # check again to make sure we have received a copy of APEX
+      fetchcontent_getproperties(apex)
+      if(NOT apex_POPULATED)
+        hpx_error("APEX could not be populated with HPX_WITH_APEX=On")
+      endif()
+      set(APEX_ROOT ${apex_SOURCE_DIR})
+
+      hpx_info("APEX_ROOT is not set. Cloning APEX into ${apex_SOURCE_DIR}.")
+    endif()
 
     list(APPEND CMAKE_MODULE_PATH "${APEX_ROOT}/cmake/Modules")
     add_subdirectory(${APEX_ROOT}/src/apex ${CMAKE_BINARY_DIR}/apex/src/apex)
     if(AMPLIFIER_FOUND)
       hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the \
-      Intel Amplifier (WITH_AMPLIFIER=Off) in order to use APEX"
+        Intel Amplifier (WITH_AMPLIFIER=Off) in order to use APEX"
       )
     endif()
   endif()
