@@ -16,20 +16,20 @@
 #endif
 #include <hpx/actions/continuation.hpp>
 #include <hpx/actions_base/plain_action.hpp>
+#include <hpx/agas/addressing_service.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/prefix/find_prefix.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/component_commandline_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 #include <hpx/runtime/components/server/component_database.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_configuration/static_factory_data.hpp>

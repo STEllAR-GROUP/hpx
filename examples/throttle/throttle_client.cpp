@@ -7,9 +7,9 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/include/util.hpp>
 
 #include "throttle/throttle.hpp"

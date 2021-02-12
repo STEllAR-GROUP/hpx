@@ -20,9 +20,9 @@
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
+#include <hpx/runtime_local/state.hpp>
 #include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
-#include <hpx/state.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 
 #include <atomic>
@@ -80,21 +80,17 @@ namespace hpx {
     protected:
         runtime(util::runtime_configuration& rtcfg,
             notification_policy_type&& notifier,
-            notification_policy_type&& main_pool_notifier
+            notification_policy_type&& main_pool_notifier,
 #ifdef HPX_HAVE_IO_POOL
-            ,
-            notification_policy_type&& io_pool_notifier
+            notification_policy_type&& io_pool_notifier,
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
-            ,
-            notification_policy_type&& timer_pool_notifier
+            notification_policy_type&& timer_pool_notifier,
 #endif
 #ifdef HPX_HAVE_NETWORKING
-            ,
             threads::detail::network_background_callback_type
-                network_background_callback
+                network_background_callback,
 #endif
-            ,
             bool initialize);
 
         /// Common initialization for different constructors
@@ -238,6 +234,12 @@ namespace hpx {
 
         /// \brief Returns a string of the locality endpoints (usable in debug output)
         virtual std::string here() const;
+
+        virtual std::uint64_t get_runtime_support_lva() const
+        {
+            return 0;
+        }
+        virtual void init_id_pool_range() {}
 
         /// \brief Report a non-recoverable error to the runtime system
         ///
@@ -387,6 +389,16 @@ namespace hpx {
         virtual std::uint32_t get_initial_num_localities() const;
 
         virtual lcos::future<std::uint32_t> get_num_localities() const;
+
+        virtual std::uint32_t assign_cores(std::string const&, std::uint32_t)
+        {
+            return std::uint32_t(-1);
+        }
+
+        virtual std::uint32_t assign_cores()
+        {
+            return std::uint32_t(-1);
+        }
 
     protected:
         void init_tss();

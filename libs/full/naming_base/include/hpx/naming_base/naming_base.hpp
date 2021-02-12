@@ -25,6 +25,9 @@ namespace hpx {
         constexpr std::uint32_t invalid_locality_id =
             ~static_cast<std::uint32_t>(0);
 
+        constexpr std::uint32_t component_invalid =
+            ~static_cast<std::uint32_t>(0);
+
         struct HPX_EXPORT gid_type;
         struct HPX_EXPORT id_type;
         struct HPX_EXPORT address;

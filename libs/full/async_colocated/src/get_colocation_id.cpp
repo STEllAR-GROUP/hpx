@@ -8,9 +8,9 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_colocated/get_colocation_id.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 
 namespace hpx {
 

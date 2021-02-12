@@ -502,18 +502,4 @@
 #  define HPX_HAVE_MAX_CPU_COUNT 256
 #endif
 
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_AGAS_BOOTSTRAP_PREFIX                    0U
-
-#define HPX_AGAS_NS_MSB                              0x0000000000000001ULL
-
-#define HPX_AGAS_PRIMARY_NS_MSB                      0x0000000100000001ULL
-#define HPX_AGAS_PRIMARY_NS_LSB                      0x0000000000000001ULL
-#define HPX_AGAS_COMPONENT_NS_MSB                    0x0000000100000001ULL
-#define HPX_AGAS_COMPONENT_NS_LSB                    0x0000000000000002ULL
-#define HPX_AGAS_SYMBOL_NS_MSB                       0x0000000100000001ULL
-#define HPX_AGAS_SYMBOL_NS_LSB                       0x0000000000000003ULL
-#define HPX_AGAS_LOCALITY_NS_MSB                     0x0000000100000001ULL
-#define HPX_AGAS_LOCALITY_NS_LSB                     0x0000000000000004ULL
-
 // clang-format on

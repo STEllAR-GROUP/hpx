@@ -12,7 +12,7 @@
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
-#include <hpx/state.hpp>
+#include <hpx/runtime_local/state.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/type_support/static.hpp>
 

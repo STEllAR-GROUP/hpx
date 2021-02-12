@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,32 +13,34 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(agas_headers
-    hpx/agas/agas_fwd.hpp hpx/agas/gva.hpp hpx/agas/primary_namespace.hpp
-    hpx/agas/server/primary_namespace.hpp
+    hpx/agas/addressing_service.hpp hpx/agas/agas_fwd.hpp
+    hpx/agas/basename_registration.hpp hpx/agas/big_boot_barrier.hpp
+    hpx/agas/state.hpp
 )
 
 # cmake-format: off
 set(agas_compat_headers
     hpx/runtime/agas_fwd.hpp => hpx/agas/agas_fwd.hpp
-    hpx/runtime/agas/gva.hpp => hpx/agas/gva.hpp
-    hpx/runtime/agas/primary_namespace.hpp => hpx/agas/primary_namespace.hpp
-    hpx/runtime/agas/server/primary_namespace.hpp => hpx/agas/server/primary_namespace.hpp
+    hpx/runtime/agas/addressing_service.hpp => hpx/agas/addressing_service.hpp
+    hpx/runtime/agas/big_boot_barrier.hpp => hpx/agas/big_boot_barrier.hpp
 )
 # cmake-format: on
 
-set(agas_sources primary_namespace.cpp server/primary_namespace_server.cpp)
+set(agas_sources addressing_service.cpp basename_registration.cpp
+                 big_boot_barrier.cpp detail/interface.cpp state.cpp
+)
 
 include(HPX_AddModule)
 add_hpx_module(
   full agas
-  COMPATIBILITY_HEADERS ON # Added in 1.6.0
+  COMPATIBILITY_HEADERS OFF
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${agas_sources}
   HEADERS ${agas_headers}
   COMPAT_HEADERS ${agas_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_async_distributed hpx_actions hpx_components_base
-                      hpx_naming_base
+  MODULE_DEPENDENCIES hpx_agas_base hpx_async_distributed hpx_naming
+                      hpx_runtime_configuration hpx_runtime_local
   CMAKE_SUBDIRS examples tests
 )

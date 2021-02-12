@@ -6,9 +6,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/agas/interface.hpp>
-#include <hpx/util/generate_unique_ids.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/util/generate_unique_ids.hpp>
 
 #include <cstddef>
 #include <mutex>

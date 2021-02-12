@@ -60,10 +60,10 @@
 #endif
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions_base/plain_action.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/naming.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>

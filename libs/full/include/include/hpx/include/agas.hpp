@@ -9,5 +9,5 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/runtime/agas/interface.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #endif

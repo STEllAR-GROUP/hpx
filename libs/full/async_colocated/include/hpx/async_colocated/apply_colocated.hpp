@@ -10,8 +10,8 @@
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/actions_base_support.hpp>
-#include <hpx/agas/primary_namespace.hpp>
-#include <hpx/agas/server/primary_namespace.hpp>
+#include <hpx/agas_base/primary_namespace.hpp>
+#include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/async_colocated/apply_colocated_fwd.hpp>
 #include <hpx/async_distributed/applier/apply_continue.hpp>
 #include <hpx/async_distributed/applier/register_apply_colocated.hpp>

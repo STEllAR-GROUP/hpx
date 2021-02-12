@@ -7,13 +7,13 @@
 #include <hpx/config.hpp>
 #include <hpx/actions/continuation.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/performance_counters/server/statistics_counter.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>

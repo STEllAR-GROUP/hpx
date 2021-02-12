@@ -50,6 +50,6 @@ add_hpx_module(
   HEADERS ${async_colocated_headers}
   COMPAT_HEADERS ${async_colocated_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_actions_base hpx_agas hpx_async_distributed
+  MODULE_DEPENDENCIES hpx_actions_base hpx_agas_base hpx_async_distributed
   CMAKE_SUBDIRS examples tests
 )

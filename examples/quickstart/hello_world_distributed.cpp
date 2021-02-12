@@ -20,6 +20,7 @@
 #include <hpx/include/util.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <list>
 #include <mutex>
 #include <set>
@@ -95,7 +96,8 @@ void hello_world_foreman()
             // task will actually run on that worker thread.
             hpx::parallel::execution::default_executor exec(
                 hpx::threads::thread_schedule_hint(
-                    hpx::threads::thread_schedule_hint_mode::thread, worker));
+                    hpx::threads::thread_schedule_hint_mode::thread,
+                    static_cast<std::int16_t>(worker)));
             futures.push_back(hpx::async(exec, hello_world_worker, worker));
         }
 

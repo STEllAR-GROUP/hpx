@@ -6,16 +6,16 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/actions_base/traits/action_was_object_migrated.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_colocated/apply_colocated.hpp>
 #include <hpx/async_distributed/apply.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>

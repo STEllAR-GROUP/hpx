@@ -20,7 +20,7 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/state.hpp>
+#include <hpx/runtime_local/state.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 
 #include <chrono>

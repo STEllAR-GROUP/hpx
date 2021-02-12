@@ -14,8 +14,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/components_base/include
 set(components_base_headers
+    hpx/components_base/agas_interface.hpp
     hpx/components_base/get_lva.hpp
     hpx/components_base/component_type.hpp
+    hpx/components_base/detail/agas_interface_functions.hpp
     hpx/components_base/pinned_ptr.hpp
     hpx/components_base/traits/action_decorate_function.hpp
     hpx/components_base/traits/component_config_data.hpp
@@ -30,6 +32,7 @@ set(components_base_headers
 # Default location is $HPX_ROOT/libs/components_base/include_compatibility
 # cmake-format: off
 set(components_base_compat_headers
+    hpx/runtime/agas/interface.hpp => hpx/components_base/agas_interface.hpp
     hpx/runtime/get_lva.hpp => hpx/components_base/get_lva.hpp
     hpx/runtime/components/component_type.hpp => hpx/modules/components_base.hpp
     hpx/runtime/components/pinned_ptr.hpp => hpx/modules/components_base.hpp
@@ -44,7 +47,9 @@ set(components_base_compat_headers
 )
 # cmake-format: on
 
-set(components_base_sources address_ostream.cpp)
+set(components_base_sources address_ostream.cpp agas_interface.cpp
+                            detail/agas_interface_functions.cpp
+)
 
 include(HPX_AddModule)
 add_hpx_module(

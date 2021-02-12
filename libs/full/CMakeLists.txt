@@ -1,4 +1,4 @@
-# Copyright (c) 2020 The STE||AR-Group
+# Copyright (c) 2020-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,6 +14,7 @@ set(_hpx_full_modules
     actions
     actions_base
     agas
+    agas_base
     async_colocated
     async_cuda
     async_distributed

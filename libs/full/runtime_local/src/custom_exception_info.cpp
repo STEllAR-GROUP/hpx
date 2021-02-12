@@ -25,7 +25,7 @@
 #include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/runtime_local/get_worker_thread_num.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/state.hpp>
+#include <hpx/runtime_local/state.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/version.hpp>
 

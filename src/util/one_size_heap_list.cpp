@@ -10,7 +10,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/state.hpp>
+#include <hpx/runtime_local/state.hpp>
 #include <hpx/util/one_size_heap_list.hpp>
 #if defined(HPX_DEBUG)
 #include <hpx/modules/logging.hpp>

@@ -8,10 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/plain_action.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/get_ptr.hpp>
 

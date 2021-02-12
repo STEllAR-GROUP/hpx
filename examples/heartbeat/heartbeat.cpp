@@ -18,7 +18,7 @@
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/state.hpp>
+#include <hpx/runtime_local/state.hpp>
 
 #include <cstdint>
 #include <iostream>

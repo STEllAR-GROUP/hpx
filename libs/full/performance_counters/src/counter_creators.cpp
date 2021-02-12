@@ -1,22 +1,27 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/actions/transfer_action.hpp>
+#include <hpx/actions/transfer_continuation_action.hpp>
+#include <hpx/actions_base/plain_action.hpp>
+#include <hpx/agas/agas_fwd.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/async.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/performance_counters/agas_namespace_action_code.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/server/component_namespace_counters.hpp>
+#include <hpx/performance_counters/server/locality_namespace_counters.hpp>
 #include <hpx/performance_counters/server/primary_namespace_counters.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
-#include <hpx/runtime/agas/server/component_namespace.hpp>
-#include <hpx/runtime/agas/server/locality_namespace.hpp>
-#include <hpx/runtime/agas/server/symbol_namespace.hpp>
+#include <hpx/performance_counters/server/symbol_namespace_counters.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstdint>
@@ -515,20 +520,17 @@ namespace hpx { namespace performance_counters {
             {
             case agas::component_ns_statistics_counter:
             {
-                agas::server::component_namespace::statistics_counter_action
-                    action;
+                agas::component_namespace_statistics_counter_action action;
                 return action(agas_id, name).get_gid();
             }
             case agas::locality_ns_statistics_counter:
             {
-                agas::server::locality_namespace::statistics_counter_action
-                    action;
+                agas::locality_namespace_statistics_counter_action action;
                 return action(agas_id, name).get_gid();
             }
             case agas::symbol_ns_statistics_counter:
             {
-                agas::server::symbol_namespace::statistics_counter_action
-                    action;
+                agas::symbol_namespace_statistics_counter_action action;
                 return action(agas_id, name).get_gid();
             }
             case agas::primary_ns_statistics_counter:

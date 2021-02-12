@@ -16,12 +16,12 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/async_local/apply.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/traits/component_type_is_compatible.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>

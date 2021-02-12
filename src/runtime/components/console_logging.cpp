@@ -7,15 +7,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/continuation.hpp>
+#include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/state.hpp>
+#include <hpx/runtime_local/state.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 

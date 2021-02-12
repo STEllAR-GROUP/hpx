@@ -24,9 +24,9 @@
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
+#include <hpx/runtime_local/state.hpp>
 #include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
-#include <hpx/state.hpp>
 #include <hpx/static_reinit/static_reinit.hpp>
 #include <hpx/thread_executors/thread_executor.hpp>
 #include <hpx/thread_support/set_thread_name.hpp>

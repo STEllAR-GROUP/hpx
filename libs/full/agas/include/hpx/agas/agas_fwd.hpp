@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,39 +8,20 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
-
-#include <cstdint>
-#include <string>
-
-namespace hpx { namespace components {
-
-    typedef std::int32_t component_type;
-}}    // namespace hpx::components
+#include <hpx/agas_base/agas_fwd.hpp>
 
 namespace hpx {
     namespace agas {
-
-        using iterate_types_function_type = hpx::util::function<void(
-            std::string const&, components::component_type)>;
-
-        struct HPX_EXPORT component_namespace;
-        struct HPX_EXPORT locality_namespace;
-        struct HPX_EXPORT primary_namespace;
-        struct HPX_EXPORT symbol_namespace;
-
-        namespace server {
-            struct HPX_EXPORT component_namespace;
-            struct HPX_EXPORT locality_namespace;
-            struct HPX_EXPORT primary_namespace;
-            struct HPX_EXPORT symbol_namespace;
-        }    // namespace server
 
         struct HPX_EXPORT addressing_service;
     }    // namespace agas
 
     namespace naming {
+
+        // FIXME: obsolete name, replace with agas::addressing_serve
         using resolver_client = agas::addressing_service;
-        HPX_EXPORT resolver_client& get_agas_client();
+
+        HPX_EXPORT agas::addressing_service& get_agas_client();
+        HPX_EXPORT agas::addressing_service* get_agas_client_ptr();
     }    // namespace naming
 }    // namespace hpx

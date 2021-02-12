@@ -7,6 +7,8 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/agas/addressing_service.hpp>
+#include <hpx/agas/big_boot_barrier.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
@@ -14,6 +16,7 @@
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/collectives/latch.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution_base/this_thread.hpp>
@@ -26,19 +29,16 @@
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/performance_counters/agas_counter_types.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/runtime/agas/addressing_service.hpp>
-#include <hpx/runtime/agas/big_boot_barrier.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
@@ -52,9 +52,9 @@
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
+#include <hpx/runtime_local/state.hpp>
 #include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
-#include <hpx/state.hpp>
 #include <hpx/thread_support/set_thread_name.hpp>
 #include <hpx/threading_base/external_timer.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
@@ -103,7 +103,9 @@ namespace hpx {
     // Install performance counter startup functions for core subsystems.
     static void register_counter_types()
     {
-        naming::get_agas_client().register_counter_types();
+        auto& agas_client = naming::get_agas_client();
+        performance_counters::register_agas_counter_types(agas_client);
+        agas_client.register_server_instances();
         lbt_ << "(2nd stage) pre_main: registered AGAS client-side "
                 "performance counter types";
 
@@ -272,8 +274,7 @@ namespace hpx {
             // If load_components returns false, shutdown the system. This
             // essentially only happens if the command line contained --exit.
             runtime_support::shutdown_all(
-                naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX),
-                -1.0);
+                naming::get_id_from_locality_id(agas::booststrap_prefix), -1.0);
             return exit_code;
         }
 
@@ -880,7 +881,7 @@ namespace hpx {
         if (terminate_all)
         {
             components::stubs::runtime_support::terminate_all(
-                naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
+                naming::get_id_from_locality_id(agas::booststrap_prefix));
         }
 
         return report_exception;
@@ -1045,6 +1046,14 @@ namespace hpx {
     }
 
     naming::gid_type get_next_id(std::size_t count = 1);
+
+    void runtime_distributed::init_id_pool_range()
+    {
+        naming::gid_type lower, upper;
+        naming::get_agas_client().get_id_range(
+            HPX_INITIAL_GID_RANGE, lower, upper);
+        return id_pool_.set_range(lower, upper);
+    }
 
     util::unique_id_ranges& runtime_distributed::get_id_pool()
     {
@@ -1963,22 +1972,44 @@ namespace hpx {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming {
+
     // shortcut for get_runtime().get_agas_client()
     resolver_client& get_agas_client()
     {
         return get_runtime_distributed().get_agas_client();
+    }
+
+    // shortcut for get_runtime_ptr()->get_agas_client()
+    resolver_client* get_agas_client_ptr()
+    {
+        auto* rtd = get_runtime_distributed_ptr();
+        return rtd ? &rtd->get_agas_client() : nullptr;
     }
 }}    // namespace hpx::naming
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_NETWORKING)
 namespace hpx { namespace parcelset {
+
     bool do_background_work(
         std::size_t num_thread, parcelport_background_mode mode)
     {
         return get_runtime_distributed()
             .get_parcel_handler()
             .do_background_work(num_thread, mode);
+    }
+
+    // shortcut for get_runtime().get_parcel_handler()
+    parcelhandler& get_parcel_handler()
+    {
+        return get_runtime_distributed().get_parcel_handler();
+    }
+
+    // shortcut for get_runtime_ptr()->get_parcel_handler()
+    parcelhandler* get_parcel_handler_ptr()
+    {
+        auto* rtd = get_runtime_distributed_ptr();
+        return rtd ? &rtd->get_parcel_handler() : nullptr;
     }
 }}    // namespace hpx::parcelset
 #endif

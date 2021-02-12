@@ -7,13 +7,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/continuation.hpp>
+#include <hpx/agas/addressing_service.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/state.hpp>
+#include <hpx/runtime_local/state.hpp>
 
 #include <exception>
 
