@@ -33,7 +33,7 @@ namespace hpx { namespace util {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-    struct annotate_function
+    struct HPX_NODISCARD annotate_function
     {
         HPX_NON_COPYABLE(annotate_function);
 
@@ -47,7 +47,7 @@ namespace hpx { namespace util {
         HPX_HOST_DEVICE ~annotate_function() {}
     };
 #elif HPX_HAVE_ITTNOTIFY != 0
-    struct annotate_function
+    struct HPX_NODISCARD annotate_function
     {
         HPX_NON_COPYABLE(annotate_function);
 
@@ -68,7 +68,7 @@ namespace hpx { namespace util {
         hpx::util::itt::task task_;
     };
 #else
-    struct annotate_function
+    struct HPX_NODISCARD annotate_function
     {
         HPX_NON_COPYABLE(annotate_function);
 
@@ -179,6 +179,8 @@ namespace hpx { namespace util {
             typename util::decay_unwrap<F>::type f_;
             char const* name_;
         };
+
+        HPX_CORE_EXPORT char const* store_function_annotation(std::string&& name);
     }    // namespace detail
 
     template <typename F>
@@ -191,9 +193,23 @@ namespace hpx { namespace util {
         return result_type(std::forward<F>(f), name);
     }
 
+    template <typename F>
+    detail::annotated_function<typename std::decay<F>::type> annotated_function(
+        F&& f, std::string name)
+    {
+        typedef detail::annotated_function<typename std::decay<F>::type>
+            result_type;
+
+        // Store string in a set to ensure it lives for the entire duration of
+        // the task.
+        char const* name_c_str =
+            detail::store_function_annotation(std::move(name));
+        return result_type(std::forward<F>(f), name_c_str);
+    }
+
 #else
     ///////////////////////////////////////////////////////////////////////////
-    struct annotate_function
+    struct HPX_NODISCARD annotate_function
     {
         HPX_NON_COPYABLE(annotate_function);
 
@@ -215,6 +231,12 @@ namespace hpx { namespace util {
     /// \param function
     template <typename F>
     F&& annotated_function(F&& f, char const* = nullptr)
+    {
+        return std::forward<F>(f);
+    }
+
+    template <typename F>
+    F&& annotated_function(F&& f, std::string const&)
     {
         return std::forward<F>(f);
     }

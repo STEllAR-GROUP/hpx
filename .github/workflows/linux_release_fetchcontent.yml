@@ -28,7 +28,8 @@ jobs:
               -DHPX_WITH_EXAMPLES=ON \
               -DHPX_WITH_TESTS=OFF \
               -DHPX_REPOSITORY="file:////$(pwd)" \
-              -DHPX_TAG="$GITHUB_SHA"
+              -DHPX_TAG="$GITHUB_SHA" \
+              -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On
     - name: Build
       shell: bash
       run: |

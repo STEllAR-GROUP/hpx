@@ -267,6 +267,24 @@ function(add_hpx_module libname modulename)
     # cmake-format: on
   endif()
 
+  if(HPX_WITH_CHECK_MODULE_DEPENDENCIES)
+    # verify that all dependencies are from the same module category
+    foreach(dep ${${modulename}_MODULE_DEPENDENCIES})
+      # consider only module dependencies, not other targets
+      string(FIND ${dep} "hpx_" find_index)
+      if(${find_index} EQUAL 0)
+        string(SUBSTRING ${dep} 4 -1 dep) # cut off leading "hpx_"
+        list(FIND _hpx_${libname}_modules ${dep} dep_index)
+        if(${dep_index} EQUAL -1)
+          hpx_error(
+            "The module ${dep} should not be be listed in MODULE_DEPENDENCIES "
+            "for module hpx_${modulename}"
+          )
+        endif()
+      endif()
+    endforeach()
+  endif()
+
   target_link_libraries(
     hpx_${modulename} PUBLIC ${${modulename}_MODULE_DEPENDENCIES}
   )
