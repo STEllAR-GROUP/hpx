@@ -180,7 +180,8 @@ namespace hpx { namespace util {
             char const* name_;
         };
 
-        HPX_CORE_EXPORT char const* store_function_annotation(std::string&& name);
+        HPX_CORE_EXPORT char const* store_function_annotation(
+            std::string&& name);
     }    // namespace detail
 
     template <typename F>
