@@ -401,6 +401,8 @@ if(HPX_WITH_PRECOMPILED_HEADERS)
     <variant>
     <vector>
   )
+
+  set_target_properties(hpx_precompiled_headers PROPERTIES FOLDER "Core")
 endif()
 
 # ##############################################################################
