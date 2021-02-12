@@ -330,6 +330,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         if (e != asio::error::operation_aborted && e != asio::error::eof)
         {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LPT_(error)
                 << "handle read operation completion: error: "
                 << e.message();

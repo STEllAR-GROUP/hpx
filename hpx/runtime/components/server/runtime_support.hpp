@@ -390,6 +390,8 @@ namespace hpx { namespace components { namespace server
 
         typedef typename Component::wrapping_type wrapping_type;
         naming::gid_type id = create<wrapping_type>();
+
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
 
@@ -409,6 +411,7 @@ namespace hpx { namespace components { namespace server
         // types.
         naming::gid_type id = create<wrapping_type>(std::move(v), std::move(vs)...);
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LRT_(info) << "successfully created component " << id
         << " of type: " << components::get_component_type_name(type);
 
@@ -434,6 +437,7 @@ namespace hpx { namespace components { namespace server
             ids.push_back(create<wrapping_type>());
         }
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LRT_(info) << "successfully created " << count //-V128
                    << " component(s) of type: "
                    << components::get_component_type_name(type);
@@ -458,6 +462,7 @@ namespace hpx { namespace components { namespace server
             ids.push_back(create<wrapping_type>(v, vs...));
         }
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LRT_(info) << "successfully created " << count //-V128
                    << " component(s) of type: "
                    << components::get_component_type_name(type);
@@ -483,6 +488,7 @@ namespace hpx { namespace components { namespace server
             id = create<wrapping_type>(*p);
         }
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
 
@@ -527,6 +533,7 @@ namespace hpx { namespace components { namespace server
             return naming::invalid_gid;
         }
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LRT_(info) << "successfully migrated component " << id
             << " of type: " << components::get_component_type_name(type)
             << " to locality: " << find_here();

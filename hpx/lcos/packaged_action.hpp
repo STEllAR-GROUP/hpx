@@ -155,6 +155,7 @@ namespace hpx { namespace lcos {
             naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             if (addr)
             {
                 hpx::apply_p_cb<action_type>(
@@ -226,6 +227,7 @@ namespace hpx { namespace lcos {
             naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             if (addr)
             {
                 hpx::apply_p_cb<action_type>(

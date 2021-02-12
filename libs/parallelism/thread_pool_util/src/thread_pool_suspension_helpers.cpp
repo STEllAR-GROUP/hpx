@@ -59,6 +59,7 @@ namespace hpx { namespace threads {
             callback();
         };
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         if (threads::get_self_ptr())
         {
             hpx::apply(std::move(resume_direct_wrapper));
@@ -78,7 +79,7 @@ namespace hpx { namespace threads {
                 "cannot call suspend_processing_unit from outside HPX, use"
                 "suspend_processing_unit_cb instead");
         }
-        else if (!pool.get_scheduler()->has_scheduler_mode(
+        if (!pool.get_scheduler()->has_scheduler_mode(
                      policies::enable_elasticity))
         {
             return hpx::make_exceptional_future<void>(
@@ -86,7 +87,7 @@ namespace hpx { namespace threads {
                     "this thread pool does not support suspending "
                     "processing units"));
         }
-        else if (!pool.get_scheduler()->has_scheduler_mode(
+        if (!pool.get_scheduler()->has_scheduler_mode(
                      policies::enable_stealing) &&
             hpx::this_thread::get_pool() == &pool)
         {
@@ -164,6 +165,7 @@ namespace hpx { namespace threads {
             callback();
         };
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         if (threads::get_self_ptr())
         {
             hpx::apply(std::move(resume_direct_wrapper));
@@ -184,7 +186,7 @@ namespace hpx { namespace threads {
                 "instead");
             return hpx::make_ready_future();
         }
-        else if (threads::get_self_ptr() &&
+        if (threads::get_self_ptr() &&
             hpx::this_thread::get_pool() == &pool)
         {
             return hpx::make_exceptional_future<void>(
@@ -212,6 +214,7 @@ namespace hpx { namespace threads {
             callback();
         };
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         if (threads::get_self_ptr())
         {
             hpx::apply(std::move(suspend_direct_wrapper));

@@ -146,6 +146,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
             std::vector<parcel_buffer_type::transmission_chunk_type>& chunks =
                 buffer_.transmission_chunks_;
+
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             if (!chunks.empty()) {
                 buffers.push_back(
                     asio::buffer(chunks.data(), chunks.size() *

@@ -294,6 +294,7 @@ namespace hpx { namespace serialization {
         {
             if (count == 0)
                 return;
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             if (disable_data_chunking())
             {
                 size_ += count;

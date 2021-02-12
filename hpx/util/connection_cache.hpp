@@ -45,20 +45,20 @@ namespace hpx { namespace util
     class connection_cache
     {
     public:
-        typedef hpx::lcos::local::spinlock mutex_type;
+        using mutex_type = hpx::lcos::local::spinlock;
 
-        typedef std::shared_ptr<Connection> connection_type;
-        typedef std::deque<connection_type> value_type;
-        typedef Key key_type;
-        typedef std::list<key_type> key_tracker_type;
-        typedef hpx::tuple<
+        using connection_type = std::shared_ptr<Connection>;
+        using value_type = std::deque<connection_type>;
+        using key_type = Key;
+        using key_tracker_type = std::list<key_type>;
+        using cache_value_type = hpx::tuple<
             value_type,                 // cached (available) connections
             std::size_t,                // number of existing connections
             std::size_t,                // max number of cached connections
             typename key_tracker_type::iterator     // reference into LRU list
-        > cache_value_type;
-        typedef std::map<key_type, cache_value_type> cache_type;
-        typedef typename cache_type::size_type size_type;
+        >;
+        using cache_type = std::map<key_type, cache_value_type>;
+        using size_type = typename cache_type::size_type;
 
         connection_cache(
             size_type max_connections
@@ -368,6 +368,8 @@ namespace hpx { namespace util
 
                 // Return the connection back to the cache only if the number
                 // of connections does not need to be shrunk.
+
+                // NOLINTNEXTLINE(bugprone-branch-clone)
                 if (num_existing_connections(ct->second) <=
                     max_num_connections(ct->second))
                 {
@@ -546,7 +548,7 @@ namespace hpx { namespace util
         void check_invariants() const
         {
 #if defined(HPX_DEBUG)
-            typedef typename cache_type::const_iterator const_iterator;
+            using const_iterator = typename cache_type::const_iterator;
 
             size_type in_cache_count = 0, total_count = 0;
             const_iterator end = cache_.end();
@@ -605,6 +607,8 @@ namespace hpx { namespace util
                 if (cached_connections(ct->second).empty())
                 {
                     // Remove the key if its connection count is zero.
+
+                    // NOLINTNEXTLINE(bugprone-branch-clone)
                     if (0 == num_existing_connections(ct->second)) {
                         cache_.erase(ct);
                         key_tracker_.erase(kt);

@@ -95,6 +95,7 @@ namespace hpx { namespace execution {
                 std::size_t test_chunk_size = f(num_iters_for_timing_);
                 if (test_chunk_size != 0)
                 {
+                    // NOLINTNEXTLINE(bugprone-branch-clone)
                     if (chunk_size_time_ == 0)
                     {
                         t = (high_resolution_clock::now() - t) /

@@ -134,6 +134,7 @@ namespace hpx { namespace agas { namespace server {
         {
             l.unlock();
 
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format(
                 "primary_namespace::begin_migration, "
                 "gid({1}), response(no_success)",
@@ -310,6 +311,7 @@ namespace hpx { namespace agas { namespace server {
 
                 l.unlock();
 
+                // NOLINTNEXTLINE(bugprone-branch-clone)
                 LAGAS_(info) << hpx::util::format(
                     "primary_namespace::bind_gid, gid({1}), gva({2}), "
                     "locality({3}), response(repeated_request)",
@@ -357,6 +359,7 @@ namespace hpx { namespace agas { namespace server {
         if (naming::refers_to_local_lva(gid) &&
             !naming::refers_to_virtual_memory(gid))
         {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format(
                 "primary_namespace::bind_gid, "
                 "gid({1}), gva({2}), locality({3})",
@@ -402,6 +405,7 @@ namespace hpx { namespace agas { namespace server {
 
         l.unlock();
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "primary_namespace::bind_gid, gid({1}), gva({2}), "
             "locality({3})",
@@ -436,6 +440,7 @@ namespace hpx { namespace agas { namespace server {
 
         if (get<0>(r) == naming::invalid_gid)
         {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format("primary_namespace::resolve_gid, "
                                               "gid({1}), response(no_success)",
                 id);
@@ -444,6 +449,7 @@ namespace hpx { namespace agas { namespace server {
                 naming::invalid_gid, gva(), naming::invalid_gid);
         }
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "primary_namespace::resolve_gid, gid({1}), base({2}), "
             "gva({3}), locality_id({4})",
@@ -487,6 +493,8 @@ namespace hpx { namespace agas { namespace server {
             gvas_.erase(it);
 
             l.unlock();
+
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format("primary_namespace::unbind_gid, "
                                               "gid({1}), count({2}), gva({3}), "
                                               "locality_id({4})",
@@ -505,6 +513,9 @@ namespace hpx { namespace agas { namespace server {
                 naming::detail::get_component_type_from_gid(id.get_msb()), 0,
                 id.get_lsb());
 
+            l.unlock();
+
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format("primary_namespace::unbind_gid, "
                                               "gid({1}), count({2}), gva({3}), "
                                               "locality({4})",
@@ -515,6 +526,7 @@ namespace hpx { namespace agas { namespace server {
 
         l.unlock();
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "primary_namespace::unbind_gid, gid({1}), count({2}), "
             "response(no_success)",
@@ -611,6 +623,7 @@ namespace hpx { namespace agas { namespace server {
         // REVIEW: Should this be an error?
         if (0 == count)
         {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format(
                 "primary_namespace::allocate, count({1}), "
                 "lower({1}), upper({3}), prefix({4}), "
@@ -653,6 +666,7 @@ namespace hpx { namespace agas { namespace server {
         naming::detail::set_credit_for_gid(
             upper, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "primary_namespace::allocate, count({1}), "
             "lower({2}), upper({3}), response(success)",
@@ -688,6 +702,7 @@ namespace hpx { namespace agas { namespace server {
                 lower_it->first, lower_it->second);
         }
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(debug) << ss.str();
     }    // dump_refcnt_matches implementation
 #endif
@@ -761,6 +776,7 @@ namespace hpx { namespace agas { namespace server {
                 it->second += credits;
             }
 
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format(
                 "primary_namespace::increment, raw({1}), refcnt({2})", lower,
                 it->second);
@@ -844,6 +860,7 @@ namespace hpx { namespace agas { namespace server {
                 return;
             }
 
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format(
                 "primary_namespace::resolve_free_list, resolved match, "
                 "gid({1}), gva({2})",
@@ -866,6 +883,7 @@ namespace hpx { namespace agas { namespace server {
         free_entry_list_type& free_entry_list, naming::gid_type const& lower,
         naming::gid_type const& upper, std::int64_t credits, error_code& ec)
     {    // {{{ decrement_sweep implementation
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "primary_namespace::decrement_sweep, lower({1}), upper({2}), "
             "credits({3})",
@@ -998,6 +1016,7 @@ namespace hpx { namespace agas { namespace server {
             if (HPX_UNLIKELY(!threads::threadmanager_is(state_running)) &&
                 e.locality_ != locality_)
             {
+                // NOLINTNEXTLINE(bugprone-branch-clone)
                 LAGAS_(info) << hpx::util::format(
                     "primary_namespace::free_components_sync, cancelling "
                     "free "
@@ -1008,6 +1027,7 @@ namespace hpx { namespace agas { namespace server {
                 continue;
             }
 
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format(
                 "primary_namespace::free_components_"
                 "sync, freeing component, "

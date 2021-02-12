@@ -56,6 +56,7 @@ namespace hpx { namespace util { namespace cache { namespace statistics {
                 default:
                     break;
 
+                // NOLINTNEXTLINE(bugprone-branch-clone)
                 case method_insert_entry:
                     return stat.insert_entry_;
 

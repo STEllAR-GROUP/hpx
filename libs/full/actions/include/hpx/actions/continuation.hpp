@@ -142,6 +142,7 @@ namespace hpx { namespace actions {
         template <typename F,
             typename Enable = typename std::enable_if<!std::is_same<
                 typename std::decay<F>::type, typed_continuation>::value>::type>
+        // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
         explicit typed_continuation(F&& f)
           : f_(std::forward<F>(f))
         {
@@ -152,6 +153,7 @@ namespace hpx { namespace actions {
 
         void trigger_value(Result&& result)
         {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LLCO_(info) << "typed_continuation<Result>::trigger_value("
                         << this->get_id() << ")";
 
@@ -256,6 +258,7 @@ namespace hpx { namespace actions {
         template <typename F,
             typename Enable = typename std::enable_if<!std::is_same<
                 typename std::decay<F>::type, typed_continuation>::value>::type>
+        // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
         explicit typed_continuation(F&& f)
           : base_type(std::forward<F>(f))
         {
@@ -266,6 +269,7 @@ namespace hpx { namespace actions {
 
         void trigger_value(RemoteResult&& result)
         {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LLCO_(info) << "typed_continuation<RemoteResult>::trigger_value("
                         << this->get_id() << ")";
 
@@ -367,6 +371,7 @@ namespace hpx { namespace actions {
         template <typename F,
             typename Enable = typename std::enable_if<!std::is_same<
                 typename std::decay<F>::type, typed_continuation>::value>::type>
+        // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
         explicit typed_continuation(F&& f)
           : f_(std::forward<F>(f))
         {

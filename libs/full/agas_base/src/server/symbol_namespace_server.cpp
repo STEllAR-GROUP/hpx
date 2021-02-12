@@ -110,6 +110,7 @@ namespace hpx { namespace agas { namespace server {
             // increase reference count
             if (raw_gid == gid)
             {
+                // NOLINTNEXTLINE(bugprone-branch-clone)
                 LAGAS_(info) << hpx::util::format(
                     "symbol_namespace::bind, key({1}), gid({2}), "
                     "old_credit({3}), "
@@ -128,6 +129,8 @@ namespace hpx { namespace agas { namespace server {
             if (LAGAS_ENABLED(info))
             {
                 naming::detail::add_credit_to_gid(gid, credits);
+
+                // NOLINTNEXTLINE(bugprone-branch-clone)
                 LAGAS_(info) << hpx::util::format(
                     "symbol_namespace::bind, key({1}), gid({2}), "
                     "response(no_success)",
@@ -198,6 +201,7 @@ namespace hpx { namespace agas { namespace server {
 
         l.unlock();
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "symbol_namespace::bind, key({1}), gid({2})", key, gid);
 
@@ -218,6 +222,7 @@ namespace hpx { namespace agas { namespace server {
 
         if (it == end)
         {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format(
                 "symbol_namespace::resolve, key({1}), response(no_success)",
                 key);
@@ -232,6 +237,7 @@ namespace hpx { namespace agas { namespace server {
         naming::gid_type gid =
             naming::detail::split_gid_if_needed(*current_gid).get();
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "symbol_namespace::resolve, key({1}), gid({2})", key, gid);
 
@@ -251,6 +257,7 @@ namespace hpx { namespace agas { namespace server {
 
         if (it == end)
         {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format(
                 "symbol_namespace::unbind, key({1}), response(no_success)",
                 key);
@@ -262,6 +269,7 @@ namespace hpx { namespace agas { namespace server {
 
         gids_.erase(it);
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "symbol_namespace::unbind, key({1}), gid({2})", key, gid);
 
@@ -317,6 +325,7 @@ namespace hpx { namespace agas { namespace server {
             }
         }
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << "symbol_namespace::iterate";
 
         return found;
@@ -368,6 +377,7 @@ namespace hpx { namespace agas { namespace server {
         }
         l.unlock();
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << "symbol_namespace::on_event";
 
         return true;

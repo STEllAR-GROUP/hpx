@@ -212,6 +212,7 @@ namespace hpx {
                 typename U =
                     typename std::enable_if<!std::is_same<select_policy<Pred>,
                         typename std::decay<F>::type>::value>::type>
+            // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
             explicit select_policy(F&& f,
                 threads::thread_priority priority =
                     threads::thread_priority::default_)    // NOLINT

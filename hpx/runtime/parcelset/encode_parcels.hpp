@@ -91,6 +91,7 @@ namespace hpx
                 buffer.size_ = buffer.data_.size();
                 buffer.data_size_ = arg_size;
 
+                // NOLINTNEXTLINE(bugprone-branch-clone)
                 LPT_(debug) << binary_archive_content(buffer);
 
                 performance_counters::parcels::data_point& data = buffer.data_point_;
@@ -200,6 +201,7 @@ namespace hpx
                             std::int64_t serialize_time =
                                 timer.elapsed_nanoseconds();
 #endif
+                            // NOLINTNEXTLINE(bugprone-branch-clone)
                             LPT_(debug) << ps[i];
 
                             auto split_gids_map = ps[i].move_split_gids();
@@ -236,6 +238,7 @@ namespace hpx
                         timer.elapsed_nanoseconds();
                 }
                 catch (hpx::exception const& e) {
+                    // NOLINTNEXTLINE(bugprone-branch-clone)
                     LPT_(fatal)
                         << "encode_parcels: "
                            "caught hpx::exception: "
@@ -244,6 +247,7 @@ namespace hpx
                     return 0;
                 }
                 catch (std::system_error const& e) {
+                    // NOLINTNEXTLINE(bugprone-branch-clone)
                     LPT_(fatal)
                         << "encode_parcels: "
                            "caught std::system_error: "
@@ -253,6 +257,7 @@ namespace hpx
                 }
 #if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
                 catch (boost::exception const&) {
+                    // NOLINTNEXTLINE(bugprone-branch-clone)
                     LPT_(fatal)
                         << "encode_parcels: "
                            "caught boost::exception";
@@ -270,6 +275,7 @@ namespace hpx
                 }
             }
             catch (...) {
+                // NOLINTNEXTLINE(bugprone-branch-clone)
                 LPT_(fatal)
                         << "encode_parcels: "
                        "caught unknown exception";
