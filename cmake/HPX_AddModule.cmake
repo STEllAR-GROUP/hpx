@@ -303,6 +303,12 @@ function(add_hpx_module libname modulename)
     PUBLIC hpx_base_libraries
   )
 
+  if(HPX_WITH_PRECOMPILED_HEADERS)
+    target_precompile_headers(
+      hpx_${modulename} REUSE_FROM hpx_precompiled_headers
+    )
+  endif()
+
   # All core modules depend on the config registry
   if("${libname}" STREQUAL "core" AND NOT "${modulename}" STREQUAL
                                       "config_registry"

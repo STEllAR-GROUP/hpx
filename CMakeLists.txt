@@ -326,6 +326,83 @@ if(HPX_WITH_UNITY_BUILD)
   set(HPX_WITH_UNITY_BUILD_OPTION UNITY_BUILD)
 endif()
 
+hpx_option(
+  HPX_WITH_PRECOMPILED_HEADERS
+  BOOL
+  "Enable precompiled headers for certain build targets (experimental, requires CMake 3.16 or newer) (default OFF)"
+  OFF
+  ADVANCED
+)
+if(HPX_WITH_PRECOMPILED_HEADERS)
+  if(CMAKE_VERSION VERSION_LESS "3.16")
+    hpx_error("HPX_WITH_UNITY_BUILD=ON but this requires CMake 3.16 or newer.")
+  endif()
+
+  set(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL ON)
+
+  add_library(hpx_precompiled_headers OBJECT libs/src/dummy.cpp)
+  target_link_libraries(hpx_precompiled_headers PRIVATE hpx_private_flags)
+  target_precompile_headers(
+    hpx_precompiled_headers
+    PRIVATE
+    <algorithm>
+    <array>
+    <atomic>
+    <bitset>
+    <cassert>
+    <cctype>
+    <cerrno>
+    <chrono>
+    <climits>
+    <cmath>
+    <complex>
+    <condition_variable>
+    <cstddef>
+    <cstdint>
+    <cstdio>
+    <cstdlib>
+    <cstring>
+    <ctime>
+    <deque>
+    <exception>
+    <forward_list>
+    <fstream>
+    <functional>
+    <iomanip>
+    <ios>
+    <iosfwd>
+    <iostream>
+    <iterator>
+    <limits>
+    <list>
+    <locale>
+    <map>
+    <memory>
+    <mutex>
+    <new>
+    <numeric>
+    <ostream>
+    <random>
+    <regex>
+    <set>
+    <shared_mutex>
+    <sstream>
+    <stack>
+    <stdexcept>
+    <string>
+    <system_error>
+    <thread>
+    <tuple>
+    <type_traits>
+    <typeinfo>
+    <unordered_map>
+    <unordered_set>
+    <utility>
+    <variant>
+    <vector>
+  )
+endif()
+
 # ##############################################################################
 # Dynamic hpx_main
 # ##############################################################################
