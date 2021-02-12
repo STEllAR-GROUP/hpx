@@ -7,16 +7,10 @@
 #include <hpx/thread_executors/this_thread_executors.hpp>
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) &&                        \
-    defined(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY) &&                   \
-    (defined(HPX_HAVE_STATIC_SCHEDULER) ||                                     \
-        defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER))
+    defined(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
 
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/schedulers/static_priority_queue_scheduler.hpp>
-#endif
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
 #include <hpx/schedulers/static_queue_scheduler.hpp>
-#endif
 
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
@@ -456,7 +450,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
 }}}}    // namespace hpx::threads::executors::detail
 
 namespace hpx { namespace threads { namespace executors {
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
     this_thread_static_queue_executor::this_thread_static_queue_executor()
       : scheduled_executor(new detail::this_thread_executor<
@@ -464,9 +457,7 @@ namespace hpx { namespace threads { namespace executors {
             "this_thread_static_queue_executor"))
     {
     }
-#endif
 
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
     this_thread_static_priority_queue_executor::
         this_thread_static_priority_queue_executor()
@@ -475,7 +466,6 @@ namespace hpx { namespace threads { namespace executors {
             "this_thread_static_priority_queue_executor"))
     {
     }
-#endif
 }}}    // namespace hpx::threads::executors
 
 #endif

@@ -69,20 +69,16 @@ int hpx_main()
     std::size_t num_threads = hpx::get_os_thread_count();
     HPX_UNUSED(num_threads);
 
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
     {
         hpx::parallel::execution::this_thread_static_queue_executor exec;
         test_timed_this_thread_executor(exec);
     }
-#endif
 
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     {
         hpx::parallel::execution::this_thread_static_priority_queue_executor
             exec;
         test_timed_this_thread_executor(exec);
     }
-#endif
 
     return hpx::finalize();
 }

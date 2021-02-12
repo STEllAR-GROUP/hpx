@@ -8,9 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) &&                        \
-    (defined(HPX_HAVE_STATIC_SCHEDULER) ||                                     \
-        defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER))
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
@@ -141,21 +139,17 @@ namespace hpx { namespace threads { namespace executors {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
     struct HPX_EXPORT this_thread_static_queue_executor
       : public scheduled_executor
     {
         this_thread_static_queue_executor();
     };
-#endif
 
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     struct HPX_EXPORT this_thread_static_priority_queue_executor
       : public scheduled_executor
     {
         this_thread_static_priority_queue_executor();
     };
-#endif
 }}}    // namespace hpx::threads::executors
 
 #include <hpx/config/warnings_suffix.hpp>

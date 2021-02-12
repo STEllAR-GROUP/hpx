@@ -195,7 +195,6 @@ namespace hpx { namespace threads { namespace policies {
         };
     };
 
-#if defined(HPX_HAVE_ABP_SCHEDULER)
     ////////////////////////////////////////////////////////////////////////////
     // FIFO + stealing at opposite end.
     struct lockfree_abp_fifo;
@@ -303,7 +302,6 @@ namespace hpx { namespace threads { namespace policies {
         };
     };
 
-#endif    // HPX_HAVE_ABP_SCHEDULER
 #endif    // HPX_HAVE_CXX11_STD_ATOMIC_128BIT
 
 }}}    // namespace hpx::threads::policies

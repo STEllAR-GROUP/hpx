@@ -155,13 +155,11 @@ int hpx_main()
     std::size_t num_threads = hpx::get_os_thread_count();
     auto const& partitioner = hpx::resource::get_partitioner();
 
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
     {
         execution::static_queue_os_executor exec(
             num_threads, partitioner.get_affinity_data());
         test_thread_pool_os_executor(exec);
     }
-#endif
 
     {
         execution::local_priority_queue_os_executor exec(
@@ -169,13 +167,11 @@ int hpx_main()
         test_thread_pool_os_executor(exec);
     }
 
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     {
         execution::static_priority_queue_os_executor exec(
             num_threads, partitioner.get_affinity_data());
         test_thread_pool_os_executor(exec);
     }
-#endif
 
     return hpx::finalize();
 }

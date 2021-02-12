@@ -27,7 +27,6 @@ spack load ninja
 
 configure_extra_options="-DCMAKE_BUILD_TYPE=Debug"
 configure_extra_options+=" -DHPX_WITH_MAX_CPU_COUNT="
-configure_extra_options+=" -DHPX_WITH_THREAD_SCHEDULERS=\"abp-priority;local;static-priority;static\""
 configure_extra_options+=" -DHPX_WITH_MALLOC=system"
 configure_extra_options+=" -DHPX_WITH_CXX${CXX_STD}=ON"
 configure_extra_options+=" -DHPX_WITH_NETWORKING=OFF"

@@ -1057,65 +1057,6 @@ hpx_option(
   CATEGORY "Profiling"
 )
 
-# ##############################################################################
-# Scheduler configuration
-# ##############################################################################
-hpx_option(
-  HPX_WITH_THREAD_SCHEDULERS
-  STRING
-  "Which thread schedulers are built. Options are: all, abp-priority, local, static-priority, static, shared-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
-  "all"
-  CATEGORY "Thread Manager"
-  ADVANCED
-)
-
-string(TOUPPER "${HPX_WITH_THREAD_SCHEDULERS}" HPX_WITH_THREAD_SCHEDULERS_UC)
-foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
-  if(_scheduler STREQUAL "ALL")
-    set(_all On)
-    set(HPX_WITH_ALL_SCHEDULERS
-        ON
-        CACHE INTERNAL ""
-    )
-  endif()
-  if(_scheduler STREQUAL "ABP-PRIORITY" OR _all)
-    hpx_add_config_define(HPX_HAVE_ABP_SCHEDULER)
-    set(HPX_WITH_ABP_SCHEDULER
-        ON
-        CACHE INTERNAL ""
-    )
-  endif()
-  if(_scheduler STREQUAL "LOCAL" OR _all)
-    hpx_add_config_define(HPX_HAVE_LOCAL_SCHEDULER)
-    set(HPX_WITH_LOCAL_SCHEDULER
-        ON
-        CACHE INTERNAL ""
-    )
-  endif()
-  if(_scheduler STREQUAL "STATIC-PRIORITY" OR _all)
-    hpx_add_config_define(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-    set(HPX_WITH_STATIC_PRIORITY_SCHEDULER
-        ON
-        CACHE INTERNAL ""
-    )
-  endif()
-  if(_scheduler STREQUAL "STATIC" OR _all)
-    hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
-    set(HPX_WITH_STATIC_SCHEDULER
-        ON
-        CACHE INTERNAL ""
-    )
-  endif()
-  if(_scheduler STREQUAL "SHARED-PRIORITY" OR _all)
-    hpx_add_config_define(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
-    set(HPX_WITH_SHARED_PRIORITY_SCHEDULER
-        ON
-        CACHE INTERNAL ""
-    )
-  endif()
-  unset(_all)
-endforeach()
-
 # Experimental settings
 hpx_option(
   HPX_WITH_IO_POOL

@@ -108,16 +108,10 @@ void test_executors(std::size_t num_pus)
 
     processing_units = (processing_units / num_pus) * num_pus;
 
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
     test_executors<local_queue_executor>(processing_units, num_pus);
-#endif
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
     test_executors<static_queue_executor>(processing_units, num_pus);
-#endif
     test_executors<local_priority_queue_executor>(processing_units, num_pus);
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     test_executors<static_priority_queue_executor>(processing_units, num_pus);
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -197,18 +191,12 @@ void test_executors_shrink(std::size_t num_pus)
     processing_units =
         (std::max)((processing_units / num_pus) * num_pus, std::size_t(1));
 
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
     test_executors_shrink<local_queue_executor>(processing_units, num_pus);
-#endif
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
     test_executors_shrink<static_queue_executor>(processing_units, num_pus);
-#endif
     test_executors_shrink<local_priority_queue_executor>(
         processing_units, num_pus);
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     test_executors_shrink<static_priority_queue_executor>(
         processing_units, num_pus);
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

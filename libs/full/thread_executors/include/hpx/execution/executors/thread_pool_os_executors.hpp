@@ -15,7 +15,6 @@
 
 namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
     /// Creates a new local_queue_os_executor
     ///
     /// \param max_punits   [in] The maximum number of processing units to
@@ -25,9 +24,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///                     (default: 1).
     ///
     using local_queue_os_executor = threads::executors::local_queue_os_executor;
-#endif
 
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
     /// Creates a new static_queue_os_executor
     ///
     /// \param max_punits   [in] The maximum number of processing units to
@@ -38,7 +35,6 @@ namespace hpx { namespace parallel { namespace execution {
     ///
     using static_queue_os_executor =
         threads::executors::static_queue_os_executor;
-#endif
 
     /// Creates a new local_priority_queue_executor
     ///
@@ -51,7 +47,6 @@ namespace hpx { namespace parallel { namespace execution {
     using local_priority_queue_os_executor =
         threads::executors::local_priority_queue_os_executor;
 
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     /// Creates a new static_priority_queue_executor
     ///
     /// \param max_punits   [in] The maximum number of processing units to
@@ -62,6 +57,5 @@ namespace hpx { namespace parallel { namespace execution {
     ///
     using static_priority_queue_os_executor =
         threads::executors::static_priority_queue_os_executor;
-#endif
 }}}    // namespace hpx::parallel::execution
 #endif

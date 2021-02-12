@@ -10,22 +10,16 @@
 #include <hpx/thread_executors/thread_pool_os_executors.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
-#include <hpx/schedulers/local_queue_scheduler.hpp>
-#endif
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
-#include <hpx/schedulers/static_queue_scheduler.hpp>
-#endif
-#include <hpx/schedulers/local_priority_queue_scheduler.hpp>
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-#include <hpx/schedulers/static_priority_queue_scheduler.hpp>
-#endif
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/unique_function.hpp>
+#include <hpx/schedulers/local_priority_queue_scheduler.hpp>
+#include <hpx/schedulers/local_queue_scheduler.hpp>
+#include <hpx/schedulers/static_priority_queue_scheduler.hpp>
+#include <hpx/schedulers/static_queue_scheduler.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 
 #include <atomic>
@@ -261,7 +255,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
 }}}}    // namespace hpx::threads::executors::detail
 
 namespace hpx { namespace threads { namespace executors {
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
     local_queue_os_executor::local_queue_os_executor(std::size_t num_threads,
         policies::detail::affinity_data const& affinity_data,
@@ -271,9 +264,7 @@ namespace hpx { namespace threads { namespace executors {
             num_threads, affinity_data, notifier))
     {
     }
-#endif
 
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
     static_queue_os_executor::static_queue_os_executor(std::size_t num_threads,
         policies::detail::affinity_data const& affinity_data,
@@ -283,7 +274,6 @@ namespace hpx { namespace threads { namespace executors {
             num_threads, affinity_data, notifier))
     {
     }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     local_priority_queue_os_executor::local_priority_queue_os_executor(
@@ -296,7 +286,6 @@ namespace hpx { namespace threads { namespace executors {
     {
     }
 
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
     static_priority_queue_os_executor::static_priority_queue_os_executor(
         std::size_t num_threads,
@@ -307,6 +296,5 @@ namespace hpx { namespace threads { namespace executors {
             num_threads, affinity_data, notifier))
     {
     }
-#endif
 }}}    // namespace hpx::threads::executors
 #endif

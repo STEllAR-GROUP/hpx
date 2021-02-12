@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
 #include <hpx/assert.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/schedulers/deadlock_detection.hpp>
@@ -156,5 +155,3 @@ namespace hpx { namespace threads { namespace policies {
 }}}    // namespace hpx::threads::policies
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif

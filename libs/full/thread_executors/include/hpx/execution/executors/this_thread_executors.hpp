@@ -14,15 +14,11 @@
 
 namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
     using this_thread_static_queue_executor =
         threads::executors::this_thread_static_queue_executor;
-#endif
 
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     using this_thread_static_priority_queue_executor =
         threads::executors::this_thread_static_priority_queue_executor;
-#endif
 }}}    // namespace hpx::parallel::execution
 
 #endif

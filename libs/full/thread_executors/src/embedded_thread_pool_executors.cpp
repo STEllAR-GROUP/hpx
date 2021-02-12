@@ -9,22 +9,16 @@
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) &&                        \
     defined(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
 
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
-#include <hpx/schedulers/local_queue_scheduler.hpp>
-#endif
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
-#include <hpx/schedulers/static_queue_scheduler.hpp>
-#endif
-#include <hpx/schedulers/local_priority_queue_scheduler.hpp>
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-#include <hpx/schedulers/static_priority_queue_scheduler.hpp>
-#endif
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
+#include <hpx/schedulers/local_priority_queue_scheduler.hpp>
+#include <hpx/schedulers/local_queue_scheduler.hpp>
+#include <hpx/schedulers/static_priority_queue_scheduler.hpp>
+#include <hpx/schedulers/static_queue_scheduler.hpp>
 #include <hpx/thread_executors/detail/on_self_reset.hpp>
 #include <hpx/thread_executors/manage_thread_executor.hpp>
 #include <hpx/thread_executors/resource_manager.hpp>
@@ -463,7 +457,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
 }}}}    // namespace hpx::threads::executors::detail
 
 namespace hpx { namespace threads { namespace executors {
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
     local_queue_executor::local_queue_executor()
       : scheduled_executor(new detail::embedded_thread_pool_executor<
@@ -480,9 +473,7 @@ namespace hpx { namespace threads { namespace executors {
             max_punits, min_punits, "local_queue_executor"))
     {
     }
-#endif
 
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
     static_queue_executor::static_queue_executor()
       : scheduled_executor(new detail::embedded_thread_pool_executor<
@@ -499,7 +490,6 @@ namespace hpx { namespace threads { namespace executors {
             max_punits, min_punits, "static_queue_executor"))
     {
     }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     local_priority_queue_executor::local_priority_queue_executor()
@@ -518,7 +508,6 @@ namespace hpx { namespace threads { namespace executors {
     {
     }
 
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
     static_priority_queue_executor::static_priority_queue_executor()
       : scheduled_executor(new detail::embedded_thread_pool_executor<
@@ -535,7 +524,6 @@ namespace hpx { namespace threads { namespace executors {
             max_punits, min_punits, "static_priority_queue_executor"))
     {
     }
-#endif
 
 }}}    // namespace hpx::threads::executors
 #endif

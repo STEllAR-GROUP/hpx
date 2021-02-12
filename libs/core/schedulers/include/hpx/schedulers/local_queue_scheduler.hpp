@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/function.hpp>
@@ -925,5 +924,3 @@ namespace hpx { namespace threads { namespace policies {
 }}}    // namespace hpx::threads::policies
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif

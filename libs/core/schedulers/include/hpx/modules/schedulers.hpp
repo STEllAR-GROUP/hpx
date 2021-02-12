@@ -8,16 +8,8 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
-#include <hpx/schedulers/local_queue_scheduler.hpp>
-#endif
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
-#include <hpx/schedulers/static_queue_scheduler.hpp>
-#endif
 #include <hpx/schedulers/local_priority_queue_scheduler.hpp>
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-#include <hpx/schedulers/static_priority_queue_scheduler.hpp>
-#endif
-#if defined(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
+#include <hpx/schedulers/local_queue_scheduler.hpp>
 #include <hpx/schedulers/shared_priority_queue_scheduler.hpp>
-#endif
+#include <hpx/schedulers/static_priority_queue_scheduler.hpp>
+#include <hpx/schedulers/static_queue_scheduler.hpp>
