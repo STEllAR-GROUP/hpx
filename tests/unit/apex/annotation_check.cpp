@@ -132,10 +132,9 @@ execution_string(const Policy& policy)
 // --------------------------------------------------------------------------
 // can be called with an executor or a policy
 template <typename Execution>
-void test_execution(Execution& exec)
+hpx::future<void> test_execution(Execution& exec)
 {
     static int prefix = 1;
-    // these string need to have lifetimes that don't go out of scope
     std::string dfs = std::to_string(prefix++) + "-" + execution_string(exec) +
         std::string(" Dataflow");
     std::string pcs = std::to_string(prefix++) + "-" + execution_string(exec) +
@@ -145,57 +144,54 @@ void test_execution(Execution& exec)
 
     std::vector<hpx::future<void>> results;
     {
-        hpx::future<int> f1 = hpx::make_ready_future(5);
+        hpx::future<int> f1 = hpx::async([]() { return 5; });
         hpx::future<int> f2 = hpx::make_ready_future(5);
         results.emplace_back(hpx::dataflow(exec,
             hpx::util::annotated_function(
-                [](auto&&, auto&&) { dummy_task(std::size_t(1000)); },
-                dfs.c_str()),
+                [](auto&&, auto&&) { dummy_task(std::size_t(1000)); }, dfs),
             f1, f2));
     }
     {
-        hpx::future<int> f1 = hpx::make_ready_future(5);
+        hpx::future<int> f1 = hpx::async([]() { return 5; });
         results.emplace_back(f1.then(exec,
             hpx::util::annotated_function(
-                [](auto&&) { dummy_task(std::size_t(1000)); }, pcs.c_str())));
+                [](auto&&) { dummy_task(std::size_t(1000)); }, pcs)));
     }
     {
-        hpx::future<int> f1 = hpx::make_ready_future(5);
+        hpx::future<int> f1 = hpx::async([]() { return 5; });
         results.emplace_back(f1.then(exec,
             hpx::util::unwrapping(hpx::util::annotated_function(
-                [](auto&&) { dummy_task(std::size_t(1000)); }, pcsu.c_str()))));
+                [](auto&&) { dummy_task(std::size_t(1000)); }, pcsu))));
     }
     // wait for completion
-    hpx::when_all(results).get();
+    return hpx::when_all(results);
 }
 
 // --------------------------------------------------------------------------
 // no executor or policy
-void test_none()
+hpx::future<void> test_none()
 {
-    // these string need to have lifetimes that don't go out of scope
     std::string dfs = std::string("1-Dataflow");
     std::string pcs = std::string("2-Continuation");
 
     std::vector<hpx::future<void>> results;
     {
-        hpx::future<int> f1 = hpx::make_ready_future(5);
+        hpx::future<int> f1 = hpx::async([]() { return 5; });
         hpx::future<int> f2 = hpx::make_ready_future(5);
         results.emplace_back(hpx::dataflow(
             hpx::util::annotated_function(
-                [](auto&&, auto&&) { dummy_task(std::size_t(1000)); },
-                dfs.c_str()),
+                [](auto&&, auto&&) { dummy_task(std::size_t(1000)); }, dfs),
             f1, f2));
     }
 
     {
-        hpx::future<int> f1 = hpx::make_ready_future(5);
+        hpx::future<int> f1 = hpx::async([]() { return 5; });
         results.emplace_back(f1.then(hpx::util::annotated_function(
-            [](auto&&) { dummy_task(std::size_t(1000)); }, pcs.c_str())));
+            [](auto&&) { dummy_task(std::size_t(1000)); }, pcs)));
     }
 
     // wait for completion
-    hpx::when_all(results).get();
+    return hpx::when_all(results);
 }
 
 int hpx_main()
@@ -208,25 +204,25 @@ int hpx_main()
 #endif
     hpx::execution::parallel_executor par_exec{};
 
-    test_none();
+    test_none().get();
     //
-    test_execution(hpx::launch::apply);
-    test_execution(hpx::launch::async);
-    test_execution(hpx::launch::deferred);
-    test_execution(hpx::launch::fork);
-    test_execution(hpx::launch::sync);
+    test_execution(hpx::launch::apply).get();
+    test_execution(hpx::launch::async).get();
+    test_execution(hpx::launch::deferred).get();
+    test_execution(hpx::launch::fork).get();
+    test_execution(hpx::launch::sync).get();
     //
 #if defined(HPX_HAVE_POOL_EXECUTOR_COMPATIBILITY)
-    test_execution(NP_executor);
+    test_execution(NP_executor).get();
 #endif
-    test_execution(par_exec);
+    test_execution(par_exec).get();
     //
     return hpx::finalize();
 }
 
-int main()
+int main(int argc, char* argv[])
 {
     apex::apex_options::use_screen_output(true);
-    HPX_TEST_EQ(hpx::init(), 0);
+    HPX_TEST_EQ(hpx::init(argc, argv), 0);
     return hpx::util::report_errors();
 }
