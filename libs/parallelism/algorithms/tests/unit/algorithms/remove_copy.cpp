@@ -23,6 +23,34 @@
 int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
+template <typename IteratorTag>
+void test_remove_copy(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size() / 2);
+    std::uniform_int_distribution<> dis(0, (c.size() >> 1) - 1);
+
+    std::size_t middle_idx = dis(gen);
+    auto middle = std::begin(c) + middle_idx;
+    std::fill(std::begin(c), middle, 1);
+    std::fill(middle, std::end(c), 2);
+
+    hpx::remove_copy(iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(d), std::size_t(2));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c), middle, std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, middle_idx);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_remove_copy(ExPolicy policy, IteratorTag)
 {
@@ -42,6 +70,34 @@ void test_remove_copy(ExPolicy policy, IteratorTag)
     std::fill(middle, std::end(c), 2);
 
     hpx::remove_copy(policy, iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(d), std::size_t(2));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c), middle, std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, middle_idx);
+}
+
+template <typename IteratorTag>
+void test_remove_copy_async(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size() / 2);
+    std::uniform_int_distribution<> dis(0, (c.size() >> 1) - 1);
+
+    std::size_t middle_idx = dis(gen);
+    auto middle = std::begin(c) + middle_idx;
+    std::fill(std::begin(c), middle, 1);
+    std::fill(middle, std::end(c), 2);
+
+    hpx::remove_copy(iterator(std::begin(c)), iterator(std::end(c)),
         std::begin(d), std::size_t(2));
 
     std::size_t count = 0;
@@ -150,10 +206,12 @@ template <typename IteratorTag>
 void test_remove_copy()
 {
     using namespace hpx::execution;
+    test_remove_copy(IteratorTag());
     test_remove_copy(seq, IteratorTag());
     test_remove_copy(par, IteratorTag());
     test_remove_copy(par_unseq, IteratorTag());
 
+    test_remove_copy_async(IteratorTag());
     test_remove_copy_async(seq(task), IteratorTag());
     test_remove_copy_async(par(task), IteratorTag());
 }
