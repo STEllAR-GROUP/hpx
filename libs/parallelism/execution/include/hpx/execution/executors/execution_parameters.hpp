@@ -226,9 +226,8 @@ namespace hpx { namespace parallel { namespace execution {
             }
 
             template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static auto call_param(
-                int, AnyParameters&& params, Executor&& /* exec */)
-                -> decltype(params.reset_thread_distribution())
+            HPX_FORCEINLINE static auto call_param(int, AnyParameters&& params,
+                Executor&&) -> decltype(params.reset_thread_distribution())
             {
                 params.reset_thread_distribution();
             }

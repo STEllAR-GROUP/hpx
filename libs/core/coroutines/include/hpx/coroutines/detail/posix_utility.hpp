@@ -96,9 +96,10 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
                     "mmap() failed to allocate thread stack";
                 if (ENOMEM == errno && use_guard_pages)
                 {
-                    error_message = "mmap() failed to allocate "
-                        "thread stack due to insufficient resources, "
-                        "increase /proc/sys/vm/max_map_count or add "
+                    error_message =
+                        "mmap() failed to allocate thread stack due to "
+                        "insufficient resources, increase "
+                        "/proc/sys/vm/max_map_count or add "
                         "-Ihpx.stacks.use_guard_pages=0 to the command line";
                 }
                 throw std::runtime_error(error_message);

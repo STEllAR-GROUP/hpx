@@ -43,7 +43,7 @@ if(NOT TARGET ASIO::standalone_asio)
 
       add_library(standalone_asio INTERFACE)
       target_include_directories(
-        standalone_asio
+        standalone_asio SYSTEM
         INTERFACE $<BUILD_INTERFACE:${ASIO_ROOT}/asio/include>
                   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
       )
@@ -102,7 +102,7 @@ if(NOT TARGET ASIO::standalone_asio)
 
     add_library(ASIO::standalone_asio INTERFACE IMPORTED)
     target_include_directories(
-      ASIO::standalone_asio INTERFACE ${ASIO_INCLUDE_DIR}
+      ASIO::standalone_asio SYSTEM INTERFACE ${ASIO_INCLUDE_DIR}
     )
 
     mark_as_advanced(ASIO_INCLUDE_DIR)
