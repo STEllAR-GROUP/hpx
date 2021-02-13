@@ -22,30 +22,24 @@ if(NOT TARGET ASIO::standalone_asio)
           CACHE INTERNAL ""
       )
 
-      hpx_info(
-        "ASIO_ROOT is not set. Cloning Asio into ${CMAKE_CURRENT_SOURCE_DIR}/asio."
-      )
-
-      set(_hpx_asio_no_update)
-      if(HPX_WITH_ASIO_NO_UPDATE)
-        set(_hpx_asio_no_update NO_UPDATE)
-      endif()
       if(NOT HPX_WITH_ASIO_TAG)
         set(HPX_WITH_ASIO_TAG "asio-1-18-1")
       endif()
 
-      include(GitExternal)
-      git_external(
-        asio https://github.com/chriskohlhoff/asio.git ${HPX_WITH_ASIO_TAG}
-        ${_hpx_asio_no_update} VERBOSE
+      include(FetchContent)
+      fetchcontent_declare(
+        asio
+        GIT_REPOSITORY https://github.com/chriskohlhoff/asio.git
+        GIT_TAG ${HPX_WITH_ASIO_TAG}
       )
-      if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/asio)
-        set(ASIO_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/asio)
-      else()
-        hpx_error(
-          "ASIO was not correctly cloned (${CMAKE_CURRENT_SOURCE_DIR}/asio does not exist)"
-        )
+
+      fetchcontent_getproperties(asio)
+      if(NOT asio_POPULATED)
+        fetchcontent_populate(asio)
       endif()
+      set(ASIO_ROOT ${asio_SOURCE_DIR})
+
+      hpx_info("ASIO_ROOT is not set. Cloning Asio into ${asio_SOURCE_DIR}.")
 
       add_library(standalone_asio INTERFACE)
       target_include_directories(
