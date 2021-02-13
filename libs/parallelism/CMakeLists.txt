@@ -21,6 +21,7 @@ set(_hpx_parallelism_modules
     lcos_local
     pack_traversal
     resiliency
+    thread_pool_util
     threading
     timed_execution
 )

@@ -9,7 +9,7 @@
 # ##############################################################################
 # gather sources
 
-set(hpx_SOURCES runtime/threads/thread_pool_suspension_helpers.cpp)
+set(hpx_SOURCES "")
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   list(
