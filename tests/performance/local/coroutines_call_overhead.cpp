@@ -53,15 +53,8 @@ std::string format_build_date()
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
     double w_M
-//  , std::vector<std::string> const& counter_shortnames
-//  , std::shared_ptr<hpx::util::activate_counters> ac
     )
 {
-//    std::vector<hpx::performance_counters::counter_value> counter_values;
-
-//    if (ac)
-//        counter_values = ac->evaluate_counters(launch::sync);
-
     if (header)
     {
         cout << "# BENCHMARK: " << benchmark_name << "\n";
@@ -81,23 +74,6 @@ void print_results(
                 "## 4:SEED:PRNG seed - Independent Variable\n"
                 "## 5:WTIME_CS:Walltime/Context Switch [nano-seconds]\n"
                 ;
-
-/*
-        std::uint64_t const last_index = 5;
-
-        for (std::uint64_t i = 0; i < counter_shortnames.size(); ++i)
-        {
-            cout << "## "
-                 << (i + 1 + last_index) << ":"
-                 << counter_shortnames[i] << ":"
-                 << ac->name(i);
-
-            if (!ac->unit_of_measure(i).empty())
-                cout << " [" << ac->unit_of_measure(i) << "]";
-
-            cout << "\n";
-        }
-*/
     }
 
     std::uint64_t const os_thread_count = hpx::get_os_thread_count();
@@ -106,14 +82,6 @@ void print_results(
 //     double E = w_T/w_M;
     double O = w_M-w_T;
 
-/*
-    cout << "w_T " << w_T   << "\n"
-         << "w_M " << w_M   << "\n"
-         << "E   " << E     << "\n"
-         << "O   " << O     << "\n"
-        ;
-*/
-
     hpx::util::format_to(cout, "{} {} {} {} {} {:.14g}",
         payload,
         os_thread_count,
@@ -121,17 +89,7 @@ void print_results(
         iterations,
         seed,
         (O/(2*iterations*os_thread_count))*1e9
-//      ((walltime/(2*iterations*os_thread_count))*1e9
     );
-
-/*
-    if (ac)
-    {
-        for (std::uint64_t i = 0; i < counter_shortnames.size(); ++i)
-            hpx::util::format_to(cout, " {:.14g}",
-                counter_values[i].get_value<double>());
-    }
-*/
 
     cout << "\n";
 }
@@ -230,34 +188,6 @@ int hpx_main(
             total_elapsed += futures[i].get();
 
         print_results(total_elapsed);
-
-        ///////////////////////////////////////////////////////////////////////
-/*
-        std::vector<std::string> counter_shortnames;
-        std::vector<std::string> counters;
-        if (vm.count("counter"))
-        {
-            std::vector<std::string> raw_counters =
-                vm["counter"].as<std::vector<std::string> >();
-
-            for (std::uint64_t i = 0; i < raw_counters.size(); ++i)
-            {
-                std::vector<std::string> entry;
-                hpx::string_util::split(entry, raw_counters[i],
-                    hpx::string_util::is_any_of(","),
-                    hpx::string_util::token_compress_mode::on);
-
-                HPX_TEST_EQ(entry.size(), 2);
-
-                counter_shortnames.push_back(entry[0]);
-                counters.push_back(entry[1]);
-            }
-        }
-
-        std::shared_ptr<hpx::util::activate_counters> ac;
-        if (!counters.empty())
-            ac.reset(new hpx::util::activate_counters(counters));
-*/
     }
 
     return hpx::finalize();
@@ -290,12 +220,6 @@ int main(
         , value<std::uint64_t>(&seed)->default_value(0)
         , "seed for the pseudo random number generator (if 0, a seed is "
           "chosen based on the current system time)")
-
-/*
-        ( "counter"
-        , value<std::vector<std::string> >()->composing()
-        , "activate and report the specified performance counter")
-*/
 
         ( "no-header"
         , "do not print out the header")

@@ -11,6 +11,7 @@
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
@@ -21,7 +22,6 @@
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
-#include <hpx/util/query_counters.hpp>
 
 #include <condition_variable>
 #include <cstddef>

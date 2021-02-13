@@ -21,6 +21,9 @@ set(benchmarks
     timed_task_spawn
 )
 
+set(timed_task_spawn_SOURCES activate_counters.cpp)
+set(timed_task_spawn_HEADERS activate_counters.hpp)
+
 if(NOT HPX_WITH_CUDA)
   list(APPEND benchmarks stream)
 endif()
@@ -200,14 +203,18 @@ if(HPX_WITH_CUDA_CLANG)
 endif()
 
 foreach(benchmark ${benchmarks})
-  set(sources ${benchmark}.cpp)
+  set(sources ${benchmark}.cpp ${${benchmark}_SOURCES})
 
   source_group("Source Files" FILES ${sources})
+  if(${benchmark}_HEADERS)
+    source_group("Header Files" FILES ${${benchmark}_HEADERS})
+    set(${benchmark}_HEADERS HEADERS ${${benchmark}_HEADERS})
+  endif()
 
   # add example executable
   add_hpx_executable(
     ${benchmark}_test INTERNAL_FLAGS
-    SOURCES ${sources} ${${benchmark}_FLAGS}
+    SOURCES ${sources} ${${benchmark}_FLAGS} ${${benchmark}_HEADERS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
     FOLDER "Benchmarks/Local"

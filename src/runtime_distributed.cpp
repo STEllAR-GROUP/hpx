@@ -33,7 +33,9 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
+#include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
+#include <hpx/performance_counters/threadmanager_counter_types.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
@@ -42,7 +44,6 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
-#include <hpx/runtime/threads/threadmanager_counters.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
@@ -61,7 +62,6 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/util/query_counters.hpp>
 #include <hpx/version.hpp>
 
 #include <atomic>
@@ -113,7 +113,8 @@ namespace hpx {
         lbt_ << "(2nd stage) pre_main: registered runtime performance "
                 "counter types";
 
-        threads::register_counter_types(threads::get_thread_manager());
+        performance_counters::register_threadmanager_counter_types(
+            threads::get_thread_manager());
         lbt_ << "(2nd stage) pre_main: registered thread-manager performance "
                 "counter types";
 
