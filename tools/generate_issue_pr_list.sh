@@ -51,6 +51,7 @@ VERSION_MILESTONE_ID=$(milestone_id_from_version "${VERSION_FULL_NOTAG}")
 
 echo "Closed issues"
 echo "============="
+echo ""
 
 if [[ "$1" = "--limit" ]]; then
     hub issue --limit 50 --state=closed --milestone="${VERSION_MILESTONE_ID}" --format="* :hpx-issue:\`%I\` - %t%n"
@@ -61,6 +62,7 @@ fi
 echo ""
 echo "Closed pull requests"
 echo "===================="
+echo ""
 
 # The hub pr list command does not allow filtering by milestone like hub issue.
 # However, it lets us print the milestone for each PR. So we print every PR with
