@@ -121,7 +121,6 @@ namespace hpx { namespace threads { namespace executors {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
     struct HPX_EXPORT local_queue_os_executor : public scheduled_executor
     {
         local_queue_os_executor(std::size_t num_threads,
@@ -129,9 +128,7 @@ namespace hpx { namespace threads { namespace executors {
             util::optional<policies::callback_notifier> notifier =
                 util::nullopt);
     };
-#endif
 
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
     struct HPX_EXPORT static_queue_os_executor : public scheduled_executor
     {
         static_queue_os_executor(std::size_t num_threads,
@@ -139,7 +136,6 @@ namespace hpx { namespace threads { namespace executors {
             util::optional<policies::callback_notifier> notifier =
                 util::nullopt);
     };
-#endif
 
     struct HPX_EXPORT local_priority_queue_os_executor
       : public scheduled_executor
@@ -150,7 +146,6 @@ namespace hpx { namespace threads { namespace executors {
                 util::nullopt);
     };
 
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     struct HPX_EXPORT static_priority_queue_os_executor
       : public scheduled_executor
     {
@@ -159,7 +154,6 @@ namespace hpx { namespace threads { namespace executors {
             util::optional<policies::callback_notifier> notifier =
                 util::nullopt);
     };
-#endif
 }}}    // namespace hpx::threads::executors
 
 #include <hpx/config/warnings_suffix.hpp>

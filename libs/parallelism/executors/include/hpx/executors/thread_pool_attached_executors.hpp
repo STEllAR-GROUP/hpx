@@ -10,20 +10,14 @@
 
 namespace hpx { namespace parallel { namespace execution {
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
     using local_queue_attached_executor = restricted_thread_pool_executor;
-#endif
 
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
     using static_queue_attached_executor = restricted_thread_pool_executor;
-#endif
 
     using local_priority_queue_attached_executor =
         restricted_thread_pool_executor;
 
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     using static_priority_queue_attached_executor =
         restricted_thread_pool_executor;
-#endif
 #endif
 }}}    // namespace hpx::parallel::execution

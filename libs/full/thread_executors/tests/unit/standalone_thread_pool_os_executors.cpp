@@ -184,19 +184,10 @@ int main()
 {
     using namespace hpx::parallel;
 
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
     spawn_test<execution::local_queue_os_executor>();
-#endif
-
     spawn_test<execution::local_priority_queue_os_executor>();
-
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
     spawn_test<execution::static_queue_os_executor>();
-#endif
-
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     spawn_test<execution::static_priority_queue_os_executor>();
-#endif
 
     return hpx::util::report_errors();
 }

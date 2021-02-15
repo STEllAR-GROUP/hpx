@@ -13,23 +13,17 @@
 
 namespace hpx { namespace threads { namespace executors {
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
     using local_queue_attached_executor =
         parallel::execution::local_queue_attached_executor;
-#endif
 
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
     using static_queue_attached_executor =
         parallel::execution::static_queue_attached_executor;
-#endif
 
     using local_priority_queue_attached_executor =
         parallel::execution::local_priority_queue_attached_executor;
 
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     using static_priority_queue_attached_executor =
         parallel::execution::static_priority_queue_attached_executor;
-#endif
 }}}    // namespace hpx::threads::executors
 
 #endif

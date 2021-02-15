@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/assert.hpp>
 #include <hpx/schedulers/local_priority_queue_scheduler.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
@@ -82,5 +81,3 @@ namespace hpx { namespace threads { namespace policies {
 }}}    // namespace hpx::threads::policies
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif

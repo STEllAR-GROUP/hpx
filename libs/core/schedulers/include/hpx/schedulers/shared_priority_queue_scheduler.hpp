@@ -42,16 +42,6 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#if !defined(HPX_HAVE_MAX_CPU_COUNT) && defined(HPX_HAVE_MORE_THAN_64_THREADS)
-static_assert(false,
-    "The shared_priority_queue_scheduler does not support dynamic bitsets for "
-    "CPU masks, i.e. HPX_WITH_MAX_CPU_COUNT=\"\" and "
-    "HPX_WITH_MORE_THAN_64_THREADS=ON. Reconfigure HPX with either "
-    "HPX_WITH_MAX_CPU_COUNT=N, where N is an integer, or disable the "
-    "shared_priority_queue_scheduler by setting HPX_WITH_THREAD_SCHEDULERS to "
-    "not include \"all\" or \"shared-priority\"");
-#else
-
 #if !defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
 #if defined(HPX_DEBUG)
 #define SHARED_PRIORITY_SCHEDULER_DEBUG false
@@ -167,6 +157,13 @@ namespace hpx { namespace threads { namespace policies {
         explicit shared_priority_queue_scheduler(init_parameter const& init)
           : scheduler_base(init.num_worker_threads_, init.description_,
                 init.thread_queue_init_)
+#if !defined(HPX_HAVE_MAX_CPU_COUNT)
+          , d_lookup_(hpx::threads::hardware_concurrency())
+          , q_lookup_(hpx::threads::hardware_concurrency())
+#ifdef SHARED_PRIORITY_SCHEDULER_LINUX
+          , schedcpu_(hpx::threads::hardware_concurrency())
+#endif
+#endif
           , cores_per_queue_(init.cores_per_queue_)
           , num_workers_(init.num_worker_threads_)
           , num_domains_(1)
@@ -1362,12 +1359,20 @@ namespace hpx { namespace threads { namespace policies {
         std::array<numa_queues, HPX_HAVE_MAX_NUMA_DOMAIN_COUNT> numa_holder_;
 
         // lookups for local thread_num into arrays
+#if !defined(HPX_HAVE_MAX_CPU_COUNT)
+        std::vector<std::size_t> d_lookup_;    // numa domain
+        std::vector<std::size_t> q_lookup_;    // queue on domain
+#ifdef SHARED_PRIORITY_SCHEDULER_LINUX
+        std::vector<std::size_t> schedcpu_;    // cpu_id
+#endif
+#else
         std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT>
             d_lookup_;    // numa domain
         std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT>
             q_lookup_;    // queue on domain
 #ifdef SHARED_PRIORITY_SCHEDULER_LINUX
         std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT> schedcpu_;    // cpu_id
+#endif
 #endif
 
         // number of cores per queue for HP, NP, LP queues
@@ -1407,6 +1412,5 @@ namespace hpx { namespace threads { namespace policies {
         std::size_t pool_index_;
     };
 }}}    // namespace hpx::threads::policies
-#endif
 
 #include <hpx/config/warnings_suffix.hpp>
