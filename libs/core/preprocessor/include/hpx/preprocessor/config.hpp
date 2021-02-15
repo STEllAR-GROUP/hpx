@@ -70,10 +70,10 @@
 #/* HPX_PP_CONFIG_ERRORS */
 #
 #if !defined(HPX_PP_CONFIG_ERRORS)
-#ifdef NDEBUG
-#define HPX_PP_CONFIG_ERRORS 0
-#else
+#ifdef HPX_DEBUG
 #define HPX_PP_CONFIG_ERRORS 1
+#else
+#define HPX_PP_CONFIG_ERRORS 0
 #endif
 #endif
 #

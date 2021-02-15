@@ -171,14 +171,6 @@ namespace hpx { namespace components
             ///        destructed
             static constexpr void finalize() {}
 
-#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-            static constexpr void mark_as_migrated()
-            {
-            }
-            static constexpr void on_migrated()
-            {
-            }
-#else
             static void mark_as_migrated()
             {
                 // If this assertion is triggered then this component instance is
@@ -194,7 +186,6 @@ namespace hpx { namespace components
                 // migration.
                 HPX_ASSERT(false);
             }
-#endif
         };
     }
 

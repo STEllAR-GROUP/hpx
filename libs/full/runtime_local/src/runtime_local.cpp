@@ -1119,7 +1119,7 @@ namespace hpx {
     }
 }    // namespace hpx
 
-#if defined(_WIN64) && defined(_DEBUG) &&                                      \
+#if defined(_WIN64) && defined(HPX_DEBUG) &&                                   \
     !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
 #endif
@@ -1296,7 +1296,7 @@ namespace hpx {
         util::function_nonser<hpx_main_function_type> const& func,
         bool blocking)
     {
-#if defined(_WIN64) && defined(_DEBUG) &&                                      \
+#if defined(_WIN64) && defined(HPX_DEBUG) &&                                   \
     !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
         // needs to be called to avoid problems at system startup
         // see: http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=100319

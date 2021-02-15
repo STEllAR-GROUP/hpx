@@ -25,10 +25,11 @@ namespace hpx { namespace util {
         class one_shot_wrapper    //-V690
         {
         public:
-#if !defined(HPX_DISABLE_ASSERTS)
             // default constructor is needed for serialization
             constexpr one_shot_wrapper()
+#if defined(HPX_DEBUG)
               : _called(false)
+#endif
             {
             }
 
@@ -37,42 +38,30 @@ namespace hpx { namespace util {
                     std::is_constructible<F, F_>::value>::type>
             constexpr explicit one_shot_wrapper(F_&& f)
               : _f(std::forward<F_>(f))
+#if defined(HPX_DEBUG)
               , _called(false)
+#endif
             {
             }
 
             constexpr one_shot_wrapper(one_shot_wrapper&& other)
               : _f(std::move(other._f))
+#if defined(HPX_DEBUG)
               , _called(other._called)
+#endif
             {
+#if defined(HPX_DEBUG)
                 other._called = true;
+#endif
             }
 
             void check_call()
             {
+#if defined(HPX_DEBUG)
                 HPX_ASSERT(!_called);
-
                 _called = true;
-            }
-#else
-            // default constructor is needed for serialization
-            constexpr one_shot_wrapper() {}
-
-            template <typename F_,
-                typename = typename std::enable_if<
-                    std::is_constructible<F, F_>::value>::type>
-            constexpr explicit one_shot_wrapper(F_&& f)
-              : _f(std::forward<F_>(f))
-            {
-            }
-
-            constexpr one_shot_wrapper(one_shot_wrapper&& other)
-              : _f(std::move(other._f))
-            {
-            }
-
-            void check_call() {}
 #endif
+            }
 
             template <typename... Ts>
             constexpr HPX_HOST_DEVICE
@@ -118,7 +107,7 @@ namespace hpx { namespace util {
 
         public:    // exposition-only
             F _f;
-#if !defined(HPX_DISABLE_ASSERTS)
+#if defined(HPX_DEBUG)
             bool _called;
 #endif
         };

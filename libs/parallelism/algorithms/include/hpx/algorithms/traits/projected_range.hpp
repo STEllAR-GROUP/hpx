@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { namespace traits {
     struct projected_range<Proj, Rng,
         typename std::enable_if<hpx::traits::is_range<Rng>::value>::type>
     {
-        typedef typename std::decay<Proj>::type projector_type;
-        typedef typename hpx::traits::range_iterator<Rng>::type iterator_type;
+        using projector_type = typename std::decay<Proj>::type;
+        using iterator_type = typename hpx::traits::range_iterator<Rng>::type;
     };
 }}}    // namespace hpx::parallel::traits

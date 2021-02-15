@@ -21,6 +21,13 @@ target_compile_definitions(
   hpx_public_flags INTERFACE $<$<CONFIG:Debug>:HPX_DEBUG>
 )
 
+target_compile_definitions(
+  hpx_private_flags
+  INTERFACE $<$<CONFIG:MinSizeRel>:NDEBUG>
+  INTERFACE $<$<CONFIG:Release>:NDEBUG>
+  INTERFACE $<$<CONFIG:RelWithDebInfo>:NDEBUG>
+)
+
 # Remaining flags are set through the macros in cmake/HPX_AddCompileFlag.cmake
 
 include(HPX_ExportTargets)

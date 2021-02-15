@@ -325,9 +325,7 @@ function(add_hpx_module libname modulename)
   endif()
 
   target_compile_definitions(
-    hpx_${modulename}
-    PRIVATE $<$<CONFIG:Debug>:DEBUG> $<$<CONFIG:Debug>:_DEBUG>
-            HPX_${libname_upper}_EXPORTS
+    hpx_${modulename} PRIVATE HPX_${libname_upper}_EXPORTS
   )
 
   # This is a temporary solution until all of HPX has been modularized as it
