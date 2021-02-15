@@ -394,20 +394,30 @@ jobs:
           paths:
             - ./build
 
-  tests.unit1:
+  tests.unit:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Unit Tests (1)
+          name: Building Unit Tests
           command: |
+              ninja -j2 -k 0 tests.unit
               ninja -j1 -k 0 tests.unit.modules.segmented_algorithms
       - run:
-          name: Running Unit Tests (1)
+          name: Running Unit Tests
           when: always
           command: |
               ulimit -c unlimited
+              ctest \
+                --timeout 60 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex tests.unit \
+                --exclude-regex \
+              "tests.unit.modules.segmented_algorithms|\
+              tests.unit.modules.compute.numa_allocator"
               ctest \
                 --timeout 120 \
                 -T test \
@@ -421,33 +431,10 @@ jobs:
       - run:
           <<: *move_debug_log
       - store_test_results:
-          path: tests.unit1
+          path: tests.unit
       - store_artifacts:
-          path: tests.unit1
+          path: tests.unit
 
-  tests.unit2:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests (2)
-          command: |
-              ninja -j2 -k 0 tests.unit
-      - run:
-          name: Running Unit Tests (2)
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest \
-                --timeout 60 \
-                -T test \
-                --no-compress-output \
-                --output-on-failure \
-                --tests-regex tests.unit \
-                --exclude-regex \
-              "tests.unit.modules.segmented_algorithms|\
-              tests.unit.modules.compute.numa_allocator"
       - run:
           <<: *convert_xml
       - run:
@@ -651,9 +638,7 @@ workflows:
           <<: *gh_pages_filter
       - tests.examples:
           <<: *core_dependency
-      - tests.unit1:
-          <<: *core_dependency
-      - tests.unit2:
+      - tests.unit:
           <<: *core_dependency
       - tests.regressions:
           <<: *core_dependency
@@ -676,8 +661,7 @@ workflows:
           requires:
             - core
             - tests.examples
-            - tests.unit1
-            - tests.unit2
+            - tests.unit
             - tests.regressions
             - tests.performance
             - tests.headers
