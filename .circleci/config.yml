@@ -408,7 +408,12 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.segmented_algorithms -E tests.unit.modules.compute.numa_allocator
+              ctest \
+                --timeout 120 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex tests.unit.modules.segmented_algorithms
       - run:
           <<: *convert_xml
       - run:
@@ -434,7 +439,15 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit -E tests.unit.modules.segmented_algorithms -E tests.unit.modules.compute.numa_allocator
+              ctest \
+                --timeout 60 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex tests.unit \
+                --exclude-regex \
+              "tests.unit.modules.segmented_algorithms|\
+              tests.unit.modules.compute.numa_allocator"
       - run:
           <<: *convert_xml
       - run:
