@@ -60,6 +60,12 @@ function(add_parcelport name)
     set_target_properties(${parcelport_name} PROPERTIES UNITY_BUILD ON)
   endif()
 
+  if(HPX_WITH_PRECOMPILED_HEADERS)
+    target_precompile_headers(
+      ${parcelport_name} REUSE_FROM hpx_precompiled_headers
+    )
+  endif()
+
   if(${name}_EXPORT)
     get_target_property(
       _link_libraries ${parcelport_name} INTERFACE_LINK_LIBRARIES

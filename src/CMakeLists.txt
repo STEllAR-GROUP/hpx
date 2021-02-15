@@ -294,6 +294,10 @@ if(HPX_WITH_UNITY_BUILD)
   set_target_properties(hpx_full PROPERTIES UNITY_BUILD ON)
 endif()
 
+if(HPX_WITH_PRECOMPILED_HEADERS)
+  target_precompile_headers(hpx_full REUSE_FROM hpx_precompiled_headers)
+endif()
+
 target_link_libraries(
   hpx_full
   PUBLIC hpx_public_flags
