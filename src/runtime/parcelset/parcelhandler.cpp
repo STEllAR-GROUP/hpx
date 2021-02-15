@@ -1658,11 +1658,14 @@ namespace hpx { namespace parcelset
 
 #if defined(HPX_HAVE_NETWORKING)
         ini_defs.emplace_back("[hpx.parcel]");
-        ini_defs.emplace_back("address = ${HPX_PARCEL_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS
+        ini_defs.emplace_back(
+            "address = ${HPX_PARCEL_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS
             "}");
-        ini_defs.emplace_back("port = ${HPX_PARCEL_SERVER_PORT:" HPX_PP_STRINGIZE(
-            HPX_INITIAL_IP_PORT) "}");
-        ini_defs.emplace_back("bootstrap = ${HPX_PARCEL_BOOTSTRAP:" HPX_PARCEL_BOOTSTRAP "}");
+        ini_defs.emplace_back(
+            "port = ${HPX_PARCEL_SERVER_PORT:" HPX_PP_STRINGIZE(
+                HPX_INITIAL_IP_PORT) "}");
+        ini_defs.emplace_back(
+            "bootstrap = ${HPX_PARCEL_BOOTSTRAP:" HPX_PARCEL_BOOTSTRAP "}");
         ini_defs.emplace_back(
             "max_connections = ${HPX_PARCEL_MAX_CONNECTIONS:" HPX_PP_STRINGIZE(
                 HPX_PARCEL_MAX_CONNECTIONS) "}");
@@ -1671,8 +1674,8 @@ namespace hpx { namespace parcelset
             "${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:" HPX_PP_STRINGIZE(
                 HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY) "}");
         ini_defs.emplace_back("max_message_size = "
-                           "${HPX_PARCEL_MAX_MESSAGE_SIZE:" HPX_PP_STRINGIZE(
-                               HPX_PARCEL_MAX_MESSAGE_SIZE) "}");
+                              "${HPX_PARCEL_MAX_MESSAGE_SIZE:" HPX_PP_STRINGIZE(
+                                  HPX_PARCEL_MAX_MESSAGE_SIZE) "}");
         ini_defs.emplace_back(
             "max_outbound_message_size = "
             "${HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE:" HPX_PP_STRINGIZE(

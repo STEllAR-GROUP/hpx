@@ -80,7 +80,7 @@ namespace hpx { namespace threads {
                 "suspend_processing_unit_cb instead");
         }
         if (!pool.get_scheduler()->has_scheduler_mode(
-                     policies::enable_elasticity))
+                policies::enable_elasticity))
         {
             return hpx::make_exceptional_future<void>(
                 HPX_GET_EXCEPTION(invalid_status, "suspend_processing_unit",
@@ -88,7 +88,7 @@ namespace hpx { namespace threads {
                     "processing units"));
         }
         if (!pool.get_scheduler()->has_scheduler_mode(
-                     policies::enable_stealing) &&
+                policies::enable_stealing) &&
             hpx::this_thread::get_pool() == &pool)
         {
             return hpx::make_exceptional_future<void>(
@@ -186,8 +186,7 @@ namespace hpx { namespace threads {
                 "instead");
             return hpx::make_ready_future();
         }
-        if (threads::get_self_ptr() &&
-            hpx::this_thread::get_pool() == &pool)
+        if (threads::get_self_ptr() && hpx::this_thread::get_pool() == &pool)
         {
             return hpx::make_exceptional_future<void>(
                 HPX_GET_EXCEPTION(bad_parameter, "suspend_pool",
