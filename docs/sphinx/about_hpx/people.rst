@@ -108,6 +108,8 @@ Acknowledgements
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
+* Brice Goglin, for reporting and helping fix issues related to the integration
+  of hwloc in |hpx|.
 * Giannis Gonidelis, for his work on the ranges adaptation during the
   Google Summer of Code 2020.
 * Auriane Reverdell (|cscs|_), for her tireless work on refactoring our CMake
