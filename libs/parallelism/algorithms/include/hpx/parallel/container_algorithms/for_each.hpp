@@ -437,10 +437,12 @@ namespace hpx { namespace ranges {
         friend for_each_result<InIter, F> tag_invoke(hpx::ranges::for_each_t,
             InIter first, Sent last, F&& f, Proj&& proj = Proj())
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<InIter>;
+            static_assert((hpx::traits::is_forward_iterator<InIter>::value),
+                "Requires at least forward iterator.");
 
-            auto it = parallel::v1::detail::for_each_(hpx::execution::seq,
-                first, last, f, std::forward<Proj>(proj), is_segmented());
+            auto it = parallel::v1::detail::for_each<InIter>().call(
+                hpx::execution::seq, std::true_type(), first, last, f,
+                std::forward<Proj>(proj));
             return {std::move(it), std::forward<F>(f)};
         }
 
@@ -461,12 +463,14 @@ namespace hpx { namespace ranges {
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
-            using is_segmented =
-                hpx::traits::is_segmented_iterator<iterator_type>;
 
-            auto it = parallel::v1::detail::for_each_(hpx::execution::seq,
-                hpx::util::begin(rng), hpx::util::end(rng), f,
-                std::forward<Proj>(proj), is_segmented());
+            static_assert(
+                (hpx::traits::is_forward_iterator<iterator_type>::value),
+                "Requires at least forward iterator.");
+
+            auto it = parallel::v1::detail::for_each<iterator_type>().call(
+                hpx::execution::seq, std::true_type(), hpx::util::begin(rng),
+                hpx::util::end(rng), f, std::forward<Proj>(proj));
             return {std::move(it), std::forward<F>(f)};
         }
 
@@ -486,11 +490,14 @@ namespace hpx { namespace ranges {
         tag_invoke(hpx::ranges::for_each_t, ExPolicy&& policy, FwdIter first,
             Sent last, F&& f, Proj&& proj = Proj())
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
+            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+                "Requires at least forward iterator.");
 
-            return parallel::v1::detail::for_each_(
-                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
-                std::forward<Proj>(proj), is_segmented());
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+            return parallel::v1::detail::for_each<FwdIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first, last,
+                std::forward<F>(f), std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -510,13 +517,17 @@ namespace hpx { namespace ranges {
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
-            using is_segmented =
-                hpx::traits::is_segmented_iterator<iterator_type>;
 
-            return parallel::v1::detail::for_each_(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            static_assert(
+                (hpx::traits::is_forward_iterator<iterator_type>::value),
+                "Requires at least forward iterator.");
+
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+            return parallel::v1::detail::for_each<iterator_type>().call(
+                std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
                 hpx::util::end(rng), std::forward<F>(f),
-                std::forward<Proj>(proj), is_segmented());
+                std::forward<Proj>(proj));
         }
     } for_each{};
 

@@ -843,7 +843,7 @@ void is_iterator()
     }
     {
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
-        using iterator = hpx::vector_iterator<int, std::vector<int>>;
+        using iterator = hpx::segmented::vector_iterator<int, std::vector<int>>;
         HPX_TEST_MSG((is_iterator<iterator>::value), "hpx-specific iterator");
 #endif
     }
@@ -993,7 +993,7 @@ void is_forward_iterator()
     }
     {
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
-        using iterator = hpx::vector_iterator<int, std::vector<int>>;
+        using iterator = hpx::segmented::vector_iterator<int, std::vector<int>>;
         HPX_TEST_MSG(
             (is_forward_iterator<iterator>::value), "hpx-specific iterator");
 #endif

@@ -32,7 +32,7 @@ namespace hpx { namespace detail
     struct view_element
     : public hpx::partitioned_vector_partition<T,Data>
     {
-        using pvector_iterator = hpx::vector_iterator<T,Data>;
+        using pvector_iterator = hpx::segmented::vector_iterator<T,Data>;
         using segment_iterator
             = typename pvector_iterator::segment_iterator;
         using local_segment_iterator
@@ -212,7 +212,8 @@ namespace hpx { namespace detail
     struct const_view_element
     : public hpx::partitioned_vector_partition<T,Data>
     {
-        using const_pvector_iterator = hpx::const_vector_iterator<T,Data>;
+        using const_pvector_iterator =
+            hpx::segmented::const_vector_iterator<T, Data>;
         using const_segment_iterator
             = typename const_pvector_iterator::segment_iterator;
         using const_local_segment_iterator
@@ -245,7 +246,7 @@ namespace hpx { namespace detail
 
         const_view_element(const_view_element const &) = default;
 
-        // Not copy-assygnable
+        // Not copy-assignable
         const_view_element& operator=(const_view_element const &) = delete;
 
         // But movable

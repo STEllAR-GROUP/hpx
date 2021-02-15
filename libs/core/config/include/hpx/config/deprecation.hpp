@@ -70,6 +70,25 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Deprecate a given functionality starting HPX V1.7
+#if !defined(HPX_HAVE_DEPRECATION_WARNINGS_V1_7)
+#define HPX_HAVE_DEPRECATION_WARNINGS_V1_7 1
+#endif
+
+#if (HPX_VERSION_FULL >= 010600) && (HPX_HAVE_DEPRECATION_WARNINGS_V1_7 != 0)
+#define HPX_DEPRECATED_MSG_V1_7                                                \
+    "This functionality is deprecated starting HPX V1.7 and will be removed "  \
+    "in the future. You can define HPX_HAVE_DEPRECATION_WARNINGS_V1_7=0 to "   \
+    "acknowledge that you have received this warning."
+#define HPX_DEPRECATED_V1_7(x)                                                 \
+    HPX_DEPRECATED(x " (" HPX_PP_EXPAND(HPX_DEPRECATED_MSG_V1_7) ")")
+#endif
+
+#if !defined(HPX_DEPRECATED_V1_7)
+#define HPX_DEPRECATED_V1_7(x)
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // Deprecate a given functionality starting at the given version of HPX
 #define HPX_DEPRECATED_V(major, minor, x)                                      \
     HPX_PP_CAT(HPX_PP_CAT(HPX_PP_CAT(HPX_DEPRECATED_V, major), _), minor)(x)

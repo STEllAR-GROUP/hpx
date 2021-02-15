@@ -35,19 +35,23 @@ namespace hpx
     {
     private:
         // Type aliases
-        using pvector_iterator = hpx::vector_iterator<T,Data>;
-        using const_pvector_iterator = hpx::const_vector_iterator<T,Data>;
+        using pvector_iterator = hpx::segmented::vector_iterator<T,Data>;
+        using const_pvector_iterator =
+            hpx::segmented::const_vector_iterator<T, Data>;
         using segment_iterator = typename pvector_iterator::segment_iterator;
         using const_segment_iterator =
             typename const_pvector_iterator::segment_iterator;
         using traits
             = typename hpx::traits::segmented_iterator_traits<pvector_iterator>;
         using list_type = std::initializer_list<std::size_t>;
+
     public:
-        using iterator
-            = typename hpx::partitioned_vector_view_iterator<T,N,Data>;
-        using const_iterator
-            = typename hpx::const_partitioned_vector_view_iterator<T,N,Data>;
+        using iterator =
+            typename hpx::segmented::partitioned_vector_view_iterator<T, N,
+                Data>;
+        using const_iterator =
+            typename hpx::segmented::const_partitioned_vector_view_iterator<T,
+                N, Data>;
 
         // Minimal dummy construction
         explicit partitioned_vector_view(

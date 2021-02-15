@@ -869,11 +869,11 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
-        typedef segment_unordered_map_iterator<
+        typedef segmented::segment_unordered_map_iterator<
                 Key, T, Hash, KeyEqual,
                 typename partitions_vector_type::iterator
             > segment_iterator;
-        typedef const_segment_unordered_map_iterator<
+        typedef segmented::const_segment_unordered_map_iterator<
                 Key, T, Hash, KeyEqual,
                 typename partitions_vector_type::const_iterator
             > const_segment_iterator;

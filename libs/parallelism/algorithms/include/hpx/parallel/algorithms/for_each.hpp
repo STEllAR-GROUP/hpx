@@ -424,81 +424,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::move(first));
             }
         };
-        /// Non Segmented implementation
-        template <typename ExPolicy, typename FwdIter, typename Size,
-            typename F, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        for_each_n_(ExPolicy&& policy, FwdIter first, Size count, F&& f,
-            Proj&& proj, std::false_type)
-        {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
-            return detail::for_each_n<FwdIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first,
-                std::size_t(count), std::forward<F>(f),
-                std::forward<Proj>(proj));
-        }
-        // forward declare the segmented version of for_each_ algorithm
-        template <typename ExPolicy, typename SegIterB, typename SegIterE,
-            typename F, typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy, SegIterB>::type
-        for_each_(ExPolicy&& policy, SegIterB first, SegIterE last, F&& f,
-            Proj&& proj, std::true_type);
-
-        /// Segmented implementation using for_each.
-        template <typename ExPolicy, typename FwdIter, typename Size,
-            typename F, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        for_each_n_(ExPolicy&& policy, FwdIter first, Size count, F&& f,
-            Proj&& proj, std::true_type)
-        {
-            auto last = first;
-            detail::advance(last, std::size_t(count));
-            return for_each_(std::forward<ExPolicy>(policy), first, last,
-                std::forward<F>(f), std::forward<Proj>(proj), std::true_type());
-        }
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename Size, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value &&
-            hpx::parallel::traits::is_projected<Proj, FwdIter>::value &&
-            hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
-                hpx::parallel::traits::projected<Proj, FwdIter>>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::for_each_n is deprecated, use hpx::for_each_n instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        for_each_n(ExPolicy&& policy, FwdIter first, Size count, F&& f,
-            Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-
-        // if count is representing a negative value, we do nothing
-        if (detail::is_negative(count))
-        {
-            return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
-                std::move(first));
-        }
-
-        using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::for_each_n_(std::forward<ExPolicy>(policy), first, count,
-            std::forward<F>(f), std::forward<Proj>(proj), is_segmented());
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     // for_each
@@ -560,29 +487,69 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
 
-        ///////////////////////////////////////////////////////////////////////
-        // non-segmented implementation
-        template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+        /// Non Segmented implementation
+        template <typename ExPolicy, typename FwdIter, typename Size,
             typename F, typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy, FwdIterB>::type
-        for_each_(ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        for_each_n_(ExPolicy&& policy, FwdIter first, Size count, F&& f,
             Proj&& proj, std::false_type)
         {
             using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-            if (first == last)
-            {
-                using result =
-                    util::detail::algorithm_result<ExPolicy, FwdIterB>;
-                return result::get(std::move(first));
-            }
-
-            return for_each<FwdIterB>().call(std::forward<ExPolicy>(policy),
-                is_seq(), first, last, std::forward<F>(f),
+            return detail::for_each_n<FwdIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first,
+                std::size_t(count), std::forward<F>(f),
                 std::forward<Proj>(proj));
         }
+
+        template <typename ExPolicy, typename FwdIter, typename Size,
+            typename F, typename Proj>
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        for_each_n_(ExPolicy&& policy, FwdIter first, Size count, F&& f,
+            Proj&& proj, std::true_type);
         /// \endcond
     }    // namespace detail
+
+    // clang-format off
+    template <typename ExPolicy, typename FwdIter, typename Size, typename F,
+        typename Proj = util::projection_identity,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value&&
+            hpx::traits::is_iterator<FwdIter>::value&&
+            hpx::parallel::traits::is_projected<Proj, FwdIter>::value&&
+            hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
+            hpx::parallel::traits::projected<Proj, FwdIter>>::value
+        )>
+    // clang-format on
+    HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::for_each_n is deprecated, use hpx::for_each_n "
+        "instead")
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        for_each_n(ExPolicy&& policy, FwdIter first, Size count, F&& f,
+            Proj&& proj = Proj())
+    {
+        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
+
+        // if count is representing a negative value or zero, we do nothing
+        if (detail::is_negative(count) || count == 0)
+        {
+            return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
+                std::move(first));
+        }
+
+        using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
+
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+        return detail::for_each_n_(std::forward<ExPolicy>(policy), first, count,
+            std::forward<F>(f), std::forward<Proj>(proj), is_segmented());
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
+    }
 
     // clang-format off
     template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
@@ -609,21 +576,23 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIterB>::value),
             "Requires at least forward iterator.");
 
-        using is_segmented = hpx::traits::is_segmented_iterator<FwdIterB>;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::for_each_(std::forward<ExPolicy>(policy), first, last,
-            std::forward<F>(f), std::forward<Proj>(proj), is_segmented());
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
+        if (first == last)
+        {
+            using result =
+                parallel::util::detail::algorithm_result<ExPolicy, FwdIterB>;
+            return result::get(std::move(first));
+        }
+
+        return parallel::v1::detail::for_each<FwdIterB>().call(
+            std::forward<ExPolicy>(policy), is_seq(), first, last,
+            std::forward<F>(f), std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
 
 namespace hpx {
+
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_each_t final
       : hpx::functional::tag<for_each_t>
     {
@@ -632,13 +601,21 @@ namespace hpx {
         template <typename InIter,
             typename F,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_input_iterator<InIter>::value
+                hpx::traits::is_iterator<InIter>::value &&
+               !hpx::traits::is_segmented_iterator<InIter>::value
             )>
         // clang-format on
         friend F tag_invoke(hpx::for_each_t, InIter first, InIter last, F&& f)
         {
-            parallel::v1::detail::for_each_(hpx::execution::seq, first, last, f,
-                parallel::util::projection_identity(), std::false_type());
+            static_assert((hpx::traits::is_input_iterator<InIter>::value),
+                "Requires at least input iterator.");
+
+            if (first != last)
+            {
+                hpx::parallel::v1::detail::for_each<InIter>().call(
+                    hpx::execution::seq, std::true_type(), first, last, f,
+                    hpx::parallel::util::projection_identity());
+            }
             return std::forward<F>(f);
         }
 
@@ -647,23 +624,36 @@ namespace hpx {
             typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_forward_iterator<FwdIter>::value
+                hpx::traits::is_iterator<FwdIter>::value &&
+               !hpx::traits::is_segmented_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             void>::type
         tag_invoke(hpx::for_each_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, F&& f)
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
+            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+                "Requires at least forward iterator.");
 
-            return parallel::util::detail::algorithm_result<ExPolicy>::get(
-                parallel::v1::detail::for_each_(std::forward<ExPolicy>(policy),
-                    first, last, std::forward<F>(f),
-                    parallel::util::projection_identity(), is_segmented()));
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+            if (first == last)
+            {
+                using result =
+                    hpx::parallel::util::detail::algorithm_result<ExPolicy>;
+                return result::get();
+            }
+
+            return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
+                hpx::parallel::v1::detail::for_each<FwdIter>().call(
+                    std::forward<ExPolicy>(policy), is_seq(), first, last,
+                    std::forward<F>(f),
+                    hpx::parallel::util::projection_identity()));
         }
     } for_each{};
 
+    ///////////////////////////////////////////////////////////////////////////
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_each_n_t final
       : hpx::functional::tag<for_each_n_t>
     {
