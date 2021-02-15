@@ -325,7 +325,11 @@ void exclusive_scan_tests_inplace_with_policy(
 template <typename T>
 void exclusive_scan_tests(std::vector<hpx::id_type>& localities)
 {
+#if defined(HPX_DEBUG)
+    std::size_t const length = 10000;
+#else
     std::size_t const length = 1000000;
+#endif
 
     exclusive_scan_tests_with_policy<T>(length, hpx::container_layout);
     exclusive_scan_tests_with_policy<T>(length, hpx::container_layout(3));
