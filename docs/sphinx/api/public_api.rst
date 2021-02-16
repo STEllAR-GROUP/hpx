@@ -70,10 +70,10 @@ Functions
 - :cpp:func:`hpx::partial_sort`
 - :cpp:func:`hpx::parallel::v1::partition`
 - :cpp:func:`hpx::parallel::v1::partition_copy`
-- :cpp:func:`hpx::parallel::v1::remove`
-- :cpp:func:`hpx::parallel::v1::remove_copy`
-- :cpp:func:`hpx::parallel::v1::remove_copy_if`
-- :cpp:func:`hpx::parallel::v1::remove_if`
+- :cpp:func:`hpx::remove`
+- :cpp:func:`hpx::remove_copy`
+- :cpp:func:`hpx::remove_copy_if`
+- :cpp:func:`hpx::remove_if`
 - :cpp:func:`hpx::parallel::v1::replace`
 - :cpp:func:`hpx::parallel::v1::replace_copy`
 - :cpp:func:`hpx::parallel::v1::replace_copy_if`
