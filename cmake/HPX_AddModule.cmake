@@ -62,14 +62,6 @@ function(add_hpx_module libname modulename)
   )
 
   # HPX options
-  hpx_option(
-    HPX_${modulename_upper}_WITH_TESTS BOOL
-    "Build HPX ${modulename} module tests. (default: ${HPX_WITH_TESTS})"
-    ${HPX_WITH_TESTS} ADVANCED
-    CATEGORY "Modules"
-    MODULE ${modulename_upper}
-  )
-
   if(${_have_compatibility_headers_option})
     set(_compatibility_headers_default OFF)
     if(${modulename}_COMPATIBILITY_HEADERS)

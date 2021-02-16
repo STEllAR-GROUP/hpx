@@ -139,12 +139,6 @@ if(HPX_WITH_TESTS)
     string(TOUPPER ${lib} lib_upper)
     foreach(module ${HPX_${lib_upper}_ENABLED_MODULES})
       if(EXISTS ${PROJECT_SOURCE_DIR}/libs/${lib}/${module}/tests)
-        string(TOUPPER ${module} module_upper)
-        hpx_option(
-          HPX_${module_upper}_WITH_TESTS BOOL
-          "Build HPX ${name} module tests. (default: ${HPX_WITH_TESTS})"
-          ${HPX_WITH_TESTS} ADVANCED CATEGORY "Modules"
-        )
         add_subdirectory(libs/${lib}/${module}/tests)
       endif()
     endforeach()

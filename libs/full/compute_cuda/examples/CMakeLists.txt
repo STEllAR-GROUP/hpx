@@ -12,10 +12,7 @@ endif()
 if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_target(examples.modules.compute_cuda)
   add_hpx_pseudo_dependencies(examples.modules examples.modules.compute_cuda)
-  if(HPX_WITH_TESTS
-     AND HPX_WITH_TESTS_EXAMPLES
-     AND HPX_COMPUTE_CUDA_WITH_TESTS
-  )
+  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_pseudo_target(tests.examples.modules.compute_cuda)
     add_hpx_pseudo_dependencies(
       tests.examples.modules tests.examples.modules.compute_cuda

@@ -21,7 +21,6 @@ if len(sys.argv) != 3:
 lib_name = sys.argv[1]
 lib_name_upper = lib_name.upper()
 module_name = sys.argv[2]
-module_name_upper = module_name.upper()
 header_str = '=' * len(module_name)
 
 # CMake minimum version
@@ -107,7 +106,7 @@ examples_cmakelists_template = cmake_header + f'''
 if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_target(examples.modules.{module_name})
   add_hpx_pseudo_dependencies(examples.modules examples.modules.{module_name})
-  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES AND HPX_{module_name_upper}_WITH_TESTS)
+  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_pseudo_target(tests.examples.modules.{module_name})
     add_hpx_pseudo_dependencies(tests.examples.modules tests.examples.modules.{module_name})
   endif()
@@ -116,14 +115,12 @@ endif()
 
 tests_cmakelists_template = cmake_header + f'''
 include(HPX_Message)
-include(HPX_Option)
 
 if(NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
-  hpx_set_option(HPX_{module_name_upper}_WITH_TESTS VALUE OFF FORCE)
   return()
 endif()
 
-if(HPX_{module_name_upper}_WITH_TESTS)
+if(HPX_WITH_TESTS)
     if(HPX_WITH_TESTS_UNIT)
       add_hpx_pseudo_target(tests.unit.modules.{module_name})
       add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.{module_name})
