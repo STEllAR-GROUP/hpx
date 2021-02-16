@@ -28,10 +28,10 @@ void test_zero()
 
     auto p_copy_if = hpx::ranges::copy_if(par, a.begin(), a.end(), b.begin(),
         [](int bar) { return bar % 2 == 1; });
-    auto p_remove_copy_if = hpx::parallel::remove_copy_if(par, a.begin(),
-        a.end(), c.begin(), [](int bar) { return bar % 2 != 1; });
+    auto p_remove_copy_if = hpx::remove_copy_if(par, a.begin(), a.end(),
+        c.begin(), [](int bar) { return bar % 2 != 1; });
     auto p_remove_copy =
-        hpx::parallel::remove_copy(par, a.begin(), a.end(), d.begin(), 0);
+        hpx::remove_copy(par, a.begin(), a.end(), d.begin(), 0);
 
     Iter ans_copy_if = std::copy_if(
         a.begin(), a.end(), b.begin(), [](int bar) { return bar % 2 == 1; });
@@ -40,8 +40,8 @@ void test_zero()
     Iter ans_remove_copy = std::remove_copy(a.begin(), a.end(), d.begin(), 0);
 
     HPX_TEST(p_copy_if.out == ans_copy_if);
-    HPX_TEST(p_remove_copy_if.out == ans_remove_copy_if);
-    HPX_TEST(p_remove_copy.out == ans_remove_copy);
+    HPX_TEST(p_remove_copy_if == ans_remove_copy_if);
+    HPX_TEST(p_remove_copy == ans_remove_copy);
 }
 
 void test_async_zero()
@@ -53,10 +53,10 @@ void test_async_zero()
 
     auto f_copy_if = hpx::ranges::copy_if(par(task), a.begin(), a.end(),
         b.begin(), [](int bar) { return bar % 2 == 1; });
-    auto f_remove_copy_if = hpx::parallel::remove_copy_if(par(task), a.begin(),
-        a.end(), c.begin(), [](int bar) { return bar % 2 != 1; });
+    auto f_remove_copy_if = hpx::remove_copy_if(par(task), a.begin(), a.end(),
+        c.begin(), [](int bar) { return bar % 2 != 1; });
     auto f_remove_copy =
-        hpx::parallel::remove_copy(par(task), a.begin(), a.end(), d.begin(), 0);
+        hpx::remove_copy(par(task), a.begin(), a.end(), d.begin(), 0);
 
     Iter ans_copy_if = std::copy_if(
         a.begin(), a.end(), b.begin(), [](int bar) { return bar % 2 == 1; });
@@ -65,8 +65,8 @@ void test_async_zero()
     Iter ans_remove_copy = std::remove_copy(a.begin(), a.end(), d.begin(), 0);
 
     HPX_TEST(f_copy_if.get().out == ans_copy_if);
-    HPX_TEST(f_remove_copy_if.get().out == ans_remove_copy_if);
-    HPX_TEST(f_remove_copy.get().out == ans_remove_copy);
+    HPX_TEST(f_remove_copy_if.get() == ans_remove_copy_if);
+    HPX_TEST(f_remove_copy.get() == ans_remove_copy);
 }
 
 void test_one(std::vector<int> a)
@@ -78,10 +78,10 @@ void test_one(std::vector<int> a)
 
     auto p_copy_if = hpx::ranges::copy_if(par, a.begin(), a.end(), b.begin(),
         [](int bar) { return bar % 2 == 1; });
-    auto p_remove_copy_if = hpx::parallel::remove_copy_if(par, a.begin(),
-        a.end(), c.begin(), [](int bar) { return bar % 2 != 1; });
+    auto p_remove_copy_if = hpx::remove_copy_if(par, a.begin(), a.end(),
+        c.begin(), [](int bar) { return bar % 2 != 1; });
     auto p_remove_copy =
-        hpx::parallel::remove_copy(par, a.begin(), a.end(), d.begin(), 0);
+        hpx::remove_copy(par, a.begin(), a.end(), d.begin(), 0);
 
     HPX_UNUSED(p_copy_if);
     HPX_UNUSED(p_remove_copy_if);
@@ -115,10 +115,10 @@ void test_async_one(std::vector<int> a)
 
     auto f_copy_if = hpx::ranges::copy_if(par(task), a.begin(), a.end(),
         b.begin(), [](int bar) { return bar % 2 == 1; });
-    auto f_remove_copy_if = hpx::parallel::remove_copy_if(par(task), a.begin(),
-        a.end(), c.begin(), [](int bar) { return bar % 2 != 1; });
+    auto f_remove_copy_if = hpx::remove_copy_if(par(task), a.begin(), a.end(),
+        c.begin(), [](int bar) { return bar % 2 != 1; });
     auto f_remove_copy =
-        hpx::parallel::remove_copy(par(task), a.begin(), a.end(), d.begin(), 0);
+        hpx::remove_copy(par(task), a.begin(), a.end(), d.begin(), 0);
 
     std::copy_if(a.begin(), a.end(), b_ans.begin(),
         [](int bar) { return bar % 2 == 1; });
