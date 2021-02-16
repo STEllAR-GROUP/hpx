@@ -15,7 +15,9 @@ set(tests
     serialization_partitioned_vector
 )
 
-set(is_iterator_partitioned_vector_FLAGS COMPONENT_DEPENDENCIES partitioned_vector)
+set(is_iterator_partitioned_vector_FLAGS COMPONENT_DEPENDENCIES
+                                         partitioned_vector
+)
 set(is_iterator_partitioned_vector_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(partitioned_vector_view_FLAGS COMPONENT_DEPENDENCIES partitioned_vector)

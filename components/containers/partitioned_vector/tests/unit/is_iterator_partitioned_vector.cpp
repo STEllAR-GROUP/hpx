@@ -13,6 +13,8 @@
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #endif
 
+#include <vector>
+
 void is_iterator()
 {
     using hpx::traits::is_iterator;

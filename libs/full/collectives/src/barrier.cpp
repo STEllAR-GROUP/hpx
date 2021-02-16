@@ -12,6 +12,7 @@
 #include <hpx/components_base/server/component_heap.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_local/run_as_hpx_thread.hpp>

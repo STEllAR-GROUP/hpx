@@ -6,9 +6,16 @@
 
 if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_target(examples.modules.command_line_handling_local)
-  add_hpx_pseudo_dependencies(examples.modules examples.modules.command_line_handling_local)
-  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES AND HPX_COMMAND_LINE_HANDLING_LOCAL_WITH_TESTS)
+  add_hpx_pseudo_dependencies(
+    examples.modules examples.modules.command_line_handling_local
+  )
+  if(HPX_WITH_TESTS
+     AND HPX_WITH_TESTS_EXAMPLES
+     AND HPX_COMMAND_LINE_HANDLING_LOCAL_WITH_TESTS
+  )
     add_hpx_pseudo_target(tests.examples.modules.command_line_handling_local)
-    add_hpx_pseudo_dependencies(tests.examples.modules tests.examples.modules.command_line_handling_local)
+    add_hpx_pseudo_dependencies(
+      tests.examples.modules tests.examples.modules.command_line_handling_local
+    )
   endif()
 endif()

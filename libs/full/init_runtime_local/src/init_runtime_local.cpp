@@ -241,8 +241,8 @@ namespace hpx { namespace local {
             // initialize logging
             // TODO: Waiting for other PR.
             //#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-            //            util::detail::init_logging(
-            //                cmdline.rtcfg_, cmdline.rtcfg_.mode_ == runtime_mode::console);
+            //util::detail::init_logging(
+            //    cmdline.rtcfg_, cmdline.rtcfg_.mode_ == runtime_mode::console);
             //#endif
         }
 
@@ -348,7 +348,7 @@ namespace hpx { namespace local {
                 &hpx::detail::test_failure_handler);
 #if defined(HPX_HAVE_APEX)
             hpx::util::set_enable_parent_task_handler(
-                &detail::enable_parent_task_handler);
+                &hpx::detail::enable_parent_task_handler);
 #endif
             hpx::set_custom_exception_info_handler(
                 &hpx::detail::custom_exception_info);

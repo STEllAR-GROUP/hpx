@@ -198,9 +198,7 @@ namespace hpx {
             runtime_distributed::get_notification_policy(
                 "timer-thread", runtime_local::os_thread_type::timer_thread),
 #endif
-#ifdef HPX_HAVE_NETWORKING
             &detail::network_background_callback,
-#endif
             false)
       , rtcfg_(rtcfg)
       , mode_(rtcfg_.mode_)

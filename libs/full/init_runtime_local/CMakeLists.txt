@@ -8,9 +8,9 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(init_runtime_local_headers hpx/init_runtime_local/init_runtime_local.hpp)
-
-set(init_runtime_local_compat_headers)
+set(init_runtime_local_headers hpx/init_runtime_local/init_runtime_local.hpp
+                               hpx/local/init.hpp
+)
 
 set(init_runtime_local_sources init_runtime_local.cpp)
 
@@ -22,7 +22,6 @@ add_hpx_module(
   GLOBAL_HEADER_GEN ON
   SOURCES ${init_runtime_local_sources}
   HEADERS ${init_runtime_local_headers}
-  COMPAT_HEADERS ${init_runtime_local_compat_headers}
   DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES hpx_program_options hpx_runtime_local
   CMAKE_SUBDIRS examples tests

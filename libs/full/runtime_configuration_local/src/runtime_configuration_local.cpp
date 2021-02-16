@@ -15,6 +15,7 @@
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime_configuration_local/init_ini_data_local.hpp>
 #include <hpx/runtime_configuration_local/runtime_configuration_local.hpp>
+#include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/version.hpp>
 
@@ -58,6 +59,7 @@ namespace hpx { namespace local { namespace detail {
             // create default installation location and logging settings
             "[hpx]",
             "location = ${HPX_LOCATION:$[system.prefix]}",
+            // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "master_ini_path = $[hpx.location]" HPX_INI_PATH_DELIMITER
             "$[system.executable_prefix]/",
             "master_ini_path_suffixes = /share/" HPX_BASE_DIR_NAME

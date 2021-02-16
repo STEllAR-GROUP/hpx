@@ -8,35 +8,48 @@ include(HPX_Message)
 include(HPX_Option)
 
 if(NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
-  hpx_set_option(HPX_COMMAND_LINE_HANDLING_LOCAL_WITH_TESTS VALUE OFF FORCE)
+  hpx_set_option(
+    HPX_COMMAND_LINE_HANDLING_LOCAL_WITH_TESTS
+    VALUE OFF
+    FORCE
+  )
   return()
 endif()
 
 if(HPX_COMMAND_LINE_HANDLING_LOCAL_WITH_TESTS)
-    if(HPX_WITH_TESTS_UNIT)
-      add_hpx_pseudo_target(tests.unit.modules.command_line_handling_local)
-      add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.command_line_handling_local)
-      add_subdirectory(unit)
-    endif()
+  if(HPX_WITH_TESTS_UNIT)
+    add_hpx_pseudo_target(tests.unit.modules.command_line_handling_local)
+    add_hpx_pseudo_dependencies(
+      tests.unit.modules tests.unit.modules.command_line_handling_local
+    )
+    add_subdirectory(unit)
+  endif()
 
-    if(HPX_WITH_TESTS_REGRESSIONS)
-      add_hpx_pseudo_target(tests.regressions.modules.command_line_handling_local)
-      add_hpx_pseudo_dependencies(tests.regressions.modules tests.regressions.modules.command_line_handling_local)
-      add_subdirectory(regressions)
-    endif()
+  if(HPX_WITH_TESTS_REGRESSIONS)
+    add_hpx_pseudo_target(tests.regressions.modules.command_line_handling_local)
+    add_hpx_pseudo_dependencies(
+      tests.regressions.modules
+      tests.regressions.modules.command_line_handling_local
+    )
+    add_subdirectory(regressions)
+  endif()
 
-    if(HPX_WITH_TESTS_BENCHMARKS)
-      add_hpx_pseudo_target(tests.performance.modules.command_line_handling_local)
-      add_hpx_pseudo_dependencies(tests.performance.modules tests.performance.modules.command_line_handling_local)
-      add_subdirectory(performance)
-    endif()
+  if(HPX_WITH_TESTS_BENCHMARKS)
+    add_hpx_pseudo_target(tests.performance.modules.command_line_handling_local)
+    add_hpx_pseudo_dependencies(
+      tests.performance.modules
+      tests.performance.modules.command_line_handling_local
+    )
+    add_subdirectory(performance)
+  endif()
 
-    if(HPX_WITH_TESTS_HEADERS)
-      add_hpx_header_tests(
-        modules.command_line_handling_local
-        HEADERS ${command_line_handling_local_headers}
-        HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-        NOLIBS
-        DEPENDENCIES hpx_command_line_handling_local)
-    endif()
+  if(HPX_WITH_TESTS_HEADERS)
+    add_hpx_header_tests(
+      modules.command_line_handling_local
+      HEADERS ${command_line_handling_local_headers}
+      HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+      NOLIBS
+      DEPENDENCIES hpx_command_line_handling_local
+    )
+  endif()
 endif()
