@@ -6,17 +6,15 @@
 
 #pragma once
 
-#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
+#include <hpx/runtime_fwd.hpp>
 
 #include <string>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace detail
-{
+namespace hpx { namespace util { namespace detail {
     /// The init_logging type will be used for initialization purposes only as
     /// well.
     HPX_EXPORT void init_logging(runtime_configuration& ini, bool isconsole);
-}}}
-
+}}}    // namespace hpx::util::detail

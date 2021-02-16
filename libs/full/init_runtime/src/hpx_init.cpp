@@ -21,6 +21,7 @@
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/hpx_user_main_config.hpp>
+#include <hpx/init_runtime/detail/init_logging.hpp>
 #include <hpx/init_runtime/detail/run_or_start.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
@@ -69,7 +70,6 @@
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/util/bind_action.hpp>
-#include <hpx/util/init_logging.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 #endif
 
@@ -400,11 +400,8 @@ namespace hpx {
                 cmdline.rtcfg_.get_spinlock_deadlock_detection_limit());
 #endif
 
-            // initialize logging
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             util::detail::init_logging(
                 cmdline.rtcfg_, cmdline.rtcfg_.mode_ == runtime_mode::console);
-#endif
 
 #if defined(HPX_HAVE_NETWORKING)
             if (cmdline.num_localities_ != 1 || cmdline.node_ != 0 ||
@@ -624,6 +621,8 @@ namespace hpx {
                 vm.count("hpx:print-counters-locally") != 0;
             if (mode == runtime_mode::console || print_counters_locally)
                 handle_list_and_print_options(rt, vm, print_counters_locally);
+#else
+            HPX_UNUSED(mode);
 #endif
 
             // Dump the configuration before all components have been loaded.
@@ -1060,6 +1059,10 @@ namespace hpx {
         p->call_shutdown_functions(false);
 
         p->stop(shutdown_timeout, naming::invalid_id, true);
+#else
+        HPX_UNUSED(shutdown_timeout);
+        HPX_UNUSED(localwait);
+        HPX_UNUSED(ec);
 #endif
 
         return 0;

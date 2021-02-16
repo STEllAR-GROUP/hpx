@@ -51,7 +51,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/trigger_lco.cpp
     runtime_distributed.cpp
     util/generate_unique_ids.cpp
-    util/init_logging.cpp
     util/one_size_heap_list.cpp
     util/pool_timer.cpp
     util/register_locks_globally.cpp
@@ -221,7 +220,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/util/functional/colocated_helpers.hpp
     hpx/util/functional/segmented_iterator_helpers.hpp
     hpx/util/generate_unique_ids.hpp
-    hpx/util/init_logging.hpp
     hpx/util/one_size_heap_list.hpp
     hpx/util/pool_timer.hpp
     hpx/util/register_locks_globally.hpp
