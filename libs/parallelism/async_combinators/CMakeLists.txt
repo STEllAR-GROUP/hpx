@@ -38,7 +38,6 @@ include(HPX_AddModule)
 add_hpx_module(
   parallelism async_combinators
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   HEADERS ${async_combinators_headers}
   COMPAT_HEADERS ${async_combinators_compat_headers}

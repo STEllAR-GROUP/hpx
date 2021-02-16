@@ -69,7 +69,6 @@ include(HPX_AddModule)
 add_hpx_module(
   parallelism executors
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${executors_sources}
   HEADERS ${executors_headers}

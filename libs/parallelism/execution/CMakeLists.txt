@@ -85,7 +85,6 @@ add_hpx_module(
   parallelism execution
   SOURCES ${execution_sources}
   HEADERS ${execution_headers}
-  DEPRECATION_WARNINGS
   COMPATIBILITY_HEADERS ON # Added in 1.5.0
   COMPAT_HEADERS ${execution_compat_headers}
   DEPENDENCIES hpx_core

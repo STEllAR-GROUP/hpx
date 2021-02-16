@@ -26,7 +26,6 @@ include(HPX_AddModule)
 add_hpx_module(
   core itt_notify
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN OFF
   SOURCES ${itt_notify_sources}
   HEADERS ${itt_notify_headers}

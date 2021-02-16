@@ -63,7 +63,6 @@ include(HPX_AddModule)
 add_hpx_module(
   full thread_executors
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${thread_executors_sources}
   HEADERS ${thread_executors_headers}

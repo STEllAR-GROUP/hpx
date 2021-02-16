@@ -186,7 +186,6 @@ include(HPX_AddModule)
 add_hpx_module(
   parallelism algorithms
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
   HEADERS ${algorithms_headers}
   COMPAT_HEADERS ${algorithms_compat_headers}
   SOURCES ${algorithms_sources}

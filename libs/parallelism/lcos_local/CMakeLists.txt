@@ -50,7 +50,6 @@ include(HPX_AddModule)
 add_hpx_module(
   parallelism lcos_local
   COMPATIBILITY_HEADERS ON # Added in 1.5.0
-  DEPRECATION_WARNINGS
   SOURCES ${lcos_local_sources}
   HEADERS ${lcos_local_headers}
   COMPAT_HEADERS ${lcos_local_compat_headers}

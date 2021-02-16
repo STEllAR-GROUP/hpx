@@ -26,7 +26,6 @@ include(HPX_AddModule)
 add_hpx_module(
   core allocator_support
   COMPATIBILITY_HEADERS ON # Added in 1.5.0
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${allocator_support_sources}
   HEADERS ${allocator_support_headers}

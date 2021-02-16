@@ -8,7 +8,7 @@ include(HPX_ExportTargets)
 
 function(add_hpx_module libname modulename)
   # Retrieve arguments
-  set(options DEPRECATION_WARNINGS CUDA CONFIG_FILES)
+  set(options CUDA CONFIG_FILES)
   # Compatibility needs to be on/off to allow 3 states : ON/OFF and disabled
   set(one_value_args COMPATIBILITY_HEADERS GLOBAL_HEADER_GEN)
   set(multi_value_args
@@ -69,26 +69,6 @@ function(add_hpx_module libname modulename)
     CATEGORY "Modules"
     MODULE ${modulename_upper}
   )
-
-  set(_deprecation_warnings_default OFF)
-  if(${HPX_WITH_DEPRECATION_WARNINGS} AND ${modulename}_DEPRECATION_WARNINGS)
-    set(_deprecation_warnings_default ON)
-  endif()
-  hpx_option(
-    HPX_${modulename_upper}_WITH_DEPRECATION_WARNINGS
-    BOOL
-    "Enable warnings for deprecated facilities. (default: ${HPX_WITH_DEPRECATION_WARNINGS})"
-    ${_deprecation_warnings_default}
-    ADVANCED
-    CATEGORY "Modules"
-    MODULE ${modulename_upper}
-  )
-  if(${HPX_${modulename_upper}_WITH_DEPRECATION_WARNINGS})
-    hpx_add_config_cond_define_namespace(
-      DEFINE HPX_${modulename_upper}_HAVE_DEPRECATION_WARNINGS NAMESPACE
-      ${modulename_upper} VALUE 1
-    )
-  endif()
 
   if(${_have_compatibility_headers_option})
     set(_compatibility_headers_default OFF)

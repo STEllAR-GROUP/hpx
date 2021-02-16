@@ -30,7 +30,6 @@ include(HPX_AddModule)
 add_hpx_module(
   full naming
   COMPATIBILITY_HEADERS ON # added in hpx V1.6.0
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${naming_sources}
   HEADERS ${naming_headers}

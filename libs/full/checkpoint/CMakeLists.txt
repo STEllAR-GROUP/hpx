@@ -29,7 +29,6 @@ include(HPX_AddModule)
 add_hpx_module(
   full checkpoint
   COMPATIBILITY_HEADERS ON # Added in 1.5.0
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${checkpoint_sources}
   HEADERS ${checkpoint_headers}

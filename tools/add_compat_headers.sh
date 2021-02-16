@@ -102,7 +102,6 @@ echo "project_path: ${project_path}"
 # Usual vars (depend on the parsing step)
 libs_path=$project_path/libs
 module_path=$libs_path/${module}
-module_caps=${module^^}
 
 # Error handling
 if [[ "$old_path_set" = "false" ]]; then
@@ -158,7 +157,7 @@ cat >${full_file} <<EOL
 #include <hpx/${module}/config/defines.hpp>
 #include <${new_path}/${f}>
 
-#if HPX_${module_caps}_HAVE_DEPRECATION_WARNINGS
+#if HPX_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message( \\
     "The header ${old_path}/${f} is deprecated, \\

@@ -54,7 +54,6 @@ include(HPX_AddModule)
 add_hpx_module(
   full async_cuda
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${async_cuda_sources}
   HEADERS ${async_cuda_headers}

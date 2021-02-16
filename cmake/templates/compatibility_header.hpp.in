@@ -12,7 +12,7 @@
 #include <hpx/@modulename@/config/defines.hpp>
 #include <@new_header@>
 
-#if HPX_@modulename_upper@_HAVE_DEPRECATION_WARNINGS
+#if HPX_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header @old_header@ is deprecated, " \
     "please include @new_header@ instead")

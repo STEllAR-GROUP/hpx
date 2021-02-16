@@ -36,7 +36,6 @@ include(HPX_AddModule)
 add_hpx_module(
   core timing
   COMPATIBILITY_HEADERS ON # Added in 1.5.0
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${timing_sources}
   HEADERS ${timing_headers}

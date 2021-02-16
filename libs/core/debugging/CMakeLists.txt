@@ -27,7 +27,6 @@ include(HPX_AddModule)
 add_hpx_module(
   core debugging
   COMPATIBILITY_HEADERS ON # Added in 1.5.0
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${debugging_sources}
   HEADERS ${debugging_headers}
