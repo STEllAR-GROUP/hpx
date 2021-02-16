@@ -299,11 +299,8 @@ else()
 endif()
 
 hpx_option(
-  HPX_WITH_UNITY_BUILD
-  BOOL
-  "Enable unity build for certain build targets (default OFF)"
-  OFF
-  ADVANCED
+  HPX_WITH_UNITY_BUILD BOOL
+  "Enable unity build for certain build targets (default OFF)" OFF ADVANCED
 )
 if(HPX_WITH_UNITY_BUILD)
   set(HPX_WITH_UNITY_BUILD_OPTION UNITY_BUILD)
