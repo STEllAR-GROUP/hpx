@@ -8,10 +8,9 @@
 #pragma once
 
 #include <hpx/async_cuda/cuda_exception.hpp>
-//
-#include <boost/lockfree/stack.hpp>
-//
 #include <hpx/async_cuda/custom_gpu_api.hpp>
+
+#include <boost/lockfree/stack.hpp>
 
 namespace hpx { namespace cuda { namespace experimental {
 
