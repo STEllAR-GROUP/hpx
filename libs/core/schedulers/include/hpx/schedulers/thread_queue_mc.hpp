@@ -98,6 +98,16 @@ namespace hpx { namespace threads { namespace policies {
         std::size_t add_new(
             std::int64_t add_count, thread_queue_type* addfrom, bool stealing)
         {
+#ifdef HPX_HAVE_BULK_STEALING
+            return add_new_bulk(add_count, addfrom, stealing);
+#else
+            return add_new_unit(add_count, addfrom, stealing);
+#endif
+        }
+
+        std::size_t add_new_unit(
+            std::int64_t add_count, thread_queue_type* addfrom, bool stealing)
+        {
             if (addfrom->new_tasks_count_.data_.load(
                     std::memory_order_relaxed) == 0)
             {
@@ -128,6 +138,86 @@ namespace hpx { namespace threads { namespace policies {
                     // specified thread_queue
                     ++added;
                     schedule_work(get_thread_id_data(tid), stealing);
+                }
+            }
+
+            return added;
+        }
+
+        std::size_t add_new_bulk(
+            std::int64_t add_count, thread_queue_type* addfrom, bool stealing)
+        {
+            if (addfrom->new_tasks_count_.data_.load(
+                    std::memory_order_relaxed) == 0)
+            {
+                return 0;
+            }
+            //
+
+            std::size_t added = 0;
+            std::array<task_description, HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT>
+                popped_tasks_;
+            std::size_t tasks_to_pop = popped_tasks_.size();
+            std::size_t tasks_nb;
+            task_description task;
+            unsigned int i;
+            while (((add_count -= tasks_to_pop) >= 0) &&
+                (tasks_nb = addfrom->new_task_items_.pop_bulk(
+                     popped_tasks_.begin(), popped_tasks_.end(), stealing)))
+            {
+                for (i = 0; i < tasks_nb; i++)
+                {
+                    // create the new thread
+                    threads::thread_init_data& data = popped_tasks_[i];
+                    threads::thread_id_type tid;
+
+                    holder_->create_thread_object(tid, data);
+                    holder_->add_to_thread_map(tid);
+                    // Decrement only after thread_map_count_ has been incremented
+                    --addfrom->new_tasks_count_.data_;
+
+                    tqmc_deb.debug(debug::str<>("add_new"), "stealing",
+                        stealing,
+                        debug::threadinfo<threads::thread_id_type*>(&tid));
+
+                    // insert the thread into work-items queue if in pending state
+                    if (data.initial_state == thread_schedule_state::pending)
+                    {
+                        // pushing the new thread into the pending queue of the
+                        // specified thread_queue
+                        ++added;
+                        schedule_work(get_thread_id_data(tid), stealing);
+                    }
+                }
+            }
+            // add_count - task_to_pop is >= 0, we need to pop the last tasks
+            if (add_count > 0)
+            {
+                tasks_nb = addfrom->new_task_items_.pop_bulk(
+                    popped_tasks_.begin(), popped_tasks_.end(), stealing);
+                for (i = 0; i < tasks_nb; i++)
+                {
+                    // create the new thread
+                    threads::thread_init_data& data = popped_tasks_[i];
+                    threads::thread_id_type tid;
+
+                    holder_->create_thread_object(tid, data);
+                    holder_->add_to_thread_map(tid);
+                    // Decrement only after thread_map_count_ has been incremented
+                    --addfrom->new_tasks_count_.data_;
+
+                    tqmc_deb.debug(debug::str<>("add_new"), "stealing",
+                        stealing,
+                        debug::threadinfo<threads::thread_id_type*>(&tid));
+
+                    // insert the thread into work-items queue if in pending state
+                    if (data.initial_state == thread_schedule_state::pending)
+                    {
+                        // pushing the new thread into the pending queue of the
+                        // specified thread_queue
+                        ++added;
+                        schedule_work(get_thread_id_data(tid), stealing);
+                    }
                 }
             }
 
