@@ -184,10 +184,10 @@ void for_each_tests(std::vector<hpx::id_type>& localities)
         hpx::partitioned_vector<T> v(
             length, T(0), hpx::container_layout(localities));
         test_for_each(v, T(0));
-        test_for_each(hpx::execution::seq, v, T(0));
-        test_for_each(hpx::execution::par, v, T(1));
-        test_for_each_async(hpx::execution::seq(hpx::execution::task), v, T(2));
-        test_for_each_async(hpx::execution::par(hpx::execution::task), v, T(3));
+        test_for_each(hpx::execution::seq, v, T(1));
+        test_for_each(hpx::execution::par, v, T(2));
+        test_for_each_async(hpx::execution::seq(hpx::execution::task), v, T(3));
+        test_for_each_async(hpx::execution::par(hpx::execution::task), v, T(4));
     }
 }
 

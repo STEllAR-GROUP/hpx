@@ -12,10 +12,7 @@
 
 #include <cstdint>
 
-void myfunction(std::int64_t i)
-{
-    std::cout << ' ' << i;
-}
+void myfunction(std::int64_t) {}
 
 void test_invoke_projected()
 {

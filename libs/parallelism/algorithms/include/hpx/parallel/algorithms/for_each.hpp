@@ -240,7 +240,7 @@ namespace hpx {
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
@@ -593,19 +593,26 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
 
+    // Note: The implementation of the non-segmented algorithms here relies on
+    //       tag_fallback_invoke. For this reason the tag_invoke overloads for
+    //       the segmented algorithms (and other specializations) take
+    //       precedence over the implementations here. This has the advantage
+    //       that the non-segmented algorithms do not need to be explicitly
+    //       disabled for other, possibly external specializations.
+    //
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_each_t final
-      : hpx::functional::tag<for_each_t>
+      : hpx::functional::tag_fallback<for_each_t>
     {
     private:
         // clang-format off
         template <typename InIter,
             typename F,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<InIter>::value &&
-               !hpx::traits::is_segmented_iterator<InIter>::value
+                hpx::traits::is_iterator<InIter>::value
             )>
         // clang-format on
-        friend F tag_invoke(hpx::for_each_t, InIter first, InIter last, F&& f)
+        friend F tag_fallback_invoke(
+            hpx::for_each_t, InIter first, InIter last, F&& f)
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
                 "Requires at least input iterator.");
@@ -624,13 +631,12 @@ namespace hpx {
             typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter>::value &&
-               !hpx::traits::is_segmented_iterator<FwdIter>::value
+                hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            void>::type
-        tag_invoke(hpx::for_each_t, ExPolicy&& policy, FwdIter first,
+        friend typename hpx::parallel::util::detail::algorithm_result<
+            ExPolicy>::type
+        tag_fallback_invoke(hpx::for_each_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, F&& f)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),

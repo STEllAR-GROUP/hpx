@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,7 @@
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <exception>
 #include <iterator>
 #include <list>
@@ -218,6 +219,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
 
+    // Note: The implementation of the non-segmented algorithms relies on
+    //       tag_fallback_invoke. For this reason the tag_invoke overloads here
+    //       take precedence over the non-segmented algorithms. This has the
+    //       advantage that the non-segmented algorithms do not need to be
+    //       explicitly disabled for segmented iterators.
+
     // clang-format off
     template <typename InIter,
         typename F,
@@ -232,6 +239,11 @@ namespace hpx { namespace segmented {
             "Requires at least input iterator.");
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<InIter>;
+
+        if (first == last)
+        {
+            return first;
+        }
 
         return hpx::parallel::v1::detail::segmented_for_each(
             hpx::parallel::v1::detail::for_each<
