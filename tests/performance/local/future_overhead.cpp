@@ -408,6 +408,41 @@ void measure_function_futures_create_thread(std::uint64_t count, bool csv)
     print_stats("create_thread", "latch", "none", count, duration, csv);
 }
 
+// Similar to create_thread but hinting the current thread
+void measure_function_futures_create_thread_hint(std::uint64_t count, bool csv)
+{
+    hpx::lcos::local::latch l(count);
+
+    auto const sched = hpx::threads::get_self_id_data()->get_scheduler_base();
+    auto func = [&l]() {
+        null_function();
+        l.count_down(1);
+    };
+    auto const thread_func =
+        hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
+    auto const desc = hpx::util::thread_description();
+    auto const prio = hpx::threads::thread_priority::normal;
+    auto const hint = hpx::get_local_worker_thread_num();
+    auto const stack_size = hpx::threads::thread_stacksize::small_;
+    hpx::error_code ec;
+
+    // start the clock
+    high_resolution_timer walltime;
+    for (std::uint64_t i = 0; i < count; ++i)
+    {
+        auto init = hpx::threads::thread_init_data(
+            hpx::threads::thread_function_type(thread_func), desc, prio, hint,
+            stack_size, hpx::threads::thread_schedule_state::pending, false,
+            sched);
+        sched->create_thread(init, nullptr, ec);
+    }
+    l.wait();
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+    print_stats("create_thread", "latch", "none", count, duration, csv);
+}
+
 void measure_function_futures_create_thread_hierarchical_placement(
     std::uint64_t count, bool csv)
 {
@@ -571,6 +606,8 @@ int hpx_main(variables_map& vm)
                     count, csv, par_nostack, "parallel_executor_nostack");
                 measure_function_futures_register_work(count, csv);
                 measure_function_futures_create_thread(count, csv);
+                // To investigate bulk
+                measure_function_futures_create_thread_hint(count, csv);
                 measure_function_futures_apply_hierarchical_placement(
                     count, csv);
             }
