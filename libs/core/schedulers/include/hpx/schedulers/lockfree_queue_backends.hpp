@@ -65,6 +65,25 @@ namespace hpx { namespace threads { namespace policies {
 #endif
         }
 
+        // Attempts to push several elements in the queue
+        // Returns false if one push failed
+        template <typename It>
+        bool push_bulk(It first, It last, bool /*other_end*/ = true)
+        {
+            for (; first != last; first++)
+            {
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+                if (!queue_.push_left(*first))
+#else
+                if (!queue_.push(*first))
+#endif
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         bool pop(reference val, bool /* steal */ = true)
         {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
@@ -142,6 +161,12 @@ namespace hpx { namespace threads { namespace policies {
             return queue_.enqueue(val);
         }
 
+        template <typename It>
+        bool push_bulk(It first, It last, bool /*other_end*/ = false)
+        {
+            return queue_.enqueue_bulk(first, std::distance(first, last));
+        }
+
         bool pop(reference val, bool /* steal */ = true)
         {
             return queue_.try_dequeue(val);
@@ -196,6 +221,34 @@ namespace hpx { namespace threads { namespace policies {
             if (other_end)
                 return queue_.push_right(val);
             return queue_.push_left(val);
+        }
+
+        // Attempts to push several elements in the queue
+        // Returns false if one push failed
+        template <typename It>
+        bool push_bulk(It first, It last, bool other_end = true)
+        {
+            if (other_end)
+            {
+                for (; first != last; first++)
+                {
+                    if (!queue_.push_right(*first))
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                for (; first != last; first++)
+                {
+                    if (!queue_.push_left(*first))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
         bool pop(reference val, bool /* steal */ = true)
@@ -262,6 +315,21 @@ namespace hpx { namespace threads { namespace policies {
         bool push(const_reference val, bool /*other_end*/ = false)
         {
             return queue_.push_left(val);
+        }
+
+        // Attempts to push several elements in the queue
+        // Returns false if one push failed
+        template <typename It>
+        bool push_bulk(It first, It last, bool /*other_end*/ = true)
+        {
+            for (; first != last; first++)
+            {
+                if (!queue_.push_left(*first))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         bool pop(reference val, bool steal = true)
@@ -345,6 +413,34 @@ namespace hpx { namespace threads { namespace policies {
             if (other_end)
                 return queue_.push_right(val);
             return queue_.push_left(val);
+        }
+
+        // Attempts to push several elements in the queue
+        // Returns false if one push failed
+        template <typename It>
+        bool push_bulk(It first, It last, bool other_end = true)
+        {
+            if (other_end)
+            {
+                for (; first != last; first++)
+                {
+                    if (!queue_.push_right(*first))
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                for (; first != last; first++)
+                {
+                    if (!queue_.push_left(*first))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
         bool pop(reference val, bool steal = true)
