@@ -466,19 +466,19 @@ Parallel algorithms
      * Saves the result of N applications of a function.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`generate_n`
-   * * :cpp:func:`hpx::parallel::v1::remove`
+   * * :cpp:func:`hpx::remove`
      * Removes the elements from a range that are equal to the given value.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`remove`
-   * * :cpp:func:`hpx::parallel::v1::remove_if`
+   * * :cpp:func:`hpx::remove_if`
      * Removes the elements from a range that are equal to the given predicate is ``false``
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`remove`
-   * * :cpp:func:`hpx::parallel::v1::remove_copy`
+   * * :cpp:func:`hpx::remove_copy`
      * Copies the elements from a range to a new location that are not equal to the given value.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`remove_copy`
-   * * :cpp:func:`hpx::parallel::v1::remove_copy_if`
+   * * :cpp:func:`hpx::remove_copy_if`
      * Copies the elements from a range to a new location for which the given predicate is ``false``
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`remove_copy`
@@ -518,7 +518,7 @@ Parallel algorithms
      * Swaps two ranges of elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`swap_ranges`
-   * * :cpp:func:`hpx::parallel::v1::transform`
+   * * :cpp:func:`hpx::transform`
      * Applies a function to a range of elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`transform`
