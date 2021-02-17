@@ -24,6 +24,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <utility>
 
 namespace hpx { namespace threads { namespace policies {
@@ -71,6 +72,27 @@ namespace hpx { namespace threads { namespace policies {
 #else
             return queue_.pop(val);
 #endif
+        }
+
+        // Attempts to pop several elements from the queue
+        // Returns the number of items actually popped
+        template <typename It>
+        std::size_t pop_bulk(It first, It last, bool /*steal*/ = true)
+        {
+            std::size_t count = 0;
+            for (; first != last; first++)
+            {
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+                if (!queue_.pop_right(*first))
+#else
+                if (!queue_.pop(*first))
+#endif
+                {
+                    break;
+                }
+                count++;
+            }
+            return count;
         }
 
         bool empty()
@@ -125,6 +147,12 @@ namespace hpx { namespace threads { namespace policies {
             return queue_.try_dequeue(val);
         }
 
+        template <typename It>
+        std::size_t pop_bulk(It first, It last, bool /* steal */ = true)
+        {
+            return queue_.try_dequeue_bulk(first, std::distance(first, last));
+        }
+
         bool empty()
         {
             return (queue_.size_approx() == 0);
@@ -150,9 +178,7 @@ namespace hpx { namespace threads { namespace policies {
     template <typename T>
     struct lockfree_lifo_backend
     {
-        using container_type =
-            boost::lockfree::deque<T, boost::lockfree::caching_freelist_t,
-                hpx::util::aligned_allocator<T>>;
+        using container_type = boost::lockfree::deque<T>;
 
         using value_type = T;
         using reference = T&;
@@ -175,6 +201,23 @@ namespace hpx { namespace threads { namespace policies {
         bool pop(reference val, bool /* steal */ = true)
         {
             return queue_.pop_left(val);
+        }
+
+        // Attempts to pop several elements from the queue
+        // Returns the number of items actually popped
+        template <typename It>
+        std::size_t pop_bulk(It first, It last, bool /*steal*/ = true)
+        {
+            std::size_t count = 0;
+            for (; first != last; first++)
+            {
+                if (!queue_.pop_left(*first))
+                {
+                    break;
+                }
+                count++;
+            }
+            return count;
         }
 
         bool empty()
@@ -203,9 +246,7 @@ namespace hpx { namespace threads { namespace policies {
     template <typename T>
     struct lockfree_abp_fifo_backend
     {
-        using container_type =
-            boost::lockfree::deque<T, boost::lockfree::caching_freelist_t,
-                hpx::util::aligned_allocator<T>>;
+        using container_type = boost::lockfree::deque<T>;
 
         using value_type = T;
         using reference = T&;
@@ -228,6 +269,37 @@ namespace hpx { namespace threads { namespace policies {
             if (steal)
                 return queue_.pop_left(val);
             return queue_.pop_right(val);
+        }
+
+        // Attempts to pop several elements from the queue
+        // Returns the number of items actually popped
+        template <typename It>
+        std::size_t pop_bulk(It first, It last, bool steal = true)
+        {
+            std::size_t count = 0;
+            if (steal)
+            {
+                for (; first != last; first++)
+                {
+                    if (!queue_.pop_left(*first))
+                    {
+                        break;
+                    }
+                    count++;
+                }
+            }
+            else
+            {
+                for (; first != last; first++)
+                {
+                    if (!queue_.pop_right(*first))
+                    {
+                        break;
+                    }
+                    count++;
+                }
+            }
+            return count;
         }
 
         bool empty()
@@ -255,9 +327,7 @@ namespace hpx { namespace threads { namespace policies {
     template <typename T>
     struct lockfree_abp_lifo_backend
     {
-        using container_type =
-            boost::lockfree::deque<T, boost::lockfree::caching_freelist_t,
-                hpx::util::aligned_allocator<T>>;
+        using container_type = boost::lockfree::deque<T>;
 
         using value_type = T;
         using reference = T&;
@@ -282,6 +352,37 @@ namespace hpx { namespace threads { namespace policies {
             if (steal)
                 return queue_.pop_right(val);
             return queue_.pop_left(val);
+        }
+
+        // Attempts to pop several elements from the queue
+        // Returns the number of items actually popped
+        template <typename It>
+        std::size_t pop_bulk(It first, It last, bool steal = true)
+        {
+            std::size_t count = 0;
+            if (steal)
+            {
+                for (; first != last; first++)
+                {
+                    if (!queue_.pop_right(*first))
+                    {
+                        break;
+                    }
+                    count++;
+                }
+            }
+            else
+            {
+                for (; first != last; first++)
+                {
+                    if (!queue_.pop_left(*first))
+                    {
+                        break;
+                    }
+                    count++;
+                }
+            }
+            return count;
         }
 
         bool empty()

@@ -200,6 +200,19 @@ namespace hpx { namespace threads { namespace policies {
         std::size_t add_new(std::int64_t add_count, thread_queue* addfrom,
             std::unique_lock<mutex_type>& lk, bool steal = false)
         {
+#ifdef HPX_HAVE_BULK_STEALING
+            return add_new_bulk(add_count, addfrom, lk, steal);
+#else
+            return add_new_unit(add_count, addfrom, lk, steal);
+#endif
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // add new threads if there is some amount of work available by
+        // popping task by task
+        std::size_t add_new_unit(std::int64_t add_count, thread_queue* addfrom,
+            std::unique_lock<mutex_type>& lk, bool steal = false)
+        {
             HPX_ASSERT(lk.owns_lock());
 
             if (HPX_UNLIKELY(0 == add_count))
@@ -264,6 +277,161 @@ namespace hpx { namespace threads { namespace policies {
                 HPX_ASSERT(
                     &get_thread_id_data(thrd)->get_queue<thread_queue>() ==
                     this);
+            }
+
+            if (added)
+            {
+                LTM_(debug) << "add_new: added " << added
+                            << " tasks to queues";    //-V128
+            }
+            return added;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // add new threads if there is some amount of work available by bulk
+        // popping
+        std::size_t add_new_bulk(std::int64_t add_count, thread_queue* addfrom,
+            std::unique_lock<mutex_type>& lk, bool steal = false)
+        {
+            HPX_ASSERT(lk.owns_lock());
+
+            if (HPX_UNLIKELY(0 == add_count))
+                return 0;
+
+            std::size_t added = 0;
+            std::array<task_description*, HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT>
+                popped_tasks_;
+            std::size_t tasks_to_pop = popped_tasks_.size();
+            std::size_t tasks_nb;
+            task_description* task = nullptr;
+            unsigned int i;
+            while (((add_count -= tasks_to_pop) >= 0) &&
+                (tasks_nb = addfrom->new_tasks_.pop_bulk(
+                     popped_tasks_.begin(), popped_tasks_.end(), steal)))
+            {
+                for (i = 0; i < tasks_nb; i++)
+                {
+                    task = popped_tasks_[i];
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
+                    if (get_maintain_queue_wait_times_enabled())
+                    {
+                        addfrom->new_tasks_wait_ +=
+                            util::high_resolution_clock::now() - task->waittime;
+                        ++addfrom->new_tasks_wait_count_;
+                    }
+#endif
+                    // create the new thread
+                    threads::thread_init_data& data = task->data;
+                    threads::thread_id_type thrd;
+
+                    bool schedule_now =
+                        data.initial_state == thread_schedule_state::pending;
+
+                    create_thread_object(thrd, data, lk);
+
+                    task->~task_description();
+                    task_description_alloc_.deallocate(task, 1);
+
+                    // add the new entry to the map of all threads
+                    std::pair<thread_map_type::iterator, bool> p =
+                        thread_map_.insert(thrd);
+
+                    if (HPX_UNLIKELY(!p.second))
+                    {
+                        --addfrom->new_tasks_count_.data_;
+                        lk.unlock();
+                        HPX_THROW_EXCEPTION(hpx::out_of_memory,
+                            "thread_queue::add_new",
+                            "Couldn't add new thread to the thread map");
+                        return 0;
+                    }
+
+                    ++thread_map_count_;
+
+                    // Decrement only after thread_map_count_ has been incremented
+                    --addfrom->new_tasks_count_.data_;
+
+                    // only insert the thread into the work-items queue if it is in
+                    // pending state
+                    if (schedule_now)
+                    {
+                        // pushing the new thread into the pending queue of the
+                        // specified thread_queue
+                        ++added;
+                        schedule_thread(get_thread_id_data(thrd));
+                    }
+
+                    // this thread has to be in the map now
+                    HPX_ASSERT(thread_map_.find(thrd) != thread_map_.end());
+                    HPX_ASSERT(
+                        &get_thread_id_data(thrd)->get_queue<thread_queue>() ==
+                        this);
+                }
+            }
+            // add_count - task_to_pop is >= 0, we need to pop the last tasks
+            if (add_count > 0)
+            {
+                HPX_ASSERT(add_count < HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT);
+                tasks_nb = addfrom->new_tasks_.pop_bulk(popped_tasks_.begin(),
+                    popped_tasks_.begin() + ++add_count, steal);
+                for (i = 0; i < tasks_nb; i++)
+                {
+                    task = popped_tasks_[i];
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
+                    if (get_maintain_queue_wait_times_enabled())
+                    {
+                        addfrom->new_tasks_wait_ +=
+                            util::high_resolution_clock::now() - task->waittime;
+                        ++addfrom->new_tasks_wait_count_;
+                    }
+#endif
+                    // create the new thread
+                    threads::thread_init_data& data = task->data;
+                    threads::thread_id_type thrd;
+
+                    bool schedule_now =
+                        data.initial_state == thread_schedule_state::pending;
+
+                    create_thread_object(thrd, data, lk);
+
+                    task->~task_description();
+                    task_description_alloc_.deallocate(task, 1);
+
+                    // add the new entry to the map of all threads
+                    std::pair<thread_map_type::iterator, bool> p =
+                        thread_map_.insert(thrd);
+
+                    if (HPX_UNLIKELY(!p.second))
+                    {
+                        --addfrom->new_tasks_count_.data_;
+                        lk.unlock();
+                        HPX_THROW_EXCEPTION(hpx::out_of_memory,
+                            "thread_queue::add_new",
+                            "Couldn't add new thread to the thread map");
+                        return 0;
+                    }
+
+                    ++thread_map_count_;
+
+                    // Decrement only after thread_map_count_ has been incremented
+                    --addfrom->new_tasks_count_.data_;
+
+                    // only insert the thread into the work-items queue if it is in
+                    // pending state
+                    if (schedule_now)
+                    {
+                        // pushing the new thread into the pending queue of the
+                        // specified thread_queue
+                        ++added;
+                        schedule_thread(get_thread_id_data(thrd));
+                    }
+
+                    // this thread has to be in the map now
+                    HPX_ASSERT(thread_map_.find(thrd) != thread_map_.end());
+                    HPX_ASSERT(
+                        &get_thread_id_data(thrd)->get_queue<thread_queue>() ==
+                        this);
+                }
             }
 
             if (added)
