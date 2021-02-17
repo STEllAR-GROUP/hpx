@@ -115,6 +115,8 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`5178` - Fix parallel ``remove``\ /\ ``remove_copy``\ /\ ``transform``
+  namespace references in docs
 * :hpx-pr:`5169` - Attempt to get Piz Daint jenkins setup running after
   maintenance
 * :hpx-pr:`5168` - Remove include of itself
