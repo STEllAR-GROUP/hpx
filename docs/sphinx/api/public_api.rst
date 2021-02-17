@@ -92,6 +92,7 @@ Functions
 - :cpp:func:`hpx::parallel::v1::stable_partition`
 - :cpp:func:`hpx::parallel::v1::stable_sort`
 - :cpp:func:`hpx::parallel::v1::swap_ranges`
+- :cpp:func:`hpx::transform`
 - :cpp:func:`hpx::parallel::v1::unique`
 - :cpp:func:`hpx::parallel::v1::unique_copy`
 - :cpp:func:`hpx::for_loop`
