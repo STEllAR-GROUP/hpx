@@ -871,7 +871,14 @@ namespace hpx { namespace util {
                 rtcfg_.mode_ = hpx::runtime_mode::local;
             }
 #elif defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-            rtcfg_.mode_ = hpx::runtime_mode::console;
+            if (vm.count("hpx:local"))
+            {
+                rtcfg_.mode_ = hpx::runtime_mode::local;
+            }
+            else
+            {
+                rtcfg_.mode_ = hpx::runtime_mode::console;
+            }
 #else
             rtcfg_.mode_ = hpx::runtime_mode::local;
 #endif
