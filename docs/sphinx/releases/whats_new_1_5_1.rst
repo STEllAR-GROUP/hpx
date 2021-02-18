@@ -17,7 +17,7 @@ General changes
 This is a patch release. It contains the following changes:
 
 * Remove restriction on suspending runtime with multiple localities, users are
-now responsible for synchronizing work between localities before suspending.
+  now responsible for synchronizing work between localities before suspending.
 * Fixes several compilation problems and warnings.
 * Adds notes in the documentation explaining how to cite HPX.
 

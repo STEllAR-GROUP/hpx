@@ -105,7 +105,7 @@ are completed to avoid confusion.
       The script requires that you have the |stellar| Group signing key.
 
    #. This step is not necessary for patch releases. Notify
-      ``hpx-users@stellar.cct.lsu.edu`` and ``stellar@cct.lsu.edu`` of the
+      ``hpx-users@stellar-group.org`` and ``stellar@cct.lsu.edu`` of the
       availability of the release candidate. Ask users to test the candidate by
       checking out the release candidate tag.
 
@@ -170,7 +170,7 @@ are completed to avoid confusion.
    * Update version number in ``hpx/package.py`` and SHA256 to that of the new
      release
 
-#. Announce the release on hpx-users@stellar.cct.lsu.edu, stellar@cct.lsu.edu,
+#. Announce the release on hpx-users@stellar-group.org, stellar@cct.lsu.edu,
    allcct@cct.lsu.edu, faculty@csc.lsu.edu, faculty@ece.lsu.edu,
    xpress@crest.iu.edu, the |hpx| Slack channel, the IRC channel, Sonia Sachs,
    our list of external collaborators, isocpp.org, reddit.com, HPC Wire, Inside
