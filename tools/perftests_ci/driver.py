@@ -14,6 +14,13 @@ from pyutils import args, default_vars as var, env, log
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
+def mkdirp(absolute_path_file):
+    # Create the directories of the run_output files if does not exist
+    import ntpath
+    nested_dir, filename = ntpath.split(absolute_path_file)
+    if nested_dir != '' and not os.path.exists(nested_dir):
+            os.makedirs(nested_dir)
+
 @args.command(description='main script for '+ var._project_name +' pyutils')
 @args.arg('--verbose',
           '-v',
@@ -114,7 +121,7 @@ if buildinfo:
               default='4',
               type=int,
               help='number of runs to do for each test')
-    @args.arg('--output',
+    @args.arg('--run_output',
               '-o',
               required=True,
               help='output file path, extension .json is added if not given')
@@ -123,20 +130,22 @@ if buildinfo:
               type=str,
               help='extra arguments to pass to the test\nWarning prefer = to \
               space to assign values to hpx options')
-    def run(local, scheduling_policy, threads, r_output, extra_opts):
+    def run(local, scheduling_policy, threads, run_output, extra_opts):
         # options
         scheduling_policy='--hpx:queuing=' + scheduling_policy
         threads='--hpx:threads=' + str(threads)
         extra_opts = ' '.join(extra_opts).lstrip()
 
-        import perftest
-        if not r_output.lower().endswith('.json'):
-            r_output += '.json'
+        if not run_output.lower().endswith('.json'):
+            run_output += '.json'
+        # Create directory of file if does not exists yet
+        mkdirp(run_output)
 
+        import perftest
         data = perftest.run(local, scheduling_policy, threads, extra_opts)
-        with open(r_output, 'w') as outfile:
+        with open(run_output, 'w') as outfile:
             json.dump(data, outfile, indent='  ')
-            log.info(f'Successfully saved perftests output to {r_output}')
+            log.info(f'Successfully saved perftests output to {run_output}')
 
 
 @perftest.command(description='plot performance results')
@@ -152,10 +161,10 @@ def _load_json(filename):
 @plot.command(description='plot performance comparison')
 @args.arg('--output', '-o', required=True, help='output directory')
 @args.arg('--input', '-i', required=True, nargs=2, help='two input files')
-def compare(c_output, c_input):
+def compare(output, input):
+    mkdirp(output)
     from perftest import plot
-
-    plot.compare(*(_load_json(i) for i in c_input), c_output)
+    plot.compare(*(_load_json(i) for i in input), output)
 
 
 @plot.command(description='plot performance history')
