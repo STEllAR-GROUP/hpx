@@ -19,8 +19,8 @@
 #include <hpx/threading_base/register_thread.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 
-#include <boost/asio/basic_waitable_timer.hpp>
-#include <boost/asio/io_service.hpp>
+#include <asio/basic_waitable_timer.hpp>
+#include <asio/io_context.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -376,16 +376,16 @@ namespace hpx { namespace threads { namespace detail {
 
         // create timer firing in correspondence with given time
         using deadline_timer =
-            boost::asio::basic_waitable_timer<std::chrono::steady_clock>;
+            asio::basic_waitable_timer<std::chrono::steady_clock>;
 
-        boost::asio::io_service* s = get_default_timer_service();
+        asio::io_context* s = get_default_timer_service();
         HPX_ASSERT(s);
         deadline_timer t(*s, abs_time);
 
         // let the timer invoke the set_state on the new (suspended) thread
         t.async_wait([wake_id, priority, retry_on_active](
-                         const std::error_code& ec) {
-            if (ec.value() == boost::system::errc::operation_canceled)
+                         std::error_code const& ec) {
+            if (ec == std::make_error_code(std::errc::operation_canceled))
             {
                 detail::set_thread_state(wake_id,
                     thread_schedule_state::pending, thread_restart_state::abort,
@@ -412,6 +412,7 @@ namespace hpx { namespace threads { namespace detail {
         HPX_ASSERT(statex == thread_restart_state::abort ||
             statex == thread_restart_state::timeout);
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         if (thread_restart_state::timeout != statex)    //-V601
         {
             triggered->store(true);

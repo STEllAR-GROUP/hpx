@@ -22,17 +22,16 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/ip/address_v4.hpp>
-#include <boost/asio/ip/address_v6.hpp>
-#include <boost/asio/ip/host_name.hpp>
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/system/error_code.hpp>
-#include <boost/system/system_error.hpp>
+#include <asio/io_context.hpp>
+#include <asio/ip/address_v4.hpp>
+#include <asio/ip/address_v6.hpp>
+#include <asio/ip/host_name.hpp>
+#include <asio/ip/tcp.hpp>
 
 #include <ctime>
 #include <exception>
 #include <sstream>
+#include <system_error>
 
 #if defined(HPX_WINDOWS)
 // Prevent asio from initializing Winsock, the object must be constructed
@@ -44,7 +43,7 @@
 #pragma warning(disable : 4073)
 #endif
 #pragma init_seg(lib)
-boost::asio::detail::winsock_init<>::manual manual_winsock_init;
+asio::detail::winsock_init<>::manual manual_winsock_init;
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
@@ -52,12 +51,13 @@ boost::asio::detail::winsock_init<>::manual manual_winsock_init;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
+
     ///////////////////////////////////////////////////////////////////////////
     bool get_endpoint(std::string const& addr, std::uint16_t port,
-        boost::asio::ip::tcp::endpoint& ep)
+        asio::ip::tcp::endpoint& ep)
     {
-        using namespace boost::asio::ip;
-        boost::system::error_code ec;
+        using namespace asio::ip;
+        std::error_code ec;
         address_v4 addr4 = address_v4::from_string(addr.c_str(), ec);
         if (!ec)
         {    // it's an IPV4 address
@@ -75,17 +75,17 @@ namespace hpx { namespace util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::string get_endpoint_name(boost::asio::ip::tcp::endpoint const& ep)
+    std::string get_endpoint_name(asio::ip::tcp::endpoint const& ep)
     {
         return ep.address().to_string();
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // properly resolve a give host name to the corresponding IP address
-    boost::asio::ip::tcp::endpoint resolve_hostname(std::string const& hostname,
-        std::uint16_t port, boost::asio::io_service& io_service)
+    asio::ip::tcp::endpoint resolve_hostname(std::string const& hostname,
+        std::uint16_t port, asio::io_context& io_service)
     {
-        using boost::asio::ip::tcp;
+        using asio::ip::tcp;
 
         // collect errors here
         exception_list errors;
@@ -97,7 +97,7 @@ namespace hpx { namespace util {
             if (util::get_endpoint(hostname, port, ep))
                 return ep;
         }
-        catch (boost::system::system_error const&)
+        catch (std::system_error const&)
         {
             errors.add(std::current_exception());
         }
@@ -109,12 +109,11 @@ namespace hpx { namespace util {
             tcp::resolver resolver(io_service);
             tcp::resolver::query query(hostname, std::to_string(port));
 
-            boost::asio::ip::tcp::resolver::iterator it =
-                resolver.resolve(query);
-            HPX_ASSERT(it != boost::asio::ip::tcp::resolver::iterator());
+            asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+            HPX_ASSERT(it != asio::ip::tcp::resolver::iterator());
             return *it;
         }
-        catch (boost::system::system_error const&)
+        catch (std::system_error const&)
         {
             errors.add(std::current_exception());
         }
@@ -132,21 +131,21 @@ namespace hpx { namespace util {
     // return the public IP address of the local node
     std::string resolve_public_ip_address()
     {
-        using boost::asio::ip::tcp;
+        using asio::ip::tcp;
 
         // collect errors here
         exception_list errors;
 
         try
         {
-            boost::asio::io_service io_service;
+            asio::io_context io_service;
             tcp::resolver resolver(io_service);
-            tcp::resolver::query query(boost::asio::ip::host_name(), "");
+            tcp::resolver::query query(asio::ip::host_name(), "");
             tcp::resolver::iterator it = resolver.resolve(query);
             tcp::endpoint endpoint = *it;
             return endpoint.address().to_string();
         }
-        catch (boost::system::system_error const&)
+        catch (std::system_error const&)
         {
             errors.add(std::current_exception());
         }
@@ -164,7 +163,7 @@ namespace hpx { namespace util {
     // Take an ip v4 or v6 address and "standardize" it for comparison checks
     // note that this code doesn't work as expected if we use the boost
     // inet_pton functions on linux. see issue #2177 for further info
-    std::string cleanup_ip_address(const std::string& addr)
+    std::string cleanup_ip_address(std::string const& addr)
     {
         char buf[sizeof(struct in6_addr)];
         int i = 0, domain[2] = {AF_INET, AF_INET6};
@@ -172,13 +171,13 @@ namespace hpx { namespace util {
 
 #if defined(HPX_WINDOWS)
         unsigned long scope_id;
-        boost::system::error_code ec;
+        std::error_code ec;
 #endif
 
         for (i = 0; i < 2; ++i)
         {
 #if defined(HPX_WINDOWS)
-            int s = boost::asio::detail::socket_ops::inet_pton(
+            int s = asio::detail::socket_ops::inet_pton(
                 domain[i], &addr[0], buf, &scope_id, ec);
             if (s > 0 && !ec)
                 break;
@@ -195,7 +194,7 @@ namespace hpx { namespace util {
         }
 
 #if defined(HPX_WINDOWS)
-        if (boost::asio::detail::socket_ops::inet_ntop(
+        if (asio::detail::socket_ops::inet_ntop(
                 domain[i], buf, str, INET6_ADDRSTRLEN, scope_id, ec) == nullptr)
         {
 #else
@@ -209,9 +208,9 @@ namespace hpx { namespace util {
     }
 
     endpoint_iterator_type connect_begin(std::string const& address,
-        std::uint16_t port, boost::asio::io_service& io_service)
+        std::uint16_t port, asio::io_context& io_service)
     {
-        using boost::asio::ip::tcp;
+        using asio::ip::tcp;
 
         // collect errors here
         exception_list errors;
@@ -228,7 +227,7 @@ namespace hpx { namespace util {
                     tcp::resolver::results_type::create(ep, address, port_str));
             }
         }
-        catch (boost::system::system_error const&)
+        catch (std::system_error const&)
         {
             errors.add(std::current_exception());
         }
@@ -239,12 +238,11 @@ namespace hpx { namespace util {
             // resolve the given address
             tcp::resolver resolver(io_service);
             tcp::resolver::query query(
-                !address.empty() ? address : boost::asio::ip::host_name(),
-                port_str);
+                !address.empty() ? address : asio::ip::host_name(), port_str);
 
             return endpoint_iterator_type(resolver.resolve(query));
         }
-        catch (boost::system::system_error const&)
+        catch (std::system_error const&)
         {
             errors.add(std::current_exception());
         }
@@ -261,9 +259,9 @@ namespace hpx { namespace util {
     }
 
     endpoint_iterator_type accept_begin(std::string const& address,
-        std::uint16_t port, boost::asio::io_service& io_service)
+        std::uint16_t port, asio::io_context& io_service)
     {
-        using boost::asio::ip::tcp;
+        using asio::ip::tcp;
 
         // collect errors here
         exception_list errors;
@@ -280,7 +278,7 @@ namespace hpx { namespace util {
                     tcp::resolver::results_type::create(ep, address, port_str));
             }
         }
-        catch (boost::system::system_error const&)
+        catch (std::system_error const&)
         {
             errors.add(std::current_exception());
         }
@@ -294,7 +292,7 @@ namespace hpx { namespace util {
 
             return endpoint_iterator_type(resolver.resolve(query));
         }
-        catch (boost::system::system_error const&)
+        catch (std::system_error const&)
         {
             errors.add(std::current_exception());
         }
@@ -306,11 +304,11 @@ namespace hpx { namespace util {
         {
             // resolve the given address
             tcp::resolver resolver(io_service);
-            tcp::resolver::query query(boost::asio::ip::host_name(), port_str);
+            tcp::resolver::query query(asio::ip::host_name(), port_str);
 
             return endpoint_iterator_type(resolver.resolve(query));
         }
-        catch (boost::system::system_error const&)
+        catch (std::system_error const&)
         {
             errors.add(std::current_exception());
         }
@@ -329,6 +327,7 @@ namespace hpx { namespace util {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
+
     ///////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]
     bool split_ip_address(

@@ -105,6 +105,7 @@ configure_file(
 target_link_libraries(hpx_core PUBLIC hpx_dependencies_boost)
 target_link_libraries(hpx_core PUBLIC hpx_dependencies_allocator)
 target_link_libraries(hpx_core PUBLIC Hwloc::hwloc)
+target_link_libraries(hpx_core PUBLIC ASIO::standalone_asio)
 
 if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
   target_link_libraries(hpx_core PUBLIC Boost::filesystem)

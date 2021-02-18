@@ -384,8 +384,8 @@ namespace hpx { namespace threads { namespace detail {
 
     struct scheduling_callbacks
     {
-        typedef util::unique_function_nonser<void()> callback_type;
-        typedef util::unique_function_nonser<bool()> background_callback_type;
+        using callback_type = util::unique_function_nonser<void()>;
+        using background_callback_type = util::unique_function_nonser<bool()>;
 
         explicit scheduling_callbacks(callback_type&& outer,
             callback_type&& inner = callback_type(),

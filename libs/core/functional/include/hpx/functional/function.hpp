@@ -31,7 +31,7 @@ namespace hpx { namespace util {
         using base_type = detail::basic_function<R(Ts...), true, Serializable>;
 
     public:
-        typedef R result_type;
+        using result_type = R;
 
         constexpr function(std::nullptr_t = nullptr) noexcept {}
 

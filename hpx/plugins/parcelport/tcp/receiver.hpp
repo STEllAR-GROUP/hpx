@@ -10,9 +10,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/system/error_code.hpp
-// hpxinspect:nodeprecatedname:boost::system::error_code
-
 #pragma once
 
 #include <hpx/config.hpp>
@@ -30,14 +27,12 @@
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 
-#include <boost/asio/buffer.hpp>
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/placeholders.hpp>
-#include <boost/asio/read.hpp>
-#include <boost/asio/write.hpp>
-#include <boost/system/error_code.hpp>
-/* The boost asio support includes termios.h.
+#include <asio/buffer.hpp>
+#include <asio/io_context.hpp>
+#include <asio/ip/tcp.hpp>
+#include <asio/read.hpp>
+#include <asio/write.hpp>
+/* The asio support includes termios.h.
  * The termios.h file on ppc64le defines these macros, which
  * are also used by blaze, blaze_tensor as Template names.
  * Make sure we undefine them before continuing. */
@@ -60,9 +55,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     class receiver
       : public parcelport_connection<receiver, std::vector<char>, std::vector<char> >
     {
-        typedef hpx::lcos::local::spinlock mutex_type;
+        using mutex_type = hpx::lcos::local::spinlock;
+
     public:
-        receiver(boost::asio::io_service& io_service, std::uint64_t max_inbound_size,
+        receiver(asio::io_context& io_service, std::uint64_t max_inbound_size,
             connection_handler& parcelport)
           : socket_(io_service)
           , max_inbound_size_(max_inbound_size)
@@ -79,7 +75,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
 
         /// Get the socket associated with the parcelport_connection.
-        boost::asio::ip::tcp::socket& socket() { return socket_; }
+        asio::ip::tcp::socket& socket() { return socket_; }
 
         /// Asynchronously read a data structure from the socket.
         template <typename Handler>
@@ -94,8 +90,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             data.num_parcels_ = 0;
 
             // Issue a read operation to read the message size.
-            using boost::asio::buffer;
-            std::vector<boost::asio::mutable_buffer> buffers;
+            using asio::buffer;
+            std::vector<asio::mutable_buffer> buffers;
             buffers.push_back(buffer(&buffer_.size_,
                 sizeof(buffer_.size_)));
             buffers.push_back(buffer(&buffer_.data_size_,
@@ -110,12 +106,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 {
                     lk.unlock();
                     // report this problem back to the handler
-                    handler(boost::asio::error::make_error_code(
-                        boost::asio::error::not_connected));
+                    handler(asio::error::make_error_code(
+                        asio::error::not_connected));
                     return;
                 }
 #if defined(__linux) || defined(linux) || defined(__linux__)
-                boost::asio::detail::socket_option::boolean<
+                asio::detail::socket_option::boolean<
                     IPPROTO_TCP, TCP_QUICKACK> quickack(true);
                 socket_.set_option(quickack);
 #endif
@@ -124,10 +120,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         std::size_t, Handler)
                     = &receiver::handle_read_header<Handler>;
 
-                boost::asio::async_read(socket_, buffers,
+                asio::async_read(socket_, buffers,
                     util::bind(f, shared_from_this(),
-                        boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred,
+                        util::placeholders::_1, // error
+                        util::placeholders::_2, // bytes_transferred
                         util::protect(handler)));
             }
         }
@@ -136,9 +132,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         {
             std::lock_guard<mutex_type> lk(mtx_);
             // gracefully and portably shutdown the socket
-            boost::system::error_code ec;
+            std::error_code ec;
             if (socket_.is_open()) {
-                socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+                socket_.shutdown(asio::ip::tcp::socket::shutdown_both, ec);
                 socket_.close(ec);    // close the socket to give it back to the OS
             }
 
@@ -169,15 +165,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 if (inbound_size > max_inbound_size_)
                 {
                     // report this problem back to the handler
-                    handler(boost::asio::error::make_error_code(
-                        boost::asio::error::operation_not_supported));
+                    handler(asio::error::make_error_code(
+                        asio::error::operation_not_supported));
                     return;
                 }
 
                 buffer_.data_point_.bytes_ = static_cast<std::size_t>(inbound_size);
 
                 // receive buffers
-                std::vector<boost::asio::mutable_buffer> buffers;
+                std::vector<asio::mutable_buffer> buffers;
 
                 // determine the size of the chunk buffer
                 std::size_t num_zero_copy_chunks =
@@ -201,12 +197,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         num_zero_copy_chunks + num_non_zero_copy_chunks));
 
                     buffers.push_back(
-                        boost::asio::buffer(chunks.data(), chunks.size() *
+                        asio::buffer(chunks.data(), chunks.size() *
                             sizeof(transmission_chunk_type)));
 
                     // add main buffer holding data which was serialized normally
                     buffer_.data_.resize(static_cast<std::size_t>(inbound_size));
-                    buffers.push_back(boost::asio::buffer(buffer_.data_));
+                    buffers.push_back(asio::buffer(buffer_.data_));
 
                     // Start an asynchronous call to receive the data.
                     f = &receiver::handle_read_chunk_data<Handler>;
@@ -214,7 +210,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 else {
                     // add main buffer holding data which was serialized normally
                     buffer_.data_.resize(static_cast<std::size_t>(inbound_size));
-                    buffers.push_back(boost::asio::buffer(buffer_.data_));
+                    buffers.push_back(asio::buffer(buffer_.data_));
 
                     // Start an asynchronous call to receive the data.
                     f = &receiver::handle_read_data<Handler>;
@@ -226,18 +222,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     {
                         lk.unlock();
                         // report this problem back to the handler
-                        handler(boost::asio::error::make_error_code(
-                            boost::asio::error::not_connected));
+                        handler(asio::error::make_error_code(
+                            asio::error::not_connected));
                         return;
                     }
 #if defined(__linux) || defined(linux) || defined(__linux__)
-                    boost::asio::detail::socket_option::boolean<
+                    asio::detail::socket_option::boolean<
                         IPPROTO_TCP, TCP_QUICKACK> quickack(true);
                     socket_.set_option(quickack);
 #endif
-                    boost::asio::async_read(socket_, buffers,
+                    asio::async_read(socket_, buffers,
                         util::bind(f, shared_from_this(),
-                            boost::asio::placeholders::error,
+                            util::placeholders::_1, // error,
                             util::protect(handler)));
                 }
             }
@@ -257,7 +253,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             }
             else {
                 // receive buffers
-                std::vector<boost::asio::mutable_buffer> buffers;
+                std::vector<asio::mutable_buffer> buffers;
 
                 // add appropriately sized chunk buffers for the zero-copy data
                 std::size_t num_zero_copy_chunks =
@@ -271,7 +267,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         buffer_.transmission_chunks_[i].second);
                     buffer_.chunks_[i].resize(chunk_size);
                     buffers.push_back(
-                        boost::asio::buffer(buffer_.chunks_[i].data(), chunk_size));
+                        asio::buffer(buffer_.chunks_[i].data(), chunk_size));
                 }
 
                 // Start an asynchronous call to receive the data.
@@ -285,18 +281,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     {
                         lk.unlock();
                         // report this problem back to the handler
-                        handler(boost::asio::error::make_error_code(
-                            boost::asio::error::not_connected));
+                        handler(asio::error::make_error_code(
+                            asio::error::not_connected));
                         return;
                     }
 #if defined(__linux) || defined(linux) || defined(__linux__)
-                    boost::asio::detail::socket_option::boolean<
+                    asio::detail::socket_option::boolean<
                         IPPROTO_TCP, TCP_QUICKACK> quickack(true);
                     socket_.set_option(quickack);
 #endif
-                    boost::asio::async_read(socket_, buffers,
+                    asio::async_read(socket_, buffers,
                         util::bind(f, shared_from_this(),
-                            boost::asio::placeholders::error,
+                            util::placeholders::_1, // error,
                             util::protect(handler)));
                 }
             }
@@ -335,14 +331,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     {
                         lk.unlock();
                         // report this problem back to the handler
-                        handler(boost::asio::error::make_error_code(
-                            boost::asio::error::not_connected));
+                        handler(asio::error::make_error_code(
+                            asio::error::not_connected));
                         return;
                     }
-                    boost::asio::async_write(socket_,
-                        boost::asio::buffer(&ack_, sizeof(ack_)),
+                    asio::async_write(socket_,
+                        asio::buffer(&ack_, sizeof(ack_)),
                         util::bind(f, shared_from_this(),
-                            boost::asio::placeholders::error,
+                            util::placeholders::_1, // error,
                             util::protect(handler)));
                 }
             }
@@ -366,7 +362,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
 
         /// Socket for the parcelport_connection.
-        boost::asio::ip::tcp::socket socket_;
+        asio::ip::tcp::socket socket_;
 
         std::uint64_t max_inbound_size_;
 

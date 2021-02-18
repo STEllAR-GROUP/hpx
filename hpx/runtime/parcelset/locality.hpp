@@ -65,8 +65,7 @@ namespace hpx { namespace parcelset
         };
 
     public:
-        locality()
-        {}
+        locality() = default;
 
         template <typename Impl,
             typename Enable1 = typename std::enable_if<!std::is_same<locality,

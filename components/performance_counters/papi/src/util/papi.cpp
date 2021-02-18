@@ -16,7 +16,7 @@
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
 
-#include <boost/asio/ip/host_name.hpp>
+#include <asio/ip/host_name.hpp>
 
 #include <cstdint>
 #include <iostream>
@@ -281,7 +281,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     // list available events with descriptions
     void list_events(std::string const& scope)
     {
-        using boost::asio::ip::host_name;
+        using asio::ip::host_name;
 
         std::string host(host_name());
         // print header

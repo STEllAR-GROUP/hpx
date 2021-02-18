@@ -15,7 +15,7 @@
 // clang-format off
 #include <winsock2.h>
 #include <windows.h>
-#include <boost/asio/detail/winsock_init.hpp>
+#include <asio/detail/winsock_init.hpp>
 // clang-format on
 
 namespace hpx { namespace detail {
@@ -23,10 +23,10 @@ namespace hpx { namespace detail {
     // is executed.
     struct winsocket_init_helper
     {
-        static boost::asio::detail::winsock_init<> const& init()
+        static asio::detail::winsock_init<> const& init()
         {
-            static const boost::asio::detail::winsock_init<> init_winsocket =
-                boost::asio::detail::winsock_init<>(false);
+            static const asio::detail::winsock_init<> init_winsocket =
+                asio::detail::winsock_init<>(false);
             return init_winsocket;
         }
     };

@@ -12,17 +12,17 @@
 #pragma once
 
 #if defined(HPX_WINDOWS)
-#include <boost/asio/windows/stream_handle.hpp>
+#include <asio/windows/stream_handle.hpp>
 #else
-#include <boost/asio/posix/stream_descriptor.hpp>
+#include <asio/posix/stream_descriptor.hpp>
 #endif
 
 namespace hpx { namespace components { namespace process  { namespace util {
 
 #if defined(HPX_WINDOWS)
-typedef boost::asio::windows::stream_handle pipe_end;
+typedef asio::windows::stream_handle pipe_end;
 #else
-typedef boost::asio::posix::stream_descriptor pipe_end;
+typedef asio::posix::stream_descriptor pipe_end;
 #endif
 
 inline const char *zero_device()

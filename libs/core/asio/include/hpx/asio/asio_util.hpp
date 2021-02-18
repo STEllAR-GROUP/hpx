@@ -15,9 +15,9 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/config/asio.hpp>
 
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/ip/tcp.hpp>
-/* The boost asio support includes termios.h.
+#include <asio/io_context.hpp>
+#include <asio/ip/tcp.hpp>
+/* The asio support includes termios.h.
  * The termios.h file on ppc64le defines these macros, which
  * are also used by blaze, blaze_tensor as Template names.
  * Make sure we undefine them before continuing. */
@@ -25,18 +25,19 @@
 #undef VT2
 
 namespace hpx { namespace util {
+
     ///////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT bool get_endpoint(std::string const& addr,
-        std::uint16_t port, boost::asio::ip::tcp::endpoint& ep);
+        std::uint16_t port, asio::ip::tcp::endpoint& ep);
 
     HPX_CORE_EXPORT std::string get_endpoint_name(
-        boost::asio::ip::tcp::endpoint const& ep);
+        asio::ip::tcp::endpoint const& ep);
 
     ///////////////////////////////////////////////////////////////////////////
     // properly resolve a give host name to the corresponding IP address
-    HPX_CORE_EXPORT boost::asio::ip::tcp::endpoint resolve_hostname(
+    HPX_CORE_EXPORT asio::ip::tcp::endpoint resolve_hostname(
         std::string const& hostname, std::uint16_t port,
-        boost::asio::io_service& io_service);
+        asio::io_context& io_service);
 
     ///////////////////////////////////////////////////////////////////////////
     // return the public IP address of the local node
@@ -44,20 +45,20 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////
     // Take an ip v4 or v6 address and "standardize" it for comparison checks
-    HPX_CORE_EXPORT std::string cleanup_ip_address(const std::string& addr);
+    HPX_CORE_EXPORT std::string cleanup_ip_address(std::string const& addr);
 
-    typedef boost::asio::ip::tcp::resolver::iterator endpoint_iterator_type;
+    using endpoint_iterator_type = asio::ip::tcp::resolver::iterator;
 
     endpoint_iterator_type HPX_CORE_EXPORT connect_begin(
         std::string const& address, std::uint16_t port,
-        boost::asio::io_service& io_service);
+        asio::io_context& io_service);
 
     /// \brief Returns an iterator which when dereferenced will give an
     ///        endpoint suitable for a call to connect() related to this
     ///        locality
     template <typename Locality>
     endpoint_iterator_type connect_begin(
-        Locality const& loc, boost::asio::io_service& io_service)
+        Locality const& loc, asio::io_context& io_service)
     {
         return connect_begin(loc.address(), loc.port(), io_service);
     }
@@ -69,7 +70,7 @@ namespace hpx { namespace util {
 
     endpoint_iterator_type HPX_CORE_EXPORT accept_begin(
         std::string const& address, std::uint16_t port,
-        boost::asio::io_service& io_service);
+        asio::io_context& io_service);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Returns an iterator which when dereferenced will give an
@@ -77,7 +78,7 @@ namespace hpx { namespace util {
     ///        locality
     template <typename Locality>
     endpoint_iterator_type accept_begin(
-        Locality const& loc, boost::asio::io_service& io_service)
+        Locality const& loc, asio::io_context& io_service)
     {
         return accept_begin(loc.address(), loc.port(), io_service);
     }
@@ -91,6 +92,7 @@ namespace hpx { namespace util {
 #endif
 
 namespace hpx { namespace util {
+
     ///////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]
     HPX_CORE_EXPORT bool split_ip_address(

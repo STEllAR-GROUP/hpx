@@ -5,9 +5,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/system/system_error.hpp
-// hpxinspect:nodeprecatedname:boost::system::system_error
-
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/errors/error.hpp>
@@ -22,8 +19,6 @@
 #elif defined(HPX_HAVE_UNISTD_H)
 #include <unistd.h>
 #endif
-
-#include <boost/system/system_error.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -282,9 +277,6 @@ namespace hpx { namespace detail {
         std::string const&);
 
     template HPX_CORE_EXPORT std::exception_ptr get_exception(
-        boost::system::system_error const&, std::string const&,
-        std::string const&, long, std::string const&);
-    template HPX_CORE_EXPORT std::exception_ptr get_exception(
         std::system_error const&, std::string const&, std::string const&, long,
         std::string const&);
 
@@ -335,9 +327,6 @@ namespace hpx { namespace detail {
     template HPX_CORE_EXPORT void throw_exception(
         hpx::exception const&, std::string const&, std::string const&, long);
 
-    template HPX_CORE_EXPORT void throw_exception(
-        boost::system::system_error const&, std::string const&,
-        std::string const&, long);
     template HPX_CORE_EXPORT void throw_exception(
         std::system_error const&, std::string const&, std::string const&, long);
 

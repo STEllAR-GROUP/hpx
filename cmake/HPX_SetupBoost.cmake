@@ -97,15 +97,6 @@ if(NOT TARGET hpx_dependencies_boost)
 
   add_library(hpx_dependencies_boost INTERFACE IMPORTED)
 
-  # If we compile natively for the MIC, we need some workarounds for certain
-  # Boost headers FIXME: push changes upstream
-  if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
-    target_include_directories(
-      hpx_dependencies_boost SYSTEM BEFORE
-      INTERFACE ${PROJECT_SOURCE_DIR}/external/asio
-    )
-  endif()
-
   target_link_libraries(hpx_dependencies_boost INTERFACE Boost::boost)
   foreach(__boost_library ${__boost_libraries})
     target_link_libraries(
@@ -114,18 +105,6 @@ if(NOT TARGET hpx_dependencies_boost)
   endforeach()
 
   include(HPX_AddDefinitions)
-
-  # Boost Asio should not use Boost exceptions
-  hpx_add_config_cond_define(BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION 0)
-  # Disable concepts support in Asio as a workaround to
-  # https://github.com/boostorg/asio/issues/312
-  hpx_add_config_cond_define(BOOST_ASIO_DISABLE_CONCEPTS)
-  # Disable experimental std::string_view support as a workaround to
-  # https://github.com/chriskohlhoff/asio/issues/597
-  hpx_add_config_cond_define(BOOST_ASIO_DISABLE_STD_EXPERIMENTAL_STRING_VIEW)
-  if(Boost_VERSION_STRING VERSION_LESS 1.67)
-    hpx_add_config_cond_define(BOOST_ASIO_DISABLE_STD_STRING_VIEW)
-  endif()
 
   find_package(Threads QUIET REQUIRED)
   target_link_libraries(hpx_dependencies_boost INTERFACE Threads::Threads)

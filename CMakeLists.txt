@@ -1801,6 +1801,7 @@ if(NOT WIN32)
   # ############################################################################
   if(NOT MSVC)
     hpx_add_compile_flag_if_available(-pthread)
+    hpx_add_link_flag_if_available(-pthread TARGETS EXE SHARED)
     if(HPX_CXX11_STD_ATOMIC_LIBRARIES)
       target_link_libraries(
         hpx_base_libraries INTERFACE ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
@@ -2250,6 +2251,10 @@ include(HPX_SetupBoost)
 include(HPX_SetupBoostFilesystem)
 include(HPX_SetupBoostIostreams)
 include(HPX_SetupBoostProgramOptions)
+
+# Set up standalone Asio
+include(HPX_SetupAsio)
+
 # Find all allocators which are currently supported.
 include(HPX_SetupAllocator)
 include(HPX_SetupHwloc)

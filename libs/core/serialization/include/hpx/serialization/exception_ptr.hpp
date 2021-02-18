@@ -36,7 +36,7 @@ namespace hpx { namespace util {
         hpx_exception = 11,
         hpx_thread_interrupted_exception = 12,
 
-#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
+#if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
         // boost exceptions
         boost_exception = 13,
 #endif

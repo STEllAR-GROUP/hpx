@@ -15,7 +15,7 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 
-#include <boost/asio/io_service.hpp>
+#include <asio/io_context.hpp>
 /* The boost asio support includes termios.h.
  * The termios.h file on ppc64le defines these macros, which
  * are also used by blaze, blaze_tensor as Template names.
@@ -84,7 +84,7 @@ namespace hpx { namespace util {
         bool stopped();
 
         /// \brief Get an io_service to use.
-        boost::asio::io_service& get_io_service(int index = -1);
+        asio::io_context& get_io_service(int index = -1);
 
         /// \brief access underlying thread handle
         std::thread& get_os_thread_handle(std::size_t thread_num);
@@ -113,22 +113,22 @@ namespace hpx { namespace util {
         void wait_locked();
 
     private:
-        using io_service_ptr = std::unique_ptr<boost::asio::io_service>;
+        using io_service_ptr = std::unique_ptr<asio::io_context>;
 
 // FIXME: Intel compilers don't like this
 #if defined(HPX_NATIVE_MIC)
-            typedef std::unique_ptr<boost::asio::io_service::work> work_type;
+            typedef std::unique_ptr<asio::io_context::work> work_type;
 #else
-            using work_type = boost::asio::io_service::work;
+            using work_type = asio::io_context::work;
 #endif
 
             HPX_FORCEINLINE work_type initialize_work(
-                boost::asio::io_service& io_service)
+                asio::io_context& io_service)
             {
                 return work_type(
 // FIXME: Intel compilers don't like this
 #if defined(HPX_NATIVE_MIC)
-                    new boost::asio::io_service::work(io_service)
+                    new asio::io_context::work(io_service)
 #else
                     io_service
 #endif

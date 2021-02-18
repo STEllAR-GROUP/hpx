@@ -17,7 +17,7 @@
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/util/pool_timer.hpp>
 
-#include <boost/asio/basic_waitable_timer.hpp>
+#include <asio/basic_waitable_timer.hpp>
 
 #include <chrono>
 #include <memory>
@@ -57,7 +57,7 @@ namespace hpx { namespace util { namespace detail
         bool stop_locked();
 
     private:
-        typedef boost::asio::basic_waitable_timer<
+        typedef asio::basic_waitable_timer<
             std::chrono::steady_clock> deadline_timer;
 
         mutable mutex_type mtx_;

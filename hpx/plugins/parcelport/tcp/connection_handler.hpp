@@ -19,8 +19,8 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 
-#include <boost/asio/ip/host_name.hpp>
-#include <boost/asio/ip/tcp.hpp>
+#include <asio/ip/host_name.hpp>
+#include <asio/ip/tcp.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -96,7 +96,7 @@ namespace hpx { namespace parcelset
             /// Return the name of this locality
             std::string get_locality_name() const
             {
-                return boost::asio::ip::host_name();
+                return asio::ip::host_name();
             }
 
             std::shared_ptr<sender> create_connection(
@@ -114,7 +114,7 @@ namespace hpx { namespace parcelset
                 std::shared_ptr<receiver> receiver_conn);
 
             /// Acceptor used to listen for incoming connections.
-            boost::asio::ip::tcp::acceptor* acceptor_;
+            asio::ip::tcp::acceptor* acceptor_;
 
             /// The list of accepted connections
             mutable lcos::local::spinlock connections_mtx_;

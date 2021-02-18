@@ -14,8 +14,8 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/ip/host_name.hpp>
+#include <asio/io_context.hpp>
+#include <asio/ip/host_name.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -81,7 +81,7 @@ namespace hpx { namespace util {
         bool found_agas_host = false;
 
 #if defined(HPX_HAVE_NETWORKING)
-        boost::asio::io_service io_service;
+        asio::io_context io_service;
 
         std::size_t agas_node_num = 0;
         for (std::string const& s : nodes)
@@ -91,7 +91,7 @@ namespace hpx { namespace util {
                 if (debug_)
                     std::cerr << "extracted: '" << s << "'" << std::endl;
 
-                boost::asio::ip::tcp::endpoint ep =
+                asio::ip::tcp::endpoint ep =
                     util::resolve_hostname(s, 0, io_service);
 
                 if (!found_agas_host &&
@@ -175,7 +175,7 @@ namespace hpx { namespace util {
 
     std::string batch_environment::host_name() const
     {
-        std::string hostname = boost::asio::ip::host_name();
+        std::string hostname = asio::ip::host_name();
         if (debug_)
             std::cerr << "asio host_name: " << hostname << std::endl;
         return hostname;

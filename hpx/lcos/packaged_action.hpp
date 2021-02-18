@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/config/detail/compat_error_code.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
@@ -25,7 +24,7 @@
 #include <hpx/modules/memory.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <boost/asio/error.hpp>
+#include <asio/error.hpp>
 #endif
 
 #include <exception>
@@ -53,9 +52,12 @@ namespace hpx { namespace lcos {
                 {
                     if (hpx::tolerate_node_faults())
                     {
-                        if (compat_error_code::equal(
-                                ec, boost::asio::error::connection_reset))
+                        if (ec ==
+                            asio::error::make_error_code(
+                                asio::error::connection_reset))
+                        {
                             return;
+                        }
                     }
                     std::exception_ptr exception = HPX_GET_EXCEPTION(ec,
                         "packaged_action::parcel_write_handler",
@@ -87,7 +89,7 @@ namespace hpx { namespace lcos {
                 cb(ec, p);
             }
         };
-    }
+    }    // namespace detail
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
@@ -124,8 +126,8 @@ namespace hpx { namespace lcos {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     class packaged_action<Action, Result, /*DirectExecute=*/false>
-        : public promise<Result,
-              typename hpx::traits::extract_action<Action>::remote_result_type>
+      : public promise<Result,
+            typename hpx::traits::extract_action<Action>::remote_result_type>
     {
     protected:
         using action_type = typename hpx::traits::extract_action<Action>::type;
@@ -142,7 +144,8 @@ namespace hpx { namespace lcos {
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
 #if defined(HPX_HAVE_NETWORKING)
-            auto&& f = detail::parcel_write_handler<Result>{this->shared_state_};
+            auto&& f =
+                detail::parcel_write_handler<Result>{this->shared_state_};
 #else
             auto shared_state = this->shared_state_;
             auto&& f = [shared_state = std::move(shared_state)]() {};
@@ -179,7 +182,8 @@ namespace hpx { namespace lcos {
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
 #if defined(HPX_HAVE_NETWORKING)
-            auto&& f = detail::parcel_write_handler<Result>{this->shared_state_};
+            auto&& f =
+                detail::parcel_write_handler<Result>{this->shared_state_};
 #else
             auto shared_state = this->shared_state_;
             auto&& f = [shared_state = std::move(shared_state)]() {};
@@ -245,7 +249,6 @@ namespace hpx { namespace lcos {
             LLCO_(info) << "packaged_action::do_apply_cb("    //-V128
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
-
 
 #if defined(HPX_HAVE_NETWORKING)
             using callback_type = typename std::decay<Callback>::type;
@@ -356,7 +359,8 @@ namespace hpx { namespace lcos {
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
 #if defined(HPX_HAVE_NETWORKING)
-            auto&& f = detail::parcel_write_handler<Result>{this->shared_state_};
+            auto&& f =
+                detail::parcel_write_handler<Result>{this->shared_state_};
 #else
             auto shared_state = this->shared_state_;
             auto&& f = [shared_state = std::move(shared_state)]() {};
@@ -404,7 +408,7 @@ namespace hpx { namespace lcos {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     class packaged_action<Action, Result, /*DirectExecute=*/true>
-        : public packaged_action<Action, Result, /*DirectExecute=*/false>
+      : public packaged_action<Action, Result, /*DirectExecute=*/false>
     {
         using action_type = typename packaged_action<Action, Result,
             /*DirectExecute=*/false>::action_type;
@@ -415,7 +419,7 @@ namespace hpx { namespace lcos {
         /// called.
         packaged_action()
           : packaged_action<Action, Result, false>(
-              std::allocator_arg, hpx::util::internal_allocator<>{})
+                std::allocator_arg, hpx::util::internal_allocator<>{})
         {
         }
 
@@ -439,14 +443,15 @@ namespace hpx { namespace lcos {
                     traits::component_type_is_compatible<component_type>::call(
                         addr));
 
-                if (traits::component_supports_migration<component_type>::call())
+                if (traits::component_supports_migration<
+                        component_type>::call())
                 {
                     r = traits::action_was_object_migrated<Action>::call(
                         id, addr.address_);
                     if (!r.first)
                     {
                         // local, direct execution
-                        auto && result = action_type::execute_function(
+                        auto&& result = action_type::execute_function(
                             addr.address_, addr.type_, std::forward<Ts>(vs)...);
                         this->shared_state_->mark_as_started();
                         this->shared_state_->set_remote_data(std::move(result));
@@ -456,7 +461,7 @@ namespace hpx { namespace lcos {
                 else
                 {
                     // local, direct execution
-                    auto && result = action_type::execute_function(
+                    auto&& result = action_type::execute_function(
                         addr.address_, addr.type_, std::forward<Ts>(vs)...);
                     this->shared_state_->mark_as_started();
                     this->shared_state_->set_remote_data(std::move(result));
@@ -482,14 +487,15 @@ namespace hpx { namespace lcos {
                     traits::component_type_is_compatible<component_type>::call(
                         addr));
 
-                if (traits::component_supports_migration<component_type>::call())
+                if (traits::component_supports_migration<
+                        component_type>::call())
                 {
                     r = traits::action_was_object_migrated<Action>::call(
                         id, addr.address_);
                     if (!r.first)
                     {
                         // local, direct execution
-                        auto && result = action_type::execute_function(
+                        auto&& result = action_type::execute_function(
                             addr.address_, addr.type_, std::forward<Ts>(vs)...);
                         this->shared_state_->mark_as_started();
                         this->shared_state_->set_remote_data(std::move(result));
@@ -499,7 +505,7 @@ namespace hpx { namespace lcos {
                 else
                 {
                     // local, direct execution
-                    auto && result = action_type::execute_function(
+                    auto&& result = action_type::execute_function(
                         addr.address_, addr.type_, std::forward<Ts>(vs)...);
                     this->shared_state_->mark_as_started();
                     this->shared_state_->set_remote_data(std::move(result));
@@ -526,14 +532,15 @@ namespace hpx { namespace lcos {
                     traits::component_type_is_compatible<component_type>::call(
                         addr));
 
-                if (traits::component_supports_migration<component_type>::call())
+                if (traits::component_supports_migration<
+                        component_type>::call())
                 {
                     r = traits::action_was_object_migrated<Action>::call(
                         id, addr.address_);
                     if (!r.first)
                     {
                         // local, direct execution
-                        auto && result = action_type::execute_function(
+                        auto&& result = action_type::execute_function(
                             addr.address_, addr.type_, std::forward<Ts>(vs)...);
                         this->shared_state_->mark_as_started();
                         this->shared_state_->set_remote_data(std::move(result));
@@ -584,14 +591,15 @@ namespace hpx { namespace lcos {
                     traits::component_type_is_compatible<component_type>::call(
                         addr));
 
-                if (traits::component_supports_migration<component_type>::call())
+                if (traits::component_supports_migration<
+                        component_type>::call())
                 {
                     r = traits::action_was_object_migrated<Action>::call(
                         id, addr.address_);
                     if (!r.first)
                     {
                         // local, direct execution
-                        auto && result = action_type::execute_function(
+                        auto&& result = action_type::execute_function(
                             addr.address_, addr.type_, std::forward<Ts>(vs)...);
                         this->shared_state_->mark_as_started();
                         this->shared_state_->set_remote_data(std::move(result));
@@ -608,7 +616,7 @@ namespace hpx { namespace lcos {
                 else
                 {
                     // local, direct execution
-                    auto && result = action_type::execute_function(
+                    auto&& result = action_type::execute_function(
                         addr.address_, addr.type_, std::forward<Ts>(vs)...);
                     this->shared_state_->mark_as_started();
                     this->shared_state_->set_remote_data(std::move(result));
@@ -629,5 +637,4 @@ namespace hpx { namespace lcos {
                 std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
     };
-}}
-
+}}    // namespace hpx::lcos

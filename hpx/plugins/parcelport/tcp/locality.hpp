@@ -19,8 +19,8 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/util/ios_flags_saver.hpp>
 
-#include <boost/asio/ip/host_name.hpp>
-#include <boost/asio/ip/tcp.hpp>
+#include <asio/ip/host_name.hpp>
+#include <asio/ip/tcp.hpp>
 
 #include <cstdint>
 #include <string>

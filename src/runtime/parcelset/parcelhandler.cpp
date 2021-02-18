@@ -48,7 +48,7 @@
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
-#include <boost/asio/error.hpp>
+#include <asio/error.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -521,7 +521,8 @@ namespace hpx { namespace parcelset
         {
             // dispatch to the message handler which is associated with the
             // encapsulated action
-            typedef std::pair<std::shared_ptr<parcelport>, locality> destination_pair;
+            using destination_pair =
+                std::pair<std::shared_ptr<parcelport>, locality>;
             destination_pair dest = find_appropriate_destination(addr.locality_);
 
             if (load_message_handlers_ && !hpx::is_stopped_or_shutting_down())
@@ -569,12 +570,12 @@ namespace hpx { namespace parcelset
         handlers.reserve(parcels.size());
         for (std::size_t i = 0; i != parcels.size(); ++i)
         {
-            handlers.push_back([this, f = std::move(funcs[i])](
-                                   std::error_code const& ec,
-                                   parcel const& p) -> void {
-                invoke_write_handler(ec, p);
-                f(ec, p);
-            });
+            handlers.emplace_back(
+                [this, f = std::move(funcs[i])](
+                    std::error_code const& ec, parcel const& p) -> void {
+                    invoke_write_handler(ec, p);
+                    f(ec, p);
+                });
         }
 
         put_parcels_impl(std::move(parcels), std::move(handlers));
@@ -631,8 +632,8 @@ namespace hpx { namespace parcelset
         std::vector<write_handler_type> resolved_handlers;
         resolved_handlers.reserve(num_parcels);
 
-        typedef std::pair<std::shared_ptr<parcelport>, locality>
-            destination_pair;
+        using destination_pair =
+            std::pair<std::shared_ptr<parcelport>, locality>;
 
         destination_pair resolved_dest;
 
@@ -772,24 +773,30 @@ namespace hpx { namespace parcelset
             // If we are in a stopped state, ignore some errors
             if (hpx::is_stopped_or_shutting_down())
             {
-                if (compat_error_code::equal(
-                        ec, boost::asio::error::connection_aborted) ||
-                    compat_error_code::equal(
-                        ec, boost::asio::error::connection_reset) ||
-                    compat_error_code::equal(
-                        ec, boost::asio::error::broken_pipe) ||
-                    compat_error_code::equal(
-                        ec, boost::asio::error::not_connected) ||
-                    compat_error_code::equal(ec, boost::asio::error::eof))
+                if (ec ==
+                        asio::error::make_error_code(
+                            asio::error::connection_aborted) ||
+                    ec ==
+                        asio::error::make_error_code(
+                            asio::error::connection_reset) ||
+                    ec ==
+                        asio::error::make_error_code(
+                            asio::error::broken_pipe) ||
+                    ec ==
+                        asio::error::make_error_code(
+                            asio::error::not_connected) ||
+                    ec == asio::error::make_error_code(asio::error::eof))
                 {
                     return;
                 }
             }
             else if (hpx::tolerate_node_faults())
             {
-                if (compat_error_code::equal(
-                        ec, boost::asio::error::connection_reset))
+                if (ec ==
+                    asio::error::make_error_code(asio::error::connection_reset))
+                {
                     return;
+                }
             }
 
             // all unhandled exceptions terminate the whole application
@@ -1650,43 +1657,44 @@ namespace hpx { namespace parcelset
         std::vector<std::string> ini_defs;
 
 #if defined(HPX_HAVE_NETWORKING)
-        ini_defs.push_back("[hpx.parcel]");
-        ini_defs.push_back(
+        ini_defs.emplace_back("[hpx.parcel]");
+        ini_defs.emplace_back(
             "address = ${HPX_PARCEL_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS
             "}");
-        ini_defs.push_back("port = ${HPX_PARCEL_SERVER_PORT:" HPX_PP_STRINGIZE(
-            HPX_INITIAL_IP_PORT) "}");
-        ini_defs.push_back(
+        ini_defs.emplace_back(
+            "port = ${HPX_PARCEL_SERVER_PORT:" HPX_PP_STRINGIZE(
+                HPX_INITIAL_IP_PORT) "}");
+        ini_defs.emplace_back(
             "bootstrap = ${HPX_PARCEL_BOOTSTRAP:" HPX_PARCEL_BOOTSTRAP "}");
-        ini_defs.push_back(
+        ini_defs.emplace_back(
             "max_connections = ${HPX_PARCEL_MAX_CONNECTIONS:" HPX_PP_STRINGIZE(
                 HPX_PARCEL_MAX_CONNECTIONS) "}");
-        ini_defs.push_back(
+        ini_defs.emplace_back(
             "max_connections_per_locality = "
             "${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:" HPX_PP_STRINGIZE(
                 HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY) "}");
-        ini_defs.push_back("max_message_size = "
-                           "${HPX_PARCEL_MAX_MESSAGE_SIZE:" HPX_PP_STRINGIZE(
-                               HPX_PARCEL_MAX_MESSAGE_SIZE) "}");
-        ini_defs.push_back(
+        ini_defs.emplace_back("max_message_size = "
+                              "${HPX_PARCEL_MAX_MESSAGE_SIZE:" HPX_PP_STRINGIZE(
+                                  HPX_PARCEL_MAX_MESSAGE_SIZE) "}");
+        ini_defs.emplace_back(
             "max_outbound_message_size = "
             "${HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE:" HPX_PP_STRINGIZE(
                 HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE) "}");
-        ini_defs.push_back(endian::native == endian::big ?
+        ini_defs.emplace_back(endian::native == endian::big ?
                 "endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}" :
                 "endian_out = ${HPX_PARCEL_ENDIAN_OUT:little}");
-        ini_defs.push_back(
+        ini_defs.emplace_back(
             "array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}");
-        ini_defs.push_back(
+        ini_defs.emplace_back(
             "zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:"
             "$[hpx.parcel.array_optimization]}");
-        ini_defs.push_back(
+        ini_defs.emplace_back(
             "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}");
 #if defined(HPX_HAVE_PARCEL_COALESCING)
-        ini_defs.push_back(
+        ini_defs.emplace_back(
             "message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:1}");
 #else
-        ini_defs.push_back(
+        ini_defs.emplace_back(
             "message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:0}");
 #endif
 

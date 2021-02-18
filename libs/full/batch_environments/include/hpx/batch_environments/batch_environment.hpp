@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
 
-#include <boost/asio/ip/tcp.hpp>
+#include <asio/ip/tcp.hpp>
 
 #include <cstddef>
 #include <cstdlib>
@@ -74,7 +74,7 @@ namespace hpx { namespace util {
         // Return a string containing the name of the batch system
         std::string get_batch_name() const;
 
-        typedef std::map<boost::asio::ip::tcp::endpoint,
+        typedef std::map<asio::ip::tcp::endpoint,
             std::pair<std::string, std::size_t>>
             node_map_type;
 

@@ -78,16 +78,16 @@ namespace hpx { namespace threads {
                 "cannot call suspend_processing_unit from outside HPX, use"
                 "suspend_processing_unit_cb instead");
         }
-        else if (!pool.get_scheduler()->has_scheduler_mode(
-                     policies::enable_elasticity))
+        if (!pool.get_scheduler()->has_scheduler_mode(
+                policies::enable_elasticity))
         {
             return hpx::make_exceptional_future<void>(
                 HPX_GET_EXCEPTION(invalid_status, "suspend_processing_unit",
                     "this thread pool does not support suspending "
                     "processing units"));
         }
-        else if (!pool.get_scheduler()->has_scheduler_mode(
-                     policies::enable_stealing) &&
+        if (!pool.get_scheduler()->has_scheduler_mode(
+                policies::enable_stealing) &&
             hpx::this_thread::get_pool() == &pool)
         {
             return hpx::make_exceptional_future<void>(
@@ -184,8 +184,7 @@ namespace hpx { namespace threads {
                 "instead");
             return hpx::make_ready_future();
         }
-        else if (threads::get_self_ptr() &&
-            hpx::this_thread::get_pool() == &pool)
+        if (threads::get_self_ptr() && hpx::this_thread::get_pool() == &pool)
         {
             return hpx::make_exceptional_future<void>(
                 HPX_GET_EXCEPTION(bad_parameter, "suspend_pool",

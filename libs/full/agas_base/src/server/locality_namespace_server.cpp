@@ -259,18 +259,18 @@ namespace hpx { namespace agas { namespace server {
             }
 
             /*
-        LAGAS_(info) << hpx::util::format(
-            "locality_namespace::free, ep({1})",
-            ep);
-        */
+            LAGAS_(info) << hpx::util::format(
+                "locality_namespace::free, ep({1})",
+                ep);
+            */
         }
 
         /*
-    LAGAS_(info) << hpx::util::format(
-        "locality_namespace::free, ep({1}), "
-        "response(no_success)",
-        ep);
-    */
+        LAGAS_(info) << hpx::util::format(
+            "locality_namespace::free, ep({1}), "
+            "response(no_success)",
+            ep);
+        */
     }    // }}}
 
     std::vector<std::uint32_t> locality_namespace::localities()
