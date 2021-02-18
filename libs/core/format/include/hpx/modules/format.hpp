@@ -187,7 +187,6 @@ namespace hpx { namespace util {
                 std::size_t length = 0;
                 std::vector<char> buffer(1);
                 buffer.resize(buffer.capacity());
-                // NOLINTNEXTLINE(bugprone-infinite-loop)
                 do
                 {
                     length = std::strftime(

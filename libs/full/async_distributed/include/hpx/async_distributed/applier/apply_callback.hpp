@@ -413,7 +413,6 @@ namespace hpx {
             template <std::size_t... Is>
             void apply_action(util::index_pack<Is...>)
             {
-                // NOLINTNEXTLINE(bugprone-branch-clone)
                 if (addr_)
                 {
                     hpx::apply_c_p_cb<Action>(contid_, std::move(addr_), id_,

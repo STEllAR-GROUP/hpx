@@ -242,14 +242,12 @@ namespace hpx { namespace parcelset
                 pp.add_received_data(data);
             }
             catch (hpx::exception const& e) {
-                // NOLINTNEXTLINE(bugprone-branch-clone)
                 LPT_(error)
                     << "decode_message: caught hpx::exception: "
                     << e.what();
                 hpx::report_error(std::current_exception());
             }
             catch (std::system_error const& e) {
-                // NOLINTNEXTLINE(bugprone-branch-clone)
                 LPT_(error)
                     << "decode_message: caught std::system_error: "
                     << e.what();
@@ -257,7 +255,6 @@ namespace hpx { namespace parcelset
             }
 #if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
             catch (boost::exception const&) {
-                // NOLINTNEXTLINE(bugprone-branch-clone)
                 LPT_(error)
                     << "decode_message: caught boost::exception.";
                 hpx::report_error(std::current_exception());
@@ -272,7 +269,6 @@ namespace hpx { namespace parcelset
             }
         }
         catch (...) {
-            // NOLINTNEXTLINE(bugprone-branch-clone)
             LPT_(error)
                 << "decode_message: caught unknown exception.";
             hpx::report_error(std::current_exception());

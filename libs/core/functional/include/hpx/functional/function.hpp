@@ -46,7 +46,6 @@ namespace hpx { namespace util {
                 !std::is_same<FD, function>::value>::type,
             typename Enable2 =
                 typename std::enable_if<is_invocable_r_v<R, FD&, Ts...>>::type>
-        // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
         function(F&& f)
         {
             assign(std::forward<F>(f));

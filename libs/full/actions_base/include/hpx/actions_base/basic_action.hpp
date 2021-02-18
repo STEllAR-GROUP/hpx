@@ -105,7 +105,6 @@ namespace hpx { namespace actions {
             {
                 try
                 {
-                    // NOLINTNEXTLINE(bugprone-branch-clone)
                     LTM_(debug)
                         << "Executing " << Action::get_action_name(lva_) << ".";
 
@@ -119,7 +118,6 @@ namespace hpx { namespace actions {
                 }
                 catch (std::exception const& e)
                 {
-                    // NOLINTNEXTLINE(bugprone-branch-clone)
                     LTM_(error)
                         << "Unhandled exception while executing "
                         << Action::get_action_name(lva_) << ": " << e.what();
@@ -129,7 +127,6 @@ namespace hpx { namespace actions {
                 }
                 catch (...)
                 {
-                    // NOLINTNEXTLINE(bugprone-branch-clone)
                     LTM_(error) << "Unhandled exception while executing "
                                 << Action::get_action_name(lva_);
 
@@ -176,7 +173,6 @@ namespace hpx { namespace actions {
             threads::thread_result_type operator()(
                 threads::thread_restart_state)
             {
-                // NOLINTNEXTLINE(bugprone-branch-clone)
                 LTM_(debug) << "Executing " << Action::get_action_name(lva_)
                             << " with continuation(" << cont_.get_id() << ")";
 
@@ -346,7 +342,6 @@ namespace hpx { namespace actions {
             naming::address_type lva, naming::component_type comptype,
             Ts&&... vs)
         {
-            // NOLINTNEXTLINE(bugprone-branch-clone)
             LTM_(debug) << "basic_action::execute_function"
                         << Derived::get_action_name(lva);
 

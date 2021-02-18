@@ -725,7 +725,6 @@ namespace hpx { namespace lcos { namespace local {
         template <typename F,
             typename Enable = typename std::enable_if<!std::is_same<
                 typename std::decay<F>::type, futures_factory>::value>::type>
-        // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
         explicit futures_factory(F&& f)
           : task_(detail::create_task_object<Result, Cancelable>::call(
                 hpx::util::internal_allocator<>{}, std::forward<F>(f)))

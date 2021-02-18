@@ -36,7 +36,6 @@ namespace hpx { namespace util {
             template <typename F_,
                 typename = typename std::enable_if<
                     std::is_constructible<F, F_>::value>::type>
-            // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
             constexpr explicit one_shot_wrapper(F_&& f)
               : _f(std::forward<F_>(f))
 #if defined(HPX_DEBUG)

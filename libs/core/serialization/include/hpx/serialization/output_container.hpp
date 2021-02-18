@@ -340,7 +340,6 @@ namespace hpx { namespace serialization {
         std::size_t save_binary_chunk(
             void const* address, std::size_t count)    // override
         {
-            // NOLINTNEXTLINE(bugprone-branch-clone)
             if (count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
             {
                 // fall back to serialization_chunk-less archive

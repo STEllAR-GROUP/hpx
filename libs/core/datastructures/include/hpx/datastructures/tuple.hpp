@@ -314,7 +314,6 @@ namespace hpx {
                 typename std::decay<UTuple>::type>::value>::type,
             typename EnableCompatible = typename std::enable_if<
                 hpx::detail::are_tuples_compatible<tuple, UTuple>::value>::type>
-        // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
         constexpr HPX_HOST_DEVICE tuple(UTuple&& other)
           : tuple(index_pack{}, std::forward<UTuple>(other))
         {

@@ -186,7 +186,6 @@ namespace hpx { namespace plugins { namespace parcel
         switch(s) {
         case detail::message_buffer::first_message:
             HPX_FALLTHROUGH;
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         case detail::message_buffer::normal:
             // start deadline timer to flush buffer
             l.unlock();

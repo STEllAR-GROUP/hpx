@@ -59,7 +59,6 @@ namespace hpx { namespace threads {
             callback();
         };
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         if (threads::get_self_ptr())
         {
             hpx::apply(std::move(resume_direct_wrapper));
@@ -165,7 +164,6 @@ namespace hpx { namespace threads {
             callback();
         };
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         if (threads::get_self_ptr())
         {
             hpx::apply(std::move(resume_direct_wrapper));
@@ -213,7 +211,6 @@ namespace hpx { namespace threads {
             callback();
         };
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         if (threads::get_self_ptr())
         {
             hpx::apply(std::move(suspend_direct_wrapper));

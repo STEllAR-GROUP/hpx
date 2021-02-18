@@ -72,7 +72,6 @@ namespace hpx { namespace parcelset
                 typename std::decay<Impl>::type>::value>::type,
             typename Enable2 = typename std::enable_if<
                 !traits::is_iterator<Impl>::value>::type>
-        // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
         explicit locality(Impl&& i)
           : impl_(new impl<typename std::decay<Impl>::type>(
                 std::forward<Impl>(i)))
@@ -92,7 +91,6 @@ namespace hpx { namespace parcelset
         {
             if(this != &other)
             {
-                // NOLINTNEXTLINE(bugprone-branch-clone)
                 if(other.impl_)
                 {
                     impl_.reset(other.impl_->clone());
@@ -109,7 +107,6 @@ namespace hpx { namespace parcelset
         {
             if(this != &other)
             {
-                // NOLINTNEXTLINE(bugprone-branch-clone)
                 if(other.impl_)
                 {
                     impl_.reset(other.impl_->move());

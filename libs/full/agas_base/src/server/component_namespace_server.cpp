@@ -137,8 +137,6 @@ namespace hpx { namespace agas { namespace server {
             // First registration for this locality, we still return no_success to
             // convey the fact that another locality already registered this
             // component type.
-
-            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format(
                 "component_namespace::bind_prefix, key({1}), prefix({2}), "
                 "ctype({3}), response(no_success)",
@@ -165,7 +163,6 @@ namespace hpx { namespace agas { namespace server {
 
         fit->second.insert(prefix);
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "component_namespace::bind_prefix, key({1}), prefix({2}), "
             "ctype({3})",
@@ -210,7 +207,6 @@ namespace hpx { namespace agas { namespace server {
             ++type_counter;
         }
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "component_namespace::bind_name, key({1}), ctype({2})", key,
             it->second);
@@ -240,7 +236,6 @@ namespace hpx { namespace agas { namespace server {
         // throw an exception if it->second.empty()? It should be impossible.
         if (it == end || it->second.empty())
         {
-            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format(
                 "component_namespace::resolve_id, key({1}), localities(0)",
                 key);
@@ -259,7 +254,6 @@ namespace hpx { namespace agas { namespace server {
             for (; pit != pend; ++pit)
                 p.push_back(*pit);
 
-            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format(
                 "component_namespace::resolve_id, "
                 "key({1}), localities({2})",
@@ -284,7 +278,6 @@ namespace hpx { namespace agas { namespace server {
         // REVIEW: Should this be an error?
         if (it == component_ids_.left.end())
         {
-            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format("component_namespace::unbind, "
                                               "key({1}), response(no_success)",
                 key);
@@ -297,7 +290,6 @@ namespace hpx { namespace agas { namespace server {
         factories_.erase(it->second);
         component_ids_.left.erase(it);
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "component_namespace::unbind, key({1})", key);
 
@@ -334,7 +326,6 @@ namespace hpx { namespace agas { namespace server {
             f(type.first, type.second);
         }
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << "component_namespace::iterate_types";
     }    // }}}
 
@@ -382,7 +373,6 @@ namespace hpx { namespace agas { namespace server {
 
         if (result.empty())
         {
-            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format(
                 "component_namespace::get_component_typename, "
                 "key({1}/{2}), response(no_success)",
@@ -392,7 +382,6 @@ namespace hpx { namespace agas { namespace server {
             return result;
         }
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "component_namespace::get_component_typename, key({1}/{2}), "
             "response({3})",
@@ -421,7 +410,6 @@ namespace hpx { namespace agas { namespace server {
                                            end = factories_.end();
         if (it == end)
         {
-            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format(
                 "component_namespace::get_num_"
                 "localities, key({1}), localities(0)",
@@ -433,7 +421,6 @@ namespace hpx { namespace agas { namespace server {
         std::uint32_t num_localities =
             static_cast<std::uint32_t>(it->second.size());
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "component_namespace::get_num_localities, key({1}), "
             "localities({2})",

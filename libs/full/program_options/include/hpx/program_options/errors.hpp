@@ -51,8 +51,6 @@ namespace hpx { namespace program_options {
     {
         // "--foo-bar" -> "foo-bar"
         std::string::size_type i = text.find_first_not_of("-/");
-
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         if (i == std::string::npos)
         {
             return text;

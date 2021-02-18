@@ -368,8 +368,6 @@ namespace hpx { namespace util
 
                 // Return the connection back to the cache only if the number
                 // of connections does not need to be shrunk.
-
-                // NOLINTNEXTLINE(bugprone-branch-clone)
                 if (num_existing_connections(ct->second) <=
                     max_num_connections(ct->second))
                 {
@@ -607,8 +605,6 @@ namespace hpx { namespace util
                 if (cached_connections(ct->second).empty())
                 {
                     // Remove the key if its connection count is zero.
-
-                    // NOLINTNEXTLINE(bugprone-branch-clone)
                     if (0 == num_existing_connections(ct->second)) {
                         cache_.erase(ct);
                         key_tracker_.erase(kt);

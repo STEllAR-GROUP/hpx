@@ -164,7 +164,6 @@ bootstrap_logging const& operator<<(bootstrap_logging const& l, T const& t)
 {
     // NOLINTNEXTLINE(bugprone-branch-clone)
     LBT_(info) << t;
-    // NOLINTNEXTLINE(bugprone-branch-clone)
     LPROGRESS_ << t;
     return l;
 }

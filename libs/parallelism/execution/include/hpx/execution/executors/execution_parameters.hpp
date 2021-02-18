@@ -595,7 +595,6 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename U,
                 typename Enable = typename std::enable_if<!std::is_same<
                     typename std::decay<U>::type, unwrapper>::value>::type>
-            // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
             unwrapper(U&& u)
               : T(std::forward<U>(u))
             {

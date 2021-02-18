@@ -172,7 +172,6 @@ namespace hpx { namespace agas { namespace server {
             return prefix;
         }
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "locality_namespace::allocate, ep({1}), count({2}), "
             "prefix({3})",
@@ -260,7 +259,6 @@ namespace hpx { namespace agas { namespace server {
             }
 
             /*
-            // NOLINTNEXTLINE(bugprone-branch-clone)
             LAGAS_(info) << hpx::util::format(
                 "locality_namespace::free, ep({1})",
                 ep);
@@ -268,7 +266,6 @@ namespace hpx { namespace agas { namespace server {
         }
 
         /*
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "locality_namespace::free, ep({1}), "
             "response(no_success)",
@@ -293,7 +290,6 @@ namespace hpx { namespace agas { namespace server {
         for (/**/; it != end; ++it)
             p.push_back(it->first);
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "locality_namespace::localities, localities({1})", p.size());
 
@@ -311,7 +307,6 @@ namespace hpx { namespace agas { namespace server {
         std::uint32_t num_localities =
             static_cast<std::uint32_t>(partitions_.size());
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "locality_namespace::get_num_localities, localities({1})",
             num_localities);
@@ -333,7 +328,6 @@ namespace hpx { namespace agas { namespace server {
             num_threads.push_back(get<1>(it->second));
         }
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "locality_namespace::get_num_threads, localities({1})",
             num_threads.size());
@@ -355,7 +349,6 @@ namespace hpx { namespace agas { namespace server {
             num_threads += get<1>(it->second);
         }
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         LAGAS_(info) << hpx::util::format(
             "locality_namespace::get_num_overall_threads, localities({1})",
             num_threads);

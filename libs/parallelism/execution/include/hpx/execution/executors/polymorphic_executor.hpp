@@ -703,7 +703,6 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Exec, typename PE = typename std::decay<Exec>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<PE, polymorphic_executor>::value>::type>
-        // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
         polymorphic_executor(Exec&& exec)
           : base_type(get_empty_vtable())
         {
