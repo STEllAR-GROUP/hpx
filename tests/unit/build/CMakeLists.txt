@@ -68,7 +68,7 @@ function(
     VERBATIM
   )
   add_dependencies(
-    ${name}.make_configure ${name}.make_build_dir hpx hpx_init
+    ${name}.make_configure ${name}.make_build_dir hpx hpx_init hpx_wrap
     iostreams_component
   )
   add_custom_target(
