@@ -219,19 +219,16 @@ namespace hpx { namespace threads { namespace coroutines {
         public:
             typedef ucontext_context_impl_base context_impl_base;
 
-            enum
-            {
-                default_stack_size = SIGSTKSZ
-            };
+            // on some platforms SIGSTKSZ resolves to a syscall, we can't make
+            // this constexpr
+            static std::ptrdiff_t const default_stack_size = SIGSTKSZ;
 
             /**
              * Create a context that on restore invokes Functor on
              *  a new stack. The stack size can be optionally specified.
              */
             explicit ucontext_context_impl(std::ptrdiff_t stack_size = -1)
-              : m_stack_size(stack_size == -1 ?
-                        static_cast<std::ptrdiff_t>(default_stack_size) :
-                        stack_size)
+              : m_stack_size(stack_size == -1 ? default_stack_size : stack_size)
               , m_stack(nullptr)
               , funp_(&trampoline<CoroutineImpl>)
             {
