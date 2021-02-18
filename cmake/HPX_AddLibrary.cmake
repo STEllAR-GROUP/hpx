@@ -43,7 +43,8 @@ function(add_hpx_library name)
 
   if(${name}_OBJECT AND ${name}_STATIC)
     hpx_error("Trying to create ${name} library with both STATIC and OBJECT.\
- Only one can be used at the same time.")
+ Only one can be used at the same time."
+    )
   endif()
 
   if(NOT ${name}_SOURCE_ROOT)
