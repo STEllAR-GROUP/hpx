@@ -40,7 +40,7 @@ void test_for_each_n_exception_seq(IteratorTag)
 
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_exception = true;
     }

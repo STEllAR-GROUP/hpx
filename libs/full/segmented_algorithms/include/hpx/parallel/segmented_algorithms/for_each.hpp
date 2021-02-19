@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,7 @@
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <exception>
 #include <iterator>
 #include <list>
@@ -25,6 +26,7 @@
 #include <vector>
 
 namespace hpx { namespace parallel { inline namespace v1 {
+
     ///////////////////////////////////////////////////////////////////////////
     // segmented_for_each
     namespace detail {
@@ -178,39 +180,111 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::move(segments)));
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        // segmented implementation
-        template <typename ExPolicy, typename SegIterB, typename SegIterE,
+        /// Segmented implementation using for_each.
+        template <typename ExPolicy, typename FwdIter, typename Size,
             typename F, typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy, SegIterB>::type
-        for_each_(ExPolicy&& policy, SegIterB first, SegIterE last, F&& f,
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        for_each_n_(ExPolicy&& policy, FwdIter first, Size count, F&& f,
+            Proj&& proj, std::false_type);
+
+        template <typename ExPolicy, typename FwdIter, typename Size,
+            typename F, typename Proj>
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        for_each_n_(ExPolicy&& policy, FwdIter first, Size count, F&& f,
             Proj&& proj, std::true_type)
         {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using iterator_traits =
+                hpx::traits::segmented_iterator_traits<FwdIter>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-            if (first == last)
+            if (detail::is_negative(count) || count == 0)
             {
-                typedef util::detail::algorithm_result<ExPolicy, SegIterB>
-                    result;
+                using result =
+                    util::detail::algorithm_result<ExPolicy, FwdIter>;
                 return result::get(std::move(first));
             }
 
-            typedef hpx::traits::segmented_iterator_traits<SegIterB>
-                iterator_traits;
-
+            auto last = first;
+            detail::advance(last, std::size_t(count));
             return segmented_for_each(
-                for_each<typename iterator_traits::local_iterator>(),
+                hpx::parallel::v1::detail::for_each<
+                    typename iterator_traits::local_iterator>(),
                 std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
                 std::forward<Proj>(proj), is_seq());
         }
-
-        // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename InIterB, typename InIterE,
-            typename F, typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy, InIterB>::type
-        for_each_(ExPolicy&& policy, InIterB first, InIterE last, F&& f,
-            Proj&& proj, std::false_type);
-
         /// \endcond
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1
+
+// The segmented iterators we support all live in namespace hpx::segmented
+namespace hpx { namespace segmented {
+
+    // Note: The implementation of the non-segmented algorithms relies on
+    //       tag_fallback_invoke. For this reason the tag_invoke overloads here
+    //       take precedence over the non-segmented algorithms. This has the
+    //       advantage that the non-segmented algorithms do not need to be
+    //       explicitly disabled for segmented iterators.
+
+    // clang-format off
+    template <typename InIter,
+        typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_iterator<InIter>::value &&
+            hpx::traits::is_segmented_iterator<InIter>::value
+        )>
+    // clang-format on
+    InIter tag_invoke(hpx::for_each_t, InIter first, InIter last, F&& f)
+    {
+        static_assert((hpx::traits::is_forward_iterator<InIter>::value),
+            "Requires at least input iterator.");
+
+        using iterator_traits = hpx::traits::segmented_iterator_traits<InIter>;
+
+        if (first == last)
+        {
+            return first;
+        }
+
+        return hpx::parallel::v1::detail::segmented_for_each(
+            hpx::parallel::v1::detail::for_each<
+                typename iterator_traits::local_iterator>(),
+            hpx::execution::seq, first, last, std::forward<F>(f),
+            hpx::parallel::util::projection_identity(), std::true_type());
+    }
+
+    // clang-format off
+    template <typename ExPolicy, typename SegIter,
+        typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<SegIter>::value &&
+            hpx::traits::is_segmented_iterator<SegIter>::value
+        )>
+    // clang-format on
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        SegIter>::type
+    tag_invoke(
+        hpx::for_each_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
+    {
+        static_assert((hpx::traits::is_forward_iterator<SegIter>::value),
+            "Requires at least forward iterator.");
+
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        if (first == last)
+        {
+            using result =
+                hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                    SegIter>;
+            return result::get(std::move(first));
+        }
+
+        using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
+
+        return segmented_for_each(
+            hpx::parallel::v1::detail::for_each<
+                typename iterator_traits::local_iterator>(),
+            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+            hpx::parallel::util::projection_identity(), is_seq());
+    }
+}}    // namespace hpx::segmented

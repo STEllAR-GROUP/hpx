@@ -32,6 +32,9 @@ namespace hpx
     template <typename Key, typename T, typename Hash = std::hash<Key>,
         typename KeyEqual = std::equal_to<Key> >
     class unordered_map;
+}
+
+namespace hpx { namespace segmented {
 
     template <typename Key, typename T, typename Hash, typename KeyEqual,
         typename BaseIter>
@@ -148,13 +151,13 @@ namespace hpx
 //     template <typename T, typename BaseIter>
 //     class local_segment_vector_iterator
 //       : public hpx::util::iterator_adaptor<
-//             local_segment_vector_iterator<T, BaseIter>, BaseIter,
+//             segmented::local_segment_vector_iterator<T, BaseIter>, BaseIter,
 //             std::vector<T>, std::forward_iterator_tag
 //         >
 //     {
 //     private:
 //         typedef hpx::util::iterator_adaptor<
-//                 local_segment_vector_iterator<T, BaseIter>, BaseIter,
+//                 segmented::local_segment_vector_iterator<T, BaseIter>, BaseIter,
 //                 std::vector<T>, std::forward_iterator_tag
 //             > base_type;
 //         typedef detail::is_requested_locality<BaseIter> predicate;
@@ -208,5 +211,23 @@ namespace hpx
 //         predicate predicate_;
 //         BaseIter end_;
 //     };
-}
+}}
 
+namespace hpx {
+
+    template <typename Key, typename T, typename Hash, typename KeyEqual,
+        typename BaseIter>
+    using segment_unordered_map_iterator HPX_DEPRECATED_V(1, 7,
+        "hpx::segment_unordered_map_iterator is deprecated. Use "
+        "hpx::segmented::segment_unordered_map_iterator instead.") =
+        segmented::segment_unordered_map_iterator<Key, T, Hash, KeyEqual,
+            BaseIter>;
+
+    template <typename Key, typename T, typename Hash, typename KeyEqual,
+        typename BaseIter>
+    using const_segment_unordered_map_iterator HPX_DEPRECATED_V(1, 7,
+        "hpx::const_segment_unordered_map_iterator is deprecated. Use "
+        "hpx::segmented::const_segment_unordered_map_iterator instead.") =
+        segmented::const_segment_unordered_map_iterator<Key, T, Hash, KeyEqual,
+            BaseIter>;
+}    // namespace hpx

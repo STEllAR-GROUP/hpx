@@ -216,35 +216,36 @@ namespace hpx
         partitions_vector_type partitions_;
 
     public:
-        typedef vector_iterator<T, Data> iterator;
-        typedef const_vector_iterator<T, Data> const_iterator;
+        typedef segmented::vector_iterator<T, Data> iterator;
+        typedef segmented::const_vector_iterator<T, Data> const_iterator;
         typedef std::reverse_iterator<iterator> reverse_iterator;
         typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
-        typedef local_vector_iterator<T, Data> local_iterator;
-        typedef const_local_vector_iterator<T, Data> const_local_iterator;
+        typedef segmented::local_vector_iterator<T, Data> local_iterator;
+        typedef segmented::const_local_vector_iterator<T, Data>
+            const_local_iterator;
 
-        typedef segment_vector_iterator<
+        typedef segmented::segment_vector_iterator<
                 T, Data, typename partitions_vector_type::iterator
             > segment_iterator;
-        typedef const_segment_vector_iterator<
+        typedef segmented::const_segment_vector_iterator<
                 T, Data, typename partitions_vector_type::const_iterator
             > const_segment_iterator;
 
-        typedef local_segment_vector_iterator<
+        typedef segmented::local_segment_vector_iterator<
                 T, Data, typename partitions_vector_type::iterator
             > local_segment_iterator;
-        typedef local_segment_vector_iterator<
+        typedef segmented::local_segment_vector_iterator<
                 T, Data, typename partitions_vector_type::const_iterator
             > const_local_segment_iterator;
 
     private:
-        friend class vector_iterator<T, Data>;
-        friend class const_vector_iterator<T, Data>;
+        friend class segmented::vector_iterator<T, Data>;
+        friend class segmented::const_vector_iterator<T, Data>;
 
-        friend class segment_vector_iterator<
+        friend class segmented::segment_vector_iterator<
             T, Data, typename partitions_vector_type::iterator>;
-        friend class const_segment_vector_iterator<
+        friend class segmented::const_segment_vector_iterator<
             T, Data, typename partitions_vector_type::const_iterator>;
 
         std::size_t get_partition_size() const;
@@ -439,9 +440,9 @@ namespace hpx
         ///         A (possibly remote) access operation is performed only once
         ///         this proxy instance is used.
         ///
-        detail::vector_value_proxy<T, Data> operator[](size_type pos)
+        segmented::detail::vector_value_proxy<T, Data> operator[](size_type pos)
         {
-            return detail::vector_value_proxy<T, Data>(*this, pos);
+            return segmented::detail::vector_value_proxy<T, Data>(*this, pos);
         }
 
         /// \brief Array subscript operator. This does not throw any exception.

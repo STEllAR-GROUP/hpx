@@ -18,24 +18,27 @@ namespace hpx
     template <typename T, typename Data = std::vector<T>>
     class partitioned_vector;
 
-    template <typename T, typename Data> class local_vector_iterator;
-    template <typename T, typename Data> class const_local_vector_iterator;
+    namespace segmented {
 
-    template <typename T, typename Data, typename BaseIter>
-    class local_raw_vector_iterator;
-    template <typename T, typename Data, typename BaseIter>
-    class const_local_raw_vector_iterator;
+        template <typename T, typename Data> class local_vector_iterator;
+        template <typename T, typename Data> class const_local_vector_iterator;
 
-    template <typename T, typename Data> class vector_iterator;
-    template <typename T, typename Data> class const_vector_iterator;
+        template <typename T, typename Data, typename BaseIter>
+        class local_raw_vector_iterator;
+        template <typename T, typename Data, typename BaseIter>
+        class const_local_raw_vector_iterator;
 
-    template <typename T, typename Data, typename BaseIter>
-    class segment_vector_iterator;
-    template <typename T, typename Data, typename BaseIter>
-    class const_segment_vector_iterator;
+        template <typename T, typename Data> class vector_iterator;
+        template <typename T, typename Data> class const_vector_iterator;
 
-    template <typename T, typename Data, typename BaseIter>
-    class local_segment_vector_iterator;
+        template <typename T, typename Data, typename BaseIter>
+        class segment_vector_iterator;
+        template <typename T, typename Data, typename BaseIter>
+        class const_segment_vector_iterator;
+
+        template <typename T, typename Data, typename BaseIter>
+        class local_segment_vector_iterator;
+    }
 
     namespace server
     {

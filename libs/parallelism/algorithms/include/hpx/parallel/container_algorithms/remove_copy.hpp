@@ -591,39 +591,56 @@ namespace hpx {
 
 namespace hpx { namespace parallel { inline namespace v1 {
 
+    // clang-format off
     template <typename ExPolicy, typename Rng, typename OutIter, typename T,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
-                    OutIter>::value&& traits::is_projected_range<Proj,
-                    Rng>::value&& traits::is_indirect_callable<ExPolicy,
-                    std::equal_to<T>, traits::projected_range<Proj, Rng>,
-                    traits::projected<Proj, T const*>>::value)>
-    typename util::detail::algorithm_result<ExPolicy,
-        util::in_out_result<
-            typename hpx::traits::range_traits<Rng>::iterator_type,
-            OutIter>>::type
-    remove_copy(ExPolicy&& policy, Rng&& rng, OutIter dest, T const& val,
-        Proj&& proj = Proj())
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_range<Rng>::value &&
+            hpx::traits::is_iterator<OutIter>::value &&
+            hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
+            hpx::parallel::traits::is_indirect_callable<
+                ExPolicy, std::equal_to<T>,
+                hpx::parallel::traits::projected_range<Proj, Rng>,
+                hpx::parallel::traits::projected<Proj, T const*>
+            >::value
+        )>
+    // clang-format on
+    HPX_DEPRECATED_V(1, 7,
+        "hpx::parallel::remove_copy is deprecated, use "
+        "hpx::ranges::remove_copy instead")
+        typename util::detail::algorithm_result<ExPolicy,
+            util::in_out_result<
+                typename hpx::traits::range_traits<Rng>::iterator_type,
+                OutIter>>::type remove_copy(ExPolicy&& policy, Rng&& rng,
+            OutIter dest, T const& val, Proj&& proj = Proj())
     {
         return remove_copy(std::forward<ExPolicy>(policy),
             hpx::util::begin(rng), hpx::util::end(rng), dest, val,
             std::forward<Proj>(proj));
     }
 
+    // clang-format off
     template <typename ExPolicy, typename Rng, typename OutIter, typename F,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
-                    OutIter>::value&& traits::is_projected_range<Proj,
-                    Rng>::value&& traits::is_indirect_callable<ExPolicy, F,
-                    traits::projected_range<Proj, Rng>>::value)>
-    typename util::detail::algorithm_result<ExPolicy,
-        util::in_out_result<
-            typename hpx::traits::range_traits<Rng>::iterator_type,
-            OutIter>>::type
-    remove_copy_if(
-        ExPolicy&& policy, Rng&& rng, OutIter dest, F&& f, Proj&& proj = Proj())
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_range<Rng>::value &&
+            hpx::traits::is_iterator<OutIter>::value &&
+            hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
+            hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
+                hpx::parallel::traits::projected_range<Proj, Rng>
+            >::value
+        )>
+    // clang-format on
+    HPX_DEPRECATED_V(1, 7,
+        "hpx::parallel::remove_copy_if is deprecated, use "
+        "hpx::ranges::remove_copy_if instead")
+        typename util::detail::algorithm_result<ExPolicy,
+            util::in_out_result<
+                typename hpx::traits::range_traits<Rng>::iterator_type,
+                OutIter>>::type remove_copy_if(ExPolicy&& policy, Rng&& rng,
+            OutIter dest, F&& f, Proj&& proj = Proj())
     {
         return remove_copy_if(std::forward<ExPolicy>(policy),
             hpx::util::begin(rng), hpx::util::end(rng), dest,
@@ -632,6 +649,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 }}}    // namespace hpx::parallel::v1
 
 namespace hpx { namespace ranges {
+
     template <typename I, typename O>
     using remove_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
@@ -740,7 +758,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Rng, typename O, typename Pred,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::is_invocable_v<Pred,
@@ -850,7 +868,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Rng, typename O, typename T,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value
             )>

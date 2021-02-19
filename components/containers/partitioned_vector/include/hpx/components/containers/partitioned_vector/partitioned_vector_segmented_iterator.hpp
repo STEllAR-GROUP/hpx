@@ -34,7 +34,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx
+namespace hpx { namespace segmented
 {
     ///////////////////////////////////////////////////////////////////////////
     // This class wraps plain a vector<>::iterator or vector<>::const_iterator
@@ -46,13 +46,14 @@ namespace hpx
     {
     private:
         typedef hpx::util::iterator_adaptor<
-                local_raw_vector_iterator<T, Data, BaseIter>, BaseIter
-            > base_type;
+            segmented::local_raw_vector_iterator<T, Data, BaseIter>, BaseIter>
+            base_type;
         typedef BaseIter base_iterator;
 
     public:
-        typedef local_vector_iterator<T, Data> local_iterator;
-        typedef const_local_vector_iterator<T, Data> local_const_iterator;
+        typedef segmented::local_vector_iterator<T, Data> local_iterator;
+        typedef segmented::const_local_vector_iterator<T, Data>
+            local_const_iterator;
 
         local_raw_vector_iterator() = default;
 
@@ -85,18 +86,20 @@ namespace hpx
     template <typename T, typename Data, typename BaseIter>
     class const_local_raw_vector_iterator
       : public hpx::util::iterator_adaptor<
-            const_local_raw_vector_iterator<T, Data, BaseIter>, BaseIter
-        >
+            segmented::const_local_raw_vector_iterator<T, Data, BaseIter>,
+            BaseIter>
     {
     private:
         typedef hpx::util::iterator_adaptor<
-                const_local_raw_vector_iterator<T, Data, BaseIter>, BaseIter
-            > base_type;
+            segmented::const_local_raw_vector_iterator<T, Data, BaseIter>,
+            BaseIter>
+            base_type;
         typedef BaseIter base_iterator;
 
     public:
-        typedef const_local_vector_iterator<T, Data> local_iterator;
-        typedef const_local_vector_iterator<T, Data> local_const_iterator;
+        typedef segmented::const_local_vector_iterator<T, Data> local_iterator;
+        typedef segmented::const_local_vector_iterator<T, Data>
+            local_const_iterator;
 
         const_local_raw_vector_iterator() = default;
 
@@ -220,17 +223,16 @@ namespace hpx
     template <typename T, typename Data>
     class local_vector_iterator
       : public hpx::util::iterator_facade<
-            local_vector_iterator<T, Data>, T,
+            segmented::local_vector_iterator<T, Data>, T,
             std::random_access_iterator_tag,
-            detail::local_vector_value_proxy<T, Data>
-        >
+            segmented::detail::local_vector_value_proxy<T, Data>>
     {
     private:
         typedef hpx::util::iterator_facade<
-                local_vector_iterator<T, Data>, T,
-                std::random_access_iterator_tag,
-                detail::local_vector_value_proxy<T, Data>
-            > base_type;
+            segmented::local_vector_iterator<T, Data>, T,
+            std::random_access_iterator_tag,
+            segmented::detail::local_vector_value_proxy<T, Data>>
+            base_type;
 
     public:
         typedef std::size_t size_type;
@@ -256,10 +258,10 @@ namespace hpx
             data_(data)
         {}
 
-        typedef local_raw_vector_iterator<
+        typedef segmented::local_raw_vector_iterator<
                 T, Data, typename Data::iterator
             > local_raw_iterator;
-        typedef const_local_raw_vector_iterator<
+        typedef segmented::const_local_raw_vector_iterator<
                 T, Data, typename Data::const_iterator
             > local_raw_const_iterator;
 
@@ -304,7 +306,7 @@ namespace hpx
 
         typename base_type::reference dereference() const
         {
-            return detail::local_vector_value_proxy<T, Data>(*this);
+            return segmented::detail::local_vector_value_proxy<T, Data>(*this);
         }
 
         void increment()
@@ -370,14 +372,14 @@ namespace hpx
       : public hpx::util::iterator_facade<
             const_local_vector_iterator<T, Data>, T const,
             std::random_access_iterator_tag,
-            detail::const_local_vector_value_proxy<T, Data>
+            segmented::detail::const_local_vector_value_proxy<T, Data>
         >
     {
     private:
         typedef hpx::util::iterator_facade<
                 const_local_vector_iterator<T, Data>, T const,
                 std::random_access_iterator_tag,
-                detail::const_local_vector_value_proxy<T, Data>
+                segmented::detail::const_local_vector_value_proxy<T, Data>
             > base_type;
 
     public:
@@ -412,7 +414,7 @@ namespace hpx
             data_(it.get_data())
         {}
 
-        typedef const_local_raw_vector_iterator<
+        typedef segmented::const_local_raw_vector_iterator<
                 T, Data, typename Data::const_iterator
             > local_raw_iterator;
         typedef local_raw_iterator local_raw_const_iterator;
@@ -458,7 +460,8 @@ namespace hpx
 
         typename base_type::reference dereference() const
         {
-            return detail::const_local_vector_value_proxy<T, Data>(*this);
+            return segmented::detail::const_local_vector_value_proxy<T, Data>(
+                *this);
         }
 
         void increment()
@@ -746,7 +749,8 @@ namespace hpx
         typename base_type::reference dereference() const
         {
             HPX_ASSERT(data_);
-            return detail::vector_value_proxy<T, Data>(*data_, global_index_);
+            return segmented::detail::vector_value_proxy<T, Data>(
+                *data_, global_index_);
         }
 
         void increment()
@@ -864,17 +868,76 @@ namespace hpx
         // global position in the referenced vector
         size_type global_index_;
     };
-}
+}}
+
+// Starting V1.7 we have moved the iterators into the segmented namespace such
+// that the tag_invoke overload for the segmented algorithms will be found.
+namespace hpx {
+
+    template <typename T, typename Data, typename BaseIter>
+    using local_raw_vector_iterator HPX_DEPRECATED_V(1, 7,
+        "hpx::local_raw_vector_iterator is deprecated. Use "
+        "hpx::segmented::local_raw_vector_iterator instead.") =
+        segmented::local_raw_vector_iterator<T, Data, BaseIter>;
+
+    template <typename T, typename Data, typename BaseIter>
+    using const_local_raw_vector_iterator HPX_DEPRECATED_V(1, 7,
+        "hpx::const_local_raw_vector_iterator is deprecated. Use "
+        "hpx::segmented::const_local_raw_vector_iterator instead.") =
+        segmented::const_local_raw_vector_iterator<T, Data, BaseIter>;
+
+    template <typename T, typename Data>
+    using local_vector_iterator HPX_DEPRECATED_V(1, 7,
+        "hpx::local_vector_iterator is deprecated. Use "
+        "hpx::segmented::local_vector_iterator instead.") =
+        segmented::local_vector_iterator<T, Data>;
+
+    template <typename T, typename Data>
+    using const_local_vector_iterator HPX_DEPRECATED_V(1, 7,
+        "hpx::const_local_vector_iterator is deprecated. Use "
+        "hpx::segmented::const_local_vector_iterator instead.") =
+        segmented::const_local_vector_iterator<T, Data>;
+
+    template <typename T, typename Data, typename BaseIter>
+    using segment_vector_iterator HPX_DEPRECATED_V(1, 7,
+        "hpx::segment_vector_iterator is deprecated. Use "
+        "hpx::segmented::segment_vector_iterator instead.") =
+        segmented::segment_vector_iterator<T, Data, BaseIter>;
+
+    template <typename T, typename Data, typename BaseIter>
+    using const_segment_vector_iterator HPX_DEPRECATED_V(1, 7,
+        "hpx::const_segment_vector_iterator is deprecated. Use "
+        "hpx::segmented::const_segment_vector_iterator instead.") =
+        segmented::const_segment_vector_iterator<T, Data, BaseIter>;
+
+    template <typename T, typename Data, typename BaseIter>
+    using local_segment_vector_iterator HPX_DEPRECATED_V(1, 7,
+        "hpx::local_segment_vector_iterator is deprecated. Use "
+        "hpx::segmented::local_segment_vector_iterator instead.") =
+        segmented::local_segment_vector_iterator<T, Data, BaseIter>;
+
+    template <typename T, typename Data>
+    using vector_iterator HPX_DEPRECATED_V(1, 7,
+        "hpx::vector_iterator is deprecated. Use "
+        "hpx::segmented::vector_iterator instead.") =
+        segmented::vector_iterator<T, Data>;
+
+    template <typename T, typename Data>
+    using const_vector_iterator HPX_DEPRECATED_V(1, 7,
+        "hpx::const_vector_iterator is deprecated. Use "
+        "hpx::segmented::const_vector_iterator instead.") =
+        segmented::const_vector_iterator<T, Data>;
+}    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits
 {
     template <typename T, typename Data>
-    struct segmented_iterator_traits<vector_iterator<T, Data> >
+    struct segmented_iterator_traits<segmented::vector_iterator<T, Data>>
     {
         typedef std::true_type is_segmented_iterator;
 
-        typedef vector_iterator<T, Data> iterator;
+        typedef segmented::vector_iterator<T, Data> iterator;
         typedef typename iterator::segment_iterator segment_iterator;
         typedef typename iterator::local_segment_iterator local_segment_iterator;
         typedef typename iterator::local_iterator local_iterator;
@@ -960,11 +1023,11 @@ namespace hpx { namespace traits
     };
 
     template <typename T, typename Data>
-    struct segmented_iterator_traits<const_vector_iterator<T, Data> >
+    struct segmented_iterator_traits<segmented::const_vector_iterator<T, Data>>
     {
         typedef std::true_type is_segmented_iterator;
 
-        typedef const_vector_iterator<T, Data> iterator;
+        typedef segmented::const_vector_iterator<T, Data> iterator;
         typedef typename iterator::segment_iterator segment_iterator;
         typedef typename iterator::local_segment_iterator local_segment_iterator;
         typedef typename iterator::local_iterator local_iterator;
@@ -1053,12 +1116,13 @@ namespace hpx { namespace traits
     // Some 'remote' iterators need to be mapped before being applied to the
     // local algorithms.
     template <typename T, typename Data>
-    struct segmented_local_iterator_traits<local_vector_iterator<T, Data> >
+    struct segmented_local_iterator_traits<
+        segmented::local_vector_iterator<T, Data>>
     {
         typedef std::true_type is_segmented_local_iterator;
 
-        typedef vector_iterator<T, Data> iterator;
-        typedef local_vector_iterator<T, Data> local_iterator;
+        typedef segmented::vector_iterator<T, Data> iterator;
+        typedef segmented::local_vector_iterator<T, Data> local_iterator;
         typedef typename local_iterator::local_raw_iterator local_raw_iterator;
 
         // Extract base iterator from local_iterator
@@ -1076,12 +1140,12 @@ namespace hpx { namespace traits
 
     template <typename T, typename Data>
     struct segmented_local_iterator_traits<
-        const_local_vector_iterator<T, Data> >
+        segmented::const_local_vector_iterator<T, Data> >
     {
         typedef std::true_type is_segmented_local_iterator;
 
-        typedef const_vector_iterator<T, Data> iterator;
-        typedef const_local_vector_iterator<T, Data> local_iterator;
+        typedef segmented::const_vector_iterator<T, Data> iterator;
+        typedef segmented::const_local_vector_iterator<T, Data> local_iterator;
         typedef typename local_iterator::local_raw_iterator local_raw_iterator;
 
         // Extract base iterator from local_iterator
@@ -1099,12 +1163,13 @@ namespace hpx { namespace traits
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Data>
-    struct is_value_proxy<hpx::detail::local_vector_value_proxy<T, Data> >
+    struct is_value_proxy<
+        hpx::segmented::detail::local_vector_value_proxy<T, Data>>
       : std::true_type
     {};
 
     template <typename T, typename Data>
-    struct is_value_proxy<hpx::detail::vector_value_proxy<T, Data> >
+    struct is_value_proxy<hpx::segmented::detail::vector_value_proxy<T, Data>>
       : std::true_type
     {};
 }}

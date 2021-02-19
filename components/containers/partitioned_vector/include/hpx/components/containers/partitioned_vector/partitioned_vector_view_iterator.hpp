@@ -18,7 +18,7 @@
 #include <functional>
 #include <iterator>
 
-namespace hpx {
+namespace hpx { namespace segmented {
 
     template<typename T, std::size_t N, typename Data>
     class partitioned_vector_view_iterator
@@ -29,7 +29,7 @@ namespace hpx {
                 hpx::detail::view_element<T,Data> >
     {
     private:
-        using pvector_iterator = hpx::vector_iterator<T,Data>;
+        using pvector_iterator = hpx::segmented::vector_iterator<T,Data>;
         using segment_iterator = typename pvector_iterator::segment_iterator;
         using indices = typename hpx::util::make_index_pack<N>::type;
 
@@ -139,7 +139,8 @@ namespace hpx {
                 hpx::detail::const_view_element<T,Data> >
     {
     private:
-        using const_pvector_iterator = hpx::const_vector_iterator<T, Data>;
+        using const_pvector_iterator =
+            hpx::segmented::const_vector_iterator<T, Data>;
         using const_segment_iterator =
             typename const_pvector_iterator::segment_iterator;
         using indices = typename hpx::util::make_index_pack<N>::type;
@@ -253,5 +254,21 @@ namespace hpx {
         std::array< std::size_t, N+1 > const & sw_basis_;
         std::array< std::size_t, N+1 > const & hw_basis_;
     };
-}
+}}
 
+// Starting V1.7 we have moved the iterators into the segmented namespace such
+// that the tag_invoke overload for the segmented algorithms will be found.
+namespace hpx {
+
+    template <typename T, std::size_t N, typename Data>
+    using partitioned_vector_view_iterator HPX_DEPRECATED_V(1, 7,
+        "hpx::partitioned_vector_view_iterator is deprecated. Use "
+        "hpx::segmented::partitioned_vector_view_iterator instead.") =
+        segmented::partitioned_vector_view_iterator<T, N, Data>;
+
+    template <typename T, std::size_t N, typename Data>
+    using const_partitioned_vector_view_iterator HPX_DEPRECATED_V(1, 7,
+        "hpx::const_partitioned_vector_view_iterator  is deprecated. Use "
+        "hpx::segmented::const_partitioned_vector_view_iterator  instead.") =
+        segmented::const_partitioned_vector_view_iterator <T, N, Data>;
+}

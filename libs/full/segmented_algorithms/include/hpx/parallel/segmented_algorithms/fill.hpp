@@ -22,6 +22,7 @@
 #include <vector>
 
 namespace hpx { namespace parallel { inline namespace v1 {
+
     ///////////////////////////////////////////////////////////////////////////
     // segmented_fill
     namespace detail {
@@ -46,7 +47,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename Archive>
             void serialize(Archive& ar, unsigned /* version */)
             {
-                ar& value_;
+                // clang-format off
+                ar & value_;
+                // clang-format on
             }
         };
 
@@ -57,12 +60,27 @@ namespace hpx { namespace parallel { inline namespace v1 {
         fill_(ExPolicy&& policy, InIter first, InIter last, T const& value,
             std::true_type)
         {
-            typedef
-                typename std::iterator_traits<InIter>::value_type value_type;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-            return for_each_(std::forward<ExPolicy>(policy), first, last,
-                fill_function<value_type>(value), util::projection_identity(),
-                std::true_type());
+            if (first == last)
+            {
+                using result =
+                    hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                        InIter>;
+                return result::get(std::move(first));
+            }
+
+            using iterator_traits =
+                hpx::traits::segmented_iterator_traits<InIter>;
+            using value_type =
+                typename std::iterator_traits<InIter>::value_type;
+
+            return segmented_for_each(
+                hpx::parallel::v1::detail::for_each<
+                    typename iterator_traits::local_iterator>(),
+                std::forward<ExPolicy>(policy), first, last,
+                fill_function<value_type>(value),
+                hpx::parallel::util::projection_identity(), is_seq());
         }
 
         // forward declare the non-segmented version of this algorithm
