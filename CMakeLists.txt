@@ -2194,6 +2194,19 @@ if(HPX_WITH_POOL_EXECUTOR_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_POOL_EXECUTOR_COMPATIBILITY)
 endif()
 
+# Compatibility with using Boost.Iterator traversal tags, introduced in V1.7.0
+hpx_option(
+  HPX_ITERATOR_SUPPORT_WITH_BOOST_ITERATOR_TRAVERSAL_TAG_COMPATIBILITY BOOL
+  "Enable Boost.Iterator traversal tag compatibility. (default: OFF)" OFF
+  ADVANCED CATEGORY "Modules"
+)
+if(HPX_ITERATOR_SUPPORT_WITH_BOOST_ITERATOR_TRAVERSAL_TAG_COMPATIBILITY)
+  hpx_add_config_define_namespace(
+    DEFINE HPX_ITERATOR_SUPPORT_HAVE_BOOST_ITERATOR_TRAVERSAL_TAG_COMPATIBILITY
+    NAMESPACE ITERATOR_SUPPORT
+  )
+endif()
+
 # ##############################################################################
 # Find Our dependencies: These are all dependencies needed to build the core
 # library. Dependencies that are only needed by plugins, examples or tests

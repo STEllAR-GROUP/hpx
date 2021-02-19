@@ -8,10 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/iterator_support/boost_iterator_categories.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/equality.hpp>
-
-#include <boost/iterator/iterator_categories.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -274,20 +273,20 @@ namespace hpx { namespace traits {
          * ForwardIterator concept.
          */
         template <typename Iter>
-        struct satisfy_traversal_concept<Iter, boost::forward_traversal_tag>
+        struct satisfy_traversal_concept<Iter, hpx::forward_traversal_tag>
           : bidirectional_concept<Iter>
         {
         };
 
         template <typename Iter>
-        struct satisfy_traversal_concept<Iter,
-            boost::bidirectional_traversal_tag> : bidirectional_concept<Iter>
+        struct satisfy_traversal_concept<Iter, hpx::bidirectional_traversal_tag>
+          : bidirectional_concept<Iter>
         {
         };
 
         template <typename Iter>
-        struct satisfy_traversal_concept<Iter,
-            boost::random_access_traversal_tag> : random_access_concept<Iter>
+        struct satisfy_traversal_concept<Iter, hpx::random_access_traversal_tag>
+          : random_access_concept<Iter>
         {
         };
     }    // namespace detail
@@ -297,8 +296,15 @@ namespace hpx { namespace traits {
     {
     };
 
+    template <typename Iter>
+    using is_iterator_t = typename is_iterator<Iter>::type;
+
+    template <typename Iter>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_iterator_v = is_iterator<Iter>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-        ///////////////////////////////////////////////////////////////////////
+
         template <typename Iter, typename Cat, typename Enable = void>
         struct belongs_to_iterator_category : std::false_type
         {
@@ -323,7 +329,7 @@ namespace hpx { namespace traits {
             typename std::enable_if<is_iterator<Iter>::value>::type>
           : std::integral_constant<bool,
                 std::is_base_of<Traversal,
-                    typename boost::iterator_traversal<Iter>::type>::value ||
+                    hpx::traits::iterator_traversal_t<Iter>>::value ||
                     satisfy_traversal_concept<Iter, Traversal>::value>
         {
         };
@@ -351,32 +357,31 @@ namespace hpx { namespace traits {
         template <typename Iter, typename Traversal>
         struct has_traversal<Iter, Traversal,
             typename std::enable_if<is_iterator<Iter>::value>::type>
-          : std::is_same<Traversal,
-                typename boost::iterator_traversal<Iter>::type>
+          : std::is_same<Traversal, hpx::traits::iterator_traversal_t<Iter>>
         {
         };
 
         template <typename Iter>
-        struct has_traversal<Iter, boost::bidirectional_traversal_tag,
+        struct has_traversal<Iter, hpx::bidirectional_traversal_tag,
             typename std::enable_if<is_iterator<Iter>::value>::type>
           : std::integral_constant<bool,
-                std::is_same<boost::bidirectional_traversal_tag,
-                    typename boost::iterator_traversal<Iter>::type>::value ||
+                std::is_same<hpx::bidirectional_traversal_tag,
+                    hpx::traits::iterator_traversal_t<Iter>>::value ||
                     (satisfy_traversal_concept<Iter,
-                         boost::bidirectional_traversal_tag>::value &&
+                         hpx::bidirectional_traversal_tag>::value &&
                         !satisfy_traversal_concept<Iter,
-                            boost::random_access_traversal_tag>::value)>
+                            hpx::random_access_traversal_tag>::value)>
         {
         };
 
         template <typename Iter>
-        struct has_traversal<Iter, boost::random_access_traversal_tag,
+        struct has_traversal<Iter, hpx::random_access_traversal_tag,
             typename std::enable_if<is_iterator<Iter>::value>::type>
           : std::integral_constant<bool,
-                std::is_same<boost::random_access_traversal_tag,
-                    typename boost::iterator_traversal<Iter>::type>::value ||
+                std::is_same<hpx::random_access_traversal_tag,
+                    hpx::traits::iterator_traversal_t<Iter>>::value ||
                     satisfy_traversal_concept<Iter,
-                        boost::random_access_traversal_tag>::value>
+                        hpx::random_access_traversal_tag>::value>
         {
         };
     }    // namespace detail
@@ -397,9 +402,16 @@ namespace hpx { namespace traits {
                 std::output_iterator_tag>::value ||
                 detail::belongs_to_iterator_traversal<
                     typename std::decay<Iter>::type,
-                    boost::incrementable_traversal_tag>::value>
+                    hpx::incrementable_traversal_tag>::value>
     {
     };
+
+    template <typename Iter>
+    using is_output_iterator_t = typename is_output_iterator<Iter>::type;
+
+    template <typename Iter>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_output_iterator_v =
+        is_output_iterator<Iter>::value;
 
     template <typename Iter, typename Enable = void>
     struct is_input_iterator
@@ -409,9 +421,16 @@ namespace hpx { namespace traits {
                 std::input_iterator_tag>::value ||
                 detail::belongs_to_iterator_traversal<
                     typename std::decay<Iter>::type,
-                    boost::single_pass_traversal_tag>::value>
+                    hpx::single_pass_traversal_tag>::value>
     {
     };
+
+    template <typename Iter>
+    using is_input_iterator_t = typename is_input_iterator<Iter>::type;
+
+    template <typename Iter>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_input_iterator_v =
+        is_input_iterator<Iter>::value;
 
     template <typename Iter, typename Enable = void>
     struct is_forward_iterator
@@ -421,9 +440,16 @@ namespace hpx { namespace traits {
                 std::forward_iterator_tag>::value ||
                 detail::belongs_to_iterator_traversal<
                     typename std::decay<Iter>::type,
-                    boost::forward_traversal_tag>::value>
+                    hpx::forward_traversal_tag>::value>
     {
     };
+
+    template <typename Iter>
+    using is_forward_iterator_t = typename is_forward_iterator<Iter>::type;
+
+    template <typename Iter>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_forward_iterator_v =
+        is_forward_iterator<Iter>::value;
 
     template <typename Iter, typename Enable = void>
     struct is_bidirectional_iterator
@@ -433,9 +459,17 @@ namespace hpx { namespace traits {
                 std::bidirectional_iterator_tag>::value ||
                 detail::belongs_to_iterator_traversal<
                     typename std::decay<Iter>::type,
-                    boost::bidirectional_traversal_tag>::value>
+                    hpx::bidirectional_traversal_tag>::value>
     {
     };
+
+    template <typename Iter>
+    using is_bidirectional_iterator_t =
+        typename is_bidirectional_iterator<Iter>::type;
+
+    template <typename Iter>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_bidirectional_iterator_v =
+        is_bidirectional_iterator<Iter>::value;
 
     template <typename Iter, typename Enable = void>
     struct is_random_access_iterator
@@ -443,20 +477,50 @@ namespace hpx { namespace traits {
             detail::has_category<typename std::decay<Iter>::type,
                 std::random_access_iterator_tag>::value ||
                 detail::has_traversal<typename std::decay<Iter>::type,
-                    boost::random_access_traversal_tag>::value>
+                    hpx::random_access_traversal_tag>::value>
     {
     };
+
+    template <typename Iter>
+    using is_random_access_iterator_t =
+        typename is_random_access_iterator<Iter>::type;
+
+    template <typename Iter>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_random_access_iterator_v =
+        is_random_access_iterator<Iter>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator, typename Enable = void>
     struct is_segmented_iterator;
 
+    template <typename Iter>
+    using is_segmented_iterator_t = typename is_segmented_iterator<Iter>::type;
+
+    template <typename Iter>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_segmented_iterator_v =
+        is_segmented_iterator<Iter>::value;
+
     template <typename Iterator, typename Enable = void>
     struct is_segmented_local_iterator;
+
+    template <typename Iter>
+    using is_segmented_local_iterator_t =
+        typename is_segmented_local_iterator<Iter>::type;
+
+    template <typename Iter>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_segmented_local_iterator_v =
+        is_segmented_local_iterator<Iter>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Enable = void>
     struct is_zip_iterator : std::false_type
     {
     };
+
+    template <typename Iter>
+    using is_zip_iterator_t = typename is_zip_iterator<Iter>::type;
+
+    template <typename Iter>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_zip_iterator_v =
+        is_zip_iterator<Iter>::value;
 }}    // namespace hpx::traits
