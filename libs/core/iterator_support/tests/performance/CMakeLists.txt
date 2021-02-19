@@ -16,7 +16,6 @@ foreach(benchmark ${benchmarks})
     ${benchmark}_test INTERNAL_FLAGS
     SOURCES ${sources}
     EXCLUDE_FROM_ALL ${${benchmark}_FLAGS}
-    DEPENDENCIES iostreams_component hpx_iterator_support hpx_timing
     FOLDER "Benchmarks/Modules/Core/IteratorSupport"
   )
 

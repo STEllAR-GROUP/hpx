@@ -15,6 +15,7 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/serialization/array.hpp>
 #include <hpx/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/serialize.hpp>
