@@ -292,18 +292,10 @@ if(HPX_WITH_DOCUMENTATION)
   endforeach()
 endif()
 
-if(MSVC)
-  hpx_option(
-    HPX_WITH_PSEUDO_DEPENDENCIES BOOL
-    "Force creating pseudo targets and pseudo dependencies (default OFF)." OFF
-    CATEGORY "Build Targets"
-  )
+if(WIN32)
+  set(HPX_WITH_PSEUDO_DEPENDENCIES OFF)
 else()
-  hpx_option(
-    HPX_WITH_PSEUDO_DEPENDENCIES BOOL
-    "Force creating pseudo targets and pseudo dependencies (default ON)." ON
-    CATEGORY "Build Targets"
-  )
+  set(HPX_WITH_PSEUDO_DEPENDENCIES ON)
 endif()
 
 hpx_option(
