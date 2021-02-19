@@ -27,7 +27,7 @@ namespace hpx { namespace local { namespace detail {
     // The runtime_configuration class is a wrapper for the runtime
     // configuration data allowing to extract configuration information in a
     // more convenient way
-    class runtime_configuration : public hpx::util::section
+    class HPX_EXPORT runtime_configuration : public hpx::util::section
     {
     protected:
         std::string hpx_ini_file;

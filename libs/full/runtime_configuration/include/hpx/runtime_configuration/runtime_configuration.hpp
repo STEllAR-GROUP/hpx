@@ -33,7 +33,7 @@ namespace hpx { namespace util {
     // The runtime_configuration class is a wrapper for the runtime
     // configuration data allowing to extract configuration information in a
     // more convenient way
-    class runtime_configuration
+    class HPX_EXPORT runtime_configuration
       : public hpx::local::detail::runtime_configuration
     {
     public:
