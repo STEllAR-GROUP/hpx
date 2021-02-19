@@ -31,10 +31,6 @@ cmake_header = f'''# Copyright (c) 2019 The STE||AR-Group
 '''
 
 root_cmakelists_template = cmake_header + f'''
-if(NOT HPX_WITH_DEFAULT_TARGETS)
-  set(_exclude_from_all_flag EXCLUDE_FROM_ALL)
-endif()
-
 set({component_name}_headers)
 
 set({component_name}_sources)
@@ -47,7 +43,6 @@ add_hpx_component({component_name}
   HEADERS ${{{component_name}_headers}}
   SOURCE_ROOT "${{CMAKE_CURRENT_SOURCE_DIR}}/src"
   SOURCES ${{{component_name}_sources}}
-  ${{_exclude_from_all_flag}}
 )
 '''
 

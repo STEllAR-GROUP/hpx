@@ -253,12 +253,6 @@ hpx_option(
 )
 
 hpx_option(
-  HPX_WITH_DEFAULT_TARGETS BOOL
-  "Associate the core HPX library with the default build target (default: ON)."
-  ON ADVANCED CATEGORY "Build Targets"
-)
-
-hpx_option(
   HPX_WITH_COMPILER_WARNINGS BOOL "Enable compiler warnings (default: ON)" ON
   ADVANCED
 )

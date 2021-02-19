@@ -10,10 +10,6 @@ if(HPX_WITH_PAPI)
       CACHE INTERNAL "list of HPX components"
   )
 
-  if(NOT HPX_WITH_DEFAULT_TARGETS)
-    set(_exclude_from_all_flag EXCLUDE_FROM_ALL)
-  endif()
-
   set(papi_counters_headers
       hpx/components/performance_counters/papi/server/papi.hpp
       hpx/components/performance_counters/papi/util/papi.hpp
@@ -30,8 +26,7 @@ if(HPX_WITH_PAPI)
     PREPEND_SOURCE_ROOT
     SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
     SOURCES ${papi_counters_sources}
-    DEPENDENCIES Papi::papi ${_exclude_from_all_flag}
-                 ${HPX_WITH_UNITY_BUILD_OPTION}
+    DEPENDENCIES Papi::papi ${HPX_WITH_UNITY_BUILD_OPTION}
   )
 
   add_hpx_pseudo_dependencies(
