@@ -36,7 +36,6 @@ include(HPX_AddModule)
 add_hpx_module(
   full runtime_components
   COMPATIBILITY_HEADERS ON # Added in 1.7.0
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   HEADERS ${runtime_components_headers}
   COMPAT_HEADERS ${runtime_components_compat_headers}
