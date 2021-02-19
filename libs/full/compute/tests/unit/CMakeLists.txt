@@ -7,7 +7,7 @@
 
 set(tests block_allocator)
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME AND HPX_WITH_SHARED_PRIORITY_SCHEDULER)
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(tests ${tests} numa_allocator)
 endif()
 
