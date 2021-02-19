@@ -22,14 +22,6 @@
 #endif
 // clang-format on
 
-// native implementation
-#if !defined(HPX_HAVE_NATIVE_TLS)
-
-#error                                                                         \
-    "platforms without support for native thread local storage are not supported"
-
-#else
-
 #if (!defined(__ANDROID__) && !defined(ANDROID)) && !defined(__bgq__)
 
 namespace hpx { namespace util {
@@ -138,5 +130,4 @@ namespace hpx { namespace util {
     };
 }}    // namespace hpx::util
 
-#endif
 #endif
