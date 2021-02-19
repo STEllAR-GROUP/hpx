@@ -9,10 +9,7 @@ if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_dependencies(
     examples.modules examples.modules.resource_partitioner
   )
-  if(HPX_WITH_TESTS
-     AND HPX_WITH_TESTS_EXAMPLES
-     AND HPX_RESOURCE_PARTITIONER_WITH_TESTS
-  )
+  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_pseudo_target(tests.examples.modules.resource_partitioner)
     add_hpx_pseudo_dependencies(
       tests.examples.modules tests.examples.modules.resource_partitioner
@@ -76,10 +73,7 @@ foreach(example_program ${example_programs})
     "modules.resource_partitioner" ${example_program}
   )
 
-  if(HPX_WITH_TESTS
-     AND HPX_WITH_TESTS_EXAMPLES
-     AND HPX_RESOURCE_PARTITIONER_WITH_TESTS
-  )
+  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_example_test(
       "modules.resource_partitioner" ${example_program}
       ${${example_program}_PARAMETERS}

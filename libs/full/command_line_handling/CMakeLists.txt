@@ -32,7 +32,6 @@ include(HPX_AddModule)
 add_hpx_module(
   full command_line_handling
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${command_line_handling_sources}
   HEADERS ${command_line_handling_headers}

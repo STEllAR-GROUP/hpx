@@ -58,7 +58,6 @@ include(HPX_AddModule)
 add_hpx_module(
   parallelism futures
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${futures_sources}
   HEADERS ${futures_headers}

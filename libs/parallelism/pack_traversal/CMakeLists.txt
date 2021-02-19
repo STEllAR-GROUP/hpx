@@ -32,7 +32,6 @@ include(HPX_AddModule)
 add_hpx_module(
   parallelism pack_traversal
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   HEADERS ${pack_traversal_headers}
   COMPAT_HEADERS ${pack_traversal_compat_headers}

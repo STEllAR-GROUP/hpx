@@ -22,7 +22,6 @@ include(HPX_AddModule)
 add_hpx_module(
   core prefix
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${prefix_sources}
   HEADERS ${prefix_headers}

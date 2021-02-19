@@ -66,7 +66,6 @@ include(HPX_AddModule)
 add_hpx_module(
   full agas_base
   COMPATIBILITY_HEADERS ON # Added in 1.6.0
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${agas_base_sources}
   HEADERS ${agas_base_headers}

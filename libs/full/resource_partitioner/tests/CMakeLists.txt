@@ -8,15 +8,10 @@ include(HPX_Message)
 include(HPX_Option)
 
 if(NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
-  hpx_set_option(
-    HPX_RESOURCE_PARTITIONER_WITH_TESTS
-    VALUE OFF
-    FORCE
-  )
   return()
 endif()
 
-if(HPX_RESOURCE_PARTITIONER_WITH_TESTS)
+if(HPX_WITH_TESTS)
   if(HPX_WITH_TESTS_UNIT)
     add_hpx_pseudo_target(tests.unit.modules.resource_partitioner)
     add_hpx_pseudo_dependencies(

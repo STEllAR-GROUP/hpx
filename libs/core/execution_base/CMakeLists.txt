@@ -44,7 +44,6 @@ include(HPX_AddModule)
 add_hpx_module(
   core execution_base
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${execution_base_sources}
   HEADERS ${execution_base_headers}

@@ -52,7 +52,6 @@ include(HPX_AddModule)
 add_hpx_module(
   core datastructures
   COMPATIBILITY_HEADERS ON # Added in 1.5.0
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${datastructures_sources}
   HEADERS ${datastructures_headers}

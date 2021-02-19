@@ -34,7 +34,6 @@ include(HPX_AddModule)
 add_hpx_module(
   full mpi_base
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${mpi_base_sources}
   HEADERS ${mpi_base_headers}

@@ -26,7 +26,7 @@ set(format_sources format.cpp util/bad_lexical_cast.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
-  core format DEPRECATION_WARNINGS
+  core format
   COMPATIBILITY_HEADERS ON # Added in 1.5.0
   GLOBAL_HEADER_GEN OFF
   SOURCES ${format_sources}

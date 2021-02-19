@@ -24,7 +24,6 @@ include(HPX_AddModule)
 add_hpx_module(
   core io_service
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${io_service_sources}
   HEADERS ${io_service_headers}

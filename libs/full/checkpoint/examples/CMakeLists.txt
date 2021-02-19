@@ -7,10 +7,7 @@
 if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_target(examples.modules.checkpoint)
   add_hpx_pseudo_dependencies(examples.modules examples.modules.checkpoint)
-  if(HPX_WITH_TESTS
-     AND HPX_WITH_TESTS_EXAMPLES
-     AND HPX_CHECKPOINT_WITH_TESTS
-  )
+  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_pseudo_target(tests.examples.modules.checkpoint)
     add_hpx_pseudo_dependencies(
       tests.examples.modules tests.examples.modules.checkpoint

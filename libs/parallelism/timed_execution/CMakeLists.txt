@@ -28,7 +28,6 @@ include(HPX_AddModule)
 add_hpx_module(
   parallelism timed_execution
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   HEADERS ${timed_execution_headers}
   COMPAT_HEADERS ${timed_execution_compat_headers}

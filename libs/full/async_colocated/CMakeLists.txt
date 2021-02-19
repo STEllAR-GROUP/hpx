@@ -44,7 +44,6 @@ include(HPX_AddModule)
 add_hpx_module(
   full async_colocated
   COMPATIBILITY_HEADERS ON # added in hpx V1.6.0
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${async_colocated_sources}
   HEADERS ${async_colocated_headers}

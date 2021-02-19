@@ -27,7 +27,6 @@ include(HPX_AddModule)
 add_hpx_module(
   core static_reinit
   COMPATIBILITY_HEADERS ON # Added in 1.5.0
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${static_reinit_sources}
   HEADERS ${static_reinit_headers}

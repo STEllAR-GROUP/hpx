@@ -8,14 +8,9 @@ include(HPX_Message)
 include(HPX_Option)
 
 if(NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
-  hpx_set_option(
-    HPX_SYNCHRONIZATION_WITH_TESTS
-    VALUE OFF
-    FORCE
-  )
   return()
 endif()
-if(NOT HPX_SYNCHRONIZATION_WITH_TESTS)
+if(NOT HPX_WITH_TESTS)
   hpx_info("    Tests for synchronization disabled")
   return()
 endif()

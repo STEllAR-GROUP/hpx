@@ -17,7 +17,7 @@ set(memory_sources)
 
 include(HPX_AddModule)
 add_hpx_module(
-  core memory DEPRECATION_WARNINGS
+  core memory
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER "hpx/memory/serialization/intrusive_ptr.hpp"
   SOURCES ${memory_sources}
