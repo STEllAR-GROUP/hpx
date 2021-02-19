@@ -23,20 +23,15 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     lcos/promise.cpp
     runtime/agas/server/route.cpp
     runtime/applier/applier.cpp
-    runtime/applier/bind_naming_wrappers.cpp
     runtime/components/binpacking_distribution_policy.cpp
     runtime/components/component_registry.cpp
-    runtime/components/component_type.cpp
     runtime/components/console_error_sink.cpp
     runtime/components/console_logging.cpp
     runtime/components/runtime_support.cpp
-    runtime/components/server/component_base.cpp
     runtime/components/server/console_error_sink_server.cpp
     runtime/components/server/console_error_sink_singleton.cpp
     runtime/components/server/console_logging_server.cpp
-    runtime/components/server/destroy_component.cpp
     runtime/components/server/runtime_support_server.cpp
-    runtime/components/server/wrapper_heap.cpp
     runtime/components/stubs/runtime_support_stubs.cpp
     runtime/get_locality_name.cpp
     runtime/parcelset/detail/parcel_await.cpp
@@ -51,7 +46,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/trigger_lco.cpp
     runtime_distributed.cpp
     util/generate_unique_ids.cpp
-    util/one_size_heap_list.cpp
     util/pool_timer.cpp
     util/register_locks_globally.cpp
   )
@@ -83,16 +77,13 @@ endif()
 # gather headers
 
 # List all headers (local and distributed)
-set(hpx_HEADERS hpx/lcos_fwd.hpp hpx/traits/managed_component_policies.hpp
-                hpx/traits/rma_memory_region_traits.hpp
-)
+set(hpx_HEADERS hpx/lcos_fwd.hpp hpx/traits/rma_memory_region_traits.hpp)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   list(
     APPEND
     hpx_HEADERS
     hpx/components/containers/container_distribution_policy.hpp
-    hpx/components_fwd.hpp
     hpx/lcos/base_lco.hpp
     hpx/lcos/base_lco_with_value.hpp
     hpx/lcos/detail/promise_base.hpp
@@ -126,15 +117,8 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/plugins/plugin_registry.hpp
     hpx/plugins/unique_plugin_name.hpp
     hpx/runtime_fwd.hpp
-    hpx/runtime/actions/continuation2_impl.hpp
-    hpx/runtime/actions/continuation_impl.hpp
     hpx/runtime/actions/lambda_to_action.hpp
-    hpx/runtime/actions/make_continuation.hpp
-    hpx/runtime/basename_registration_fwd.hpp
-    hpx/runtime/basename_registration.hpp
     hpx/runtime/components/binpacking_distribution_policy.hpp
-    hpx/runtime/components/client_base.hpp
-    hpx/runtime/components/client.hpp
     hpx/runtime/components/colocating_distribution_policy.hpp
     hpx/runtime/components/component_commandline_base.hpp
     hpx/runtime/components/component_commandline.hpp
@@ -145,48 +129,23 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/components/component_startup_shutdown.hpp
     hpx/runtime/components/console_error_sink.hpp
     hpx/runtime/components/console_logging.hpp
-    hpx/runtime/components/copy_component.hpp
-    hpx/runtime/components/create_component_helpers.hpp
     hpx/runtime/components/default_distribution_policy.hpp
     hpx/runtime/components/derived_component_factory.hpp
     hpx/runtime/components_fwd.hpp
-    hpx/runtime/components/make_client.hpp
-    hpx/runtime/components/migrate_component.hpp
-    hpx/runtime/components/new.hpp
     hpx/runtime/components/runtime_support.hpp
-    hpx/runtime/components/server/abstract_component_base.hpp
-    hpx/runtime/components/server/abstract_migration_support.hpp
-    hpx/runtime/components/server/component_base.hpp
-    hpx/runtime/components/server/component_database.hpp
-    hpx/runtime/components/server/component_heap.hpp
-    hpx/runtime/components/server/component.hpp
     hpx/runtime/components/server/console_error_sink.hpp
     hpx/runtime/components/server/console_error_sink_singleton.hpp
     hpx/runtime/components/server/console_logging.hpp
-    hpx/runtime/components/server/copy_component.hpp
-    hpx/runtime/components/server/create_component_fwd.hpp
-    hpx/runtime/components/server/create_component.hpp
-    hpx/runtime/components/server/destroy_component.hpp
     hpx/runtime/components/server/distributed_metadata_base.hpp
     hpx/runtime/components/server/executor_component.hpp
-    hpx/runtime/components/server/fixed_component_base.hpp
     hpx/runtime/components/server/invoke_function.hpp
-    hpx/runtime/components/server/locking_hook.hpp
-    hpx/runtime/components/server/managed_component_base.hpp
-    hpx/runtime/components/server/migrate_component.hpp
-    hpx/runtime/components/server/migration_support.hpp
     hpx/runtime/components/server/runtime_support.hpp
-    hpx/runtime/components/server/simple_component_base.hpp
-    hpx/runtime/components/server/wrapper_heap.hpp
-    hpx/runtime/components/server/wrapper_heap_list.hpp
     hpx/runtime/components/stubs/runtime_support.hpp
-    hpx/runtime/components/stubs/stub_base.hpp
     hpx/runtime/components/target_distribution_policy.hpp
     hpx/runtime/components/unwrapping_result_policy.hpp
     hpx/runtime/find_here.hpp
     hpx/runtime/find_all_localities.hpp
     hpx/runtime/get_locality_name.hpp
-    hpx/runtime/get_ptr.hpp
     hpx/runtime/message_handler_fwd.hpp
     hpx/runtime/parcelset/decode_parcels.hpp
     hpx/runtime/parcelset/detail/call_for_each.hpp
@@ -212,20 +171,16 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/trigger_lco_fwd.hpp
     hpx/traits/action_message_handler.hpp
     hpx/traits/action_serialization_filter.hpp
-    hpx/traits/is_client.hpp
     hpx/traits/is_continuation.hpp
-    hpx/traits/is_distribution_policy.hpp
     hpx/util/bind_action.hpp
     hpx/util/connection_cache.hpp
     hpx/util/functional/colocated_helpers.hpp
     hpx/util/functional/segmented_iterator_helpers.hpp
     hpx/util/generate_unique_ids.hpp
-    hpx/util/one_size_heap_list.hpp
     hpx/util/pool_timer.hpp
     hpx/util/register_locks_globally.hpp
     hpx/util/remove_local_destinations.hpp
     hpx/util/storage/tuple.hpp
-    hpx/util/wrapper_heap_base.hpp
   )
 endif()
 

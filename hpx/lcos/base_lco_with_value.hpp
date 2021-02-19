@@ -13,6 +13,9 @@
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components_base/component_type.hpp>
+#include <hpx/components_base/server/component_base.hpp>
+#include <hpx/components_base/server/component_heap.hpp>
+#include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos_fwd.hpp>
@@ -22,9 +25,6 @@
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime/components/server/component_base.hpp>
-#include <hpx/runtime/components/server/component_heap.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/type_support/unused.hpp>

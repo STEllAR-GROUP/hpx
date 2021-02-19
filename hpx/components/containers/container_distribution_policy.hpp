@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/runtime/components/default_distribution_policy.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
 
 #include <hpx/assert.hpp>
 #include <hpx/serialization/serialize.hpp>

@@ -18,13 +18,13 @@
 template <typename T>
 struct simple_base
 {
-    typedef hpx::components::simple_component_base<T> type;
+    typedef hpx::components::component_base<T> type;
 };
 
 template <typename T>
 struct managed_base
 {
-    typedef hpx::components::simple_component_base<T> type;
+    typedef hpx::components::component_base<T> type;
 };
 
 template <template <typename> class ComponentBase>
@@ -102,16 +102,16 @@ typedef test_server2<simple_base> test_simple_server2;
 typedef test_server1<managed_base> test_managed_server1;
 typedef test_server2<managed_base> test_managed_server2;
 
-typedef hpx::components::simple_component<test_simple_server1> simple_server1_type;
+typedef hpx::components::component<test_simple_server1> simple_server1_type;
 HPX_REGISTER_COMPONENT(simple_server1_type, test_simple_server1);
 
-typedef hpx::components::simple_component<test_simple_server2> simple_server2_type;
+typedef hpx::components::component<test_simple_server2> simple_server2_type;
 HPX_REGISTER_COMPONENT(simple_server2_type, test_simple_server2);
 
-typedef hpx::components::simple_component<test_managed_server1> managed_server1_type;
+typedef hpx::components::component<test_managed_server1> managed_server1_type;
 HPX_REGISTER_COMPONENT(managed_server1_type, test_managed_server1);
 
-typedef hpx::components::simple_component<test_managed_server2> managed_server2_type;
+typedef hpx::components::component<test_managed_server2> managed_server2_type;
 HPX_REGISTER_COMPONENT(managed_server2_type, test_managed_server2);
 
 template <template <typename> class ComponentBase>

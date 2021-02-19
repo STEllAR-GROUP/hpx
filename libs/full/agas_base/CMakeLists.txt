@@ -31,19 +31,19 @@ set(agas_base_headers
 
 # cmake-format: off
 set(agas_base_compat_headers
-    hpx/runtime/agas/gva.hpp => hpx/agas_base/gva.hpp
-    hpx/runtime/agas/component_namespace.hpp => hpx/agas_base/component_namespace.hpp
-    hpx/runtime/agas/locality_namespace.hpp => hpx/agas_base/locality_namespace.hpp
-    hpx/runtime/agas/primary_namespace.hpp => hpx/agas_base/primary_namespace.hpp
-    hpx/runtime/agas/detail/bootstrap_component_namespace.hpp => hpx/agas_base/detail/bootstrap_component_namespace.hpp
-    hpx/runtime/agas/detail/bootstrap_locality_namespace.hpp => hpx/agas_base/detail/bootstrap_locality_namespace.hpp
-    hpx/runtime/agas/detail/hosted_component_namespace.hpp => hpx/agas_base/detail/hosted_component_namespace.hpp
-    hpx/runtime/agas/detail/hosted_locality_namespace.hpp => hpx/agas_base/detail/hosted_locality_namespace.hpp
-    hpx/runtime/agas/server/component_namespace.hpp => hpx/agas_base/server/component_namespace.hpp
-    hpx/runtime/agas/server/locality_namespace.hpp => hpx/agas_base/server/locality_namespace.hpp
-    hpx/runtime/agas/server/primary_namespace.hpp => hpx/agas_base/server/primary_namespace.hpp
-    hpx/runtime/agas/server/symbol_namespace.hpp => hpx/agas_base/server/symbol_namespace.hpp
-    hpx/runtime/agas/symbol_namespace.hpp => hpx/agas_base/symbol_namespace.hpp
+    hpx/runtime/agas/gva.hpp => hpx/modules/agas_base.hpp
+    hpx/runtime/agas/component_namespace.hpp => hpx/modules/agas_base.hpp
+    hpx/runtime/agas/locality_namespace.hpp => hpx/modules/agas_base.hpp
+    hpx/runtime/agas/primary_namespace.hpp => hpx/modules/agas_base.hpp
+    hpx/runtime/agas/detail/bootstrap_component_namespace.hpp => hpx/modules/agas_base.hpp
+    hpx/runtime/agas/detail/bootstrap_locality_namespace.hpp => hpx/modules/agas_base.hpp
+    hpx/runtime/agas/detail/hosted_component_namespace.hpp => hpx/modules/agas_base.hpp
+    hpx/runtime/agas/detail/hosted_locality_namespace.hpp => hpx/modules/agas_base.hpp
+    hpx/runtime/agas/server/component_namespace.hpp => hpx/modules/agas_base.hpp
+    hpx/runtime/agas/server/locality_namespace.hpp => hpx/modules/agas_base.hpp
+    hpx/runtime/agas/server/primary_namespace.hpp => hpx/modules/agas_base.hpp
+    hpx/runtime/agas/server/symbol_namespace.hpp => hpx/modules/agas_base.hpp
+    hpx/runtime/agas/symbol_namespace.hpp => hpx/modules/agas_base.hpp
 )
 # cmake-format: on
 
@@ -65,7 +65,7 @@ set(agas_base_sources
 include(HPX_AddModule)
 add_hpx_module(
   full agas_base
-  COMPATIBILITY_HEADERS ON # Added in 1.6.0
+  COMPATIBILITY_HEADERS ON # Added in 1.7.0
   GLOBAL_HEADER_GEN ON
   SOURCES ${agas_base_sources}
   HEADERS ${agas_base_headers}

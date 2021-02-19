@@ -11,14 +11,14 @@
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/components_base/server/managed_component_base.hpp>
+#include <hpx/components_base/traits/managed_component_policies.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/synchronization/barrier.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/traits/managed_component_policies.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>

@@ -24,6 +24,7 @@ set(_hpx_full_modules
     checkpoint_base
     collectives
     command_line_handling
+    components
     components_base
     compute
     compute_cuda
@@ -38,6 +39,7 @@ set(_hpx_full_modules
     program_options
     resiliency_distributed
     resource_partitioner
+    runtime_components
     runtime_configuration
     runtime_distributed
     runtime_local

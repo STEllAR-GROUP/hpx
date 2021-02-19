@@ -85,7 +85,9 @@ list(APPEND CMAKE_MODULE_PATH "${{CMAKE_CURRENT_SOURCE_DIR}}/cmake")
 
 set({module_name}_headers)
 
+# cmake-format: off
 set({module_name}_compat_headers)
+# cmake-format: on
 
 set({module_name}_sources)
 
@@ -108,7 +110,9 @@ if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_dependencies(examples.modules examples.modules.{module_name})
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_pseudo_target(tests.examples.modules.{module_name})
-    add_hpx_pseudo_dependencies(tests.examples.modules tests.examples.modules.{module_name})
+    add_hpx_pseudo_dependencies(
+      tests.examples.modules tests.examples.modules.{module_name}
+    )
   endif()
 endif()
 '''
@@ -121,32 +125,38 @@ if(NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
 endif()
 
 if(HPX_WITH_TESTS)
-    if(HPX_WITH_TESTS_UNIT)
-      add_hpx_pseudo_target(tests.unit.modules.{module_name})
-      add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.{module_name})
-      add_subdirectory(unit)
-    endif()
+  if(HPX_WITH_TESTS_UNIT)
+    add_hpx_pseudo_target(tests.unit.modules.{module_name})
+    add_hpx_pseudo_dependencies(
+      tests.unit.modules tests.unit.modules.{module_name}
+    )
+    add_subdirectory(unit)
+  endif()
 
-    if(HPX_WITH_TESTS_REGRESSIONS)
-      add_hpx_pseudo_target(tests.regressions.modules.{module_name})
-      add_hpx_pseudo_dependencies(tests.regressions.modules tests.regressions.modules.{module_name})
-      add_subdirectory(regressions)
-    endif()
+  if(HPX_WITH_TESTS_REGRESSIONS)
+    add_hpx_pseudo_target(tests.regressions.modules.{module_name})
+    add_hpx_pseudo_dependencies(
+      tests.regressions.modules tests.regressions.modules.{module_name}
+    )
+    add_subdirectory(regressions)
+  endif()
 
-    if(HPX_WITH_TESTS_BENCHMARKS)
-      add_hpx_pseudo_target(tests.performance.modules.{module_name})
-      add_hpx_pseudo_dependencies(tests.performance.modules tests.performance.modules.{module_name})
-      add_subdirectory(performance)
-    endif()
+  if(HPX_WITH_TESTS_BENCHMARKS)
+    add_hpx_pseudo_target(tests.performance.modules.{module_name})
+    add_hpx_pseudo_dependencies(
+      tests.performance.modules tests.performance.modules.{module_name}
+    )
+    add_subdirectory(performance)
+  endif()
 
-    if(HPX_WITH_TESTS_HEADERS)
-      add_hpx_header_tests(
-        modules.{module_name}
-        HEADERS ${{{module_name}_headers}}
-        HEADER_ROOT ${{PROJECT_SOURCE_DIR}}/include
-        NOLIBS
-        DEPENDENCIES hpx_{module_name})
-    endif()
+  if(HPX_WITH_TESTS_HEADERS)
+    add_hpx_header_tests(
+      modules.{module_name}
+      HEADERS ${{{module_name}_headers}}
+      HEADER_ROOT ${{PROJECT_SOURCE_DIR}}/include
+      DEPENDENCIES hpx_{module_name}
+    )
+  endif()
 endif()
 '''
 
@@ -207,7 +217,6 @@ if module_name != '--recreate-index':
     # Generate tests/regressions/CMakeLists.txt
     f = open(os.path.join(lib_name, module_name, 'tests', 'regressions', 'CMakeLists.txt'), 'w')
     f.write(cmake_header)
-    f.write('\n')
 
     # Generate tests/performance/CMakeLists.txt
     f = open(os.path.join(lib_name, module_name, 'tests', 'performance', 'CMakeLists.txt'), 'w')

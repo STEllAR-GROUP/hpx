@@ -19,13 +19,14 @@ namespace hpx { namespace traits {
         struct pin_helper
         {
             template <typename Component>
-            static constexpr void call(wrap_int, Component*)
+            static constexpr void call(wrap_int, Component*) noexcept
             {
             }
 
             // forward the call if the component implements the function
             template <typename Component>
-            static constexpr auto call(int, Component* p) -> decltype(p->pin())
+            static constexpr auto call(int, Component* p) noexcept
+                -> decltype(p->pin())
             {
                 p->pin();
             }
@@ -34,14 +35,14 @@ namespace hpx { namespace traits {
         struct unpin_helper
         {
             template <typename Component>
-            static constexpr bool call(wrap_int, Component*)
+            static constexpr bool call(wrap_int, Component*) noexcept
             {
                 return false;
             }
 
             // forward the call if the component implements the function
             template <typename Component>
-            static constexpr auto call(int, Component* p)
+            static constexpr auto call(int, Component* p) noexcept
                 -> decltype(p->unpin())
             {
                 return p->unpin();
@@ -51,14 +52,14 @@ namespace hpx { namespace traits {
         struct pin_count_helper
         {
             template <typename Component>
-            static constexpr std::uint32_t call(wrap_int, Component*)
+            static constexpr std::uint32_t call(wrap_int, Component*) noexcept
             {
                 return 0;
             }
 
             // forward the call if the component implements the function
             template <typename Component>
-            static constexpr auto call(int, Component* p)
+            static constexpr auto call(int, Component* p) noexcept
                 -> decltype(p->pin_count())
             {
                 return p->pin_count();
@@ -69,17 +70,17 @@ namespace hpx { namespace traits {
     template <typename Component, typename Enable = void>
     struct component_pin_support
     {
-        static constexpr void pin(Component* p)
+        static constexpr void pin(Component* p) noexcept
         {
             detail::pin_helper::call(0, p);
         }
 
-        static constexpr bool unpin(Component* p)
+        static constexpr bool unpin(Component* p) noexcept
         {
             return detail::unpin_helper::call(0, p);
         }
 
-        static constexpr std::uint32_t pin_count(Component* p)
+        static constexpr std::uint32_t pin_count(Component* p) noexcept
         {
             return detail::pin_count_helper::call(0, p);
         }

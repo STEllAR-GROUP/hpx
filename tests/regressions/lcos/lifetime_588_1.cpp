@@ -28,7 +28,7 @@ HPX_PLAIN_ACTION(get_count, get_count_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct foo
-  : public hpx::components::simple_component_base<foo>
+  : public hpx::components::component_base<foo>
 {
     foo()
     {
@@ -42,7 +42,7 @@ struct foo
 
 HPX_REGISTER_ACTION(foo::bar_action, foo_bar_action);
 
-HPX_REGISTER_COMPONENT(hpx::components::simple_component<foo>, foo);
+HPX_REGISTER_COMPONENT(hpx::components::component<foo>, foo);
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()

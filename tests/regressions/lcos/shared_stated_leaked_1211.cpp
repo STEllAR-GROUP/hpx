@@ -15,7 +15,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/modules/testing.hpp>
 
-struct test_server : hpx::components::simple_component_base<test_server>
+struct test_server : hpx::components::component_base<test_server>
 {
     static bool destructor_called;
 
@@ -39,7 +39,7 @@ struct test_server : hpx::components::simple_component_base<test_server>
 
 bool test_server::destructor_called = false;
 
-typedef hpx::components::simple_component<test_server> test_server_type;
+typedef hpx::components::component<test_server> test_server_type;
 HPX_REGISTER_COMPONENT(test_server_type, test_server);
 
 typedef test_server::test_action test_action;

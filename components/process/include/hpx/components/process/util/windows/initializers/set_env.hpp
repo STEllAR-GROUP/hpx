@@ -17,8 +17,6 @@
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 #include <hpx/serialization/string.hpp>
 
-#include <boost/range/numeric.hpp>
-
 #include <cstddef>
 #include <cstring>
 #include <iterator>

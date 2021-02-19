@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/traits/managed_component_policies.hpp>
+#include <hpx/components/components_fwd.hpp>
 
 #include <cstddef>
 #include <string>
@@ -28,47 +28,7 @@ namespace hpx {
     /// \namespace components
     namespace components {
 
-        /// \ cond NODETAIL
-        namespace detail {
-            struct this_type
-            {
-            };
-        }    // namespace detail
-        /// \ endcond
-
         ///////////////////////////////////////////////////////////////////////
-        template <typename Component = detail::this_type>
-        class fixed_component_base;
-
-        template <typename Component>
-        class fixed_component;
-
-        template <typename Component = detail::this_type>
-        class abstract_simple_component_base;
-
-        template <typename Component = detail::this_type>
-        class component_base;
-
-        template <typename Component>
-        class component;
-
-        template <typename Component>
-        using simple_component = component<Component>;
-
-        template <typename Component>
-        using simple_component_base = component_base<Component>;
-
-        template <typename Component, typename Derived = detail::this_type>
-        class abstract_managed_component_base;
-
-        template <typename Component, typename Wrapper = detail::this_type,
-            typename CtorPolicy = traits::construct_without_back_ptr,
-            typename DtorPolicy = traits::managed_object_controls_lifetime>
-        class managed_component_base;
-
-        template <typename Component, typename Derived = detail::this_type>
-        class managed_component;
-
         struct HPX_EXPORT component_factory_base;
 
         template <typename Component>
@@ -77,7 +37,6 @@ namespace hpx {
         class runtime_support;
         class memory;
 
-        class pinned_ptr;
 
         namespace stubs {
             struct runtime_support;

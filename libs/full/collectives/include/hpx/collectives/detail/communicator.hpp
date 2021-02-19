@@ -13,6 +13,8 @@
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/components/basename_registration.hpp>
+#include <hpx/components_base/server/component_base.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/future.hpp>
@@ -21,8 +23,6 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
-#include <hpx/runtime/basename_registration.hpp>
-#include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime_distributed/get_num_localities.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>

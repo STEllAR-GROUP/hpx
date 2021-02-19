@@ -11,12 +11,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/server/invoke_function.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <type_traits>

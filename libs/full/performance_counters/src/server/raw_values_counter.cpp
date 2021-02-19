@@ -29,6 +29,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server {
+
     raw_values_counter::raw_values_counter(counter_info const& info,
         hpx::util::function_nonser<std::vector<std::int64_t>(bool)> f)
       : base_type_holder(info)

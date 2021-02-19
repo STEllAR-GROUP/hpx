@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/basic_action.hpp>
+#include <hpx/actions_base/traits/is_client.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/modules/components_base.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
-#include <hpx/traits/is_client.hpp>
 
 #include <boost/utility/string_ref.hpp>
 
@@ -249,7 +249,7 @@ namespace hpx { namespace actions {
 ///       {
 ///           // Define a simple component exposing one action 'print_greeting'
 ///           class HPX_COMPONENT_EXPORT server
-///             : public hpx::components::simple_component_base<server>
+///             : public hpx::components::component_base<server>
 ///           {
 ///               void print_greeting() const
 ///               {

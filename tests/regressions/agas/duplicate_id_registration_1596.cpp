@@ -23,7 +23,7 @@ namespace tests { namespace server
 {
 
 struct ViewRegistrationListener
-    : hpx::components::simple_component_base<ViewRegistrationListener>
+    : hpx::components::component_base<ViewRegistrationListener>
 {
     ViewRegistrationListener() :
         name("<unknown>")
@@ -50,7 +50,7 @@ struct ViewRegistrationListener
 
 }}
 
-typedef hpx::components::simple_component<
+typedef hpx::components::component<
         tests::server::ViewRegistrationListener
     > view_registration_listener_type;
 

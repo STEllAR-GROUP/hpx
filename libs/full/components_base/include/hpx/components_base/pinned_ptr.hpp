@@ -37,7 +37,7 @@ namespace hpx { namespace components {
             {
             }
 
-            virtual ~pinned_ptr_base() {}
+            virtual ~pinned_ptr_base() = default;
 
         protected:
             naming::address_type lva_;
@@ -50,7 +50,7 @@ namespace hpx { namespace components {
             HPX_NON_COPYABLE(pinned_ptr);
 
         public:
-            pinned_ptr() noexcept {}
+            pinned_ptr() = default;
 
             explicit pinned_ptr(naming::address_type lva) noexcept
               : pinned_ptr_base(lva)
@@ -65,7 +65,7 @@ namespace hpx { namespace components {
             }
 
         protected:
-            void pin()
+            void pin() noexcept
             {
                 if (0 != this->lva_)
                 {
@@ -74,7 +74,7 @@ namespace hpx { namespace components {
                 }
             }
 
-            void unpin()
+            void unpin() noexcept
             {
                 if (0 != this->lva_)
                 {
@@ -99,7 +99,7 @@ namespace hpx { namespace components {
         template <typename Component, typename Enable = void>
         struct create_helper
         {
-            static pinned_ptr call(naming::address_type)
+            static pinned_ptr call(naming::address_type) noexcept
             {
                 return pinned_ptr{};
             }

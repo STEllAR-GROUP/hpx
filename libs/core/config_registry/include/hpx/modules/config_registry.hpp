@@ -10,20 +10,23 @@
 #include <string>
 #include <vector>
 
-#if (defined(_WIN32) || defined(__WIN32__) || defined(WIN32))
+#if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
+#if !defined(HPX_MODULE_STATIC_LINKING)
 #if defined(HPX_CORE_EXPORTS)
 #define HPX_CONFIG_REGISTRY_EXPORT __declspec(dllexport)
 #else
 #define HPX_CONFIG_REGISTRY_EXPORT __declspec(dllimport)
 #endif
+#endif
 #elif defined(__NVCC__) || defined(__CUDACC__)
 #define HPX_CONFIG_REGISTRY_EXPORT /* empty */
-#else
-#if defined(HPX_CORE_EXPORTS)
+#elif defined(HPX_CORE_EXPORTS)
 #define HPX_CONFIG_REGISTRY_EXPORT __attribute__((visibility("default")))
-#else
-#define HPX_CONFIG_REGISTRY_EXPORT /* empty */
 #endif
+
+// make sure we have reasonable defaults
+#if !defined(HPX_CONFIG_REGISTRY_EXPORT)
+#define HPX_CONFIG_REGISTRY_EXPORT /* empty */
 #endif
 
 namespace hpx { namespace config_registry {

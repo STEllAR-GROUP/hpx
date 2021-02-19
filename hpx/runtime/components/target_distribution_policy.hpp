@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
+#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
@@ -20,10 +21,9 @@
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/components/create_component_helpers.hpp>
 #include <hpx/runtime/find_here.hpp>
+#include <hpx/runtime_components/create_component_helpers.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
 
 #include <algorithm>
 #include <cstddef>

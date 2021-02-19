@@ -9,11 +9,11 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/chrono.hpp>
+#include <hpx/components_base/server/locking_hook.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/mutex.hpp>
-#include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/util/storage/tuple.hpp>
 
 #include <algorithm>

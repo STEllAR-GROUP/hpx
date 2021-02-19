@@ -5,7 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/agas/addressing_service.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/functional/bind_front.hpp>
@@ -19,6 +18,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace detail {
+
     ///////////////////////////////////////////////////////////////////////////
     // Extract the current number of instances for the given component type
     static std::int64_t get_instance_count(components::component_type type)
@@ -71,7 +71,7 @@ namespace hpx { namespace performance_counters { namespace detail {
 
             // ask AGAS to resolve the component type
             components::component_type type =
-                naming::get_agas_client().get_component_id(paths.parameters_);
+                agas::get_component_id(paths.parameters_);
 
             if (type == components::component_invalid)
             {

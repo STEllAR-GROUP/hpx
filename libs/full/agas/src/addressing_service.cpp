@@ -11,7 +11,6 @@
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/agas/addressing_service.hpp>
-#include <hpx/agas/big_boot_barrier.hpp>
 #include <hpx/agas_base/detail/bootstrap_component_namespace.hpp>
 #include <hpx/agas_base/detail/bootstrap_locality_namespace.hpp>
 #include <hpx/assert.hpp>
@@ -32,7 +31,6 @@
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
@@ -141,109 +139,46 @@ namespace hpx { namespace agas {
             gva_cache_->reserve(ini_.get_agas_local_cache_size());
     }
 
-#if defined(HPX_HAVE_NETWORKING)
     void addressing_service::bootstrap(
-        parcelset::parcelhandler& ph, util::runtime_configuration const& ini)
-    {    // {{{
-        LPROGRESS_;
-
-        std::shared_ptr<parcelset::parcelport> pp =
-            ph.get_bootstrap_parcelport();
-        create_big_boot_barrier(pp ? pp.get() : nullptr, ph.endpoints(), ini);
-        if (is_bootstrap())
-        {
-            launch_bootstrap(pp, ph.endpoints(), ini);
-        }
-    }    // }}}
-
-    void addressing_service::initialize(
-        parcelset::parcelhandler& ph, std::uint64_t rts_lva)
-    {    // {{{
-        rts_lva_ = rts_lva;
-
-        // now, boot the parcel port
-        std::shared_ptr<parcelset::parcelport> pp =
-            ph.get_bootstrap_parcelport();
-        if (pp)
-            pp->run(false);
-
-        if (is_bootstrap())
-        {
-            get_big_boot_barrier().wait_bootstrap();
-        }
-        else
-        {
-            launch_hosted();
-            get_big_boot_barrier().wait_hosted(
-                pp ? pp->get_locality_name() : "<console>", primary_ns_.ptr(),
-                symbol_ns_.ptr());
-        }
-
-        set_status(state_running);
-    }    // }}}
-
-#else
-
-    void addressing_service::bootstrap(util::runtime_configuration const& ini)
+        parcelset::endpoints_type const& endpoints,
+        util::runtime_configuration& rtcfg)
     {    // {{{
         LPROGRESS_;
 
         HPX_ASSERT(is_bootstrap());
-        parcelset::endpoints_type endpoints;
-        endpoints.insert(parcelset::endpoints_type::value_type(
-            "local-loopback", parcelset::locality{}));
-        launch_bootstrap(endpoints, ini);
+        launch_bootstrap(endpoints, rtcfg);
     }    // }}}
 
     void addressing_service::initialize(std::uint64_t rts_lva)
     {    // {{{
         rts_lva_ = rts_lva;
-
-        HPX_ASSERT(is_bootstrap());
         set_status(state_running);
     }    // }}}
-
-#endif
 
     namespace detail {
 
         std::uint32_t get_number_of_pus_in_cores(std::uint32_t num_cores);
     }
 
-#if defined(HPX_HAVE_NETWORKING)
     void addressing_service::launch_bootstrap(
-        std::shared_ptr<parcelset::parcelport> const& pp,
         parcelset::endpoints_type const& endpoints,
-        util::runtime_configuration const& ini_)
+        util::runtime_configuration& rtcfg)
     {    // {{{
         component_ns_.reset(new detail::bootstrap_component_namespace);
         locality_ns_.reset(new detail::bootstrap_locality_namespace(
             reinterpret_cast<server::primary_namespace*>(primary_ns_.ptr())));
 
-        runtime& rt = get_runtime();
-
         naming::gid_type const here =
             naming::get_gid_from_locality_id(agas::booststrap_prefix);
         set_local_locality(here);
 
-        // store number of cores used by other processes
-        std::uint32_t cores_needed = rt.assign_cores();
-        std::uint32_t first_used_core = rt.assign_cores(
-            pp ? pp->get_locality_name() : "<console>", cores_needed);
-
-        util::runtime_configuration& cfg = rt.get_config();
-        cfg.set_first_used_core(first_used_core);
-        HPX_ASSERT(pp ? pp->here() == pp->agas_locality(cfg) : true);
-
-        rt.get_config().parse("assigned locality",
+        rtcfg.parse("assigned locality",
             hpx::util::format(
                 "hpx.locality!={1}", naming::get_locality_id_from_gid(here)));
 
         std::uint32_t num_threads =
-            hpx::util::get_entry_as<std::uint32_t>(ini_, "hpx.os_threads", 1u);
+            hpx::util::get_entry_as<std::uint32_t>(rtcfg, "hpx.os_threads", 1u);
         locality_ns_->allocate(endpoints, 0, num_threads, naming::invalid_gid);
-
-        rt.init_id_pool_range();
 
         register_name("/0/agas/locality#0", here);
         if (is_console())
@@ -251,47 +186,6 @@ namespace hpx { namespace agas {
             register_name("/0/locality#console", here);
         }
     }    // }}}
-
-#else    // HPX_HAVE_NETWORKING
-
-    void addressing_service::launch_bootstrap(
-        parcelset::endpoints_type const& endpoints,
-        util::runtime_configuration const& ini_)
-    {    // {{{
-        component_ns_.reset(new detail::bootstrap_component_namespace);
-        locality_ns_.reset(new detail::bootstrap_locality_namespace(
-            reinterpret_cast<server::primary_namespace*>(primary_ns_.ptr())));
-
-        runtime& rt = get_runtime();
-
-        naming::gid_type const here =
-            naming::get_gid_from_locality_id(agas::booststrap_prefix);
-        set_local_locality(here);
-
-        // store number of cores used by other processes
-        std::uint32_t cores_needed = rt.assign_cores();
-        std::uint32_t first_used_core =
-            rt.assign_cores("<console>", cores_needed);
-
-        util::runtime_configuration& cfg = rt.get_config();
-        cfg.set_first_used_core(first_used_core);
-
-        rt.get_config().parse("assigned locality",
-            hpx::util::format(
-                "hpx.locality!={1}", naming::get_locality_id_from_gid(here)));
-
-        std::uint32_t num_threads =
-            hpx::util::get_entry_as<std::uint32_t>(ini_, "hpx.os_threads", 1u);
-        locality_ns_->allocate(endpoints, 0, num_threads, naming::invalid_gid);
-
-        rt.init_id_pool_range();
-
-        register_name("/0/agas/locality#0", here);
-        register_name("/0/locality#console", here);
-    }    // }}}
-#endif
-
-    void addressing_service::launch_hosted() {}
 
     void addressing_service::adjust_local_cache_size(std::size_t cache_size)
     {    // {{{

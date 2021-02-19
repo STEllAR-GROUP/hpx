@@ -18,7 +18,6 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/timing/scoped_timer.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
@@ -1034,7 +1033,7 @@ namespace hpx { namespace agas { namespace server {
             }
             else
             {
-                components::server::destroy_component(e.gid_, addr);
+                agas::destroy_component(e.gid_, addr);
             }
         }
 

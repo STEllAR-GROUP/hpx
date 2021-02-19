@@ -7,9 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/components_base/server/component_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
-#include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime_local/interval_timer.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
@@ -20,10 +20,12 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server {
+
     namespace detail {
+
         struct counter_type_from_statistic_base
         {
-            virtual ~counter_type_from_statistic_base() {}
+            virtual ~counter_type_from_statistic_base() = default;
 
             virtual bool need_reset() const = 0;
             virtual double get_value() = 0;
@@ -77,8 +79,7 @@ namespace hpx { namespace performance_counters { namespace server {
 
         void on_terminate() {}
 
-        /// \brief finalize() will be called just before the instance gets
-        ///        destructed
+        // finalize() will be called just before the instance gets destructed
         void finalize()
         {
             base_performance_counter::finalize();
@@ -94,10 +95,11 @@ namespace hpx { namespace performance_counters { namespace server {
         typedef lcos::local::spinlock mutex_type;
         mutable mutex_type mtx_;
 
-        hpx::util::interval_timer
-            timer_;    ///< base time interval in milliseconds
-        std::string
-            base_counter_name_;    ///< name of base counter to be queried
+        // base time interval in milliseconds
+        hpx::util::interval_timer timer_;
+
+        // name of base counter to be queried
+        std::string base_counter_name_;
         naming::id_type base_counter_id_;
 
         std::unique_ptr<detail::counter_type_from_statistic_base> value_;

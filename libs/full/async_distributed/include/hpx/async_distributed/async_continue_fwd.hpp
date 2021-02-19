@@ -12,11 +12,11 @@
 #include <hpx/actions_base/basic_action_fwd.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
+#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/naming.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
 
 #include <type_traits>
 

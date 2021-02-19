@@ -11,15 +11,16 @@
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/components_base/component_type.hpp>
+#include <hpx/components_base/server/component.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter_base.hpp>
-#include <hpx/runtime/components/server/component.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server {
+
     class base_performance_counter
       : public hpx::performance_counters::performance_counter_base
       , public hpx::traits::detail::component_tag
@@ -27,47 +28,46 @@ namespace hpx { namespace performance_counters { namespace server {
     protected:
         /// the following functions are not implemented by default, they will
         /// just throw
-        virtual void reset_counter_value() override
+        void reset_counter_value() override
         {
             HPX_THROW_EXCEPTION(invalid_status, "reset_counter_value",
                 "reset_counter_value is not implemented for this counter");
         }
 
-        virtual void set_counter_value(counter_value const& /*value*/) override
+        void set_counter_value(counter_value const& /*value*/) override
         {
             HPX_THROW_EXCEPTION(invalid_status, "set_counter_value",
                 "set_counter_value is not implemented for this counter");
         }
 
-        virtual counter_value get_counter_value(bool /*reset*/) override
+        counter_value get_counter_value(bool /*reset*/) override
         {
             HPX_THROW_EXCEPTION(invalid_status, "get_counter_value",
                 "get_counter_value is not implemented for this counter");
-            return counter_value();
+            return {};
         }
 
-        virtual counter_values_array get_counter_values_array(
-            bool /*reset*/) override
+        counter_values_array get_counter_values_array(bool /*reset*/) override
         {
             HPX_THROW_EXCEPTION(invalid_status, "get_counter_values_array",
                 "get_counter_values_array is not implemented for this "
                 "counter");
-            return counter_values_array();
+            return {};
         }
 
-        virtual bool start() override
+        bool start() override
         {
             return false;    // nothing to do
         }
 
-        virtual bool stop() override
+        bool stop() override
         {
             return false;    // nothing to do
         }
 
-        virtual void reinit(bool /*reset*/) override {}
+        void reinit(bool /*reset*/) override {}
 
-        virtual counter_info get_counter_info() const override
+        counter_info get_counter_info() const override
         {
             return info_;
         }
@@ -86,14 +86,14 @@ namespace hpx { namespace performance_counters { namespace server {
         // components must contain a typedef for wrapping_type defining the
         // component type used to encapsulate instances of this
         // component
-        typedef components::component<base_performance_counter> wrapping_type;
-        typedef base_performance_counter base_type_holder;
+        using wrapping_type = components::component<base_performance_counter>;
+        using base_type_holder = base_performance_counter;
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
-        void finalize() {}
+        constexpr void finalize() {}
 
-        static components::component_type get_component_type()
+        static components::component_type get_component_type() noexcept
         {
             return components::get_component_type<wrapping_type>();
         }

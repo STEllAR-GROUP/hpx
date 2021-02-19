@@ -8,10 +8,10 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/components_base/component_type.hpp>
+#include <hpx/components_base/server/component.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
-#include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 

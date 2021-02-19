@@ -23,6 +23,7 @@
 #include <hpx/actions_base/traits/action_remote_result.hpp>
 #include <hpx/actions_base/traits/action_stacksize.hpp>
 #include <hpx/actions_base/traits/action_trigger_continuation_fwd.hpp>
+#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/sync.hpp>
 #include <hpx/async_local/sync_fwd.hpp>
@@ -42,7 +43,6 @@
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
@@ -762,7 +762,7 @@ namespace hpx { namespace actions {
 ///      {
 ///          // Define a simple component exposing one action 'print_greeting'
 ///          class HPX_COMPONENT_EXPORT server
-///            : public hpx::components::simple_component_base<server>
+///            : public hpx::components::component_base<server>
 ///          {
 ///              void print_greeting ()
 ///              {

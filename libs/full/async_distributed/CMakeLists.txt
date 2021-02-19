@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,7 +21,6 @@ set(async_headers
     hpx/async_distributed/applier/apply_continue_fwd.hpp
     hpx/async_distributed/applier/apply_continue.hpp
     hpx/async_distributed/applier/apply.hpp
-    hpx/async_distributed/applier/bind_naming_wrappers.hpp
     hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp
     hpx/async_distributed/applier/detail/apply_implementations.hpp
     hpx/async_distributed/applier_fwd.hpp
@@ -35,6 +34,9 @@ set(async_headers
     hpx/async_distributed/async_continue_fwd.hpp
     hpx/async_distributed/async_continue.hpp
     hpx/async_distributed/async.hpp
+    hpx/async_distributed/continuation_impl.hpp
+    hpx/async_distributed/continuation2_impl.hpp
+    hpx/async_distributed/make_continuation.hpp
     hpx/async_distributed/dataflow.hpp
     hpx/async_distributed/detail/async_implementations_fwd.hpp
     hpx/async_distributed/detail/async_implementations.hpp
@@ -60,6 +62,9 @@ set(async_compat_headers
     hpx/lcos/dataflow.hpp => hpx/include/async.hpp
     hpx/lcos/sync_fwd.hpp => hpx/include/async.hpp
     hpx/lcos/sync.hpp => hpx/include/async.hpp
+    hpx/runtime/actions/continuation_impl.hpp => hpx/include/async.hpp
+    hpx/runtime/actions/continuation2_impl.hpp => hpx/include/async.hpp
+    hpx/runtime/actions/make_continuation.hpp => hpx/include/async.hpp
     hpx/runtime/applier/applier.hpp => hpx/include/async.hpp
     hpx/runtime/applier/apply_callback.hpp => hpx/include/async.hpp
     hpx/runtime/applier/apply_continue_callback.hpp => hpx/include/async.hpp

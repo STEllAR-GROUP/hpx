@@ -37,7 +37,7 @@ inline std::size_t idx(std::size_t i, int dir)
 }
 
 class test_receive_buffer_server
-  : public hpx::components::simple_component_base<test_receive_buffer_server>
+  : public hpx::components::component_base<test_receive_buffer_server>
 {
 public:
     test_receive_buffer_server()
@@ -70,7 +70,7 @@ private:
     hpx::lcos::local::receive_buffer<std::size_t> buffer_;
 };
 
-typedef hpx::components::simple_component<
+typedef hpx::components::component<
         test_receive_buffer_server
     > server_type;
 HPX_REGISTER_COMPONENT(server_type, server_type);

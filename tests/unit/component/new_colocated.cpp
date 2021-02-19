@@ -14,14 +14,14 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-struct test_server : hpx::components::simple_component_base<test_server>
+struct test_server : hpx::components::component_base<test_server>
 {
     hpx::id_type call() const { return hpx::find_here(); }
 
     HPX_DEFINE_COMPONENT_ACTION(test_server, call);
 };
 
-typedef hpx::components::simple_component<test_server> server_type;
+typedef hpx::components::component<test_server> server_type;
 HPX_REGISTER_COMPONENT(server_type, test_server);
 
 typedef test_server::call_action call_action;

@@ -15,12 +15,12 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_local/dataflow.hpp>
 #endif
+#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/compute/detail/target_distribution_policy.hpp>
 #include <hpx/compute/host/target.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/runtime/components/create_component_helpers.hpp>
+#include <hpx/runtime_components/create_component_helpers.hpp>
 #include <hpx/serialization/base_object.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <algorithm>

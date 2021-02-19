@@ -9,19 +9,19 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
+#include <hpx/components/client_base.hpp>
+#include <hpx/components/get_ptr.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/components/copy_component.hpp>
-#include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/components/server/distributed_metadata_base.hpp>
-#include <hpx/runtime/get_ptr.hpp>
+#include <hpx/runtime_components/copy_component.hpp>
+#include <hpx/runtime_components/new.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/unordered_map.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>

@@ -7,23 +7,24 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/components_base/server/component_base.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
-#include <hpx/runtime/components/server/component_base.hpp>
 
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server {
+
     class HPX_EXPORT raw_counter
       : public base_performance_counter
       , public components::component_base<raw_counter>
     {
-        typedef components::component_base<raw_counter> base_type;
+        using base_type = components::component_base<raw_counter>;
 
     public:
-        typedef raw_counter type_holder;
-        typedef base_performance_counter base_type_holder;
+        using type_holder = raw_counter;
+        using base_type_holder = base_performance_counter;
 
         raw_counter()
           : reset_(false)
@@ -34,11 +35,10 @@ namespace hpx { namespace performance_counters { namespace server {
             hpx::util::function_nonser<std::int64_t(bool)> f);
 
         hpx::performance_counters::counter_value get_counter_value(
-            bool reset = false);
-        void reset_counter_value();
+            bool reset = false) override;
+        void reset_counter_value() override;
 
-        /// \brief finalize() will be called just before the instance gets
-        ///        destructed
+        // finalize() will be called just before the instance gets destructed
         void finalize()
         {
             base_performance_counter::finalize();

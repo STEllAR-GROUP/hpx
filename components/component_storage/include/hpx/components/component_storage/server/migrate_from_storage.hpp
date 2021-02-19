@@ -14,7 +14,7 @@
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
-#include <hpx/runtime/components/server/migrate_component.hpp>
+#include <hpx/runtime_components/server/migrate_component.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>

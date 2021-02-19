@@ -10,9 +10,9 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/async.hpp>
-#include <hpx/modules/errors.hpp>
+#include <hpx/components/client_base.hpp>
 #include <hpx/lcos/server/object_semaphore.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <cstdint>
 #include <utility>

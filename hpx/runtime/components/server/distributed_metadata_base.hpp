@@ -11,13 +11,14 @@
 #include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/components_base/server/component.hpp>
+#include <hpx/components_base/server/component_base.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
 
 #include <type_traits>
 
@@ -31,7 +32,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     template <typename ConfigData, typename Derived = detail::this_type>
     class distributed_metadata_base
-      : public hpx::components::simple_component_base<
+      : public hpx::components::component_base<
             typename std::conditional<
                 std::is_same<Derived, detail::this_type>::value,
                 distributed_metadata_base<ConfigData, Derived>,
@@ -90,19 +91,15 @@ namespace hpx { namespace components { namespace server
 #define HPX_DISTRIBUTED_METADATA_1(config)                                    \
     HPX_DISTRIBUTED_METADATA_2(config, config)                                \
     /**/
-#define HPX_DISTRIBUTED_METADATA_2(config, name)                              \
-    HPX_REGISTER_ACTION(                                                      \
-        ::hpx::components::server::distributed_metadata_base<config>::        \
-            get_action,                                                       \
-        HPX_PP_CAT(__distributed_metadata_get_action_, name));                \
-    HPX_REGISTER_ACTION(                                                      \
-        ::hpx::lcos::base_lco_with_value<config>::set_value_action,           \
-        HPX_PP_CAT(__set_value_distributed_metadata_config_data_, name))      \
-    typedef ::hpx::components::simple_component<                              \
-        ::hpx::components::server::distributed_metadata_base<config>          \
-    > HPX_PP_CAT(__distributed_metadata_, name);                              \
-    HPX_REGISTER_COMPONENT(                                                   \
-        HPX_PP_CAT(__distributed_metadata_, name))                            \
+#define HPX_DISTRIBUTED_METADATA_2(config, name)                               \
+    HPX_REGISTER_ACTION(::hpx::components::server::distributed_metadata_base<  \
+                            config>::get_action,                               \
+        HPX_PP_CAT(__distributed_metadata_get_action_, name));                 \
+    HPX_REGISTER_ACTION(                                                       \
+        ::hpx::lcos::base_lco_with_value<config>::set_value_action,            \
+        HPX_PP_CAT(__set_value_distributed_metadata_config_data_, name))       \
+    typedef ::hpx::components::component<                                      \
+        ::hpx::components::server::distributed_metadata_base<config>>          \
+        HPX_PP_CAT(__distributed_metadata_, name);                             \
+    HPX_REGISTER_COMPONENT(HPX_PP_CAT(__distributed_metadata_, name))          \
     /**/
-
-

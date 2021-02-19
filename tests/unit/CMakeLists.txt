@@ -8,7 +8,7 @@
 set(subdirs build lcos resource traits util)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(subdirs ${subdirs} actions agas component)
+  set(subdirs ${subdirs} actions component)
 endif()
 
 if(HPX_WITH_NETWORKING)

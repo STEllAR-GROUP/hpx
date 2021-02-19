@@ -39,7 +39,7 @@ HPX_REGISTER_ACTION_DECLARATION(call_action);
 HPX_REGISTER_ACTION(call_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-struct test_server : hpx::components::simple_component_base<test_server>
+struct test_server : hpx::components::component_base<test_server>
 {
     hpx::future<std::int32_t> increment(std::int32_t i)
     {
@@ -55,7 +55,7 @@ struct test_server : hpx::components::simple_component_base<test_server>
     HPX_DEFINE_COMPONENT_ACTION(test_server, increment_with_future);
 };
 
-typedef hpx::components::simple_component<test_server> test_server_type;
+typedef hpx::components::component<test_server> test_server_type;
 HPX_REGISTER_COMPONENT(test_server_type, test_server);
 
 typedef test_server::increment_action increment_action;

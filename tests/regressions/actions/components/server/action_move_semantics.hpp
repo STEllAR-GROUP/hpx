@@ -18,7 +18,7 @@
 namespace hpx { namespace test { namespace server
 {
     struct action_move_semantics
-      : components::simple_component_base<action_move_semantics>
+      : components::component_base<action_move_semantics>
     {
         ///////////////////////////////////////////////////////////////////////
         std::size_t test_movable(movable_object const& obj)

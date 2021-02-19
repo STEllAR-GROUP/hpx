@@ -8,6 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
+#include <hpx/actions_base/traits/is_client.hpp>
+#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/actions_base/traits/is_valid_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
@@ -15,15 +17,13 @@
 #include <hpx/async_distributed/detail/sync_implementations.hpp>
 #include <hpx/async_distributed/sync.hpp>
 #include <hpx/async_local/sync.hpp>
+#include <hpx/components/client_base.hpp>
 #include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
 #include <hpx/executors/sync.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/components/client_base.hpp>
-#include <hpx/traits/is_client.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/util/bind_action.hpp>
 
 #include <type_traits>

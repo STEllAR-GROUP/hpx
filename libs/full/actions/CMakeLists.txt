@@ -38,9 +38,9 @@ set(actions_compat_headers
     hpx/async_distributed/applier/apply_helper.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions_fwd.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions/action_support.hpp => hpx/modules/actions.hpp
+    hpx/runtime/actions/base_action.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions/continuation_fwd.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions/continuation.hpp => hpx/modules/actions.hpp
-    hpx/runtime/actions/base_action.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions/set_lco_value_continuation.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions/transfer_action.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions/transfer_base_action.hpp => hpx/modules/actions.hpp
