@@ -22,16 +22,11 @@ if(NOT TARGET hpx_dependencies_boost)
       "1.73.0" "1.73"
       "1.72.0" "1.72"
       "1.71.0" "1.71"
-      "1.70.0" "1.70"
-      "1.69.0" "1.69"
-      "1.68.0" "1.68"
-      "1.67.0" "1.67"
-      "1.66.0" "1.66"
   )
   # cmake-format: on
   set(Boost_MINIMUM_VERSION
-      "1.66"
-      CACHE INTERNAL "1.66" FORCE
+      "1.71"
+      CACHE INTERNAL "1.71" FORCE
   )
 
   set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
@@ -53,12 +48,6 @@ if(NOT TARGET hpx_dependencies_boost)
     )
   endif()
 
-  # Boost.System is header-only from 1.69 onwards. But filesystem is needed the
-  # libboost_system.so library in Boost 1.69 so can't link only to filesystem
-  if(Boost_VERSION_STRING VERSION_LESS 1.70)
-    set(__boost_libraries ${__boost_libraries} system)
-  endif()
-
   if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
     # if context is needed, we should still link with boost thread and chrono
     set(__boost_libraries ${__boost_libraries} context thread chrono)
@@ -75,13 +64,6 @@ if(NOT TARGET hpx_dependencies_boost)
     hpx_error(
       "Could not find Boost. Please set BOOST_ROOT to point to your Boost installation."
     )
-  endif()
-
-  # target_arch should be set already by the parent CMakeLists file
-  if("${__target_arch}" STREQUAL "ppc" OR "${__target_arch}" STREQUAL "ppc64")
-    if("${Boost_VERSION_STRING}" VERSION_LESS "1.69.0")
-      hpx_error("Boost versions < 1.69.0 are unsupported on PPC architecture")
-    endif()
   endif()
 
   # We are assuming that there is only one Boost Root
