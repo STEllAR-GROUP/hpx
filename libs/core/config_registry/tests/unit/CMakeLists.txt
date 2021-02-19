@@ -6,7 +6,7 @@
 
 set(tests config_registry)
 
-set(config_registry_FLAGS COMPILE_FLAGS -DHPX_MODULE_STATIC_LINKING=1)
+set(config_registry_FLAGS COMPILE_FLAGS -DHPX_MODULE_STATIC_LINKING)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

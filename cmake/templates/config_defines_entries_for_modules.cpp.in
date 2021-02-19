@@ -8,7 +8,7 @@
 
 #include <hpx/modules/config_registry.hpp>
 
-namespace hpx { namespace __@module_name@ {
+namespace hpx { namespace @module_name@_cfg {
 
     config_registry::add_module_config_helper add_config{
     {
