@@ -13,6 +13,7 @@ endif()
 set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_stacksize_PARAMETERS LOCALITIES 2)
 set(thread_affinity_PARAMETERS THREADS_PER_LOCALITY 4)
+set(thread_affinity_LIBRARIES DEPENDENCIES PRIVATE Hwloc::hwloc)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
