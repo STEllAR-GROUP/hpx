@@ -18,7 +18,6 @@ include(HPX_AddModule)
 add_hpx_module(
   full init_runtime_local
   COMPATIBILITY_HEADERS OFF
-  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${init_runtime_local_sources}
   HEADERS ${init_runtime_local_headers}
