@@ -259,9 +259,8 @@ namespace hpx {
     threads::policies::callback_notifier::on_error_type global_on_error_func;
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(
-        hpx::local::detail::runtime_configuration& rtcfg_local, bool initialize)
-      : rtcfg_local_(rtcfg_local)
+    runtime::runtime(hpx::util::runtime_configuration& rtcfg, bool initialize)
+      : rtcfg_(rtcfg)
       , instance_number_(++instance_number_counter_)
       , thread_support_(new util::thread_mapper)
       , topology_(resource::get_partitioner().get_topology())
@@ -275,18 +274,18 @@ namespace hpx {
 #ifdef HPX_HAVE_IO_POOL
       , io_pool_notifier_(runtime::get_notification_policy(
             "io-thread", runtime_local::os_thread_type::io_thread))
-      , io_pool_(rtcfg_local_.get_thread_pool_size("io_pool"),
-            io_pool_notifier_, "io_pool")
+      , io_pool_(rtcfg_.get_thread_pool_size("io_pool"), io_pool_notifier_,
+            "io_pool")
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
       , timer_pool_notifier_(runtime::get_notification_policy(
             "timer-thread", runtime_local::os_thread_type::timer_thread))
-      , timer_pool_(rtcfg_local_.get_thread_pool_size("timer_pool"),
+      , timer_pool_(rtcfg_.get_thread_pool_size("timer_pool"),
             timer_pool_notifier_, "timer_pool")
 #endif
       , notifier_(runtime::get_notification_policy(
             "worker-thread", runtime_local::os_thread_type::worker_thread))
-      , thread_manager_(new hpx::threads::threadmanager(rtcfg_local_,
+      , thread_manager_(new hpx::threads::threadmanager(rtcfg_,
 #ifdef HPX_HAVE_TIMER_POOL
             timer_pool_,
 #endif
@@ -308,7 +307,7 @@ namespace hpx {
         }
     }
 
-    runtime::runtime(hpx::local::detail::runtime_configuration& rtcfg_local,
+    runtime::runtime(hpx::util::runtime_configuration& rtcfg,
         notification_policy_type&& notifier,
         notification_policy_type&& main_pool_notifier,
 #ifdef HPX_HAVE_IO_POOL
@@ -320,7 +319,7 @@ namespace hpx {
         threads::detail::network_background_callback_type
             network_background_callback,
         bool initialize)
-      : rtcfg_local_(rtcfg_local)
+      : rtcfg_(rtcfg)
       , instance_number_(++instance_number_counter_)
       , thread_support_(new util::thread_mapper)
       , topology_(resource::get_partitioner().get_topology())
@@ -333,16 +332,16 @@ namespace hpx {
       , main_pool_(1, main_pool_notifier_, "main_pool")
 #ifdef HPX_HAVE_IO_POOL
       , io_pool_notifier_(std::move(io_pool_notifier))
-      , io_pool_(rtcfg_local_.get_thread_pool_size("io_pool"),
-            io_pool_notifier_, "io_pool")
+      , io_pool_(rtcfg_.get_thread_pool_size("io_pool"), io_pool_notifier_,
+            "io_pool")
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
       , timer_pool_notifier_(std::move(timer_pool_notifier))
-      , timer_pool_(rtcfg_local_.get_thread_pool_size("timer_pool"),
+      , timer_pool_(rtcfg_.get_thread_pool_size("timer_pool"),
             timer_pool_notifier_, "timer_pool")
 #endif
       , notifier_(std::move(notifier))
-      , thread_manager_(new hpx::threads::threadmanager(rtcfg_local_,
+      , thread_manager_(new hpx::threads::threadmanager(rtcfg_,
 #ifdef HPX_HAVE_TIMER_POOL
             timer_pool_,
 #endif
@@ -466,14 +465,14 @@ namespace hpx {
         return state_.load() == state_stopped;
     }
 
-    hpx::local::detail::runtime_configuration& runtime::get_config()
+    hpx::util::runtime_configuration& runtime::get_config()
     {
-        return rtcfg_local_;
+        return rtcfg_;
     }
 
-    hpx::local::detail::runtime_configuration const& runtime::get_config() const
+    hpx::util::runtime_configuration const& runtime::get_config() const
     {
-        return rtcfg_local_;
+        return rtcfg_;
     }
 
     std::size_t runtime::get_instance_number() const
@@ -1084,12 +1083,10 @@ namespace hpx {
         return runtime::get_system_uptime();
     }
 
-    namespace local {
-        hpx::local::detail::runtime_configuration const& get_config()
-        {
-            return get_runtime().get_config();
-        }
-    }    // namespace local
+    hpx::util::runtime_configuration const& get_config()
+    {
+        return get_runtime().get_config();
+    }
 
     hpx::util::io_service_pool* get_thread_pool(
         char const* name, char const* name_suffix)
@@ -2006,8 +2003,7 @@ namespace hpx {
         {
             thread_stacksize size_enum = thread_stacksize::unknown;
 
-            hpx::local::detail::runtime_configuration const& rtcfg =
-                hpx::local::get_config();
+            hpx::util::runtime_configuration const& rtcfg = hpx::get_config();
             if (rtcfg.get_stack_size(thread_stacksize::small_) == size)
                 size_enum = thread_stacksize::small_;
             else if (rtcfg.get_stack_size(thread_stacksize::medium) == size)

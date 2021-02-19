@@ -74,11 +74,11 @@ namespace hpx {
             std::uint32_t, std::string const&);
 
         /// Construct a new HPX runtime instance
-        explicit runtime(hpx::local::detail::runtime_configuration& rtcfg_local,
-            bool initialize = true);
+        explicit runtime(
+            hpx::util::runtime_configuration& rtcfg, bool initialize = true);
 
     protected:
-        runtime(hpx::local::detail::runtime_configuration& rtcfg_local,
+        runtime(hpx::util::runtime_configuration& rtcfg,
             notification_policy_type&& notifier,
             notification_policy_type&& main_pool_notifier,
 #ifdef HPX_HAVE_IO_POOL
@@ -112,9 +112,9 @@ namespace hpx {
         bool stopped() const;
 
         /// \brief access configuration information
-        hpx::local::detail::runtime_configuration& get_config();
+        hpx::util::runtime_configuration& get_config();
 
-        hpx::local::detail::runtime_configuration const& get_config() const;
+        hpx::util::runtime_configuration const& get_config() const;
 
         std::size_t get_instance_number() const;
 
@@ -410,7 +410,7 @@ namespace hpx {
         on_exit_type on_exit_functions_;
         mutable std::mutex mtx_;
 
-        hpx::local::detail::runtime_configuration rtcfg_local_;
+        hpx::util::runtime_configuration rtcfg_;
 
         long instance_number_;
         static std::atomic<int> instance_number_counter_;

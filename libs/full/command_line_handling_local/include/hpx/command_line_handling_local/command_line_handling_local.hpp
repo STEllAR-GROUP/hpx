@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/program_options.hpp>
-#include <hpx/modules/runtime_configuration_local.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/util.hpp>
 
 #include <cstddef>
@@ -21,7 +21,7 @@
 namespace hpx { namespace local { namespace detail {
     struct command_line_handling
     {
-        command_line_handling(runtime_configuration rtcfg,
+        command_line_handling(hpx::util::runtime_configuration rtcfg,
             std::vector<std::string> ini_config,
             util::function_nonser<int(hpx::program_options::variables_map& vm)>
                 hpx_main_f)
@@ -44,7 +44,7 @@ namespace hpx { namespace local { namespace detail {
             int argc, char** argv);
 
         hpx::program_options::variables_map vm_;
-        runtime_configuration rtcfg_;
+        hpx::util::runtime_configuration rtcfg_;
 
         std::vector<std::string> ini_config_;
         util::function_nonser<int(hpx::program_options::variables_map& vm)>

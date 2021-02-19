@@ -435,7 +435,8 @@ namespace hpx { namespace local {
                 }
 
                 hpx::local::detail::command_line_handling cmdline{
-                    hpx::local::detail::runtime_configuration(argv[0]),
+                    hpx::util::runtime_configuration(
+                        argv[0], hpx::runtime_mode::local),
                     params.cfg, f};
 
                 // scope exception handling to resource partitioner initialization

@@ -13,7 +13,7 @@
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/program_options.hpp>
-#include <hpx/modules/runtime_configuration_local.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/util.hpp>
 #include <hpx/preprocessor/stringize.hpp>
@@ -242,7 +242,7 @@ namespace hpx { namespace local { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////
     std::size_t handle_num_threads(util::manage_config& cfgmap,
-        runtime_configuration const& rtcfg,
+        hpx::util::runtime_configuration const& rtcfg,
         hpx::program_options::variables_map& vm, bool use_process_mask)
     {
         // If using the process mask we override "cores" and "all" options but

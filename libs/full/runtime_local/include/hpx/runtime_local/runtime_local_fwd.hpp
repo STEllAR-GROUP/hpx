@@ -73,10 +73,7 @@ namespace hpx {
     HPX_EXPORT bool is_scheduler_numa_sensitive();
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace local {
-        HPX_EXPORT hpx::local::detail::runtime_configuration const&
-        get_config();
-    }
+    HPX_EXPORT hpx::util::runtime_configuration const& get_config();
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT hpx::util::io_service_pool* get_thread_pool(
