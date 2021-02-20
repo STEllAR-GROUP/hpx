@@ -482,11 +482,11 @@ Parallel algorithms
      * Copies the elements from a range to a new location for which the given predicate is ``false``
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`remove_copy`
-   * * :cpp:func:`hpx::parallel::v1::replace`
+   * * :cpp:func:`hpx::replace`
      * Replaces all values satisfying specific criteria with another value.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`replace`
-   * * :cpp:func:`hpx::parallel::v1::replace_if`
+   * * :cpp:func:`hpx::replace_if`
      * Replaces all values satisfying specific criteria with another value.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`replace`

@@ -143,16 +143,24 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           returns \a void otherwise.
     ///           It returns \a last.
     ///
+    // clang-format off
     template <typename ExPolicy, typename FwdIter, typename T1, typename T2,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&& hpx::
-                traits::is_iterator<FwdIter>::value&& traits::is_projected<Proj,
-                    FwdIter>::value&& traits::is_indirect_callable<ExPolicy,
-                    std::equal_to<T1>, traits::projected<Proj, FwdIter>,
-                    traits::projected<Proj, T1 const*>>::value)>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type replace(
-        ExPolicy&& policy, FwdIter first, FwdIter last, T1 const& old_value,
-        T2 const& new_value, Proj&& proj = Proj())
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value&&
+            hpx::traits::is_iterator<FwdIter>::value&&
+            traits::is_projected<Proj,FwdIter>::value&&
+            traits::is_indirect_callable<ExPolicy,std::equal_to<T1>,
+                traits::projected<Proj, FwdIter>,
+                traits::projected<Proj, T1 const*>>::value
+        )>
+    // clang-format on
+    HPX_DEPRECATED_V(1, 7,
+        "hpx::parallel::replace is deprecated, use hpx::ranges::replace "
+        "instead")
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        replace(ExPolicy&& policy, FwdIter first, FwdIter last,
+            T1 const& old_value, T2 const& new_value, Proj&& proj = Proj())
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
@@ -170,11 +178,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \cond NOINTERNAL
 
         // sequential replace_if
-        template <typename InIter, typename F, typename T, typename Proj>
+        template <typename InIter, typename Sent, typename F, typename T,
+            typename Proj>
         inline InIter sequential_replace_if(
-            InIter first, InIter last, F&& f, T const& new_value, Proj&& proj)
+            InIter first, Sent sent, F&& f, T const& new_value, Proj&& proj)
         {
-            for (/* */; first != last; ++first)
+            for (/* */; first != sent; ++first)
             {
                 using hpx::util::invoke;
                 if (invoke(f, invoke(proj, *first)))
@@ -193,27 +202,27 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
             }
 
-            template <typename ExPolicy, typename InIter, typename F,
-                typename T, typename Proj>
-            static InIter sequential(ExPolicy, InIter first, InIter last, F&& f,
+            template <typename ExPolicy, typename InIter, typename Sent,
+                typename F, typename T, typename Proj>
+            static InIter sequential(ExPolicy, InIter first, Sent last, F&& f,
                 T const& new_value, Proj&& proj)
             {
                 return sequential_replace_if(first, last, std::forward<F>(f),
                     new_value, std::forward<Proj>(proj));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename F,
-                typename T, typename Proj>
+            template <typename ExPolicy, typename FwdIter, typename Sent,
+                typename F, typename T, typename Proj>
             static
                 typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-                parallel(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
+                parallel(ExPolicy&& policy, FwdIter first, Sent last, F&& f,
                     T const& new_value, Proj&& proj)
             {
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 return for_each_n<FwdIter>().call(
                     std::forward<ExPolicy>(policy), std::false_type(), first,
-                    std::distance(first, last),
+                    detail::distance(first, last),
                     [new_value, f = std::forward<F>(f),
                         proj = std::forward<Proj>(proj)](type& t) -> void {
                         using hpx::util::invoke;
@@ -296,15 +305,22 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           and returns \a FwdIter otherwise.
     ///           It returns \a last.
     ///
+    // clang-format off
     template <typename ExPolicy, typename FwdIter, typename F, typename T,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&& hpx::
-                traits::is_iterator<FwdIter>::value&& traits::is_projected<Proj,
-                    FwdIter>::value&& traits::is_indirect_callable<ExPolicy, F,
-                    traits::projected<Proj, FwdIter>>::value)>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type replace_if(
-        ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-        T const& new_value, Proj&& proj = Proj())
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value&&
+            hpx::traits::is_iterator<FwdIter>::value&&
+            traits::is_projected<Proj,FwdIter>::value&&
+            traits::is_indirect_callable<ExPolicy, F,
+                traits::projected<Proj, FwdIter>>::value)>
+    // clang-format on
+    HPX_DEPRECATED_V(1, 7,
+        "hpx::parallel::replace_if is deprecated, use hpx::ranges::replace_if "
+        "instead")
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        replace_if(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
+            T const& new_value, Proj&& proj = Proj())
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
@@ -658,3 +674,109 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::forward<F>(f), new_value, std::forward<Proj>(proj)));
     }
 }}}    // namespace hpx::parallel::v1
+
+namespace hpx {
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::replace_if
+    HPX_INLINE_CONSTEXPR_VARIABLE struct replace_if_t final
+      : hpx::functional::tag<replace_if_t>
+    {
+        // clang-format off
+        template <typename Iter,
+            typename Pred, typename T, HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<Iter>::value &&
+                hpx::is_invocable_v<Pred,
+                    typename std::iterator_traits<Iter>::value_type
+                >
+            )>
+        // clang-format on
+        friend void tag_invoke(hpx::replace_if_t, Iter first, Iter last,
+            Pred&& pred, T const& new_value)
+        {
+            static_assert((hpx::traits::is_forward_iterator<Iter>::value),
+                "Required at least input iterator.");
+
+            hpx::parallel::v1::detail::replace_if<Iter>().call(
+                hpx::execution::sequenced_policy{}, std::true_type{}, first,
+                last, std::forward<Pred>(pred), new_value,
+                hpx::parallel::util::projection_identity());
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter,
+            typename Pred,  typename T, HPX_CONCEPT_REQUIRES_(
+                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter>::value &&
+                hpx::is_invocable_v<Pred,
+                    typename std::iterator_traits<FwdIter>::value_type
+                >
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            void>::type
+        tag_invoke(hpx::replace_if_t, ExPolicy&& policy, FwdIter first,
+            FwdIter last, Pred&& pred, T const& new_value)
+        {
+            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+                "Required at least forward iterator.");
+
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+
+            return parallel::util::detail::algorithm_result<ExPolicy>::get(
+                hpx::parallel::v1::detail::replace_if<FwdIter>().call(
+                    std::forward<ExPolicy>(policy), is_seq(), first, last,
+                    std::forward<Pred>(pred), new_value,
+                    hpx::parallel::util::projection_identity()));
+        }
+    } replace_if{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::replace
+    HPX_INLINE_CONSTEXPR_VARIABLE struct replace_t final
+      : hpx::functional::tag<replace_t>
+    {
+    private:
+        // clang-format off
+        template <typename FwdIter,
+            typename T, HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<FwdIter>::value
+            )>
+        // clang-format on
+        friend void tag_invoke(hpx::replace_t, FwdIter first, FwdIter last,
+            T const& old_value, T const& new_value)
+        {
+            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+                "Required at least forward iterator.");
+
+            typedef typename std::iterator_traits<FwdIter>::value_type Type;
+
+            return hpx::replace_if(
+                hpx::execution::seq, first, last,
+                [old_value](Type const& a) -> bool { return old_value == a; },
+                new_value);
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter,
+            typename T, HPX_CONCEPT_REQUIRES_(
+                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            void>::type
+        tag_invoke(hpx::replace_t, ExPolicy&& policy, FwdIter first,
+            FwdIter last, T const& old_value, T const& new_value)
+        {
+            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+                "Required at least forward iterator.");
+
+            typedef typename std::iterator_traits<FwdIter>::value_type Type;
+
+            return hpx::replace_if(
+                std::forward<ExPolicy>(policy), first, last,
+                [old_value](Type const& a) -> bool { return old_value == a; },
+                new_value);
+        }
+    } replace{};
+}    // namespace hpx
