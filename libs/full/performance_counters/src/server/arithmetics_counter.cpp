@@ -14,7 +14,7 @@
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/performance_counters/server/arithmetics_counter.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
-#include <hpx/runtime_components/derived_component_factory.hpp>
+#include <hpx/runtime_components_base/derived_component_factory.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstddef>

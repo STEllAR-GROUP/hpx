@@ -16,17 +16,17 @@
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/components/client_base.hpp>
+#include <hpx/components/distributed_metadata_base.hpp>
 #include <hpx/components/get_ptr.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime/components/server/distributed_metadata_base.hpp>
-#include <hpx/runtime_components/copy_component.hpp>
 #include <hpx/runtime_components/new.hpp>
+#include <hpx/runtime_distributed/copy_component.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>
 #include <hpx/components/containers/partitioned_vector/export_definitions.hpp>
-#include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 
 #include <algorithm>
@@ -42,8 +42,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \cond NOINTERNAL
-namespace hpx { namespace server
-{
+namespace hpx { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     struct partitioned_vector_config_data
     {
@@ -52,14 +51,18 @@ namespace hpx { namespace server
         struct partition_data
         {
             partition_data()
-              : size_(0), locality_id_(naming::invalid_locality_id)
-            {}
+              : size_(0)
+              , locality_id_(naming::invalid_locality_id)
+            {
+            }
 
             partition_data(id_type const& part, std::size_t size,
-                    std::uint32_t locality_id)
-              : partition_(part),
-                size_(size), locality_id_(locality_id)
-            {}
+                std::uint32_t locality_id)
+              : partition_(part)
+              , size_(size)
+              , locality_id_(locality_id)
+            {
+            }
 
             id_type const& get_id() const
             {
@@ -76,19 +79,21 @@ namespace hpx { namespace server
             template <typename Archive>
             void serialize(Archive& ar, unsigned)
             {
-                ar & partition_ & size_ & locality_id_;
+                ar& partition_& size_& locality_id_;
             }
         };
 
         partitioned_vector_config_data()
           : size_(0)
-        {}
+        {
+        }
 
-        partitioned_vector_config_data(std::size_t size,
-                std::vector<partition_data> && partitions)
-          : size_(size),
-            partitions_(std::move(partitions))
-        {}
+        partitioned_vector_config_data(
+            std::size_t size, std::vector<partition_data>&& partitions)
+          : size_(size)
+          , partitions_(std::move(partitions))
+        {
+        }
 
         std::size_t size_;
         std::vector<partition_data> partitions_;
@@ -99,10 +104,10 @@ namespace hpx { namespace server
         template <typename Archive>
         void serialize(Archive& ar, unsigned)
         {
-            ar & size_ & partitions_;
+            ar& size_& partitions_;
         }
     };
-}}
+}}    // namespace hpx::server
 
 HPX_DISTRIBUTED_METADATA_DECLARATION(
     hpx::server::partitioned_vector_config_data,
@@ -110,8 +115,7 @@ HPX_DISTRIBUTED_METADATA_DECLARATION(
 
 /// \endcond
 
-namespace hpx
-{
+namespace hpx {
     /// hpx::partitioned_vector is a sequence container that encapsulates
     /// dynamic size arrays.
     ///
@@ -147,7 +151,7 @@ namespace hpx
     class partitioned_vector
       : public hpx::components::client_base<partitioned_vector<T, Data>,
             hpx::components::server::distributed_metadata_base<
-                server::partitioned_vector_config_data> >
+                server::partitioned_vector_config_data>>
     {
     public:
         typedef typename Data::allocator_type allocator_type;
@@ -169,11 +173,10 @@ namespace hpx
 #endif
 
     private:
-        typedef hpx::components::client_base<
-                partitioned_vector,
-                hpx::components::server::distributed_metadata_base<
-                    server::partitioned_vector_config_data>
-            > base_type;
+        typedef hpx::components::client_base<partitioned_vector,
+            hpx::components::server::distributed_metadata_base<
+                server::partitioned_vector_config_data>>
+            base_type;
 
         typedef hpx::server::partitioned_vector<T, Data>
             partitioned_vector_partition_server;
@@ -183,22 +186,24 @@ namespace hpx
         struct partition_data
           : server::partitioned_vector_config_data::partition_data
         {
-            typedef
-                server::partitioned_vector_config_data::partition_data
+            typedef server::partitioned_vector_config_data::partition_data
                 base_type;
 
             partition_data()
               : base_type()
-            {}
+            {
+            }
 
             partition_data(id_type const& part, std::size_t size,
-                    std::uint32_t locality_id)
+                std::uint32_t locality_id)
               : base_type(part, size, locality_id)
-            {}
+            {
+            }
 
-            partition_data(base_type && base)
+            partition_data(base_type&& base)
               : base_type(std::move(base))
-            {}
+            {
+            }
 
             std::shared_ptr<partitioned_vector_partition_server> local_data_;
         };
@@ -208,8 +213,8 @@ namespace hpx
         // size, and locality id.
         typedef std::vector<partition_data> partitions_vector_type;
 
-        size_type size_;                // overall size of the vector
-        size_type partition_size_;      // cached partition size
+        size_type size_;              // overall size of the vector
+        size_type partition_size_;    // cached partition size
 
         // This is the vector representing the base_index and corresponding
         // global ID's of the underlying partitioned_vector_partitions.
@@ -225,38 +230,38 @@ namespace hpx
         typedef segmented::const_local_vector_iterator<T, Data>
             const_local_iterator;
 
-        typedef segmented::segment_vector_iterator<
-                T, Data, typename partitions_vector_type::iterator
-            > segment_iterator;
-        typedef segmented::const_segment_vector_iterator<
-                T, Data, typename partitions_vector_type::const_iterator
-            > const_segment_iterator;
+        typedef segmented::segment_vector_iterator<T, Data,
+            typename partitions_vector_type::iterator>
+            segment_iterator;
+        typedef segmented::const_segment_vector_iterator<T, Data,
+            typename partitions_vector_type::const_iterator>
+            const_segment_iterator;
 
-        typedef segmented::local_segment_vector_iterator<
-                T, Data, typename partitions_vector_type::iterator
-            > local_segment_iterator;
-        typedef segmented::local_segment_vector_iterator<
-                T, Data, typename partitions_vector_type::const_iterator
-            > const_local_segment_iterator;
+        typedef segmented::local_segment_vector_iterator<T, Data,
+            typename partitions_vector_type::iterator>
+            local_segment_iterator;
+        typedef segmented::local_segment_vector_iterator<T, Data,
+            typename partitions_vector_type::const_iterator>
+            const_local_segment_iterator;
 
     private:
         friend class segmented::vector_iterator<T, Data>;
         friend class segmented::const_vector_iterator<T, Data>;
 
-        friend class segmented::segment_vector_iterator<
-            T, Data, typename partitions_vector_type::iterator>;
-        friend class segmented::const_segment_vector_iterator<
-            T, Data, typename partitions_vector_type::const_iterator>;
+        friend class segmented::segment_vector_iterator<T, Data,
+            typename partitions_vector_type::iterator>;
+        friend class segmented::const_segment_vector_iterator<T, Data,
+            typename partitions_vector_type::const_iterator>;
 
         std::size_t get_partition_size() const;
-        std::size_t get_global_index(std::size_t segment,
-            std::size_t part_size, size_type local_index) const;
+        std::size_t get_global_index(std::size_t segment, std::size_t part_size,
+            size_type local_index) const;
 
         ///////////////////////////////////////////////////////////////////////
         // Connect this vector to the existing vector using the given symbolic
         // name.
-        void get_data_helper(id_type id,
-            server::partitioned_vector_config_data data);
+        void get_data_helper(
+            id_type id, server::partitioned_vector_config_data data);
 
         // this will be called by the base class once the registered id becomes
         // available
@@ -272,7 +277,7 @@ namespace hpx
         void register_as(launch::sync_policy, std::string const& symbolic_name);
 
         // construct from id
-        partitioned_vector(future<id_type> && f);
+        partitioned_vector(future<id_type>&& f);
 
     public:
         // Return the sequence number of the segment corresponding to the
@@ -285,14 +290,14 @@ namespace hpx
 
         // Return the local indices inside the segment corresponding to the
         // given global indices
-        std::vector<size_type>
-        get_local_indices(std::vector<size_type> indices) const;
+        std::vector<size_type> get_local_indices(
+            std::vector<size_type> indices) const;
 
         // Return the global index corresponding to the local index inside the
         // given segment.
         template <typename SegmentIter>
-        std::size_t get_global_index(SegmentIter const& it,
-            size_type local_index) const
+        std::size_t get_global_index(
+            SegmentIter const& it, size_type local_index) const
         {
             std::size_t part_size = partition_size_;
             if (part_size == std::size_t(-1) || part_size == 0)
@@ -325,26 +330,25 @@ namespace hpx
 
     protected:
         /// \cond NOINTERNAL
-        typedef std::pair<hpx::id_type, std::vector<hpx::id_type> >
+        typedef std::pair<hpx::id_type, std::vector<hpx::id_type>>
             bulk_locality_result;
         /// \endcond
 
         template <typename DistPolicy>
-        static hpx::future<std::vector<bulk_locality_result> >
-        create_helper1(DistPolicy const& policy, std::size_t count,
-            std::size_t size);
+        static hpx::future<std::vector<bulk_locality_result>> create_helper1(
+            DistPolicy const& policy, std::size_t count, std::size_t size);
 
         template <typename DistPolicy>
-        static hpx::future<std::vector<bulk_locality_result> >
-        create_helper2(DistPolicy const& policy, std::size_t count,
-            std::size_t size, T const& val);
+        static hpx::future<std::vector<bulk_locality_result>> create_helper2(
+            DistPolicy const& policy, std::size_t count, std::size_t size,
+            T const& val);
 
         struct get_ptr_helper;
 
         // This function is called when we are creating the vector. It
         // initializes the partitions based on the give parameters.
         template <typename DistPolicy, typename Create>
-        void create(DistPolicy const& policy, Create && creator);
+        void create(DistPolicy const& policy, Create&& creator);
 
         template <typename DistPolicy>
         void create(DistPolicy const& policy);
@@ -389,9 +393,9 @@ namespace hpx
         ///
         template <typename DistPolicy>
         partitioned_vector(size_type size, DistPolicy const& policy,
-                typename std::enable_if<
-                    traits::is_distribution_policy<DistPolicy>::value
-                >::type* = nullptr);
+            typename std::enable_if<
+                traits::is_distribution_policy<DistPolicy>::value>::type* =
+                nullptr);
 
         /// Constructor which create and initialize vector with the
         /// given \a where all elements are initialized with \a val and
@@ -407,24 +411,24 @@ namespace hpx
         partitioned_vector(size_type size, T const& val,
             DistPolicy const& policy,
             typename std::enable_if<
-                traits::is_distribution_policy<DistPolicy>::value
-            >::type* = nullptr);
+                traits::is_distribution_policy<DistPolicy>::value>::type* =
+                nullptr);
 
         /// Copy construction performs a deep copy of the right hand side
         /// vector.
         partitioned_vector(partitioned_vector const& rhs)
-          : base_type(),
-            size_(0)
+          : base_type()
+          , size_(0)
         {
             if (rhs.size_ != 0)
                 copy_from(rhs);
         }
 
-        partitioned_vector(partitioned_vector && rhs)
-          : base_type(std::move(rhs)),
-            size_(rhs.size_),
-            partition_size_(rhs.partition_size_),
-            partitions_(std::move(rhs.partitions_))
+        partitioned_vector(partitioned_vector&& rhs)
+          : base_type(std::move(rhs))
+          , size_(rhs.size_)
+          , partition_size_(rhs.partition_size_)
+          , partitions_(std::move(rhs.partitions_))
         {
             rhs.size_ = 0;
             rhs.partition_size_ = std::size_t(-1);
@@ -474,11 +478,12 @@ namespace hpx
             return *this;
         }
 
-        partitioned_vector& operator=(partitioned_vector && rhs)
+        partitioned_vector& operator=(partitioned_vector&& rhs)
         {
             if (this != &rhs)
             {
-                this->base_type::operator=(std::move(static_cast<base_type&&>(rhs)));
+                this->base_type::operator=(
+                    std::move(static_cast<base_type&&>(rhs)));
 
                 size_ = rhs.size_;
                 partition_size_ = rhs.partition_size_;
@@ -515,8 +520,8 @@ namespace hpx
         ///
         T get_value(launch::sync_policy, size_type pos) const
         {
-            return get_value(launch::sync, get_partition(pos),
-                get_local_index(pos));
+            return get_value(
+                launch::sync, get_partition(pos), get_local_index(pos));
         }
 
         /// Returns the element at position \a pos in the vector container.
@@ -568,7 +573,8 @@ namespace hpx
             }
 
             return partitioned_vector_partition_client(
-                partitions_[part].partition_).get_value(pos);
+                partitions_[part].partition_)
+                .get_value(pos);
         }
 
         /// Returns the elements at the positions \a pos from the given
@@ -580,8 +586,7 @@ namespace hpx
         /// \return Returns the value of the element at position represented by
         ///         \a pos.
         ///
-        std::vector<T>
-        get_values(launch::sync_policy, size_type part,
+        std::vector<T> get_values(launch::sync_policy, size_type part,
             std::vector<size_type> const& pos) const
         {
             partition_data const& part_data = partitions_[part];
@@ -601,12 +606,13 @@ namespace hpx
         /// \return Returns the hpx::future to values of the elements at the
         ///         given positions represented by \a pos.
         ///
-        future<std::vector<T> >
-        get_values(size_type part, std::vector<size_type> const& pos) const
+        future<std::vector<T>> get_values(
+            size_type part, std::vector<size_type> const& pos) const
         {
             partition_data const& part_data = partitions_[part];
             if (part_data.local_data_)
-                return make_ready_future(part_data.local_data_->get_values(pos));
+                return make_ready_future(
+                    part_data.local_data_->get_values(pos));
 
             return partitioned_vector_partition_client(part_data.partition_)
                 .get_values(pos);
@@ -620,8 +626,8 @@ namespace hpx
         /// \return Returns the value of the element at position represented by
         ///         \a pos.
         ///
-        future<std::vector<T> >
-        get_values(std::vector<size_type> const & pos_vec) const
+        future<std::vector<T>> get_values(
+            std::vector<size_type> const& pos_vec) const
         {
             // check if position vector is empty
             // the following code needs at least one element.
@@ -636,9 +642,10 @@ namespace hpx
                 pos_vec.begin();
 
             // vector holding futures of the values for all blocks
-            std::vector<future<std::vector<T> > > part_values_future;
+            std::vector<future<std::vector<T>>> part_values_future;
             for (typename std::vector<size_type>::const_iterator it =
-                    pos_vec.begin(); it != pos_vec.end(); ++it)
+                     pos_vec.begin();
+                 it != pos_vec.end(); ++it)
             {
                 // get the partition of the current position
                 size_type part = get_partition(*it);
@@ -656,7 +663,8 @@ namespace hpx
                     // of the same partition ('part').
                     // get async values for this block
                     part_values_future.push_back(get_values(part_cur,
-                        get_local_indices(std::vector<size_type>(part_begin, it))));
+                        get_local_indices(
+                            std::vector<size_type>(part_begin, it))));
 
                     // reset block variables to start a new one from here
                     part_cur = part;
@@ -667,31 +675,30 @@ namespace hpx
             // the end of the vector is also an end of a block
             // get async values for this block
             part_values_future.push_back(get_values(part_cur,
-                get_local_indices(std::vector<size_type>(
-                    part_begin, pos_vec.end()))));
+                get_local_indices(
+                    std::vector<size_type>(part_begin, pos_vec.end()))));
 
             // This helper function unwraps the vectors from each partition
             // and merge them to one vector
             auto merge_func =
-                [&pos_vec](std::vector<future<std::vector<T> > > && part_values_f)
-                    -> std::vector<T>
-                {
-                    std::vector<T> values;
-                    values.reserve(pos_vec.size());
+                [&pos_vec](std::vector<future<std::vector<T>>>&& part_values_f)
+                -> std::vector<T> {
+                std::vector<T> values;
+                values.reserve(pos_vec.size());
 
-                    for (future<std::vector<T> >& part_f: part_values_f)
-                    {
-                        std::vector<T> part_values = part_f.get();
-                        std::move(part_values.begin(), part_values.end(),
-                            std::back_inserter(values));
-                    }
-                    return values;
-                };
+                for (future<std::vector<T>>& part_f : part_values_f)
+                {
+                    std::vector<T> part_values = part_f.get();
+                    std::move(part_values.begin(), part_values.end(),
+                        std::back_inserter(values));
+                }
+                return values;
+            };
 
             // when all values are here merge them to one vector
             // and return a future to this vector
-            return dataflow(launch::async, merge_func,
-                std::move(part_values_future));
+            return dataflow(
+                launch::async, merge_func, std::move(part_values_future));
         }
 
         /// Returns the elements at the positions \a pos
@@ -702,148 +709,147 @@ namespace hpx
         /// \return Returns the value of the element at position represented by
         ///         \a pos.
         ///
-        std::vector<T>
-        get_values(launch::sync_policy,
-            std::vector<size_type> const & pos_vec) const
+        std::vector<T> get_values(
+            launch::sync_policy, std::vector<size_type> const& pos_vec) const
         {
             return get_values(pos_vec).get();
         }
 
-//         //FRONT (never throws exception)
-//         /** @brief Access the value of first element in the vector.
-//          *
-//          *  Calling the function on empty container cause undefined behavior.
-//          *
-//          * @return Return the value of the first element in the vector
-//          */
-//         VALUE_TYPE front() const
-//         {
-//             return partitioned_vector_partition_stub::front_async(
-//                                     (partitions_.front().first).get()
-//                                                   ).get();
-//         }//end of front_value
-//
-//         /** @brief Asynchronous API for front().
-//          *
-//          *  Calling the function on empty container cause undefined behavior.
-//          *
-//          * @return Return the hpx::future to return value of front()
-//          */
-//         hpx::future< VALUE_TYPE > front_async() const
-//         {
-//             return partitioned_vector_partition_stub::front_async(
-//                                     (partitions_.front().first).get()
-//                                                   );
-//         }//end of front_async
-//
-//         //BACK (never throws exception)
-//         /** @brief Access the value of last element in the vector.
-//          *
-//          *  Calling the function on empty container cause undefined behavior.
-//          *
-//          * @return Return the value of the last element in the vector
-//          */
-//         VALUE_TYPE back() const
-//         {
-//             // As the LAST pair is there and then decrement operator to that
-//             // LAST is undefined hence used the end() function rather than back()
-//             return partitioned_vector_partition_stub::back_async(
-//                             ((partitions_.end() - 2)->first).get()
-//                                                  ).get();
-//         }//end of back_value
-//
-//         /** @brief Asynchronous API for back().
-//          *
-//          *  Calling the function on empty container cause undefined behavior.
-//          *
-//          * @return Return hpx::future to the return value of back()
-//          */
-//         hpx::future< VALUE_TYPE > back_async() const
-//         {
-//             //As the LAST pair is there
-//             return partitioned_vector_partition_stub::back_async(
-//                             ((partitions_.end() - 2)->first).get()
-//                                                  );
-//         }//end of back_async
-//
-//         //
-//         // Modifier component action
-//         //
-//
-//         //ASSIGN
-//         /** @brief Assigns new contents to each partition, replacing its
-//          *          current contents and modifying each partition size
-//          *          accordingly.
-//          *
-//          *  @param n     New size of each partition
-//          *  @param val   Value to fill the partition with
-//          *
-//          *  @exception hpx::invalid_vector_error If the \a n is equal to zero
-//          *              then it throw \a hpx::invalid_vector_error exception.
-//          */
-//         void assign(size_type n, VALUE_TYPE const& val)
-//         {
-//             if(n == 0)
-//                 HPX_THROW_EXCEPTION(
-//                     hpx::invalid_vector_error,
-//                     "assign",
-//                     "Invalid Vector: new_partition_size should be greater than zero"
-//                                     );
-//
-//             std::vector<future<void>> assign_lazy_sync;
-//             for (partition_description_type const& p,
-//                 util::make_iterator_range(partitions_.begin(),
-//                                            partitions_.end() - 1)
-//                 )
-//             {
-//                 assign_lazy_sync.push_back(
-//                     partitioned_vector_partition_stub::assign_async(
-//                          (p.first).get(), n, val)
-//                                           );
-//             }
-//             hpx::wait_all(assign_lazy_sync);
-//             adjust_base_index(partitions_.begin(),
-//                               partitions_.end() - 1,
-//                               n);
-//         }//End of assign
-//
-//         /** @brief Asynchronous API for assign().
-//          *
-//          *  @param n     New size of each partition
-//          *  @param val   Value to fill the partition with
-//          *
-//          *  @exception hpx::invalid_vector_error If the \a n is equal to zero
-//          *              then it throw \a hpx::invalid_vector_error exception.
-//          *
-//          *  @return This return the hpx::future of type void [The void return
-//          *           type can help to check whether the action is completed or
-//          *           not]
-//          */
-//         future<void> assign_async(size_type n, VALUE_TYPE const& val)
-//         {
-//             return hpx::async(launch::async,
-//                               &vector::assign,
-//                               this,
-//                               n,
-//                               val
-//                               );
-//         }
-//
-//         //PUSH_BACK
-//         /** @brief Add new element at the end of vector. The added element
-//          *          contain the \a val as value.
-//          *
-//          *  The value is added to the back to the last partition.
-//          *
-//          *  @param val Value to be copied to new element
-//          */
-//         void push_back(VALUE_TYPE const& val)
-//         {
-//             partitioned_vector_partition_stub::push_back_async(
-//                             ((partitions_.end() - 2 )->first).get(),
-//                                                 val
-//                                                 ).get();
-//         }
+        // //FRONT (never throws exception)
+        // /** @brief Access the value of first element in the vector.
+        //  *
+        //  *  Calling the function on empty container cause undefined behavior.
+        //  *
+        //  * @return Return the value of the first element in the vector
+        //  */
+        // VALUE_TYPE front() const
+        // {
+        //     return partitioned_vector_partition_stub::front_async(
+        //                             (partitions_.front().first).get()
+        //                                           ).get();
+        // }//end of front_value
+        //
+        // /** @brief Asynchronous API for front().
+        //  *
+        //  *  Calling the function on empty container cause undefined behavior.
+        //  *
+        //  * @return Return the hpx::future to return value of front()
+        //  */
+        // hpx::future< VALUE_TYPE > front_async() const
+        // {
+        //     return partitioned_vector_partition_stub::front_async(
+        //                             (partitions_.front().first).get()
+        //                                           );
+        // }//end of front_async
+        //
+        // //BACK (never throws exception)
+        // /** @brief Access the value of last element in the vector.
+        //  *
+        //  *  Calling the function on empty container cause undefined behavior.
+        //  *
+        //  * @return Return the value of the last element in the vector
+        //  */
+        // VALUE_TYPE back() const
+        // {
+        //     // As the LAST pair is there and then decrement operator to that
+        //     // LAST is undefined hence used the end() function rather than back()
+        //     return partitioned_vector_partition_stub::back_async(
+        //                     ((partitions_.end() - 2)->first).get()
+        //                                          ).get();
+        // }//end of back_value
+        //
+        // /** @brief Asynchronous API for back().
+        //  *
+        //  *  Calling the function on empty container cause undefined behavior.
+        //  *
+        //  * @return Return hpx::future to the return value of back()
+        //  */
+        // hpx::future< VALUE_TYPE > back_async() const
+        // {
+        //     //As the LAST pair is there
+        //     return partitioned_vector_partition_stub::back_async(
+        //                     ((partitions_.end() - 2)->first).get()
+        //                                          );
+        // }//end of back_async
+        //
+        // //
+        // // Modifier component action
+        // //
+        //
+        // //ASSIGN
+        // /** @brief Assigns new contents to each partition, replacing its
+        //  *          current contents and modifying each partition size
+        //  *          accordingly.
+        //  *
+        //  *  @param n     New size of each partition
+        //  *  @param val   Value to fill the partition with
+        //  *
+        //  *  @exception hpx::invalid_vector_error If the \a n is equal to zero
+        //  *              then it throw \a hpx::invalid_vector_error exception.
+        //  */
+        // void assign(size_type n, VALUE_TYPE const& val)
+        // {
+        //     if(n == 0)
+        //         HPX_THROW_EXCEPTION(
+        //             hpx::invalid_vector_error,
+        //             "assign",
+        //             "Invalid Vector: new_partition_size should be greater than zero"
+        //                             );
+        //
+        //     std::vector<future<void>> assign_lazy_sync;
+        //     for (partition_description_type const& p,
+        //         util::make_iterator_range(partitions_.begin(),
+        //                                    partitions_.end() - 1)
+        //         )
+        //     {
+        //         assign_lazy_sync.push_back(
+        //             partitioned_vector_partition_stub::assign_async(
+        //                  (p.first).get(), n, val)
+        //                                   );
+        //     }
+        //     hpx::wait_all(assign_lazy_sync);
+        //     adjust_base_index(partitions_.begin(),
+        //                       partitions_.end() - 1,
+        //                       n);
+        // }//End of assign
+        //
+        // /** @brief Asynchronous API for assign().
+        //  *
+        //  *  @param n     New size of each partition
+        //  *  @param val   Value to fill the partition with
+        //  *
+        //  *  @exception hpx::invalid_vector_error If the \a n is equal to zero
+        //  *              then it throw \a hpx::invalid_vector_error exception.
+        //  *
+        //  *  @return This return the hpx::future of type void [The void return
+        //  *           type can help to check whether the action is completed or
+        //  *           not]
+        //  */
+        // future<void> assign_async(size_type n, VALUE_TYPE const& val)
+        // {
+        //     return hpx::async(launch::async,
+        //                       &vector::assign,
+        //                       this,
+        //                       n,
+        //                       val
+        //                       );
+        // }
+        //
+        // //PUSH_BACK
+        // /** @brief Add new element at the end of vector. The added element
+        //  *          contain the \a val as value.
+        //  *
+        //  *  The value is added to the back to the last partition.
+        //  *
+        //  *  @param val Value to be copied to new element
+        //  */
+        // void push_back(VALUE_TYPE const& val)
+        // {
+        //     partitioned_vector_partition_stub::push_back_async(
+        //                     ((partitions_.end() - 2 )->first).get(),
+        //                                         val
+        //                                         ).get();
+        // }
 
         /// Copy the value of \a val in the element at position \a pos in
         /// the vector container.
@@ -852,7 +858,7 @@ namespace hpx
         /// \param val   The value to be copied
         ///
         template <typename T_>
-        void set_value(launch::sync_policy, size_type pos, T_ && val)
+        void set_value(launch::sync_policy, size_type pos, T_&& val)
         {
             return set_value(launch::sync, get_partition(pos),
                 get_local_index(pos), std::forward<T_>(val));
@@ -866,8 +872,8 @@ namespace hpx
         /// \param val   The value to be copied
         ///
         template <typename T_>
-        void set_value(launch::sync_policy, size_type part, size_type pos,
-            T_ && val)
+        void set_value(
+            launch::sync_policy, size_type part, size_type pos, T_&& val)
         {
             partition_data const& part_data = partitions_[part];
             if (part_data.local_data_)
@@ -891,7 +897,7 @@ namespace hpx
         ///         once the operation is finished.
         ///
         template <typename T_>
-        future<void> set_value(size_type pos, T_ && val)
+        future<void> set_value(size_type pos, T_&& val)
         {
             return set_value(get_partition(pos), get_local_index(pos),
                 std::forward<T_>(val));
@@ -908,7 +914,7 @@ namespace hpx
         ///         once the operation is finished.
         ///
         template <typename T_>
-        future<void> set_value(size_type part, size_type pos, T_ && val)
+        future<void> set_value(size_type part, size_type pos, T_&& val)
         {
             partition_data const& part_data = partitions_[part];
             if (part_data.local_data_)
@@ -944,9 +950,8 @@ namespace hpx
         /// \return This returns the hpx::future of type void which gets ready
         ///         once the operation is finished.
         ///
-        future<void>
-        set_values(size_type part, std::vector<size_type> const& pos,
-            std::vector<T> const& val)
+        future<void> set_values(size_type part,
+            std::vector<size_type> const& pos, std::vector<T> const& val)
         {
             HPX_ASSERT(pos.size() == val.size());
 
@@ -957,7 +962,8 @@ namespace hpx
             }
 
             return partitioned_vector_partition_client(
-                partitions_[part].partition_).set_values(pos, val);
+                partitions_[part].partition_)
+                .set_values(pos, val);
         }
 
         /// Asynchronously set the element at position \a pos
@@ -969,8 +975,8 @@ namespace hpx
         /// \return This returns the hpx::future of type void which gets ready
         ///         once the operation is finished.
         ///
-        future<void>
-        set_values(std::vector<size_type> const& pos, std::vector<T> const& val)
+        future<void> set_values(
+            std::vector<size_type> const& pos, std::vector<T> const& val)
         {
             HPX_ASSERT(pos.size() == val.size());
 
@@ -985,13 +991,15 @@ namespace hpx
             // iterator to the begin of current block
             typename std::vector<size_type>::const_iterator pos_block_begin =
                 pos.begin();
-            typename std::vector<T>::const_iterator val_block_begin = val.begin();
+            typename std::vector<T>::const_iterator val_block_begin =
+                val.begin();
 
             // vector holding futures of the state for all blocks
-            std::vector<future<void> > part_futures;
+            std::vector<future<void>> part_futures;
 
             // going through the position vector
-            typename std::vector<size_type>::const_iterator pos_it = pos.begin();
+            typename std::vector<size_type>::const_iterator pos_it =
+                pos.begin();
             typename std::vector<T>::const_iterator val_it = val.begin();
             for (/**/; pos_it != pos.end(); ++pos_it, ++val_it)
             {
@@ -1011,8 +1019,8 @@ namespace hpx
                     // of the same partition ('part').
                     // set asynchronous values for this block
                     part_futures.push_back(set_values(part_cur,
-                        get_local_indices(std::vector<size_type>(
-                            pos_block_begin, pos_it)),
+                        get_local_indices(
+                            std::vector<size_type>(pos_block_begin, pos_it)),
                         std::vector<T>(val_block_begin, val_it)));
 
                     // reset block variables to start a new one from here
@@ -1025,8 +1033,8 @@ namespace hpx
             // the end of the vector is also an end of a block
             // get asynchronous values for this block
             part_futures.push_back(set_values(part_cur,
-                get_local_indices(std::vector<size_type>(
-                    pos_block_begin, pos.end())),
+                get_local_indices(
+                    std::vector<size_type>(pos_block_begin, pos.end())),
                 std::vector<T>(val_block_begin, val.end())));
 
             return when_all(part_futures);
@@ -1038,20 +1046,22 @@ namespace hpx
             return set_values(pos, val).get();
         }
 
-//   //CLEAR
-//   //TODO if number of partitions is kept constant every time then
-//   // clear should modified (clear each partitioned_vector_partition one by one).
-//     void clear()
-//     {
-//         //It is keeping one gid hence iterator does not go
-//         //in an invalid state
-//         partitions_.erase(partitions_.begin() + 1,
-//                                    partitions_.end()-1);
-//         partitioned_vector_partition_stub::clear_async((partitions_[0].second).get())
-//                 .get();
-//         HPX_ASSERT(partitions_.size() > 1);
-//         //As this function changes the size we should have LAST always.
-//     }
+        // //CLEAR
+        // //TODO if number of partitions is kept constant every time then
+        // // clear should modified (clear each partitioned_vector_partition
+        // // one by one).
+        //   void clear()
+        //   {
+        //       //It is keeping one gid hence iterator does not go
+        //       //in an invalid state
+        //       partitions_.erase(partitions_.begin() + 1,
+        //                                  partitions_.end()-1);
+        //       partitioned_vector_partition_stub::clear_async(
+        //          (partitions_[0].second).get())
+        //               .get();
+        //       HPX_ASSERT(partitions_.size() > 1);
+        //       //As this function changes the size we should have LAST always.
+        //   }
 
         ///////////////////////////////////////////////////////////////////////
         /// Return the iterator at the beginning of the first segment located
@@ -1103,14 +1113,16 @@ namespace hpx
         /// vector on the given locality.
         const_iterator begin(std::uint32_t id) const
         {
-            return const_iterator(this, get_global_index(segment_cbegin(id), 0));
+            return const_iterator(
+                this, get_global_index(segment_cbegin(id), 0));
         }
 
         /// Return the iterator at the beginning of the first partition of the
         /// vector on the given locality.
         const_iterator cbegin(std::uint32_t id) const
         {
-            return const_iterator(this, get_global_index(segment_cbegin(id), 0));
+            return const_iterator(
+                this, get_global_index(segment_cbegin(id), 0));
         }
 
         /// Return the iterator at the end of the last partition of the
@@ -1195,7 +1207,7 @@ namespace hpx
             return const_segment_iterator(partitions_.cbegin(), this);
         }
 
-        const_segment_iterator segment_cbegin() const //-V524
+        const_segment_iterator segment_cbegin() const    //-V524
         {
             return const_segment_iterator(partitions_.cbegin(), this);
         }
@@ -1210,7 +1222,7 @@ namespace hpx
             return const_segment_iterator(partitions_.cend(), this);
         }
 
-        const_segment_iterator segment_cend() const //-V524
+        const_segment_iterator segment_cend() const    //-V524
         {
             return const_segment_iterator(partitions_.cend(), this);
         }
@@ -1219,20 +1231,20 @@ namespace hpx
         // Return local segment iterator
         local_segment_iterator segment_begin(std::uint32_t id)
         {
-            return local_segment_iterator(partitions_.begin(),
-                partitions_.end(), id);
+            return local_segment_iterator(
+                partitions_.begin(), partitions_.end(), id);
         }
 
         const_local_segment_iterator segment_begin(std::uint32_t id) const
         {
-            return const_local_segment_iterator(partitions_.cbegin(),
-                partitions_.cend(), id);
+            return const_local_segment_iterator(
+                partitions_.cbegin(), partitions_.cend(), id);
         }
 
         const_local_segment_iterator segment_cbegin(std::uint32_t id) const
         {
-            return const_local_segment_iterator(partitions_.cbegin(),
-                partitions_.cend(), id);
+            return const_local_segment_iterator(
+                partitions_.cbegin(), partitions_.cend(), id);
         }
 
         local_segment_iterator segment_end(std::uint32_t id)
@@ -1293,5 +1305,4 @@ namespace hpx
             return segment_cend(naming::get_locality_id_from_id(id));
         }
     };
-}
-
+}    // namespace hpx

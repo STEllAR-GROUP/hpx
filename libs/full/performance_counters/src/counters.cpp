@@ -18,11 +18,11 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/performance_counters/base_performance_counter.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/counter_interface.hpp>
 #include <hpx/performance_counters/counter_parser.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_local/get_num_all_localities.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
@@ -1167,15 +1167,17 @@ namespace hpx { namespace performance_counters {
                 lcos::future<naming::id_type> f;
                 if (p.parentinstanceindex_ >= 0)
                 {
-                    f = runtime_support::create_performance_counter_async(
+                    f = create_performance_counter_async(
                         naming::get_id_from_locality_id(
                             static_cast<std::uint32_t>(p.parentinstanceindex_)),
                         complemented_info);
                 }
                 else
                 {
-                    f = runtime_support::create_performance_counter_async(
-                        find_here(), complemented_info);
+                    f = create_performance_counter_async(
+                        naming::get_id_from_locality_id(
+                            agas::get_locality_id()),
+                        complemented_info);
                 }
 
                 // attach the function which registers the id_type with AGAS
@@ -1204,7 +1206,7 @@ namespace hpx { namespace performance_counters {
     lcos::future<naming::id_type> get_counter_async(
         std::string name, error_code& ec)
     {
-        ensure_counter_prefix(name);    // pre-pend prefix, if necessary
+        ensure_counter_prefix(name);    // prepend prefix, if necessary
 
         counter_info info(name);    // set full counter name
         return get_counter_async(info, ec);

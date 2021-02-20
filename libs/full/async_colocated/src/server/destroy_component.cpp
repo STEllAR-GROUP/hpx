@@ -65,13 +65,13 @@ namespace hpx { namespace components { namespace server {
 
     ///////////////////////////////////////////////////////////////////////////
     // initialize AGAS interface function pointers in components_base module
-    struct HPX_EXPORT init_interface_functions
+    struct HPX_EXPORT destroy_interface_function
     {
-        init_interface_functions()
+        destroy_interface_function()
         {
             agas::detail::destroy_component = &destroy_component;
         }
     };
 
-    init_interface_functions init;
+    destroy_interface_function destroy_init;
 }}}    // namespace hpx::components::server

@@ -21,6 +21,7 @@ set(actions_headers
     hpx/actions/base_action.hpp
     hpx/actions/continuation_fwd.hpp
     hpx/actions/continuation.hpp
+    hpx/actions/invoke_function.hpp
     hpx/actions/register_action.hpp
     hpx/actions/set_lco_value_continuation.hpp
     hpx/actions/transfer_base_action.hpp
@@ -46,6 +47,7 @@ set(actions_compat_headers
     hpx/runtime/actions/transfer_base_action.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions/transfer_continuation_action.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions/trigger.hpp => hpx/modules/actions.hpp
+    hpx/runtime/components/server/invoke_function.hpp => hpx/modules/actions.hpp
     hpx/traits/action_continuation.hpp => hpx/modules/actions.hpp
     hpx/traits/action_decorate_continuation.hpp => hpx/modules/actions.hpp
 )

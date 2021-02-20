@@ -5,13 +5,12 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 include(HPX_Message)
-include(HPX_Option)
 
 if(NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
   return()
 endif()
 
-if(HPX_RUNTIME_COMPONENTS_WITH_TESTS)
+if(HPX_WITH_TESTS)
   if(HPX_WITH_TESTS_UNIT)
     add_hpx_pseudo_target(tests.unit.modules.runtime_components)
     add_hpx_pseudo_dependencies(

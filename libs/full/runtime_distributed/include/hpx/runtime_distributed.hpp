@@ -13,12 +13,12 @@
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
-#include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/runtime_components/server/console_error_sink_singleton.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
+#include <hpx/runtime_distributed/server/runtime_support.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/util/generate_unique_ids.hpp>

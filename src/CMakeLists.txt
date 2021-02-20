@@ -24,14 +24,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/agas/server/route.cpp
     runtime/applier/applier.cpp
     runtime/components/binpacking_distribution_policy.cpp
-    runtime/components/console_error_sink.cpp
-    runtime/components/console_logging.cpp
-    runtime/components/runtime_support.cpp
-    runtime/components/server/console_error_sink_server.cpp
-    runtime/components/server/console_error_sink_singleton.cpp
-    runtime/components/server/console_logging_server.cpp
-    runtime/components/server/runtime_support_server.cpp
-    runtime/components/stubs/runtime_support_stubs.cpp
     runtime/get_locality_name.cpp
     runtime/parcelset/detail/parcel_await.cpp
     runtime/parcelset/detail/parcel_route_handler.cpp
@@ -119,19 +111,8 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/actions/lambda_to_action.hpp
     hpx/runtime/components/binpacking_distribution_policy.hpp
     hpx/runtime/components/colocating_distribution_policy.hpp
-    hpx/runtime/components/console_error_sink.hpp
-    hpx/runtime/components/console_logging.hpp
     hpx/runtime/components/default_distribution_policy.hpp
     hpx/runtime/components_fwd.hpp
-    hpx/runtime/components/runtime_support.hpp
-    hpx/runtime/components/server/console_error_sink.hpp
-    hpx/runtime/components/server/console_error_sink_singleton.hpp
-    hpx/runtime/components/server/console_logging.hpp
-    hpx/runtime/components/server/distributed_metadata_base.hpp
-    hpx/runtime/components/server/executor_component.hpp
-    hpx/runtime/components/server/invoke_function.hpp
-    hpx/runtime/components/server/runtime_support.hpp
-    hpx/runtime/components/stubs/runtime_support.hpp
     hpx/runtime/components/target_distribution_policy.hpp
     hpx/runtime/components/unwrapping_result_policy.hpp
     hpx/runtime/find_here.hpp

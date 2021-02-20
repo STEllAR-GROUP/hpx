@@ -38,8 +38,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace server
-{
+namespace hpx { namespace server {
     /// \brief This is the basic wrapper class for stl vector.
     ///
     /// This contain the implementation of the partitioned_vector_partition's
@@ -47,8 +46,7 @@ namespace hpx { namespace server
     template <typename T, typename Data>
     class partitioned_vector
       : public components::locking_hook<
-            components::component_base<partitioned_vector<T, Data> >
-        >
+            components::component_base<partitioned_vector<T, Data>>>
     {
     public:
         typedef Data data_type;
@@ -59,7 +57,7 @@ namespace hpx { namespace server
         typedef typename data_type::const_iterator const_iterator_type;
 
         typedef components::locking_hook<
-                components::component_base<partitioned_vector<T, Data> > >
+            components::component_base<partitioned_vector<T, Data>>>
             base_type;
 
         data_type partitioned_vector_partition_;
@@ -83,11 +81,11 @@ namespace hpx { namespace server
         partitioned_vector(size_type partition_size, T const& val);
 
         partitioned_vector(size_type partition_size, T const& val,
-                allocator_type const& alloc);
+            allocator_type const& alloc);
 
         // support components::copy
         partitioned_vector(partitioned_vector const& rhs);
-        partitioned_vector(partitioned_vector && rhs);
+        partitioned_vector(partitioned_vector&& rhs);
 
         ///////////////////////////////////////////////////////////////////////
         data_type& get_data();
@@ -97,7 +95,7 @@ namespace hpx { namespace server
         data_type get_copied_data() const;
 
         ///////////////////////////////////////////////////////////////////////
-        void set_data(data_type && other);
+        void set_data(data_type&& other);
 
         ///////////////////////////////////////////////////////////////////////
         iterator_type begin();
@@ -239,8 +237,8 @@ namespace hpx { namespace server
         ///
         /// \param val   The value to be copied
         ///
-        void set_values(std::vector<size_type> const& pos,
-            std::vector<T> const& val);
+        void set_values(
+            std::vector<size_type> const& pos, std::vector<T> const& val);
 
         /// Remove all elements from the vector leaving the
         /// partitioned_vector_partition with size 0.
@@ -250,89 +248,85 @@ namespace hpx { namespace server
         /// Macros to define HPX component actions for all exported functions.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, size);
 
-//         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, max_size);
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, max_size);
 
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, resize);
 
-//         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, capacity);
-//         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, empty);
-//         HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, reserve);
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, capacity);
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, empty);
+        // HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, reserve);
 
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_value);
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_values);
 
-//         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, front);
-//         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, back);
-//         HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, assign);
-//         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, push_back);
-//         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, pop_back);
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, front);
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, back);
+        // HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, assign);
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, push_back);
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, pop_back);
 
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_value);
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_values);
 
-//         HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, clear);
+        // HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, clear);
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_copied_data);
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_data);
     };
-}}
+}}    // namespace hpx::server
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(...)                      \
-    HPX_REGISTER_VECTOR_DECLARATION_(__VA_ARGS__)                             \
+#define HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(...)                       \
+    HPX_REGISTER_VECTOR_DECLARATION_(__VA_ARGS__)                              \
 /**/
-#define HPX_REGISTER_VECTOR_DECLARATION_(...)                                 \
-    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
-        HPX_REGISTER_VECTOR_DECLARATION_, HPX_PP_NARGS(__VA_ARGS__)           \
-    )(__VA_ARGS__))                                                           \
-/**/
+#define HPX_REGISTER_VECTOR_DECLARATION_(...)                                  \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_VECTOR_DECLARATION_,                 \
+        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
+    /**/
 
-#define HPX_REGISTER_VECTOR_DECLARATION_IMPL(type, name)                      \
-    HPX_REGISTER_ACTION_DECLARATION(type::get_value_action,                   \
-        HPX_PP_CAT(__vector_get_value_action_, name));                        \
-    HPX_REGISTER_ACTION_DECLARATION(type::get_values_action,                  \
-        HPX_PP_CAT(__vector_get_values_action_, name));                       \
-    HPX_REGISTER_ACTION_DECLARATION(type::set_value_action,                   \
-        HPX_PP_CAT(__vector_set_value_action_, name));                        \
-    HPX_REGISTER_ACTION_DECLARATION(type::set_values_action,                  \
-        HPX_PP_CAT(__vector_set_values_action_, name));                       \
-    HPX_REGISTER_ACTION_DECLARATION(type::size_action,                        \
-        HPX_PP_CAT(__vector_size_action_, name));                             \
-    HPX_REGISTER_ACTION_DECLARATION(type::resize_action,                      \
-        HPX_PP_CAT(__vector_resize_action_, name));                           \
-    HPX_REGISTER_ACTION_DECLARATION(type::get_copied_data_action,             \
-        HPX_PP_CAT(__vector_get_copied_data_action_, name));                  \
-    HPX_REGISTER_ACTION_DECLARATION(type::set_data_action,                    \
-        HPX_PP_CAT(__vector_set_data_action_, name));                         \
-/**/
+#define HPX_REGISTER_VECTOR_DECLARATION_IMPL(type, name)                       \
+    HPX_REGISTER_ACTION_DECLARATION(                                           \
+        type::get_value_action, HPX_PP_CAT(__vector_get_value_action_, name)); \
+    HPX_REGISTER_ACTION_DECLARATION(type::get_values_action,                   \
+        HPX_PP_CAT(__vector_get_values_action_, name));                        \
+    HPX_REGISTER_ACTION_DECLARATION(                                           \
+        type::set_value_action, HPX_PP_CAT(__vector_set_value_action_, name)); \
+    HPX_REGISTER_ACTION_DECLARATION(type::set_values_action,                   \
+        HPX_PP_CAT(__vector_set_values_action_, name));                        \
+    HPX_REGISTER_ACTION_DECLARATION(                                           \
+        type::size_action, HPX_PP_CAT(__vector_size_action_, name));           \
+    HPX_REGISTER_ACTION_DECLARATION(                                           \
+        type::resize_action, HPX_PP_CAT(__vector_resize_action_, name));       \
+    HPX_REGISTER_ACTION_DECLARATION(type::get_copied_data_action,              \
+        HPX_PP_CAT(__vector_get_copied_data_action_, name));                   \
+    HPX_REGISTER_ACTION_DECLARATION(                                           \
+        type::set_data_action, HPX_PP_CAT(__vector_set_data_action_, name));   \
+    /**/
 
-#define HPX_REGISTER_VECTOR_DECLARATION_1(type)                               \
-    HPX_REGISTER_VECTOR_DECLARATION_2(type, std::vector< type>)               \
+#define HPX_REGISTER_VECTOR_DECLARATION_1(type)                                \
+    HPX_REGISTER_VECTOR_DECLARATION_2(type, std::vector<type>)                 \
 /**/
-#define HPX_REGISTER_VECTOR_DECLARATION_2(type, data)                         \
-    HPX_REGISTER_VECTOR_DECLARATION_3(type, data, type)                       \
+#define HPX_REGISTER_VECTOR_DECLARATION_2(type, data)                          \
+    HPX_REGISTER_VECTOR_DECLARATION_3(type, data, type)                        \
 /**/
-#define HPX_REGISTER_VECTOR_DECLARATION_3(type, data, name)                   \
-    typedef ::hpx::server::partitioned_vector< type, data>                    \
-        HPX_PP_CAT(__partitioned_vector_, HPX_PP_CAT(type, name));            \
-    HPX_REGISTER_VECTOR_DECLARATION_IMPL(                                     \
-        HPX_PP_CAT(__partitioned_vector_, HPX_PP_CAT(type, name)), name)      \
-/**/
+#define HPX_REGISTER_VECTOR_DECLARATION_3(type, data, name)                    \
+    typedef ::hpx::server::partitioned_vector<type, data> HPX_PP_CAT(          \
+        __partitioned_vector_, HPX_PP_CAT(type, name));                        \
+    HPX_REGISTER_VECTOR_DECLARATION_IMPL(                                      \
+        HPX_PP_CAT(__partitioned_vector_, HPX_PP_CAT(type, name)), name)       \
+    /**/
 
-namespace hpx
-{
+namespace hpx {
     template <typename T, typename Data>
     class partitioned_vector_partition
-      : public components::client_base<
-            partitioned_vector_partition<T, Data>,
-            server::partitioned_vector<T, Data>
-        >
+      : public components::client_base<partitioned_vector_partition<T, Data>,
+            server::partitioned_vector<T, Data>>
     {
     private:
         typedef hpx::server::partitioned_vector<T, Data> server_type;
         typedef hpx::components::client_base<
-                partitioned_vector_partition<T, Data>,
-                server::partitioned_vector<T, Data>
-            > base_type;
+            partitioned_vector_partition<T, Data>,
+            server::partitioned_vector<T, Data>>
+            base_type;
 
     public:
         partitioned_vector_partition() = default;
@@ -343,7 +337,7 @@ namespace hpx
             hpx::shared_future<id_type> const& gid);
 
         // Return the pinned pointer to the underlying component
-        std::shared_ptr<server::partitioned_vector<T, Data> > get_ptr() const;
+        std::shared_ptr<server::partitioned_vector<T, Data>> get_ptr() const;
 
         ///////////////////////////////////////////////////////////////////////
         //  Capacity related API's in partitioned_vector_partition client class
@@ -361,15 +355,15 @@ namespace hpx
         ///
         std::size_t size() const;
 
-//         future<std::size_t> max_size_async() const
-//         {
-//             HPX_ASSERT(this->get_id());
-//             return this->base_type::max_size_async(this->get_id());
-//         }
-//         std::size_t max_size() const
-//         {
-//             return max_size_async().get();
-//         }
+        //         future<std::size_t> max_size_async() const
+        //         {
+        //             HPX_ASSERT(this->get_id());
+        //             return this->base_type::max_size_async(this->get_id());
+        //         }
+        //         std::size_t max_size() const
+        //         {
+        //             return max_size_async().get();
+        //         }
 
         /// Resize the partitioned_vector_partition component.
         /// If the \a val is not specified it use default constructor instead.
@@ -392,31 +386,31 @@ namespace hpx
         ///
         future<void> resize_async(std::size_t n, T const& val = T());
 
-//         future<std::size_t> capacity_async() const
-//         {
-//             HPX_ASSERT(this->get_id());
-//             return this->base_type::capacity_async(this->get_id());
-//         }
-//         std::size_t capacity() const
-//         {
-//             return capacity_async().get();
-//         }
+        //         future<std::size_t> capacity_async() const
+        //         {
+        //             HPX_ASSERT(this->get_id());
+        //             return this->base_type::capacity_async(this->get_id());
+        //         }
+        //         std::size_t capacity() const
+        //         {
+        //             return capacity_async().get();
+        //         }
 
-//         future<bool> empty_async() const
-//         {
-//             HPX_ASSERT(this->get_id());
-//             return this->base_type::empty_async(this->get_id());
-//         }
-//         bool empty() const
-//         {
-//             return empty_async().get();
-//         }
+        //         future<bool> empty_async() const
+        //         {
+        //             HPX_ASSERT(this->get_id());
+        //             return this->base_type::empty_async(this->get_id());
+        //         }
+        //         bool empty() const
+        //         {
+        //             return empty_async().get();
+        //         }
 
-//         void reserve(std::size_t n)
-//         {
-//             HPX_ASSERT(this->get_id());
-//             this->base_type::reserve_async(this->get_id(), n).get();
-//         }
+        //         void reserve(std::size_t n)
+        //         {
+        //             HPX_ASSERT(this->get_id());
+        //             this->base_type::reserve_async(this->get_id(), n).get();
+        //         }
 
         //  Element Access API's in Client class
 
@@ -447,8 +441,8 @@ namespace hpx
         /// \return Returns the value of the element at position represented
         ///         by \a pos
         ///
-        std::vector<T> get_values(launch::sync_policy,
-            std::vector<std::size_t> const& pos) const;
+        std::vector<T> get_values(
+            launch::sync_policy, std::vector<std::size_t> const& pos) const;
 
         /// Return the element at the position \a pos in the
         /// partitioned_vector_partition container.
@@ -457,50 +451,50 @@ namespace hpx
         ///
         /// \return This returns the value as the hpx::future
         ///
-        future<std::vector<T> >
-        get_values(std::vector<std::size_t> const& pos) const;
+        future<std::vector<T>> get_values(
+            std::vector<std::size_t> const& pos) const;
 
-//         future<T> front_async() const
-//         {
-//             HPX_ASSERT(this->get_id());
-//             return this->base_type::front_async(this->get_id());
-//         }
-//         T front() const
-//         {
-//             HPX_ASSERT(this->get_id());
-//             return front_async().get();
-//         }
+        // future<T> front_async() const
+        // {
+        //     HPX_ASSERT(this->get_id());
+        //     return this->base_type::front_async(this->get_id());
+        // }
+        // T front() const
+        // {
+        //     HPX_ASSERT(this->get_id());
+        //     return front_async().get();
+        // }
 
-//         future<T> back_async() const
-//         {
-//             HPX_ASSERT(this->get_id());
-//             return this->base_type::back_async(this->get_id());
-//         }
-//         T back() const
-//         {
-//             return back_async().get();
-//         }
+        // future<T> back_async() const
+        // {
+        //     HPX_ASSERT(this->get_id());
+        //     return this->base_type::back_async(this->get_id());
+        // }
+        // T back() const
+        // {
+        //     return back_async().get();
+        // }
 
         //  Modifiers API's in client class
-//         void assign(std::size_t n, T const& val)
-//         {
-//             HPX_ASSERT(this->get_id());
-//             this->base_type::assign_async(this->get_id(), n, val).get();
-//         }
+        // void assign(std::size_t n, T const& val)
+        // {
+        //     HPX_ASSERT(this->get_id());
+        //     this->base_type::assign_async(this->get_id(), n, val).get();
+        // }
 
-//         template <typename T_>
-//         void push_back(T_ && val)
-//         {
-//             HPX_ASSERT(this->get_id());
-//             this->base_type::push_back_async(
-//                 this->get_id(), std::forward<T_>(val)).get();
-//         }
+        // template <typename T_>
+        // void push_back(T_ && val)
+        // {
+        //     HPX_ASSERT(this->get_id());
+        //     this->base_type::push_back_async(
+        //         this->get_id(), std::forward<T_>(val)).get();
+        // }
 
-//         void pop_back()
-//         {
-//             HPX_ASSERT(this->get_id());
-//             this->base_type::pop_back_async(this->get_id()).get();
-//         }
+        // void pop_back()
+        // {
+        //     HPX_ASSERT(this->get_id());
+        //     this->base_type::pop_back_async(this->get_id()).get();
+        // }
 
         /// Copy the value of \a val in the element at position
         /// \a pos in the partitioned_vector_partition container.
@@ -508,7 +502,7 @@ namespace hpx
         /// \param pos   Position of the element in the partitioned_vector_partition
         /// \param val   The value to be copied
         ///
-        void set_value(launch::sync_policy, std::size_t pos, T && val);
+        void set_value(launch::sync_policy, std::size_t pos, T&& val);
         void set_value(launch::sync_policy, std::size_t pos, T const& val);
 
         /// Copy the value of \a val in the element at position
@@ -519,7 +513,7 @@ namespace hpx
         ///
         /// \return This returns the hpx::future of type void
         ///
-        future<void> set_value(std::size_t pos, T && val);
+        future<void> set_value(std::size_t pos, T&& val);
         future<void> set_value(std::size_t pos, T const& val);
 
         /// Copy the value of \a val in the element at position
@@ -539,21 +533,22 @@ namespace hpx
         ///
         /// \return This returns the hpx::future of type void
         ///
-        future<void> set_values(std::vector<std::size_t> const& pos,
-            std::vector<T> const& val);
+        future<void> set_values(
+            std::vector<std::size_t> const& pos, std::vector<T> const& val);
 
-//         void clear()
-//         {
-//             HPX_ASSERT(this->get_id());
-//             this->base_type::clear_async(this->get_id()).get();
-//         }
+        //         void clear()
+        //         {
+        //             HPX_ASSERT(this->get_id());
+        //             this->base_type::clear_async(this->get_id()).get();
+        //         }
 
         /// Returns a copy of the data owned by the partitioned_vector_partition
         /// component.
         ///
         /// \return This returns the data of the partitioned_vector_partition
         ///
-        typename server_type::data_type get_copied_data(launch::sync_policy) const;
+        typename server_type::data_type get_copied_data(
+            launch::sync_policy) const;
 
         /// Returns a copy of the data owned by the partitioned_vector_partition
         /// component.
@@ -567,8 +562,8 @@ namespace hpx
         ///
         /// \return This returns the data of the partition_vector
         ///
-        void set_data(launch::sync_policy,
-            typename server_type::data_type && other) const;
+        void set_data(
+            launch::sync_policy, typename server_type::data_type&& other) const;
 
         /// Updates the data owned by the partition_vector
         /// component.
@@ -578,7 +573,6 @@ namespace hpx
         hpx::future<void> set_data(
             typename server_type::data_type&& other) const;
     };
-}
+}    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
-
