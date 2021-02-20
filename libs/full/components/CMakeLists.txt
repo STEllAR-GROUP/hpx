@@ -34,7 +34,7 @@ set(components_compat_headers
 )
 # cmake-format: on
 
-set(components_sources basename_registration.cpp)
+set(components_sources basename_registration.cpp )
 
 include(HPX_AddModule)
 add_hpx_module(
@@ -45,6 +45,6 @@ add_hpx_module(
   HEADERS ${components_headers}
   COMPAT_HEADERS ${components_compat_headers}
   DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES hpx_actions_base hpx_components_base
+  MODULE_DEPENDENCIES hpx_actions_base hpx_components_base hpx_runtime_local
   CMAKE_SUBDIRS examples tests
 )

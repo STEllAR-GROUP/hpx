@@ -6,12 +6,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/runtime/components/component_factory_base.hpp>
-#include <hpx/runtime/components/component_startup_shutdown.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/modules/format.hpp>
+#include <hpx/components_base/component_startup_shutdown.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/performance_counters/manage_counter_type.hpp>
+#include <hpx/runtime_configuration/component_factory_base.hpp>
+#include <hpx/runtime_local/startup_function.hpp>
 
 #include <hpx/components/performance_counters/io/io_counters.hpp>
 

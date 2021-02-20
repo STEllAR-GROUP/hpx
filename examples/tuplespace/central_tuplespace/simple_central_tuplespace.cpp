@@ -7,7 +7,7 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
-#include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/runtime_components/component_factory.hpp>
 
 #include "server/simple_central_tuplespace.hpp"
 

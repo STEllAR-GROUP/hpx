@@ -24,7 +24,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/agas/server/route.cpp
     runtime/applier/applier.cpp
     runtime/components/binpacking_distribution_policy.cpp
-    runtime/components/component_registry.cpp
     runtime/components/console_error_sink.cpp
     runtime/components/console_logging.cpp
     runtime/components/runtime_support.cpp
@@ -120,17 +119,9 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/actions/lambda_to_action.hpp
     hpx/runtime/components/binpacking_distribution_policy.hpp
     hpx/runtime/components/colocating_distribution_policy.hpp
-    hpx/runtime/components/component_commandline_base.hpp
-    hpx/runtime/components/component_commandline.hpp
-    hpx/runtime/components/component_factory_base.hpp
-    hpx/runtime/components/component_factory.hpp
-    hpx/runtime/components/component_registry.hpp
-    hpx/runtime/components/component_startup_shutdown_base.hpp
-    hpx/runtime/components/component_startup_shutdown.hpp
     hpx/runtime/components/console_error_sink.hpp
     hpx/runtime/components/console_logging.hpp
     hpx/runtime/components/default_distribution_policy.hpp
-    hpx/runtime/components/derived_component_factory.hpp
     hpx/runtime/components_fwd.hpp
     hpx/runtime/components/runtime_support.hpp
     hpx/runtime/components/server/console_error_sink.hpp

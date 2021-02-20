@@ -8,7 +8,7 @@
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/components_base/server/component_base.hpp>
-#include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/runtime_components/component_factory.hpp>
 
 #include <hpx/components/component_storage/server/migrate_to_storage.hpp>
 

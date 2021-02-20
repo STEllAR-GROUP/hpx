@@ -15,7 +15,6 @@
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/type_support/unused.hpp>
 

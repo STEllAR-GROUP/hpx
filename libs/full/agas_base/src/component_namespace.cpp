@@ -11,7 +11,6 @@
 #include <hpx/agas_base/server/component_namespace.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/serialization/vector.hpp>
 
 using hpx::components::component_agas_component_namespace;

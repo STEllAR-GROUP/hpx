@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2017      Thomas Heller
 //  Copyright (c) 2011      Bryce Lelbach
 //
@@ -6,13 +6,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime/components/component_registry.hpp>
-
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/prefix/find_prefix.hpp>
+#include <hpx/runtime_components/component_registry.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>
 
@@ -21,8 +20,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace detail
-{
+namespace hpx { namespace components { namespace detail {
+
     void get_component_info(std::vector<std::string>& fillini,
         std::string const& filepath, bool is_static, char const* name,
         char const* component_string, factory_state_enum state,
@@ -33,16 +32,19 @@ namespace hpx { namespace components { namespace detail
 
         if (!is_static)
         {
-            if (filepath.empty()) {
+            if (filepath.empty())
+            {
                 fillini.emplace_back(std::string("path = ") +
                     util::find_prefixes("/hpx", component_string));
             }
-            else {
+            else
+            {
                 fillini.emplace_back(std::string("path = ") + filepath);
             }
         }
 
-        switch (state) {
+        switch (state)
+        {
         case factory_enabled:
             fillini.emplace_back("enabled = 1");
             break;
@@ -54,13 +56,16 @@ namespace hpx { namespace components { namespace detail
             break;
         }
 
-        if (is_static) {
+        if (is_static)
+        {
             fillini.emplace_back("static = 1");
         }
 
-        if (more) {
+        if (more)
+        {
             std::vector<std::string> data;
-            hpx::string_util::split(data, more, hpx::string_util::is_any_of("\n"));
+            hpx::string_util::split(
+                data, more, hpx::string_util::is_any_of("\n"));
             std::copy(data.begin(), data.end(), std::back_inserter(fillini));
         }
     }
@@ -78,8 +83,8 @@ namespace hpx { namespace components { namespace detail
             enabled_entry == "0")
         {
             LRT_(info) << "plugin factory disabled: " << name;
-            return false;     // this component has been disabled
+            return false;    // this component has been disabled
         }
         return true;
     }
-}}}
+}}}    // namespace hpx::components::detail

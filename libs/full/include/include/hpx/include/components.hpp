@@ -12,14 +12,12 @@
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/include/actions.hpp>
 
-#include <hpx/runtime/components/component_registry.hpp>
+#include <hpx/runtime_components/component_registry.hpp>
+#include <hpx/runtime_components/component_factory.hpp>
+#include <hpx/runtime_components/derived_component_factory.hpp>
 
-#include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/runtime/components/derived_component_factory.hpp>
-
-#include <hpx/runtime/components/component_commandline.hpp>
-#include <hpx/runtime/components/component_startup_shutdown.hpp>
-
+#include <hpx/components_base/component_commandline.hpp>
+#include <hpx/components_base/component_startup_shutdown.hpp>
 #include <hpx/components_base/component_type.hpp>
 
 #include <hpx/runtime/components/runtime_support.hpp>

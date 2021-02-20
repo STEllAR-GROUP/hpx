@@ -14,7 +14,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/runtime/components/derived_component_factory.hpp>
+#include <hpx/runtime_components/derived_component_factory.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_local/detail/serialize_exception.hpp>
 #include <hpx/type_support/unused.hpp>

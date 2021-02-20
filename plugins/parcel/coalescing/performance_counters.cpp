@@ -7,12 +7,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
+#include <hpx/components_base/component_startup_shutdown.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>

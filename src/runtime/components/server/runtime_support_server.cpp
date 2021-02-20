@@ -26,14 +26,14 @@
 #include <hpx/modules/timing.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/prefix/find_prefix.hpp>
-#include <hpx/runtime/components/component_commandline_base.hpp>
-#include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/runtime_configuration/component_commandline_base.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
+#include <hpx/runtime_local/component_startup_shutdown_base.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>

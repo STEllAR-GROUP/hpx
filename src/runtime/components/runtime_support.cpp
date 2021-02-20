@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
-#include <hpx/runtime/components/component_registry.hpp>
+#include <hpx/runtime_components/component_registry.hpp>
 
 #include <mutex>
 #include <utility>

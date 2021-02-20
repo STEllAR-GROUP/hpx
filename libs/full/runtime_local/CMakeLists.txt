@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(runtime_local_headers
+    hpx/runtime_local/component_startup_shutdown_base.hpp
     hpx/runtime_local/config_entry.hpp
     hpx/runtime_local/custom_exception_info.hpp
     hpx/runtime_local/debugging.hpp
@@ -44,6 +45,7 @@ set(runtime_local_compat_headers
     hpx/custom_exception_info.hpp => hpx/modules/runtime_local.hpp
     hpx/parallel/executors/pool_executor.hpp => hpx/include/parallel_executors.hpp
     hpx/parallel/executors/service_executors.hpp => hpx/include/parallel_executors.hpp
+    hpx/runtime/components/component_startup_shutdown_base.hpp => hpx/modules/runtime_local.hpp
     hpx/runtime/config_entry.hpp => hpx/modules/runtime_local.hpp
     hpx/runtime/get_locality_id.hpp => hpx/runtime.hpp
     hpx/runtime/get_os_thread_count.hpp => hpx/runtime.hpp

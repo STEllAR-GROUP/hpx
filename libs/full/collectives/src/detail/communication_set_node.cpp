@@ -19,7 +19,7 @@
 #include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parallel/container_algorithms/count.hpp>
-#include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/runtime_components/component_factory.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/get_num_localities.hpp>
 
