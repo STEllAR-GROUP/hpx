@@ -47,7 +47,7 @@ static hpx::config_registry::add_module_config_helper add_config{
 // linking statically only to this module.
 namespace hpx { namespace config_registry_cfg {
     extern config_registry::add_module_config_helper add_config;
-}}    // namespace hpx::config_registry
+}}    // namespace hpx::config_registry_cfg
 
 void* generated_module_configs[] = {&hpx::config_registry_cfg::add_config};
 
