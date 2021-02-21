@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/parallel/util/tagged_pair.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
@@ -147,9 +147,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIter, typename T1, typename T2,
         typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&&
-            hpx::traits::is_iterator<FwdIter>::value&&
-            traits::is_projected<Proj,FwdIter>::value&&
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter>::value &&
+            traits::is_projected<Proj,FwdIter>::value &&
             traits::is_indirect_callable<ExPolicy,std::equal_to<T1>,
                 traits::projected<Proj, FwdIter>,
                 traits::projected<Proj, T1 const*>>::value
@@ -309,9 +309,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIter, typename F, typename T,
         typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&&
-            hpx::traits::is_iterator<FwdIter>::value&&
-            traits::is_projected<Proj,FwdIter>::value&&
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter>::value &&
+            traits::is_projected<Proj,FwdIter>::value &&
             traits::is_indirect_callable<ExPolicy, F,
                 traits::projected<Proj, FwdIter>>::value)>
     // clang-format on
@@ -338,19 +338,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \cond NOINTERNAL
 
         // sequential replace_copy
-        template <typename InIter, typename OutIter, typename T, typename Proj>
-        inline std::pair<InIter, OutIter> sequential_replace_copy(InIter first,
-            InIter last, OutIter dest, T const& old_value, T const& new_value,
-            Proj&& proj)
+        template <typename InIter, typename Sent, typename OutIter, typename T,
+            typename Proj>
+        inline util::in_out_result<InIter, OutIter> sequential_replace_copy(
+            InIter first, Sent sent, OutIter dest, T const& old_value,
+            T const& new_value, Proj&& proj)
         {
-            for (/* */; first != last; ++first)
+            for (/* */; first != sent; ++first)
             {
                 if (hpx::util::invoke(proj, *first) == old_value)
                     *dest++ = new_value;
                 else
                     *dest++ = *first;
             }
-            return std::make_pair(first, dest);
+            return util::in_out_result<InIter, OutIter>(first, dest);
         }
 
         template <typename IterPair>
@@ -362,21 +363,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
             }
 
-            template <typename ExPolicy, typename InIter, typename OutIter,
-                typename T, typename Proj>
-            static std::pair<InIter, OutIter> sequential(ExPolicy, InIter first,
-                InIter last, OutIter dest, T const& old_value,
+            template <typename ExPolicy, typename InIter, typename Sent,
+                typename OutIter, typename T, typename Proj>
+            static util::in_out_result<InIter, OutIter> sequential(ExPolicy,
+                InIter first, Sent sent, OutIter dest, T const& old_value,
                 T const& new_value, Proj&& proj)
             {
-                return sequential_replace_copy(first, last, dest, old_value,
+                return sequential_replace_copy(first, sent, dest, old_value,
                     new_value, std::forward<Proj>(proj));
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-                typename T, typename Proj>
+            template <typename ExPolicy, typename FwdIter1, typename Sent,
+                typename FwdIter2, typename T, typename Proj>
             static typename util::detail::algorithm_result<ExPolicy,
-                std::pair<FwdIter1, FwdIter2>>::type
-            parallel(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+                util::in_out_result<FwdIter1, FwdIter2>>::type
+            parallel(ExPolicy&& policy, FwdIter1 first, Sent sent,
                 FwdIter2 dest, T const& old_value, T const& new_value,
                 Proj&& proj)
             {
@@ -384,19 +385,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     zip_iterator;
                 typedef typename zip_iterator::reference reference;
 
-                return get_iter_pair(for_each_n<zip_iterator>().call(
-                    std::forward<ExPolicy>(policy), std::false_type(),
-                    hpx::util::make_zip_iterator(first, dest),
-                    std::distance(first, last),
-                    [old_value, new_value, proj = std::forward<Proj>(proj)](
-                        reference t) -> void {
-                        using hpx::get;
-                        if (hpx::util::invoke(proj, get<0>(t)) == old_value)
-                            get<1>(t) = new_value;
-                        else
-                            get<1>(t) = get<0>(t);    //-V573
-                    },
-                    util::projection_identity()));
+                return util::detail::get_in_out_result(
+                    for_each_n<zip_iterator>().call(
+                        std::forward<ExPolicy>(policy), std::false_type(),
+                        hpx::util::make_zip_iterator(first, dest),
+                        detail::distance(first, sent),
+                        [old_value, new_value, proj = std::forward<Proj>(proj)](
+                            reference t) -> void {
+                            using hpx::get;
+                            if (hpx::util::invoke(proj, get<0>(t)) == old_value)
+                                get<1>(t) = new_value;
+                            else
+                                get<1>(t) = get<0>(t);    //-V573
+                        },
+                        util::projection_identity()));
             }
         };
         /// \endcond
@@ -467,19 +469,27 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T1, typename T2, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<
-            ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1>::value&&
-                traits::is_projected<Proj, FwdIter1>::value&&
-                    traits::is_indirect_callable<ExPolicy, std::equal_to<T1>,
-                        traits::projected<Proj, FwdIter1>,
-                        traits::projected<Proj, T1 const*>>::value)>
-    typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
-    replace_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest, T1 const& old_value, T2 const& new_value,
-        Proj&& proj = Proj())
+    // clang-format off
+    template <typename ExPolicy, typename FwdIter1, typename Sent,
+        typename FwdIter2, typename T1, typename T2,
+        typename Proj = util::projection_identity,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter1>::value &&
+            traits::is_projected<Proj, FwdIter1>::value &&
+            traits::is_indirect_callable<ExPolicy, std::equal_to<T1>,
+                traits::projected<Proj, FwdIter1>,
+                traits::projected<Proj, T1 const*>>::value
+        )>
+    // clang-format on
+    HPX_DEPRECATED_V(1, 7,
+        "hpx::parallel::replace_copy is deprecated, use "
+        "hpx::ranges::replace_copy "
+        "instead") typename util::detail::algorithm_result<ExPolicy,
+        util::in_out_result<FwdIter1, FwdIter2>>::type
+        replace_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest, T1 const& old_value, T2 const& new_value,
+            Proj&& proj = Proj())
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
@@ -488,10 +498,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return hpx::util::make_tagged_pair<tag::in, tag::out>(
-            detail::replace_copy<std::pair<FwdIter1, FwdIter2>>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
-                old_value, new_value, std::forward<Proj>(proj)));
+        return detail::replace_copy<util::in_out_result<FwdIter1, FwdIter2>>()
+            .call(std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
+                old_value, new_value, std::forward<Proj>(proj));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -500,13 +509,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \cond NOINTERNAL
 
         // sequential replace_copy_if
-        template <typename InIter, typename OutIter, typename F, typename T,
-            typename Proj>
-        inline std::pair<InIter, OutIter> sequential_replace_copy_if(
-            InIter first, InIter last, OutIter dest, F&& f, T const& new_value,
+        template <typename InIter, typename Sent, typename OutIter, typename F,
+            typename T, typename Proj>
+        inline util::in_out_result<InIter, OutIter> sequential_replace_copy_if(
+            InIter first, Sent sent, OutIter dest, F&& f, T const& new_value,
             Proj&& proj)
         {
-            for (/* */; first != last; ++first)
+            for (/* */; first != sent; ++first)
             {
                 using hpx::util::invoke;
                 if (invoke(f, invoke(proj, *first)))
@@ -514,7 +523,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 else
                     *dest++ = *first;
             }
-            return std::make_pair(first, dest);
+            return util::in_out_result<InIter, OutIter>{first, dest};
         }
 
         template <typename IterPair>
@@ -526,41 +535,43 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
             }
 
-            template <typename ExPolicy, typename InIter, typename OutIter,
-                typename F, typename T, typename Proj>
-            static std::pair<InIter, OutIter> sequential(ExPolicy, InIter first,
-                InIter last, OutIter dest, F&& f, T const& new_value,
-                Proj&& proj)
+            template <typename ExPolicy, typename InIter, typename Sent,
+                typename OutIter, typename F, typename T, typename Proj>
+            static util::in_out_result<InIter, OutIter> sequential(ExPolicy,
+                InIter first, Sent sent, OutIter dest, F&& f,
+                T const& new_value, Proj&& proj)
             {
-                return sequential_replace_copy_if(first, last, dest,
+                return sequential_replace_copy_if(first, sent, dest,
                     std::forward<F>(f), new_value, std::forward<Proj>(proj));
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-                typename F, typename T, typename Proj>
+            template <typename ExPolicy, typename FwdIter1, typename Sent,
+                typename FwdIter2, typename F, typename T, typename Proj>
             static typename util::detail::algorithm_result<ExPolicy,
-                std::pair<FwdIter1, FwdIter2>>::type
-            parallel(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+                util::in_out_result<FwdIter1, FwdIter2>>::type
+            parallel(ExPolicy&& policy, FwdIter1 first, Sent sent,
                 FwdIter2 dest, F&& f, T const& new_value, Proj&& proj)
             {
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
                     zip_iterator;
                 typedef typename zip_iterator::reference reference;
 
-                return get_iter_pair(for_each_n<zip_iterator>().call(
-                    std::forward<ExPolicy>(policy), std::false_type(),
-                    hpx::util::make_zip_iterator(first, dest),
-                    std::distance(first, last),
-                    [new_value, f = std::forward<F>(f),
-                        proj = std::forward<Proj>(proj)](reference t) -> void {
-                        using hpx::get;
-                        using hpx::util::invoke;
-                        if (invoke(f, invoke(proj, get<0>(t))))
-                            get<1>(t) = new_value;
-                        else
-                            get<1>(t) = get<0>(t);    //-V573
-                    },
-                    util::projection_identity()));
+                return util::detail::get_in_out_result(
+                    for_each_n<zip_iterator>().call(
+                        std::forward<ExPolicy>(policy), std::false_type(),
+                        hpx::util::make_zip_iterator(first, dest),
+                        detail::distance(first, sent),
+                        [new_value, f = std::forward<F>(f),
+                            proj = std::forward<Proj>(proj)](
+                            reference t) -> void {
+                            using hpx::get;
+                            using hpx::util::invoke;
+                            if (invoke(f, invoke(proj, get<0>(t))))
+                                get<1>(t) = new_value;
+                            else
+                                get<1>(t) = get<0>(t);    //-V573
+                        },
+                        util::projection_identity()));
             }
         };
         /// \endcond
@@ -649,17 +660,24 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
+    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename F, typename T, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter1>::value&&
-                    traits::is_projected<Proj, FwdIter1>::value&&
-                        traits::is_indirect_callable<ExPolicy, F,
-                            traits::projected<Proj, FwdIter1>>::value)>
-    typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
-    replace_copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest, F&& f, T const& new_value, Proj&& proj = Proj())
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter1>::value &&
+            traits::is_projected<Proj, FwdIter1>::value &&
+            traits::is_indirect_callable<ExPolicy, F,
+                traits::projected<Proj, FwdIter1>>::value
+        )>
+    // clang-format on
+    HPX_DEPRECATED_V(1, 7,
+        "hpx::parallel::replace_copy_if is deprecated, use "
+        "hpx::ranges::replace_copy_if "
+        "instead") typename util::detail::algorithm_result<ExPolicy,
+        util::in_out_result<FwdIter1, FwdIter2>>::type
+        replace_copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest, F&& f, T const& new_value, Proj&& proj = Proj())
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
@@ -668,10 +686,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return hpx::util::make_tagged_pair<tag::in, tag::out>(
-            detail::replace_copy_if<std::pair<FwdIter1, FwdIter2>>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
-                std::forward<F>(f), new_value, std::forward<Proj>(proj)));
+        return detail::replace_copy_if<
+            util::in_out_result<FwdIter1, FwdIter2>>()
+            .call(std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
+                std::forward<F>(f), new_value, std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -679,7 +697,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::replace_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_if_t final
-      : hpx::functional::tag<replace_if_t>
+      : hpx::functional::tag_fallback<replace_if_t>
     {
         // clang-format off
         template <typename Iter,
@@ -690,10 +708,10 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend void tag_invoke(hpx::replace_if_t, Iter first, Iter last,
-            Pred&& pred, T const& new_value)
+        friend void tag_fallback_invoke(hpx::replace_if_t, Iter first,
+            Iter last, Pred&& pred, T const& new_value)
         {
-            static_assert((hpx::traits::is_forward_iterator<Iter>::value),
+            static_assert((hpx::traits::is_input_iterator<Iter>::value),
                 "Required at least input iterator.");
 
             hpx::parallel::v1::detail::replace_if<Iter>().call(
@@ -705,7 +723,7 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter,
             typename Pred,  typename T, HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type
@@ -714,7 +732,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             void>::type
-        tag_invoke(hpx::replace_if_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(hpx::replace_if_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, Pred&& pred, T const& new_value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -722,7 +740,7 @@ namespace hpx {
 
             typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-            return parallel::util::detail::algorithm_result<ExPolicy>::get(
+            return parallel::util::detail::algorithm_result<void>::get(
                 hpx::parallel::v1::detail::replace_if<FwdIter>().call(
                     std::forward<ExPolicy>(policy), is_seq(), first, last,
                     std::forward<Pred>(pred), new_value,
@@ -733,22 +751,22 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::replace
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_t final
-      : hpx::functional::tag<replace_t>
+      : hpx::functional::tag_fallback<replace_t>
     {
     private:
         // clang-format off
-        template <typename FwdIter,
+        template <typename InIter,
             typename T, HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter>::value
+                hpx::traits::is_iterator<InIter>::value
             )>
         // clang-format on
-        friend void tag_invoke(hpx::replace_t, FwdIter first, FwdIter last,
-            T const& old_value, T const& new_value)
+        friend void tag_fallback_invoke(hpx::replace_t, InIter first,
+            InIter last, T const& old_value, T const& new_value)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Required at least forward iterator.");
+            static_assert((hpx::traits::is_input_iterator<InIter>::value),
+                "Required at least input iterator.");
 
-            typedef typename std::iterator_traits<FwdIter>::value_type Type;
+            typedef typename std::iterator_traits<InIter>::value_type Type;
 
             return hpx::replace_if(
                 hpx::execution::seq, first, last,
@@ -759,13 +777,13 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter,
             typename T, HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             void>::type
-        tag_invoke(hpx::replace_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(hpx::replace_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, T const& old_value, T const& new_value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -779,4 +797,129 @@ namespace hpx {
                 new_value);
         }
     } replace{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::replace_copy_if
+    HPX_INLINE_CONSTEXPR_VARIABLE struct replace_copy_if_t final
+      : hpx::functional::tag_fallback<replace_copy_if_t>
+    {
+        // clang-format off
+        template <typename InIter, typename OutIter,
+            typename Pred, typename T, HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<InIter>::value &&
+                hpx::traits::is_iterator<OutIter>::value &&
+                hpx::is_invocable_v<Pred,
+                    typename std::iterator_traits<InIter>::value_type
+                >
+            )>
+        // clang-format on
+        friend OutIter tag_fallback_invoke(hpx::replace_copy_if_t, InIter first,
+            InIter last, OutIter dest, Pred&& pred, T const& new_value)
+        {
+            static_assert((hpx::traits::is_input_iterator<InIter>::value),
+                "Required at least input iterator.");
+
+            static_assert((hpx::traits::is_output_iterator<OutIter>::value),
+                "Required at least output iterator.");
+
+            return parallel::util::get_second_element(
+                hpx::parallel::v1::detail::replace_copy_if<
+                    hpx::parallel::util::in_out_result<InIter, OutIter>>()
+                    .call(hpx::execution::sequenced_policy{}, std::true_type{},
+                        first, last, dest, std::forward<Pred>(pred), new_value,
+                        hpx::parallel::util::projection_identity()));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename Pred,  typename T, HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::is_invocable_v<Pred,
+                    typename std::iterator_traits<FwdIter1>::value_type
+                >
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter2>::type
+        tag_fallback_invoke(hpx::replace_copy_if_t, ExPolicy&& policy,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred&& pred,
+            T const& new_value)
+        {
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+                "Required at least forward iterator.");
+
+            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+                "Required at least forward iterator.");
+
+            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+
+            return parallel::util::get_second_element(
+                hpx::parallel::v1::detail::replace_copy_if<
+                    hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
+                    .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
+                        dest, std::forward<Pred>(pred), new_value,
+                        hpx::parallel::util::projection_identity()));
+        }
+    } replace_copy_if{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::replace_copy
+    HPX_INLINE_CONSTEXPR_VARIABLE struct replace_copy_t final
+      : hpx::functional::tag_fallback<replace_copy_t>
+    {
+    private:
+        // clang-format off
+        template <typename InIter, typename OutIter,
+            typename T, HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<InIter>::value &&
+                hpx::traits::is_iterator<OutIter>::value
+            )>
+        // clang-format on
+        friend OutIter tag_fallback_invoke(hpx::replace_copy_t, InIter first,
+            InIter last, OutIter dest, T const& old_value, T const& new_value)
+        {
+            static_assert((hpx::traits::is_input_iterator<InIter>::value),
+                "Required at least input iterator.");
+
+            static_assert((hpx::traits::is_output_iterator<OutIter>::value),
+                "Required at least output iterator.");
+
+            typedef typename std::iterator_traits<InIter>::value_type Type;
+
+            return hpx::replace_copy_if(
+                hpx::execution::seq, first, last, dest,
+                [old_value](Type const& a) -> bool { return old_value == a; },
+                new_value);
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename T, HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter2>::type
+        tag_fallback_invoke(hpx::replace_copy_t, ExPolicy&& policy,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, T const& old_value,
+            T const& new_value)
+        {
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+                "Required at least forward iterator.");
+
+            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+                "Required at least forward iterator.");
+
+            typedef typename std::iterator_traits<FwdIter1>::value_type Type;
+
+            return hpx::replace_copy_if(
+                std::forward<ExPolicy>(policy), first, last, dest,
+                [old_value](Type const& a) -> bool { return old_value == a; },
+                new_value);
+        }
+    } replace_copy{};
 }    // namespace hpx

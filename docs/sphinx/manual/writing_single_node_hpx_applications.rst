@@ -490,11 +490,11 @@ Parallel algorithms
      * Replaces all values satisfying specific criteria with another value.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`replace`
-   * * :cpp:func:`hpx::parallel::v1::replace_copy`
+   * * :cpp:func:`hpx::replace_copy`
      * Copies a range, replacing elements satisfying specific criteria with another value.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`replace_copy`
-   * * :cpp:func:`hpx::parallel::v1::replace_copy_if`
+   * * :cpp:func:`hpx::replace_copy_if`
      * Copies a range, replacing elements satisfying specific criteria with another value.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`replace_copy`

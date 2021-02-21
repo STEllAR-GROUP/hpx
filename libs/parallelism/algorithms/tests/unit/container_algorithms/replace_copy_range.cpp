@@ -20,6 +20,35 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_replace_copy(IteratorTag)
+{
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag>
+        test_vector;
+
+    test_vector c(10007);
+    std::vector<std::size_t> d1(c.size());
+    std::vector<std::size_t> d2(c.size());    //-V656
+
+    std::iota(std::begin(c.base()), std::end(c.base()), std::rand());
+
+    std::size_t idx = std::rand() % c.size();    //-V104
+
+    hpx::ranges::replace_copy(c, std::begin(d1), c[idx], c[idx] + 1);
+
+    std::replace_copy(std::begin(c.base()), std::end(c.base()), std::begin(d2),
+        c[idx], c[idx] + 1);
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(d1), std::end(d1), std::begin(d2),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d1.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_replace_copy(ExPolicy policy, IteratorTag)
 {
@@ -37,7 +66,7 @@ void test_replace_copy(ExPolicy policy, IteratorTag)
 
     std::size_t idx = std::rand() % c.size();    //-V104
 
-    hpx::parallel::replace_copy(policy, c, std::begin(d1), c[idx], c[idx] + 1);
+    hpx::ranges::replace_copy(policy, c, std::begin(d1), c[idx], c[idx] + 1);
 
     std::replace_copy(std::begin(c.base()), std::end(c.base()), std::begin(d2),
         c[idx], c[idx] + 1);
@@ -67,7 +96,7 @@ void test_replace_copy_async(ExPolicy p, IteratorTag)
     std::size_t idx = std::rand() % c.size();    //-V104
 
     auto f =
-        hpx::parallel::replace_copy(p, c, std::begin(d1), c[idx], c[idx] + 1);
+        hpx::ranges::replace_copy(p, c, std::begin(d1), c[idx], c[idx] + 1);
     f.wait();
 
     std::replace_copy(std::begin(c.base()), std::end(c.base()), std::begin(d2),
@@ -119,7 +148,7 @@ void test_replace_copy_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::replace_copy(policy,
+        hpx::ranges::replace_copy(policy,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
@@ -155,7 +184,7 @@ void test_replace_copy_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::replace_copy(p,
+        auto f = hpx::ranges::replace_copy(p,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
@@ -219,7 +248,7 @@ void test_replace_copy_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::replace_copy(policy,
+        hpx::ranges::replace_copy(policy,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::bad_alloc(); }),
@@ -254,7 +283,7 @@ void test_replace_copy_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::replace_copy(p,
+        auto f = hpx::ranges::replace_copy(p,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::bad_alloc(); }),

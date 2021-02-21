@@ -75,8 +75,8 @@ Functions
 - :cpp:func:`hpx::remove_copy_if`
 - :cpp:func:`hpx::remove_if`
 - :cpp:func:`hpx::replace`
-- :cpp:func:`hpx::parallel::v1::replace_copy`
-- :cpp:func:`hpx::parallel::v1::replace_copy_if`
+- :cpp:func:`hpx::replace_copy`
+- :cpp:func:`hpx::replace_copy_if`
 - :cpp:func:`hpx::replace_if`
 - :cpp:func:`hpx::parallel::v1::reverse`
 - :cpp:func:`hpx::parallel::v1::reverse_copy`
