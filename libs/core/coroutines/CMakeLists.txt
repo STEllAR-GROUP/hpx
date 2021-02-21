@@ -52,6 +52,7 @@ set(coroutines_compat_headers
 
 set(coroutines_sources
     detail/context_base.cpp
+    detail/context_posix.cpp
     detail/coroutine_impl.cpp
     detail/coroutine_self.cpp
     detail/posix_utility.cpp
