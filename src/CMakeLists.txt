@@ -174,7 +174,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/traits/is_continuation.hpp
     hpx/util/bind_action.hpp
     hpx/util/connection_cache.hpp
-    hpx/util/functional/colocated_helpers.hpp
     hpx/util/functional/segmented_iterator_helpers.hpp
     hpx/util/generate_unique_ids.hpp
     hpx/util/pool_timer.hpp

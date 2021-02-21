@@ -13,6 +13,7 @@
 #include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_colocated/async_colocated_fwd.hpp>
+#include <hpx/async_colocated/functional/colocated_helpers.hpp>
 #include <hpx/async_distributed/async_continue_fwd.hpp>
 #include <hpx/async_local/async_fwd.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -24,7 +25,6 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/bind_action.hpp>
-#include <hpx/util/functional/colocated_helpers.hpp>
 
 #include <type_traits>
 #include <utility>
