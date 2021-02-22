@@ -55,10 +55,10 @@ endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 # We explicitly set the default to 98 to force CMake to emit a -std=c++XX flag.
-# Some compilers (clang) have a different default standard for cpp and cu
-# files, but CMake does not know about this difference. If the standard is set
-# to the .cpp default in CMake, CMake will omit the flag, resulting in the
-# wrong standard for .cu files.
+# Some compilers (clang) have a different default standard for cpp and cu files,
+# but CMake does not know about this difference. If the standard is set to the
+# .cpp default in CMake, CMake will omit the flag, resulting in the wrong
+# standard for .cu files.
 set(CMAKE_CXX_STANDARD_DEFAULT 98)
 
 hpx_info("Using C++${HPX_CXX_STANDARD}")
