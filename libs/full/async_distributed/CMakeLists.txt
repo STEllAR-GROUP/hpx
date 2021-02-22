@@ -24,7 +24,6 @@ set(async_headers
     hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp
     hpx/async_distributed/applier/detail/apply_implementations.hpp
     hpx/async_distributed/applier_fwd.hpp
-    hpx/async_distributed/applier/register_apply_colocated.hpp
     hpx/async_distributed/applier/trigger.hpp
     hpx/async_distributed/apply.hpp
     hpx/async_distributed/async_callback_fwd.hpp
@@ -74,7 +73,6 @@ set(async_compat_headers
     hpx/runtime/applier/apply.hpp => hpx/include/async.hpp
     hpx/runtime/applier/bind_naming_wrappers.hpp => hpx/include/async.hpp
     hpx/runtime/applier_fwd.hpp => hpx/include/async.hpp
-    hpx/runtime/applier/register_apply_colocated.hpp => hpx/include/async.hpp
     hpx/runtime/applier/trigger.hpp => hpx/include/async.hpp
     hpx/sync.hpp => hpx/include/async.hpp
 )

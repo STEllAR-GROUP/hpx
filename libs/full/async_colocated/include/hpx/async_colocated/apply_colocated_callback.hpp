@@ -15,11 +15,11 @@
 #include <hpx/agas_base/primary_namespace.hpp>
 #include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/async_colocated/apply_colocated_callback_fwd.hpp>
+#include <hpx/async_colocated/functional/colocated_helpers.hpp>
+#include <hpx/async_colocated/register_apply_colocated.hpp>
 #include <hpx/async_distributed/applier/apply_continue_callback.hpp>
-#include <hpx/async_distributed/applier/register_apply_colocated.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/util/bind_action.hpp>
-#include <hpx/util/functional/colocated_helpers.hpp>
 
 #include <utility>
 

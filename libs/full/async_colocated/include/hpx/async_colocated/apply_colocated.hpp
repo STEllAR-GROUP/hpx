@@ -13,12 +13,12 @@
 #include <hpx/agas_base/primary_namespace.hpp>
 #include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/async_colocated/apply_colocated_fwd.hpp>
+#include <hpx/async_colocated/functional/colocated_helpers.hpp>
+#include <hpx/async_colocated/register_apply_colocated.hpp>
 #include <hpx/async_distributed/applier/apply_continue.hpp>
-#include <hpx/async_distributed/applier/register_apply_colocated.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/bind_action.hpp>
-#include <hpx/util/functional/colocated_helpers.hpp>
 
 #include <type_traits>
 #include <utility>

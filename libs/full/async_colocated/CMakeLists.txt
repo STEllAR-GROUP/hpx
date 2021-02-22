@@ -21,7 +21,9 @@ set(async_colocated_headers
     hpx/async_colocated/apply_colocated_callback.hpp
     hpx/async_colocated/apply_colocated_fwd.hpp
     hpx/async_colocated/apply_colocated.hpp
+    hpx/async_colocated/functional/colocated_helpers.hpp
     hpx/async_colocated/get_colocation_id.hpp
+    hpx/async_colocated/register_apply_colocated.hpp
     hpx/async_colocated/server/destroy_component.hpp
 )
 
@@ -35,8 +37,10 @@ set(async_colocated_compat_headers
     hpx/async_distributed/applier/detail/apply_colocated_callback.hpp => hpx/async_colocated/apply_colocated_callback.hpp
     hpx/async_distributed/applier/detail/apply_colocated_fwd.hpp  => hpx/async_colocated/apply_colocated_fwd.hpp
     hpx/async_distributed/applier/detail/apply_colocated.hpp  => hpx/async_colocated/apply_colocated.hpp
+    hpx/runtime/applier/register_apply_colocated.hpp => hpx/async_colocated/register_apply_colocated.hpp
     hpx/runtime/components/server/destroy_component.hpp => hpx/async_colocated/server/destroy_component.hpp
     hpx/runtime/get_colocation_id.hpp  => hpx/async_colocated/get_colocation_id.hpp
+    hpx/util/functional/colocated_helpers.hpp  => hpx/async_colocated/functional/colocated_helpers.hpp
 )
 # cmake-format: on
 
