@@ -417,7 +417,7 @@ function(add_hpx_module libname modulename)
 
   include(HPX_PrintSummary)
   create_configuration_summary(
-    "  Module configuration summary (${modulename}):" "${modulename}"
+    "    Module configuration (${modulename}):" "${modulename}"
   )
 
 endfunction(add_hpx_module)

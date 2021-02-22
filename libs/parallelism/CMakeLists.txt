@@ -28,7 +28,7 @@ set(_hpx_parallelism_modules
 # cmake-format: on
 
 hpx_info("")
-hpx_info("Configuring libhpx_parallelism modules:")
+hpx_info("  Configuring libhpx_parallelism modules")
 
 foreach(module ${_hpx_parallelism_modules})
   add_subdirectory(${module})

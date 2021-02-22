@@ -58,7 +58,7 @@ set(_hpx_core_modules
 # cmake-format: on
 
 hpx_info("")
-hpx_info("Configuring libhpx_core modules:")
+hpx_info("  Configuring libhpx_core modules")
 
 foreach(module ${_hpx_core_modules})
   add_subdirectory(${module})
