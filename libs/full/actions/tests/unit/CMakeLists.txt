@@ -6,13 +6,13 @@
 
 set(tests set_thread_state thread_affinity thread_stacksize)
 
-if(HPX_WITH_NETWORKING AND HPX_WITH_DISTRIBUTED_RUNTIME)
+if(HPX_WITH_NETWORKING)
   set(tests ${tests} serialize_buffer zero_copy_serialization)
 endif()
 
 set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_stacksize_PARAMETERS LOCALITIES 2)
-set(thread_affinity_PARAMETERS THREADS_PER_LOCALITY 4)
+set(thread_affinity_PARAMETERS THREADS_PER_LOCALITY 4 RUN_SERIAL)
 set(thread_affinity_LIBRARIES DEPENDENCIES PRIVATE Hwloc::hwloc)
 
 foreach(test ${tests})
