@@ -154,31 +154,23 @@ namespace hpx { namespace execution { namespace experimental {
         {
         };
 
-        // clang-format off
-            template <typename T, typename E>
-            struct is_receiver_impl<true, T, E>
-              : std::integral_constant<bool,
-                    hpx::is_invocable_v<
-                        hpx::execution::experimental::set_done_t,
-                            std::decay_t<T>&&> &&
-                    hpx::is_invocable_v<
-                        hpx::execution::experimental::set_error_t,
-                        std::decay_t<T>&&, E>>
-            {
-            };
-        // clang-format on
-    }    // namespace detail
-
-    // clang-format off
         template <typename T, typename E>
-        struct is_receiver
-          : detail::is_receiver_impl<
-                std::is_move_constructible<std::decay_t<T>>::value &&
-                std::is_constructible<std::decay_t<T>, T>::value,
-                T, E>
+        struct is_receiver_impl<true, T, E>
+          : std::integral_constant<bool,
+                hpx::is_invocable_v<set_done_t, std::decay_t<T>&&> &&
+                    hpx::is_invocable_v<set_error_t, std::decay_t<T>&&, E>>
         {
         };
-    // clang-format on
+    }    // namespace detail
+
+    template <typename T, typename E>
+    struct is_receiver
+      : detail::is_receiver_impl<
+            std::is_move_constructible<std::decay_t<T>>::value &&
+                std::is_constructible<std::decay_t<T>, T>::value,
+            T, E>
+    {
+    };
 
     template <typename T, typename E = std::exception_ptr>
     constexpr bool is_receiver_v = is_receiver<T, E>::value;
@@ -193,16 +185,12 @@ namespace hpx { namespace execution { namespace experimental {
         {
         };
 
-        // clang-format off
-            template <typename T, typename... As>
-            struct is_receiver_of_impl<true, T, As...>
-              : std::integral_constant<bool,
-                    hpx::is_invocable_v<
-                        hpx::execution::experimental::set_value_t,
-                            std::decay_t<T>&&, As...>>
-            {
-            };
-        // clang-format on
+        template <typename T, typename... As>
+        struct is_receiver_of_impl<true, T, As...>
+          : std::integral_constant<bool,
+                hpx::is_invocable_v<set_value_t, std::decay_t<T>&&, As...>>
+        {
+        };
     }    // namespace detail
 
     template <typename T, typename... As>
@@ -227,8 +215,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename T, typename... As>
         struct is_nothrow_receiver_of_impl<true, T, As...>
           : std::integral_constant<bool,
-                noexcept(hpx::execution::experimental::set_value(
-                    std::declval<T>(), std::declval<As>()...))>
+                noexcept(set_value(std::declval<T>(), std::declval<As>()...))>
         {
         };
     }    // namespace detail

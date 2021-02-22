@@ -287,8 +287,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Sender>
         constexpr bool specialized(
-            typename hpx::execution::experimental::sender_traits<
-                Sender>::__unspecialized*)
+            typename sender_traits<Sender>::__unspecialized*)
         {
             return false;
         }
@@ -403,13 +402,11 @@ namespace hpx { namespace execution { namespace experimental {
             void start() noexcept
             try
             {
-                hpx::execution::experimental::execute(
-                    std::move(e), as_invocable<std::decay_t<R>, S>{r});
+                execute(std::move(e), as_invocable<std::decay_t<R>, S>{r});
             }
             catch (...)
             {
-                hpx::execution::experimental::set_error(
-                    std::move(r), std::current_exception());
+                set_error(std::move(r), std::current_exception());
             }
         };
 
@@ -436,9 +433,8 @@ namespace hpx { namespace execution { namespace experimental {
             typename std::enable_if<is_sender_v<S> && is_receiver_v<R>,
                 decltype(std::declval<S&&>().connect(std::forward<R>(r)))>::type
         {
-            static_assert(
-                hpx::execution::experimental::is_operation_state_v<decltype(
-                    std::declval<S&&>().connect(std::forward<R>(r)))>,
+            static_assert(is_operation_state_v<decltype(
+                              std::declval<S&&>().connect(std::forward<R>(r)))>,
                 "hpx::execution::experimental::connect needs to return a "
                 "type satisfying the operation_state concept");
 
@@ -475,8 +471,7 @@ namespace hpx { namespace execution { namespace experimental {
         struct connect_result_helper<S, R,
             typename std::enable_if<
                 hpx::is_invocable<connect_t, S, R>::value>::type>
-          : hpx::util::invoke_result<hpx::execution::experimental::connect_t, S,
-                R>
+          : hpx::util::invoke_result<connect_t, S, R>
         {
         };
 
@@ -516,8 +511,7 @@ namespace hpx { namespace execution { namespace experimental {
 
             submit_state(S&& s, R&& r)
               : r(std::forward<R>(r))
-              , state(hpx::execution::experimental::connect(
-                    std::forward<S>(s), submit_receiver{this}))
+              , state(connect(std::forward<S>(s), submit_receiver{this}))
             {
             }
         };
@@ -549,23 +543,21 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         template <typename S, typename R>
-        friend constexpr HPX_FORCEINLINE auto
-        tag_fallback_invoke(submit_t, S&& s, R&& r) noexcept(
-            noexcept(hpx::execution::experimental::start(
-                (new detail::submit_state<S, R>{
-                     std::forward<S>(s), std::forward<R>(r)})
-                    ->state))) ->
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(submit_t,
+            S&& s,
+            R&& r) noexcept(noexcept(start((new detail::submit_state<S, R>{
+                                                std::forward<S>(s),
+                                                std::forward<R>(r)})
+                                               ->state))) ->
             typename std::enable_if<!detail::has_member_submit<S, R>::value,
                 typename hpx::util::always_void<decltype(
-                    hpx::execution::experimental::start(
-                        (new detail::submit_state<S, R>{
-                             std::forward<S>(s), std::forward<R>(r)})
-                            ->state))>::type>::type
+                    start((new detail::submit_state<S, R>{
+                               std::forward<S>(s), std::forward<R>(r)})
+                              ->state))>::type>::type
         {
-            hpx::execution::experimental::start(
-                (new detail::submit_state<S, R>{
-                     std::forward<S>(s), std::forward<R>(r)})
-                    ->state);
+            start((new detail::submit_state<S, R>{
+                       std::forward<S>(s), std::forward<R>(r)})
+                      ->state);
         }
     } submit;
 
@@ -603,22 +595,18 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace detail
 
     template <typename Executor, typename F>
-    constexpr HPX_FORCEINLINE auto
-    tag_fallback_invoke(execute_t, Executor&& executor, F&& f) noexcept(
-        noexcept(hpx::execution::experimental::submit(
-            std::forward<Executor>(executor),
-            detail::as_receiver<std::decay_t<F>, Executor>{
-                std::forward<F>(f)}))) ->
+    constexpr HPX_FORCEINLINE auto tag_fallback_invoke(execute_t,
+        Executor&& executor,
+        F&& f) noexcept(noexcept(submit(std::forward<Executor>(executor),
+        detail::as_receiver<std::decay_t<F>, Executor>{std::forward<F>(f)}))) ->
         typename std::enable_if<
             hpx::traits::is_invocable<std::decay_t<F>&>::value &&
                 !detail::has_member_execute<Executor, F>::value,
-            decltype(hpx::execution::experimental::submit(
-                std::forward<Executor>(executor),
+            decltype(submit(std::forward<Executor>(executor),
                 detail::as_receiver<std::decay_t<F>, Executor>{
                     std::forward<F>(f)}))>::type
     {
-        return hpx::execution::experimental::submit(
-            std::forward<Executor>(executor),
+        return submit(std::forward<Executor>(executor),
             detail::as_receiver<std::decay_t<F>, Executor>{std::forward<F>(f)});
     }
 
@@ -744,40 +732,21 @@ namespace hpx { namespace execution { namespace experimental {
         {
         };
 
-        // clang-format off
-            template <typename Sender, typename Receiver>
-            struct is_sender_to_impl<true, Sender, Receiver>
-              : std::integral_constant<bool,
-                    hpx::is_invocable_v<
-                        hpx::execution::experimental::connect_t,
-                            Sender&&, Receiver&&> ||
-                    hpx::is_invocable_v<
-                        hpx::execution::experimental::connect_t,
-                            Sender&&, Receiver&> ||
-                    hpx::is_invocable_v<
-                        hpx::execution::experimental::connect_t,
-                            Sender&&, Receiver const&> ||
-                    hpx::is_invocable_v<
-                        hpx::execution::experimental::connect_t,
-                            Sender&, Receiver&&> ||
-                    hpx::is_invocable_v<
-                        hpx::execution::experimental::connect_t,
-                            Sender&, Receiver&> ||
-                    hpx::is_invocable_v<
-                        hpx::execution::experimental::connect_t,
-                            Sender&, Receiver const&> ||
-                    hpx::is_invocable_v<
-                        hpx::execution::experimental::connect_t,
-                            Sender const&, Receiver&&> ||
-                    hpx::is_invocable_v<
-                        hpx::execution::experimental::connect_t,
-                            Sender const&, Receiver&> ||
-                    hpx::is_invocable_v<
-                        hpx::execution::experimental::connect_t,
-                            Sender const&, Receiver const&>>
-            {
-            };
-        // clang-format on
+        template <typename Sender, typename Receiver>
+        struct is_sender_to_impl<true, Sender, Receiver>
+          : std::integral_constant<bool,
+                hpx::is_invocable_v<connect_t, Sender&&, Receiver&&> ||
+                    hpx::is_invocable_v<connect_t, Sender&&, Receiver&> ||
+                    hpx::is_invocable_v<connect_t, Sender&&, Receiver const&> ||
+                    hpx::is_invocable_v<connect_t, Sender&, Receiver&&> ||
+                    hpx::is_invocable_v<connect_t, Sender&, Receiver&> ||
+                    hpx::is_invocable_v<connect_t, Sender&, Receiver const&> ||
+                    hpx::is_invocable_v<connect_t, Sender const&, Receiver&&> ||
+                    hpx::is_invocable_v<connect_t, Sender const&, Receiver&> ||
+                    hpx::is_invocable_v<connect_t, Sender const&,
+                        Receiver const&>>
+        {
+        };
     }    // namespace detail
 
     template <typename Sender, typename Receiver>
@@ -873,8 +842,8 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Sender>
         struct sender_traits_executor_base<Sender,
             typename std::enable_if<is_executor_of_base_impl<Sender,
-                hpx::execution::experimental::detail::as_invocable<
-                    void_receiver, Sender>>::value>::type> : std::false_type
+                detail::as_invocable<void_receiver, Sender>>::value>::type>
+          : std::false_type
         {
             template <template <class...> class Tuple,
                 template <class...> class Variant>
