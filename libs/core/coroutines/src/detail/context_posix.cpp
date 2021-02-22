@@ -6,8 +6,10 @@
 
 #include <hpx/config.hpp>
 
-#if defined(_POSIX_VERSION) || defined(__bgq__) || defined(__powerpc__) ||     \
-    defined(__s390x__)
+#if !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES) &&                           \
+    !(defined(__linux) || defined(linux) || defined(__linux__)) &&             \
+    (defined(_POSIX_VERSION) || defined(__bgq__) || defined(__powerpc__) ||    \
+        defined(__s390x__))
 #include <hpx/coroutines/detail/context_posix.hpp>
 
 #include <cstddef>
