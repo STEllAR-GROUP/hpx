@@ -10,6 +10,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(runtime_configuration_headers
     hpx/runtime_configuration/agas_service_mode.hpp
+    hpx/runtime_configuration/component_commandline_base.hpp
+    hpx/runtime_configuration/component_factory_base.hpp
     hpx/runtime_configuration/component_registry_base.hpp
     hpx/runtime_configuration/ini.hpp
     hpx/runtime_configuration/init_ini_data.hpp
@@ -26,6 +28,8 @@ set(runtime_configuration_compat_headers
     hpx/util/init_ini_data.hpp => hpx/modules/runtime_configuration.hpp
     hpx/util/runtime_configuration.hpp => hpx/modules/runtime_configuration.hpp
     hpx/plugins/plugin_registry_base.hpp => hpx/modules/runtime_configuration.hpp
+    hpx/runtime/components/component_commandline_base.hpp => hpx/modules/runtime_configuration.hpp
+    hpx/runtime/components/component_factory_base.hpp => hpx/modules/runtime_configuration.hpp
     hpx/runtime/components/component_registry_base.hpp => hpx/modules/runtime_configuration.hpp
     hpx/runtime/components/static_factory_data.hpp => hpx/modules/runtime_configuration.hpp
     hpx/runtime/runtime_mode.hpp => hpx/modules/runtime_configuration.hpp
@@ -44,6 +48,6 @@ add_hpx_module(
   SOURCES ${runtime_configuration_sources}
   HEADERS ${runtime_configuration_headers}
   COMPAT_HEADERS ${runtime_configuration_compat_headers}
-  DEPENDENCIES hpx_core hpx_parallelism
+  DEPENDENCIES hpx_core hpx_parallelism hpx_program_options
   CMAKE_SUBDIRS examples tests
 )

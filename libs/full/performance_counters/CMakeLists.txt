@@ -20,9 +20,11 @@ set(performance_counters_headers
     hpx/performance_counters/base_performance_counter.hpp
     hpx/performance_counters/component_namespace_counters.hpp
     hpx/performance_counters/counter_creators.hpp
+    hpx/performance_counters/counter_interface.hpp
     hpx/performance_counters/counter_parser.hpp
     hpx/performance_counters/counters.hpp
     hpx/performance_counters/counters_fwd.hpp
+    hpx/performance_counters/detail/counter_interface_functions.hpp
     hpx/performance_counters/locality_namespace_counters.hpp
     hpx/performance_counters/manage_counter.hpp
     hpx/performance_counters/manage_counter_type.hpp
@@ -54,8 +56,10 @@ set(performance_counters_sources
     agas_namespace_action_code.cpp
     component_namespace_counters.cpp
     counter_creators.cpp
+    counter_interface.cpp
     counter_parser.cpp
     counters.cpp
+    detail/counter_interface_functions.cpp
     locality_namespace_counters.cpp
     manage_counter.cpp
     manage_counter_type.cpp
@@ -91,6 +95,7 @@ add_hpx_module(
     hpx_async_colocated
     hpx_async_distributed
     hpx_naming
+    hpx_runtime_components_base
     hpx_runtime_local
     hpx_runtime_distributed
     hpx_threadmanager

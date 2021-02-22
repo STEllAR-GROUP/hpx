@@ -626,14 +626,14 @@ namespace hpx { namespace naming {
 
     ///////////////////////////////////////////////////////////////////////////
     // initialize AGAS interface function pointers in components_base module
-    struct HPX_EXPORT init_interface_functions
+    struct HPX_EXPORT credit_interface_function
     {
-        init_interface_functions()
+        credit_interface_function()
         {
             agas::detail::replenish_credits = &detail::replenish_credits;
         }
     };
 
-    init_interface_functions init;
+    credit_interface_function credit_init;
 
 }}    // namespace hpx::naming

@@ -18,6 +18,8 @@ set(components_base_headers
     hpx/components_base/get_lva.hpp
     hpx/components_base/components_base_fwd.hpp
     hpx/components_base/component_type.hpp
+    hpx/components_base/component_commandline.hpp
+    hpx/components_base/component_startup_shutdown.hpp
     hpx/components_base/detail/agas_interface_functions.hpp
     hpx/components_base/pinned_ptr.hpp
     hpx/components_base/server/abstract_component_base.hpp
@@ -107,6 +109,6 @@ add_hpx_module(
   HEADERS ${components_base_headers}
   COMPAT_HEADERS ${components_base_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_naming_base hpx_runtime_local
+  MODULE_DEPENDENCIES hpx_naming_base hpx_program_options hpx_runtime_local
   CMAKE_SUBDIRS examples tests
 )

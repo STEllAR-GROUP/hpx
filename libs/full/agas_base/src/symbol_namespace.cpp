@@ -17,7 +17,6 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/collectives.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstdint>

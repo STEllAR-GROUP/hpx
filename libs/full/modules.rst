@@ -43,6 +43,7 @@ Main |hpx| modules
    /libs/full/resiliency_distributed/docs/index.rst
    /libs/full/resource_partitioner/docs/index.rst
    /libs/full/runtime_components/docs/index.rst
+   /libs/full/runtime_components_base/docs/index.rst
    /libs/full/runtime_configuration/docs/index.rst
    /libs/full/runtime_distributed/docs/index.rst
    /libs/full/runtime_local/docs/index.rst

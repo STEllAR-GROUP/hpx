@@ -14,14 +14,14 @@
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/components/client_base.hpp>
+#include <hpx/components/distributed_metadata_base.hpp>
 #include <hpx/components/get_ptr.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
-#include <hpx/runtime/components/server/distributed_metadata_base.hpp>
-#include <hpx/runtime_components/copy_component.hpp>
 #include <hpx/runtime_components/new.hpp>
+#include <hpx/runtime_distributed/copy_component.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>

@@ -10,7 +10,6 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/detail/agas_interface_functions.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
-#include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 
@@ -302,40 +301,6 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
         naming::get_agas_client().garbage_collect(ec);
     }
 
-    /// \brief Invoke an asynchronous garbage collection step on the given target
-    ///        locality.
-    void garbage_collect_non_blocking_id(
-        naming::id_type const& id, error_code& ec)
-    {
-        try
-        {
-            components::stubs::runtime_support::garbage_collect_non_blocking(
-                id);
-        }
-        catch (hpx::exception const& e)
-        {
-            if (&ec == &throws)
-                throw;
-            ec = make_error_code(e.get_error(), e.what());
-        }
-    }
-
-    /// \brief Invoke a synchronous garbage collection step on the given target
-    ///        locality.
-    void garbage_collect_id(naming::id_type const& id, error_code& ec)
-    {
-        try
-        {
-            components::stubs::runtime_support::garbage_collect(id);
-        }
-        catch (hpx::exception const& e)
-        {
-            if (&ec == &throws)
-                throw;
-            ec = make_error_code(e.get_error(), e.what());
-        }
-    }
-
     /// \brief Return an id_type referring to the console locality.
     naming::id_type get_console_locality(error_code& ec)
     {
@@ -523,9 +488,9 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
 namespace hpx { namespace agas {
 
     // initialize AGAS interface function pointers in components_base module
-    struct HPX_EXPORT init_interface_functions
+    struct HPX_EXPORT agas_interface_functions
     {
-        init_interface_functions()
+        agas_interface_functions()
         {
             detail::is_console = &detail::impl::is_console;
 
@@ -586,9 +551,6 @@ namespace hpx { namespace agas {
             detail::garbage_collect_non_blocking =
                 &detail::impl::garbage_collect_non_blocking;
             detail::garbage_collect = &detail::impl::garbage_collect;
-            detail::garbage_collect_non_blocking_id =
-                &detail::impl::garbage_collect_non_blocking_id;
-            detail::garbage_collect_id = &detail::impl::garbage_collect_id;
 
             detail::get_console_locality = &detail::impl::get_console_locality;
             detail::get_locality_id = &detail::impl::get_locality_id;
@@ -619,5 +581,5 @@ namespace hpx { namespace agas {
         }
     };
 
-    init_interface_functions init;
+    agas_interface_functions agas_init;
 }}    // namespace hpx::agas

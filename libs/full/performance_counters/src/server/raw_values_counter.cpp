@@ -9,7 +9,7 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/server/raw_values_counter.hpp>
-#include <hpx/runtime/components/derived_component_factory.hpp>
+#include <hpx/runtime_components_base/derived_component_factory.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstdint>
