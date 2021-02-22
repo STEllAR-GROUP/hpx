@@ -65,6 +65,7 @@
 #include <cstdint>
 #include <exception>
 #include <limits>
+
 #include "pth/pth.h"
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
@@ -184,6 +185,10 @@ namespace hpx { namespace threads { namespace coroutines {
         class ucontext_context_impl_base : detail::context_impl_base
         {
         public:
+            // on some platforms SIGSTKSZ resolves to a syscall, we can't make
+            // this constexpr
+            HPX_CORE_EXPORT static std::ptrdiff_t default_stack_size;
+
             ucontext_context_impl_base()
             {
                 HPX_COROUTINE_CREATE_CONTEXT(m_ctx);
@@ -219,16 +224,13 @@ namespace hpx { namespace threads { namespace coroutines {
         public:
             typedef ucontext_context_impl_base context_impl_base;
 
-            // on some platforms SIGSTKSZ resolves to a syscall, we can't make
-            // this constexpr
-            static std::ptrdiff_t const default_stack_size = SIGSTKSZ;
-
             /**
              * Create a context that on restore invokes Functor on
              *  a new stack. The stack size can be optionally specified.
              */
             explicit ucontext_context_impl(std::ptrdiff_t stack_size = -1)
-              : m_stack_size(stack_size == -1 ? default_stack_size : stack_size)
+              : m_stack_size(
+                    stack_size == -1 ? this->default_stack_size : stack_size)
               , m_stack(nullptr)
               , funp_(&trampoline<CoroutineImpl>)
             {
