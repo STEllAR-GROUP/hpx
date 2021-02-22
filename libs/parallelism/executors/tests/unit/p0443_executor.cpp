@@ -11,10 +11,12 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/thread.hpp>
 
+#include <array>
 #include <atomic>
 #include <cstddef>
 #include <string>
 #include <type_traits>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_execute()
@@ -212,6 +214,118 @@ void test_sender_receiver_transform_arguments()
     HPX_TEST_EQ(result, std::size_t(12));
 }
 
+template <typename F>
+struct callback_receiver
+{
+    std::decay_t<F> f;
+    hpx::lcos::local::condition_variable& cond;
+    std::atomic<bool>& executed;
+
+    template <typename E>
+    void set_error(E&&) noexcept
+    {
+        HPX_TEST(false);
+    }
+
+    void set_done() noexcept
+    {
+        HPX_TEST(false);
+    };
+
+    template <typename... Ts>
+    void set_value(Ts&&...) noexcept
+    {
+        HPX_INVOKE(f);
+        executed = true;
+        cond.notify_one();
+    }
+};
+
+void test_properties()
+{
+    hpx::execution::experimental::executor exec{};
+    hpx::lcos::local::mutex mtx;
+    hpx::lcos::local::condition_variable cond;
+    std::atomic<bool> executed{false};
+
+    constexpr std::array<hpx::threads::thread_priority, 3> priorities{
+        {hpx::threads::thread_priority::low,
+            hpx::threads::thread_priority::normal,
+            hpx::threads::thread_priority::high}};
+
+    for (auto const prio : priorities)
+    {
+        auto exec_prop =
+            hpx::execution::experimental::make_with_priority(exec, prio);
+        HPX_TEST_EQ(
+            hpx::execution::experimental::get_priority(exec_prop), prio);
+
+        auto check = [prio]() {
+            HPX_TEST_EQ(prio, hpx::this_thread::get_priority());
+        };
+        executed = false;
+        hpx::execution::experimental::start(
+            hpx::execution::experimental::connect(
+                hpx::execution::experimental::schedule(exec_prop),
+                callback_receiver<decltype(check)>{check, cond, executed}));
+        {
+            std::unique_lock<hpx::lcos::local::mutex> l{mtx};
+            cond.wait(l, [&]() { return executed.load(); });
+        }
+
+        HPX_TEST(executed);
+    }
+
+    constexpr std::array<hpx::threads::thread_stacksize, 4> stacksizes{
+        {hpx::threads::thread_stacksize::small_,
+            hpx::threads::thread_stacksize::medium,
+            hpx::threads::thread_stacksize::large,
+            hpx::threads::thread_stacksize::huge}};
+
+    for (auto const stacksize : stacksizes)
+    {
+        auto exec_prop =
+            hpx::execution::experimental::make_with_stacksize(exec, stacksize);
+        HPX_TEST_EQ(
+            hpx::execution::experimental::get_stacksize(exec_prop), stacksize);
+
+        auto check = [stacksize]() {
+            HPX_TEST_EQ(stacksize,
+                hpx::threads::get_thread_id_data(hpx::threads::get_self_id())
+                    ->get_stack_size_enum());
+        };
+        executed = false;
+        hpx::execution::experimental::start(
+            hpx::execution::experimental::connect(
+                hpx::execution::experimental::schedule(exec_prop),
+                callback_receiver<decltype(check)>{check, cond, executed}));
+        {
+            std::unique_lock<hpx::lcos::local::mutex> l{mtx};
+            cond.wait(l, [&]() { return executed.load(); });
+        }
+
+        HPX_TEST(executed);
+    }
+
+    constexpr std::array<hpx::threads::thread_schedule_hint, 4> hints{
+        {hpx::threads::thread_schedule_hint{},
+            hpx::threads::thread_schedule_hint{1},
+            hpx::threads::thread_schedule_hint{
+                hpx::threads::thread_schedule_hint_mode::thread, 2},
+            hpx::threads::thread_schedule_hint{
+                hpx::threads::thread_schedule_hint_mode::numa, 3}}};
+
+    for (auto const hint : hints)
+    {
+        auto exec_prop =
+            hpx::execution::experimental::make_with_hint(exec, hint);
+        HPX_TEST(hpx::execution::experimental::get_hint(exec_prop) == hint);
+
+        // A hint is not guaranteed to be respected, so we only check that the
+        // executor holds the property.
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
@@ -222,6 +336,7 @@ int hpx_main()
     test_sender_receiver_transform_wait();
     test_sender_receiver_transform_sync_wait();
     test_sender_receiver_transform_arguments();
+    test_properties();
 
     return hpx::finalize();
 }

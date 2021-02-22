@@ -92,17 +92,18 @@ namespace hpx { namespace execution { namespace experimental {
                 std::forward<F>(f));
         }
 
-        template <typename R>
+        template <typename Executor, typename R>
         struct operation_state
         {
-            typename std::decay<R>::type r;
+            std::decay_t<Executor> exec;
+            std::decay_t<R> r;
 
             void start() noexcept
             {
                 try
                 {
                     hpx::execution::experimental::execute(
-                        executor{}, [r = std::move(r)]() mutable {
+                        exec, [r = std::move(r)]() mutable {
                             hpx::execution::experimental::set_value(
                                 std::move(r));
                         });
@@ -115,8 +116,11 @@ namespace hpx { namespace execution { namespace experimental {
             }
         };
 
+        template <typename Executor>
         struct sender
         {
+            std::decay_t<Executor> exec;
+
             template <template <typename...> class Tuple,
                 template <typename...> class Variant>
             using value_types = Variant<Tuple<>>;
@@ -127,9 +131,9 @@ namespace hpx { namespace execution { namespace experimental {
             static constexpr bool sends_done = false;
 
             template <typename R>
-            operation_state<R> connect(R&& r) &&
+            operation_state<Executor, R> connect(R&& r) &&
             {
-                return {std::forward<R>(r)};
+                return {std::move(exec), std::forward<R>(r)};
             }
         };
 
@@ -143,14 +147,14 @@ namespace hpx { namespace execution { namespace experimental {
         static constexpr bool sends_done = false;
 
         template <typename R>
-        operation_state<R> connect(R&& r) &&
+        operation_state<executor, R> connect(R&& r) &&
         {
-            return {std::forward<R>(r)};
+            return {*this, std::forward<R>(r)};
         }
 
-        constexpr sender schedule() const
+        constexpr sender<executor> schedule() const
         {
-            return {};
+            return {*this};
         }
         /// \endcond
 
