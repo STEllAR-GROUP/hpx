@@ -4,6 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/condition_variable.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/functional.hpp>
 #include <hpx/init.hpp>
@@ -25,21 +26,73 @@ void test_execute()
         [parent_id]() { HPX_TEST_NEQ(hpx::this_thread::get_id(), parent_id); });
 }
 
+struct check_context_receiver
+{
+    hpx::thread::id parent_id;
+    hpx::lcos::local::condition_variable& cond;
+    std::atomic<bool>& executed;
+
+    template <typename E>
+    void set_error(E&&) noexcept
+    {
+        HPX_TEST(false);
+    }
+
+    void set_done() noexcept
+    {
+        HPX_TEST(false);
+    };
+
+    template <typename... Ts>
+    void set_value(Ts&&...) noexcept
+    {
+        HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
+        HPX_TEST_NEQ(hpx::thread::id(hpx::threads::invalid_thread_id),
+            hpx::this_thread::get_id());
+        executed = true;
+        cond.notify_one();
+    }
+};
+
 void test_sender_receiver_basic()
 {
+    hpx::thread::id parent_id = hpx::this_thread::get_id();
+    hpx::lcos::local::mutex mtx;
+    hpx::lcos::local::condition_variable cond;
+    std::atomic<bool> executed{false};
+
     hpx::execution::experimental::executor exec{};
 
     auto begin = hpx::execution::experimental::schedule(exec);
     auto work = hpx::execution::experimental::connect(
-        begin, hpx::execution::experimental::sink_receiver{});
+        begin, check_context_receiver{parent_id, cond, executed});
     hpx::execution::experimental::start(work);
+
+    {
+        std::unique_lock<hpx::lcos::local::mutex> l{mtx};
+        cond.wait(l, [&]() { return executed.load(); });
+    }
+
+    HPX_TEST(executed);
 }
 
 void test_sender_receiver_basic2()
 {
+    hpx::thread::id parent_id = hpx::this_thread::get_id();
+    hpx::lcos::local::mutex mtx;
+    hpx::lcos::local::condition_variable cond;
+    std::atomic<bool> executed{false};
+
     hpx::execution::experimental::start(hpx::execution::experimental::connect(
         hpx::execution::experimental::executor{},
-        hpx::execution::experimental::sink_receiver{}));
+        check_context_receiver{parent_id, cond, executed}));
+
+    {
+        std::unique_lock<hpx::lcos::local::mutex> l{mtx};
+        cond.wait(l, [&]() { return executed.load(); });
+    }
+
+    HPX_TEST(executed);
 }
 
 hpx::thread::id sender_receiver_transform_thread_id;
@@ -48,6 +101,9 @@ void test_sender_receiver_transform()
 {
     hpx::execution::experimental::executor exec{};
     hpx::thread::id parent_id = hpx::this_thread::get_id();
+    hpx::lcos::local::mutex mtx;
+    hpx::lcos::local::condition_variable cond;
+    std::atomic<bool> executed{false};
 
     auto begin = hpx::execution::experimental::schedule(exec);
     auto work1 = hpx::execution::experimental::transform(begin, [=]() {
@@ -59,8 +115,15 @@ void test_sender_receiver_transform()
             sender_receiver_transform_thread_id, hpx::this_thread::get_id());
     });
     auto end = hpx::execution::experimental::connect(
-        work2, hpx::execution::experimental::sink_receiver{});
+        work2, check_context_receiver{parent_id, cond, executed});
     hpx::execution::experimental::start(end);
+
+    {
+        std::unique_lock<hpx::lcos::local::mutex> l{mtx};
+        cond.wait(l, [&]() { return executed.load(); });
+    }
+
+    HPX_TEST(executed);
 }
 
 void test_sender_receiver_transform_wait()
@@ -68,6 +131,7 @@ void test_sender_receiver_transform_wait()
     hpx::execution::experimental::executor exec{};
     hpx::thread::id parent_id = hpx::this_thread::get_id();
     std::atomic<std::size_t> transform_count{0};
+    std::atomic<bool> executed{false};
 
     auto begin = hpx::execution::experimental::schedule(exec);
     auto work1 = hpx::execution::experimental::transform(
@@ -76,14 +140,16 @@ void test_sender_receiver_transform_wait()
             HPX_TEST_NEQ(sender_receiver_transform_thread_id, parent_id);
             ++transform_count;
         });
-    auto work2 =
-        hpx::execution::experimental::transform(work1, [&transform_count]() {
+    auto work2 = hpx::execution::experimental::transform(
+        work1, [&transform_count, &executed]() {
             HPX_TEST_EQ(sender_receiver_transform_thread_id,
                 hpx::this_thread::get_id());
             ++transform_count;
+            executed = true;
         });
     hpx::execution::experimental::sync_wait(work2);
     HPX_TEST_EQ(transform_count, std::size_t(2));
+    HPX_TEST(executed);
 }
 
 void test_sender_receiver_transform_sync_wait()
