@@ -17,7 +17,53 @@
 #include <string>
 #include <vector>
 
+#include "iter_sent.hpp"
 #include "test_utils.hpp"
+
+////////////////////////////////////////////////////////////////////////////
+void test_replace_copy_sent()
+{
+    using hpx::get;
+
+    std::size_t const size = 100;
+    std::vector<std::int16_t> c(size), d(size);
+    std::iota(std::begin(c), std::end(c), 0);
+    c[99] = 42;
+
+    int old_value = 42;
+    int new_value = 1;
+
+    hpx::ranges::replace_copy(std::begin(c), sentinel<std::int16_t>{50},
+        std::begin(d), old_value, new_value);
+    auto result1 = std::count(std::begin(d), std::end(d), old_value);
+    auto result2 = std::count(std::begin(d), std::end(d), new_value);
+
+    HPX_TEST(result1 == 0 && result2 == 2);
+}
+
+template <typename ExPolicy>
+void test_replace_copy_sent(ExPolicy policy)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    using hpx::get;
+
+    std::size_t const size = 100;
+    std::vector<std::int16_t> c(size), d(size);
+    std::iota(std::begin(c), std::end(c), 0);
+    c[99] = 42;
+
+    int old_value = 42;
+    int new_value = 1;
+
+    hpx::ranges::replace_copy(policy, std::begin(c), sentinel<std::int16_t>{50},
+        std::begin(d), old_value, new_value);
+    auto result1 = std::count(std::begin(d), std::end(d), old_value);
+    auto result2 = std::count(std::begin(d), std::end(d), new_value);
+
+    HPX_TEST(result1 == 0 && result2 == 2);
+}
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
@@ -116,12 +162,18 @@ template <typename IteratorTag>
 void test_replace_copy()
 {
     using namespace hpx::execution;
+    test_replace_copy(IteratorTag());
     test_replace_copy(seq, IteratorTag());
     test_replace_copy(par, IteratorTag());
     test_replace_copy(par_unseq, IteratorTag());
 
     test_replace_copy_async(seq(task), IteratorTag());
     test_replace_copy_async(par(task), IteratorTag());
+
+    test_replace_copy_sent();
+    test_replace_copy_sent(seq);
+    test_replace_copy_sent(par);
+    test_replace_copy_sent(par_unseq);
 }
 
 void replace_copy_test()

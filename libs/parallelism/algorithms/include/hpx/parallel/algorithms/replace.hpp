@@ -740,7 +740,7 @@ namespace hpx {
 
             typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-            return parallel::util::detail::algorithm_result<void>::get(
+            return parallel::util::detail::algorithm_result<ExPolicy>::get(
                 hpx::parallel::v1::detail::replace_if<FwdIter>().call(
                     std::forward<ExPolicy>(policy), is_seq(), first, last,
                     std::forward<Pred>(pred), new_value,
