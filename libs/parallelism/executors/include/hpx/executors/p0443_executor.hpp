@@ -127,7 +127,7 @@ namespace hpx { namespace execution { namespace experimental {
             static constexpr bool sends_done = false;
 
             template <typename R>
-            operation_state<R> connect(R&& r)
+            operation_state<R> connect(R&& r) &&
             {
                 return {std::forward<R>(r)};
             }
@@ -143,7 +143,7 @@ namespace hpx { namespace execution { namespace experimental {
         static constexpr bool sends_done = false;
 
         template <typename R>
-        operation_state<R> connect(R&& r)
+        operation_state<R> connect(R&& r) &&
         {
             return {std::forward<R>(r)};
         }

@@ -65,8 +65,8 @@ void test_sender_receiver_basic()
 
     auto begin = hpx::execution::experimental::schedule(exec);
     auto work = hpx::execution::experimental::connect(
-        begin, check_context_receiver{parent_id, cond, executed});
-    hpx::execution::experimental::start(work);
+        std::move(begin), check_context_receiver{parent_id, cond, executed});
+    hpx::execution::experimental::start(std::move(work));
 
     {
         std::unique_lock<hpx::lcos::local::mutex> l{mtx};
@@ -106,17 +106,19 @@ void test_sender_receiver_transform()
     std::atomic<bool> executed{false};
 
     auto begin = hpx::execution::experimental::schedule(exec);
-    auto work1 = hpx::execution::experimental::transform(begin, [=]() {
-        sender_receiver_transform_thread_id = hpx::this_thread::get_id();
-        HPX_TEST_NEQ(sender_receiver_transform_thread_id, parent_id);
-    });
-    auto work2 = hpx::execution::experimental::transform(work1, []() {
-        HPX_TEST_EQ(
-            sender_receiver_transform_thread_id, hpx::this_thread::get_id());
-    });
+    auto work1 =
+        hpx::execution::experimental::transform(std::move(begin), [=]() {
+            sender_receiver_transform_thread_id = hpx::this_thread::get_id();
+            HPX_TEST_NEQ(sender_receiver_transform_thread_id, parent_id);
+        });
+    auto work2 =
+        hpx::execution::experimental::transform(std::move(work1), []() {
+            HPX_TEST_EQ(sender_receiver_transform_thread_id,
+                hpx::this_thread::get_id());
+        });
     auto end = hpx::execution::experimental::connect(
-        work2, check_context_receiver{parent_id, cond, executed});
-    hpx::execution::experimental::start(end);
+        std::move(work2), check_context_receiver{parent_id, cond, executed});
+    hpx::execution::experimental::start(std::move(end));
 
     {
         std::unique_lock<hpx::lcos::local::mutex> l{mtx};
@@ -135,19 +137,19 @@ void test_sender_receiver_transform_wait()
 
     auto begin = hpx::execution::experimental::schedule(exec);
     auto work1 = hpx::execution::experimental::transform(
-        begin, [&transform_count, parent_id]() {
+        std::move(begin), [&transform_count, parent_id]() {
             sender_receiver_transform_thread_id = hpx::this_thread::get_id();
             HPX_TEST_NEQ(sender_receiver_transform_thread_id, parent_id);
             ++transform_count;
         });
     auto work2 = hpx::execution::experimental::transform(
-        work1, [&transform_count, &executed]() {
+        std::move(work1), [&transform_count, &executed]() {
             HPX_TEST_EQ(sender_receiver_transform_thread_id,
                 hpx::this_thread::get_id());
             ++transform_count;
             executed = true;
         });
-    hpx::execution::experimental::sync_wait(work2);
+    hpx::execution::experimental::sync_wait(std::move(work2));
     HPX_TEST_EQ(transform_count, std::size_t(2));
     HPX_TEST(executed);
 }
@@ -160,13 +162,13 @@ void test_sender_receiver_transform_sync_wait()
 
     auto begin = hpx::execution::experimental::schedule(exec);
     auto work = hpx::execution::experimental::transform(
-        begin, [&transform_count, parent_id]() {
+        std::move(begin), [&transform_count, parent_id]() {
             sender_receiver_transform_thread_id = hpx::this_thread::get_id();
             HPX_TEST_NEQ(sender_receiver_transform_thread_id, parent_id);
             ++transform_count;
             return 42;
         });
-    auto result = hpx::execution::experimental::sync_wait(work);
+    auto result = hpx::execution::experimental::sync_wait(std::move(work));
     HPX_TEST_EQ(transform_count, std::size_t(1));
     static_assert(
         std::is_same<int, typename std::decay<decltype(result)>::type>::value,
@@ -182,27 +184,27 @@ void test_sender_receiver_transform_arguments()
 
     auto begin = hpx::execution::experimental::schedule(exec);
     auto work1 = hpx::execution::experimental::transform(
-        begin, [&transform_count, parent_id]() {
+        std::move(begin), [&transform_count, parent_id]() {
             sender_receiver_transform_thread_id = hpx::this_thread::get_id();
             HPX_TEST_NEQ(sender_receiver_transform_thread_id, parent_id);
             ++transform_count;
             return 3;
         });
     auto work2 = hpx::execution::experimental::transform(
-        work1, [&transform_count](int x) -> std::string {
+        std::move(work1), [&transform_count](int x) -> std::string {
             HPX_TEST_EQ(sender_receiver_transform_thread_id,
                 hpx::this_thread::get_id());
             ++transform_count;
             return std::string("hello") + std::to_string(x);
         });
     auto work3 = hpx::execution::experimental::transform(
-        work2, [&transform_count](std::string s) {
+        std::move(work2), [&transform_count](std::string s) {
             HPX_TEST_EQ(sender_receiver_transform_thread_id,
                 hpx::this_thread::get_id());
             ++transform_count;
             return 2 * s.size();
         });
-    auto result = hpx::execution::experimental::sync_wait(work3);
+    auto result = hpx::execution::experimental::sync_wait(std::move(work3));
     HPX_TEST_EQ(transform_count, std::size_t(3));
     static_assert(std::is_same<std::size_t,
                       typename std::decay<decltype(result)>::type>::value,
