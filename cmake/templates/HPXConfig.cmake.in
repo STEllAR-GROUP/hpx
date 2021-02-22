@@ -34,6 +34,12 @@ set(HPX_PREFIX "${_hpx_root_dir}")
 set(HPX_DEBUG_POSTFIX "@HPX_DEBUG_POSTFIX@")
 set(HPX_BUILD_TYPE "@CMAKE_BUILD_TYPE@")
 set(HPX_CXX_STANDARD "@HPX_CXX_STANDARD@")
+# We explicitly set the default to 98 to force CMake to emit a -std=c++XX flag.
+# Some compilers (clang) have a different default standard for cpp and cu
+# files, but CMake does not know about this difference. If the standard is set
+# to the .cpp default in CMake, CMake will omit the flag, resulting in the
+# wrong standard for .cu files.
+set(CMAKE_CXX_STANDARD_DEFAULT 98)
 
 set(HPX_GIT_COMMIT
     "@HPX_WITH_GIT_COMMIT@"
