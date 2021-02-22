@@ -70,7 +70,6 @@ set(synchronization_sources
 include(HPX_AddModule)
 add_hpx_module(
   core synchronization
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   GLOBAL_HEADER_GEN ON
   SOURCES ${synchronization_sources}
   HEADERS ${synchronization_headers}

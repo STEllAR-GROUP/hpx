@@ -86,7 +86,6 @@ set(runtime_local_sources
 include(HPX_AddModule)
 add_hpx_module(
   full runtime_local
-  COMPATIBILITY_HEADERS ON
   GLOBAL_HEADER_GEN ON
   SOURCES ${runtime_local_sources}
   HEADERS ${runtime_local_headers}

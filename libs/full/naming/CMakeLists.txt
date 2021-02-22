@@ -29,7 +29,6 @@ set(naming_sources credit_handling.cpp detail/preprocess_gid_types.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   full naming
-  COMPATIBILITY_HEADERS ON # added in hpx V1.6.0
   GLOBAL_HEADER_GEN ON
   SOURCES ${naming_sources}
   HEADERS ${naming_headers}

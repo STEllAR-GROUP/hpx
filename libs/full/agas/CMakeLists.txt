@@ -28,7 +28,6 @@ set(agas_sources addressing_service.cpp detail/interface.cpp state.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   full agas
-  COMPATIBILITY_HEADERS ON # Added in 1.7.0
   GLOBAL_HEADER_GEN ON
   SOURCES ${agas_sources}
   HEADERS ${agas_headers}

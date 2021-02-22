@@ -85,7 +85,6 @@ add_hpx_module(
   parallelism execution
   SOURCES ${execution_sources}
   HEADERS ${execution_headers}
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   COMPAT_HEADERS ${execution_compat_headers}
   DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES hpx_async_base hpx_async_combinators hpx_threading

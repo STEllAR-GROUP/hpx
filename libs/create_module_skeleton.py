@@ -94,7 +94,6 @@ set({module_name}_sources)
 include(HPX_AddModule)
 add_hpx_module(
   {lib_name} {module_name}
-  COMPATIBILITY_HEADERS OFF
   GLOBAL_HEADER_GEN ON
   SOURCES ${{{module_name}_sources}}
   HEADERS ${{{module_name}_headers}}

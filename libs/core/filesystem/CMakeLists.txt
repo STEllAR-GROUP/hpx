@@ -23,7 +23,6 @@ include(HPX_AddModule)
 add_hpx_module(
   core filesystem
   GLOBAL_HEADER_GEN OFF
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   HEADERS ${filesystem_headers}
   COMPAT_HEADERS ${filesystem_compat_headers}
   MODULE_DEPENDENCIES hpx_config

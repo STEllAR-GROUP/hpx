@@ -28,7 +28,6 @@ set(preprocessor_sources)
 include(HPX_AddModule)
 add_hpx_module(
   core preprocessor
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   SOURCES ${preprocessor_sources}
   HEADERS ${preprocessor_headers}
   COMPAT_HEADERS ${preprocessor_compat_headers}

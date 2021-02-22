@@ -62,7 +62,6 @@ set(thread_executors_sources
 include(HPX_AddModule)
 add_hpx_module(
   full thread_executors
-  COMPATIBILITY_HEADERS ON
   GLOBAL_HEADER_GEN ON
   SOURCES ${thread_executors_sources}
   HEADERS ${thread_executors_headers}

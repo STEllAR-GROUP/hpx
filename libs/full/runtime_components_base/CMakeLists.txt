@@ -31,7 +31,6 @@ set(runtime_components_base_sources component_registry.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   full runtime_components_base
-  COMPATIBILITY_HEADERS OFF
   GLOBAL_HEADER_GEN ON
   SOURCES ${runtime_components_base_sources}
   HEADERS ${runtime_components_base_headers}

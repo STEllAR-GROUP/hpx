@@ -23,7 +23,6 @@ set(threading_sources thread.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   parallelism threading
-  COMPATIBILITY_HEADERS ON
   GLOBAL_HEADER_GEN ON
   SOURCES ${threading_sources}
   HEADERS ${threading_headers}

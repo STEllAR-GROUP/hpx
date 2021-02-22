@@ -25,7 +25,6 @@ set(executors_distributed_compat_headers
 include(HPX_AddModule)
 add_hpx_module(
   full executors_distributed
-  COMPATIBILITY_HEADERS ON
   GLOBAL_HEADER_GEN ON
   HEADERS ${executors_distributed_headers}
   COMPAT_HEADERS ${executors_distributed_compat_headers}

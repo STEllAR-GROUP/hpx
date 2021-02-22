@@ -349,7 +349,6 @@ with section("parse"):
                                         'pargs': { 'flags': ['APPEND'],
                                                    'nargs': '1+'}},
     'add_hpx_module': { 'kwargs': { 'CMAKE_SUBDIRS': '+',
-                                    'COMPATIBILITY_HEADERS': 1,
                                     'COMPAT_HEADERS': '+',
                                     'DEPENDENCIES': '+',
                                     'EXCLUDE_FROM_GLOBAL_HEADER': '+',

@@ -45,7 +45,6 @@ set(segmented_algorithms_compat_headers
 include(HPX_AddModule)
 add_hpx_module(
   full segmented_algorithms
-  COMPATIBILITY_HEADERS ON
   HEADERS ${segmented_algorithms_headers}
   COMPAT_HEADERS ${segmented_algorithms_compat_headers}
   DEPENDENCIES hpx_core hpx_parallelism

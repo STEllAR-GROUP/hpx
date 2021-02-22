@@ -29,7 +29,6 @@ set(lcos_distributed_sources)
 include(HPX_AddModule)
 add_hpx_module(
   full lcos_distributed
-  COMPATIBILITY_HEADERS ON
   GLOBAL_HEADER_GEN ON
   SOURCES ${lcos_distributed_sources}
   HEADERS ${lcos_distributed_headers}
