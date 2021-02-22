@@ -77,11 +77,6 @@ namespace hpx { namespace local {
                         hpx::program_options::variables_map&)> const& f,
         int argc, char** argv, init_params const& params = init_params())
     {
-#if defined(HPX_HAVE_APEX)
-        // artificially force the apex shared library to be loaded by the
-        // application
-        apex::version();
-#endif
         util::set_hpx_prefix(HPX_PREFIX);
 #if defined(__FreeBSD__)
         freebsd_environ = environ;

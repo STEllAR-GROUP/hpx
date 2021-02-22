@@ -346,10 +346,6 @@ namespace hpx { namespace local {
                 &hpx::detail::assertion_handler);
             hpx::util::set_test_failure_handler(
                 &hpx::detail::test_failure_handler);
-#if defined(HPX_HAVE_APEX)
-            hpx::util::set_enable_parent_task_handler(
-                &hpx::detail::enable_parent_task_handler);
-#endif
             hpx::set_custom_exception_info_handler(
                 &hpx::detail::custom_exception_info);
             hpx::serialization::detail::set_save_custom_exception_handler(
