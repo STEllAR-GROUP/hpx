@@ -297,8 +297,7 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename Sender>
     struct is_sender
       : std::integral_constant<bool,
-            std::is_move_constructible<
-                typename std::decay<Sender>::type>::value &&
+            std::is_move_constructible<std::decay_t<Sender>>::value &&
                 detail::specialized<Sender>(nullptr)>
     {
     };
@@ -319,12 +318,11 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Executor, typename F>
         struct is_executor_of_base_impl<Executor, F,
-            typename std::enable_if<hpx::traits::is_invocable<
-                                        typename std::decay<F>::type&>::value &&
-                std::is_constructible<typename std::decay<F>::type, F>::value &&
-                std::is_destructible<typename std::decay<F>::type>::value &&
-                std::is_move_constructible<
-                    typename std::decay<F>::type>::value &&
+            typename std::enable_if<
+                hpx::traits::is_invocable<std::decay_t<F>&>::value &&
+                std::is_constructible<std::decay_t<F>, F>::value &&
+                std::is_destructible<std::decay_t<F>>::value &&
+                std::is_move_constructible<std::decay_t<F>>::value &&
                 std::is_copy_constructible<Executor>::value &&
                 hpx::traits::is_equality_comparable<Executor>::value>::type>
           : std::true_type
@@ -333,7 +331,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Executor>
         struct is_executor_base
-          : is_executor_of_base_impl<typename std::decay<Executor>::type,
+          : is_executor_of_base_impl<std::decay_t<Executor>,
                 invocable_archetype>
         {
         };
@@ -347,8 +345,8 @@ namespace hpx { namespace execution { namespace experimental {
             Executor&& executor,
             F&& f) noexcept(noexcept(std::forward<Executor>(executor)
                                          .execute(std::forward<F>(f)))) ->
-            typename std::enable_if<hpx::traits::is_invocable<
-                                        typename std::decay<F>::type&>::value &&
+            typename std::enable_if<
+                hpx::traits::is_invocable<std::decay_t<F>&>::value &&
                     (is_sender_v<Executor> ||
                         detail::is_executor_base<Executor>::value),
                 decltype(std::forward<Executor>(executor).execute(
@@ -399,14 +397,14 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename S, typename R>
         struct as_operation
         {
-            typename std::decay<S>::type e;
-            typename std::decay<R>::type r;
+            std::decay_t<S> e;
+            std::decay_t<R> r;
 
             void start() noexcept
             try
             {
-                hpx::execution::experimental::execute(std::move(e),
-                    as_invocable<typename std::decay<R>::type, S>{r});
+                hpx::execution::experimental::execute(
+                    std::move(e), as_invocable<std::decay_t<R>, S>{r});
             }
             catch (...)
             {
@@ -453,10 +451,8 @@ namespace hpx { namespace execution { namespace experimental {
             std::forward<S>(s), std::forward<R>(r)})) ->
             typename std::enable_if<!detail::has_member_connect<S, R>::value &&
                     is_receiver_of_v<R> &&
-                    detail::is_executor_of_base_impl<
-                        typename std::decay<S>::type,
-                        detail::as_invocable<typename std::decay<R>::type,
-                            S>>::value,
+                    detail::is_executor_of_base_impl<std::decay_t<S>,
+                        detail::as_invocable<std::decay_t<R>, S>>::value,
                 decltype(detail::as_operation<S, R>{
                     std::forward<S>(s), std::forward<R>(r)})>::type
         {
@@ -515,7 +511,7 @@ namespace hpx { namespace execution { namespace experimental {
                 }
             };
 
-            typename std::decay<R>::type r;
+            std::decay_t<R> r;
             typename connect_result_helper<S, submit_receiver>::type state;
 
             submit_state(S&& s, R&& r)
@@ -611,20 +607,19 @@ namespace hpx { namespace execution { namespace experimental {
     tag_fallback_invoke(execute_t, Executor&& executor, F&& f) noexcept(
         noexcept(hpx::execution::experimental::submit(
             std::forward<Executor>(executor),
-            detail::as_receiver<typename std::decay<F>::type, Executor>{
+            detail::as_receiver<std::decay_t<F>, Executor>{
                 std::forward<F>(f)}))) ->
         typename std::enable_if<
-            hpx::traits::is_invocable<typename std::decay<F>::type&>::value &&
+            hpx::traits::is_invocable<std::decay_t<F>&>::value &&
                 !detail::has_member_execute<Executor, F>::value,
             decltype(hpx::execution::experimental::submit(
                 std::forward<Executor>(executor),
-                detail::as_receiver<typename std::decay<F>::type, Executor>{
+                detail::as_receiver<std::decay_t<F>, Executor>{
                     std::forward<F>(f)}))>::type
     {
         return hpx::execution::experimental::submit(
             std::forward<Executor>(executor),
-            detail::as_receiver<typename std::decay<F>::type, Executor>{
-                std::forward<F>(f)});
+            detail::as_receiver<std::decay_t<F>, Executor>{std::forward<F>(f)});
     }
 
     namespace detail {
@@ -728,17 +723,15 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         template <typename S>
-        friend constexpr HPX_FORCEINLINE auto
-        tag_fallback_invoke(schedule_t, S&& s) noexcept(
-            noexcept(detail::as_sender<typename std::decay<S>::type>{
-                std::forward<S>(s)})) ->
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(schedule_t,
+            S&& s) noexcept(noexcept(detail::as_sender<std::decay_t<S>>{
+            std::forward<S>(s)})) ->
             typename std::enable_if<!detail::has_member_schedule<S>::value &&
                     is_executor_v<S>,
-                decltype(detail::as_sender<typename std::decay<S>::type>{
+                decltype(detail::as_sender<std::decay_t<S>>{
                     std::forward<S>(s)})>::type
         {
-            return detail::as_sender<typename std::decay<S>::type>{
-                std::forward<S>(s)};
+            return detail::as_sender<std::decay_t<S>>{std::forward<S>(s)};
         }
     } schedule{};
 

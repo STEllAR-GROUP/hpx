@@ -160,10 +160,10 @@ namespace hpx { namespace execution { namespace experimental {
               : std::integral_constant<bool,
                     hpx::is_invocable_v<
                         hpx::execution::experimental::set_done_t,
-                            typename std::decay<T>::type&&> &&
+                            std::decay_t<T>&&> &&
                     hpx::is_invocable_v<
                         hpx::execution::experimental::set_error_t,
-                        typename std::decay<T>::type&&, E>>
+                        std::decay_t<T>&&, E>>
             {
             };
         // clang-format on
@@ -173,8 +173,8 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename T, typename E>
         struct is_receiver
           : detail::is_receiver_impl<
-                std::is_move_constructible<typename std::decay<T>::type>::value &&
-                std::is_constructible<typename std::decay<T>::type, T>::value,
+                std::is_move_constructible<std::decay_t<T>>::value &&
+                std::is_constructible<std::decay_t<T>, T>::value,
                 T, E>
         {
         };
@@ -199,7 +199,7 @@ namespace hpx { namespace execution { namespace experimental {
               : std::integral_constant<bool,
                     hpx::is_invocable_v<
                         hpx::execution::experimental::set_value_t,
-                            typename std::decay<T>::type&&, As...>>
+                            std::decay_t<T>&&, As...>>
             {
             };
         // clang-format on
