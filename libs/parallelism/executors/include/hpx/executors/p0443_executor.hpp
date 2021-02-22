@@ -148,7 +148,7 @@ namespace hpx { namespace execution { namespace experimental {
             return {std::forward<R>(r)};
         }
 
-        sender schedule()
+        constexpr sender schedule() const
         {
             return {};
         }
