@@ -17,6 +17,12 @@ set(CTEST_UPDATE_VERSION_ONLY "ON")
 set(CTEST_SUBMIT_RETRY_COUNT 5)
 set(CTEST_SUBMIT_RETRY_DELAY 60)
 
+# We reduce the number of concurrent jobs with icc since it has higher memory
+# requirements than other compilers.
+if("${CTEST_BUILD_CONFIGURATION_NAME}" STREQUAL "icc")
+  set(CTEST_BUILD_PARALLELISM 5)
+endif()
+
 if(NOT "$ENV{ghprbPullId}" STREQUAL "")
   set(CTEST_BUILD_NAME "$ENV{ghprbPullId}-${CTEST_BUILD_CONFIGURATION_NAME}")
   set(CTEST_TRACK "Pull_Requests")

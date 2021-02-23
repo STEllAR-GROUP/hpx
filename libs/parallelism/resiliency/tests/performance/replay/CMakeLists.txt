@@ -7,17 +7,17 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(benchmarks
-    1d_stencil
-    1d_stencil_replay
-    1d_stencil_checksum
-    async_replay
-    async_replay_validate
-    dataflow_replay
-    dataflow_replay_validate
-    pure_async_for_replay
-    pure_dataflow
+set(benchmarks 1d_stencil async_replay async_replay_validate
+               pure_async_for_replay pure_dataflow
 )
+
+# The Intel compiler version 19.1.1.217 does not manage to compile these. Other
+# versions have not been tested.
+if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  list(APPEND benchmarks 1d_stencil_checksum 1d_stencil_replay dataflow_replay
+       dataflow_replay_validate
+  )
+endif()
 
 foreach(benchmark ${benchmarks})
 

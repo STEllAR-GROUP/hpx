@@ -48,7 +48,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     HPX_HOST_DEVICE constexpr void advance_impl(
         InputIterator& i, Distance n, std::input_iterator_tag)
     {
+#if defined(HPX_INTEL_VERSION)
+#pragma warning(push)
+#pragma warning(disable : 186)
+#endif
         HPX_ASSERT(n >= 0);
+#if defined(HPX_INTEL_VERSION)
+#pragma warning(pop)
+#endif
         while (n--)
             ++i;
     }

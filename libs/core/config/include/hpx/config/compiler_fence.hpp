@@ -21,6 +21,8 @@
 #else
 #if defined(__INTEL_COMPILER)
 
+#include <immintrin.h>
+#define HPX_SMT_PAUSE _mm_pause()
 #define HPX_COMPILER_FENCE __memory_barrier()
 
 #elif defined(_MSC_VER) && _MSC_VER >= 1310

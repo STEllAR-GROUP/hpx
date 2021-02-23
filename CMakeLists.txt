@@ -2069,6 +2069,8 @@ else()
     hpx_add_compile_flag_if_available(-wd2203)
     # #2536: cannot specify explicit initializer for arrays
     hpx_add_compile_flag_if_available(-wd2536)
+    # #1286: invalid attribute
+    hpx_add_compile_flag_if_available(-wd1286)
   endif()
 
   set(__has_timestamp_support OFF)
