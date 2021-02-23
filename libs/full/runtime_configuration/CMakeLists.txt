@@ -45,6 +45,6 @@ add_hpx_module(
   HEADERS ${runtime_configuration_headers}
   COMPAT_HEADERS ${runtime_configuration_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_runtime_configuration_local
+  MODULE_DEPENDENCIES hpx_program_options hpx_runtime_configuration_local
   CMAKE_SUBDIRS examples tests
 )
