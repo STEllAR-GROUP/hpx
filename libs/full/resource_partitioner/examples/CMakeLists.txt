@@ -23,24 +23,15 @@ set(example_programs simplest_resource_partitioner_1
                      simplest_resource_partitioner_2
 )
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME
-   AND HPX_WITH_MAX_CPU_COUNT
-   AND HPX_WITH_SHARED_PRIORITY_SCHEDULER
+set(example_programs
+    ${example_programs} async_customization
+    oversubscribing_resource_partitioner simple_resource_partitioner
 )
-  set(example_programs
-      ${example_programs} async_customization
-      oversubscribing_resource_partitioner simple_resource_partitioner
-  )
 
-  # Intel compilers have trouble compiling this example
-  if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-    set(example_programs ${example_programs} guided_pool_test)
-  endif()
+# Intel compilers have trouble compiling this example
+if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+  set(example_programs ${example_programs} guided_pool_test)
 endif()
-
-set(guided_pool_test_FLAGS DEPENDENCIES iostreams_component)
-set(oversubscribing_resource_partitioner_FLAGS DEPENDENCIES iostreams_component)
-set(simple_resource_partitioner_FLAGS DEPENDENCIES iostreams_component)
 
 set(oversubscribing_resource_partitioner_PARAMETERS
     THREADS_PER_LOCALITY 4 "--use-pools" "--pool-threads" 1

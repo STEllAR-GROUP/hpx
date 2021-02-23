@@ -13,13 +13,11 @@
 #include <hpx/thread_executors/guided_pool_executor.hpp>
 //#include <hpx/topology/cpu_mask.hpp>
 //#include <hpx/include/parallel_executors.hpp>
-#include <hpx/modules/async_distributed.hpp>
 
 // we should not need these
 #include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>
 
 #include <hpx/async_combinators/when_all.hpp>
-#include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/functional/deferred_call.hpp>

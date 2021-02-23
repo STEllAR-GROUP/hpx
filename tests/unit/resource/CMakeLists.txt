@@ -16,11 +16,9 @@ set(tests
     # suspend_thread_timed
 )
 
-if(HPX_WITH_SHARED_PRIORITY_SCHEDULER)
-  set(tests ${tests} cross_pool_injection scheduler_binding_check)
-  set(cross_pool_injection_PARAMETERS THREADS_PER_LOCALITY -1 TIMEOUT 300)
-  set(scheduler_binding_check_PARAMETERS THREADS_PER_LOCALITY -1)
-endif()
+set(tests ${tests} cross_pool_injection scheduler_binding_check)
+set(cross_pool_injection_PARAMETERS THREADS_PER_LOCALITY -1 TIMEOUT 300)
+set(scheduler_binding_check_PARAMETERS THREADS_PER_LOCALITY -1)
 
 # NB. threads = -2 = threads = 'cores' NB. threads = -1 = threads = 'all'
 
