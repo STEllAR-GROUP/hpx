@@ -22,7 +22,7 @@ struct movable_only
     movable_only& operator=(movable_only&&) = default;
 };
 
-void pass_shared_future_movable(hpx::shared_future<movable_only> const& obj) {}
+void pass_shared_future_movable(hpx::shared_future<movable_only> const&) {}
 
 HPX_PLAIN_ACTION(pass_shared_future_movable, pass_shared_future_movable_action)
 
