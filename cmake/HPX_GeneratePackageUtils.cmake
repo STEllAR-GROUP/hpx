@@ -142,6 +142,9 @@ function(
           endif()
         endif()
 
+      elseif(${dep} MATCHES "::@")
+        # Skip targets beginning with ::@ as they come from object libraries
+        # which do not need to be linked.
       elseif(${dep} MATCHES "\\$<TARGET_NAME_IF_EXISTS:")
         # Skip conditional targets like $<TARGET_NAME_IF_EXISTS:hpx> as they are
         # not useful for pkgconfig file generation.
