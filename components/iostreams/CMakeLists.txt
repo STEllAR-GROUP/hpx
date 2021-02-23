@@ -14,10 +14,6 @@ set(HPX_COMPONENTS
     CACHE INTERNAL "list of HPX components"
 )
 
-if(NOT HPX_WITH_DEFAULT_TARGETS)
-  set(_exclude_from_all_flag EXCLUDE_FROM_ALL)
-endif()
-
 set(iostreams_headers
     hpx/components/iostreams/server/buffer.hpp
     hpx/components/iostreams/server/order_output.hpp
@@ -43,8 +39,7 @@ add_hpx_component(
   HEADERS ${iostreams_headers}
   PREPEND_SOURCE_ROOT
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
-  SOURCES ${iostreams_sources} ${_exclude_from_all_flag}
-          ${HPX_WITH_UNITY_BUILD_OPTION}
+  SOURCES ${iostreams_sources} ${HPX_WITH_UNITY_BUILD_OPTION}
 )
 
 target_compile_definitions(

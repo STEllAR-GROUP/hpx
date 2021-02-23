@@ -10,10 +10,6 @@ if(HPX_WITH_IO_COUNTERS)
       CACHE INTERNAL "list of HPX components"
   )
 
-  if(NOT HPX_WITH_DEFAULT_TARGETS)
-    set(_exclude_from_all_flag EXCLUDE_FROM_ALL)
-  endif()
-
   set(io_counters_headers
       hpx/components/performance_counters/io/io_counters.hpp
   )
@@ -28,8 +24,7 @@ if(HPX_WITH_IO_COUNTERS)
     HEADERS ${io_counters_headers}
     PREPEND_SOURCE_ROOT
     SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
-    SOURCES ${io_counters_sources} ${_exclude_from_all_flag}
-            ${HPX_WITH_UNITY_BUILD_OPTION}
+    SOURCES ${io_counters_sources} ${HPX_WITH_UNITY_BUILD_OPTION}
   )
 
   add_hpx_pseudo_dependencies(

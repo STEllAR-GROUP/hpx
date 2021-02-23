@@ -13,10 +13,6 @@ set(HPX_COMPONENTS
     CACHE INTERNAL "list of HPX components"
 )
 
-if(NOT HPX_WITH_DEFAULT_TARGETS)
-  set(_exclude_from_all_flag EXCLUDE_FROM_ALL)
-endif()
-
 set(unordered_headers
     hpx/components/containers/unordered/partition_unordered_map_component.hpp
     hpx/components/containers/unordered/unordered_map.hpp
@@ -34,8 +30,7 @@ add_hpx_component(
   HEADERS ${unordered_headers}
   PREPEND_SOURCE_ROOT
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
-  SOURCES ${unordered_sources} ${_exclude_from_all_flag}
-          ${HPX_WITH_UNITY_BUILD_OPTION}
+  SOURCES ${unordered_sources} ${HPX_WITH_UNITY_BUILD_OPTION}
 )
 
 add_hpx_pseudo_dependencies(components.containers.unordered unordered_component)

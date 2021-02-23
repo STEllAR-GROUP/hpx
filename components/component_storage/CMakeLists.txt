@@ -13,10 +13,6 @@ set(HPX_COMPONENTS
     CACHE INTERNAL "list of HPX components"
 )
 
-if(NOT HPX_WITH_DEFAULT_TARGETS)
-  set(_exclude_from_all_flag EXCLUDE_FROM_ALL)
-endif()
-
 set(component_storage_headers
     hpx/components/component_storage/server/component_storage.hpp
     hpx/components/component_storage/server/migrate_from_storage.hpp
@@ -41,8 +37,7 @@ add_hpx_component(
   PREPEND_SOURCE_ROOT
   SOURCE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src
   SOURCES ${component_storage_sources}
-  DEPENDENCIES unordered_component ${_exclude_from_all_flag}
-               ${HPX_WITH_UNITY_BUILD_OPTION}
+  DEPENDENCIES unordered_component ${HPX_WITH_UNITY_BUILD_OPTION}
 )
 
 target_compile_definitions(

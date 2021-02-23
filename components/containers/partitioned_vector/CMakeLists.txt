@@ -13,10 +13,6 @@ set(HPX_COMPONENTS
     CACHE INTERNAL "list of HPX components"
 )
 
-if(NOT HPX_WITH_DEFAULT_TARGETS)
-  set(_exclude_from_all_flag EXCLUDE_FROM_ALL)
-endif()
-
 set(partitioned_vector_headers
     hpx/components/containers/coarray/coarray.hpp
     hpx/components/containers/partitioned_vector/detail/view_element.hpp
@@ -54,8 +50,7 @@ add_hpx_component(
   HEADERS ${partitioned_vector_headers}
   PREPEND_SOURCE_ROOT
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
-  SOURCES ${partitioned_vector_sources} ${_exclude_from_all_flag}
-          ${HPX_WITH_UNITY_BUILD_OPTION}
+  SOURCES ${partitioned_vector_sources} ${HPX_WITH_UNITY_BUILD_OPTION}
 )
 
 target_compile_definitions(

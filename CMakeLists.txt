@@ -253,12 +253,6 @@ hpx_option(
 )
 
 hpx_option(
-  HPX_WITH_DEFAULT_TARGETS BOOL
-  "Associate the core HPX library with the default build target (default: ON)."
-  ON ADVANCED CATEGORY "Build Targets"
-)
-
-hpx_option(
   HPX_WITH_COMPILER_WARNINGS BOOL "Enable compiler warnings (default: ON)" ON
   ADVANCED
 )
@@ -298,18 +292,10 @@ if(HPX_WITH_DOCUMENTATION)
   endforeach()
 endif()
 
-if(MSVC)
-  hpx_option(
-    HPX_WITH_PSEUDO_DEPENDENCIES BOOL
-    "Force creating pseudo targets and pseudo dependencies (default OFF)." OFF
-    CATEGORY "Build Targets"
-  )
+if(WIN32)
+  set(HPX_WITH_PSEUDO_DEPENDENCIES OFF)
 else()
-  hpx_option(
-    HPX_WITH_PSEUDO_DEPENDENCIES BOOL
-    "Force creating pseudo targets and pseudo dependencies (default ON)." ON
-    CATEGORY "Build Targets"
-  )
+  set(HPX_WITH_PSEUDO_DEPENDENCIES ON)
 endif()
 
 hpx_option(
@@ -680,25 +666,6 @@ else()
 endif()
 
 # ##############################################################################
-# Native TLS configuration
-# ##############################################################################
-hpx_option(
-  HPX_WITH_NATIVE_TLS
-  BOOL
-  "Use native TLS support if available (default: ${HPX_WITH_NATIVE_TLS_DEFAULT})"
-  ON
-  ADVANCED
-)
-if(HPX_WITH_NATIVE_TLS)
-  hpx_info("Native TLS is enabled.")
-  hpx_add_config_define(HPX_HAVE_NATIVE_TLS)
-else()
-  hpx_error(
-    "Native TLS is disabled. HPX requires native TLS. This option will be removed in a future release."
-  )
-endif()
-
-# ##############################################################################
 # Threadlevel Nice option
 # ##############################################################################
 hpx_option(
@@ -804,20 +771,6 @@ hpx_add_config_define(
   HPX_HAVE_MAX_NUMA_DOMAIN_COUNT ${HPX_WITH_MAX_NUMA_DOMAIN_COUNT}
 )
 
-# Deprecated in 1.4.0
-hpx_option(
-  HPX_WITH_MORE_THAN_64_THREADS
-  BOOL
-  "HPX applications will be able to run on more than 64 cores (This variable is deprecated. The value is derived from HPX_WITH_MAX_CPU_COUNT instead.)"
-  ""
-  CATEGORY "Thread Manager"
-  ADVANCED
-)
-if(HPX_WITH_MORE_THAN_64_THREADS)
-  hpx_warn(
-    "HPX_WITH_MORE_THAN_64_THREADS is deprecated. Instead use HPX_WITH_MAX_CPU_COUNT directly. If HPX_WITH_MAX_CPU_COUNT is greater than 64, or empty, HPX_HAVE_MORE_THAN_64_THREADS will be automatically set."
-  )
-endif()
 hpx_option(
   HPX_WITH_THREAD_STACK_MMAP BOOL
   "Use mmap for stack allocation on appropriate platforms" ON

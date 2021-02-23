@@ -13,10 +13,6 @@ set(HPX_COMPONENTS
     CACHE INTERNAL "list of HPX components"
 )
 
-if(NOT HPX_WITH_DEFAULT_TARGETS)
-  set(_exclude_from_all_flag EXCLUDE_FROM_ALL)
-endif()
-
 set(process_headers
     hpx/components/process/util/windows/wait_for_exit.hpp
     hpx/components/process/util/windows/terminate.hpp
@@ -121,8 +117,7 @@ add_hpx_component(
   HEADERS ${process_headers}
   PREPEND_SOURCE_ROOT
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
-  SOURCES ${process_sources} ${_exclude_from_all_flag}
-          ${HPX_WITH_UNITY_BUILD_OPTION}
+  SOURCES ${process_sources} ${HPX_WITH_UNITY_BUILD_OPTION}
 )
 
 target_compile_definitions(process_component PRIVATE HPX_PROCESS_EXPORTS)

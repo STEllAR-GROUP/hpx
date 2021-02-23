@@ -26,7 +26,6 @@ jobs:
           cmake . -Bbuild -G'Visual Studio 16 2019' \
               -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_TOOLCHAIN_FILE='C:/projects/vcpkg/scripts/buildsystems/vcpkg.cmake' \
-              -DHPX_WITH_PSEUDO_DEPENDENCIES=OFF \
               -DHPX_WITH_EXAMPLES=ON \
               -DHPX_WITH_TESTS=ON \
               -DHPX_WITH_TESTS_UNIT=ON \
