@@ -318,8 +318,22 @@ namespace hpx { namespace threads {
     /// The type of hint given when creating new tasks.
     enum class thread_schedule_hint_mode : std::int16_t
     {
+        /// A hint that leaves the choice of scheduling entirely up to the
+        /// scheduler.
         none = 0,
+        /// A hint that tells the scheduler to prefer scheduling a task on the
+        /// local thread number associated with this hint. Local thread numbers
+        /// are indexed from zero. It is up to the scheduler to decide how to
+        /// interpret thread numbers that are larger than the number of threads
+        /// available to the scheduler. Typically thread numbers will wrap
+        /// around when too large.
         thread = 1,
+        /// A hint that tells the scheduler to prefer scheduling a task on the
+        /// NUMA domain associated with this hint. NUMA domains are indexed from
+        /// zero. It is up to the scheduler to decide how to interpret NUMA
+        /// domain indices that are larger than the number of available NUMA
+        /// domains to the scheduler. Typically indices will wrap around when
+        /// too large.
         numa = 2,
     };
 
@@ -342,20 +356,30 @@ namespace hpx { namespace threads {
 #undef HPX_THREAD_SCHEDULE_HINT_UNSCOPED_ENUM_DEPRECATION_MSG
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief A hint given to a scheduler to guide where a task should be
+    /// scheduled.
+    ///
+    /// A scheduler is free to ignore the hint, or modify the hint to suit the
+    /// resources available to the scheduler.
     struct thread_schedule_hint
     {
+        /// Construct a default hint with mode thread_schedule_hint_mode::none.
         constexpr thread_schedule_hint() noexcept
           : mode(thread_schedule_hint_mode::none)
           , hint(-1)
         {
         }
 
+        /// Construct a hint with mode thread_schedule_hint_mode::thread and the
+        /// given hint as the local thread number.
         constexpr explicit thread_schedule_hint(std::int16_t thread_hint)
           : mode(thread_schedule_hint_mode::thread)
           , hint(thread_hint)
         {
         }
 
+        /// Construct a hint with the given mode and hint. The numerical hint is
+        /// unused when the mode is thread_schedule_hint_mode::none.
         constexpr thread_schedule_hint(
             thread_schedule_hint_mode mode, std::int16_t hint) noexcept
           : mode(mode)
@@ -363,6 +387,7 @@ namespace hpx { namespace threads {
         {
         }
 
+        /// \cond NOINTERNAL
         bool operator==(thread_schedule_hint const& rhs) const noexcept
         {
             return mode == rhs.mode && hint == rhs.hint;
@@ -372,8 +397,12 @@ namespace hpx { namespace threads {
         {
             return !(*this == rhs);
         }
+        /// \endcond
 
+        /// The mode of the scheduling hint.
         thread_schedule_hint_mode mode;
+        /// The hint associated with the mode. The interepretation of this hint
+        /// depends on the given mode.
         std::int16_t hint;
     };
 }}    // namespace hpx::threads
