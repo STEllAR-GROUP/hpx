@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2021      Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +8,472 @@
 /// \file parallel/algorithms/replace.hpp
 
 #pragma once
+
+#if defined(DOXYGEN)
+
+namespace hpx {
+
+    /// Replaces all elements satisfying specific criteria with \a new_value
+    /// in the range [first, last).
+    ///
+    /// Effects: Substitutes elements referred by the iterator it in the range
+    ///          [first, last) with new_value, when the following corresponding
+    ///          conditions hold: *it == old_value
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    ///
+    /// \tparam InIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam T           The type of the old and new values to replace (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param old_value    Refers to the old value of the elements to replace.
+    /// \param new_value    Refers to the new value to use as the replacement.
+    ///
+    /// The assignments in the parallel \a replace algorithm
+    /// execute in sequential order in the calling thread.
+    ///
+    ///
+    /// \returns  The \a replace algorithm returns a \a void.
+    ///
+    template <typename Initer, typename T>
+    void replace(
+        InIter first, InIter last, T const& old_value, T const& new_value);
+
+    /// Replaces all elements satisfying specific criteria with \a new_value
+    /// in the range [first, last).
+    ///
+    /// Effects: Substitutes elements referred by the iterator it in the range
+    ///          [first, last) with new_value, when the following corresponding
+    ///          conditions hold: *it == old_value
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam T          The type of the old and new values to replace (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param old_value    Refers to the old value of the elements to replace.
+    /// \param new_value    Refers to the new value to use as the replacement.
+    ///
+    /// The assignments in the parallel \a replace algorithm invoked with an
+    /// execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a replace algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a replace algorithm returns a \a hpx::future<void> if
+    ///           the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a void otherwise.
+    ///
+    template <typename ExPolicy, typename FwdIter, typename T>
+    typename parallel::util::detail::algorithm_result<ExPolicy, void>::type
+    replace(ExPolicy&& policy, FwdIter first, FwdIter last, T const& old_value,
+        T const& new_value);
+
+    /// Replaces all elements satisfying specific criteria (for which predicate
+    /// \a f returns true) with \a new_value in the range [first, last).
+    ///
+    /// Effects: Substitutes elements referred by the iterator it in the range
+    ///          [first, last) with new_value, when the following corresponding
+    ///          conditions hold: INVOKE(f, *it) != false
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first applications of
+    ///         the predicate.
+    ///
+    /// \tparam Iter        The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a equal requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///                     (deduced).
+    /// \tparam T           The type of the new values to replace (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param pred         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).This is an
+    ///                     unary predicate which returns \a true for the
+    ///                     elements which need to replaced. The
+    ///                     signature of this predicate should be equivalent
+    ///                     to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a InIter can be dereferenced and then
+    ///                     implicitly converted to \a Type.
+    /// \param new_value    Refers to the new value to use as the replacement.
+    ///
+    /// The assignments in the parallel \a replace_if algorithm
+    /// execute in sequential order in the calling thread.
+    ///
+    ///
+    /// \returns  The \a replace_if algorithm returns \a void.
+    ///
+    template <typename Iter, typename Pred, typename T>
+    void replace_if(Iter first, Iter last, Pred&& pred, T const& new_value);
+
+    /// Replaces all elements satisfying specific criteria (for which predicate
+    /// \a f returns true) with \a new_value in the range [first, last).
+    ///
+    /// Effects: Substitutes elements referred by the iterator it in the range
+    ///          [first, last) with new_value, when the following corresponding
+    ///          conditions hold: INVOKE(f, *it) != false
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first applications of
+    ///         the predicate.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a equal requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///                     (deduced).
+    /// \tparam T           The type of the new values to replace (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param pred         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).This is an
+    ///                     unary predicate which returns \a true for the
+    ///                     elements which need to replaced. The
+    ///                     signature of this predicate should be equivalent
+    ///                     to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to \a Type.
+    /// \param new_value    Refers to the new value to use as the replacement.
+    ///
+    /// The assignments in the parallel \a replace_if algorithm invoked with an
+    /// execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a replace_if algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a replace_if algorithm returns a \a hpx::future<void>
+    ///           if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy
+    ///           and returns \a void otherwise.
+    ///
+    template <typename ExPolicy, typename FwdIter, typename Pred, typename T>
+    typename parallel::util::detail::algorithm_result<ExPolicy, void>::type
+    replace_if(ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred,
+        T const& new_value);
+
+    /// Copies the all elements from the range [first, last) to another range
+    /// beginning at \a dest replacing all elements satisfying a specific
+    /// criteria with \a new_value.
+    ///
+    /// Effects: Assigns to every iterator it in the range
+    ///          [result, result + (last - first)) either new_value or
+    ///          *(first + (it - result)) depending on whether the following
+    ///          corresponding condition holds:
+    ///          *(first + (i - result)) == old_value
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first applications of
+    ///         the predicate.
+    ///
+
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam InIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam OutIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     output iterator.
+    /// \tparam T          The type of the old and new values (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param old_value    Refers to the old value of the elements to replace.
+    /// \param new_value    Refers to the new value to use as the replacement.
+    ///
+    /// The assignments in the parallel \a replace_copy algorithm
+    /// execute in sequential order in the calling thread.
+    ///
+    ///
+    /// \returns  The \a replace_copy algorithm returns an
+    ///           \a OutIter
+    ///           The \a replace_copy algorithm returns the
+    ///           Iterator to the element past the last element copied.
+    ///
+    template <typename InIter, typename OutIter, typename T>
+    OutIter replace_copy(InIter first, InIter last, OutIter dest,
+        T const& old_value, T const& new_value);
+
+    /// Copies the all elements from the range [first, last) to another range
+    /// beginning at \a dest replacing all elements satisfying a specific
+    /// criteria with \a new_value.
+    ///
+    /// Effects: Assigns to every iterator it in the range
+    ///          [result, result + (last - first)) either new_value or
+    ///          *(first + (it - result)) depending on whether the following
+    ///          corresponding condition holds:
+    ///          *(first + (i - result)) == old_value
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first applications of
+    ///         the predicate.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam T           The type of the old and new values (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param old_value    Refers to the old value of the elements to replace.
+    /// \param new_value    Refers to the new value to use as the replacement.
+    ///
+    /// The assignments in the parallel \a replace_copy algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a replace_copy algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a replace_copy algorithm returns a
+    ///           \a hpx::future<FwdIter2>
+    ///           if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a FwdIter2
+    ///           otherwise.
+    ///           The \a replace_copy algorithm returns the
+    ///           Iterator to the element past the last element copied.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename T>
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    replace_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+        FwdIter2 dest, T const& old_value, T const& new_value);
+
+    /// Copies the all elements from the range [first, last) to another range
+    /// beginning at \a dest replacing all elements satisfying a specific
+    /// criteria with \a new_value.
+    ///
+    /// Effects: Assigns to every iterator it in the range
+    ///          [result, result + (last - first)) either new_value or
+    ///          *(first + (it - result)) depending on whether the following
+    ///          corresponding condition holds:
+    ///          INVOKE(f, *(first + (i - result))) != false
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first applications of
+    ///         the predicate.
+    ///
+    /// \tparam InIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam OutIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     output iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a equal requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///                     (deduced).
+    /// \tparam T           The type of the new values to replace (deduced).
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param pred         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).This is an
+    ///                     unary predicate which returns \a true for the
+    ///                     elements which need to replaced. The
+    ///                     signature of this predicate should be equivalent
+    ///                     to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a InIter can be dereferenced and then
+    ///                     implicitly converted to \a Type.
+    /// \param new_value    Refers to the new value to use as the replacement.
+    ///
+    /// The assignments in the parallel \a replace_copy_if algorithm
+    /// execute in sequential order in the calling thread.
+    ///
+    ///
+    /// \returns  The \a replace_copy_if algorithm returns an
+    ///           \a OutIter.
+    ///           The \a replace_copy_if algorithm returns
+    ///           the output iterator to the
+    ///           element in the destination range, one past the last element
+    ///           copied.
+    ///
+    template <typename InIter, typename OutIter, typename Pred, typename T>
+    OutIter replace_copy_if(InIter first, InIter last, OutIter dest,
+        Pred&& pred, T const& new_value);
+
+    /// Copies the all elements from the range [first, last) to another range
+    /// beginning at \a dest replacing all elements satisfying a specific
+    /// criteria with \a new_value.
+    ///
+    /// Effects: Assigns to every iterator it in the range
+    ///          [result, result + (last - first)) either new_value or
+    ///          *(first + (it - result)) depending on whether the following
+    ///          corresponding condition holds:
+    ///          INVOKE(f, *(first + (i - result))) != false
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first applications of
+    ///         the predicate.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a equal requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///                     (deduced).
+    /// \tparam T           The type of the new values to replace (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param pred         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).This is an
+    ///                     unary predicate which returns \a true for the
+    ///                     elements which need to replaced. The
+    ///                     signature of this predicate should be equivalent
+    ///                     to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     implicitly converted to \a Type.
+    /// \param new_value    Refers to the new value to use as the replacement.
+    ///
+    /// The assignments in the parallel \a replace_copy_if algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a replace_copy_if algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a replace_copy_if algorithm returns a
+    ///           \a hpx::future<FwdIter2>
+    ///           if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy
+    ///           and returns \a FwdIter2
+    ///           otherwise.
+    ///           The \a replace_copy_if algorithm returns the
+    ///           iterator to the
+    ///           element in the destination range, one past the last element
+    ///           copied.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename Pred, typename T>
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    replace_copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+        FwdIter2 dest, Pred&& pred, T const& new_value);
+
+}    // namespace hpx
+
+#else    // DOXYGEN
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -92,57 +559,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Replaces all elements satisfying specific criteria with \a new_value
-    /// in the range [first, last).
-    ///
-    /// Effects: Substitutes elements referred by the iterator it in the range
-    ///          [first, last) with new_value, when the following corresponding
-    ///          conditions hold: INVOKE(proj, *it) == old_value
-    ///
-    /// \note   Complexity: Performs exactly \a last - \a first assignments.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
-    /// \tparam T1          The type of the old value to replace (deduced).
-    /// \tparam T2          The type of the new values to replace (deduced).
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param old_value    Refers to the old value of the elements to replace.
-    /// \param new_value    Refers to the new value to use as the replacement.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a replace algorithm invoked with an
-    /// execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a replace algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a replace algorithm returns a \a hpx::future<FwdIter> if
-    ///           the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a void otherwise.
-    ///           It returns \a last.
-    ///
     // clang-format off
     template <typename ExPolicy, typename FwdIter, typename T1, typename T2,
         typename Proj = util::projection_identity,
@@ -235,76 +651,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Replaces all elements satisfying specific criteria (for which predicate
-    /// \a f returns true) with \a new_value in the range [first, last).
-    ///
-    /// Effects: Substitutes elements referred by the iterator it in the range
-    ///          [first, last) with new_value, when the following corresponding
-    ///          conditions hold: INVOKE(f, INVOKE(proj, *it)) != false
-    ///
-    /// \note   Complexity: Performs exactly \a last - \a first applications of
-    ///         the predicate.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a equal requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
-    ///                     (deduced).
-    /// \tparam T           The type of the new values to replace (deduced).
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param f            Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last).This is an
-    ///                     unary predicate which returns \a true for the
-    ///                     elements which need to replaced. The
-    ///                     signature of this predicate should be equivalent
-    ///                     to:
-    ///                     \code
-    ///                     bool pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
-    ///                     implicitly converted to \a Type.
-    /// \param new_value    Refers to the new value to use as the replacement.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a replace_if algorithm invoked with an
-    /// execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a replace_if algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a replace_if algorithm returns a \a hpx::future<FwdIter>
-    ///           if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy
-    ///           and returns \a FwdIter otherwise.
-    ///           It returns \a last.
-    ///
     // clang-format off
     template <typename ExPolicy, typename FwdIter, typename F, typename T,
         typename Proj = util::projection_identity,
@@ -404,71 +750,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Copies the all elements from the range [first, last) to another range
-    /// beginning at \a dest replacing all elements satisfying a specific
-    /// criteria with \a new_value.
-    ///
-    /// Effects: Assigns to every iterator it in the range
-    ///          [result, result + (last - first)) either new_value or
-    ///          *(first + (it - result)) depending on whether the following
-    ///          corresponding condition holds:
-    ///          INVOKE(proj, *(first + (i - result))) == old_value
-    ///
-    /// \note   Complexity: Performs exactly \a last - \a first applications of
-    ///         the predicate.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam T1          The type of the old value to replace (deduced).
-    /// \tparam T2          The type of the new values to replace (deduced).
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    /// \param old_value    Refers to the old value of the elements to replace.
-    /// \param new_value    Refers to the new value to use as the replacement.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a replace_copy algorithm invoked
-    /// with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a replace_copy algorithm invoked
-    /// with an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a replace_copy algorithm returns a
-    ///           \a hpx::future<tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)> >
-    ///           if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
-    ///           otherwise.
-    ///           The \a copy algorithm returns the pair of the input iterator
-    ///           \a last and the output iterator to the
-    ///           element in the destination range, one past the last element
-    ///           copied.
-    ///
     // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename Sent,
         typename FwdIter2, typename T1, typename T2,
@@ -577,89 +858,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Copies the all elements from the range [first, last) to another range
-    /// beginning at \a dest replacing all elements satisfying a specific
-    /// criteria with \a new_value.
-    ///
-    /// Effects: Assigns to every iterator it in the range
-    ///          [result, result + (last - first)) either new_value or
-    ///          *(first + (it - result)) depending on whether the following
-    ///          corresponding condition holds:
-    ///          INVOKE(f, INVOKE(proj, *(first + (i - result)))) != false
-    ///
-    /// \note   Complexity: Performs exactly \a last - \a first applications of
-    ///         the predicate.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a equal requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
-    ///                     (deduced).
-    /// \tparam T           The type of the new values to replace (deduced).
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    /// \param f            Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last).This is an
-    ///                     unary predicate which returns \a true for the
-    ///                     elements which need to replaced. The
-    ///                     signature of this predicate should be equivalent
-    ///                     to:
-    ///                     \code
-    ///                     bool pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
-    ///                     implicitly converted to \a Type.
-    /// \param new_value    Refers to the new value to use as the replacement.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a replace_copy_if algorithm invoked
-    /// with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a replace_copy_if algorithm invoked
-    /// with an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a replace_copy_if algorithm returns a
-    ///           \a hpx::future<tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)> >
-    ///           if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy
-    ///           and returns \a tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
-    ///           otherwise.
-    ///           The \a replace_copy_if algorithm returns the input iterator
-    ///           \a last and the output iterator to the
-    ///           element in the destination range, one past the last element
-    ///           copied.
-    ///
     // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename F, typename T, typename Proj = util::projection_identity,
@@ -923,3 +1121,5 @@ namespace hpx {
         }
     } replace_copy{};
 }    // namespace hpx
+
+#endif    // DOXYGEN
