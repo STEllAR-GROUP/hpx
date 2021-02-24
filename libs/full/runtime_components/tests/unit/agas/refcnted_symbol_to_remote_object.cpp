@@ -8,6 +8,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/iostream.hpp>
 #include <hpx/modules/testing.hpp>
 

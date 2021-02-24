@@ -477,16 +477,16 @@ namespace hpx { namespace agas {
             return;
         }
 
-        naming::address locality_addr(hpx::get_locality(),
+        naming::address locality_addr(agas::get_locality(),
             hpx::components::component_agas_locality_namespace,
             agas_client.locality_ns_->ptr());
-        naming::address primary_addr(hpx::get_locality(),
+        naming::address primary_addr(agas::get_locality(),
             hpx::components::component_agas_primary_namespace,
             agas_client.primary_ns_.ptr());
-        naming::address component_addr(hpx::get_locality(),
+        naming::address component_addr(agas::get_locality(),
             hpx::components::component_agas_component_namespace,
             agas_client.component_ns_->ptr());
-        naming::address symbol_addr(hpx::get_locality(),
+        naming::address symbol_addr(agas::get_locality(),
             hpx::components::component_agas_symbol_namespace,
             agas_client.symbol_ns_.ptr());
 
@@ -582,7 +582,7 @@ namespace hpx { namespace agas {
             header.component_ns_address));
         agas_client.locality_ns_.reset(
             new detail::hosted_locality_namespace(header.locality_ns_address));
-        naming::gid_type const& here = hpx::get_locality();
+        naming::gid_type const& here = agas::get_locality();
 
         // register runtime support component
         naming::gid_type runtime_support_gid(

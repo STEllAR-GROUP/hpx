@@ -8,6 +8,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
+#include <hpx/components/basename_registration_fwd.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/execution.hpp>

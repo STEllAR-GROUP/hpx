@@ -23,7 +23,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     lcos/promise.cpp
     runtime/agas/server/route.cpp
     runtime/applier/applier.cpp
-    runtime/get_locality_name.cpp
     runtime/parcelset/detail/parcel_await.cpp
     runtime/parcelset/detail/parcel_route_handler.cpp
     runtime/parcelset/detail/per_action_data_counter.cpp
@@ -33,9 +32,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/parcelset/parcelport.cpp
     runtime/parcelset/put_parcel.cpp
     runtime/set_parcel_write_handler.cpp
-    runtime_distributed.cpp
-    util/generate_unique_ids.cpp
-    util/pool_timer.cpp
     util/register_locks_globally.cpp
   )
 endif()
@@ -104,10 +100,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/plugins/plugin_factory_base.hpp
     hpx/plugins/plugin_registry.hpp
     hpx/plugins/unique_plugin_name.hpp
-    hpx/runtime_fwd.hpp
-    hpx/runtime/find_here.hpp
-    hpx/runtime/find_all_localities.hpp
-    hpx/runtime/get_locality_name.hpp
     hpx/runtime/message_handler_fwd.hpp
     hpx/runtime/parcelset/decode_parcels.hpp
     hpx/runtime/parcelset/detail/call_for_each.hpp
@@ -132,11 +124,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/traits/action_serialization_filter.hpp
     hpx/util/bind_action.hpp
     hpx/util/connection_cache.hpp
-    hpx/util/functional/segmented_iterator_helpers.hpp
-    hpx/util/generate_unique_ids.hpp
-    hpx/util/pool_timer.hpp
     hpx/util/register_locks_globally.hpp
-    hpx/util/remove_local_destinations.hpp
     hpx/util/storage/tuple.hpp
   )
 endif()

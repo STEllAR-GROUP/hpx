@@ -16,7 +16,7 @@
 #include <hpx/topology/topology.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/runtime/find_here.hpp>
+#include <hpx/runtime_distributed/find_here.hpp>
 #endif
 
 #include <cstddef>

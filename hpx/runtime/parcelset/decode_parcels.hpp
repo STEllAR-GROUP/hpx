@@ -12,6 +12,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
@@ -19,7 +20,8 @@
 #include <hpx/runtime/parcelset/detail/data_point.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime_distributed/runtime_fwd.hpp>
+#include <hpx/runtime_local/report_error.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 
@@ -170,13 +172,12 @@ namespace hpx { namespace parcelset
                         pp.add_received_data(p.get_action()->get_action_name(),
                             action_data);
 #endif
-
                         // make sure this parcel ended up on the right locality
-                        naming::gid_type const& here = hpx::get_locality();
-                        if (hpx::get_runtime_ptr() && here &&
+                        std::uint32_t here = agas::get_locality_id();
+                        if (hpx::get_runtime_ptr() &&
+                            here != naming::invalid_locality_id &&
                             (naming::get_locality_id_from_gid(
-                                 p.destination_locality()) !=
-                             naming::get_locality_id_from_gid(here)))
+                                 p.destination_locality()) != here))
                         {
                             std::ostringstream os;
                             os << "parcel destination does not match "

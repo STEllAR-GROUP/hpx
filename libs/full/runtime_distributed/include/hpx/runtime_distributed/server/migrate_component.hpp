@@ -13,6 +13,7 @@
 #include <hpx/components_base/traits/component_supports_migration.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/runtime_distributed/find_here.hpp>
 #include <hpx/runtime_distributed/stubs/runtime_support.hpp>
 
 #include <cstdint>

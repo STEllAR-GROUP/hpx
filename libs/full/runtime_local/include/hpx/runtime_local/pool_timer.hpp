@@ -13,13 +13,13 @@
 #include <memory>
 #include <string>
 
-namespace hpx { namespace util { namespace detail
-{
-    class pool_timer;
-}}}
+namespace hpx { namespace util { namespace detail {
 
-namespace hpx { namespace util
-{
+    class pool_timer;
+}}}    // namespace hpx::util::detail
+
+namespace hpx { namespace util {
+
     class HPX_EXPORT pool_timer
     {
     public:
@@ -30,8 +30,7 @@ namespace hpx { namespace util
 
         pool_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            std::string const& description = "",
-            bool pre_shutdown = true);
+            std::string const& description = "", bool pre_shutdown = true);
 
         ~pool_timer();
 
@@ -45,6 +44,4 @@ namespace hpx { namespace util
     private:
         std::shared_ptr<detail::pool_timer> timer_;
     };
-}}
-
-
+}}    // namespace hpx::util

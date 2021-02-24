@@ -14,8 +14,12 @@ set(runtime_distributed_headers
     hpx/runtime_distributed/big_boot_barrier.hpp
     hpx/runtime_distributed/copy_component.hpp
     hpx/runtime_distributed.hpp
-    hpx/runtime_distributed/get_num_localities.hpp
+    hpx/runtime_distributed/detail/runtime_fwd.hpp
+    hpx/runtime_distributed/find_all_localities.hpp
+    hpx/runtime_distributed/find_here.hpp
     hpx/runtime_distributed/find_localities.hpp
+    hpx/runtime_distributed/get_locality_name.hpp
+    hpx/runtime_distributed/get_num_localities.hpp
     hpx/runtime_distributed/migrate_component.hpp
     hpx/runtime_distributed/runtime_fwd.hpp
     hpx/runtime_distributed/runtime_support.hpp
@@ -27,16 +31,19 @@ set(runtime_distributed_headers
 
 # cmake-format: off
 set(runtime_distributed_compat_headers
-    hpx/runtime/find_localities.hpp => hpx/runtime_distributed.hpp
-    hpx/runtime/get_num_localities.hpp => hpx/runtime_distributed.hpp
     hpx/runtime/agas/big_boot_barrier.hpp => hpx/runtime_distributed.hpp
-    hpx/runtime/components/copy_component.hpp => hpx/modules/runtime_components.hpp
-    hpx/runtime/components/migrate_component.hpp => hpx/modules/runtime_components.hpp
+    hpx/runtime/components/copy_component.hpp => hpx/modules/runtime_distributed.hpp
+    hpx/runtime/components/migrate_component.hpp => hpx/modules/runtime_distributed.hpp
+    hpx/runtime/find_here.hpp => hpx/modules/runtime_distributed.hpp
+    hpx/runtime/find_all_localities.hpp => hpx/modules/runtime_distributed.hpp
+    hpx/runtime/find_localities.hpp => hpx/modules/runtime_distributed.hpp
+    hpx/runtime/runtime_fwd.hpp => hpx/modules/runtime_distributed.hpp
 )
 # cmake-format: on
 
 set(runtime_distributed_sources
-    big_boot_barrier.cpp runtime_support.cpp server/runtime_support_server.cpp
+    big_boot_barrier.cpp get_locality_name.cpp runtime_support.cpp
+    runtime_distributed.cpp server/runtime_support_server.cpp
     stubs/runtime_support_stubs.cpp
 )
 
@@ -48,7 +55,7 @@ endif()
 include(HPX_AddModule)
 add_hpx_module(
   full runtime_distributed
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
   SOURCES ${runtime_distributed_sources}
   HEADERS ${runtime_distributed_headers}
   COMPAT_HEADERS ${runtime_distributed_compat_headers}
@@ -59,6 +66,7 @@ add_hpx_module(
     hpx_async_colocated
     hpx_async_distributed
     hpx_collectives
+    hpx_distribution_policies
     ${MPI_DEPS}
     hpx_naming
     hpx_naming_base

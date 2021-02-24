@@ -10,11 +10,11 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/components_base/generate_unique_ids.hpp>
 #include <hpx/components_base/server/wrapper_heap_base.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/util/generate_unique_ids.hpp>
 
 #include <cstddef>
 #include <cstdint>

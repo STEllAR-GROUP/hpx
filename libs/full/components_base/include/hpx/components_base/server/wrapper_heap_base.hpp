@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components_base/component_type.hpp>
-#include <hpx/util/generate_unique_ids.hpp>
+#include <hpx/components_base/generate_unique_ids.hpp>
 
 #include <cstddef>
 

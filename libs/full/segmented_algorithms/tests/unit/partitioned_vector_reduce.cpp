@@ -9,10 +9,8 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_reduce.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
-
+#include <hpx/include/runtime.hpp>
 #include <hpx/modules/testing.hpp>
-
-#include <boost/range/functions.hpp>
 
 #include <cstddef>
 #include <vector>

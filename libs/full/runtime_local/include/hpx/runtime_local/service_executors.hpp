@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/executors/service_executors.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/runtime_local/runtime_local_fwd.hpp>
 
 #include <type_traits>
 

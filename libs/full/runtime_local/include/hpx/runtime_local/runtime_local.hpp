@@ -384,6 +384,8 @@ namespace hpx {
 
         virtual lcos::future<std::uint32_t> get_num_localities() const;
 
+        virtual std::string get_locality_name() const;
+
         virtual std::uint32_t assign_cores(std::string const&, std::uint32_t)
         {
             return std::uint32_t(-1);

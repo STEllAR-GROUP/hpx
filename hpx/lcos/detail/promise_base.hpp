@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component_heap.hpp>
 #include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/functional/deferred_call.hpp>
@@ -337,7 +338,7 @@ namespace lcos {
                     new wrapped_type(this->shared_state_)), &wrapping_deleter);
 
                 id_ = lco_ptr->get_unmanaged_id();
-                addr_ = naming::address(hpx::get_locality(),
+                addr_ = naming::address(agas::get_locality(),
                     components::get_component_type<wrapped_type>(),
                     lco_ptr.get());
 

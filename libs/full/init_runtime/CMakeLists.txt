@@ -24,9 +24,15 @@ set(init_runtime_headers
 set(init_runtime_sources hpx_init.cpp hpx_main_winsocket.cpp init_logging.cpp)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(init_runtime_headers ${init_runtime_headers}
+                           hpx/init_runtime/pre_main.hpp
+  )
+
+  set(init_runtime_sources ${init_runtime_sources} pre_main.cpp)
+
   set(init_runtime_optional_module_dependencies
-      hpx_async_distributed hpx_naming hpx_performance_counters
-      hpx_runtime_components hpx_runtime_distributed
+      hpx_async_distributed hpx_runtime_distributed hpx_naming
+      hpx_performance_counters hpx_runtime_components hpx_runtime_distributed
   )
 endif()
 

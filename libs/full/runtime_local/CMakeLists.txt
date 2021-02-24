@@ -14,6 +14,7 @@ set(runtime_local_headers
     hpx/runtime_local/detail/runtime_local_fwd.hpp
     hpx/runtime_local/detail/serialize_exception.hpp
     hpx/runtime_local/get_locality_id.hpp
+    hpx/runtime_local/get_locality_name.hpp
     hpx/runtime_local/get_num_all_localities.hpp
     hpx/runtime_local/get_os_thread_count.hpp
     hpx/runtime_local/get_thread_name.hpp
@@ -21,6 +22,7 @@ set(runtime_local_headers
     hpx/runtime_local/interval_timer.hpp
     hpx/runtime_local/os_thread_type.hpp
     hpx/runtime_local/pool_executor.hpp
+    hpx/runtime_local/pool_timer.hpp
     hpx/runtime_local/report_error.hpp
     hpx/runtime_local/run_as_hpx_thread.hpp
     hpx/runtime_local/run_as_os_thread.hpp
@@ -31,11 +33,11 @@ set(runtime_local_headers
     hpx/runtime_local/state.hpp
     hpx/runtime_local/shutdown_function.hpp
     hpx/runtime_local/startup_function.hpp
+    hpx/runtime_local/thread_aware_timer.hpp
     hpx/runtime_local/thread_hooks.hpp
     hpx/runtime_local/thread_mapper.hpp
     hpx/runtime_local/thread_pool_helpers.hpp
     hpx/runtime_local/thread_stacktrace.hpp
-    hpx/util/thread_aware_timer.hpp
 )
 
 # cmake-format: off
@@ -46,6 +48,7 @@ set(runtime_local_compat_headers
     hpx/runtime/components/component_startup_shutdown_base.hpp => hpx/modules/runtime_local.hpp
     hpx/runtime/config_entry.hpp => hpx/modules/runtime_local.hpp
     hpx/runtime/get_locality_id.hpp => hpx/runtime.hpp
+    hpx/runtime/get_num_localities.hpp => hpx/modules/runtime_local.hpp
     hpx/runtime/get_os_thread_count.hpp => hpx/runtime.hpp
     hpx/runtime/get_thread_name.hpp => hpx/runtime.hpp
     hpx/runtime/get_worker_thread_num.hpp => hpx/runtime.hpp
@@ -59,6 +62,7 @@ set(runtime_local_compat_headers
     hpx/runtime/threads/run_as_hpx_thread.hpp => hpx/include/run_as.hpp
     hpx/runtime/threads/run_as_os_thread.hpp => hpx/include/run_as.hpp
     hpx/runtime_handlers.hpp => hpx/modules/runtime_local.hpp
+    hpx/util/pool_timer.hpp => hpx/modules/runtime_local.hpp
     hpx/util/debug/thread_stacktrace.hpp => hpx/modules/runtime_local.hpp
     hpx/util/debugging.hpp => hpx/modules/runtime_local.hpp
     hpx/util/interval_timer.hpp => hpx/modules/runtime_local.hpp
@@ -70,7 +74,9 @@ set(runtime_local_sources
     custom_exception_info.cpp
     debugging.cpp
     interval_timer.cpp
+    get_locality_name.cpp
     os_thread_type.cpp
+    pool_timer.cpp
     runtime_handlers.cpp
     runtime_local.cpp
     serialize_exception.cpp

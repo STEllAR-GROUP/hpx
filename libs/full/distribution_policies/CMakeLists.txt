@@ -41,6 +41,6 @@ add_hpx_module(
   COMPAT_HEADERS ${distribution_policies_compat_headers}
   DEPENDENCIES hpx_core hpx_parallelism
   MODULE_DEPENDENCIES hpx_actions_base hpx_async_distributed hpx_components
-                      hpx_performance_counters hpx_runtime_distributed
+                      hpx_performance_counters
   CMAKE_SUBDIRS examples tests
 )

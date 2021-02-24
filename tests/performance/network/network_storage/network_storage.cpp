@@ -9,7 +9,6 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/actions.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
 #include <hpx/synchronization/detail/sliding_semaphore.hpp>
 #include <hpx/modules/serialization.hpp>

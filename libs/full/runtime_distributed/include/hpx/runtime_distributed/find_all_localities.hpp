@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,8 +15,8 @@
 
 #include <vector>
 
-namespace hpx
-{
+namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing the root locality
     ///
@@ -107,5 +107,4 @@ namespace hpx
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
     HPX_EXPORT std::vector<naming::id_type> find_remote_localities(
         error_code& ec = throws);
-}
-
+}    // namespace hpx

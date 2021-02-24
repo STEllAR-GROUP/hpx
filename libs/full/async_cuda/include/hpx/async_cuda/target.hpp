@@ -17,12 +17,12 @@
 #include <hpx/async_cuda/get_targets.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
-#include <hpx/runtime_fwd.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/runtime/find_here.hpp>
+#include <hpx/runtime_distributed/find_here.hpp>
+#include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #endif
 

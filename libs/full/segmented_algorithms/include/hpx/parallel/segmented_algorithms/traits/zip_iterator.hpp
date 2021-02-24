@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2014 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,7 +14,7 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/util/functional/segmented_iterator_helpers.hpp>
+#include <hpx/parallel/segmented_algorithms/functional/segmented_iterator_helpers.hpp>
 
 #include <cstddef>
 #include <iterator>

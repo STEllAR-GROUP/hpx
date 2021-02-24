@@ -18,8 +18,6 @@
 #include <string>
 #include <vector>
 
-
-
 void output_hpx_info()
 {
   std::cout << "HPX information:" << std::endl;

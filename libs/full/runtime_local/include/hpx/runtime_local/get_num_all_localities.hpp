@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file get_num_localities.hpp
+/// \file get_num_all_localities.hpp
 
 #pragma once
 
@@ -17,6 +17,7 @@
 #include <cstdint>
 
 namespace hpx {
+
     /// \brief Return the number of localities which were registered at startup
     ///        for the running application.
     ///

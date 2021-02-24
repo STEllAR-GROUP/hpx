@@ -13,6 +13,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/modules/testing.hpp>
 

@@ -10,7 +10,7 @@
 #include <hpx/include/parallel_find.hpp>
 #include <hpx/include/parallel_scan.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
-
+#include <hpx/include/runtime.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,9 +12,6 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/async_distributed/apply.hpp>
-#include <hpx/collectives/barrier.hpp>
-#include <hpx/collectives/detail/barrier_node.hpp>
-#include <hpx/collectives/latch.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/components_base/server/component_base.hpp>
@@ -30,13 +27,11 @@
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/performance_counters/agas_counter_types.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/performance_counters/threadmanager_counter_types.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime_components/console_error_sink.hpp>
@@ -46,6 +41,7 @@
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/big_boot_barrier.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
+#include <hpx/runtime_distributed/get_num_localities.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/runtime_support.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
@@ -89,205 +85,19 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-static void garbage_collect_non_blocking()
-{
-    hpx::agas::garbage_collect_non_blocking();
-}
-static void garbage_collect()
-{
-    hpx::agas::garbage_collect();
-}
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
 
-    ///////////////////////////////////////////////////////////////////////////////
-    // Install performance counter startup functions for core subsystems.
-    static void register_counter_types()
-    {
-        auto& agas_client = naming::get_agas_client();
-        performance_counters::register_agas_counter_types(agas_client);
-        agas_client.register_server_instances();
-        lbt_ << "(2nd stage) pre_main: registered AGAS client-side "
-                "performance counter types";
-
-        get_runtime_distributed().register_counter_types();
-        lbt_ << "(2nd stage) pre_main: registered runtime performance "
-                "counter types";
-
-        performance_counters::register_threadmanager_counter_types(
-            threads::get_thread_manager());
-        lbt_ << "(2nd stage) pre_main: registered thread-manager performance "
-                "counter types";
-
-#if defined(HPX_HAVE_NETWORKING)
-        applier::get_applier().get_parcel_handler().register_counter_types();
-        lbt_ << "(2nd stage) pre_main: registered parcelset performance "
-                "counter types";
-#endif
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_NETWORKING)
-    // There is no need to protect these global from thread concurrent access
-    // as they are access during early startup only.
-    std::vector<hpx::tuple<char const*, char const*>>&
-    get_message_handler_registrations()
-    {
-        static std::vector<hpx::tuple<char const*, char const*>>
-            message_handler_registrations;
-        return message_handler_registrations;
-    }
-
-    static void register_message_handlers()
-    {
-        runtime_distributed& rtd = get_runtime_distributed();
-        for (auto const& t : get_message_handler_registrations())
-        {
-            error_code ec(lightweight);
-            rtd.register_message_handler(hpx::get<0>(t), hpx::get<1>(t), ec);
-        }
-        lbt_ << "(3rd stage) pre_main: registered message handlers";
-    }
-#endif
-
-    ///////////////////////////////////////////////////////////////////////////////
-    // Implements second and third stage bootstrapping.
-    int pre_main(runtime_mode mode)
-    {
-        // Register pre-shutdown and shutdown functions to flush pending
-        // reference counting operations.
-        register_pre_shutdown_function(&::garbage_collect_non_blocking);
-        register_shutdown_function(&::garbage_collect);
-
-        using components::stubs::runtime_support;
-
-        naming::resolver_client& agas_client = naming::get_agas_client();
-        runtime& rt = get_runtime();
-
-        int exit_code = 0;
-        if (runtime_mode::connect == mode)
-        {
-            lbt_ << "(2nd stage) pre_main: locality is in connect mode, "
-                    "skipping 2nd and 3rd stage startup synchronization";
-            lbt_ << "(2nd stage) pre_main: addressing services enabled";
-
-            // Load components, so that we can use the barrier LCO.
-            exit_code = runtime_support::load_components(find_here());
-            lbt_ << "(2nd stage) pre_main: loaded components"
-                 << (exit_code ? ", application exit has been requested" : "");
-
-            // Work on registration requests for message handler plugins
-#if defined(HPX_HAVE_NETWORKING)
-            register_message_handlers();
-#endif
-
-            // Register all counter types before the startup functions are being
-            // executed.
-            register_counter_types();
-
-            rt.set_state(state_pre_startup);
-            runtime_support::call_startup_functions(find_here(), true);
-            lbt_ << "(3rd stage) pre_main: ran pre-startup functions";
-
-            rt.set_state(state_startup);
-            runtime_support::call_startup_functions(find_here(), false);
-            lbt_ << "(4th stage) pre_main: ran startup functions";
-        }
-        else
-        {
-            lbt_ << "(2nd stage) pre_main: addressing services enabled";
-
-            // Load components, so that we can use the barrier LCO.
-            exit_code = runtime_support::load_components(find_here());
-            lbt_ << "(2nd stage) pre_main: loaded components"
-                 << (exit_code ? ", application exit has been requested" : "");
-
-            // {{{ Second and third stage barrier creation.
-            if (agas_client.is_bootstrap())
-            {
-                naming::gid_type console_;
-                if (HPX_UNLIKELY(!agas_client.get_console_locality(console_)))
-                {
-                    HPX_THROW_EXCEPTION(network_error, "pre_main",
-                        "no console locality registered");
-                }
-
-                lbt_ << "(2nd stage) pre_main: creating 2nd and 3rd stage boot "
-                        "barriers";
-            }
-            else    // Hosted.
-            {
-                lbt_ << "(2nd stage) pre_main: finding 2nd and 3rd stage boot "
-                        "barriers";
-            }
-            // }}}
-
-            // create our global barrier...
-            hpx::lcos::barrier::get_global_barrier() =
-                hpx::lcos::barrier::create_global_barrier();
-
-            // Second stage bootstrap synchronizes component loading across all
-            // localities, ensuring that the component namespace tables are fully
-            // populated before user code is executed.
-            lcos::barrier::synchronize();
-            lbt_ << "(2nd stage) pre_main: passed 2nd stage boot barrier";
-
-            // Work on registration requests for message handler plugins
-#if defined(HPX_HAVE_NETWORKING)
-            register_message_handlers();
-#endif
-
-            // Register all counter types before the startup functions are being
-            // executed.
-            register_counter_types();
-
-            // Second stage bootstrap synchronizes performance counter loading
-            // across all localities.
-            lcos::barrier::synchronize();
-            lbt_ << "(3rd stage) pre_main: passed 3rd stage boot barrier";
-
-            runtime_support::call_startup_functions(find_here(), true);
-            lbt_ << "(3rd stage) pre_main: ran pre-startup functions";
-
-            // Third stage separates pre-startup and startup function phase.
-            lcos::barrier::synchronize();
-            lbt_ << "(4th stage) pre_main: passed 4th stage boot barrier";
-
-            runtime_support::call_startup_functions(find_here(), false);
-            lbt_ << "(4th stage) pre_main: ran startup functions";
-
-            // Forth stage bootstrap synchronizes startup functions across all
-            // localities. This is done after component loading to guarantee that
-            // all user code, including startup functions, are only run after the
-            // component tables are populated.
-            lcos::barrier::synchronize();
-            lbt_ << "(5th stage) pre_main: passed 4th stage boot barrier";
-        }
-
-        // Enable logging. Even if we terminate at this point we will see all
-        // pending log messages so far.
-        components::activate_logging();
-        lbt_ << "(last stage) pre_main: activated logging";
-
-        // Any error in post-command line handling or any explicit --exit command
-        // line option will cause the application to terminate at this point.
-        if (exit_code)
-        {
-            // If load_components returns false, shutdown the system. This
-            // essentially only happens if the command line contained --exit.
-            runtime_support::shutdown_all(
-                naming::get_id_from_locality_id(agas::booststrap_prefix), -1.0);
-            return exit_code;
-        }
-
-        return 0;
-    }
-
-}    // namespace hpx
-
-namespace hpx {
     namespace detail {
+        // There is no need to protect these global from thread concurrent access
+        // as they are access during early startup only.
+        std::vector<hpx::tuple<char const*, char const*>>&
+        get_message_handler_registrations()
+        {
+            static std::vector<hpx::tuple<char const*, char const*>>
+                message_handler_registrations;
+            return message_handler_registrations;
+        }
+
         naming::gid_type get_next_id(std::size_t count)
         {
             if (nullptr == get_runtime_ptr())
@@ -296,7 +106,7 @@ namespace hpx {
             return get_runtime_distributed().get_next_id(count);
         }
 
-        ///////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_NETWORKING)
         void dijkstra_make_black()
         {
@@ -373,7 +183,8 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime_distributed::runtime_distributed(util::runtime_configuration& rtcfg)
+    runtime_distributed::runtime_distributed(
+        util::runtime_configuration& rtcfg, int (*pre_main)(runtime_mode))
       : runtime(rtcfg,
             runtime_distributed::get_notification_policy(
                 "worker-thread", runtime_local::os_thread_type::worker_thread),
@@ -402,6 +213,7 @@ namespace hpx {
       , applier_(*thread_manager_)
 #endif
       , runtime_support_(new components::server::runtime_support(rtcfg_))
+      , pre_main_(pre_main)
     {
         // This needs to happen first
         runtime::init();
@@ -515,7 +327,12 @@ namespace hpx {
             threads::set_thread_description(threads::get_self_id(), "pre_main");
 
             // Finish the bootstrap
-            result = hpx::pre_main(mode_);
+            result = 0;
+            if (pre_main_ != nullptr)
+            {
+                result = pre_main_(mode_);
+            }
+
             if (result)
             {
                 lbt_ << "runtime_distributed::run_helper: bootstrap "
@@ -532,7 +349,6 @@ namespace hpx {
 #if defined(HPX_HAVE_NETWORKING)
             parcel_handler_.enable_alternative_parcelports();
 #endif
-
             // reset all counters right before running main, if requested
             if (get_config_entry("hpx.print_counter.startup", "0") == "1")
             {
@@ -542,25 +358,6 @@ namespace hpx {
 
                 error_code ec(lightweight);    // ignore errors
                 evaluate_active_counters(reset, "startup", ec);
-            }
-
-            // Connect back to given latch if specified
-            std::string connect_back_to(
-                get_config_entry("hpx.on_startup.wait_on_latch", ""));
-            if (!connect_back_to.empty())
-            {
-                lbt_ << "(5th stage) runtime::run_helper: about to "
-                        "synchronize with latch: "
-                     << connect_back_to;
-
-                // inform launching process that this locality is up and running
-                hpx::lcos::latch l;
-                l.connect_to(connect_back_to);
-                l.count_down_and_wait();
-
-                lbt_ << "(5th stage) runtime::run_helper: "
-                        "synchronized with latch: "
-                     << connect_back_to;
             }
         }
         catch (...)
@@ -628,7 +425,8 @@ namespace hpx {
 #endif
         // start the thread manager
         thread_manager_->run();
-        lbt_ << "(1st stage) runtime_distributed::start: started threadmanager";
+        lbt_ << "(1st stage) runtime_distributed::start: started "
+                "threadmanager";
         // }}}
 
         // invoke the AGAS v2 notifications
@@ -638,7 +436,8 @@ namespace hpx {
 
         // {{{ launch main
         // register the given main function with the thread manager
-        lbt_ << "(1st stage) runtime_distributed::start: launching run_helper "
+        lbt_ << "(1st stage) runtime_distributed::start: launching "
+                "run_helper "
                 "HPX thread";
 
         threads::thread_init_data data(
@@ -895,8 +694,6 @@ namespace hpx {
                 std::lock_guard<std::mutex> l(mtx_);
                 exception_ = e;
             }
-
-            lcos::barrier::get_global_barrier().detach();
 
             // initiate stopping the runtime system
             runtime_support_->notify_waiting_main();
@@ -1293,7 +1090,8 @@ namespace hpx {
                 // multiply counter
                 {"/arithmetics/multiply",
                     performance_counters::counter_aggregating,
-                    "returns the product of the values of the specified base "
+                    "returns the product of the values of the specified "
+                    "base "
                     "counters; "
                     "pass the required base counters as the parameters: "
                     "/arithmetics/"
@@ -1316,7 +1114,8 @@ namespace hpx {
 
                 // arithmetics mean counter
                 {"/arithmetics/mean", performance_counters::counter_aggregating,
-                    "returns the average value of all values of the specified "
+                    "returns the average value of all values of the "
+                    "specified "
                     "base counters; pass the required base counters as the "
                     "parameters: "
                     "/arithmetics/"
@@ -1352,7 +1151,8 @@ namespace hpx {
                     &performance_counters::default_counter_discoverer, ""},
                 // arithmetics min counter
                 {"/arithmetics/min", performance_counters::counter_aggregating,
-                    "returns the minimum value of all values of the specified "
+                    "returns the minimum value of all values of the "
+                    "specified "
                     "base counters; pass the required base counters as the "
                     "parameters: "
                     "/arithmetics/"
@@ -1363,7 +1163,8 @@ namespace hpx {
                     &performance_counters::default_counter_discoverer, ""},
                 // arithmetics max counter
                 {"/arithmetics/max", performance_counters::counter_aggregating,
-                    "returns the maximum value of all values of the specified "
+                    "returns the maximum value of all values of the "
+                    "specified "
                     "base counters; pass the required base counters as the "
                     "parameters: "
                     "/arithmetics/"
@@ -1375,7 +1176,8 @@ namespace hpx {
                 // arithmetics count counter
                 {"/arithmetics/count",
                     performance_counters::counter_aggregating,
-                    "returns the count value of all values of the specified "
+                    "returns the count value of all values of the "
+                    "specified "
                     "base counters; pass the required base counters as the "
                     "parameters: "
                     "/arithmetics/"
@@ -1740,6 +1542,15 @@ namespace hpx {
         return agas_client_.get_num_localities_async();
     }
 
+    std::string runtime_distributed::get_locality_name() const
+    {
+#if defined(HPX_HAVE_NETWORKING)
+        return get_parcel_handler().get_locality_name();
+#else
+        return "<unknown>";
+#endif
+    }
+
     std::uint32_t runtime_distributed::get_num_localities(
         hpx::launch::sync_policy, components::component_type type,
         error_code& ec) const
@@ -1793,7 +1604,6 @@ namespace hpx {
         std::cerr << msg << std::endl;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
     // Create an instance of a message handler plugin
@@ -1808,7 +1618,7 @@ namespace hpx {
         }
 
         // store the request for later
-        get_message_handler_registrations().push_back(
+        detail::get_message_handler_registrations().push_back(
             hpx::make_tuple(message_handler_type, action));
     }
 
@@ -1867,16 +1677,16 @@ namespace hpx {
     // Helpers
     naming::id_type find_here(error_code& ec)
     {
-        if (nullptr == hpx::applier::get_applier_ptr())
+        runtime* rt = get_runtime_ptr();
+        if (nullptr == rt)
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::find_here",
                 "the runtime system is not available at this time");
             return naming::invalid_id;
         }
 
-        static naming::id_type here(
-            hpx::applier::get_applier().get_raw_locality(ec),
-            naming::id_type::unmanaged);
+        static naming::id_type here =
+            naming::get_id_from_locality_id(rt->get_locality_id(ec));
         return here;
     }
 

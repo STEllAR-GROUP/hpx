@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Vinay C Amatya
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,6 +14,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/continuation.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime_distributed.hpp>
@@ -40,14 +41,11 @@ namespace hpx { namespace detail {
 HPX_PLAIN_ACTION_ID(hpx::detail::update_agas_cache, update_agas_cache_action,
     hpx::actions::update_agas_cache_action_id)
 
-namespace hpx { namespace agas { namespace server
-{
-    void primary_namespace::route(parcelset::parcel && p)
-    { // {{{ route implementation
-        util::scoped_timer<std::atomic<std::int64_t> > update(
-            counter_data_.route_.time_,
-            counter_data_.route_.enabled_
-        );
+namespace hpx { namespace agas { namespace server {
+    void primary_namespace::route(parcelset::parcel&& p)
+    {    // {{{ route implementation
+        util::scoped_timer<std::atomic<std::int64_t>> update(
+            counter_data_.route_.time_, counter_data_.route_.enabled_);
         counter_data_.increment_route_count();
 
         naming::gid_type const& gid = p.destination();
@@ -76,11 +74,9 @@ namespace hpx { namespace agas { namespace server
             {
                 l.unlock();
 
-                HPX_THROWS_IF(ec, no_success,
-                    "primary_namespace::route",
+                HPX_THROWS_IF(ec, no_success, "primary_namespace::route",
                     hpx::util::format(
-                        "can't route parcel to unknown gid: {}",
-                        gid));
+                        "can't route parcel to unknown gid: {}", gid));
 
                 return;
             }
@@ -92,8 +88,8 @@ namespace hpx { namespace agas { namespace server
                     hpx::get<0>(cache_address));
             }
 
-            gva const g = hpx::get<1>(cache_address).resolve(
-                gid, hpx::get<0>(cache_address));
+            gva const g = hpx::get<1>(cache_address)
+                              .resolve(gid, hpx::get<0>(cache_address));
 
             addr.locality_ = g.prefix;
             addr.type_ = g.type;
@@ -103,7 +99,8 @@ namespace hpx { namespace agas { namespace server
         naming::id_type source = p.source_id();
 
         // either send the parcel on its way or execute actions locally
-        if (addr.locality_ == get_locality())
+        if (naming::get_locality_id_from_gid(addr.locality_) ==
+            agas::get_locality_id())
         {
             // destination is local
             p.schedule_action();
@@ -130,7 +127,7 @@ namespace hpx { namespace agas { namespace server
                     source, id, addr, g.count, g.offset);
             }
         }
-    } // }}}
-}}}
+    }    // }}}
+}}}      // namespace hpx::agas::server
 
 #endif

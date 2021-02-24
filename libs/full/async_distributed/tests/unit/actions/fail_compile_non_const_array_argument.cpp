@@ -10,6 +10,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/include/runtime.hpp>
 
 void test(int (&ptr)[20]) {}
 HPX_PLAIN_ACTION(test);

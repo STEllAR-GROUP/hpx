@@ -9,11 +9,11 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/bind_front.hpp>
 
-#include <hpx/runtime_fwd.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/shared_ptr.hpp>
 #include <hpx/serialization/vector.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 
 #include <hpx/components/iostreams/server/buffer.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>

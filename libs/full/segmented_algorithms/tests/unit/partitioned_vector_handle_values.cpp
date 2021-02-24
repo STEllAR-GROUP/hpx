@@ -9,7 +9,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
-
+#include <hpx/include/runtime.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -7,14 +7,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components_base/agas_interface.hpp>
+#include <hpx/components_base/generate_unique_ids.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/util/generate_unique_ids.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <mutex>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
+
     naming::gid_type unique_id_ranges::get_id(std::size_t count)
     {
         // create a new id
@@ -29,7 +30,7 @@ namespace hpx { namespace util
             std::size_t count_ = (std::max)(std::size_t(range_delta), count);
 
             {
-                unlock_guard<std::unique_lock<mutex_type> > ul(l);
+                unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 lower = hpx::agas::get_next_id(count_);
             }
 
@@ -46,5 +47,4 @@ namespace hpx { namespace util
         lower_ += count;
         return result;
     }
-}}
-
+}}    // namespace hpx::util

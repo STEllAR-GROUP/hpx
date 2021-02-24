@@ -11,6 +11,7 @@
 #include <hpx/include/component_storage.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/naming.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 

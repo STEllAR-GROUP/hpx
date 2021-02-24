@@ -14,6 +14,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/runtime.hpp>
 
 #include <iostream>
 #include <string>

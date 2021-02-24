@@ -620,6 +620,11 @@ namespace hpx {
         return make_ready_future(std::uint32_t(1));
     }
 
+    std::string runtime::get_locality_name() const
+    {
+        return "console";
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     threads::policies::callback_notifier::on_startstop_type
     get_thread_on_start_func()

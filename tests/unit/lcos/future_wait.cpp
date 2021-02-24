@@ -8,11 +8,12 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/async_combinators/wait_each.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/threads.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/async_combinators/wait_each.hpp>
+#include <hpx/include/runtime.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>

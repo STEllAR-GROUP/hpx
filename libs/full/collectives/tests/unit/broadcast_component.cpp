@@ -10,6 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/modules/collectives.hpp>
 #include <hpx/modules/testing.hpp>
 

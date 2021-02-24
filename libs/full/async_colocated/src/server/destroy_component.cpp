@@ -27,7 +27,8 @@ namespace hpx { namespace components { namespace server {
         naming::gid_type const& gid, naming::address const& addr_)
     {
         naming::address addr(addr_);
-        if (addr.locality_ == hpx::get_locality() ||
+        if (naming::get_locality_id_from_gid(addr.locality_) ==
+                agas::get_locality_id() ||
             agas::is_local_address_cached(gid, addr))
         {
             // Check if component was migrated, we are not interested in

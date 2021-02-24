@@ -21,6 +21,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/iostream.hpp>
 #include <hpx/serialization.hpp>

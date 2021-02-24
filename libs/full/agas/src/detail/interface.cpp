@@ -9,9 +9,9 @@
 #include <hpx/assert.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/detail/agas_interface_functions.hpp>
+#include <hpx/components_base/generate_unique_ids.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/util/generate_unique_ids.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -333,6 +333,25 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
                    naming::invalid_locality_id;
     }
 
+    std::vector<std::uint32_t> get_all_locality_ids(
+        naming::component_type type, error_code& ec)
+    {
+        std::vector<std::uint32_t> result;
+
+        std::vector<naming::gid_type> localities;
+        if (!naming::get_agas_client().get_localities(localities, type, ec))
+        {
+            return result;
+        }
+
+        result.reserve(localities.size());
+        for (auto const& gid : localities)
+        {
+            result.push_back(naming::get_locality_id_from_gid(gid));
+        }
+        return result;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     naming::gid_type get_next_id(std::size_t count, error_code& ec)
     {
@@ -554,6 +573,8 @@ namespace hpx { namespace agas {
 
             detail::get_console_locality = &detail::impl::get_console_locality;
             detail::get_locality_id = &detail::impl::get_locality_id;
+            detail::get_all_locality_ids = &detail::impl::get_all_locality_ids;
+
             detail::get_next_id = &detail::impl::get_next_id;
 
             detail::decref = &detail::impl::decref;

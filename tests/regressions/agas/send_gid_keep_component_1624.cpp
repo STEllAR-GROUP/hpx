@@ -8,9 +8,6 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/actions.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/components.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
 
