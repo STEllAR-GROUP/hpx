@@ -122,6 +122,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/adjacent_find.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -268,7 +269,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     HPX_INLINE_CONSTEXPR_VARIABLE struct adjacent_find_t final
-      : hpx::functional::tag<adjacent_find_t>
+      : hpx::functional::tag_fallback<adjacent_find_t>
     {
     private:
         // clang-format off
@@ -278,7 +279,7 @@ namespace hpx {
                 hpx::traits::is_input_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_invoke(hpx::adjacent_find_t, FwdIter first,
+        friend FwdIter tag_fallback_invoke(hpx::adjacent_find_t, FwdIter first,
             FwdIter last, Pred&& pred = Pred())
         {
             using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
@@ -297,8 +298,8 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_invoke(hpx::adjacent_find_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, Pred&& pred = Pred())
+        tag_fallback_invoke(hpx::adjacent_find_t, ExPolicy&& policy,
+            FwdIter first, FwdIter last, Pred&& pred = Pred())
         {
             using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
             return hpx::parallel::v1::detail::adjacent_find_(
