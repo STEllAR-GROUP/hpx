@@ -9,7 +9,6 @@ include(HPX_ExportTargets)
 function(add_hpx_module libname modulename)
   # Retrieve arguments
   set(options CUDA CONFIG_FILES)
-  # Compatibility needs to be on/off to allow 3 states : ON/OFF and disabled
   set(one_value_args GLOBAL_HEADER_GEN)
   set(multi_value_args
       SOURCES
