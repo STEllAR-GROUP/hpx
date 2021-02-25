@@ -12,6 +12,7 @@
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/include/actions.hpp>
 
+#include <hpx/runtime_components/default_distribution_policy.hpp>
 #include <hpx/runtime_components_base/component_factory.hpp>
 #include <hpx/runtime_components_base/component_registry.hpp>
 #include <hpx/runtime_components_base/derived_component_factory.hpp>
@@ -46,9 +47,9 @@
 #include <hpx/runtime_distributed/runtime_support.hpp>
 #include <hpx/runtime_distributed/stubs/runtime_support.hpp>
 
-#include <hpx/runtime/components/binpacking_distribution_policy.hpp>
-#include <hpx/runtime/components/colocating_distribution_policy.hpp>
-#include <hpx/runtime/components/default_distribution_policy.hpp>
-#include <hpx/runtime/components/unwrapping_result_policy.hpp>
+#include <hpx/distribution_policies/binpacking_distribution_policy.hpp>
+#include <hpx/distribution_policies/colocating_distribution_policy.hpp>
+#include <hpx/distribution_policies/target_distribution_policy.hpp>
+#include <hpx/distribution_policies/unwrapping_result_policy.hpp>
 
 #endif

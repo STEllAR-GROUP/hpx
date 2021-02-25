@@ -23,7 +23,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     lcos/promise.cpp
     runtime/agas/server/route.cpp
     runtime/applier/applier.cpp
-    runtime/components/binpacking_distribution_policy.cpp
     runtime/get_locality_name.cpp
     runtime/parcelset/detail/parcel_await.cpp
     runtime/parcelset/detail/parcel_route_handler.cpp
@@ -74,7 +73,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
   list(
     APPEND
     hpx_HEADERS
-    hpx/components/containers/container_distribution_policy.hpp
     hpx/lcos/base_lco.hpp
     hpx/lcos/base_lco_with_value.hpp
     hpx/lcos/detail/promise_base.hpp
@@ -108,12 +106,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/plugins/plugin_registry.hpp
     hpx/plugins/unique_plugin_name.hpp
     hpx/runtime_fwd.hpp
-    hpx/runtime/components/binpacking_distribution_policy.hpp
-    hpx/runtime/components/colocating_distribution_policy.hpp
-    hpx/runtime/components/default_distribution_policy.hpp
     hpx/runtime/components_fwd.hpp
-    hpx/runtime/components/target_distribution_policy.hpp
-    hpx/runtime/components/unwrapping_result_policy.hpp
     hpx/runtime/find_here.hpp
     hpx/runtime/find_all_localities.hpp
     hpx/runtime/get_locality_name.hpp

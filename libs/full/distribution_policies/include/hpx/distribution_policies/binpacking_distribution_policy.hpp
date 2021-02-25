@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,13 +12,13 @@
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
-#include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime_components/create_component_helpers.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/string.hpp>
@@ -33,27 +33,28 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace components
-{
-    static char const* const default_binpacking_counter_name =
-        "/runtime{locality/total}/count/component@";
+namespace hpx { namespace components {
 
-    namespace detail
-    {
+    HPX_INLINE_CONSTEXPR_VARIABLE char const* const
+        default_binpacking_counter_name =
+            "/runtime{locality/total}/count/component@";
+
+    namespace detail {
+
         /// \cond NOINTERNAL
-        HPX_EXPORT std::vector<std::size_t>
-        get_items_count(std::size_t count, std::vector<std::uint64_t> const& values);
+        HPX_EXPORT std::vector<std::size_t> get_items_count(
+            std::size_t count, std::vector<std::uint64_t> const& values);
 
-        HPX_EXPORT hpx::future<std::vector<std::uint64_t> >
+        HPX_EXPORT hpx::future<std::vector<std::uint64_t>>
         retrieve_counter_values(
-            std::vector<performance_counters::performance_counter> && counters);
+            std::vector<performance_counters::performance_counter>&& counters);
 
-        HPX_EXPORT hpx::future<std::vector<std::uint64_t> > get_counter_values(
+        HPX_EXPORT hpx::future<std::vector<std::uint64_t>> get_counter_values(
             std::string const& component_name, std::string const& counter_name,
             std::vector<hpx::id_type> const& localities);
 
         HPX_EXPORT hpx::id_type const& get_best_locality(
-            hpx::future<std::vector<std::uint64_t> > && f,
+            hpx::future<std::vector<std::uint64_t>>&& f,
             std::vector<hpx::id_type> const& localities);
 
         template <typename Component>
@@ -61,11 +62,12 @@ namespace hpx { namespace components
         {
             explicit create_helper(std::vector<hpx::id_type> const& localities)
               : localities_(localities)
-            {}
+            {
+            }
 
-            template <typename ...Ts>
+            template <typename... Ts>
             hpx::future<hpx::id_type> operator()(
-                hpx::future<std::vector<std::uint64_t> > && values,
+                hpx::future<std::vector<std::uint64_t>>&& values,
                 Ts&&... vs) const
             {
                 hpx::id_type const& best_locality =
@@ -81,24 +83,24 @@ namespace hpx { namespace components
         template <typename Component>
         struct create_bulk_helper
         {
-            typedef std::pair<hpx::id_type, std::vector<hpx::id_type> >
+            typedef std::pair<hpx::id_type, std::vector<hpx::id_type>>
                 bulk_locality_result;
 
             explicit create_bulk_helper(
                 std::vector<hpx::id_type> const& localities)
               : localities_(localities)
-            {}
+            {
+            }
 
-            template <typename ...Ts>
-            hpx::future<std::vector<bulk_locality_result> >
-            operator()(
-                hpx::future<std::vector<std::uint64_t> > && values,
+            template <typename... Ts>
+            hpx::future<std::vector<bulk_locality_result>> operator()(
+                hpx::future<std::vector<std::uint64_t>>&& values,
                 std::size_t count, Ts&&... vs) const
             {
                 std::vector<std::size_t> to_create =
                     detail::get_items_count(count, values.get());
 
-                std::vector<hpx::future<std::vector<hpx::id_type> > > objs;
+                std::vector<hpx::future<std::vector<hpx::id_type>>> objs;
                 objs.reserve(localities_.size());
 
                 for (std::size_t i = 0; i != to_create.size(); ++i)
@@ -108,10 +110,10 @@ namespace hpx { namespace components
                 }
 
                 // consolidate all results
-                return hpx::dataflow(hpx::launch::sync,
-                    [=](std::vector<hpx::future<std::vector<hpx::id_type> > > && v)
-                        mutable -> std::vector<bulk_locality_result>
-                    {
+                return hpx::dataflow(
+                    hpx::launch::sync,
+                    [=](std::vector<hpx::future<std::vector<hpx::id_type>>>&&
+                            v) mutable -> std::vector<bulk_locality_result> {
                         HPX_ASSERT(localities_.size() == v.size());
 
                         std::vector<bulk_locality_result> result;
@@ -120,8 +122,7 @@ namespace hpx { namespace components
                         for (std::size_t i = 0; i != v.size(); ++i)
                         {
                             result.emplace_back(
-                                    std::move(localities_[i]), v[i].get()
-                                );
+                                std::move(localities_[i]), v[i].get());
                         }
                         return result;
                     },
@@ -131,7 +132,7 @@ namespace hpx { namespace components
             std::vector<hpx::id_type> const& localities_;
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// This class specifies the parameters for a binpacking distribution policy
     /// to use for creating a given number of items on a given set of localities.
@@ -146,7 +147,8 @@ namespace hpx { namespace components
         /// This policy will represent one locality (the local locality).
         binpacking_distribution_policy()
           : counter_name_(default_binpacking_counter_name)
-        {}
+        {
+        }
 
         /// Create a new \a default_distribution policy representing the given
         /// set of localities.
@@ -161,10 +163,11 @@ namespace hpx { namespace components
         ///
         binpacking_distribution_policy operator()(
             std::vector<id_type> const& locs,
-            char const* perf_counter_name = default_binpacking_counter_name) const
+            char const* perf_counter_name =
+                default_binpacking_counter_name) const
         {
 #if defined(HPX_DEBUG)
-            for (id_type const& loc: locs)
+            for (id_type const& loc : locs)
             {
                 HPX_ASSERT(naming::is_locality(loc));
             }
@@ -183,18 +186,18 @@ namespace hpx { namespace components
         ///                      instances of the given component type will be
         ///                      used).
         ///
-        binpacking_distribution_policy operator()(
-            std::vector<id_type> && locs,
-            char const* perf_counter_name = default_binpacking_counter_name) const
+        binpacking_distribution_policy operator()(std::vector<id_type>&& locs,
+            char const* perf_counter_name =
+                default_binpacking_counter_name) const
         {
 #if defined(HPX_DEBUG)
-            for (id_type const& loc: locs)
+            for (id_type const& loc : locs)
             {
                 HPX_ASSERT(naming::is_locality(loc));
             }
 #endif
-            return binpacking_distribution_policy(std::move(locs),
-                perf_counter_name);
+            return binpacking_distribution_policy(
+                std::move(locs), perf_counter_name);
         }
 
         /// Create a new \a default_distribution policy representing the given
@@ -202,14 +205,15 @@ namespace hpx { namespace components
         ///
         /// \param loc     [in] The locality the new instance should
         ///                 represent
-        /// \param perf_counter_name  [in] The name of the performance counter which
-        ///                      should be used as the distribution criteria
+        /// \param perf_counter_name  [in] The name of the performance counter
+        ///                      that should be used as the distribution criteria
         ///                      (by default the overall number of existing
         ///                      instances of the given component type will be
         ///                      used).
         ///
         binpacking_distribution_policy operator()(id_type const& loc,
-            char const* perf_counter_name = default_binpacking_counter_name) const
+            char const* perf_counter_name =
+                default_binpacking_counter_name) const
         {
             HPX_ASSERT(naming::is_locality(loc));
             return binpacking_distribution_policy(loc, perf_counter_name);
@@ -224,14 +228,15 @@ namespace hpx { namespace components
         /// \returns A future holding the global address which represents
         ///          the newly created object
         ///
-        template <typename Component, typename ...Ts>
+        template <typename Component, typename... Ts>
         hpx::future<hpx::id_type> create(Ts&&... vs) const
         {
             // handle special cases
             if (localities_.size() == 0)
             {
                 return create_async<Component>(
-                    hpx::find_here(), std::forward<Ts>(vs)...);
+                    naming::get_id_from_locality_id(agas::get_locality_id()),
+                    std::forward<Ts>(vs)...);
             }
             else if (localities_.size() == 1)
             {
@@ -240,9 +245,8 @@ namespace hpx { namespace components
             }
 
             // schedule creation of all objects across given localities
-            hpx::future<std::vector<std::uint64_t> > values =
-                detail::get_counter_values(
-                    get_component_name<Component>(),
+            hpx::future<std::vector<std::uint64_t>> values =
+                detail::get_counter_values(get_component_name<Component>(),
                     counter_name_, localities_);
 
             return values.then(hpx::util::bind_back(
@@ -251,8 +255,8 @@ namespace hpx { namespace components
         }
 
         /// \cond NOINTERNAL
-        typedef std::pair<hpx::id_type, std::vector<hpx::id_type> >
-            bulk_locality_result;
+        using bulk_locality_result =
+            std::pair<hpx::id_type, std::vector<hpx::id_type>>;
         /// \endcond
 
         /// Create multiple objects on the localities associated by
@@ -265,37 +269,34 @@ namespace hpx { namespace components
         /// \returns A future holding the list of global addresses which
         ///          represent the newly created objects
         ///
-        template <typename Component, typename ...Ts>
-        hpx::future<std::vector<bulk_locality_result> >
-        bulk_create(std::size_t count, Ts&&... vs) const
+        template <typename Component, typename... Ts>
+        hpx::future<std::vector<bulk_locality_result>> bulk_create(
+            std::size_t count, Ts&&... vs) const
         {
             if (localities_.size() > 1)
             {
                 // schedule creation of all objects across given localities
-                hpx::future<std::vector<std::uint64_t> > values =
-                    detail::get_counter_values(
-                    get_component_name<Component>(),
-                    counter_name_, localities_);
+                hpx::future<std::vector<std::uint64_t>> values =
+                    detail::get_counter_values(get_component_name<Component>(),
+                        counter_name_, localities_);
 
-                return values.then(
-                    hpx::util::bind_back(
-                        detail::create_bulk_helper<Component>(localities_),
-                        count, std::forward<Ts>(vs)...));
+                return values.then(hpx::util::bind_back(
+                    detail::create_bulk_helper<Component>(localities_), count,
+                    std::forward<Ts>(vs)...));
             }
 
             // handle special cases
-            hpx::id_type id =
-                localities_.empty() ? hpx::find_here() : localities_.front();
+            hpx::id_type id = localities_.empty() ?
+                naming::get_id_from_locality_id(agas::get_locality_id()) :
+                localities_.front();
 
-            hpx::future<std::vector<hpx::id_type> > f =
+            hpx::future<std::vector<hpx::id_type>> f =
                 bulk_create_async<Component>(
                     id, count, std::forward<Ts>(vs)...);
 
             return f.then(hpx::launch::sync,
-                [id = std::move(id)](
-                    hpx::future<std::vector<hpx::id_type> > && f
-                ) -> std::vector<bulk_locality_result>
-                {
+                [id = std::move(id)](hpx::future<std::vector<hpx::id_type>>&& f)
+                    -> std::vector<bulk_locality_result> {
                     std::vector<bulk_locality_result> result;
                     result.emplace_back(id, f.get());
                     return result;
@@ -323,19 +324,21 @@ namespace hpx { namespace components
     protected:
         /// \cond NOINTERNAL
         binpacking_distribution_policy(std::vector<id_type> const& localities,
-                char const* perf_counter_name)
-          : localities_(localities),
-            counter_name_(perf_counter_name)
-        {}
+            char const* perf_counter_name)
+          : localities_(localities)
+          , counter_name_(perf_counter_name)
+        {
+        }
 
-        binpacking_distribution_policy(std::vector<id_type> && localities,
-                char const* perf_counter_name)
-          : localities_(std::move(localities)),
-            counter_name_(perf_counter_name)
-        {}
+        binpacking_distribution_policy(
+            std::vector<id_type>&& localities, char const* perf_counter_name)
+          : localities_(std::move(localities))
+          , counter_name_(perf_counter_name)
+        {
+        }
 
-        binpacking_distribution_policy(id_type const& locality,
-                char const* perf_counter_name)
+        binpacking_distribution_policy(
+            id_type const& locality, char const* perf_counter_name)
           : counter_name_(perf_counter_name)
         {
             localities_.push_back(locality);
@@ -346,32 +349,33 @@ namespace hpx { namespace components
         template <typename Archive>
         void serialize(Archive& ar, unsigned int const)
         {
+            // clang-format off
             ar & counter_name_ & localities_;
+            // clang-format on
         }
 
-        std::vector<id_type> localities_;   // localities to create things on
-        std::string counter_name_;          // name of counter to use as criteria
+        std::vector<id_type> localities_;    // localities to create things on
+        std::string counter_name_;    // name of counter to use as criteria
         /// \endcond
     };
 
     /// A predefined instance of the binpacking \a distribution_policy. It will
     /// represent the local locality and will place all items to create here.
-    static binpacking_distribution_policy const binpacked;
-}}
+    static binpacking_distribution_policy const binpacked{};
+}}    // namespace hpx::components
 
 /// \cond NOINTERNAL
-namespace hpx
-{
-    using hpx::components::binpacking_distribution_policy;
+namespace hpx {
+
     using hpx::components::binpacked;
+    using hpx::components::binpacking_distribution_policy;
 
-    namespace traits
-    {
+    namespace traits {
         template <>
-        struct is_distribution_policy<components::binpacking_distribution_policy>
-          : std::true_type
-        {};
-    }
-}
+        struct is_distribution_policy<
+            components::binpacking_distribution_policy> : std::true_type
+        {
+        };
+    }    // namespace traits
+}    // namespace hpx
 /// \endcond
-

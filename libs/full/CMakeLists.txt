@@ -28,6 +28,7 @@ set(_hpx_full_modules
     components_base
     compute
     compute_cuda
+    distribution_policies
     executors_distributed
     include
     init_runtime

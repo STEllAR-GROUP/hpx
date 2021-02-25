@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2014-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,10 +19,10 @@
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/detail/async_implementations.hpp>
 #include <hpx/components/client_base.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime_components/create_component_helpers.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
@@ -32,8 +32,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace components
-{
+namespace hpx { namespace components {
+
     /// This class specifies the parameters for a distribution policy to use
     /// for creating a given number of items on the locality where a given
     /// object is currently placed.
@@ -45,7 +45,7 @@ namespace hpx { namespace components
         colocating_distribution_policy() = default;
 
         /// Create a new \a colocating_distribution_policy representing the
-        /// locality where the given object os current located
+        /// locality where the given object is current located
         ///
         /// \param id     [in] The global address of the object with which
         ///                the new instances should be colocated on
@@ -56,7 +56,7 @@ namespace hpx { namespace components
         }
 
         /// Create a new \a colocating_distribution_policy representing the
-        /// locality where the given object os current located
+        /// locality where the given object is current located
         ///
         /// \param client  [in] The client side representation of the object
         ///                with which the new instances should be colocated on
@@ -80,21 +80,22 @@ namespace hpx { namespace components
         /// \returns A future holding the global address which represents
         ///          the newly created object
         ///
-        template <typename Component, typename ...Ts>
+        template <typename Component, typename... Ts>
         hpx::future<hpx::id_type> create(Ts&&... vs) const
         {
             if (!id_)
             {
                 return create_async<Component>(
-                    hpx::find_here(), std::forward<Ts>(vs)...);
+                    naming::get_id_from_locality_id(agas::get_locality_id()),
+                    std::forward<Ts>(vs)...);
             }
             return create_colocated_async<Component>(
                 id_, std::forward<Ts>(vs)...);
         }
 
         /// \cond NOINTERNAL
-        typedef std::pair<hpx::id_type, std::vector<hpx::id_type> >
-            bulk_locality_result;
+        using bulk_locality_result =
+            std::pair<hpx::id_type, std::vector<hpx::id_type>>;
         /// \endcond
 
         /// Create multiple objects colocated with the object represented
@@ -110,30 +111,28 @@ namespace hpx { namespace components
         /// \returns A future holding the list of global addresses which
         ///          represent the newly created objects
         ///
-        template <typename Component, typename ...Ts>
-        hpx::future<std::vector<bulk_locality_result> >
-        bulk_create(std::size_t count, Ts&&... vs) const
+        template <typename Component, typename... Ts>
+        hpx::future<std::vector<bulk_locality_result>> bulk_create(
+            std::size_t count, Ts&&... vs) const
         {
             hpx::id_type id;
-            hpx::future<std::vector<hpx::id_type> > f;
+            hpx::future<std::vector<hpx::id_type>> f;
             if (!id_)
             {
-                id = hpx::find_here();
+                id = naming::get_id_from_locality_id(agas::get_locality_id());
                 f = bulk_create_async<Component>(
-                        id, count, std::forward<Ts>(vs)...);
+                    id, count, std::forward<Ts>(vs)...);
             }
             else
             {
                 id = id_;
                 f = bulk_create_colocated_async<Component>(
-                        id, count, std::forward<Ts>(vs)...);
+                    id, count, std::forward<Ts>(vs)...);
             }
 
             return f.then(hpx::launch::sync,
-                [id = std::move(id)](
-                    hpx::future<std::vector<hpx::id_type> > && f
-                ) -> std::vector<bulk_locality_result>
-                {
+                [id = std::move(id)](hpx::future<std::vector<hpx::id_type>>&& f)
+                    -> std::vector<bulk_locality_result> {
                     std::vector<bulk_locality_result> result;
                     result.emplace_back(id, f.get());
                     return result;
@@ -146,19 +145,20 @@ namespace hpx { namespace components
         template <typename Action>
         struct async_result
         {
-            using type = hpx::future<typename traits::promise_local_result<
-                typename hpx::traits::extract_action<Action>::remote_result_type
-            >::type>;
+            using type = hpx::future<
+                typename traits::promise_local_result<typename hpx::traits::
+                        extract_action<Action>::remote_result_type>::type>;
         };
 
-        template <typename Action, typename ...Ts>
-        typename async_result<Action>::type
-        async(launch policy, Ts&&... vs) const
+        template <typename Action, typename... Ts>
+        typename async_result<Action>::type async(
+            launch policy, Ts&&... vs) const
         {
             if (!id_)
             {
-                return hpx::detail::async_impl<Action>(
-                    policy, hpx::find_here(), std::forward<Ts>(vs)...);
+                return hpx::detail::async_impl<Action>(policy,
+                    naming::get_id_from_locality_id(agas::get_locality_id()),
+                    std::forward<Ts>(vs)...);
             }
             return hpx::detail::async_colocated<Action>(
                 id_, std::forward<Ts>(vs)...);
@@ -167,44 +167,46 @@ namespace hpx { namespace components
         /// \note This function is part of the invocation policy implemented by
         ///       this class
         ///
-        template <typename Action, typename Callback, typename ...Ts>
-        typename async_result<Action>::type
-        async_cb(launch policy, Callback&& cb, Ts&&... vs) const
+        template <typename Action, typename Callback, typename... Ts>
+        typename async_result<Action>::type async_cb(
+            launch policy, Callback&& cb, Ts&&... vs) const
         {
             if (!id_)
             {
-                return hpx::detail::async_cb_impl<Action>(
-                    policy, hpx::find_here(),
+                return hpx::detail::async_cb_impl<Action>(policy,
+                    naming::get_id_from_locality_id(agas::get_locality_id()),
                     std::forward<Callback>(cb), std::forward<Ts>(vs)...);
             }
-            return hpx::detail::async_colocated_cb<Action>(id_,
-                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            return hpx::detail::async_colocated_cb<Action>(
+                id_, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
         ///       this class
         ///
-        template <typename Action, typename Continuation, typename ...Ts>
-        bool apply(Continuation && c,
-            threads::thread_priority priority, Ts&&... vs) const
+        template <typename Action, typename Continuation, typename... Ts>
+        bool apply(Continuation&& c, threads::thread_priority priority,
+            Ts&&... vs) const
         {
             if (!id_)
             {
                 return hpx::detail::apply_impl<Action>(
                     std::forward<Continuation>(c),
-                    hpx::find_here(), priority, std::forward<Ts>(vs)...);
+                    naming::get_id_from_locality_id(agas::get_locality_id()),
+                    priority, std::forward<Ts>(vs)...);
             }
             return hpx::detail::apply_colocated<Action>(
                 std::forward<Continuation>(c), id_, std::forward<Ts>(vs)...);
         }
 
-        template <typename Action, typename ...Ts>
+        template <typename Action, typename... Ts>
         bool apply(threads::thread_priority priority, Ts&&... vs) const
         {
             if (!id_)
             {
                 return hpx::detail::apply_impl<Action>(
-                    hpx::find_here(), priority, std::forward<Ts>(vs)...);
+                    naming::get_id_from_locality_id(agas::get_locality_id()),
+                    priority, std::forward<Ts>(vs)...);
             }
             return hpx::detail::apply_colocated<Action>(
                 id_, std::forward<Ts>(vs)...);
@@ -214,31 +216,32 @@ namespace hpx { namespace components
         ///       this class
         ///
         template <typename Action, typename Continuation, typename Callback,
-            typename ...Ts>
-        bool apply_cb(Continuation && c,
-            threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
+            typename... Ts>
+        bool apply_cb(Continuation&& c, threads::thread_priority priority,
+            Callback&& cb, Ts&&... vs) const
         {
             if (!id_)
             {
                 return hpx::detail::apply_cb_impl<Action>(
                     std::forward<Continuation>(c),
-                    hpx::find_here(), priority, std::forward<Callback>(cb),
+                    naming::get_id_from_locality_id(agas::get_locality_id()),
+                    priority, std::forward<Callback>(cb),
                     std::forward<Ts>(vs)...);
             }
             return hpx::detail::apply_colocated_cb<Action>(
-                std::forward<Continuation>(c),
-                id_, std::forward<Callback>(cb),
+                std::forward<Continuation>(c), id_, std::forward<Callback>(cb),
                 std::forward<Ts>(vs)...);
         }
 
-        template <typename Action, typename Callback, typename ...Ts>
+        template <typename Action, typename Callback, typename... Ts>
         bool apply_cb(
             threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
         {
             if (!id_)
             {
                 return hpx::detail::apply_cb_impl<Action>(
-                    hpx::find_here(), priority, std::forward<Callback>(cb),
+                    naming::get_id_from_locality_id(agas::get_locality_id()),
+                    priority, std::forward<Callback>(cb),
                     std::forward<Ts>(vs)...);
             }
             return hpx::detail::apply_colocated_cb<Action>(
@@ -260,47 +263,51 @@ namespace hpx { namespace components
         /// async operation
         hpx::id_type get_next_target() const
         {
-            return id_ ? id_ : hpx::find_here();
+            return id_ ?
+                id_ :
+                naming::get_id_from_locality_id(agas::get_locality_id());
         }
 
     protected:
         /// \cond NOINTERNAL
         explicit colocating_distribution_policy(id_type const& id)
           : id_(id)
-        {}
+        {
+        }
 
         friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive& ar, unsigned int const)
         {
+            // clang-format off
             ar & id_;
+            // clang-format on
         }
 
-        hpx::id_type id_;   // the global address of the object with which the
-                            // new objects will be colocated
+        hpx::id_type id_;    // the global address of the object with which the
+                             // new objects will be colocated
         /// \endcond
     };
 
     /// A predefined instance of the co-locating \a distribution_policy. It
     /// will represent the local locality and will place all items to create
     /// here.
-    static colocating_distribution_policy const colocated;
-}}
+    static colocating_distribution_policy const colocated{};
+}}    // namespace hpx::components
 
 /// \cond NOINTERNAL
-namespace hpx
-{
-    using hpx::components::colocating_distribution_policy;
+namespace hpx {
+
     using hpx::components::colocated;
+    using hpx::components::colocating_distribution_policy;
 
-    namespace traits
-    {
+    namespace traits {
         template <>
-        struct is_distribution_policy<components::colocating_distribution_policy>
-          : std::true_type
-        {};
-    }
-}
+        struct is_distribution_policy<
+            components::colocating_distribution_policy> : std::true_type
+        {
+        };
+    }    // namespace traits
+}    // namespace hpx
 /// \endcond
-

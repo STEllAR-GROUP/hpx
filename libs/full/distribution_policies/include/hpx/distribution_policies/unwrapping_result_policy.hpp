@@ -1,10 +1,10 @@
-//  Copyright (c) 2014-2018 Hartmut Kaiser
+//  Copyright (c) 2014-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file colocating_distribution_policy.hpp
+/// \file unwrapping_result_policy.hpp
 
 #pragma once
 
@@ -23,8 +23,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace components
-{
+namespace hpx { namespace components {
+
     /// This class is a distribution policy that can be using with actions that
     /// return futures. For those actions it is possible to apply certain
     /// optimizations if the action is invoked synchronously.
@@ -33,45 +33,45 @@ namespace hpx { namespace components
     public:
         explicit unwrapping_result_policy(id_type const& id)
           : id_(id)
-        {}
+        {
+        }
 
         template <typename Client, typename Stub>
         explicit unwrapping_result_policy(
             client_base<Client, Stub> const& client)
           : id_(client.get_id())
-        {}
+        {
+        }
 
         template <typename Action>
         struct async_result
         {
-            using type = typename traits::promise_local_result<
-                typename hpx::traits::extract_action<Action>::remote_result_type
-            >::type;
+            using type = typename traits::promise_local_result<typename hpx::
+                    traits::extract_action<Action>::remote_result_type>::type;
         };
 
-        template <typename Action, typename ...Ts>
-        HPX_FORCEINLINE typename async_result<Action>::type
-        async(launch policy, Ts&&... vs) const
+        template <typename Action, typename... Ts>
+        HPX_FORCEINLINE typename async_result<Action>::type async(
+            launch policy, Ts&&... vs) const
         {
             return hpx::detail::async_unwrap_result_impl<Action>(
                 policy, get_next_target(), std::forward<Ts>(vs)...);
         }
 
-        template <typename Action, typename ...Ts>
-        HPX_FORCEINLINE typename async_result<Action>::type
-        async(launch::sync_policy, Ts&&... vs) const
+        template <typename Action, typename... Ts>
+        HPX_FORCEINLINE typename async_result<Action>::type async(
+            launch::sync_policy, Ts&&... vs) const
         {
             return hpx::detail::sync_impl<Action>(
                 launch::sync, get_next_target(), std::forward<Ts>(vs)...);
         }
 
-        template <typename Action, typename Callback, typename ...Ts>
-        typename async_result<Action>::type
-        async_cb(launch policy, Callback&& cb, Ts&&... vs) const
+        template <typename Action, typename Callback, typename... Ts>
+        typename async_result<Action>::type async_cb(
+            launch policy, Callback&& cb, Ts&&... vs) const
         {
-            return hpx::detail::async_cb_impl<Action>(policy,
-                get_next_target(), std::forward<Callback>(cb),
-                std::forward<Ts>(vs)...);
+            return hpx::detail::async_cb_impl<Action>(policy, get_next_target(),
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
@@ -81,8 +81,9 @@ namespace hpx { namespace components
         bool apply(Continuation&& c, threads::thread_priority priority,
             Ts&&... vs) const
         {
-            return hpx::detail::apply_impl<Action>(std::forward<Continuation>(c),
-                get_next_target(), priority, std::forward<Ts>(vs)...);
+            return hpx::detail::apply_impl<Action>(
+                std::forward<Continuation>(c), get_next_target(), priority,
+                std::forward<Ts>(vs)...);
         }
 
         template <typename Action, typename... Ts>
@@ -109,9 +110,8 @@ namespace hpx { namespace components
         bool apply_cb(
             threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
         {
-            return hpx::detail::apply_cb_impl<Action>(
-                get_next_target(), priority,
-                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            return hpx::detail::apply_cb_impl<Action>(get_next_target(),
+                priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
         hpx::id_type const& get_next_target() const
@@ -121,23 +121,22 @@ namespace hpx { namespace components
 
     protected:
         /// \cond NOINTERNAL
-        hpx::id_type const& id_;   // locality to encapsulate
+        hpx::id_type const& id_;    // locality to encapsulate
         /// \endcond
     };
-}}
+}}    // namespace hpx::components
 
 /// \cond NOINTERNAL
-namespace hpx
-{
+namespace hpx {
+
     using unwrap_result = hpx::components::unwrapping_result_policy;
 
-    namespace traits
-    {
+    namespace traits {
         template <>
         struct is_distribution_policy<components::unwrapping_result_policy>
           : std::true_type
-        {};
-    }
-}
+        {
+        };
+    }    // namespace traits
+}    // namespace hpx
 /// \endcond
-

@@ -18,12 +18,12 @@
 #include <hpx/components/client_base.hpp>
 #include <hpx/components/distributed_metadata_base.hpp>
 #include <hpx/components/get_ptr.hpp>
+#include <hpx/distribution_policies/container_distribution_policy.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/copy_component.hpp>
 
-#include <hpx/components/containers/container_distribution_policy.hpp>
 #include <hpx/components/containers/partitioned_vector/export_definitions.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>

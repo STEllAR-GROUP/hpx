@@ -6,7 +6,8 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/components/containers/container_distribution_policy.hpp>
+#include <hpx/distribution_policies/container_distribution_policy.hpp>
+
 #include <hpx/components/containers/partitioned_vector/export_definitions.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>

@@ -1,11 +1,11 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/distribution_policies/binpacking_distribution_policy.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/runtime/components/binpacking_distribution_policy.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -69,16 +69,16 @@ namespace hpx { namespace components { namespace detail {
     {
         using namespace hpx::performance_counters;
 
-        std::vector<hpx::future<std::uint64_t> > values;
+        std::vector<hpx::future<std::uint64_t>> values;
         values.reserve(counters.size());
 
-        for (performance_counter const& counter: counters)
+        for (performance_counter const& counter : counters)
             values.push_back(counter.get_value<std::uint64_t>());
 
-        return hpx::dataflow(hpx::launch::sync,
-            [](std::vector<hpx::future<std::uint64_t>> && values)
-                -> std::vector<std::uint64_t>
-            {
+        return hpx::dataflow(
+            hpx::launch::sync,
+            [](std::vector<hpx::future<std::uint64_t>>&& values)
+                -> std::vector<std::uint64_t> {
                 return hpx::util::unwrap(values);
             },
             std::move(values));
@@ -94,32 +94,30 @@ namespace hpx { namespace components { namespace detail {
         std::vector<performance_counter> counters;
         counters.reserve(localities.size());
 
-        if (counter_name[counter_name.size()-1] == '@')
+        if (counter_name[counter_name.size() - 1] == '@')
         {
             std::string name(counter_name + component_name);
 
-            for (hpx::id_type const& id: localities)
+            for (hpx::id_type const& id : localities)
                 counters.emplace_back(name, id);
         }
         else
         {
-            for (hpx::id_type const& id: localities)
+            for (hpx::id_type const& id : localities)
                 counters.emplace_back(counter_name, id);
         }
 
-        return hpx::dataflow(
-            &retrieve_counter_values, std::move(counters));
+        return hpx::dataflow(&retrieve_counter_values, std::move(counters));
     }
 
     hpx::id_type const& get_best_locality(
-        hpx::future<std::vector<std::uint64_t> > && f,
+        hpx::future<std::vector<std::uint64_t>>&& f,
         std::vector<hpx::id_type> const& localities)
     {
         std::vector<std::uint64_t> values = f.get();
 
         std::size_t best_locality = 0;
-        std::uint64_t min_value =
-            (std::numeric_limits<std::uint64_t>::max)();
+        std::uint64_t min_value = (std::numeric_limits<std::uint64_t>::max)();
 
         for (std::size_t i = 0; i != values.size(); ++i)
         {

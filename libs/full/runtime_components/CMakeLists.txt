@@ -15,6 +15,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(runtime_components_headers
     hpx/runtime_components/console_error_sink.hpp
     hpx/runtime_components/create_component_helpers.hpp
+    hpx/runtime_components/default_distribution_policy.hpp
     hpx/runtime_components/new.hpp
     hpx/runtime_components/server/console_error_sink.hpp
     hpx/runtime_components/server/console_error_sink_singleton.hpp
@@ -25,6 +26,7 @@ set(runtime_components_compat_headers
     hpx/runtime/components/console_error_sink.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/console_logging.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/create_component_helpers.hpp => hpx/modules/runtime_components.hpp
+    hpx/runtime/components/default_distribution_policy.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/new.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/server/console_error_sink.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/server/console_logging.hpp => hpx/modules/runtime_components.hpp
@@ -53,6 +55,7 @@ add_hpx_module(
     hpx_async_colocated
     hpx_async_distributed
     hpx_components
+    hpx_distribution_policies
     hpx_naming
     hpx_performance_counters
     hpx_runtime_local

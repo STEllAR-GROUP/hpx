@@ -17,8 +17,8 @@
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/components/default_distribution_policy.hpp>
 #include <hpx/runtime_components/create_component_helpers.hpp>
+#include <hpx/runtime_components/default_distribution_policy.hpp>
 #include <hpx/type_support/lazy_enable_if.hpp>
 
 #include <algorithm>
@@ -286,8 +286,8 @@ namespace hpx { namespace components {
             static type call(
                 DistPolicy const& policy, std::size_t count, Ts&&... vs)
             {
-                typedef typename DistPolicy::bulk_locality_result
-                    bulk_locality_result;
+                using bulk_locality_result =
+                    typename DistPolicy::bulk_locality_result;
 
                 hpx::future<std::vector<bulk_locality_result>> f =
                     policy.template bulk_create<Component>(
@@ -402,7 +402,8 @@ namespace hpx { namespace components {
         detail::new_component<Component>>::type
     new_(id_type const& locality, Ts&&... vs)
     {
-        if (locality == hpx::find_here())
+        if (naming::get_locality_id_from_id(locality) ==
+            agas::get_locality_id())
         {
             return detail::local_new_component<Component>::call(
                 std::forward<Ts>(vs)...);
@@ -425,12 +426,13 @@ namespace hpx { namespace components {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         // create a single instance of a component
         template <typename Client>
         struct new_client
         {
-            typedef Client type;
-            typedef typename Client::server_component_type component_type;
+            using type = Client;
+            using component_type = typename Client::server_component_type;
 
             template <typename... Ts>
             static type call(hpx::id_type const& locality, Ts&&... vs)
@@ -453,8 +455,8 @@ namespace hpx { namespace components {
         template <typename Client>
         struct new_client<Client[]>
         {
-            typedef hpx::future<std::vector<Client>> type;
-            typedef typename Client::server_component_type component_type;
+            using type = hpx::future<std::vector<Client>>;
+            using component_type = typename Client::server_component_type;
 
             template <typename... Ts>
             static type call(Ts&&... vs)
@@ -490,9 +492,9 @@ namespace hpx { namespace components {
         template <typename Client>
         struct local_new_client<Client[]>
         {
-            typedef hpx::future<std::vector<Client>> type;
-            typedef typename Client::server_component_type::wrapping_type
-                component_type;
+            using type = hpx::future<std::vector<Client>>;
+            using component_type =
+                typename Client::server_component_type::wrapping_type;
 
             template <typename... Ts>
             static type call(Ts&&... ts)
@@ -515,7 +517,8 @@ namespace hpx { namespace components {
         detail::new_client<Client>>::type
     new_(id_type const& locality, Ts&&... vs)
     {
-        if (locality == hpx::find_here())
+        if (naming::get_locality_id_from_id(locality) ==
+            agas::get_locality_id())
         {
             return detail::local_new_client<Client>::call(
                 std::forward<Ts>(vs)...);
@@ -583,6 +586,7 @@ namespace hpx { namespace components {
 }}    // namespace hpx::components
 
 namespace hpx {
+
     using hpx::components::local_new;
     using hpx::components::new_;
 }    // namespace hpx
