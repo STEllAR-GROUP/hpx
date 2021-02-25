@@ -36,8 +36,8 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename R, typename F>
         struct transform_receiver
         {
-            typename std::decay<R>::type r;
-            typename std::decay<F>::type f;
+            std::decay_t<R> r;
+            std::decay_t<F> f;
 
             template <typename R_, typename F_>
             transform_receiver(R_&& r, F_&& f)
@@ -72,7 +72,8 @@ namespace hpx { namespace execution { namespace experimental {
                     std::move(r), HPX_INVOKE(f, std::forward<Ts>(ts)...));
             }
 
-            template <typename... Ts>
+            template <typename... Ts,
+                typename = std::enable_if_t<hpx::is_invocable_v<F, Ts...>>>
             void set_value(Ts&&... ts) noexcept
             {
                 using is_void_result = std::is_void<
@@ -84,8 +85,8 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename S, typename F>
         struct transform_sender
         {
-            typename std::decay<S>::type s;
-            typename std::decay<F>::type f;
+            std::decay_t<S> s;
+            std::decay_t<F> f;
 
             template <typename Tuple>
             struct invoke_result_helper;

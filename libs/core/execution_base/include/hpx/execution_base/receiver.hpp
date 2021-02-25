@@ -108,10 +108,9 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename R, typename... Args>
         friend constexpr HPX_FORCEINLINE auto
         tag_override_invoke(set_value_t, R&& r, Args&&... args) noexcept(
-            noexcept(
-                std::declval<R&&>().set_value(std::forward<Args>(args)...)))
+            noexcept(std::forward<R>(r).set_value(std::forward<Args>(args)...)))
             -> decltype(
-                std::declval<R&&>().set_value(std::forward<Args>(args)...))
+                std::forward<R>(r).set_value(std::forward<Args>(args)...))
         {
             return std::forward<R>(r).set_value(std::forward<Args>(args)...);
         }

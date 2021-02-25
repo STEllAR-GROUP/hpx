@@ -10,6 +10,7 @@
 
 #include <cstddef>
 #include <exception>
+#include <memory>
 #include <utility>
 
 static std::size_t start_calls = 0;
@@ -24,9 +25,11 @@ struct receiver_1
     void set_value(int v) noexcept
     {
         i = v;
+        *is = v;
     }
 
     int i = -1;
+    std::shared_ptr<int> is = std::make_shared<int>(-1);
 };
 
 struct sender_1
@@ -43,7 +46,7 @@ struct sender_1
     struct operation_state
     {
         receiver_1& r;
-        void start() && noexcept
+        void start() noexcept
         {
             ++start_calls;
             std::move(r).set_value(4711);
@@ -77,7 +80,7 @@ struct sender_2
     struct operation_state
     {
         receiver_1& r;
-        void start() && noexcept
+        void start() noexcept
         {
             ++start_calls;
             std::move(r).set_value(4711);
@@ -118,7 +121,7 @@ struct sender_3
     struct operation_state
     {
         receiver_1& r;
-        void start() && noexcept
+        void start() noexcept
         {
             ++start_calls;
             std::move(r).set_value(4711);
@@ -174,6 +177,7 @@ int main()
     receiver_1 r1;
     hpx::execution::experimental::submit(sender_1{}, r1);
     HPX_TEST_EQ(r1.i, 4711);
+    HPX_TEST_EQ(*r1.is, 4711);
     HPX_TEST_EQ(start_calls, std::size_t(1));
     HPX_TEST_EQ(connect_calls, std::size_t(1));
     HPX_TEST_EQ(member_submit_calls, std::size_t(1));
@@ -182,6 +186,7 @@ int main()
     receiver_1 r2;
     hpx::execution::experimental::submit(sender_2{}, r2);
     HPX_TEST_EQ(r2.i, 4711);
+    HPX_TEST_EQ(*r2.is, 4711);
     HPX_TEST_EQ(start_calls, std::size_t(2));
     HPX_TEST_EQ(connect_calls, std::size_t(2));
     HPX_TEST_EQ(member_submit_calls, std::size_t(2));
@@ -189,7 +194,8 @@ int main()
 
     receiver_1 r3;
     hpx::execution::experimental::submit(sender_3{}, r3);
-    HPX_TEST_EQ(r2.i, 4711);
+    HPX_TEST_EQ(r3.i, 4711);
+    HPX_TEST_EQ(*r3.is, 4711);
     HPX_TEST_EQ(start_calls, std::size_t(3));
     HPX_TEST_EQ(connect_calls, std::size_t(3));
     HPX_TEST_EQ(member_submit_calls, std::size_t(2));
@@ -197,7 +203,8 @@ int main()
 
     receiver_1 r4;
     hpx::execution::experimental::submit(sender_4{}, r4);
-    HPX_TEST_EQ(r2.i, 4711);
+    HPX_TEST_EQ(r4.i, -1);    // The fallback implementation copies the receiver
+    HPX_TEST_EQ(*r4.is, 4711);
     HPX_TEST_EQ(start_calls, std::size_t(4));
     HPX_TEST_EQ(connect_calls, std::size_t(4));
     HPX_TEST_EQ(member_submit_calls, std::size_t(2));
