@@ -72,8 +72,6 @@ header files in most cases.
 
 ``add_hpx_module`` requires a module name. Optional flags are:
 
-* ``DEPRECATION_WARNINGS``: Enables deprecation warnings for the module.
-
 Optional single-value arguments are:
 
 * ``INSTALL_BINARIES``: Install the resulting library.
