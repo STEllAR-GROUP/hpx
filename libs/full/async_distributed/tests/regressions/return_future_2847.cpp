@@ -19,6 +19,7 @@
 struct non_default_ctor
 {
     int i;
+
     non_default_ctor() = delete;
     non_default_ctor(int i)
       : i(i)
@@ -28,7 +29,9 @@ struct non_default_ctor
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int)
     {
+        // clang-format off
         ar & i;
+        // clang-format on
     }
 
     template <class Archive>
@@ -63,7 +66,7 @@ void test_plain_call_future_non_default_ctor(hpx::id_type id)
     }
     hpx::wait_all(calls);
 
-    for (auto && f : calls)
+    for (auto&& f : calls)
     {
         HPX_TEST_EQ(f.get().i, 42);
     }
