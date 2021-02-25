@@ -211,7 +211,7 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      *
      *
    * * |cmake|_
-     * 3.13
+     * 3.17
      * Cuda support 3.9
    * * **Required Libraries**
      *
@@ -243,7 +243,7 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      *
      *
    * * |cmake|_
-     * 3.13
+     * 3.17
      *
    * * **Required Libraries**
      *
