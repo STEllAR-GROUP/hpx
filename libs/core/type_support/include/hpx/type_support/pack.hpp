@@ -193,4 +193,48 @@ namespace hpx { namespace util {
     {
     };
 
-}}    // namespace hpx::util
+    namespace detail {
+        template <typename Pack, template <typename> class Transformer>
+        struct transform;
+
+        template <template <typename> class Transformer,
+            template <typename...> class Pack, typename... Ts>
+        struct transform<Pack<Ts...>, Transformer>
+        {
+            using type = Pack<typename Transformer<Ts>::type...>;
+        };
+
+        template <typename PackUnique, typename PackRest>
+        struct unique_helper;
+
+        template <template <typename...> class Pack, typename... Ts>
+        struct unique_helper<Pack<Ts...>, Pack<>>
+        {
+            using type = Pack<Ts...>;
+        };
+
+        template <template <typename...> class Pack, typename... Ts, typename U,
+            typename... Us>
+        struct unique_helper<Pack<Ts...>, Pack<U, Us...>>
+          : std::conditional<contains<Ts..., U>::value,
+                unique_helper<Pack<Ts...>, Pack<Us...>>,
+                unique_helper<Pack<Ts..., U>, Pack<Us...>>>::type
+        {
+        };
+
+        template <template <typename...> class Pack, typename... Ts,
+            typename... Us>
+        struct unique_helper<Pack<Ts...>, Pack<Us...>>
+          : unique_helper<Pack<>, Pack<Ts...>>
+        {
+        };
+
+        template <typename Pack>
+        struct unique;
+
+        template <template <typename...> class Pack, typename... Ts>
+        struct unique<Pack<Ts...>> : unique_helper<Pack<>, Pack<Ts...>>
+        {
+        };
+    }    // namespace detail
+}}       // namespace hpx::util

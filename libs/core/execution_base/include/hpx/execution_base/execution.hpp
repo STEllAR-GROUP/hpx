@@ -169,47 +169,46 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Executor, typename F, typename Shape, typename... Ts>
         HPX_FORCEINLINE auto bulk_async_execute(
             Executor&& exec, F&& f, Shape const& shape, Ts&&... ts) ->
-            typename bulk_async_execute_fn_helper<
-                typename std::decay<Executor>::type>::template result<Executor,
-                F, Shape, Ts...>::type
+            typename bulk_async_execute_fn_helper<std::decay_t<Executor>>::
+                template result<Executor, F, Shape, Ts...>::type
         {
-            return bulk_async_execute_fn_helper<typename std::decay<
-                Executor>::type>::call(std::forward<Executor>(exec),
-                std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+            return bulk_async_execute_fn_helper<std::decay_t<Executor>>::call(
+                std::forward<Executor>(exec), std::forward<F>(f), shape,
+                std::forward<Ts>(ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
         // async_execute dispatch point
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto async_execute(Executor&& exec, F&& f, Ts&&... ts)
-            -> typename async_execute_fn_helper<typename std::decay<
-                Executor>::type>::template result<Executor, F, Ts...>::type
+            -> typename async_execute_fn_helper<std::decay_t<Executor>>::
+                template result<Executor, F, Ts...>::type
         {
-            return async_execute_fn_helper<typename std::decay<
-                Executor>::type>::call(std::forward<Executor>(exec),
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return async_execute_fn_helper<std::decay_t<Executor>>::call(
+                std::forward<Executor>(exec), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
         // sync_execute dispatch point
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto sync_execute(Executor&& exec, F&& f, Ts&&... ts) ->
-            typename sync_execute_fn_helper<typename std::decay<
-                Executor>::type>::template result<Executor, F, Ts...>::type
+            typename sync_execute_fn_helper<std::decay_t<Executor>>::
+                template result<Executor, F, Ts...>::type
         {
-            return sync_execute_fn_helper<typename std::decay<Executor>::type>::
-                call(std::forward<Executor>(exec), std::forward<F>(f),
-                    std::forward<Ts>(ts)...);
+            return sync_execute_fn_helper<std::decay_t<Executor>>::call(
+                std::forward<Executor>(exec), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
         // post dispatch point
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto post(Executor&& exec, F&& f, Ts&&... ts) ->
-            typename post_fn_helper<typename std::decay<Executor>::type>::
-                template result<Executor, F, Ts...>::type
+            typename post_fn_helper<std::decay_t<Executor>>::template result<
+                Executor, F, Ts...>::type
         {
-            return post_fn_helper<typename std::decay<Executor>::type>::call(
+            return post_fn_helper<std::decay_t<Executor>>::call(
                 std::forward<Executor>(exec), std::forward<F>(f),
                 std::forward<Ts>(ts)...);
         }
@@ -220,14 +219,12 @@ namespace hpx { namespace parallel { namespace execution {
             typename Future, typename... Ts>
         HPX_FORCEINLINE auto bulk_then_execute(Executor&& exec, F&& f,
             Shape const& shape, Future&& predecessor, Ts&&... ts) ->
-            typename bulk_then_execute_fn_helper<
-                typename std::decay<Executor>::type>::template result<Executor,
-                F, Shape, Future, Ts...>::type
+            typename bulk_then_execute_fn_helper<std::decay_t<Executor>>::
+                template result<Executor, F, Shape, Future, Ts...>::type
         {
-            return bulk_then_execute_fn_helper<typename std::decay<
-                Executor>::type>::call(std::forward<Executor>(exec),
-                std::forward<F>(f), shape, std::forward<Future>(predecessor),
-                std::forward<Ts>(ts)...);
+            return bulk_then_execute_fn_helper<std::decay_t<Executor>>::call(
+                std::forward<Executor>(exec), std::forward<F>(f), shape,
+                std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -235,13 +232,12 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Executor, typename F, typename Shape, typename... Ts>
         HPX_FORCEINLINE auto bulk_sync_execute(
             Executor&& exec, F&& f, Shape const& shape, Ts&&... ts) ->
-            typename bulk_sync_execute_fn_helper<
-                typename std::decay<Executor>::type>::template result<Executor,
-                F, Shape, Ts...>::type
+            typename bulk_sync_execute_fn_helper<std::decay_t<Executor>>::
+                template result<Executor, F, Shape, Ts...>::type
         {
-            return bulk_sync_execute_fn_helper<typename std::decay<
-                Executor>::type>::call(std::forward<Executor>(exec),
-                std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+            return bulk_sync_execute_fn_helper<std::decay_t<Executor>>::call(
+                std::forward<Executor>(exec), std::forward<F>(f), shape,
+                std::forward<Ts>(ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -250,13 +246,12 @@ namespace hpx { namespace parallel { namespace execution {
             typename... Ts>
         HPX_FORCEINLINE auto then_execute(
             Executor&& exec, F&& f, Future&& predecessor, Ts&&... ts) ->
-            typename then_execute_fn_helper<
-                typename std::decay<Executor>::type>::template result<Executor,
-                F, Future, Ts...>::type
+            typename then_execute_fn_helper<std::decay_t<Executor>>::
+                template result<Executor, F, Future, Ts...>::type
         {
-            return then_execute_fn_helper<typename std::decay<Executor>::type>::
-                call(std::forward<Executor>(exec), std::forward<F>(f),
-                    std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
+            return then_execute_fn_helper<std::decay_t<Executor>>::call(
+                std::forward<Executor>(exec), std::forward<F>(f),
+                std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////

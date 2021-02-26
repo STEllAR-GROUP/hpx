@@ -875,6 +875,26 @@ namespace hpx { namespace parallel { namespace execution {
 }}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace execution { namespace experimental {
+    HPX_INLINE_CONSTEXPR_VARIABLE struct make_with_priority_t
+      : hpx::functional::tag<make_with_priority_t>
+    {
+    } make_with_priority{};
+
+    HPX_INLINE_CONSTEXPR_VARIABLE struct get_priority_t
+      : hpx::functional::tag<get_priority_t>
+    {
+    } get_priority{};
+
+    HPX_INLINE_CONSTEXPR_VARIABLE struct make_with_stacksize_t
+      : hpx::functional::tag<make_with_stacksize_t>
+    {
+    } make_with_stacksize{};
+
+    HPX_INLINE_CONSTEXPR_VARIABLE struct get_stacksize_t
+      : hpx::functional::tag<get_stacksize_t>
+    {
+    } get_stacksize{};
+
     HPX_INLINE_CONSTEXPR_VARIABLE struct make_with_hint_t
       : hpx::functional::tag<make_with_hint_t>
     {
