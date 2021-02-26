@@ -11,7 +11,7 @@ on: [pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: stellargroup/build_env:ubuntu
+    container: stellargroup/build_env:2
 
     steps:
     - uses: actions/checkout@v2
