@@ -1185,9 +1185,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx { namespace ranges {
 
+    /// `replace_copy_if_result` is equivalent to
+    /// `hpx::parallel::util::in_out_result`
     template <typename I, typename O>
     using replace_copy_if_result = hpx::parallel::util::in_out_result<I, O>;
 
+    /// `replace_copy_result` is equivalent to
+    /// `hpx::parallel::util::in_out_result`
     template <typename I, typename O>
     using replace_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
