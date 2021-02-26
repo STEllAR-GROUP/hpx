@@ -250,7 +250,7 @@ modules_cmakelists += ')\n# cmake-format: on\n'
 
 modules_cmakelists += f'''
 hpx_info("")
-hpx_info("Configuring libhpx_{lib_name} modules:")
+hpx_info("Configuring libhpx{"_" + lib_name if lib_name != "full" else ""} modules:")
 
 foreach(module ${{_hpx_{lib_name}_modules}})
   add_subdirectory(${{module}})
@@ -259,6 +259,9 @@ endforeach()
 
 f = open(os.path.join(cwd, lib_name, 'CMakeLists.txt'), 'w')
 f.write(modules_cmakelists)
+
+header_name_str = "Main |hpx| modules" if lib_name == "full" else lib_name.capitalize() + " modules"
+header_underline_str = '=' * len(header_name_str)
 
 modules_rst = f'''..
     Copyright (c) 2018-2021 The STE||AR-Group
@@ -269,9 +272,9 @@ modules_rst = f'''..
 
 .. _{lib_name}_modules:
 
-==================
-{lib_name} modules
-==================
+{header_underline_str}
+{header_name_str}
+{header_underline_str}
 
 .. toctree::
    :maxdepth: 2
