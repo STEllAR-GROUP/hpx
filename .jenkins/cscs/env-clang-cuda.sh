@@ -9,7 +9,7 @@ source $SPACK_ROOT/share/spack/setup-env.sh
 export CRAYPE_LINK_TYPE=dynamic
 export APPS_ROOT="/apps/daint/SSL/HPX/packages"
 export CXX_STD="17"
-export BOOST_ROOT="${APPS_ROOT}/boost-1.69.0-gcc-8.3.0-c++17-release"
+export BOOST_ROOT="${APPS_ROOT}/boost-1.73.0-gcc-8.3.0-c++17-release"
 export HWLOC_ROOT="${APPS_ROOT}/hwloc-2.0.3-gcc-8.3.0"
 
 module load daint-gpu
