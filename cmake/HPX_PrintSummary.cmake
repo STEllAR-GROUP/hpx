@@ -6,9 +6,6 @@
 
 function(create_configuration_summary message module_name)
 
-  hpx_info("")
-  hpx_info(${message})
-
   set(hpx_config_information)
   set(upper_cfg_name "HPX")
   set(upper_option_suffix "")
@@ -31,22 +28,27 @@ function(create_configuration_summary message module_name)
   get_property(
     _variableNames GLOBAL PROPERTY HPX_MODULE_CONFIG_${module_name_uc}
   )
-  foreach(_variableName ${_variableNames})
-    if(${_variableName}Category)
 
-      # handle only options which start with HPX_WITH_
-      string(FIND ${_variableName} "${upper_cfg_name}_WITH_" __pos)
+  # Only print the module configuration if options specified
+  list(LENGTH _variableNames _length)
+  if(${_length} GREATER_EQUAL 1)
+    hpx_info("")
+    hpx_info(${message})
 
-      # hpx_info("  ${_variableName} ${module_name} ${module_name_uc},
-      # ${upper_cfg_name} ${__pos}")
+    foreach(_variableName ${_variableNames})
+      if(${_variableName}Category)
 
-      if(${__pos} EQUAL 0)
-        get_property(
-          _value
-          CACHE "${_variableName}"
-          PROPERTY VALUE
-        )
-        hpx_info("    ${_variableName}=${_value}")
+        # handle only options which start with HPX_WITH_
+        string(FIND ${_variableName} "${upper_cfg_name}_WITH_" __pos)
+
+        if(${__pos} EQUAL 0)
+          get_property(
+            _value
+            CACHE "${_variableName}"
+            PROPERTY VALUE
+          )
+          hpx_info("    ${_variableName}=${_value}")
+        endif()
 
         string(REPLACE "_WITH_" "_HAVE_" __variableName ${_variableName})
         list(FIND DEFINITIONS_VARS ${__variableName} __pos)
@@ -69,10 +71,9 @@ function(create_configuration_summary message module_name)
             )
           endif()
         endif()
-
       endif()
-    endif()
-  endforeach()
+    endforeach()
+  endif()
 
   if(hpx_config_information)
     string(REPLACE ";" "" hpx_config_information ${hpx_config_information})

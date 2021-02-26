@@ -40,7 +40,6 @@ set(errors_sources error_code.cpp exception.cpp exception_list.cpp
 include(HPX_AddModule)
 add_hpx_module(
   core errors
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   GLOBAL_HEADER_GEN ON
   SOURCES ${errors_sources}
   HEADERS ${errors_headers}

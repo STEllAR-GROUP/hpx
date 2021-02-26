@@ -101,7 +101,6 @@ set(components_base_sources
 include(HPX_AddModule)
 add_hpx_module(
   full components_base
-  COMPATIBILITY_HEADERS ON
   GLOBAL_HEADER_GEN ON
   SOURCES ${components_base_sources}
   HEADERS ${components_base_headers}

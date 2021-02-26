@@ -41,7 +41,6 @@ set(type_support_sources)
 include(HPX_AddModule)
 add_hpx_module(
   core type_support
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   GLOBAL_HEADER_GEN ON
   SOURCES ${type_support_sources}
   HEADERS ${type_support_headers}

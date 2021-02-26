@@ -19,7 +19,6 @@ set(hashing_sources)
 include(HPX_AddModule)
 add_hpx_module(
   core hashing
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   GLOBAL_HEADER_GEN ON
   SOURCES ${hashing_sources}
   HEADERS ${hashing_headers}

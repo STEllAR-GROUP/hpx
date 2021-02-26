@@ -41,7 +41,6 @@ set(components_sources basename_registration.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   full components
-  COMPATIBILITY_HEADERS ON # Added in 1.7.0
   GLOBAL_HEADER_GEN ON
   SOURCES ${components_sources}
   HEADERS ${components_headers}

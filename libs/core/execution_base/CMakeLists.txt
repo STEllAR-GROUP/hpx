@@ -41,7 +41,6 @@ set(execution_base_sources agent_ref.cpp register_locks.cpp
 include(HPX_AddModule)
 add_hpx_module(
   core execution_base
-  COMPATIBILITY_HEADERS ON
   GLOBAL_HEADER_GEN ON
   SOURCES ${execution_base_sources}
   HEADERS ${execution_base_headers}

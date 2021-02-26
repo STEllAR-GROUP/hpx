@@ -38,7 +38,6 @@ set(concurrency_sources barrier.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   core concurrency
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   GLOBAL_HEADER_GEN ON
   SOURCES ${concurrency_sources}
   HEADERS ${concurrency_headers}

@@ -22,7 +22,6 @@ set(threadmanager_sources threadmanager.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   full threadmanager
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   GLOBAL_HEADER_GEN OFF
   SOURCES ${threadmanager_sources}
   HEADERS ${threadmanager_headers}

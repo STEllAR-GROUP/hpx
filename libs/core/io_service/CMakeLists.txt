@@ -21,7 +21,6 @@ set(io_service_sources io_service_pool.cpp io_service_thread_pool.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   core io_service
-  COMPATIBILITY_HEADERS ON
   GLOBAL_HEADER_GEN ON
   SOURCES ${io_service_sources}
   HEADERS ${io_service_headers}

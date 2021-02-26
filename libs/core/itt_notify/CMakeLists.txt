@@ -23,7 +23,6 @@ set(itt_notify_sources itt_notify.cpp thread_name.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   core itt_notify
-  COMPATIBILITY_HEADERS ON
   GLOBAL_HEADER_GEN OFF
   SOURCES ${itt_notify_sources}
   HEADERS ${itt_notify_headers}

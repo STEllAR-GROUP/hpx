@@ -35,7 +35,6 @@ set(async_combinators_compat_headers
 include(HPX_AddModule)
 add_hpx_module(
   parallelism async_combinators
-  COMPATIBILITY_HEADERS ON
   GLOBAL_HEADER_GEN ON
   HEADERS ${async_combinators_headers}
   COMPAT_HEADERS ${async_combinators_compat_headers}

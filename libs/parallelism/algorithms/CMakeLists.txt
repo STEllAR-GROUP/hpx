@@ -183,7 +183,6 @@ set(algorithms_sources handle_exception_termination_handler.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   parallelism algorithms
-  COMPATIBILITY_HEADERS ON
   HEADERS ${algorithms_headers}
   COMPAT_HEADERS ${algorithms_compat_headers}
   SOURCES ${algorithms_sources}

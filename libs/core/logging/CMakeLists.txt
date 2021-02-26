@@ -54,7 +54,6 @@ set(logging_sources
 include(HPX_AddModule)
 add_hpx_module(
   core logging
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   GLOBAL_HEADER_GEN OFF
   SOURCES ${logging_sources}
   HEADERS ${logging_headers}

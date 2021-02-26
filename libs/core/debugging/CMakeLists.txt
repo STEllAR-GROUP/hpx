@@ -24,7 +24,6 @@ set(debugging_sources attach_debugger.cpp backtrace.cpp print.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   core debugging
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   GLOBAL_HEADER_GEN ON
   SOURCES ${debugging_sources}
   HEADERS ${debugging_headers}

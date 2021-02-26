@@ -56,7 +56,6 @@ set(actions_sources base_action.cpp continuation.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   full actions
-  COMPATIBILITY_HEADERS ON
   GLOBAL_HEADER_GEN ON
   SOURCES ${actions_sources}
   HEADERS ${actions_headers}

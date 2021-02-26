@@ -43,7 +43,6 @@ include(HPX_AddModule)
 
 add_hpx_module(
   core hardware
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   EXCLUDE_FROM_GLOBAL_HEADER
     "hpx/hardware/cpuid/linux_x86.hpp"
     "hpx/hardware/cpuid/msvc.hpp"

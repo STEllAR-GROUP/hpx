@@ -66,7 +66,6 @@ set(executors_sources current_executor.cpp exception_list_callbacks.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   parallelism executors
-  COMPATIBILITY_HEADERS ON
   GLOBAL_HEADER_GEN ON
   SOURCES ${executors_sources}
   HEADERS ${executors_headers}

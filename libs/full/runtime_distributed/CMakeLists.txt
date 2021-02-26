@@ -47,7 +47,6 @@ endif()
 include(HPX_AddModule)
 add_hpx_module(
   full runtime_distributed
-  COMPATIBILITY_HEADERS ON # added in hpx V1.6.0
   GLOBAL_HEADER_GEN OFF
   SOURCES ${runtime_distributed_sources}
   HEADERS ${runtime_distributed_headers}

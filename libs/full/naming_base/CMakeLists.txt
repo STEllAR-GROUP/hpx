@@ -28,7 +28,6 @@ set(naming_base_sources address.cpp gid_type.cpp id_type.cpp unmanaged.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   full naming_base
-  COMPATIBILITY_HEADERS ON # introduced in V1.6.0
   GLOBAL_HEADER_GEN ON
   HEADERS ${naming_base_headers}
   COMPAT_HEADERS ${naming_base_compat_headers}

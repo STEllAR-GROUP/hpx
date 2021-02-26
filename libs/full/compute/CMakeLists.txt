@@ -49,7 +49,6 @@ endif()
 include(HPX_AddModule)
 add_hpx_module(
   full compute
-  COMPATIBILITY_HEADERS ON
   GLOBAL_HEADER_GEN ON
   SOURCES ${compute_sources}
   HEADERS ${compute_headers}

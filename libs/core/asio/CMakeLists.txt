@@ -20,7 +20,6 @@ set(asio_sources asio_util.cpp map_hostnames.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   core asio
-  COMPATIBILITY_HEADERS ON
   GLOBAL_HEADER_GEN ON
   SOURCES ${asio_sources}
   HEADERS ${asio_headers}
