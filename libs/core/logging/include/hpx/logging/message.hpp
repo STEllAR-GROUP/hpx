@@ -55,25 +55,25 @@ namespace hpx { namespace util { namespace logging {
          */
         explicit message(std::stringstream msg)
           :
-#if !defined(HPX_COMPUTE_HOST_CODE)
+#if defined(HPX_COMPUTE_HOST_CODE)
           m_str(std::move(msg))
           ,
 #endif
           m_full_msg_computed(false)
         {
-#if defined(HPX_COMPUTE_HOST_CODE)
+#if !defined(HPX_COMPUTE_HOST_CODE)
             HPX_UNUSED(msg);
 #endif
         }
 
         message(message&& other) noexcept
           :
-#if !defined(HPX_COMPUTE_HOST_CODE)
+#if defined(HPX_COMPUTE_HOST_CODE)
           m_str(std::move(other.m_str))
           ,
 #endif
           m_full_msg_computed(other.m_full_msg_computed)
-#if !defined(HPX_COMPUTE_HOST_CODE)
+#if defined(HPX_COMPUTE_HOST_CODE)
           , m_full_msg(std::move(other.m_full_msg))
 #endif
         {

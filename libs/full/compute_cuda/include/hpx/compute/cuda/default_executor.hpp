@@ -43,12 +43,12 @@ namespace hpx { namespace cuda { namespace experimental {
             static void call(hpx::cuda::experimental::target const& target,
                 F&& f, Shape const& shape,
                 Ts&&...
-#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
+#if defined(HPX_COMPUTE_CODE)
                 ts
 #endif
             )
             {
-#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
+#if defined(HPX_COMPUTE_CODE)
                 std::size_t count = util::size(shape);
 
                 int threads_per_block =
@@ -99,12 +99,12 @@ namespace hpx { namespace cuda { namespace experimental {
             static void call(hpx::cuda::experimental::target const& target,
                 F&& f, Shape const& shape,
                 Ts&&...
-#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
+#if defined(HPX_COMPUTE_CODE)
                 ts
 #endif
             )
             {
-#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
+#if defined(HPX_COMPUTE_CODE)
                 typedef typename hpx::traits::range_traits<Shape>::value_type
                     value_type;
 
