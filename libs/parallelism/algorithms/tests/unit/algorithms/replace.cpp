@@ -35,8 +35,8 @@ void test_replace(ExPolicy policy, IteratorTag)
 
     std::size_t idx = std::rand() % c.size();    //-V104
 
-    hpx::parallel::replace(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), c[idx], c[idx] + 1);
+    hpx::replace(policy, iterator(std::begin(c)), iterator(std::end(c)), c[idx],
+        c[idx] + 1);
 
     std::replace(std::begin(d), std::end(d), d[idx], d[idx] + 1);
 
@@ -63,7 +63,7 @@ void test_replace_async(ExPolicy p, IteratorTag)
 
     std::size_t idx = std::rand() % c.size();    //-V104
 
-    hpx::future<void> f = hpx::parallel::replace(
+    hpx::future<void> f = hpx::replace(
         p, iterator(std::begin(c)), iterator(std::end(c)), c[idx], c[idx] + 1);
     f.wait();
 
@@ -114,7 +114,7 @@ void test_replace_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::replace(policy,
+        hpx::replace(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), std::size_t(42), std::size_t(43));
@@ -147,7 +147,7 @@ void test_replace_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::replace(p,
+        hpx::future<void> f = hpx::replace(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), std::size_t(42), std::size_t(43));
@@ -208,7 +208,7 @@ void test_replace_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::replace(policy,
+        hpx::replace(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::size_t(42), std::size_t(43));
         HPX_TEST(false);
@@ -239,7 +239,7 @@ void test_replace_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::replace(p,
+        hpx::future<void> f = hpx::replace(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::size_t(42), std::size_t(43));
         returned_from_algorithm = true;
