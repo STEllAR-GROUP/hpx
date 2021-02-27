@@ -33,7 +33,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/parcelset/parcelport.cpp
     runtime/parcelset/put_parcel.cpp
     runtime/set_parcel_write_handler.cpp
-    runtime/trigger_lco.cpp
     runtime_distributed.cpp
     util/generate_unique_ids.cpp
     util/pool_timer.cpp
@@ -106,7 +105,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/plugins/plugin_registry.hpp
     hpx/plugins/unique_plugin_name.hpp
     hpx/runtime_fwd.hpp
-    hpx/runtime/components_fwd.hpp
     hpx/runtime/find_here.hpp
     hpx/runtime/find_all_localities.hpp
     hpx/runtime/get_locality_name.hpp
@@ -129,13 +127,9 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/parcelset/parcelport_impl.hpp
     hpx/runtime/parcelset/policies/message_handler.hpp
     hpx/runtime/parcelset/put_parcel.hpp
-    hpx/runtime/runtime_fwd.hpp
     hpx/runtime/set_parcel_write_handler.hpp
-    hpx/runtime/trigger_lco.hpp
-    hpx/runtime/trigger_lco_fwd.hpp
     hpx/traits/action_message_handler.hpp
     hpx/traits/action_serialization_filter.hpp
-    hpx/traits/is_continuation.hpp
     hpx/util/bind_action.hpp
     hpx/util/connection_cache.hpp
     hpx/util/functional/segmented_iterator_helpers.hpp

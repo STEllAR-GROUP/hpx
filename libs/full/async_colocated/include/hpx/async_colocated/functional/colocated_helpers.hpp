@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions/continuation.hpp>
 #include <hpx/agas_base/gva.hpp>
+#include <hpx/async_distributed/continuation.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>

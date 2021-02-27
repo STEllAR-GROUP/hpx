@@ -16,11 +16,11 @@
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/components/client_base.hpp>
-#include <hpx/components/distributed_metadata_base.hpp>
 #include <hpx/components/get_ptr.hpp>
 #include <hpx/distribution_policies/container_distribution_policy.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/runtime_components/distributed_metadata_base.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/copy_component.hpp>
 

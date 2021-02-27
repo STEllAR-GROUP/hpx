@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions/continuation_fwd.hpp>
 #include <hpx/actions_base/actions_base_fwd.hpp>
 
 namespace hpx { namespace actions {
@@ -25,6 +24,5 @@ namespace hpx { namespace actions {
     template <typename Action>
     struct transfer_continuation_action;
 #endif
-
     /// \endcond
 }}    // namespace hpx::actions

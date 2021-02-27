@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions/continuation_fwd.hpp>
+#include <hpx/async_distributed/continuation_fwd.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/type_support/unused.hpp>
 

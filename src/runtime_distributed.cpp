@@ -39,13 +39,14 @@
 #include <hpx/performance_counters/threadmanager_counter_types.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_components/console_error_sink.hpp>
+#include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_components/server/console_error_sink.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/big_boot_barrier.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
+#include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/runtime_support.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
 #include <hpx/runtime_local/config_entry.hpp>

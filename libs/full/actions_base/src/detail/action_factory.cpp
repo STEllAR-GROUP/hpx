@@ -27,17 +27,18 @@ namespace hpx { namespace actions { namespace detail {
     }
 
     void action_registry::register_factory(
-        std::string const& type_name, ctor_t ctor)
+        std::string const& type_name, ctor_t ctor, ctor_t ctor_cont)
     {
-        HPX_ASSERT(ctor != nullptr);
+        HPX_ASSERT(ctor != nullptr && ctor_cont != nullptr);
 
-        typename_to_ctor_.emplace(std::string(type_name), ctor);
+        typename_to_ctor_.emplace(
+            std::string(type_name), std::make_pair(ctor, ctor_cont));
 
         // populate cache
         typename_to_id_t::const_iterator it = typename_to_id_.find(type_name);
         if (it != typename_to_id_.end())
         {
-            cache_id(it->second, ctor);
+            cache_id(it->second, ctor, ctor_cont);
         }
     }
 
@@ -62,7 +63,7 @@ namespace hpx { namespace actions { namespace detail {
             typename_to_ctor_.find(type_name);
         if (it != typename_to_ctor_.end())
         {
-            cache_id(id, it->second);
+            cache_id(id, it->second.first, it->second.second);
         }
 
         if (id > max_id_)
@@ -74,7 +75,7 @@ namespace hpx { namespace actions { namespace detail {
     // This makes sure that the registries are consistent.
     void action_registry::fill_missing_typenames()
     {
-        // Register all type-names and ssign missing ids
+        // Register all type-names and assign missing ids
         for (std::string const& str : get_unassigned_typenames())
         {
             register_typename(str, ++max_id_);
@@ -87,7 +88,9 @@ namespace hpx { namespace actions { namespace detail {
             typename_to_ctor_t::const_iterator it =
                 typename_to_ctor_.find(d.first);
             if (it != typename_to_ctor_.end())
-                cache_id(d.second, it->second);
+            {
+                cache_id(d.second, it->second.first, it->second.second);
+            }
         }
 
         // Go over all registered mappings from type-names to ctors and
@@ -96,7 +99,7 @@ namespace hpx { namespace actions { namespace detail {
         {
             typename_to_id_t::const_iterator it = typename_to_id_.find(d.first);
             HPX_ASSERT(it != typename_to_id_.end());
-            cache_id(it->second, d.second);
+            cache_id(it->second, d.second.first, d.second.second);
         }
     }
 
@@ -165,8 +168,8 @@ namespace hpx { namespace actions { namespace detail {
             return nullptr;
         }
 
-        ctor_t ctor = this_.cache_[id];
-        if (ctor == nullptr)    // -V108
+        std::pair<ctor_t, ctor_t> const& ctors = this_.cache_[id];
+        if (ctors.first == nullptr || ctors.second == nullptr)    // -V108
         {
             std::string msg("Unknown type descriptor " + std::to_string(id));
 #if defined(HPX_DEBUG)
@@ -182,7 +185,7 @@ namespace hpx { namespace actions { namespace detail {
                 serialization_error, "action_registry::create", msg);
             return nullptr;
         }
-        return ctor(with_continuation);
+        return !with_continuation ? ctors.first() : ctors.second();
     }
 
     action_registry& action_registry::instance()
@@ -191,20 +194,20 @@ namespace hpx { namespace actions { namespace detail {
         return this_;
     }
 
-    void action_registry::cache_id(
-        std::uint32_t id, action_registry::ctor_t ctor)
+    void action_registry::cache_id(std::uint32_t id,
+        action_registry::ctor_t ctor, action_registry::ctor_t ctor_cont)
     {
         std::size_t id_ = std::size_t(id);
         if (id_ >= cache_.size())
         {
-            cache_.resize(id_ + 1, nullptr);
-            cache_[id_] = nullptr;
+            cache_.resize(id_ + 1, std::pair<ctor_t, ctor_t>(nullptr, nullptr));
+            cache_[id_] = std::pair<ctor_t, ctor_t>{};
             return;
         }
 
-        if (cache_[id_] == nullptr)
+        if (cache_[id_].first == nullptr || cache_[id_].second == nullptr)
         {
-            cache_[id_] = ctor;
+            cache_[id_] = std::make_pair(ctor, ctor_cont);
         }
     }
 

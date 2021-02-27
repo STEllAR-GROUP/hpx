@@ -18,7 +18,7 @@
 #include <hpx/actions_base/detail/invocation_count_registry.hpp>
 #include <hpx/actions_base/detail/per_action_data_counter_registry.hpp>
 #include <hpx/actions_base/preassigned_action_id.hpp>
-#include <hpx/actions_base/traits/action_continuation_fwd.hpp>
+#include <hpx/actions_base/traits/action_continuation.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
 #include <hpx/actions_base/traits/action_stacksize.hpp>
@@ -170,8 +170,10 @@ namespace hpx { namespace actions {
             {
             }
 
-            threads::thread_result_type operator()(
-                threads::thread_restart_state)
+            template <typename State,
+                typename Enable = typename std::enable_if<std::is_same<State,
+                    threads::thread_restart_state>::value>::type>
+            threads::thread_result_type operator()(State)
             {
                 LTM_(debug) << "Executing " << Action::get_action_name(lva_)
                             << " with continuation(" << cont_.get_id() << ")";

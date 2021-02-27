@@ -24,23 +24,9 @@ set(init_runtime_headers
 set(init_runtime_sources hpx_init.cpp hpx_main_winsocket.cpp init_logging.cpp)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(init_runtime_headers
-      ${init_runtime_headers} hpx/init_runtime/console_logging.hpp
-      hpx/init_runtime/server/console_logging.hpp
-  )
-
-  # cmake-format: off
-  set(init_runtime_compat_headers COMPAT_HEADERS
-      hpx/runtime/components/console_logging.hpp => hpx/modules/init_runtime.hpp
-      hpx/runtime/components/server/console_logging.hpp => hpx/modules/init_runtime.hpp
-  )
-  # cmake-format: on
-
-  set(init_runtime_sources ${init_runtime_sources} console_logging.cpp
-                           server/console_logging_server.cpp
-  )
   set(init_runtime_optional_module_dependencies
       hpx_async_distributed hpx_naming hpx_performance_counters
+      hpx_runtime_components hpx_runtime_distributed
   )
 endif()
 
@@ -53,7 +39,7 @@ add_hpx_module(
   full init_runtime
   GLOBAL_HEADER_GEN OFF
   HEADERS ${init_runtime_headers}
-  SOURCES ${init_runtime_sources} ${init_runtime_compat_headers}
+  SOURCES ${init_runtime_sources}
   DEPENDENCIES hpx_core hpx_parallelism
   MODULE_DEPENDENCIES hpx_program_options hpx_runtime_local hpx_threadmanager
                       ${init_runtime_optional_module_dependencies}

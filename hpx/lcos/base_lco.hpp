@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/component_action.hpp>
+#include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/get_lva.hpp>
 #include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/components_fwd.hpp>
+#include <hpx/runtime_components/components_fwd.hpp>
 
 #include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
 

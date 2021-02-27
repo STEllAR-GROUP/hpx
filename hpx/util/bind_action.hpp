@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
+#include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_local/async_fwd.hpp>
 #include <hpx/datastructures/member_pack.hpp>
@@ -19,7 +20,6 @@
 #include <hpx/functional/traits/is_placeholder.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
-#include <hpx/traits/is_continuation.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>

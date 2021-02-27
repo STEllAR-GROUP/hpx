@@ -10,6 +10,7 @@
 #include <hpx/agas_base/component_namespace.hpp>
 #include <hpx/agas_base/server/component_namespace.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
+#include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/serialization/vector.hpp>
 

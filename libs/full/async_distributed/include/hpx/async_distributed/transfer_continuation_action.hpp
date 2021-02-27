@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -13,9 +13,12 @@
 #include <hpx/config.hpp>
 
 #include <hpx/actions/apply_helper.hpp>
-#include <hpx/actions/continuation.hpp>
+#include <hpx/actions/base_action.hpp>
+#include <hpx/actions/register_action.hpp>
 #include <hpx/actions/transfer_base_action.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
+#include <hpx/async_distributed/continuation.hpp>
+#include <hpx/async_distributed/traits/action_trigger_continuation.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/serialization/input_archive.hpp>
@@ -41,15 +44,23 @@ namespace hpx { namespace actions {
     struct transfer_continuation_action : transfer_base_action<Action>
     {
     public:
-        HPX_NON_COPYABLE(transfer_continuation_action);
-
-        typedef transfer_base_action<Action> base_type;
-        typedef typename base_type::continuation_type continuation_type;
+        transfer_continuation_action(
+            transfer_continuation_action const&) = delete;
+        transfer_continuation_action(transfer_continuation_action&&) = delete;
+        transfer_continuation_action& operator=(
+            transfer_continuation_action const&) = delete;
+        transfer_continuation_action& operator=(
+            transfer_continuation_action&&) = delete;
 
     public:
+        using base_type = transfer_base_action<Action>;
+        using continuation_type = typename base_type::continuation_type;
+
         // construct an empty transfer_continuation_action to avoid serialization
         // overhead
         transfer_continuation_action() = default;
+
+        ~transfer_continuation_action() noexcept override;
 
         // construct an action from its arguments
         template <typename... Ts>
@@ -246,6 +257,21 @@ namespace hpx { namespace actions {
         }
 
         schedule_thread(std::move(target), lva, comptype, num_thread);
+    }
+
+    template <typename Action>
+    base_action* detail::register_action<Action>::create_cont()
+    {
+        return new transfer_continuation_action<Action>{};
+    }
+
+    template <typename Action>
+    transfer_continuation_action<
+        Action>::~transfer_continuation_action() noexcept
+    {
+        // make sure proper register action function is instantiated
+        auto* ptr = &detail::register_action<Action>::create_cont;
+        (void) ptr;
     }
 }}    // namespace hpx::actions
 

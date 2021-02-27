@@ -19,13 +19,18 @@ namespace hpx { namespace actions { namespace detail {
     template <typename Action>
     struct register_action
     {
-    public:
-        HPX_NON_COPYABLE(register_action);
+        register_action(register_action const&) = delete;
+        register_action(register_action&&) = delete;
+        register_action& operator=(register_action const&) = delete;
+        register_action& operator=(register_action&&) = delete;
 
-    public:
         register_action();
 
-        static base_action* create(bool);
+        // defined in actions/transfer_action.hpp
+        static base_action* create();
+
+        // defined in async_distributed/transfer_continuation_action.hpp
+        static base_action* create_cont();
 
         register_action& instantiate();
 
@@ -39,16 +44,8 @@ namespace hpx { namespace actions { namespace detail {
     register_action<Action>::register_action()
     {
         action_registry::instance().register_factory(
-            hpx::actions::detail::get_action_name<Action>(), &create);
-    }
-
-    template <typename Action>
-    base_action* register_action<Action>::create(bool has_continuation)
-    {
-        if (has_continuation)
-            return new transfer_continuation_action<Action>{};
-
-        return new transfer_action<Action>{};
+            hpx::actions::detail::get_action_name<Action>(), &create,
+            &create_cont);
     }
 
     template <typename Action>

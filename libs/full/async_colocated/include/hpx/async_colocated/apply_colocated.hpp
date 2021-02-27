@@ -10,6 +10,7 @@
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/actions_base_support.hpp>
+#include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/agas_base/primary_namespace.hpp>
 #include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/async_colocated/apply_colocated_fwd.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/async_colocated/register_apply_colocated.hpp>
 #include <hpx/async_distributed/applier/apply_continue.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/bind_action.hpp>
 
 #include <type_traits>

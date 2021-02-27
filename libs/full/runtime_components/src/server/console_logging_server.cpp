@@ -6,13 +6,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/actions/continuation.hpp>
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions/transfer_continuation_action.hpp>
+#include <hpx/async_distributed/continuation.hpp>
+#include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/init_runtime/server/console_logging.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/runtime_components/console_logging.hpp>
+#include <hpx/runtime_components/server/console_logging.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/type_support/static.hpp>
 
