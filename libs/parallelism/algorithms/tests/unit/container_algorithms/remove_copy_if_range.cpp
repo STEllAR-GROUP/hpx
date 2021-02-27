@@ -140,40 +140,6 @@ void test_remove_copy_if(ExPolicy policy, IteratorTag)
     HPX_TEST_EQ(count, d.size());
 }
 
-template <typename IteratorTag>
-void test_remove_copy_if_async(IteratorTag)
-{
-    typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
-
-    test_vector c(10007);
-    std::vector<int> d(c.size());
-    std::size_t middle_idx = std::rand() % (c.size() / 2);
-    auto middle =
-        hpx::parallel::v1::detail::next(std::begin(c.base()), middle_idx);
-    std::iota(
-        std::begin(c.base()), middle, static_cast<int>(std::rand() % c.size()));
-    std::fill(middle, std::end(c.base()), -1);
-
-    hpx::ranges::remove_copy_if(c, std::begin(d), [](int i) { return i < 0; });
-
-    std::size_t count = 0;
-    HPX_TEST(std::equal(std::begin(c.base()), middle, std::begin(d),
-        [&count](int v1, int v2) -> bool {
-            HPX_TEST_EQ(v1, v2);
-            ++count;
-            return v1 == v2;
-        }));
-
-    HPX_TEST(std::equal(middle, std::end(c.base()), std::begin(d) + middle_idx,
-        [&count](int v1, int v2) -> bool {
-            HPX_TEST_NEQ(v1, v2);
-            ++count;
-            return v1 != v2;
-        }));
-
-    HPX_TEST_EQ(count, d.size());
-}
-
 template <typename ExPolicy, typename IteratorTag>
 void test_remove_copy_if_async(ExPolicy p, IteratorTag)
 {
@@ -276,7 +242,6 @@ void test_remove_copy_if()
     test_remove_copy_if(par, IteratorTag());
     test_remove_copy_if(par_unseq, IteratorTag());
 
-    test_remove_copy_if_async(IteratorTag());
     test_remove_copy_if_async(seq(task), IteratorTag());
     test_remove_copy_if_async(par(task), IteratorTag());
 
