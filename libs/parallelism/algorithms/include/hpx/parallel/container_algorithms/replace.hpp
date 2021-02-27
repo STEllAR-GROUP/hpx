@@ -1103,9 +1103,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
         replace(ExPolicy&& policy, Rng&& rng, T1 const& old_value,
             T2 const& new_value, Proj&& proj = Proj())
     {
-        return hpx::replace(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), old_value, new_value,
-            std::forward<Proj>(proj));
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+
+        return hpx::parallel::v1::detail::replace<
+            typename hpx::traits::range_traits<Rng>::iterator_type>()
+            .call(std::forward<ExPolicy>(policy), is_seq(),
+                hpx::util::begin(rng), hpx::util::end(rng), old_value,
+                new_value, std::forward<Proj>(proj));
     }
 
     // clang-format off
@@ -1126,9 +1130,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
         replace_if(ExPolicy&& policy, Rng&& rng, F&& f, T const& new_value,
             Proj&& proj = Proj())
     {
-        return hpx::replace_if(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), std::forward<F>(f),
-            new_value, std::forward<Proj>(proj));
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+
+        return hpx::parallel::v1::detail::replace_if<
+            typename hpx::traits::range_traits<Rng>::iterator_type>()
+            .call(std::forward<ExPolicy>(policy), is_seq(),
+                hpx::util::begin(rng), hpx::util::end(rng), std::forward<F>(f),
+                new_value, std::forward<Proj>(proj));
     }
 
     // clang-format off
@@ -1152,9 +1160,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
         type replace_copy(ExPolicy&& policy, Rng&& rng, OutIter dest,
             T1 const& old_value, T2 const& new_value, Proj&& proj = Proj())
     {
-        return replace_copy(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), dest, old_value,
-            new_value, std::forward<Proj>(proj));
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+
+        return hpx::parallel::v1::detail::replace_copy<util::in_out_result<
+            typename hpx::traits::range_traits<Rng>::iterator_type, OutIter>>()
+            .call(std::forward<ExPolicy>(policy), is_seq(),
+                hpx::util::begin(rng), hpx::util::end(rng), dest, old_value,
+                new_value, std::forward<Proj>(proj));
     }
 
     // clang-format off
@@ -1177,9 +1189,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
             OutIter>>::type replace_copy_if(ExPolicy&& policy, Rng&& rng,
         OutIter dest, F&& f, T const& new_value, Proj&& proj = Proj())
     {
-        return replace_copy_if(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), dest,
-            std::forward<F>(f), new_value, std::forward<Proj>(proj));
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+
+        return hpx::parallel::v1::detail::replace_copy_if<util::in_out_result<
+            typename hpx::traits::range_traits<Rng>::iterator_type, OutIter>>()
+            .call(std::forward<ExPolicy>(policy), is_seq(),
+                hpx::util::begin(rng), hpx::util::end(rng), dest,
+                std::forward<F>(f), new_value, std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
 

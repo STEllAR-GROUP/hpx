@@ -448,9 +448,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         typedef typename std::iterator_traits<FwdIter>::value_type Type;
 
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+
         // Just utilize existing parallel remove_if.
-        return remove_if(
-            std::forward<ExPolicy>(policy), first, last,
+        return detail::remove_if<FwdIter>().call(
+            std::forward<ExPolicy>(policy), is_seq(), first, last,
             [value](Type const& a) -> bool { return value == a; },
             std::forward<Proj>(proj));
     }
