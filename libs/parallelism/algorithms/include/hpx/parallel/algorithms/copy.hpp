@@ -204,7 +204,7 @@ namespace hpx {
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
@@ -635,7 +635,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::copy
     HPX_INLINE_CONSTEXPR_VARIABLE struct copy_t final
-      : hpx::functional::tag<copy_t>
+      : hpx::functional::tag_fallback<copy_t>
     {
     private:
         // clang-format off
@@ -648,7 +648,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_invoke(hpx::copy_t, ExPolicy&& policy, FwdIter1 first,
+        tag_fallback_invoke(hpx::copy_t, ExPolicy&& policy, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest)
         {
             return parallel::util::get_second_element(
@@ -664,7 +664,7 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
         // clang-format on
-        friend FwdIter2 tag_invoke(
+        friend FwdIter2 tag_fallback_invoke(
             hpx::copy_t, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
             return parallel::util::get_second_element(
@@ -677,7 +677,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::copy_n
     HPX_INLINE_CONSTEXPR_VARIABLE struct copy_n_t final
-      : hpx::functional::tag<copy_n_t>
+      : hpx::functional::tag_fallback<copy_n_t>
     {
     private:
         // clang-format off
@@ -691,8 +691,8 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_invoke(hpx::copy_n_t, ExPolicy&& policy, FwdIter1 first, Size count,
-            FwdIter2 dest)
+        tag_fallback_invoke(hpx::copy_n_t, ExPolicy&& policy, FwdIter1 first,
+            Size count, FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
@@ -724,7 +724,7 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
         // clang-format on
-        friend FwdIter2 tag_invoke(
+        friend FwdIter2 tag_fallback_invoke(
             hpx::copy_n_t, FwdIter1 first, Size count, FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -751,7 +751,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::copy_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct copy_if_t final
-      : hpx::functional::tag<copy_if_t>
+      : hpx::functional::tag_fallback<copy_if_t>
     {
     private:
         // clang-format off
@@ -768,7 +768,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_invoke(hpx::copy_if_t, ExPolicy&& policy, FwdIter1 first,
+        tag_fallback_invoke(hpx::copy_if_t, ExPolicy&& policy, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest, Pred&& pred)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -798,7 +798,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend FwdIter2 tag_invoke(hpx::copy_if_t, FwdIter1 first,
+        friend FwdIter2 tag_fallback_invoke(hpx::copy_if_t, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest, Pred&& pred)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
