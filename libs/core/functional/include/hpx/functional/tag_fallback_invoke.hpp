@@ -13,8 +13,8 @@ namespace hpx { namespace functional {
         /// The `hpx::functional::tag_fallback_invoke` name defines a constexpr object
         /// that is invocable with one or more arguments. The first argument
         /// is a 'tag' (typically a CPO). It is only invocable if an overload
-        /// of tag_invoke() that accepts the same arguments could be found via
-        /// ADL.
+        /// of tag_fallback_invoke() that accepts the same arguments could be
+        /// found via ADL.
         ///
         /// The evaluation of the expression
         /// `hpx::functional::tag_fallback_invoke(tag, args...)` is
@@ -202,8 +202,34 @@ namespace hpx { namespace functional {
         typename tag_fallback_invoke_result<Tag, Args...>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    // helper base class implementing the tag_invoke logic for CPOs that fall
-    // back to directly invoke its fallback
+    /// Helper base class implementing the tag_invoke logic for CPOs that fall
+    /// back to directly invoke its fallback.
+    ///
+    /// This base class is in many cases preferable to the plain tag base class.
+    /// With the normal tag base class a default, unconstrained, default
+    /// tag_invoke overload will take precedence over user-defined tag_invoke
+    /// overloads that are not perfect matches. For example, with a default
+    /// overload:
+    ///
+    /// template <typename T> auto tag_invoke(tag_t, T&& t) {...}
+    ///
+    /// and a user-defined overload in another namespace:
+    ///
+    /// auto tag_invoke(my_type t)
+    ///
+    /// the user-defined overload will only be considered when it is an exact
+    /// match. This means const and reference qualifiers must match exactly, and
+    /// conversions to a base class are not considered.
+    ///
+    /// With tag_fallback one can define the default implementation in terms of
+    /// a tag_fallback_invoke overload instead of tag_invoke:
+    ///
+    /// template <typename T> auto tag_fallback_invoke(tag_t, T&& t) {...}
+    ///
+    /// With the same user-defined tag_invoke overload, the user-defined
+    /// overload will now be used if is a match even if isn't an exact match.
+    /// This is because tag_fallback will dispatch to tag_fallback_invoke only
+    /// if there are no matching tag_invoke overloads.
     template <typename Tag>
     struct tag_fallback
     {

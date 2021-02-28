@@ -14,8 +14,8 @@ namespace hpx { namespace functional {
         /// The `hpx::functional::tag_override_invoke` name defines a constexpr object
         /// that is invocable with one or more arguments. The first argument
         /// is a 'tag' (typically a CPO). It is only invocable if an overload
-        /// of tag_invoke() that accepts the same arguments could be found via
-        /// ADL.
+        /// of tag_override_invoke() that accepts the same arguments could be
+        /// found via ADL.
         ///
         /// The evaluation of the expression
         /// `hpx::functional::tag_override_invoke(tag, args...)` is
@@ -204,9 +204,18 @@ namespace hpx { namespace functional {
         typename tag_override_invoke_result<Tag, Args...>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    // Helper base class implementing the tag_invoke logic for CPOs that allow
-    // overriding user-defined tag_invoke overloads with tag_override_invoke,
-    // and that allow setting a fallback with tag_fallback_invoke.
+    /// Helper base class implementing the tag_invoke logic for CPOs that allow
+    /// overriding user-defined tag_invoke overloads with tag_override_invoke,
+    /// and that allow setting a fallback with tag_fallback_invoke.
+    ///
+    /// This helper class is otherwise identical to tag_fallback, but allows
+    /// defining an implementation that will always take priority if it is
+    /// feasible. This is useful for example in cases where a member function
+    /// should always take priority over any free function tag_invoke overloads,
+    /// when available, like this:
+    ///
+    /// template <typename T>
+    /// auto tag_override_invoke(T&& t) -> decltype(t.foo()){ return t.foo(); }
     template <typename Tag>
     struct tag_priority
     {
