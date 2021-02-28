@@ -79,4 +79,11 @@ namespace hpx { namespace traits {
             typename std::decay<U>::type>
     {
     };
+
+    template <typename T>
+    struct is_equality_comparable
+      : detail::is_weakly_equality_comparable_with<typename std::decay<T>::type,
+            typename std::decay<T>::type>
+    {
+    };
 }}    // namespace hpx::traits

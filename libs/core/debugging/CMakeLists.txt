@@ -4,8 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
-
 set(debugging_headers
     hpx/debugging/attach_debugger.hpp hpx/debugging/backtrace.hpp
     hpx/debugging/backtrace/backtrace.hpp hpx/debugging/demangle_helper.hpp
@@ -26,7 +24,6 @@ set(debugging_sources attach_debugger.cpp backtrace.cpp print.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   core debugging
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   GLOBAL_HEADER_GEN ON
   SOURCES ${debugging_sources}
   HEADERS ${debugging_headers}

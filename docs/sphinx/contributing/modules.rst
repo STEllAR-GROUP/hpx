@@ -72,14 +72,8 @@ header files in most cases.
 
 ``add_hpx_module`` requires a module name. Optional flags are:
 
-* ``DEPRECATION_WARNINGS``: Enables deprecation warnings for the module.
-
 Optional single-value arguments are:
 
-* ``COMPATIBILITY_HEADERS``: Can be ``ON``, ``OFF``, or left out. Enables
-  compatibility headers. Creates a variable which can be turned on or off by the
-  user when set to ``ON`` or ``OFF``. If left out the option is completely
-  disabled.
 * ``INSTALL_BINARIES``: Install the resulting library.
 
 Optional multi-value arguments-are:

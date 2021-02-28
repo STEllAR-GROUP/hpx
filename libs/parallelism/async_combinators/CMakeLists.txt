@@ -4,8 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(async_combinators_headers
@@ -37,7 +35,6 @@ set(async_combinators_compat_headers
 include(HPX_AddModule)
 add_hpx_module(
   parallelism async_combinators
-  COMPATIBILITY_HEADERS ON
   GLOBAL_HEADER_GEN ON
   HEADERS ${async_combinators_headers}
   COMPAT_HEADERS ${async_combinators_compat_headers}

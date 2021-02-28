@@ -4,8 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
-
 if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
   return()
 endif()
@@ -49,7 +47,6 @@ endif()
 include(HPX_AddModule)
 add_hpx_module(
   full runtime_distributed
-  COMPATIBILITY_HEADERS ON # added in hpx V1.6.0
   GLOBAL_HEADER_GEN OFF
   SOURCES ${runtime_distributed_sources}
   HEADERS ${runtime_distributed_headers}

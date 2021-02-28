@@ -4,8 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
-
 if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
   return()
 endif()
@@ -65,7 +63,6 @@ set(agas_base_sources
 include(HPX_AddModule)
 add_hpx_module(
   full agas_base
-  COMPATIBILITY_HEADERS ON # Added in 1.7.0
   GLOBAL_HEADER_GEN ON
   SOURCES ${agas_base_sources}
   HEADERS ${agas_base_headers}

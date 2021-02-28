@@ -4,8 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
-
 # Note: HPX_WITH_ASYNC_MPI is handled in the main CMakeLists.txt
 
 # if the user does not want mpi async futures, quit - the module will not be

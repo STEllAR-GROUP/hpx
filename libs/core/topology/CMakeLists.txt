@@ -4,8 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Special option to enable testing of FreeBSD specific limitations This is
@@ -49,7 +47,6 @@ set(topology_sources cpu_mask.cpp topology.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   core topology
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   GLOBAL_HEADER_GEN ON
   SOURCES ${topology_sources}
   HEADERS ${topology_headers}

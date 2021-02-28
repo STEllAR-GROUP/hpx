@@ -50,8 +50,8 @@ void test_replace_if(ExPolicy policy, IteratorTag)
 
     std::size_t idx = std::rand() % c.size();    //-V104
 
-    hpx::parallel::replace_if(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), equal_f(c[idx]), c[idx] + 1);
+    hpx::replace_if(policy, iterator(std::begin(c)), iterator(std::end(c)),
+        equal_f(c[idx]), c[idx] + 1);
 
     std::replace_if(std::begin(d), std::end(d), equal_f(d[idx]), d[idx] + 1);
 
@@ -78,7 +78,7 @@ void test_replace_if_async(ExPolicy p, IteratorTag)
 
     std::size_t idx = std::rand() % c.size();    //-V104
 
-    hpx::future<void> f = hpx::parallel::replace_if(p, iterator(std::begin(c)),
+    hpx::future<void> f = hpx::replace_if(p, iterator(std::begin(c)),
         iterator(std::end(c)), equal_f(c[idx]), c[idx] + 1);
     f.wait();
 
@@ -129,7 +129,7 @@ void test_replace_if_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::replace_if(policy,
+        hpx::replace_if(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), equal_f(42), std::size_t(43));
@@ -162,7 +162,7 @@ void test_replace_if_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::replace_if(p,
+        hpx::future<void> f = hpx::replace_if(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), equal_f(42), std::size_t(43));
@@ -223,7 +223,7 @@ void test_replace_if_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::replace_if(policy,
+        hpx::replace_if(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), equal_f(42), std::size_t(43));
         HPX_TEST(false);
@@ -254,7 +254,7 @@ void test_replace_if_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::replace_if(p,
+        hpx::future<void> f = hpx::replace_if(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), equal_f(42), std::size_t(43));
         returned_from_algorithm = true;

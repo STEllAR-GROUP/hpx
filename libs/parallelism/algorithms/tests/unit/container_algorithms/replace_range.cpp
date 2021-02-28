@@ -17,9 +17,82 @@
 #include <string>
 #include <vector>
 
+#include "iter_sent.hpp"
 #include "test_utils.hpp"
 
+////////////////////////////////////////////////////////////////////////////
+void test_replace_sent()
+{
+    using hpx::get;
+
+    std::size_t const size = 100;
+    std::vector<std::int16_t> c(size);
+    std::iota(std::begin(c), std::end(c), 0);
+    c[99] = 42;    //both c[99] and c[42] equal 42
+
+    int old_value = 42;
+    int new_value = 99;
+
+    auto pre_result = std::count(std::begin(c), std::end(c), old_value);
+    hpx::ranges::replace(
+        std::begin(c), sentinel<std::int16_t>{50}, old_value, new_value);
+    auto post_result = std::count(std::begin(c), std::end(c), old_value);
+
+    HPX_TEST(pre_result == 2 && post_result == 1);
+}
+
+template <typename ExPolicy>
+void test_replace_sent(ExPolicy policy)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    using hpx::get;
+
+    std::size_t const size = 100;
+    std::vector<std::int16_t> c(size);
+    std::iota(std::begin(c), std::end(c), 0);
+    c[99] = 42;    //both c[99] and c[42] equal 42
+
+    int old_value = 42;
+    int new_value = 99;
+
+    auto pre_result = std::count(std::begin(c), std::end(c), old_value);
+    hpx::ranges::replace(policy, std::begin(c), sentinel<std::int16_t>{50},
+        old_value, new_value);
+    auto post_result = std::count(std::begin(c), std::end(c), old_value);
+
+    HPX_TEST(pre_result == 2 && post_result == 1);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_replace(IteratorTag)
+{
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag>
+        test_vector;
+
+    test_vector c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::iota(std::begin(c.base()), std::end(c.base()), std::rand());
+    std::copy(std::begin(c.base()), std::end(c.base()), std::begin(d));
+
+    std::size_t idx = std::rand() % c.size();    //-V104
+
+    hpx::ranges::replace(c, c[idx], c[idx] + 1);
+
+    std::replace(std::begin(d), std::end(d), d[idx], d[idx] + 1);
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c.base()), std::end(c.base()), std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_replace(ExPolicy policy, IteratorTag)
 {
@@ -36,7 +109,7 @@ void test_replace(ExPolicy policy, IteratorTag)
 
     std::size_t idx = std::rand() % c.size();    //-V104
 
-    hpx::parallel::replace(policy, c, c[idx], c[idx] + 1);
+    hpx::ranges::replace(policy, c, c[idx], c[idx] + 1);
 
     std::replace(std::begin(d), std::end(d), d[idx], d[idx] + 1);
 
@@ -63,7 +136,7 @@ void test_replace_async(ExPolicy p, IteratorTag)
 
     std::size_t idx = std::rand() % c.size();    //-V104
 
-    auto f = hpx::parallel::replace(p, c, c[idx], c[idx] + 1);
+    auto f = hpx::ranges::replace(p, c, c[idx], c[idx] + 1);
     f.wait();
 
     std::replace(std::begin(d), std::end(d), d[idx], d[idx] + 1);
@@ -82,12 +155,18 @@ template <typename IteratorTag>
 void test_replace()
 {
     using namespace hpx::execution;
+    test_replace(IteratorTag());
     test_replace(seq, IteratorTag());
     test_replace(par, IteratorTag());
     test_replace(par_unseq, IteratorTag());
 
     test_replace_async(seq(task), IteratorTag());
     test_replace_async(par(task), IteratorTag());
+
+    test_replace_sent();
+    test_replace_sent(seq);
+    test_replace_sent(par);
+    test_replace_sent(par_unseq);
 }
 
 void replace_test()
@@ -113,7 +192,7 @@ void test_replace_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::replace(policy,
+        hpx::ranges::replace(policy,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
@@ -148,7 +227,7 @@ void test_replace_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::replace(p,
+        auto f = hpx::ranges::replace(p,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
@@ -211,7 +290,7 @@ void test_replace_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::replace(policy,
+        hpx::ranges::replace(policy,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::bad_alloc(); }),
@@ -245,7 +324,7 @@ void test_replace_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::replace(p,
+        auto f = hpx::ranges::replace(p,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::bad_alloc(); }),

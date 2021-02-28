@@ -4,8 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
-
 # Compatibility with using Boost.FileSystem, introduced in V1.4.0
 hpx_option(
   HPX_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE BOOL
@@ -51,7 +49,6 @@ set(datastructures_sources)
 include(HPX_AddModule)
 add_hpx_module(
   core datastructures
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   GLOBAL_HEADER_GEN ON
   SOURCES ${datastructures_sources}
   HEADERS ${datastructures_headers}

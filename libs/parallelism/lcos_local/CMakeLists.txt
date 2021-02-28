@@ -4,8 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/lcos_local/include
@@ -49,7 +47,6 @@ set(lcos_local_sources composable_guard.cpp preprocess_future.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   parallelism lcos_local
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   SOURCES ${lcos_local_sources}
   HEADERS ${lcos_local_headers}
   COMPAT_HEADERS ${lcos_local_compat_headers}

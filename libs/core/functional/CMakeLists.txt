@@ -4,8 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/functional/include
@@ -34,6 +32,7 @@ set(functional_headers
     hpx/functional/protect.hpp
     hpx/functional/tag_fallback_invoke.hpp
     hpx/functional/tag_invoke.hpp
+    hpx/functional/tag_priority_invoke.hpp
     hpx/functional/unique_function.hpp
     hpx/functional/serialization/detail/serializable_basic_function.hpp
     hpx/functional/serialization/detail/vtable/serializable_function_vtable.hpp
@@ -79,7 +78,6 @@ set(functional_sources basic_function.cpp empty_function.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   core functional
-  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER
     "hpx/functional/traits/get_function_address.hpp"

@@ -410,15 +410,7 @@ namespace hpx { namespace threads {
 #include <hpx/config/warnings_suffix.hpp>
 
     ///////////////////////////////////////////////////////////////////////////
-    struct topology_tag
-    {
-    };
-
-    inline topology& create_topology()
-    {
-        util::static_<topology, topology_tag> topo;
-        return topo.get();
-    }
+    HPX_CORE_EXPORT topology& create_topology();
 
     HPX_NODISCARD HPX_CORE_EXPORT unsigned int hardware_concurrency();
 

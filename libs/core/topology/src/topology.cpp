@@ -1577,6 +1577,13 @@ namespace hpx { namespace threads {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    topology& create_topology()
+    {
+        static topology topo;
+        return topo;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     struct hardware_concurrency_tag
     {
     };
@@ -1599,7 +1606,7 @@ namespace hpx { namespace threads {
 
     unsigned int hardware_concurrency()
     {
-        util::static_<hw_concurrency, hardware_concurrency_tag> hwc;
-        return static_cast<unsigned int>(hwc.get().num_of_cores_);
+        static hw_concurrency hwc;
+        return static_cast<unsigned int>(hwc.num_of_cores_);
     }
 }}    // namespace hpx::threads

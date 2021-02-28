@@ -180,9 +180,9 @@ namespace mylib {
 
 int main()
 {
-    using hpx::execution::experimental::traits::is_nothrow_receiver_of;
-    using hpx::execution::experimental::traits::is_receiver;
-    using hpx::execution::experimental::traits::is_receiver_of;
+    using hpx::execution::experimental::is_nothrow_receiver_of;
+    using hpx::execution::experimental::is_receiver;
+    using hpx::execution::experimental::is_receiver_of;
 
     static_assert(is_receiver<mylib::receiver_1>::value,
         "mylib::receiver_1 should be a receiver");

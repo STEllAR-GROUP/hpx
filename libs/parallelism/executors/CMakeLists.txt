@@ -4,8 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/executors/include
@@ -23,6 +21,7 @@ set(executors_headers
     hpx/executors/execution_policy.hpp
     hpx/executors/fork_join_executor.hpp
     hpx/executors/limiting_executor.hpp
+    hpx/executors/p0443_executor.hpp
     hpx/executors/parallel_executor_aggregated.hpp
     hpx/executors/parallel_executor.hpp
     hpx/executors/restricted_thread_pool_executor.hpp
@@ -68,7 +67,6 @@ set(executors_sources current_executor.cpp exception_list_callbacks.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   parallelism executors
-  COMPATIBILITY_HEADERS ON
   GLOBAL_HEADER_GEN ON
   SOURCES ${executors_sources}
   HEADERS ${executors_headers}

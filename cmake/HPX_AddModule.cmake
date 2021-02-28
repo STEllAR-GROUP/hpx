@@ -9,8 +9,7 @@ include(HPX_ExportTargets)
 function(add_hpx_module libname modulename)
   # Retrieve arguments
   set(options CUDA CONFIG_FILES)
-  # Compatibility needs to be on/off to allow 3 states : ON/OFF and disabled
-  set(one_value_args COMPATIBILITY_HEADERS GLOBAL_HEADER_GEN)
+  set(one_value_args GLOBAL_HEADER_GEN)
   set(multi_value_args
       SOURCES
       HEADERS
@@ -35,12 +34,6 @@ function(add_hpx_module libname modulename)
   include(HPX_Message)
   include(HPX_Option)
 
-  if(NOT "${${modulename}_COMPATIBILITY_HEADERS}" STREQUAL "")
-    set(_have_compatibility_headers_option TRUE)
-  else()
-    set(_have_compatibility_headers_option FALSE)
-  endif()
-
   # Global headers should be always generated except if explicitly disabled
   if("${${modulename}_GLOBAL_HEADER_GEN}" STREQUAL "")
     set(${modulename}_GLOBAL_HEADER_GEN ON)
@@ -61,23 +54,6 @@ function(add_hpx_module libname modulename)
             FORCE
   )
 
-  # HPX options
-  if(${_have_compatibility_headers_option})
-    set(_compatibility_headers_default OFF)
-    if(${modulename}_COMPATIBILITY_HEADERS)
-      set(_compatibility_headers_default ON)
-    endif()
-    hpx_option(
-      HPX_${modulename_upper}_WITH_COMPATIBILITY_HEADERS
-      BOOL
-      "Enable compatibility headers for old headers. (default: ${_compatibility_headers_default})"
-      ${_compatibility_headers_default}
-      ADVANCED
-      CATEGORY "Modules"
-      MODULE ${modulename_upper}
-    )
-  endif()
-
   # Main directories of the module
   set(SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src")
   set(HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -85,9 +61,7 @@ function(add_hpx_module libname modulename)
   hpx_debug("Add module ${modulename}: SOURCE_ROOT: ${SOURCE_ROOT}")
   hpx_debug("Add module ${modulename}: HEADER_ROOT: ${HEADER_ROOT}")
 
-  if(${_have_compatibility_headers_option}
-     AND HPX_${modulename_upper}_WITH_COMPATIBILITY_HEADERS
-  )
+  if(${modulename}_COMPAT_HEADERS)
     set(COMPAT_HEADER_ROOT "${CMAKE_CURRENT_BINARY_DIR}/include_compatibility")
     file(MAKE_DIRECTORY ${COMPAT_HEADER_ROOT})
     hpx_debug(
@@ -104,9 +78,7 @@ function(add_hpx_module libname modulename)
   list(TRANSFORM ${modulename}_HEADERS PREPEND ${HEADER_ROOT}/ OUTPUT_VARIABLE
                                                                headers
   )
-  if(${_have_compatibility_headers_option}
-     AND HPX_${modulename_upper}_WITH_COMPATIBILITY_HEADERS
-  )
+  if(${modulename}_COMPAT_HEADERS)
     string(REPLACE ";=>;" "=>" ${modulename}_COMPAT_HEADERS
                    "${${modulename}_COMPAT_HEADERS}"
     )
@@ -288,9 +260,7 @@ function(add_hpx_module libname modulename)
     target_link_libraries(hpx_${modulename} PUBLIC hpx_config_registry)
   endif()
 
-  if(${_have_compatibility_headers_option}
-     AND HPX_${modulename_upper}_WITH_COMPATIBILITY_HEADERS
-  )
+  if(${modulename}_COMPAT_HEADERS)
     target_include_directories(
       hpx_${modulename} PUBLIC $<BUILD_INTERFACE:${COMPAT_HEADER_ROOT}>
     )
@@ -316,9 +286,7 @@ function(add_hpx_module libname modulename)
     CLASS "Source Files"
     TARGETS ${sources}
   )
-  if(${_have_compatibility_headers_option}
-     AND HPX_${modulename_upper}_WITH_COMPATIBILITY_HEADERS
-  )
+  if(${modulename}_COMPAT_HEADERS)
     add_hpx_source_group(
       NAME hpx_${modulename}
       ROOT ${COMPAT_HEADER_ROOT}/hpx
@@ -385,9 +353,7 @@ function(add_hpx_module libname modulename)
   )
 
   # Install the compatibility headers from the source
-  if(${_have_compatibility_headers_option}
-     AND HPX_${modulename_upper}_WITH_COMPATIBILITY_HEADERS
-  )
+  if(${modulename}_COMPAT_HEADERS)
     install(
       DIRECTORY ${COMPAT_HEADER_ROOT}/hpx
       DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
@@ -450,7 +416,7 @@ function(add_hpx_module libname modulename)
 
   include(HPX_PrintSummary)
   create_configuration_summary(
-    "  Module configuration summary (${modulename}):" "${modulename}"
+    "    Module configuration (${modulename}):" "${modulename}"
   )
 
 endfunction(add_hpx_module)
