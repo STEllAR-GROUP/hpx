@@ -350,7 +350,6 @@ After adding the component, the way you add the executable is as follows:
 
    # build your application using HPX
    add_hpx_executable(hello_world
-       ESSENTIAL
        SOURCES hello_world_client.cpp
        COMPONENT_DEPENDENCIES hello_world)
 
