@@ -490,47 +490,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     }    // namespace detail
 
     // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename Size, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&&
-            hpx::traits::is_iterator<FwdIter>::value&&
-            hpx::parallel::traits::is_projected<Proj, FwdIter>::value&&
-            hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
-            hpx::parallel::traits::projected<Proj, FwdIter>>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::for_each_n is deprecated, use hpx::for_each_n "
-        "instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        for_each_n(ExPolicy&& policy, FwdIter first, Size count, F&& f,
-            Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-
-        // if count is representing a negative value or zero, we do nothing
-        if (detail::is_negative(count) || count == 0)
-        {
-            return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
-                std::move(first));
-        }
-
-        using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::for_each_n_(std::forward<ExPolicy>(policy), first, count,
-            std::forward<F>(f), std::forward<Proj>(proj), is_segmented());
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
     template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
         typename F, typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
