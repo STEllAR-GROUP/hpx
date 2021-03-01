@@ -486,27 +486,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::move(first));
             }
         };
-
-        /// Non Segmented implementation
-        template <typename ExPolicy, typename FwdIter, typename Size,
-            typename F, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        for_each_n_(ExPolicy&& policy, FwdIter first, Size count, F&& f,
-            Proj&& proj, std::false_type)
-        {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
-            return detail::for_each_n<FwdIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first,
-                std::size_t(count), std::forward<F>(f),
-                std::forward<Proj>(proj));
-        }
-
-        template <typename ExPolicy, typename FwdIter, typename Size,
-            typename F, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        for_each_n_(ExPolicy&& policy, FwdIter first, Size count, F&& f,
-            Proj&& proj, std::true_type);
         /// \endcond
     }    // namespace detail
 
@@ -661,7 +640,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_each_n_t final
-      : hpx::functional::tag<for_each_n_t>
+      : hpx::functional::tag_fallback<for_each_n_t>
     {
     private:
         // clang-format off
@@ -670,18 +649,22 @@ namespace hpx {
                 hpx::traits::is_input_iterator<InIter>::value
             )>
         // clang-format on
-        friend InIter tag_invoke(
+        friend InIter tag_fallback_invoke(
             hpx::for_each_n_t, InIter first, Size count, F&& f)
         {
+            static_assert((hpx::traits::is_input_iterator<InIter>::value),
+                "Requires at least input iterator.");
+
             // if count is representing a negative value, we do nothing
             if (parallel::v1::detail::is_negative(count))
             {
                 return first;
             }
 
-            return parallel::v1::detail::for_each_n_(hpx::execution::seq, first,
-                count, std::forward<F>(f),
-                parallel::util::projection_identity(), std::false_type());
+            return hpx::parallel::v1::detail::for_each_n<InIter>().call(
+                hpx::execution::seq, std::true_type(), first,
+                std::size_t(count), std::forward<F>(f),
+                parallel::util::projection_identity());
         }
 
         // clang-format off
@@ -693,22 +676,26 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_invoke(hpx::for_each_n_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(hpx::for_each_n_t, ExPolicy&& policy, FwdIter first,
             Size count, F&& f)
         {
+            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+                "Requires at least forward iterator.");
+
             // if count is representing a negative value, we do nothing
             if (parallel::v1::detail::is_negative(count))
             {
-                return parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::get(std::move(first));
+                using result =
+                    parallel::util::detail::algorithm_result<ExPolicy, FwdIter>;
+                return result::get(std::move(first));
             }
 
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-            return parallel::v1::detail::for_each_n_(
-                std::forward<ExPolicy>(policy), first, count,
-                std::forward<F>(f), parallel::util::projection_identity(),
-                is_segmented());
+            return hpx::parallel::v1::detail::for_each_n<FwdIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first,
+                std::size_t(count), std::forward<F>(f),
+                parallel::util::projection_identity());
         }
     } for_each_n{};
 }    // namespace hpx
