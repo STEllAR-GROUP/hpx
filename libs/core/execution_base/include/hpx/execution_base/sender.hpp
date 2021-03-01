@@ -317,8 +317,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Executor, typename F>
         struct is_executor_of_base_impl<Executor, F,
-            std::enable_if_t<
-                hpx::traits::is_invocable<std::decay_t<F>&>::value &&
+            std::enable_if_t<hpx::is_invocable<std::decay_t<F>&>::value &&
                 std::is_constructible<std::decay_t<F>, F>::value &&
                 std::is_destructible<std::decay_t<F>>::value &&
                 std::is_move_constructible<std::decay_t<F>>::value &&
@@ -340,10 +339,10 @@ namespace hpx { namespace execution { namespace experimental {
       : hpx::functional::tag_priority<execute_t>
     {
         template <typename Executor, typename F,
-            typename = std::enable_if_t<
-                hpx::traits::is_invocable<std::decay_t<F>&>::value &&
-                (is_sender_v<Executor> ||
-                    detail::is_executor_base<Executor>::value)>>
+            typename =
+                std::enable_if_t<hpx::is_invocable<std::decay_t<F>&>::value &&
+                    (is_sender_v<Executor> ||
+                        detail::is_executor_base<Executor>::value)>>
         friend constexpr HPX_FORCEINLINE auto tag_override_invoke(execute_t,
             Executor&& executor,
             F&& f) noexcept(noexcept(std::forward<Executor>(executor)
@@ -494,8 +493,8 @@ namespace hpx { namespace execution { namespace experimental {
 
                 template <typename... Ts,
                     typename = std::enable_if_t<is_receiver_of_v<R, Ts...>>>
-                    void set_value(Ts&&... ts) &&
-                    noexcept(is_nothrow_receiver_of_v<R, Ts...>)
+                void set_value(Ts&&... ts) && noexcept(
+                    is_nothrow_receiver_of_v<R, Ts...>)
                 {
                     hpx::execution::experimental::set_value(
                         std::move(p->r), std::forward<Ts>(ts)...);
@@ -504,7 +503,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                 template <typename E,
                     typename = std::enable_if_t<is_receiver_v<R, E>>>
-                    void set_error(E&& e) && noexcept
+                void set_error(E&& e) && noexcept
                 {
                     hpx::execution::experimental::set_error(
                         std::move(p->r), std::forward<E>(e));
@@ -607,10 +606,10 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace detail
 
     template <typename Executor, typename F,
-        typename = std::enable_if_t<
-            hpx::traits::is_invocable<std::decay_t<F>&>::value &&
-            !detail::has_member_execute<Executor, F>::value &&
-            !detail::is_as_invocable<F>::value>>
+        typename =
+            std::enable_if_t<hpx::is_invocable<std::decay_t<F>&>::value &&
+                !detail::has_member_execute<Executor, F>::value &&
+                !detail::is_as_invocable<F>::value>>
     constexpr HPX_FORCEINLINE auto tag_fallback_invoke(execute_t,
         Executor&& executor,
         F&& f) noexcept(noexcept(submit(std::forward<Executor>(executor),
@@ -630,8 +629,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Executor, typename F>
         struct is_executor_of_impl<Executor, F,
-            std::enable_if_t<
-                hpx::traits::is_invocable<execute_t, Executor, F>::value>>
+            std::enable_if_t<hpx::is_invocable<execute_t, Executor, F>::value>>
           : is_executor_of_base_impl<Executor, F>
         {
         };
@@ -893,8 +891,7 @@ namespace hpx { namespace execution { namespace experimental {
 
     template <typename Scheduler>
     struct is_scheduler<Scheduler,
-        std::enable_if_t<
-            hpx::traits::is_invocable<schedule_t, Scheduler&&>::value &&
+        std::enable_if_t<hpx::is_invocable<schedule_t, Scheduler&&>::value &&
             std::is_copy_constructible<Scheduler>::value &&
             hpx::traits::is_equality_comparable<Scheduler>::value>>
       : std::true_type

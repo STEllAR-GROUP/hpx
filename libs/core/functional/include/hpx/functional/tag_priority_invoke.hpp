@@ -156,7 +156,7 @@ namespace hpx { namespace functional {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Tag, typename... Args>
     using is_tag_override_invocable =
-        hpx::traits::is_invocable<decltype(tag_override_invoke), Tag, Args...>;
+        hpx::is_invocable<decltype(tag_override_invoke), Tag, Args...>;
 
     template <typename Tag, typename... Args>
     constexpr bool is_tag_override_invocable_v =
