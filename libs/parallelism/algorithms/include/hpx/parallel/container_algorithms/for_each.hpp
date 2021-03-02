@@ -551,8 +551,8 @@ namespace hpx { namespace ranges {
             hpx::ranges::for_each_n_t, InIter first, Size count, F&& f,
             Proj&& proj = Proj())
         {
-            static_assert((hpx::traits::is_forward_iterator<InIter>::value),
-                "Requires at least forward iterator.");
+            static_assert((hpx::traits::is_input_iterator<InIter>::value),
+                "Requires at least input iterator.");
 
             // if count is representing a negative value, we do nothing
             if (parallel::v1::detail::is_negative(count))

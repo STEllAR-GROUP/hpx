@@ -278,7 +278,7 @@ namespace hpx { namespace segmented {
             hpx::parallel::util::projection_identity(), std::true_type());
     }
 
-    //clang-format off
+    // clang-format off
     template <typename ExPolicy, typename SegIter, typename Size,
         typename F,
         HPX_CONCEPT_REQUIRES_(
@@ -286,7 +286,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_iterator<SegIter>::value &&
             hpx::traits::is_segmented_iterator<SegIter>::value
         )>
-    //clang-format on
+    // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         SegIter>::type
     tag_invoke(
