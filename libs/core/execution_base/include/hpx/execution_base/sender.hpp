@@ -493,8 +493,8 @@ namespace hpx { namespace execution { namespace experimental {
 
                 template <typename... Ts,
                     typename = std::enable_if_t<is_receiver_of_v<R, Ts...>>>
-                void set_value(Ts&&... ts) && noexcept(
-                    is_nothrow_receiver_of_v<R, Ts...>)
+                    void set_value(Ts&&... ts) &&
+                    noexcept(is_nothrow_receiver_of_v<R, Ts...>)
                 {
                     hpx::execution::experimental::set_value(
                         std::move(p->r), std::forward<Ts>(ts)...);
@@ -503,7 +503,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                 template <typename E,
                     typename = std::enable_if_t<is_receiver_v<R, E>>>
-                void set_error(E&& e) && noexcept
+                    void set_error(E&& e) && noexcept
                 {
                     hpx::execution::experimental::set_error(
                         std::move(p->r), std::forward<E>(e));
