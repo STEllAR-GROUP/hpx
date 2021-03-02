@@ -259,7 +259,7 @@ namespace hpx { namespace segmented {
     // clang-format on
     InIter tag_invoke(hpx::for_each_n_t, InIter first, Size count, F&& f)
     {
-        static_assert((hpx::traits::is_forward_iterator<InIter>::value),
+        static_assert((hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<InIter>;
@@ -279,10 +279,13 @@ namespace hpx { namespace segmented {
     }
 
     //clang-format off
-    template <typename ExPolicy, typename SegIter, typename Size, typename F,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<SegIter>::value&&
-                    hpx::traits::is_segmented_iterator<SegIter>::value)>
+    template <typename ExPolicy, typename SegIter, typename Size,
+        typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<SegIter>::value &&
+            hpx::traits::is_segmented_iterator<SegIter>::value
+        )>
     //clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         SegIter>::type
