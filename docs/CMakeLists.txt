@@ -14,9 +14,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_locality_name.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/set_parcel_write_handler.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/trigger_lco.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/components/binpacking_distribution_policy.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/components/colocating_distribution_policy.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/components/default_distribution_policy.hpp"
 )
 
 # Definitions for autodoc.doxy.in

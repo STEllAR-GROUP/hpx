@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2018 Hartmut Kaiser
+//  Copyright (c) 2014-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,12 +16,12 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime_components/create_component_helpers.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/shared_ptr.hpp>
@@ -34,18 +34,18 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace components
-{
+namespace hpx { namespace components {
+
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
-    namespace detail
-    {
-        HPX_FORCEINLINE std::size_t
-        round_to_multiple(std::size_t n1, std::size_t n2, std::size_t n3)
+    namespace detail {
+
+        HPX_FORCEINLINE std::size_t round_to_multiple(
+            std::size_t n1, std::size_t n2, std::size_t n3)
         {
             return (n1 / n2) * n3;
         }
-    }
+    }    // namespace detail
     /// \endcond
 
     /// This class specifies the parameters for a simple distribution policy
@@ -56,7 +56,7 @@ namespace hpx { namespace components
     public:
         /// Default-construct a new instance of a \a default_distribution_policy.
         /// This policy will represent one locality (the local locality).
-        default_distribution_policy() = default;
+        constexpr default_distribution_policy() = default;
 
         /// Create a new \a default_distribution policy representing the given
         /// set of localities.
@@ -102,12 +102,12 @@ namespace hpx { namespace components
         /// \returns A future holding the global address which represents
         ///          the newly created object
         ///
-        template <typename Component, typename ...Ts>
+        template <typename Component, typename... Ts>
         hpx::future<hpx::id_type> create(Ts&&... vs) const
         {
             if (localities_)
             {
-                for (hpx::id_type const& loc: *localities_)
+                for (hpx::id_type const& loc : *localities_)
                 {
                     if (get_num_items(1, loc) != 0)
                     {
@@ -120,12 +120,13 @@ namespace hpx { namespace components
             // by default the object will be created on the current
             // locality
             return create_async<Component>(
-                hpx::find_here(), std::forward<Ts>(vs)...);
+                naming::get_id_from_locality_id(agas::get_locality_id()),
+                std::forward<Ts>(vs)...);
         }
 
         /// \cond NOINTERNAL
-        typedef std::pair<hpx::id_type, std::vector<hpx::id_type> >
-            bulk_locality_result;
+        using bulk_locality_result =
+            std::pair<hpx::id_type, std::vector<hpx::id_type>>;
         /// \endcond
 
         /// Create multiple objects on the localities associated by
@@ -141,16 +142,16 @@ namespace hpx { namespace components
         /// \returns A future holding the list of global addresses which
         ///          represent the newly created objects
         ///
-        template <typename Component, typename ...Ts>
-        hpx::future<std::vector<bulk_locality_result> >
-        bulk_create(std::size_t count, Ts&&... vs) const
+        template <typename Component, typename... Ts>
+        hpx::future<std::vector<bulk_locality_result>> bulk_create(
+            std::size_t count, Ts&&... vs) const
         {
             if (localities_ && localities_->size() > 1)
             {
                 // schedule creation of all objects across given localities
-                std::vector<hpx::future<std::vector<hpx::id_type> > > objs;
+                std::vector<hpx::future<std::vector<hpx::id_type>>> objs;
                 objs.reserve(localities_->size());
-                for (hpx::id_type const& loc: *localities_)
+                for (hpx::id_type const& loc : *localities_)
                 {
                     objs.push_back(bulk_create_async<Component>(
                         loc, get_num_items(count, loc), vs...));
@@ -158,11 +159,11 @@ namespace hpx { namespace components
 
                 // consolidate all results
                 auto localities = localities_;
-                return hpx::dataflow(hpx::launch::sync,
-                    [localities](
-                        std::vector<hpx::future<std::vector<hpx::id_type> > > && v
-                    ) mutable -> std::vector<bulk_locality_result>
-                    {
+                return hpx::dataflow(
+                    hpx::launch::sync,
+                    [localities = std::move(localities)](
+                        std::vector<hpx::future<std::vector<hpx::id_type>>>&&
+                            v) mutable -> std::vector<bulk_locality_result> {
                         HPX_ASSERT(localities->size() == v.size());
 
                         std::vector<bulk_locality_result> result;
@@ -185,10 +186,8 @@ namespace hpx { namespace components
                     id, count, std::forward<Ts>(vs)...);
 
             return f.then(hpx::launch::sync,
-                [id = std::move(id)](
-                    hpx::future<std::vector<hpx::id_type> > && f
-                ) -> std::vector<bulk_locality_result>
-                {
+                [id = std::move(id)](hpx::future<std::vector<hpx::id_type>>&& f)
+                    -> std::vector<bulk_locality_result> {
                     std::vector<bulk_locality_result> result;
                     result.emplace_back(id, f.get());
                     return result;
@@ -201,45 +200,44 @@ namespace hpx { namespace components
         template <typename Action>
         struct async_result
         {
-            using type = hpx::future<typename traits::promise_local_result<
-                typename hpx::traits::extract_action<Action>::remote_result_type
-            >::type>;
+            using type = hpx::future<
+                typename traits::promise_local_result<typename hpx::traits::
+                        extract_action<Action>::remote_result_type>::type>;
         };
 
-        template <typename Action, typename ...Ts>
-        typename async_result<Action>::type
-        async(launch policy, Ts&&... vs) const
+        template <typename Action, typename... Ts>
+        typename async_result<Action>::type async(
+            launch policy, Ts&&... vs) const
         {
-            return hpx::detail::async_impl<Action>(policy,
-                get_next_target(), std::forward<Ts>(vs)...);
+            return hpx::detail::async_impl<Action>(
+                policy, get_next_target(), std::forward<Ts>(vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
         ///       this class
         ///
-        template <typename Action, typename Callback, typename ...Ts>
-        typename async_result<Action>::type
-        async_cb(launch policy, Callback&& cb, Ts&&... vs) const
+        template <typename Action, typename Callback, typename... Ts>
+        typename async_result<Action>::type async_cb(
+            launch policy, Callback&& cb, Ts&&... vs) const
         {
-            return hpx::detail::async_cb_impl<Action>(policy,
-                get_next_target(), std::forward<Callback>(cb),
+            return hpx::detail::async_cb_impl<Action>(policy, get_next_target(),
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+        }
+
+        /// \note This function is part of the invocation policy implemented by
+        ///       this class
+        ///
+        template <typename Action, typename Continuation, typename... Ts>
+        bool apply(Continuation&& c, threads::thread_priority priority,
+            Ts&&... vs) const
+        {
+            return hpx::detail::apply_impl<Action>(
+                std::forward<Continuation>(c), get_next_target(), priority,
                 std::forward<Ts>(vs)...);
         }
 
-        /// \note This function is part of the invocation policy implemented by
-        ///       this class
-        ///
-        template <typename Action, typename Continuation, typename ...Ts>
-        bool apply(Continuation && c,
-            threads::thread_priority priority, Ts&&... vs) const
-        {
-            return hpx::detail::apply_impl<Action>(std::forward<Continuation>(c),
-                get_next_target(), priority, std::forward<Ts>(vs)...);
-        }
-
-        template <typename Action, typename ...Ts>
-        bool apply(
-            threads::thread_priority priority, Ts&&... vs) const
+        template <typename Action, typename... Ts>
+        bool apply(threads::thread_priority priority, Ts&&... vs) const
         {
             return hpx::detail::apply_impl<Action>(
                 get_next_target(), priority, std::forward<Ts>(vs)...);
@@ -249,22 +247,21 @@ namespace hpx { namespace components
         ///       this class
         ///
         template <typename Action, typename Continuation, typename Callback,
-            typename ...Ts>
-        bool apply_cb(Continuation && c,
-            threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
+            typename... Ts>
+        bool apply_cb(Continuation&& c, threads::thread_priority priority,
+            Callback&& cb, Ts&&... vs) const
         {
-            return hpx::detail::apply_cb_impl<Action>(std::forward<Continuation>(c),
-                get_next_target(), priority, std::forward<Callback>(cb),
-                std::forward<Ts>(vs)...);
+            return hpx::detail::apply_cb_impl<Action>(
+                std::forward<Continuation>(c), get_next_target(), priority,
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
-        template <typename Action, typename Callback, typename ...Ts>
+        template <typename Action, typename Callback, typename... Ts>
         bool apply_cb(
             threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
         {
-            return hpx::detail::apply_cb_impl<Action>(
-                get_next_target(), priority, std::forward<Callback>(cb),
-                std::forward<Ts>(vs)...);
+            return hpx::detail::apply_cb_impl<Action>(get_next_target(),
+                priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
         /// Returns the number of associated localities for this distribution
@@ -282,7 +279,9 @@ namespace hpx { namespace components
         /// async operation
         hpx::id_type get_next_target() const
         {
-            return !localities_ ? hpx::find_here() : localities_->front();
+            return !localities_ ?
+                naming::get_id_from_locality_id(agas::get_locality_id()) :
+                localities_->front();
         }
 
     protected:
@@ -291,11 +290,9 @@ namespace hpx { namespace components
             std::size_t items, hpx::id_type const& loc) const
         {
             // make sure the given id is known to this distribution policy
-            HPX_ASSERT(
-                localities_ &&
+            HPX_ASSERT(localities_ &&
                 std::find(localities_->begin(), localities_->end(), loc) !=
-                    localities_->end()
-            );
+                    localities_->end());
 
             // this distribution policy places an equal number of items onto
             // each locality
@@ -305,7 +302,8 @@ namespace hpx { namespace components
             // of localities
             if (items < locs)
             {
-                auto it = std::find(localities_->begin(), localities_->end(), loc);
+                auto it =
+                    std::find(localities_->begin(), localities_->end(), loc);
                 std::size_t num_loc = std::distance(localities_->begin(), it);
                 return (items < num_loc) ? 1 : 0;
             }
@@ -313,7 +311,7 @@ namespace hpx { namespace components
             // the last locality might get less items
             if (locs > 1 && loc == localities_->back())
             {
-                return items - detail::round_to_multiple(items, locs, locs-1);
+                return items - detail::round_to_multiple(items, locs, locs - 1);
             }
 
             // otherwise just distribute evenly
@@ -336,8 +334,9 @@ namespace hpx { namespace components
             }
         }
 
-        explicit default_distribution_policy(std::vector<id_type> && localities)
-          : localities_(std::make_shared<std::vector<id_type>>(std::move(localities)))
+        explicit default_distribution_policy(std::vector<id_type>&& localities)
+          : localities_(
+                std::make_shared<std::vector<id_type>>(std::move(localities)))
         {
             if (localities_->empty())
             {
@@ -349,14 +348,17 @@ namespace hpx { namespace components
 
         explicit default_distribution_policy(id_type const& locality)
           : localities_(std::make_shared<std::vector<id_type>>(1, locality))
-        {}
+        {
+        }
 
         friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive& ar, unsigned int const)
         {
+            // clang-format off
             ar & localities_;
+            // clang-format on
         }
 
         // localities to create things on
@@ -367,20 +369,20 @@ namespace hpx { namespace components
     /// A predefined instance of the default \a distribution_policy. It will
     /// represent the local locality and will place all items to create here.
     static default_distribution_policy const default_layout{};
-}}
+}}    // namespace hpx::components
 
 /// \cond NOINTERNAL
-namespace hpx
-{
+namespace hpx {
+
     using hpx::components::default_distribution_policy;
     using hpx::components::default_layout;
 
-    namespace traits
-    {
+    namespace traits {
         template <>
         struct is_distribution_policy<components::default_distribution_policy>
           : std::true_type
-        {};
-    }
-}
+        {
+        };
+    }    // namespace traits
+}    // namespace hpx
 /// \endcond

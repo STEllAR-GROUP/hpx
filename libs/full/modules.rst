@@ -31,6 +31,7 @@ Main |hpx| modules
    /libs/full/components_base/docs/index.rst
    /libs/full/compute/docs/index.rst
    /libs/full/compute_cuda/docs/index.rst
+   /libs/full/distribution_policies/docs/index.rst
    /libs/full/executors_distributed/docs/index.rst
    /libs/full/include/docs/index.rst
    /libs/full/init_runtime/docs/index.rst

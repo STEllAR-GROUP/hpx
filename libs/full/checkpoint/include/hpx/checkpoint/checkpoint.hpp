@@ -1,5 +1,5 @@
 // Copyright (c) 2018 Adrian Serio
-// Copyright (c) 2018-2020 Hartmut Kaiser
+// Copyright (c) 2018-2021 Hartmut Kaiser
 //
 // SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,6 +20,7 @@
 #include <hpx/checkpoint_base/checkpoint_data.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/components/get_ptr.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/naming.hpp>
 #include <hpx/runtime_components/new.hpp>
@@ -804,7 +805,8 @@ namespace hpx { namespace util {
                     f_server_ptr;
                 ar >> f_server_ptr;
                 c = hpx::new_<Client>(
-                    hpx::find_here(), std::move(*(f_server_ptr.get())));
+                    naming::get_id_from_locality_id(agas::get_locality_id()),
+                    std::move(*(f_server_ptr.get())));
             }
         };
     }    // namespace detail

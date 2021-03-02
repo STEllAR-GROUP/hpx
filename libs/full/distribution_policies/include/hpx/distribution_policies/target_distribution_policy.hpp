@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2018 Hartmut Kaiser
+//  Copyright (c) 2014-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,7 +21,6 @@
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime_components/create_component_helpers.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
@@ -31,8 +30,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace components
-{
+namespace hpx { namespace components {
+
     /// This class specifies the parameters for a simple distribution policy
     /// to use for creating (and evenly distributing) a given number of items
     /// on a given set of localities.
@@ -65,7 +64,7 @@ namespace hpx { namespace components
         /// \returns A future holding the global address which represents
         ///          the newly created object
         ///
-        template <typename Component, typename ...Ts>
+        template <typename Component, typename... Ts>
         hpx::future<hpx::id_type> create(Ts&&... vs) const
         {
             // by default the object will be created on the current
@@ -75,7 +74,7 @@ namespace hpx { namespace components
         }
 
         /// \cond NOINTERNAL
-        typedef std::pair<hpx::id_type, std::vector<hpx::id_type> >
+        typedef std::pair<hpx::id_type, std::vector<hpx::id_type>>
             bulk_locality_result;
         /// \endcond
 
@@ -92,22 +91,20 @@ namespace hpx { namespace components
         /// \returns A future holding the list of global addresses which
         ///          represent the newly created objects
         ///
-        template <typename Component, typename ...Ts>
-        hpx::future<std::vector<bulk_locality_result> >
-        bulk_create(std::size_t count, Ts&&... vs) const
+        template <typename Component, typename... Ts>
+        hpx::future<std::vector<bulk_locality_result>> bulk_create(
+            std::size_t count, Ts&&... vs) const
         {
             // by default the object will be created on the current
             // locality
             hpx::id_type id = get_next_target();
-            hpx::future<std::vector<hpx::id_type> > f =
+            hpx::future<std::vector<hpx::id_type>> f =
                 components::bulk_create_async<Component>(
                     id, count, std::forward<Ts>(vs)...);
 
             return f.then(hpx::launch::sync,
-                [id = std::move(id)](
-                    hpx::future<std::vector<hpx::id_type> > && f
-                ) -> std::vector<bulk_locality_result>
-                {
+                [id = std::move(id)](hpx::future<std::vector<hpx::id_type>>&& f)
+                    -> std::vector<bulk_locality_result> {
                     std::vector<bulk_locality_result> result;
                     result.emplace_back(id, f.get());
                     return result;
@@ -120,45 +117,44 @@ namespace hpx { namespace components
         template <typename Action>
         struct async_result
         {
-            using type = hpx::future<typename traits::promise_local_result<
-                typename hpx::traits::extract_action<Action>::remote_result_type
-            >::type>;
+            using type = hpx::future<
+                typename traits::promise_local_result<typename hpx::traits::
+                        extract_action<Action>::remote_result_type>::type>;
         };
 
-        template <typename Action, typename ...Ts>
-        HPX_FORCEINLINE typename async_result<Action>::type
-        async(launch policy, Ts&&... vs) const
+        template <typename Action, typename... Ts>
+        HPX_FORCEINLINE typename async_result<Action>::type async(
+            launch policy, Ts&&... vs) const
         {
-            return hpx::detail::async_impl<Action>(policy,
-                get_next_target(), std::forward<Ts>(vs)...);
+            return hpx::detail::async_impl<Action>(
+                policy, get_next_target(), std::forward<Ts>(vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
         ///       this class
         ///
-        template <typename Action, typename Callback, typename ...Ts>
-        HPX_FORCEINLINE typename async_result<Action>::type
-        async_cb(launch policy, Callback&& cb, Ts&&... vs) const
+        template <typename Action, typename Callback, typename... Ts>
+        HPX_FORCEINLINE typename async_result<Action>::type async_cb(
+            launch policy, Callback&& cb, Ts&&... vs) const
         {
-            return hpx::detail::async_cb_impl<Action>(policy,
-                get_next_target(), std::forward<Callback>(cb),
+            return hpx::detail::async_cb_impl<Action>(policy, get_next_target(),
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+        }
+
+        /// \note This function is part of the invocation policy implemented by
+        ///       this class
+        ///
+        template <typename Action, typename Continuation, typename... Ts>
+        bool apply(Continuation&& c, threads::thread_priority priority,
+            Ts&&... vs) const
+        {
+            return hpx::detail::apply_impl<Action>(
+                std::forward<Continuation>(c), get_next_target(), priority,
                 std::forward<Ts>(vs)...);
         }
 
-        /// \note This function is part of the invocation policy implemented by
-        ///       this class
-        ///
-        template <typename Action, typename Continuation, typename ...Ts>
-        bool apply(Continuation && c,
-            threads::thread_priority priority, Ts&&... vs) const
-        {
-            return hpx::detail::apply_impl<Action>(std::forward<Continuation>(c),
-                get_next_target(), priority, std::forward<Ts>(vs)...);
-        }
-
-        template <typename Action, typename ...Ts>
-        bool apply(
-            threads::thread_priority priority, Ts&&... vs) const
+        template <typename Action, typename... Ts>
+        bool apply(threads::thread_priority priority, Ts&&... vs) const
         {
             return hpx::detail::apply_impl<Action>(
                 get_next_target(), priority, std::forward<Ts>(vs)...);
@@ -168,22 +164,21 @@ namespace hpx { namespace components
         ///       this class
         ///
         template <typename Action, typename Continuation, typename Callback,
-            typename ...Ts>
-        bool apply_cb(Continuation && c,
-            threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
+            typename... Ts>
+        bool apply_cb(Continuation&& c, threads::thread_priority priority,
+            Callback&& cb, Ts&&... vs) const
         {
-            return hpx::detail::apply_cb_impl<Action>(std::forward<Continuation>(c),
-                get_next_target(), priority,
+            return hpx::detail::apply_cb_impl<Action>(
+                std::forward<Continuation>(c), get_next_target(), priority,
                 std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
-        template <typename Action, typename Callback, typename ...Ts>
+        template <typename Action, typename Callback, typename... Ts>
         bool apply_cb(
             threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
         {
-            return hpx::detail::apply_cb_impl<Action>(
-                get_next_target(), priority,
-                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            return hpx::detail::apply_cb_impl<Action>(get_next_target(),
+                priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
         /// Returns the number of associated localities for this distribution
@@ -201,45 +196,49 @@ namespace hpx { namespace components
         /// async operation
         hpx::id_type get_next_target() const
         {
-            return id_ ? id_ : hpx::find_here();
+            return id_ ?
+                id_ :
+                naming::get_id_from_locality_id(agas::get_locality_id());
         }
 
     protected:
         /// \cond NOINTERNAL
         explicit target_distribution_policy(hpx::id_type const& id)
           : id_(id)
-        {}
+        {
+        }
 
         friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive& ar, unsigned int const)
         {
+            // clang-format off
             ar & id_;
+            // clang-format on
         }
 
-        hpx::id_type id_;   // locality to encapsulate
+        hpx::id_type id_;    // locality to encapsulate
         /// \endcond
     };
 
     /// A predefined instance of the \a target_distribution_policy. It will
     /// represent the local locality and will place all items to create here.
-    static target_distribution_policy const target;
-}}
+    static target_distribution_policy const target{};
+}}    // namespace hpx::components
 
 /// \cond NOINTERNAL
-namespace hpx
-{
-    using hpx::components::target_distribution_policy;
-    using hpx::components::target;
+namespace hpx {
 
-    namespace traits
-    {
+    using hpx::components::target;
+    using hpx::components::target_distribution_policy;
+
+    namespace traits {
         template <>
         struct is_distribution_policy<components::target_distribution_policy>
           : std::true_type
-        {};
-    }
-}
+        {
+        };
+    }    // namespace traits
+}    // namespace hpx
 /// \endcond
-

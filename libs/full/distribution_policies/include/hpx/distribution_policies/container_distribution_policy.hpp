@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Bibek Ghimire
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
-#include <hpx/runtime/components/default_distribution_policy.hpp>
+#include <hpx/components_base/agas_interface.hpp>
+#include <hpx/runtime_components/default_distribution_policy.hpp>
 
 #include <hpx/assert.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -23,8 +24,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx
-{
+namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     // This class specifies the block chunking policy parameters to use for the
     // partitioning of the data in a hpx::partitioned_vector
@@ -34,7 +35,8 @@ namespace hpx
     public:
         container_distribution_policy()
           : num_partitions_(std::size_t(-1))
-        {}
+        {
+        }
 
         container_distribution_policy operator()(
             std::size_t num_partitions) const
@@ -61,7 +63,7 @@ namespace hpx
         }
 
         container_distribution_policy operator()(
-            std::vector<id_type> && localities) const
+            std::vector<id_type>&& localities) const
         {
             if (num_partitions_ != std::size_t(-1))
             {
@@ -78,8 +80,8 @@ namespace hpx
             return container_distribution_policy(num_partitions, localities);
         }
 
-        container_distribution_policy operator()(std::size_t num_partitions,
-            std::vector<id_type> && localities) const
+        container_distribution_policy operator()(
+            std::size_t num_partitions, std::vector<id_type>&& localities) const
         {
             return container_distribution_policy(
                 num_partitions, std::move(localities));
@@ -91,7 +93,8 @@ namespace hpx
             if (localities_)
             {
                 std::size_t num_parts = (num_partitions_ == std::size_t(-1)) ?
-                    localities_->size() : num_partitions_;
+                    localities_->size() :
+                    num_partitions_;
                 return (std::max)(num_parts, std::size_t(1));
             }
             return std::size_t(1);
@@ -102,7 +105,8 @@ namespace hpx
             if (!localities_)
             {
                 // use this locality, if this object was default constructed
-                return std::vector<id_type>(1, hpx::find_here());
+                return std::vector<id_type>(1,
+                    naming::get_id_from_locality_id(agas::get_locality_id()));
             }
 
             HPX_ASSERT(!localities_->empty());
@@ -115,49 +119,53 @@ namespace hpx
         template <typename Archive>
         void serialize(Archive& ar, const unsigned int /* version */)
         {
+            // clang-format off
             ar & localities_ & num_partitions_;
+            // clang-format on
         }
 
-        container_distribution_policy(std::size_t num_partitions,
-                std::vector<id_type> const& localities)
-          : components::default_distribution_policy(localities),
-            num_partitions_(num_partitions)
-        {}
+        container_distribution_policy(
+            std::size_t num_partitions, std::vector<id_type> const& localities)
+          : components::default_distribution_policy(localities)
+          , num_partitions_(num_partitions)
+        {
+        }
 
-        container_distribution_policy(std::size_t num_partitions,
-                std::vector<id_type> && localities)
-          : components::default_distribution_policy(std::move(localities)),
-            num_partitions_(num_partitions)
-        {}
+        container_distribution_policy(
+            std::size_t num_partitions, std::vector<id_type>&& localities)
+          : components::default_distribution_policy(std::move(localities))
+          , num_partitions_(num_partitions)
+        {
+        }
 
         explicit container_distribution_policy(hpx::id_type const& locality)
-          : components::default_distribution_policy(locality),
-            num_partitions_(1)
-        {}
+          : components::default_distribution_policy(locality)
+          , num_partitions_(1)
+        {
+        }
 
     private:
-        std::size_t num_partitions_;        // number of chunks to create
+        std::size_t num_partitions_;    // number of chunks to create
     };
 
-    static container_distribution_policy const container_layout;
+    static container_distribution_policy const container_layout{};
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace traits
-    {
+    namespace traits {
+
         template <>
         struct is_distribution_policy<container_distribution_policy>
           : std::true_type
-        {};
+        {
+        };
 
         template <>
         struct num_container_partitions<container_distribution_policy>
         {
-            static std::size_t
-            call(container_distribution_policy const& policy)
+            static std::size_t call(container_distribution_policy const& policy)
             {
                 return policy.get_num_partitions();
             }
         };
-    }
-}
-
+    }    // namespace traits
+}    // namespace hpx
