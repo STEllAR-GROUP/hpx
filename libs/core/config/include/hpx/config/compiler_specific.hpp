@@ -103,9 +103,6 @@
 #  if defined(__CUDA_ARCH__)
      // nvcc compiling CUDA code, device mode.
 #    define HPX_COMPUTE_DEVICE_CODE
-#  else
-     // nvcc compiling CUDA code, host mode.
-#    define HPX_COMPUTE_HOST_CODE
 #  endif
 // Detecting Clang CUDA
 #elif defined(__clang__) && defined(__CUDA__)
@@ -113,9 +110,6 @@
 #  if defined(__CUDA_ARCH__)
      // clang compiling CUDA code, device mode.
 #    define HPX_COMPUTE_DEVICE_CODE
-#  else
-     // clang compiling CUDA code, host mode.
-#    define HPX_COMPUTE_HOST_CODE
 #  endif
 // Detecting HIPCC
 #elif defined(__HIPCC__)
@@ -134,13 +128,14 @@
 #  if defined(__HIP_DEVICE_COMPILE__)
      // hipclang compiling CUDA/HIP code, device mode.
 #    define HPX_COMPUTE_DEVICE_CODE
-#  else
-     // clang compiling CUDA/HIP code, host mode.
-#    define HPX_COMPUTE_HOST_CODE
 #  endif
 #endif
 
-#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#  define HPX_COMPUTE_HOST_CODE
+#endif
+
+#if defined(HPX_COMPUTE_CODE)
 #define HPX_DEVICE __device__
 #define HPX_HOST __host__
 #define HPX_CONSTANT __constant__

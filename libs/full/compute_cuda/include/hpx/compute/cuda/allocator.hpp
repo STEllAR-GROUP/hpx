@@ -210,12 +210,12 @@ namespace hpx { namespace cuda { namespace experimental {
         template <typename... Args>
         HPX_HOST_DEVICE void construct(pointer p,
             Args&&...
-#if defined(HPX_COMPUTE_HOST_CODE) || defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_COMPUTE_CODE)
             args
 #endif
         )
         {
-#if defined(HPX_COMPUTE_HOST_CODE) || defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_COMPUTE_CODE)
             detail::launch(
                 target_, 1, 1,
                 [] HPX_DEVICE(T * p, Args const&... args) {
@@ -231,7 +231,7 @@ namespace hpx { namespace cuda { namespace experimental {
         // Calls the destructor of count objects pointed to by p
         HPX_HOST_DEVICE void bulk_destroy(pointer p, std::size_t count)
         {
-#if defined(HPX_COMPUTE_HOST_CODE) || defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_COMPUTE_CODE)
             int threads_per_block = (hpx::util::min)(1024, int(count));
             int num_blocks =
                 int((count + threads_per_block) / threads_per_block) - 1;
