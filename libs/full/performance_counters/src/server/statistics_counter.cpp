@@ -14,7 +14,7 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/performance_counters/server/statistics_counter.hpp>
-#include <hpx/runtime_components_base/derived_component_factory.hpp>
+#include <hpx/runtime_components/derived_component_factory.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>

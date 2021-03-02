@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,8 +11,12 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(lcos_distributed_headers
-    hpx/distributed/channel.hpp hpx/lcos_distributed/channel.hpp
+    hpx/distributed/channel.hpp
+    hpx/distributed/object_semaphore.hpp
+    hpx/lcos_distributed/channel.hpp
+    hpx/lcos_distributed/object_semaphore.hpp
     hpx/lcos_distributed/server/channel.hpp
+    hpx/lcos_distributed/server/object_semaphore.hpp
 )
 
 # cmake-format: off

@@ -11,7 +11,7 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/performance_counters/server/arithmetics_counter_extended.hpp>
-#include <hpx/runtime_components_base/derived_component_factory.hpp>
+#include <hpx/runtime_components/derived_component_factory.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 
 #include <boost/accumulators/accumulators.hpp>

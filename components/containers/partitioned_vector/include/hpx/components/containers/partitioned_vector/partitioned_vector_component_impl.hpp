@@ -18,7 +18,7 @@
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime_components_base/component_factory.hpp>
+#include <hpx/runtime_components/component_factory.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>

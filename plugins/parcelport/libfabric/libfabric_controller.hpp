@@ -10,9 +10,9 @@
 // config
 #include <hpx/config/defines.hpp>
 //
-#include <hpx/modules/functional.hpp>
+#include <hpx/async_distributed/promise.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>
 //
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>

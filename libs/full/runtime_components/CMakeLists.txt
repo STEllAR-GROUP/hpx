@@ -12,10 +12,13 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(runtime_components_headers
     hpx/runtime_components/components_fwd.hpp
+    hpx/runtime_components/component_factory.hpp
+    hpx/runtime_components/component_registry.hpp
     hpx/runtime_components/console_error_sink.hpp
     hpx/runtime_components/console_logging.hpp
     hpx/runtime_components/create_component_helpers.hpp
     hpx/runtime_components/default_distribution_policy.hpp
+    hpx/runtime_components/derived_component_factory.hpp
     hpx/runtime_components/distributed_metadata_base.hpp
     hpx/runtime_components/new.hpp
     hpx/runtime_components/server/console_error_sink.hpp
@@ -26,10 +29,13 @@ set(runtime_components_headers
 # cmake-format: off
 set(runtime_components_compat_headers
     hpx/runtime/components_fwd.hpp => hpx/modules/runtime_components.hpp
+    hpx/runtime/components/component_factory.hpp => hpx/modules/runtime_components.hpp
+    hpx/runtime/components/component_registry.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/console_error_sink.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/console_logging.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/create_component_helpers.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/default_distribution_policy.hpp => hpx/modules/runtime_components.hpp
+    hpx/runtime/components/derived_component_factory.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/new.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/server/console_error_sink.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/server/console_logging.hpp => hpx/modules/runtime_components.hpp
@@ -43,7 +49,7 @@ set(runtime_components_compat_headers
 # cmake-format: on
 
 set(runtime_components_sources
-    console_error_sink.cpp console_logging.cpp
+    component_registry.cpp console_error_sink.cpp console_logging.cpp
     server/console_error_sink_server.cpp
     server/console_error_sink_singleton.cpp server/console_logging_server.cpp
 )

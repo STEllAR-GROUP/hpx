@@ -10,9 +10,9 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/async_distributed/promise.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/client.hpp>
-#include <hpx/lcos/promise.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 

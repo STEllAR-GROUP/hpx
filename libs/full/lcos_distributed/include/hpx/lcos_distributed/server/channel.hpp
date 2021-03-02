@@ -9,13 +9,13 @@
 #include <hpx/config.hpp>
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
+#include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/futures/traits/get_remote_result.hpp>
 #include <hpx/futures/traits/promise_remote_result.hpp>
-#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos_local/channel.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>

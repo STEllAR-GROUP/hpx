@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
@@ -31,6 +32,7 @@
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_configuration/component_commandline_base.hpp>
+#include <hpx/runtime_configuration/component_factory_base.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime_distributed.hpp>
@@ -1906,6 +1908,16 @@ namespace hpx { namespace components { namespace server {
         hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_UNUSED(d);
+        HPX_UNUSED(ini);
+        HPX_UNUSED(instance);
+        HPX_UNUSED(lib);
+        HPX_UNUSED(options);
+        HPX_UNUSED(startup_handled);
+
+        return false;
+#else
         try
         {
             // initialize the factory instance using the preferences from the
@@ -1959,6 +1971,7 @@ namespace hpx { namespace components { namespace server {
             return false;
         }
         return true;    // component got loaded
+#endif
     }
 #endif
 

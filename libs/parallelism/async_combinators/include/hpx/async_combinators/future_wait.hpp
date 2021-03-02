@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,38 +10,34 @@
 #include <hpx/assert.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
-#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 
-#include <boost/dynamic_bitset.hpp>
-
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 #include <utility>
 #include <vector>
-#include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos
-{
-    namespace detail
-    {
+namespace hpx { namespace lcos {
+
+    namespace detail {
         template <typename Future>
         struct wait_acquire_future
         {
             template <typename R>
-            HPX_FORCEINLINE hpx::future<R>
-            operator()(hpx::future<R>& future) const
+            HPX_FORCEINLINE hpx::future<R> operator()(
+                hpx::future<R>& future) const
             {
                 return std::move(future);
             }
 
             template <typename R>
-            HPX_FORCEINLINE hpx::shared_future<R>
-            operator()(hpx::shared_future<R>& future) const
+            HPX_FORCEINLINE hpx::shared_future<R> operator()(
+                hpx::shared_future<R>& future) const
             {
                 return future;
             }
@@ -73,7 +69,8 @@ namespace hpx { namespace lcos
             void on_future_ready(
                 std::false_type, Index i, hpx::execution_base::agent_ref ctx)
             {
-                if (lazy_values_[i].has_value()) {
+                if (lazy_values_[i].has_value())
+                {
                     if (success_counter_)
                         ++*success_counter_;
                     // invoke callback function
@@ -88,7 +85,8 @@ namespace hpx { namespace lcos
             void on_future_ready(
                 std::true_type, Index i, hpx::execution_base::agent_ref ctx)
             {
-                if (lazy_values_[i].has_value()) {
+                if (lazy_values_[i].has_value())
+                {
                     if (success_counter_)
                         ++*success_counter_;
                     // invoke callback function
@@ -100,43 +98,46 @@ namespace hpx { namespace lcos
             }
 
         public:
-            typedef std::vector<Future> argument_type;
+            using argument_type = std::vector<Future>;
 
             template <typename F_>
-            wait_each(argument_type const& lazy_values, F_ && f,
-                    std::atomic<std::size_t>* success_counter)
-              : lazy_values_(lazy_values),
-                ready_count_(0),
-                f_(std::forward<F>(f)),
-                success_counter_(success_counter),
-                goal_reached_on_calling_thread_(false)
-            {}
+            wait_each(argument_type const& lazy_values, F_&& f,
+                std::atomic<std::size_t>* success_counter)
+              : lazy_values_(lazy_values)
+              , ready_count_(0)
+              , f_(std::forward<F>(f))
+              , success_counter_(success_counter)
+              , goal_reached_on_calling_thread_(false)
+            {
+            }
 
             template <typename F_>
-            wait_each(argument_type && lazy_values, F_ && f,
-                    std::atomic<std::size_t>* success_counter)
-              : lazy_values_(std::move(lazy_values)),
-                ready_count_(0),
-                f_(std::forward<F>(f)),
-                success_counter_(success_counter),
-                goal_reached_on_calling_thread_(false)
-            {}
+            wait_each(argument_type&& lazy_values, F_&& f,
+                std::atomic<std::size_t>* success_counter)
+              : lazy_values_(std::move(lazy_values))
+              , ready_count_(0)
+              , f_(std::forward<F>(f))
+              , success_counter_(success_counter)
+              , goal_reached_on_calling_thread_(false)
+            {
+            }
 
-            wait_each(wait_each && rhs)
-              : lazy_values_(std::move(rhs.lazy_values_)),
-                ready_count_(rhs.ready_count_.load()),
-                f_(std::move(rhs.f_)),
-                success_counter_(rhs.success_counter_),
-                goal_reached_on_calling_thread_(
+            wait_each(wait_each&& rhs)
+              : lazy_values_(std::move(rhs.lazy_values_))
+              , ready_count_(rhs.ready_count_.load())
+              , f_(std::move(rhs.f_))
+              , success_counter_(rhs.success_counter_)
+              , goal_reached_on_calling_thread_(
                     rhs.goal_reached_on_calling_thread_)
             {
                 rhs.success_counter_ = nullptr;
                 rhs.goal_reached_on_calling_thread_ = false;
             }
 
-            wait_each& operator= (wait_each && rhs)
+            wait_each& operator=(wait_each&& rhs)
             {
-                if (this != &rhs) {
+                if (this != &rhs)
+                {
                     lazy_values_ = std::move(rhs.lazy_values_);
                     ready_count_.store(rhs.ready_count_.load());
                     rhs.ready_count_ = 0;
@@ -160,9 +161,8 @@ namespace hpx { namespace lcos
                 auto ctx = hpx::execution_base::this_thread::agent();
                 for (std::size_t i = 0; i != size; ++i)
                 {
-                    typedef
-                        typename traits::detail::shared_state_ptr_for<Future>::type
-                        shared_state_ptr;
+                    typedef typename traits::detail::shared_state_ptr_for<
+                        Future>::type shared_state_ptr;
                     shared_state_ptr current =
                         traits::detail::get_shared_state(lazy_values_[i]);
 
@@ -196,7 +196,7 @@ namespace hpx { namespace lcos
             std::atomic<std::size_t>* success_counter_;
             bool goal_reached_on_calling_thread_;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // Asynchronous versions.
@@ -205,21 +205,19 @@ namespace hpx { namespace lcos
     /// expected value directly (without wrapping it into a tuple).
     template <typename Future, typename F>
     inline typename std::enable_if<
-        !std::is_void<typename traits::future_traits<Future>::type>::value
-      , std::size_t
-    >::type
-    wait(Future && f1, F && f)
+        !std::is_void<typename traits::future_traits<Future>::type>::value,
+        std::size_t>::type
+    wait(Future&& f1, F&& f)
     {
         f(0, f1.get());
         return 1;
     }
 
     template <typename Future, typename F>
-    inline typename std::enable_if< //-V659
-        std::is_void<typename traits::future_traits<Future>::type>::value
-      , std::size_t
-    >::type
-    wait(Future && f1, F && f)
+    inline typename std::enable_if<    //-V659
+        std::is_void<typename traits::future_traits<Future>::type>::value,
+        std::size_t>::type
+    wait(Future&& f1, F&& f)
     {
         f1.get();
         f(0);
@@ -247,8 +245,8 @@ namespace hpx { namespace lcos
 
         std::atomic<std::size_t> success_counter(0);
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_each<Future, F>(std::move(lazy_values_),
-                std::forward<F>(f), &success_counter));
+            detail::wait_each<Future, F>(
+                std::move(lazy_values_), std::forward<F>(f), &success_counter));
 
         p.apply();
         p.get_future().get();
@@ -257,9 +255,8 @@ namespace hpx { namespace lcos
     }
 
     template <typename Future, typename F>
-    inline std::size_t
-    wait(std::vector<Future> && lazy_values, F && f,
-        std::int32_t suspend_for = 10)
+    inline std::size_t wait(
+        std::vector<Future>&& lazy_values, F&& f, std::int32_t suspend_for = 10)
     {
         return wait(lazy_values, std::forward<F>(f), suspend_for);
     }
@@ -281,13 +278,12 @@ namespace hpx { namespace lcos
 
         std::atomic<std::size_t> success_counter(0);
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_each<Future, F>(std::move(lazy_values_),
-                std::forward<F>(f), &success_counter));
+            detail::wait_each<Future, F>(
+                std::move(lazy_values_), std::forward<F>(f), &success_counter));
 
         p.apply();
         p.get_future().get();
 
         return success_counter.load();
     }
-}}
-
+}}    // namespace hpx::lcos

@@ -6,13 +6,14 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/apply.hpp>
+#include <hpx/async_distributed/base_lco.hpp>
 #include <hpx/async_distributed/trigger_lco.hpp>
-#include <hpx/lcos/base_lco.hpp>
+
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/type_support/unused.hpp>
 #if defined(HPX_MSVC) && !defined(HPX_DEBUG)
-#include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/async_distributed/base_lco_with_value.hpp>
 #endif
 
 #include <exception>

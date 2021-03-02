@@ -12,7 +12,7 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/runtime_components_base/component_factory.hpp>
+#include <hpx/runtime_components/component_factory.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 

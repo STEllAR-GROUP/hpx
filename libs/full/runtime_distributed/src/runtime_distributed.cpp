@@ -34,6 +34,7 @@
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime_components/components_fwd.hpp>
 #include <hpx/runtime_components/console_error_sink.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_components/server/console_error_sink.hpp>

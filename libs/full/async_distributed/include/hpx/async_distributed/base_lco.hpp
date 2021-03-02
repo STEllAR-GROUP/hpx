@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,6 @@
 #include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime_components/components_fwd.hpp>
 
 #include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
 
@@ -24,8 +23,8 @@
 #include <exception>
 #include <type_traits>
 
-namespace hpx { namespace lcos
-{
+namespace hpx { namespace lcos {
+
     /// The \a base_lco class is the common base class for all LCO's
     /// implementing a simple set_event action
     class base_lco
@@ -36,10 +35,10 @@ namespace hpx { namespace lcos
         virtual void set_exception(std::exception_ptr const& e);
 
         // noop by default
-        virtual void connect(naming::id_type const &);
+        virtual void connect(naming::id_type const&);
 
         // noop by default
-        virtual void disconnect(naming::id_type const &);
+        virtual void disconnect(naming::id_type const&);
 
         // components must contain a typedef for wrapping_type defining the
         // managed_component type used to encapsulate instances of this
@@ -47,7 +46,7 @@ namespace hpx { namespace lcos
         typedef components::managed_component<base_lco> wrapping_type;
         typedef base_lco base_type_holder;
 
-        static components::component_type get_component_type();
+        static components::component_type get_component_type() noexcept;
         static void set_component_type(components::component_type type);
 
         /// Destructor, needs to be virtual to allow for clean destruction of
@@ -79,7 +78,7 @@ namespace hpx { namespace lcos
         /// overloaded by the derived concrete LCO.
         ///
         /// \param id [in] target id
-        void connect_nonvirt(naming::id_type const & id);
+        void connect_nonvirt(naming::id_type const& id);
 
         /// The \a function disconnect_nonvirt is called whenever a
         /// \a disconnect_action is applied on a instance of a LCO. This function
@@ -87,7 +86,7 @@ namespace hpx { namespace lcos
         /// overloaded by the derived concrete LCO.
         ///
         /// \param id [in] target id
-        void disconnect_nonvirt(naming::id_type const & id);
+        void disconnect_nonvirt(naming::id_type const& id);
 
     public:
         /// Each of the exposed functions needs to be encapsulated into an action
@@ -96,8 +95,8 @@ namespace hpx { namespace lcos
         ///
         /// The \a set_event_action may be used to unconditionally trigger any
         /// LCO instances, it carries no additional parameters.
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco, set_event_nonvirt,
-            set_event_action);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(
+            base_lco, set_event_nonvirt, set_event_action);
 
         /// The \a set_exception_action may be used to transfer arbitrary error
         /// information from the remote site to the LCO instance specified as
@@ -106,18 +105,18 @@ namespace hpx { namespace lcos
         /// \param std::exception_ptr
         ///               [in] The exception encapsulating the error to report
         ///               to this LCO instance.
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco, set_exception_nonvirt,
-            set_exception_action);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(
+            base_lco, set_exception_nonvirt, set_exception_action);
 
         /// The \a connect_action may be used to
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco, connect_nonvirt,
-            connect_action);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(
+            base_lco, connect_nonvirt, connect_action);
 
         /// The \a set_exception_action may be used to
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco, disconnect_nonvirt,
-            disconnect_action);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(
+            base_lco, disconnect_nonvirt, disconnect_action);
     };
-}}
+}}    // namespace hpx::lcos
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
@@ -161,4 +160,3 @@ HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(
 HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(
     hpx::lcos::base_lco::set_exception_action, "lco_set_value_action",
     std::size_t(-1), std::size_t(-1))
-

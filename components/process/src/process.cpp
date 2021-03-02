@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/components_base/server/component.hpp>
-#include <hpx/runtime_components_base/component_factory.hpp>
+#include <hpx/runtime_components/component_factory.hpp>
 
 #include <hpx/components/process/process.hpp>
 #include <hpx/components/process/server/child.hpp>

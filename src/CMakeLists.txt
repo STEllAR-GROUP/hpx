@@ -15,12 +15,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
   list(
     APPEND
     hpx_SOURCES
-    lcos/base_lco.cpp
-    lcos/base_lco_with_value_1.cpp
-    lcos/base_lco_with_value_2.cpp
-    lcos/base_lco_with_value_3.cpp
-    lcos/base_lco_with_value.cpp
-    lcos/promise.cpp
     runtime/agas/server/route.cpp
     runtime/applier/applier.cpp
     runtime/parcelset/detail/parcel_await.cpp
@@ -68,14 +62,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
   list(
     APPEND
     hpx_HEADERS
-    hpx/lcos/base_lco.hpp
-    hpx/lcos/base_lco_with_value.hpp
-    hpx/lcos/detail/promise_base.hpp
-    hpx/lcos/detail/promise_lco.hpp
-    hpx/lcos/object_semaphore.hpp
-    hpx/lcos/packaged_action.hpp
-    hpx/lcos/promise.hpp
-    hpx/lcos/server/object_semaphore.hpp
     hpx/plugins/binary_filter_factory_base.hpp
     hpx/plugins/binary_filter_factory.hpp
     hpx/plugins/message_handler_factory_base.hpp

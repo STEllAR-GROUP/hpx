@@ -13,11 +13,11 @@
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/async_distributed/async_continue_fwd.hpp>
+#include <hpx/async_distributed/packaged_action.hpp>
 #include <hpx/async_local/async_fwd.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/futures/traits/promise_remote_result.hpp>
-#include <hpx/lcos/packaged_action.hpp>
 
 #include <type_traits>
 #include <utility>
