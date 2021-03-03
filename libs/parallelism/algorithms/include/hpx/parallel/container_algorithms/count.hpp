@@ -239,8 +239,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic pop
 #endif
         return hpx::parallel::v1::detail::count_if<difference_type>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, last,
-            std::forward<F>(f), std::forward<Proj>(proj));
+            std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
+            hpx::util::end(rng), std::forward<F>(f), std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
 

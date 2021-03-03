@@ -77,7 +77,11 @@ void test_count_if(ExPolicy&& policy, IteratorTag)
     diff_type num_items = hpx::count_if(policy, iterator(std::begin(c)),
         iterator(std::end(c)), smaller_than_50());
 
+    diff_type num_items1 = hpx::parallel::count_if(policy,
+        iterator(std::begin(c)), iterator(std::end(c)), smaller_than_50());
+
     HPX_TEST_EQ(num_items, 50u);
+    HPX_TEST_EQ(num_items1, 50u);
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -94,7 +98,11 @@ void test_count_if_async(ExPolicy&& p, IteratorTag)
     hpx::future<diff_type> f = hpx::count_if(
         p, iterator(std::begin(c)), iterator(std::end(c)), smaller_than_50());
 
+    hpx::future<diff_type> f1 = hpx::parallel::count_if(
+        p, iterator(std::begin(c)), iterator(std::end(c)), smaller_than_50());
+
     HPX_TEST_EQ(f.get(), 50);
+    HPX_TEST_EQ(f1.get(), 50);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
