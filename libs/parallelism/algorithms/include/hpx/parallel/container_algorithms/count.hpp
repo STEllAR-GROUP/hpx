@@ -189,14 +189,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<iterator_type>::value),
             "Required at least forward iterator.");
 
-        using is_segmented = hpx::traits::is_segmented_iterator<iterator_type>;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        using difference_type =
+            typename std::iterator_traits<iterator_type>::difference_type;
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
-
-        return detail::count_(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), value,
-            std::forward<Proj>(proj), is_segmented{});
+        return hpx::parallel::v1::detail::count<difference_type>().call(
+            std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
+            hpx::util::end(rng), value, std::forward<Proj>(proj));
     }
 
     // clang-format off
@@ -229,14 +231,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<iterator_type>::value),
             "Required at least forward iterator.");
 
-        using is_segmented = hpx::traits::is_segmented_iterator<iterator_type>;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        using difference_type =
+            typename std::iterator_traits<iterator_type>::difference_type;
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
-
-        return detail::count_if_(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), std::forward<F>(f),
-            std::forward<Proj>(proj), is_segmented{});
+        return hpx::parallel::v1::detail::count_if<difference_type>().call(
+            std::forward<ExPolicy>(policy), is_seq(), first, last,
+            std::forward<F>(f), std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -245,7 +249,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::count
     HPX_INLINE_CONSTEXPR_VARIABLE struct count_t final
-      : hpx::functional::tag<count_t>
+      : hpx::functional::tag_fallback<count_t>
     {
     private:
         // clang-format off
@@ -260,8 +264,8 @@ namespace hpx { namespace ranges {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<typename hpx::traits::range_traits<
                 Rng>::iterator_type>::difference_type>::type
-        tag_invoke(count_t, ExPolicy&& policy, Rng&& rng, T const& value,
-            Proj&& proj = Proj())
+        tag_fallback_invoke(count_t, ExPolicy&& policy, Rng&& rng,
+            T const& value, Proj&& proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -270,13 +274,14 @@ namespace hpx { namespace ranges {
                 (hpx::traits::is_forward_iterator<iterator_type>::value),
                 "Required at least forward iterator.");
 
-            using is_segmented =
-                hpx::traits::is_segmented_iterator<iterator_type>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-            return hpx::parallel::v1::detail::count_(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), value, std::forward<Proj>(proj),
-                is_segmented{});
+            using difference_type =
+                typename std::iterator_traits<iterator_type>::difference_type;
+
+            return hpx::parallel::v1::detail::count<difference_type>().call(
+                std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
+                hpx::util::end(rng), value, std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -289,17 +294,20 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<Iter>::difference_type>::type
-        tag_invoke(count_t, ExPolicy&& policy, Iter first, Sent last,
+        tag_fallback_invoke(count_t, ExPolicy&& policy, Iter first, Sent last,
             T const& value, Proj&& proj = Proj())
         {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Required at least forward iterator.");
 
-            using is_segmented = hpx::traits::is_segmented_iterator<Iter>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-            return hpx::parallel::v1::detail::count_(
-                std::forward<ExPolicy>(policy), first, last, value,
-                std::forward<Proj>(proj), is_segmented{});
+            using difference_type =
+                typename std::iterator_traits<Iter>::difference_type;
+
+            return hpx::parallel::v1::detail::count<difference_type>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first, last, value,
+                std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -312,7 +320,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename std::iterator_traits<typename hpx::traits::range_traits<
             Rng>::iterator_type>::difference_type
-        tag_invoke(count_t, Rng&& rng, T const& value, Proj&& proj = Proj())
+        tag_fallback_invoke(
+            count_t, Rng&& rng, T const& value, Proj&& proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -321,12 +330,12 @@ namespace hpx { namespace ranges {
                 (hpx::traits::is_forward_iterator<iterator_type>::value),
                 "Required at least forward iterator.");
 
-            using is_segmented =
-                hpx::traits::is_segmented_iterator<iterator_type>;
+            using difference_type =
+                typename std::iterator_traits<iterator_type>::difference_type;
 
-            return hpx::parallel::v1::detail::count_(hpx::execution::seq,
-                hpx::util::begin(rng), hpx::util::end(rng), value,
-                std::forward<Proj>(proj), is_segmented{});
+            return hpx::parallel::v1::detail::count<difference_type>().call(
+                hpx::execution::seq, std::true_type(), hpx::util::begin(rng),
+                hpx::util::end(rng), value, std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -336,24 +345,26 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
         // clang-format on
-        friend typename std::iterator_traits<Iter>::difference_type tag_invoke(
-            count_t, Iter first, Sent last, T const& value,
+        friend typename std::iterator_traits<Iter>::difference_type
+        tag_fallback_invoke(count_t, Iter first, Sent last, T const& value,
             Proj&& proj = Proj())
         {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Required at least forward iterator.");
 
-            using is_segmented = hpx::traits::is_segmented_iterator<Iter>;
+            using difference_type =
+                typename std::iterator_traits<Iter>::difference_type;
 
-            return hpx::parallel::v1::detail::count_(hpx::execution::seq, first,
-                last, value, std::forward<Proj>(proj), is_segmented{});
+            return hpx::parallel::v1::detail::count<difference_type>().call(
+                hpx::execution::seq, std::true_type(), first, last, value,
+                std::forward<Proj>(proj));
         }
     } count{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::count_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct count_if_t final
-      : hpx::functional::tag<count_if_t>
+      : hpx::functional::tag_fallback<count_if_t>
     {
     private:
         // clang-format off
@@ -371,7 +382,7 @@ namespace hpx { namespace ranges {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<typename hpx::traits::range_traits<
                 Rng>::iterator_type>::difference_type>::type
-        tag_invoke(count_if_t, ExPolicy&& policy, Rng&& rng, F&& f,
+        tag_fallback_invoke(count_if_t, ExPolicy&& policy, Rng&& rng, F&& f,
             Proj&& proj = Proj())
         {
             using iterator_type =
@@ -381,13 +392,15 @@ namespace hpx { namespace ranges {
                 (hpx::traits::is_forward_iterator<iterator_type>::value),
                 "Required at least forward iterator.");
 
-            using is_segmented =
-                hpx::traits::is_segmented_iterator<iterator_type>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-            return hpx::parallel::v1::detail::count_if_(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            using difference_type =
+                typename std::iterator_traits<iterator_type>::difference_type;
+
+            return hpx::parallel::v1::detail::count_if<difference_type>().call(
+                std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
                 hpx::util::end(rng), std::forward<F>(f),
-                std::forward<Proj>(proj), is_segmented{});
+                std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -404,17 +417,20 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<Iter>::difference_type>::type
-        tag_invoke(count_if_t, ExPolicy&& policy, Iter first, Sent last, F&& f,
-            Proj&& proj = Proj())
+        tag_fallback_invoke(count_if_t, ExPolicy&& policy, Iter first,
+            Sent last, F&& f, Proj&& proj = Proj())
         {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Required at least forward iterator.");
 
-            using is_segmented = hpx::traits::is_segmented_iterator<Iter>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-            return hpx::parallel::v1::detail::count_if_(
-                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
-                std::forward<Proj>(proj), is_segmented{});
+            using difference_type =
+                typename std::iterator_traits<Iter>::difference_type;
+
+            return hpx::parallel::v1::detail::count_if<difference_type>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first, last,
+                std::forward<F>(f), std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -431,7 +447,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename std::iterator_traits<typename hpx::traits::range_traits<
             Rng>::iterator_type>::difference_type
-        tag_invoke(count_if_t, Rng&& rng, F&& f, Proj&& proj = Proj())
+        tag_fallback_invoke(count_if_t, Rng&& rng, F&& f, Proj&& proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -440,12 +456,13 @@ namespace hpx { namespace ranges {
                 (hpx::traits::is_forward_iterator<iterator_type>::value),
                 "Required at least forward iterator.");
 
-            using is_segmented =
-                hpx::traits::is_segmented_iterator<iterator_type>;
+            using difference_type =
+                typename std::iterator_traits<iterator_type>::difference_type;
 
-            return hpx::parallel::v1::detail::count_if_(hpx::execution::seq,
-                hpx::util::begin(rng), hpx::util::end(rng), std::forward<F>(f),
-                std::forward<Proj>(proj), is_segmented{});
+            return hpx::parallel::v1::detail::count_if<difference_type>().call(
+                hpx::execution::seq, std::true_type(), hpx::util::begin(rng),
+                hpx::util::end(rng), std::forward<F>(f),
+                std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -460,17 +477,19 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend typename std::iterator_traits<Iter>::difference_type tag_invoke(
+        friend typename std::iterator_traits<Iter>::difference_type
+        tag_fallback_invoke(
             count_if_t, Iter first, Sent last, F&& f, Proj&& proj = Proj())
         {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Required at least forward iterator.");
 
-            using is_segmented = hpx::traits::is_segmented_iterator<Iter>;
+            using difference_type =
+                typename std::iterator_traits<Iter>::difference_type;
 
-            return hpx::parallel::v1::detail::count_if_(hpx::execution::seq,
-                first, last, std::forward<F>(f), std::forward<Proj>(proj),
-                is_segmented{});
+            return hpx::parallel::v1::detail::count_if<difference_type>().call(
+                hpx::execution::seq, std::true_type(), first, last,
+                std::forward<F>(f), std::forward<Proj>(proj));
         }
     } count_if{};
 

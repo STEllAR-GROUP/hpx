@@ -156,7 +156,7 @@ namespace hpx {
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -301,32 +301,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         }));
             }
         };
-
-        template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-            typename T, typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIterB>::difference_type>::type
-        count_(ExPolicy&& policy, FwdIterB first, FwdIterE last, T const& value,
-            Proj&& proj, std::false_type)
-        {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
-            using difference_type =
-                typename std::iterator_traits<FwdIterB>::difference_type;
-
-            return detail::count<difference_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last, value,
-                std::forward<Proj>(proj));
-        }
-
-        // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-            typename T, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIterB>::difference_type>::type
-        count_(ExPolicy&& policy, FwdIterB first, FwdIterE last, T const& value,
-            Proj&& proj, std::true_type);
-
         /// \endcond
     }    // namespace detail
 
@@ -349,14 +323,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIterB>::value),
             "Required at least forward iterator.");
 
-        typedef hpx::traits::is_segmented_iterator<FwdIterB> is_segmented;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        using difference_type =
+            typename std::iterator_traits<FwdIterB>::difference_type;
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::count_(std::forward<ExPolicy>(policy), first, last,
-            value, std::forward<Proj>(proj), is_segmented{});
+        return hpx::parallel::v1::detail::count<difference_type>().call(
+            std::forward<ExPolicy>(policy), is_seq(), first, last, value,
+            std::forward<Proj>(proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -419,39 +397,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         }));
             }
         };
-
-        template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-            typename F, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIterB>::difference_type>::type
-        count_if_(ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,
-            Proj&& proj, std::false_type)
-        {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
-            using difference_type =
-                typename std::iterator_traits<FwdIterB>::difference_type;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-            return detail::count_if<difference_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last,
-                std::forward<F>(f), std::forward<Proj>(proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-        }
-
-        // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-            typename F, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIterB>::difference_type>::type
-        count_if_(ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,
-            Proj&& proj, std::true_type);
-
         /// \endcond
     }    // namespace detail
 
@@ -477,14 +422,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIterB>::value),
             "Required at least forward iterator.");
 
-        typedef hpx::traits::is_segmented_iterator<FwdIterB> is_segmented;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        using difference_type =
+            typename std::iterator_traits<FwdIterB>::difference_type;
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::count_if_(std::forward<ExPolicy>(policy), first, last,
-            std::forward<F>(f), std::forward<Proj>(proj), is_segmented{});
+        return hpx::parallel::v1::detail::count_if<difference_type>().call(
+            std::forward<ExPolicy>(policy), is_seq(), first, last,
+            std::forward<F>(f), std::forward<Proj>(proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -496,7 +445,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::count
     HPX_INLINE_CONSTEXPR_VARIABLE struct count_t final
-      : hpx::functional::tag<count_t>
+      : hpx::functional::tag_fallback<count_t>
     {
     private:
         // clang-format off
@@ -508,17 +457,20 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<FwdIter>::difference_type>::type
-        tag_invoke(count_t, ExPolicy&& policy, FwdIter first, FwdIter last,
-            T const& value)
+        tag_fallback_invoke(count_t, ExPolicy&& policy, FwdIter first,
+            FwdIter last, T const& value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-            return hpx::parallel::v1::detail::count_(
-                std::forward<ExPolicy>(policy), first, last, value,
-                hpx::parallel::util::projection_identity{}, is_segmented{});
+            using difference_type =
+                typename std::iterator_traits<FwdIter>::difference_type;
+
+            return hpx::parallel::v1::detail::count<difference_type>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first, last, value,
+                hpx::parallel::util::projection_identity{});
         }
 
         // clang-format off
@@ -528,21 +480,25 @@ namespace hpx {
             )>
         // clang-format on
         friend typename std::iterator_traits<FwdIter>::difference_type
-        tag_invoke(count_t, FwdIter first, FwdIter last, T const& value)
+        tag_fallback_invoke(
+            count_t, FwdIter first, FwdIter last, T const& value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::count_(hpx::execution::seq, first,
-                last, value, hpx::parallel::util::projection_identity{},
-                std::false_type{});
+            using difference_type =
+                typename std::iterator_traits<FwdIter>::difference_type;
+
+            return hpx::parallel::v1::detail::count<difference_type>().call(
+                hpx::execution::seq, std::true_type(), first, last, value,
+                hpx::parallel::util::projection_identity{});
         }
     } count{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::count_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct count_if_t final
-      : hpx::functional::tag<count_if_t>
+      : hpx::functional::tag_fallback<count_if_t>
     {
     private:
         // clang-format off
@@ -557,17 +513,20 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<FwdIter>::difference_type>::type
-        tag_invoke(
+        tag_fallback_invoke(
             count_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-            return hpx::parallel::v1::detail::count_if_(
-                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
-                hpx::parallel::util::projection_identity{}, is_segmented{});
+            using difference_type =
+                typename std::iterator_traits<FwdIter>::difference_type;
+
+            return hpx::parallel::v1::detail::count_if<difference_type>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first, last,
+                std::forward<F>(f), hpx::parallel::util::projection_identity{});
         }
 
         // clang-format off
@@ -580,14 +539,17 @@ namespace hpx {
             )>
         // clang-format on
         friend typename std::iterator_traits<FwdIter>::difference_type
-        tag_invoke(count_if_t, FwdIter first, FwdIter last, F&& f)
+        tag_fallback_invoke(count_if_t, FwdIter first, FwdIter last, F&& f)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::count_if_(hpx::execution::seq,
-                first, last, std::forward<F>(f),
-                hpx::parallel::util::projection_identity{}, std::false_type{});
+            using difference_type =
+                typename std::iterator_traits<FwdIter>::difference_type;
+
+            return hpx::parallel::v1::detail::count_if<difference_type>().call(
+                hpx::execution::seq, std::true_type(), first, last,
+                std::forward<F>(f), hpx::parallel::util::projection_identity{});
         }
     } count_if{};
 
