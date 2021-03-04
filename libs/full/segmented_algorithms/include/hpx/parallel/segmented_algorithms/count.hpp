@@ -377,8 +377,7 @@ namespace hpx { namespace segmented {
         }
 
         return hpx::parallel::v1::detail::segmented_count(
-            hpx::parallel::v1::detail::count<
-                typename iterator_traits::local_iterator>(),
+            hpx::parallel::v1::detail::count<difference_type>(),
             hpx::execution::seq, first, last, value,
             hpx::parallel::util::projection_identity(), std::true_type());
     }
@@ -413,8 +412,7 @@ namespace hpx { namespace segmented {
         }
 
         return hpx::parallel::v1::detail::segmented_count(
-            hpx::parallel::v1::detail::count<
-                typename iterator_traits::local_iterator>(),
+            hpx::parallel::v1::detail::count<difference_type>(),
             std::forward<ExPolicy>(policy), first, last, value,
             hpx::parallel::util::projection_identity(), is_seq());
     }
@@ -443,8 +441,7 @@ namespace hpx { namespace segmented {
         }
 
         return hpx::parallel::v1::detail::segmented_count_if(
-            hpx::parallel::v1::detail::count_if<
-                typename iterator_traits::local_iterator>(),
+            hpx::parallel::v1::detail::count_if<difference_type>(),
             hpx::execution::seq, first, last, std::forward<F>(f),
             hpx::parallel::util::projection_identity(), std::true_type());
     }
@@ -479,8 +476,7 @@ namespace hpx { namespace segmented {
         }
 
         return hpx::parallel::v1::detail::segmented_count_if(
-            hpx::parallel::v1::detail::count_if<
-                typename iterator_traits::local_iterator>(),
+            hpx::parallel::v1::detail::count_if<difference_type>(),
             std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
             hpx::parallel::util::projection_identity(), is_seq());
     }
