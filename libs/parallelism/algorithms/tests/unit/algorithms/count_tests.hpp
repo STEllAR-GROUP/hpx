@@ -67,11 +67,7 @@ void test_count(ExPolicy&& policy, IteratorTag)
     std::int64_t num_items = hpx::count(
         policy, iterator(std::begin(c)), iterator(std::end(c)), int(0));
 
-    std::int64_t num_items1 = hpx::parallel::count(
-        policy, iterator(std::begin(c)), iterator(std::end(c)), int(0));
-
     HPX_TEST_EQ(num_items, static_cast<std::int64_t>(find_count));
-    HPX_TEST_EQ(num_items1, static_cast<std::int64_t>(find_count));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -94,11 +90,7 @@ void test_count_async(ExPolicy&& p, IteratorTag)
     hpx::future<diff_type> f =
         hpx::count(p, iterator(std::begin(c)), iterator(std::end(c)), int(0));
 
-    hpx::future<diff_type> f1 = hpx::parallel::count(
-        p, iterator(std::begin(c)), iterator(std::end(c)), int(0));
-
     HPX_TEST_EQ(static_cast<diff_type>(find_count), f.get());
-    HPX_TEST_EQ(static_cast<diff_type>(find_count), f1.get());
 }
 
 ///////////////////////////////////////////////////////////////////////////////

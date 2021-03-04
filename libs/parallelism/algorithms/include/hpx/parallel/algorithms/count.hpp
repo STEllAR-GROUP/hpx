@@ -474,20 +474,20 @@ namespace hpx {
         }
 
         // clang-format off
-        template <typename FwdIter, typename T,
+        template <typename InIter, typename T,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter>::value
+                hpx::traits::is_iterator<InIter>::value
             )>
         // clang-format on
-        friend typename std::iterator_traits<FwdIter>::difference_type
+        friend typename std::iterator_traits<InIter>::difference_type
         tag_fallback_invoke(
-            count_t, FwdIter first, FwdIter last, T const& value)
+            count_t, InIter first, InIter last, T const& value)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Required at least forward iterator.");
+            static_assert((hpx::traits::is_input_iterator<InIter>::value),
+                "Required at least input iterator.");
 
             using difference_type =
-                typename std::iterator_traits<FwdIter>::difference_type;
+                typename std::iterator_traits<InIter>::difference_type;
 
             return hpx::parallel::v1::detail::count<difference_type>().call(
                 hpx::execution::seq, std::true_type(), first, last, value,
@@ -530,22 +530,22 @@ namespace hpx {
         }
 
         // clang-format off
-        template <typename FwdIter, typename F,
+        template <typename InIter, typename F,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter>::value &&
+                hpx::traits::is_iterator<InIter>::value &&
                 hpx::is_invocable_v<F,
-                    typename std::iterator_traits<FwdIter>::value_type
+                    typename std::iterator_traits<InIter>::value_type
                 >
             )>
         // clang-format on
-        friend typename std::iterator_traits<FwdIter>::difference_type
-        tag_fallback_invoke(count_if_t, FwdIter first, FwdIter last, F&& f)
+        friend typename std::iterator_traits<InIter>::difference_type
+        tag_fallback_invoke(count_if_t, InIter first, InIter last, F&& f)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Required at least forward iterator.");
+            static_assert((hpx::traits::is_input_iterator<InIter>::value),
+                "Required at least input iterator.");
 
             using difference_type =
-                typename std::iterator_traits<FwdIter>::difference_type;
+                typename std::iterator_traits<InIter>::difference_type;
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
                 hpx::execution::seq, std::true_type(), first, last,

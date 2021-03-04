@@ -327,8 +327,8 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
             static_assert(
-                (hpx::traits::is_forward_iterator<iterator_type>::value),
-                "Required at least forward iterator.");
+                (hpx::traits::is_input_iterator<iterator_type>::value),
+                "Required at least input iterator.");
 
             using difference_type =
                 typename std::iterator_traits<iterator_type>::difference_type;
@@ -349,8 +349,8 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(count_t, Iter first, Sent last, T const& value,
             Proj&& proj = Proj())
         {
-            static_assert((hpx::traits::is_forward_iterator<Iter>::value),
-                "Required at least forward iterator.");
+            static_assert((hpx::traits::is_input_iterator<Iter>::value),
+                "Required at least input iterator.");
 
             using difference_type =
                 typename std::iterator_traits<Iter>::difference_type;
