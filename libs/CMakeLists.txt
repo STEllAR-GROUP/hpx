@@ -114,3 +114,7 @@ endif()
 if(MSVC AND HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
   target_link_options(hpx_core PRIVATE "/EXPORT:switch_to_fiber")
 endif()
+
+if(HPX_WITH_ITTNOTIFY)
+  target_link_libraries(hpx_core PUBLIC Amplifier::amplifier)
+endif()

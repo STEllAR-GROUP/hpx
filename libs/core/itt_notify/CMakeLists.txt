@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,13 +20,17 @@ set(itt_notify_compat_headers
 
 set(itt_notify_sources itt_notify.cpp thread_name.cpp)
 
+if(HPX_WITH_ITTNOTIFY)
+  set(itt_notify_dependencies DEPENDENCIES Amplifier::amplifier)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   core itt_notify
   GLOBAL_HEADER_GEN OFF
   SOURCES ${itt_notify_sources}
   HEADERS ${itt_notify_headers}
-  COMPAT_HEADERS ${itt_notify_compat_headers}
+  COMPAT_HEADERS ${itt_notify_compat_headers} ${itt_notify_dependencies}
   MODULE_DEPENDENCIES hpx_config
   CMAKE_SUBDIRS examples tests
 )
