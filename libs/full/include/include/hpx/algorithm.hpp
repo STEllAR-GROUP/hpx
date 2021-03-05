@@ -20,8 +20,6 @@ namespace hpx {
     using hpx::parallel::minmax_element;
     using hpx::parallel::partition;
     using hpx::parallel::partition_copy;
-    using hpx::parallel::reverse;
-    using hpx::parallel::reverse_copy;
     using hpx::parallel::rotate;
     using hpx::parallel::rotate_copy;
     using hpx::parallel::sort;

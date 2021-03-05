@@ -566,7 +566,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         )>
     // clang-format on
     HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::replace is deprecated, use hpx::ranges::replace "
+        "hpx::parallel::replace is deprecated, use hpx::replace "
         "instead")
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         replace(ExPolicy&& policy, FwdIter first, FwdIter last,
@@ -653,7 +653,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 traits::projected<Proj, FwdIter>>::value)>
     // clang-format on
     HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::replace_if is deprecated, use hpx::ranges::replace_if "
+        "hpx::parallel::replace_if is deprecated, use hpx::replace_if "
         "instead")
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         replace_if(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
@@ -754,7 +754,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format on
     HPX_DEPRECATED_V(1, 7,
         "hpx::parallel::replace_copy is deprecated, use "
-        "hpx::ranges::replace_copy "
+        "hpx::replace_copy "
         "instead") typename util::detail::algorithm_result<ExPolicy,
         util::in_out_result<FwdIter1, FwdIter2>>::type
         replace_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
@@ -858,7 +858,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format on
     HPX_DEPRECATED_V(1, 7,
         "hpx::parallel::replace_copy_if is deprecated, use "
-        "hpx::ranges::replace_copy_if "
+        "hpx::replace_copy_if "
         "instead") typename util::detail::algorithm_result<ExPolicy,
         util::in_out_result<FwdIter1, FwdIter2>>::type
         replace_copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
@@ -882,6 +882,7 @@ namespace hpx {
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_if_t final
       : hpx::functional::tag_fallback<replace_if_t>
     {
+    private:
         // clang-format off
         template <typename Iter,
             typename Pred, typename T, HPX_CONCEPT_REQUIRES_(
@@ -984,6 +985,7 @@ namespace hpx {
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_copy_if_t final
       : hpx::functional::tag_fallback<replace_copy_if_t>
     {
+    private:
         // clang-format off
         template <typename InIter, typename OutIter,
             typename Pred, typename T, HPX_CONCEPT_REQUIRES_(

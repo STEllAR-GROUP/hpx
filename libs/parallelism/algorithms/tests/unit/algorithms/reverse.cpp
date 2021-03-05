@@ -19,6 +19,32 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_reverse(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d1;
+
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::copy(std::begin(c), std::end(c), std::back_inserter(d1));
+
+    hpx::reverse(iterator(std::begin(c)), iterator(std::end(c)));
+
+    std::reverse(std::begin(d1), std::end(d1));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d1),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d1.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_reverse(ExPolicy policy, IteratorTag)
 {
@@ -34,8 +60,7 @@ void test_reverse(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
     std::copy(std::begin(c), std::end(c), std::back_inserter(d1));
 
-    hpx::parallel::reverse(
-        policy, iterator(std::begin(c)), iterator(std::end(c)));
+    hpx::reverse(policy, iterator(std::begin(c)), iterator(std::end(c)));
 
     std::reverse(std::begin(d1), std::end(d1));
 
@@ -61,8 +86,7 @@ void test_reverse_async(ExPolicy p, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
     std::copy(std::begin(c), std::end(c), std::back_inserter(d1));
 
-    auto f = hpx::parallel::reverse(
-        p, iterator(std::begin(c)), iterator(std::end(c)));
+    auto f = hpx::reverse(p, iterator(std::begin(c)), iterator(std::end(c)));
     f.wait();
 
     std::reverse(std::begin(d1), std::end(d1));
@@ -81,6 +105,7 @@ template <typename IteratorTag>
 void test_reverse()
 {
     using namespace hpx::execution;
+    test_reverse(IteratorTag());
     test_reverse(seq, IteratorTag());
     test_reverse(par, IteratorTag());
     test_reverse(par_unseq, IteratorTag());
@@ -112,7 +137,7 @@ void test_reverse_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::reverse(policy, decorated_iterator(std::begin(c)),
+        hpx::reverse(policy, decorated_iterator(std::begin(c)),
             decorated_iterator(
                 std::end(c), []() { throw std::runtime_error("test"); }));
         HPX_TEST(false);
@@ -144,10 +169,9 @@ void test_reverse_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f =
-            hpx::parallel::reverse(p, decorated_iterator(std::begin(c)),
-                decorated_iterator(
-                    std::end(c), []() { throw std::runtime_error("test"); }));
+        hpx::future<void> f = hpx::reverse(p, decorated_iterator(std::begin(c)),
+            decorated_iterator(
+                std::end(c), []() { throw std::runtime_error("test"); }));
         returned_from_algorithm = true;
         f.get();
 
@@ -205,7 +229,7 @@ void test_reverse_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::reverse(policy, decorated_iterator(std::begin(c)),
+        hpx::reverse(policy, decorated_iterator(std::begin(c)),
             decorated_iterator(std::end(c), []() { throw std::bad_alloc(); }));
         HPX_TEST(false);
     }
@@ -235,8 +259,7 @@ void test_reverse_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::reverse(p,
-            decorated_iterator(std::begin(c)),
+        hpx::future<void> f = hpx::reverse(p, decorated_iterator(std::begin(c)),
             decorated_iterator(std::end(c), []() { throw std::bad_alloc(); }));
         returned_from_algorithm = true;
         f.get();
