@@ -1,16 +1,30 @@
 {
   "outputs": [
     {
-      "name": "future overhead - action - WaitAll",
+      "name": "future overhead - create_thread - latch",
       "executor": "no-executor",
       "series": [
-        0.678135
+        0.251752,
+        0.23276,
+        0.239111,
+        0.245585,
+        0.231835,
+        0.234296,
+        0.231487,
+        0.230589,
+        0.233698,
+        0.237571,
+        0.233052,
+        0.23678,
+        0.248381,
+        0.234628,
+        0.234575
       ]
     }
   ],
   "HPX": {
-    "commit": "3a6f93e5208c5f7a7e774e3b29037727578afdfc",
-    "datetime": "2020-09-25T08:14:35+00:00"
+    "commit": "4408251a9542ff54f24b4f1eb31fc8cc2f2f5d97",
+    "datetime": "2021-03-03T16:51:16+00:00"
   },
   "environment": {
     "hostname": "daint105",
