@@ -367,7 +367,6 @@ namespace hpx { namespace segmented {
         static_assert((hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
-        using iterator_traits = hpx::traits::segmented_iterator_traits<InIter>;
         using difference_type =
             typename std::iterator_traits<InIter>::difference_type;
 
@@ -399,7 +398,6 @@ namespace hpx { namespace segmented {
         static_assert((hpx::traits::is_forward_iterator<SegIter>::value),
             "Requires at least forward iterator.");
 
-        using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
         using difference_type =
             typename std::iterator_traits<SegIter>::difference_type;
 
@@ -431,7 +429,6 @@ namespace hpx { namespace segmented {
         static_assert((hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
-        using iterator_traits = hpx::traits::segmented_iterator_traits<InIter>;
         using difference_type =
             typename std::iterator_traits<InIter>::difference_type;
 
@@ -463,7 +460,6 @@ namespace hpx { namespace segmented {
         static_assert((hpx::traits::is_forward_iterator<SegIter>::value),
             "Requires at least forward iterator.");
 
-        using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
         using difference_type =
             typename std::iterator_traits<SegIter>::difference_type;
 
