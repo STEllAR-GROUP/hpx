@@ -21,7 +21,7 @@ void is_sentinel_for()
     HPX_TEST_MSG(
         (hpx::traits::is_sentinel_for<std::int64_t, std::int64_t>::value ==
             false),
-        "Integer - integer pair is ncompatible pair");
+        "Integer - integer pair is incompatible pair");
 
     HPX_TEST_MSG((hpx::traits::is_sentinel_for<std::vector<int>::iterator,
                       std::vector<int>::iterator>::value == true),
@@ -29,7 +29,7 @@ void is_sentinel_for()
 
     HPX_TEST_MSG((hpx::traits::is_sentinel_for<std::string,
                       std::string::iterator>::value == false),
-        "String - string::iterator is ncompatible pair");
+        "String - string::iterator is incompatible pair");
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -141,27 +141,9 @@ struct iterator
         return this->state == that.state;
     }
 
-    friend bool operator==(iterator i, sentinel<Value> s)
-    {
-        return i.state == s.get_stop();
-    }
-    friend bool operator==(sentinel<Value> s, iterator i)
-    {
-        return i.state == s.get_stop();
-    }
-
     bool operator!=(const iterator& that) const
     {
         return this->state != that.state;
-    }
-
-    friend bool operator!=(iterator i, sentinel<Value> s)
-    {
-        return i.state != s.get_stop();
-    }
-    friend bool operator!=(sentinel<Value> s, iterator i)
-    {
-        return i.state != s.get_stop();
     }
 
     bool operator<(const iterator& that) const

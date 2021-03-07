@@ -20,6 +20,7 @@ set(tests
     static_chunker_2282
     transform_inclusive_scan_4786
     transform_inclusive_scan_4787
+    ranges_facilities
 )
 
 if(HPX_WITH_DATAPAR_VC)
