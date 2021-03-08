@@ -5,10 +5,16 @@
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-defaults: &defaults
+working_dir_default: &working_dir_default
     working_directory: /hpx/build
+
+docker_default: &docker_default
     docker:
       - image: stellargroup/build_env:2
+
+defaults: &defaults
+    <<: *working_dir_default
+    <<: *docker_default
 
 convert_xml: &convert_xml
     name: Converting XML
@@ -73,8 +79,7 @@ version: 2
 
 jobs:
   checkout_code:
-    docker:
-      - image: stellargroup/build_env:1
+    <<: *docker_default
     working_directory: /hpx
     steps:
       - checkout:
@@ -100,7 +105,8 @@ jobs:
 
   # Check circular dependencies with cpp-dependencies tool
   check_circular_deps:
-    <<: *defaults
+    <<: *working_dir_default
+    <<: *docker_default
     steps:
       - attach_workspace:
           at: /hpx
@@ -162,7 +168,7 @@ jobs:
 
   # Ensure that CMake files stay cmake-formatted
   cmake_format:
-    <<: *defaults
+    <<: *docker_default
     steps:
       - attach_workspace:
           at: /hpx
@@ -498,8 +504,7 @@ jobs:
               ninja -j2 -k 0 tests.performance
 
   install:
-    docker:
-      - image: stellargroup/build_env:1
+    <<: *docker_default
     environment:
       TARGET_IMAGE_NAME: stellargroup/hpx:dev
     steps:
@@ -569,8 +574,7 @@ jobs:
   # This is the final step once everything else passes. We need a full clone
   # here again to be able to push the new tag.
   push_stable_tag:
-    docker:
-      - image: stellargroup/build_env:1
+    <<: *docker_default
     steps:
       - checkout:
           path: /hpx/source
