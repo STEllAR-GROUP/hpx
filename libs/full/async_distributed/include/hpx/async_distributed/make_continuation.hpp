@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <hpx/actions/set_lco_value_continuation.hpp>
 #include <hpx/async_distributed/continuation2_impl.hpp>
 #include <hpx/async_distributed/continuation_impl.hpp>
+#include <hpx/async_distributed/set_lco_value_continuation.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/find_here.hpp>
 

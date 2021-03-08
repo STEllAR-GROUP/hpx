@@ -159,12 +159,12 @@ namespace hpx { namespace lcos {
 
 #include <hpx/config.hpp>
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_colocated/async_colocated.hpp>
 #include <hpx/async_combinators/when_all.hpp>
+#include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>

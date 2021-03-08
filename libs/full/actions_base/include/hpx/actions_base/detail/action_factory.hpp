@@ -16,26 +16,29 @@
 #include <cstdint>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace actions { namespace detail {
 
     struct action_registry
     {
-    public:
-        HPX_NON_COPYABLE(action_registry);
+        action_registry(action_registry const&) = delete;
+        action_registry(action_registry&&) = delete;
+        action_registry& operator=(action_registry const&) = delete;
+        action_registry& operator=(action_registry&&) = delete;
 
-    public:
-        using ctor_t = base_action* (*) (bool);
-        using typename_to_ctor_t = std::unordered_map<std::string, ctor_t>;
+        using ctor_t = base_action* (*) ();
+        using typename_to_ctor_t =
+            std::unordered_map<std::string, std::pair<ctor_t, ctor_t>>;
         using typename_to_id_t = std::unordered_map<std::string, std::uint32_t>;
-        using cache_t = std::vector<ctor_t>;
+        using cache_t = std::vector<std::pair<ctor_t, ctor_t>>;
 
-        HPX_STATIC_CONSTEXPR std::uint32_t invalid_id = ~0;
+        static constexpr std::uint32_t invalid_id = ~0;
 
         HPX_EXPORT action_registry();
         HPX_EXPORT void register_factory(
-            std::string const& type_name, ctor_t ctor);
+            std::string const& type_name, ctor_t ctor, ctor_t ctor_cont);
         HPX_EXPORT void register_typename(
             std::string const& type_name, std::uint32_t id);
         HPX_EXPORT void fill_missing_typenames();
@@ -48,7 +51,7 @@ namespace hpx { namespace actions { namespace detail {
 
         HPX_EXPORT static action_registry& instance();
 
-        void cache_id(std::uint32_t id, ctor_t ctor);
+        void cache_id(std::uint32_t id, ctor_t ctor, ctor_t ctor_cont);
         std::string collect_registered_typenames();
 
         std::uint32_t max_id_;
@@ -63,10 +66,11 @@ namespace hpx { namespace actions { namespace detail {
     template <std::uint32_t Id>
     struct add_constant_entry
     {
-    public:
-        HPX_NON_COPYABLE(add_constant_entry);
+        add_constant_entry(add_constant_entry const&) = delete;
+        add_constant_entry(add_constant_entry&&) = delete;
+        add_constant_entry& operator=(add_constant_entry const&) = delete;
+        add_constant_entry& operator=(add_constant_entry&&) = delete;
 
-    public:
         add_constant_entry();
         static add_constant_entry instance;
     };

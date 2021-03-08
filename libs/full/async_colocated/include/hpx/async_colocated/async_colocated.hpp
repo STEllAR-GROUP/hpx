@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
+#include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/agas_base/primary_namespace.hpp>
 #include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
@@ -22,7 +23,6 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/traits/is_continuation.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/bind_action.hpp>
 

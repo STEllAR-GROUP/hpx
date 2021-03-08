@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <hpx/actions/continuation_fwd.hpp>
-#include <hpx/actions/trigger.hpp>
 #include <hpx/actions_base/traits/action_trigger_continuation_fwd.hpp>
+#include <hpx/async_distributed/continuation_fwd.hpp>
+#include <hpx/async_distributed/trigger.hpp>
 
 #include <utility>
 

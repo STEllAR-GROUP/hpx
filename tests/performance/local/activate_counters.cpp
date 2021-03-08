@@ -6,10 +6,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/actions/continuation.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
+#include <hpx/async_distributed/continuation.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/format.hpp>

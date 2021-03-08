@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/futures/future.hpp>

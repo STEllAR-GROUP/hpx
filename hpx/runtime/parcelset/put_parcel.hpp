@@ -12,8 +12,9 @@
 
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions/transfer_continuation_action.hpp>
+#include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
@@ -25,9 +26,8 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/put_parcel_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/traits/is_continuation.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>

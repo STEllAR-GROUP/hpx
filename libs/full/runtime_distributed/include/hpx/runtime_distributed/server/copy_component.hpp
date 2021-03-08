@@ -11,7 +11,7 @@
 #include <hpx/components/get_ptr.hpp>
 #include <hpx/futures/traits/get_remote_result.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/components_fwd.hpp>
+#include <hpx/runtime_components/components_fwd.hpp>
 #include <hpx/runtime_distributed/stubs/runtime_support.hpp>
 
 #include <memory>

@@ -8,9 +8,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/actions/continuation.hpp>
 #include <hpx/agas_base/server/component_namespace.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_distributed/continuation.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/naming/credit_handling.hpp>

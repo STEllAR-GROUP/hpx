@@ -6,19 +6,26 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/actions/continuation.hpp>
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
+#include <hpx/async_distributed/continuation.hpp>
+#include <hpx/components_base/agas_interface.hpp>
+#include <hpx/concurrency/spinlock.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/init_runtime/console_logging.hpp>
-#include <hpx/init_runtime/server/console_logging.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/threadmanager.hpp>
+#include <hpx/naming_base/id_type.hpp>
+#include <hpx/runtime_components/console_logging.hpp>
+#include <hpx/runtime_components/server/console_logging.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/state.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
+#include <hpx/synchronization/mutex.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/type_support/static.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <mutex>
 #include <string>
@@ -98,6 +105,50 @@ namespace hpx { namespace components {
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    struct HPX_EXPORT pending_logs
+    {
+        using prefix_mutex_type = lcos::local::mutex;
+        using queue_mutex_type = util::spinlock;
+
+        enum
+        {
+            max_pending = 128
+        };
+
+        pending_logs()
+          : prefix_mtx_()
+          , prefix_(naming::invalid_id)
+          , queue_mtx_()
+          , activated_(false)
+          , is_sending_(false)
+        {
+        }
+
+        void add(message_type const& msg);
+
+        void cleanup();
+
+        void activate()
+        {
+            activated_.store(true);
+        }
+
+    private:
+        bool ensure_prefix();
+        void send();
+        bool is_active();
+
+        prefix_mutex_type prefix_mtx_;
+        naming::id_type prefix_;
+
+        queue_mutex_type queue_mtx_;
+        messages_type queue_;
+
+        std::atomic<bool> activated_;
+        std::atomic<bool> is_sending_;
+    };
+
     bool pending_logs::is_active()
     {
         return threads::get_self_ptr() &&
@@ -139,7 +190,7 @@ namespace hpx { namespace components {
 
             // Invoke actual logging immediately if we're on the console or
             // if the number of waiting log messages is too large.
-            if (naming::get_agas_client().is_console() || size > max_pending)
+            if (agas::is_console() || size > max_pending)
                 send();
         }
         else
@@ -149,7 +200,7 @@ namespace hpx { namespace components {
             // on a HPX-thread.
 
             // Note: is_console can be called outside of a HPX-thread
-            if (!naming::get_agas_client().is_console())
+            if (!agas::is_console())
             {
                 // queue it for delivery to the console
                 std::lock_guard<queue_mutex_type> l(queue_mtx_);
@@ -264,6 +315,11 @@ namespace hpx { namespace components {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
+        struct pending_logs_tag
+        {
+        };
+
         pending_logs& logger()
         {
             util::reinitializable_static<pending_logs, pending_logs_tag> logs;

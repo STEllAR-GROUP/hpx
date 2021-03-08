@@ -8,9 +8,9 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
-#include <hpx/actions/continuation.hpp>
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/async_combinators/wait_each.hpp>
+#include <hpx/async_distributed/continuation.hpp>
 #include <hpx/execution_base/register_locks.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>

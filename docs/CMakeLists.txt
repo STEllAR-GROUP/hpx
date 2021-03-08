@@ -13,7 +13,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/find_all_localities.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_locality_name.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/set_parcel_write_handler.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/trigger_lco.hpp"
 )
 
 # Definitions for autodoc.doxy.in

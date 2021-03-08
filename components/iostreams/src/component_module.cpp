@@ -7,6 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/basic_action.hpp>
+#include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/component_startup_shutdown.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/component.hpp>

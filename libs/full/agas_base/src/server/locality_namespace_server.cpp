@@ -7,10 +7,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/actions/continuation.hpp>
 #include <hpx/agas_base/server/locality_namespace.hpp>
 #include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_distributed/continuation.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>

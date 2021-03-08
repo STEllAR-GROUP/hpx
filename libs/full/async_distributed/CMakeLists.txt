@@ -31,6 +31,8 @@ set(async_headers
     hpx/async_distributed/async_continue_fwd.hpp
     hpx/async_distributed/async_continue.hpp
     hpx/async_distributed/async.hpp
+    hpx/async_distributed/continuation_fwd.hpp
+    hpx/async_distributed/continuation.hpp
     hpx/async_distributed/continuation_impl.hpp
     hpx/async_distributed/continuation2_impl.hpp
     hpx/async_distributed/make_continuation.hpp
@@ -42,6 +44,12 @@ set(async_headers
     hpx/async_distributed/detail/sync_implementations_fwd.hpp
     hpx/async_distributed/detail/sync_implementations.hpp
     hpx/async_distributed/sync.hpp
+    hpx/async_distributed/set_lco_value_continuation.hpp
+    hpx/async_distributed/traits/action_trigger_continuation.hpp
+    hpx/async_distributed/transfer_continuation_action.hpp
+    hpx/async_distributed/trigger.hpp
+    hpx/async_distributed/trigger_lco.hpp
+    hpx/async_distributed/trigger_lco_fwd.hpp
 )
 
 # cmake-format: off
@@ -72,14 +80,24 @@ set(async_compat_headers
     hpx/runtime/applier/bind_naming_wrappers.hpp => hpx/include/async.hpp
     hpx/runtime/applier_fwd.hpp => hpx/include/async.hpp
     hpx/runtime/applier/trigger.hpp => hpx/include/async.hpp
+    hpx/runtime/actions/continuation_fwd.hpp => hpx/modules/async.hpp
+    hpx/runtime/actions/continuation.hpp => hpx/modules/async.hpp
+    hpx/runtime/actions/set_lco_value_continuation.hpp => hpx/modules/async.hpp
+    hpx/runtime/actions/transfer_continuation_action.hpp => hpx/modules/async.hpp
+    hpx/runtime/trigger_lco.hpp => hpx/modules/async.hpp
+    hpx/runtime/trigger_lco_fwd.hpp => hpx/modules/async.hpp
     hpx/sync.hpp => hpx/include/async.hpp
+    hpx/traits/action_trigger_continuation.hpp => hpx/modules/actions.hpp
 )
 # cmake-format: on
+
+set(actions_sources continuation.cpp trigger_lco.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
   full async_distributed
   GLOBAL_HEADER_GEN OFF
+  SOURCES ${actions_sources}
   HEADERS ${async_headers}
   COMPAT_HEADERS ${async_compat_headers}
   DEPENDENCIES hpx_core hpx_parallelism

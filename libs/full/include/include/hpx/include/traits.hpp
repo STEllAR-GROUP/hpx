@@ -39,12 +39,11 @@
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
 #include <hpx/serialization/traits/serialization_access_data.hpp>
 #include <hpx/timed_execution/traits/is_timed_executor.hpp>
-#include <hpx/traits/is_continuation.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/actions/traits/action_continuation.hpp>
-#include <hpx/actions/traits/action_decorate_continuation.hpp>
+#include <hpx/actions_base/traits/action_continuation.hpp>
+#include <hpx/actions_base/traits/action_decorate_continuation.hpp>
 #include <hpx/actions_base/traits/action_does_termination_detection.hpp>
 #include <hpx/actions_base/traits/action_is_target_valid.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
@@ -55,8 +54,10 @@
 #include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/actions_base/traits/is_client.hpp>
+#include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/actions_base/traits/is_valid_action.hpp>
+#include <hpx/async_distributed/traits/action_trigger_continuation.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/components_base/traits/component_config_data.hpp>
 #include <hpx/components_base/traits/component_heap_type.hpp>

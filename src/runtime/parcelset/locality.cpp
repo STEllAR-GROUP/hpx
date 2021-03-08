@@ -8,10 +8,10 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/string.hpp>
 #include <hpx/type_support/unused.hpp>

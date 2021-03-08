@@ -17,18 +17,10 @@ set(actions_headers
     hpx/actions/apply_helper_fwd.hpp
     hpx/actions/apply_helper.hpp
     hpx/actions/base_action.hpp
-    hpx/actions/continuation_fwd.hpp
-    hpx/actions/continuation.hpp
     hpx/actions/invoke_function.hpp
     hpx/actions/register_action.hpp
-    hpx/actions/set_lco_value_continuation.hpp
     hpx/actions/transfer_base_action.hpp
     hpx/actions/transfer_action.hpp
-    hpx/actions/transfer_continuation_action.hpp
-    hpx/actions/trigger.hpp
-    hpx/actions/traits/action_continuation.hpp
-    hpx/actions/traits/action_decorate_continuation.hpp
-    hpx/actions/traits/action_trigger_continuation.hpp
 )
 
 # Default location is $HPX_ROOT/libs/actions/include_compatibility
@@ -38,20 +30,14 @@ set(actions_compat_headers
     hpx/runtime/actions_fwd.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions/action_support.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions/base_action.hpp => hpx/modules/actions.hpp
-    hpx/runtime/actions/continuation_fwd.hpp => hpx/modules/actions.hpp
-    hpx/runtime/actions/continuation.hpp => hpx/modules/actions.hpp
-    hpx/runtime/actions/set_lco_value_continuation.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions/transfer_action.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions/transfer_base_action.hpp => hpx/modules/actions.hpp
-    hpx/runtime/actions/transfer_continuation_action.hpp => hpx/modules/actions.hpp
     hpx/runtime/actions/trigger.hpp => hpx/modules/actions.hpp
     hpx/runtime/components/server/invoke_function.hpp => hpx/modules/actions.hpp
-    hpx/traits/action_continuation.hpp => hpx/modules/actions.hpp
-    hpx/traits/action_decorate_continuation.hpp => hpx/modules/actions.hpp
 )
 # cmake-format: on
 
-set(actions_sources base_action.cpp continuation.cpp)
+set(actions_sources base_action.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(

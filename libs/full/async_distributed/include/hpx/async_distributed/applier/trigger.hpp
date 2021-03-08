@@ -9,8 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/async_distributed/trigger_lco.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/trigger_lco.hpp>
 
 #include <exception>
 #include <utility>

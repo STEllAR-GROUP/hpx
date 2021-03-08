@@ -15,14 +15,14 @@
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/actions/base_action.hpp>
 #include <hpx/actions/register_action.hpp>
-#include <hpx/actions/traits/action_continuation.hpp>
-#include <hpx/actions/traits/action_trigger_continuation.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/detail/invocation_count_registry.hpp>
+#include <hpx/actions_base/traits/action_continuation.hpp>
 #include <hpx/actions_base/traits/action_does_termination_detection.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/action_schedule_thread.hpp>
 #include <hpx/actions_base/traits/action_stacksize.hpp>
+#include <hpx/actions_base/traits/action_trigger_continuation_fwd.hpp>
 #include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
 
@@ -54,6 +54,7 @@ namespace hpx { namespace actions {
     // the transfer_action does not store the argument tuple directly but a
     // unique_ptr to the tuple instead.
     namespace detail {
+
         template <typename Args>
         struct argument_holder
         {
@@ -97,6 +98,7 @@ namespace hpx { namespace actions {
 }}       // namespace hpx::actions
 
 namespace hpx {
+
     template <std::size_t I, typename Args>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         typename hpx::tuple_element<I, Args>::type&
@@ -139,7 +141,10 @@ namespace hpx { namespace actions {
     struct transfer_base_action : base_action_data
     {
     public:
-        HPX_NON_COPYABLE(transfer_base_action);
+        transfer_base_action(transfer_base_action const&) = delete;
+        transfer_base_action(transfer_base_action&&) = delete;
+        transfer_base_action& operator=(transfer_base_action const&) = delete;
+        transfer_base_action& operator=(transfer_base_action&&) = delete;
 
     public:
         using component_type = typename Action::component_type;

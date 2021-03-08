@@ -6,12 +6,21 @@
 
 #pragma once
 
-#include <hpx/actions_base/traits/extract_action.hpp>
+namespace hpx { namespace actions {
+
+    template <typename Result, typename RemoteResult = Result>
+    struct typed_continuation;
+}}    // namespace hpx::actions
 
 namespace hpx { namespace traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Trait to determine the continuation type for an action
     template <typename Action, typename Enable = void>
-    struct action_continuation;
+    struct action_continuation
+    {
+        using type =
+            hpx::actions::typed_continuation<typename Action::local_result_type,
+                typename Action::remote_result_type>;
+    };
 }}    // namespace hpx::traits

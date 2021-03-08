@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -12,6 +12,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/apply_helper.hpp>
+#include <hpx/actions/base_action.hpp>
+#include <hpx/actions/register_action.hpp>
 #include <hpx/actions/transfer_base_action.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 
@@ -39,13 +41,18 @@ namespace hpx { namespace actions {
     struct transfer_action : transfer_base_action<Action>
     {
     public:
-        HPX_NON_COPYABLE(transfer_action);
-
-        typedef transfer_base_action<Action> base_type;
+        transfer_action(transfer_action const&) = delete;
+        transfer_action(transfer_action&&) = delete;
+        transfer_action& operator=(transfer_action const&) = delete;
+        transfer_action& operator=(transfer_action&&) = delete;
 
     public:
+        using base_type = transfer_base_action<Action>;
+
         // construct an empty transfer_action to avoid serialization overhead
         transfer_action() = default;
+
+        ~transfer_action() noexcept override;
 
         // construct an action from its arguments
         template <typename... Ts>
@@ -227,6 +234,21 @@ namespace hpx { namespace actions {
         }
 
         schedule_thread(std::move(target), lva, comptype, num_thread);
+    }
+
+    // define registration function
+    template <typename Action>
+    base_action* detail::register_action<Action>::create()
+    {
+        return new transfer_action<Action>{};
+    }
+
+    template <typename Action>
+    transfer_action<Action>::~transfer_action() noexcept
+    {
+        // make sure proper register action function is instantiated
+        auto* ptr = &detail::register_action<Action>::create;
+        (void) ptr;
     }
 }}    // namespace hpx::actions
 

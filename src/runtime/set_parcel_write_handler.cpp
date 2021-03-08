@@ -7,11 +7,11 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/runtime_distributed.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>
-#include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime_distributed/runtime_fwd.hpp>
 
 namespace hpx
 {

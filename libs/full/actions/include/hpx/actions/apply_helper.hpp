@@ -9,9 +9,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/apply_helper_fwd.hpp>
-#include <hpx/actions/traits/action_continuation.hpp>
-#include <hpx/actions/traits/action_decorate_continuation.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
+#include <hpx/actions_base/traits/action_continuation.hpp>
+#include <hpx/actions_base/traits/action_decorate_continuation.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/action_schedule_thread.hpp>
 #include <hpx/actions_base/traits/action_select_direct_execution.hpp>

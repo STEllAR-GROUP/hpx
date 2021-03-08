@@ -16,7 +16,6 @@ set(components_headers
     hpx/components/components_fwd.hpp
     hpx/components/client.hpp
     hpx/components/client_base.hpp
-    hpx/components/distributed_metadata_base.hpp
     hpx/components/executor_component.hpp
     hpx/components/get_ptr.hpp
     hpx/components/make_client.hpp
@@ -30,7 +29,6 @@ set(components_compat_headers
     hpx/runtime/components/client.hpp => hpx/modules/components.hpp
     hpx/runtime/components/client_base.hpp => hpx/modules/components.hpp
     hpx/runtime/components/make_client.hpp => hpx/modules/components.hpp
-    hpx/runtime/components/server/distributed_metadata_base.hpp => hpx/modules/components.hpp
     hpx/runtime/components/server/executor_component.hpp => hpx/modules/components.hpp
     hpx/runtime/get_ptr.hpp => hpx/modules/components.hpp
 )

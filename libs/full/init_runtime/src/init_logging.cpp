@@ -21,8 +21,8 @@
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/agas/addressing_service.hpp>
-#include <hpx/init_runtime/console_logging.hpp>
 #include <hpx/modules/naming.hpp>
+#include <hpx/runtime_components/console_logging.hpp>
 #endif
 
 #include <cstddef>

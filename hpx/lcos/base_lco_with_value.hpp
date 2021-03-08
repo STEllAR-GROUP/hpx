@@ -9,9 +9,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/components_base/server/component_heap.hpp>
@@ -25,7 +25,7 @@
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime/components_fwd.hpp>
+#include <hpx/runtime_components/components_fwd.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/type_support/void_guard.hpp>

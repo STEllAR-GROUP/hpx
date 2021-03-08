@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/components_base/traits/managed_component_policies.hpp>
 #include <hpx/lcos/base_lco.hpp>

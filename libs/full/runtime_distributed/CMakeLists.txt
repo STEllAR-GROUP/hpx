@@ -17,6 +17,7 @@ set(runtime_distributed_headers
     hpx/runtime_distributed/get_num_localities.hpp
     hpx/runtime_distributed/find_localities.hpp
     hpx/runtime_distributed/migrate_component.hpp
+    hpx/runtime_distributed/runtime_fwd.hpp
     hpx/runtime_distributed/runtime_support.hpp
     hpx/runtime_distributed/server/copy_component.hpp
     hpx/runtime_distributed/server/migrate_component.hpp

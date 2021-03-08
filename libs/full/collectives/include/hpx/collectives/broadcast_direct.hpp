@@ -129,7 +129,6 @@ namespace hpx { namespace lcos {
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions/transfer_continuation_action.hpp>
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/assert.hpp>
@@ -137,6 +136,7 @@ namespace hpx { namespace lcos {
 #include <hpx/async_colocated/async_colocated.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/async_distributed/apply.hpp>
+#include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>

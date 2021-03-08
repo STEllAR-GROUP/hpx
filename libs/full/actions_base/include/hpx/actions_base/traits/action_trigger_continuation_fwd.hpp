@@ -14,6 +14,6 @@ namespace hpx { namespace traits {
     struct action_trigger_continuation
     {
         template <typename F, typename... Ts>
-        static decltype(auto) call(Continuation&&, F&&, Ts&&...) noexcept;
+        static void call(Continuation&&, F&&, Ts&&...) noexcept;
     };
 }}    // namespace hpx::traits
