@@ -669,44 +669,44 @@ void satisfy_traversal_concept_forward()
     {
         using iterator = std::ostream_iterator<int>;
         HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
-                         boost::forward_traversal_tag>::value),
+                         hpx::forward_traversal_tag>::value),
             "output iterator");
     }
     {
         using iterator = std::istream_iterator<int>;
         HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
-                         boost::forward_traversal_tag>::value),
+                         hpx::forward_traversal_tag>::value),
             "input iterator");
     }
     {
         // see comment on definition for explanation
         using iterator = typename std::forward_list<int>::iterator;
         HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
-                         boost::forward_traversal_tag>::value),
+                         hpx::forward_traversal_tag>::value),
             "forward iterator");
     }
     {
         using iterator = typename std::list<int>::iterator;
         HPX_TEST_MSG((satisfy_traversal_concept<iterator,
-                         boost::forward_traversal_tag>::value),
+                         hpx::forward_traversal_tag>::value),
             "bidirectional iterator");
     }
     {
         using iterator = typename std::vector<int>::iterator;
         HPX_TEST_MSG((satisfy_traversal_concept<iterator,
-                         boost::forward_traversal_tag>::value),
+                         hpx::forward_traversal_tag>::value),
             "random access iterator");
     }
     {
         using iterator = bidirectional_traversal_iterator;
         HPX_TEST_MSG((satisfy_traversal_concept<iterator,
-                         boost::forward_traversal_tag>::value),
+                         hpx::forward_traversal_tag>::value),
             "bidirectional traversal input iterator");
     }
     {
         using iterator = random_access_traversal_iterator;
         HPX_TEST_MSG((satisfy_traversal_concept<iterator,
-                         boost::forward_traversal_tag>::value),
+                         hpx::forward_traversal_tag>::value),
             "random access traversal input iterator");
     }
 }
@@ -718,43 +718,43 @@ void satisfy_traversal_concept_bidirectional()
     {
         using iterator = std::ostream_iterator<int>;
         HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
-                         boost::bidirectional_traversal_tag>::value),
+                         hpx::bidirectional_traversal_tag>::value),
             "output iterator");
     }
     {
         using iterator = std::istream_iterator<int>;
         HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
-                         boost::bidirectional_traversal_tag>::value),
+                         hpx::bidirectional_traversal_tag>::value),
             "input iterator");
     }
     {
         using iterator = typename std::forward_list<int>::iterator;
         HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
-                         boost::bidirectional_traversal_tag>::value),
+                         hpx::bidirectional_traversal_tag>::value),
             "forward iterator");
     }
     {
         using iterator = typename std::list<int>::iterator;
         HPX_TEST_MSG((satisfy_traversal_concept<iterator,
-                         boost::bidirectional_traversal_tag>::value),
+                         hpx::bidirectional_traversal_tag>::value),
             "bidirectional iterator");
     }
     {
         using iterator = typename std::vector<int>::iterator;
         HPX_TEST_MSG((satisfy_traversal_concept<iterator,
-                         boost::bidirectional_traversal_tag>::value),
+                         hpx::bidirectional_traversal_tag>::value),
             "random access iterator");
     }
     {
         using iterator = bidirectional_traversal_iterator;
         HPX_TEST_MSG((satisfy_traversal_concept<iterator,
-                         boost::bidirectional_traversal_tag>::value),
+                         hpx::bidirectional_traversal_tag>::value),
             "bidirectional traversal input iterator");
     }
     {
         using iterator = random_access_traversal_iterator;
         HPX_TEST_MSG((satisfy_traversal_concept<iterator,
-                         boost::bidirectional_traversal_tag>::value),
+                         hpx::bidirectional_traversal_tag>::value),
             "random access traversal input iterator");
     }
 }
@@ -766,43 +766,43 @@ void satisfy_traversal_concept_random_access()
     {
         using iterator = std::ostream_iterator<int>;
         HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
-                         boost::random_access_traversal_tag>::value),
+                         hpx::random_access_traversal_tag>::value),
             "output iterator");
     }
     {
         using iterator = std::istream_iterator<int>;
         HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
-                         boost::random_access_traversal_tag>::value),
+                         hpx::random_access_traversal_tag>::value),
             "input iterator");
     }
     {
         using iterator = typename std::forward_list<int>::iterator;
         HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
-                         boost::random_access_traversal_tag>::value),
+                         hpx::random_access_traversal_tag>::value),
             "forward iterator");
     }
     {
         using iterator = typename std::list<int>::iterator;
         HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
-                         boost::random_access_traversal_tag>::value),
+                         hpx::random_access_traversal_tag>::value),
             "bidirectional iterator");
     }
     {
         using iterator = typename std::vector<int>::iterator;
         HPX_TEST_MSG((satisfy_traversal_concept<iterator,
-                         boost::random_access_traversal_tag>::value),
+                         hpx::random_access_traversal_tag>::value),
             "random access iterator");
     }
     {
         using iterator = bidirectional_traversal_iterator;
         HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
-                         boost::random_access_traversal_tag>::value),
+                         hpx::random_access_traversal_tag>::value),
             "bidirectional traversal input iterator");
     }
     {
         using iterator = random_access_traversal_iterator;
         HPX_TEST_MSG((satisfy_traversal_concept<iterator,
-                         boost::random_access_traversal_tag>::value),
+                         hpx::random_access_traversal_tag>::value),
             "random access traversal input iterator");
     }
 }
