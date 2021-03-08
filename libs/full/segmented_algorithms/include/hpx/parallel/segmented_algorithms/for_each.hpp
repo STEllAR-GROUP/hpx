@@ -179,39 +179,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 },
                 std::move(segments)));
         }
-
-        /// Segmented implementation using for_each.
-        template <typename ExPolicy, typename FwdIter, typename Size,
-            typename F, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        for_each_n_(ExPolicy&& policy, FwdIter first, Size count, F&& f,
-            Proj&& proj, std::false_type);
-
-        template <typename ExPolicy, typename FwdIter, typename Size,
-            typename F, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        for_each_n_(ExPolicy&& policy, FwdIter first, Size count, F&& f,
-            Proj&& proj, std::true_type)
-        {
-            using iterator_traits =
-                hpx::traits::segmented_iterator_traits<FwdIter>;
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
-            if (detail::is_negative(count) || count == 0)
-            {
-                using result =
-                    util::detail::algorithm_result<ExPolicy, FwdIter>;
-                return result::get(std::move(first));
-            }
-
-            auto last = first;
-            detail::advance(last, std::size_t(count));
-            return segmented_for_each(
-                hpx::parallel::v1::detail::for_each<
-                    typename iterator_traits::local_iterator>(),
-                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
-                std::forward<Proj>(proj), is_seq());
-        }
         /// \endcond
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1
@@ -275,6 +242,73 @@ namespace hpx { namespace segmented {
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
 
+        return segmented_for_each(
+            hpx::parallel::v1::detail::for_each<
+                typename iterator_traits::local_iterator>(),
+            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+            hpx::parallel::util::projection_identity(), is_seq());
+    }
+
+    // clang-format off
+    template <typename InIter, typename Size,
+        typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_iterator<InIter>::value &&
+            hpx::traits::is_segmented_iterator<InIter>::value
+        )>
+    // clang-format on
+    InIter tag_invoke(hpx::for_each_n_t, InIter first, Size count, F&& f)
+    {
+        static_assert((hpx::traits::is_input_iterator<InIter>::value),
+            "Requires at least input iterator.");
+
+        using iterator_traits = hpx::traits::segmented_iterator_traits<InIter>;
+
+        if (hpx::parallel::v1::detail::is_negative(count) || count == 0)
+        {
+            return first;
+        }
+
+        auto last = first;
+        hpx::parallel::v1::detail::advance(last, std::size_t(count));
+        return hpx::parallel::v1::detail::segmented_for_each(
+            hpx::parallel::v1::detail::for_each<
+                typename iterator_traits::local_iterator>(),
+            hpx::execution::seq, first, last, std::forward<F>(f),
+            hpx::parallel::util::projection_identity(), std::true_type());
+    }
+
+    // clang-format off
+    template <typename ExPolicy, typename SegIter, typename Size,
+        typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<SegIter>::value &&
+            hpx::traits::is_segmented_iterator<SegIter>::value
+        )>
+    // clang-format on
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        SegIter>::type
+    tag_invoke(
+        hpx::for_each_n_t, ExPolicy&& policy, SegIter first, Size count, F&& f)
+    {
+        static_assert((hpx::traits::is_forward_iterator<SegIter>::value),
+            "Requires at least input iterator.");
+
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        if (hpx::parallel::v1::detail::is_negative(count) || count == 0)
+        {
+            using result =
+                hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                    SegIter>;
+            return result::get(std::move(first));
+        }
+
+        using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
+
+        auto last = first;
+        hpx::parallel::v1::detail::advance(last, std::size_t(count));
         return segmented_for_each(
             hpx::parallel::v1::detail::for_each<
                 typename iterator_traits::local_iterator>(),
