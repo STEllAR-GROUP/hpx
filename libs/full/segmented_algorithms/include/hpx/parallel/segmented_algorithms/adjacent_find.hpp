@@ -297,7 +297,7 @@ namespace hpx { namespace segmented {
 
         if (first == last)
         {
-            return last;
+            return first;
         }
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<InIter>;
@@ -334,7 +334,7 @@ namespace hpx { namespace segmented {
             using result =
                 hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     SegIter>;
-            return result::get(std::move(last));
+            return result::get(std::move(first));
         }
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
