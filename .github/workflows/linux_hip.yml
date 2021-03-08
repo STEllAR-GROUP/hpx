@@ -32,12 +32,4 @@ jobs:
       shell: bash
       run: |
           cmake --build build --target all
-          cmake --build build --target tests.{examples,unit,regression,performance}.modules.{compute,async}_cuda
-    - name: Test
-      shell: bash
-      run: |
-          cd build
-          ctest \
-            --output-on-failure \
-            --tests-regex tests.examples \
-            --exclude-regex "tests.examples.modules.(compute|async)_cuda|tests.examples.transpose.transpose_block_numa"
+          cmake --build build --target tests.{examples,unit,regressions,performance}.modules.{compute,async}_cuda
