@@ -1,5 +1,5 @@
 //  Copyright (c) 2014-2017 Hartmut Kaiser
-//  Copyright (c) 2021      Giannis Gonidelis
+//  Copyright (c)      2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -27,8 +27,6 @@ namespace hpx {
     ///                     input iterator.
     /// \tparam T           The type of the old and new values to replace (deduced).
     ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
@@ -114,8 +112,6 @@ namespace hpx {
     ///                     (deduced).
     /// \tparam T           The type of the new values to replace (deduced).
     ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
@@ -239,8 +235,6 @@ namespace hpx {
     ///                     output iterator.
     /// \tparam T          The type of the old and new values (deduced).
     ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
@@ -751,7 +745,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     }    // namespace detail
 
     // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename Sent,
+    template <typename ExPolicy, typename FwdIter1,
         typename FwdIter2, typename T1, typename T2,
         typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
