@@ -89,6 +89,7 @@ namespace hpx { namespace components { namespace detail {
       , heap_free_function_("wrapper_heap::free", class_name)
     {
         util::itt::heap_internal_access hia;
+        HPX_UNUSED(hia);
         if (!init_pool())
             throw std::bad_alloc();
     }

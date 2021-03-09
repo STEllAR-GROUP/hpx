@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -247,7 +247,8 @@ bool use_ittnotify_api = false;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace itt {
-    domain::domain(char const* name)
+
+    domain::domain(char const* name) noexcept
       : domain_(HPX_ITT_DOMAIN_CREATE(name))
     {
         if (domain_ != nullptr)
@@ -256,15 +257,15 @@ namespace hpx { namespace util { namespace itt {
         }
     }
 
-    domain::domain()
+    domain::domain() noexcept
       : domain_(nullptr)
     {
     }
 
     static thread_local std::unique_ptr<___itt_domain> thread_domain_;
 
-    thread_domain::thread_domain()
-      : domain_()
+    thread_domain::thread_domain() noexcept
+      : domain()
     {
         if (thread_domain_.get() == nullptr)
         {
@@ -280,9 +281,9 @@ namespace hpx { namespace util { namespace itt {
         }
     }
 
-    task::task(domain const& domain, string_handle const& name)
+    task::task(domain const& domain, string_handle const& name) noexcept
       : domain_(domain)
-      , id_(0)
+      , id_(nullptr)
       , sh_(name)
     {
         id_ = HPX_ITT_MAKE_ID(
@@ -291,8 +292,8 @@ namespace hpx { namespace util { namespace itt {
         HPX_ITT_TASK_BEGIN_ID(domain_.domain_, id_, sh_.handle_);
     }
 
-    task::task(
-        domain const& domain, string_handle const& name, std::uint64_t metadata)
+    task::task(domain const& domain, string_handle const& name,
+        std::uint64_t metadata) noexcept
       : domain_(domain)
       , id_(0)
       , sh_(name)
@@ -313,128 +314,130 @@ namespace hpx { namespace util { namespace itt {
 }}}    // namespace hpx::util::itt
 
 ///////////////////////////////////////////////////////////////////////////////
-void itt_sync_create(void* addr, const char* objtype, const char* objname)
+void itt_sync_create(
+    void* addr, const char* objtype, const char* objname) noexcept
 {
     HPX_INTERNAL_ITT_SYNC_CREATE(addr, objtype, objname);
 }
 
-void itt_sync_rename(void* addr, const char* objname)
+void itt_sync_rename(void* addr, const char* objname) noexcept
 {
     HPX_INTERNAL_ITT_SYNC_RENAME(addr, objname);
 }
 
-void itt_sync_prepare(void* addr)
+void itt_sync_prepare(void* addr) noexcept
 {
     HPX_INTERNAL_ITT_SYNC_PREPARE(addr);
 }
 
-void itt_sync_acquired(void* addr)
+void itt_sync_acquired(void* addr) noexcept
 {
     HPX_INTERNAL_ITT_SYNC_ACQUIRED(addr);
 }
 
-void itt_sync_cancel(void* addr)
+void itt_sync_cancel(void* addr) noexcept
 {
     HPX_INTERNAL_ITT_SYNC_CANCEL(addr);
 }
 
-void itt_sync_releasing(void* addr)
+void itt_sync_releasing(void* addr) noexcept
 {
     HPX_INTERNAL_ITT_SYNC_RELEASING(addr);
 }
 
-void itt_sync_released(void* addr)
+void itt_sync_released(void* addr) noexcept
 {
     HPX_INTERNAL_ITT_SYNC_RELEASED(addr);
 }
 
-void itt_sync_destroy(void* addr)
+void itt_sync_destroy(void* addr) noexcept
 {
     HPX_INTERNAL_ITT_SYNC_DESTROY(addr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-__itt_caller itt_stack_create()
+__itt_caller itt_stack_create() noexcept
 {
     return HPX_INTERNAL_ITT_STACK_CREATE();
 }
 
-void itt_stack_enter(__itt_caller ctx)
+void itt_stack_enter(__itt_caller ctx) noexcept
 {
     HPX_INTERNAL_ITT_STACK_ENTER(ctx);
 }
 
-void itt_stack_leave(__itt_caller ctx)
+void itt_stack_leave(__itt_caller ctx) noexcept
 {
     HPX_INTERNAL_ITT_STACK_LEAVE(ctx);
 }
 
-void itt_stack_destroy(__itt_caller ctx)
+void itt_stack_destroy(__itt_caller ctx) noexcept
 {
     HPX_INTERNAL_ITT_STACK_DESTROY(ctx);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void itt_frame_begin(___itt_domain const* domain, ___itt_id* id)
+void itt_frame_begin(___itt_domain const* domain, ___itt_id* id) noexcept
 {
     HPX_INTERNAL_ITT_FRAME_BEGIN(domain, id);
 }
 
-void itt_frame_end(___itt_domain const* domain, ___itt_id* id)
+void itt_frame_end(___itt_domain const* domain, ___itt_id* id) noexcept
 {
     HPX_INTERNAL_ITT_FRAME_END(domain, id);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int itt_mark_create(char const* name)
+int itt_mark_create(char const* name) noexcept
 {
     return HPX_INTERNAL_ITT_MARK_CREATE(name);
 }
 
-void itt_mark_off(int mark)
+void itt_mark_off(int mark) noexcept
 {
     HPX_INTERNAL_ITT_MARK_OFF(mark);
 }
 
-void itt_mark(int mark, char const* par)
+void itt_mark(int mark, char const* par) noexcept
 {
     HPX_INTERNAL_ITT_MARK(mark, par);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void itt_thread_set_name(char const* name)
+void itt_thread_set_name(char const* name) noexcept
 {
     HPX_INTERNAL_ITT_THREAD_SET_NAME(name);
 }
 
-void itt_thread_ignore()
+void itt_thread_ignore() noexcept
 {
     HPX_INTERNAL_ITT_THREAD_IGNORE();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void itt_task_begin(___itt_domain const* domain, ___itt_string_handle* name)
+void itt_task_begin(
+    ___itt_domain const* domain, ___itt_string_handle* name) noexcept
 {
     HPX_INTERNAL_ITT_TASK_BEGIN(domain, name);
 }
 
-void itt_task_begin(
-    ___itt_domain const* domain, ___itt_id* id, ___itt_string_handle* name)
+void itt_task_begin(___itt_domain const* domain, ___itt_id* id,
+    ___itt_string_handle* name) noexcept
 {
     HPX_INTERNAL_ITT_TASK_BEGIN_ID(domain, *id, name);
 }
 
-void itt_task_end(___itt_domain const* domain)
+void itt_task_end(___itt_domain const* domain) noexcept
 {
     HPX_INTERNAL_ITT_TASK_END(domain);
 }
 
-___itt_domain* itt_domain_create(char const* name)
+___itt_domain* itt_domain_create(char const* name) noexcept
 {
     return HPX_INTERNAL_ITT_DOMAIN_CREATE(name);
 }
 
-___itt_string_handle* itt_string_handle_create(char const* name)
+___itt_string_handle* itt_string_handle_create(char const* name) noexcept
 {
     return HPX_INTERNAL_ITT_STRING_HANDLE_CREATE(name);
 }
@@ -444,128 +447,129 @@ ___itt_id* itt_make_id(void* addr, std::size_t extra)
     return new ___itt_id(HPX_INTERNAL_ITT_MAKE_ID(addr, extra));
 }
 
-void itt_id_create(___itt_domain const* domain, ___itt_id* id)
+void itt_id_create(___itt_domain const* domain, ___itt_id* id) noexcept
 {
     HPX_INTERNAL_ITT_ID_CREATE(domain, *id);
 }
 
-void itt_id_destroy(___itt_id* id)
+void itt_id_destroy(___itt_id* id) noexcept
 {
     HPX_INTERNAL_ITT_ID_DESTROY(id);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 __itt_heap_function itt_heap_function_create(
-    const char* name, const char* domain)
+    const char* name, const char* domain) noexcept
 {
     return HPX_INTERNAL_ITT_HEAP_FUNCTION_CREATE(name, domain);
 }
 
-void itt_heap_allocate_begin(__itt_heap_function f, std::size_t size, int init)
+void itt_heap_allocate_begin(
+    __itt_heap_function f, std::size_t size, int init) noexcept
 {
     HPX_INTERNAL_HEAP_ALLOCATE_BEGIN(f, size, init);
 }
 
 void itt_heap_allocate_end(
-    __itt_heap_function f, void** addr, std::size_t size, int init)
+    __itt_heap_function f, void** addr, std::size_t size, int init) noexcept
 {
     HPX_INTERNAL_HEAP_ALLOCATE_END(f, addr, size, init);
 }
 
-void itt_heap_free_begin(__itt_heap_function f, void* addr)
+void itt_heap_free_begin(__itt_heap_function f, void* addr) noexcept
 {
     HPX_INTERNAL_HEAP_FREE_BEGIN(f, addr);
 }
 
-void itt_heap_free_end(__itt_heap_function f, void* addr)
+void itt_heap_free_end(__itt_heap_function f, void* addr) noexcept
 {
     HPX_INTERNAL_HEAP_FREE_END(f, addr);
 }
 
 void itt_heap_reallocate_begin(
-    __itt_heap_function f, void* addr, std::size_t new_size, int init)
+    __itt_heap_function f, void* addr, std::size_t new_size, int init) noexcept
 {
     HPX_INTERNAL_HEAP_REALLOCATE_BEGIN(f, addr, new_size, init);
 }
 
 void itt_heap_reallocate_end(__itt_heap_function f, void* addr, void** new_addr,
-    std::size_t new_size, int init)
+    std::size_t new_size, int init) noexcept
 {
     HPX_INTERNAL_HEAP_REALLOCATE_END(f, addr, new_addr, new_size, init);
 }
 
-void itt_heap_internal_access_begin()
+void itt_heap_internal_access_begin() noexcept
 {
     HPX_INTERNAL_INTERNAL_ACCESS_BEGIN();
 }
 
-void itt_heap_internal_access_end()
+void itt_heap_internal_access_end() noexcept
 {
     HPX_INTERNAL_INTERNAL_ACCESS_END();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-__itt_counter itt_counter_create(char const* name, char const* domain)
+__itt_counter itt_counter_create(char const* name, char const* domain) noexcept
 {
     return HPX_INTERNAL_COUNTER_CREATE(name, domain);
 }
 
 __itt_counter itt_counter_create_typed(
-    char const* name, char const* domain, int type)
+    char const* name, char const* domain, int type) noexcept
 {
     return HPX_INTERNAL_COUNTER_CREATE_TYPED(
         name, domain, (__itt_metadata_type) type);
 }
 
-void itt_counter_destroy(__itt_counter id)
+void itt_counter_destroy(__itt_counter id) noexcept
 {
     HPX_INTERNAL_COUNTER_DESTROY(id);
 }
 
-void itt_counter_set_value(__itt_counter id, void* value_ptr)
+void itt_counter_set_value(__itt_counter id, void* value_ptr) noexcept
 {
     HPX_INTERNAL_COUNTER_SET_VALUE(id, value_ptr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-__itt_event itt_event_create(char const* name, int namelen)
+__itt_event itt_event_create(char const* name, int namelen) noexcept
 {
     return HPX_INTERNAL_EVENT_CREATE(name, namelen);
 }
 
-int itt_event_start(__itt_event evnt)
+int itt_event_start(__itt_event evnt) noexcept
 {
     return HPX_INTERNAL_EVENT_START(evnt);
 }
 
-int itt_event_end(__itt_event evnt)
+int itt_event_end(__itt_event evnt) noexcept
 {
     return HPX_INTERNAL_EVENT_END(evnt);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
-    ___itt_string_handle* key, std::uint64_t const& data)
+    ___itt_string_handle* key, std::uint64_t const& data) noexcept
 {
     HPX_INTERNAL_METADATA_ADD(domain, *id, key, __itt_metadata_u64, 1,
         const_cast<std::uint64_t*>(&data));
 }
 
 void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
-    ___itt_string_handle* key, double const& data)
+    ___itt_string_handle* key, double const& data) noexcept
 {
     HPX_INTERNAL_METADATA_ADD(
         domain, *id, key, __itt_metadata_double, 1, const_cast<double*>(&data));
 }
 
 void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
-    ___itt_string_handle* key, char const* data)
+    ___itt_string_handle* key, char const* data) noexcept
 {
     HPX_INTERNAL_METADATA_STR_ADD(domain, *id, key, data);
 }
 
 void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
-    ___itt_string_handle* key, void const* data)
+    ___itt_string_handle* key, void const* data) noexcept
 {
     HPX_INTERNAL_METADATA_ADD(
         domain, *id, key, __itt_metadata_unknown, 1, const_cast<void*>(data));
