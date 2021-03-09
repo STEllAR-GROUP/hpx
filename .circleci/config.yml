@@ -423,7 +423,8 @@ jobs:
                 --tests-regex tests.unit \
                 --exclude-regex \
               "tests.unit.modules.segmented_algorithms|\
-              tests.unit.modules.compute.numa_allocator"
+              tests.unit.modules.compute.numa_allocator|\
+              tests.unit.resource.scheduler_binding_check"
               ctest \
                 --timeout 120 \
                 -T test \
