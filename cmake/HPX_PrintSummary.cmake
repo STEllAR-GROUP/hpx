@@ -28,6 +28,7 @@ function(create_configuration_summary message module_name)
   get_property(
     _variableNames GLOBAL PROPERTY HPX_MODULE_CONFIG_${module_name_uc}
   )
+  list(SORT _variableNames)
 
   # Only print the module configuration if options specified
   list(LENGTH _variableNames _length)
