@@ -30,6 +30,10 @@ pipeline {
         stage('checkout') {
             steps {
                 dir('hpx') {
+                    sh '''
+                    #!/bin/bash -l
+                    rm -rf *
+                    '''
                     checkout scm
                     echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 }

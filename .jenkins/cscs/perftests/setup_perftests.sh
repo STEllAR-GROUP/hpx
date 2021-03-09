@@ -6,6 +6,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+set -ux
+
 # Clean up old artifacts
 rm -f ./jenkins-hpx* ./*-Testing
 
@@ -33,7 +35,7 @@ build_dir="/dev/shm/hpx/build"
 
 # Copy source directory to /dev/shm for faster builds
 mkdir -p "${build_dir}"
-cp -r "${orig_src_dir}" "${src_dir}"
+rsync -r --exclude=.git "${orig_src_dir}" "${src_dir}"
 
 # Tmp! Will be handled by the python script later
 envfile=${src_dir}/.jenkins/cscs/env-${configuration_name}.sh
