@@ -14,8 +14,6 @@
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/type_support/pack.hpp>
 
-#include <boost/variant.hpp>
-
 #include <exception>
 #include <tuple>
 #include <type_traits>
