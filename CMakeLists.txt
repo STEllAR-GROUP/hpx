@@ -2308,7 +2308,7 @@ hpx_include(Documentation)
 # ##############################################################################
 # Target specification
 # ##############################################################################
-if(HPX_WITH_TOOLS)
+if(HPX_WITH_TOOLS OR HPX_WITH_TESTS_BENCHMARKS)
   add_hpx_pseudo_target(tools)
   add_subdirectory(tools)
 endif()
@@ -2490,10 +2490,6 @@ hpx_option(
 
 if(HPX_WITH_RPM)
   add_subdirectory(cmake/packaging/rpm)
-endif()
-
-if(HPX_WITH_TESTS_BENCHMARKS)
-  add_subdirectory(tools/perftests_ci)
 endif()
 
 # ##############################################################################
