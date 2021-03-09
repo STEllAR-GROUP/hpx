@@ -203,14 +203,17 @@ namespace hpx {
         auto const& configs = hpx::config_registry::get_module_configs();
         for (auto const& c : configs)
         {
-            strm << "Module " << c.module_name << ":\n";
-
-            for (auto const& e : c.config_entries)
+            if (!c.config_entries.empty())
             {
-                strm << "  " << e << std::endl;
-            }
+                strm << "Module " << c.module_name << ":\n";
 
-            strm << "\n";
+                for (auto const& e : c.config_entries)
+                {
+                    strm << "  " << e << std::endl;
+                }
+
+                strm << "\n";
+            }
         }
 
         return strm.str();
