@@ -436,7 +436,7 @@ namespace hpx { namespace util {
             // Always add the option to start the local runtime
             hpx_options.add_options()("hpx:local",
                 "run this instance in local mode (experimental; certain "
-                "functionality not available at runt-time)");
+                "functionality not available at run-time)");
 
             // general options definitions
             // clang-format off
