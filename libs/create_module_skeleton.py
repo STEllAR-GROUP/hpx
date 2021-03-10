@@ -245,7 +245,7 @@ modules_cmakelists += ')\n# cmake-format: on\n'
 
 modules_cmakelists += f'''
 hpx_info("")
-hpx_info("Configuring libhpx{"_" + lib_name if lib_name != "full" else ""} modules:")
+hpx_info("  Configuring libhpx{"_" + lib_name if lib_name != "full" else ""} modules:")
 
 foreach(module ${{_hpx_{lib_name}_modules}})
   add_subdirectory(${{module}})
