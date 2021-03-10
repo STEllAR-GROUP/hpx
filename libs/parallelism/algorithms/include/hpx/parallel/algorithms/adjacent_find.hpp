@@ -219,28 +219,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::move(f1), std::move(f2));
             }
         };
-
-        template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename Pred, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        adjacent_find_(ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred,
-            Proj&& proj, std::false_type)
-        {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Requires at least a forward iterator");
-
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
-            return detail::adjacent_find<FwdIter, Sent>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last,
-                std::forward<Pred>(pred), std::forward<Proj>(proj));
-        }
-
-        template <typename ExPolicy, typename FwdIter, typename Pred,
-            typename Proj>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        adjacent_find_(ExPolicy&& policy, FwdIter first, FwdIter last,
-            Pred&& pred, Proj&& proj, std::true_type);
         /// \endcond
     }    // namespace detail
 
@@ -252,15 +230,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
         adjacent_find(ExPolicy&& policy, FwdIter first, FwdIter last,
             Pred&& pred = Pred())
     {
-        using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::adjacent_find_(std::forward<ExPolicy>(policy), first,
-            last, std::forward<Pred>(pred),
-            hpx::parallel::util::projection_identity{}, is_segmented());
+        return detail::adjacent_find<FwdIter, FwdIter>().call(
+            std::forward<ExPolicy>(policy), is_seq(), first, last,
+            std::forward<Pred>(pred),
+            hpx::parallel::util::projection_identity{});
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -273,19 +252,22 @@ namespace hpx {
     {
     private:
         // clang-format off
-        template <typename FwdIter,
+        template <typename InIter,
             typename Pred = hpx::parallel::v1::detail::equal_to,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_input_iterator<FwdIter>::value
+                hpx::traits::is_input_iterator<InIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_invoke(hpx::adjacent_find_t, FwdIter first,
-            FwdIter last, Pred&& pred = Pred())
+        friend InIter tag_fallback_invoke(hpx::adjacent_find_t, InIter first,
+            InIter last, Pred&& pred = Pred())
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
-            return hpx::parallel::v1::detail::adjacent_find_(
-                hpx::execution::seq, first, last, std::forward<Pred>(pred),
-                hpx::parallel::util::projection_identity{}, is_segmented());
+            static_assert((hpx::traits::is_input_iterator<InIter>::value),
+                "Requires at least input iterator.");
+
+            return parallel::v1::detail::adjacent_find<InIter, InIter>().call(
+                hpx::execution::seq, std::true_type(), first, last,
+                std::forward<Pred>(pred),
+                hpx::parallel::util::projection_identity{});
         }
 
         // clang-format off
@@ -301,11 +283,15 @@ namespace hpx {
         tag_fallback_invoke(hpx::adjacent_find_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, Pred&& pred = Pred())
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
-            return hpx::parallel::v1::detail::adjacent_find_(
-                std::forward<ExPolicy>(policy), first, last,
+            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+                "Requires at least a forward iterator");
+
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+            return parallel::v1::detail::adjacent_find<FwdIter, FwdIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first, last,
                 std::forward<Pred>(pred),
-                hpx::parallel::util::projection_identity{}, is_segmented());
+                hpx::parallel::util::projection_identity{});
         }
     } adjacent_find{};
 }    // namespace hpx

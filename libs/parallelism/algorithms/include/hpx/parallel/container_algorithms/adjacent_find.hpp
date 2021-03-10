@@ -293,10 +293,9 @@ namespace hpx { namespace ranges {
             FwdIter first, Sent last, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
-            return hpx::parallel::v1::detail::adjacent_find_(
-                hpx::execution::seq, first, last, std::forward<Pred>(pred),
-                std::forward<Proj>(proj), is_segmented());
+            return hpx::parallel::v1::detail::adjacent_find<FwdIter, FwdIter>()
+                .call(hpx::execution::seq, std::true_type(), first, last,
+                    std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -321,11 +320,11 @@ namespace hpx { namespace ranges {
             FwdIter first, Sent last, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
-            return hpx::parallel::v1::detail::adjacent_find_(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Pred>(pred), std::forward<Proj>(proj),
-                is_segmented());
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+            return hpx::parallel::v1::detail::adjacent_find<FwdIter, FwdIter>()
+                .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
+                    std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -348,12 +347,16 @@ namespace hpx { namespace ranges {
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
-            using is_segmented =
-                hpx::traits::is_segmented_iterator<iterator_type>;
-            return hpx::parallel::v1::detail::adjacent_find_(
-                hpx::execution::seq, std::begin(rng), std::end(rng),
-                std::forward<Pred>(pred), std::forward<Proj>(proj),
-                is_segmented());
+
+            static_assert(
+                (hpx::traits::is_forward_iterator<iterator_type>::value),
+                "Requires at least forward iterator.");
+
+            return hpx::parallel::v1::detail::adjacent_find<iterator_type,
+                iterator_type>()
+                .call(hpx::execution::seq, std::true_type(), std::begin(rng),
+                    std::end(rng), std::forward<Pred>(pred),
+                    std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -378,12 +381,18 @@ namespace hpx { namespace ranges {
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
-            using is_segmented =
-                hpx::traits::is_segmented_iterator<iterator_type>;
-            return hpx::parallel::v1::detail::adjacent_find_(
-                std::forward<ExPolicy>(policy), std::begin(rng), std::end(rng),
-                std::forward<Pred>(pred), std::forward<Proj>(proj),
-                is_segmented());
+
+            static_assert(
+                (hpx::traits::is_forward_iterator<iterator_type>::value),
+                "Requires at least forward iterator.");
+
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+            return hpx::parallel::v1::detail::adjacent_find<iterator_type,
+                iterator_type>()
+                .call(std::forward<ExPolicy>(policy), is_seq(), std::begin(rng),
+                    std::end(rng), std::forward<Pred>(pred),
+                    std::forward<Proj>(proj));
         }
     } adjacent_find{};
 }}    // namespace hpx::ranges
