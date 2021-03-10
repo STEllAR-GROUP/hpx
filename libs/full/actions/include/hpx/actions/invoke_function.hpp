@@ -12,6 +12,7 @@
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 
+#include <cstddef>
 #include <utility>
 
 namespace hpx { namespace components { namespace server {
@@ -29,6 +30,19 @@ namespace hpx { namespace components { namespace server {
                 return f(std::move(ts)...);
             }
         };
+
+        // simple utility action which invoke an arbitrary global function
+        template <typename F>
+        struct invoke_function_ptr;
+
+        template <typename R, typename... Ts>
+        struct invoke_function_ptr<R (*)(Ts...)>
+        {
+            static R call(std::size_t f, Ts... ts)
+            {
+                return reinterpret_cast<R (*)(Ts...)>(f)(std::move(ts)...);
+            }
+        };
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -39,6 +53,17 @@ namespace hpx { namespace components { namespace server {
                                    F, Ts...),
             &detail::invoke_function<F, Ts...>::call,
             invoke_function_action<F, Ts...>>
+    {
+    };
+
+    // action definition exposing invoke_function_ptr<> that binds a global
+    // function (Note: this assumes global function addresses are the same on
+    // all localities)
+    template <typename R, typename... Ts>
+    struct invoke_function_action<R (*)(Ts...), Ts...>
+      : ::hpx::actions::action<R (*)(std::size_t, Ts...),
+            &detail::invoke_function_ptr<R (*)(Ts...)>::call,
+            invoke_function_action<R (*)(Ts...), Ts...>>
     {
     };
 }}}    // namespace hpx::components::server

@@ -74,7 +74,9 @@ namespace hpx { namespace parallel { namespace execution {
         typename std::enable_if<!hpx::traits::is_action<F>::value>::type
         post_impl(F&& f, Ts&&... ts) const
         {
-            typedef components::server::invoke_function_action<F> action_type;
+            using action_type =
+                components::server::invoke_function_action<std::decay_t<F>,
+                    std::decay_t<Ts>...>;
             policy_.template apply<action_type>(
                 threads::thread_priority::default_, std::forward<F>(f),
                 std::forward<Ts>(ts)...);
@@ -95,7 +97,9 @@ namespace hpx { namespace parallel { namespace execution {
                 F>::type>>::type
         async_execute_impl(F&& f, Ts&&... ts) const
         {
-            typedef components::server::invoke_function_action<F> action_type;
+            using action_type =
+                components::server::invoke_function_action<std::decay_t<F>,
+                    std::decay_t<Ts>...>;
             return policy_.template async<action_type>(
                 launch::async, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
