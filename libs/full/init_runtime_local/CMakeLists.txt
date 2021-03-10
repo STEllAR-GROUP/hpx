@@ -17,7 +17,6 @@ set(init_runtime_local_sources init_runtime_local.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   full init_runtime_local
-  COMPATIBILITY_HEADERS OFF
   GLOBAL_HEADER_GEN ON
   SOURCES ${init_runtime_local_sources}
   HEADERS ${init_runtime_local_headers}
