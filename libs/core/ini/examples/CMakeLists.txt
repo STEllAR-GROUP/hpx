@@ -1,4 +1,4 @@
-# Copyright (c) 2020 The STE||AR-Group
+# Copyright (c) 2020-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,10 +7,7 @@
 if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_target(examples.modules.ini)
   add_hpx_pseudo_dependencies(examples.modules examples.modules.ini)
-  if(HPX_WITH_TESTS
-     AND HPX_WITH_TESTS_EXAMPLES
-     AND HPX_INI_WITH_TESTS
-  )
+  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_pseudo_target(tests.examples.modules.ini)
     add_hpx_pseudo_dependencies(
       tests.examples.modules tests.examples.modules.ini

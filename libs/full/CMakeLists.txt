@@ -32,7 +32,6 @@ set(_hpx_full_modules
     distribution_policies
     executors_distributed
     include
-    ini
     init_runtime
     init_runtime_local
     lcos_distributed

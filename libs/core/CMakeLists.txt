@@ -1,4 +1,4 @@
-# Copyright (c) 2020 The STE||AR-Group
+# Copyright (c) 2020-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,6 +30,7 @@ set(_hpx_core_modules
     functional
     hardware
     hashing
+    ini
     io_service
     iterator_support
     itt_notify
@@ -58,7 +59,7 @@ set(_hpx_core_modules
 # cmake-format: on
 
 hpx_info("")
-hpx_info("  Configuring libhpx_core modules")
+hpx_info("Configuring libhpx_core modules:")
 
 foreach(module ${_hpx_core_modules})
   add_subdirectory(${module})

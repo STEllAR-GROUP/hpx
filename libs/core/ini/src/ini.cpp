@@ -1013,10 +1013,10 @@ namespace hpx { namespace util {
     }
 
     // explicit instantiation for the correct archive types
-    template HPX_EXPORT void section::save(
+    template HPX_CORE_EXPORT void section::save(
         serialization::output_archive&, const unsigned int version) const;
 
-    template HPX_EXPORT void section::load(
+    template HPX_CORE_EXPORT void section::load(
         serialization::input_archive&, const unsigned int version);
 
 }}    // namespace hpx::util

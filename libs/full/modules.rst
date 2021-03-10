@@ -35,7 +35,6 @@ Main |hpx| modules
    /libs/full/distribution_policies/docs/index.rst
    /libs/full/executors_distributed/docs/index.rst
    /libs/full/include/docs/index.rst
-   /libs/full/ini/docs/index.rst
    /libs/full/init_runtime/docs/index.rst
    /libs/full/init_runtime_local/docs/index.rst
    /libs/full/lcos_distributed/docs/index.rst
