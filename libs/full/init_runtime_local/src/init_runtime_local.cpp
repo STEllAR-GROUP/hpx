@@ -25,7 +25,6 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
-#include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/variables_map.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
@@ -44,10 +43,6 @@
 #include <hpx/type_support/pack.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
-
-#include <hpx/program_options/options_description.hpp>
-#include <hpx/program_options/parsers.hpp>
-#include <hpx/program_options/variables_map.hpp>
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__)
 #include <cstdlib>
@@ -71,8 +66,52 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace local {
-    // Print stack trace and exit.
+namespace hpx {
+    namespace detail {
+
+        int init_helper(hpx::program_options::variables_map& /*vm*/,
+            util::function_nonser<int(int, char**)> const& f)
+        {
+            std::string cmdline(
+                hpx::get_config_entry("hpx.reconstructed_cmd_line", ""));
+
+            using namespace hpx::program_options;
+#if defined(HPX_WINDOWS)
+            std::vector<std::string> args = split_winmain(cmdline);
+#else
+            std::vector<std::string> args = split_unix(cmdline);
+#endif
+
+            // Copy all arguments which are not hpx related to a temporary array
+            std::vector<char*> argv(args.size() + 1);
+            std::size_t argcount = 0;
+            for (std::size_t i = 0; i != args.size(); ++i)
+            {
+                if (0 != args[i].find("--hpx:"))
+                {
+                    argv[argcount++] = const_cast<char*>(args[i].data());
+                }
+                else if (6 == args[i].find("positional", 6))
+                {
+                    std::string::size_type p = args[i].find_first_of('=');
+                    if (p != std::string::npos)
+                    {
+                        args[i] = args[i].substr(p + 1);
+                        argv[argcount++] = const_cast<char*>(args[i].data());
+                    }
+                }
+            }
+
+            // add a single nullptr in the end as some application rely on that
+            argv[argcount] = nullptr;
+
+            // Invoke custom startup functions
+            return f(static_cast<int>(argcount), argv.data());
+        }
+    }    // namespace detail
+
+    namespace local {
+        // Print stack trace and exit.
 #if defined(HPX_WINDOWS)
     extern BOOL WINAPI termination_handler(DWORD ctrl_type);
 #else
@@ -108,7 +147,6 @@ namespace hpx { namespace local {
             return -1;
         }
 
-        // TODO
         rt->finalize(0);
 
         return 0;
@@ -188,25 +226,6 @@ namespace hpx { namespace local {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        struct dump_config
-        {
-            dump_config(hpx::runtime const& rt)
-              : rt_(std::cref(rt))
-            {
-            }
-
-            void operator()() const
-            {
-                std::cout << "Configuration after runtime start:\n";
-                std::cout << "----------------------------------\n";
-                rt_.get().get_config().dump(0, std::cout);
-                std::cout << "----------------------------------\n";
-            }
-
-            std::reference_wrapper<hpx::runtime const> rt_;
-        };
-
-        ///////////////////////////////////////////////////////////////////////
         void activate_global_options(
             local::detail::command_line_handling& cmdline)
         {
@@ -237,12 +256,8 @@ namespace hpx { namespace local {
                 cmdline.rtcfg_.get_spinlock_deadlock_detection_limit());
 #endif
 
-            // initialize logging
-            // TODO: Waiting for other PR.
-            //#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-            //util::detail::init_logging(
-            //    cmdline.rtcfg_, cmdline.rtcfg_.mode_ == runtime_mode::console);
-            //#endif
+            // TODO
+            //util::detail::init_logging(cmdline.rtcfg_, true);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -376,11 +391,6 @@ namespace hpx { namespace local {
                 &hpx::detail::get_pu_mask);
             hpx::parallel::execution::detail::set_get_os_thread_count(
                 []() { return hpx::get_os_thread_count(); });
-            hpx::parallel::v1::detail::set_exception_list_termination_handler(
-                &std::terminate);    // TODO
-            hpx::parallel::util::detail::
-                set_parallel_exception_termination_handler(
-                    &std::terminate);    // TODO
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
             unsetenv("LANG");
@@ -423,7 +433,6 @@ namespace hpx { namespace local {
             int result = 0;
             try
             {
-                // make sure the runtime system is not active yet
                 if ((result = ensure_no_runtime_is_up()) != 0)
                 {
                     return result;
@@ -510,46 +519,5 @@ namespace hpx { namespace local {
             return result;
         }
     }    // namespace detail
-
-    namespace detail {
-        int init_helper(hpx::program_options::variables_map& /*vm*/,
-            util::function_nonser<int(int, char**)> const& f)
-        {
-            std::string cmdline(
-                hpx::get_config_entry("hpx.reconstructed_cmd_line", ""));
-
-            using namespace hpx::program_options;
-#if defined(HPX_WINDOWS)
-            std::vector<std::string> args = split_winmain(cmdline);
-#else
-            std::vector<std::string> args = split_unix(cmdline);
-#endif
-
-            // Copy all arguments which are not hpx related to a temporary array
-            std::vector<char*> argv(args.size() + 1);
-            std::size_t argcount = 0;
-            for (std::size_t i = 0; i != args.size(); ++i)
-            {
-                if (0 != args[i].find("--hpx:"))
-                {
-                    argv[argcount++] = const_cast<char*>(args[i].data());
-                }
-                else if (6 == args[i].find("positional", 6))
-                {
-                    std::string::size_type p = args[i].find_first_of('=');
-                    if (p != std::string::npos)
-                    {
-                        args[i] = args[i].substr(p + 1);
-                        argv[argcount++] = const_cast<char*>(args[i].data());
-                    }
-                }
-            }
-
-            // add a single nullptr in the end as some application rely on that
-            argv[argcount] = nullptr;
-
-            // Invoke custom startup functions
-            return f(static_cast<int>(argcount), argv.data());
-        }
-    }    // namespace detail
-}}       // namespace hpx::local
+    }    // namespace local
+}    // namespace hpx
