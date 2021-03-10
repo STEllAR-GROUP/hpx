@@ -21,6 +21,7 @@ add_hpx_module(
   SOURCES ${init_runtime_local_sources}
   HEADERS ${init_runtime_local_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_program_options hpx_runtime_local
+  MODULE_DEPENDENCIES hpx_command_line_handling_local hpx_program_options
+                      hpx_runtime_local
   CMAKE_SUBDIRS examples tests
 )
