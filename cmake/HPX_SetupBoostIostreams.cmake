@@ -4,7 +4,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT TARGET Boost::iostreams)
+if((HPX_WITH_COMPRESSION_BZIP2
+    OR HPX_WITH_COMPRESSION_SNAPPY
+    OR HPX_WITH_COMPRESSION_ZLIB)
+   AND NOT TARGET Boost::iostreams
+)
   find_package(Boost ${Boost_MINIMUM_VERSION} MODULE COMPONENTS iostreams)
 
   if(Boost_IOSTREAMS_FOUND)
