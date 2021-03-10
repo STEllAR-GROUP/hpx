@@ -172,7 +172,6 @@ namespace hpx { namespace util {
             "numa_sensitive = 0",
             "max_background_threads = "
             "${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
-
             "max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:" HPX_PP_STRINGIZE(
                 HPX_PP_EXPAND(HPX_IDLE_LOOP_COUNT_MAX)) "}",
             "max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:" HPX_PP_STRINGIZE(

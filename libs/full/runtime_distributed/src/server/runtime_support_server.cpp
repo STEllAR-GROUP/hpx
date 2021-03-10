@@ -632,8 +632,7 @@ namespace hpx { namespace components { namespace server {
     // Retrieve configuration information
     util::section runtime_support::get_config()
     {
-        return *(
-            get_runtime_distributed().get_config().get_section("application"));
+        return *(get_runtime().get_config().get_section("application"));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -961,8 +960,7 @@ namespace hpx { namespace components { namespace server {
     int runtime_support::load_components()
     {
         // load components now that AGAS is up
-        util::runtime_configuration& ini =
-            get_runtime_distributed().get_config();
+        util::runtime_configuration& ini = get_runtime().get_config();
 
         // first static components
         ini.load_components_static(components::get_static_module_data());

@@ -42,6 +42,7 @@ void print_system_characteristics()
 
     //! -------------------------------------- runtime_configuration
     std::cout << "[Runtime configuration]\n"
+              << "number of localities  : " << cfg.get_num_localities() << "\n"
               << "os thread count       : " << cfg.get_os_thread_count() << "\n"
               << "                        " << hpx::get_os_thread_count()
               << "\n"

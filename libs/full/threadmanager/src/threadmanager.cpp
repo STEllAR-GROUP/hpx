@@ -157,6 +157,11 @@ namespace hpx { namespace threads {
             max_idle_backoff_time, small_stacksize, medium_stacksize,
             large_stacksize, huge_stacksize);
 
+        if (!rtcfg_.enable_networking())
+        {
+            max_background_threads = 0;
+        }
+
         // instantiate the pools
         for (size_t i = 0; i != num_pools; i++)
         {
