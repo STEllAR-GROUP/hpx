@@ -96,7 +96,7 @@ namespace hpx { namespace parallel { namespace util {
             typename std::enable_if<
                 iterator_datapar_compatible<Iter>::value>::type>
         {
-            template <typename Iter_>
+            template <typename Iter_, typename Sent_>
             static bool call(Iter_ const& first, Sent_ const& last)
             {
                 typedef
@@ -104,7 +104,7 @@ namespace hpx { namespace parallel { namespace util {
                 typedef typename traits::vector_pack_type<value_type>::type V;
 
                 return traits::vector_pack_size<V>::value <=
-                    (std::size_t) detail::distance(first, last);
+                    (std::size_t) parallel::v1::detail::distance(first, last);
             }
         };
 
@@ -318,7 +318,7 @@ namespace hpx { namespace parallel { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin loop(
-        parallel::execution::datapar_policy, Begin begin, End end, F&& f)
+        hpx::execution::datapar_policy, Begin begin, End end, F&& f)
     {
         return detail::datapar_loop<Begin>::call(
             begin, end, std::forward<F>(f));
@@ -326,7 +326,7 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin loop(
-        parallel::execution::datapar_task_policy, Begin begin, End end, F&& f)
+        hpx::execution::datapar_task_policy, Begin begin, End end, F&& f)
     {
         return detail::datapar_loop<Begin>::call(
             begin, end, std::forward<F>(f));
