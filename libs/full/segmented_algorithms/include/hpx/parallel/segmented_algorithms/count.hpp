@@ -177,40 +177,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }),
                 segments));
         }
-
-        ///////////////////////////////////////////////////////////////////////
-        // segmented implementation
-        template <typename ExPolicy, typename InIterB, typename InIterE,
-            typename T, typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<InIterB>::difference_type>::type
-        count_(ExPolicy&& policy, InIterB first, InIterE last, T const& value,
-            Proj&& proj, std::true_type)
-        {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
-            using difference_type =
-                typename std::iterator_traits<InIterB>::difference_type;
-
-            if (first == last)
-            {
-                return util::detail::algorithm_result<ExPolicy,
-                    difference_type>::get(difference_type());
-            }
-
-            return segmented_count(count<difference_type>(),
-                std::forward<ExPolicy>(policy), first, last, value,
-                std::forward<Proj>(proj), is_seq());
-        }
-
-        // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename InIterB, typename InIterE,
-            typename T, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<InIterB>::difference_type>::type
-        count_(ExPolicy&& policy, InIterB first, InIterE last, T const& value,
-            Proj&& proj, std::false_type);
-
         /// \endcond
     }    // namespace detail
 
@@ -380,38 +346,134 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 },
                 std::move(segments)));
         }
-
-        template <typename ExPolicy, typename InIterB, typename InIterE,
-            typename F, typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<InIterB>::difference_type>::type
-        count_if_(ExPolicy&& policy, InIterB first, InIterE last, F&& f,
-            Proj&& proj, std::true_type)
-        {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
-            using difference_type =
-                typename std::iterator_traits<InIterB>::difference_type;
-
-            if (first == last)
-            {
-                return util::detail::algorithm_result<ExPolicy,
-                    difference_type>::get(difference_type());
-            }
-
-            return segmented_count_if(count_if<difference_type>(),
-                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
-                std::forward<Proj>(proj), is_seq());
-        }
-
-        // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename InIterB, typename InIterE,
-            typename F, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<InIterB>::difference_type>::type
-        count_if_(ExPolicy&& policy, InIterB first, InIterE last, F&& f,
-            Proj&& proj, std::false_type);
-
         /// \endcond
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1
+
+// The segmented iterators we support all live in namespace hpx::segmented
+namespace hpx { namespace segmented {
+
+    // clang-format off
+    template <typename InIter,
+        typename T,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_iterator<InIter>::value &&
+            hpx::traits::is_segmented_iterator<InIter>::value
+        )>
+    // clang-format on
+    typename std::iterator_traits<InIter>::difference_type tag_invoke(
+        hpx::count_t, InIter first, InIter last, T const& value)
+    {
+        static_assert((hpx::traits::is_input_iterator<InIter>::value),
+            "Requires at least input iterator.");
+
+        using difference_type =
+            typename std::iterator_traits<InIter>::difference_type;
+
+        if (first == last)
+        {
+            return difference_type();
+        }
+
+        return hpx::parallel::v1::detail::segmented_count(
+            hpx::parallel::v1::detail::count<difference_type>(),
+            hpx::execution::seq, first, last, value,
+            hpx::parallel::util::projection_identity(), std::true_type());
+    }
+
+    // clang-format off
+    template <typename ExPolicy, typename SegIter,
+        typename T,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<SegIter>::value &&
+            hpx::traits::is_segmented_iterator<SegIter>::value
+        )>
+    // clang-format on
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        typename std::iterator_traits<SegIter>::difference_type>::type
+    tag_invoke(hpx::count_t, ExPolicy&& policy, SegIter first, SegIter last,
+        T const& value)
+    {
+        static_assert((hpx::traits::is_forward_iterator<SegIter>::value),
+            "Requires at least forward iterator.");
+
+        using difference_type =
+            typename std::iterator_traits<SegIter>::difference_type;
+
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        if (first == last)
+        {
+            return parallel::util::detail::algorithm_result<ExPolicy,
+                difference_type>::get(difference_type());
+        }
+
+        return hpx::parallel::v1::detail::segmented_count(
+            hpx::parallel::v1::detail::count<difference_type>(),
+            std::forward<ExPolicy>(policy), first, last, value,
+            hpx::parallel::util::projection_identity(), is_seq());
+    }
+
+    // clang-format off
+    template <typename InIter,
+        typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_iterator<InIter>::value &&
+            hpx::traits::is_segmented_iterator<InIter>::value
+        )>
+    // clang-format on
+    typename std::iterator_traits<InIter>::difference_type tag_invoke(
+        hpx::count_if_t, InIter first, InIter last, F&& f)
+    {
+        static_assert((hpx::traits::is_input_iterator<InIter>::value),
+            "Requires at least input iterator.");
+
+        using difference_type =
+            typename std::iterator_traits<InIter>::difference_type;
+
+        if (first == last)
+        {
+            return difference_type();
+        }
+
+        return hpx::parallel::v1::detail::segmented_count_if(
+            hpx::parallel::v1::detail::count_if<difference_type>(),
+            hpx::execution::seq, first, last, std::forward<F>(f),
+            hpx::parallel::util::projection_identity(), std::true_type());
+    }
+
+    // clang-format off
+    template <typename ExPolicy, typename SegIter,
+        typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<SegIter>::value &&
+            hpx::traits::is_segmented_iterator<SegIter>::value
+        )>
+    // clang-format on
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        typename std::iterator_traits<SegIter>::difference_type>::type
+    tag_invoke(
+        hpx::count_if_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
+    {
+        static_assert((hpx::traits::is_forward_iterator<SegIter>::value),
+            "Requires at least forward iterator.");
+
+        using difference_type =
+            typename std::iterator_traits<SegIter>::difference_type;
+
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        if (first == last)
+        {
+            return parallel::util::detail::algorithm_result<ExPolicy,
+                difference_type>::get(difference_type());
+        }
+
+        return hpx::parallel::v1::detail::segmented_count_if(
+            hpx::parallel::v1::detail::count_if<difference_type>(),
+            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+            hpx::parallel::util::projection_identity(), is_seq());
+    }
+}}    // namespace hpx::segmented
