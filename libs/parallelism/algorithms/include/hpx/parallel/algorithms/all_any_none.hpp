@@ -341,7 +341,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
             "Required at least forward iterator.");
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -441,7 +441,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
             "Required at least forward iterator.");
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -541,7 +541,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
             "Required at least forward iterator.");
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -578,7 +578,7 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
                 "Required at least forward iterator.");
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::none_of().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last,
@@ -624,7 +624,7 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
                 "Required at least forward iterator.");
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::any_of().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last,
@@ -670,7 +670,7 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
                 "Required at least forward iterator.");
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::all_of().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last,

@@ -350,7 +350,7 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(none_of_t, ExPolicy&& policy, Rng&& rng, F&& f,
             Proj&& proj = Proj())
         {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
@@ -383,7 +383,7 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(none_of_t, ExPolicy&& policy, Iter first, Sent last,
             F&& f, Proj&& proj = Proj())
         {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
                 "Required at least forward iterator.");
@@ -471,7 +471,7 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             static_assert(
                 hpx::traits::is_forward_iterator<iterator_type>::value,
@@ -501,7 +501,7 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(any_of_t, ExPolicy&& policy, Iter first, Sent last,
             F&& f, Proj&& proj = Proj())
         {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
                 "Required at least forward iterator.");
@@ -588,7 +588,7 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             static_assert(
                 hpx::traits::is_forward_iterator<iterator_type>::value,
@@ -618,7 +618,7 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(all_of_t, ExPolicy&& policy, Iter first, Sent last,
             F&& f, Proj&& proj = Proj())
         {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
                 "Required at least forward iterator.");
