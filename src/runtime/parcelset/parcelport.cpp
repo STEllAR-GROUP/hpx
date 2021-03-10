@@ -15,7 +15,7 @@
 #include <hpx/modules/threading.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_local/state.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #if defined(HPX_HAVE_APEX)

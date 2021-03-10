@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,8 +13,8 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
-namespace hpx
-{
+namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing this locality
     ///
@@ -43,5 +43,4 @@ namespace hpx
     ///
     /// \see      \a hpx::find_all_localities(), \a hpx::find_locality()
     HPX_EXPORT naming::id_type find_here(error_code& ec = throws);
-}
-
+}    // namespace hpx

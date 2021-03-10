@@ -8,6 +8,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/include/unordered_map.hpp>
 

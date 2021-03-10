@@ -255,6 +255,12 @@ namespace hpx { namespace agas {
         return detail::get_locality_id(ec);
     }
 
+    std::vector<std::uint32_t> get_all_locality_ids(
+        naming::component_type type, error_code& ec)
+    {
+        return detail::get_all_locality_ids(type, ec);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     naming::gid_type get_next_id(std::size_t count, error_code& ec)
     {

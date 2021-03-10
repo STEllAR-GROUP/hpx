@@ -13,6 +13,7 @@
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components/client_base.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/create_component.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/futures/future.hpp>

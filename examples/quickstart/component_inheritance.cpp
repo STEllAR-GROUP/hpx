@@ -13,6 +13,7 @@
 #include <hpx/iostream.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/runtime.hpp>
 
 #include <vector>
 

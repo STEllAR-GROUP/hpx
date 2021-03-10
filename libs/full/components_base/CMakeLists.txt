@@ -19,6 +19,7 @@ set(components_base_headers
     hpx/components_base/component_commandline.hpp
     hpx/components_base/component_startup_shutdown.hpp
     hpx/components_base/detail/agas_interface_functions.hpp
+    hpx/components_base/generate_unique_ids.hpp
     hpx/components_base/pinned_ptr.hpp
     hpx/components_base/server/abstract_component_base.hpp
     hpx/components_base/server/abstract_migration_support.hpp
@@ -84,6 +85,7 @@ set(components_base_compat_headers
     hpx/traits/component_type_database.hpp => hpx/modules/components_base.hpp
     hpx/traits/is_component.hpp => hpx/modules/components_base.hpp
     hpx/traits/managed_component_policies.hpp => hpx/modules/components_base.hpp
+    hpx/util/generate_unique_ids.hpp => hpx/modules/components_base.hpp
     hpx/util/one_size_heap_list.hpp => hpx/modules/components_base.hpp
 )
 # cmake-format: on
@@ -93,6 +95,7 @@ set(components_base_sources
     agas_interface.cpp
     component_type.cpp
     detail/agas_interface_functions.cpp
+    generate_unique_ids.cpp
     server/component_base.cpp
     server/one_size_heap_list.cpp
     server/wrapper_heap.cpp

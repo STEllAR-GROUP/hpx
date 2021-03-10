@@ -10,7 +10,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/util/thread_aware_timer.hpp>
+#include <hpx/runtime_local/thread_aware_timer.hpp>
 
 #include <cstdint>
 

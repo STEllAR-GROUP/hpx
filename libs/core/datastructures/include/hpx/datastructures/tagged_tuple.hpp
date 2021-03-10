@@ -25,9 +25,9 @@ namespace hpx { namespace util {
       : tagged<hpx::tuple<typename detail::tag_elem<Ts>::type...>,
             typename detail::tag_spec<Ts>::type...>
     {
-        typedef tagged<hpx::tuple<typename detail::tag_elem<Ts>::type...>,
-            typename detail::tag_spec<Ts>::type...>
-            base_type;
+        using base_type =
+            tagged<hpx::tuple<typename detail::tag_elem<Ts>::type...>,
+                typename detail::tag_spec<Ts>::type...>;
 
         template <typename... Ts_>
         tagged_tuple(Ts_&&... ts)
@@ -41,8 +41,8 @@ namespace hpx { namespace util {
         template <typename Tag, typename T>
         struct tagged_type
         {
-            typedef typename std::decay<T>::type decayed_type;
-            typedef typename hpx::util::identity<Tag(decayed_type)>::type type;
+            using decayed_type = typename std::decay<T>::type;
+            using type = typename hpx::util::identity<Tag(decayed_type)>::type;
         };
     }    // namespace detail
 
@@ -51,8 +51,8 @@ namespace hpx { namespace util {
         tagged_tuple<typename detail::tagged_type<Tags, Ts>::type...>
         make_tagged_tuple(Ts&&... ts)
     {
-        typedef tagged_tuple<typename detail::tagged_type<Tags, Ts>::type...>
-            result_type;
+        using result_type =
+            tagged_tuple<typename detail::tagged_type<Tags, Ts>::type...>;
 
         return result_type(std::forward<Ts>(ts)...);
     }
@@ -62,12 +62,13 @@ namespace hpx { namespace util {
         tagged_tuple<typename detail::tagged_type<Tags, Ts>::type...>
         make_tagged_tuple(hpx::tuple<Ts...>&& t)
     {
-        static_assert(sizeof...(Tags) == tuple_size<hpx::tuple<Ts...>>::value,
+        static_assert(
+            sizeof...(Tags) == hpx::tuple_size<hpx::tuple<Ts...>>::value,
             "the number of tags must be identical to the size of the given "
             "tuple");
 
-        typedef tagged_tuple<typename detail::tagged_type<Tags, Ts>::type...>
-            result_type;
+        using result_type =
+            tagged_tuple<typename detail::tagged_type<Tags, Ts>::type...>;
 
         return result_type(std::move(t));
     }
@@ -77,8 +78,8 @@ namespace hpx { namespace util {
         template <typename Tag, std::size_t I, typename Tuple>
         struct tagged_element_type
         {
-            typedef typename hpx::tuple_element<I, Tuple>::type element_type;
-            typedef typename hpx::util::identity<Tag(element_type)>::type type;
+            using element_type = typename hpx::tuple_element<I, Tuple>::type;
+            using type = typename hpx::util::identity<Tag(element_type)>::type;
         };
 
         template <typename Tuple, typename Indices, typename... Tags>
@@ -88,9 +89,8 @@ namespace hpx { namespace util {
         struct tagged_tuple_helper<hpx::tuple<Ts...>, index_pack<Is...>,
             Tags...>
         {
-            typedef tagged_tuple<typename tagged_element_type<Tags, Is,
-                hpx::tuple<Ts...>>::type...>
-                type;
+            using type = tagged_tuple<typename tagged_element_type<Tags, Is,
+                hpx::tuple<Ts...>>::type...>;
         };
     }    // namespace detail
 }}       // namespace hpx::util

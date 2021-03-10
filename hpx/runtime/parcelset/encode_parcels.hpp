@@ -23,7 +23,8 @@
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime_distributed/runtime_fwd.hpp>
+#include <hpx/runtime_local/report_error.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)

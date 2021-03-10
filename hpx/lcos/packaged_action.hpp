@@ -480,7 +480,8 @@ namespace hpx { namespace lcos {
         {
             std::pair<bool, components::pinned_ptr> r;
 
-            if (addr.locality_ == hpx::get_locality())
+            if (naming::get_locality_id_from_gid(addr.locality_) ==
+                agas::get_locality_id())
             {
                 using component_type = typename Action::component_type;
                 HPX_ASSERT(
@@ -584,7 +585,8 @@ namespace hpx { namespace lcos {
         {
             std::pair<bool, components::pinned_ptr> r;
 
-            if (addr.locality_ == hpx::get_locality())
+            if (naming::get_locality_id_from_gid(addr.locality_) ==
+                agas::get_locality_id())
             {
                 using component_type = typename Action::component_type;
                 HPX_ASSERT(

@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2020 Hartmut Kaiser
+//  Copyright (c) 2016-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,8 +15,8 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
-#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
+#include <hpx/runtime_local/runtime_local_fwd.hpp>
 
 #include <algorithm>
 #include <cstddef>

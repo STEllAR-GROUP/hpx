@@ -11,6 +11,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/modules/testing.hpp>
 

@@ -40,8 +40,10 @@
 #include <hpx/runtime_local/debugging.hpp>
 #include <hpx/runtime_local/detail/serialize_exception.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
+#include <hpx/runtime_local/report_error.hpp>
 #include <hpx/runtime_local/runtime_handlers.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
+#include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/string_util/classification.hpp>
@@ -61,6 +63,7 @@
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/components_base/agas_interface.hpp>
+#include <hpx/init_runtime/pre_main.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/naming.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -901,7 +904,8 @@ namespace hpx {
                 {
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
                     LPROGRESS_ << "creating distributed runtime";
-                    rt.reset(new hpx::runtime_distributed(cmdline.rtcfg_));
+                    rt.reset(new hpx::runtime_distributed(
+                        cmdline.rtcfg_, &hpx::detail::pre_main));
                     break;
 #else
                     char const* mode_name =

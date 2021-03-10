@@ -13,6 +13,7 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/naming_base/gid_type.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
 #include <cstddef>
@@ -89,6 +90,21 @@ namespace hpx { namespace agas {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT std::uint32_t get_locality_id(error_code& ec = throws);
+
+    inline hpx::naming::gid_type get_locality()
+    {
+        return naming::get_gid_from_locality_id(get_locality_id());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT std::vector<std::uint32_t> get_all_locality_ids(
+        naming::component_type type, error_code& ec = throws);
+
+    inline std::vector<std::uint32_t> get_all_locality_ids(
+        error_code& ec = throws)
+    {
+        return get_all_locality_ids(naming::component_invalid, ec);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT bool is_local_address_cached(

@@ -18,7 +18,6 @@
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime_fwd.hpp>
 
 #include <system_error>
 #include <type_traits>
@@ -96,7 +95,8 @@ namespace hpx { namespace detail {
             }
 
             std::pair<bool, components::pinned_ptr> r;
-            if (addr.locality_ == hpx::get_locality())
+            if (naming::get_locality_id_from_gid(addr.locality_) ==
+                agas::get_locality_id())
             {
                 using component_type = typename Action::component_type;
                 if (traits::component_supports_migration<
@@ -202,7 +202,8 @@ namespace hpx { namespace detail {
             }
 
             std::pair<bool, components::pinned_ptr> r;
-            if (addr.locality_ == hpx::get_locality())
+            if (naming::get_locality_id_from_gid(addr.locality_) ==
+                agas::get_locality_id())
             {
                 using component_type = typename Action::component_type;
                 if (traits::component_supports_migration<

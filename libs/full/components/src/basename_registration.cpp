@@ -12,7 +12,6 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/find_here.hpp>
 
 #include <cstddef>
 #include <string>
@@ -93,8 +92,7 @@ namespace hpx {
 
         if (sequence_nr == ~static_cast<std::size_t>(0))
         {
-            sequence_nr =
-                std::size_t(naming::get_locality_id_from_id(find_here()));
+            sequence_nr = std::size_t(agas::get_locality_id());
         }
 
         std::string name = detail::name_from_basename(basename, sequence_nr);
@@ -112,8 +110,7 @@ namespace hpx {
 
         if (sequence_nr == ~static_cast<std::size_t>(0))
         {
-            sequence_nr =
-                std::size_t(naming::get_locality_id_from_id(find_here()));
+            sequence_nr = std::size_t(agas::get_locality_id());
         }
 
         std::string name = detail::name_from_basename(basename, sequence_nr);
@@ -142,8 +139,7 @@ namespace hpx {
 
         if (sequence_nr == ~static_cast<std::size_t>(0))
         {
-            sequence_nr =
-                std::size_t(naming::get_locality_id_from_id(find_here()));
+            sequence_nr = std::size_t(agas::get_locality_id());
         }
 
         std::string name = detail::name_from_basename(basename, sequence_nr);

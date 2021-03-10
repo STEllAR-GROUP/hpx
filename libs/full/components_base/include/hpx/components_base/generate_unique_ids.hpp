@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,13 +14,10 @@
 #include <cstddef>
 #include <mutex>
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
+#include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
+
     /// The unique_id_ranges class is a type responsible for generating
     /// unique ids for components, parcels, threads etc.
     class HPX_EXPORT unique_id_ranges
@@ -31,19 +28,24 @@ namespace hpx { namespace util
 
         /// size of the id range returned by command_getidrange
         /// FIXME: is this a policy?
-        enum { range_delta = 0x100000 };
+        enum
+        {
+            range_delta = 0x100000
+        };
 
     public:
         unique_id_ranges()
-          : mtx_(), lower_(0), upper_(0)
-        {}
+          : mtx_()
+          , lower_(0)
+          , upper_(0)
+        {
+        }
 
         /// Generate next unique component id
         naming::gid_type get_id(std::size_t count = 1);
 
         void set_range(
-            naming::gid_type const& lower
-          , naming::gid_type const& upper)
+            naming::gid_type const& lower, naming::gid_type const& upper)
         {
             std::lock_guard<mutex_type> l(mtx_);
             lower_ = lower;
@@ -55,11 +57,6 @@ namespace hpx { namespace util
         naming::gid_type lower_;
         naming::gid_type upper_;
     };
-}}
+}}    // namespace hpx::util
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
-#endif
-
-
-
+#include <hpx/config/warnings_suffix.hpp>

@@ -21,6 +21,7 @@ set(segmented_algorithms_headers
     hpx/parallel/segmented_algorithms/exclusive_scan.hpp
     hpx/parallel/segmented_algorithms/fill.hpp
     hpx/parallel/segmented_algorithms/find.hpp
+    hpx/parallel/segmented_algorithms/functional/segmented_iterator_helpers.hpp
     hpx/parallel/segmented_algorithms/for_each.hpp
     hpx/parallel/segmented_algorithms/generate.hpp
     hpx/parallel/segmented_algorithms/inclusive_scan.hpp

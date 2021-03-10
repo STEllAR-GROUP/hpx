@@ -11,6 +11,7 @@
 #include <hpx/agas_base/detail/bootstrap_locality_namespace.hpp>
 #include <hpx/agas_base/server/locality_namespace.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 
@@ -29,7 +30,7 @@ namespace hpx { namespace agas { namespace detail {
 
     naming::address bootstrap_locality_namespace::addr() const
     {
-        return naming::address(hpx::get_locality(),
+        return naming::address(agas::get_locality(),
             components::component_agas_locality_namespace, this->ptr());
     }
 

@@ -75,6 +75,9 @@ namespace hpx { namespace agas { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     extern HPX_EXPORT std::uint32_t (*get_locality_id)(error_code& ec);
 
+    extern HPX_EXPORT std::vector<std::uint32_t> (*get_all_locality_ids)(
+        naming::component_type type, error_code& ec);
+
     ///////////////////////////////////////////////////////////////////////////
     extern HPX_EXPORT bool (*is_local_address_cached)(
         naming::gid_type const& gid, error_code& ec);

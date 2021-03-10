@@ -12,6 +12,7 @@
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
 #include <hpx/collectives/spmd_block.hpp>
+#include <hpx/runtime_distributed/find_all_localities.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <algorithm>

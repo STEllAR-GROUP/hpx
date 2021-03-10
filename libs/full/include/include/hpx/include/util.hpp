@@ -26,6 +26,7 @@
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/runtime_local/interval_timer.hpp>
+#include <hpx/runtime_local/thread_aware_timer.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
@@ -33,7 +34,6 @@
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/thread_aware_timer.hpp>
 #include <hpx/util/to_string.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)

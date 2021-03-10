@@ -18,6 +18,7 @@
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/runtime_distributed/find_here.hpp>
 #endif
 
 #include <cstddef>

@@ -117,8 +117,13 @@ set(include_headers
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(include_optional_module_dependencies
-      hpx_agas hpx_async_distributed hpx_runtime_components
-      hpx_lcos_distributed hpx_performance_counters hpx_segmented_algorithms
+      hpx_agas
+      hpx_async_distributed
+      hpx_runtime_components
+      hpx_runtime_distributed
+      hpx_lcos_distributed
+      hpx_performance_counters
+      hpx_segmented_algorithms
   )
 endif()
 

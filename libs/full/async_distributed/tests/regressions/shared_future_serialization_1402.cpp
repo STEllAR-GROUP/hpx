@@ -10,6 +10,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/future.hpp>
+#include <hpx/include/runtime.hpp>
 
 struct movable_only
 {

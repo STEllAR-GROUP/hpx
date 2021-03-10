@@ -8,10 +8,11 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx.hpp>
 #include <hpx/future.hpp>
-#include <hpx/modules/actions_base.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/include/client.hpp>
+#include <hpx/include/runtime.hpp>
+#include <hpx/modules/actions_base.hpp>
 
 #include "stubs/throttle.hpp"
 

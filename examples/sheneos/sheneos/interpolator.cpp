@@ -9,6 +9,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos_local.hpp>
+#include <hpx/include/runtime.hpp>
 
 #include <cstddef>
 #include <cstdint>

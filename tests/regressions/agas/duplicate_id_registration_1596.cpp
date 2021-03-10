@@ -11,6 +11,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>

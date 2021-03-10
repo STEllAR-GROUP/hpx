@@ -14,6 +14,7 @@
 #include <hpx/actions/invoke_function.hpp>
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>

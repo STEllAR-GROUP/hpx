@@ -21,7 +21,7 @@
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 

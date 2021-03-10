@@ -1188,8 +1188,8 @@ namespace hpx { namespace components { namespace server {
 
             indirect_packaged_task ipt;
             callbacks.push_back(ipt.get_future());
-            apply_cb(
-                act, id, std::move(ipt), hpx::get_locality(), rtd->endpoints());
+            apply_cb(act, id, std::move(ipt), agas::get_locality(),
+                rtd->endpoints());
         }
 
         wait_all(callbacks);
@@ -1217,7 +1217,7 @@ namespace hpx { namespace components { namespace server {
         // handle console separately
         id_type id = naming::get_id_from_locality_id(0);
         apply_cb(
-            act, id, std::move(ipt), hpx::get_locality(), rtd->endpoints());
+            act, id, std::move(ipt), agas::get_locality(), rtd->endpoints());
 
         callback.wait();
 #endif

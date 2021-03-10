@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,22 +9,22 @@
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 
-namespace hpx { namespace util { namespace functional
-{
+namespace hpx { namespace util { namespace functional {
+
     ///////////////////////////////////////////////////////////////////////////
     struct segmented_iterator_segment
     {
         template <typename Iterator>
         struct apply
         {
-            typedef typename traits::segmented_iterator_traits<
-                    Iterator
-                >::segment_iterator type;
+            using type = typename traits::segmented_iterator_traits<
+                Iterator>::segment_iterator;
 
             template <typename Iter>
             type operator()(Iter iter) const
             {
-                return traits::segmented_iterator_traits<Iterator>::segment(iter);
+                return traits::segmented_iterator_traits<Iterator>::segment(
+                    iter);
             }
         };
     };
@@ -34,9 +34,8 @@ namespace hpx { namespace util { namespace functional
         template <typename Iterator>
         struct apply
         {
-            typedef typename traits::segmented_iterator_traits<
-                    Iterator
-                >::local_iterator type;
+            using type = typename traits::segmented_iterator_traits<
+                Iterator>::local_iterator;
 
             template <typename Iter>
             type operator()(Iter iter) const
@@ -51,9 +50,8 @@ namespace hpx { namespace util { namespace functional
         template <typename Iterator>
         struct apply
         {
-            typedef typename traits::segmented_iterator_traits<
-                    Iterator
-                >::local_iterator type;
+            using type = typename traits::segmented_iterator_traits<
+                Iterator>::local_iterator;
 
             template <typename SegIter>
             type operator()(SegIter iter) const
@@ -68,9 +66,8 @@ namespace hpx { namespace util { namespace functional
         template <typename Iterator>
         struct apply
         {
-            typedef typename traits::segmented_iterator_traits<
-                    Iterator
-                >::local_iterator type;
+            using type = typename traits::segmented_iterator_traits<
+                Iterator>::local_iterator;
 
             template <typename SegIter>
             type operator()(SegIter iter) const
@@ -85,9 +82,8 @@ namespace hpx { namespace util { namespace functional
         template <typename Iterator>
         struct apply
         {
-            typedef typename traits::segmented_iterator_traits<
-                    Iterator
-                >::local_raw_iterator type;
+            using type = typename traits::segmented_iterator_traits<
+                Iterator>::local_raw_iterator;
 
             template <typename LocalSegIter>
             type operator()(LocalSegIter iter) const
@@ -102,9 +98,8 @@ namespace hpx { namespace util { namespace functional
         template <typename Iterator>
         struct apply
         {
-            typedef typename traits::segmented_iterator_traits<
-                    Iterator
-                >::local_raw_iterator type;
+            using type = typename traits::segmented_iterator_traits<
+                Iterator>::local_raw_iterator;
 
             template <typename LocalSegIter>
             type operator()(LocalSegIter iter) const
@@ -113,6 +108,4 @@ namespace hpx { namespace util { namespace functional
             }
         };
     };
-}}}
-
-
+}}}    // namespace hpx::util::functional

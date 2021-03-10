@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
@@ -154,7 +155,8 @@ namespace hpx {
         }
 
         // Determine whether the gid is local or remote
-        if (addr.locality_ == hpx::get_locality())
+        if (naming::get_locality_id_from_gid(addr.locality_) ==
+            agas::get_locality_id())
         {
             // apply locally
             bool result = applier::detail::apply_l_p<Action>(

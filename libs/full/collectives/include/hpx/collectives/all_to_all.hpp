@@ -98,12 +98,12 @@ namespace hpx { namespace lcos {
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime_distributed/get_num_localities.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -218,7 +218,7 @@ namespace hpx { namespace lcos {
     {
         if (this_site == std::size_t(-1))
         {
-            this_site = static_cast<std::size_t>(hpx::get_locality_id());
+            this_site = static_cast<std::size_t>(agas::get_locality_id());
         }
 
         auto all_to_all_data = [this_site](hpx::future<hpx::id_type>&& f,
@@ -254,11 +254,11 @@ namespace hpx { namespace lcos {
         if (num_sites == std::size_t(-1))
         {
             num_sites = static_cast<std::size_t>(
-                hpx::get_num_localities(hpx::launch::sync));
+                agas::get_num_localities(hpx::launch::sync));
         }
         if (this_site == std::size_t(-1))
         {
-            this_site = static_cast<std::size_t>(hpx::get_locality_id());
+            this_site = static_cast<std::size_t>(agas::get_locality_id());
         }
 
         if (this_site == root_site)
@@ -286,7 +286,7 @@ namespace hpx { namespace lcos {
     {
         if (this_site == std::size_t(-1))
         {
-            this_site = static_cast<std::size_t>(hpx::get_locality_id());
+            this_site = static_cast<std::size_t>(agas::get_locality_id());
         }
 
         auto all_to_all_data_direct =
@@ -320,11 +320,11 @@ namespace hpx { namespace lcos {
         if (num_sites == std::size_t(-1))
         {
             num_sites = static_cast<std::size_t>(
-                hpx::get_num_localities(hpx::launch::sync));
+                agas::get_num_localities(hpx::launch::sync));
         }
         if (this_site == std::size_t(-1))
         {
-            this_site = static_cast<std::size_t>(hpx::get_locality_id());
+            this_site = static_cast<std::size_t>(agas::get_locality_id());
         }
 
         if (this_site == root_site)

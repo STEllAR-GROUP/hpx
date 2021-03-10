@@ -21,7 +21,6 @@
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/runtime_fwd.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 
 #include <algorithm>

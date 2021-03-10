@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
+#include <hpx/components_base/generate_unique_ids.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
@@ -21,7 +22,6 @@
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
-#include <hpx/util/generate_unique_ids.hpp>
 
 #include <condition_variable>
 #include <cstddef>
@@ -33,13 +33,20 @@
 #include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx {
-    // \brief Returns if HPX continues past connection signals
-    // caused by crashed nodes
+    // Returns if HPX continues past connection signals caused by crashed nodes
     HPX_EXPORT bool tolerate_node_faults();
+
+    namespace detail {
+
+        // Get access to the registry of registered message handlers
+        HPX_EXPORT std::vector<hpx::tuple<char const*, char const*>>&
+        get_message_handler_registrations();
+    }    // namespace detail
 
     /// The \a runtime class encapsulates the HPX runtime system in a simple to
     /// use way. It makes sure all required parts of the HPX runtime system are
@@ -51,7 +58,8 @@ namespace hpx {
         ///
         /// \param locality_mode  [in] This is the mode the given runtime
         ///                       instance should be executed in.
-        explicit runtime_distributed(util::runtime_configuration& rtcfg);
+        explicit runtime_distributed(util::runtime_configuration& rtcfg,
+            int (*pre_main)(runtime_mode) = nullptr);
 
         /// \brief The destructor makes sure all HPX runtime services are
         ///        properly shut down before exiting.
@@ -352,6 +360,8 @@ namespace hpx {
 
         lcos::future<std::uint32_t> get_num_localities() const override;
 
+        std::string get_locality_name() const override;
+
         std::uint32_t get_num_localities(hpx::launch::sync_policy,
             components::component_type type, error_code& ec) const;
 
@@ -407,6 +417,8 @@ namespace hpx {
 
         std::unique_ptr<components::server::runtime_support> runtime_support_;
         std::shared_ptr<util::query_counters> active_counters_;
+
+        int (*pre_main_)(runtime_mode);
     };
 }    // namespace hpx
 

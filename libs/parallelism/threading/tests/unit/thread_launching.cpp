@@ -9,6 +9,7 @@
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <cmath>
 #include <functional>
 #include <string>
 #include <vector>

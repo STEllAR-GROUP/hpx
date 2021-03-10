@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,6 +19,7 @@
 #include <cstdint>
 
 namespace hpx {
+
     /// \brief Asynchronously return the number of localities which are
     ///        currently registered for the running application.
     ///

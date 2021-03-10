@@ -9,8 +9,8 @@
 #include <hpx/async_distributed/continuation2_impl.hpp>
 #include <hpx/async_distributed/continuation_impl.hpp>
 #include <hpx/async_distributed/set_lco_value_continuation.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/find_here.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -28,7 +28,8 @@ namespace hpx {
     {
         using cont_type = typename std::decay<Cont>::type;
         return hpx::actions::continuation_impl<cont_type>(
-            std::forward<Cont>(cont), hpx::find_here());
+            std::forward<Cont>(cont),
+            naming::get_id_from_locality_id(agas::get_locality_id()));
     }
 
     template <typename Cont>
@@ -51,7 +52,9 @@ namespace hpx {
         using function_type = typename std::decay<F>::type;
 
         return hpx::actions::continuation2_impl<cont_type, function_type>(
-            std::forward<Cont>(cont), hpx::find_here(), std::forward<F>(f));
+            std::forward<Cont>(cont),
+            naming::get_id_from_locality_id(agas::get_locality_id()),
+            std::forward<F>(f));
     }
 
     template <typename Cont, typename F>

@@ -17,6 +17,7 @@
 #include <hpx/iostream.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/parallel_executors.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/include/util.hpp>
 
 #include <cstddef>

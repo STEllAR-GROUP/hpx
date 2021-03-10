@@ -8,6 +8,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/runtime.hpp>
 
 #include <string>
 #include <vector>

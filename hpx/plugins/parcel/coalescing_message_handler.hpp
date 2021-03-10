@@ -11,11 +11,11 @@
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
 
 #include <hpx/functional/function.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
+#include <hpx/runtime_local/pool_timer.hpp>
 #include <hpx/statistics/histogram.hpp>
-#include <hpx/util/pool_timer.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 
 #include <hpx/plugins/parcel/message_buffer.hpp>
 

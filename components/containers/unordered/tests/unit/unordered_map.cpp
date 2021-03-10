@@ -7,6 +7,7 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/include/traits.hpp>
 #include <hpx/include/unordered_map.hpp>
 #include <hpx/modules/testing.hpp>

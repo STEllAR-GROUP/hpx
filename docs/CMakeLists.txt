@@ -8,10 +8,6 @@
 set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/components/component_storage/include/hpx/components/component_storage/migrate_from_storage.hpp"
     "${PROJECT_SOURCE_DIR}/components/component_storage/include/hpx/components/component_storage/migrate_to_storage.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime_fwd.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/find_here.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/find_all_localities.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/get_locality_name.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/set_parcel_write_handler.hpp"
 )
 
