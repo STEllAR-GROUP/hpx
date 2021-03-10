@@ -52,6 +52,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       hello_world_distributed
       interest_calculator
       interval_timer
+      invoke_function
       latch_remote
       local_channel_docs
       local_channel

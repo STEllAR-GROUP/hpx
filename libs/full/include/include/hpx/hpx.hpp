@@ -28,6 +28,7 @@
 #include <hpx/modules/errors.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/include/components.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #endif

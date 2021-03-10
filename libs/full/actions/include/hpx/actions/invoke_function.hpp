@@ -12,6 +12,7 @@
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 
+#include <cstddef>
 #include <utility>
 
 namespace hpx { namespace components { namespace server {
@@ -24,9 +25,9 @@ namespace hpx { namespace components { namespace server {
         struct invoke_function
         {
             static typename util::invoke_result<F, Ts...>::type call(
-                F f, Ts... ts)
+                std::size_t f, Ts... ts)
             {
-                return f(std::move(ts)...);
+                return reinterpret_cast<F>(f)(std::move(ts)...);
             }
         };
     }    // namespace detail
@@ -36,7 +37,7 @@ namespace hpx { namespace components { namespace server {
     template <typename F, typename... Ts>
     struct invoke_function_action
       : ::hpx::actions::action<typename util::invoke_result<F, Ts...>::type (*)(
-                                   F, Ts...),
+                                   std::size_t, Ts...),
             &detail::invoke_function<F, Ts...>::call,
             invoke_function_action<F, Ts...>>
     {
