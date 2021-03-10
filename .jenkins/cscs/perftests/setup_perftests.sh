@@ -30,13 +30,13 @@ source .jenkins/cscs/slurm-constraint-${configuration_name}.sh
 logfile=jenkins-hpx-${configuration_name}.out
 
 orig_src_dir="$(pwd)"
-src_dir="/dev/shm/hpx/src"
+# Temporary solution cannot
+#src_dir="/dev/shm/hpx/src"
+src_dir="${orig_src_dir}"
 build_dir="/dev/shm/hpx/build"
 
 # Copy source directory to /dev/shm for faster builds
 mkdir -p "${build_dir}"
-rsync -r --exclude=.git "${orig_src_dir}" "${src_dir}"
-
 # Tmp! Will be handled by the python script later
 envfile=${src_dir}/.jenkins/cscs/env-${configuration_name}.sh
 
