@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c)      2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -301,6 +302,7 @@ void test_replace_if_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_replace_if_exception(IteratorTag());
     test_replace_if_exception(seq, IteratorTag());
     test_replace_if_exception(par, IteratorTag());
 
@@ -320,6 +322,38 @@ void replace_if_exception_test()
 }
 
 //////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_replace_if_bad_alloc(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    bool caught_bad_alloc = false;
+    try
+    {
+        hpx::ranges::replace_if(hpx::util::make_iterator_range(
+                                    decorated_iterator(std::begin(c),
+                                        []() { throw std::bad_alloc(); }),
+                                    decorated_iterator(std::end(c))),
+            equal_f(42), std::size_t(43));
+        HPX_TEST(false);
+    }
+    catch (std::bad_alloc const&)
+    {
+        caught_bad_alloc = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_bad_alloc);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_replace_if_bad_alloc(ExPolicy policy, IteratorTag)
 {
@@ -402,6 +436,7 @@ void test_replace_if_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_replace_if_bad_alloc(IteratorTag());
     test_replace_if_bad_alloc(seq, IteratorTag());
     test_replace_if_bad_alloc(par, IteratorTag());
 
