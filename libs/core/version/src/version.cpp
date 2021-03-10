@@ -43,6 +43,7 @@
 
 #include <hwloc.h>
 
+#include <algorithm>
 #include <cstdint>
 #include <sstream>
 #include <string>
@@ -161,11 +162,13 @@ namespace hpx {
 
         strm << "Core library:\n";
 
-        char const* const* p = hpx::config_strings;
-        while (*p)
-            strm << "  " << *p++ << "\n";
-        strm << "\n";
-
+#if defined(HPX_AGAS_LOCAL_CACHE_SIZE)
+        strm << "  HPX_AGAS_LOCAL_CACHE_SIZE=" << HPX_AGAS_LOCAL_CACHE_SIZE
+             << "\n";
+#endif
+#if defined(HPX_HAVE_MALLOC)
+        strm << "  HPX_HAVE_MALLOC=" << HPX_HAVE_MALLOC << "\n";
+#endif
 #if defined(HPX_PARCEL_MAX_CONNECTIONS)
         strm << "  HPX_PARCEL_MAX_CONNECTIONS=" << HPX_PARCEL_MAX_CONNECTIONS
              << "\n";
@@ -173,13 +176,6 @@ namespace hpx {
 #if defined(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY)
         strm << "  HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY="
              << HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY << "\n";
-#endif
-#if defined(HPX_AGAS_LOCAL_CACHE_SIZE)
-        strm << "  HPX_AGAS_LOCAL_CACHE_SIZE=" << HPX_AGAS_LOCAL_CACHE_SIZE
-             << "\n";
-#endif
-#if defined(HPX_HAVE_MALLOC)
-        strm << "  HPX_HAVE_MALLOC=" << HPX_HAVE_MALLOC << "\n";
 #endif
 
         const char* prefix = util::hpx_prefix();
@@ -199,9 +195,16 @@ namespace hpx {
         }
         strm << "\n";
 
+        char const* const* p = hpx::config_strings;
+        while (*p)
+            strm << "  " << *p++ << "\n";
+        strm << "\n";
+
         // print module configurations
-        auto const& configs = hpx::config_registry::get_module_configs();
-        for (auto const& c : configs)
+        auto configs = hpx::config_registry::get_module_configs();
+        std::sort(configs.begin(), configs.end(),
+            [](auto& a, auto& b) { return a.module_name < b.module_name; });
+        for (auto& c : configs)
         {
             if (!c.config_entries.empty())
             {
