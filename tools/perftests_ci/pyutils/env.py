@@ -24,7 +24,7 @@ def load(envfile):
 
     envdir, envfile = os.path.split(envfile)
     output = runtools.run(
-        ['bash', '-c', f'set -e && source {envfile} && env -0'],
+        ['bash', '-l', '-c', f'set -e && source {envfile} && env -0'],
         cwd=envdir).strip('\0')
     env.update(line.split('=', 1) for line in output.split('\0'))
 
