@@ -47,7 +47,6 @@ Main |hpx| modules
    /libs/full/resource_partitioner/docs/index.rst
    /libs/full/runtime_components/docs/index.rst
    /libs/full/runtime_configuration/docs/index.rst
-   /libs/full/runtime_configuration_local/docs/index.rst
    /libs/full/runtime_distributed/docs/index.rst
    /libs/full/runtime_local/docs/index.rst
    /libs/full/segmented_algorithms/docs/index.rst

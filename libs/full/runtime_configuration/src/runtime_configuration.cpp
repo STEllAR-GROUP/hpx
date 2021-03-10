@@ -18,7 +18,6 @@
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
-#include <hpx/runtime_configuration_local/runtime_configuration_local.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/version.hpp>
 
@@ -172,11 +171,7 @@ namespace hpx { namespace util {
             "pu_offset = 0",
             "numa_sensitive = 0",
             "max_background_threads = "
-#if defined(HPX_HAVE_NETWORKING)
             "${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
-#else
-            "0",
-#endif
 
             "max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:" HPX_PP_STRINGIZE(
                 HPX_PP_EXPAND(HPX_IDLE_LOOP_COUNT_MAX)) "}",
@@ -361,6 +356,158 @@ namespace hpx { namespace util {
         this->parse("<static defaults>", lines, false, false, false);
 
         need_to_call_pre_initialize = false;
+    }
+
+    void runtime_configuration::post_initialize_ini(std::string& hpx_ini_file_,
+        std::vector<std::string> const& cmdline_ini_defs_)
+    {
+        util::init_ini_data_base(*this, hpx_ini_file_);
+        need_to_call_pre_initialize = true;
+
+        // let the command line override the config file.
+        if (!cmdline_ini_defs_.empty())
+        {
+            // do not weed out comments
+            this->parse(
+                "<command line definitions>", cmdline_ini_defs_, true, false);
+            need_to_call_pre_initialize = true;
+        }
+    }
+
+    void runtime_configuration::pre_initialize_logging_ini()
+    {
+        std::vector<std::string> lines = {
+        // clang-format off
+#if defined(HPX_HAVE_LOGGING)
+#define HPX_TIMEFORMAT "$hh:$mm.$ss.$mili"
+            // general logging
+            "[hpx.logging]",
+            "level = ${HPX_LOGLEVEL:0}",
+            "destination = ${HPX_LOGDESTINATION:console}",
+            "format = ${HPX_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                HPX_TIMEFORMAT ") [%idx%]|\\n}",
+
+            // general console logging
+            "[hpx.logging.console]",
+            "level = ${HPX_LOGLEVEL:$[hpx.logging.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_LOGDESTINATION:"
+                "file(hpx.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_LOGFORMAT:|}",
+
+            // logging related to timing
+            "[hpx.logging.timing]",
+            "level = ${HPX_TIMING_LOGLEVEL:-1}",
+            "destination = ${HPX_TIMING_LOGDESTINATION:console}",
+            "format = ${HPX_TIMING_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                HPX_TIMEFORMAT ") [%idx%] [TIM] |\\n}",
+
+            // console logging related to timing
+            "[hpx.logging.console.timing]",
+            "level = ${HPX_TIMING_LOGLEVEL:$[hpx.logging.timing.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:"
+                "file(hpx.timing.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_TIMING_LOGFORMAT:|}",
+
+            // logging related to AGAS
+            "[hpx.logging.agas]",
+            "level = ${HPX_AGAS_LOGLEVEL:-1}",
+            "destination = ${HPX_AGAS_LOGDESTINATION:"
+                "file(hpx.agas.$[system.pid].log)}",
+            "format = ${HPX_AGAS_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                    HPX_TIMEFORMAT ") [%idx%][AGAS] |\\n}",
+
+            // console logging related to AGAS
+            "[hpx.logging.console.agas]",
+            "level = ${HPX_AGAS_LOGLEVEL:$[hpx.logging.agas.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:"
+                "file(hpx.agas.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_AGAS_LOGFORMAT:|}",
+
+            // logging related to the parcel transport
+            "[hpx.logging.parcel]",
+            "level = ${HPX_PARCEL_LOGLEVEL:-1}",
+            "destination = ${HPX_PARCEL_LOGDESTINATION:"
+                "file(hpx.parcel.$[system.pid].log)}",
+            "format = ${HPX_PARCEL_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                HPX_TIMEFORMAT ") [%idx%][  PT] |\\n}",
+
+            // console logging related to the parcel transport
+            "[hpx.logging.console.parcel]",
+            "level = ${HPX_PARCEL_LOGLEVEL:$[hpx.logging.parcel.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:"
+                "file(hpx.parcel.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_PARCEL_LOGFORMAT:|}",
+
+            // logging related to applications
+            "[hpx.logging.application]",
+            "level = ${HPX_APP_LOGLEVEL:-1}",
+            "destination = ${HPX_APP_LOGDESTINATION:console}",
+            "format = ${HPX_APP_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                HPX_TIMEFORMAT ") [%idx%] [APP] |\\n}",
+
+            // console logging related to applications
+            "[hpx.logging.console.application]",
+            "level = ${HPX_APP_LOGLEVEL:$[hpx.logging.application.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:"
+                "file(hpx.application.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_APP_LOGFORMAT:|}",
+
+            // logging of debug channel
+            "[hpx.logging.debuglog]",
+            "level = ${HPX_DEB_LOGLEVEL:-1}",
+            "destination = ${HPX_DEB_LOGDESTINATION:console}",
+            "format = ${HPX_DEB_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                HPX_TIMEFORMAT ") [%idx%] [DEB] |\\n}",
+
+            "[hpx.logging.console.debuglog]",
+            "level = ${HPX_DEB_LOGLEVEL:$[hpx.logging.debuglog.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:"
+                "file(hpx.debuglog.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_DEB_LOGFORMAT:|}"
+
+#undef HPX_TIMEFORMAT
+#endif
+            // clang-format on
+        };
+
+        // don't overload user overrides
+        this->parse("<static logging defaults>", lines, false, false);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -548,12 +695,62 @@ namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     runtime_configuration::runtime_configuration(
         char const* argv0_, runtime_mode mode)
-      : hpx::local::detail::runtime_configuration(argv0_, false)
-      , mode_(mode)
+      : mode_(mode)
       , num_localities(0)
+      , small_stacksize(HPX_SMALL_STACK_SIZE)
+      , medium_stacksize(HPX_MEDIUM_STACK_SIZE)
+      , large_stacksize(HPX_LARGE_STACK_SIZE)
+      , huge_stacksize(HPX_HUGE_STACK_SIZE)
+      , need_to_call_pre_initialize(true)
+#if defined(__linux) || defined(linux) || defined(__linux__)
+      , argv0(argv0_)
+#endif
     {
-        need_to_call_pre_initialize = true;
         pre_initialize_ini();
+
+        // set global config options
+#if HPX_HAVE_ITTNOTIFY != 0
+        use_ittnotify_api = get_itt_notify_mode();
+#endif
+        HPX_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
+
+        small_stacksize = init_small_stack_size();
+        medium_stacksize = init_medium_stack_size();
+        large_stacksize = init_large_stack_size();
+        HPX_ASSERT(init_huge_stack_size() <= HPX_HUGE_STACK_SIZE);
+        huge_stacksize = init_huge_stack_size();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void runtime_configuration::reconfigure(std::string const& hpx_ini_file_)
+    {
+        hpx_ini_file = hpx_ini_file_;
+        reconfigure();
+    }
+
+    void runtime_configuration::reconfigure(
+        std::vector<std::string> const& cmdline_ini_defs_)
+    {
+        cmdline_ini_defs = cmdline_ini_defs_;
+        reconfigure();
+    }
+
+    void runtime_configuration::reconfigure()
+    {
+        pre_initialize_ini();
+        pre_initialize_logging_ini();
+        post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
+
+        // set global config options
+#if HPX_HAVE_ITTNOTIFY != 0
+        use_ittnotify_api = get_itt_notify_mode();
+#endif
+        HPX_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
+
+        small_stacksize = init_small_stack_size();
+        medium_stacksize = init_medium_stack_size();
+        large_stacksize = init_large_stack_size();
+        huge_stacksize = init_huge_stack_size();
     }
 
     std::size_t runtime_configuration::get_ipc_data_buffer_cache_size() const
@@ -768,6 +965,39 @@ namespace hpx { namespace util {
         return HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS;
     }
 
+    bool runtime_configuration::get_itt_notify_mode() const
+    {
+#if HPX_HAVE_ITTNOTIFY != 0
+        if (has_section("hpx"))
+        {
+            util::section const* sec = get_section("hpx");
+            if (nullptr != sec)
+            {
+                return hpx::util::get_entry_as<int>(
+                           *sec, "use_itt_notify", 0) != 0;
+            }
+        }
+#endif
+        return false;
+    }
+
+    // Enable lock detection during suspension
+    bool runtime_configuration::enable_lock_detection() const
+    {
+#ifdef HPX_HAVE_VERIFY_LOCKS
+        if (has_section("hpx"))
+        {
+            util::section const* sec = get_section("hpx");
+            if (nullptr != sec)
+            {
+                return hpx::util::get_entry_as<int>(
+                           *sec, "lock_detection", 0) != 0;
+            }
+        }
+#endif
+        return false;
+    }
+
     // Enable global lock tracking
     bool runtime_configuration::enable_global_lock_detection() const
     {
@@ -785,6 +1015,144 @@ namespace hpx { namespace util {
         return false;
     }
 
+    // Enable minimal deadlock detection for HPX threads
+    bool runtime_configuration::enable_minimal_deadlock_detection() const
+    {
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
+        if (has_section("hpx"))
+        {
+            util::section const* sec = get_section("hpx");
+            if (nullptr != sec)
+            {
+#ifdef HPX_DEBUG
+                return hpx::util::get_entry_as<int>(
+                           *sec, "minimal_deadlock_detection", 1) != 0;
+#else
+                return hpx::util::get_entry_as<int>(
+                           *sec, "minimal_deadlock_detection", 0) != 0;
+#endif
+            }
+        }
+
+#ifdef HPX_DEBUG
+        return true;
+#else
+        return false;
+#endif
+
+#else
+        return false;
+#endif
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool runtime_configuration::enable_spinlock_deadlock_detection() const
+    {
+#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
+        if (has_section("hpx"))
+        {
+            util::section const* sec = get_section("hpx");
+            if (nullptr != sec)
+            {
+#ifdef HPX_DEBUG
+                return hpx::util::get_entry_as<int>(
+                           *sec, "spinlock_deadlock_detection", 1) != 0;
+#else
+                return hpx::util::get_entry_as<int>(
+                           *sec, "spinlock_deadlock_detection", 0) != 0;
+#endif
+            }
+        }
+
+#ifdef HPX_DEBUG
+        return true;
+#else
+        return false;
+#endif
+
+#else
+        return false;
+#endif
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::size_t runtime_configuration::get_spinlock_deadlock_detection_limit()
+        const
+    {
+#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
+        if (has_section("hpx"))
+        {
+            util::section const* sec = get_section("hpx");
+            if (nullptr != sec)
+            {
+                return hpx::util::get_entry_as<std::size_t>(*sec,
+                    "spinlock_deadlock_detection_limit",
+                    HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT);
+            }
+        }
+        return HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT;
+#else
+        return std::size_t(-1);
+#endif
+    }
+
+    std::size_t runtime_configuration::trace_depth() const
+    {
+        if (has_section("hpx"))
+        {
+            util::section const* sec = get_section("hpx");
+            if (nullptr != sec)
+            {
+                return hpx::util::get_entry_as<std::size_t>(
+                    *sec, "trace_depth", HPX_HAVE_THREAD_BACKTRACE_DEPTH);
+            }
+        }
+        return HPX_HAVE_THREAD_BACKTRACE_DEPTH;
+    }
+
+    std::size_t runtime_configuration::get_os_thread_count() const
+    {
+        if (has_section("hpx"))
+        {
+            util::section const* sec = get_section("hpx");
+            if (nullptr != sec)
+            {
+                return hpx::util::get_entry_as<std::size_t>(
+                    *sec, "os_threads", 1);
+            }
+        }
+        return 1;
+    }
+
+    std::string runtime_configuration::get_cmd_line() const
+    {
+        if (has_section("hpx"))
+        {
+            util::section const* sec = get_section("hpx");
+            if (nullptr != sec)
+            {
+                return sec->get_entry("cmd_line", "");
+            }
+        }
+        return "";
+    }
+
+    // Return the configured sizes of any of the know thread pools
+    std::size_t runtime_configuration::get_thread_pool_size(
+        char const* poolname) const
+    {
+        if (has_section("hpx.threadpools"))
+        {
+            util::section const* sec = get_section("hpx.threadpools");
+            if (nullptr != sec)
+            {
+                return hpx::util::get_entry_as<std::size_t>(
+                    *sec, std::string(poolname) + "_size", 2);
+            }
+        }
+        return 2;    // the default size for all pools is 2
+    }
+
     // Return the endianness to be used for out-serialization
     std::string runtime_configuration::get_endian_out() const
     {
@@ -798,6 +1166,66 @@ namespace hpx { namespace util {
             }
         }
         return endian::native == endian::big ? "big" : "little";
+    }
+
+    // Will return the stack size to use for all HPX-threads.
+    std::ptrdiff_t runtime_configuration::init_stack_size(char const* entryname,
+        char const* defaultvaluestr, std::ptrdiff_t defaultvalue) const
+    {
+        if (has_section("hpx"))
+        {
+            util::section const* sec = get_section("hpx.stacks");
+            if (nullptr != sec)
+            {
+                std::string entry = sec->get_entry(entryname, defaultvaluestr);
+                char* endptr = nullptr;
+                std::ptrdiff_t val =
+                    std::strtoll(entry.c_str(), &endptr, /*base:*/ 0);
+                return endptr != entry.c_str() ? val : defaultvalue;
+            }
+        }
+        return defaultvalue;
+    }
+
+#if defined(__linux) || defined(linux) || defined(__linux__) ||                \
+    defined(__FreeBSD__)
+    bool runtime_configuration::use_stack_guard_pages() const
+    {
+        if (has_section("hpx"))
+        {
+            util::section const* sec = get_section("hpx.stacks");
+            if (nullptr != sec)
+            {
+                return hpx::util::get_entry_as<int>(
+                           *sec, "use_guard_pages", 1) != 0;
+            }
+        }
+        return true;    // default is true
+    }
+#endif
+
+    std::ptrdiff_t runtime_configuration::init_small_stack_size() const
+    {
+        return init_stack_size("small_size",
+            HPX_PP_STRINGIZE(HPX_SMALL_STACK_SIZE), HPX_SMALL_STACK_SIZE);
+    }
+
+    std::ptrdiff_t runtime_configuration::init_medium_stack_size() const
+    {
+        return init_stack_size("medium_size",
+            HPX_PP_STRINGIZE(HPX_MEDIUM_STACK_SIZE), HPX_MEDIUM_STACK_SIZE);
+    }
+
+    std::ptrdiff_t runtime_configuration::init_large_stack_size() const
+    {
+        return init_stack_size("large_size",
+            HPX_PP_STRINGIZE(HPX_LARGE_STACK_SIZE), HPX_LARGE_STACK_SIZE);
+    }
+
+    std::ptrdiff_t runtime_configuration::init_huge_stack_size() const
+    {
+        return init_stack_size("huge_size",
+            HPX_PP_STRINGIZE(HPX_HUGE_STACK_SIZE), HPX_HUGE_STACK_SIZE);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -833,5 +1261,52 @@ namespace hpx { namespace util {
             }
         }
         return HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE;    // default is 1GByte
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool runtime_configuration::load_application_configuration(
+        char const* filename, error_code& ec)
+    {
+        try
+        {
+            section appcfg(filename);
+            section applroot;
+            applroot.add_section("application", appcfg);
+            this->section::merge(applroot);
+        }
+        catch (hpx::exception const& e)
+        {
+            // file doesn't exist or is ill-formed
+            if (&ec == &throws)
+                throw;
+            ec = make_error_code(e.get_error(), e.what(), hpx::rethrow);
+            return false;
+        }
+        return true;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::ptrdiff_t runtime_configuration::get_stack_size(
+        threads::thread_stacksize stacksize) const
+    {
+        switch (stacksize)
+        {
+        case threads::thread_stacksize::medium:
+            return medium_stacksize;
+
+        case threads::thread_stacksize::large:
+            return large_stacksize;
+
+        case threads::thread_stacksize::huge:
+            return huge_stacksize;
+
+        case threads::thread_stacksize::nostack:
+            return (std::numeric_limits<std::ptrdiff_t>::max)();
+
+        default:
+        case threads::thread_stacksize::small_:
+            break;
+        }
+        return small_stacksize;
     }
 }}    // namespace hpx::util

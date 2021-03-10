@@ -57,7 +57,7 @@ namespace hpx { namespace threads {
         typedef threads::policies::scheduler_base scheduler_type;
         typedef std::vector<pool_type> pool_vector;
 
-        threadmanager(hpx::local::detail::runtime_configuration& rtcfg_,
+        threadmanager(hpx::util::runtime_configuration& rtcfg_,
 #ifdef HPX_HAVE_TIMER_POOL
             util::io_service_pool& timer_pool,
 #endif
@@ -394,7 +394,7 @@ namespace hpx { namespace threads {
     private:
         mutable mutex_type mtx_;    // mutex protecting the members
 
-        hpx::local::detail::runtime_configuration& rtcfg_;
+        hpx::util::runtime_configuration& rtcfg_;
         std::vector<pool_id_type> threads_lookup_;
 
 #ifdef HPX_HAVE_TIMER_POOL

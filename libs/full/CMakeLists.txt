@@ -44,7 +44,6 @@ set(_hpx_full_modules
     resource_partitioner
     runtime_components
     runtime_configuration
-    runtime_configuration_local
     runtime_distributed
     runtime_local
     segmented_algorithms
