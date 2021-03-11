@@ -9,6 +9,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(execution_headers
     hpx/execution/algorithms/detail/is_negative.hpp
     hpx/execution/algorithms/detail/predicates.hpp
+    hpx/execution/algorithms/detail/single_result.hpp
+    hpx/execution/algorithms/just.hpp
+    hpx/execution/algorithms/just_on.hpp
+    hpx/execution/algorithms/on.hpp
     hpx/execution/algorithms/sync_wait.hpp
     hpx/execution/algorithms/transform.hpp
     hpx/execution/detail/async_launch_policy_dispatch.hpp

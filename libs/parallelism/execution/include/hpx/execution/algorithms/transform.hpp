@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <exception>
@@ -61,15 +62,31 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename... Ts>
             void set_value_helper(std::true_type, Ts&&... ts) noexcept
             {
-                HPX_INVOKE(f, std::forward<Ts>(ts)...);
-                hpx::execution::experimental::set_value(std::move(r));
+                try
+                {
+                    HPX_INVOKE(f, std::forward<Ts>(ts)...);
+                    hpx::execution::experimental::set_value(std::move(r));
+                }
+                catch (...)
+                {
+                    hpx::execution::experimental::set_error(
+                        std::move(r), std::current_exception());
+                }
             }
 
             template <typename... Ts>
             void set_value_helper(std::false_type, Ts&&... ts) noexcept
             {
-                hpx::execution::experimental::set_value(
-                    std::move(r), HPX_INVOKE(f, std::forward<Ts>(ts)...));
+                try
+                {
+                    hpx::execution::experimental::set_value(
+                        std::move(r), HPX_INVOKE(f, std::forward<Ts>(ts)...));
+                }
+                catch (...)
+                {
+                    hpx::execution::experimental::set_error(
+                        std::move(r), std::current_exception());
+                }
             }
 
             template <typename... Ts,
@@ -125,10 +142,16 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
-    template <typename S, typename F>
-    auto transform(S&& s, F&& f)
+    HPX_INLINE_CONSTEXPR_VARIABLE struct transform_t final
+      : hpx::functional::tag_fallback<transform_t>
     {
-        return detail::transform_sender<S, F>{
-            std::forward<S>(s), std::forward<F>(f)};
-    }
+    private:
+        template <typename S, typename F>
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+            transform_t, S&& s, F&& f)
+        {
+            return detail::transform_sender<S, F>{
+                std::forward<S>(s), std::forward<F>(f)};
+        }
+    } transform{};
 }}}    // namespace hpx::execution::experimental

@@ -8,8 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/optional.hpp>
+#include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/type_support/pack.hpp>
@@ -20,26 +22,6 @@
 #include <utility>
 
 namespace hpx { namespace execution { namespace experimental {
-    template <typename... Variants>
-    struct sync_wait_single_result
-    {
-        static_assert(sizeof...(Variants) == 1,
-            "sync_wait expects the predecessor sender to have a single variant "
-            "in sender_traits<>::value_types");
-    };
-
-    template <typename T>
-    struct sync_wait_single_result<hpx::util::pack<hpx::util::pack<T>>>
-    {
-        using type = T;
-    };
-
-    template <>
-    struct sync_wait_single_result<hpx::util::pack<hpx::util::pack<>>>
-    {
-        using type = void;
-    };
-
     namespace detail {
         template <typename T>
         struct sync_wait_receiver
@@ -181,15 +163,22 @@ namespace hpx { namespace execution { namespace experimental {
         }
     }    // namespace detail
 
-    template <typename S>
-    decltype(auto) sync_wait(S&& s)
+    HPX_INLINE_CONSTEXPR_VARIABLE struct sync_wait_t final
+      : hpx::functional::tag_fallback<sync_wait_t>
     {
-        using value_types =
-            typename hpx::execution::experimental::sender_traits<
-                S>::template value_types<hpx::util::pack, hpx::util::pack>;
-        using result_type = typename sync_wait_single_result<value_types>::type;
+    private:
+        template <typename S>
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+            sync_wait_t, S&& s)
+        {
+            using value_types =
+                typename hpx::execution::experimental::sender_traits<
+                    S>::template value_types<hpx::util::pack, hpx::util::pack>;
+            using result_type =
+                typename detail::sync_wait_single_result<value_types>::type;
 
-        return detail::sync_wait_impl(
-            std::is_void<result_type>{}, std::forward<S>(s));
-    }
+            return detail::sync_wait_impl(
+                std::is_void<result_type>{}, std::forward<S>(s));
+        }
+    } sync_wait{};
 }}}    // namespace hpx::execution::experimental
