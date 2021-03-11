@@ -20,7 +20,7 @@ env = os.environ.copy()
 def load(envfile):
     if not os.path.exists(envfile):
         raise FileNotFoundError(f'Could find environment file "{envfile}"')
-    env['HPX_CMAKE_PYUTILS_ENVFILE'] = os.path.abspath(envfile)
+    #env['HPX_CMAKE_PYUTILS_ENVFILE'] = os.path.abspath(envfile)
 
     envdir, envfile = os.path.split(envfile)
     output = runtools.run(
@@ -48,19 +48,21 @@ def _items_with_tag(tag):
 
 def cmake_args():
     args = []
-    for k, v in _items_with_tag('GTCMAKE_').items():
+    for k, v in _items_with_tag('PYUTILS_').items():
         if v.strip().upper() in ('ON', 'OFF'):
             k += ':BOOL'
         else:
             k += ':STRING'
         args.append(f'-D{k}={v}')
+    for k, v in _items_with_tag('-G').items():
+        args.append(f'-G{k}')
     return args
 
 
 def set_cmake_arg(arg, value):
     if isinstance(value, bool):
         value = 'ON' if value else 'OFF'
-    env['GTCMAKE_' + arg] = value
+    env[arg] = value
 
 
 def sbatch_options(mpi):
