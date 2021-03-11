@@ -6,7 +6,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set -ux
+set -eux
 
 # Clean up old artifacts
 rm -f ./jenkins-hpx* ./*-Testing
@@ -45,8 +45,6 @@ mkdir -p ${build_dir}/tools/perftests_ci
 cp -r ${src_dir}/tools/perftests_ci/* ${build_dir}/tools/perftests_ci
 
 pushd ${build_dir} > /dev/null
-# FIXME: we can probably do this step as the other tests and use gridtools
-# script only for running and plotting
 # build binaries for performance tests
 ./tools/perftests_ci/driver.py -v -l $logfile build -b release \
     -o build --source-dir ${src_dir} --build-dir ${build_dir} -e $envfile \
