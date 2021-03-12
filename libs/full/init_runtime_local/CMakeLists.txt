@@ -8,11 +8,12 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(init_runtime_local_headers hpx/init_runtime_local/init_runtime_local.hpp
-                               hpx/local/init.hpp
+set(init_runtime_local_headers
+    hpx/init_runtime_local/detail/init_logging.hpp
+    hpx/init_runtime_local/init_runtime_local.hpp hpx/local/init.hpp
 )
 
-set(init_runtime_local_sources init_runtime_local.cpp)
+set(init_runtime_local_sources init_logging.cpp init_runtime_local.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(

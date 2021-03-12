@@ -1335,6 +1335,8 @@ namespace hpx { namespace util {
                 "HPX using the option -DHPX_WITH_LOGGING=On.");
             // clang-format on
         }
+
+        HPX_UNUSED(ini_config);
 #endif
     }
 

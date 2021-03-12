@@ -375,8 +375,9 @@ namespace hpx {
                 cmdline.rtcfg_.get_spinlock_deadlock_detection_limit());
 #endif
 
-            util::detail::init_logging<hpx::util::console>(
-                cmdline.rtcfg_, cmdline.rtcfg_.mode_ == runtime_mode::console, util::detail::define_formatters);
+            util::detail::init_logging<util::console>(cmdline.rtcfg_,
+                cmdline.rtcfg_.mode_ == runtime_mode::console,
+                util::detail::define_formatters);
 
 #if defined(HPX_HAVE_NETWORKING)
             if (cmdline.num_localities_ != 1 || cmdline.node_ != 0 ||

@@ -16,6 +16,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
+#include <hpx/init_runtime_local/detail/init_logging.hpp>
 #include <hpx/init_runtime_local/init_runtime_local.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
@@ -113,411 +114,417 @@ namespace hpx {
     namespace local {
         // Print stack trace and exit.
 #if defined(HPX_WINDOWS)
-    extern BOOL WINAPI termination_handler(DWORD ctrl_type);
+        extern BOOL WINAPI termination_handler(DWORD ctrl_type);
 #else
-    extern void termination_handler(int signum);
+        extern void termination_handler(int signum);
 #endif
 
-    int finalize(error_code& ec)
-    {
-        if (!threads::get_self_ptr())
+        int finalize(error_code& ec)
         {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
-                "this function can be called from an HPX thread only");
-            return -1;
-        }
-
-        if (!is_running())
-        {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
-                "the runtime system is not active (did you already "
-                "call finalize?)");
-            return -1;
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-        {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
-                "the runtime system is not active (did you already "
-                "call hpx::stop?)");
-            return -1;
-        }
-
-        rt->finalize(0);
-
-        return 0;
-    }
-
-    int stop(error_code& ec)
-    {
-        if (threads::get_self_ptr())
-        {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
-                "this function cannot be called from an HPX thread");
-            return -1;
-        }
-
-        std::unique_ptr<runtime> rt(get_runtime_ptr());    // take ownership!
-        if (nullptr == rt.get())
-        {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
-                "the runtime system is not active (did you already "
-                "call hpx::stop?)");
-            return -1;
-        }
-
-        int result = rt->wait();
-
-        rt->stop();
-        rt->rethrow_exception();
-
-        return result;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    int suspend(error_code& ec)
-    {
-        if (threads::get_self_ptr())
-        {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::suspend",
-                "this function cannot be called from an HPX thread");
-            return -1;
-        }
-
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-        {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::suspend",
-                "the runtime system is not active (did you already "
-                "call hpx::stop?)");
-            return -1;
-        }
-
-        return rt->suspend();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    int resume(error_code& ec)
-    {
-        if (threads::get_self_ptr())
-        {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::resume",
-                "this function cannot be called from an HPX thread");
-            return -1;
-        }
-
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-        {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::resume",
-                "the runtime system is not active (did you already "
-                "call hpx::stop?)");
-            return -1;
-        }
-
-        return rt->resume();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail {
-
-        ///////////////////////////////////////////////////////////////////////
-        void activate_global_options(
-            local::detail::command_line_handling& cmdline)
-        {
-#if defined(__linux) || defined(linux) || defined(__linux__) ||                \
-    defined(__FreeBSD__)
-            threads::coroutines::detail::posix::use_guard_pages =
-                cmdline.rtcfg_.use_stack_guard_pages();
-#endif
-#ifdef HPX_HAVE_VERIFY_LOCKS
-            if (cmdline.rtcfg_.enable_lock_detection())
+            if (!threads::get_self_ptr())
             {
-                util::enable_lock_detection();
-                util::trace_depth_lock_detection(cmdline.rtcfg_.trace_depth());
-            }
-            else
-            {
-                util::disable_lock_detection();
-            }
-#endif
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-            threads::policies::set_minimal_deadlock_detection_enabled(
-                cmdline.rtcfg_.enable_minimal_deadlock_detection());
-#endif
-#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-            util::detail::set_spinlock_break_on_deadlock_enabled(
-                cmdline.rtcfg_.enable_spinlock_deadlock_detection());
-            util::detail::set_spinlock_deadlock_detection_limit(
-                cmdline.rtcfg_.get_spinlock_deadlock_detection_limit());
-#endif
-
-            // TODO
-            //util::detail::init_logging(cmdline.rtcfg_, true);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        void add_startup_functions(hpx::runtime& rt,
-            hpx::program_options::variables_map& vm,
-            startup_function_type startup, shutdown_function_type shutdown)
-        {
-            if (vm.count("hpx:app-config"))
-            {
-                std::string config(vm["hpx:app-config"].as<std::string>());
-                rt.get_config().load_application_configuration(config.c_str());
-            }
-
-            if (!!startup)
-                rt.add_startup_function(std::move(startup));
-
-            if (!!shutdown)
-                rt.add_shutdown_function(std::move(shutdown));
-
-            if (vm.count("hpx:dump-config-initial"))
-            {
-                std::cout << "Configuration after runtime construction:\n";
-                std::cout << "-----------------------------------------\n";
-                rt.get_config().dump(0, std::cout);
-                std::cout << "-----------------------------------------\n";
-            }
-
-            if (vm.count("hpx:dump-config"))
-                rt.add_startup_function(dump_config(rt));
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        int run(hpx::runtime& rt,
-            util::function_nonser<int(
-                hpx::program_options::variables_map& vm)> const& f,
-            hpx::program_options::variables_map& vm,
-            startup_function_type startup, shutdown_function_type shutdown)
-        {
-            LPROGRESS_;
-
-            add_startup_functions(
-                rt, vm, std::move(startup), std::move(shutdown));
-
-            // Run this runtime instance using the given function f.
-            if (!f.empty())
-                return rt.run(util::bind_front(f, vm));
-
-            // Run this runtime instance without an hpx_main
-            return rt.run();
-        }
-
-        int start(hpx::runtime& rt,
-            util::function_nonser<int(
-                hpx::program_options::variables_map& vm)> const& f,
-            hpx::program_options::variables_map& vm,
-            startup_function_type startup, shutdown_function_type shutdown)
-        {
-            LPROGRESS_;
-
-            add_startup_functions(
-                rt, vm, std::move(startup), std::move(shutdown));
-
-            if (!f.empty())
-            {
-                // Run this runtime instance using the given function f.
-                return rt.start(util::bind_front(f, vm));
-            }
-
-            // Run this runtime instance without an hpx_main
-            return rt.start();
-        }
-
-        int run_or_start(bool blocking, std::unique_ptr<hpx::runtime> rt,
-            local::detail::command_line_handling& cfg,
-            startup_function_type startup, shutdown_function_type shutdown)
-        {
-            if (blocking)
-            {
-                return run(*rt, cfg.hpx_main_f_, cfg.vm_, std::move(startup),
-                    std::move(shutdown));
-            }
-
-            // non-blocking version
-            start(*rt, cfg.hpx_main_f_, cfg.vm_, std::move(startup),
-                std::move(shutdown));
-
-            // pointer to runtime is stored in TLS
-            hpx::runtime* p = rt.release();
-            (void) p;
-
-            return 0;
-        }
-
-        ////////////////////////////////////////////////////////////////////////
-        void init_environment()
-        {
-            HPX_UNUSED(hpx::filesystem::initial_path());
-
-            hpx::assertion::set_assertion_handler(
-                &hpx::detail::assertion_handler);
-            hpx::util::set_test_failure_handler(
-                &hpx::detail::test_failure_handler);
-            hpx::set_custom_exception_info_handler(
-                &hpx::detail::custom_exception_info);
-            hpx::serialization::detail::set_save_custom_exception_handler(
-                &hpx::runtime_local::detail::save_custom_exception);
-            hpx::serialization::detail::set_load_custom_exception_handler(
-                &hpx::runtime_local::detail::load_custom_exception);
-            hpx::set_pre_exception_handler(&hpx::detail::pre_exception_handler);
-            hpx::set_thread_termination_handler(
-                [](std::exception_ptr const& e) { report_error(e); });
-            hpx::lcos::detail::set_run_on_completed_error_handler(
-                [](std::exception_ptr const& e) {
-                    hpx::detail::report_exception_and_terminate(e);
-                });
-#if defined(HPX_HAVE_VERIFY_LOCKS)
-            hpx::util::set_registered_locks_error_handler(
-                &hpx::detail::registered_locks_error_handler);
-            hpx::util::set_register_locks_predicate(
-                &hpx::detail::register_locks_predicate);
-#endif
-#if !defined(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
-            set_error_handlers();
-#endif
-            hpx::threads::detail::set_get_default_pool(
-                &hpx::detail::get_default_pool);
-            hpx::threads::detail::set_get_default_timer_service(
-                &hpx::detail::get_default_timer_service);
-            hpx::threads::detail::set_get_locality_id(&get_locality_id);
-            hpx::parallel::execution::detail::set_get_pu_mask(
-                &hpx::detail::get_pu_mask);
-            hpx::parallel::execution::detail::set_get_os_thread_count(
-                []() { return hpx::get_os_thread_count(); });
-
-#if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
-            unsetenv("LANG");
-            unsetenv("LC_CTYPE");
-            unsetenv("LC_NUMERIC");
-            unsetenv("LC_TIME");
-            unsetenv("LC_COLLATE");
-            unsetenv("LC_MONETARY");
-            unsetenv("LC_MESSAGES");
-            unsetenv("LC_PAPER");
-            unsetenv("LC_NAME");
-            unsetenv("LC_ADDRESS");
-            unsetenv("LC_TELEPHONE");
-            unsetenv("LC_MEASUREMENT");
-            unsetenv("LC_IDENTIFICATION");
-            unsetenv("LC_ALL");
-#endif
-        }
-
-        // make sure the runtime system is not active yet
-        int ensure_no_runtime_is_up()
-        {
-            // make sure the runtime system is not active yet
-            if (get_runtime_ptr() != nullptr)
-            {
-                std::cerr << "hpx::init: can't initialize runtime system "
-                             "more than once! Exiting...\n";
+                HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
+                    "this function can be called from an HPX thread only");
                 return -1;
             }
+
+            if (!is_running())
+            {
+                HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
+                    "the runtime system is not active (did you already "
+                    "call finalize?)");
+                return -1;
+            }
+
+            if (&ec != &throws)
+                ec = make_success_code();
+
+            runtime* rt = get_runtime_ptr();
+            if (nullptr == rt)
+            {
+                HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
+                    "the runtime system is not active (did you already "
+                    "call hpx::stop?)");
+                return -1;
+            }
+
+            rt->finalize(0);
+
             return 0;
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        int run_or_start(util::function_nonser<int(
-                             hpx::program_options::variables_map& vm)> const& f,
-            int argc, char** argv, init_params const& params, bool blocking)
+        int stop(error_code& ec)
         {
-            init_environment();
-
-            int result = 0;
-            try
+            if (threads::get_self_ptr())
             {
-                if ((result = ensure_no_runtime_is_up()) != 0)
+                HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
+                    "this function cannot be called from an HPX thread");
+                return -1;
+            }
+
+            std::unique_ptr<runtime> rt(
+                get_runtime_ptr());    // take ownership!
+            if (nullptr == rt.get())
+            {
+                HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
+                    "the runtime system is not active (did you already "
+                    "call hpx::stop?)");
+                return -1;
+            }
+
+            int result = rt->wait();
+
+            rt->stop();
+            rt->rethrow_exception();
+
+            return result;
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+        int suspend(error_code& ec)
+        {
+            if (threads::get_self_ptr())
+            {
+                HPX_THROWS_IF(ec, invalid_status, "hpx::suspend",
+                    "this function cannot be called from an HPX thread");
+                return -1;
+            }
+
+            runtime* rt = get_runtime_ptr();
+            if (nullptr == rt)
+            {
+                HPX_THROWS_IF(ec, invalid_status, "hpx::suspend",
+                    "the runtime system is not active (did you already "
+                    "call hpx::stop?)");
+                return -1;
+            }
+
+            return rt->suspend();
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+        int resume(error_code& ec)
+        {
+            if (threads::get_self_ptr())
+            {
+                HPX_THROWS_IF(ec, invalid_status, "hpx::resume",
+                    "this function cannot be called from an HPX thread");
+                return -1;
+            }
+
+            runtime* rt = get_runtime_ptr();
+            if (nullptr == rt)
+            {
+                HPX_THROWS_IF(ec, invalid_status, "hpx::resume",
+                    "the runtime system is not active (did you already "
+                    "call hpx::stop?)");
+                return -1;
+            }
+
+            return rt->resume();
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+        namespace detail {
+
+            ///////////////////////////////////////////////////////////////////////
+            void activate_global_options(
+                local::detail::command_line_handling& cmdline)
+            {
+#if defined(__linux) || defined(linux) || defined(__linux__) ||                \
+    defined(__FreeBSD__)
+                threads::coroutines::detail::posix::use_guard_pages =
+                    cmdline.rtcfg_.use_stack_guard_pages();
+#endif
+#ifdef HPX_HAVE_VERIFY_LOCKS
+                if (cmdline.rtcfg_.enable_lock_detection())
                 {
-                    return result;
+                    util::enable_lock_detection();
+                    util::trace_depth_lock_detection(
+                        cmdline.rtcfg_.trace_depth());
+                }
+                else
+                {
+                    util::disable_lock_detection();
+                }
+#endif
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
+                threads::policies::set_minimal_deadlock_detection_enabled(
+                    cmdline.rtcfg_.enable_minimal_deadlock_detection());
+#endif
+#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
+                util::detail::set_spinlock_break_on_deadlock_enabled(
+                    cmdline.rtcfg_.enable_spinlock_deadlock_detection());
+                util::detail::set_spinlock_deadlock_detection_limit(
+                    cmdline.rtcfg_.get_spinlock_deadlock_detection_limit());
+#endif
+
+                util::detail::init_logging<util::console_local>(cmdline.rtcfg_,
+                    true, util::detail::define_formatters_local);
+            }
+
+            ///////////////////////////////////////////////////////////////////////
+            void add_startup_functions(hpx::runtime& rt,
+                hpx::program_options::variables_map& vm,
+                startup_function_type startup, shutdown_function_type shutdown)
+            {
+                if (vm.count("hpx:app-config"))
+                {
+                    std::string config(vm["hpx:app-config"].as<std::string>());
+                    rt.get_config().load_application_configuration(
+                        config.c_str());
                 }
 
-                hpx::local::detail::command_line_handling cmdline{
-                    hpx::util::runtime_configuration(
-                        argv[0], hpx::runtime_mode::local),
-                    params.cfg, f};
+                if (!!startup)
+                    rt.add_startup_function(std::move(startup));
 
-                // scope exception handling to resource partitioner initialization
-                // any exception thrown during run_or_start below are handled
-                // separately
+                if (!!shutdown)
+                    rt.add_shutdown_function(std::move(shutdown));
+
+                if (vm.count("hpx:dump-config-initial"))
+                {
+                    std::cout << "Configuration after runtime construction:\n";
+                    std::cout << "-----------------------------------------\n";
+                    rt.get_config().dump(0, std::cout);
+                    std::cout << "-----------------------------------------\n";
+                }
+
+                if (vm.count("hpx:dump-config"))
+                    rt.add_startup_function(dump_config(rt));
+            }
+
+            ///////////////////////////////////////////////////////////////////////
+            int run(hpx::runtime& rt,
+                util::function_nonser<int(
+                    hpx::program_options::variables_map& vm)> const& f,
+                hpx::program_options::variables_map& vm,
+                startup_function_type startup, shutdown_function_type shutdown)
+            {
+                LPROGRESS_;
+
+                add_startup_functions(
+                    rt, vm, std::move(startup), std::move(shutdown));
+
+                // Run this runtime instance using the given function f.
+                if (!f.empty())
+                    return rt.run(util::bind_front(f, vm));
+
+                // Run this runtime instance without an hpx_main
+                return rt.run();
+            }
+
+            int start(hpx::runtime& rt,
+                util::function_nonser<int(
+                    hpx::program_options::variables_map& vm)> const& f,
+                hpx::program_options::variables_map& vm,
+                startup_function_type startup, shutdown_function_type shutdown)
+            {
+                LPROGRESS_;
+
+                add_startup_functions(
+                    rt, vm, std::move(startup), std::move(shutdown));
+
+                if (!f.empty())
+                {
+                    // Run this runtime instance using the given function f.
+                    return rt.start(util::bind_front(f, vm));
+                }
+
+                // Run this runtime instance without an hpx_main
+                return rt.start();
+            }
+
+            int run_or_start(bool blocking, std::unique_ptr<hpx::runtime> rt,
+                local::detail::command_line_handling& cfg,
+                startup_function_type startup, shutdown_function_type shutdown)
+            {
+                if (blocking)
+                {
+                    return run(*rt, cfg.hpx_main_f_, cfg.vm_,
+                        std::move(startup), std::move(shutdown));
+                }
+
+                // non-blocking version
+                start(*rt, cfg.hpx_main_f_, cfg.vm_, std::move(startup),
+                    std::move(shutdown));
+
+                // pointer to runtime is stored in TLS
+                hpx::runtime* p = rt.release();
+                (void) p;
+
+                return 0;
+            }
+
+            ////////////////////////////////////////////////////////////////////////
+            void init_environment()
+            {
+                HPX_UNUSED(hpx::filesystem::initial_path());
+
+                hpx::assertion::set_assertion_handler(
+                    &hpx::detail::assertion_handler);
+                hpx::util::set_test_failure_handler(
+                    &hpx::detail::test_failure_handler);
+                hpx::set_custom_exception_info_handler(
+                    &hpx::detail::custom_exception_info);
+                hpx::serialization::detail::set_save_custom_exception_handler(
+                    &hpx::runtime_local::detail::save_custom_exception);
+                hpx::serialization::detail::set_load_custom_exception_handler(
+                    &hpx::runtime_local::detail::load_custom_exception);
+                hpx::set_pre_exception_handler(
+                    &hpx::detail::pre_exception_handler);
+                hpx::set_thread_termination_handler(
+                    [](std::exception_ptr const& e) { report_error(e); });
+                hpx::lcos::detail::set_run_on_completed_error_handler(
+                    [](std::exception_ptr const& e) {
+                        hpx::detail::report_exception_and_terminate(e);
+                    });
+#if defined(HPX_HAVE_VERIFY_LOCKS)
+                hpx::util::set_registered_locks_error_handler(
+                    &hpx::detail::registered_locks_error_handler);
+                hpx::util::set_register_locks_predicate(
+                    &hpx::detail::register_locks_predicate);
+#endif
+#if !defined(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
+                set_error_handlers();
+#endif
+                hpx::threads::detail::set_get_default_pool(
+                    &hpx::detail::get_default_pool);
+                hpx::threads::detail::set_get_default_timer_service(
+                    &hpx::detail::get_default_timer_service);
+                hpx::threads::detail::set_get_locality_id(&get_locality_id);
+                hpx::parallel::execution::detail::set_get_pu_mask(
+                    &hpx::detail::get_pu_mask);
+                hpx::parallel::execution::detail::set_get_os_thread_count(
+                    []() { return hpx::get_os_thread_count(); });
+
+#if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
+                unsetenv("LANG");
+                unsetenv("LC_CTYPE");
+                unsetenv("LC_NUMERIC");
+                unsetenv("LC_TIME");
+                unsetenv("LC_COLLATE");
+                unsetenv("LC_MONETARY");
+                unsetenv("LC_MESSAGES");
+                unsetenv("LC_PAPER");
+                unsetenv("LC_NAME");
+                unsetenv("LC_ADDRESS");
+                unsetenv("LC_TELEPHONE");
+                unsetenv("LC_MEASUREMENT");
+                unsetenv("LC_IDENTIFICATION");
+                unsetenv("LC_ALL");
+#endif
+            }
+
+            // make sure the runtime system is not active yet
+            int ensure_no_runtime_is_up()
+            {
+                // make sure the runtime system is not active yet
+                if (get_runtime_ptr() != nullptr)
+                {
+                    std::cerr << "hpx::init: can't initialize runtime system "
+                                 "more than once! Exiting...\n";
+                    return -1;
+                }
+                return 0;
+            }
+
+            ///////////////////////////////////////////////////////////////////////
+            int run_or_start(
+                util::function_nonser<int(
+                    hpx::program_options::variables_map& vm)> const& f,
+                int argc, char** argv, init_params const& params, bool blocking)
+            {
+                init_environment();
+
+                int result = 0;
                 try
                 {
-                    result = cmdline.call(params.desc_cmdline, argc, argv);
-
-                    hpx::threads::policies::detail::affinity_data
-                        affinity_data{};
-                    affinity_data.init(hpx::util::get_entry_as<std::size_t>(
-                                           cmdline.rtcfg_, "hpx.os_threads", 0),
-                        hpx::util::get_entry_as<std::size_t>(
-                            cmdline.rtcfg_, "hpx.cores", 0),
-                        hpx::util::get_entry_as<std::size_t>(
-                            cmdline.rtcfg_, "hpx.pu_offset", 0),
-                        hpx::util::get_entry_as<std::size_t>(
-                            cmdline.rtcfg_, "hpx.pu_step", 0),
-                        0, cmdline.rtcfg_.get_entry("hpx.affinity", ""),
-                        cmdline.rtcfg_.get_entry("hpx.bind", ""),
-                        hpx::util::get_entry_as<bool>(
-                            cmdline.rtcfg_, "hpx.use_process_mask", 0));
-
-                    hpx::resource::partitioner rp =
-                        hpx::resource::detail::make_partitioner(
-                            params.rp_mode, cmdline.rtcfg_, affinity_data);
-
-                    activate_global_options(cmdline);
-
-                    // check whether HPX should be exited at this point
-                    // (parse_result is returning a result > 0, if the program options
-                    // contain --hpx:help or --hpx:version, on error result is < 0)
-                    if (result != 0)
+                    if ((result = ensure_no_runtime_is_up()) != 0)
                     {
-                        if (result > 0)
-                            result = 0;
                         return result;
                     }
 
-                    // If thread_pools initialization in user main
-                    if (params.rp_callback)
+                    hpx::local::detail::command_line_handling cmdline{
+                        hpx::util::runtime_configuration(
+                            argv[0], hpx::runtime_mode::local),
+                        params.cfg, f};
+
+                    // scope exception handling to resource partitioner initialization
+                    // any exception thrown during run_or_start below are handled
+                    // separately
+                    try
                     {
-                        params.rp_callback(rp, cmdline.vm_);
+                        result = cmdline.call(params.desc_cmdline, argc, argv);
+
+                        hpx::threads::policies::detail::affinity_data
+                            affinity_data{};
+                        affinity_data.init(
+                            hpx::util::get_entry_as<std::size_t>(
+                                cmdline.rtcfg_, "hpx.os_threads", 0),
+                            hpx::util::get_entry_as<std::size_t>(
+                                cmdline.rtcfg_, "hpx.cores", 0),
+                            hpx::util::get_entry_as<std::size_t>(
+                                cmdline.rtcfg_, "hpx.pu_offset", 0),
+                            hpx::util::get_entry_as<std::size_t>(
+                                cmdline.rtcfg_, "hpx.pu_step", 0),
+                            0, cmdline.rtcfg_.get_entry("hpx.affinity", ""),
+                            cmdline.rtcfg_.get_entry("hpx.bind", ""),
+                            hpx::util::get_entry_as<bool>(
+                                cmdline.rtcfg_, "hpx.use_process_mask", 0));
+
+                        hpx::resource::partitioner rp =
+                            hpx::resource::detail::make_partitioner(
+                                params.rp_mode, cmdline.rtcfg_, affinity_data);
+
+                        activate_global_options(cmdline);
+
+                        // check whether HPX should be exited at this point
+                        // (parse_result is returning a result > 0, if the program options
+                        // contain --hpx:help or --hpx:version, on error result is < 0)
+                        if (result != 0)
+                        {
+                            if (result > 0)
+                                result = 0;
+                            return result;
+                        }
+
+                        // If thread_pools initialization in user main
+                        if (params.rp_callback)
+                        {
+                            params.rp_callback(rp, cmdline.vm_);
+                        }
+
+                        // Setup all internal parameters of the resource_partitioner
+                        rp.configure_pools();
+                    }
+                    catch (hpx::exception const& e)
+                    {
+                        std::cerr << "hpx::init: hpx::exception caught: "
+                                  << hpx::get_error_what(e) << "\n";
+                        return -1;
                     }
 
-                    // Setup all internal parameters of the resource_partitioner
-                    rp.configure_pools();
+                    // Initialize and start the HPX runtime.
+                    LPROGRESS_ << "run_local: create runtime";
+
+                    // Build and configure this runtime instance.
+                    std::unique_ptr<hpx::runtime> rt;
+
+                    // Command line handling should have updated this by now.
+                    LPROGRESS_ << "creating local runtime";
+                    rt.reset(new hpx::runtime(cmdline.rtcfg_));
+
+                    result = run_or_start(blocking, std::move(rt), cmdline,
+                        std::move(params.startup), std::move(params.shutdown));
                 }
-                catch (hpx::exception const& e)
+                catch (hpx::detail::command_line_error const& e)
                 {
-                    std::cerr << "hpx::init: hpx::exception caught: "
-                              << hpx::get_error_what(e) << "\n";
+                    std::cerr << "hpx::local::init: std::exception caught: "
+                              << e.what() << "\n";
                     return -1;
                 }
-
-                // Initialize and start the HPX runtime.
-                LPROGRESS_ << "run_local: create runtime";
-
-                // Build and configure this runtime instance.
-                std::unique_ptr<hpx::runtime> rt;
-
-                // Command line handling should have updated this by now.
-                LPROGRESS_ << "creating local runtime";
-                rt.reset(new hpx::runtime(cmdline.rtcfg_));
-
-                result = run_or_start(blocking, std::move(rt), cmdline,
-                    std::move(params.startup), std::move(params.shutdown));
+                return result;
             }
-            catch (hpx::detail::command_line_error const& e)
-            {
-                std::cerr << "hpx::local::init: std::exception caught: "
-                          << e.what() << "\n";
-                return -1;
-            }
-            return result;
-        }
-    }    // namespace detail
-    }    // namespace local
+        }    // namespace detail
+    }        // namespace local
 }    // namespace hpx

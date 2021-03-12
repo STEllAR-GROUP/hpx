@@ -8,6 +8,18 @@
 
 #include <hpx/config.hpp>
 
+namespace hpx {
+    enum logging_destination
+    {
+        destination_hpx = 0,
+        destination_timing = 1,
+        destination_agas = 2,
+        destination_parcel = 3,
+        destination_app = 4,
+        destination_debuglog = 5
+    };
+}
+
 #if defined(HPX_HAVE_LOGGING)
 
 #include <hpx/assertion/current_function.hpp>

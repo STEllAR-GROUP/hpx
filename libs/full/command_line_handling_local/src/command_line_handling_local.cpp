@@ -17,6 +17,7 @@
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/util.hpp>
 #include <hpx/preprocessor/stringize.hpp>
+#include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/version.hpp>
 
@@ -680,6 +681,8 @@ namespace hpx { namespace local { namespace detail {
                 "HPX using the option -DHPX_WITH_LOGGING=On.");
             // clang-format on
         }
+
+        HPX_UNUSED(ini_config);
 #endif
     }
 
