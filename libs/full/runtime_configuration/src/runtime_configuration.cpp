@@ -18,6 +18,7 @@
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
+#include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/version.hpp>
 
