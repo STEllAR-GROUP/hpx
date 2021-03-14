@@ -14,8 +14,8 @@
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/actions_base/lambda_to_action.hpp>
 #include <hpx/actions_base/plain_action.hpp>
+#include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/async_distributed/make_continuation.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/lcos/base_lco_with_value.hpp>
 #endif

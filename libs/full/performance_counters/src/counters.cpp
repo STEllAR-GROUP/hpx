@@ -1165,7 +1165,6 @@ namespace hpx { namespace performance_counters {
 
                 // use the runtime_support component of the target locality to
                 // create the new performance counter
-                using namespace components::stubs;
                 lcos::future<naming::id_type> f;
                 if (p.parentinstanceindex_ >= 0)
                 {

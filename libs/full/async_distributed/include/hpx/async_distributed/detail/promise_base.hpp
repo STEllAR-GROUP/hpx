@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2016-2017 Thomas Heller
 //  Copyright (c) 2011      Bryce Adelstein-Lelbach
 //
@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/async_distributed/detail/promise_lco.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component_heap.hpp>
 #include <hpx/components_base/server/managed_component_base.hpp>
@@ -16,7 +17,6 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/traits/future_access.hpp>
-#include <hpx/lcos/detail/promise_lco.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
@@ -29,19 +29,19 @@
 #include <utility>
 
 namespace hpx {
-namespace lcos {
-    namespace detail {
+    namespace lcos { namespace detail {
 
         template <typename Result>
         struct promise_data : task_base<Result>
         {
-            typedef typename task_base<Result>::init_no_addref init_no_addref;
+            using init_no_addref = typename task_base<Result>::init_no_addref;
 
             promise_data() = default;
 
             explicit promise_data(init_no_addref no_addref)
               : task_base<Result>(no_addref)
-            {}
+            {
+            }
 
             void set_task(util::unique_function_nonser<void()>&& f)
             {
@@ -85,20 +85,22 @@ namespace lcos {
         template <typename Result, typename Allocator>
         struct promise_data_allocator : promise_data<Result>
         {
-            typedef typename promise_data<Result>::init_no_addref init_no_addref;
-            typedef typename
-                    std::allocator_traits<Allocator>::template
-                        rebind_alloc<promise_data_allocator>
-                other_allocator;
+            using init_no_addref =
+                typename promise_data<Result>::init_no_addref;
+            using other_allocator = typename std::allocator_traits<
+                Allocator>::template rebind_alloc<promise_data_allocator>;
 
             explicit promise_data_allocator(other_allocator const& alloc)
               : alloc_(alloc)
-            {}
+            {
+            }
 
             promise_data_allocator(init_no_addref no_addref, in_place,
-                    other_allocator const& alloc)
-              : promise_data<Result>(no_addref), alloc_(alloc)
-            {}
+                other_allocator const& alloc)
+              : promise_data<Result>(no_addref)
+              , alloc_(alloc)
+            {
+            }
 
         private:
             void destroy()
@@ -127,9 +129,8 @@ namespace lcos {
 
             template <typename SharedState>
             HPX_FORCEINLINE static auto call(int,
-                    SharedState const& shared_state, id_type const& id,
-                    bool& id_retrieved)
-            ->  decltype(shared_state->set_id(id))
+                SharedState const& shared_state, id_type const& id,
+                bool& id_retrieved) -> decltype(shared_state->set_id(id))
             {
                 shared_state->set_id(id);
                 id_retrieved = true;
@@ -137,32 +138,28 @@ namespace lcos {
         };
 
         template <typename SharedState>
-        HPX_FORCEINLINE
-        void call_set_id(SharedState const& shared_state, id_type const& id,
-            bool& id_retrieved)
+        HPX_FORCEINLINE void call_set_id(SharedState const& shared_state,
+            id_type const& id, bool& id_retrieved)
         {
             set_id_helper::call(0, shared_state, id, id_retrieved);
         }
-    }
-}
+    }}    // namespace lcos::detail
 
-namespace traits {
-    namespace detail {
+    namespace traits { namespace detail {
+
         // specialize for promise_data to extract corresponding, allocator-
         // based shared state type
         template <typename R, typename Allocator>
         struct shared_state_allocator<lcos::detail::promise_data<R>, Allocator>
         {
-            typedef lcos::detail::promise_data_allocator<R, Allocator> type;
+            using type = lcos::detail::promise_data_allocator<R, Allocator>;
         };
-    }    // namespace detail
-}    // namespace traits
+    }}    // namespace traits::detail
 
-namespace lcos {
-    namespace detail {
+    namespace lcos { namespace detail {
+
         // Promise base contains the actual implementation for the remotely
-        // settable
-        // promise. It consists of two parts:
+        // settable promise. It consists of two parts:
         //  1) The shared state, which is used to signal the future
         //  2) The LCO, which is used to set the promise remotely
         //
@@ -177,17 +174,13 @@ namespace lcos {
         class promise_base
           : public hpx::lcos::local::detail::promise_base<Result, SharedState>
         {
-            typedef hpx::lcos::local::detail::promise_base<
-                    Result, SharedState
-                > base_type;
+            using base_type =
+                hpx::lcos::local::detail::promise_base<Result, SharedState>;
 
         protected:
-            typedef Result result_type;
-            typedef SharedState shared_state_type;
-            typedef hpx::intrusive_ptr<shared_state_type> shared_state_ptr;
-
-            typedef promise_lco<Result, RemoteResult> wrapped_type;
-            typedef components::managed_component<wrapped_type> wrapping_type;
+            using result_type = Result;
+            using shared_state_type = SharedState;
+            using shared_state_ptr = hpx::intrusive_ptr<shared_state_type>;
 
         public:
             promise_base()
@@ -206,10 +199,10 @@ namespace lcos {
             }
 
             promise_base(promise_base&& other) noexcept
-                : base_type(std::move(static_cast<base_type&&>(other))),
-                  id_retrieved_(other.id_retrieved_),
-                  id_(std::move(other.id_)),
-                  addr_(std::move(other.addr_))
+              : base_type(std::move(static_cast<base_type&&>(other)))
+              , id_retrieved_(other.id_retrieved_)
+              , id_(std::move(other.id_))
+              , addr_(std::move(other.addr_))
             {
                 other.id_retrieved_ = false;
                 other.id_ = naming::invalid_id;
@@ -225,7 +218,8 @@ namespace lcos {
 
             promise_base& operator=(promise_base&& other) noexcept
             {
-                base_type::operator=(std::move(static_cast<base_type&&>(other)));
+                base_type::operator=(
+                    std::move(static_cast<base_type&&>(other)));
                 id_retrieved_ = other.id_retrieved_;
                 id_ = std::move(other.id_);
                 addr_ = std::move(other.addr_);
@@ -236,8 +230,8 @@ namespace lcos {
                 return *this;
             }
 
-            naming::id_type get_id(bool mark_as_started = true,
-                error_code& ec = throws) const
+            naming::id_type get_id(
+                bool mark_as_started = true, error_code& ec = throws) const
             {
                 if (this->shared_state_ == nullptr)
                 {
@@ -291,51 +285,64 @@ namespace lcos {
                 }
                 return addr_;
             }
-        private:
-            static void wrapping_deleter(wrapping_type *ptr)
-            {
-                ptr->~wrapping_type();
-                hpx::components::component_heap<wrapping_type>().free(ptr);
-            }
 
+        private:
             // This helper is used to keep the component alive until the
             // completion handler has been called. We need to manually free
             // the component here, since we don't rely on reference counting
             // anymore
             struct keep_alive
             {
-                typedef std::unique_ptr<wrapping_type, void(*)(wrapping_type*)>
-                    wrapping_ptr;
+                using wrapped_type = promise_lco<Result, RemoteResult>;
+                using wrapping_type =
+                    components::managed_component<wrapped_type>;
+
+                using wrapping_ptr =
+                    std::unique_ptr<wrapping_type, void (*)(wrapping_type*)>;
+
+                static void wrapping_deleter(wrapping_type* ptr)
+                {
+                    ptr->~wrapping_type();
+                    hpx::components::component_heap<wrapping_type>().free(ptr);
+                }
 
                 wrapping_ptr ptr_;
 
                 explicit keep_alive(wrapping_ptr& ptr)
                   : ptr_(ptr.release(), &wrapping_deleter)
-                {}
+                {
+                }
 
                 keep_alive(keep_alive&& o)
                   : ptr_(o.ptr_.release(), &wrapping_deleter)
-                {}
+                {
+                }
 
                 keep_alive& operator=(keep_alive&& o) = default;
 
                 void operator()()
                 {
-                    delete ptr_->get(); // delete wrapped_type
+                    delete ptr_->get();    // delete wrapped_type
                 }
             };
 
         protected:
             void init_shared_state()
             {
+                using wrapped_type = typename keep_alive::wrapped_type;
+                using wrapping_type = typename keep_alive::wrapping_type;
+
                 // The lifetime of the LCO (component) part is completely
                 // handled by the shared state, we create the object to get our
                 // gid and then attach it to the completion handler of the
                 // shared state.
-                typedef typename keep_alive::wrapping_ptr wrapping_ptr;
-                auto ptr = hpx::components::component_heap<wrapping_type>().alloc();
+                using wrapping_ptr = typename keep_alive::wrapping_ptr;
+
+                auto ptr =
+                    hpx::components::component_heap<wrapping_type>().alloc();
                 wrapping_ptr lco_ptr(new (ptr) wrapping_type(
-                    new wrapped_type(this->shared_state_)), &wrapping_deleter);
+                                         new wrapped_type(this->shared_state_)),
+                    &keep_alive::wrapping_deleter);
 
                 id_ = lco_ptr->get_unmanaged_id();
                 addr_ = naming::address(agas::get_locality(),
@@ -350,8 +357,7 @@ namespace lcos {
 
             void check_abandon_shared_state(const char* fun)
             {
-                if (this->shared_state_ != nullptr &&
-                    this->future_retrieved_ &&
+                if (this->shared_state_ != nullptr && this->future_retrieved_ &&
                     !(this->shared_state_->is_ready() || id_retrieved_))
                 {
                     this->shared_state_->set_error(broken_promise, fun,
@@ -364,7 +370,5 @@ namespace lcos {
             naming::id_type id_;
             naming::address addr_;
         };
-    }
-}
-}
-
+    }}    // namespace lcos::detail
+}    // namespace hpx

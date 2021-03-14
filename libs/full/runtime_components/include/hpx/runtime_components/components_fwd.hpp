@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components/components_fwd.hpp>
+#include <hpx/runtime_configuration/component_factory_base.hpp>
 
 #include <cstddef>
 #include <string>
@@ -19,8 +20,6 @@ namespace hpx {
     namespace components {
 
         ///////////////////////////////////////////////////////////////////////
-        struct HPX_EXPORT component_factory_base;
-
         template <typename Component>
         struct component_factory;
 

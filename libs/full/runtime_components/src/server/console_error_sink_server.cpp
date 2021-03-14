@@ -8,9 +8,9 @@
 #include <hpx/config.hpp>
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions_base/basic_action.hpp>
+#include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/runtime_components/server/console_error_sink.hpp>
 #include <hpx/runtime_components/server/console_error_sink_singleton.hpp>

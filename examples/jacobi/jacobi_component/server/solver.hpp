@@ -16,8 +16,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/include/runtime.hpp>
-#include <hpx/lcos/future_wait.hpp>
+#include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/timing.hpp>
 
 #include <cstddef>

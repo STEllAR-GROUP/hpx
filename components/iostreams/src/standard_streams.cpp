@@ -7,11 +7,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/plain_action.hpp>
+#include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/components_base/server/create_component.hpp>
 #include <hpx/functional/bind_back.hpp>
-#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 

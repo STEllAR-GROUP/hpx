@@ -8,7 +8,7 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/detail/agas_interface_functions.hpp>
 #include <hpx/performance_counters/detail/counter_interface_functions.hpp>
-#include <hpx/runtime_components_base/component_registry.hpp>
+#include <hpx/runtime_components/component_registry.hpp>
 #include <hpx/runtime_distributed/runtime_support.hpp>
 
 #include <mutex>

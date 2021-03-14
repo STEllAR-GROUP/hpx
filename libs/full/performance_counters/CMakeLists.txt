@@ -93,7 +93,7 @@ add_hpx_module(
     hpx_async_colocated
     hpx_async_distributed
     hpx_naming
-    hpx_runtime_components_base
+    hpx_runtime_components
     hpx_runtime_local
     hpx_runtime_distributed
     hpx_threadmanager

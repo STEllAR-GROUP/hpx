@@ -11,6 +11,11 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 
+namespace hpx { namespace components {
+
+    struct HPX_EXPORT component_factory_base;
+}}    // namespace hpx::components
+
 ///////////////////////////////////////////////////////////////////////////////
 /// This macro is used to register the given component factory with
 /// Hpx.Plugin. This macro has to be used for each of the component factories.

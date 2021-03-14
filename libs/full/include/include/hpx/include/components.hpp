@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,12 +12,12 @@
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/include/actions.hpp>
 
+#include <hpx/runtime_components/component_factory.hpp>
+#include <hpx/runtime_components/component_registry.hpp>
 #include <hpx/runtime_components/default_distribution_policy.hpp>
+#include <hpx/runtime_components/derived_component_factory.hpp>
 #include <hpx/runtime_components/distributed_metadata_base.hpp>
 #include <hpx/runtime_components/new.hpp>
-#include <hpx/runtime_components_base/component_factory.hpp>
-#include <hpx/runtime_components_base/component_registry.hpp>
-#include <hpx/runtime_components_base/derived_component_factory.hpp>
 
 #include <hpx/async_colocated/server/destroy_component.hpp>
 

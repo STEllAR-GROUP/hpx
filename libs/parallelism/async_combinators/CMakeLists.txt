@@ -7,6 +7,7 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(async_combinators_headers
+    hpx/async_combinators/future_wait.hpp
     hpx/async_combinators/split_future.hpp
     hpx/async_combinators/wait_all.hpp
     hpx/async_combinators/wait_any.hpp
@@ -20,6 +21,7 @@ set(async_combinators_headers
 
 # cmake-format: off
 set(async_combinators_compat_headers
+    hpx/lcos/future_wait.hpp => hpx/future.hpp
     hpx/lcos/split_future.hpp => hpx/future.hpp
     hpx/lcos/wait_all.hpp => hpx/future.hpp
     hpx/lcos/wait_any.hpp => hpx/future.hpp

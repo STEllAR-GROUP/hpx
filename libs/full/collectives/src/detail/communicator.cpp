@@ -15,8 +15,8 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/runtime_components/component_factory.hpp>
 #include <hpx/runtime_components/new.hpp>
-#include <hpx/runtime_components_base/component_factory.hpp>
 #include <hpx/runtime_distributed/find_here.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
 

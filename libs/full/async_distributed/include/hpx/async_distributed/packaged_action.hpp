@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,10 +15,10 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/applier/apply_callback.hpp>
+#include <hpx/async_distributed/promise.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
 #include <hpx/components_base/traits/component_type_is_compatible.hpp>
-#include <hpx/lcos/promise.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
@@ -47,7 +47,8 @@ namespace hpx { namespace lcos {
             void operator()(
                 std::error_code const& ec, parcelset::parcel const& p)
             {
-                // any error in the parcel layer will be stored in the future object
+                // any error in the parcel layer will be stored in the future
+                // object
                 if (ec)
                 {
                     if (hpx::tolerate_node_faults())
@@ -76,7 +77,8 @@ namespace hpx { namespace lcos {
             void operator()(
                 std::error_code const& ec, parcelset::parcel const& p)
             {
-                // any error in the parcel layer will be stored in the future object
+                // any error in the parcel layer will be stored in the future
+                // object
                 if (ec)
                 {
                     std::exception_ptr exception = HPX_GET_EXCEPTION(ec,

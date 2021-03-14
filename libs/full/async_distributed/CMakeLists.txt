@@ -31,6 +31,8 @@ set(async_headers
     hpx/async_distributed/async_continue_fwd.hpp
     hpx/async_distributed/async_continue.hpp
     hpx/async_distributed/async.hpp
+    hpx/async_distributed/base_lco.hpp
+    hpx/async_distributed/base_lco_with_value.hpp
     hpx/async_distributed/continuation_fwd.hpp
     hpx/async_distributed/continuation.hpp
     hpx/async_distributed/continuation_impl.hpp
@@ -43,6 +45,10 @@ set(async_headers
     hpx/async_distributed/detail/async_unwrap_result_implementations.hpp
     hpx/async_distributed/detail/sync_implementations_fwd.hpp
     hpx/async_distributed/detail/sync_implementations.hpp
+    hpx/async_distributed/packaged_action.hpp
+    hpx/async_distributed/promise.hpp
+    hpx/async_distributed/detail/promise_base.hpp
+    hpx/async_distributed/detail/promise_lco.hpp
     hpx/async_distributed/sync.hpp
     hpx/async_distributed/set_lco_value_continuation.hpp
     hpx/async_distributed/traits/action_trigger_continuation.hpp
@@ -64,7 +70,11 @@ set(async_compat_headers
     hpx/lcos/async_continue.hpp => hpx/include/async.hpp
     hpx/lcos/async_fwd.hpp => hpx/include/async.hpp
     hpx/lcos/async.hpp => hpx/include/async.hpp
+    hpx/lcos/base_lco.hpp => hpx/include/async.hpp
+    hpx/lcos/base_lco_with_value.hpp => hpx/include/async.hpp
     hpx/lcos/dataflow.hpp => hpx/include/async.hpp
+    hpx/lcos/packaged_action.hpp => hpx/include/async.hpp
+    hpx/lcos/promise.hpp => hpx/include/async.hpp
     hpx/lcos/sync_fwd.hpp => hpx/include/async.hpp
     hpx/lcos/sync.hpp => hpx/include/async.hpp
     hpx/runtime/actions/continuation_impl.hpp => hpx/include/async.hpp
@@ -91,13 +101,22 @@ set(async_compat_headers
 )
 # cmake-format: on
 
-set(actions_sources continuation.cpp trigger_lco.cpp)
+set(async_sources
+    base_lco.cpp
+    base_lco_with_value.cpp
+    base_lco_with_value_1.cpp
+    base_lco_with_value_2.cpp
+    base_lco_with_value_3.cpp
+    continuation.cpp
+    promise.cpp
+    trigger_lco.cpp
+)
 
 include(HPX_AddModule)
 add_hpx_module(
   full async_distributed
   GLOBAL_HEADER_GEN OFF
-  SOURCES ${actions_sources}
+  SOURCES ${async_sources}
   HEADERS ${async_headers}
   COMPAT_HEADERS ${async_compat_headers}
   DEPENDENCIES hpx_core hpx_parallelism
