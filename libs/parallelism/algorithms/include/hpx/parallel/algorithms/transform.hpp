@@ -759,6 +759,32 @@ namespace hpx { namespace traits {
         }
     };
 
+    template <typename ExPolicy, typename F, typename Proj1, typename Proj2>
+    struct get_function_address<
+        parallel::v1::detail::transform_binary_iteration<ExPolicy, F, Proj1, Proj2>>
+    {
+        static std::size_t call(
+            parallel::v1::detail::transform_binary_iteration<ExPolicy, F, Proj1, Proj2> const&
+                f) noexcept
+        {
+            return get_function_address<typename std::decay<F>::type>::call(
+                f.f_);
+        }
+    };
+
+    template <typename ExPolicy, typename F, typename Proj1, typename Proj2>
+    struct get_function_annotation<
+        parallel::v1::detail::transform_binary_iteration<ExPolicy, F, Proj1, Proj2>>
+    {
+        static char const* call(
+            parallel::v1::detail::transform_binary_iteration<ExPolicy, F, Proj1, Proj2> const&
+                f) noexcept
+        {
+            return get_function_annotation<typename std::decay<F>::type>::call(
+                f.f_);
+        }
+    };
+
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
     template <typename ExPolicy, typename F, typename Proj>
     struct get_function_annotation_itt<
@@ -766,6 +792,19 @@ namespace hpx { namespace traits {
     {
         static util::itt::string_handle call(
             parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> const&
+                f) noexcept
+        {
+            return get_function_annotation_itt<
+                typename std::decay<F>::type>::call(f.f_);
+        }
+    };
+
+    template <typename ExPolicy, typename F, typename Proj1, typename Proj2>
+    struct get_function_annotation_itt<
+        parallel::v1::detail::transform_binary_iteration<ExPolicy, F, Proj1, Proj2>>
+    {
+        static util::itt::string_handle call(
+            parallel::v1::detail::transform_binary_iteration<ExPolicy, F, Proj1, Proj2> const&
                 f) noexcept
         {
             return get_function_annotation_itt<
