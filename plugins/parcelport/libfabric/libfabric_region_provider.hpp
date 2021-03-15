@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <hpx/traits/rma_memory_region_traits.hpp>
 //
 #include <rdma/fabric.h>
 #include <rdma/fi_cm.h>
@@ -18,6 +17,9 @@
 #include <memory>
 #include <utility>
 //
+
+#include <plugins/parcelport/libfabric/rma_memory_region_traits.hpp>
+
 namespace hpx {
 namespace parcelset {
 namespace policies {

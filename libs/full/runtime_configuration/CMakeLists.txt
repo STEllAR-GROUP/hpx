@@ -14,6 +14,7 @@ set(runtime_configuration_headers
     hpx/runtime_configuration/ini.hpp
     hpx/runtime_configuration/init_ini_data.hpp
     hpx/runtime_configuration/plugin_registry_base.hpp
+    hpx/runtime_configuration/register_locks_globally.hpp
     hpx/runtime_configuration/runtime_configuration.hpp
     hpx/runtime_configuration/runtime_configuration_fwd.hpp
     hpx/runtime_configuration/runtime_mode.hpp
@@ -24,6 +25,7 @@ set(runtime_configuration_headers
 set(runtime_configuration_compat_headers
     hpx/util/ini.hpp => hpx/modules/runtime_configuration.hpp
     hpx/util/init_ini_data.hpp => hpx/modules/runtime_configuration.hpp
+    hpx/util/register_locks_globally.hpp => hpx/modules/runtime_configuration.hpp
     hpx/util/runtime_configuration.hpp => hpx/modules/runtime_configuration.hpp
     hpx/plugins/plugin_registry_base.hpp => hpx/modules/runtime_configuration.hpp
     hpx/runtime/components/component_commandline_base.hpp => hpx/modules/runtime_configuration.hpp
@@ -34,8 +36,9 @@ set(runtime_configuration_compat_headers
 )
 # cmake-format: on
 
-set(runtime_configuration_sources ini.cpp init_ini_data.cpp
-                                  runtime_configuration.cpp runtime_mode.cpp
+set(runtime_configuration_sources
+    ini.cpp init_ini_data.cpp register_locks_globally.cpp
+    runtime_configuration.cpp runtime_mode.cpp
 )
 
 include(HPX_AddModule)

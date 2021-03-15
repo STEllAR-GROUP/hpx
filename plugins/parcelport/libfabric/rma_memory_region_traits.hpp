@@ -8,30 +8,31 @@
 
 #include <memory>
 //
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
+
     template <typename RegionProvider>
     struct rma_memory_region_traits
     {
         typedef typename RegionProvider::provider_domain provider_domain;
         typedef typename RegionProvider::provider_region provider_region;
         //
-        static int register_memory(
-            provider_domain *pd, const void *buf, size_t len,
-            uint64_t access, uint64_t offset, uint64_t requested_key,
-            uint64_t flags, provider_region **mr, void *context)
+        static int register_memory(provider_domain* pd, const void* buf,
+            size_t len, uint64_t access, uint64_t offset,
+            uint64_t requested_key, uint64_t flags, provider_region** mr,
+            void* context)
         {
-            return RegionProvider::register_memory(
-                pd, buf, len, access, offset, requested_key, flags, mr, context);
+            return RegionProvider::register_memory(pd, buf, len, access, offset,
+                requested_key, flags, mr, context);
         }
         //
-        static int unregister_memory(provider_region *mr) {
+        static int unregister_memory(provider_region* mr)
+        {
             return RegionProvider::unregister_memory(mr);
         }
         //
-        static int flags() {
+        static int flags()
+        {
             return RegionProvider::flags();
         }
     };
-}}
-
+}}    // namespace hpx::traits

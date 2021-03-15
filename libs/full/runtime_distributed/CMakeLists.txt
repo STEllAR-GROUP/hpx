@@ -11,6 +11,8 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(runtime_distributed_headers
+    hpx/runtime_distributed/applier.hpp
+    hpx/runtime_distributed/applier_fwd.hpp
     hpx/runtime_distributed/big_boot_barrier.hpp
     hpx/runtime_distributed/copy_component.hpp
     hpx/runtime_distributed.hpp
@@ -32,6 +34,8 @@ set(runtime_distributed_headers
 # cmake-format: off
 set(runtime_distributed_compat_headers
     hpx/runtime/agas/big_boot_barrier.hpp => hpx/runtime_distributed.hpp
+    hpx/runtime/applier/applier.hpp => hpx/runtime_distributed.hpp
+    hpx/runtime/applier_fwd.hpp => hpx/runtime_distributed.hpp
     hpx/runtime/components/copy_component.hpp => hpx/modules/runtime_distributed.hpp
     hpx/runtime/components/migrate_component.hpp => hpx/modules/runtime_distributed.hpp
     hpx/runtime/find_here.hpp => hpx/modules/runtime_distributed.hpp
@@ -42,8 +46,12 @@ set(runtime_distributed_compat_headers
 # cmake-format: on
 
 set(runtime_distributed_sources
-    big_boot_barrier.cpp get_locality_name.cpp runtime_support.cpp
-    runtime_distributed.cpp server/runtime_support_server.cpp
+    applier.cpp
+    big_boot_barrier.cpp
+    get_locality_name.cpp
+    runtime_support.cpp
+    runtime_distributed.cpp
+    server/runtime_support_server.cpp
     stubs/runtime_support_stubs.cpp
 )
 

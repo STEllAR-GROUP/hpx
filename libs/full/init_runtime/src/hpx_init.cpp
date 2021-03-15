@@ -62,18 +62,18 @@
 #endif
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions_base/plain_action.hpp>
+#include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/init_runtime/pre_main.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/naming.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
+#include <hpx/runtime_configuration/register_locks_globally.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/runtime_support.hpp>
-#include <hpx/util/bind_action.hpp>
-#include <hpx/util/register_locks_globally.hpp>
 #endif
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__)

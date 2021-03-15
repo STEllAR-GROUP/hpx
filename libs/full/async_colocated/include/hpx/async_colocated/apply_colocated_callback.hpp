@@ -18,8 +18,8 @@
 #include <hpx/async_colocated/functional/colocated_helpers.hpp>
 #include <hpx/async_colocated/register_apply_colocated.hpp>
 #include <hpx/async_distributed/applier/apply_continue_callback.hpp>
+#include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/util/bind_action.hpp>
 
 #include <utility>
 

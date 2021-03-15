@@ -14,6 +14,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
+#include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/async_distributed/detail/sync_implementations.hpp>
 #include <hpx/async_distributed/sync.hpp>
 #include <hpx/async_local/sync.hpp>
@@ -24,7 +25,6 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/util/bind_action.hpp>
 
 #include <type_traits>
 #include <utility>

@@ -20,7 +20,6 @@
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/util/connection_cache.hpp>
 #include <boost/lockfree/queue.hpp>
 
 #include <condition_variable>

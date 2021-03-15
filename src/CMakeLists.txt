@@ -9,28 +9,22 @@
 # ##############################################################################
 # gather sources
 
-set(hpx_SOURCES "")
-
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  list(
-    APPEND
-    hpx_SOURCES
-    runtime/agas/server/route.cpp
-    runtime/applier/applier.cpp
-    runtime/parcelset/detail/parcel_await.cpp
-    runtime/parcelset/detail/parcel_route_handler.cpp
-    runtime/parcelset/detail/per_action_data_counter.cpp
-    runtime/parcelset/locality.cpp
-    runtime/parcelset/parcel.cpp
-    runtime/parcelset/parcelhandler.cpp
-    runtime/parcelset/parcelport.cpp
-    runtime/parcelset/put_parcel.cpp
-    runtime/set_parcel_write_handler.cpp
-    util/register_locks_globally.cpp
+  set(hpx_SOURCES
+      runtime/parcelset/detail/parcel_await.cpp
+      runtime/parcelset/detail/parcel_route_handler.cpp
+      runtime/parcelset/detail/per_action_data_counter.cpp
+      runtime/parcelset/locality.cpp
+      runtime/parcelset/parcel.cpp
+      runtime/parcelset/parcelhandler.cpp
+      runtime/parcelset/parcelport.cpp
+      runtime/parcelset/put_parcel.cpp
+      runtime/set_parcel_write_handler.cpp
   )
+  list(TRANSFORM hpx_SOURCES PREPEND ${PROJECT_SOURCE_DIR}/src/)
+else()
+  set(hpx_SOURCES ${PROJECT_SOURCE_DIR}/libs/src/dummy.cpp)
 endif()
-
-list(TRANSFORM hpx_SOURCES PREPEND ${PROJECT_SOURCE_DIR}/src/)
 
 set(hpx_external_objects_SOURCES)
 
@@ -56,66 +50,60 @@ endif()
 # gather headers
 
 # List all headers (local and distributed)
-set(hpx_HEADERS hpx/lcos_fwd.hpp hpx/traits/rma_memory_region_traits.hpp)
+set(hpx_HEADERS)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  list(
-    APPEND
-    hpx_HEADERS
-    hpx/plugins/binary_filter_factory_base.hpp
-    hpx/plugins/binary_filter_factory.hpp
-    hpx/plugins/message_handler_factory_base.hpp
-    hpx/plugins/message_handler_factory.hpp
-    hpx/plugins/parcel/coalescing_counter_registry.hpp
-    hpx/plugins/parcel/coalescing_message_handler.hpp
-    hpx/plugins/parcel/coalescing_message_handler_registration.hpp
-    hpx/plugins/parcel/message_buffer.hpp
-    hpx/plugins/parcelport_factory_base.hpp
-    hpx/plugins/parcelport_factory.hpp
-    hpx/plugins/parcelport/mpi/header.hpp
-    hpx/plugins/parcelport/mpi/locality.hpp
-    hpx/plugins/parcelport/mpi/receiver_connection.hpp
-    hpx/plugins/parcelport/mpi/receiver.hpp
-    hpx/plugins/parcelport/mpi/sender_connection.hpp
-    hpx/plugins/parcelport/mpi/sender.hpp
-    hpx/plugins/parcelport/mpi/tag_provider.hpp
-    hpx/plugins/parcelport/tcp/connection_handler.hpp
-    hpx/plugins/parcelport/tcp/locality.hpp
-    hpx/plugins/parcelport/tcp/receiver.hpp
-    hpx/plugins/parcelport/tcp/sender.hpp
-    hpx/plugins/plugin_factory_base.hpp
-    hpx/plugins/plugin_registry.hpp
-    hpx/plugins/unique_plugin_name.hpp
-    hpx/runtime/message_handler_fwd.hpp
-    hpx/runtime/parcelset/decode_parcels.hpp
-    hpx/runtime/parcelset/detail/call_for_each.hpp
-    hpx/runtime/parcelset/detail/data_point.hpp
-    hpx/runtime/parcelset/detail/gatherer.hpp
-    hpx/runtime/parcelset/detail/parcel_await.hpp
-    hpx/runtime/parcelset/detail/parcel_route_handler.hpp
-    hpx/runtime/parcelset/detail/per_action_data_counter.hpp
-    hpx/runtime/parcelset/encode_parcels.hpp
-    hpx/runtime/parcelset_fwd.hpp
-    hpx/runtime/parcelset/locality.hpp
-    hpx/runtime/parcelset/parcel_buffer.hpp
-    hpx/runtime/parcelset/parcelhandler.hpp
-    hpx/runtime/parcelset/parcel.hpp
-    hpx/runtime/parcelset/parcelport_connection.hpp
-    hpx/runtime/parcelset/parcelport.hpp
-    hpx/runtime/parcelset/parcelport_impl.hpp
-    hpx/runtime/parcelset/policies/message_handler.hpp
-    hpx/runtime/parcelset/put_parcel.hpp
-    hpx/runtime/set_parcel_write_handler.hpp
-    hpx/traits/action_message_handler.hpp
-    hpx/traits/action_serialization_filter.hpp
-    hpx/util/bind_action.hpp
-    hpx/util/connection_cache.hpp
-    hpx/util/register_locks_globally.hpp
-    hpx/util/storage/tuple.hpp
+  set(hpx_HEADERS
+      hpx/plugins/binary_filter_factory_base.hpp
+      hpx/plugins/binary_filter_factory.hpp
+      hpx/plugins/message_handler_factory_base.hpp
+      hpx/plugins/message_handler_factory.hpp
+      hpx/plugins/parcel/coalescing_counter_registry.hpp
+      hpx/plugins/parcel/coalescing_message_handler.hpp
+      hpx/plugins/parcel/coalescing_message_handler_registration.hpp
+      hpx/plugins/parcel/message_buffer.hpp
+      hpx/plugins/parcelport_factory_base.hpp
+      hpx/plugins/parcelport_factory.hpp
+      hpx/plugins/parcelport/mpi/header.hpp
+      hpx/plugins/parcelport/mpi/locality.hpp
+      hpx/plugins/parcelport/mpi/receiver_connection.hpp
+      hpx/plugins/parcelport/mpi/receiver.hpp
+      hpx/plugins/parcelport/mpi/sender_connection.hpp
+      hpx/plugins/parcelport/mpi/sender.hpp
+      hpx/plugins/parcelport/mpi/tag_provider.hpp
+      hpx/plugins/parcelport/tcp/connection_handler.hpp
+      hpx/plugins/parcelport/tcp/locality.hpp
+      hpx/plugins/parcelport/tcp/receiver.hpp
+      hpx/plugins/parcelport/tcp/sender.hpp
+      hpx/plugins/plugin_factory_base.hpp
+      hpx/plugins/plugin_registry.hpp
+      hpx/plugins/unique_plugin_name.hpp
+      hpx/runtime/message_handler_fwd.hpp
+      hpx/runtime/parcelset/connection_cache.hpp
+      hpx/runtime/parcelset/decode_parcels.hpp
+      hpx/runtime/parcelset/detail/call_for_each.hpp
+      hpx/runtime/parcelset/detail/data_point.hpp
+      hpx/runtime/parcelset/detail/gatherer.hpp
+      hpx/runtime/parcelset/detail/parcel_await.hpp
+      hpx/runtime/parcelset/detail/parcel_route_handler.hpp
+      hpx/runtime/parcelset/detail/per_action_data_counter.hpp
+      hpx/runtime/parcelset/encode_parcels.hpp
+      hpx/runtime/parcelset_fwd.hpp
+      hpx/runtime/parcelset/locality.hpp
+      hpx/runtime/parcelset/parcel_buffer.hpp
+      hpx/runtime/parcelset/parcelhandler.hpp
+      hpx/runtime/parcelset/parcel.hpp
+      hpx/runtime/parcelset/parcelport_connection.hpp
+      hpx/runtime/parcelset/parcelport.hpp
+      hpx/runtime/parcelset/parcelport_impl.hpp
+      hpx/runtime/parcelset/policies/message_handler.hpp
+      hpx/runtime/parcelset/put_parcel.hpp
+      hpx/runtime/set_parcel_write_handler.hpp
+      hpx/traits/action_message_handler.hpp
+      hpx/traits/action_serialization_filter.hpp
   )
+  list(TRANSFORM hpx_HEADERS PREPEND ${PROJECT_SOURCE_DIR}/)
 endif()
-
-list(TRANSFORM hpx_HEADERS PREPEND ${PROJECT_SOURCE_DIR}/)
 
 foreach(lib "hpx" "hpx_external" "hpx_generated")
   set(${lib}_SOURCES

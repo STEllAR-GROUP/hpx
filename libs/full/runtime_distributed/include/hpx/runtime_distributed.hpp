@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/agas/addressing_service.hpp>
-#include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/components_base/generate_unique_ids.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
@@ -18,6 +17,7 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime_components/server/console_error_sink_singleton.hpp>
+#include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>

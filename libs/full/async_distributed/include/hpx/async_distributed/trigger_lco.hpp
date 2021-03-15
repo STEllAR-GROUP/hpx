@@ -14,9 +14,9 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/async_distributed/continuation_fwd.hpp>
+#include <hpx/async_distributed/lcos_fwd.hpp>
 #include <hpx/async_distributed/trigger_lco_fwd.hpp>
 #include <hpx/components_base/component_type.hpp>
-#include <hpx/lcos_fwd.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/type_support/unused.hpp>

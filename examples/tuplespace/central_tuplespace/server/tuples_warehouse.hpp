@@ -14,7 +14,6 @@
 #include <hpx/include/components.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/mutex.hpp>
-#include <hpx/util/storage/tuple.hpp>
 
 #include <algorithm>
 #include <cstdint>
@@ -23,6 +22,8 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+
+#include "tuple.hpp"
 
 // #define TS_DEBUG
 
