@@ -75,8 +75,6 @@ void test_approximation()
 
 void test_approximation_with_multiname_options()
 {
-#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
-    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
     // the long_names() API function was introduced in Boost V1.68
     options_description desc;
     // clang-format off
@@ -114,13 +112,10 @@ void test_approximation_with_multiname_options()
         desc.find("baz", false, false, false).long_names().first[0], "fizbaz");
     HPX_TEST_EQ(
         desc.find("baz", false, false, false).long_names().first[1], "baz");
-#endif
 }
 
 void test_long_names_for_option_description()
 {
-#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
-    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
     // the long_names() API function was introduced in Boost V1.68
     options_description desc;
     // clang-format off
@@ -152,7 +147,6 @@ void test_long_names_for_option_description()
         desc.find("qux", false, false, false).long_names().first[0], "qux");
     HPX_TEST_EQ(
         desc.find("qux", false, false, false).long_names().first[1], "fo");
-#endif
 }
 
 void test_formatting()
@@ -210,8 +204,6 @@ void test_formatting()
 
 void test_multiname_option_formatting()
 {
-#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
-    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
     // the long_names() API function was introduced in Boost V1.68
     options_description desc;
     desc.add_options()(
@@ -220,7 +212,6 @@ void test_multiname_option_formatting()
     stringstream ss;
     ss << desc;
     HPX_TEST_EQ(ss.str(), "  --foo arg             a multiple-name option\n");
-#endif
 }
 
 void test_formatting_description_length()

@@ -11,6 +11,8 @@
 
 #include <sys/mman.h>
 #include <sys/param.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>

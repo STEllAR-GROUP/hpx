@@ -102,8 +102,6 @@ void check_value(const woption& option, const char* name, const wchar_t* value)
 
 void test_command_line()
 {
-#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
-    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
     // the long_names() API function was introduced in Boost V1.68
     options_description desc;
     desc.add_options()("foo,f", new untyped_value(), "")
@@ -124,7 +122,6 @@ void test_command_line()
     check_value(a4[1], "foo", L"4");
     check_value(a4[2], "bar", L"11");
     check_value(a4[4], "qux", L"10");
-#endif
 }
 
 // Since we've already tested conversion between parser encoding and
