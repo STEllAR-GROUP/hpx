@@ -34,19 +34,26 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename E>
-            void set_error(E&& e) noexcept
+            auto set_error(E&& e) noexcept
+                -> decltype(hpx::execution::experimental::set_error(
+                                std::move(r), std::forward<E>(e)),
+                    void())
             {
                 hpx::execution::experimental::set_error(
                     std::move(r), std::forward<E>(e));
             }
 
-            void set_done() noexcept
+            auto set_done() noexcept -> decltype(
+                hpx::execution::experimental::set_done(std::move(r)), void())
             {
                 hpx::execution::experimental::set_done(std::move(r));
             };
 
             template <typename... Ts>
-            void set_value(Ts&&... ts) noexcept
+            auto set_value(Ts&&... ts) noexcept
+                -> decltype(hpx::execution::experimental::set_value(
+                                std::move(r), std::forward<Ts>(ts)...),
+                    void())
             {
                 hpx::execution::experimental::execute(
                     scheduler, [=, r = std::move(r)]() mutable {

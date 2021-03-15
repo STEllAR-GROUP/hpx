@@ -82,7 +82,8 @@ struct callback_receiver
     };
 
     template <typename... Ts>
-    void set_value(Ts&&... ts) noexcept
+    auto set_value(Ts&&... ts) noexcept
+        -> decltype(HPX_INVOKE(f, std::forward<Ts>(ts)...), void())
     {
         HPX_INVOKE(f, std::forward<Ts>(ts)...);
         set_value_called = true;
