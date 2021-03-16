@@ -8,6 +8,8 @@
 
 #include <hpx/type_support/pack.hpp>
 
+#include <type_traits>
+
 namespace hpx {
     namespace execution {
         namespace experimental {
@@ -48,6 +50,44 @@ namespace hpx {
         static_assert(sizeof(T) == 0,
             "sync_wait expects the predecessor sender to have a single variant "
             "with a single type in sender_traits<>::value_types (two or more "
+            "variants given)");
+    };
+
+    template <typename Variants>
+    struct when_all_single_result
+    {
+        static_assert(sizeof(Variants) == 0,
+            "when_all expects the predecessor sender to have a single variant "
+            "with a single non-void type in sender_traits<>::value_types");
+    };
+
+    template <typename T>
+    struct when_all_single_result<hpx::util::pack<hpx::util::pack<T>>>
+    {
+        static_assert(!std::is_void<T>::value,
+            "when_all expects the predecessor sender to have a single variant "
+            "with a single non-void type in sender_traits<>::value_types (void "
+            "given)");
+
+        using type = T;
+    };
+
+    template <typename T, typename U, typename... Ts>
+    struct when_all_single_result<hpx::util::pack<hpx::util::pack<T, U, Ts...>>>
+    {
+        static_assert(sizeof(T) == 0,
+            "when_all expects the predecessor sender to have a single variant "
+            "with a single non-void type in sender_traits<>::value_types "
+            "(single variant with two or more types given)");
+    };
+
+    template <typename T, typename U, typename... Ts>
+    struct when_all_single_result<hpx::util::pack<T, U, Ts...>>
+    {
+        static_assert(sizeof(T) == 0,
+            "when_all expects the predecessor sender to have a single variant "
+            "with a single non-void type in sender_traits<>::value_types (two "
+            "or more "
             "variants given)");
     };
 }}}}    // namespace hpx::execution::experimental::detail

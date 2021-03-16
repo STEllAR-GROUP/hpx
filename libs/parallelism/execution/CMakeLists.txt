@@ -16,6 +16,7 @@ set(execution_headers
     hpx/execution/algorithms/on.hpp
     hpx/execution/algorithms/sync_wait.hpp
     hpx/execution/algorithms/transform.hpp
+    hpx/execution/algorithms/when_all.hpp
     hpx/execution/detail/async_launch_policy_dispatch.hpp
     hpx/execution/detail/future_exec.hpp
     hpx/execution/detail/execution_parameter_callbacks.hpp

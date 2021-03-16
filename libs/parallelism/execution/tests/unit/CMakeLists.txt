@@ -10,6 +10,7 @@ set(tests
     algorithm_on
     algorithm_sync_wait
     algorithm_transform
+    algorithm_when_all
     bulk_async
     created_executor
     executor_parameters
