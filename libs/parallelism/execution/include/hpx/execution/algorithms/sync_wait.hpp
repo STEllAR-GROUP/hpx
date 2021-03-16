@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/optional.hpp>
+#if defined(HPX_HAVE_CXX17_STD_VARIANT)
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution_base/operation_state.hpp>
@@ -21,146 +21,143 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <variant>
 
 namespace hpx { namespace execution { namespace experimental {
     namespace detail {
-        template <typename T>
-        struct sync_wait_receiver
+        struct sync_wait_error_visitor
         {
-            struct state
+            void operator()(std::exception_ptr e)
             {
-                hpx::lcos::local::condition_variable cv;
-                hpx::lcos::local::mutex m;
-                bool done = false;
-                bool has_exception = false;
-                std::exception_ptr ep;
-                hpx::util::optional<T> result;
-            };
-
-            state& st;
-
-            void signal_done() noexcept
-            {
-                std::unique_lock<hpx::lcos::local::mutex> l(st.m);
-                st.done = true;
-                st.cv.notify_one();
+                std::rethrow_exception(e);
             }
 
-            void set_error(std::exception_ptr ep) noexcept
+            template <typename E>
+            void operator()(E& e)
             {
-                st.ep = ep;
-                st.has_exception = true;
-                signal_done();
-            }
-
-            void set_done() noexcept
-            {
-                signal_done();
-            };
-
-            template <typename T_>
-            void set_value(T_&& t) noexcept
-            {
-                st.result = std::forward<T_>(t);
-                signal_done();
+                throw e;
             }
         };
 
-        template <>
-        struct sync_wait_receiver<void>
+        template <typename S>
+        struct sync_wait_receiver
         {
+            // value and error_types of the predecessor sender
+            template <template <typename...> class Tuple,
+                template <typename...> class Variant>
+            using predecessor_value_types =
+                typename hpx::execution::experimental::sender_traits<
+                    S>::template value_types<Tuple, Variant>;
+
+            template <template <typename...> class Variant>
+            using predecessor_error_types =
+                typename hpx::execution::experimental::sender_traits<
+                    S>::template error_types<Variant>;
+
+            // The type of the single void or non-void result that we store. If
+            // there are multiple variants or multiple values sync_wait will
+            // fail to compile.
+            using result_type = std::decay_t<single_result_t<
+                predecessor_value_types<hpx::util::pack, hpx::util::pack>>>;
+
+            // Constant to indicate if the type of the result from the
+            // predecessor sender is void or not
+            static constexpr bool is_void_result =
+                std::is_same_v<result_type, void>;
+
+            // Dummy type to indicate that set_value with void has been called
+            struct void_value_type
+            {
+            };
+
+            // The type of the value to store in the variant, void_value_type if
+            // result_type is void, or result_type if it is not
+            using value_type = std::conditional_t<is_void_result,
+                void_value_type, result_type>;
+
+            // The type of errors to store in the variant. This in itself is a
+            // variant.
+            using error_type =
+                hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
+                    predecessor_error_types<std::variant>, std::exception_ptr>>;
+
             struct state
             {
                 hpx::lcos::local::condition_variable cv;
                 hpx::lcos::local::mutex m;
-                bool done = false;
-                bool has_exception = false;
-                std::exception_ptr ep;
+                bool set_called = false;
+                std::variant<std::monostate, error_type, value_type> v;
+
+                void wait()
+                {
+                    {
+                        std::unique_lock<hpx::lcos::local::mutex> l(m);
+                        if (!set_called)
+                        {
+                            cv.wait(l);
+                        }
+                    }
+                }
+
+                auto get_value()
+                {
+                    if (std::holds_alternative<value_type>(v))
+                    {
+                        if constexpr (is_void_result)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            return std::move(std::get<value_type>(v));
+                        }
+                    }
+                    else if (std::holds_alternative<error_type>(v))
+                    {
+                        // The visit will throw or terminate
+                        std::visit(
+                            sync_wait_error_visitor{}, std::get<error_type>(v));
+                    }
+
+                    // If the variant holds a std::monostate we also terminate
+                    std::terminate();
+                }
             };
 
             state& st;
 
-            void signal_done() noexcept
+            void signal_set_called() noexcept
             {
                 std::unique_lock<hpx::lcos::local::mutex> l(st.m);
-                st.done = true;
+                st.set_called = true;
                 st.cv.notify_one();
             }
 
-            void set_error(std::exception_ptr ep) noexcept
+            template <typename E>
+            void set_error(E&& e) noexcept
             {
-                st.ep = ep;
-                st.has_exception = true;
-                signal_done();
+                st.v.template emplace<error_type>(e);
+                signal_set_called();
             }
 
             void set_done() noexcept
             {
-                signal_done();
+                signal_set_called();
             };
 
             void set_value() noexcept
             {
-                signal_done();
+                st.v.template emplace<value_type>();
+                signal_set_called();
+            }
+
+            template <typename U>
+            void set_value(U&& u) noexcept
+            {
+                st.v.template emplace<value_type>(std::forward<U>(u));
+                signal_set_called();
             }
         };
-
-        template <typename S>
-        auto sync_wait_impl(std::true_type, S&& s)
-        {
-            using state_type = typename detail::sync_wait_receiver<void>::state;
-
-            state_type st{};
-            auto os = hpx::execution::experimental::connect(
-                std::forward<S>(s), detail::sync_wait_receiver<void>{st});
-            hpx::execution::experimental::start(os);
-
-            {
-                std::unique_lock<hpx::lcos::local::mutex> l(st.m);
-                if (!st.done)
-                {
-                    st.cv.wait(l);
-                }
-            }
-
-            if (st.has_exception)
-            {
-                std::rethrow_exception(st.ep);
-            }
-        }
-
-        template <typename S>
-        auto sync_wait_impl(std::false_type, S&& s)
-        {
-            using value_types =
-                typename hpx::execution::experimental::sender_traits<
-                    S>::template value_types<hpx::util::pack, hpx::util::pack>;
-            using result_type = std::decay_t<single_result_t<value_types>>;
-            using state_type =
-                typename detail::sync_wait_receiver<result_type>::state;
-
-            state_type st{};
-            auto os = hpx::execution::experimental::connect(std::forward<S>(s),
-                detail::sync_wait_receiver<result_type>{st});
-            hpx::execution::experimental::start(os);
-
-            {
-                std::unique_lock<hpx::lcos::local::mutex> l(st.m);
-                if (!st.done)
-                {
-                    st.cv.wait(l);
-                }
-            }
-
-            if (st.has_exception)
-            {
-                std::rethrow_exception(st.ep);
-            }
-            else
-            {
-                return std::move(st.result.value());
-            }
-        }
     }    // namespace detail
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct sync_wait_t final
@@ -171,13 +168,16 @@ namespace hpx { namespace execution { namespace experimental {
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             sync_wait_t, S&& s)
         {
-            using value_types =
-                typename hpx::execution::experimental::sender_traits<
-                    S>::template value_types<hpx::util::pack, hpx::util::pack>;
-            using result_type = detail::single_result_t<value_types>;
+            using receiver_type = detail::sync_wait_receiver<S>;
+            using state_type = typename receiver_type::state;
 
-            return detail::sync_wait_impl(
-                std::is_void<result_type>{}, std::forward<S>(s));
+            state_type st{};
+            auto os = hpx::execution::experimental::connect(
+                std::forward<S>(s), receiver_type{st});
+            hpx::execution::experimental::start(os);
+
+            st.wait();
+            return st.get_value();
         }
 
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(sync_wait_t)
@@ -186,3 +186,4 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } sync_wait{};
 }}}    // namespace hpx::execution::experimental
+#endif

@@ -14,6 +14,8 @@
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
+#include <exception>
+#include <stdexcept>
 #include <utility>
 
 namespace hpx { namespace execution { namespace experimental {
@@ -24,7 +26,6 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename std::size_t... Is, typename... Ts>
         struct just_sender<hpx::util::index_pack<Is...>, Ts...>
         {
-            // TODO: Are references allowed?
             hpx::util::member_pack_for<std::decay_t<Ts>...> ts;
 
             template <typename... Ts_>
@@ -38,7 +39,7 @@ namespace hpx { namespace execution { namespace experimental {
             using value_types = Variant<Tuple<Ts...>>;
 
             template <template <typename...> class Variant>
-            using error_types = Variant<>;
+            using error_types = Variant<std::exception_ptr>;
 
             static constexpr bool sends_done = false;
 
@@ -55,20 +56,37 @@ namespace hpx { namespace execution { namespace experimental {
                   , ts(std::move(ts))
                 {
                 }
+
                 operation_state(operation_state&&) = delete;
+                operation_state& operator=(operation_state&&) = delete;
                 operation_state(operation_state const&) = delete;
+                operation_state& operator=(operation_state const&) = delete;
 
                 void start() noexcept
                 {
-                    hpx::execution::experimental::set_value(
-                        std::move(r), std::move(ts).template get<Is>()...);
+                    try
+                    {
+                        hpx::execution::experimental::set_value(
+                            std::move(r), std::move(ts).template get<Is>()...);
+                    }
+                    catch (...)
+                    {
+                        hpx::execution::experimental::set_error(
+                            std::move(r), std::current_exception());
+                    }
                 }
             };
 
             template <typename R>
-            auto connect(R&& r)
+            auto connect(R&& r) &&
             {
-                return operation_state<R>(std::forward<R>(r), std::move(ts));
+                return operation_state<R>{std::forward<R>(r), std::move(ts)};
+            }
+
+            template <typename R>
+            auto connect(R&& r) &
+            {
+                return operation_state<R>{r, ts};
             }
         };
     }    // namespace detail

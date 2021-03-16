@@ -7,6 +7,8 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include "algorithm_test_utils.hpp"
+
 #include <atomic>
 #include <exception>
 #include <stdexcept>
@@ -15,57 +17,6 @@
 #include <utility>
 
 namespace ex = hpx::execution::experimental;
-
-template <typename F>
-struct callback_receiver
-{
-    std::decay_t<F> f;
-    std::atomic<bool>& set_value_called;
-
-    template <typename E>
-    void set_error(E&&) noexcept
-    {
-        HPX_TEST(false);
-    }
-
-    void set_done() noexcept
-    {
-        HPX_TEST(false);
-    };
-
-    template <typename... Ts>
-    auto set_value(Ts&&... ts) noexcept
-        -> decltype(HPX_INVOKE(f, std::forward<Ts>(ts)...), void())
-    {
-        HPX_INVOKE(f, std::forward<Ts>(ts)...);
-        set_value_called = true;
-    }
-};
-
-template <typename F>
-struct error_callback_receiver
-{
-    std::decay_t<F> f;
-    std::atomic<bool>& set_error_called;
-
-    template <typename E>
-    void set_error(E&& e) noexcept
-    {
-        HPX_INVOKE(f, std::forward<E>(e));
-        set_error_called = true;
-    }
-
-    void set_done() noexcept
-    {
-        HPX_TEST(false);
-    };
-
-    template <typename... Ts>
-    void set_value(Ts&&...) noexcept
-    {
-        HPX_TEST(false);
-    }
-};
 
 struct custom_transformer
 {
@@ -89,18 +40,6 @@ auto tag_invoke(ex::transform_t, S&& s, custom_transformer t)
     t.tag_invoke_overload_called = true;
     return ex::transform(std::forward<S>(s), [t = std::move(t)]() { t(); });
 }
-
-void check_exception_ptr(std::exception_ptr eptr)
-{
-    try
-    {
-        std::rethrow_exception(eptr);
-    }
-    catch (const std::runtime_error& e)
-    {
-        HPX_TEST_EQ(std::string(e.what()), std::string("error"));
-    }
-};
 
 int main()
 {

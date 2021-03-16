@@ -7,6 +7,8 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include "algorithm_test_utils.hpp"
+
 #include <atomic>
 #include <string>
 #include <type_traits>
@@ -14,43 +16,12 @@
 
 namespace ex = hpx::execution::experimental;
 
-template <typename F>
-struct callback_receiver
-{
-    std::decay_t<F> f;
-    std::atomic<bool>& set_value_called;
-
-    template <typename E>
-    void set_error(E&&) noexcept
-    {
-        HPX_TEST(false);
-    }
-
-    void set_done() noexcept
-    {
-        HPX_TEST(false);
-    };
-
-    template <typename... Ts>
-    auto set_value(Ts&&... ts) noexcept
-        -> decltype(HPX_INVOKE(f, std::forward<Ts>(ts)...), void())
-    {
-        HPX_INVOKE(f, std::forward<Ts>(ts)...);
-        set_value_called = true;
-    }
-};
-
-template <typename T>
-struct custom_type
-{
-    std::atomic<bool>& called;
-    std::decay_t<T> x;
-};
-
+// This overload is only used to check dispatching. It is not a useful
+// implementation.
 template <typename T>
 auto tag_invoke(ex::just_t, custom_type<T> c)
 {
-    c.called = true;
+    c.tag_invoke_overload_called = true;
     return ex::just(c.x);
 }
 

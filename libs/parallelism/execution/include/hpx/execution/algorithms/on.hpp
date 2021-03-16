@@ -24,8 +24,8 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename R, typename Scheduler>
         struct on_receiver
         {
-            typename std::decay<R>::type r;
-            typename std::decay<Scheduler>::type scheduler;
+            std::decay_t<R> r;
+            std::decay_t<Scheduler> scheduler;
 
             template <typename R_, typename Scheduler_>
             on_receiver(R_&& r, Scheduler_&& scheduler)
@@ -67,8 +67,8 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename S, typename Scheduler>
         struct on_sender
         {
-            typename std::decay<S>::type s;
-            typename std::decay<Scheduler>::type scheduler;
+            std::decay_t<S> s;
+            std::decay_t<Scheduler> scheduler;
 
             template <template <typename...> class Tuple,
                 template <typename...> class Variant>
@@ -84,11 +84,18 @@ namespace hpx { namespace execution { namespace experimental {
             static constexpr bool sends_done = false;
 
             template <typename R>
-            auto connect(R&& r)
+            auto connect(R&& r) &&
             {
                 return hpx::execution::experimental::connect(std::move(s),
                     on_receiver<R, Scheduler>(
                         std::forward<R>(r), std::move(scheduler)));
+            }
+
+            template <typename R>
+            auto connect(R&& r) &
+            {
+                return hpx::execution::experimental::connect(s,
+                    on_receiver<R, Scheduler>(std::forward<R>(r), scheduler));
             }
         };
     }    // namespace detail

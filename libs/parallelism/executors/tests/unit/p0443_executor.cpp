@@ -9,12 +9,15 @@
 #include <hpx/functional.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/mutex.hpp>
 #include <hpx/thread.hpp>
 
 #include <array>
 #include <atomic>
 #include <chrono>
 #include <cstddef>
+#include <exception>
+#include <stdexcept>
 #include <string>
 #include <thread>
 #include <type_traits>
@@ -154,6 +157,7 @@ void test_sender_receiver_transform_wait()
             executed = true;
         });
     ex::sync_wait(std::move(work2));
+
     HPX_TEST_EQ(transform_count, std::size_t(2));
     HPX_TEST(executed);
 }
@@ -515,42 +519,40 @@ void test_just_on_two_args()
 
 void test_when_all()
 {
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
     ex::executor exec{};
 
     {
         hpx::thread::id parent_id = hpx::this_thread::get_id();
 
-        auto begin1 = ex::schedule(exec);
-        auto work1 = ex::transform(begin1, [parent_id]() {
+        auto work1 = ex::schedule(exec) | ex::transform([parent_id]() {
             HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
             return 42;
         });
 
-        auto begin2 = ex::schedule(exec);
-        auto work2 = ex::transform(begin2, [parent_id]() {
+        auto work2 = ex::schedule(exec) | ex::transform([parent_id]() {
             HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
             return std::string("hello");
         });
 
-        auto begin3 = ex::schedule(exec);
-        auto work3 = ex::transform(begin3, [parent_id]() {
+        auto work3 = ex::schedule(exec) | ex::transform([parent_id]() {
             HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
             return 3.14;
         });
 
-        auto when1 = ex::when_all(work1, work2, work3);
+        auto when1 =
+            ex::when_all(std::move(work1), std::move(work2), std::move(work3));
 
         std::atomic<bool> executed{false};
-        auto transform1 = ex::transform(
-            when1, [parent_id, &executed](int x, std::string y, double z) {
-                HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
-                HPX_TEST_EQ(x, 42);
-                HPX_TEST_EQ(y, std::string("hello"));
-                HPX_TEST_EQ(z, 3.14);
-                executed = true;
-            });
-        ex::sync_wait(transform1);
+        std::move(when1) |
+            ex::transform(
+                [parent_id, &executed](int x, std::string y, double z) {
+                    HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
+                    HPX_TEST_EQ(x, 42);
+                    HPX_TEST_EQ(y, std::string("hello"));
+                    HPX_TEST_EQ(z, 3.14);
+                    executed = true;
+                }) |
+            ex::sync_wait();
         HPX_TEST(executed);
     }
 
@@ -559,33 +561,29 @@ void test_when_all()
 
         // The exception is likely to be thrown before set_value from the second
         // sender is called because the second sender sleeps.
-        auto begin1 = ex::schedule(exec);
-        auto work1 = ex::transform(begin1, [parent_id]() {
+        auto work1 = ex::schedule(exec) | ex::transform([parent_id]() {
             HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
             throw std::runtime_error("error");
             return 42;
         });
 
-        auto begin2 = ex::schedule(exec);
-        auto work2 = ex::transform(begin2, [parent_id]() {
+        auto work2 = ex::schedule(exec) | ex::transform([parent_id]() {
             HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
             return std::string("hello");
         });
 
-        auto when1 = ex::when_all(work1, work2);
-        auto transform1 =
-            ex::transform(when1, [parent_id](int x, std::string y) {
-                HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
-                HPX_TEST_EQ(x, 42);
-                HPX_TEST_EQ(y, std::string("hello"));
-            });
-
         bool exception_thrown = false;
 
         try
         {
-            ex::sync_wait(transform1);
+            ex::when_all(std::move(work1), std::move(work2)) |
+                ex::transform([parent_id](int x, std::string y) {
+                    HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
+                    HPX_TEST_EQ(x, 42);
+                    HPX_TEST_EQ(y, std::string("hello"));
+                }) |
+                ex::sync_wait();
         }
         catch (std::runtime_error const& e)
         {
@@ -601,33 +599,29 @@ void test_when_all()
 
         // The exception is likely to be thrown after set_value from the second
         // sender is called because the first sender sleeps before throwing.
-        auto begin1 = ex::schedule(exec);
-        auto work1 = ex::transform(begin1, [parent_id]() {
+        auto work1 = ex::schedule(exec) | ex::transform([parent_id]() {
             HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
             throw std::runtime_error("error");
             return 42;
         });
 
-        auto begin2 = ex::schedule(exec);
-        auto work2 = ex::transform(begin2, [parent_id]() {
+        auto work2 = ex::schedule(exec) | ex::transform([parent_id]() {
             HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
             return std::string("hello");
         });
-
-        auto when1 = ex::when_all(work1, work2);
-        auto transform1 =
-            ex::transform(when1, [parent_id](int x, std::string y) {
-                HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
-                HPX_TEST_EQ(x, 42);
-                HPX_TEST_EQ(y, std::string("hello"));
-            });
 
         bool exception_thrown = false;
 
         try
         {
-            ex::sync_wait(transform1);
+            ex::when_all(std::move(work1), std::move(work2)) |
+                ex::transform([parent_id](int x, std::string y) {
+                    HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
+                    HPX_TEST_EQ(x, 42);
+                    HPX_TEST_EQ(y, std::string("hello"));
+                }) |
+                ex::sync_wait();
         }
         catch (std::runtime_error const& e)
         {
@@ -637,7 +631,6 @@ void test_when_all()
 
         HPX_TEST(exception_thrown);
     }
-#endif
 }
 
 void test_future_sender()
@@ -782,7 +775,6 @@ void test_future_sender()
         HPX_TEST(called);
     }
 
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
     {
         auto s1 = ex::just_on(ex::executor{}, std::size_t(42));
         auto s2 = ex::just_on(ex::executor{}, 3.14);
@@ -792,7 +784,6 @@ void test_future_sender()
             [](std::size_t x, double, std::string z) { return z.size() + x; }));
         HPX_TEST_EQ(f.get(), std::size_t(47));
     }
-#endif
 
     // mixing senders and futures
     {
@@ -808,7 +799,6 @@ void test_future_sender()
             42);
     }
 
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
     {
         auto s1 = ex::just_on(ex::executor{}, std::size_t(42));
         auto s2 = ex::just_on(ex::executor{}, 3.14);
@@ -829,7 +819,370 @@ void test_future_sender()
 
         HPX_TEST_EQ(last.get(), std::size_t(18));
     }
-#endif
+}
+
+void test_ensure_started()
+{
+    ex::executor exec{};
+
+    {
+        ex::schedule(exec) | ex::ensure_started() | ex::sync_wait();
+    }
+
+    {
+        auto s = ex::just_on(exec, 42) | ex::ensure_started();
+        HPX_TEST_EQ(ex::sync_wait(std::move(s)), 42);
+    }
+
+    {
+        auto s = ex::just_on(exec, 42) | ex::ensure_started() | ex::on(exec);
+        HPX_TEST_EQ(ex::sync_wait(std::move(s)), 42);
+    }
+
+    {
+        auto s = ex::just_on(exec, 42) | ex::ensure_started();
+        HPX_TEST_EQ(ex::sync_wait(s), 42);
+        HPX_TEST_EQ(ex::sync_wait(s), 42);
+        HPX_TEST_EQ(ex::sync_wait(s), 42);
+        HPX_TEST_EQ(ex::sync_wait(std::move(s)), 42);
+    }
+}
+
+void test_ensure_started_when_all()
+{
+    ex::executor exec{};
+
+    {
+        std::atomic<std::size_t> first_task_calls{0};
+        std::atomic<std::size_t> successor_task_calls{0};
+        auto s = ex::schedule(exec) |
+            ex::transform([&]() { ++first_task_calls; }) | ex::ensure_started();
+        auto succ1 = s | ex::transform([&]() {
+            ++successor_task_calls;
+            return 1;
+        });
+        auto succ2 = s | ex::transform([&]() {
+            ++successor_task_calls;
+            return 2;
+        });
+        HPX_TEST_EQ(ex::when_all(succ1, succ2) |
+                ex::transform(
+                    [](int const& x, int const& y) { return x + y; }) |
+                ex::sync_wait(),
+            3);
+        HPX_TEST_EQ(first_task_calls, std::size_t(1));
+        HPX_TEST_EQ(successor_task_calls, std::size_t(2));
+    }
+
+    {
+        std::atomic<std::size_t> first_task_calls{0};
+        std::atomic<std::size_t> successor_task_calls{0};
+        auto s = ex::schedule(exec) | ex::transform([&]() {
+            ++first_task_calls;
+            return 3;
+        }) | ex::ensure_started();
+        auto succ1 = s | ex::transform([&](int const& x) {
+            ++successor_task_calls;
+            return x + 1;
+        });
+        auto succ2 = s | ex::transform([&](int const& x) {
+            ++successor_task_calls;
+            return x + 2;
+        });
+        HPX_TEST_EQ(ex::when_all(succ1, succ2) |
+                ex::transform(
+                    [](int const& x, int const& y) { return x + y; }) |
+                ex::sync_wait(),
+            9);
+        HPX_TEST_EQ(first_task_calls, std::size_t(1));
+        HPX_TEST_EQ(successor_task_calls, std::size_t(2));
+    }
+
+    {
+        std::atomic<std::size_t> first_task_calls{0};
+        std::atomic<std::size_t> successor_task_calls{0};
+        auto s = ex::schedule(exec) | ex::transform([&]() {
+            ++first_task_calls;
+            return 3;
+        }) | ex::ensure_started();
+        auto succ1 = s | ex::on(exec) | ex::transform([&](int const& x) {
+            ++successor_task_calls;
+            return x + 1;
+        });
+        auto succ2 = s | ex::on(exec) | ex::transform([&](int const& x) {
+            ++successor_task_calls;
+            return x + 2;
+        });
+        HPX_TEST_EQ(ex::when_all(succ1, succ2) |
+                ex::transform(
+                    [](int const& x, int const& y) { return x + y; }) |
+                ex::sync_wait(),
+            9);
+        HPX_TEST_EQ(first_task_calls, std::size_t(1));
+        HPX_TEST_EQ(successor_task_calls, std::size_t(2));
+    }
+}
+
+void test_let_value()
+{
+    ex::executor exec{};
+
+    // void predecessor
+    {
+        auto result = ex::schedule(exec) |
+            ex::let_value([]() { return ex::just(42); }) | ex::sync_wait();
+        HPX_TEST_EQ(result, 42);
+    }
+
+    {
+        auto result = ex::schedule(exec) |
+            ex::let_value([=]() { return ex::just_on(exec, 42); }) |
+            ex::sync_wait();
+        HPX_TEST_EQ(result, 42);
+    }
+
+    {
+        auto result = ex::just() |
+            ex::let_value([=]() { return ex::just_on(exec, 42); }) |
+            ex::sync_wait();
+        HPX_TEST_EQ(result, 42);
+    }
+
+    // int predecessor, value ignored
+    {
+        auto result = ex::just_on(exec, 43) |
+            ex::let_value([](int&) { return ex::just(42); }) | ex::sync_wait();
+        HPX_TEST_EQ(result, 42);
+    }
+
+    {
+        auto result = ex::just_on(exec, 43) |
+            ex::let_value([=](int&) { return ex::just_on(exec, 42); }) |
+            ex::sync_wait();
+        HPX_TEST_EQ(result, 42);
+    }
+
+    {
+        auto result = ex::just(43) |
+            ex::let_value([=](int&) { return ex::just_on(exec, 42); }) |
+            ex::sync_wait();
+        HPX_TEST_EQ(result, 42);
+    }
+
+    // int predecessor, value used
+    {
+        auto result = ex::just_on(exec, 43) | ex::let_value([](int& x) {
+            return ex::just(42) | ex::transform([&](int y) { return x + y; });
+        }) | ex::sync_wait();
+        HPX_TEST_EQ(result, 85);
+    }
+
+    {
+        auto result = ex::just_on(exec, 43) | ex::let_value([=](int& x) {
+            return ex::just_on(exec, 42) |
+                ex::transform([&](int y) { return x + y; });
+        }) | ex::sync_wait();
+        HPX_TEST_EQ(result, 85);
+    }
+
+    {
+        auto result = ex::just(43) | ex::let_value([=](int& x) {
+            return ex::just_on(exec, 42) |
+                ex::transform([&](int y) { return x + y; });
+        }) | ex::sync_wait();
+        HPX_TEST_EQ(result, 85);
+    }
+
+    // predecessor throws, let sender is ignored
+    {
+        bool exception_thrown = false;
+
+        try
+        {
+            ex::just_on(exec, 43) | ex::transform([](int x) {
+                throw std::runtime_error("error");
+                return x;
+            }) | ex::let_value([](int&) {
+                HPX_TEST(false);
+                return ex::just(0);
+            }) | ex::sync_wait();
+        }
+        catch (std::runtime_error const& e)
+        {
+            HPX_TEST_EQ(std::string(e.what()), std::string("error"));
+            exception_thrown = true;
+        }
+
+        HPX_TEST(exception_thrown);
+    }
+}
+
+void check_exception_ptr_message(
+    std::exception_ptr ep, std::string const& message)
+{
+    try
+    {
+        std::rethrow_exception(ep);
+    }
+    catch (std::runtime_error const& e)
+    {
+        HPX_TEST_EQ(std::string(e.what()), message);
+        return;
+    }
+
+    HPX_TEST(false);
+}
+
+void test_let_error()
+{
+    ex::executor exec{};
+
+    // void predecessor
+    {
+        std::atomic<bool> called{false};
+        ex::schedule(exec) | ex::transform([]() {
+            throw std::runtime_error("error");
+        }) | ex::let_error([&called](std::exception_ptr& ep) {
+            called = true;
+            check_exception_ptr_message(ep, "error");
+            return ex::just();
+        }) | ex::sync_wait();
+        HPX_TEST(called);
+    }
+
+    {
+        std::atomic<bool> called{false};
+        ex::schedule(exec) | ex::transform([]() {
+            throw std::runtime_error("error");
+        }) | ex::let_error([=, &called](std::exception_ptr& ep) {
+            called = true;
+            check_exception_ptr_message(ep, "error");
+            return ex::just_on(exec);
+        }) | ex::sync_wait();
+        HPX_TEST(called);
+    }
+
+    {
+        std::atomic<bool> called{false};
+        ex::just() | ex::transform([]() {
+            throw std::runtime_error("error");
+        }) | ex::let_error([=, &called](std::exception_ptr& ep) {
+            called = true;
+            check_exception_ptr_message(ep, "error");
+            return ex::just_on(exec);
+        }) | ex::sync_wait();
+        HPX_TEST(called);
+    }
+
+    // int predecessor
+    {
+        auto result = ex::schedule(exec) | ex::transform([]() {
+            throw std::runtime_error("error");
+            return 43;
+        }) | ex::let_error([](std::exception_ptr& ep) {
+            check_exception_ptr_message(ep, "error");
+            return ex::just(42);
+        }) | ex::sync_wait();
+        HPX_TEST_EQ(result, 42);
+    }
+
+    {
+        auto result = ex::schedule(exec) | ex::transform([]() {
+            throw std::runtime_error("error");
+            return 43;
+        }) | ex::let_error([=](std::exception_ptr& ep) {
+            check_exception_ptr_message(ep, "error");
+            return ex::just_on(exec, 42);
+        }) | ex::sync_wait();
+        HPX_TEST_EQ(result, 42);
+    }
+
+    {
+        auto result = ex::just() | ex::transform([]() {
+            throw std::runtime_error("error");
+            return 43;
+        }) | ex::let_error([=](std::exception_ptr& ep) {
+            check_exception_ptr_message(ep, "error");
+            return ex::just_on(exec, 42);
+        }) | ex::sync_wait();
+        HPX_TEST_EQ(result, 42);
+    }
+
+    // predecessor doesn't throw, let sender is ignored
+    {
+        auto result = ex::just_on(exec, 42) |
+            ex::let_error([](std::exception_ptr) {
+                HPX_TEST(false);
+                return ex::just(43);
+            }) |
+            ex::sync_wait();
+        HPX_TEST_EQ(result, 42);
+    }
+
+    {
+        auto result = ex::just_on(exec, 42) |
+            ex::let_error([=](std::exception_ptr) {
+                HPX_TEST(false);
+                return ex::just_on(exec, 43);
+            }) |
+            ex::sync_wait();
+        HPX_TEST_EQ(result, 42);
+    }
+
+    {
+        auto result = ex::just(42) | ex::let_error([=](std::exception_ptr) {
+            HPX_TEST(false);
+            return ex::just_on(exec, 43);
+        }) | ex::sync_wait();
+        HPX_TEST_EQ(result, 42);
+    }
+}
+
+void test_detach()
+{
+    ex::executor exec{};
+
+    {
+        bool called = false;
+        hpx::mutex m;
+        hpx::condition_variable cv;
+        ex::schedule(exec) | ex::transform([&]() {
+            std::unique_lock<hpx::mutex> l(m);
+            called = true;
+            cv.notify_one();
+        }) | ex::detach();
+
+        {
+            std::unique_lock<hpx::mutex> l(m);
+            while (!called)
+            {
+                cv.wait_for(l, std::chrono::seconds(1));
+            }
+        }
+        HPX_TEST(called);
+    }
+
+    // Values passed to set_value are ignored
+    {
+        bool called = false;
+        hpx::mutex m;
+        hpx::condition_variable cv;
+        ex::schedule(exec) | ex::transform([&]() {
+            std::unique_lock<hpx::mutex> l(m);
+            called = true;
+            cv.notify_one();
+            return 42;
+        }) | ex::detach();
+
+        {
+            std::unique_lock<hpx::mutex> l(m);
+            while (!called)
+            {
+                cv.wait_for(l, std::chrono::seconds(1));
+            }
+        }
+        HPX_TEST(called);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -853,6 +1206,11 @@ int hpx_main()
     test_just_on_two_args();
     test_when_all();
     test_future_sender();
+    test_ensure_started();
+    test_ensure_started_when_all();
+    test_let_value();
+    test_let_error();
+    test_detach();
 
     return hpx::finalize();
 }

@@ -492,8 +492,8 @@ namespace hpx { namespace execution { namespace experimental {
 
                 template <typename... Ts,
                     typename = std::enable_if_t<is_receiver_of_v<R, Ts...>>>
-                    void set_value(Ts&&... ts) &&
-                    noexcept(is_nothrow_receiver_of_v<R, Ts...>)
+                void set_value(Ts&&... ts) && noexcept(
+                    is_nothrow_receiver_of_v<R, Ts...>)
                 {
                     hpx::execution::experimental::set_value(
                         std::move(p->r), std::forward<Ts>(ts)...);
@@ -502,7 +502,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                 template <typename E,
                     typename = std::enable_if_t<is_receiver_v<R, E>>>
-                    void set_error(E&& e) && noexcept
+                void set_error(E&& e) && noexcept
                 {
                     hpx::execution::experimental::set_error(
                         std::move(p->r), std::forward<E>(e));
@@ -899,6 +899,33 @@ namespace hpx { namespace execution { namespace experimental {
         using __unspecialized = void;
     };
 
+    namespace detail {
+        template <template <typename...> class Tuple,
+            template <typename...> class Variant>
+        struct value_types
+        {
+            template <typename Sender>
+            struct apply
+            {
+                using type =
+                    typename hpx::execution::experimental::sender_traits<
+                        Sender>::template value_types<Tuple, Variant>;
+            };
+        };
+
+        template <template <typename...> class Variant>
+        struct error_types
+        {
+            template <typename Sender>
+            struct apply
+            {
+                using type =
+                    typename hpx::execution::experimental::sender_traits<
+                        Sender>::template error_types<Variant>;
+            };
+        };
+    }    // namespace detail
+
     template <typename Scheduler, typename Enable = void>
     struct is_scheduler : std::false_type
     {
@@ -915,4 +942,8 @@ namespace hpx { namespace execution { namespace experimental {
 
     template <typename Scheduler>
     constexpr bool is_scheduler_v = is_scheduler<Scheduler>::value;
+
+    template <typename S, typename R>
+    using connect_result_t =
+        typename hpx::util::invoke_result<connect_t, S, R>::type;
 }}}    // namespace hpx::execution::experimental

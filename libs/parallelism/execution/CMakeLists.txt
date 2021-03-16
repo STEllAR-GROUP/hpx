@@ -11,8 +11,12 @@ set(execution_headers
     hpx/execution/algorithms/detail/partial_algorithm.hpp
     hpx/execution/algorithms/detail/predicates.hpp
     hpx/execution/algorithms/detail/single_result.hpp
+    hpx/execution/algorithms/detach.hpp
+    hpx/execution/algorithms/ensure_started.hpp
     hpx/execution/algorithms/just.hpp
     hpx/execution/algorithms/just_on.hpp
+    hpx/execution/algorithms/let_value.hpp
+    hpx/execution/algorithms/let_error.hpp
     hpx/execution/algorithms/on.hpp
     hpx/execution/algorithms/sync_wait.hpp
     hpx/execution/algorithms/transform.hpp

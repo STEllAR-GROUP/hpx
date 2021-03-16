@@ -69,7 +69,7 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                     try
                     {
-                        os.ts.template get<I>() = std::forward<T>(t);
+                        os.ts.template get<I>().emplace(std::forward<T>(t));
                     }
                     catch (...)
                     {
@@ -105,17 +105,19 @@ namespace hpx { namespace execution { namespace experimental {
                 using type = detail::single_result_non_void_t<value_types>;
             };
 
+            template <typename Sender>
+            using value_types_helper_t =
+                typename value_types_helper<Sender>::type;
+
             template <template <typename...> class Tuple,
                 template <typename...> class Variant>
-            using value_types =
-                Variant<Tuple<typename value_types_helper<Ss>::type...>>;
+            using value_types = Variant<Tuple<value_types_helper_t<Ss>...>>;
 
             template <template <typename...> class Variant>
-            using error_types = typename hpx::util::detail::unique<
-                typename hpx::util::detail::cat<
-                    typename hpx::execution::experimental::sender_traits<
-                        Ss>::template error_types<Variant>...,
-                    Variant<std::exception_ptr>>::type>::type;
+            using error_types = hpx::util::detail::unique_concat_t<
+                typename hpx::execution::experimental::sender_traits<
+                    Ss>::template error_types<Variant>...,
+                Variant<std::exception_ptr>>;
 
             static constexpr bool sends_done = false;
 
@@ -133,7 +135,7 @@ namespace hpx { namespace execution { namespace experimental {
                 std::atomic<std::size_t> predecessors_remaining =
                     num_predecessors;
                 hpx::util::member_pack_for<
-                    std::decay_t<typename value_types_helper<Ss>::type>...>
+                    std::decay_t<value_types_helper_t<Ss>>...>
                     ts;
                 std::optional<error_types<std::variant>> e;
                 std::atomic<bool> set_done_error_called{false};
@@ -237,6 +239,12 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 return operation_state<R, num_predecessors - 1>(
                     std::forward<R>(r), senders);
+            }
+
+            template <typename R>
+            auto connect(R&& r) &
+            {
+                return operation_state<R, num_predecessors - 1>(r, senders);
             }
         };
     }    // namespace detail
