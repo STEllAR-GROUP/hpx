@@ -422,6 +422,7 @@ function(add_hpx_module libname modulename)
     )
   else()
     target_link_libraries(hpx_${libname} PUBLIC hpx_${modulename})
+    target_link_libraries(hpx_${libname} PRIVATE ${${modulename}_OBJECTS})
   endif()
 
   foreach(dir ${${modulename}_CMAKE_SUBDIRS})
