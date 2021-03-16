@@ -13,6 +13,10 @@
 #include <utility>
 #include <vector>
 
+#if _WIN32
+#include <windows.h>
+#endif
+
 static constexpr bool enable_debug = false;
 
 // example values in slurm conf
@@ -45,7 +49,11 @@ static auto run_in_slurm_env(
             std::back_inserter(defaultenvironment));
         for (auto& env : defaultenvironment)
         {
+#if _WIN32
+            ::_putenv_s(env.first, env.second);
+#else
             ::setenv(env.first, env.second, 1);
+#endif
         }
 
         std::vector<std::string> nodelist;
@@ -59,7 +67,11 @@ static auto run_in_slurm_env(
 
         for (auto& env : defaultenvironment)
         {
+#if _WIN32
+            _putenv_s(env.first, "");
+#else
             ::unsetenv(env.first);
+#endif
         }
     }
     return;

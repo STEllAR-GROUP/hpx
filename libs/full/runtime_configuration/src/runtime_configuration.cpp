@@ -21,16 +21,12 @@
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/version.hpp>
 
-#include <boost/spirit/include/qi_alternative.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/qi_parse.hpp>
-#include <boost/spirit/include/qi_sequence.hpp>
-#include <boost/spirit/include/qi_string.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <iterator>
 #include <limits>
 #include <map>
@@ -1182,12 +1178,10 @@ namespace hpx { namespace util {
             if (nullptr != sec)
             {
                 std::string entry = sec->get_entry(entryname, defaultvaluestr);
-                std::ptrdiff_t val = defaultvalue;
-
-                namespace qi = boost::spirit::qi;
-                qi::parse(entry.begin(), entry.end(),
-                    "0x" >> qi::hex | "0" >> qi::oct | qi::int_, val);
-                return val;
+                char* endptr = nullptr;
+                std::ptrdiff_t val =
+                    std::strtoll(entry.c_str(), &endptr, /*base:*/ 0);
+                return endptr != entry.c_str() ? val : defaultvalue;
             }
         }
         return defaultvalue;

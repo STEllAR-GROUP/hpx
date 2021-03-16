@@ -49,12 +49,17 @@ namespace hpx { namespace threads {
             };
             HPX_CORE_EXPORT static char const* type_name(type t);
 
-            static std::int64_t all_entities()
+            static std::int64_t all_entities() noexcept
             {
                 return (std::numeric_limits<std::int64_t>::min)();
             }
 
-            spec_type(type t = unknown, std::int64_t min = all_entities(),
+            spec_type() noexcept
+              : type_(unknown)
+            {
+            }
+
+            spec_type(type t, std::int64_t min = all_entities(),
                 std::int64_t max = all_entities())
               : type_(t)
               , index_bounds_()
@@ -76,19 +81,9 @@ namespace hpx { namespace threads {
                 }
             }
 
-            bool operator==(spec_type const& rhs) const
+            bool operator==(spec_type const& rhs) const noexcept
             {
-                if (type_ != rhs.type_ ||
-                    index_bounds_.size() != rhs.index_bounds_.size())
-                    return false;
-
-                for (std::size_t i = 0; i < index_bounds_.size(); ++i)
-                {
-                    if (index_bounds_[i] != rhs.index_bounds_[i])
-                        return false;
-                }
-
-                return true;
+                return type_ == rhs.type_ && index_bounds_ == rhs.index_bounds_;
             }
 
             type type_;
