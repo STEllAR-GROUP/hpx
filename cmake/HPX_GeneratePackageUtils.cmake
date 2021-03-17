@@ -259,7 +259,7 @@ function(
   # NOTE: This uses -I and not -isystem in lack of a good way to filter out
   # compiler search paths.
   set(_cflag_list
-      "${_cflag_list} $<$<BOOL:${${sys_include_dirs}}>:-I$<JOIN:${${sys_include_dirs}}, -isystem>>"
+      "${_cflag_list} $<$<BOOL:${${sys_include_dirs}}>:-I$<JOIN:${${sys_include_dirs}}, -I>>"
   )
   set(${cflag_list}
       ${_cflag_list}
