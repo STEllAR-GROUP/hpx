@@ -8,6 +8,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(execution_headers
     hpx/execution/algorithms/detail/is_negative.hpp
+    hpx/execution/algorithms/detail/partial_algorithm.hpp
     hpx/execution/algorithms/detail/predicates.hpp
     hpx/execution/algorithms/detail/single_result.hpp
     hpx/execution/algorithms/just.hpp

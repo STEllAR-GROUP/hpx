@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/optional.hpp>
+#include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/sender.hpp>
@@ -179,6 +180,11 @@ namespace hpx { namespace execution { namespace experimental {
 
             return detail::sync_wait_impl(
                 std::is_void<result_type>{}, std::forward<S>(s));
+        }
+
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(sync_wait_t)
+        {
+            return detail::partial_algorithm<sync_wait_t>{};
         }
     } sync_wait{};
 }}}    // namespace hpx::execution::experimental

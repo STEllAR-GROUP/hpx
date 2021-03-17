@@ -120,6 +120,24 @@ int main()
         HPX_TEST_EQ(ex::sync_wait(ex::just(3)), 3);
     }
 
+    // operator| overload
+    {
+        std::atomic<bool> start_called{false};
+        std::atomic<bool> connect_called{false};
+        std::atomic<bool> tag_invoke_sync_wait_overload_called{false};
+        sender{start_called, connect_called,
+            tag_invoke_sync_wait_overload_called} |
+            ex::sync_wait();
+        HPX_TEST(start_called);
+        HPX_TEST(connect_called);
+        HPX_TEST(!tag_invoke_sync_wait_overload_called);
+    }
+
+    {
+        HPX_TEST_EQ(ex::just(3) | ex::sync_wait(), 3);
+    }
+
+    // tag_invoke overload
     {
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};

@@ -247,6 +247,26 @@ int main()
         HPX_TEST(scheduler_execute_called);
     }
 
+    // operator| overload
+    {
+        std::atomic<bool> set_value_called{false};
+        std::atomic<bool> scheduler_execute_called{false};
+        std::atomic<bool> tag_invoke_overload_called{false};
+        auto s = ex::just(std::string("hello"), 3) |
+            ex::on(scheduler{
+                scheduler_execute_called, tag_invoke_overload_called});
+        auto f = [](std::string s, int x) {
+            HPX_TEST_EQ(s, std::string("hello"));
+            HPX_TEST_EQ(x, 3);
+        };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        ex::start(ex::connect(s, r));
+        HPX_TEST(set_value_called);
+        HPX_TEST(!tag_invoke_overload_called);
+        HPX_TEST(scheduler_execute_called);
+    }
+
+    // tag_invoke overload
     {
         std::atomic<bool> set_value_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};

@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/tag_fallback_invoke.hpp>
@@ -102,6 +103,14 @@ namespace hpx { namespace execution { namespace experimental {
         {
             return detail::on_sender<S, Scheduler>{
                 std::forward<S>(s), std::forward<Scheduler>(scheduler)};
+        }
+
+        template <typename Scheduler>
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+            on_t, Scheduler&& scheduler)
+        {
+            return detail::partial_algorithm<on_t, Scheduler>{
+                std::forward<Scheduler>(scheduler)};
         }
     } on{};
 }}}    // namespace hpx::execution::experimental

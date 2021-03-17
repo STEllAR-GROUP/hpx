@@ -148,6 +148,20 @@ int main()
         HPX_TEST(set_value_called);
     }
 
+    // operator| overload
+    {
+        std::atomic<bool> set_value_called{false};
+        auto s = ex::just() | ex::transform([]() { return 3; }) |
+            ex::transform([](int x) { return x / 1.5; }) |
+            ex::transform([](double x) { return x / 2; }) |
+            ex::transform([](int x) { return std::to_string(x); });
+        auto f = [](std::string x) { HPX_TEST_EQ(x, std::string("1")); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        ex::start(ex::connect(std::move(s), r));
+        HPX_TEST(set_value_called);
+    }
+
+    // tag_invoke overload
     {
         std::atomic<bool> receiver_set_value_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
