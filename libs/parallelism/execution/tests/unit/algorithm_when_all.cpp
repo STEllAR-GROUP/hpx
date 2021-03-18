@@ -97,6 +97,7 @@ struct error_sender
     struct operation_state
     {
         std::decay_t<R> r;
+
         void start() noexcept
         {
             try

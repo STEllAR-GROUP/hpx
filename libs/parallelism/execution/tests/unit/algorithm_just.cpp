@@ -61,7 +61,8 @@ int main()
         auto s = ex::just();
         auto f = [] {};
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
-        ex::start(ex::connect(s, r));
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
         HPX_TEST(set_value_called);
     }
 
@@ -70,7 +71,8 @@ int main()
         auto s = ex::just(3);
         auto f = [](int x) { HPX_TEST_EQ(x, 3); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
-        ex::start(ex::connect(s, r));
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
         HPX_TEST(set_value_called);
     }
 
@@ -82,7 +84,8 @@ int main()
             HPX_TEST_EQ(x, 3);
         };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
-        ex::start(ex::connect(s, r));
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
         HPX_TEST(set_value_called);
     }
 
@@ -93,7 +96,8 @@ int main()
         auto s = ex::just(c);
         auto f = [](int x) { HPX_TEST_EQ(x, 3); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
-        ex::start(ex::connect(s, r));
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
         HPX_TEST(set_value_called);
         HPX_TEST(tag_invoke_overload_called);
     }

@@ -111,9 +111,9 @@ namespace hpx { namespace execution { namespace experimental {
             using state_type = typename detail::sync_wait_receiver<void>::state;
 
             state_type st{};
-            hpx::execution::experimental::start(
-                hpx::execution::experimental::connect(
-                    std::forward<S>(s), detail::sync_wait_receiver<void>{st}));
+            auto os = hpx::execution::experimental::connect(
+                std::forward<S>(s), detail::sync_wait_receiver<void>{st});
+            hpx::execution::experimental::start(os);
 
             {
                 std::unique_lock<hpx::lcos::local::mutex> l(st.m);
@@ -141,9 +141,9 @@ namespace hpx { namespace execution { namespace experimental {
                 typename detail::sync_wait_receiver<result_type>::state;
 
             state_type st{};
-            hpx::execution::experimental::start(
-                hpx::execution::experimental::connect(std::forward<S>(s),
-                    detail::sync_wait_receiver<result_type>{st}));
+            auto os = hpx::execution::experimental::connect(std::forward<S>(s),
+                detail::sync_wait_receiver<result_type>{st});
+            hpx::execution::experimental::start(os);
 
             {
                 std::unique_lock<hpx::lcos::local::mutex> l(st.m);
