@@ -9,7 +9,6 @@
 #include <hpx/parallel/util/ranges_facilities.hpp>
 
 #include "libs/parallelism/algorithms/tests/util/iter_sent.hpp"
-#include "test_utils.hpp"
 
 #include <vector>
 
@@ -30,8 +29,8 @@ void test_ranges_next()
     auto next4 = hpx::ranges::next(it, 2, v.end());
     HPX_TEST_EQ(*next4, 3);
 
-    // next4 = hpx::ranges::next(it, 42, v.end());
-    // HPX_TEST_EQ(next4, end);
+    auto next5 = hpx::ranges::next(it, 42, v.end());
+    HPX_TEST(next5 == v.end());
 }
 
 int main()

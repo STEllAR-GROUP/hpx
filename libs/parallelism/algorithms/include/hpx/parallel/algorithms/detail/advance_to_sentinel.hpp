@@ -37,7 +37,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     constexpr inline Iter advance_to_sentinel(Iter first, Sent last)
     {
         return advance_to_sentinel(first, last,
-            typename hpx::traits::is_sized_sentinel_for<Iter, Sent>::type{});
+            typename hpx::traits::is_sized_sentinel_for<Sent, Iter>::type{});
     }
 
     template <typename Iter>

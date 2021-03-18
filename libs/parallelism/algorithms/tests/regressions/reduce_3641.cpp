@@ -11,7 +11,8 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_reduce.hpp>
 #include <hpx/modules/testing.hpp>
-#include "iter_sent.hpp"
+
+#include "libs/parallelism/algorithms/tests/util/iter_sent.hpp"
 
 #include <cstdint>
 

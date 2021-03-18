@@ -14,7 +14,7 @@
 #include <cstdint>
 #include <iterator>
 
-#include "iter_sent.hpp"
+#include "libs/parallelism/algorithms/tests/util/iter_sent.hpp"
 
 struct bit_counting_iterator : public iterator<std::int64_t>
 {

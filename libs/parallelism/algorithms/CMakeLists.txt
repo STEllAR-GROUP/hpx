@@ -157,6 +157,7 @@ set(algorithms_headers
     hpx/parallel/util/prefetching.hpp
     hpx/parallel/util/projection_identity.hpp
     hpx/parallel/util/range.hpp
+    hpx/parallel/util/ranges_facilities.hpp
     hpx/parallel/util/result_types.hpp
     hpx/parallel/util/scan_partitioner.hpp
     hpx/parallel/util/tagged_pair.hpp
