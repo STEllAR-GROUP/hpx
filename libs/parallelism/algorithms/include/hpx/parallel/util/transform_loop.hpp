@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,21 +20,25 @@
 #include <utility>
 
 namespace hpx { namespace parallel { namespace util {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Iter>
         struct transform_loop
         {
             template <typename InIterB, typename InIterE, typename OutIter,
                 typename F>
             HPX_HOST_DEVICE
-                HPX_FORCEINLINE static util::in_out_result<InIterB, OutIter>
+                HPX_FORCEINLINE static constexpr util::in_out_result<InIterB,
+                    OutIter>
                 call(InIterB first, InIterE last, OutIter dest, F&& f)
             {
                 for (/* */; first != last; (void) ++first, ++dest)
                 {
-                    *dest = HPX_INVOKE(std::forward<F>(f), first);
+                    *dest = HPX_INVOKE(f, first);
                 }
+
                 return util::in_out_result<InIterB, OutIter>{
                     std::move(first), std::move(dest)};
             }
@@ -43,8 +47,9 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename ExPolicy, typename IterB, typename IterE,
         typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE util::in_out_result<IterB, OutIter>
-    transform_loop(ExPolicy&&, IterB it, IterE end, OutIter dest, F&& f)
+    HPX_HOST_DEVICE
+        HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
+        transform_loop(ExPolicy&&, IterB it, IterE end, OutIter dest, F&& f)
     {
         return detail::transform_loop<IterB>::call(
             it, end, dest, std::forward<F>(f));
@@ -52,36 +57,73 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
+        template <typename Iter>
+        struct transform_loop_ind
+        {
+            template <typename InIterB, typename InIterE, typename OutIter,
+                typename F>
+            HPX_HOST_DEVICE
+                HPX_FORCEINLINE static constexpr util::in_out_result<InIterB,
+                    OutIter>
+                call(InIterB first, InIterE last, OutIter dest, F&& f)
+            {
+                for (/* */; first != last; (void) ++first, ++dest)
+                {
+                    *dest = HPX_INVOKE(f, *first);
+                }
+
+                return util::in_out_result<InIterB, OutIter>{
+                    std::move(first), std::move(dest)};
+            }
+        };
+    }    // namespace detail
+
+    template <typename ExPolicy, typename IterB, typename IterE,
+        typename OutIter, typename F>
+    HPX_HOST_DEVICE
+        HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
+        transform_loop_ind(ExPolicy&&, IterB it, IterE end, OutIter dest, F&& f)
+    {
+        return detail::transform_loop_ind<IterB>::call(
+            it, end, dest, std::forward<F>(f));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail {
+
         template <typename Iter1, typename Iter2>
         struct transform_binary_loop
         {
             template <typename InIter1B, typename InIter1E, typename InIter2,
                 typename OutIter, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static util::in_in_out_result<
-                InIter1B, InIter2, OutIter>
-            call(InIter1B first1, InIter1E last1, InIter2 first2, OutIter dest,
-                F&& f)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr util::
+                in_in_out_result<InIter1B, InIter2, OutIter>
+                call(InIter1B first1, InIter1E last1, InIter2 first2,
+                    OutIter dest, F&& f)
             {
                 for (/* */; first1 != last1; (void) ++first1, ++first2, ++dest)
                 {
-                    *dest = HPX_INVOKE(std::forward<F>(f), first1, first2);
+                    *dest = HPX_INVOKE(f, first1, first2);
                 }
+
                 return util::in_in_out_result<InIter1B, InIter2, OutIter>{
                     std::move(first1), std::move(first2), std::move(dest)};
             }
 
             template <typename InIter1B, typename InIter1E, typename InIter2,
                 typename OutIter, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static util::in_in_out_result<
-                InIter1B, InIter2, OutIter>
-            call(InIter1B first1, InIter1E last1, InIter2 first2, InIter2 last2,
-                OutIter dest, F&& f)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr util::
+                in_in_out_result<InIter1B, InIter2, OutIter>
+                call(InIter1B first1, InIter1E last1, InIter2 first2,
+                    InIter2 last2, OutIter dest, F&& f)
             {
                 for (/* */; first1 != last1 && first2 != last2;
                      (void) ++first1, ++first2, ++dest)
                 {
-                    *dest = HPX_INVOKE(std::forward<F>(f), first1, first2);
+                    *dest = HPX_INVOKE(f, first1, first2);
                 }
+
                 return util::in_in_out_result<InIter1B, InIter2, OutIter>{
                     first1, first2, dest};
             }
@@ -90,7 +132,7 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename ExPolicy, typename InIter1B, typename InIter1E,
         typename InIter2, typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
         !hpx::is_vectorpack_execution_policy<ExPolicy>::value,
         util::in_in_out_result<InIter1B, InIter2, OutIter>>::type
     transform_binary_loop(
@@ -102,7 +144,7 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename ExPolicy, typename InIter1B, typename InIter1E,
         typename InIter2B, typename InIter2E, typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
         !hpx::is_vectorpack_execution_policy<ExPolicy>::value,
         util::in_in_out_result<InIter1B, InIter2B, OutIter>>::type
     transform_binary_loop(InIter1B first1, InIter1E last1, InIter2B first2,
@@ -113,49 +155,190 @@ namespace hpx { namespace parallel { namespace util {
     }
 
     namespace detail {
+
         template <typename Iter>
         struct transform_loop_n
         {
             template <typename InIter, typename OutIter, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter>
-            call(InIter first, std::size_t count, OutIter dest, F&& f)
+            HPX_HOST_DEVICE
+                HPX_FORCEINLINE static constexpr std::pair<InIter, OutIter>
+                call(InIter it, std::size_t num, OutIter dest, F&& f,
+                    std::false_type)
             {
-                for (/* */; count != 0; (void) --count, ++first, ++dest)
+                std::size_t count(num & std::size_t(-4));    // -V112
+                for (std::size_t i = 0; i < count;
+                     (void) ++it, i += 4)    // -V112
                 {
-                    *dest = HPX_INVOKE(f, first);
+                    *dest++ = HPX_INVOKE(f, it);
+                    *dest++ = HPX_INVOKE(f, ++it);
+                    *dest++ = HPX_INVOKE(f, ++it);
+                    *dest++ = HPX_INVOKE(f, ++it);
                 }
-                return std::make_pair(std::move(first), std::move(dest));
+                for (/**/; count < num; (void) ++count, ++it, ++dest)
+                {
+                    *dest = HPX_INVOKE(f, it);
+                }
+
+                return std::make_pair(std::move(it), std::move(dest));
+            }
+
+            template <typename InIter, typename OutIter, typename F>
+            HPX_HOST_DEVICE
+                HPX_FORCEINLINE static constexpr std::pair<InIter, OutIter>
+                call(InIter it, std::size_t num, OutIter dest, F&& f,
+                    std::true_type)
+            {
+                while (num >= 4)
+                {
+                    *dest++ = HPX_INVOKE(f, it);
+                    *dest++ = HPX_INVOKE(f, it + 1);
+                    *dest++ = HPX_INVOKE(f, it + 2);
+                    *dest++ = HPX_INVOKE(f, it + 3);
+
+                    it += 4;
+                    num -= 4;
+                }
+
+                switch (num)
+                {
+                case 3:
+                    *dest++ = HPX_INVOKE(f, it);
+                    *dest++ = HPX_INVOKE(f, it + 1);
+                    *dest++ = HPX_INVOKE(f, it + 2);
+                    break;
+
+                case 2:
+                    *dest++ = HPX_INVOKE(f, it);
+                    *dest++ = HPX_INVOKE(f, it + 1);
+                    break;
+
+                case 1:
+                    *dest++ = HPX_INVOKE(f, it);
+                    break;
+
+                default:
+                    break;
+                }
+
+                return std::make_pair(it + num, std::move(dest));
             }
         };
     }    // namespace detail
 
     template <typename ExPolicy, typename Iter, typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
         !hpx::is_vectorpack_execution_policy<ExPolicy>::value,
         std::pair<Iter, OutIter>>::type
     transform_loop_n(Iter it, std::size_t count, OutIter dest, F&& f)
     {
+        using pred = hpx::traits::is_random_access_iterator<Iter>;
+
         return detail::transform_loop_n<Iter>::call(
-            it, count, dest, std::forward<F>(f));
+            it, count, dest, std::forward<F>(f), pred());
+    }
+
+    namespace detail {
+
+        template <typename Iter>
+        struct transform_loop_n_ind
+        {
+            template <typename InIter, typename OutIter, typename F>
+            HPX_HOST_DEVICE
+                HPX_FORCEINLINE static constexpr std::pair<InIter, OutIter>
+                call(InIter it, std::size_t num, OutIter dest, F&& f,
+                    std::false_type)
+            {
+                std::size_t count(num & std::size_t(-4));    // -V112
+                for (std::size_t i = 0; i < count;
+                     (void) ++it, i += 4)    // -V112
+                {
+                    *dest++ = HPX_INVOKE(f, *it);
+                    *dest++ = HPX_INVOKE(f, *(++it));
+                    *dest++ = HPX_INVOKE(f, *(++it));
+                    *dest++ = HPX_INVOKE(f, *(++it));
+                }
+                for (/**/; count < num; (void) ++count, ++it, ++dest)
+                {
+                    *dest = HPX_INVOKE(f, *it);
+                }
+
+                return std::make_pair(std::move(it), std::move(dest));
+            }
+
+            template <typename InIter, typename OutIter, typename F>
+            HPX_HOST_DEVICE
+                HPX_FORCEINLINE static constexpr std::pair<InIter, OutIter>
+                call(InIter it, std::size_t num, OutIter dest, F&& f,
+                    std::true_type)
+            {
+                while (num >= 4)
+                {
+                    *dest++ = HPX_INVOKE(f, *it);
+                    *dest++ = HPX_INVOKE(f, *(it + 1));
+                    *dest++ = HPX_INVOKE(f, *(it + 2));
+                    *dest++ = HPX_INVOKE(f, *(it + 3));
+
+                    it += 4;
+                    num -= 4;
+                }
+
+                switch (num)
+                {
+                case 3:
+                    *dest++ = HPX_INVOKE(f, *it);
+                    *dest++ = HPX_INVOKE(f, *(it + 1));
+                    *dest++ = HPX_INVOKE(f, *(it + 2));
+                    break;
+
+                case 2:
+                    *dest++ = HPX_INVOKE(f, *it);
+                    *dest++ = HPX_INVOKE(f, *(it + 1));
+                    break;
+
+                case 1:
+                    *dest++ = HPX_INVOKE(f, *it);
+                    break;
+
+                default:
+                    break;
+                }
+
+                return std::make_pair(it + num, std::move(dest));
+            }
+        };
+    }    // namespace detail
+
+    template <typename ExPolicy, typename Iter, typename OutIter, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
+        !hpx::is_vectorpack_execution_policy<ExPolicy>::value,
+        std::pair<Iter, OutIter>>::type
+    transform_loop_n_ind(Iter it, std::size_t count, OutIter dest, F&& f)
+    {
+        using pred = hpx::traits::is_random_access_iterator<Iter>;
+
+        return detail::transform_loop_n_ind<Iter>::call(
+            it, count, dest, std::forward<F>(f), pred());
     }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Iter1, typename Inter2>
         struct transform_binary_loop_n
         {
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE
-                HPX_FORCEINLINE static hpx::tuple<InIter1, InIter2, OutIter>
-                call(InIter1 first1, std::size_t count, InIter2 first2,
-                    OutIter dest, F&& f)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr hpx::tuple<InIter1,
+                InIter2, OutIter>
+            call(InIter1 first1, std::size_t count, InIter2 first2,
+                OutIter dest, F&& f)
             {
                 for (/* */; count != 0;
                      (void) --count, ++first1, first2++, ++dest)
                 {
                     *dest = HPX_INVOKE(f, first1, first2);
                 }
+
                 return hpx::make_tuple(
                     std::move(first1), std::move(first2), std::move(dest));
             }
@@ -164,7 +347,7 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
         !hpx::is_vectorpack_execution_policy<ExPolicy>::value,
         hpx::tuple<InIter1, InIter2, OutIter>>::type
     transform_binary_loop_n(

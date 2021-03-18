@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -833,21 +833,32 @@ namespace hpx {
                         Ts)>::type();
                     detail::init_iteration(args_, pack, part_index);
 
-                    while (part_steps != 0)
+                    if (stride_ == 1)
                     {
-                        detail::invoke_iteration(args_, pack, f_, part_begin);
+                        while (part_steps-- != 0)
+                        {
+                            detail::invoke_iteration(
+                                args_, pack, f_, part_begin++);
+                            detail::next_iteration(args_, pack, ++part_index);
+                        }
+                    }
+                    else
+                    {
+                        while (part_steps != 0)
+                        {
+                            detail::invoke_iteration(
+                                args_, pack, f_, part_begin);
 
-                        // NVCC seems to have a bug with std::min...
-                        std::size_t chunk =
-                            S(part_steps) < stride_ ? part_steps : stride_;
+                            std::size_t chunk = stride_;
 
-                        // modifies 'chunk'
-                        part_begin = parallel::v1::detail::next(
-                            part_begin, part_steps, chunk);
-                        part_steps -= chunk;
-                        part_index += chunk;
+                            // modifies 'chunk'
+                            part_begin = parallel::v1::detail::next(
+                                part_begin, part_steps, chunk);
+                            part_steps -= chunk;
+                            part_index += chunk;
 
-                        detail::next_iteration(args_, pack, part_index);
+                            detail::next_iteration(args_, pack, part_index);
+                        }
                     }
                 }
 
@@ -879,26 +890,6 @@ namespace hpx {
                 HPX_HOST_DEVICE constexpr void execute(
                     B part_begin, std::size_t part_steps)
                 {
-                    while (part_steps != 0)
-                    {
-                        HPX_INVOKE(f_, part_begin);
-
-                        // NVCC seems to have a bug with std::min...
-                        std::size_t chunk =
-                            S(part_steps) < stride_ ? part_steps : stride_;
-
-                        // modifies 'chunk'
-                        part_begin = parallel::v1::detail::next(
-                            part_begin, part_steps, chunk);
-                        part_steps -= chunk;
-                    }
-                }
-
-                template <typename B>
-                HPX_HOST_DEVICE void operator()(
-                    B part_begin, std::size_t part_steps, std::size_t)
-                {
-                    hpx::util::annotate_function annotate(f_);
                     if (stride_ == 1)
                     {
                         using pred = std::integral_constant<bool,
@@ -910,8 +901,26 @@ namespace hpx {
                     }
                     else
                     {
-                        execute(part_begin, part_steps);
+                        while (part_steps != 0)
+                        {
+                            HPX_INVOKE(f_, part_begin);
+
+                            std::size_t chunk = stride_;
+
+                            // modifies 'chunk'
+                            part_begin = parallel::v1::detail::next(
+                                part_begin, part_steps, chunk);
+                            part_steps -= chunk;
+                        }
                     }
+                }
+
+                template <typename B>
+                HPX_HOST_DEVICE void operator()(
+                    B part_begin, std::size_t part_steps, std::size_t)
+                {
+                    hpx::util::annotate_function annotate(f_);
+                    execute(part_begin, part_steps);
                 }
             };
 
@@ -923,25 +932,57 @@ namespace hpx {
                 {
                 }
 
+                template <typename ExPolicy, typename InIter, typename S,
+                    typename F>
+                HPX_HOST_DEVICE static hpx::util::unused_type sequential(
+                    ExPolicy /* policy */, InIter first, std::size_t count,
+                    S stride, F&& f)
+                {
+                    if (stride == 1)
+                    {
+                        using pred = std::integral_constant<bool,
+                            hpx::traits::is_random_access_iterator<
+                                InIter>::value ||
+                                std::is_integral<InIter>::value>;
+
+                        parallel::util::detail::loop_n<InIter>::call(
+                            first, count, std::forward<F>(f), pred());
+                    }
+                    else
+                    {
+                        while (count != 0)
+                        {
+                            HPX_INVOKE(f, first);
+
+                            std::size_t chunk = stride;
+
+                            // modifies 'chunk'
+                            first =
+                                parallel::v1::detail::next(first, count, chunk);
+                            count -= chunk;
+                        }
+                    }
+                    return hpx::util::unused_type();
+                }
+
                 template <typename ExPolicy, typename InIter, typename Size,
-                    typename S, typename F, typename... Args>
+                    typename S, typename F, typename Arg, typename... Args>
                 HPX_HOST_DEVICE static hpx::util::unused_type sequential(
                     ExPolicy /* policy */, InIter first, Size size, S stride,
-                    F&& f, Args&&... args)
+                    F&& f, Arg&& arg, Args&&... args)
                 {
                     std::size_t part_index = 0;
-                    int const init_sequencer[] = {
-                        0, (args.init_iteration(0), 0)...};
+                    int const init_sequencer[] = {(arg.init_iteration(0), 0),
+                        (args.init_iteration(0), 0)...};
                     (void) init_sequencer;
 
                     std::size_t count = size;
                     while (count != 0)
                     {
-                        HPX_INVOKE(f, first, args.iteration_value()...);
+                        HPX_INVOKE(f, first, arg.iteration_value(),
+                            args.iteration_value()...);
 
-                        // NVCC seems to have a bug with std::min...
-                        std::size_t chunk =
-                            (S(count) < stride) ? count : stride;
+                        std::size_t chunk = stride;
 
                         // modifies 'chunk'
                         first = parallel::v1::detail::next(first, count, chunk);
@@ -949,13 +990,14 @@ namespace hpx {
                         part_index += chunk;
 
                         int const next_sequencer[] = {
-                            0, (args.next_iteration(part_index), 0)...};
+                            (arg.next_iteration(part_index), 0),
+                            (args.next_iteration(part_index), 0)...};
                         (void) next_sequencer;
                     }
 
                     // make sure live-out variables are properly set on return
-                    int const exit_sequencer[] = {
-                        0, (args.exit_iteration(size), 0)...};
+                    int const exit_sequencer[] = {(arg.exit_iteration(size), 0),
+                        (args.exit_iteration(size), 0)...};
                     (void) exit_sequencer;
 
                     return hpx::util::unused_type();

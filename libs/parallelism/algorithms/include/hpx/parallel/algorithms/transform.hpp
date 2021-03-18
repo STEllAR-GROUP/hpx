@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -208,6 +208,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // transform
     namespace detail {
+
         /// \cond NOINTERNAL
         template <typename F, typename Proj>
         struct transform_projected
@@ -215,12 +216,37 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename std::decay<F>::type& f_;
             typename std::decay<Proj>::type& proj_;
 
-            template <typename Iter>
-            HPX_HOST_DEVICE HPX_FORCEINLINE auto operator()(Iter curr)
-                -> decltype(
-                    hpx::util::invoke(f_, hpx::util::invoke(proj_, *curr)))
+            HPX_HOST_DEVICE constexpr transform_projected(
+                F& f, Proj& proj) noexcept
+              : f_(f)
+              , proj_(proj)
             {
-                return hpx::util::invoke(f_, hpx::util::invoke(proj_, *curr));
+            }
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(Iter curr)
+                -> decltype(HPX_INVOKE(f_, HPX_INVOKE(proj_, *curr)))
+            {
+                return HPX_INVOKE(f_, HPX_INVOKE(proj_, *curr));
+            }
+        };
+
+        template <typename F>
+        struct transform_projected<F, util::projection_identity>
+        {
+            typename std::decay<F>::type& f_;
+
+            HPX_HOST_DEVICE constexpr transform_projected(
+                F& f, util::projection_identity) noexcept
+              : f_(f)
+            {
+            }
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(Iter curr)
+                -> decltype(HPX_INVOKE(f_, *curr))
+            {
+                return HPX_INVOKE(f_, *curr);
             }
         };
 
@@ -273,7 +299,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto iters = part_begin.get_iterator_tuple();
                 return util::transform_loop_n<execution_policy_type>(
                     hpx::get<0>(iters), part_size, hpx::get<1>(iters),
-                    transform_projected<F, Proj>{f_, proj_});
+                    transform_projected<F, Proj>(f_, proj_));
             }
 
             template <typename Iter>
@@ -290,6 +316,68 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
 
+        template <typename ExPolicy, typename F>
+        struct transform_iteration<ExPolicy, F, util::projection_identity>
+        {
+            typedef typename std::decay<ExPolicy>::type execution_policy_type;
+            typedef typename std::decay<F>::type fun_type;
+
+            fun_type f_;
+
+            template <typename F_>
+            HPX_HOST_DEVICE transform_iteration(
+                F_&& f, util::projection_identity)
+              : f_(std::forward<F_>(f))
+            {
+            }
+
+#if !defined(__NVCC__) && !defined(__CUDACC__)
+            transform_iteration(transform_iteration const&) = default;
+            transform_iteration(transform_iteration&&) = default;
+#else
+            HPX_HOST_DEVICE transform_iteration(transform_iteration const& rhs)
+              : f_(rhs.f_)
+            {
+            }
+
+            HPX_HOST_DEVICE transform_iteration(transform_iteration&& rhs)
+              : f_(std::move(rhs.f_))
+            {
+            }
+#endif
+
+            transform_iteration& operator=(
+                transform_iteration const&) = default;
+            transform_iteration& operator=(transform_iteration&&) = default;
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+                std::pair<typename hpx::tuple_element<0,
+                              typename Iter::iterator_tuple_type>::type,
+                    typename hpx::tuple_element<1,
+                        typename Iter::iterator_tuple_type>::type>
+                execute(Iter part_begin, std::size_t part_size)
+            {
+                auto iters = part_begin.get_iterator_tuple();
+                return util::transform_loop_n_ind<execution_policy_type>(
+                    hpx::get<0>(iters), part_size, hpx::get<1>(iters), f_);
+            }
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+                std::pair<typename hpx::tuple_element<0,
+                              typename Iter::iterator_tuple_type>::type,
+                    typename hpx::tuple_element<1,
+                        typename Iter::iterator_tuple_type>::type>
+                operator()(Iter part_begin, std::size_t part_size,
+                    std::size_t /*part_index*/)
+            {
+                hpx::util::annotate_function annotate(f_);
+                return execute(part_begin, part_size);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename IterPair>
         struct transform
           : public detail::algorithm<transform<IterPair>, IterPair>
@@ -301,12 +389,24 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIterB, typename InIterE,
                 typename OutIter, typename F, typename Proj>
-            HPX_HOST_DEVICE static util::in_out_result<InIterB, OutIter>
+            HPX_HOST_DEVICE static constexpr util::in_out_result<InIterB,
+                OutIter>
             sequential(ExPolicy&& policy, InIterB first, InIterE last,
                 OutIter dest, F&& f, Proj&& proj)
             {
                 return util::transform_loop(std::forward<ExPolicy>(policy),
-                    first, last, dest, transform_projected<F, Proj>{f, proj});
+                    first, last, dest, transform_projected<F, Proj>(f, proj));
+            }
+
+            template <typename ExPolicy, typename InIterB, typename InIterE,
+                typename OutIter, typename F>
+            HPX_HOST_DEVICE static constexpr util::in_out_result<InIterB,
+                OutIter>
+            sequential(ExPolicy&& policy, InIterB first, InIterE last,
+                OutIter dest, F&& f, util::projection_identity)
+            {
+                return util::transform_loop_ind(std::forward<ExPolicy>(policy),
+                    first, last, dest, std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,

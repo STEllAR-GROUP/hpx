@@ -137,31 +137,20 @@ namespace hpx { namespace parallel { namespace util {
                 // round up distance to cover all of underlying range
                 return (idx_ - rhs.idx_ + chunk_size_ - 1) / chunk_size_;
             }
-            inline prefetching_iterator operator+(difference_type rhs) const
+
+            friend inline prefetching_iterator operator+(
+                prefetching_iterator const& lhs, difference_type rhs)
             {
-                prefetching_iterator tmp(*this);
+                prefetching_iterator tmp(lhs);
                 tmp += rhs;
                 return tmp;
             }
-
-            // FIXME: What happens if the distance is not divisible by the
-            //        chunk_size? Should enforce this?
-            inline prefetching_iterator operator-(difference_type rhs) const
+            friend inline prefetching_iterator operator-(
+                prefetching_iterator const& lhs, difference_type rhs)
             {
-                prefetching_iterator tmp(*this);
+                prefetching_iterator tmp(lhs);
                 tmp -= rhs;
                 return tmp;
-            }
-
-            friend inline prefetching_iterator operator+(
-                const prefetching_iterator& lhs, difference_type rhs)
-            {
-                return rhs + lhs;
-            }
-            friend inline prefetching_iterator operator-(
-                const prefetching_iterator& lhs, difference_type rhs)
-            {
-                return lhs - rhs;
             }
 
             // FIXME: should other members be compared too?
