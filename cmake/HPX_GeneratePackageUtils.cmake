@@ -142,6 +142,9 @@ function(
           endif()
         endif()
 
+      elseif(${dep} MATCHES "::@")
+        # Skip targets beginning with ::@ as they come from object libraries
+        # which do not need to be linked.
       elseif(${dep} MATCHES "\\$<TARGET_NAME_IF_EXISTS:")
         # Skip conditional targets like $<TARGET_NAME_IF_EXISTS:hpx> as they are
         # not useful for pkgconfig file generation.
@@ -256,7 +259,7 @@ function(
   # NOTE: This uses -I and not -isystem in lack of a good way to filter out
   # compiler search paths.
   set(_cflag_list
-      "${_cflag_list} $<$<BOOL:${${sys_include_dirs}}>:-I$<JOIN:${${sys_include_dirs}}, -isystem>>"
+      "${_cflag_list} $<$<BOOL:${${sys_include_dirs}}>:-I$<JOIN:${${sys_include_dirs}}, -I>>"
   )
   set(${cflag_list}
       ${_cflag_list}

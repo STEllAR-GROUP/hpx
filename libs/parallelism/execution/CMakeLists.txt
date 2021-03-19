@@ -80,13 +80,17 @@ set(execution_compat_headers
 )
 # cmake-format: on
 
+if(TARGET Vc::vc)
+  set(execution_optional_dependencies Vc::vc)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   parallelism execution
   SOURCES ${execution_sources}
   HEADERS ${execution_headers}
   COMPAT_HEADERS ${execution_compat_headers}
-  DEPENDENCIES hpx_core
+  DEPENDENCIES hpx_core ${execution_optional_dependencies}
   MODULE_DEPENDENCIES hpx_async_base hpx_async_combinators hpx_threading
                       hpx_pack_traversal
   CMAKE_SUBDIRS examples tests

@@ -20,8 +20,8 @@ set(itt_notify_compat_headers
 
 set(itt_notify_sources itt_notify.cpp thread_name.cpp)
 
-if(HPX_WITH_ITTNOTIFY)
-  set(itt_notify_dependencies Amplifier::amplifier)
+if(TARGET Amplifier::amplifier)
+  set(itt_notify_optional_dependencies Amplifier::amplifier)
 endif()
 
 include(HPX_AddModule)
@@ -31,7 +31,7 @@ add_hpx_module(
   SOURCES ${itt_notify_sources}
   HEADERS ${itt_notify_headers}
   COMPAT_HEADERS ${itt_notify_compat_headers}
-  DEPENDENCIES ${itt_notify_dependencies}
+  DEPENDENCIES ${itt_notify_optional_dependencies}
   MODULE_DEPENDENCIES hpx_config
   CMAKE_SUBDIRS examples tests
 )

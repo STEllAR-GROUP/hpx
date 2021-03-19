@@ -350,6 +350,7 @@ with section("parse"):
                                     'EXCLUDE_FROM_GLOBAL_HEADER': '+',
                                     'GLOBAL_HEADER_GEN': 1,
                                     'HEADERS': '+',
+                                    'OBJECTS': '+',
                                     'MODULE_DEPENDENCIES': '+',
                                     'SOURCES': '+'},
                         'pargs': { 'flags': ['FORCE_LINKING_GEN',

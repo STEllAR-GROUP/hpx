@@ -14,6 +14,7 @@ function(add_hpx_library name)
       NOEXPORT
       AUTOGLOB
       STATIC
+      OBJECT
       PLUGIN
       NONAMEPREFIX
       UNITY_BUILD
@@ -39,6 +40,12 @@ function(add_hpx_library name)
   cmake_parse_arguments(
     ${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN}
   )
+
+  if(${name}_OBJECT AND ${name}_STATIC)
+    hpx_error("Trying to create ${name} library with both STATIC and OBJECT.\
+ Only one can be used at the same time."
+    )
+  endif()
 
   if(NOT ${name}_SOURCE_ROOT)
     set(${name}_SOURCE_ROOT ".")
@@ -195,6 +202,8 @@ function(add_hpx_library name)
 
   if(${name}_STATIC)
     set(${name}_linktype STATIC)
+  elseif(${name}_OBJECT)
+    set(${name}_linktype OBJECT)
   else()
     if(HPX_WITH_STATIC_LINKING)
       set(${name}_linktype STATIC)

@@ -111,7 +111,8 @@ add_hpx_module(
   core coroutines
   GLOBAL_HEADER_GEN ON
   SOURCES ${coroutines_sources}
-  HEADERS ${coroutines_headers} OBJECTS "${switch_to_fiber_object}"
+  HEADERS ${coroutines_headers}
+  OBJECTS "${switch_to_fiber_object}"
   COMPAT_HEADERS ${coroutines_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion

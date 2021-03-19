@@ -68,7 +68,7 @@ function(
     VERBATIM
   )
   add_dependencies(
-    ${name}.make_configure ${name}.make_build_dir hpx hpx_init
+    ${name}.make_configure ${name}.make_build_dir hpx hpx_init hpx_wrap
     iostreams_component
   )
   add_custom_target(
@@ -176,25 +176,15 @@ foreach(build_type ${build_types})
   endif()
 endforeach()
 
-# PkgConfig
-if(NOT MSVC
-   AND NOT APPLE
-   AND NOT HPX_WITH_HIP
-)
-  # Disabling test for hipcc since the workaround for one of its bug resulted in
-  # breaking clang-7 CI (with -DHPX_WITH_DYNAMIC_MAIN=OFF)
-  # https://github.com/ROCm-Developer-Tools/HIP/issues/2167#issuecomment-712286173
-  find_package(PkgConfig)
-  if(PKGCONFIG_FOUND)
-    create_pkgconfig_test(
-      pkgconfig_build_dir_test "${PROJECT_BINARY_DIR}/lib/pkgconfig"
-    )
-
-    create_pkgconfig_test(
-      pkgconfig_install_dir_test "${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig"
-    )
-  endif()
-endif()
+# TODO: Support pkgconfig? PkgConfig if(NOT MSVC AND NOT APPLE AND NOT
+# HPX_WITH_HIP ) # Disabling test for hipcc since the workaround for one of its
+# bug resulted in # breaking clang-7 CI (with -DHPX_WITH_DYNAMIC_MAIN=OFF) #
+# https://github.com/ROCm-Developer-Tools/HIP/issues/2167#issuecomment-712286173
+# find_package(PkgConfig) if(PKGCONFIG_FOUND) create_pkgconfig_test(
+# pkgconfig_build_dir_test "${PROJECT_BINARY_DIR}/lib/pkgconfig" )
+#
+# create_pkgconfig_test( pkgconfig_install_dir_test
+# "${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig" ) endif() endif()
 
 set(build_systems cmake)
 set(cmake_tests build_dir_targets install_dir_targets build_dir_macros
@@ -203,15 +193,9 @@ set(cmake_tests build_dir_targets install_dir_targets build_dir_macros
 if(HPX_WITH_DYNAMIC_HPX_MAIN)
   list(APPEND cmake_tests build_dir_gtest_emulation install_dir_gtest_emulation)
 endif()
-if(NOT CMAKE_TOOLCHAIN_FILE
-   AND PKGCONFIG_FOUND
-   AND NOT MSVC
-   AND NOT APPLE
-   AND NOT HPX_WITH_HIP
-)
-  set(build_systems ${build_systems} pkgconfig)
-  set(pkgconfig_tests build_dir install_dir)
-endif()
+# if(NOT CMAKE_TOOLCHAIN_FILE AND PKGCONFIG_FOUND AND NOT MSVC AND NOT APPLE AND
+# NOT HPX_WITH_HIP ) set(build_systems ${build_systems} pkgconfig)
+# set(pkgconfig_tests build_dir install_dir) endif()
 
 set(system cmake)
 add_hpx_pseudo_target(tests.unit.build.${system})

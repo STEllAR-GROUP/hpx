@@ -105,6 +105,8 @@ include(HPX_SetupPapi)
 # CUDA
 include(HPX_SetupCUDA)
 
+include(HPX_SetupMPI)
+
 # APEX
 set(APEX_WITH_MSR "@APEX_WITH_MSR@")
 set(MSR_ROOT "@MSR_ROOT@")

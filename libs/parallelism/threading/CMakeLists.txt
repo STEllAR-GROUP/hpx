@@ -26,6 +26,6 @@ add_hpx_module(
   HEADERS ${threading_headers}
   COMPAT_HEADERS ${threading_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_execution hpx_futures
+  MODULE_DEPENDENCIES hpx_futures
   CMAKE_SUBDIRS examples tests
 )

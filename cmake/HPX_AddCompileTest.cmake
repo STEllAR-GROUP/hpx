@@ -5,7 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 function(add_hpx_compile_test category name)
-  set(options FAILURE_EXPECTED NOLIBS)
+  set(options FAILURE_EXPECTED NOLIBS OBJECT)
   set(one_value_args SOURCE_ROOT FOLDER)
   set(multi_value_args SOURCES COMPONENT_DEPENDENCIES DEPENDENCIES)
 
@@ -17,18 +17,33 @@ function(add_hpx_compile_test category name)
   if(${name}_NOLIBS)
     set(_additional_flags ${_additional_flags} NOLIBS)
   endif()
+  if(${name}_OBJECT)
+    set(_additional_flags ${_additional_flags} OBJECT)
+  endif()
 
   string(REGEX REPLACE "\\." "_" test_name "${category}.${name}")
 
-  add_hpx_executable(
-    ${test_name}
-    SOURCE_ROOT ${${name}_SOURCE_ROOT}
-    SOURCES ${${name}_SOURCES}
-    EXCLUDE_FROM_ALL EXCLUDE_FROM_DEFAULT_BUILD
-    FOLDER ${${name}_FOLDER}
-    COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES}
-    DEPENDENCIES ${${name}_DEPENDENCIES} ${_additional_flags}
-  )
+  if(${name}_OBJECT)
+    add_hpx_library(
+      ${test_name}
+      SOURCE_ROOT ${${name}_SOURCE_ROOT}
+      SOURCES ${${name}_SOURCES}
+      EXCLUDE_FROM_ALL EXCLUDE_FROM_DEFAULT_BUILD
+      FOLDER ${${name}_FOLDER}
+      COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES}
+      DEPENDENCIES ${${name}_DEPENDENCIES} ${_additional_flags}
+    )
+  else()
+    add_hpx_executable(
+      ${test_name}
+      SOURCE_ROOT ${${name}_SOURCE_ROOT}
+      SOURCES ${${name}_SOURCES}
+      EXCLUDE_FROM_ALL EXCLUDE_FROM_DEFAULT_BUILD
+      FOLDER ${${name}_FOLDER}
+      COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES}
+      DEPENDENCIES ${${name}_DEPENDENCIES} ${_additional_flags}
+    )
+  endif()
 
   add_test(
     NAME "${category}.${name}"
@@ -42,7 +57,6 @@ function(add_hpx_compile_test category name)
   endif()
 
   set_tests_properties("${category}.${name}" PROPERTIES RUN_SERIAL TRUE)
-
 endfunction(add_hpx_compile_test)
 
 function(add_hpx_compile_test_target_dependencies category name)
@@ -75,7 +89,9 @@ endfunction(add_hpx_regression_compile_test)
 function(add_hpx_headers_compile_test subcategory name)
   # Important to keep the double quotes around subcategory otherwise don't
   # consider empty argument but just remove it
-  add_test_and_deps_compile_test("headers" "${subcategory}" ${name} ${ARGN})
+  add_test_and_deps_compile_test(
+    "headers" "${subcategory}" ${name} ${ARGN} OBJECT
+  )
 endfunction(add_hpx_headers_compile_test)
 
 function(add_hpx_header_tests category)
