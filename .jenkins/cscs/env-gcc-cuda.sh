@@ -9,6 +9,10 @@ source $SPACK_ROOT/share/spack/setup-env.sh
 export CRAYPE_LINK_TYPE=dynamic
 export CXX_STD="14"
 
+# This makes deprecated modules available. This should be removed when a newer
+# Boost is available on CrayGNU-20.11.
+module use /apps/daint/UES/jenkins/7.0.UP02/gpu/easybuild/modules/all
+
 module load daint-gpu
 module switch PrgEnv-cray PrgEnv-gnu
 module load cudatoolkit

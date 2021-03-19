@@ -13,7 +13,8 @@ export BOOST_ROOT="${APPS_ROOT}/boost-1.73.0-gcc-8.3.0-c++17-release"
 export HWLOC_ROOT="${APPS_ROOT}/hwloc-2.0.3-gcc-8.3.0"
 
 module load daint-gpu
-module load cudatoolkit
+module load cudatoolkit/10.2.89_3.29-7.0.2.1_3.5__g67354b4
+module switch cce cce/10.0.2
 spack load cmake
 spack load ninja
 
