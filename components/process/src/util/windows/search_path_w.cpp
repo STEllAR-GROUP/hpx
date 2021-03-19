@@ -18,6 +18,7 @@
 
 #include <boost/tokenizer.hpp>
 
+#include <windows.h>
 #include <shellapi.h>
 
 #include <array>
