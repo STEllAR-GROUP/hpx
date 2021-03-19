@@ -99,9 +99,8 @@ namespace hpx { namespace lcos { namespace detail {
             serialize_future_load(
                 ar, f, std::is_default_constructible<value_type>());
         }
-        else
-            // NOLINTNEXTLINE(bugprone-branch-clone)
-            if (state == future_state::has_exception)
+        // NOLINTNEXTLINE(bugprone-branch-clone)
+        else if (state == future_state::has_exception)
         {
             std::exception_ptr exception;
             ar >> exception;
@@ -112,9 +111,8 @@ namespace hpx { namespace lcos { namespace detail {
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
         }
-        else
-            // NOLINTNEXTLINE(bugprone-branch-clone)
-            if (state == future_state::invalid)
+        // NOLINTNEXTLINE(bugprone-branch-clone)
+        else if (state == future_state::invalid)
         {
             f = Future();
         }
@@ -488,10 +486,9 @@ namespace hpx { namespace lcos { namespace detail {
     class future_base
     {
     public:
-        typedef R result_type;
-        typedef future_data_base<
-            typename traits::detail::shared_state_ptr_result<R>::type>
-            shared_state_type;
+        using result_type = R;
+        using shared_state_type = future_data_base<
+            typename traits::detail::shared_state_ptr_result<R>::type>;
 
     private:
         template <typename F>
@@ -772,6 +769,103 @@ namespace hpx { namespace lcos { namespace detail {
     protected:
         hpx::intrusive_ptr<shared_state_type> shared_state_;
     };
+
+    // Operation state for sender compatibility
+    template <typename Receiver, typename Future>
+    class operation_state
+    {
+    private:
+        using receiver_type = std::decay_t<Receiver>;
+        using future_type = std::decay_t<Future>;
+        using result_type = typename future_type::result_type;
+
+    public:
+        template <typename Receiver_>
+        operation_state(Receiver_&& r, future_type f)
+          : receiver_(std::forward<Receiver_>(r))
+          , future_(std::move(f))
+        {
+        }
+
+        operation_state(operation_state&&) = delete;
+        operation_state(operation_state const&) = delete;
+
+        void start() noexcept
+        {
+            start_helper(std::is_void<result_type>{});
+        }
+
+    private:
+        void start_helper(std::true_type) noexcept
+        {
+            try
+            {
+                auto state = traits::detail::get_shared_state(future_);
+
+                if (!state)
+                {
+                    HPX_THROW_EXCEPTION(no_state, "operation_state::start",
+                        "the future has no valid shared state");
+                }
+
+                state->set_on_completed(
+                    [this, receiver = std::move(receiver_)]() mutable {
+                        if (future_.has_value())
+                        {
+                            hpx::execution::experimental::set_value(
+                                std::move(receiver));
+                        }
+                        else if (future_.has_exception())
+                        {
+                            hpx::execution::experimental::set_error(
+                                std::move(receiver),
+                                future_.get_exception_ptr());
+                        }
+                    });
+            }
+            catch (...)
+            {
+                hpx::execution::experimental::set_error(
+                    std::move(receiver_), std::current_exception());
+            }
+        }
+
+        void start_helper(std::false_type) noexcept
+        {
+            try
+            {
+                auto state = traits::detail::get_shared_state(future_);
+
+                if (!state)
+                {
+                    HPX_THROW_EXCEPTION(no_state, "operation_state::start",
+                        "the future has no valid shared state");
+                }
+                state->set_on_completed(
+                    [this, receiver = std::move(receiver_)]() mutable {
+                        if (future_.has_value())
+                        {
+                            hpx::execution::experimental::set_value(
+                                std::move(receiver), future_.get());
+                        }
+                        else if (future_.has_exception())
+                        {
+                            hpx::execution::experimental::set_error(
+                                std::move(receiver),
+                                future_.get_exception_ptr());
+                        }
+                    });
+            }
+            catch (...)
+            {
+                hpx::execution::experimental::set_error(
+                    std::move(receiver_), std::current_exception());
+            }
+        }
+
+        std::decay_t<Receiver> receiver_;
+        future_type future_;
+    };
 }}}    // namespace hpx::lcos::detail
 
 namespace hpx { namespace lcos {
@@ -782,8 +876,27 @@ namespace hpx { namespace lcos {
         typedef detail::future_base<future<R>, R> base_type;
 
     public:
-        typedef R result_type;
-        typedef typename base_type::shared_state_type shared_state_type;
+        using result_type = R;
+        using shared_state_type = typename base_type::shared_state_type;
+
+        // Sender compatibility
+        template <template <typename...> class Tuple,
+            template <typename...> class Variant>
+        using value_types = std::conditional_t<std::is_void<result_type>::value,
+            Variant<Tuple<>>,
+            Variant<Tuple<std::add_rvalue_reference_t<result_type>>>>;
+
+        template <template <typename...> class Variant>
+        using error_types = Variant<std::exception_ptr>;
+
+        static constexpr bool sends_done = false;
+
+        template <typename Receiver>
+        detail::operation_state<Receiver, future> connect(
+            Receiver&& receiver) &&
+        {
+            return {std::forward<Receiver>(receiver), std::move(*this)};
+        }
 
     private:
         struct invalidate
@@ -1100,8 +1213,34 @@ namespace hpx { namespace lcos {
         typedef detail::future_base<shared_future<R>, R> base_type;
 
     public:
-        typedef R result_type;
-        typedef typename base_type::shared_state_type shared_state_type;
+        using result_type = R;
+        using shared_state_type = typename base_type::shared_state_type;
+
+        // Sender compatibility
+        template <template <typename...> class Tuple,
+            template <typename...> class Variant>
+        using value_types = std::conditional_t<std::is_void<result_type>::value,
+            Variant<Tuple<>>,
+            Variant<Tuple<std::add_rvalue_reference_t<result_type>>>>;
+
+        template <template <typename...> class Variant>
+        using error_types = Variant<std::exception_ptr>;
+
+        static constexpr bool sends_done = false;
+
+        template <typename Receiver>
+        detail::operation_state<Receiver, shared_future> connect(
+            Receiver&& receiver) &&
+        {
+            return {std::forward<Receiver>(receiver), std::move(*this)};
+        }
+
+        template <typename Receiver>
+        detail::operation_state<Receiver, shared_future> connect(
+            Receiver&& receiver) &
+        {
+            return {std::forward<Receiver>(receiver), *this};
+        }
 
     private:
         template <typename Future>

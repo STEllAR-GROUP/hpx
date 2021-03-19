@@ -23,6 +23,7 @@ set(execution_headers
     hpx/execution/detail/post_policy_dispatch.hpp
     hpx/execution/detail/sync_launch_policy_dispatch.hpp
     hpx/execution/execution.hpp
+    hpx/execution/sender_future.hpp
     hpx/execution/executor_parameters.hpp
     hpx/execution/executors/auto_chunk_size.hpp
     hpx/execution/executors/dynamic_chunk_size.hpp
