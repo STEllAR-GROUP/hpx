@@ -20,11 +20,11 @@ void test_transform_binary()
 {
     using namespace hpx::execution;
 
-    test_transform_binary(execution::dataseq, IteratorTag());
-    test_transform_binary(execution::datapar, IteratorTag());
+    test_transform_binary(dataseq, IteratorTag());
+    test_transform_binary(datapar, IteratorTag());
 
-    test_transform_binary_async(execution::dataseq(task), IteratorTag());
-    test_transform_binary_async(execution::datapar(task), IteratorTag());
+    test_transform_binary_async(dataseq(task), IteratorTag());
+    test_transform_binary_async(datapar(task), IteratorTag());
 }
 
 void transform_binary_test()
@@ -39,13 +39,11 @@ void test_transform_binary_exception()
 {
     using namespace hpx::execution;
 
-    test_transform_binary_exception(execution::dataseq, IteratorTag());
-    test_transform_binary_exception(execution::datapar, IteratorTag());
+    test_transform_binary_exception(dataseq, IteratorTag());
+    test_transform_binary_exception(datapar, IteratorTag());
 
-    test_transform_binary_exception_async(
-        execution::dataseq(task), IteratorTag());
-    test_transform_binary_exception_async(
-        execution::datapar(task), IteratorTag());
+    test_transform_binary_exception_async(dataseq(task), IteratorTag());
+    test_transform_binary_exception_async(datapar(task), IteratorTag());
 }
 
 void transform_binary_exception_test()
@@ -60,13 +58,11 @@ void test_transform_binary_bad_alloc()
 {
     using namespace hpx::execution;
 
-    test_transform_binary_bad_alloc(execution::dataseq, IteratorTag());
-    test_transform_binary_bad_alloc(execution::datapar, IteratorTag());
+    test_transform_binary_bad_alloc(dataseq, IteratorTag());
+    test_transform_binary_bad_alloc(datapar, IteratorTag());
 
-    test_transform_binary_bad_alloc_async(
-        execution::dataseq(task), IteratorTag());
-    test_transform_binary_bad_alloc_async(
-        execution::datapar(task), IteratorTag());
+    test_transform_binary_bad_alloc_async(dataseq(task), IteratorTag());
+    test_transform_binary_bad_alloc_async(datapar(task), IteratorTag());
 }
 
 void transform_binary_bad_alloc_test()

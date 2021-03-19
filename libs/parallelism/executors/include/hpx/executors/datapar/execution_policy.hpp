@@ -92,7 +92,10 @@ namespace hpx { namespace execution { inline namespace v1 {
             Executor, executor_parameters_type>::type
         on(Executor&& exec) const
         {
-            static_assert(hpx::traits::is_threads_executor<Executor>::value ||
+            static_assert(
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+                hpx::traits::is_threads_executor<Executor>::value ||
+#endif
                     hpx::traits::is_executor_any<Executor>::value,
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
