@@ -14,6 +14,7 @@
 #include <hpx/execution/traits/vector_pack_type.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <cstddef>
 #include <iterator>
