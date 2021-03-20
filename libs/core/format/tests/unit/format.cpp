@@ -10,6 +10,7 @@
 
 #include <ctime>
 #include <string>
+#include <vector>
 
 int main(int argc, char* argv[])
 {
@@ -52,6 +53,15 @@ int main(int argc, char* argv[])
 
         std::strftime(buffer, 64, "%A %c", &tm);
         HPX_TEST_EQ((format("{:%A %c}", tm)), buffer);
+    }
+
+    {
+        using hpx::util::format_join;
+        std::vector<int> const vs = {42, 43};
+        HPX_TEST_EQ((format("{}", format_join(vs))), "4243");
+        HPX_TEST_EQ((format("{}", format_join(vs, ","))), "42,43");
+        HPX_TEST_EQ((format("{:x}", format_join(vs))), "2a2b");
+        HPX_TEST_EQ((format("{:04x}", format_join(vs, ","))), "002a,002b");
     }
 
     {
