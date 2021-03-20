@@ -285,7 +285,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj2 = std::forward<Proj2>(proj2)](
                               zip_iterator it,
                               std::size_t part_count) mutable -> bool {
-                    util::loop_n<ExPolicy>(it, part_count, tok,
+                    util::loop_n<std::decay_t<ExPolicy>>(it, part_count, tok,
                         [&f, &proj1, &proj2, &tok](zip_iterator const& curr) {
                             reference t = *curr;
                             if (!hpx::util::invoke(f,
@@ -390,7 +390,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 util::cancellation_token<> tok;
                 auto f1 = [f, tok](zip_iterator it,
                               std::size_t part_count) mutable -> bool {
-                    util::loop_n<ExPolicy>(it, part_count, tok,
+                    util::loop_n<std::decay_t<ExPolicy>>(it, part_count, tok,
                         [&f, &tok](zip_iterator const& curr) {
                             reference t = *curr;
                             if (!hpx::util::invoke(

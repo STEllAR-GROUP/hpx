@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +15,7 @@
 #include <hpx/execution/traits/vector_pack_load_store.hpp>
 #include <hpx/execution/traits/vector_pack_type.hpp>
 #include <hpx/executors/datapar/execution_policy_fwd.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -345,9 +346,10 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename Iter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
         hpx::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
-    loop_n(Iter it, std::size_t count, F&& f)
+    tag_invoke(hpx::parallel::util::loop_n_t<ExPolicy>, Iter it,
+        std::size_t count, F&& f)
     {
         return detail::datapar_loop_n<Iter>::call(
             it, count, std::forward<F>(f));

@@ -323,6 +323,60 @@ namespace hpx { namespace parallel { namespace util {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Itr, typename... Ts>
+        struct loop_ind<detail::prefetching_iterator<Itr, Ts...>>
+        {
+            typedef detail::prefetching_iterator<Itr, Ts...> iterator_type;
+            typedef typename iterator_type::base_iterator type;
+            typedef typename hpx::util::make_index_pack<sizeof...(Ts)>::type
+                index_pack_type;
+
+            template <typename End, typename F>
+            static iterator_type call(iterator_type it, End end, F&& f)
+            {
+                for (/**/; it != end; ++it)
+                {
+                    Itr base = it.base();
+                    std::size_t j = it.index();
+
+                    std::size_t last = (std::min)(
+                        it.index() + it.chunk_size(), it.range_size());
+
+                    for (/**/; j != last; (void) ++j, ++base)
+                        f(*base);
+
+                    if (j != it.range_size())
+                        prefetch_containers(it.ranges(), index_pack_type(), j);
+                }
+                return it;
+            }
+
+            template <typename End, typename CancelToken, typename F>
+            static iterator_type call(
+                iterator_type it, End end, CancelToken& tok, F&& f)
+            {
+                for (/**/; it != end; ++it)
+                {
+                    if (tok.was_cancelled())
+                        break;
+
+                    Itr base = it.base();
+                    std::size_t j = it.index();
+
+                    std::size_t last = (std::min)(
+                        it.index() + it.chunk_size(), it.range_size());
+
+                    for (/**/; j != last; (void) ++j, ++base)
+                        f(*base);
+
+                    if (j != it.range_size())
+                        prefetch_containers(it.ranges(), index_pack_type(), j);
+                }
+                return it;
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Itr, typename... Ts>
         struct loop_n<detail::prefetching_iterator<Itr, Ts...>>
         {
             typedef detail::prefetching_iterator<Itr, Ts...> iterator_type;
@@ -368,6 +422,61 @@ namespace hpx { namespace parallel { namespace util {
 
                     for (/**/; j != last; (void) ++j, ++base)
                         f(base);
+
+                    if (j != it.range_size())
+                        prefetch_containers(it.ranges(), index_pack_type(), j);
+                }
+                return it;
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Itr, typename... Ts>
+        struct loop_n_ind<detail::prefetching_iterator<Itr, Ts...>>
+        {
+            typedef detail::prefetching_iterator<Itr, Ts...> iterator_type;
+            typedef typename iterator_type::base_iterator type;
+            typedef typename hpx::util::make_index_pack<sizeof...(Ts)>::type
+                index_pack_type;
+
+            template <typename F, typename Pred>
+            static iterator_type call(
+                iterator_type it, std::size_t count, F&& f, Pred)
+            {
+                for (/**/; count != 0; (void) --count, ++it)
+                {
+                    Itr base = it.base();
+                    std::size_t j = it.index();
+
+                    std::size_t last = (std::min)(
+                        it.index() + it.chunk_size(), it.range_size());
+
+                    for (/**/; j != last; (void) ++j, ++base)
+                        f(*base);
+
+                    if (j != it.range_size())
+                        prefetch_containers(it.ranges(), index_pack_type(), j);
+                }
+                return it;
+            }
+
+            template <typename CancelToken, typename F, typename Pred>
+            static iterator_type call(iterator_type it, std::size_t count,
+                CancelToken& tok, F&& f, Pred)
+            {
+                for (/**/; count != 0; (void) --count, ++it)
+                {
+                    if (tok.was_cancelled())
+                        break;
+
+                    Itr base = it.base();
+                    std::size_t j = it.index();
+
+                    std::size_t last = (std::min)(
+                        it.index() + it.chunk_size(), it.range_size());
+
+                    for (/**/; j != last; (void) ++j, ++base)
+                        f(*base);
 
                     if (j != it.range_size())
                         prefetch_containers(it.ranges(), index_pack_type(), j);

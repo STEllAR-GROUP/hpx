@@ -44,7 +44,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
             }
 
             HPX_HOST_DEVICE
-            constexpr void next_iteration(std::size_t /*index*/) noexcept
+            constexpr void next_iteration() noexcept
             {
                 ++curr_;
             }
@@ -80,7 +80,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
             }
 
             HPX_HOST_DEVICE
-            constexpr void next_iteration(std::size_t /*index*/) noexcept
+            constexpr void next_iteration() noexcept
             {
                 ++curr_;
             }
@@ -123,7 +123,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
             }
 
             HPX_HOST_DEVICE
-            constexpr void next_iteration(std::size_t /*index*/) noexcept
+            constexpr void next_iteration() noexcept
             {
                 curr_ = parallel::v1::detail::next(curr_, stride_);
             }
@@ -162,7 +162,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
             }
 
             HPX_HOST_DEVICE
-            constexpr void next_iteration(std::size_t /*index*/) noexcept
+            constexpr void next_iteration() noexcept
             {
                 curr_ = parallel::v1::detail::next(curr_, stride_);
             }

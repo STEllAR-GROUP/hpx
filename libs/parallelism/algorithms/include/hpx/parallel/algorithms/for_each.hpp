@@ -263,6 +263,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // for_each_n
     namespace detail {
+
         /// \cond NOINTERNAL
         template <typename F, typename Proj = util::projection_identity>
         struct invoke_projected
@@ -338,9 +339,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename F, typename Proj>
         struct for_each_iteration
         {
-            using execution_policy_type = typename std::decay<ExPolicy>::type;
-            using fun_type = typename std::decay<F>::type;
-            using proj_type = typename std::decay<Proj>::type;
+            using execution_policy_type = std::decay_t<ExPolicy>;
+            using fun_type = std::decay_t<F>;
+            using proj_type = Proj;
 
             fun_type f_;
             proj_type proj_;
@@ -392,8 +393,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename F>
         struct for_each_iteration<ExPolicy, F, util::projection_identity>
         {
-            using execution_policy_type = typename std::decay<ExPolicy>::type;
-            using fun_type = typename std::decay<F>::type;
+            using execution_policy_type = std::decay_t<ExPolicy>;
+            using fun_type = std::decay_t<F>;
 
             fun_type f_;
 
@@ -463,8 +464,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             HPX_HOST_DEVICE static constexpr Iter sequential(
                 ExPolicy&&, InIter first, std::size_t count, F&& f, Proj&& proj)
             {
-                return util::loop_n<ExPolicy>(
-                    first, count, invoke_projected<F, Proj>{f, proj});
+                return util::loop_n<std::decay_t<ExPolicy>>(first, count,
+                    invoke_projected<F, std::decay_t<Proj>>{f, proj});
             }
 
             template <typename ExPolicy, typename InIter, typename F>
@@ -472,7 +473,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 InIter first, std::size_t count, F&& f,
                 util::projection_identity)
             {
-                return util::loop_n_ind<ExPolicy>(
+                return util::loop_n_ind<std::decay_t<ExPolicy>>(
                     first, count, std::forward<F>(f));
             }
 
@@ -485,8 +486,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 if (count != 0)
                 {
-                    auto f1 = for_each_iteration<ExPolicy, F, Proj>(
-                        std::forward<F>(f), std::forward<Proj>(proj));
+                    auto f1 =
+                        for_each_iteration<ExPolicy, F, std::decay_t<Proj>>(
+                            std::forward<F>(f), std::forward<Proj>(proj));
 
                     return util::foreach_partitioner<ExPolicy>::call(
                         std::forward<ExPolicy>(policy), first, count,
@@ -520,9 +522,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             sequential(
                 ExPolicy&&, InIterB first, InIterE last, F&& f, Proj&& proj)
             {
-                return util::loop_n<typename std::decay<ExPolicy>::type>(first,
+                return util::loop_n<std::decay_t<ExPolicy>>(first,
                     static_cast<std::size_t>(detail::distance(first, last)),
-                    invoke_projected<F, Proj>{f, proj});
+                    invoke_projected<F, std::decay_t<Proj>>{f, proj});
             }
 
             template <typename ExPolicy, typename InIterB, typename InIterE,
@@ -534,7 +536,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Proj&& proj)
             {
                 return util::loop(std::forward<ExPolicy>(policy), first, last,
-                    invoke_projected<F, Proj>{f, proj});
+                    invoke_projected<F, std::decay_t<Proj>>{f, proj});
             }
 
             template <typename ExPolicy, typename InIterB, typename InIterE,
@@ -545,8 +547,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             sequential(ExPolicy&&, InIterB first, InIterE last, F&& f,
                 util::projection_identity)
             {
-                return util::loop_n_ind<typename std::decay<ExPolicy>::type>(
-                    first,
+                return util::loop_n_ind<std::decay_t<ExPolicy>>(first,
                     static_cast<std::size_t>(detail::distance(first, last)),
                     std::forward<F>(f));
             }
@@ -572,8 +573,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 if (first != last)
                 {
-                    auto f1 = for_each_iteration<ExPolicy, F, Proj>(
-                        std::forward<F>(f), std::forward<Proj>(proj));
+                    auto f1 =
+                        for_each_iteration<ExPolicy, F, std::decay_t<Proj>>(
+                            std::forward<F>(f), std::forward<Proj>(proj));
 
                     return util::foreach_partitioner<ExPolicy>::call(
                         std::forward<ExPolicy>(policy), first,
@@ -801,8 +803,7 @@ namespace hpx { namespace traits {
             parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const&
                 f) noexcept
         {
-            return get_function_address<typename std::decay<F>::type>::call(
-                f.f_);
+            return get_function_address<std::decay_t<F>>::call(f.f_);
         }
     };
 
@@ -814,8 +815,7 @@ namespace hpx { namespace traits {
             parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const&
                 f) noexcept
         {
-            return get_function_annotation<typename std::decay<F>::type>::call(
-                f.f_);
+            return get_function_annotation<std::decay_t<F>>::call(f.f_);
         }
     };
 
@@ -828,8 +828,7 @@ namespace hpx { namespace traits {
             parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const&
                 f) noexcept
         {
-            return get_function_annotation_itt<
-                typename std::decay<F>::type>::call(f.f_);
+            return get_function_annotation_itt<std::decay_t<F>>::call(f.f_);
         }
     };
 #endif

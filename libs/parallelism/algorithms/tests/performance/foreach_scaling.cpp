@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -74,16 +75,17 @@ namespace hpx { namespace parallel { namespace execution {
 ///////////////////////////////////////////////////////////////////////////////
 void measure_plain_for(std::vector<std::size_t> const& data_representation)
 {
-    std::size_t size = data_representation.size();
-    std::size_t i = 0;
-    for (/**/; i < size; i += 4)
+    std::size_t num = data_representation.size();
+
+    std::size_t size = num & std::size_t(-4);    // -V112
+    for (std::size_t i = 0; i < size; i += 4)
     {
         worker_timed(delay);
         worker_timed(delay);
         worker_timed(delay);
         worker_timed(delay);
     }
-    for (/**/; i < size; ++i)
+    for (/**/; size < num; ++size)
     {
         worker_timed(delay);
     }

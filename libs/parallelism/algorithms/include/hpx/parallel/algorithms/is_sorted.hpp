@@ -289,7 +289,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               FwdIter part_begin,
                               std::size_t part_size) mutable -> bool {
                     FwdIter trail = part_begin++;
-                    util::loop_n<ExPolicy>(part_begin, part_size - 1,
+                    util::loop_n<std::decay_t<ExPolicy>>(part_begin,
+                        part_size - 1,
                         [&trail, &tok, &pred_projected](FwdIter it) -> void {
                             if (hpx::util::invoke(
                                     pred_projected, *it, *trail++))
