@@ -25,9 +25,8 @@
 #include <map>
 #include <set>
 #include <string>
+#include <unordered_map>
 #include <vector>
-
-#include <boost/bimap.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -54,7 +53,7 @@ namespace hpx { namespace agas { namespace server {
         using prefixes_type = std::set<std::uint32_t>;
 
         using component_id_table_type =
-            boost::bimap<std::string, component_id_type>;
+            std::unordered_map<std::string, component_id_type>;
 
         using factory_table_type = std::map<component_id_type, prefixes_type>;
 
