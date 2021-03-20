@@ -320,7 +320,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int /* version */)
         {
             // clang-format off
             ar & exec_ & params_;
@@ -468,7 +468,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& /* ar */, const unsigned int /* version */)
         {
         }
 
@@ -621,7 +621,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int /* version */)
         {
             // clang-format off
             ar & exec_ & params_;
@@ -771,7 +771,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& /* ar */, const unsigned int /* version */)
         {
         }
 
@@ -908,7 +908,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& /* ar */, const unsigned int /* version */)
         {
         }
 
@@ -1060,7 +1060,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int /* version */)
         {
             // clang-format off
             ar & exec_ & params_;
@@ -1215,7 +1215,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int /* version */)
         {
             // clang-format off
             ar & exec_ & params_;
