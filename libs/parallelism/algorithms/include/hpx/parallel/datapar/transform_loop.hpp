@@ -82,7 +82,19 @@ namespace hpx { namespace parallel { namespace util {
                     first, count, dest, std::forward<F>(f));
             }
         };
+    }    // namespace detail
 
+    template <typename ExPolicy, typename Iter, typename OutIter, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
+        hpx::is_vectorpack_execution_policy<ExPolicy>::value,
+        std::pair<Iter, OutIter>>::type
+    transform_loop_n(Iter it, std::size_t count, OutIter dest, F&& f)
+    {
+        return detail::datapar_transform_loop_n<Iter>::call(
+            it, count, dest, std::forward<F>(f));
+    }
+
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename Iterator>
         struct datapar_transform_loop
@@ -119,7 +131,26 @@ namespace hpx { namespace parallel { namespace util {
                     hpx::execution::seq, first, last, dest, std::forward<F>(f));
             }
         };
+    }    // namespace detail
 
+    template <typename Iter, typename OutIter, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Iter, OutIter> transform_loop(
+        hpx::execution::datapar_policy, Iter it, Iter end, OutIter dest, F&& f)
+    {
+        return detail::datapar_transform_loop<Iter>::call(
+            it, end, dest, std::forward<F>(f));
+    }
+
+    template <typename Iter, typename OutIter, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Iter, OutIter> transform_loop(
+        hpx::execution::datapar_task_policy, Iter it, Iter end, OutIter dest,
+        F&& f)
+    {
+        return detail::datapar_transform_loop<Iter>::call(
+            it, end, dest, std::forward<F>(f));
+    }
+
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename Iter1, typename Iter2>
         struct datapar_transform_binary_loop_n
@@ -184,7 +215,21 @@ namespace hpx { namespace parallel { namespace util {
                     first1, count, first2, dest, std::forward<F>(f));
             }
         };
+    }    // namespace detail
 
+    template <typename ExPolicy, typename InIter1, typename InIter2,
+        typename OutIter, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
+        hpx::is_vectorpack_execution_policy<ExPolicy>::value,
+        hpx::tuple<InIter1, InIter2, OutIter>>::type
+    transform_binary_loop_n(
+        InIter1 first1, std::size_t count, InIter2 first2, OutIter dest, F&& f)
+    {
+        return detail::datapar_transform_binary_loop_n<InIter1, InIter2>::call(
+            first1, count, first2, dest, std::forward<F>(f));
+    }
+
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename Iter1, typename Iter2>
         struct datapar_transform_binary_loop
@@ -275,50 +320,6 @@ namespace hpx { namespace parallel { namespace util {
         };
     }    // namespace detail
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename Iter, typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
-        hpx::is_vectorpack_execution_policy<ExPolicy>::value,
-        std::pair<Iter, OutIter>>::type
-    transform_loop_n(Iter it, std::size_t count, OutIter dest, F&& f)
-    {
-        return detail::datapar_transform_loop_n<Iter>::call(
-            it, count, dest, std::forward<F>(f));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Iter, OutIter> transform_loop(
-        hpx::execution::datapar_policy, Iter it, Iter end, OutIter dest, F&& f)
-    {
-        return detail::datapar_transform_loop<Iter>::call(
-            it, end, dest, std::forward<F>(f));
-    }
-
-    template <typename Iter, typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Iter, OutIter> transform_loop(
-        hpx::execution::datapar_task_policy, Iter it, Iter end, OutIter dest,
-        F&& f)
-    {
-        return detail::datapar_transform_loop<Iter>::call(
-            it, end, dest, std::forward<F>(f));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
-        hpx::is_vectorpack_execution_policy<ExPolicy>::value,
-        hpx::tuple<InIter1, InIter2, OutIter>>::type
-    transform_binary_loop_n(
-        InIter1 first1, std::size_t count, InIter2 first2, OutIter dest, F&& f)
-    {
-        return detail::datapar_transform_binary_loop_n<InIter1, InIter2>::call(
-            first1, count, first2, dest, std::forward<F>(f));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
@@ -343,5 +344,4 @@ namespace hpx { namespace parallel { namespace util {
             first1, last1, first2, last2, dest, std::forward<F>(f));
     }
 }}}    // namespace hpx::parallel::util
-
 #endif
