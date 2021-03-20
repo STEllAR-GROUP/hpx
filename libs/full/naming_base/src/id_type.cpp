@@ -10,7 +10,7 @@
 #include <hpx/naming_base/id_type.hpp>
 
 #include <iomanip>
-#include <iostream>
+#include <ostream>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

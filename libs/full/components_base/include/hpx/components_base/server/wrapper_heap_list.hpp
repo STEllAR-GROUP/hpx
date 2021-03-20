@@ -12,7 +12,6 @@
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 
-#include <iostream>
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -19,6 +19,7 @@
 #include <hpx/components/iostreams/standard_streams.hpp>
 
 #include <functional>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -26,6 +27,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace iostreams { namespace detail
 {
+    std::ostream& get_coutstream() noexcept
+    {
+        return std::cout;
+    }
+
+    std::ostream& get_cerrstream() noexcept
+    {
+        return std::cerr;
+    }
+
     std::stringstream& get_consolestream()
     {
         static std::stringstream console_stream;

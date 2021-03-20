@@ -12,7 +12,6 @@
 
 #include <fstream>
 #include <functional>
-#include <iostream>
 #include <locale.h>
 #include <locale>
 #include <stdexcept>

@@ -6,7 +6,7 @@
 
 #include <hpx/assertion/source_location.hpp>
 
-#include <iostream>
+#include <ostream>
 
 namespace hpx { namespace assertion {
     std::ostream& operator<<(std::ostream& os, source_location const& loc)

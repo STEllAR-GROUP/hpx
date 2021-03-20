@@ -23,9 +23,9 @@
 #include <atomic>
 #include <cstdint>
 #include <ios>
-#include <iostream>
 #include <iterator>
 #include <mutex>
+#include <ostream>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -91,14 +91,18 @@ namespace hpx { namespace iostreams
         };
 
         ///////////////////////////////////////////////////////////////////////
+        std::ostream& get_coutstream() noexcept;
+
         inline std::ostream& get_outstream(cout_tag)
         {
-            return std::cout;
+            return get_coutstream();
         }
+
+        std::ostream& get_cerrstream() noexcept;
 
         inline std::ostream& get_outstream(cerr_tag)
         {
-            return std::cerr;
+            return get_cerrstream();
         }
 
         std::stringstream& get_consolestream();

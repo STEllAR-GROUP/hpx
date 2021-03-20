@@ -12,7 +12,6 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>

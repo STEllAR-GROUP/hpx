@@ -13,7 +13,6 @@
 #include <hpx/program_options/errors.hpp>
 
 #include <fstream>
-#include <iostream>
 #include <set>
 #include <string>
 
