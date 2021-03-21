@@ -256,14 +256,17 @@ namespace hpx { namespace parallel { namespace util {
                     iterator_datapar_compatible<InIter1>::value &&
                     iterator_datapar_compatible<InIter2>::value &&
                     iterator_datapar_compatible<OutIter>::value,
-                hpx::tuple<InIter1, InIter2, OutIter>>::type
+                util::in_in_out_result<InIter1, InIter2, OutIter>>::type
             call(InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest,
                 F&& f)
             {
-                return util::transform_binary_loop_n<
+                auto ret = util::transform_binary_loop_n<
                     hpx::execution::datapar_policy>(first1,
                     std::distance(first1, last1), first2, dest,
                     std::forward<F>(f));
+
+                return util::in_in_out_result<InIter1, InIter2, OutIter>{
+                    hpx::get<0>(ret), hpx::get<1>(ret), hpx::get<2>(ret)};
             }
 
             template <typename InIter1, typename InIter2, typename OutIter,
@@ -274,7 +277,7 @@ namespace hpx { namespace parallel { namespace util {
                     !iterator_datapar_compatible<InIter1>::value ||
                     !iterator_datapar_compatible<InIter2>::value ||
                     !iterator_datapar_compatible<OutIter>::value,
-                hpx::tuple<InIter1, InIter2, OutIter>>::type
+                util::in_in_out_result<InIter1, InIter2, OutIter>>::type
             call(InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest,
                 F&& f)
             {
@@ -290,16 +293,19 @@ namespace hpx { namespace parallel { namespace util {
                     iterator_datapar_compatible<InIter1>::value &&
                     iterator_datapar_compatible<InIter2>::value &&
                     iterator_datapar_compatible<OutIter>::value,
-                hpx::tuple<InIter1, InIter2, OutIter>>::type
+                util::in_in_out_result<InIter1, InIter2, OutIter>>::type
             call(InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
                 OutIter dest, F&& f)
             {
                 std::size_t count = (std::min)(
                     std::distance(first1, last1), std::distance(first2, last2));
 
-                return util::transform_binary_loop_n<
+                auto ret = util::transform_binary_loop_n<
                     hpx::execution::datapar_policy>(
                     first1, count, first2, dest, std::forward<F>(f));
+
+                return util::in_in_out_result<InIter1, InIter2, OutIter>{
+                    hpx::get<0>(ret), hpx::get<1>(ret), hpx::get<2>(ret)};
             }
 
             template <typename InIter1, typename InIter2, typename OutIter,
@@ -310,7 +316,7 @@ namespace hpx { namespace parallel { namespace util {
                     !iterator_datapar_compatible<InIter1>::value ||
                     !iterator_datapar_compatible<InIter2>::value ||
                     !iterator_datapar_compatible<OutIter>::value,
-                hpx::tuple<InIter1, InIter2, OutIter>>::type
+                util::in_in_out_result<InIter1, InIter2, OutIter>>::type
             call(InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
                 OutIter dest, F&& f)
             {
@@ -324,7 +330,7 @@ namespace hpx { namespace parallel { namespace util {
         typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         hpx::is_vectorpack_execution_policy<ExPolicy>::value,
-        hpx::tuple<InIter1, InIter2, OutIter>>::type
+        util::in_in_out_result<InIter1, InIter2, OutIter>>::type
     transform_binary_loop(
         InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest, F&& f)
     {
@@ -336,7 +342,7 @@ namespace hpx { namespace parallel { namespace util {
         typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         hpx::is_vectorpack_execution_policy<ExPolicy>::value,
-        hpx::tuple<InIter1, InIter2, OutIter>>::type
+        util::in_in_out_result<InIter1, InIter2, OutIter>>::type
     transform_binary_loop(InIter1 first1, InIter1 last1, InIter2 first2,
         InIter2 last2, OutIter dest, F&& f)
     {
