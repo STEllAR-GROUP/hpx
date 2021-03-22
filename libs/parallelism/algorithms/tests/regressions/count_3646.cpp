@@ -29,42 +29,6 @@ struct bit_counting_iterator : public iterator<std::int64_t>
     {
     }
 
-    std::int64_t operator*() const override
-    {
-        return countBits(this->state);
-    }
-
-    std::int64_t operator[](difference_type n) const override
-    {
-        return countBits(this->state + n);
-    }
-
-    bit_counting_iterator& operator++()
-    {
-        ++(this->state);
-        return *this;
-    }
-
-    bit_counting_iterator operator++(int)
-    {
-        auto copy = *this;
-        ++(*this);
-        return copy;
-    }
-
-    bit_counting_iterator& operator--()
-    {
-        --(this->state);
-        return *this;
-    }
-
-    bit_counting_iterator operator--(int)
-    {
-        auto copy = *this;
-        --(*this);
-        return copy;
-    }
-
 private:
     std::int64_t countBits(std::int64_t v) const
     {

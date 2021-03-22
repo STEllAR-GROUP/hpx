@@ -10,6 +10,7 @@
 
 #include "libs/parallelism/algorithms/tests/util/iter_sent.hpp"
 
+#include <cstdint>
 #include <vector>
 
 void test_ranges_next()

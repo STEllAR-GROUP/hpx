@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c)      2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -121,6 +122,38 @@ void reverse_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_reverse_exception(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::reverse(decorated_iterator(std::begin(c)),
+            decorated_iterator(
+                std::end(c), []() { throw std::runtime_error("test"); }));
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<hpx::execution::sequenced_policy,
+            IteratorTag>::call(hpx::execution::seq, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_reverse_exception(ExPolicy policy, IteratorTag)
 {
@@ -199,6 +232,7 @@ void test_reverse_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_reverse_exception(IteratorTag());
     test_reverse_exception(seq, IteratorTag());
     test_reverse_exception(par, IteratorTag());
 
@@ -213,6 +247,35 @@ void reverse_exception_test()
 }
 
 //////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_reverse_bad_alloc(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    bool caught_bad_alloc = false;
+    try
+    {
+        hpx::reverse(decorated_iterator(std::begin(c)),
+            decorated_iterator(std::end(c), []() { throw std::bad_alloc(); }));
+        HPX_TEST(false);
+    }
+    catch (std::bad_alloc const&)
+    {
+        caught_bad_alloc = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_bad_alloc);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_reverse_bad_alloc(ExPolicy policy, IteratorTag)
 {
@@ -287,6 +350,7 @@ void test_reverse_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_reverse_bad_alloc(IteratorTag());
     test_reverse_bad_alloc(seq, IteratorTag());
     test_reverse_bad_alloc(par, IteratorTag());
 
