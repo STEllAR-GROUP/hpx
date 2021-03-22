@@ -538,7 +538,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 return for_each_n<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), std::false_type(), first,
+                    std::forward<ExPolicy>(policy), first,
                     std::distance(first, last),
                     [old_value, new_value, proj = std::forward<Proj>(proj)](
                         type& t) -> void {
@@ -628,7 +628,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 return for_each_n<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), std::false_type(), first,
+                    std::forward<ExPolicy>(policy), first,
                     detail::distance(first, last),
                     [new_value, f = std::forward<F>(f),
                         proj = std::forward<Proj>(proj)](type& t) -> void {
@@ -722,7 +722,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return util::detail::get_in_out_result(
                     for_each_n<zip_iterator>().call(
-                        std::forward<ExPolicy>(policy), std::false_type(),
+                        std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(first, dest),
                         detail::distance(first, sent),
                         [old_value, new_value, proj = std::forward<Proj>(proj)](
@@ -826,7 +826,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return util::detail::get_in_out_result(
                     for_each_n<zip_iterator>().call(
-                        std::forward<ExPolicy>(policy), std::false_type(),
+                        std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(first, dest),
                         detail::distance(first, sent),
                         [new_value, f = std::forward<F>(f),

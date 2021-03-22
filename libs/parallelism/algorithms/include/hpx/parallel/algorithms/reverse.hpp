@@ -61,7 +61,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return util::detail::convert_to_result(
                     for_each_n<zip_iterator>().call(
-                        std::forward<ExPolicy>(policy), std::false_type(),
+                        std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(
                             first, destination_iterator(last)),
                         std::distance(first, last) / 2,
@@ -172,8 +172,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return util::detail::convert_to_result(
                     detail::copy<util::in_out_result<iterator, FwdIter>>().call(
-                        std::forward<ExPolicy>(policy), std::false_type(),
-                        iterator(last), iterator(first), dest_first),
+                        std::forward<ExPolicy>(policy), iterator(last),
+                        iterator(first), dest_first),
                     [](util::in_out_result<iterator, FwdIter> const& p)
                         -> util::in_out_result<BidirIter, FwdIter> {
                         return util::in_out_result<BidirIter, FwdIter>{

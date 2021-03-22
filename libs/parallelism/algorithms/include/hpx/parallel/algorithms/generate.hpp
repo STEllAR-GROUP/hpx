@@ -187,7 +187,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using type = typename std::iterator_traits<Iter>::value_type;
 
                 return for_each_n<Iter>().call(
-                    std::forward<ExPolicy>(policy), std::false_type(), first,
+                    std::forward<ExPolicy>(policy), first,
                     detail::distance(first, last),
                     [f = std::forward<F>(f)](type& v) mutable { v = f(); },
                     util::projection_identity());
@@ -270,8 +270,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 return for_each_n<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), std::false_type(), first,
-                    count,
+                    std::forward<ExPolicy>(policy), first, count,
                     [f = std::forward<F>(f)](type& v) mutable { v = f(); },
                     util::projection_identity());
             }

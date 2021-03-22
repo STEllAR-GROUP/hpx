@@ -99,7 +99,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 it, part_size, value, tok));
                     },
                     // finalize, called once if no error occurred
-                    [](std::vector<hpx::future<partition_result_type>>&&)
+                    [](std::vector<hpx::future<partition_result_type>> &&)
                         -> void {},
                     // cleanup function, called for each partition which
                     // didn't fail, but only if at least one failed

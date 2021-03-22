@@ -192,7 +192,7 @@ namespace hpx { namespace ranges {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::destroy<iterator_type>().call(
-                hpx::execution::seq, std::false_type{}, hpx::util::begin(rng),
+                hpx::execution::seq, hpx::util::begin(rng),
                 hpx::util::end(rng));
         }
 
@@ -208,7 +208,7 @@ namespace hpx { namespace ranges {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::destroy<Iter>().call(
-                hpx::execution::seq, std::false_type{}, first, last);
+                hpx::execution::seq, first, last);
         }
     } destroy{};
 
@@ -261,8 +261,7 @@ namespace hpx { namespace ranges {
             }
 
             return hpx::parallel::v1::detail::destroy_n<FwdIter>().call(
-                hpx::execution::seq, std::false_type{}, first,
-                std::size_t(count));
+                hpx::execution::seq, first, std::size_t(count));
         }
     } destroy_n{};
 }}    // namespace hpx::ranges

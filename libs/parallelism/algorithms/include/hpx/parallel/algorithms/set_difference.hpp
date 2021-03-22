@@ -214,8 +214,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (first2 == last2)
                 {
                     return detail::copy<result_type>().call(
-                        std::forward<ExPolicy>(policy), std::false_type(),
-                        first1, last1, dest);
+                        std::forward<ExPolicy>(policy), first1, last1, dest);
                 }
 
                 using buffer_type = typename set_operations_buffer<Iter3>::type;

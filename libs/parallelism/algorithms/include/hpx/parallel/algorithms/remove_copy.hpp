@@ -321,8 +321,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 FwdIter2 dest, T const& val, Proj&& proj)
             {
                 return copy_if<IterPair>().call(
-                    std::forward<ExPolicy>(policy), std::false_type(), first,
-                    last, dest,
+                    std::forward<ExPolicy>(policy), first, last, dest,
                     [val](T const& a) -> bool { return !(a == val); },
                     std::forward<Proj>(proj));
             }
@@ -411,8 +410,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     value_type;
 
                 return copy_if<IterPair>().call(
-                    std::forward<ExPolicy>(policy), std::false_type(), first,
-                    last, dest,
+                    std::forward<ExPolicy>(policy), first, last, dest,
                     [f = std::forward<F>(f)](value_type const& a) -> bool {
                         return !hpx::util::invoke(f, a);
                     },

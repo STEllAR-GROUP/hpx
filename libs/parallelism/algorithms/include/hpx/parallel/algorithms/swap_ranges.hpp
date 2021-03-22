@@ -57,7 +57,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     FwdIter2>::type result_type;
 
                 return get_iter<1, result_type>(for_each_n<zip_iterator>().call(
-                    std::forward<ExPolicy>(policy), std::false_type(),
+                    std::forward<ExPolicy>(policy),
                     hpx::util::make_zip_iterator(first1, first2),
                     std::distance(first1, last1),
                     [](reference t) -> void {

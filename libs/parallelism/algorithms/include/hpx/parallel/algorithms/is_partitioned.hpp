@@ -267,7 +267,7 @@ namespace hpx {
             hpx::is_partitioned_t, FwdIter first, FwdIter last, Pred&& pred)
         {
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, FwdIter>()
-                .call(hpx::execution::seq, std::false_type(), first, last,
+                .call(hpx::execution::seq, first, last,
                     std::forward<Pred>(pred),
                     hpx::parallel::util::projection_identity());
         }
