@@ -537,6 +537,15 @@ function(hpx_check_for_cxx20_std_endian)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_cxx20_std_execution_policies)
+  add_hpx_config_test(
+    HPX_WITH_CXX20_STD_EXECUTION_POLICES
+    SOURCE cmake/tests/cxx20_std_execution_policies.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_builtin_integer_pack)
   add_hpx_config_test(
     HPX_WITH_BUILTIN_INTEGER_PACK

@@ -304,6 +304,18 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             return call2(hpx::execution::par_unseq, std::false_type(),
                 std::forward<Args>(args)...);
         }
+
+#if defined(HPX_HAVE_CXX20_STD_EXECUTION_POLICES)
+        template <typename... Args>
+        HPX_FORCEINLINE constexpr
+            typename parallel::util::detail::algorithm_result<
+                hpx::execution::unsequenced_policy, local_result_type>::type
+            call(std::execution::unsequenced_policy, Args&&... args)
+        {
+            return call2(hpx::execution::unseq, std::false_type(),
+                std::forward<Args>(args)...);
+        }
+#endif
 #endif
 
     private:

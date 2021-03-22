@@ -214,6 +214,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
 
         template <>
+        struct remove_asynchronous<hpx::execution::unsequenced_policy>
+        {
+            typedef hpx::execution::sequenced_policy type;
+        };
+
+        template <>
         struct remove_asynchronous<hpx::execution::sequenced_task_policy>
         {
             typedef hpx::execution::sequenced_policy type;

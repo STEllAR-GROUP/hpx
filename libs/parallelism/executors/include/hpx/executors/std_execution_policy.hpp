@@ -55,6 +55,20 @@ namespace hpx { namespace detail {
       : std::true_type
     {
     };
+
+#if defined(HPX_HAVE_CXX20_STD_EXECUTION_POLICES)
+    template <>
+    struct is_execution_policy<std::execution::unsequenced_policy>
+      : std::true_type
+    {
+    };
+
+    template <>
+    struct is_sequenced_execution_policy<std::execution::unsequenced_policy>
+      : std::true_type
+    {
+    };
+#endif
     /// \endcond
 }}    // namespace hpx::detail
 
