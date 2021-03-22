@@ -83,17 +83,15 @@ namespace hpx { namespace agas { namespace server {
 
         std::unique_lock<mutex_type> l(mutex_);
 
-        component_id_table_type::left_map::iterator
-            cit = component_ids_.left.find(key),
-            cend = component_ids_.left.end();
+        auto cit = component_ids_.find(key);
+        auto const cend = component_ids_.end();
 
         // This is the first request, so we use the type counter, and then
         // increment it.
-        if (component_ids_.left.find(key) == cend)
+        if (component_ids_.find(key) == cend)
         {
             if (HPX_UNLIKELY(!util::insert_checked(
-                    component_ids_.left.insert(
-                        std::make_pair(key, type_counter)),
+                    component_ids_.insert(std::make_pair(key, type_counter)),
                     cit)))
             {
                 l.unlock();
@@ -180,17 +178,15 @@ namespace hpx { namespace agas { namespace server {
 
         std::unique_lock<mutex_type> l(mutex_);
 
-        component_id_table_type::left_map::iterator
-            it = component_ids_.left.find(key),
-            end = component_ids_.left.end();
+        auto it = component_ids_.find(key);
+        auto const end = component_ids_.end();
 
         // If the name is not in the table, register it (this is only done so
         // we can implement a backwards compatible get_component_id).
         if (it == end)
         {
             if (HPX_UNLIKELY(!util::insert_checked(
-                    component_ids_.left.insert(
-                        std::make_pair(key, type_counter)),
+                    component_ids_.insert(std::make_pair(key, type_counter)),
                     it)))
             {
                 l.unlock();
@@ -245,14 +241,10 @@ namespace hpx { namespace agas { namespace server {
 
         else
         {
-            std::vector<std::uint32_t> p;
-
             prefixes_type const& prefixes = it->second;
-            prefixes_type::const_iterator pit = prefixes.begin(),
-                                          pend = prefixes.end();
 
-            for (; pit != pend; ++pit)
-                p.push_back(*pit);
+            std::vector<std::uint32_t> p;
+            p.assign(prefixes.cbegin(), prefixes.cend());
 
             LAGAS_(info) << hpx::util::format(
                 "component_namespace::resolve_id, "
@@ -272,11 +264,10 @@ namespace hpx { namespace agas { namespace server {
 
         std::lock_guard<mutex_type> l(mutex_);
 
-        component_id_table_type::left_map::iterator it =
-            component_ids_.left.find(key);
+        auto const it = component_ids_.find(key);
 
         // REVIEW: Should this be an error?
-        if (it == component_ids_.left.end())
+        if (it == component_ids_.end())
         {
             LAGAS_(info) << hpx::util::format("component_namespace::unbind, "
                                               "key({1}), response(no_success)",
@@ -288,7 +279,7 @@ namespace hpx { namespace agas { namespace server {
         // REVIEW: If there are no localities with this type, should we throw
         // an exception here?
         factories_.erase(it->second);
-        component_ids_.left.erase(it);
+        component_ids_.erase(it);
 
         LAGAS_(info) << hpx::util::format(
             "component_namespace::unbind, key({1})", key);
@@ -305,20 +296,13 @@ namespace hpx { namespace agas { namespace server {
             counter_data_.iterate_types_.enabled_);
         counter_data_.increment_iterate_types_count();
 
-        std::vector<typename component_id_table_type::left_map::value_type>
-            types;
-        types.reserve(component_ids_.size());
-
+        using value_type = std::pair<typename component_id_table_type::key_type,
+            typename component_id_table_type::mapped_type>;
+        std::vector<value_type> types;
         {
             std::lock_guard<mutex_type> l(mutex_);
 
-            for (component_id_table_type::left_map::iterator
-                     it = component_ids_.left.begin(),
-                     end = component_ids_.left.end();
-                 it != end; ++it)
-            {
-                types.push_back(*it);
-            }
+            types.assign(component_ids_.cbegin(), component_ids_.cend());
         }
 
         for (auto&& type : types)
@@ -329,17 +313,19 @@ namespace hpx { namespace agas { namespace server {
         LAGAS_(info) << "component_namespace::iterate_types";
     }    // }}}
 
-    template <typename Map>
-    std::string get_component_name(Map const& m, components::component_type t)
+    static std::string get_component_name(
+        component_namespace::component_id_table_type const& m,
+        components::component_type t)
     {
         if (t < components::component_last)
             return components::get_component_type_name(t);
 
-        typename Map::const_iterator it = m.find(t);
-        if (it == m.end())
-            return "";
-
-        return (*it).second;
+        for (auto const& c : m)
+        {
+            if (c.second == t)
+                return c.first;
+        }
+        return "";
     }
 
     std::string component_namespace::get_component_type_name(
@@ -360,15 +346,15 @@ namespace hpx { namespace agas { namespace server {
         }
         else if (components::get_derived_type(t) == 0)
         {
-            result = get_component_name(component_ids_.right, t);
+            result = get_component_name(component_ids_, t);
         }
         else if (components::get_derived_type(t) != 0)
         {
             result = get_component_name(
-                component_ids_.right, components::get_derived_type(t));
+                component_ids_, components::get_derived_type(t));
             result += "/";
             result += get_component_name(
-                component_ids_.right, components::get_base_type(t));
+                component_ids_, components::get_base_type(t));
         }
 
         if (result.empty())
