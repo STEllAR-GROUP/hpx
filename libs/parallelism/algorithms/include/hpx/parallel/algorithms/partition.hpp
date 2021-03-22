@@ -298,7 +298,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::is_sequenced_execution_policy<ExPolicy>::value ||
                 !hpx::traits::is_random_access_iterator<BidirIter>::value>;
 
-        return detail::stable_partition<BidirIter>().call(
+        return detail::stable_partition<BidirIter>().call2(
             std::forward<ExPolicy>(policy), is_seq(), first, last,
             std::forward<F>(f), std::forward<Proj>(proj));
     }
@@ -1067,11 +1067,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
-        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
         return detail::partition<FwdIter>().call(std::forward<ExPolicy>(policy),
-            is_seq(), first, last, std::forward<Pred>(pred),
-            std::forward<Proj>(proj));
+            first, last, std::forward<Pred>(pred), std::forward<Proj>(proj));
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -1350,13 +1347,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter3>::value),
             "Requires at least forward iterator.");
 
-        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
         using result_type = hpx::tuple<FwdIter1, FwdIter2, FwdIter3>;
 
         return hpx::util::make_tagged_tuple<tag::in, tag::out1, tag::out2>(
             detail::partition_copy<result_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last,
-                dest_true, dest_false, std::forward<Pred>(pred),
+                std::forward<ExPolicy>(policy), first, last, dest_true,
+                dest_false, std::forward<Pred>(pred),
                 std::forward<Proj>(proj)));
     }
 }}}    // namespace hpx::parallel::v1

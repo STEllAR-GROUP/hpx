@@ -501,13 +501,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         remove(
             ExPolicy&& policy, Rng&& rng, T const& value, Proj&& proj = Proj())
     {
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         return hpx::parallel::v1::detail::remove_if<
             typename hpx::traits::range_iterator<Rng>::type>()
-            .call(std::forward<ExPolicy>(policy), is_seq(),
-                hpx::util::begin(rng), hpx::util::end(rng), value,
-                std::forward<Proj>(proj));
+            .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                hpx::util::end(rng), value, std::forward<Proj>(proj));
     }
 
     // clang-format off
@@ -528,13 +525,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
         remove_if(
             ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj())
     {
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         return hpx::parallel::v1::detail::remove_if<
             typename hpx::traits::range_iterator<Rng>::type>()
-            .call(std::forward<ExPolicy>(policy), is_seq(),
-                hpx::util::begin(rng), hpx::util::end(rng),
-                std::forward<Pred>(pred), std::forward<Proj>(proj));
+            .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                hpx::util::end(rng), std::forward<Pred>(pred),
+                std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -568,8 +563,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::util::make_subrange<Iter, Sent>(
                 hpx::parallel::v1::detail::remove_if<Iter>().call(
-                    hpx::execution::seq, std::true_type{}, first, sent,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)),
+                    hpx::execution::seq, first, sent, std::forward<Pred>(pred),
+                    std::forward<Proj>(proj)),
                 sent);
         }
 
@@ -600,9 +595,9 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_sentinel<Rng>::type>(
                 hpx::parallel::v1::detail::remove_if<
                     typename hpx::traits::range_iterator<Rng>::type>()
-                    .call(hpx::execution::seq, std::true_type{},
-                        hpx::util::begin(rng), hpx::util::end(rng),
-                        std::forward<Pred>(pred), std::forward<Proj>(proj)),
+                    .call(hpx::execution::seq, hpx::util::begin(rng),
+                        hpx::util::end(rng), std::forward<Pred>(pred),
+                        std::forward<Proj>(proj)),
                 hpx::util::end(rng));
         }
 
@@ -626,11 +621,9 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
             return hpx::parallel::util::make_subrange<FwdIter, Sent>(
                 hpx::parallel::v1::detail::remove_if<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), is_seq(), first, sent,
+                    std::forward<ExPolicy>(policy), first, sent,
                     std::forward<Pred>(pred), std::forward<Proj>(proj)),
                 sent);
         }
@@ -656,16 +649,14 @@ namespace hpx { namespace ranges {
                     typename hpx::traits::range_iterator<Rng>::type>::value),
                 "Required at least forward iterator.");
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
             return hpx::parallel::util::make_subrange<
                 typename hpx::traits::range_iterator<Rng>::type,
                 typename hpx::traits::range_sentinel<Rng>::type>(
                 hpx::parallel::v1::detail::remove_if<
                     typename hpx::traits::range_iterator<Rng>::type>()
-                    .call(std::forward<ExPolicy>(policy), is_seq(),
-                        hpx::util::begin(rng), hpx::util::end(rng),
-                        std::forward<Pred>(pred), std::forward<Proj>(proj)),
+                    .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                        hpx::util::end(rng), std::forward<Pred>(pred),
+                        std::forward<Proj>(proj)),
                 hpx::util::end(rng));
         }
     } remove_if{};

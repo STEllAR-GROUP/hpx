@@ -57,10 +57,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         transfer_(ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest,
             std::false_type)
         {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
             return Algo().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last, dest);
+                std::forward<ExPolicy>(policy), first, last, dest);
         }
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)

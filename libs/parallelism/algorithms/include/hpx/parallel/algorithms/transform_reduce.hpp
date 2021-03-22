@@ -355,11 +355,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         transform_reduce_(ExPolicy&& policy, Iter first, Sent last, T&& init,
             Reduce&& red_op, Convert&& conv_op, std::false_type)
         {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
             using init_type = typename std::decay<T>::type;
 
             return transform_reduce<init_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last,
+                std::forward<ExPolicy>(policy), first, last,
                 std::forward<T>(init), std::forward<Reduce>(red_op),
                 std::forward<Convert>(conv_op));
         }
@@ -619,10 +618,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return detail::transform_reduce_binary<T>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
+                std::forward<ExPolicy>(policy), first1, last1, first2,
                 std::move(init), std::forward<Reduce>(red_op),
                 std::forward<Convert>(conv_op));
         }

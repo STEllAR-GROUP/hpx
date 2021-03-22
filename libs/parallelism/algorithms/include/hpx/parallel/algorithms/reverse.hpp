@@ -124,10 +124,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
             "Requires at least bidirectional iterator.");
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         return detail::reverse<BidirIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, last);
+            std::forward<ExPolicy>(policy), first, last);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -256,10 +254,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         return detail::reverse_copy<util::in_out_result<BidirIter, FwdIter>>()
-            .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
-                dest_first);
+            .call(std::forward<ExPolicy>(policy), first, last, dest_first);
     }
 }}}    // namespace hpx::parallel::v1

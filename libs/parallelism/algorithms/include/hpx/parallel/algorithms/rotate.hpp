@@ -158,7 +158,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 !hpx::traits::is_bidirectional_iterator<FwdIter>::value>
             is_seq;
 
-        return detail::rotate<util::in_out_result<FwdIter, FwdIter>>().call(
+        return detail::rotate<util::in_out_result<FwdIter, FwdIter>>().call2(
             std::forward<ExPolicy>(policy), is_seq(), first, new_first, last);
     }
 
@@ -304,7 +304,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             is_seq;
 
         return detail::rotate_copy<util::in_out_result<FwdIter1, FwdIter2>>()
-            .call(std::forward<ExPolicy>(policy), is_seq(), first, new_first,
+            .call2(std::forward<ExPolicy>(policy), is_seq(), first, new_first,
                 last, dest_first);
     }
 }}}    // namespace hpx::parallel::v1

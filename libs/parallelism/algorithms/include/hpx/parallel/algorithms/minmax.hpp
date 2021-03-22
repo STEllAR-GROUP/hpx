@@ -148,11 +148,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         min_element_(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
             Proj&& proj, std::false_type)
         {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
             return detail::min_element<FwdIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last,
-                std::forward<F>(f), std::forward<Proj>(proj));
+                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+                std::forward<Proj>(proj));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -363,11 +361,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         max_element_(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
             Proj&& proj, std::false_type)
         {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
             return detail::max_element<FwdIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last,
-                std::forward<F>(f), std::forward<Proj>(proj));
+                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+                std::forward<Proj>(proj));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -600,11 +596,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         minmax_element_(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
             Proj&& proj, std::false_type)
         {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
             return detail::minmax_element<FwdIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last,
-                std::forward<F>(f), std::forward<Proj>(proj));
+                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+                std::forward<Proj>(proj));
         }
 
         ///////////////////////////////////////////////////////////////////////

@@ -295,7 +295,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         using result_type =
             parallel::util::in_in_out_result<FwdIter1, FwdIter2, FwdIter3>;
 
-        return util::get_third_element(detail::set_union<result_type>().call(
+        return util::get_third_element(detail::set_union<result_type>().call2(
             std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
             last2, dest, std::forward<Pred>(op), util::projection_identity(),
             util::projection_identity()));
@@ -351,7 +351,7 @@ namespace hpx {
                 FwdIter2, FwdIter3>;
 
             return hpx::parallel::util::get_third_element(
-                hpx::parallel::v1::detail::set_union<result_type>().call(
+                hpx::parallel::v1::detail::set_union<result_type>().call2(
                     std::forward<ExPolicy>(policy), is_seq(), first1, last1,
                     first2, last2, dest, std::forward<Pred>(op),
                     hpx::parallel::util::projection_identity(),
@@ -386,8 +386,8 @@ namespace hpx {
 
             return hpx::parallel::util::get_third_element(
                 hpx::parallel::v1::detail::set_union<result_type>().call(
-                    hpx::execution::seq, std::true_type(), first1, last1,
-                    first2, last2, dest, std::forward<Pred>(op),
+                    hpx::execution::seq, first1, last1, first2, last2, dest,
+                    std::forward<Pred>(op),
                     hpx::parallel::util::projection_identity(),
                     hpx::parallel::util::projection_identity()));
         }

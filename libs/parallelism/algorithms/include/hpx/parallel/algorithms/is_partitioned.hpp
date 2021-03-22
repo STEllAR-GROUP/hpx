@@ -239,14 +239,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::is_partitioned<FwdIter, FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, last,
+            std::forward<ExPolicy>(policy), first, last,
             std::forward<Pred>(pred), util::projection_identity());
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -287,10 +285,8 @@ namespace hpx {
         tag_invoke(hpx::is_partitioned_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, Pred&& pred)
         {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, FwdIter>()
-                .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
+                .call(std::forward<ExPolicy>(policy), first, last,
                     std::forward<Pred>(pred),
                     hpx::parallel::util::projection_identity());
         }

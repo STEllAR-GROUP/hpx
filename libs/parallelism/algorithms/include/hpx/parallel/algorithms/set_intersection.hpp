@@ -271,7 +271,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return util::get_third_element(
-            detail::set_intersection<result_type>().call(
+            detail::set_intersection<result_type>().call2(
                 std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
                 last2, dest, std::forward<Pred>(op),
                 util::projection_identity(), util::projection_identity()));
@@ -327,11 +327,11 @@ namespace hpx {
                 FwdIter2, FwdIter3>;
 
             return hpx::parallel::util::get_third_element(
-                hpx::parallel::v1::detail::set_intersection<result_type>().call(
-                    std::forward<ExPolicy>(policy), is_seq(), first1, last1,
-                    first2, last2, dest, std::forward<Pred>(op),
-                    hpx::parallel::util::projection_identity(),
-                    hpx::parallel::util::projection_identity()));
+                hpx::parallel::v1::detail::set_intersection<result_type>()
+                    .call2(std::forward<ExPolicy>(policy), is_seq(), first1,
+                        last1, first2, last2, dest, std::forward<Pred>(op),
+                        hpx::parallel::util::projection_identity(),
+                        hpx::parallel::util::projection_identity()));
         }
 
         // clang-format off
@@ -363,8 +363,8 @@ namespace hpx {
 
             return hpx::parallel::util::get_third_element(
                 hpx::parallel::v1::detail::set_intersection<result_type>().call(
-                    hpx::execution::seq, std::true_type(), first1, last1,
-                    first2, last2, dest, std::forward<Pred>(op),
+                    hpx::execution::seq, first1, last1, first2, last2, dest,
+                    std::forward<Pred>(op),
                     hpx::parallel::util::projection_identity(),
                     hpx::parallel::util::projection_identity()));
         }

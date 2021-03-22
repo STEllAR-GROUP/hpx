@@ -294,7 +294,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
         return hpx::parallel::util::get_second_element(
             detail::set_difference<util::in_out_result<FwdIter1, FwdIter3>>()
-                .call(std::forward<ExPolicy>(policy), is_seq(), first1, last1,
+                .call2(std::forward<ExPolicy>(policy), is_seq(), first1, last1,
                     first2, last2, dest, std::forward<Pred>(op),
                     util::projection_identity(), util::projection_identity()));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -349,7 +349,7 @@ namespace hpx {
                 hpx::parallel::util::in_out_result<FwdIter1, FwdIter3>;
 
             return hpx::parallel::util::get_second_element(
-                hpx::parallel::v1::detail::set_difference<result_type>().call(
+                hpx::parallel::v1::detail::set_difference<result_type>().call2(
                     std::forward<ExPolicy>(policy), is_seq(), first1, last1,
                     first2, last2, dest, std::forward<Pred>(op),
                     hpx::parallel::util::projection_identity(),
@@ -385,8 +385,8 @@ namespace hpx {
 
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::set_difference<result_type>().call(
-                    hpx::execution::seq, std::true_type(), first1, last1,
-                    first2, last2, dest, std::forward<Pred>(op),
+                    hpx::execution::seq, first1, last1, first2, last2, dest,
+                    std::forward<Pred>(op),
                     hpx::parallel::util::projection_identity(),
                     hpx::parallel::util::projection_identity()));
         }

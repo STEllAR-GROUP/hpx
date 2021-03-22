@@ -1019,14 +1019,12 @@ namespace hpx {
                     "Requires at least forward iterator or integral loop "
                     "boundaries.");
 
-                typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
                 std::size_t size = parallel::v1::detail::distance(first, last);
                 auto&& t = hpx::forward_as_tuple(std::forward<Args>(args)...);
 
                 return for_loop_algo().call(std::forward<ExPolicy>(policy),
-                    is_seq(), first, size, stride,
-                    hpx::get<sizeof...(Args) - 1>(t), hpx::get<Is>(t)...);
+                    first, size, stride, hpx::get<sizeof...(Args) - 1>(t),
+                    hpx::get<Is>(t)...);
             }
 
             // reshuffle arguments, last argument is function object, will go first
@@ -1055,13 +1053,11 @@ namespace hpx {
                     "Requires at least forward iterator or integral loop "
                     "boundaries.");
 
-                typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
                 auto&& t = hpx::forward_as_tuple(std::forward<Args>(args)...);
 
                 return for_loop_algo().call(std::forward<ExPolicy>(policy),
-                    is_seq(), first, size, stride,
-                    hpx::get<sizeof...(Args) - 1>(t), hpx::get<Is>(t)...);
+                    first, size, stride, hpx::get<sizeof...(Args) - 1>(t),
+                    hpx::get<Is>(t)...);
             }
             /// \endcond
         }    // namespace detail

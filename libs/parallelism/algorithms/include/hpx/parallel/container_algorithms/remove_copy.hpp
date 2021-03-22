@@ -615,13 +615,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 OutIter>>::type remove_copy(ExPolicy&& policy, Rng&& rng,
             OutIter dest, T const& val, Proj&& proj = Proj())
     {
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         return hpx::parallel::v1::detail::remove_copy<util::in_out_result<
             typename hpx::traits::range_traits<Rng>::iterator_type, OutIter>>()
-            .call(std::forward<ExPolicy>(policy), is_seq(),
-                hpx::util::begin(rng), hpx::util::end(rng), dest, val,
-                std::forward<Proj>(proj));
+            .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                hpx::util::end(rng), dest, val, std::forward<Proj>(proj));
     }
 
     // clang-format off
@@ -646,13 +643,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 OutIter>>::type remove_copy_if(ExPolicy&& policy, Rng&& rng,
             OutIter dest, F&& f, Proj&& proj = Proj())
     {
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         return hpx::parallel::v1::detail::remove_copy_if<util::in_out_result<
             typename hpx::traits::range_traits<Rng>::iterator_type, OutIter>>()
-            .call(std::forward<ExPolicy>(policy), is_seq(),
-                hpx::util::begin(rng), hpx::util::end(rng), dest,
-                std::forward<F>(f), std::forward<Proj>(proj));
+            .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                hpx::util::end(rng), dest, std::forward<F>(f),
+                std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -694,7 +689,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::remove_copy_if<
                 hpx::parallel::util::in_out_result<I, O>>()
-                .call(hpx::execution::seq, std::true_type{}, first, last, dest,
+                .call(hpx::execution::seq, first, last, dest,
                     std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
 
@@ -724,9 +719,9 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::remove_copy_if<
                 hpx::parallel::util::in_out_result<
                     typename hpx::traits::range_iterator<Rng>::type, O>>()
-                .call(hpx::execution::seq, std::true_type{},
-                    hpx::util::begin(rng), hpx::util::end(rng), dest,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(hpx::execution::seq, hpx::util::begin(rng),
+                    hpx::util::end(rng), dest, std::forward<Pred>(pred),
+                    std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -754,12 +749,10 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<O>::value),
                 "Required at least forward iterator.");
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
             return hpx::parallel::v1::detail::remove_copy_if<
                 hpx::parallel::util::in_out_result<I, O>>()
-                .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
-                    dest, std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(std::forward<ExPolicy>(policy), first, last, dest,
+                    std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -787,14 +780,12 @@ namespace hpx { namespace ranges {
                     typename hpx::traits::range_iterator<Rng>::type>::value),
                 "Required at least forward iterator.");
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
             return hpx::parallel::v1::detail::remove_copy_if<
                 hpx::parallel::util::in_out_result<
                     typename hpx::traits::range_iterator<Rng>::type, O>>()
-                .call(std::forward<ExPolicy>(policy), is_seq(),
-                    hpx::util::begin(rng), hpx::util::end(rng), dest,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), dest, std::forward<Pred>(pred),
+                    std::forward<Proj>(proj));
         }
     } remove_copy_if{};
 

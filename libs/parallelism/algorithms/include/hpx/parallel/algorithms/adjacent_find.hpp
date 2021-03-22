@@ -230,14 +230,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         adjacent_find(ExPolicy&& policy, FwdIter first, FwdIter last,
             Pred&& pred = Pred())
     {
-        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::adjacent_find<FwdIter, FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, last,
+            std::forward<ExPolicy>(policy), first, last,
             std::forward<Pred>(pred),
             hpx::parallel::util::projection_identity{});
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -265,8 +263,7 @@ namespace hpx {
                 "Requires at least input iterator.");
 
             return parallel::v1::detail::adjacent_find<InIter, InIter>().call(
-                hpx::execution::seq, std::true_type(), first, last,
-                std::forward<Pred>(pred),
+                hpx::execution::seq, first, last, std::forward<Pred>(pred),
                 hpx::parallel::util::projection_identity{});
         }
 
@@ -286,10 +283,8 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least a forward iterator");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return parallel::v1::detail::adjacent_find<FwdIter, FwdIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last,
+                std::forward<ExPolicy>(policy), first, last,
                 std::forward<Pred>(pred),
                 hpx::parallel::util::projection_identity{});
         }

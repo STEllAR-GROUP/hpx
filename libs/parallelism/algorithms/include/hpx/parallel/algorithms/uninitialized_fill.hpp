@@ -99,7 +99,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 it, part_size, value, tok));
                     },
                     // finalize, called once if no error occurred
-                    [](std::vector<hpx::future<partition_result_type>> &&)
+                    [](std::vector<hpx::future<partition_result_type>>&&)
                         -> void {},
                     // cleanup function, called for each partition which
                     // didn't fail, but only if at least one failed
@@ -192,10 +192,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         return detail::uninitialized_fill().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, last, value);
+            std::forward<ExPolicy>(policy), first, last, value);
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -318,10 +316,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return util::detail::algorithm_result<ExPolicy>::get();
         }
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         return detail::uninitialized_fill_n().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, std::size_t(count),
-            value);
+            std::forward<ExPolicy>(policy), first, std::size_t(count), value);
     }
 }}}    // namespace hpx::parallel::v1

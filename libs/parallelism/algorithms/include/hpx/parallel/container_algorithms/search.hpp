@@ -789,8 +789,8 @@ namespace hpx { namespace ranges {
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             return hpx::parallel::v1::detail::search<FwdIter, Sent>().call(
-                hpx::execution::seq, std::true_type{}, first, last, s_first,
-                s_last, std::forward<Pred>(op), std::forward<Proj1>(proj1),
+                hpx::execution::seq, first, last, s_first, s_last,
+                std::forward<Pred>(op), std::forward<Proj1>(proj1),
                 std::forward<Proj2>(proj2));
         }
 
@@ -821,11 +821,9 @@ namespace hpx { namespace ranges {
             Sent last, FwdIter2 s_first, Sent2 s_last, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::search<FwdIter, Sent>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last, s_first,
-                s_last, std::forward<Pred>(op), std::forward<Proj1>(proj1),
+                std::forward<ExPolicy>(policy), first, last, s_first, s_last,
+                std::forward<Pred>(op), std::forward<Proj1>(proj1),
                 std::forward<Proj2>(proj2));
         }
 
@@ -855,11 +853,10 @@ namespace hpx { namespace ranges {
             using sent_type = typename hpx::traits::range_sentinel<Rng1>::type;
 
             return hpx::parallel::v1::detail::search<fwditer_type, sent_type>()
-                .call(hpx::execution::seq, std::true_type{},
-                    hpx::util::begin(rng1), hpx::util::end(rng1),
-                    hpx::util::begin(rng2), hpx::util::end(rng2),
-                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                .call(hpx::execution::seq, hpx::util::begin(rng1),
+                    hpx::util::end(rng1), hpx::util::begin(rng2),
+                    hpx::util::end(rng2), std::forward<Pred>(op),
+                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
 
         // clang-format off
@@ -885,17 +882,15 @@ namespace hpx { namespace ranges {
             Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
             using fwditer_type =
                 typename hpx::traits::range_iterator<Rng1>::type;
             using sent_type = typename hpx::traits::range_sentinel<Rng1>::type;
 
             return hpx::parallel::v1::detail::search<fwditer_type, sent_type>()
-                .call(std::forward<ExPolicy>(policy), is_seq(),
-                    hpx::util::begin(rng1), hpx::util::end(rng1),
-                    hpx::util::begin(rng2), hpx::util::end(rng2),
-                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                    hpx::util::end(rng1), hpx::util::begin(rng2),
+                    hpx::util::end(rng2), std::forward<Pred>(op),
+                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
 
     } search{};
@@ -928,8 +923,8 @@ namespace hpx { namespace ranges {
             Proj2&& proj2 = Proj2())
         {
             return hpx::parallel::v1::detail::search_n<FwdIter, FwdIter>().call(
-                hpx::execution::seq, std::true_type{}, first, count, s_first,
-                s_last, std::forward<Pred>(op), std::forward<Proj1>(proj1),
+                hpx::execution::seq, first, count, s_first, s_last,
+                std::forward<Pred>(op), std::forward<Proj1>(proj1),
                 std::forward<Proj2>(proj2));
         }
 
@@ -959,11 +954,9 @@ namespace hpx { namespace ranges {
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::search_n<FwdIter, FwdIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, count, s_first,
-                s_last, std::forward<Pred>(op), std::forward<Proj1>(proj1),
+                std::forward<ExPolicy>(policy), first, count, s_first, s_last,
+                std::forward<Pred>(op), std::forward<Proj1>(proj1),
                 std::forward<Proj2>(proj2));
         }
 
@@ -995,10 +988,10 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::search_n<fwditer_type,
                 sent_type>()
-                .call(hpx::execution::seq, std::true_type{},
-                    hpx::util::begin(rng1), count, hpx::util::begin(rng2),
-                    hpx::util::end(rng2), std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                .call(hpx::execution::seq, hpx::util::begin(rng1), count,
+                    hpx::util::begin(rng2), hpx::util::end(rng2),
+                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
+                    std::forward<Proj2>(proj2));
         }
 
         // clang-format off
@@ -1024,17 +1017,16 @@ namespace hpx { namespace ranges {
             std::size_t count, Rng2&& rng2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
             using fwditer_type =
                 typename hpx::traits::range_iterator<Rng1>::type;
             using sent_type = typename hpx::traits::range_sentinel<Rng1>::type;
 
             return hpx::parallel::v1::detail::search_n<fwditer_type,
                 sent_type>()
-                .call(std::forward<ExPolicy>(policy), is_seq(),
-                    hpx::util::begin(rng1), count, hpx::util::begin(rng2),
-                    hpx::util::end(rng2), std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                    count, hpx::util::begin(rng2), hpx::util::end(rng2),
+                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
+                    std::forward<Proj2>(proj2));
         }
 
     } search_n{};

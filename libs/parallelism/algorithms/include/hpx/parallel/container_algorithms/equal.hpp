@@ -257,11 +257,9 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<Iter2>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::equal_binary().call(
-                std::forward<ExPolicy>(policy), is_seq{}, first1, last1, first2,
-                last2, std::forward<Pred>(op), std::forward<Proj1>(proj1),
+                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
+                std::forward<Pred>(op), std::forward<Proj1>(proj1),
                 std::forward<Proj2>(proj2));
         }
 
@@ -297,14 +295,11 @@ namespace hpx { namespace ranges {
                         range_traits<Rng2>::iterator_type>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::equal_binary().call(
-                std::forward<ExPolicy>(policy), is_seq{},
-                hpx::util::begin(rng1), hpx::util::end(rng1),
-                hpx::util::begin(rng2), hpx::util::end(rng2),
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                hpx::util::end(rng1), hpx::util::begin(rng2),
+                hpx::util::end(rng2), std::forward<Pred>(op),
+                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
 
         // clang-format off
@@ -332,8 +327,8 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::equal_binary().call(
-                hpx::execution::seq, std::true_type{}, first1, last1, first2,
-                last2, std::forward<Pred>(op), std::forward<Proj1>(proj1),
+                hpx::execution::seq, first1, last1, first2, last2,
+                std::forward<Pred>(op), std::forward<Proj1>(proj1),
                 std::forward<Proj2>(proj2));
         }
 
@@ -367,7 +362,7 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::equal_binary().call(
-                hpx::execution::seq, std::true_type{}, hpx::util::begin(rng1),
+                hpx::execution::seq, hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
                 hpx::util::end(rng2), std::forward<Pred>(op),
                 std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
