@@ -428,6 +428,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             OutIter>>::type transform(ExPolicy&& policy, Rng&& rng,
         OutIter dest, F&& f, Proj&& proj = Proj())
     {
+        using iterator_type =
+            typename hpx::traits::range_traits<Rng>::iterator_type;
+
+        static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
+            "Requires at least forward iterator.");
+
         return transform(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), std::move(dest), std::forward<F>(f),
             std::forward<Proj>(proj));
@@ -458,6 +464,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
         transform(ExPolicy&& policy, Rng&& rng, InIter2 first2, OutIter dest,
             F&& f, Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
+        using iterator_type =
+            typename hpx::traits::range_traits<Rng>::iterator_type;
+
+        static_assert(hpx::traits::is_forward_iterator<iterator_type>::value &&
+                hpx::traits::is_forward_iterator<InIter2>::value,
+            "Requires at least forward iterator.");
+
         return transform(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), std::move(first2), std::move(dest),
             std::forward<F>(f), std::forward<Proj1>(proj1),
@@ -488,6 +501,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
         transform(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, OutIter dest,
             F&& f, Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
+        using iterator_type1 =
+            typename hpx::traits::range_traits<Rng1>::iterator_type;
+
+        using iterator_type2 =
+            typename hpx::traits::range_traits<Rng2>::iterator_type;
+
+        static_assert(hpx::traits::is_forward_iterator<iterator_type1>::value &&
+                hpx::traits::is_forward_iterator<iterator_type2>::value,
+            "Requires at least forward iterator.");
+
         return transform(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
             hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
             std::move(dest), std::forward<F>(f), std::forward<Proj1>(proj1),
@@ -506,7 +529,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::transform
     HPX_INLINE_CONSTEXPR_VARIABLE struct transform_t final
-      : hpx::functional::tag<transform_t>
+      : hpx::functional::tag_fallback<transform_t>
     {
     private:
         // clang-format off
@@ -522,14 +545,19 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             ranges::unary_transform_result<FwdIter1, FwdIter2>>::type
-        tag_invoke(hpx::ranges::transform_t, ExPolicy&& policy, FwdIter1 first,
-            Sent1 last, FwdIter2 dest, F&& f, Proj&& proj = Proj())
+        tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
+            FwdIter1 first, Sent1 last, FwdIter2 dest, F&& f,
+            Proj&& proj = Proj())
         {
-            typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
+            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+                "Requires at least forward iterator.");
 
-            return parallel::v1::detail::transform_(
-                std::forward<ExPolicy>(policy), first, last, dest,
-                std::forward<F>(f), std::forward<Proj>(proj), is_segmented());
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+            return parallel::v1::detail::transform<
+                unary_transform_result<FwdIter1, FwdIter2>>()
+                .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
+                    dest, std::forward<F>(f), std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -544,18 +572,23 @@ namespace hpx { namespace ranges {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             ranges::unary_transform_result<
                 typename hpx::traits::range_iterator<Rng>::type, FwdIter>>::type
-        tag_invoke(hpx::ranges::transform_t, ExPolicy&& policy, Rng&& rng,
-            FwdIter dest, F&& f, Proj&& proj = Proj())
+        tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
+            Rng&& rng, FwdIter dest, F&& f, Proj&& proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
-            using is_segmented =
-                hpx::traits::is_segmented_iterator<iterator_type>;
 
-            return parallel::v1::detail::transform_(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), dest, std::forward<F>(f),
-                std::forward<Proj>(proj), is_segmented());
+            static_assert(
+                hpx::traits::is_forward_iterator<iterator_type>::value,
+                "Requires at least forward iterator.");
+
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+            return parallel::v1::detail::transform<
+                unary_transform_result<iterator_type, FwdIter>>()
+                .call(std::forward<ExPolicy>(policy), is_seq(),
+                    hpx::util::begin(rng), hpx::util::end(rng), dest,
+                    std::forward<F>(f), std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -574,18 +607,22 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             ranges::binary_transform_result<FwdIter1, FwdIter2, FwdIter3>>::type
-        tag_invoke(hpx::ranges::transform_t, ExPolicy&& policy, FwdIter1 first1,
-            Sent1 last1, FwdIter2 first2, Sent2 last2, FwdIter3 dest, F&& f,
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+        tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
+            FwdIter1 first1, Sent1 last1, FwdIter2 first2, Sent2 last2,
+            FwdIter3 dest, F&& f, Proj1&& proj1 = Proj1(),
+            Proj2&& proj2 = Proj2())
         {
-            using is_segmented = std::integral_constant<bool,
-                hpx::traits::is_segmented_iterator<FwdIter1>::value ||
-                    hpx::traits::is_segmented_iterator<FwdIter2>::value>;
+            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value &&
+                    hpx::traits::is_forward_iterator<FwdIter2>::value,
+                "Requires at least forward iterator.");
 
-            return parallel::v1::detail::transform_(
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                dest, std::forward<F>(f), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2), is_segmented());
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+            return parallel::v1::detail::transform_binary2<
+                binary_transform_result<FwdIter1, FwdIter2, FwdIter3>>()
+                .call(std::forward<ExPolicy>(policy), is_seq(), first1, last1,
+                    first2, last2, dest, std::forward<F>(f),
+                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
 
         // clang-format off
@@ -604,25 +641,30 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_iterator<Rng1>::type,
                 typename hpx::traits::range_iterator<Rng2>::type,
                 FwdIter>>::type
-        tag_invoke(hpx::ranges::transform_t, ExPolicy&& policy, Rng1&& rng1,
-            Rng2&& rng2, FwdIter dest, F&& f, Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+        tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
+            Rng1&& rng1, Rng2&& rng2, FwdIter dest, F&& f,
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             using iterator_type1 =
                 typename hpx::traits::range_traits<Rng1>::iterator_type;
             using iterator_type2 =
                 typename hpx::traits::range_traits<Rng2>::iterator_type;
 
-            using is_segmented = std::integral_constant<bool,
-                hpx::traits::is_segmented_iterator<iterator_type1>::value ||
-                    hpx::traits::is_segmented_iterator<iterator_type2>::value>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-            return parallel::v1::detail::transform_(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
-                hpx::util::end(rng1), hpx::util::begin(rng2),
-                hpx::util::end(rng2), dest, std::forward<F>(f),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2),
-                is_segmented());
+            static_assert(
+                hpx::traits::is_forward_iterator<iterator_type1>::value &&
+                    hpx::traits::is_forward_iterator<iterator_type2>::value,
+                "Requires at least forward iterator.");
+
+            return parallel::v1::detail::transform_binary2<
+                binary_transform_result<iterator_type1, iterator_type2,
+                    FwdIter>>()
+                .call(std::forward<ExPolicy>(policy), is_seq(),
+                    hpx::util::begin(rng1), hpx::util::end(rng1),
+                    hpx::util::begin(rng2), hpx::util::end(rng2), dest,
+                    std::forward<F>(f), std::forward<Proj1>(proj1),
+                    std::forward<Proj2>(proj2));
         }
 
         // clang-format off
@@ -635,13 +677,17 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
         // clang-format on
-        friend ranges::unary_transform_result<FwdIter1, FwdIter2> tag_invoke(
-            hpx::ranges::transform_t, FwdIter1 first, Sent1 last, FwdIter2 dest,
-            F&& f, Proj&& proj = Proj())
+        friend ranges::unary_transform_result<FwdIter1, FwdIter2>
+        tag_fallback_invoke(hpx::ranges::transform_t, FwdIter1 first,
+            Sent1 last, FwdIter2 dest, F&& f, Proj&& proj = Proj())
         {
-            return parallel::v1::detail::transform_(hpx::execution::seq, first,
-                last, dest, std::forward<F>(f), std::forward<Proj>(proj),
-                std::false_type{});
+            static_assert(hpx::traits::is_input_iterator<FwdIter1>::value,
+                "Requires at least input iterator.");
+
+            return parallel::v1::detail::transform<
+                unary_transform_result<FwdIter1, FwdIter2>>()
+                .call(hpx::execution::seq, std::true_type{}, first, last, dest,
+                    std::forward<F>(f), std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -654,13 +700,20 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend ranges::unary_transform_result<
             typename hpx::traits::range_iterator<Rng>::type, FwdIter>
-        tag_invoke(hpx::ranges::transform_t, Rng&& rng, FwdIter dest, F&& f,
-            Proj&& proj = Proj())
+        tag_fallback_invoke(hpx::ranges::transform_t, Rng&& rng, FwdIter dest,
+            F&& f, Proj&& proj = Proj())
         {
-            return parallel::v1::detail::transform_(hpx::execution::seq,
-                hpx::util::begin(rng), hpx::util::end(rng), dest,
-                std::forward<F>(f), std::forward<Proj>(proj),
-                std::false_type{});
+            using iterator_type =
+                typename hpx::traits::range_traits<Rng>::iterator_type;
+
+            static_assert(hpx::traits::is_input_iterator<iterator_type>::value,
+                "Requires at least input iterator.");
+
+            return parallel::v1::detail::transform<
+                unary_transform_result<iterator_type, FwdIter>>()
+                .call(hpx::execution::seq, std::true_type{},
+                    hpx::util::begin(rng), hpx::util::end(rng), dest,
+                    std::forward<F>(f), std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -677,14 +730,19 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend ranges::binary_transform_result<FwdIter1, FwdIter2, FwdIter3>
-        tag_invoke(hpx::ranges::transform_t, FwdIter1 first1, Sent1 last1,
-            FwdIter2 first2, Sent2 last2, FwdIter3 dest, F&& f,
+        tag_fallback_invoke(hpx::ranges::transform_t, FwdIter1 first1,
+            Sent1 last1, FwdIter2 first2, Sent2 last2, FwdIter3 dest, F&& f,
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
-            return parallel::v1::detail::transform_(hpx::execution::seq, first1,
-                last1, first2, last2, dest, std::forward<F>(f),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2),
-                std::false_type{});
+            static_assert(hpx::traits::is_input_iterator<FwdIter1>::value &&
+                    hpx::traits::is_input_iterator<FwdIter2>::value,
+                "Requires at least input iterator.");
+
+            return parallel::v1::detail::transform_binary2<
+                binary_transform_result<FwdIter1, FwdIter2, FwdIter3>>()
+                .call(hpx::execution::seq, std::true_type{}, first1, last1,
+                    first2, last2, dest, std::forward<F>(f),
+                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
 
         // clang-format off
@@ -700,15 +758,28 @@ namespace hpx { namespace ranges {
         friend ranges::binary_transform_result<
             typename hpx::traits::range_iterator<Rng1>::type,
             typename hpx::traits::range_iterator<Rng2>::type, FwdIter>
-        tag_invoke(hpx::ranges::transform_t, Rng1&& rng1, Rng2&& rng2,
+        tag_fallback_invoke(hpx::ranges::transform_t, Rng1&& rng1, Rng2&& rng2,
             FwdIter dest, F&& f, Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
-            return parallel::v1::detail::transform_(hpx::execution::seq,
-                hpx::util::begin(rng1), hpx::util::end(rng1),
-                hpx::util::begin(rng2), hpx::util::end(rng2), dest,
-                std::forward<F>(f), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2), std::false_type{});
+            using iterator_type1 =
+                typename hpx::traits::range_traits<Rng1>::iterator_type;
+            using iterator_type2 =
+                typename hpx::traits::range_traits<Rng2>::iterator_type;
+
+            static_assert(
+                hpx::traits::is_forward_iterator<iterator_type1>::value &&
+                    hpx::traits::is_forward_iterator<iterator_type2>::value,
+                "Requires at least forward iterator.");
+
+            return parallel::v1::detail::transform_binary2<
+                binary_transform_result<iterator_type1, iterator_type2,
+                    FwdIter>>()
+                .call(hpx::execution::seq, std::true_type{},
+                    hpx::util::begin(rng1), hpx::util::end(rng1),
+                    hpx::util::begin(rng2), hpx::util::end(rng2), dest,
+                    std::forward<F>(f), std::forward<Proj1>(proj1),
+                    std::forward<Proj2>(proj2));
         }
 
     } transform{};
