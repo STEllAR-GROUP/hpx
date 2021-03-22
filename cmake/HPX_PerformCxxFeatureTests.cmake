@@ -33,6 +33,10 @@ function(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX17_STD_ALIGNED_ALLOC
   )
 
+  hpx_check_for_cxx17_std_execution_policies(
+    DEFINITIONS HPX_HAVE_CXX17_STD_EXECUTION_POLICES
+  )
+
   hpx_check_for_cxx17_filesystem(DEFINITIONS HPX_HAVE_CXX17_FILESYSTEM)
 
   hpx_check_for_cxx17_fold_expressions(

@@ -320,6 +320,14 @@ function(hpx_check_for_cxx17_std_aligned_alloc)
   )
 endfunction()
 
+function(hpx_check_for_cxx17_std_execution_policies)
+  add_hpx_config_test(
+    HPX_WITH_CXX17_STD_EXECUTION_POLICES
+    SOURCE cmake/tests/cxx17_std_execution_policies.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
 # ##############################################################################
 function(hpx_check_for_cxx11_std_quick_exit)
   add_hpx_config_test(

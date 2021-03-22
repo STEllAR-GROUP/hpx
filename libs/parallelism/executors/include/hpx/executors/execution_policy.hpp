@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/execution_policy.hpp
+/// \file hpx/execution/execution_policy.hpp
 
 #pragma once
 
@@ -29,9 +29,10 @@
 #include <utility>
 
 namespace hpx { namespace execution {
+
     ///////////////////////////////////////////////////////////////////////////
     /// Default sequential execution policy object.
-    static constexpr task_policy_tag task;
+    static constexpr task_policy_tag task{};
 
     ///////////////////////////////////////////////////////////////////////////
     /// Extension: The class sequenced_task_policy is an execution
@@ -67,7 +68,7 @@ namespace hpx { namespace execution {
         };
 
         /// \cond NOINTERNAL
-        constexpr sequenced_task_policy() {}
+        constexpr sequenced_task_policy() = default;
         /// \endcond
 
         /// Create a new sequenced_task_policy from itself
@@ -177,7 +178,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& /* ar */, const unsigned int /* version */)
+        constexpr void serialize(Archive&, const unsigned int)
         {
         }
 
@@ -346,7 +347,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int /* version */)
+        void serialize(Archive& ar, const unsigned int)
         {
             // clang-format off
             ar & exec_ & params_;
@@ -388,11 +389,7 @@ namespace hpx { namespace execution {
         };
 
         /// \cond NOINTERNAL
-        constexpr sequenced_policy()
-          : exec_{}
-          , params_{}
-        {
-        }
+        constexpr sequenced_policy() = default;
         /// \endcond
 
         /// Create a new sequenced_task_policy.
@@ -503,7 +500,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& /* ar */, const unsigned int /* version */)
+        constexpr void serialize(Archive&, const unsigned int)
         {
         }
 
@@ -513,7 +510,7 @@ namespace hpx { namespace execution {
     };
 
     /// Default sequential execution policy object.
-    HPX_STATIC_CONSTEXPR sequenced_policy seq;
+    static constexpr sequenced_policy seq{};
 
     /// The class sequenced_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
@@ -667,7 +664,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int /* version */)
+        void serialize(Archive& ar, const unsigned int)
         {
             // clang-format off
             ar & exec_ & params_;
@@ -713,7 +710,7 @@ namespace hpx { namespace execution {
         };
 
         /// \cond NOINTERNAL
-        constexpr parallel_task_policy() {}
+        constexpr parallel_task_policy() = default;
         /// \endcond
 
         /// Create a new parallel_task_policy from itself
@@ -821,7 +818,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& /* ar */, const unsigned int /* version */)
+        constexpr void serialize(Archive&, const unsigned int)
         {
         }
 
@@ -984,7 +981,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int /* version */)
+        void serialize(Archive& ar, const unsigned int)
         {
             // clang-format off
             ar & exec_ & params_;
@@ -1026,11 +1023,7 @@ namespace hpx { namespace execution {
         };
 
         /// \cond NOINTERNAL
-        constexpr parallel_policy()
-          : exec_{}
-          , params_{}
-        {
-        }
+        constexpr parallel_policy() = default;
         /// \endcond
 
         /// Create a new parallel_policy referencing a chunk size.
@@ -1133,7 +1126,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& /* ar */, const unsigned int /* version */)
+        constexpr void serialize(Archive&, const unsigned int)
         {
         }
 
@@ -1143,7 +1136,7 @@ namespace hpx { namespace execution {
     };
 
     /// Default parallel execution policy object.
-    HPX_STATIC_CONSTEXPR parallel_policy par;
+    static constexpr parallel_policy par{};
 
     /// The class parallel_policy_shim is an execution policy type
     /// used as a unique type to disambiguate parallel algorithm overloading
@@ -1296,7 +1289,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int /* version */)
+        void serialize(Archive& ar, const unsigned int)
         {
             // clang-format off
             ar & exec_ & params_;
@@ -1328,11 +1321,7 @@ namespace hpx { namespace execution {
         typedef parallel_execution_tag execution_category;
 
         /// \cond NOINTERNAL
-        constexpr parallel_unsequenced_policy()
-          : exec_{}
-          , params_{}
-        {
-        }
+        constexpr parallel_unsequenced_policy() = default;
         /// \endcond
 
         /// Create a new parallel_unsequenced_policy from itself
@@ -1374,7 +1363,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& /* ar */, const unsigned int /* version */)
+        constexpr void serialize(Archive&, const unsigned int)
         {
         }
 
@@ -1384,26 +1373,26 @@ namespace hpx { namespace execution {
     };
 
     /// Default vector execution policy object.
-    HPX_STATIC_CONSTEXPR parallel_unsequenced_policy par_unseq;
+    static constexpr parallel_unsequenced_policy par_unseq{};
 }}    // namespace hpx::execution
 
 namespace hpx { namespace parallel { namespace execution {
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::par is deprecated. Please use "
         "hpx::execution::par instead.")
-    static constexpr hpx::execution::parallel_policy par;
+    static constexpr hpx::execution::parallel_policy par{};
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::par_unseq is deprecated. Please use "
         "hpx::execution::par_unseq instead.")
-    static constexpr hpx::execution::parallel_policy par_unseq;
+    static constexpr hpx::execution::parallel_policy par_unseq{};
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::seq is deprecated. Please use "
         "hpx::execution::seq instead.")
-    static constexpr hpx::execution::sequenced_policy seq;
+    static constexpr hpx::execution::sequenced_policy seq{};
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::task is deprecated. Please use "
         "hpx::execution::task instead.")
-    static constexpr hpx::execution::task_policy_tag task;
+    static constexpr hpx::execution::task_policy_tag task{};
     using parallel_executor HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::parallel_executor is deprecated. Please use "
         "hpx::execution::parallel_executor instead.") =
