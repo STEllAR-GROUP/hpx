@@ -11,7 +11,6 @@
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/executors/datapar/execution_policy_fwd.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -78,7 +77,7 @@ namespace hpx { namespace parallel { namespace util {
                 std::pair<InIter, OutIter>>::type
             call(InIter first, std::size_t count, OutIter dest, F&& f)
             {
-                return util::transform_loop_n<execution::sequenced_policy>(
+                return util::transform_loop_n<hpx::execution::sequenced_policy>(
                     first, count, dest, std::forward<F>(f));
             }
         };
@@ -211,7 +210,7 @@ namespace hpx { namespace parallel { namespace util {
                 OutIter dest, F&& f)
             {
                 return util::transform_binary_loop_n<
-                    execution::sequenced_policy>(
+                    hpx::execution::sequenced_policy>(
                     first1, count, first2, dest, std::forward<F>(f));
             }
         };
@@ -281,7 +280,8 @@ namespace hpx { namespace parallel { namespace util {
             call(InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest,
                 F&& f)
             {
-                return util::transform_binary_loop<execution::sequenced_policy>(
+                return util::transform_binary_loop<
+                    hpx::execution::sequenced_policy>(
                     first1, last1, first2, dest, std::forward<F>(f));
             }
 
@@ -320,7 +320,8 @@ namespace hpx { namespace parallel { namespace util {
             call(InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
                 OutIter dest, F&& f)
             {
-                return util::transform_binary_loop<execution::sequenced_policy>(
+                return util::transform_binary_loop<
+                    hpx::execution::sequenced_policy>(
                     first1, last1, first2, last2, dest, std::forward<F>(f));
             }
         };
