@@ -1963,7 +1963,9 @@ if(HPX_WITH_COMPILER_WARNINGS)
     endif()
 
     # false positive when build with Vc and Clang
-    if (NOT (HPX_WITH_DATAPAR_VC AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+    if(NOT (HPX_WITH_DATAPAR_VC AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+           )
+    )
       hpx_add_compile_flag_if_available(-Werror=trampolines)
     endif()
     hpx_add_compile_flag_if_available(-Werror=parentheses)
@@ -2017,9 +2019,9 @@ else()
     hpx_add_compile_flag_if_available(-Wno-maybe-uninitialized)
   endif()
 
-  # Silence warning about __sync_fetch_and_nand changing semantics
-  # false positive when build with Vc and Clang
-  if (NOT (HPX_WITH_DATAPAR_VC AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+  # Silence warning about __sync_fetch_and_nand changing semantics false
+  # positive when build with Vc and Clang
+  if(NOT (HPX_WITH_DATAPAR_VC AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
     hpx_add_compile_flag_if_available(-Wno-sync-nand)
   endif()
 
