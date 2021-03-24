@@ -83,6 +83,7 @@ if(NOT BOOST_ROOT AND NOT "$ENV{BOOST_ROOT}")
 endif()
 include(HPX_SetupBoost)
 include(HPX_SetupBoostFilesystem)
+include(HPX_SetupBoostIostreams)
 include(HPX_SetupBoostProgramOptions)
 
 # Asio
