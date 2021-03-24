@@ -5,6 +5,11 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    algorithm_just
+    algorithm_just_on
+    algorithm_on
+    algorithm_sync_wait
+    algorithm_transform
     bulk_async
     created_executor
     executor_parameters
