@@ -1962,7 +1962,7 @@ if(HPX_WITH_COMPILER_WARNINGS)
       hpx_add_compile_flag_if_available(-Wcast-align)
     endif()
 
-    # false positive when build with Vc and Clang
+    # False positive when build with Vc and Clang
     if(NOT (HPX_WITH_DATAPAR_VC AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
            )
     )
@@ -2019,9 +2019,9 @@ else()
     hpx_add_compile_flag_if_available(-Wno-maybe-uninitialized)
   endif()
 
-  # Silence warning about __sync_fetch_and_nand changing semantics false
-  # positive when build with Vc and Clang
+  # False positive when building with Vc and Clang
   if(NOT (HPX_WITH_DATAPAR_VC AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+    # Silence warning about __sync_fetch_and_nand changing semantics
     hpx_add_compile_flag_if_available(-Wno-sync-nand)
   endif()
 
