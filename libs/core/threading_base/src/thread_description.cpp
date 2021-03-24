@@ -11,7 +11,7 @@
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/to_string.hpp>
 
-#include <iostream>
+#include <ostream>
 #include <sstream>
 #include <string>
 

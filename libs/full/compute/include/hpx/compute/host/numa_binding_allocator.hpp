@@ -17,20 +17,19 @@
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/topology/topology.hpp>
 
+#include <cstddef>
+#include <memory>
 #include <sstream>
 #include <string>
-#include <vector>
-
-#include <cstddef>
-#include <iostream>
-#include <memory>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
 #include <linux/unistd.h>
 #include <sys/mman.h>
 #define NUMA_ALLOCATOR_LINUX
+#include <iostream>
 #endif
 
 // Can be used to enable debugging of the allocator page mapping
@@ -379,7 +378,6 @@ namespace hpx { namespace compute { namespace host {
                 {
                     return status[0];
                 }
-                // if (status[0]<0) std::cout << "." << decnumber(status[0]) << ".";
                 return -1;
             }
             HPX_THROW_EXCEPTION(kernel_error, "get_numa_domain",

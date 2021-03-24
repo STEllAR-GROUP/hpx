@@ -7,8 +7,6 @@
 
 #include <hpx/modules/config_registry.hpp>
 
-#include <iostream>
-#include <string>
 #include <vector>
 
 namespace hpx { namespace config_registry {
