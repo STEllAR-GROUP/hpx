@@ -220,8 +220,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     return util::detail::convert_to_result(
                         detail::copy<util::in_out_result<Iter2, Iter3>>().call(
-                            std::forward<ExPolicy>(policy), std::false_type(),
-                            first2, last2, dest),
+                            std::forward<ExPolicy>(policy), first2, last2,
+                            dest),
                         [first1](util::in_out_result<Iter2, Iter3> const& p)
                             -> result_type {
                             return {first1, p.in, p.out};
@@ -232,8 +232,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     return util::detail::convert_to_result(
                         detail::copy<util::in_out_result<Iter1, Iter3>>().call(
-                            std::forward<ExPolicy>(policy), std::false_type(),
-                            first1, last1, dest),
+                            std::forward<ExPolicy>(policy), first1, last1,
+                            dest),
                         [first2](util::in_out_result<Iter1, Iter3> const& p)
                             -> result_type {
                             return {p.in, first2, p.out};
@@ -308,7 +308,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             parallel::util::in_in_out_result<FwdIter1, FwdIter2, FwdIter3>;
 
         return util::get_third_element(
-            detail::set_symmetric_difference<result_type>().call(
+            detail::set_symmetric_difference<result_type>().call2(
                 std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
                 last2, dest, std::forward<Pred>(op),
                 util::projection_identity(), util::projection_identity()));
@@ -366,7 +366,7 @@ namespace hpx {
             return hpx::parallel::util::get_third_element(
                 hpx::parallel::v1::detail::set_symmetric_difference<
                     result_type>()
-                    .call(std::forward<ExPolicy>(policy), is_seq(), first1,
+                    .call2(std::forward<ExPolicy>(policy), is_seq(), first1,
                         last1, first2, last2, dest, std::forward<Pred>(op),
                         hpx::parallel::util::projection_identity(),
                         hpx::parallel::util::projection_identity()));
@@ -402,8 +402,8 @@ namespace hpx {
             return hpx::parallel::util::get_third_element(
                 hpx::parallel::v1::detail::set_symmetric_difference<
                     result_type>()
-                    .call(hpx::execution::seq, std::true_type(), first1, last1,
-                        first2, last2, dest, std::forward<Pred>(op),
+                    .call(hpx::execution::seq, first1, last1, first2, last2,
+                        dest, std::forward<Pred>(op),
                         hpx::parallel::util::projection_identity(),
                         hpx::parallel::util::projection_identity()));
         }

@@ -300,10 +300,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static_assert((hpx::traits::is_forward_iterator<FwdIterB>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return detail::reduce<T>().call(std::forward<ExPolicy>(policy),
-                is_seq(), first, last, std::move(init), std::forward<F>(f));
+                first, last, std::move(init), std::forward<F>(f));
         }
 
         // Forward Declaration of Segmented Reduce

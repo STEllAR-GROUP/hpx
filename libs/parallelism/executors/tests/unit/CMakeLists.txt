@@ -12,6 +12,10 @@ if(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY)
   set(tests ${tests} thread_pool_attached_executors)
 endif()
 
+if(HPX_WITH_CXX17_STD_EXECUTION_POLICES)
+  set(tests ${tests} std_execution_policies)
+endif()
+
 foreach(test ${tests})
   set(sources ${test}.cpp)
 

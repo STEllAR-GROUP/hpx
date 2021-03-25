@@ -24,7 +24,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename Result = void>
         struct handle_exception_impl
         {
-            typedef Result type;
+            using type = Result;
 
             HPX_NORETURN static Result call()
             {
@@ -78,7 +78,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename Result>
         struct handle_exception_task_impl
         {
-            typedef future<Result> type;
+            using type = future<Result>;
 
             static future<Result> call()
             {
@@ -180,8 +180,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         using exception_list_termination_handler_type =
             hpx::util::function_nonser<void()>;
+
         HPX_PARALLELISM_EXPORT void set_exception_list_termination_handler(
             exception_list_termination_handler_type f);
+
         HPX_NORETURN HPX_PARALLELISM_EXPORT void
         exception_list_termination_handler();
 
@@ -190,7 +192,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         struct handle_exception_impl<
             hpx::execution::parallel_unsequenced_policy, Result>
         {
-            typedef Result type;
+            using type = Result;
 
             HPX_NORETURN static Result call()
             {
@@ -212,15 +214,39 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
 
+        template <typename Result>
+        struct handle_exception_impl<hpx::execution::unsequenced_policy, Result>
+        {
+            using type = Result;
+
+            HPX_NORETURN static Result call()
+            {
+                // any exceptions thrown by algorithms executed with the
+                // unsequenced_policy are to call terminate.
+                exception_list_termination_handler();
+            }
+
+            HPX_NORETURN
+            static hpx::future<Result> call(hpx::future<Result>&&)
+            {
+                exception_list_termination_handler();
+            }
+
+            HPX_NORETURN
+            static hpx::future<Result> call(std::exception_ptr const&)
+            {
+                exception_list_termination_handler();
+            }
+        };
+
         template <typename ExPolicy, typename Result = void>
         struct handle_exception
-          : handle_exception_impl<typename std::decay<ExPolicy>::type, Result>
+          : handle_exception_impl<std::decay_t<ExPolicy>, Result>
         {
         };
         /// \endcond
     }    // namespace detail
 
     // we're just reusing our existing implementation
-
     using hpx::exception_list;
 }}}    // namespace hpx::parallel::v1

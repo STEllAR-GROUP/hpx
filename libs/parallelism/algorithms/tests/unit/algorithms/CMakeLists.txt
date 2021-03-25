@@ -149,6 +149,10 @@ set(tests
     unique_copy
 )
 
+if(HPX_WITH_CXX17_STD_EXECUTION_POLICES)
+  set(tests ${tests} foreach_std_policies)
+endif()
+
 foreach(test ${tests})
   set(sources ${test}.cpp)
 

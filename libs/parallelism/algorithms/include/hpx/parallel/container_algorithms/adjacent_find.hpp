@@ -294,7 +294,7 @@ namespace hpx { namespace ranges {
             Proj&& proj = Proj())
         {
             return hpx::parallel::v1::detail::adjacent_find<FwdIter, FwdIter>()
-                .call(hpx::execution::seq, std::true_type(), first, last,
+                .call(hpx::execution::seq, first, last,
                     std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
 
@@ -320,10 +320,8 @@ namespace hpx { namespace ranges {
             FwdIter first, Sent last, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::adjacent_find<FwdIter, FwdIter>()
-                .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
+                .call(std::forward<ExPolicy>(policy), first, last,
                     std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
 
@@ -354,9 +352,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::adjacent_find<iterator_type,
                 iterator_type>()
-                .call(hpx::execution::seq, std::true_type(), std::begin(rng),
-                    std::end(rng), std::forward<Pred>(pred),
-                    std::forward<Proj>(proj));
+                .call(hpx::execution::seq, std::begin(rng), std::end(rng),
+                    std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -386,11 +383,9 @@ namespace hpx { namespace ranges {
                 (hpx::traits::is_forward_iterator<iterator_type>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::adjacent_find<iterator_type,
                 iterator_type>()
-                .call(std::forward<ExPolicy>(policy), is_seq(), std::begin(rng),
+                .call(std::forward<ExPolicy>(policy), std::begin(rng),
                     std::end(rng), std::forward<Pred>(pred),
                     std::forward<Proj>(proj));
         }

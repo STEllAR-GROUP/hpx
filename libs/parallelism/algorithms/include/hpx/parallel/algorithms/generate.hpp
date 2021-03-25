@@ -187,7 +187,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using type = typename std::iterator_traits<Iter>::value_type;
 
                 return for_each_n<Iter>().call(
-                    std::forward<ExPolicy>(policy), std::false_type(), first,
+                    std::forward<ExPolicy>(policy), first,
                     detail::distance(first, last),
                     [f = std::forward<F>(f)](type& v) mutable { v = f(); },
                     util::projection_identity());
@@ -201,10 +201,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         generate_(
             ExPolicy&& policy, Iter first, Sent last, F&& f, std::false_type)
         {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
             return detail::generate<Iter>().call(std::forward<ExPolicy>(policy),
-                is_seq(), first, last, std::forward<F>(f));
+                first, last, std::forward<F>(f));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -272,8 +270,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 return for_each_n<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), std::false_type(), first,
-                    count,
+                    std::forward<ExPolicy>(policy), first, count,
                     [f = std::forward<F>(f)](type& v) mutable { v = f(); },
                     util::projection_identity());
             }
@@ -295,8 +292,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
-        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
         if (detail::is_negative(count))
         {
             return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
@@ -308,7 +303,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::generate_n<FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, std::size_t(count),
+            std::forward<ExPolicy>(policy), first, std::size_t(count),
             std::forward<F>(f));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -384,8 +379,6 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             if (hpx::parallel::v1::detail::is_negative(count))
             {
                 return hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -393,8 +386,8 @@ namespace hpx {
             }
 
             return hpx::parallel::v1::detail::generate_n<FwdIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first,
-                std::size_t(count), std::forward<F>(f));
+                std::forward<ExPolicy>(policy), first, std::size_t(count),
+                std::forward<F>(f));
         }
 
         // clang-format off
@@ -415,8 +408,8 @@ namespace hpx {
             }
 
             return hpx::parallel::v1::detail::generate_n<FwdIter>().call(
-                hpx::execution::seq, std::true_type(), first,
-                std::size_t(count), std::forward<F>(f));
+                hpx::execution::seq, first, std::size_t(count),
+                std::forward<F>(f));
         }
     } generate_n{};
 }    // namespace hpx

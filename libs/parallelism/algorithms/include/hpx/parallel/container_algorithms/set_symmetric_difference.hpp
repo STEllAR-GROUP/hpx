@@ -323,7 +323,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::set_symmetric_difference<
                 result_type>()
-                .call(std::forward<ExPolicy>(policy), is_seq(), first1, last1,
+                .call2(std::forward<ExPolicy>(policy), is_seq(), first1, last1,
                     first2, last2, dest, std::forward<Pred>(op),
                     std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
@@ -382,7 +382,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::set_symmetric_difference<
                 result_type>()
-                .call(std::forward<ExPolicy>(policy), is_seq(),
+                .call2(std::forward<ExPolicy>(policy), is_seq(),
                     hpx::util::begin(rng1), hpx::util::end(rng1),
                     hpx::util::begin(rng2), hpx::util::end(rng2), dest,
                     std::forward<Pred>(op), std::forward<Proj1>(proj1),
@@ -424,9 +424,9 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::set_symmetric_difference<
                 result_type>()
-                .call(hpx::execution::seq, std::true_type(), first1, last1,
-                    first2, last2, dest, std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                .call(hpx::execution::seq, first1, last1, first2, last2, dest,
+                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
+                    std::forward<Proj2>(proj2));
         }
 
         // clang-format off
@@ -473,11 +473,10 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::set_symmetric_difference<
                 result_type>()
-                .call(hpx::execution::seq, std::true_type(),
-                    hpx::util::begin(rng1), hpx::util::end(rng1),
-                    hpx::util::begin(rng2), hpx::util::end(rng2), dest,
-                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                .call(hpx::execution::seq, hpx::util::begin(rng1),
+                    hpx::util::end(rng1), hpx::util::begin(rng2),
+                    hpx::util::end(rng2), dest, std::forward<Pred>(op),
+                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
     } set_symmetric_difference{};
 

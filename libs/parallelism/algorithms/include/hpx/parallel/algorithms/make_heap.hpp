@@ -437,11 +437,9 @@ namespace hpx {
                 hpx::traits::is_random_access_iterator<RndIter>::value,
                 "Requires random access iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
                 hpx::parallel::v1::detail::make_heap<RndIter>().call(
-                    std::forward<ExPolicy>(policy), is_seq{}, first, last,
+                    std::forward<ExPolicy>(policy), first, last,
                     std::forward<Comp>(comp),
                     hpx::parallel::util::projection_identity{}));
         }
@@ -461,13 +459,12 @@ namespace hpx {
                 hpx::traits::is_random_access_iterator<RndIter>::value,
                 "Requires random access iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
             using value_type =
                 typename std::iterator_traits<RndIter>::value_type;
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
                 hpx::parallel::v1::detail::make_heap<RndIter>().call(
-                    std::forward<ExPolicy>(policy), is_seq{}, first, last,
+                    std::forward<ExPolicy>(policy), first, last,
                     std::less<value_type>(),
                     hpx::parallel::util::projection_identity{}));
         }
@@ -490,8 +487,7 @@ namespace hpx {
                 "Requires random access iterator.");
 
             hpx::parallel::v1::detail::make_heap<RndIter>().call(
-                hpx::execution::seq, std::true_type{}, first, last,
-                std::forward<Comp>(comp),
+                hpx::execution::seq, first, last, std::forward<Comp>(comp),
                 hpx::parallel::util::projection_identity{});
         }
 
@@ -511,8 +507,7 @@ namespace hpx {
                 typename std::iterator_traits<RndIter>::value_type;
 
             hpx::parallel::v1::detail::make_heap<RndIter>().call(
-                hpx::execution::seq, std::true_type{}, first, last,
-                std::less<value_type>(),
+                hpx::execution::seq, first, last, std::less<value_type>(),
                 hpx::parallel::util::projection_identity{});
         }
     } make_heap{};

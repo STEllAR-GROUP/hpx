@@ -48,7 +48,7 @@ namespace hpx { namespace execution {
     /// \cond NOINTERNAL
     struct task_policy_tag
     {
-        constexpr task_policy_tag() {}
+        constexpr task_policy_tag() = default;
     };
 }}    // namespace hpx::execution
 

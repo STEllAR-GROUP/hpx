@@ -152,10 +152,8 @@ namespace hpx { namespace ranges {
                 (hpx::traits::is_forward_iterator<iterator_type>::value),
                 "Required at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::destroy<iterator_type>().call(
-                std::forward<ExPolicy>(policy), is_seq{}, hpx::util::begin(rng),
+                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
                 hpx::util::end(rng));
         }
 
@@ -173,10 +171,8 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Required at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::destroy<Iter>().call(
-                std::forward<ExPolicy>(policy), is_seq{}, first, last);
+                std::forward<ExPolicy>(policy), first, last);
         }
 
         // clang-format off
@@ -196,7 +192,7 @@ namespace hpx { namespace ranges {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::destroy<iterator_type>().call(
-                hpx::execution::seq, std::false_type{}, hpx::util::begin(rng),
+                hpx::execution::seq, hpx::util::begin(rng),
                 hpx::util::end(rng));
         }
 
@@ -212,7 +208,7 @@ namespace hpx { namespace ranges {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::destroy<Iter>().call(
-                hpx::execution::seq, std::false_type{}, first, last);
+                hpx::execution::seq, first, last);
         }
     } destroy{};
 
@@ -243,11 +239,8 @@ namespace hpx { namespace ranges {
                     FwdIter>::get(std::move(first));
             }
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::destroy_n<FwdIter>().call(
-                std::forward<ExPolicy>(policy), is_seq{}, first,
-                std::size_t(count));
+                std::forward<ExPolicy>(policy), first, std::size_t(count));
         }
 
         // clang-format off
@@ -268,8 +261,7 @@ namespace hpx { namespace ranges {
             }
 
             return hpx::parallel::v1::detail::destroy_n<FwdIter>().call(
-                hpx::execution::seq, std::false_type{}, first,
-                std::size_t(count));
+                hpx::execution::seq, first, std::size_t(count));
         }
     } destroy_n{};
 }}    // namespace hpx::ranges

@@ -28,12 +28,13 @@
 #include <utility>
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>
     struct algorithm_result_helper
     {
         template <typename T_>
-        static HPX_FORCEINLINE T_ call(T_&& val)
+        HPX_FORCEINLINE static constexpr T_ call(T_&& val)
         {
             return std::forward<T_>(val);
         }
@@ -42,7 +43,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <>
     struct algorithm_result_helper<future<void>>
     {
-        static HPX_FORCEINLINE future<void> call(future<void>&& f)
+        HPX_FORCEINLINE static future<void> call(future<void>&& f)
         {
             return std::move(f);
         }
@@ -53,9 +54,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         typename std::enable_if<
             hpx::traits::is_segmented_local_iterator<Iterator>::value>::type>
     {
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator> traits;
+        using traits = hpx::traits::segmented_local_iterator_traits<Iterator>;
 
-        static HPX_FORCEINLINE Iterator call(
+        HPX_FORCEINLINE static Iterator call(
             typename traits::local_raw_iterator&& it)
         {
             return traits::remote(std::move(it));
@@ -68,10 +69,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             hpx::traits::is_segmented_local_iterator<Iterator1>::value ||
             hpx::traits::is_segmented_local_iterator<Iterator2>::value>::type>
     {
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator1> traits1;
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator2> traits2;
+        using traits1 = hpx::traits::segmented_local_iterator_traits<Iterator1>;
+        using traits2 = hpx::traits::segmented_local_iterator_traits<Iterator2>;
 
-        static HPX_FORCEINLINE std::pair<typename traits1::local_iterator,
+        HPX_FORCEINLINE static std::pair<typename traits1::local_iterator,
             typename traits2::local_iterator>
         call(std::pair<typename traits1::local_raw_iterator,
             typename traits2::local_raw_iterator>&& p)
@@ -87,10 +88,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             hpx::traits::is_segmented_local_iterator<Iterator1>::value ||
             hpx::traits::is_segmented_local_iterator<Iterator2>::value>::type>
     {
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator1> traits1;
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator2> traits2;
+        using traits1 = hpx::traits::segmented_local_iterator_traits<Iterator1>;
+        using traits2 = hpx::traits::segmented_local_iterator_traits<Iterator2>;
 
-        static HPX_FORCEINLINE util::in_out_result<
+        HPX_FORCEINLINE static util::in_out_result<
             typename traits1::local_iterator, typename traits2::local_iterator>
         call(util::in_out_result<typename traits1::local_raw_iterator,
             typename traits2::local_raw_iterator>&& p)
@@ -109,11 +110,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             hpx::traits::is_segmented_local_iterator<Iterator2>::value ||
             hpx::traits::is_segmented_local_iterator<Iterator3>::value>::type>
     {
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator1> traits1;
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator2> traits2;
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator3> traits3;
+        using traits1 = hpx::traits::segmented_local_iterator_traits<Iterator1>;
+        using traits2 = hpx::traits::segmented_local_iterator_traits<Iterator2>;
+        using traits3 = hpx::traits::segmented_local_iterator_traits<Iterator3>;
 
-        static HPX_FORCEINLINE hpx::tuple<typename traits1::local_iterator,
+        HPX_FORCEINLINE static hpx::tuple<typename traits1::local_iterator,
             typename traits2::local_iterator, typename traits3::local_iterator>
         call(hpx::tuple<typename traits1::local_raw_iterator,
             typename traits2::local_raw_iterator,
@@ -133,11 +134,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             hpx::traits::is_segmented_local_iterator<Iterator2>::value ||
             hpx::traits::is_segmented_local_iterator<Iterator3>::value>::type>
     {
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator1> traits1;
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator2> traits2;
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator3> traits3;
+        using traits1 = hpx::traits::segmented_local_iterator_traits<Iterator1>;
+        using traits2 = hpx::traits::segmented_local_iterator_traits<Iterator2>;
+        using traits3 = hpx::traits::segmented_local_iterator_traits<Iterator3>;
 
-        static HPX_FORCEINLINE util::in_in_out_result<
+        HPX_FORCEINLINE static util::in_in_out_result<
             typename traits1::local_iterator, typename traits2::local_iterator,
             typename traits3::local_iterator>
         call(util::in_in_out_result<typename traits1::local_raw_iterator,
@@ -158,12 +159,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         typename std::enable_if<
             hpx::traits::is_segmented_local_iterator<Iterator>::value>::type>
     {
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator> traits;
+        using traits = hpx::traits::segmented_local_iterator_traits<Iterator>;
 
-        static HPX_FORCEINLINE future<Iterator> call(
+        HPX_FORCEINLINE static future<Iterator> call(
             future<typename traits::local_raw_iterator>&& f)
         {
-            typedef future<typename traits::local_raw_iterator> argtype;
+            using argtype = future<typename traits::local_raw_iterator>;
             return f.then(hpx::launch::sync, [](argtype&& f) -> Iterator {
                 return traits::remote(f.get());
             });
@@ -176,14 +177,13 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             hpx::traits::is_segmented_local_iterator<Iterator1>::value ||
             hpx::traits::is_segmented_local_iterator<Iterator2>::value>::type>
     {
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator1> traits1;
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator2> traits2;
+        using traits1 = hpx::traits::segmented_local_iterator_traits<Iterator1>;
+        using traits2 = hpx::traits::segmented_local_iterator_traits<Iterator2>;
 
-        typedef std::pair<typename traits1::local_raw_iterator,
-            typename traits2::local_raw_iterator>
-            arg_type;
+        using arg_type = std::pair<typename traits1::local_raw_iterator,
+            typename traits2::local_raw_iterator>;
 
-        static HPX_FORCEINLINE future<std::pair<
+        HPX_FORCEINLINE static future<std::pair<
             typename traits1::local_iterator, typename traits2::local_iterator>>
         call(future<arg_type>&& f)
         {
@@ -208,14 +208,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             hpx::traits::is_segmented_local_iterator<Iterator1>::value ||
             hpx::traits::is_segmented_local_iterator<Iterator2>::value>::type>
     {
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator1> traits1;
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator2> traits2;
+        using traits1 = hpx::traits::segmented_local_iterator_traits<Iterator1>;
+        using traits2 = hpx::traits::segmented_local_iterator_traits<Iterator2>;
 
-        typedef util::in_out_result<typename traits1::local_raw_iterator,
-            typename traits2::local_raw_iterator>
-            arg_type;
+        using arg_type =
+            util::in_out_result<typename traits1::local_raw_iterator,
+                typename traits2::local_raw_iterator>;
 
-        static HPX_FORCEINLINE future<util::in_out_result<
+        HPX_FORCEINLINE static future<util::in_out_result<
             typename traits1::local_iterator, typename traits2::local_iterator>>
         call(future<arg_type>&& f)
         {
@@ -242,16 +242,15 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             hpx::traits::is_segmented_local_iterator<Iterator2>::value ||
             hpx::traits::is_segmented_local_iterator<Iterator3>::value>::type>
     {
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator1> traits1;
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator2> traits2;
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator3> traits3;
+        using traits1 = hpx::traits::segmented_local_iterator_traits<Iterator1>;
+        using traits2 = hpx::traits::segmented_local_iterator_traits<Iterator2>;
+        using traits3 = hpx::traits::segmented_local_iterator_traits<Iterator3>;
 
-        typedef hpx::tuple<typename traits1::local_raw_iterator,
+        using arg_type = hpx::tuple<typename traits1::local_raw_iterator,
             typename traits2::local_raw_iterator,
-            typename traits3::local_raw_iterator>
-            arg_type;
+            typename traits3::local_raw_iterator>;
 
-        static HPX_FORCEINLINE future<hpx::tuple<
+        HPX_FORCEINLINE static future<hpx::tuple<
             typename traits1::local_iterator, typename traits2::local_iterator,
             typename traits3::local_iterator>>
         call(future<arg_type>&& f)
@@ -281,16 +280,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             hpx::traits::is_segmented_local_iterator<Iterator2>::value ||
             hpx::traits::is_segmented_local_iterator<Iterator3>::value>::type>
     {
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator1> traits1;
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator2> traits2;
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator3> traits3;
+        using traits1 = hpx::traits::segmented_local_iterator_traits<Iterator1>;
+        using traits2 = hpx::traits::segmented_local_iterator_traits<Iterator2>;
+        using traits3 = hpx::traits::segmented_local_iterator_traits<Iterator3>;
 
-        typedef util::in_in_out_result<typename traits1::local_raw_iterator,
-            typename traits2::local_raw_iterator,
-            typename traits3::local_raw_iterator>
-            arg_type;
+        using arg_type =
+            util::in_in_out_result<typename traits1::local_raw_iterator,
+                typename traits2::local_raw_iterator,
+                typename traits3::local_raw_iterator>;
 
-        static HPX_FORCEINLINE future<util::in_in_out_result<
+        HPX_FORCEINLINE static future<util::in_in_out_result<
             typename traits1::local_iterator, typename traits2::local_iterator,
             typename traits3::local_iterator>>
         call(future<arg_type>&& f)
@@ -319,25 +318,25 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct dispatcher_helper
     {
         template <typename ExPolicy, typename... Args>
-        static HPX_FORCEINLINE R sequential(
+        HPX_FORCEINLINE static R sequential(
             Algo const& algo, ExPolicy&& policy, Args&&... args)
         {
             using hpx::traits::segmented_local_iterator_traits;
             return detail::algorithm_result_helper<R>::call(
-                algo.call(std::forward<ExPolicy>(policy), std::true_type(),
-                    segmented_local_iterator_traits<typename std::decay<
-                        Args>::type>::local(std::forward<Args>(args))...));
+                algo.call2(std::forward<ExPolicy>(policy), std::true_type(),
+                    segmented_local_iterator_traits<std::decay_t<Args>>::local(
+                        std::forward<Args>(args))...));
         }
 
         template <typename ExPolicy, typename... Args>
-        static HPX_FORCEINLINE R parallel(
+        HPX_FORCEINLINE static R parallel(
             Algo const& algo, ExPolicy&& policy, Args&&... args)
         {
             using hpx::traits::segmented_local_iterator_traits;
             return detail::algorithm_result_helper<R>::call(
-                algo.call(std::forward<ExPolicy>(policy), std::false_type(),
-                    segmented_local_iterator_traits<typename std::decay<
-                        Args>::type>::local(std::forward<Args>(args))...));
+                algo.call2(std::forward<ExPolicy>(policy), std::false_type(),
+                    segmented_local_iterator_traits<std::decay_t<Args>>::local(
+                        std::forward<Args>(args))...));
         }
     };
 
@@ -345,25 +344,25 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct dispatcher_helper<void, Algo>
     {
         template <typename ExPolicy, typename... Args>
-        static HPX_FORCEINLINE
+        HPX_FORCEINLINE static
             typename parallel::util::detail::algorithm_result<ExPolicy>::type
             sequential(Algo const& algo, ExPolicy&& policy, Args&&... args)
         {
             using hpx::traits::segmented_local_iterator_traits;
-            return algo.call(std::forward<ExPolicy>(policy), std::true_type(),
-                segmented_local_iterator_traits<typename std::decay<
-                    Args>::type>::local(std::forward<Args>(args))...);
+            return algo.call2(std::forward<ExPolicy>(policy), std::true_type(),
+                segmented_local_iterator_traits<std::decay_t<Args>>::local(
+                    std::forward<Args>(args))...);
         }
 
         template <typename ExPolicy, typename... Args>
-        static HPX_FORCEINLINE
+        HPX_FORCEINLINE static
             typename parallel::util::detail::algorithm_result<ExPolicy>::type
             parallel(Algo const& algo, ExPolicy&& policy, Args&&... args)
         {
             using hpx::traits::segmented_local_iterator_traits;
-            return algo.call(std::forward<ExPolicy>(policy), std::false_type(),
-                segmented_local_iterator_traits<typename std::decay<
-                    Args>::type>::local(std::forward<Args>(args))...);
+            return algo.call2(std::forward<ExPolicy>(policy), std::false_type(),
+                segmented_local_iterator_traits<std::decay_t<Args>>::local(
+                    std::forward<Args>(args))...);
         }
     };
 
@@ -371,19 +370,20 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename Algo, typename ExPolicy, typename... Args>
     struct dispatcher
     {
-        typedef typename parallel::util::detail::algorithm_result<ExPolicy,
-            typename std::decay<Algo>::type::result_type>::type result_type;
+        using result_type =
+            typename parallel::util::detail::algorithm_result<ExPolicy,
+                typename std::decay_t<Algo>::result_type>::type;
 
-        typedef dispatcher_helper<result_type, Algo> base_dispatcher;
+        using base_dispatcher = dispatcher_helper<result_type, Algo>;
 
-        static HPX_FORCEINLINE result_type sequential(
+        HPX_FORCEINLINE static result_type sequential(
             Algo const& algo, ExPolicy policy, Args... args)
         {
             return base_dispatcher::sequential(
                 algo, std::move(policy), std::move(args)...);
         }
 
-        static HPX_FORCEINLINE result_type parallel(
+        HPX_FORCEINLINE static result_type parallel(
             Algo const& algo, ExPolicy policy, Args... args)
         {
             return base_dispatcher::parallel(
@@ -418,16 +418,17 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Algo, typename ExPolicy, typename IsSeq,
         typename... Args>
-    HPX_FORCEINLINE future<typename std::decay<Algo>::type::result_type>
+    HPX_FORCEINLINE future<typename std::decay_t<Algo>::result_type>
     dispatch_async(id_type const& id, Algo&& algo, ExPolicy const& policy,
         IsSeq, Args&&... args)
     {
-        typedef typename std::decay<Algo>::type algo_type;
-        typedef typename parallel::util::detail::algorithm_result<ExPolicy,
-            typename algo_type::result_type>::type result_type;
+        using algo_type = std::decay_t<Algo>;
+        using result_type =
+            typename parallel::util::detail::algorithm_result<ExPolicy,
+                typename algo_type::result_type>::type;
 
         algorithm_invoker_action<algo_type, ExPolicy, typename IsSeq::type,
-            result_type(typename std::decay<Args>::type...)>
+            result_type(std::decay_t<Args>...)>
             act;
 
         return hpx::async(act, hpx::colocated(id), std::forward<Algo>(algo),
@@ -436,12 +437,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename Algo, typename ExPolicy, typename IsSeq,
         typename... Args>
-    HPX_FORCEINLINE typename std::decay<Algo>::type::result_type dispatch(
+    HPX_FORCEINLINE typename std::decay_t<Algo>::result_type dispatch(
         id_type const& id, Algo&& algo, ExPolicy const& policy, IsSeq is_seq,
         Args&&... args)
     {
         // synchronously invoke remote operation
-        future<typename std::decay<Algo>::type::result_type> f =
+        future<typename std::decay_t<Algo>::result_type> f =
             dispatch_async(id, std::forward<Algo>(algo), policy, is_seq,
                 std::forward<Args>(args)...);
         f.wait();

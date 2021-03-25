@@ -214,6 +214,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
 
         template <>
+        struct remove_asynchronous<hpx::execution::unsequenced_policy>
+        {
+            typedef hpx::execution::sequenced_policy type;
+        };
+
+        template <>
         struct remove_asynchronous<hpx::execution::sequenced_task_policy>
         {
             typedef hpx::execution::sequenced_policy type;
@@ -595,11 +601,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 keys_output, values_output});
         }
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         return detail::reduce_by_key<FwdIter1, FwdIter2>().call(
-            std::forward<ExPolicy>(policy), is_seq(), key_first, key_last,
-            values_first, keys_output, values_output,
-            std::forward<Compare>(comp), std::forward<Func>(func));
+            std::forward<ExPolicy>(policy), key_first, key_last, values_first,
+            keys_output, values_output, std::forward<Compare>(comp),
+            std::forward<Func>(func));
     }
 }}}    // namespace hpx::parallel::v1

@@ -19,6 +19,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util { namespace detail {
+
     ///////////////////////////////////////////////////////////////////////
     template <typename ExPolicy>
     struct handle_remote_exceptions
@@ -77,6 +78,38 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     template <>
     struct handle_remote_exceptions<hpx::execution::parallel_unsequenced_policy>
+    {
+        HPX_NORETURN static void call(
+            std::exception_ptr const&, std::list<std::exception_ptr>&)
+        {
+            parallel_exception_termination_handler();
+        }
+
+        template <typename T>
+        static void call(std::vector<hpx::future<T>> const& workitems,
+            std::list<std::exception_ptr>&)
+        {
+            for (hpx::future<T> const& f : workitems)
+            {
+                if (f.has_exception())
+                    parallel_exception_termination_handler();
+            }
+        }
+
+        template <typename T>
+        static void call(std::vector<hpx::shared_future<T>> const& workitems,
+            std::list<std::exception_ptr>&)
+        {
+            for (hpx::shared_future<T> const& f : workitems)
+            {
+                if (f.has_exception())
+                    parallel_exception_termination_handler();
+            }
+        }
+    };
+
+    template <>
+    struct handle_remote_exceptions<hpx::execution::unsequenced_policy>
     {
         HPX_NORETURN static void call(
             std::exception_ptr const&, std::list<std::exception_ptr>&)

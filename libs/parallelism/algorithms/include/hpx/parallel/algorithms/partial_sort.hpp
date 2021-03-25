@@ -495,7 +495,7 @@ namespace hpx {
                 "Requires at least random access iterator.");
 
             return parallel::v1::partial_sort<RandIter>().call(
-                hpx::execution::seq, std::true_type(), first, middle, last,
+                hpx::execution::seq, first, middle, last,
                 std::forward<Comp>(comp),
                 parallel::util::projection_identity());
         }
@@ -523,12 +523,11 @@ namespace hpx {
 
             using algorithm_result =
                 parallel::util::detail::algorithm_result<ExPolicy, RandIter>;
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return algorithm_result::get(
                 parallel::v1::partial_sort<RandIter>().call(
-                    std::forward<ExPolicy>(policy), is_seq(), first, middle,
-                    last, std::forward<Comp>(comp),
+                    std::forward<ExPolicy>(policy), first, middle, last,
+                    std::forward<Comp>(comp),
                     parallel::util::projection_identity()));
         }
     } partial_sort{};

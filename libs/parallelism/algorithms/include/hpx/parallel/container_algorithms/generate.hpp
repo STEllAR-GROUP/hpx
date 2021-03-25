@@ -349,8 +349,6 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             if (hpx::parallel::v1::detail::is_negative(count))
             {
                 return hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -358,8 +356,8 @@ namespace hpx { namespace ranges {
             }
 
             return hpx::parallel::v1::detail::generate_n<FwdIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first,
-                std::size_t(count), std::forward<F>(f));
+                std::forward<ExPolicy>(policy), first, std::size_t(count),
+                std::forward<F>(f));
         }
 
         // clang-format off
@@ -380,8 +378,8 @@ namespace hpx { namespace ranges {
             }
 
             return hpx::parallel::v1::detail::generate_n<FwdIter>().call(
-                hpx::execution::seq, std::true_type(), first,
-                std::size_t(count), std::forward<F>(f));
+                hpx::execution::seq, first, std::size_t(count),
+                std::forward<F>(f));
         }
     } generate_n{};
 }}    // namespace hpx::ranges

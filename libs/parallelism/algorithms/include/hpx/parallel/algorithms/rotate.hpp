@@ -40,7 +40,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         hpx::future<util::in_out_result<FwdIter, FwdIter>> rotate_helper(
             ExPolicy policy, FwdIter first, FwdIter new_first, FwdIter last)
         {
-            typedef std::false_type non_seq;
+            using non_seq = std::false_type;
 
             auto p = hpx::execution::parallel_task_policy()
                          .on(policy.executor())
@@ -55,7 +55,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     f1.get();
                     f2.get();
 
-                    hpx::future<FwdIter> f = r.call(p, non_seq(), first, last);
+                    hpx::future<FwdIter> f = r.call2(p, non_seq(), first, last);
                     return f.then([=](hpx::future<FwdIter>&& f) mutable
                         -> util::in_out_result<FwdIter, FwdIter> {
                         f.get();    // propagate exceptions
@@ -64,8 +64,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             first, last};
                     });
                 },
-                r.call(p, non_seq(), first, new_first),
-                r.call(p, non_seq(), new_first, last));
+                r.call2(p, non_seq(), first, new_first),
+                r.call2(p, non_seq(), new_first, last));
         }
 
         template <typename IterPair>
@@ -158,7 +158,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 !hpx::traits::is_bidirectional_iterator<FwdIter>::value>
             is_seq;
 
-        return detail::rotate<util::in_out_result<FwdIter, FwdIter>>().call(
+        return detail::rotate<util::in_out_result<FwdIter, FwdIter>>().call2(
             std::forward<ExPolicy>(policy), is_seq(), first, new_first, last);
     }
 
@@ -194,13 +194,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef util::in_out_result<FwdIter1, FwdIter2> copy_return_type;
 
             hpx::future<copy_return_type> f =
-                detail::copy<copy_return_type>().call(
+                detail::copy<copy_return_type>().call2(
                     p, non_seq(), new_first, last, dest_first);
 
             return f.then([=](hpx::future<copy_return_type>&& result)
                               -> hpx::future<copy_return_type> {
                 copy_return_type p1 = result.get();
-                return detail::copy<copy_return_type>().call(
+                return detail::copy<copy_return_type>().call2(
                     p, non_seq(), first, new_first, p1.out);
             });
         }
@@ -304,7 +304,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             is_seq;
 
         return detail::rotate_copy<util::in_out_result<FwdIter1, FwdIter2>>()
-            .call(std::forward<ExPolicy>(policy), is_seq(), first, new_first,
+            .call2(std::forward<ExPolicy>(policy), is_seq(), first, new_first,
                 last, dest_first);
     }
 }}}    // namespace hpx::parallel::v1

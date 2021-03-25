@@ -538,7 +538,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 return for_each_n<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), std::false_type(), first,
+                    std::forward<ExPolicy>(policy), first,
                     std::distance(first, last),
                     [old_value, new_value, proj = std::forward<Proj>(proj)](
                         type& t) -> void {
@@ -575,11 +575,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         return detail::replace<FwdIter>().call(std::forward<ExPolicy>(policy),
-            is_seq(), first, last, old_value, new_value,
-            std::forward<Proj>(proj));
+            first, last, old_value, new_value, std::forward<Proj>(proj));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -631,7 +628,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 return for_each_n<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), std::false_type(), first,
+                    std::forward<ExPolicy>(policy), first,
                     detail::distance(first, last),
                     [new_value, f = std::forward<F>(f),
                         proj = std::forward<Proj>(proj)](type& t) -> void {
@@ -665,11 +662,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         return detail::replace_if<FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, last,
-            std::forward<F>(f), new_value, std::forward<Proj>(proj));
+            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+            new_value, std::forward<Proj>(proj));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -727,7 +722,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return util::detail::get_in_out_result(
                     for_each_n<zip_iterator>().call(
-                        std::forward<ExPolicy>(policy), std::false_type(),
+                        std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(first, dest),
                         detail::distance(first, sent),
                         [old_value, new_value, proj = std::forward<Proj>(proj)](
@@ -771,11 +766,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         return detail::replace_copy<util::in_out_result<FwdIter1, FwdIter2>>()
-            .call(std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
-                old_value, new_value, std::forward<Proj>(proj));
+            .call(std::forward<ExPolicy>(policy), first, last, dest, old_value,
+                new_value, std::forward<Proj>(proj));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -833,7 +826,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return util::detail::get_in_out_result(
                     for_each_n<zip_iterator>().call(
-                        std::forward<ExPolicy>(policy), std::false_type(),
+                        std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(first, dest),
                         detail::distance(first, sent),
                         [new_value, f = std::forward<F>(f),
@@ -876,11 +869,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         return detail::replace_copy_if<
             util::in_out_result<FwdIter1, FwdIter2>>()
-            .call(std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
+            .call(std::forward<ExPolicy>(policy), first, last, dest,
                 std::forward<F>(f), new_value, std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
@@ -907,8 +898,8 @@ namespace hpx {
                 "Required at least input iterator.");
 
             hpx::parallel::v1::detail::replace_if<Iter>().call(
-                hpx::execution::sequenced_policy{}, std::true_type{}, first,
-                last, std::forward<Pred>(pred), new_value,
+                hpx::execution::sequenced_policy{}, first, last,
+                std::forward<Pred>(pred), new_value,
                 hpx::parallel::util::projection_identity());
         }
 
@@ -930,11 +921,9 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
             return parallel::util::detail::algorithm_result<ExPolicy>::get(
                 hpx::parallel::v1::detail::replace_if<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), is_seq(), first, last,
+                    std::forward<ExPolicy>(policy), first, last,
                     std::forward<Pred>(pred), new_value,
                     hpx::parallel::util::projection_identity()));
         }
@@ -1017,8 +1006,8 @@ namespace hpx {
             return parallel::util::get_second_element(
                 hpx::parallel::v1::detail::replace_copy_if<
                     hpx::parallel::util::in_out_result<InIter, OutIter>>()
-                    .call(hpx::execution::sequenced_policy{}, std::true_type{},
-                        first, last, dest, std::forward<Pred>(pred), new_value,
+                    .call(hpx::execution::sequenced_policy{}, first, last, dest,
+                        std::forward<Pred>(pred), new_value,
                         hpx::parallel::util::projection_identity()));
         }
 
@@ -1045,13 +1034,11 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Required at least forward iterator.");
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
             return parallel::util::get_second_element(
                 hpx::parallel::v1::detail::replace_copy_if<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
-                        dest, std::forward<Pred>(pred), new_value,
+                    .call(std::forward<ExPolicy>(policy), first, last, dest,
+                        std::forward<Pred>(pred), new_value,
                         hpx::parallel::util::projection_identity()));
         }
     } replace_copy_if{};

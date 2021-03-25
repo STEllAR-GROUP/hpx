@@ -9,84 +9,88 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/modules/errors.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/futures/future.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/result_types.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 
+#if defined(HPX_HAVE_CXX17_STD_EXECUTION_POLICES)
+#include <execution>
+#endif
 #include <string>
 #include <type_traits>
 #include <utility>
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
     struct local_algorithm_result
     {
-        typedef typename hpx::traits::segmented_local_iterator_traits<
-            Result>::local_raw_iterator type;
+        using type = typename hpx::traits::segmented_local_iterator_traits<
+            Result>::local_raw_iterator;
     };
 
     template <typename Result1, typename Result2>
     struct local_algorithm_result<std::pair<Result1, Result2>>
     {
-        typedef typename hpx::traits::segmented_local_iterator_traits<
-            Result1>::local_raw_iterator type1;
-        typedef typename hpx::traits::segmented_local_iterator_traits<
-            Result2>::local_raw_iterator type2;
+        using type1 = typename hpx::traits::segmented_local_iterator_traits<
+            Result1>::local_raw_iterator;
+        using type2 = typename hpx::traits::segmented_local_iterator_traits<
+            Result2>::local_raw_iterator;
 
-        typedef std::pair<type1, type2> type;
+        using type = std::pair<type1, type2>;
     };
 
     template <typename Result1, typename Result2>
     struct local_algorithm_result<util::in_out_result<Result1, Result2>>
     {
-        typedef typename hpx::traits::segmented_local_iterator_traits<
-            Result1>::local_raw_iterator type1;
-        typedef typename hpx::traits::segmented_local_iterator_traits<
-            Result2>::local_raw_iterator type2;
+        using type1 = typename hpx::traits::segmented_local_iterator_traits<
+            Result1>::local_raw_iterator;
+        using type2 = typename hpx::traits::segmented_local_iterator_traits<
+            Result2>::local_raw_iterator;
 
-        typedef util::in_out_result<type1, type2> type;
+        using type = util::in_out_result<type1, type2>;
     };
 
     template <typename Result1, typename Result2, typename Result3>
     struct local_algorithm_result<hpx::tuple<Result1, Result2, Result3>>
     {
-        typedef typename hpx::traits::segmented_local_iterator_traits<
-            Result1>::local_raw_iterator type1;
-        typedef typename hpx::traits::segmented_local_iterator_traits<
-            Result2>::local_raw_iterator type2;
-        typedef typename hpx::traits::segmented_local_iterator_traits<
-            Result3>::local_raw_iterator type3;
+        using type1 = typename hpx::traits::segmented_local_iterator_traits<
+            Result1>::local_raw_iterator;
+        using type2 = typename hpx::traits::segmented_local_iterator_traits<
+            Result2>::local_raw_iterator;
+        using type3 = typename hpx::traits::segmented_local_iterator_traits<
+            Result3>::local_raw_iterator;
 
-        typedef hpx::tuple<type1, type2, type3> type;
+        using type = hpx::tuple<type1, type2, type3>;
     };
 
     template <typename Result1, typename Result2, typename Result3>
     struct local_algorithm_result<
         util::in_in_out_result<Result1, Result2, Result3>>
     {
-        typedef typename hpx::traits::segmented_local_iterator_traits<
-            Result1>::local_raw_iterator type1;
-        typedef typename hpx::traits::segmented_local_iterator_traits<
-            Result2>::local_raw_iterator type2;
-        typedef typename hpx::traits::segmented_local_iterator_traits<
-            Result3>::local_raw_iterator type3;
+        using type1 = typename hpx::traits::segmented_local_iterator_traits<
+            Result1>::local_raw_iterator;
+        using type2 = typename hpx::traits::segmented_local_iterator_traits<
+            Result2>::local_raw_iterator;
+        using type3 = typename hpx::traits::segmented_local_iterator_traits<
+            Result3>::local_raw_iterator;
 
-        typedef util::in_in_out_result<type1, type2, type3> type;
+        using type = util::in_in_out_result<type1, type2, type3>;
     };
 
     template <>
     struct local_algorithm_result<void>
     {
-        typedef void type;
+        using type = void;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -100,9 +104,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
 
     public:
-        typedef Result result_type;
-        typedef typename local_algorithm_result<result_type>::type
-            local_result_type;
+        using result_type = Result;
+        using local_result_type =
+            typename local_algorithm_result<result_type>::type;
 
         explicit algorithm(char const* const name)
           : name_(name)
@@ -110,6 +114,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
 
         ///////////////////////////////////////////////////////////////////////
+        // this equivalent to sequential execution
         template <typename ExPolicy, typename... Args>
         HPX_HOST_DEVICE
             typename parallel::util::detail::algorithm_result<ExPolicy,
@@ -120,10 +125,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             try
             {
 #endif
-                typedef typename std::decay<
-                    ExPolicy>::type::executor_parameters_type parameters_type;
-                typedef typename std::decay<ExPolicy>::type::executor_type
-                    executor_type;
+                using parameters_type = typename std::decay<
+                    ExPolicy>::type::executor_parameters_type;
+                using executor_type =
+                    typename std::decay<ExPolicy>::type::executor_type;
 
                 parallel::util::detail::scoped_executor_parameters_ref<
                     parameters_type, executor_type>
@@ -144,49 +149,31 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 #endif
         }
 
+    protected:
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename... Args>
-        typename parallel::util::detail::algorithm_result<ExPolicy,
+        constexpr typename parallel::util::detail::algorithm_result<ExPolicy,
             local_result_type>::type
         call_execute(ExPolicy&& policy, std::false_type, Args&&... args) const
         {
-            return parallel::util::detail::algorithm_result<ExPolicy,
-                local_result_type>::get(execution::sync_execute(policy
-                                                                    .executor(),
+            using result = parallel::util::detail::algorithm_result<ExPolicy,
+                local_result_type>;
+
+            return result::get(execution::sync_execute(policy.executor(),
                 derived(), std::forward<ExPolicy>(policy),
                 std::forward<Args>(args)...));
         }
 
         template <typename ExPolicy, typename... Args>
-        typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        call_execute(ExPolicy&& policy, std::true_type, Args&&... args) const
+        constexpr
+            typename parallel::util::detail::algorithm_result<ExPolicy>::type
+            call_execute(
+                ExPolicy&& policy, std::true_type, Args&&... args) const
         {
             execution::sync_execute(policy.executor(), derived(),
                 std::forward<ExPolicy>(policy), std::forward<Args>(args)...);
 
             return parallel::util::detail::algorithm_result<ExPolicy>::get();
-        }
-
-        template <typename ExPolicy, typename... Args>
-        typename parallel::util::detail::algorithm_result<ExPolicy,
-            local_result_type>::type
-        call(ExPolicy&& policy, std::true_type, Args&&... args) const
-        {
-            try
-            {
-                typedef std::is_void<local_result_type> is_void;
-                return call_execute(std::forward<ExPolicy>(policy), is_void(),
-                    std::forward<Args>(args)...);
-            }
-            catch (std::bad_alloc const& ba)
-            {
-                throw ba;
-            }
-            catch (...)
-            {
-                return detail::handle_exception<ExPolicy,
-                    local_result_type>::call();
-            }
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -217,178 +204,119 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             }
         }
 
-        template <typename... Args>
-        typename parallel::util::detail::algorithm_result<
-            hpx::execution::sequenced_task_policy, local_result_type>::type
-        call(hpx::execution::sequenced_task_policy policy, std::true_type,
-            Args&&... args) const
-        {
-            return call_sequential(policy, std::forward<Args>(args)...);
-        }
-
-        template <typename Executor, typename Parameters, typename... Args>
-        typename parallel::util::detail::algorithm_result<
-            hpx::execution::sequenced_task_policy_shim<Executor, Parameters>,
-            local_result_type>::type
-        call(hpx::execution::sequenced_task_policy_shim<Executor, Parameters>&
-                 policy,
-            std::true_type, Args&&... args) const
-        {
-            return call_sequential(policy, std::forward<Args>(args)...);
-        }
-
-        template <typename Executor, typename Parameters, typename... Args>
-        typename parallel::util::detail::algorithm_result<
-            hpx::execution::sequenced_task_policy_shim<Executor, Parameters>,
-            local_result_type>::type
-        call(hpx::execution::sequenced_task_policy_shim<Executor, Parameters>&&
-                 policy,
-            std::true_type, Args&&... args) const
-        {
-            return call_sequential(policy, std::forward<Args>(args)...);
-        }
-
-        template <typename Executor, typename Parameters, typename... Args>
-        typename parallel::util::detail::algorithm_result<
-            hpx::execution::sequenced_task_policy_shim<Executor, Parameters>,
-            local_result_type>::type
-        call(hpx::execution::sequenced_task_policy_shim<Executor,
-                 Parameters> const& policy,
-            std::true_type, Args&&... args) const
-        {
-            return call_sequential(policy, std::forward<Args>(args)...);
-        }
-
-#if defined(HPX_HAVE_DATAPAR)
-        template <typename... Args>
-        typename parallel::util::detail::algorithm_result<
-            hpx::execution::dataseq_task_policy, local_result_type>::type
-        call(hpx::execution::dataseq_task_policy policy, std::true_type,
-            Args&&... args) const
-        {
-            return call_sequential(policy, std::forward<Args>(args)...);
-        }
-
-        template <typename Executor, typename Parameters, typename... Args>
-        typename parallel::util::detail::algorithm_result<
-            hpx::execution::dataseq_task_policy_shim<Executor, Parameters>,
-            local_result_type>::type
-        call(hpx::execution::dataseq_task_policy_shim<Executor, Parameters>&
-                 policy,
-            std::true_type, Args&&... args) const
-        {
-            return call_sequential(policy, std::forward<Args>(args)...);
-        }
-
-        template <typename Executor, typename Parameters, typename... Args>
-        typename parallel::util::detail::algorithm_result<
-            hpx::execution::dataseq_task_policy_shim<Executor, Parameters>,
-            local_result_type>::type
-        call(hpx::execution::dataseq_task_policy_shim<Executor, Parameters>&&
-                 policy,
-            std::true_type, Args&&... args) const
-        {
-            return call_sequential(policy, std::forward<Args>(args)...);
-        }
-
-        template <typename Executor, typename Parameters, typename... Args>
-        typename parallel::util::detail::algorithm_result<
-            hpx::execution::dataseq_task_policy_shim<Executor, Parameters>,
-            local_result_type>::type
-        call(hpx::execution::dataseq_task_policy_shim<Executor,
-                 Parameters> const& policy,
-            std::true_type, Args&&... args) const
-        {
-            return call_sequential(policy, std::forward<Args>(args)...);
-        }
-#endif
-
+    public:
         ///////////////////////////////////////////////////////////////////////
-        template <typename... Args>
-        typename parallel::util::detail::algorithm_result<
-            hpx::execution::parallel_task_policy, local_result_type>::type
-        call(hpx::execution::parallel_task_policy policy, std::true_type,
-            Args&&... args) const
-        {
-            return call_sequential(policy, std::forward<Args>(args)...);
-        }
+        // main sequential dispatch entry points
 
-        template <typename Executor, typename Parameters, typename... Args>
-        typename parallel::util::detail::algorithm_result<
-            hpx::execution::parallel_task_policy_shim<Executor, Parameters>,
+        // specialization for all task-based (asynchronous) execution policies
+        // clang-format off
+        template <typename ExPolicy, typename... Args,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_async_execution_policy_v<std::decay_t<ExPolicy>>
+            )>
+        // clang-format on
+        constexpr typename parallel::util::detail::algorithm_result<ExPolicy,
             local_result_type>::type
-        call(hpx::execution::parallel_task_policy_shim<Executor, Parameters>&
-                 policy,
-            std::true_type, Args&&... args) const
+        call2(ExPolicy&& policy, std::true_type, Args&&... args) const
         {
-            return call_sequential(policy, std::forward<Args>(args)...);
+            return call_sequential(
+                std::forward<ExPolicy>(policy), std::forward<Args>(args)...);
         }
 
-        template <typename Executor, typename Parameters, typename... Args>
-        typename parallel::util::detail::algorithm_result<
-            hpx::execution::parallel_task_policy_shim<Executor, Parameters>,
-            local_result_type>::type
-        call(hpx::execution::parallel_task_policy_shim<Executor, Parameters>&&
-                 policy,
-            std::true_type, Args&&... args) const
-        {
-            return call_sequential(policy, std::forward<Args>(args)...);
-        }
-
-        template <typename Executor, typename Parameters, typename... Args>
-        typename parallel::util::detail::algorithm_result<
-            hpx::execution::parallel_task_policy_shim<Executor, Parameters>,
-            local_result_type>::type
-        call(hpx::execution::parallel_task_policy_shim<Executor,
-                 Parameters> const& policy,
-            std::true_type, Args&&... args) const
-        {
-            return call_sequential(policy, std::forward<Args>(args)...);
-        }
-
-#if defined(HPX_HAVE_DATAPAR)
-        template <typename Executor, typename Parameters, typename... Args>
-        typename parallel::util::detail::algorithm_result<
-            hpx::execution::datapar_task_policy_shim<Executor, Parameters>,
-            local_result_type>::type
-        call(hpx::execution::datapar_task_policy_shim<Executor, Parameters>&
-                 policy,
-            std::true_type, Args&&... args) const
-        {
-            return call_sequential(policy, std::forward<Args>(args)...);
-        }
-
-        template <typename Executor, typename Parameters, typename... Args>
-        typename parallel::util::detail::algorithm_result<
-            hpx::execution::datapar_task_policy_shim<Executor, Parameters>,
-            local_result_type>::type
-        call(hpx::execution::datapar_task_policy_shim<Executor, Parameters>&&
-                 policy,
-            std::true_type, Args&&... args) const
-        {
-            return call_sequential(policy, std::forward<Args>(args)...);
-        }
-
-        template <typename Executor, typename Parameters, typename... Args>
-        typename parallel::util::detail::algorithm_result<
-            hpx::execution::datapar_task_policy_shim<Executor, Parameters>,
-            local_result_type>::type
-        call(hpx::execution::datapar_task_policy_shim<Executor,
-                 Parameters> const& policy,
-            std::true_type, Args&&... args) const
-        {
-            return call_sequential(policy, std::forward<Args>(args)...);
-        }
-#endif
-
-        template <typename ExPolicy, typename... Args>
+        // clang-format off
+        template <typename ExPolicy, typename... Args,
+            HPX_CONCEPT_REQUIRES_(
+                !hpx::is_async_execution_policy_v<std::decay_t<ExPolicy>>
+            )>
+        // clang-format on
         typename parallel::util::detail::algorithm_result<ExPolicy,
             local_result_type>::type
-        call(ExPolicy&& policy, std::false_type, Args&&... args) const
+        call2(ExPolicy&& policy, std::true_type, Args&&... args) const
+        {
+            try
+            {
+                using is_void = std::is_void<local_result_type>;
+                return call_execute(std::forward<ExPolicy>(policy), is_void(),
+                    std::forward<Args>(args)...);
+            }
+            catch (std::bad_alloc const& ba)
+            {
+                throw ba;
+            }
+            catch (...)
+            {
+                return detail::handle_exception<ExPolicy,
+                    local_result_type>::call();
+            }
+        }
+
+        // main parallel dispatch entry point
+        template <typename ExPolicy, typename... Args>
+        static constexpr
+            typename parallel::util::detail::algorithm_result<ExPolicy,
+                local_result_type>::type
+            call2(ExPolicy&& policy, std::false_type, Args&&... args)
         {
             return Derived::parallel(
                 std::forward<ExPolicy>(policy), std::forward<Args>(args)...);
         }
+
+        template <typename ExPolicy, typename... Args>
+        HPX_FORCEINLINE constexpr
+            typename parallel::util::detail::algorithm_result<ExPolicy,
+                local_result_type>::type
+            call(ExPolicy&& policy, Args&&... args)
+        {
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+            return call2(std::forward<ExPolicy>(policy), is_seq(),
+                std::forward<Args>(args)...);
+        }
+
+#if defined(HPX_HAVE_CXX17_STD_EXECUTION_POLICES)
+        // main dispatch entry points for std execution policies
+        template <typename... Args>
+        HPX_FORCEINLINE constexpr
+            typename parallel::util::detail::algorithm_result<
+                hpx::execution::sequenced_policy, local_result_type>::type
+            call(std::execution::sequenced_policy, Args&&... args)
+        {
+            return call2(hpx::execution::seq, std::true_type(),
+                std::forward<Args>(args)...);
+        }
+
+        template <typename... Args>
+        HPX_FORCEINLINE constexpr
+            typename parallel::util::detail::algorithm_result<
+                hpx::execution::parallel_policy, local_result_type>::type
+            call(std::execution::parallel_policy, Args&&... args)
+        {
+            return call2(hpx::execution::par, std::false_type(),
+                std::forward<Args>(args)...);
+        }
+
+        template <typename... Args>
+        HPX_FORCEINLINE constexpr
+            typename parallel::util::detail::algorithm_result<
+                hpx::execution::parallel_unsequenced_policy,
+                local_result_type>::type
+            call(std::execution::parallel_unsequenced_policy, Args&&... args)
+        {
+            return call2(hpx::execution::par_unseq, std::false_type(),
+                std::forward<Args>(args)...);
+        }
+
+#if defined(HPX_HAVE_CXX20_STD_EXECUTION_POLICES)
+        template <typename... Args>
+        HPX_FORCEINLINE constexpr
+            typename parallel::util::detail::algorithm_result<
+                hpx::execution::unsequenced_policy, local_result_type>::type
+            call(std::execution::unsequenced_policy, Args&&... args)
+        {
+            return call2(hpx::execution::unseq, std::false_type(),
+                std::forward<Args>(args)...);
+        }
+#endif
+#endif
 
     private:
         char const* const name_;
