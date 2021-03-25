@@ -232,8 +232,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 operator()(Iter part_begin, std::size_t part_size)
             {
                 typename std::iterator_traits<Iter>::difference_type ret = 0;
-                util::loop_n<execution_policy_type>(part_begin, part_size,
-                    hpx::util::bind_back(*this, std::ref(ret)));
+                util::detail::loop_n<execution_policy_type>(part_begin,
+                    part_size, hpx::util::bind_back(*this, std::ref(ret)));
                 return ret;
             }
 

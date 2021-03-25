@@ -153,7 +153,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     T val = curr.get();
                     FwdIter2 dst = get<1>(part_begin.get_iterator_tuple());
 
-                    util::loop_n<std::decay_t<ExPolicy>>(
+                    util::detail::loop_n<std::decay_t<ExPolicy>>(
                         dst, part_size, [&op, &val](FwdIter2 it) -> void {
                             *it = hpx::util::invoke(op, val, *it);
                         });

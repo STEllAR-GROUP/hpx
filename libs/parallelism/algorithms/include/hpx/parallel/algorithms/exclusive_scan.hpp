@@ -130,7 +130,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     *dst++ = val;
 
                     // MSVC 2015 fails if op is captured by reference
-                    util::loop_n<std::decay_t<ExPolicy>>(
+                    util::detail::loop_n<std::decay_t<ExPolicy>>(
                         dst, part_size - 1, [=, &val](FwdIter2 it) {
                             *it = hpx::util::invoke(op, val, *it);
                         });

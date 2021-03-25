@@ -94,8 +94,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         if (part_size > 1)
                         {
                             // MSVC complains if 'op' is captured by reference
-                            util::loop_n<execution_policy_type>(part_begin + 1,
-                                part_size - 1,
+                            util::detail::loop_n<execution_policy_type>(
+                                part_begin + 1, part_size - 1,
                                 [&ret, op, conv](FwdIter const& curr) {
                                     ret = hpx::util::invoke(op, ret,
                                         hpx::util::invoke(conv, *curr));
@@ -108,7 +108,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         if (results.size() > 1)
                         {
                             // MSVC complains if 'op' is captured by reference
-                            util::loop_n<execution_policy_type>(
+                            util::detail::loop_n<execution_policy_type>(
                                 results.begin() + 1, results.size() - 1,
                                 [&ret, op](
                                     typename std::vector<T>::iterator const&

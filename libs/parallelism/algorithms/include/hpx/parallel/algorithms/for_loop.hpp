@@ -918,7 +918,7 @@ namespace hpx {
                             hpx::traits::is_random_access_iterator<B>::value ||
                                 std::is_integral<B>::value>;
 
-                        parallel::util::detail::loop_n<B>::call(
+                        parallel::util::detail::loop_n_helper::call(
                             part_begin, part_steps, f_, pred());
                     }
                     else if (stride_ > 0)
@@ -985,7 +985,7 @@ namespace hpx {
                                 InIter>::value ||
                                 std::is_integral<InIter>::value>;
 
-                        parallel::util::detail::loop_n<InIter>::call(
+                        parallel::util::detail::loop_n_helper::call(
                             first, count, std::forward<F>(f), pred());
                     }
                     else if (stride > 0)

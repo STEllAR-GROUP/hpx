@@ -192,8 +192,7 @@ namespace hpx { namespace parallel { namespace util {
 
         // Helper class to repeatedly call a function a given number of times
         // starting from a given iterator position.
-        template <typename Iterator>
-        struct loop_n
+        struct loop_n_helper
         {
             ///////////////////////////////////////////////////////////////////
             // handle sequences of non-futures
@@ -324,6 +323,62 @@ namespace hpx { namespace parallel { namespace util {
         };
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename ExPolicy>
+        struct loop_n_t final
+          : hpx::functional::tag_fallback<loop_n_t<ExPolicy>>
+        {
+        private:
+            template <typename Iter, typename F>
+            friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
+            tag_fallback_invoke(hpx::parallel::util::detail::loop_n_t<ExPolicy>,
+                Iter it, std::size_t count, F&& f)
+            {
+                using pred = std::integral_constant<bool,
+                    hpx::traits::is_random_access_iterator<Iter>::value ||
+                        std::is_integral<Iter>::value>;
+
+                return detail::loop_n_helper::call(
+                    it, count, std::forward<F>(f), pred());
+            }
+
+            template <typename Iter, typename CancelToken, typename F>
+            friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
+            tag_fallback_invoke(hpx::parallel::util::detail::loop_n_t<ExPolicy>,
+                Iter it, std::size_t count, CancelToken& tok, F&& f)
+            {
+                using pred = std::integral_constant<bool,
+                    hpx::traits::is_random_access_iterator<Iter>::value ||
+                        std::is_integral<Iter>::value>;
+
+                return detail::loop_n_helper::call(
+                    it, count, tok, std::forward<F>(f), pred());
+            }
+        };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        template <typename ExPolicy>
+        HPX_INLINE_CONSTEXPR_VARIABLE loop_n_t<ExPolicy> loop_n =
+            loop_n_t<ExPolicy>{};
+#else
+        template <typename ExPolicy, typename Iter, typename F>
+        HPX_DEVICE HPX_FORCEINLINE constexpr Iter loop_n(
+            Iter it, std::size_t count, F&& f)
+        {
+            return hpx::parallel::util::detail::loop_n_t<ExPolicy>{}(
+                it, count, std::forward<F>(f));
+        }
+
+        template <typename ExPolicy, typename Iter, typename CancelToken,
+            typename F>
+        HPX_DEVICE HPX_FORCEINLINE constexpr Iter loop_n(
+            Iter it, std::size_t count, CancelToken& tok, F&& f)
+        {
+            return hpx::parallel::util::detail::loop_n_t<ExPolicy>{}(
+                it, count, tok, std::forward<F>(f));
+        }
+#endif
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
             !hpx::is_vectorpack_execution_policy<ExPolicy>::value,
@@ -350,70 +405,11 @@ namespace hpx { namespace parallel { namespace util {
             return HPX_INVOKE(
                 std::forward<F>(f), std::forward<T1>(init), std::forward<T>(v));
         }
-    }    // namespace detail
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
-    struct loop_n_t final : hpx::functional::tag_fallback<loop_n_t<ExPolicy>>
-    {
-    private:
-        template <typename Iter, typename F>
-        friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
-        tag_fallback_invoke(hpx::parallel::util::loop_n_t<ExPolicy>, Iter it,
-            std::size_t count, F&& f)
-        {
-            using pred = std::integral_constant<bool,
-                hpx::traits::is_random_access_iterator<Iter>::value ||
-                    std::is_integral<Iter>::value>;
-
-            return detail::loop_n<Iter>::call(
-                it, count, std::forward<F>(f), pred());
-        }
-
-        template <typename Iter, typename CancelToken, typename F>
-        friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
-        tag_fallback_invoke(hpx::parallel::util::loop_n_t<ExPolicy>, Iter it,
-            std::size_t count, CancelToken& tok, F&& f)
-        {
-            using pred = std::integral_constant<bool,
-                hpx::traits::is_random_access_iterator<Iter>::value ||
-                    std::is_integral<Iter>::value>;
-
-            return detail::loop_n<Iter>::call(
-                it, count, tok, std::forward<F>(f), pred());
-        }
-    };
-
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE loop_n_t<ExPolicy> loop_n =
-        loop_n_t<ExPolicy>{};
-#else
-    template <typename ExPolicy, typename Iter, typename F>
-    HPX_DEVICE HPX_FORCEINLINE constexpr Iter loop_n(
-        Iter it, std::size_t count, F&& f)
-    {
-        return hpx::parallel::util::loop_n_t<ExPolicy>{}(
-            it, count, std::forward<F>(f));
-    }
-
-    template <typename ExPolicy, typename Iter, typename CancelToken,
-        typename F>
-    HPX_DEVICE HPX_FORCEINLINE constexpr Iter loop_n(
-        Iter it, std::size_t count, CancelToken& tok, F&& f)
-    {
-        return hpx::parallel::util::loop_n_t<ExPolicy>{}(
-            it, count, tok, std::forward<F>(f));
-    }
-#endif
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail {
+        ///////////////////////////////////////////////////////////////////////
         // Helper class to repeatedly call a function a given number of times
         // starting from a given iterator position.
-
-        template <typename Iterator>
-        struct loop_n_ind
+        struct loop_n_ind_helper
         {
             ///////////////////////////////////////////////////////////////////
             // handle sequences of non-futures
@@ -543,67 +539,66 @@ namespace hpx { namespace parallel { namespace util {
                 return it + num;
             }
         };
-    }    // namespace detail
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
-    struct loop_n_ind_t final
-      : hpx::functional::tag_fallback<loop_n_ind_t<ExPolicy>>
-    {
-    private:
-        template <typename Iter, typename F>
-        friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
-        tag_fallback_invoke(hpx::parallel::util::loop_n_ind_t<ExPolicy>,
-            Iter it, std::size_t count, F&& f)
+        ///////////////////////////////////////////////////////////////////////
+        template <typename ExPolicy>
+        struct loop_n_ind_t final
+          : hpx::functional::tag_fallback<loop_n_ind_t<ExPolicy>>
         {
-            using pred = std::integral_constant<bool,
-                hpx::traits::is_random_access_iterator<Iter>::value ||
-                    std::is_integral<Iter>::value>;
+        private:
+            template <typename Iter, typename F>
+            friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
+            tag_fallback_invoke(
+                hpx::parallel::util::detail::loop_n_ind_t<ExPolicy>, Iter it,
+                std::size_t count, F&& f)
+            {
+                using pred = std::integral_constant<bool,
+                    hpx::traits::is_random_access_iterator<Iter>::value ||
+                        std::is_integral<Iter>::value>;
 
-            return detail::loop_n_ind<Iter>::call(
-                it, count, std::forward<F>(f), pred());
-        }
+                return loop_n_ind_helper::call(
+                    it, count, std::forward<F>(f), pred());
+            }
 
-        template <typename Iter, typename CancelToken, typename F>
-        friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
-        tag_fallback_invoke(hpx::parallel::util::loop_n_ind_t<ExPolicy>,
-            Iter it, std::size_t count, CancelToken& tok, F&& f)
-        {
-            using pred = std::integral_constant<bool,
-                hpx::traits::is_random_access_iterator<Iter>::value ||
-                    std::is_integral<Iter>::value>;
+            template <typename Iter, typename CancelToken, typename F>
+            friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
+            tag_fallback_invoke(
+                hpx::parallel::util::detail::loop_n_ind_t<ExPolicy>, Iter it,
+                std::size_t count, CancelToken& tok, F&& f)
+            {
+                using pred = std::integral_constant<bool,
+                    hpx::traits::is_random_access_iterator<Iter>::value ||
+                        std::is_integral<Iter>::value>;
 
-            return detail::loop_n_ind<Iter>::call(
-                it, count, tok, std::forward<F>(f), pred());
-        }
-    };
+                return loop_n_ind_helper::call(
+                    it, count, tok, std::forward<F>(f), pred());
+            }
+        };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE loop_n_ind_t<ExPolicy> loop_n_ind =
-        loop_n_ind_t<ExPolicy>{};
+        template <typename ExPolicy>
+        HPX_INLINE_CONSTEXPR_VARIABLE loop_n_ind_t<ExPolicy> loop_n_ind =
+            loop_n_ind_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename Iter, typename F>
-    HPX_DEVICE HPX_FORCEINLINE constexpr Iter loop_n_ind(
-        Iter it, std::size_t count, F&& f)
-    {
-        return hpx::parallel::util::loop_n_ind_t<ExPolicy>{}(
-            it, count, std::forward<F>(f));
-    }
+        template <typename ExPolicy, typename Iter, typename F>
+        HPX_DEVICE HPX_FORCEINLINE constexpr Iter loop_n_ind(
+            Iter it, std::size_t count, F&& f)
+        {
+            return hpx::parallel::util::detail::loop_n_ind_t<ExPolicy>{}(
+                it, count, std::forward<F>(f));
+        }
 
-    template <typename ExPolicy, typename Iter, typename CancelToken,
-        typename F>
-    HPX_DEVICE HPX_FORCEINLINE constexpr Iter loop_n_ind(
-        Iter it, std::size_t count, CancelToken& tok, F&& f)
-    {
-        return hpx::parallel::util::loop_n_ind_t<ExPolicy>{}(
-            it, count, tok, std::forward<F>(f));
-    }
+        template <typename ExPolicy, typename Iter, typename CancelToken,
+            typename F>
+        HPX_DEVICE HPX_FORCEINLINE constexpr Iter loop_n_ind(
+            Iter it, std::size_t count, CancelToken& tok, F&& f)
+        {
+            return hpx::parallel::util::detail::loop_n_ind_t<ExPolicy>{}(
+                it, count, tok, std::forward<F>(f));
+        }
 #endif
 
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail {
-
+        ///////////////////////////////////////////////////////////////////////
         // Helper class to repeatedly call a function a given number of times
         // starting from a given iterator position. If an exception is thrown,
         // the given cleanup function will be called.
