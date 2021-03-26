@@ -304,7 +304,7 @@ namespace hpx { namespace util {
 
     template <typename Range>
     detail::format_join<Range> format_join(
-        Range const& range, boost::string_ref delimiter = "") noexcept
+        Range const& range, boost::string_ref delimiter) noexcept
     {
         return {range, delimiter};
     }
