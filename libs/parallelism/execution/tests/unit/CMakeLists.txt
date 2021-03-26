@@ -5,12 +5,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    algorithm_just
-    algorithm_just_on
-    algorithm_on
-    algorithm_sync_wait
-    algorithm_transform
-    algorithm_when_all
     bulk_async
     created_executor
     executor_parameters
@@ -27,6 +21,19 @@ set(tests
     shared_parallel_executor
     standalone_thread_pool_executor
 )
+
+if(HPX_CXX_STANDARD GREATER_EQUAL 17)
+  list(
+    APPEND
+    tests
+    algorithm_just
+    algorithm_just_on
+    algorithm_on
+    algorithm_sync_wait
+    algorithm_transform
+    algorithm_when_all
+  )
+endif()
 
 set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 
