@@ -1046,7 +1046,12 @@ namespace hpx { namespace components { namespace server {
 
             // secondary command line handling, looking for --exit and other
             // options
-            std::string cmd_line(ini.get_entry("hpx.cmd_line", ""));
+            std::string cmd_line =
+                ini.get_entry("hpx.commandline.command", "") + " " +
+                ini.get_entry("hpx.commandline.prepend_options", "") +
+                ini.get_entry("hpx.commandline.options", "") +
+                ini.get_entry("hpx.commandline.config_options", "");
+
             if (!cmd_line.empty())
             {
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
@@ -1067,10 +1072,14 @@ namespace hpx { namespace components { namespace server {
 
 #if defined(HPX_HAVE_NETWORKING)
                 if (vm.count("hpx:list-parcel-ports"))
+                {
                     detail::handle_list_parcelports();
+                }
 #endif
                 if (vm.count("hpx:exit"))
+                {
                     return 1;
+                }
             }
         }
         catch (std::exception const& e)

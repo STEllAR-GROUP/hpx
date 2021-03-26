@@ -36,5 +36,5 @@ add_hpx_module(
   DEPENDENCIES hpx_core hpx_parallelism
   MODULE_DEPENDENCIES hpx_batch_environments hpx_program_options
                       hpx_runtime_configuration ${MPI_DEPS}
-  CMAKE_SUBDIRS
+  CMAKE_SUBDIRS tests
 )
