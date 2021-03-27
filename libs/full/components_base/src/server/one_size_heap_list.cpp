@@ -31,14 +31,14 @@ namespace hpx { namespace util {
     one_size_heap_list::~one_size_heap_list() noexcept
     {
 #if defined(HPX_DEBUG)
-        LOSH_(info) << hpx::util::format(
+        LOSH_(info).format(
             "{1}::~{1}: size({2}), max_count({3}), alloc_count({4}), "
             "free_count({5})",
             name(), heap_count_, max_alloc_count_, alloc_count_, free_count_);
 
         if (alloc_count_ > free_count_)
         {
-            LOSH_(warning) << hpx::util::format(
+            LOSH_(warning).format(
                 "{1}::~{1}: releasing with {2} allocated objects", name(),
                 alloc_count_ - free_count_);
         }
@@ -81,7 +81,7 @@ namespace hpx { namespace util {
                     }
 
 #if defined(HPX_DEBUG)
-                    LOSH_(info) << hpx::util::format(
+                    LOSH_(info).format(
                         "{1}::alloc: failed to allocate from heap[{2}] "
                         "(heap[{2}] has allocated {3} objects and has "
                         "space for {4} more objects)",
@@ -124,7 +124,7 @@ namespace hpx { namespace util {
             alloc_count_ += count;
             ++heap_count_;
 
-            LOSH_(info) << hpx::util::format(
+            LOSH_(info).format(
                 "{1}::alloc: creating new heap[{2}], size is now {3}", name(),
                 heap_count_, heap_list_.size());
 #endif

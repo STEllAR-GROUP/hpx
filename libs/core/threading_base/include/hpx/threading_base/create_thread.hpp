@@ -87,13 +87,13 @@ namespace hpx { namespace threads { namespace detail {
         scheduler->create_thread(data, &id, ec);
 
         // NOLINTNEXTLINE(bugprone-branch-clone)
-        LTM_(info) << "register_thread(" << id << "): initial_state("
-                   << get_thread_state_name(data.initial_state) << "), "
-                   << "run_now(" << (data.run_now ? "true" : "false")
+        LTM_(info)
+            .format("register_thread({}): initial_state({}), run_now({})", id,
+                get_thread_state_name(data.initial_state), data.run_now)
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-                   << "), description(" << data.description
+            .format(", description({})", data.description)
 #endif
-                   << ")";
+            ;
 
         // NOTE: Don't care if the hint is a NUMA hint, just want to wake up a
         // thread.

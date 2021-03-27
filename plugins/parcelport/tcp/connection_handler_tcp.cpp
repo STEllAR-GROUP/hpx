@@ -326,9 +326,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         if (e != asio::error::operation_aborted && e != asio::error::eof)
         {
-            LPT_(error)
-                << "handle read operation completion: error: "
-                << e.message();
+            LPT_(error).format(
+                "handle read operation completion: error: {}", e.message());
         }
 
         //if (!compat_error_code::equal(e, asio::error::eof))

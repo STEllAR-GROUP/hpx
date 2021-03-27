@@ -133,9 +133,8 @@ namespace hpx { namespace agas { namespace server {
         {
             l.unlock();
 
-            LAGAS_(info) << hpx::util::format(
-                "primary_namespace::begin_migration, "
-                "gid({1}), response(no_success)",
+            LAGAS_(info).format("primary_namespace::begin_migration, gid({1}), "
+                                "response(no_success)",
                 id);
 
             return std::make_pair(naming::invalid_id, naming::address());
@@ -307,7 +306,7 @@ namespace hpx { namespace agas { namespace server {
 
                 l.unlock();
 
-                LAGAS_(info) << hpx::util::format(
+                LAGAS_(info).format(
                     "primary_namespace::bind_gid, gid({1}), gva({2}), "
                     "locality({3}), response(repeated_request)",
                     id, g, locality);
@@ -354,9 +353,9 @@ namespace hpx { namespace agas { namespace server {
         if (naming::refers_to_local_lva(gid) &&
             !naming::refers_to_virtual_memory(gid))
         {
-            LAGAS_(info) << hpx::util::format(
-                "primary_namespace::bind_gid, "
-                "gid({1}), gva({2}), locality({3})",
+            LAGAS_(info).format(
+                "primary_namespace::bind_gid, gid({1}), gva({2}), "
+                "locality({3})",
                 gid, g, locality);
 
             return true;
@@ -397,9 +396,8 @@ namespace hpx { namespace agas { namespace server {
 
         l.unlock();
 
-        LAGAS_(info) << hpx::util::format(
-            "primary_namespace::bind_gid, gid({1}), gva({2}), "
-            "locality({3})",
+        LAGAS_(info).format(
+            "primary_namespace::bind_gid, gid({1}), gva({2}), locality({3})",
             id, g, locality);
 
         return true;
@@ -431,17 +429,17 @@ namespace hpx { namespace agas { namespace server {
 
         if (get<0>(r) == naming::invalid_gid)
         {
-            LAGAS_(info) << hpx::util::format("primary_namespace::resolve_gid, "
-                                              "gid({1}), response(no_success)",
+            LAGAS_(info).format("primary_namespace::resolve_gid, gid({1}), "
+                                "response(no_success)",
                 id);
 
             return resolved_type(
                 naming::invalid_gid, gva(), naming::invalid_gid);
         }
 
-        LAGAS_(info) << hpx::util::format(
-            "primary_namespace::resolve_gid, gid({1}), base({2}), "
-            "gva({3}), locality_id({4})",
+        LAGAS_(info).format(
+            "primary_namespace::resolve_gid, gid({1}), base({2}), gva({3}), "
+            "locality_id({4})",
             id, get<0>(r), get<1>(r), get<2>(r));
 
         return r;
@@ -482,9 +480,9 @@ namespace hpx { namespace agas { namespace server {
             gvas_.erase(it);
 
             l.unlock();
-            LAGAS_(info) << hpx::util::format("primary_namespace::unbind_gid, "
-                                              "gid({1}), count({2}), gva({3}), "
-                                              "locality_id({4})",
+            LAGAS_(info).format(
+                "primary_namespace::unbind_gid, gid({1}), count({2}), "
+                "gva({3}), locality_id({4})",
                 id, count, data.first, data.second);
 
             gva g = data.first;
@@ -500,9 +498,9 @@ namespace hpx { namespace agas { namespace server {
                 naming::detail::get_component_type_from_gid(id.get_msb()), 0,
                 id.get_lsb());
 
-            LAGAS_(info) << hpx::util::format("primary_namespace::unbind_gid, "
-                                              "gid({1}), count({2}), gva({3}), "
-                                              "locality({4})",
+            LAGAS_(info).format(
+                "primary_namespace::unbind_gid, gid({1}), count({2}), "
+                "gva({3}), locality({4})",
                 id, count, g, g.prefix);
 
             return naming::address(g.prefix, g.type, g.lva());
@@ -510,7 +508,7 @@ namespace hpx { namespace agas { namespace server {
 
         l.unlock();
 
-        LAGAS_(info) << hpx::util::format(
+        LAGAS_(info).format(
             "primary_namespace::unbind_gid, gid({1}), count({2}), "
             "response(no_success)",
             id, count);
@@ -606,10 +604,9 @@ namespace hpx { namespace agas { namespace server {
         // REVIEW: Should this be an error?
         if (0 == count)
         {
-            LAGAS_(info) << hpx::util::format(
-                "primary_namespace::allocate, count({1}), "
-                "lower({1}), upper({3}), prefix({4}), "
-                "response(repeated_request)",
+            LAGAS_(info).format(
+                "primary_namespace::allocate, count({1}), lower({1}), "
+                "upper({3}), prefix({4}), response(repeated_request)",
                 count, next_id_, next_id_,
                 naming::get_locality_id_from_gid(next_id_));
 
@@ -648,9 +645,9 @@ namespace hpx { namespace agas { namespace server {
         naming::detail::set_credit_for_gid(
             upper, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
 
-        LAGAS_(info) << hpx::util::format(
-            "primary_namespace::allocate, count({1}), "
-            "lower({2}), upper({3}), response(success)",
+        LAGAS_(info).format(
+            "primary_namespace::allocate, count({1}), lower({2}), upper({3}), "
+            "response(success)",
             count, lower, upper);
 
         return std::make_pair(lower, upper);
@@ -755,7 +752,7 @@ namespace hpx { namespace agas { namespace server {
                 it->second += credits;
             }
 
-            LAGAS_(info) << hpx::util::format(
+            LAGAS_(info).format(
                 "primary_namespace::increment, raw({1}), refcnt({2})", lower,
                 it->second);
         }
@@ -835,7 +832,7 @@ namespace hpx { namespace agas { namespace server {
                 return;
             }
 
-            LAGAS_(info) << hpx::util::format(
+            LAGAS_(info).format(
                 "primary_namespace::resolve_free_list, resolved match, "
                 "gid({1}), gva({2})",
                 gid, g);
@@ -857,7 +854,7 @@ namespace hpx { namespace agas { namespace server {
         free_entry_list_type& free_entry_list, naming::gid_type const& lower,
         naming::gid_type const& upper, std::int64_t credits, error_code& ec)
     {    // {{{ decrement_sweep implementation
-        LAGAS_(info) << hpx::util::format(
+        LAGAS_(info).format(
             "primary_namespace::decrement_sweep, lower({1}), upper({2}), "
             "credits({3})",
             lower, upper, credits);
@@ -985,21 +982,17 @@ namespace hpx { namespace agas { namespace server {
             if (HPX_UNLIKELY(!threads::threadmanager_is(state_running)) &&
                 e.locality_ != locality_)
             {
-                LAGAS_(info) << hpx::util::format(
-                    "primary_namespace::free_components_sync, cancelling "
-                    "free "
-                    "operation because the threadmanager is down, "
-                    "lower({1}), "
+                LAGAS_(info).format(
+                    "primary_namespace::free_components_sync, cancelling free "
+                    "operation because the threadmanager is down, lower({1}), "
                     "upper({2}), base({3}), gva({4}), locality({5})",
                     lower, upper, e.gid_, e.gva_, e.locality_);
                 continue;
             }
 
-            LAGAS_(info) << hpx::util::format(
-                "primary_namespace::free_components_"
-                "sync, freeing component, "
-                "lower({1}), upper({2}), base({3}), "
-                "gva({4}), locality({5})",
+            LAGAS_(info).format(
+                "primary_namespace::free_components_sync, freeing component, "
+                "lower({1}), upper({2}), base({3}), gva({4}), locality({5})",
                 lower, upper, e.gid_, e.gva_, e.locality_);
 
             // Destroy the component.

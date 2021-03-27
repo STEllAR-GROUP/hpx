@@ -530,8 +530,8 @@ namespace hpx { namespace components { namespace server {
             return;
         }
 
-        LRT_(info) << "runtime_support::shutdown_all: "
-                      "initializing application shutdown";
+        LRT_(info).format(
+            "runtime_support::shutdown_all: initializing application shutdown");
 
         applier::applier& appl = hpx::applier::get_applier();
         naming::resolver_client& agas_client = naming::get_agas_client();
@@ -547,25 +547,25 @@ namespace hpx { namespace components { namespace server {
         std::vector<naming::id_type> locality_ids = find_all_localities();
         std::size_t count = dijkstra_termination_detection(locality_ids);
 
-        LRT_(info) << "runtime_support::shutdown_all: "    //-V128
-                      "passed first termination detection (count: "
-                   << count << ").";
+        LRT_(info).format("runtime_support::shutdown_all: passed first "
+                          "termination detection (count: {}).",
+            count);
 
         // execute registered shutdown functions on all localities
         invoke_shutdown_functions(locality_ids, true);
         invoke_shutdown_functions(locality_ids, false);
 
-        LRT_(info) << "runtime_support::shutdown_all: "
-                      "invoked shutdown functions";
+        LRT_(info).format(
+            "runtime_support::shutdown_all: invoked shutdown functions");
 
         // Do a second round of termination detection to synchronize with all
         // work that was triggered by the invocation of the shutdown
         // functions.
         count = dijkstra_termination_detection(locality_ids);
 
-        LRT_(info) << "runtime_support::shutdown_all: "    //-V128
-                      "passed second termination detection (count: "
-                   << count << ").";
+        LRT_(info).format("runtime_support::shutdown_all: passed second "
+                          "termination detection (count: {}).",
+            count);
 
         // Shut down all localities except the local one, we can't use
         // broadcast here as we have to handle the back parcel in a special
@@ -587,8 +587,8 @@ namespace hpx { namespace components { namespace server {
         // wait for all localities to be stopped
         wait_all(lazy_actions);
 
-        LRT_(info) << "runtime_support::shutdown_all: "
-                      "all localities have been shut down";
+        LRT_(info).format("runtime_support::shutdown_all: all localities have "
+                          "been shut down");
 
         // Now make sure this local locality gets shut down as well.
         // There is no need to respond...
@@ -701,9 +701,9 @@ namespace hpx { namespace components { namespace server {
         std::unique_lock<std::mutex> l(mtx_);
         while (!stop_done_)
         {
-            LRT_(info) << "runtime_support: about to enter wait state";
+            LRT_(info).format("runtime_support: about to enter wait state");
             wait_condition_.wait(l);
-            LRT_(info) << "runtime_support: exiting wait state";
+            LRT_(info).format("runtime_support: exiting wait state");
         }
     }
 
@@ -1122,8 +1122,9 @@ namespace hpx { namespace components { namespace server {
             ec = make_success_code();
 
         // log result if requested
-        LRT_(info) << "successfully registered message handler plugin of type: "
-                   << message_handler_type;
+        LRT_(info).format(
+            "successfully registered message handler plugin of type: {}",
+            message_handler_type);
     }
 
     parcelset::policies::message_handler*
@@ -1182,8 +1183,9 @@ namespace hpx { namespace components { namespace server {
             ec = make_success_code();
 
         // log result if requested
-        LRT_(info) << "successfully created message handler plugin of type: "
-                   << message_handler_type;
+        LRT_(info).format(
+            "successfully created message handler plugin of type: {}",
+            message_handler_type);
         return mh;
     }
 
@@ -1230,9 +1232,9 @@ namespace hpx { namespace components { namespace server {
             ec = make_success_code();
 
         // log result if requested
-        LRT_(info)
-            << "successfully created binary filter handler plugin of type: "
-            << binary_filter_type;
+        LRT_(info).format(
+            "successfully created binary filter handler plugin of type: {}",
+            binary_filter_type);
         return bf;
     }
 #endif
@@ -1265,14 +1267,15 @@ namespace hpx { namespace components { namespace server {
                 util::plugin::get_plugins_list_type f;
                 if (!components::get_static_factory(instance, f))
                 {
-                    LRT_(warning) << "static loading failed: " << lib.string()
-                                  << ": " << instance << ": couldn't find "
-                                  << "factory in global static factory map";
+                    LRT_(warning).format(
+                        "static loading failed: {}: {}: couldn't find factory "
+                        "in global static factory map",
+                        lib.string(), instance);
                     return false;
                 }
 
-                LRT_(info) << "static loading succeeded: " << lib.string()
-                           << ": " << instance;
+                LRT_(info).format(
+                    "static loading succeeded: {}: {}", lib.string(), instance);
             }
 
             // make sure startup/shutdown registration is called once for each
@@ -1293,14 +1296,14 @@ namespace hpx { namespace components { namespace server {
         }
         catch (std::logic_error const& e)
         {
-            LRT_(warning) << "static loading failed: " << lib.string() << ": "
-                          << instance << ": " << e.what();
+            LRT_(warning).format("static loading failed: {}: {}: {}",
+                lib.string(), instance, e.what());
             return false;
         }
         catch (std::exception const& e)
         {
-            LRT_(warning) << "static loading failed: " << lib.string() << ": "
-                          << instance << ": " << e.what();
+            LRT_(warning).format("static loading failed: {}: {}: {}",
+                lib.string(), instance, e.what());
             return false;
         }
         return true;    // component got loaded
@@ -1316,8 +1319,9 @@ namespace hpx { namespace components { namespace server {
         // load all components as described in the configuration information
         if (!ini.has_section("hpx.components"))
         {
-            LRT_(info) << "No components found/loaded, HPX will be mostly "
-                          "non-functional (no section [hpx.components] found).";
+            LRT_(info).format(
+                "No components found/loaded, HPX will be mostly non-functional "
+                "(no section [hpx.components] found).");
             return 0;    // no components to load
         }
 
@@ -1337,7 +1341,7 @@ namespace hpx { namespace components { namespace server {
         util::section* sec = ini.get_section("hpx.components");
         if (nullptr == sec)
         {
-            LRT_(error) << "nullptr section found";
+            LRT_(error).format("nullptr section found");
             return 0;    // something bad happened
         }
 
@@ -1365,7 +1369,8 @@ namespace hpx { namespace components { namespace server {
                 hpx::string_util::to_lower(tmp);
                 if (tmp == "no" || tmp == "false" || tmp == "0")
                 {
-                    LRT_(info) << "component factory disabled: " << instance;
+                    LRT_(info).format(
+                        "component factory disabled: {}", instance);
                     isenabled = false;    // this component has been disabled
                 }
             }
@@ -1429,9 +1434,9 @@ namespace hpx { namespace components { namespace server {
             }
             catch (hpx::exception const& e)
             {
-                LRT_(warning)
-                    << "caught exception while loading " << instance << ", "
-                    << e.get_error_code().get_message() << ": " << e.what();
+                LRT_(warning).format(
+                    "caught exception while loading {}, {}: {}", instance,
+                    e.get_error_code().get_message(), e.what());
                 if (e.get_error_code().value() == hpx::commandline_option_error)
                 {
                     std::cerr << "runtime_support::load_components: "
@@ -1455,10 +1460,11 @@ namespace hpx { namespace components { namespace server {
             util::plugin::get_plugins_list_type f;
             if (!components::get_static_startup_shutdown(mod, f))
             {
-                LRT_(debug) << "static loading of startup/shutdown functions "
-                               "failed: "
-                            << mod << ": couldn't find module in global "
-                            << "static startup/shutdown functions data map";
+                LRT_(debug).format(
+                    "static loading of startup/shutdown functions failed: {}: "
+                    "couldn't find module in global static startup/shutdown "
+                    "functions data map",
+                    mod);
                 return false;
             }
 
@@ -1470,9 +1476,9 @@ namespace hpx { namespace components { namespace server {
                 pf.create("startup_shutdown", ec));
             if (ec)
             {
-                LRT_(debug) << "static loading of startup/shutdown functions "
-                               "failed: "
-                            << mod << ": " << get_error_what(ec);
+                LRT_(debug).format("static loading of startup/shutdown "
+                                   "functions failed: {}: {}",
+                    mod, get_error_what(ec));
                 return false;
             }
 
@@ -1516,16 +1522,16 @@ namespace hpx { namespace components { namespace server {
         }
         catch (std::logic_error const& e)
         {
-            LRT_(debug)
-                << "static loading of startup/shutdown functions failed: "
-                << mod << ": " << e.what();
+            LRT_(debug).format(
+                "static loading of startup/shutdown functions failed: {}: {}",
+                mod, e.what());
             return false;
         }
         catch (std::exception const& e)
         {
-            LRT_(debug)
-                << "static loading of startup/shutdown functions failed: "
-                << mod << ": " << e.what();
+            LRT_(debug).format(
+                "static loading of startup/shutdown functions failed: {}: {}",
+                mod, e.what());
             return false;
         }
         return true;    // startup/shutdown functions got registered
@@ -1541,10 +1547,10 @@ namespace hpx { namespace components { namespace server {
             util::plugin::get_plugins_list_type f;
             if (!components::get_static_commandline(mod, f))
             {
-                LRT_(debug)
-                    << "static loading of command-line options failed: " << mod
-                    << ": couldn't find module in global "
-                    << "static command line data map";
+                LRT_(debug).format("static loading of command-line options "
+                                   "failed: {}: couldn't find module in global "
+                                   "static command line data map",
+                    mod);
                 return false;
             }
 
@@ -1557,9 +1563,9 @@ namespace hpx { namespace components { namespace server {
                 pf.create("commandline_options", ec));
             if (ec)
             {
-                LRT_(debug)
-                    << "static loading of command-line options failed: " << mod
-                    << ": " << get_error_what(ec);
+                LRT_(debug).format(
+                    "static loading of command-line options failed: {}: {}",
+                    mod, get_error_what(ec));
                 return false;
             }
 
@@ -1571,14 +1577,16 @@ namespace hpx { namespace components { namespace server {
         }
         catch (std::logic_error const& e)
         {
-            LRT_(debug) << "static loading of command-line options failed: "
-                        << mod << ": " << e.what();
+            LRT_(debug).format(
+                "static loading of command-line options failed: {}: {}", mod,
+                e.what());
             return false;
         }
         catch (std::exception const& e)
         {
-            LRT_(debug) << "static loading of command-line options failed: "
-                        << mod << ": " << e.what();
+            LRT_(debug).format(
+                "static loading of command-line options failed: {}: {}", mod,
+                e.what());
             return false;
         }
         return true;    // startup/shutdown functions got registered
@@ -1614,8 +1622,8 @@ namespace hpx { namespace components { namespace server {
             d.load_library(ec);
             if (ec)
             {
-                LRT_(warning) << "dynamic loading failed: " << lib.string()
-                              << ": " << instance << ": " << get_error_what(ec);
+                LRT_(warning).format("dynamic loading failed: {}: {}: {}",
+                    lib.string(), instance, get_error_what(ec));
                 return false;    // next please :-P
             }
         }
@@ -1645,8 +1653,9 @@ namespace hpx { namespace components { namespace server {
                 pf.create("startup_shutdown", ec));
             if (ec)
             {
-                LRT_(debug) << "loading of startup/shutdown functions failed: "
-                            << d.get_name() << ": " << get_error_what(ec);
+                LRT_(debug).format(
+                    "loading of startup/shutdown functions failed: {}: {}",
+                    d.get_name(), get_error_what(ec));
                 return false;
             }
 
@@ -1676,14 +1685,16 @@ namespace hpx { namespace components { namespace server {
         }
         catch (std::logic_error const& e)
         {
-            LRT_(debug) << "loading of startup/shutdown functions failed: "
-                        << d.get_name() << ": " << e.what();
+            LRT_(debug).format(
+                "loading of startup/shutdown functions failed: {}: {}",
+                d.get_name(), e.what());
             return false;
         }
         catch (std::exception const& e)
         {
-            LRT_(debug) << "loading of startup/shutdown functions failed: "
-                        << d.get_name() << ": " << e.what();
+            LRT_(debug).format(
+                "loading of startup/shutdown functions failed: {}: {}",
+                d.get_name(), e.what());
             return false;
         }
         return true;    // startup/shutdown functions got registered
@@ -1703,8 +1714,9 @@ namespace hpx { namespace components { namespace server {
                 pf.create("commandline_options", ec));
             if (ec)
             {
-                LRT_(debug) << "loading of command-line options failed: "
-                            << d.get_name() << ": " << get_error_what(ec);
+                LRT_(debug).format(
+                    "loading of command-line options failed: {}: {}",
+                    d.get_name(), get_error_what(ec));
                 return false;
             }
 
@@ -1716,14 +1728,14 @@ namespace hpx { namespace components { namespace server {
         }
         catch (std::logic_error const& e)
         {
-            LRT_(debug) << "loading of command-line options failed: "
-                        << d.get_name() << ": " << e.what();
+            LRT_(debug).format("loading of command-line options failed: {}: {}",
+                d.get_name(), e.what());
             return false;
         }
         catch (std::exception const& e)
         {
-            LRT_(debug) << "loading of command-line options failed: "
-                        << d.get_name() << ": " << e.what();
+            LRT_(debug).format("loading of command-line options failed: {}: {}",
+                d.get_name(), e.what());
             return false;
         }
         return true;    // startup/shutdown functions got registered
@@ -1769,8 +1781,8 @@ namespace hpx { namespace components { namespace server {
                 hpx::util::plugin::plugin_factory<component_factory_base> pf(
                     d, "factory");
 
-                LRT_(info) << "dynamic loading succeeded: " << lib.string()
-                           << ": " << instance;
+                LRT_(info).format("dynamic loading succeeded: {}: {}",
+                    lib.string(), instance);
             }
 
             // make sure startup/shutdown registration is called once for each
@@ -1791,14 +1803,14 @@ namespace hpx { namespace components { namespace server {
         }
         catch (std::logic_error const& e)
         {
-            LRT_(warning) << "dynamic loading failed: " << lib.string() << ": "
-                          << instance << ": " << e.what();
+            LRT_(warning).format("dynamic loading failed: {}: {}: {}",
+                lib.string(), instance, e.what());
             return false;
         }
         catch (std::exception const& e)
         {
-            LRT_(warning) << "dynamic loading failed: " << lib.string() << ": "
-                          << instance << ": " << e.what();
+            LRT_(warning).format("dynamic loading failed: {}: {}: {}",
+                lib.string(), instance, e.what());
             return false;
         }
         return true;    // component got loaded
@@ -1815,7 +1827,7 @@ namespace hpx { namespace components { namespace server {
         // load all components as described in the configuration information
         if (!ini.has_section("hpx.plugins"))
         {
-            LRT_(info) << "No plugins found/loaded.";
+            LRT_(info).format("No plugins found/loaded.");
             return true;    // no plugins to load
         }
 
@@ -1835,7 +1847,7 @@ namespace hpx { namespace components { namespace server {
         util::section* sec = ini.get_section("hpx.plugins");
         if (nullptr == sec)
         {
-            LRT_(error) << "nullptr section found";
+            LRT_(error).format("nullptr section found");
             return false;    // something bad happened
         }
 
@@ -1863,7 +1875,7 @@ namespace hpx { namespace components { namespace server {
                 hpx::string_util::to_lower(tmp);
                 if (tmp == "no" || tmp == "false" || tmp == "0")
                 {
-                    LRT_(info) << "plugin factory disabled: " << instance;
+                    LRT_(info).format("plugin factory disabled: {}", instance);
                     isenabled = false;    // this component has been disabled
                 }
             }
@@ -1920,9 +1932,9 @@ namespace hpx { namespace components { namespace server {
             }
             catch (hpx::exception const& e)
             {
-                LRT_(warning)
-                    << "caught exception while loading " << instance << ", "
-                    << e.get_error_code().get_message() << ": " << e.what();
+                LRT_(warning).format(
+                    "caught exception while loading {}, {}: {}", instance,
+                    e.get_error_code().get_message(), e.what());
                 if (e.get_error_code().value() == hpx::commandline_option_error)
                 {
                     std::cerr << "runtime_support::load_plugins: "
@@ -1976,19 +1988,19 @@ namespace hpx { namespace components { namespace server {
 
                     if (!p.second)
                     {
-                        LRT_(fatal) << "duplicate plugin type: " << instance;
+                        LRT_(fatal).format(
+                            "duplicate plugin type: {}", instance);
                         return false;
                     }
 
-                    LRT_(info) << "dynamic loading succeeded: " << lib.string()
-                               << ": " << instance;
+                    LRT_(info).format("dynamic loading succeeded: {}: {}",
+                        lib.string(), instance);
                 }
                 else
                 {
-                    LRT_(warning)
-                        << "dynamic loading of plugin factory failed: "
-                        << lib.string() << ": " << instance << ": "
-                        << get_error_what(ec);
+                    LRT_(warning).format(
+                        "dynamic loading of plugin factory failed: {}: {}: {}",
+                        lib.string(), instance, get_error_what(ec));
                 }
             }
 
@@ -2009,14 +2021,14 @@ namespace hpx { namespace components { namespace server {
         }
         catch (std::logic_error const& e)
         {
-            LRT_(warning) << "dynamic loading failed: " << lib.string() << ": "
-                          << instance << ": " << e.what();
+            LRT_(warning).format("dynamic loading failed: {}: {}: {}",
+                lib.string(), instance, e.what());
             return false;
         }
         catch (std::exception const& e)
         {
-            LRT_(warning) << "dynamic loading failed: " << lib.string() << ": "
-                          << instance << ": " << e.what();
+            LRT_(warning).format("dynamic loading failed: {}: {}: {}",
+                lib.string(), instance, e.what());
             return false;
         }
         return true;
@@ -2049,8 +2061,8 @@ namespace hpx { namespace components { namespace server {
             d.load_library(ec);
             if (ec)
             {
-                LRT_(warning) << "dynamic loading failed: " << lib.string()
-                              << ": " << instance << ": " << get_error_what(ec);
+                LRT_(warning).format("dynamic loading failed: {}: {}: {}",
+                    lib.string(), instance, get_error_what(ec));
                 return false;    // next please :-P
             }
         }

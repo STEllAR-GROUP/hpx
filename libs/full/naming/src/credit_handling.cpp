@@ -148,9 +148,9 @@ namespace hpx { namespace naming {
                 }
                 catch (hpx::exception const& e)
                 {
-                    LTM_(error) << "Unhandled exception while executing "
-                                   "decrement_refcnt: "
-                                << e.what();
+                    LTM_(error).format("Unhandled exception while executing "
+                                       "decrement_refcnt: {}",
+                        e.what());
                 }
             }
             else

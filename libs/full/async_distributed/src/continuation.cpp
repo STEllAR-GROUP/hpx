@@ -71,7 +71,7 @@ namespace hpx { namespace actions {
             return;
         }
 
-        LLCO_(info) << "continuation::trigger_error(" << id_ << ")";
+        LLCO_(info).format("continuation::trigger_error({})", id_);
         set_lco_error(id_, this->get_addr(), e);
     }
 
@@ -84,7 +84,7 @@ namespace hpx { namespace actions {
             return;
         }
 
-        LLCO_(info) << "continuation::trigger_error(" << id_ << ")";
+        LLCO_(info).format("continuation::trigger_error({})", id_);
         set_lco_error(id_, this->get_addr(), std::move(e));
     }
 
@@ -127,8 +127,8 @@ namespace hpx { namespace actions {
 
     void typed_continuation<void, util::unused_type>::trigger()
     {
-        LLCO_(info) << "typed_continuation<void>::trigger(" << this->get_id()
-                    << ")";
+        LLCO_(info).format(
+            "typed_continuation<void>::trigger({})", this->get_id());
 
         if (f_.empty())
         {

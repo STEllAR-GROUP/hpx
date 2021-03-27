@@ -65,8 +65,8 @@ namespace hpx { namespace util {
 
             if (handle_ini_file(ini, inipath.string()))
             {
-                LBT_(info) << "loaded configuration (${" << env_var
-                           << "}): " << inipath.string();
+                LBT_(info).format("loaded configuration (${{{}}}): {}", env_var,
+                    inipath.string());
                 return true;
             }
         }
@@ -108,8 +108,7 @@ namespace hpx { namespace util {
                 bool result2 = handle_ini_file(ini, path + "/hpx.ini");
                 if (result2)
                 {
-                    LBT_(info)
-                        << "loaded configuration: " << path << "/hpx.ini";
+                    LBT_(info).format("loaded configuration: {}/hpx.ini", path);
                 }
                 result = result2 || result;
             }
@@ -121,7 +120,7 @@ namespace hpx { namespace util {
             bool result2 = handle_ini_file(ini, cwd);
             if (result2)
             {
-                LBT_(info) << "loaded configuration: " << cwd;
+                LBT_(info).format("loaded configuration: {}", cwd);
             }
             result = result2 || result;
         }
@@ -135,8 +134,7 @@ namespace hpx { namespace util {
             bool result2 = handle_ini_file(ini, "/etc/hpx.ini");
             if (result2)
             {
-                LBT_(info) << "loaded configuration: "
-                           << "/etc/hpx.ini";
+                LBT_(info).format("loaded configuration: /etc/hpx.ini");
             }
             result = result2 || result;
         }
@@ -163,7 +161,7 @@ namespace hpx { namespace util {
                 bool result2 = handle_ini_file(ini, hpx_ini_file);
                 if (result2)
                 {
-                    LBT_(info) << "loaded configuration: " << hpx_ini_file;
+                    LBT_(info).format("loaded configuration: {}", hpx_ini_file);
                 }
                 return result || result2;
             }
@@ -207,15 +205,15 @@ namespace hpx { namespace util {
 
                 for (fs::directory_iterator dir(this_path); dir != nodir; ++dir)
                 {
-                    if ((*dir).path().extension() != ".ini")
+                    if (dir->path().extension() != ".ini")
                         continue;
 
                     // read and merge the ini file into the main ini hierarchy
                     try
                     {
-                        ini.merge((*dir).path().string());
-                        LBT_(info) << "loaded configuration: "
-                                   << (*dir).path().string();
+                        ini.merge(dir->path().string());
+                        LBT_(info).format(
+                            "loaded configuration: {}", dir->path().string());
                     }
                     catch (hpx::exception const& /*e*/)
                     {
@@ -478,16 +476,16 @@ namespace hpx { namespace util {
                 }
                 else
                 {
-                    LRT_(warning) << "skipping module " << basename << " ("
-                                  << canonical_curr.string() << ")"
-                                  << ": ignored because of: "
-                                  << (*p.first).second.string();
+                    LRT_(warning).format(
+                        "skipping module {} ({}): ignored because of: {}",
+                        basename, canonical_curr.string(),
+                        p.first->second.string());
                 }
             }
         }
         catch (fs::filesystem_error const& e)
         {
-            LRT_(info) << "caught filesystem error: " << e.what();
+            LRT_(info).format("caught filesystem error: {}", e.what());
         }
 
         // return if no new modules have been found
@@ -502,7 +500,7 @@ namespace hpx { namespace util {
         typedef std::pair<fs::path, std::string> libdata_type;
         for (libdata_type const& p : libdata)
         {
-            LRT_(info) << "attempting to load: " << p.first.string();
+            LRT_(info).format("attempting to load: {}", p.first.string());
 
             // get the handle of the library
             error_code ec(lightweight);
@@ -510,8 +508,8 @@ namespace hpx { namespace util {
             d.load_library(ec);
             if (ec)
             {
-                LRT_(info) << "skipping (load_library failed): "
-                           << p.first.string() << ": " << get_error_what(ec);
+                LRT_(info).format("skipping (load_library failed): {}: {}",
+                    p.first.string(), get_error_what(ec));
                 continue;
             }
 
@@ -523,14 +521,15 @@ namespace hpx { namespace util {
                 d, ini, curr_fullname, component_registries, p.second, ec);
             if (ec)
             {
-                LRT_(info) << "skipping (load_component_factory failed): "
-                           << p.first.string() << ": " << get_error_what(ec);
+                LRT_(info).format(
+                    "skipping (load_component_factory failed): {}: {}",
+                    p.first.string(), get_error_what(ec));
                 ec = error_code(lightweight);    // reinit ec
             }
             else
             {
-                LRT_(debug)
-                    << "load_component_factory succeeded: " << p.first.string();
+                LRT_(debug).format(
+                    "load_component_factory succeeded: {}", p.first.string());
                 must_keep_loaded = true;
             }
 
@@ -540,13 +539,14 @@ namespace hpx { namespace util {
 
             if (ec)
             {
-                LRT_(info) << "skipping (load_plugin_factory failed): "
-                           << p.first.string() << ": " << get_error_what(ec);
+                LRT_(info).format(
+                    "skipping (load_plugin_factory failed): {}: {}",
+                    p.first.string(), get_error_what(ec));
             }
             else
             {
-                LRT_(debug)
-                    << "load_plugin_factory succeeded: " << p.first.string();
+                LRT_(debug).format(
+                    "load_plugin_factory succeeded: {}", p.first.string());
 
                 std::copy(tmp_regs.begin(), tmp_regs.end(),
                     std::back_inserter(plugin_registries));

@@ -195,10 +195,9 @@ namespace hpx { namespace agas {
             std::size_t previous = gva_cache_->size();
             gva_cache_->reserve(cache_size);
 
-            LAGAS_(info) << hpx::util::format(
+            LAGAS_(info).format(
                 "addressing_service::adjust_local_cache_size, previous size: "
-                "{1}, "
-                "new size: {2}",
+                "{1}, new size: {2}",
                 previous, cache_size);
         }
     }    // }}}
@@ -407,9 +406,9 @@ namespace hpx { namespace agas {
                     }
                 }
 
-                LAGAS_(debug) << hpx::util::format(
-                    "addressing_server::get_console_locality, "
-                    "caching console locality, prefix({1})",
+                LAGAS_(debug).format(
+                    "addressing_server::get_console_locality, caching console "
+                    "locality, prefix({1})",
                     console);
 
                 return true;
@@ -996,9 +995,8 @@ namespace hpx { namespace agas {
         if (&ec != &throws)
             ec = make_success_code();
 
-        LAGAS_(debug) << hpx::util::format(
-            "addressing_service::resolve_cached, "
-            "cache miss for address {1}",
+        LAGAS_(debug).format(
+            "addressing_service::resolve_cached, cache miss for address {1}",
             id);
 
         return false;
@@ -1647,7 +1645,7 @@ namespace hpx { namespace agas {
             // so we convert it to 1 here so that the cache doesn't break.
             const std::uint64_t count = (g.count ? g.count : 1);
 
-            LAGAS_(debug) << hpx::util::format(
+            LAGAS_(debug).format(
                 "addressing_service::update_cache_entry, gid({1}), count({2})",
                 gid, count);
 
@@ -1674,9 +1672,9 @@ namespace hpx { namespace agas {
                             return;
                         }
 
-                        LAGAS_(warning) << hpx::util::format(
-                            "addressing_service::update_cache_entry, "
-                            "aborting update due to key collision in cache, "
+                        LAGAS_(warning).format(
+                            "addressing_service::update_cache_entry, aborting "
+                            "update due to key collision in cache, "
                             "new_gid({1}), new_count({2}), old_gid({3}), "
                             "old_count({4})",
                             gid, count, idbase.get_gid(), idbase.get_count());
@@ -1738,8 +1736,8 @@ namespace hpx { namespace agas {
 
         try
         {
-            LAGAS_(warning)
-                << "addressing_service::clear_cache, clearing cache";
+            LAGAS_(warning).format(
+                "addressing_service::clear_cache, clearing cache");
 
             std::lock_guard<mutex_type> lock(gva_cache_mtx_);
 
@@ -1786,7 +1784,7 @@ namespace hpx { namespace agas {
 
         try
         {
-            LAGAS_(warning) << "addressing_service::remove_cache_entry";
+            LAGAS_(warning).format("addressing_service::remove_cache_entry");
 
             std::lock_guard<mutex_type> lock(gva_cache_mtx_);
 
@@ -1994,9 +1992,8 @@ namespace hpx { namespace agas {
 
             l.unlock();
 
-            LAGAS_(info) << hpx::util::format(
-                "addressing_service::send_refcnt_requests_non_blocking, "
-                "requests({1})",
+            LAGAS_(info).format("addressing_service::send_refcnt_requests_non_"
+                                "blocking, requests({1})",
                 p->size());
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
@@ -2068,9 +2065,8 @@ namespace hpx { namespace agas {
 
         l.unlock();
 
-        LAGAS_(info) << hpx::util::format(
-            "addressing_service::send_refcnt_requests_async, "
-            "requests({1})",
+        LAGAS_(info).format(
+            "addressing_service::send_refcnt_requests_async, requests({1})",
             p->size());
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)

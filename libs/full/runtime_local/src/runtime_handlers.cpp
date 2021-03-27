@@ -98,14 +98,15 @@ namespace hpx { namespace detail {
         {
             if (back_trace.empty())
             {
-                LERR_(debug) << "suspending thread while at least one lock is "
-                                "being held (stack backtrace was disabled at "
-                                "compile time)";
+                LERR_(debug).format(
+                    "suspending thread while at least one lock is being held "
+                    "(stack backtrace was disabled at compile time)");
             }
             else
             {
-                LERR_(debug) << "suspending thread while at least one lock is "
-                             << "being held, stack backtrace: " << back_trace;
+                LERR_(debug).format("suspending thread while at least one lock "
+                                    "is being held, stack backtrace: {}",
+                    back_trace);
             }
         }
         else

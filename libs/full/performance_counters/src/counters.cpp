@@ -1188,10 +1188,9 @@ namespace hpx { namespace performance_counters {
                 if (&ec == &throws)
                     throw;
                 ec = make_error_code(e.get_error(), e.what());
-                LPCS_(warning)
-                    << hpx::util::format("failed to create counter {} ({})",
-                           remove_counter_prefix(complemented_info.fullname_),
-                           e.what());
+                LPCS_(warning).format("failed to create counter {} ({})",
+                    remove_counter_prefix(complemented_info.fullname_),
+                    e.what());
                 return lcos::future<naming::id_type>();
             }
         }

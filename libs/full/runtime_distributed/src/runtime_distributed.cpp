@@ -295,7 +295,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     runtime_distributed::~runtime_distributed()
     {
-        LRT_(debug) << "~runtime_distributed(entering)";
+        LRT_(debug).format("~runtime_distributed(entering)");
 
         // reset counter registry
         get_counter_registry().clear();
@@ -309,7 +309,7 @@ namespace hpx {
         // unload libraries
         runtime_support_->tidy();
 
-        LRT_(debug) << "~runtime_distributed(finished)";
+        LRT_(debug).format("~runtime_distributed(finished)");
 
         LPROGRESS_;
     }
@@ -401,7 +401,7 @@ namespace hpx {
             nullptr, hpx::get_locality_id(), hpx::get_initial_num_localities());
 #endif
 
-        LRT_(info) << "cmd_line: " << get_config().get_cmd_line();
+        LRT_(info).format("cmd_line: {}", get_config().get_cmd_line());
 
         lbt_ << "(1st stage) runtime_distributed::start: booting locality "
              << here();
@@ -527,7 +527,7 @@ namespace hpx {
 
     int runtime_distributed::wait()
     {
-        LRT_(info) << "runtime_distributed: about to enter wait state";
+        LRT_(info).format("runtime_distributed: about to enter wait state");
 
         // start the wait_helper in a separate thread
         std::mutex mtx;
@@ -551,7 +551,7 @@ namespace hpx {
         // block main thread
         t.join();
 
-        LRT_(info) << "runtime_distributed: exiting wait state";
+        LRT_(info).format("runtime_distributed: exiting wait state");
         return result_;
     }
 
@@ -560,7 +560,7 @@ namespace hpx {
     // schedule a task managed by timer_pool to initiate second part
     void runtime_distributed::stop(bool blocking)
     {
-        LRT_(warning) << "runtime_distributed: about to stop services";
+        LRT_(warning).format("runtime_distributed: about to stop services");
 
         // flush all parcel buffers, stop buffering parcels at this point
         //parcel_handler_.do_background_work(true, parcelport_background_mode_all);
@@ -599,7 +599,7 @@ namespace hpx {
             // this disables all logging from the main thread
             deinit_tss_helper("main-thread", 0);
 
-            LRT_(info) << "runtime_distributed: stopped all services";
+            LRT_(info).format("runtime_distributed: stopped all services");
         }
 
         // stop the rest of the system
@@ -607,7 +607,7 @@ namespace hpx {
         parcel_handler_.stop(blocking);
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
-        LTM_(info) << "stop: stopping timer pool";
+        LTM_(info).format("stop: stopping timer pool");
         timer_pool_.stop();
         if (blocking)
         {
@@ -616,7 +616,7 @@ namespace hpx {
         }
 #endif
 #ifdef HPX_HAVE_IO_POOL
-        LTM_(info) << "stop: stopping io pool";
+        LTM_(info).format("stop: stopping io pool");
         io_pool_.stop();
         if (blocking)
         {
@@ -653,7 +653,7 @@ namespace hpx {
         // this disables all logging from the main thread
         deinit_tss_helper("main-thread", 0);
 
-        LRT_(info) << "runtime_distributed: stopped all services";
+        LRT_(info).format("runtime_distributed: stopped all services");
 
         std::lock_guard<std::mutex> l(mtx);
         cond.notify_all();    // we're done now
@@ -1599,7 +1599,7 @@ namespace hpx {
     void runtime_distributed::default_errorsink(std::string const& msg)
     {
         // log the exception information in any case
-        LERR_(always) << "default_errorsink: unhandled exception: " << msg;
+        LERR_(always).format("default_errorsink: unhandled exception: {}", msg);
 
         std::cerr << msg << std::endl;
     }

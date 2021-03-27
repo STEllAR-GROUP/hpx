@@ -82,7 +82,7 @@ namespace hpx { namespace components { namespace detail {
         if (enabled_entry == "no" || enabled_entry == "false" ||
             enabled_entry == "0")
         {
-            LRT_(info) << "plugin factory disabled: " << name;
+            LRT_(info).format("plugin factory disabled: {}", name);
             return false;    // this component has been disabled
         }
         return true;

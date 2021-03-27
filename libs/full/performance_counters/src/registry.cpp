@@ -105,13 +105,12 @@ namespace hpx { namespace performance_counters {
 
         if (!p.second)
         {
-            LPCS_(warning) << hpx::util::format(
+            LPCS_(warning).format(
                 "failed to register counter type {}", type_name);
             return status_invalid_data;
         }
 
-        LPCS_(info) << hpx::util::format(
-            "counter type {} registered", type_name);
+        LPCS_(info).format("counter type {} registered", type_name);
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -379,8 +378,7 @@ namespace hpx { namespace performance_counters {
             return status_counter_type_unknown;
         }
 
-        LPCS_(info) << hpx::util::format(
-            "counter type {} unregistered", type_name);
+        LPCS_(info).format("counter type {} unregistered", type_name);
 
         countertypes_.erase(it);
 
@@ -486,13 +484,12 @@ namespace hpx { namespace performance_counters {
             if (&ec == &throws)
                 throw;
             ec = make_error_code(e.get_error(), e.what());
-            LPCS_(warning) << hpx::util::format(
-                "failed to create raw counter {} ({})",
+            LPCS_(warning).format("failed to create raw counter {} ({})",
                 complemented_info.fullname_, e.what());
             return status_invalid_data;
         }
 
-        LPCS_(info) << hpx::util::format(
+        LPCS_(info).format(
             "raw counter {} created at {}", complemented_info.fullname_, id);
 
         if (&ec != &throws)
@@ -558,13 +555,12 @@ namespace hpx { namespace performance_counters {
             if (&ec == &throws)
                 throw;
             ec = make_error_code(e.get_error(), e.what());
-            LPCS_(warning) << hpx::util::format(
-                "failed to create raw counter {} ({})",
+            LPCS_(warning).format("failed to create raw counter {} ({})",
                 complemented_info.fullname_, e.what());
             return status_invalid_data;
         }
 
-        LPCS_(info) << hpx::util::format(
+        LPCS_(info).format(
             "raw counter {} created at {}", complemented_info.fullname_, id);
 
         if (&ec != &throws)
@@ -637,13 +633,12 @@ namespace hpx { namespace performance_counters {
             if (&ec == &throws)
                 throw;
             ec = make_error_code(e.get_error(), e.what());
-            LPCS_(warning) << hpx::util::format(
-                "failed to create counter {} ({})", complemented_info.fullname_,
-                e.what());
+            LPCS_(warning).format("failed to create counter {} ({})",
+                complemented_info.fullname_, e.what());
             return status_invalid_data;
         }
 
-        LPCS_(info) << hpx::util::format(
+        LPCS_(info).format(
             "counter {} created at {}", complemented_info.fullname_, id);
 
         if (&ec != &throws)
@@ -864,13 +859,12 @@ namespace hpx { namespace performance_counters {
                 throw;
 
             ec = make_error_code(e.get_error(), e.what());
-            LPCS_(warning) << hpx::util::format(
-                "failed to create statistics counter {} ({})",
+            LPCS_(warning).format("failed to create statistics counter {} ({})",
                 complemented_info.fullname_, e.what());
             return status_invalid_data;
         }
 
-        LPCS_(info) << hpx::util::format("statistics counter {} created at {}",
+        LPCS_(info).format("statistics counter {} created at {}",
             complemented_info.fullname_, gid);
 
         if (&ec != &throws)
@@ -975,13 +969,13 @@ namespace hpx { namespace performance_counters {
                 throw;
 
             ec = make_error_code(e.get_error(), e.what());
-            LPCS_(warning) << hpx::util::format(
+            LPCS_(warning).format(
                 "failed to create aggregating counter {} ({})",
                 complemented_info.fullname_, e.what());
             return status_invalid_data;
         }
 
-        LPCS_(info) << hpx::util::format("aggregating counter {} created at {}",
+        LPCS_(info).format("aggregating counter {} created at {}",
             complemented_info.fullname_, gid);
 
         if (&ec != &throws)
@@ -1108,13 +1102,13 @@ namespace hpx { namespace performance_counters {
                 throw;
 
             ec = make_error_code(e.get_error(), e.what());
-            LPCS_(warning) << hpx::util::format(
+            LPCS_(warning).format(
                 "failed to create aggregating counter {} ({})",
                 complemented_info.fullname_, e.what());
             return status_invalid_data;
         }
 
-        LPCS_(info) << hpx::util::format("aggregating counter {} created at {}",
+        LPCS_(info).format("aggregating counter {} created at {}",
             complemented_info.fullname_, gid);
 
         if (&ec != &throws)
@@ -1183,7 +1177,7 @@ namespace hpx { namespace performance_counters {
         agas::unregister_name(launch::sync, name, ec);
         if (ec)
         {
-            LPCS_(warning) << hpx::util::format(
+            LPCS_(warning).format(
                 "failed to remove counter {}", complemented_info.fullname_);
             return status_invalid_data;
         }

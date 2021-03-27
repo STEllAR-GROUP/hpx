@@ -141,9 +141,9 @@ namespace hpx { namespace lcos {
         void do_apply(naming::address&& addr, naming::id_type const& id,
             threads::thread_priority priority, Ts&&... vs)
         {
-            LLCO_(info) << "packaged_action::do_apply("    //-V128
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", " << id << ") args(" << sizeof...(Ts) << ")";
+            LLCO_(info).format("packaged_action::do_apply({}, {}) args({})",
+                hpx::actions::detail::get_action_name<action_type>(), id,
+                sizeof...(Ts));
 
 #if defined(HPX_HAVE_NETWORKING)
             auto&& f =
@@ -179,9 +179,9 @@ namespace hpx { namespace lcos {
         void do_apply(naming::id_type const& id,
             threads::thread_priority priority, Ts&&... vs)
         {
-            LLCO_(info) << "packaged_action::do_apply("    //-V128
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", " << id << ") args(" << sizeof...(Ts) << ")";
+            LLCO_(info).format("packaged_action::do_apply({}, {}) args({})",
+                hpx::actions::detail::get_action_name<action_type>(), id,
+                sizeof...(Ts));
 
 #if defined(HPX_HAVE_NETWORKING)
             auto&& f =
@@ -207,9 +207,9 @@ namespace hpx { namespace lcos {
         void do_apply_cb(naming::address&& addr, naming::id_type const& id,
             threads::thread_priority priority, Callback&& cb, Ts&&... vs)
         {
-            LLCO_(info) << "packaged_action::do_apply_cb("    //-V128
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", " << id << ") args(" << sizeof...(Ts) << ")";
+            LLCO_(info).format("packaged_action::do_apply_cb({}, {}) args({})",
+                hpx::actions::detail::get_action_name<action_type>(), id,
+                sizeof...(Ts));
 
 #if defined(HPX_HAVE_NETWORKING)
             using callback_type = typename std::decay<Callback>::type;
@@ -248,9 +248,9 @@ namespace hpx { namespace lcos {
         void do_apply_cb(naming::id_type const& id,
             threads::thread_priority priority, Callback&& cb, Ts&&... vs)
         {
-            LLCO_(info) << "packaged_action::do_apply_cb("    //-V128
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", " << id << ") args(" << sizeof...(Ts) << ")";
+            LLCO_(info).format("packaged_action::do_apply_cb({}, {}) args({})",
+                hpx::actions::detail::get_action_name<action_type>(), id,
+                sizeof...(Ts));
 
 #if defined(HPX_HAVE_NETWORKING)
             using callback_type = typename std::decay<Callback>::type;
@@ -356,9 +356,10 @@ namespace hpx { namespace lcos {
         void apply_deferred(
             naming::address&& addr, naming::id_type const& id, Ts&&... vs)
         {
-            LLCO_(info) << "packaged_action::apply_deferred("    //-V128
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", " << id << ") args(" << sizeof...(Ts) << ")";
+            LLCO_(info).format(
+                "packaged_action::apply_deferred({}, {}) args({})",
+                hpx::actions::detail::get_action_name<action_type>(), id,
+                sizeof...(Ts));
 
 #if defined(HPX_HAVE_NETWORKING)
             auto&& f =
@@ -382,9 +383,10 @@ namespace hpx { namespace lcos {
         void apply_deferred_cb(naming::address&& addr,
             naming::id_type const& id, Callback&& cb, Ts&&... vs)
         {
-            LLCO_(info) << "packaged_action::apply_deferred("    //-V128
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", " << id << ") args(" << sizeof...(Ts) << ")";
+            LLCO_(info).format(
+                "packaged_action::apply_deferred({}, {}) args({})",
+                hpx::actions::detail::get_action_name<action_type>(), id,
+                sizeof...(Ts));
 
 #if defined(HPX_HAVE_NETWORKING)
             using callback_type = typename std::decay<Callback>::type;

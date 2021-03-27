@@ -181,8 +181,7 @@ namespace hpx { namespace threads { namespace detail {
     template <typename Lock>
     void scheduled_thread_pool<Scheduler>::stop_locked(Lock& l, bool blocking)
     {
-        LTM_(info) << "stop: " << id_.name() << " blocking(" << std::boolalpha
-                   << blocking << ")";
+        LTM_(info).format("stop: {} blocking({})", id_.name(), blocking);
 
         if (!threads_.empty())
         {
@@ -204,11 +203,11 @@ namespace hpx { namespace threads { namespace detail {
                         continue;
 
                     // make sure no OS thread is waiting
-                    LTM_(info) << "stop: " << id_.name() << " notify_all";
+                    LTM_(info).format("stop: {} notify_all", id_.name());
 
                     sched_->Scheduler::do_some_work(std::size_t(-1));
 
-                    LTM_(info) << "stop: " << id_.name() << " join:" << i;
+                    LTM_(info).format("stop: {} join:{}", id_.name(), i);
 
                     {
                         // unlock the lock while joining
@@ -235,13 +234,10 @@ namespace hpx { namespace threads { namespace detail {
     {
         HPX_ASSERT(l.owns_lock());
 
-        LTM_(info)    //-V128
-            << "run: " << id_.name()
-            << " number of processing units available: "    //-V128
-            << threads::hardware_concurrency();
-        LTM_(info)    //-V128
-            << "run: " << id_.name() << " creating " << pool_threads
-            << " OS thread(s)";    //-V128
+        LTM_(info).format("run: {} number of processing units available: {}",
+            id_.name(), threads::hardware_concurrency());
+        LTM_(info).format(
+            "run: {} creating {} OS thread(s)", id_.name(), pool_threads);
 
         if (0 == pool_threads)
         {
@@ -258,8 +254,8 @@ namespace hpx { namespace threads { namespace detail {
         init_perf_counter_data(pool_threads);
         this->init_pool_time_scale();
 
-        LTM_(info) << "run: " << id_.name()
-                   << " timestamp_scale: " << timestamp_scale_;    //-V128
+        LTM_(info).format(
+            "run: {} timestamp_scale: {}", id_.name(), timestamp_scale_);
 
         // run threads and wait for initialization to complete
         std::size_t thread_num = 0;
@@ -282,11 +278,10 @@ namespace hpx { namespace threads { namespace detail {
                 // get_pu_mask expects index according to ordering of masks
                 // in affinity_data::affinity_masks_
                 // which is in order of occupied PU
-                LTM_(info)    //-V128
-                    << "run: " << id_.name() << " create OS thread "
-                    << global_thread_num    //-V128
-                    << ": will run on processing units within this mask: "
-                    << std::hex << HPX_CPU_MASK_PREFIX << mask;
+                LTM_(info).format(
+                    "run: {} create OS thread {}: will run on processing units "
+                    "within this mask: " HPX_CPU_MASK_PREFIX "{:x}",
+                    id_.name(), global_thread_num, mask);
 
                 // create a new thread
                 add_processing_unit_internal(
@@ -300,8 +295,8 @@ namespace hpx { namespace threads { namespace detail {
         }
         catch (std::exception const& e)
         {
-            LTM_(always) << "run: " << id_.name()
-                         << " failed with: " << e.what();
+            LTM_(always).format(
+                "run: {} failed with: {}", id_.name(), e.what());
 
             // trigger the barrier
             pool_threads -= (thread_num + 1);
@@ -314,7 +309,7 @@ namespace hpx { namespace threads { namespace detail {
             return false;
         }
 
-        LTM_(info) << "run: " << id_.name() << " running";
+        LTM_(info).format("run: {} running", id_.name());
         return true;
     }
 
@@ -404,19 +399,16 @@ namespace hpx { namespace threads { namespace detail {
             topo.set_thread_affinity_mask(mask, ec);
             if (ec)
             {
-                LTM_(warning)    //-V128
-                    << "thread_func: " << id_.name()
-                    << " setting thread affinity on OS thread "    //-V128
-                    << global_thread_num
-                    << " failed with: " << ec.get_message();
+                LTM_(warning).format("thread_func: {} setting thread affinity "
+                                     "on OS thread {} failed with: {}",
+                    id_.name(), global_thread_num, ec.get_message());
             }
         }
         else
         {
-            LTM_(debug)    //-V128
-                << "thread_func: " << id_.name()
-                << " setting thread affinity on OS thread "    //-V128
-                << global_thread_num << " was explicitly disabled.";
+            LTM_(debug).format("thread_func: {} setting thread affinity on OS "
+                               "thread {} was explicitly disabled.",
+                id_.name(), global_thread_num);
         }
 
         // Setting priority of worker threads to a lower priority, this
@@ -429,11 +421,9 @@ namespace hpx { namespace threads { namespace detail {
             topo.reduce_thread_priority(ec);
             if (ec)
             {
-                LTM_(warning)    //-V128
-                    << "thread_func: " << id_.name()
-                    << " reducing thread priority on OS thread "    //-V128
-                    << global_thread_num
-                    << " failed with: " << ec.get_message();
+                LTM_(warning).format("thread_func: {} reducing thread priority "
+                                     "on OS thread {} failed with: {}",
+                    id_.name(), global_thread_num, ec.get_message());
             }
         }
 
@@ -453,9 +443,8 @@ namespace hpx { namespace threads { namespace detail {
         // wait for all threads to start up before before starting HPX work
         startup->wait();
 
-        LTM_(info)    //-V128
-            << "thread_func: " << id_.name()
-            << " starting OS thread: " << thread_num;    //-V128
+        LTM_(info).format(
+            "thread_func: {} starting OS thread: {}", id_.name(), thread_num);
 
         try
         {
@@ -524,22 +513,19 @@ namespace hpx { namespace threads { namespace detail {
             }
             catch (hpx::exception const& e)
             {
-                LFATAL_    //-V128
-                    << "thread_func: " << id_.name()
-                    << " thread_num:" << global_thread_num    //-V128
-                    << " : caught hpx::exception: " << e.what()
-                    << ", aborted thread execution";
+                LFATAL_.format("thread_func: {} thread_num:{} : caught "
+                               "hpx::exception: {}, aborted thread execution",
+                    id_.name(), global_thread_num, e.what());
 
                 report_error(global_thread_num, std::current_exception());
                 return;
             }
             catch (std::system_error const& e)
             {
-                LFATAL_    //-V128
-                    << "thread_func: " << id_.name()
-                    << " thread_num:" << global_thread_num    //-V128
-                    << " : caught std::system_error: " << e.what()
-                    << ", aborted thread execution";
+                LFATAL_.format(
+                    "thread_func: {} thread_num:{} : caught "
+                    "std::system_error: {}, aborted thread execution",
+                    id_.name(), global_thread_num, e.what());
 
                 report_error(global_thread_num, std::current_exception());
                 return;
@@ -553,22 +539,18 @@ namespace hpx { namespace threads { namespace detail {
         }
         catch (...)
         {
-            LFATAL_    //-V128
-                << "thread_func: " << id_.name()
-                << " thread_num:" << global_thread_num    //-V128
-                << " : caught unexpected "                //-V128
-                   "exception, aborted thread execution";
+            LFATAL_.format("thread_func: {} thread_num:{} : caught "
+                           "unexpected exception, aborted thread execution",
+                id_.name(), global_thread_num);
 
             report_error(global_thread_num, std::current_exception());
             return;
         }
 
-        LTM_(info)    //-V128
-            << "thread_func: " << id_.name()
-            << " thread_num: " << global_thread_num
-            << " , ending OS thread, executed "    //-V128
-            << counter_data_[global_thread_num].executed_threads_
-            << " HPX threads";
+        LTM_(info).format("thread_func: {} thread_num: {}, ending OS thread, "
+                          "executed {} HPX threads",
+            id_.name(), global_thread_num,
+            counter_data_[global_thread_num].executed_threads_);
     }
 
     ///////////////////////////////////////////////////////////////////////////

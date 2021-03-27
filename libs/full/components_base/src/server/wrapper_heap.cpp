@@ -363,11 +363,9 @@ namespace hpx { namespace components { namespace detail {
 
         free_size_ = parameters_.capacity;
 
-        LOSH_(info)    //-V128
-            << "wrapper_heap ("
-            << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-            << "): init_pool (" << std::hex << static_cast<void*>(pool_) << ")"
-            << " size: " << total_num_bytes << ".";
+        LOSH_(info).format("wrapper_heap ({}): init_pool ({}) size: {}.",
+            !class_name_.empty() ? class_name_.c_str() : "<Unknown>",
+            static_cast<void*>(pool_), total_num_bytes);
 
         return true;
     }
@@ -376,13 +374,13 @@ namespace hpx { namespace components { namespace detail {
     {
         if (pool_ != nullptr)
         {
-            LOSH_(debug)    //-V128
-                << "wrapper_heap ("
-                << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                << ")"
+            LOSH_(debug)
+                    .format("wrapper_heap ({})",
+                        !class_name_.empty() ? class_name_.c_str() :
+                                               "<Unknown>")
 #if defined(HPX_DEBUG)
-                << ": releasing heap: alloc count: " << alloc_count_
-                << ", free count: " << free_count_
+                    .format(": releasing heap: alloc count: {}, free count: {}",
+                        alloc_count_, free_count_)
 #endif
                 << ".";
 
@@ -392,13 +390,10 @@ namespace hpx { namespace components { namespace detail {
 #endif
             )
             {
-                LOSH_(warning)    //-V128
-                    << "wrapper_heap ("
-                    << (!class_name_.empty() ? class_name_.c_str() :
-                                               "<Unknown>")
-                    << "): releasing heap (" << std::hex
-                    << static_cast<void*>(pool_) << ")"
-                    << " with " << size() << " allocated object(s)!";
+                LOSH_(warning).format("wrapper_heap ({}): releasing heap ({}) "
+                                      "with {} allocated object(s)!",
+                    !class_name_.empty() ? class_name_.c_str() : "<Unknown>",
+                    static_cast<void*>(pool_), size());
             }
 
             std::size_t const total_num_bytes =

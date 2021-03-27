@@ -61,41 +61,37 @@ namespace hpx { namespace threads { namespace detail {
 
     void write_to_log(char const* valuename, std::size_t value)
     {
-        LTM_(debug) << "topology: " << valuename << ": " << value;    //-V128
+        LTM_(debug).format("topology: {}: {}", valuename, value);    //-V128
     }
 
     void write_to_log_mask(char const* valuename, mask_cref_type value)
     {
-        LTM_(debug) << "topology: " << valuename << ": " HPX_CPU_MASK_PREFIX
-                    << std::hex << value;
+        LTM_(debug).format(
+            "topology: {}: " HPX_CPU_MASK_PREFIX "{:x}", valuename, value);
     }
 
     void write_to_log(
         char const* valuename, std::vector<std::size_t> const& values)
     {
-        LTM_(debug) << "topology: " << valuename << "s, size: "    //-V128
-                    << values.size();
+        LTM_(debug).format("topology: {}s, size: {}", valuename, values.size());
 
         std::size_t i = 0;
         for (std::size_t value : values)
         {
-            LTM_(debug) << "topology: " << valuename    //-V128
-                        << "(" << i++ << "): " << value;
+            LTM_(debug).format("topology: {}({}): {}", valuename, i++, value);
         }
     }
 
     void write_to_log_mask(
         char const* valuename, std::vector<mask_type> const& values)
     {
-        LTM_(debug) << "topology: " << valuename << "s, size: "    //-V128
-                    << values.size();
+        LTM_(debug).format("topology: {}s, size: {}", valuename, values.size());
 
         std::size_t i = 0;
         for (mask_cref_type value : values)
         {
-            LTM_(debug) << "topology: " << valuename    //-V128
-                        << "(" << i++ << "): " HPX_CPU_MASK_PREFIX << std::hex
-                        << value;
+            LTM_(debug).format("topology: {}({}): " HPX_CPU_MASK_PREFIX "{:x}",
+                valuename, i++, value);
         }
     }
 

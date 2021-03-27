@@ -393,8 +393,8 @@ namespace hpx { namespace components { namespace server {
 
         typedef typename Component::wrapping_type wrapping_type;
         naming::gid_type id = create<wrapping_type>();
-        LRT_(info) << "successfully created component " << id
-                   << " of type: " << components::get_component_type_name(type);
+        LRT_(info).format("successfully created component {} of type: {}", id,
+            components::get_component_type_name(type));
 
         return id;
     }
@@ -412,8 +412,8 @@ namespace hpx { namespace components { namespace server {
         naming::gid_type id =
             create<wrapping_type>(std::move(v), std::move(vs)...);
 
-        LRT_(info) << "successfully created component " << id
-                   << " of type: " << components::get_component_type_name(type);
+        LRT_(info).format("successfully created component {} of type: {}", id,
+            components::get_component_type_name(type));
 
         return id;
     }
@@ -435,9 +435,8 @@ namespace hpx { namespace components { namespace server {
             ids.push_back(create<wrapping_type>());
         }
 
-        LRT_(info) << "successfully created " << count    //-V128
-                   << " component(s) of type: "
-                   << components::get_component_type_name(type);
+        LRT_(info).format("successfully created {} component(s) of type: {}",
+            count, components::get_component_type_name(type));
 
         return ids;
     }
@@ -458,9 +457,8 @@ namespace hpx { namespace components { namespace server {
             ids.push_back(create<wrapping_type>(v, vs...));
         }
 
-        LRT_(info) << "successfully created " << count    //-V128
-                   << " component(s) of type: "
-                   << components::get_component_type_name(type);
+        LRT_(info).format("successfully created {} component(s) of type: {}",
+            count, components::get_component_type_name(type));
 
         return ids;
     }
@@ -484,8 +482,8 @@ namespace hpx { namespace components { namespace server {
             id = create<wrapping_type>(*p);
         }
 
-        LRT_(info) << "successfully created component " << id
-                   << " of type: " << components::get_component_type_name(type);
+        LRT_(info).format("successfully created component {} of type: {}", id,
+            components::get_component_type_name(type));
 
         return id;
     }
@@ -527,9 +525,9 @@ namespace hpx { namespace components { namespace server {
             return naming::invalid_gid;
         }
 
-        LRT_(info) << "successfully migrated component " << id
-                   << " of type: " << components::get_component_type_name(type)
-                   << " to locality: " << find_here();
+        LRT_(info).format(
+            "successfully migrated component {} of type: {} to locality: {}",
+            id, components::get_component_type_name(type), find_here());
 
         // inform the newly created component that it has been migrated
         new_instance->on_migrated();

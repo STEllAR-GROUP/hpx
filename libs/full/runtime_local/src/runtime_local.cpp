@@ -432,14 +432,14 @@ namespace hpx {
 
     runtime::~runtime()
     {
-        LRT_(debug) << "~runtime_local(entering)";
+        LRT_(debug).format("~runtime_local(entering)");
 
         // stop all services
         thread_manager_->stop();    // stops timer_pool_ as well
 #ifdef HPX_HAVE_IO_POOL
         io_pool_.stop();
 #endif
-        LRT_(debug) << "~runtime_local(finished)";
+        LRT_(debug).format("~runtime_local(finished)");
 
         LPROGRESS_;
 
@@ -1393,7 +1393,7 @@ namespace hpx {
         util::external_timer::init(nullptr, 0, 1);
 #endif
 
-        LRT_(info) << "cmd_line: " << get_config().get_cmd_line();
+        LRT_(info).format("cmd_line: {}", get_config().get_cmd_line());
 
         lbt_ << "(1st stage) runtime::start: booting locality " << here();
 
@@ -1468,9 +1468,9 @@ namespace hpx {
         std::unique_lock<std::mutex> l(mtx_);
         while (!stop_done_)
         {
-            LRT_(info) << "runtime: about to enter wait state";
+            LRT_(info).format("runtime: about to enter wait state");
             wait_condition_.wait(l);
-            LRT_(info) << "runtime: exiting wait state";
+            LRT_(info).format("runtime: exiting wait state");
         }
     }
 
@@ -1504,7 +1504,7 @@ namespace hpx {
 
     int runtime::wait()
     {
-        LRT_(info) << "runtime_local: about to enter wait state";
+        LRT_(info).format("runtime_local: about to enter wait state");
 
         // start the wait_helper in a separate thread
         std::mutex mtx;
@@ -1536,7 +1536,7 @@ namespace hpx {
             },
             "runtime::wait");
 
-        LRT_(info) << "runtime_local: exiting wait state";
+        LRT_(info).format("runtime_local: exiting wait state");
         return result_;
     }
 
@@ -1545,7 +1545,7 @@ namespace hpx {
     // schedule a task managed by timer_pool to initiate second part
     void runtime::stop(bool blocking)
     {
-        LRT_(warning) << "runtime_local: about to stop services";
+        LRT_(warning).format("runtime_local: about to stop services");
 
         // execute all on_exit functions whenever the first thread calls this
         this->runtime::stopping();
@@ -1580,11 +1580,11 @@ namespace hpx {
             // this disables all logging from the main thread
             deinit_tss_helper("main-thread", 0);
 
-            LRT_(info) << "runtime_local: stopped all services";
+            LRT_(info).format("runtime_local: stopped all services");
         }
 
 #ifdef HPX_HAVE_TIMER_POOL
-        LTM_(info) << "stop: stopping timer pool";
+        LTM_(info).format("stop: stopping timer pool");
         timer_pool_.stop();
         if (blocking)
         {
@@ -1593,7 +1593,7 @@ namespace hpx {
         }
 #endif
 #ifdef HPX_HAVE_IO_POOL
-        LTM_(info) << "stop: stopping io pool";
+        LTM_(info).format("stop: stopping io pool");
         io_pool_.stop();
         if (blocking)
         {
@@ -1615,7 +1615,7 @@ namespace hpx {
         // this disables all logging from the main thread
         deinit_tss_helper("main-thread", 0);
 
-        LRT_(info) << "runtime_local: stopped all services";
+        LRT_(info).format("runtime_local: stopped all services");
 
         std::lock_guard<std::mutex> l(mtx);
         cond.notify_all();    // we're done now
@@ -1623,7 +1623,7 @@ namespace hpx {
 
     int runtime::suspend()
     {
-        LRT_(info) << "runtime_local: about to suspend runtime";
+        LRT_(info).format("runtime_local: about to suspend runtime");
 
         if (state_.load() == state_sleeping)
         {
@@ -1660,7 +1660,7 @@ namespace hpx {
 
     int runtime::resume()
     {
-        LRT_(info) << "runtime_local: about to resume runtime";
+        LRT_(info).format("runtime_local: about to resume runtime");
 
         if (state_.load() == state_running)
         {

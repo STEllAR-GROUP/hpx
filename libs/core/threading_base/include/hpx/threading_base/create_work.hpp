@@ -43,14 +43,14 @@ namespace hpx { namespace threads { namespace detail {
         }
 #endif
 
-        LTM_(info) << "create_work: initial_state("
-                   << get_thread_state_name(data.initial_state)
-                   << "), thread_priority("
-                   << get_thread_priority_name(data.priority)
+        LTM_(info)
+            .format("create_work: initial_state({}), thread_priority({})",
+                get_thread_state_name(data.initial_state),
+                get_thread_priority_name(data.priority))
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-                   << "), description(" << data.description
+            .format(", description({})", data.description)
 #endif
-                   << ")";
+            ;
 
         thread_self* self = get_self_ptr();
 

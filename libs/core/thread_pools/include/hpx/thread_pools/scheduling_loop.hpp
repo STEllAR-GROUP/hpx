@@ -38,29 +38,27 @@ namespace hpx { namespace threads { namespace detail {
     inline void write_new_state_log_debug(std::size_t num_thread,
         thread_data* thrd, thread_schedule_state state, char const* info)
     {
-        LTM_(debug) << "tfunc(" << num_thread << "): "    //-V128
-                    << "thread(" << thrd->get_thread_id() << "), "
-                    << "description(" << thrd->get_description() << "), "
-                    << "new state(" << get_thread_state_name(state) << "), "
-                    << info;
+        LTM_(debug).format(
+            "tfunc({}): thread({}), description({}), new state({}), {}",
+            num_thread, thrd->get_thread_id(), thrd->get_description(),
+            get_thread_state_name(state), info);
     }
     inline void write_new_state_log_warning(std::size_t num_thread,
         thread_data* thrd, thread_schedule_state state, char const* info)
     {
         // log this in any case
-        LTM_(warning) << "tfunc(" << num_thread << "): "    //-V128
-                      << "thread(" << thrd->get_thread_id() << "), "
-                      << "description(" << thrd->get_description() << "), "
-                      << "new state(" << get_thread_state_name(state) << "), "
-                      << info;
+        LTM_(warning).format(
+            "tfunc({}): thread({}), description({}), new state({}), {}",
+            num_thread, thrd->get_thread_id(), thrd->get_description(),
+            get_thread_state_name(state), info);
     }
     inline void write_old_state_log(
         std::size_t num_thread, thread_data* thrd, thread_schedule_state state)
     {
-        LTM_(debug) << "tfunc(" << num_thread << "): "    //-V128
-                    << "thread(" << thrd->get_thread_id() << "), "
-                    << "description(" << thrd->get_description() << "), "
-                    << "old state(" << get_thread_state_name(state) << ")";
+        LTM_(debug).format(
+            "tfunc({}): thread({}), description({}), old state({})", num_thread,
+            thrd->get_thread_id(), thrd->get_description(),
+            get_thread_state_name(state));
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -828,16 +826,10 @@ namespace hpx { namespace threads { namespace detail {
                 else if (HPX_UNLIKELY(
                              thread_schedule_state::active == state_val))
                 {
-                    LTM_(warning) << "tfunc(" << num_thread
-                                  << "): "    //-V128
-                                     "thread("
-                                  << thrd->get_thread_id()
-                                  << "), "
-                                     "description("
-                                  << thrd->get_description()
-                                  << "), "
-                                     "rescheduling";
-
+                    LTM_(warning).format(
+                        "tfunc({}): thread({}), description({}), rescheduling",
+                        num_thread, thrd->get_thread_id(),
+                        thrd->get_description());
                     // re-schedule thread, if it is still marked as active
                     // this might happen, if some thread has been added to the
                     // scheduler queue already but the state has not been reset
