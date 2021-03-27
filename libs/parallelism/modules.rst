@@ -22,6 +22,7 @@ Parallelism modules
    /libs/parallelism/executors/docs/index.rst
    /libs/parallelism/futures/docs/index.rst
    /libs/parallelism/lcos_local/docs/index.rst
+   /libs/parallelism/libcds/docs/index.rst
    /libs/parallelism/pack_traversal/docs/index.rst
    /libs/parallelism/resiliency/docs/index.rst
    /libs/parallelism/thread_pool_util/docs/index.rst

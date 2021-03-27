@@ -238,6 +238,12 @@ namespace hpx { namespace util {
                 HPX_PP_EXPAND(HPX_NUM_TIMER_POOL_SIZE)) "}",
 #endif
 
+#if defined(HPX_HAVE_MODULE_LIBCDS)
+            "[hpx.cds]",
+            "num_concurrent_hazard_pointer_threads="
+            "${HPX_NUM_CONCURRENT_HAZARD_POINTER_THREADS:128}",
+#endif
+
             "[hpx.thread_queue]",
             "max_thread_count = ${HPX_THREAD_QUEUE_MAX_THREAD_COUNT:" HPX_PP_STRINGIZE(
                 HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",

@@ -60,6 +60,11 @@
 #ifdef HPX_HAVE_MODULE_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>
 #endif
+
+#if defined(HPX_HAVE_MODULE_LIBCDS)
+#include <hpx/modules/libcds.hpp>
+#endif
+
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/components_base/agas_interface.hpp>
@@ -750,6 +755,15 @@ namespace hpx {
                 &hpx::terminate);
             hpx::parallel::util::detail::
                 set_parallel_exception_termination_handler(&hpx::terminate);
+
+#if defined(HPX_HAVE_MODULE_LIBCDS)
+            hpx::cds::detail::set_get_num_concurrent_hazard_pointer_threads(
+                []() {
+                    return std::stoul(hpx::get_config_entry(
+                        "hpx.cds.num_concurrent_hazard_pointer_threads",
+                        "128"));
+                });
+#endif
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
             unsetenv("LANG");

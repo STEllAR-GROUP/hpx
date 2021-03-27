@@ -124,13 +124,9 @@ namespace hpx {
         std::size_t get_thread_data() const;
         std::size_t set_thread_data(std::size_t);
 
-#if defined(HPX_HAVE_LIBCDS)
-        std::size_t get_libcds_data() const;
-        std::size_t set_libcds_data(std::size_t);
+#if defined(HPX_HAVE_MODULE_LIBCDS)
         std::size_t get_libcds_hazard_pointer_data() const;
         std::size_t set_libcds_hazard_pointer_data(std::size_t);
-        std::size_t get_libcds_dynamic_hazard_pointer_data() const;
-        std::size_t set_libcds_dynamic_hazard_pointer_data(std::size_t);
 #endif
 
     private:
@@ -270,16 +266,10 @@ namespace hpx {
         HPX_PARALLELISM_EXPORT std::size_t get_thread_data();
         HPX_PARALLELISM_EXPORT std::size_t set_thread_data(std::size_t);
 
-#if defined(HPX_HAVE_LIBCDS)
-        HPX_PARALLELISM_EXPORT std::size_t get_libcds_data();
-        HPX_PARALLELISM_EXPORT std::size_t set_libcds_data(std::size_t);
+#if defined(HPX_HAVE_MODULE_LIBCDS)
         HPX_PARALLELISM_EXPORT std::size_t get_libcds_hazard_pointer_data();
         HPX_PARALLELISM_EXPORT std::size_t set_libcds_hazard_pointer_data(
             std::size_t);
-        HPX_PARALLELISM_EXPORT std::size_t
-        get_libcds_dynamic_hazard_pointer_data();
-        HPX_PARALLELISM_EXPORT std::size_t
-            set_libcds_dynamic_hazard_pointer_data(std::size_t);
 #endif
 
         class HPX_PARALLELISM_EXPORT disable_interruption

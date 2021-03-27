@@ -19,6 +19,7 @@ set(_hpx_parallelism_modules
     executors
     futures
     lcos_local
+    libcds
     pack_traversal
     resiliency
     thread_pool_util

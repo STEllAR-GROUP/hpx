@@ -86,10 +86,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #else
           , m_thread_data(0)
 #endif
-#if defined(HPX_HAVE_LIBCDS)
-          , libcds_data_(0)
+#if defined(HPX_HAVE_MODULE_LIBCDS)
           , libcds_hazard_pointer_data_(0)
-          , libcds_dynamic_hazard_pointer_data_(0)
 #endif
           , m_type_info()
           , m_thread_id(id)
@@ -104,10 +102,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #else
             m_thread_data = 0;
 #endif
-#if defined(HPX_HAVE_LIBCDS)
-            libcds_data_ = 0;
+#if defined(HPX_HAVE_MODULE_LIBCDS)
             libcds_hazard_pointer_data_ = 0;
-            libcds_dynamic_hazard_pointer_data_ = 0;
 #endif
         }
 
@@ -215,10 +211,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #else
             m_thread_data = 0;
 #endif
-#if defined(HPX_HAVE_LIBCDS)
-            libcds_data_ = 0;
+#if defined(HPX_HAVE_MODULE_LIBCDS)
             libcds_hazard_pointer_data_ = 0;
-            libcds_dynamic_hazard_pointer_data_ = 0;
 #endif
         }
 
@@ -244,18 +238,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #endif
         }
 
-#if defined(HPX_HAVE_LIBCDS)
-        std::size_t get_libcds_data() const
-        {
-            return libcds_data_;
-        }
-
-        std::size_t set_libcds_data(std::size_t data)
-        {
-            std::swap(data, libcds_data_);
-            return data;
-        }
-
+#if defined(HPX_HAVE_MODULE_LIBCDS)
         std::size_t get_libcds_hazard_pointer_data() const
         {
             return libcds_hazard_pointer_data_;
@@ -264,17 +247,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         std::size_t set_libcds_hazard_pointer_data(std::size_t data)
         {
             std::swap(data, libcds_hazard_pointer_data_);
-            return data;
-        }
-
-        std::size_t get_libcds_dynamic_hazard_pointer_data() const
-        {
-            return libcds_dynamic_hazard_pointer_data_;
-        }
-
-        std::size_t set_libcds_dynamic_hazard_pointer_data(std::size_t data)
-        {
-            std::swap(data, libcds_dynamic_hazard_pointer_data_);
             return data;
         }
 #endif
@@ -335,10 +307,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #else
             HPX_ASSERT(m_thread_data == 0);
 #endif
-#if defined(HPX_HAVE_LIBCDS)
-            HPX_ASSERT(libcds_data_ == 0);
+#if defined(HPX_HAVE_MODULE_LIBCDS)
             HPX_ASSERT(libcds_hazard_pointer_data_ == 0);
-            HPX_ASSERT(libcds_dynamic_hazard_pointer_data_ == 0);
 #endif
             // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
             m_type_info = std::exception_ptr();
@@ -401,10 +371,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #else
         mutable std::size_t m_thread_data;
 #endif
-#if defined(HPX_HAVE_LIBCDS)
-        mutable std::size_t libcds_data_;
+#if defined(HPX_HAVE_MODULE_LIBCDS)
         mutable std::size_t libcds_hazard_pointer_data_;
-        mutable std::size_t libcds_dynamic_hazard_pointer_data_;
 #endif
 
         // This is used to generate a meaningful exception trace.

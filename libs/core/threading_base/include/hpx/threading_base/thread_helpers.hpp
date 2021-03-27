@@ -393,23 +393,11 @@ namespace hpx { namespace threads {
     HPX_CORE_EXPORT std::size_t set_thread_data(
         thread_id_type const& id, std::size_t data, error_code& ec = throws);
 
-#if defined(HPX_HAVE_LIBCDS)
-    HPX_CORE_EXPORT std::size_t get_libcds_data(
-        thread_id_type const& id, error_code& ec = throws);
-
-    HPX_CORE_EXPORT std::size_t set_libcds_data(
-        thread_id_type const& id, std::size_t data, error_code& ec = throws);
-
+#if defined(HPX_HAVE_MODULE_LIBCDS)
     HPX_CORE_EXPORT std::size_t get_libcds_hazard_pointer_data(
         thread_id_type const& id, error_code& ec = throws);
 
     HPX_CORE_EXPORT std::size_t set_libcds_hazard_pointer_data(
-        thread_id_type const& id, std::size_t data, error_code& ec = throws);
-
-    HPX_CORE_EXPORT std::size_t get_libcds_dynamic_hazard_pointer_data(
-        thread_id_type const& id, error_code& ec = throws);
-
-    HPX_CORE_EXPORT std::size_t set_libcds_dynamic_hazard_pointer_data(
         thread_id_type const& id, std::size_t data, error_code& ec = throws);
 #endif
 

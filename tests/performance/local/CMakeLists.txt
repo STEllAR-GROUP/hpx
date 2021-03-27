@@ -28,9 +28,8 @@ if(NOT HPX_WITH_CUDA)
   list(APPEND benchmarks stream)
 endif()
 
-if(HPX_WITH_LIBCDS)
-  list(APPEND benchmarks libcds_hazard_pointer_overhead)
-  set(libcds_hazard_pointer_overhead_FLAGS DEPENDENCIES iostreams_component)
+if(NOT HPX_WITH_SANITIZERS)
+  list(APPEND benchmarks start_stop)
 endif()
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME AND (HPX_WITH_DATAPAR_VC
