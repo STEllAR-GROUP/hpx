@@ -191,8 +191,7 @@ namespace hpx { namespace components {
                 {
                     HPX_THROW_EXCEPTION(duplicate_component_id,
                         "get_agas_component_type",
-                        std::string("the component name ") + name +
-                            " is already in use");
+                        "the component name {} is already in use", name);
                 }
             }
             else

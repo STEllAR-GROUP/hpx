@@ -363,7 +363,7 @@ namespace hpx { namespace util {
                 name = "<root>";
 
             HPX_THROW_EXCEPTION(bad_parameter, "section::get_section",
-                "No such section (" + sec_name + ") in section: " + name);
+                "No such section ({}) in section: {}", sec_name, name);
             return nullptr;
         }
 
@@ -372,7 +372,7 @@ namespace hpx { namespace util {
             return &((*it).second);
 
         HPX_THROW_EXCEPTION(bad_parameter, "section::get_section",
-            "No such section (" + sec_name + ") in section: " + get_name());
+            "No such section ({}) in section: {}", sec_name, get_name());
         return nullptr;
     }
 
@@ -396,7 +396,7 @@ namespace hpx { namespace util {
                 name = "<root>";
 
             HPX_THROW_EXCEPTION(bad_parameter, "section::get_section",
-                "No such section (" + sec_name + ") in section: " + name);
+                "No such section ({}) in section: {}", sec_name, name);
             return nullptr;
         }
 
@@ -405,7 +405,7 @@ namespace hpx { namespace util {
             return &((*it).second);
 
         HPX_THROW_EXCEPTION(bad_parameter, "section::get_section",
-            "No such section (" + sec_name + ") in section: " + get_name());
+            "No such section ({}) in section: {}", sec_name, get_name());
         return nullptr;
     }
 
@@ -641,7 +641,7 @@ namespace hpx { namespace util {
             }
 
             HPX_THROW_EXCEPTION(bad_parameter, "section::get_entry",
-                "No such key (" + key + ") in section: " + get_name());
+                "No such key ({}) in section: {}", key, get_name());
             return "";
         }
 
@@ -653,7 +653,7 @@ namespace hpx { namespace util {
         }
 
         HPX_THROW_EXCEPTION(bad_parameter, "section::get_entry",
-            "No such section (" + key + ") in section: " + get_name());
+            "No such section ({}) in section: {}", key, get_name());
         return "";
     }
 

@@ -303,7 +303,7 @@ namespace hpx { namespace performance_counters {
         if (!parse_counter_name(name, elements))
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements",
-                hpx::util::format("invalid counter name format: {}", name));
+                "invalid counter name format: {}", name);
             return status_invalid_data;
         }
 
@@ -357,8 +357,7 @@ namespace hpx { namespace performance_counters {
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "get_counter_path_elements",
-                            hpx::util::format(
-                                "invalid counter name format: {}", name));
+                            "invalid counter name format: {}", name);
                         return status_invalid_data;
                     }
                 }
@@ -395,7 +394,7 @@ namespace hpx { namespace performance_counters {
         if (!parse_counter_name(name, elements))
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_type_path_elements",
-                hpx::util::format("invalid counter name format: {}", name));
+                "invalid counter name format: {}", name);
             return status_invalid_data;
         }
 
@@ -770,9 +769,8 @@ namespace hpx { namespace performance_counters {
             if (ec)
             {
                 HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
-                    "no create function for performance counter found: " +
-                        remove_counter_prefix(info.fullname_) + " (" +
-                        ec.get_message() + ")");
+                    "no create function for performance counter found: {} ({})",
+                    remove_counter_prefix(info.fullname_), ec.get_message());
                 return naming::invalid_gid;
             }
 
@@ -786,8 +784,8 @@ namespace hpx { namespace performance_counters {
                     static_cast<std::int64_t>(hpx::get_locality_id()))
             {
                 HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
-                    "attempt to create counter on wrong locality (" +
-                        ec.get_message() + ")");
+                    "attempt to create counter on wrong locality ({})",
+                    ec.get_message());
                 return hpx::naming::invalid_gid;
             }
 
@@ -796,9 +794,8 @@ namespace hpx { namespace performance_counters {
             if (ec)
             {
                 HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
-                    "couldn't create performance counter: " +
-                        remove_counter_prefix(info.fullname_) + " (" +
-                        ec.get_message() + ")");
+                    "couldn't create performance counter: {} ({})",
+                    remove_counter_prefix(info.fullname_), ec.get_message());
                 return naming::invalid_gid;
             }
 

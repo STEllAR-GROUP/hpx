@@ -1279,7 +1279,7 @@ namespace hpx { namespace agas {
         {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "addressing_service::incref_async",
-                hpx::util::format("invalid credit count of {1}", credit));
+                "invalid credit count of {1}", credit);
             return lcos::future<std::int64_t>();
         }
 
@@ -1388,7 +1388,7 @@ namespace hpx { namespace agas {
         if (HPX_UNLIKELY(credit <= 0))
         {
             HPX_THROWS_IF(ec, bad_parameter, "addressing_service::decref",
-                hpx::util::format("invalid credit count of {1}", credit));
+                "invalid credit count of {1}", credit);
             return;
         }
 
@@ -1416,9 +1416,8 @@ namespace hpx { namespace agas {
 
                     HPX_THROWS_IF(ec, bad_parameter,
                         "addressing_service::decref",
-                        hpx::util::format("couldn't insert decref request "
-                                          "for {1} ({2})",
-                            raw, credit));
+                        "couldn't insert decref request for {1} ({2})", raw,
+                        credit);
                     return;
                 }
             }

@@ -9,7 +9,6 @@
 #if defined(HPX_WINDOWS)
 
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/format.hpp>
 
 #include <cstdint>
 #include <cstring>
@@ -43,8 +42,9 @@ namespace hpx { namespace performance_counters { namespace memory
             {
                 HPX_THROW_EXCEPTION(kernel_error,
                     "hpx::performance_counters::memory::read_psm_virtual",
-                    hpx::util::format("format message failed with {:x} (while "
-                        "retrieving message for {:x})", GetLastError(), hr));
+                    "format message failed with {:x} (while retrieving message "
+                    "for {:x})",
+                    GetLastError(), hr);
                 return std::uint64_t(-1);
             }
 
@@ -81,8 +81,9 @@ namespace hpx { namespace performance_counters { namespace memory
             {
                 HPX_THROW_EXCEPTION(kernel_error,
                     "hpx::performance_counters::memory::read_psm_resident",
-                    hpx::util::format("format message failed with {:x} (while "
-                        "retrieving message for {:x})", GetLastError(), hr));
+                    "format message failed with {:x} (while retrieving message "
+                    "for {:x})",
+                    GetLastError(), hr);
                 return std::uint64_t(-1);
             }
 
@@ -116,8 +117,9 @@ namespace hpx { namespace performance_counters { namespace memory
             {
                 HPX_THROW_EXCEPTION(kernel_error,
                     "hpx::performance_counters::memory::read_total_mem_avail",
-                    hpx::util::format("format message failed with {:x} (while "
-                        "retrieving message for {:x})", GetLastError(), hr));
+                    "format message failed with {:x} (while "
+                    "retrieving message for {:x})",
+                    GetLastError(), hr);
                 return std::uint64_t(-1);
             }
 

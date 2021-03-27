@@ -1884,15 +1884,13 @@ namespace hpx {
                         used_processing_units),
                     ec);
 
-                // comment this out for now as on CIrcleCI this is causing unending grief
+                // comment this out for now as on CircleCI this is causing unending grief
                 //if (ec)
                 //{
-                //    HPX_THROW_EXCEPTION(kernel_error
-                //        , "runtime::init_tss_ex"
-                //        , hpx::util::format(
-                //            "failed to set thread affinity mask ("
-                //            HPX_CPU_MASK_PREFIX "{:x}) for service thread: {}",
-                //            used_processing_units, detail::thread_name()));
+                //    HPX_THROW_EXCEPTION(kernel_error, "runtime::init_tss_ex",
+                //        "failed to set thread affinity mask "
+                //        "(" HPX_CPU_MASK_PREFIX "{:x}) for service thread: {}",
+                //        used_processing_units, detail::thread_name());
                 //}
             }
 #endif
@@ -1969,7 +1967,7 @@ namespace hpx {
             return &main_pool_;
 
         HPX_THROW_EXCEPTION(bad_parameter, "runtime::get_thread_pool",
-            std::string("unknown thread pool requested: ") + name);
+            "unknown thread pool requested: {}", name);
         return nullptr;
     }
 

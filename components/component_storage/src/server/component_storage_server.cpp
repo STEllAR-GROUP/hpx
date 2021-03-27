@@ -6,7 +6,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
 
 #include <vector>
@@ -32,9 +31,7 @@ namespace hpx { namespace components { namespace server
         {
             HPX_THROW_EXCEPTION(duplicate_component_address,
                 "component_storage::migrate_to_here",
-                hpx::util::format(
-                    "failed to rebind id {} to storage locality: {}", id,
-                    gid_));
+                "failed to rebind id {} to storage locality: {}", id, gid_);
             return naming::invalid_gid;
         }
 

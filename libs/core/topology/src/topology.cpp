@@ -419,7 +419,7 @@ namespace hpx { namespace threads {
 
         HPX_THROWS_IF(ec, bad_parameter,
             "hpx::threads::topology::get_socket_affinity_mask",
-            hpx::util::format("thread number {1} is out of range", num_thread));
+            "thread number {1} is out of range", num_thread);
         return empty_mask;
     }    // }}}
 
@@ -438,7 +438,7 @@ namespace hpx { namespace threads {
 
         HPX_THROWS_IF(ec, bad_parameter,
             "hpx::threads::topology::get_numa_node_affinity_mask",
-            hpx::util::format("thread number {1} is out of range", num_thread));
+            "thread number {1} is out of range", num_thread);
         return empty_mask;
     }    // }}}
 
@@ -457,7 +457,7 @@ namespace hpx { namespace threads {
 
         HPX_THROWS_IF(ec, bad_parameter,
             "hpx::threads::topology::get_core_affinity_mask",
-            hpx::util::format("thread number {1} is out of range", num_thread));
+            "thread number {1} is out of range", num_thread);
         return empty_mask;
     }
 
@@ -476,7 +476,7 @@ namespace hpx { namespace threads {
 
         HPX_THROWS_IF(ec, bad_parameter,
             "hpx::threads::topology::get_thread_affinity_mask",
-            hpx::util::format("thread number {1} is out of range", num_thread));
+            "thread number {1} is out of range", num_thread);
         return empty_mask;
     }    // }}}
 
@@ -518,10 +518,9 @@ namespace hpx { namespace threads {
 
                     HPX_THROWS_IF(ec, kernel_error,
                         "hpx::threads::topology::set_thread_affinity_mask",
-                        hpx::util::format("failed to set thread affinity mask "
-                                          "(" HPX_CPU_MASK_PREFIX
-                                          "{}) for cpuset {}",
-                            mask, buffer.get()));
+                        "failed to set thread affinity mask "
+                        "(" HPX_CPU_MASK_PREFIX "{}) for cpuset {}",
+                        mask, buffer.get());
                     return;
                 }
             }
@@ -591,8 +590,8 @@ namespace hpx { namespace threads {
                 HPX_THROW_EXCEPTION(no_success,
                     "topology::get_thread_affinity_mask_from_lva",
                     "failed calling 'hwloc_get_area_membind_nodeset', "
-                    "reported error: " +
-                        errstr);
+                    "reported error: {}",
+                    errstr);
             }
         }
 
@@ -1368,7 +1367,7 @@ namespace hpx { namespace threads {
                 msg = "the binding cannot be enforced";
             HPX_THROW_EXCEPTION(kernel_error,
                 "hpx::threads::topology::set_area_membind_nodeset",
-                "hwloc_set_area_membind_nodeset failed : " + msg);
+                "hwloc_set_area_membind_nodeset failed : {}", msg);
             return false;
         }
 #endif
@@ -1441,7 +1440,7 @@ namespace hpx { namespace threads {
             std::string msg(strerror(errno));
             HPX_THROW_EXCEPTION(kernel_error,
                 "hpx::threads::topology::get_numa_domain",
-                "hwloc_get_area_memlocation failed " + msg);
+                "hwloc_get_area_memlocation failed {}", msg);
             return -1;
 #endif
         }

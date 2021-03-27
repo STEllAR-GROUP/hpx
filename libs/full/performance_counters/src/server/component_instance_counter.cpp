@@ -77,8 +77,8 @@ namespace hpx { namespace performance_counters { namespace detail {
             {
                 HPX_THROWS_IF(ec, bad_parameter,
                     "component_instance_counter_creator",
-                    "invalid component type as counter parameter: " +
-                        paths.parameters_);
+                    "invalid component type as counter parameter: {}",
+                    paths.parameters_);
                 return naming::invalid_gid;
             }
 

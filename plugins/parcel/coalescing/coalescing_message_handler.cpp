@@ -12,16 +12,16 @@
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/plugin/traits/plugin_config_data.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <hpx/plugins/message_handler_factory.hpp>
-#include <hpx/plugins/parcel/coalescing_message_handler.hpp>
 #include <hpx/plugins/parcel/coalescing_counter_registry.hpp>
+#include <hpx/plugins/parcel/coalescing_message_handler.hpp>
 
 #include <boost/accumulators/accumulators.hpp>
 
@@ -33,8 +33,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     // Inject additional configuration data into the factory registry for this
     // type. This information ends up in the system wide configuration database
     // under the plugin specific section:
@@ -54,7 +53,7 @@ namespace hpx { namespace traits
                    "allow_background_flush = 1";
         }
     };
-}}
+}}    // namespace hpx::traits
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_PLUGIN_MODULE_DYNAMIC();
@@ -63,10 +62,8 @@ HPX_REGISTER_MESSAGE_HANDLER_FACTORY(
     coalescing_message_handler);
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace plugins { namespace parcel
-{
-    namespace detail
-    {
+namespace hpx { namespace plugins { namespace parcel {
+    namespace detail {
         std::size_t get_num_messages(std::size_t num_messages)
         {
             return hpx::util::from_string<std::size_t>(hpx::get_config_entry(
@@ -87,7 +84,7 @@ namespace hpx { namespace plugins { namespace parcel
                 "1");
             return !value.empty() && value[0] != '0';
         }
-    }
+    }    // namespace detail
 
     void coalescing_message_handler::update_num_messages()
     {
@@ -103,40 +100,48 @@ namespace hpx { namespace plugins { namespace parcel
     }
 
     coalescing_message_handler::coalescing_message_handler(
-            char const* action_name, parcelset::parcelport* pp, std::size_t num,
-            std::size_t interval)
-      : pp_(pp),
-        num_coalesced_parcels_(detail::get_num_messages(num)),
-        interval_(detail::get_interval(interval)),
-        buffer_(num_coalesced_parcels_),
-        timer_(
+        char const* action_name, parcelset::parcelport* pp, std::size_t num,
+        std::size_t interval)
+      : pp_(pp)
+      , num_coalesced_parcels_(detail::get_num_messages(num))
+      , interval_(detail::get_interval(interval))
+      , buffer_(num_coalesced_parcels_)
+      , timer_(
             util::bind_back(&coalescing_message_handler::timer_flush, this_()),
-            util::bind_back(&coalescing_message_handler::flush_terminate, this_()),
-            std::string(action_name) + "_timer"),
-        stopped_(false),
-        allow_background_flush_(detail::get_background_flush()),
-        action_name_(action_name),
-        num_parcels_(0), reset_num_parcels_(0),
-            reset_num_parcels_per_message_parcels_(0),
-        num_messages_(0), reset_num_messages_(0),
-            reset_num_parcels_per_message_messages_(0),
-        started_at_(hpx::chrono::high_resolution_clock::now()),
-        reset_time_num_parcels_(0),
-        last_parcel_time_(started_at_),
-        histogram_min_boundary_(-1),
-        histogram_max_boundary_(-1),
-        histogram_num_buckets_(-1)
+            util::bind_back(
+                &coalescing_message_handler::flush_terminate, this_()),
+            std::string(action_name) + "_timer")
+      , stopped_(false)
+      , allow_background_flush_(detail::get_background_flush())
+      , action_name_(action_name)
+      , num_parcels_(0)
+      , reset_num_parcels_(0)
+      , reset_num_parcels_per_message_parcels_(0)
+      , num_messages_(0)
+      , reset_num_messages_(0)
+      , reset_num_parcels_per_message_messages_(0)
+      , started_at_(hpx::chrono::high_resolution_clock::now())
+      , reset_time_num_parcels_(0)
+      , last_parcel_time_(started_at_)
+      , histogram_min_boundary_(-1)
+      , histogram_max_boundary_(-1)
+      , histogram_num_buckets_(-1)
     {
         // register performance counter functions
         coalescing_counter_registry::instance().register_action(action_name,
-            util::bind_front(&coalescing_message_handler::get_parcels_count, this),
-            util::bind_front(&coalescing_message_handler::get_messages_count, this),
+            util::bind_front(
+                &coalescing_message_handler::get_parcels_count, this),
+            util::bind_front(
+                &coalescing_message_handler::get_messages_count, this),
+            util::bind_front(
+                &coalescing_message_handler::get_parcels_per_message_count,
+                this),
+            util::bind_front(
+                &coalescing_message_handler::get_average_time_between_parcels,
+                this),
             util::bind_front(&coalescing_message_handler::
-                get_parcels_per_message_count, this),
-            util::bind_front(&coalescing_message_handler::
-                get_average_time_between_parcels, this),
-            util::bind_front(&coalescing_message_handler::
-                get_time_between_parcels_histogram_creator, this));
+                                 get_time_between_parcels_histogram_creator,
+                this));
 
         // register parameter update callbacks
         set_config_entry_callback(
@@ -147,9 +152,8 @@ namespace hpx { namespace plugins { namespace parcel
             util::bind(&coalescing_message_handler::update_interval, this));
     }
 
-    void coalescing_message_handler::put_parcel(
-        parcelset::locality const& dest, parcelset::parcel p,
-        write_handler_type f)
+    void coalescing_message_handler::put_parcel(parcelset::locality const& dest,
+        parcelset::parcel p, write_handler_type f)
     {
         std::unique_lock<mutex_type> l(mtx_);
         ++num_parcels_;
@@ -169,8 +173,7 @@ namespace hpx { namespace plugins { namespace parcel
         // empty and time since last parcel is larger than coalescing interval.
         if (stopped_ ||
             (buffer_.empty() &&
-                std::chrono::nanoseconds(time_since_last_parcel) > interval
-           ))
+                std::chrono::nanoseconds(time_since_last_parcel) > interval))
         {
             ++num_messages_;
             l.unlock();
@@ -183,7 +186,8 @@ namespace hpx { namespace plugins { namespace parcel
         detail::message_buffer::message_buffer_append_state s =
             buffer_.append(dest, std::move(p), std::move(f));
 
-        switch(s) {
+        switch (s)
+        {
         case detail::message_buffer::first_message:
             HPX_FALLTHROUGH;
         case detail::message_buffer::normal:
@@ -214,8 +218,8 @@ namespace hpx { namespace plugins { namespace parcel
         if (!buffer_.empty())
         {
             flush_locked(l,
-                parcelset::policies::message_handler::flush_mode_timer,
-                false, false);
+                parcelset::policies::message_handler::flush_mode_timer, false,
+                false);
         }
 
         // do not restart timer for now, will be restarted on next parcel
@@ -246,7 +250,9 @@ namespace hpx { namespace plugins { namespace parcel
 
         // proceed with background work only if explicitly allowed
         if (!allow_background_flush_ &&
-            mode == parcelset::policies::message_handler::flush_mode_background_work)
+            mode ==
+                parcelset::policies::message_handler::
+                    flush_mode_background_work)
         {
             return false;
         }
@@ -255,47 +261,49 @@ namespace hpx { namespace plugins { namespace parcel
         {
             stopped_ = true;
             {
-                hpx::util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
-                timer_.stop();              // interrupt timer
+                hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                timer_.stop();    // interrupt timer
             }
         }
         else if (cancel_timer)
         {
-            hpx::util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
-            timer_.stop();              // interrupt timer
+            hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+            timer_.stop();    // interrupt timer
         }
 
         if (buffer_.empty())
             return false;
 
-        detail::message_buffer buff (num_coalesced_parcels_);
+        detail::message_buffer buff(num_coalesced_parcels_);
         std::swap(buff, buffer_);
 
         ++num_messages_;
         l.unlock();
 
         HPX_ASSERT(nullptr != pp_);
-        buff(pp_);                   // 'invoke' the buffer
+        buff(pp_);    // 'invoke' the buffer
 
         return true;
     }
 
     // performance counter values
-    std::int64_t
-    coalescing_message_handler::get_average_time_between_parcels(bool reset)
+    std::int64_t coalescing_message_handler::get_average_time_between_parcels(
+        bool reset)
     {
         std::lock_guard<mutex_type> l(mtx_);
         std::int64_t now = hpx::chrono::high_resolution_clock::now();
         if (num_parcels_ == 0)
         {
-            if (reset) started_at_ = now;
+            if (reset)
+                started_at_ = now;
             return 0;
         }
 
         std::int64_t num_parcels = num_parcels_ - reset_time_num_parcels_;
         if (num_parcels == 0)
         {
-            if (reset) started_at_ = now;
+            if (reset)
+                started_at_ = now;
             return 0;
         }
 
@@ -320,8 +328,8 @@ namespace hpx { namespace plugins { namespace parcel
         return num_parcels;
     }
 
-    std::int64_t
-        coalescing_message_handler::get_parcels_per_message_count(bool reset)
+    std::int64_t coalescing_message_handler::get_parcels_per_message_count(
+        bool reset)
     {
         std::unique_lock<mutex_type> l(mtx_);
 
@@ -337,8 +345,8 @@ namespace hpx { namespace plugins { namespace parcel
 
         std::int64_t num_parcels =
             num_parcels_ - reset_num_parcels_per_message_parcels_;
-        std::int64_t
-            num_messages = num_messages_ - reset_num_parcels_per_message_messages_;
+        std::int64_t num_messages =
+            num_messages_ - reset_num_parcels_per_message_messages_;
 
         if (reset)
         {
@@ -373,9 +381,10 @@ namespace hpx { namespace plugins { namespace parcel
             l.unlock();
             HPX_THROW_EXCEPTION(bad_parameter,
                 "coalescing_message_handler::"
-                    "get_time_between_parcels_histogram",
+                "get_time_between_parcels_histogram",
                 "parcel-arrival-histogram counter was not initialized for "
-                "action type: " + action_name_);
+                "action type: {}",
+                action_name_);
             return result;
         }
 
@@ -393,8 +402,7 @@ namespace hpx { namespace plugins { namespace parcel
         return result;
     }
 
-    void
-    coalescing_message_handler::get_time_between_parcels_histogram_creator(
+    void coalescing_message_handler::get_time_between_parcels_histogram_creator(
         std::int64_t min_boundary, std::int64_t max_boundary,
         std::int64_t num_buckets,
         util::function_nonser<std::vector<std::int64_t>(bool)>& result)
@@ -402,8 +410,9 @@ namespace hpx { namespace plugins { namespace parcel
         std::lock_guard<mutex_type> l(mtx_);
         if (time_between_parcels_)
         {
-            result = util::bind_front(&coalescing_message_handler::
-                get_time_between_parcels_histogram, this);
+            result = util::bind_front(
+                &coalescing_message_handler::get_time_between_parcels_histogram,
+                this);
             return;
         }
 
@@ -417,19 +426,20 @@ namespace hpx { namespace plugins { namespace parcel
             hpx::util::tag::histogram::max_range = double(max_boundary)));
         last_parcel_time_ = hpx::chrono::high_resolution_clock::now();
 
-        result = util::bind_front(&coalescing_message_handler::
-            get_time_between_parcels_histogram, this);
+        result = util::bind_front(
+            &coalescing_message_handler::get_time_between_parcels_histogram,
+            this);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // register the given action (called during startup)
-    void coalescing_message_handler::register_action(char const* action,
-        error_code& ec)
+    void coalescing_message_handler::register_action(
+        char const* action, error_code& ec)
     {
         coalescing_counter_registry::instance().register_action(action);
         if (&ec != &throws)
             ec = make_success_code();
     }
-}}}
+}}}    // namespace hpx::plugins::parcel
 
 #endif

@@ -24,7 +24,6 @@
 #include <hpx/modules/collectives.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
@@ -1085,10 +1084,9 @@ namespace hpx { namespace components { namespace server {
                 // we don't know anything about this component
                 HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                     "runtime_support::create_message_handler",
-                    hpx::util::format(
-                        "attempt to create message handler plugin instance of "
-                        "invalid/unknown type: {}",
-                        message_handler_type));
+                    "attempt to create message handler plugin instance of "
+                    "invalid/unknown type: {}",
+                    message_handler_type);
             }
             else
             {
@@ -1114,9 +1112,9 @@ namespace hpx { namespace components { namespace server {
         {
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::register_message_handler",
-                hpx::util::format("couldn't register action '{}' for message "
-                                  "handler plugin of type: {}",
-                    action, message_handler_type));
+                "couldn't register action '{}' for message handler plugin of "
+                "type: {}",
+                action, message_handler_type);
             return;
         }
 
@@ -1147,10 +1145,9 @@ namespace hpx { namespace components { namespace server {
                 // we don't know anything about this component
                 HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                     "runtime_support::create_message_handler",
-                    hpx::util::format(
-                        "attempt to create message handler plugin instance of "
-                        "invalid/unknown type: {}",
-                        message_handler_type));
+                    "attempt to create message handler plugin instance of "
+                    "invalid/unknown type: {}",
+                    message_handler_type);
             }
             else
             {
@@ -1176,9 +1173,8 @@ namespace hpx { namespace components { namespace server {
         {
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_message_handler",
-                hpx::util::format(
-                    "couldn't create message handler plugin of type: {}",
-                    message_handler_type));
+                "couldn't create message handler plugin of type: {}",
+                message_handler_type);
             return nullptr;
         }
 
@@ -1206,10 +1202,9 @@ namespace hpx { namespace components { namespace server {
             // we don't know anything about this component
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_binary_filter",
-                hpx::util::format(
-                    "attempt to create binary filter plugin instance of "
-                    "invalid/unknown type: {}",
-                    binary_filter_type));
+                "attempt to create binary filter plugin instance of "
+                "invalid/unknown type: {}",
+                binary_filter_type);
             return nullptr;
         }
 
@@ -1226,9 +1221,8 @@ namespace hpx { namespace components { namespace server {
         {
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_binary_filter",
-                hpx::util::format(
-                    "couldn't create binary filter plugin of type: {}",
-                    binary_filter_type));
+                "couldn't create binary filter plugin of type: {}",
+                binary_filter_type);
             return nullptr;
         }
 
@@ -1424,8 +1418,8 @@ namespace hpx { namespace components { namespace server {
                     HPX_THROW_EXCEPTION(service_unavailable,
                         "runtime_support::load_components",
                         "static linking configuration does not support dynamic "
-                        "loading of component '" +
-                            instance + "'");
+                        "loading of component '{}'",
+                        instance);
 #else
                     load_component_dynamic(ini, instance, component, lib,
                         prefix, agas_client, isdefault, isenabled, options,
@@ -1906,8 +1900,8 @@ namespace hpx { namespace components { namespace server {
                     HPX_THROW_EXCEPTION(service_unavailable,
                         "runtime_support::load_plugins",
                         "static linking configuration does not support static "
-                        "loading of plugin '" +
-                            instance + "'");
+                        "loading of plugin '{}'",
+                        instance);
                 }
                 else
                 {
@@ -1915,8 +1909,8 @@ namespace hpx { namespace components { namespace server {
                     HPX_THROW_EXCEPTION(service_unavailable,
                         "runtime_support::load_plugins",
                         "static linking configuration does not support dynamic "
-                        "loading of plugin '" +
-                            instance + "'");
+                        "loading of plugin '{}'",
+                        instance);
 #else
                     // first, try using the path as the full path to the library
                     load_plugin_dynamic(ini, instance, component, lib,

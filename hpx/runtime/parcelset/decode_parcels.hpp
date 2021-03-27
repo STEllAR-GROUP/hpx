@@ -15,7 +15,6 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/parcelset/detail/data_point.hpp>
@@ -181,11 +180,9 @@ namespace hpx { namespace parcelset
                         {
                             HPX_THROW_EXCEPTION(invalid_status,
                                 "hpx::parcelset::decode_message",
-                                hpx::util::format(
-                                    "parcel destination does not match "
-                                    "locality which received the parcel ({}), "
-                                    "{}",
-                                    here, p));
+                                "parcel destination does not match locality "
+                                "which received the parcel ({}), {}",
+                                here, p);
                             return;
                         }
 

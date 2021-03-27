@@ -281,10 +281,9 @@ namespace hpx { namespace agas { namespace server {
 
                     HPX_THROW_EXCEPTION(bad_parameter,
                         "primary_namespace::bind_gid",
-                        hpx::util::format(
-                            "attempt to update a GVA with an invalid type, "
-                            "gid({1}), gva({2}), locality({3})",
-                            id, g, locality));
+                        "attempt to update a GVA with an invalid type, "
+                        "gid({1}), gva({2}), locality({3})",
+                        id, g, locality);
                 }
 
                 if (HPX_UNLIKELY(!locality))
@@ -293,11 +292,10 @@ namespace hpx { namespace agas { namespace server {
 
                     HPX_THROW_EXCEPTION(bad_parameter,
                         "primary_namespace::bind_gid",
-                        hpx::util::format(
-                            "attempt to update a GVA with an invalid "
-                            "locality id, "
-                            "gid({1}), gva({2}), locality({3})",
-                            id, g, locality));
+                        "attempt to update a GVA with an invalid "
+                        "locality id, "
+                        "gid({1}), gva({2}), locality({3})",
+                        id, g, locality);
                 }
 
                 // Store the new endpoint and offset
@@ -380,10 +378,9 @@ namespace hpx { namespace agas { namespace server {
             l.unlock();
 
             HPX_THROW_EXCEPTION(bad_parameter, "primary_namespace::bind_gid",
-                hpx::util::format(
-                    "attempt to insert a GVA with an invalid type, "
-                    "gid({1}), gva({2}), locality({3})",
-                    id, g, locality));
+                "attempt to insert a GVA with an invalid type, "
+                "gid({1}), gva({2}), locality({3})",
+                id, g, locality);
         }
 
         // Insert a GID -> GVA entry into the GVA table.
@@ -393,10 +390,9 @@ namespace hpx { namespace agas { namespace server {
             l.unlock();
 
             HPX_THROW_EXCEPTION(lock_error, "primary_namespace::bind_gid",
-                hpx::util::format(
-                    "GVA table insertion failed due to a locking error or "
-                    "memory corruption, gid({1}), gva({2}), locality({3})",
-                    id, g, locality));
+                "GVA table insertion failed due to a locking error or "
+                "memory corruption, gid({1}), gva({2}), locality({3})",
+                id, g, locality);
         }
 
         l.unlock();
@@ -546,7 +542,7 @@ namespace hpx { namespace agas { namespace server {
         {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "primary_namespace::increment_credit",
-                hpx::util::format("invalid credit count of {1}", credits));
+                "invalid credit count of {1}", credits);
             return 0;
         }
 
@@ -589,7 +585,7 @@ namespace hpx { namespace agas { namespace server {
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "primary_namespace::decrement_credit",
-                    hpx::util::format("invalid credit count of {1}", credits));
+                    "invalid credit count of {1}", credits);
             }
             res_credits.push_back(credits);
         }
@@ -746,10 +742,9 @@ namespace hpx { namespace agas { namespace server {
 
                     HPX_THROWS_IF(ec, invalid_data,
                         "primary_namespace::increment",
-                        hpx::util::format("couldn't create entry in "
-                                          "reference count table, "
-                                          "raw({1}), ref-count({2})",
-                            raw, count));
+                        "couldn't create entry in reference count table, "
+                        "raw({1}), ref-count({2})",
+                        raw, count);
                     return;
                 }
 
@@ -807,10 +802,9 @@ namespace hpx { namespace agas { namespace server {
 
                 HPX_THROWS_IF(ec, internal_server_error,
                     "primary_namespace::resolve_free_list",
-                    hpx::util::format("primary_namespace::resolve_free_"
-                                      "list, failed to resolve "
-                                      "gid, gid({1})",
-                        gid));
+                    "primary_namespace::resolve_free_list, failed to resolve "
+                    "gid, gid({1})",
+                    gid);
                 return;    // couldn't resolve this one
             }
 
@@ -824,10 +818,9 @@ namespace hpx { namespace agas { namespace server {
 
                 HPX_THROWS_IF(ec, internal_server_error,
                     "primary_namespace::resolve_free_list",
-                    hpx::util::format(
-                        "encountered a GVA with an invalid type while "
-                        "performing a decrement, gid({1}), gva({2})",
-                        gid, g));
+                    "encountered a GVA with an invalid type while performing a "
+                    "decrement, gid({1}), gva({2})",
+                    gid, g);
                 return;
             }
             else if (HPX_UNLIKELY(0 == g.count))
@@ -836,10 +829,9 @@ namespace hpx { namespace agas { namespace server {
 
                 HPX_THROWS_IF(ec, internal_server_error,
                     "primary_namespace::resolve_free_list",
-                    hpx::util::format(
-                        "encountered a GVA with a count of zero while "
-                        "performing a decrement, gid({1}), gva({2})",
-                        gid, g));
+                    "encountered a GVA with a count of zero while performing a "
+                    "decrement, gid({1}), gva({2})",
+                    gid, g);
                 return;
             }
 
@@ -919,12 +911,10 @@ namespace hpx { namespace agas { namespace server {
 
                         HPX_THROWS_IF(ec, invalid_data,
                             "primary_namespace::decrement_sweep",
-                            hpx::util::format("negative entry in reference "
-                                              "count table, raw({1}), "
-                                              "refcount({2})",
-                                raw,
-                                std::int64_t(HPX_GLOBALCREDIT_INITIAL) -
-                                    credits));
+                            "negative entry in reference count table, "
+                            "raw({1}), refcount({2})",
+                            raw,
+                            std::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits);
                         return;
                     }
 
@@ -940,10 +930,9 @@ namespace hpx { namespace agas { namespace server {
 
                         HPX_THROWS_IF(ec, invalid_data,
                             "primary_namespace::decrement_sweep",
-                            hpx::util::format("couldn't create entry in "
-                                              "reference count table, "
-                                              "raw({1}), ref-count({2})",
-                                raw, count));
+                            "couldn't create entry in reference count table, "
+                            "raw({1}), ref-count({2})",
+                            raw, count);
                         return;
                     }
 
@@ -961,10 +950,9 @@ namespace hpx { namespace agas { namespace server {
 
                     HPX_THROWS_IF(ec, invalid_data,
                         "primary_namespace::decrement_sweep",
-                        hpx::util::format("negative entry in reference "
-                                          "count table, raw({1}), "
-                                          "refcount({2})",
-                            raw, it->second));
+                        "negative entry in reference count table, raw({1}), "
+                        "refcount({2})",
+                        raw, it->second);
                     return;
                 }
 

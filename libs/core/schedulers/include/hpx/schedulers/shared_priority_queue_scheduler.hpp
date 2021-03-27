@@ -409,9 +409,8 @@ namespace hpx { namespace threads { namespace policies {
             default:
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "shared_priority_queue_scheduler::create_thread",
-                    "Invalid schedule hint mode: " +
-                        std::to_string(
-                            static_cast<std::size_t>(data.schedulehint.mode)));
+                    "Invalid schedule hint mode: {}",
+                    static_cast<std::size_t>(data.schedulehint.mode));
             }
             // we do not allow threads created on other queues to 'run now'
             // as this causes cross-thread allocations and map accesses
@@ -808,9 +807,8 @@ namespace hpx { namespace threads { namespace policies {
             default:
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "shared_priority_queue_scheduler::schedule_thread",
-                    "Invalid schedule hint mode: " +
-                        std::to_string(
-                            static_cast<std::size_t>(schedulehint.mode)));
+                    "Invalid schedule hint mode: {}",
+                    static_cast<std::size_t>(schedulehint.mode));
             }
 
             spq_deb.debug(debug::str<>("thread scheduled"), msg, "Thread",
@@ -1229,7 +1227,7 @@ namespace hpx { namespace threads { namespace policies {
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "shared_priority_queue_scheduler::on_stop_thread",
-                    "Invalid thread number: " + std::to_string(thread_num));
+                    "Invalid thread number: {}", std::to_string(thread_num));
             }
             // @TODO Do we need to do any queue related cleanup here?
         }
@@ -1241,7 +1239,7 @@ namespace hpx { namespace threads { namespace policies {
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "shared_priority_queue_scheduler::on_error",
-                    "Invalid thread number: " + std::to_string(thread_num));
+                    "Invalid thread number: {}", std::to_string(thread_num));
             }
             // @TODO Do we need to do any queue related cleanup here?
         }

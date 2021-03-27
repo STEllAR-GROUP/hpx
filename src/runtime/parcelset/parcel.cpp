@@ -417,10 +417,9 @@ namespace hpx { namespace parcelset
             data_.addr_.type_, comptype)))
         {
             HPX_THROW_EXCEPTION(bad_component_type, "applier::schedule_action",
-                hpx::util::format(
-                    " types are not compatible: destination_type({}) "
-                    "action_type({}) parcel ({})",
-                    data_.addr_.type_, comptype, *this));
+                " types are not compatible: destination_type({}) "
+                "action_type({}) parcel ({})",
+                data_.addr_.type_, comptype, *this);
         }
 
         return std::make_pair(lva, comptype);

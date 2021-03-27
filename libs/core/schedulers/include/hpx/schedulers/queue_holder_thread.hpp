@@ -595,8 +595,7 @@ namespace hpx { namespace threads { namespace policies {
                 lk.unlock();
                 HPX_THROW_EXCEPTION(hpx::out_of_memory,
                     "queue_holder_thread::add_to_thread_map",
-                    "Couldn't add new thread to the thread map " + map_size +
-                        " " /*+ prev*/);
+                    "Couldn't add new thread to the thread map {}", map_size);
             }
 
             ++thread_map_count_.data_;

@@ -117,8 +117,7 @@ namespace hpx { namespace util {
                 // out of memory
                 guard.unlock();
                 HPX_THROW_EXCEPTION(out_of_memory, name() + "::alloc",
-                    hpx::util::format(
-                        "new heap failed to allocate {1} objects", count));
+                    "new heap failed to allocate {1} objects", count);
             }
 
 #if defined(HPX_DEBUG)
@@ -195,8 +194,7 @@ namespace hpx { namespace util {
         ul.unlock();
 
         HPX_THROW_EXCEPTION(bad_parameter, name() + "::free",
-            hpx::util::format(
-                "pointer {1} was not allocated by this {2}", p, name()));
+            "pointer {1} was not allocated by this {2}", p, name());
     }
 
     bool one_size_heap_list::did_alloc(void* p) const

@@ -134,10 +134,9 @@ namespace hpx { namespace performance_counters {
 
             HPX_THROWS_IF(ec, bad_parameter,
                 "invocation_count_registry::counter_discoverer",
-                hpx::util::format(
-                    "action type {} does not match any known type, "
-                    "known action types: \n{}",
-                    p.parameters_, types));
+                "action type {} does not match any known type, known action "
+                "types: \n{}",
+                p.parameters_, types);
             return false;
         }
 

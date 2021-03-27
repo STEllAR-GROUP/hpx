@@ -123,10 +123,9 @@ namespace hpx { namespace agas { namespace server {
 
                 HPX_THROW_EXCEPTION(duplicate_component_id,
                     "component_namespace::bind_prefix",
-                    hpx::util::format(
-                        "component id is already registered for the given "
-                        "locality, key({1}), prefix({2}), ctype({3})",
-                        key, prefix, cit->second));
+                    "component id is already registered for the given "
+                    "locality, key({1}), prefix({2}), ctype({3})",
+                    key, prefix, cit->second);
                 return components::component_invalid;
             }
 

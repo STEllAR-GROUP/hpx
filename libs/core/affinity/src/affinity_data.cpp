@@ -8,7 +8,6 @@
 #include <hpx/affinity/parse_affinity_options.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
 
@@ -105,11 +104,9 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "affinity_data::affinity_data",
-                    hpx::util::format(
-                        "The number of OS threads requested "
-                        "({1}) does not match the number of threads to "
-                        "bind ({2})",
-                        num_threads_, num_initialized));
+                    "The number of OS threads requested ({1}) does not match "
+                    "the number of threads to bind ({2})",
+                    num_threads_, num_initialized);
             }
         }
         else if (pu_offset == std::size_t(-1))

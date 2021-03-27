@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
@@ -30,8 +29,7 @@ namespace hpx { namespace threads { namespace detail {
         default:
         {
             HPX_THROWS_IF(ec, bad_parameter, "thread::detail::create_work",
-                hpx::util::format(
-                    "invalid initial state: {}", data.initial_state));
+                "invalid initial state: {}", data.initial_state);
             return;
         }
         }

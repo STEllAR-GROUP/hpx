@@ -148,11 +148,10 @@ namespace hpx { namespace agas { namespace server {
             l.unlock();
 
             HPX_THROW_EXCEPTION(lock_error, "locality_namespace::allocate",
-                hpx::util::format(
-                    "partition table insertion failed due to a locking "
-                    "error or memory corruption, endpoint({1}), "
-                    "prefix({2})",
-                    endpoints, prefix));
+                "partition table insertion failed due to a locking "
+                "error or memory corruption, endpoint({1}), "
+                "prefix({2})",
+                endpoints, prefix);
         }
 
         // Now that we've inserted the locality into the partition table
@@ -166,8 +165,7 @@ namespace hpx { namespace agas { namespace server {
             if (!primary_->bind_gid(g, id, id))
             {
                 HPX_THROW_EXCEPTION(bad_request, "locality_namespace::allocate",
-                    hpx::util::format(
-                        "unable to bind prefix({1}) to a gid", prefix));
+                    "unable to bind prefix({1}) to a gid", prefix);
             }
             return prefix;
         }

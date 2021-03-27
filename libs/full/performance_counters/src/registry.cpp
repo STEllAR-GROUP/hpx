@@ -11,7 +11,6 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
@@ -96,8 +95,7 @@ namespace hpx { namespace performance_counters {
         if (it != countertypes_.end())
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::add_counter_type",
-                hpx::util::format(
-                    "counter type already defined: {}", type_name));
+                "counter type already defined: {}", type_name);
             return status_already_defined;
         }
 
@@ -148,9 +146,8 @@ namespace hpx { namespace performance_counters {
 
                 HPX_THROWS_IF(ec, bad_parameter,
                     "registry::discover_counter_type",
-                    hpx::util::format("unknown counter type: {}, known counter "
-                                      "types: \n{}",
-                        type_name, types));
+                    "unknown counter type: {}, known counter types: \n{}",
+                    type_name, types);
                 return status_counter_type_unknown;
             }
 
@@ -229,10 +226,9 @@ namespace hpx { namespace performance_counters {
 
                 HPX_THROWS_IF(ec, bad_parameter,
                     "registry::discover_counter_type",
-                    hpx::util::format(
-                        "counter type {} does not match any known type, "
-                        "known counter types: \n{}",
-                        type_name, types));
+                    "counter type {} does not match any known type, known "
+                    "counter types: \n{}",
+                    type_name, types);
                 return status_counter_type_unknown;
             }
         }
@@ -306,10 +302,8 @@ namespace hpx { namespace performance_counters {
 
             HPX_THROWS_IF(ec, bad_parameter,
                 "registry::get_counter_create_function",
-                hpx::util::format(
-                    "counter type {} is not defined, known counter "
-                    "types: \n{}",
-                    type_name, types));
+                "counter type {} is not defined, known counter types: \n{}",
+                type_name, types);
             return status_counter_type_unknown;
         }
 
@@ -317,9 +311,7 @@ namespace hpx { namespace performance_counters {
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "registry::get_counter_create_function",
-                hpx::util::format("counter type {} has no associated create "
-                                  "function",
-                    type_name));
+                "counter type {} has no associated create function", type_name);
             return status_invalid_data;
         }
 
@@ -348,7 +340,7 @@ namespace hpx { namespace performance_counters {
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "registry::get_counter_discovery_function",
-                hpx::util::format("counter type {} is not defined", type_name));
+                "counter type {} is not defined", type_name);
             return status_counter_type_unknown;
         }
 
@@ -356,9 +348,8 @@ namespace hpx { namespace performance_counters {
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "registry::get_counter_discovery_function",
-                hpx::util::format("counter type {} has no associated discovery "
-                                  "function",
-                    type_name));
+                "counter type {} has no associated discovery function",
+                type_name);
             return status_invalid_data;
         }
 
@@ -451,7 +442,7 @@ namespace hpx { namespace performance_counters {
         if (it == countertypes_.end())
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_raw_counter",
-                hpx::util::format("unknown counter type {}", type_name));
+                "unknown counter type {}", type_name);
             return status_counter_type_unknown;
         }
 
@@ -471,10 +462,9 @@ namespace hpx { namespace performance_counters {
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_raw_counter",
                 "invalid counter type requested (only counter_raw, "
-                "counter_monotonically_increasing, "
-                "counter_aggregating, counter_elapsed_time, "
-                "counter_average_count, or counter_average_timer are "
-                "supported)");
+                "counter_monotonically_increasing, counter_aggregating, "
+                "counter_elapsed_time, counter_average_count, or "
+                "counter_average_timer are supported)");
             return status_counter_type_unknown;
         }
 
@@ -534,7 +524,7 @@ namespace hpx { namespace performance_counters {
         if (it == countertypes_.end())
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_raw_counter",
-                hpx::util::format("unknown counter type {}", type_name));
+                "unknown counter type {}", type_name);
             return status_counter_type_unknown;
         }
 
@@ -545,8 +535,8 @@ namespace hpx { namespace performance_counters {
                     counter_raw_values == info.type_)))
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_raw_counter",
-                "invalid counter type requested (only counter_histogram "
-                "or counter_raw_values are supported)");
+                "invalid counter type requested (only counter_histogram or "
+                "counter_raw_values are supported)");
             return status_counter_type_unknown;
         }
 
@@ -597,7 +587,7 @@ namespace hpx { namespace performance_counters {
         if (it == countertypes_.end())
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_counter",
-                hpx::util::format("unknown counter type {}", type_name));
+                "unknown counter type {}", type_name);
             return status_counter_type_unknown;
         }
 
@@ -681,7 +671,7 @@ namespace hpx { namespace performance_counters {
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "registry::create_statistics_counter",
-                hpx::util::format("unknown counter type {}", type_name));
+                "unknown counter type {}", type_name);
             return status_counter_type_unknown;
         }
 
@@ -691,8 +681,8 @@ namespace hpx { namespace performance_counters {
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "registry::create_statistics_counter",
-                "invalid counter type requested \
-                 (only counter_aggregating is supported)");
+                "invalid counter type requested (only counter_aggregating is "
+                "supported)");
             return status_counter_type_unknown;
         }
 
@@ -863,7 +853,7 @@ namespace hpx { namespace performance_counters {
             {
                 HPX_THROWS_IF(ec, bad_parameter,
                     "registry::create_statistics_counter",
-                    "invalid counter type requested: " + p.countername_);
+                    "invalid counter type requested: {}", p.countername_);
                 return status_counter_type_unknown;
             }
         }
@@ -907,7 +897,7 @@ namespace hpx { namespace performance_counters {
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "registry::create_arithmetics_counter",
-                hpx::util::format("unknown counter type {}", type_name));
+                "unknown counter type {}", type_name);
             return status_counter_type_unknown;
         }
 
@@ -974,7 +964,7 @@ namespace hpx { namespace performance_counters {
             {
                 HPX_THROWS_IF(ec, bad_parameter,
                     "registry::create_arithmetics_counter",
-                    "invalid counter type requested: " + p.countername_);
+                    "invalid counter type requested: {}", p.countername_);
                 return status_counter_type_unknown;
             }
         }
@@ -1018,7 +1008,7 @@ namespace hpx { namespace performance_counters {
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "registry::create_arithmetics_counter_extended",
-                hpx::util::format("unknown counter type {}", type_name));
+                "unknown counter type {}", type_name);
             return status_counter_type_unknown;
         }
 
@@ -1107,7 +1097,7 @@ namespace hpx { namespace performance_counters {
             {
                 HPX_THROWS_IF(ec, bad_parameter,
                     "registry::create_arithmetics_counter",
-                    "invalid counter type requested: " + p.countername_);
+                    "invalid counter type requested: {}", p.countername_);
                 return status_counter_type_unknown;
             }
         }
@@ -1155,7 +1145,7 @@ namespace hpx { namespace performance_counters {
         if (it == countertypes_.end())
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::add_counter",
-                hpx::util::format("unknown counter type {}", type_name));
+                "unknown counter type {}", type_name);
             return status_counter_type_unknown;
         }
 
@@ -1217,7 +1207,7 @@ namespace hpx { namespace performance_counters {
         if (it == countertypes_.end())
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::get_counter_type",
-                hpx::util::format("unknown counter type {}", type_name));
+                "unknown counter type {}", type_name);
             return status_counter_type_unknown;
         }
 

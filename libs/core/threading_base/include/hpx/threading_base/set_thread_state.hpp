@@ -13,7 +13,6 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/create_thread.hpp>
 #include <hpx/threading_base/create_work.hpp>
@@ -100,8 +99,8 @@ namespace hpx { namespace threads { namespace detail {
         if (new_state == thread_schedule_state::active)
         {
             HPX_THROWS_IF(ec, bad_parameter,
-                "threads::detail::set_thread_state",
-                hpx::util::format("invalid new state: {}", new_state));
+                "threads::detail::set_thread_state", "invalid new state: {}",
+                new_state);
             return thread_state(
                 thread_schedule_state::unknown, thread_restart_state::unknown);
         }

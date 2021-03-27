@@ -13,6 +13,7 @@
 #include <hpx/assertion/current_function.hpp>
 #include <hpx/errors/error.hpp>
 #include <hpx/errors/exception_fwd.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -154,8 +155,9 @@ namespace hpx {
 ///      }
 /// \endcode
 ///
-#define HPX_THROW_EXCEPTION(errcode, f, msg)                                   \
-    hpx::detail::throw_exception(errcode, msg, f, __FILE__, __LINE__) /**/
+#define HPX_THROW_EXCEPTION(errcode, f, ...)                                   \
+    hpx::detail::throw_exception(                                              \
+        errcode, hpx::util::format(__VA_ARGS__), f, __FILE__, __LINE__) /**/
 
 /// \def HPX_THROWS_IF(ec, errcode, f, msg)
 /// \brief Either throw a hpx::exception or initialize \a hpx::error_code from
@@ -172,7 +174,8 @@ namespace hpx {
 /// name of the function exception is thrown from and the parameter \p msg
 /// holds the error message the new exception should encapsulate.
 ///
-#define HPX_THROWS_IF(ec, errcode, f, msg)                                     \
-    hpx::detail::throws_if(ec, errcode, msg, f, __FILE__, __LINE__) /**/
+#define HPX_THROWS_IF(ec, errcode, f, ...)                                     \
+    hpx::detail::throws_if(ec, errcode, hpx::util::format(__VA_ARGS__), f,     \
+        __FILE__, __LINE__) /**/
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -182,9 +182,8 @@ namespace hpx { namespace threads {
         if (statex == threads::thread_restart_state::abort)
         {
             HPX_THROW_EXCEPTION(yield_aborted, desc,
-                hpx::util::format(
-                    "thread({}) aborted (yield returned wait_abort)",
-                    description()));
+                "thread({}) aborted (yield returned wait_abort)",
+                description());
         }
 
         return statex;

@@ -915,8 +915,7 @@ namespace hpx { namespace resource { namespace detail {
         if (!(mode_ & mode_allow_dynamic_pools))
         {
             HPX_THROW_EXCEPTION(bad_parameter, "partitioner::shrink_pool",
-                "dynamic pools have not been enabled for the "
-                "partitioner");
+                "dynamic pools have not been enabled for the partitioner");
         }
 
         std::vector<std::size_t> pu_nums_to_remove;
@@ -944,9 +943,7 @@ namespace hpx { namespace resource { namespace detail {
         if (!has_non_exclusive_pus)
         {
             HPX_THROW_EXCEPTION(bad_parameter, "partitioner::shrink_pool",
-                "pool '" + pool_name +
-                    "' has no non-exclusive pus "
-                    "associated");
+                "pool '{}' has no non-exclusive pus associated", pool_name);
         }
 
         for (std::size_t pu_num : pu_nums_to_remove)
@@ -963,8 +960,7 @@ namespace hpx { namespace resource { namespace detail {
         if (!(mode_ & mode_allow_dynamic_pools))
         {
             HPX_THROW_EXCEPTION(bad_parameter, "partitioner::expand_pool",
-                "dynamic pools have not been enabled for the "
-                "partitioner");
+                "dynamic pools have not been enabled for the partitioner");
         }
 
         std::vector<std::size_t> pu_nums_to_add;
@@ -992,9 +988,7 @@ namespace hpx { namespace resource { namespace detail {
         if (!has_non_exclusive_pus)
         {
             HPX_THROW_EXCEPTION(bad_parameter, "partitioner::expand_pool",
-                "pool '" + pool_name +
-                    "' has no non-exclusive pus "
-                    "associated");
+                "pool '{}' has no non-exclusive pus associated", pool_name);
         }
 
         for (std::size_t pu_num : pu_nums_to_add)

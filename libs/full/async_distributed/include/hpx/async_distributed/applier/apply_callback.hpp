@@ -15,7 +15,6 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <hpx/async_distributed/applier/apply.hpp>
@@ -148,9 +147,8 @@ namespace hpx {
         if (!traits::action_is_target_valid<Action>::call(gid))
         {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
-                hpx::util::format("the target (destination) does not match the "
-                                  "action type ({})",
-                    hpx::actions::detail::get_action_name<Action>()));
+                "the target (destination) does not match the action type ({})",
+                hpx::actions::detail::get_action_name<Action>());
             return false;
         }
 

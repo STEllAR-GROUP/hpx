@@ -578,8 +578,8 @@ namespace hpx { namespace threads {
 
         //! FIXME Add names of available pools?
         HPX_THROW_EXCEPTION(bad_parameter, "threadmanager::get_pool",
-            "the resource partitioner does not own a thread pool named '" +
-                pool_name + "'. \n");
+            "the resource partitioner does not own a thread pool named '{}'.\n",
+            pool_name);
     }
 
     thread_pool_base& threadmanager::get_pool(pool_id_type const& pool_id) const

@@ -280,8 +280,8 @@ namespace hpx { namespace performance_counters { namespace detail {
                     HPX_THROWS_IF(ec, bad_parameter,
                         "arithmetics_counter_extended_creator",
                         "the parameter specification for an arithmetic counter "
-                        "has to expand to at least one counter name: " +
-                            paths.parameters_);
+                        "has to expand to at least one counter name: {}",
+                        paths.parameters_);
                     return naming::invalid_gid;
                 }
 
@@ -295,8 +295,8 @@ namespace hpx { namespace performance_counters { namespace detail {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "arithmetics_counter_extended_creator",
                             "the given (expanded) counter name is not "
-                            "a validly formed performance counter name: " +
-                                name);
+                            "a validly formed performance counter name: {}",
+                            name);
                         return naming::invalid_gid;
                     }
                 }
@@ -309,8 +309,8 @@ namespace hpx { namespace performance_counters { namespace detail {
                     "arithmetics_counter_extended_creator",
                     "the parameter specification for an arithmetic counter "
                     "has to be a comma separated list of performance "
-                    "counter names, none is given: " +
-                        remove_counter_prefix(info.fullname_));
+                    "counter names, none is given: {}",
+                    remove_counter_prefix(info.fullname_));
             }
         }
         break;

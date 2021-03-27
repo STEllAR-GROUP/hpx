@@ -121,8 +121,8 @@ namespace hpx { namespace detail {
             {
                 HPX_THROW_EXCEPTION(invalid_status, "verify_no_locks",
                     "suspending thread while at least one lock is "
-                    "being held, stack backtrace: " +
-                        back_trace);
+                    "being held, stack backtrace: {}",
+                    back_trace);
             }
         }
     }

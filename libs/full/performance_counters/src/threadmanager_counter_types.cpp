@@ -71,8 +71,8 @@ namespace hpx { namespace performance_counters { namespace detail {
         if (paths.parentinstance_is_basename_)
         {
             HPX_THROWS_IF(ec, bad_parameter, "queue_length_counter_creator",
-                "invalid counter instance parent name: " +
-                    paths.parentinstancename_);
+                "invalid counter instance parent name: {}",
+                paths.parentinstancename_);
             return naming::invalid_gid;
         }
 
@@ -115,7 +115,7 @@ namespace hpx { namespace performance_counters { namespace detail {
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "locality_pool_thread_counter_creator",
-            "invalid counter instance name: " + paths.instancename_);
+            "invalid counter instance name: {}", paths.instancename_);
         return naming::invalid_gid;
     }
 
@@ -135,8 +135,8 @@ namespace hpx { namespace performance_counters { namespace detail {
         if (paths.parentinstance_is_basename_)
         {
             HPX_THROWS_IF(ec, bad_parameter, "scheduler_utilization_creator",
-                "invalid counter instance parent name: " +
-                    paths.parentinstancename_);
+                "invalid counter instance parent name: {}",
+                paths.parentinstancename_);
             return naming::invalid_gid;
         }
 
@@ -175,7 +175,7 @@ namespace hpx { namespace performance_counters { namespace detail {
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "scheduler_utilization_creator",
-            "invalid counter instance name: " + paths.instancename_);
+            "invalid counter instance name: {}", paths.instancename_);
         return naming::invalid_gid;
     }
 
@@ -198,8 +198,8 @@ namespace hpx { namespace performance_counters { namespace detail {
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "locality_pool_thread_no_total_counter_creator",
-                "invalid counter instance parent name: " +
-                    paths.parentinstancename_);
+                "invalid counter instance parent name: {}",
+                paths.parentinstancename_);
             return naming::invalid_gid;
         }
 
@@ -209,8 +209,8 @@ namespace hpx { namespace performance_counters { namespace detail {
             // overall counter, not supported
             HPX_THROWS_IF(ec, bad_parameter,
                 "locality_pool_thread_no_total_counter_creator",
-                "invalid counter instance name: " + paths.instancename_ +
-                    "'total' is not supported");
+                "invalid counter instance name: {} 'total' is not supported",
+                paths.instancename_);
         }
         else if (paths.instancename_ == "pool")
         {
@@ -243,7 +243,7 @@ namespace hpx { namespace performance_counters { namespace detail {
 
         HPX_THROWS_IF(ec, bad_parameter,
             "locality_pool_thread_no_total_counter_creator",
-            "invalid counter instance name: " + paths.instancename_);
+            "invalid counter instance name: {}", paths.instancename_);
         return naming::invalid_gid;
     }
 
@@ -351,8 +351,8 @@ namespace hpx { namespace performance_counters { namespace detail {
         if (paths.parentinstance_is_basename_)
         {
             HPX_THROWS_IF(ec, bad_parameter, "counter_creator",
-                "invalid counter instance parent name: " +
-                    paths.parentinstancename_);
+                "invalid counter instance parent name: {}",
+                paths.parentinstancename_);
             return naming::invalid_gid;
         }
 
@@ -374,7 +374,7 @@ namespace hpx { namespace performance_counters { namespace detail {
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "counter_creator",
-            "invalid counter instance name: " + paths.instancename_);
+            "invalid counter instance name: {}", paths.instancename_);
         return naming::invalid_gid;
     }
 
@@ -428,7 +428,7 @@ namespace hpx { namespace performance_counters { namespace detail {
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "thread_counts_counter_creator",
-            "invalid counter instance name: " + paths.instancename_);
+            "invalid counter instance name: {}", paths.instancename_);
         return naming::invalid_gid;
     }
 #endif

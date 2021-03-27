@@ -906,15 +906,13 @@ namespace hpx {
                     break;
 #else
                     HPX_THROW_EXCEPTION(invalid_status, "run_or_start",
-                        hpx::util::format(
-                            "Attempted to start the runtime in the mode "
-                            "\"{1}\", but HPX was compiled with "
-                            "HPX_WITH_DISTRIBUTED_RUNTIME=OFF, and \"{1}\" "
-                            "requires HPX_WITH_DISTRIBUTED_RUNTIME=ON. "
-                            "Recompile HPX with "
-                            "HPX_WITH_DISTRIBUTED_RUNTIME=ON or change the "
-                            "runtime mode.",
-                            get_runtime_mode_name(cmdline.rtcfg_.mode_)));
+                        "Attempted to start the runtime in the mode \"{1}\", "
+                        "but HPX was compiled with "
+                        "HPX_WITH_DISTRIBUTED_RUNTIME=OFF, and \"{1}\" "
+                        "requires HPX_WITH_DISTRIBUTED_RUNTIME=ON. "
+                        "Recompile HPX with HPX_WITH_DISTRIBUTED_RUNTIME=ON or "
+                        "change the runtime mode.",
+                        get_runtime_mode_name(cmdline.rtcfg_.mode_));
                     break;
 #endif
                 }
