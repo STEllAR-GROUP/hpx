@@ -42,7 +42,6 @@
 #include <memory>
 #include <mutex>
 #include <random>
-#include <sstream>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -562,10 +561,8 @@ namespace hpx { namespace agas {
 
         if (HPX_UNLIKELY(agas_client.get_status() != state_starting))
         {
-            std::ostringstream strm;
-            strm << "locality " << rt.here() << " has launched early";
-            HPX_THROW_EXCEPTION(
-                internal_server_error, "agas::notify_worker", strm.str());
+            HPX_THROW_EXCEPTION(internal_server_error, "agas::notify_worker",
+                hpx::util::format("locality {} has launched early", rt.here()));
         }
 
         util::runtime_configuration& cfg = rt.get_config();

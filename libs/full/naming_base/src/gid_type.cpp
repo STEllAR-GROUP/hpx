@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/naming_base/gid_type.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -14,11 +15,9 @@
 
 #include <cstdint>
 #include <functional>
-#include <iomanip>
 #include <memory>
 #include <mutex>
 #include <ostream>
-#include <sstream>
 #include <string>
 #include <utility>
 
@@ -110,11 +109,7 @@ namespace hpx { namespace naming {
 
     std::string gid_type::to_string() const
     {
-        std::ostringstream out;
-        out << std::hex << std::right << std::setfill('0') << std::setw(16)
-            << id_msb_ << std::right << std::setfill('0') << std::setw(16)
-            << id_lsb_;
-        return out.str();
+        return hpx::util::format("{:016x}{:016x}", id_msb_, id_lsb_);
     }
 
     std::ostream& operator<<(std::ostream& os, gid_type const& id)
@@ -122,9 +117,8 @@ namespace hpx { namespace naming {
         hpx::util::ios_flags_saver ifs(os);
         if (id != naming::invalid_gid)
         {
-            os << std::hex << "{" << std::right << std::setfill('0')
-               << std::setw(16) << id.id_msb_ << ", " << std::right
-               << std::setfill('0') << std::setw(16) << id.id_lsb_ << "}";
+            hpx::util::format_to(
+                os, "{{{:016x}, {:016x}}}", id.id_msb_, id.id_lsb_);
         }
         else
         {

@@ -287,13 +287,13 @@ namespace hpx { namespace agas {
                 endpoints = locality_ns_->resolve_locality(gid);
                 if (endpoints.empty())
                 {
-                    std::stringstream strm;
-                    strm << "couldn't resolve the given target locality ("
-                         << gid << ")";
+                    std::string str = hpx::util::format(
+                        "couldn't resolve the given target locality ({})", gid);
+
                     l.unlock();
 
                     HPX_THROWS_IF(ec, bad_parameter,
-                        "addressing_service::resolve_locality", strm.str());
+                        "addressing_service::resolve_locality", str);
                     return resolved_localities_[naming::invalid_gid];
                 }
             }

@@ -13,6 +13,7 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/create_thread.hpp>
 #include <hpx/threading_base/create_work.hpp>
@@ -27,7 +28,7 @@
 #include <cstddef>
 #include <functional>
 #include <memory>
-#include <sstream>
+#include <string>
 #include <system_error>
 
 namespace hpx { namespace threads { namespace detail {
@@ -98,10 +99,9 @@ namespace hpx { namespace threads { namespace detail {
         // set_state can't be used to force a thread into active state
         if (new_state == thread_schedule_state::active)
         {
-            std::ostringstream strm;
-            strm << "invalid new state: " << get_thread_state_name(new_state);
             HPX_THROWS_IF(ec, bad_parameter,
-                "threads::detail::set_thread_state", strm.str());
+                "threads::detail::set_thread_state",
+                hpx::util::format("invalid new state: {}", new_state));
             return thread_state(
                 thread_schedule_state::unknown, thread_restart_state::unknown);
         }
@@ -202,20 +202,18 @@ namespace hpx { namespace threads { namespace detail {
                 {
                     // we do not allow explicit resetting of a state to suspended
                     // without the thread being executed.
-                    std::ostringstream strm;
-                    strm << "set_thread_state: invalid new state, can't demote "
-                            "a "
-                            "pending thread, "
-                         << "thread(" << thrd << "), description("
-                         << get_thread_id_data(thrd)->get_description()
-                         << "), new state(" << get_thread_state_name(new_state)
-                         << ")";
+                    std::string str = hpx::util::format(
+                        "set_thread_state: invalid new state, can't demote a "
+                        "pending thread, thread({}), description({}), new "
+                        "state({})",
+                        thrd, get_thread_id_data(thrd)->get_description(),
+                        new_state);
 
                     // NOLINTNEXTLINE(bugprone-branch-clone)
-                    LTM_(fatal) << strm.str();
+                    LTM_(fatal) << str;
 
                     HPX_THROWS_IF(ec, bad_parameter,
-                        "threads::detail::set_thread_state", strm.str());
+                        "threads::detail::set_thread_state", str);
                     return thread_state(thread_schedule_state::unknown,
                         thread_restart_state::unknown);
                 }
@@ -226,12 +224,9 @@ namespace hpx { namespace threads { namespace detail {
                 HPX_FALLTHROUGH;
             default:
             {
-                std::ostringstream strm;
-                strm << "set_thread_state: previous state was "
-                     << get_thread_state_name(previous_state_val) << " ("
-                     << previous_state_val << ")";
-                HPX_ASSERT_MSG(
-                    false, strm.str().c_str());    // should not happen
+                HPX_ASSERT_MSG(false,
+                    hpx::util::format("set_thread_state: previous state was {}",
+                        previous_state_val));    // should not happen
                 break;
             }
             }

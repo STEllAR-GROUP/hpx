@@ -35,6 +35,7 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -55,7 +56,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
-#include <sstream>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -210,9 +210,7 @@ namespace hpx { namespace actions {
         ///////////////////////////////////////////////////////////////////////
         inline std::string make_action_name(boost::string_ref action_name)
         {
-            std::stringstream name;
-            name << "action(" << action_name << ")";
-            return name.str();
+            return hpx::util::format("action({})", action_name);
         }
     }    // namespace detail
 

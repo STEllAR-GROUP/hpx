@@ -15,6 +15,7 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/parcelset/detail/data_point.hpp>
@@ -33,7 +34,6 @@
 #include <cstdint>
 #include <exception>
 #include <functional>
-#include <sstream>
 #include <system_error>
 #include <utility>
 #include <vector>
@@ -179,13 +179,13 @@ namespace hpx { namespace parcelset
                             (naming::get_locality_id_from_gid(
                                  p.destination_locality()) != here))
                         {
-                            std::ostringstream os;
-                            os << "parcel destination does not match "
-                                  "locality which received the parcel ("
-                               << here << "), " << p;
                             HPX_THROW_EXCEPTION(invalid_status,
                                 "hpx::parcelset::decode_message",
-                                os.str());
+                                hpx::util::format(
+                                    "parcel destination does not match "
+                                    "locality which received the parcel ({}), "
+                                    "{}",
+                                    here, p));
                             return;
                         }
 

@@ -8,13 +8,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 
 #include <cstddef>
-#include <sstream>
 
 namespace hpx { namespace threads { namespace detail {
     inline void create_thread(policies::scheduler_base* scheduler,
@@ -36,11 +36,9 @@ namespace hpx { namespace threads { namespace detail {
 
         default:
         {
-            std::ostringstream strm;
-            strm << "invalid initial state: "
-                 << get_thread_state_name(data.initial_state);
             HPX_THROWS_IF(ec, bad_parameter, "threads::detail::create_thread",
-                strm.str());
+                hpx::util::format(
+                    "invalid initial state: {}", data.initial_state));
             return;
         }
         }

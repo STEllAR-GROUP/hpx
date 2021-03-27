@@ -11,6 +11,7 @@
 #include <hpx/datastructures/any.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/plugin/abstract_factory.hpp>
 #include <hpx/plugin/dll.hpp>
 #include <hpx/plugin/export_plugin.hpp>
@@ -65,10 +66,14 @@ namespace hpx { namespace util { namespace plugin {
             else
             {
                 std::ostringstream str;
-                str << "Hpx.Plugin: Class '" << class_name << "' was not found";
+                hpx::util::format_to(
+                    str, "Hpx.Plugin: Class '{}' was not found", class_name);
 
                 if (!libname.empty())
-                    str << " in the shared library '" << libname << "'.";
+                {
+                    hpx::util::format_to(
+                        str, " in the shared library '{}'.", libname);
+                }
 
                 if (!e.empty())
                 {
@@ -82,12 +87,12 @@ namespace hpx { namespace util { namespace plugin {
                     {
                         if (first)
                         {
-                            str << "'" << (*jt).first << "'";
+                            str << "'" << jt->first << "'";
                             first = false;
                         }
                         else
                         {
-                            str << ", '" << (*jt).first << "'";
+                            str << ", '" << jt->first << "'";
                         }
                     }
                     str << ".";

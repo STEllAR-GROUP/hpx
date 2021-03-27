@@ -6,9 +6,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
 
-#include <sstream>
 #include <vector>
 
 namespace hpx { namespace components { namespace server
@@ -30,13 +30,11 @@ namespace hpx { namespace components { namespace server
         addr.address_ = 0;       // invalidate lva
         if (!agas::bind(launch::sync, gid, addr, this->gid_))
         {
-            std::ostringstream strm;
-            strm << "failed to rebind id " << id
-                 << "to storage locality: " << gid_;
-
             HPX_THROW_EXCEPTION(duplicate_component_address,
                 "component_storage::migrate_to_here",
-                strm.str());
+                hpx::util::format(
+                    "failed to rebind id {} to storage locality: {}", id,
+                    gid_));
             return naming::invalid_gid;
         }
 

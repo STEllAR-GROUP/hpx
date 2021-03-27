@@ -14,6 +14,7 @@
 #include <hpx/util/regex_from_pattern.hpp>
 
 #include <regex>
+#include <sstream>
 #include <string>
 #include <utility>
 
@@ -98,18 +99,19 @@ namespace hpx { namespace performance_counters {
             if (!found_one)
             {
                 // compose a list of known action types
-                std::string types;
+                std::ostringstream strm;
+                hpx::util::format_to(strm,
+                    "action type {} does not match any known type, "
+                    "known action types: \n",
+                    p.parameters_);
                 for (auto const& e : map)
                 {
-                    types += "  " + e.first + "\n";
+                    strm << "  " << e.first << "\n";
                 }
 
                 HPX_THROWS_IF(ec, bad_parameter,
                     "invocation_count_registry::counter_discoverer",
-                    hpx::util::format(
-                        "action type {} does not match any known type, "
-                        "known action types: \n{}",
-                        p.parameters_, types));
+                    strm.str());
                 return false;
             }
 

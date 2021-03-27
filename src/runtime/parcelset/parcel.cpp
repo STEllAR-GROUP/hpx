@@ -14,6 +14,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/component_type.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/naming/detail/preprocess_gid_types.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
@@ -27,13 +28,13 @@
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/threading_base/external_timer.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/util/to_string.hpp>
 
 #include <hpx/thread_support/atomic_count.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <memory>
-#include <sstream>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -415,13 +416,11 @@ namespace hpx { namespace parcelset
         if (HPX_UNLIKELY(!components::types_are_compatible(
             data_.addr_.type_, comptype)))
         {
-            std::ostringstream strm;
-            strm << " types are not compatible: destination_type("
-                  << data_.addr_.type_ << ") action_type(" << comptype
-                  << ") parcel ("  << *this << ")";
-            HPX_THROW_EXCEPTION(bad_component_type,
-                "applier::schedule_action",
-                strm.str());
+            HPX_THROW_EXCEPTION(bad_component_type, "applier::schedule_action",
+                hpx::util::format(
+                    " types are not compatible: destination_type({}) "
+                    "action_type({}) parcel ({})",
+                    data_.addr_.type_, comptype, *this));
         }
 
         return std::make_pair(lva, comptype);
@@ -529,19 +528,17 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::ostream& operator<< (std::ostream& os, parcel const& p)
+    std::ostream& operator<<(std::ostream& os, parcel const& p)
     {
-        os << "(" << p.data_.dest_ << ":" << p.data_.addr_ << ":";
-        os << p.action_->get_action_name() << ")";
+        return hpx::util::format_to(os, "({}:{}:{})", p.data_.dest_,
+            p.data_.addr_, p.action_->get_action_name());
 
         return os;
     }
 
     std::string dump_parcel(parcel const& p)
     {
-        std::ostringstream os;
-        os << p;
-        return os.str();
+        return hpx::util::to_string(p);
     }
 }}
 

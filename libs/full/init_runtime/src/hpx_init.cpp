@@ -256,13 +256,10 @@ namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     void list_symbolic_name(std::string const& name, hpx::id_type const& id)
     {
-        std::ostringstream strm;
-
-        strm << name << ", " << id << ", "
-             << (id.get_management_type() == id_type::managed ? "managed" :
-                                                                "unmanaged");
-
-        print(strm.str());
+        std::string str = hpx::util::format("{}, {}, {}", name, id,
+            (id.get_management_type() == id_type::managed ? "managed" :
+                                                            "unmanaged"));
+        print(str);
     }
 
     void list_symbolic_names()
@@ -908,19 +905,16 @@ namespace hpx {
                         cmdline.rtcfg_, &hpx::detail::pre_main));
                     break;
 #else
-                    char const* mode_name =
-                        get_runtime_mode_name(cmdline.rtcfg_.mode_);
-                    std::ostringstream s;
-                    s << "Attempted to start the runtime in the mode \""
-                      << mode_name
-                      << "\", but HPX was compiled with "
-                         "HPX_WITH_DISTRIBUTED_RUNTIME=OFF, and \""
-                      << mode_name
-                      << "\" requires HPX_WITH_DISTRIBUTED_RUNTIME=ON. "
-                         "Recompile HPX with HPX_WITH_DISTRIBUTED_RUNTIME=ON "
-                         "or change the runtime mode.";
-                    HPX_THROW_EXCEPTION(
-                        invalid_status, "run_or_start", s.str());
+                    HPX_THROW_EXCEPTION(invalid_status, "run_or_start",
+                        hpx::util::format(
+                            "Attempted to start the runtime in the mode "
+                            "\"{1}\", but HPX was compiled with "
+                            "HPX_WITH_DISTRIBUTED_RUNTIME=OFF, and \"{1}\" "
+                            "requires HPX_WITH_DISTRIBUTED_RUNTIME=ON. "
+                            "Recompile HPX with "
+                            "HPX_WITH_DISTRIBUTED_RUNTIME=ON or change the "
+                            "runtime mode.",
+                            get_runtime_mode_name(cmdline.rtcfg_.mode_)));
                     break;
 #endif
                 }

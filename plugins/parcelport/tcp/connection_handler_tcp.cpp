@@ -17,6 +17,7 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/plugins/parcelport/tcp/connection_handler.hpp>
 #include <hpx/plugins/parcelport/tcp/receiver.hpp>
 #include <hpx/plugins/parcelport/tcp/sender.hpp>
@@ -34,7 +35,6 @@
 #include <exception>
 #include <memory>
 #include <mutex>
-#include <sstream>
 #include <string>
 #include <system_error>
 
@@ -207,16 +207,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             sender_connection->socket().close();
             sender_connection.reset();
 
-            std::ostringstream strm;
-            strm << error.message() << " (while trying to connect to: "
-                  << l << ")";
-
             if (tolerate_node_faults())
                 return sender_connection;
 
             HPX_THROWS_IF(ec, network_error,
                 "tcp::connection_handler::get_connection",
-                strm.str());
+                hpx::util::format(
+                    "{} (while trying to connect to: {})", error.message(), l));
             return sender_connection;
         }
 

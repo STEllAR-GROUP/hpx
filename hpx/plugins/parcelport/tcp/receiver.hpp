@@ -43,7 +43,6 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
-#include <sstream>
 #include <system_error>
 #include <utility>
 #include <vector>

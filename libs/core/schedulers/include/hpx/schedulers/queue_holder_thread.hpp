@@ -19,22 +19,21 @@
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/type_support/unused.hpp>
 
+#include <atomic>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
+#include <functional>
 #include <iomanip>
 #include <list>
 #include <map>
-#include <unordered_set>
-#include <vector>
-
-#include <atomic>
-#include <exception>
-#include <functional>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <unordered_set>
 #include <utility>
+#include <vector>
 
 #if !defined(QUEUE_HOLDER_THREAD_DEBUG)
 #if defined(HPX_DEBUG)
@@ -586,9 +585,7 @@ namespace hpx { namespace threads { namespace policies {
                 std::string map_size = std::to_string(thread_map_.size());
                 // threads::thread_id_type tid2 = *(p.first);
                 // threads::thread_data* td = get_thread_id_data(tid2);
-                //std::ostringstream address;
-                //address << (void const*) td;
-                //std::string prev = address.str();
+                // std::string prev = hpx::util::format("{}", td);
 
                 tq_deb.error(debug::str<>("map add"),
                     "Couldn't add new thread to the thread map",

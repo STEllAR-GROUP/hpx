@@ -6,15 +6,12 @@
 
 #include <hpx/topology/cpu_mask.hpp>
 
-#include <iomanip>
-#include <sstream>
+#include <hpx/modules/format.hpp>
 #include <string>
 
 namespace hpx { namespace threads {
     std::string to_string(mask_cref_type val)
     {
-        std::ostringstream ostr;
-        ostr << std::hex << HPX_CPU_MASK_PREFIX << val;
-        return ostr.str();
+        return hpx::util::format("{}{:x}", HPX_CPU_MASK_PREFIX, val);
     }
 }}    // namespace hpx::threads

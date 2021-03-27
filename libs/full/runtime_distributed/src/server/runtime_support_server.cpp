@@ -24,6 +24,7 @@
 #include <hpx/modules/collectives.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
@@ -1082,12 +1083,12 @@ namespace hpx { namespace components { namespace server {
             if (ec.category() != hpx::get_lightweight_hpx_category())
             {
                 // we don't know anything about this component
-                std::ostringstream strm;
-                strm << "attempt to create message handler plugin instance of "
-                        "invalid/unknown type: "
-                     << message_handler_type;
                 HPX_THROWS_IF(ec, hpx::bad_plugin_type,
-                    "runtime_support::create_message_handler", strm.str());
+                    "runtime_support::create_message_handler",
+                    hpx::util::format(
+                        "attempt to create message handler plugin instance of "
+                        "invalid/unknown type: {}",
+                        message_handler_type));
             }
             else
             {
@@ -1111,12 +1112,11 @@ namespace hpx { namespace components { namespace server {
 
         if (ec)
         {
-            std::ostringstream strm;
-            strm << "couldn't register action '" << action
-                 << "' for message handler plugin of type: "
-                 << message_handler_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
-                "runtime_support::register_message_handler", strm.str());
+                "runtime_support::register_message_handler",
+                hpx::util::format("couldn't register action '{}' for message "
+                                  "handler plugin of type: {}",
+                    action, message_handler_type));
             return;
         }
 
@@ -1145,12 +1145,12 @@ namespace hpx { namespace components { namespace server {
             if (ec.category() != hpx::get_lightweight_hpx_category())
             {
                 // we don't know anything about this component
-                std::ostringstream strm;
-                strm << "attempt to create message handler plugin instance of "
-                        "invalid/unknown type: "
-                     << message_handler_type;
                 HPX_THROWS_IF(ec, hpx::bad_plugin_type,
-                    "runtime_support::create_message_handler", strm.str());
+                    "runtime_support::create_message_handler",
+                    hpx::util::format(
+                        "attempt to create message handler plugin instance of "
+                        "invalid/unknown type: {}",
+                        message_handler_type));
             }
             else
             {
@@ -1174,11 +1174,11 @@ namespace hpx { namespace components { namespace server {
             factory->create(action, pp, num_messages, interval);
         if (nullptr == mh)
         {
-            std::ostringstream strm;
-            strm << "couldn't create message handler plugin of type: "
-                 << message_handler_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
-                "runtime_support::create_message_handler", strm.str());
+                "runtime_support::create_message_handler",
+                hpx::util::format(
+                    "couldn't create message handler plugin of type: {}",
+                    message_handler_type));
             return nullptr;
         }
 
@@ -1204,12 +1204,12 @@ namespace hpx { namespace components { namespace server {
         {
             l.unlock();
             // we don't know anything about this component
-            std::ostringstream strm;
-            strm << "attempt to create binary filter plugin instance of "
-                    "invalid/unknown type: "
-                 << binary_filter_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
-                "runtime_support::create_binary_filter", strm.str());
+                "runtime_support::create_binary_filter",
+                hpx::util::format(
+                    "attempt to create binary filter plugin instance of "
+                    "invalid/unknown type: {}",
+                    binary_filter_type));
             return nullptr;
         }
 
@@ -1224,11 +1224,11 @@ namespace hpx { namespace components { namespace server {
             factory->create(compress, next_filter);
         if (nullptr == bf)
         {
-            std::ostringstream strm;
-            strm << "couldn't create binary filter plugin of type: "
-                 << binary_filter_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
-                "runtime_support::create_binary_filter", strm.str());
+                "runtime_support::create_binary_filter",
+                hpx::util::format(
+                    "couldn't create binary filter plugin of type: {}",
+                    binary_filter_type));
             return nullptr;
         }
 

@@ -27,7 +27,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
-#include <sstream>
 #include <string>
 #include <utility>
 
@@ -248,11 +247,10 @@ namespace hpx { namespace threads {
             default:
             {
                 // should not happen...
-                std::ostringstream strm;
-                strm << "resume: previous state was "
-                     << get_thread_state_name(previous_state_val) << " ("
-                     << previous_state_val << ")";
-                HPX_ASSERT_MSG(false, strm.str().c_str());
+                HPX_ASSERT_MSG(false,
+                    hpx::util::format(
+                        "resume: previous state was {}", previous_state_val)
+                        .c_str());
                 break;
             }
             }
