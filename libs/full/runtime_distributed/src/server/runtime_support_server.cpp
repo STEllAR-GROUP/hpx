@@ -13,6 +13,7 @@
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
+#include <hpx/command_line_handling/late_command_line_handling.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/component_type.hpp>
@@ -860,103 +861,24 @@ namespace hpx { namespace components { namespace server {
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    inline void decode(std::string& str, char const* s, char const* r)
-    {
-        std::string::size_type pos = 0;
-        while ((pos = str.find(s, pos)) != std::string::npos)
-        {
-            str.replace(pos, 2, r);
-        }
-    }
-
-    inline std::string decode_string(std::string str)
-    {
-        decode(str, "\\n", "\n");
-        return str;
-    }
-
-    namespace detail {
-        void handle_print_bind(
-            hpx::program_options::variables_map const& /* vm_ */,
-            std::size_t num_threads)
-        {
-            threads::topology& top = threads::create_topology();
-            auto const& rp = hpx::resource::get_partitioner();
-            auto const& tm = get_runtime().get_thread_manager();
-            {
-                std::ostringstream
-                    strm;    // make sure all output is kept together
-
-                strm << std::string(79, '*') << '\n';
-                strm << "locality: " << hpx::get_locality_id() << '\n';
-                for (std::size_t i = 0; i != num_threads; ++i)
-                {
-                    // print the mask for the current PU
-                    threads::mask_cref_type pu_mask = rp.get_pu_mask(i);
-
-                    if (!threads::any(pu_mask))
-                    {
-                        strm << std::setw(4) << i    //-V112
-                             << ": thread binding disabled" << std::endl;
-                    }
-                    else
-                    {
-                        std::string pool_name = tm.get_pool(i).get_pool_name();
-                        top.print_affinity_mask(strm, i, pu_mask, pool_name);
-                    }
-
-                    // Make sure the mask does not contradict the CPU bindings
-                    // returned by the system (see #973: Would like option to
-                    // report HWLOC bindings).
-                    error_code ec(lightweight);
-                    std::thread& blob = tm.get_os_thread_handle(i);
-                    threads::mask_type boundcpu =
-                        top.get_cpubind_mask(blob, ec);
-
-                    /* threads::mask_type boundcpu = top.get_cpubind_mask(
-                    rt.get_thread_manager().get_os_thread_handle(i), ec);*/
-
-                    // The masks reported by HPX must be the same as the ones
-                    // reported from HWLOC.
-                    if (!ec && threads::any(boundcpu) &&
-                        !threads::equal(boundcpu, pu_mask, num_threads))
-                    {
-                        std::string boundcpu_str = threads::to_string(boundcpu);
-                        std::string pu_mask_str = threads::to_string(pu_mask);
-                        HPX_THROW_EXCEPTION(invalid_status, "handle_print_bind",
-                            hpx::util::format(
-                                "unexpected mismatch between locality {1}: "
-                                "binding "
-                                "reported from HWLOC({2}) and HPX({3}) on "
-                                "thread {4}",
-                                hpx::get_locality_id(), boundcpu_str,
-                                pu_mask_str, i));
-                    }
-                }
-
-                std::cout << strm.str();
-            }
-        }
-
 #if defined(HPX_HAVE_NETWORKING)
+    namespace detail {
         void handle_list_parcelports()
         {
-            {
-                std::ostringstream
-                    strm;    // make sure all output is kept together
-                strm << std::string(79, '*') << '\n';
-                strm << "locality: " << hpx::get_locality_id() << '\n';
+            // make sure all output is kept together
+            std::ostringstream strm;
+            strm << std::string(79, '*') << '\n';
+            strm << "locality: " << hpx::get_locality_id() << '\n';
 
-                get_runtime_distributed().get_parcel_handler().list_parcelports(
-                    strm);
+            get_runtime_distributed().get_parcel_handler().list_parcelports(
+                strm);
 
-                std::cout << strm.str();
-            }
+            std::cout << strm.str();
         }
-#endif
     }    // namespace detail
+#endif
 
+    ///////////////////////////////////////////////////////////////////////////
     int runtime_support::load_components()
     {
         // load components now that AGAS is up
@@ -979,117 +901,23 @@ namespace hpx { namespace components { namespace server {
         naming::resolver_client& client = naming::get_agas_client();
         int result = load_components(
             ini, client.get_local_locality(), client, options, startup_handled);
+        if (result != 0)
+        {
+            return result;
+        }
 
         if (!load_plugins(ini, options, startup_handled))
-            result = -2;
-
-        // do secondary command line processing, check validity of options only
-        try
         {
-            std::string unknown_cmd_line(
-                ini.get_entry("hpx.unknown_cmd_line", ""));
-            if (!unknown_cmd_line.empty())
-            {
-                std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
-                hpx::program_options::variables_map vm;
-
-                util::commandline_error_mode mode = util::rethrow_on_error;
-                std::string allow_unknown(
-                    ini.get_entry("hpx.commandline.allow_unknown", "0"));
-                if (allow_unknown != "0")
-                    mode = util::allow_unregistered;
-
-                std::vector<std::string> still_unregistered_options;
-                util::parse_commandline(ini, options, unknown_cmd_line, vm,
-                    std::size_t(-1), mode,
-                    get_runtime_mode_from_name(runtime_mode), nullptr,
-                    &still_unregistered_options);
-
-                std::string still_unknown_commandline;
-                for (std::size_t i = 1; i < still_unregistered_options.size();
-                     ++i)
-                {
-                    if (i != 1)
-                    {
-                        still_unknown_commandline += " ";
-                    }
-                    still_unknown_commandline +=
-                        util::detail::enquote(still_unregistered_options[i]);
-                }
-
-                if (!still_unknown_commandline.empty())
-                {
-                    util::section* s = ini.get_section("hpx");
-                    HPX_ASSERT(s != nullptr);
-                    s->add_entry(
-                        "unknown_cmd_line_option", still_unknown_commandline);
-                }
-            }
-
-            std::string fullhelp(ini.get_entry("hpx.cmd_line_help", ""));
-            if (!fullhelp.empty())
-            {
-                std::string help_option(
-                    ini.get_entry("hpx.cmd_line_help_option", ""));
-                if (0 == std::string("full").find(help_option))
-                {
-                    std::cout << decode_string(fullhelp);
-                    std::cout << options << std::endl;
-                }
-                else
-                {
-                    throw hpx::detail::command_line_error(
-                        "unknown help option: " + help_option);
-                }
-                return 1;
-            }
-
-            // secondary command line handling, looking for --exit and other
-            // options
-            std::string cmd_line =
-                ini.get_entry("hpx.commandline.command", "") + " " +
-                ini.get_entry("hpx.commandline.prepend_options", "") +
-                ini.get_entry("hpx.commandline.options", "") +
-                ini.get_entry("hpx.commandline.config_options", "");
-
-            if (!cmd_line.empty())
-            {
-                std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
-                hpx::program_options::variables_map vm;
-
-                util::parse_commandline(ini, options, cmd_line, vm,
-                    std::size_t(-1),
-                    util::allow_unregistered | util::report_missing_config_file,
-                    get_runtime_mode_from_name(runtime_mode));
-
-                if (vm.count("hpx:print-bind"))
-                {
-                    std::size_t num_threads =
-                        hpx::util::from_string<std::size_t>(
-                            ini.get_entry("hpx.os_threads", 1));
-                    detail::handle_print_bind(vm, num_threads);
-                }
+            return -2;
+        }
 
 #if defined(HPX_HAVE_NETWORKING)
-                if (vm.count("hpx:list-parcel-ports"))
-                {
-                    detail::handle_list_parcelports();
-                }
+        return util::handle_late_commandline_options(ini, options,
+            &hpx::detail::handle_print_bind, &detail::handle_list_parcelports);
+#else
+        return util::handle_late_commandline_options(
+            ini, options, &hpx::detail::handle_print_bind);
 #endif
-                if (vm.count("hpx:exit"))
-                {
-                    return 1;
-                }
-            }
-        }
-        catch (std::exception const& e)
-        {
-            std::cerr << "runtime_support::load_components: "
-                      << "command line processing: " << e.what() << std::endl;
-            return -1;
-        }
-
-        return result;
     }
 
     void runtime_support::call_startup_functions(bool pre_startup)
