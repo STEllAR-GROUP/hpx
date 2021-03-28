@@ -1367,10 +1367,8 @@ namespace hpx { namespace util {
 
         // Store the program name and the command line.
         ini_config_.emplace_back("hpx.cmd_line!=" + cmd_line);
-        ini_config_.emplace_back(
-            "hpx.commandline.command!=" + command);
-        ini_config_.emplace_back(
-            "hpx.commandline.options!=" + options);
+        ini_config_.emplace_back("hpx.commandline.command!=" + command);
+        ini_config_.emplace_back("hpx.commandline.options!=" + options);
     }
 
     ///////////////////////////////////////////////////////////////////////////
