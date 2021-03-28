@@ -18,16 +18,14 @@
 int hpx_main()
 {
     // check number of localities
+    HPX_TEST_EQ(hpx::util::from_string<std::uint32_t>(
+                    hpx::get_config_entry("hpx.localities", "")),
+        hpx::get_num_localities(hpx::launch::sync));
+    HPX_TEST_EQ(hpx::util::from_string<std::size_t>(
+                    hpx::get_config_entry("hpx.os_threads", "")),
+        hpx::get_os_thread_count());
     HPX_TEST_EQ(
-        hpx::util::from_string<std::uint32_t>(
-            hpx::get_config_entry("hpx.localities", "")),
-                hpx::get_num_localities(hpx::launch::sync));
-    HPX_TEST_EQ(
-        hpx::util::from_string<std::size_t>(
-            hpx::get_config_entry("hpx.os_threads", "")),
-                hpx::get_os_thread_count());
-    HPX_TEST_EQ(hpx::get_config_entry("hpx.runtime_mode", ""),
-        std::string("console"));
+        hpx::get_config_entry("hpx.runtime_mode", ""), std::string("console"));
 
     return hpx::finalize();
 }

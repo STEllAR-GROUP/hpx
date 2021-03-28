@@ -19,22 +19,18 @@
 int hpx_main()
 {
     HPX_TEST_EQ(
-        hpx::threads::hardware_concurrency(),
-        hpx::get_os_thread_count());
+        hpx::threads::hardware_concurrency(), hpx::get_os_thread_count());
 
     return hpx::finalize();
 }
 
 // Ignore all command line options to avoid any interference with the test
 // runners.
-char* argv[] =
-{
-    const_cast<char*>("use_all_cores_2262"), nullptr
-};
+char* argv[] = {const_cast<char*>("use_all_cores_2262"), nullptr};
 
 int main()
 {
-    std::vector<std::string> cfg = { "hpx.os_threads=all" };
+    std::vector<std::string> cfg = {"hpx.os_threads=all"};
 
     hpx::init_params init_args;
     init_args.cfg = cfg;

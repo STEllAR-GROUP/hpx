@@ -17,8 +17,8 @@ foreach(subdir ${subdirs})
   add_hpx_pseudo_dependencies(tests.regressions tests.regressions.${subdir})
 endforeach()
 
-set(tests multiple_init multiple_init_2918
-          stack_size_config_4543 unhandled_exception_582
+set(tests multiple_init multiple_init_2918 stack_size_config_4543
+          unhandled_exception_582
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
