@@ -17,7 +17,7 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/timing/scoped_timer.hpp>
 
@@ -51,9 +51,6 @@ namespace hpx { namespace agas { namespace server {
         naming::gid_type const& gid = p.destination();
         naming::address& addr = p.addr();
         resolved_type cache_address;
-
-        runtime& rt = get_runtime();
-        runtime_distributed& rtd = get_runtime_distributed();
 
         // resolve destination addresses, we should be able to resolve all of
         // them, otherwise it's an error
@@ -108,9 +105,10 @@ namespace hpx { namespace agas { namespace server {
         else
         {
             // destination is remote
-            rtd.get_parcel_handler().put_parcel(std::move(p));
+            hpx::parcelset::put_parcel(std::move(p));
         }
 
+        runtime& rt = get_runtime();
         if (rt.get_state() < state_pre_shutdown)
         {
             // asynchronously update cache on source locality

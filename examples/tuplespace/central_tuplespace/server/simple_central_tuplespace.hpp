@@ -14,21 +14,20 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos_local.hpp>
-#include <hpx/util/storage/tuple.hpp>
 
 #include <mutex>
 
+#include "tuple.hpp"
 #include "tuples_warehouse.hpp"
 
 // #define TS_DEBUG
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace examples { namespace server
-{
+namespace examples { namespace server {
 
     ///////////////////////////////////////////////////////////////////////////
-    /// This class is a simple central tuplespace (SCTS) as an HPX component. An HPX
-    /// component is a class that:
+    /// This class is a simple central tuplespace (SCTS) as an HPX component.
+    /// An HPX component is a class that:
     ///
     ///     * Inherits from a component base class:
     ///       \a hpx::components::component_base
@@ -52,8 +51,8 @@ namespace examples { namespace server
     /// read,
     /// take
     ///
-    /// each has the last argument as a timeout value, pre-defined WAIT_FOREVER, NO_WAIT
-    /// users can also provide its own timeout values.
+    /// each has the last argument as a timeout value, pre-defined WAIT_FOREVER,
+    /// NO_WAIT users can also provide its own timeout values.
     ///
     /// uses mutex, will hurt performance.
     ///
@@ -62,131 +61,125 @@ namespace examples { namespace server
       : public hpx::components::component_base<simple_central_tuplespace>
     //]
     {
-        public:
+    public:
+        typedef hpx::util::storage::tuple tuple_type;
+        typedef hpx::util::storage::tuple::elem_type elem_type;
+        typedef hpx::lcos::local::spinlock mutex_type;
 
-            typedef hpx::util::storage::tuple tuple_type;
-            typedef hpx::util::storage::tuple::elem_type elem_type;
-            typedef hpx::lcos::local::spinlock mutex_type;
+        typedef examples::server::tuples_warehouse tuples_type;
 
-            typedef examples::server::tuples_warehouse tuples_type;
+        // pre-defined timeout values
+        enum
+        {
+            WAIT_FOREVER = -1,    // <0 means blocking
+            NO_WAIT = 0
+        };
 
-            // pre-defined timeout values
-            enum {
-                WAIT_FOREVER = -1, // <0 means blocking
-                NO_WAIT = 0
-            };
+        //[simple_central_tuplespace_server_ctor
+        simple_central_tuplespace() {}
+        //]
 
-            //[simple_central_tuplespace_server_ctor
-            simple_central_tuplespace() {}
-            //]
+        ///////////////////////////////////////////////////////////////////////
+        // Exposed functionality of this component.
 
-            ///////////////////////////////////////////////////////////////////////
-            // Exposed functionality of this component.
+        //[simple_accumulator_methods
 
-            //[simple_accumulator_methods
-
-            // put tuple into tuplespace
-            // out function
-            int write(tuple_type const& tp)
+        // put tuple into tuplespace
+        // out function
+        int write(tuple_type const& tp)
+        {
+            if (tp.empty())
             {
-                if(tp.empty())
+                return -1;
+            }
+
+            {
+                std::lock_guard<mutex_type> l(mtx_);
+
+                tuples_.insert(tp);
+            }
+
+            return 0;
+        }
+
+        // read from tuplespace
+        // rd function
+        tuple_type read(tuple_type const& tp, double const timeout) const
+        {
+            tuple_type result;
+            hpx::chrono::high_resolution_timer t;
+
+            do
+            {
+                if (tuples_.empty())
                 {
-                    return -1;
+                    continue;
                 }
 
                 {
                     std::lock_guard<mutex_type> l(mtx_);
 
-                    tuples_.insert(tp);
+                    result = tuples_.match(tp);
                 }
 
-                return 0;
-            }
-
-            // read from tuplespace
-            // rd function
-            tuple_type read(tuple_type const& tp, double const timeout) const
-            {
-                tuple_type result;
-                hpx::chrono::high_resolution_timer t;
-
-                do
+                if (!result.empty())
                 {
-                    if(tuples_.empty())
-                    {
-                        continue;
-                    }
+                    break;    // found
+                }
+            } while ((timeout < 0) || (timeout > t.elapsed()));
 
-                    {
-                        std::lock_guard<mutex_type> l(mtx_);
+            return result;
+        }
 
-                        result = tuples_.match(tp);
-                    }
+        // take from tuplespace
+        // in function
+        tuple_type take(tuple_type const& tp, double const timeout)
+        {
+            tuple_type result;
+            hpx::chrono::high_resolution_timer t;
 
-
-                    if(!result.empty())
-                    {
-                        break; // found
-                    }
-                } while((timeout < 0) || (timeout > t.elapsed()));
-
-                return result;
-            }
-
-            // take from tuplespace
-            // in function
-            tuple_type take(tuple_type const& tp, double const timeout)
+            do
             {
-                tuple_type result;
-                hpx::chrono::high_resolution_timer t;
-
-                do
+                if (tuples_.empty())
                 {
+                    continue;
+                }
 
-                    if(tuples_.empty())
-                    {
-                        continue;
-                    }
+                {
+                    std::lock_guard<mutex_type> l(mtx_);
 
-                    {
-                        std::lock_guard<mutex_type> l(mtx_);
+                    result = tuples_.match_and_erase(tp);
+                }
 
-                        result = tuples_.match_and_erase(tp);
-                    }
+                if (!result.empty())
+                {
+                    break;    // found
+                }
+            } while ((timeout < 0) || (timeout > t.elapsed()));
 
+            return result;
+        }
 
-                    if(!result.empty())
-                    {
-                        break; // found
-                    }
-                } while((timeout < 0) || (timeout > t.elapsed()));
+        //]
 
-                return result;
-            }
+        ///////////////////////////////////////////////////////////////////////
+        // Each of the exposed functions needs to be encapsulated into an
+        // action type, generating all required boilerplate code for threads,
+        // serialization, etc.
 
-            //]
+        //[simple_central_tuplespace_action_types
+        HPX_DEFINE_COMPONENT_ACTION(simple_central_tuplespace, write);
+        HPX_DEFINE_COMPONENT_ACTION(simple_central_tuplespace, read);
+        HPX_DEFINE_COMPONENT_ACTION(simple_central_tuplespace, take);
+        //]
 
-
-
-            ///////////////////////////////////////////////////////////////////////
-            // Each of the exposed functions needs to be encapsulated into an
-            // action type, generating all required boilerplate code for threads,
-            // serialization, etc.
-
-            //[simple_central_tuplespace_action_types
-            HPX_DEFINE_COMPONENT_ACTION(simple_central_tuplespace, write);
-            HPX_DEFINE_COMPONENT_ACTION(simple_central_tuplespace, read);
-            HPX_DEFINE_COMPONENT_ACTION(simple_central_tuplespace, take);
-            //]
-
-            //[simple_central_tuplespace_server_data_member
-        private:
-            tuples_type tuples_;
-            mutable mutex_type mtx_;
-            //]
+        //[simple_central_tuplespace_server_data_member
+    private:
+        tuples_type tuples_;
+        mutable mutex_type mtx_;
+        //]
     };
-}} // examples::server
-
+}}    // namespace examples::server
 
 //[simple_central_tuplespace_registration_declarations
 HPX_REGISTER_ACTION_DECLARATION(
@@ -203,6 +196,5 @@ HPX_REGISTER_ACTION_DECLARATION(
 //]
 
 #undef TS_DEBUG
-
 
 #endif

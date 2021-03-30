@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_distributed/applier/applier.hpp>
+#include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/stubs/runtime_support.hpp>
 
 #include <cstddef>

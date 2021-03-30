@@ -23,8 +23,7 @@ namespace hpx { namespace util { namespace storage {
     private:
         struct compare_any
         {
-            bool operator()(
-                hpx::any const& lhs, hpx::any const& rhs) const
+            bool operator()(hpx::any const& lhs, hpx::any const& rhs) const
             {
                 return lhs.equal_to(rhs);
             }
@@ -47,7 +46,9 @@ namespace hpx { namespace util { namespace storage {
         template <typename Archive>
         void serialize(Archive& ar, unsigned const)
         {
+            // clang-format off
             ar & tuple_;
+            // clang-format on
         }
 
         bool empty() const
@@ -125,4 +126,3 @@ namespace hpx { namespace util { namespace storage {
         tuple_holder tuple_;
     };
 }}}    // namespace hpx::util::storage
-

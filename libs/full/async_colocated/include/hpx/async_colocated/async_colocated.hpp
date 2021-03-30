@@ -16,6 +16,7 @@
 #include <hpx/async_colocated/async_colocated_fwd.hpp>
 #include <hpx/async_colocated/functional/colocated_helpers.hpp>
 #include <hpx/async_distributed/async_continue_fwd.hpp>
+#include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/async_local/async_fwd.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/bind.hpp>
@@ -24,7 +25,6 @@
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/type_support/pack.hpp>
-#include <hpx/util/bind_action.hpp>
 
 #include <type_traits>
 #include <utility>

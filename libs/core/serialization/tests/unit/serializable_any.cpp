@@ -10,8 +10,7 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/serialization/serializable_any.hpp>
 
-#include <hpx/util/storage/tuple.hpp>
-
+#include <cstdint>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -45,7 +44,7 @@ int hpx_main()
         }
 
         {
-            using index_type = uint64_t;
+            using index_type = std::uint64_t;
             using elem_type = hpx::any;
             using hash_elem_functor = hpx::util::hash_any;
 
@@ -108,11 +107,11 @@ int hpx_main()
             any3 = any1;
 
             HPX_TEST_EQ(
-                (hpx::any_cast<small_object>(any1))(7), uint64_t(17 + 7));
+                (hpx::any_cast<small_object>(any1))(7), std::uint64_t(17 + 7));
             HPX_TEST_EQ(
-                (hpx::any_cast<small_object>(any2))(9), uint64_t(17 + 9));
-            HPX_TEST_EQ(
-                (hpx::any_cast<small_object>(any3))(11), uint64_t(17 + 11));
+                (hpx::any_cast<small_object>(any2))(9), std::uint64_t(17 + 9));
+            HPX_TEST_EQ((hpx::any_cast<small_object>(any3))(11),
+                std::uint64_t(17 + 11));
         }
 
         {
@@ -128,11 +127,11 @@ int hpx_main()
             hpx::any any3 = any1;
 
             HPX_TEST_EQ((hpx::any_cast<big_object>(any1))(0, 1),
-                uint64_t(5 + 12 + 0 + 1));
+                std::uint64_t(5 + 12 + 0 + 1));
             HPX_TEST_EQ((hpx::any_cast<big_object>(any2))(1, 0),
-                uint64_t(5 + 12 + 1 + 0));
+                std::uint64_t(5 + 12 + 1 + 0));
             HPX_TEST_EQ((hpx::any_cast<big_object>(any3))(1, 1),
-                uint64_t(5 + 12 + 1 + 1));
+                std::uint64_t(5 + 12 + 1 + 1));
         }
 
         // move semantics

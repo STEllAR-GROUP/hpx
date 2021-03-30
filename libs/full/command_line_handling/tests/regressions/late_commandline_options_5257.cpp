@@ -23,7 +23,7 @@ int hpx_main(int, char*[])
 int main(int argc, char* argv[])
 {
     hpx::init_params params;
-    params.cfg = { "--hpx:exit" };
+    params.cfg = {"--hpx:exit"};
 
     HPX_TEST_EQ(hpx::init(argc, argv, params), 1);
     HPX_TEST(!invoked);

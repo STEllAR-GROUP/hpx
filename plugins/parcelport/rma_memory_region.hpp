@@ -6,11 +6,13 @@
 
 #pragma once
 
-#include <hpx/traits/rma_memory_region_traits.hpp>
+#include <plugins/parcelport/libfabric/rma_memory_region_traits.hpp>
 #include <plugins/parcelport/parcelport_logging.hpp>
 //
 #include <memory>
 //
+
+
 namespace hpx {
 namespace parcelset
 {

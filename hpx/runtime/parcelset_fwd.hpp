@@ -10,30 +10,28 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/modules/errors.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <cstddef>
 #include <system_error>
 
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     /// \namespace parcelset
-    namespace parcelset
-    {
+    namespace parcelset {
         class HPX_EXPORT locality;
 
         class HPX_EXPORT parcel;
         class HPX_EXPORT parcelport;
         class HPX_EXPORT parcelhandler;
 
-        namespace policies
-        {
+        namespace policies {
             struct message_handler;
         }
 
-        namespace detail
-        {
+        namespace detail {
             struct create_parcel;
         }
 
@@ -57,19 +55,13 @@ namespace hpx {
         /// \param locality this represents the locality type.
         ///
         /// \param ec[int, out] this represents the error code during exit.
-
+        ///
         HPX_EXPORT policies::message_handler* get_message_handler(
             parcelhandler* ph, char const* name, char const* type,
             std::size_t num, std::size_t interval, locality const& l,
             error_code& ec = throws);
 
         ////////////////////////////////////////////////////////////////////////
-        /// \brief Return boolean value when thread processing is completed.
-        ///
-        /// This returns true/false based on the background work.
-        ///
-        /// \param num_thread this represents the number of threads.
-
         /// Type of background work to perform
         enum parcelport_background_mode
         {
@@ -83,21 +75,33 @@ namespace hpx {
             parcelport_background_mode_all = 0x07
         };
 
+        ////////////////////////////////////////////////////////////////////////
+        /// \brief Return boolean value when thread processing is completed.
+        ///
+        /// This returns true/false based on the background work.
+        ///
+        /// \param num_thread this represents the number of threads.
+        ///
         HPX_EXPORT bool do_background_work(std::size_t num_thread = 0,
             parcelport_background_mode mode = parcelport_background_mode_all);
 
-        typedef util::function_nonser<
-            void(std::error_code const&, parcel const&)
-        > write_handler_type;
+        using write_handler_type =
+            util::function_nonser<void(std::error_code const&, parcel const&)>;
+
+        ///////////////////////////////////////////////////////////////////////
+        // default callback for put_parcel
+        HPX_EXPORT void default_write_handler(
+            std::error_code const&, parcel const&);
 
         ///////////////////////////////////////////////////////////////////////
         /// Hand a parcel to the underlying parcel layer for delivery.
-        HPX_EXPORT void put_parcel(parcel&& p, write_handler_type&& f);
+        HPX_EXPORT void put_parcel(
+            parcel&& p, write_handler_type&& f = &default_write_handler);
 
         /// Hand a parcel to the underlying parcel layer for delivery.
         /// Wait for the operation to finish before returning to the user.
         HPX_EXPORT void sync_put_parcel(parcelset::parcel&& p);
-    }
-}
+    }    // namespace parcelset
+}    // namespace hpx
 
 #endif
