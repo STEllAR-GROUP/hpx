@@ -108,6 +108,7 @@ namespace hpx { namespace functional {
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_invoke_is_applicable.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 
 #include <type_traits>
@@ -204,6 +205,27 @@ namespace hpx { namespace functional {
         typename tag_override_invoke_result<Tag, Args...>::type;
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Tag, typename... Args>
+    using is_tag_priority_invocable = std::integral_constant<bool,
+        is_tag_override_invocable<Tag, Args...>::value ||
+            is_tag_invocable<Tag, Args...>::value ||
+            is_tag_fallback_invocable<Tag, Args...>::value>;
+
+    template <typename Tag, typename... Args>
+    constexpr bool is_tag_priority_invocable_v =
+        is_tag_priority_invocable<Tag, Args...>::value;
+
+    template <typename Tag, typename... Args>
+    using is_nothrow_tag_priority_invocable = std::integral_constant<bool,
+        is_nothrow_tag_override_invocable<Tag, Args...>::value ||
+            is_nothrow_tag_invocable<Tag, Args...>::value ||
+            is_nothrow_tag_fallback_invocable<Tag, Args...>::value>;
+
+    template <typename Tag, typename... Args>
+    constexpr bool is_nothrow_tag_priority_invocable_v =
+        is_nothrow_tag_priority_invocable<Tag, Args...>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
     /// Helper base class implementing the tag_invoke logic for CPOs that allow
     /// overriding user-defined tag_invoke overloads with tag_override_invoke,
     /// and that allow setting a fallback with tag_fallback_invoke.
@@ -227,6 +249,10 @@ namespace hpx { namespace functional {
             noexcept(is_nothrow_tag_override_invocable_v<Tag, Args...>)
                 -> tag_override_invoke_result_t<Tag, Args&&...>
         {
+            static_assert(
+                hpx::functional::is_tag_invoke_applicable_v<Tag, Args...>,
+                "hpx::functional::is_tag_invoke_applicable_v<Tag, Args...>");
+
             return hpx::functional::tag_override_invoke(
                 static_cast<Tag const&>(*this), std::forward<Args>(args)...);
         }
@@ -240,6 +266,10 @@ namespace hpx { namespace functional {
             noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
                 -> tag_invoke_result_t<Tag, Args&&...>
         {
+            static_assert(
+                hpx::functional::is_tag_invoke_applicable_v<Tag, Args...>,
+                "hpx::functional::is_tag_invoke_applicable_v<Tag, Args...>");
+
             return hpx::functional::tag_invoke(
                 static_cast<Tag const&>(*this), std::forward<Args>(args)...);
         }
@@ -255,6 +285,10 @@ namespace hpx { namespace functional {
             noexcept(is_nothrow_tag_fallback_invocable_v<Tag, Args...>)
                 -> tag_fallback_invoke_result_t<Tag, Args&&...>
         {
+            static_assert(
+                hpx::functional::is_tag_invoke_applicable_v<Tag, Args...>,
+                "hpx::functional::is_tag_invoke_applicable_v<Tag, Args...>");
+
             return hpx::functional::tag_fallback_invoke(
                 static_cast<Tag const&>(*this), std::forward<Args>(args)...);
         }
@@ -275,6 +309,10 @@ namespace hpx { namespace functional {
         constexpr HPX_FORCEINLINE auto operator()(Args&&... args) const noexcept
             -> tag_override_invoke_result_t<Tag, Args&&...>
         {
+            static_assert(
+                hpx::functional::is_tag_invoke_applicable_v<Tag, Args...>,
+                "hpx::functional::is_tag_invoke_applicable_v<Tag, Args...>");
+
             return hpx::functional::tag_override_invoke(
                 static_cast<Tag const&>(*this), std::forward<Args>(args)...);
         }
@@ -287,6 +325,10 @@ namespace hpx { namespace functional {
         constexpr HPX_FORCEINLINE auto operator()(Args&&... args) const noexcept
             -> tag_invoke_result_t<Tag, Args&&...>
         {
+            static_assert(
+                hpx::functional::is_tag_invoke_applicable_v<Tag, Args...>,
+                "hpx::functional::is_tag_invoke_applicable_v<Tag, Args...>");
+
             return hpx::functional::tag_invoke(
                 static_cast<Tag const&>(*this), std::forward<Args>(args)...);
         }
@@ -301,6 +343,10 @@ namespace hpx { namespace functional {
         constexpr HPX_FORCEINLINE auto operator()(Args&&... args) const noexcept
             -> tag_fallback_invoke_result_t<Tag, Args&&...>
         {
+            static_assert(
+                hpx::functional::is_tag_invoke_applicable_v<Tag, Args...>,
+                "hpx::functional::is_tag_invoke_applicable_v<Tag, Args...>");
+
             return hpx::functional::tag_fallback_invoke(
                 static_cast<Tag const&>(*this), std::forward<Args>(args)...);
         }

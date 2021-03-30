@@ -66,7 +66,17 @@ namespace boost
       const path & full_path,   // example: c:/foo/boost/filesystem/path.hpp
       const string & contents )     // contents of file to be inspected
     {
-      if (contents.find( "hpxinspect:" "noapple_macros" ) != string::npos) return;
+      std::string::size_type p = contents.find("hpxinspect:" "noapple_macros");
+      if (p != string::npos)
+      {
+          // ignore this directive here (it is handled below) if it is followed
+          // by a ':'
+          if (p == contents.size() - 25 ||
+              (contents.size() > p + 25 && contents[p + 25] != ':'))
+          {
+              return;
+          }
+      }
 
       boost::sregex_iterator cur(contents.begin(),
           contents.end(), apple_macro_regex), end;
@@ -75,11 +85,18 @@ namespace boost
 
       for( ; cur != end; ++cur /*, ++m_files_with_errors*/ )
       {
+        auto m = *cur;
 
-        if(!(*cur)[3].matched)
+        if(!m[3].matched)
         {
+          std::string found_name(m[3].first, m[3].second);
+
+          std::string tag("hpxinspect:" "noapple_macros:" + found_name);
+          if (contents.find(tag) != string::npos)
+              continue;
+
           string::const_iterator it = contents.begin();
-          string::const_iterator match_it = (*cur)[0].first;
+          string::const_iterator match_it = m[0].first;
 
           string::const_iterator line_start = it;
 
@@ -92,7 +109,7 @@ namespace boost
           }
           ++errors;
           error( library_name, full_path,
-            "Apple macro clash: " + std::string((*cur)[0].first, (*cur)[0].second-1),
+            "Apple macro clash: " + std::string(m[0].first, m[0].second-1),
             line_number );
         }
       }

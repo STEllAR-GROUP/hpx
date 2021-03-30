@@ -10,6 +10,9 @@ namespace hpx { namespace util {
     template <typename... T>
     struct always_void
     {
-        typedef void type;
+        using type = void;
     };
+
+    template <typename... T>
+    using always_void_t = typename always_void<T...>::type;
 }}    // namespace hpx::util

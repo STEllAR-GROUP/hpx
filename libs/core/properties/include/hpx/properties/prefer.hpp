@@ -8,12 +8,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/tag_fallback_invoke.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
 
 #include <type_traits>
 #include <utility>
 
 namespace hpx { namespace experimental {
+
     HPX_INLINE_CONSTEXPR_VARIABLE struct prefer_t
       : hpx::functional::tag_fallback<prefer_t>
     {
@@ -31,11 +31,11 @@ namespace hpx { namespace experimental {
 
         template <typename Tag, typename T0, typename... Tn>
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(prefer_t,
-            Tag&&, T0&& t0, Tn&&...) noexcept(noexcept(std::forward<T0>(t0))) ->
-            typename std::enable_if<!hpx::functional::is_tag_invocable<prefer_t,
-                                        Tag, T0, Tn...>::value &&
+            Tag&&, T0&& t0, Tn&&...) noexcept(noexcept(std::forward<T0>(t0)))
+            -> std::enable_if_t<!hpx::functional::is_tag_invocable<prefer_t,
+                                    Tag, T0, Tn...>::value &&
                     !hpx::functional::is_tag_invocable<Tag, T0, Tn...>::value,
-                decltype(std::forward<T0>(t0))>::type
+                decltype(std::forward<T0>(t0))>
         {
             return std::forward<T0>(t0);
         }

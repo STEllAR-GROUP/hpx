@@ -100,6 +100,7 @@ namespace hpx { namespace functional {
 
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke_result.hpp>
+#include <hpx/functional/tag_invoke_is_applicable.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 
 #include <type_traits>
@@ -203,6 +204,10 @@ namespace hpx { namespace functional {
             noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
                 -> tag_invoke_result_t<Tag, Args...>
         {
+            static_assert(
+                hpx::functional::is_tag_invoke_applicable_v<Tag, Args...>,
+                "hpx::functional::is_tag_invoke_applicable_v<Tag, Args...>");
+
             return hpx::functional::tag_invoke(
                 static_cast<Tag const&>(*this), std::forward<Args>(args)...);
         }
@@ -217,6 +222,10 @@ namespace hpx { namespace functional {
         constexpr HPX_FORCEINLINE auto operator()(Args&&... args) const noexcept
             -> tag_invoke_result_t<Tag, decltype(args)...>
         {
+            static_assert(
+                hpx::functional::is_tag_invoke_applicable_v<Tag, Args...>,
+                "hpx::functional::is_tag_invoke_applicable_v<Tag, Args...>");
+
             return hpx::functional::tag_invoke(
                 static_cast<Tag const&>(*this), std::forward<Args>(args)...);
         }
