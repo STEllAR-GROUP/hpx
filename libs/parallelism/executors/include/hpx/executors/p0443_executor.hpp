@@ -98,6 +98,15 @@ namespace hpx { namespace execution { namespace experimental {
             std::decay_t<Executor> exec;
             std::decay_t<R> r;
 
+            template <typename Executor_, typename R_>
+            operation_state(Executor_&& exec, R_&& r)
+              : exec(std::forward<Executor_>(exec))
+              , r(std::forward<R_>(r))
+            {
+            }
+            operation_state(operation_state&&) = delete;
+            operation_state(operation_state const&) = delete;
+
             void start() noexcept
             {
                 try

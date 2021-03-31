@@ -110,7 +110,8 @@ int main()
         auto s = ex::transform(ex::just(), [] {});
         auto f = [] {};
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
-        ex::start(ex::connect(s, r));
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
         HPX_TEST(set_value_called);
     }
 
@@ -119,7 +120,8 @@ int main()
         auto s = ex::transform(ex::just(0), [](int x) { return ++x; });
         auto f = [](int x) { HPX_TEST_EQ(x, 1); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
-        ex::start(ex::connect(s, r));
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
         HPX_TEST(set_value_called);
     }
 
@@ -131,7 +133,8 @@ int main()
         auto s4 = ex::transform(std::move(s3), [](int x) { return ++x; });
         auto f = [](int x) { HPX_TEST_EQ(x, 4); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
-        ex::start(ex::connect(std::move(s4), r));
+        auto os = ex::connect(std::move(s4), std::move(r));
+        ex::start(os);
         HPX_TEST(set_value_called);
     }
 
@@ -144,7 +147,8 @@ int main()
             std::move(s3), [](int x) { return std::to_string(x); });
         auto f = [](std::string x) { HPX_TEST_EQ(x, std::string("1")); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
-        ex::start(ex::connect(std::move(s4), r));
+        auto os = ex::connect(std::move(s4), std::move(r));
+        ex::start(os);
         HPX_TEST(set_value_called);
     }
 
@@ -157,7 +161,8 @@ int main()
             ex::transform([](int x) { return std::to_string(x); });
         auto f = [](std::string x) { HPX_TEST_EQ(x, std::string("1")); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
-        ex::start(ex::connect(std::move(s), r));
+        auto os = ex::connect(std::move(s), r);
+        ex::start(os);
         HPX_TEST(set_value_called);
     }
 
@@ -171,7 +176,8 @@ int main()
                 custom_transformer_call_operator_called, false});
         auto f = [] {};
         auto r = callback_receiver<decltype(f)>{f, receiver_set_value_called};
-        ex::start(ex::connect(s, r));
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
         HPX_TEST(receiver_set_value_called);
         HPX_TEST(tag_invoke_overload_called);
         HPX_TEST(custom_transformer_call_operator_called);
@@ -184,7 +190,8 @@ int main()
             ex::just(), [] { throw std::runtime_error("error"); });
         auto r = error_callback_receiver<decltype(check_exception_ptr)>{
             check_exception_ptr, set_error_called};
-        ex::start(ex::connect(s, r));
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
         HPX_TEST(set_error_called);
     }
 
@@ -205,7 +212,8 @@ int main()
         });
         auto r = error_callback_receiver<decltype(check_exception_ptr)>{
             check_exception_ptr, set_error_called};
-        ex::start(ex::connect(std::move(s4), r));
+        auto os = ex::connect(std::move(s4), std::move(r));
+        ex::start(os);
         HPX_TEST(set_error_called);
     }
 
@@ -218,7 +226,8 @@ int main()
                 custom_transformer_call_operator_called, true});
         auto r = error_callback_receiver<decltype(check_exception_ptr)>{
             check_exception_ptr, receiver_set_error_called};
-        ex::start(ex::connect(s, r));
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
         HPX_TEST(receiver_set_error_called);
         HPX_TEST(tag_invoke_overload_called);
         HPX_TEST(custom_transformer_call_operator_called);

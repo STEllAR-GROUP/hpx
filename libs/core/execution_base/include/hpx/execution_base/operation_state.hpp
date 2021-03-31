@@ -51,7 +51,7 @@ namespace hpx { namespace execution { namespace experimental {
     private:
         template <typename OperationState>
         friend constexpr HPX_FORCEINLINE auto
-        tag_override_invoke(start_t, OperationState&& o) noexcept(
+        tag_override_invoke(start_t, OperationState& o) noexcept(
             noexcept(std::declval<OperationState&&>().start()))
             -> decltype(std::declval<OperationState&&>().start())
         {

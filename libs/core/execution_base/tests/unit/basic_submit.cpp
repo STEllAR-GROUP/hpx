@@ -157,7 +157,7 @@ struct sender_4
     struct operation_state
     {
         R r;
-        void start() & noexcept
+        void start() noexcept
         {
             ++start_calls;
             std::move(r).set_value(4711);

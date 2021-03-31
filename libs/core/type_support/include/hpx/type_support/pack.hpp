@@ -236,5 +236,21 @@ namespace hpx { namespace util {
         struct unique<Pack<Ts...>> : unique_helper<Pack<>, Pack<Ts...>>
         {
         };
+
+        template <typename... Packs>
+        struct cat;
+
+        template <template <typename...> class Pack, typename... Ts>
+        struct cat<Pack<Ts...>>
+        {
+            using type = Pack<Ts...>;
+        };
+
+        template <template <typename...> class Pack, typename... Ts,
+            typename... Us, typename... Rest>
+        struct cat<Pack<Ts...>, Pack<Us...>, Rest...>
+          : cat<Pack<Ts..., Us...>, Rest...>
+        {
+        };
     }    // namespace detail
 }}       // namespace hpx::util

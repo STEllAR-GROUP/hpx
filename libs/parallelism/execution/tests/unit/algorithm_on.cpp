@@ -41,6 +41,7 @@ struct scheduler
     struct operation_state
     {
         std::decay_t<R> r;
+
         void start() noexcept
         {
             ex::set_value(std::move(r));
@@ -210,7 +211,8 @@ int main()
             scheduler{scheduler_execute_called, tag_invoke_overload_called});
         auto f = [] {};
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
-        ex::start(ex::connect(s, r));
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
         HPX_TEST(set_value_called);
         HPX_TEST(!tag_invoke_overload_called);
         HPX_TEST(scheduler_execute_called);
@@ -224,7 +226,8 @@ int main()
             scheduler{scheduler_execute_called, tag_invoke_overload_called});
         auto f = [](int x) { HPX_TEST_EQ(x, 3); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
-        ex::start(ex::connect(s, r));
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
         HPX_TEST(set_value_called);
         HPX_TEST(!tag_invoke_overload_called);
         HPX_TEST(scheduler_execute_called);
@@ -241,7 +244,8 @@ int main()
             HPX_TEST_EQ(x, 3);
         };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
-        ex::start(ex::connect(s, r));
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
         HPX_TEST(set_value_called);
         HPX_TEST(!tag_invoke_overload_called);
         HPX_TEST(scheduler_execute_called);
@@ -260,7 +264,8 @@ int main()
             HPX_TEST_EQ(x, 3);
         };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
-        ex::start(ex::connect(s, r));
+        auto os = ex::connect(s, r);
+        ex::start(os);
         HPX_TEST(set_value_called);
         HPX_TEST(!tag_invoke_overload_called);
         HPX_TEST(scheduler_execute_called);
@@ -276,7 +281,8 @@ int main()
                 scheduler_execute_called, tag_invoke_overload_called}});
         auto f = [] {};
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
-        ex::start(ex::connect(std::move(s), r));
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
         HPX_TEST(set_value_called);
         HPX_TEST(tag_invoke_overload_called);
         HPX_TEST(!scheduler_execute_called);
@@ -291,7 +297,8 @@ int main()
             scheduler{scheduler_execute_called, tag_invoke_overload_called});
         auto r = error_callback_receiver<decltype(check_exception_ptr)>{
             check_exception_ptr, set_error_called};
-        ex::start(ex::connect(std::move(s), r));
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
         HPX_TEST(set_error_called);
         HPX_TEST(!tag_invoke_overload_called);
         HPX_TEST(!scheduler_execute_called);

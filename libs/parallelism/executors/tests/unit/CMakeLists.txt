@@ -4,9 +4,13 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests fork_join_executor limiting_executor p0443_executor
-          sequenced_executor service_executors
+set(tests fork_join_executor limiting_executor sequenced_executor
+          service_executors
 )
+
+if(HPX_CXX_STANDARD GREATER_EQUAL 17)
+  list(APPEND tests p0443_executor)
+endif()
 
 if(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY)
   set(tests ${tests} thread_pool_attached_executors)

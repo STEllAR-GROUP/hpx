@@ -48,6 +48,16 @@ namespace hpx { namespace execution { namespace experimental {
                 std::decay_t<R> r;
                 hpx::util::member_pack_for<std::decay_t<Ts>...> ts;
 
+                template <typename R_>
+                operation_state(
+                    R_&& r, hpx::util::member_pack_for<std::decay_t<Ts>...> ts)
+                  : r(std::forward<R_>(r))
+                  , ts(std::move(ts))
+                {
+                }
+                operation_state(operation_state&&) = delete;
+                operation_state(operation_state const&) = delete;
+
                 void start() noexcept
                 {
                     hpx::execution::experimental::set_value(
@@ -58,7 +68,7 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename R>
             auto connect(R&& r)
             {
-                return operation_state<R>{std::forward<R>(r), std::move(ts)};
+                return operation_state<R>(std::forward<R>(r), std::move(ts));
             }
         };
     }    // namespace detail
