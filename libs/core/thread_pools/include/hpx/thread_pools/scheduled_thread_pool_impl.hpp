@@ -131,7 +131,7 @@ namespace hpx { namespace threads { namespace detail {
            << "] with scheduler " << sched_->Scheduler::get_scheduler_name()
            << "\n"
            << "is running on PUs : \n";
-        os << std::hex << HPX_CPU_MASK_PREFIX << get_used_processing_units()
+        os << hpx::threads::to_string(get_used_processing_units())
 #ifdef HPX_HAVE_MAX_CPU_COUNT
            << " "
            << std::bitset<HPX_HAVE_MAX_CPU_COUNT>(get_used_processing_units())
@@ -280,8 +280,9 @@ namespace hpx { namespace threads { namespace detail {
                 // which is in order of occupied PU
                 LTM_(info).format(
                     "run: {} create OS thread {}: will run on processing units "
-                    "within this mask: " HPX_CPU_MASK_PREFIX "{:x}",
-                    id_.name(), global_thread_num, mask);
+                    "within this mask: {}",
+                    id_.name(), global_thread_num,
+                    hpx::threads::to_string(mask));
 
                 // create a new thread
                 add_processing_unit_internal(

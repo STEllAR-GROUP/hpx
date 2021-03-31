@@ -1888,9 +1888,10 @@ namespace hpx {
                 //if (ec)
                 //{
                 //    HPX_THROW_EXCEPTION(kernel_error, "runtime::init_tss_ex",
-                //        "failed to set thread affinity mask "
-                //        "(" HPX_CPU_MASK_PREFIX "{:x}) for service thread: {}",
-                //        used_processing_units, detail::thread_name());
+                //        "failed to set thread affinity mask ({}) for service "
+                //        "thread: {}",
+                //        hpx::threads::to_string(used_processing_units),
+                //        detail::thread_name());
                 //}
             }
 #endif

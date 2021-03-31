@@ -67,7 +67,7 @@ namespace hpx { namespace threads { namespace detail {
     void write_to_log_mask(char const* valuename, mask_cref_type value)
     {
         LTM_(debug).format(
-            "topology: {}: " HPX_CPU_MASK_PREFIX "{:x}", valuename, value);
+            "topology: {}: {}", valuename, hpx::threads::to_string(value));
     }
 
     void write_to_log(
@@ -90,8 +90,8 @@ namespace hpx { namespace threads { namespace detail {
         std::size_t i = 0;
         for (mask_cref_type value : values)
         {
-            LTM_(debug).format("topology: {}({}): " HPX_CPU_MASK_PREFIX "{:x}",
-                valuename, i++, value);
+            LTM_(debug).format("topology: {}({}): {}", valuename, i++,
+                hpx::threads::to_string(value));
         }
     }
 
@@ -514,9 +514,8 @@ namespace hpx { namespace threads {
 
                     HPX_THROWS_IF(ec, kernel_error,
                         "hpx::threads::topology::set_thread_affinity_mask",
-                        "failed to set thread affinity mask "
-                        "(" HPX_CPU_MASK_PREFIX "{}) for cpuset {}",
-                        mask, buffer.get());
+                        "failed to set thread affinity mask ({}) for cpuset {}",
+                        hpx::threads::to_string(mask), buffer.get());
                     return;
                 }
             }
@@ -1511,7 +1510,7 @@ namespace hpx { namespace threads {
 
         for (std::size_t i = 0; i != s; i++)
         {
-            os << std::hex << HPX_CPU_MASK_PREFIX << v[i] << "\n";
+            os << hpx::threads::to_string(v[i]) << "\n";
         }
         os << "\n";
     }
@@ -1548,7 +1547,7 @@ namespace hpx { namespace threads {
         //! -------------------------------------- topology (affinity masks)
         os << "[HWLOC topology info] affinity masks :\n"
            << "machine               : \n"
-           << std::hex << HPX_CPU_MASK_PREFIX << machine_affinity_mask_ << "\n";
+           << hpx::threads::to_string(machine_affinity_mask_) << "\n";
 
         os << "socket                : \n";
         print_mask_vector(os, socket_affinity_masks_);

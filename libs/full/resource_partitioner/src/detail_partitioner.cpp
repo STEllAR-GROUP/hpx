@@ -155,7 +155,7 @@ namespace hpx { namespace resource { namespace detail {
 
         for (threads::mask_cref_type assigned_pu : assigned_pus_)
         {
-            os << std::hex << HPX_CPU_MASK_PREFIX << assigned_pu << '\n';
+            os << hpx::threads::to_string(assigned_pu) << '\n';
         }
     }
 
