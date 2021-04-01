@@ -27,7 +27,7 @@ ctest \
 
 if [[ "${install_hpx}" ]]; then
     install_root="/work/jenkins/install"
-    install_dir="${install_root}/${configuration_name_with_build_type}-${sha1}"
+    install_dir="${install_root}/${configuration_name_with_build_type}-${GIT_COMMIT}"
     install_dir_master="${install_root}/${configuration_name_with_build_type}"
 
     # Install the current build into a directory suffixed by the commit hash
