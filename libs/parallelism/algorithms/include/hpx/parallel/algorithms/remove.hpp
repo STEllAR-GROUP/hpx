@@ -443,13 +443,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
         remove(ExPolicy&& policy, FwdIter first, FwdIter last, T const& value,
             Proj&& proj = Proj())
     {
-        typedef typename std::iterator_traits<FwdIter>::value_type Type;
+
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+        using value_type = typename std::iterator_traits<FwdIter>::value_type;
 
         // Just utilize existing parallel remove_if.
         return detail::remove_if<FwdIter>().call(
             std::forward<ExPolicy>(policy), first, last,
-            [value](Type const& a) -> bool { return value == a; },
+            [value](value_type const& a) -> bool { return value == a; },
             std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
 
