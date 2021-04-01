@@ -27,8 +27,8 @@ ctest \
 
 if [[ "${install_hpx}" ]]; then
     install_root="/work/jenkins/install"
-    install_dir="${install_root}/${configuration_name_with_build_type}-${GIT_COMMIT}"
     install_dir_master="${install_root}/${configuration_name_with_build_type}"
+    install_dir="${install_dir_master}-${GIT_COMMIT}"
 
     # Install the current build into a directory suffixed by the commit hash
     cmake "${build_dir}" -DCMAKE_INSTALL_PREFIX="${install_dir}"
@@ -40,7 +40,7 @@ if [[ "${install_hpx}" ]]; then
 
     # Delete all but the 10 newest builds
     builds_to_keep=10
-    rm -rf $(ls -d --sort=time "${install_dir}-*" | head --lines=-${builds_to_keep})
+    rm -rf $(ls -d --sort=time "${install_dir_master}-*" | head --lines=-${builds_to_keep})
 fi
 set -e
 
