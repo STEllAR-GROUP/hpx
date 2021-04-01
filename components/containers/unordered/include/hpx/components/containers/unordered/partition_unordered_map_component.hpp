@@ -38,7 +38,6 @@
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <tuple>

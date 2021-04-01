@@ -189,15 +189,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<iterator_type>::value),
             "Required at least forward iterator.");
 
-        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
         using difference_type =
             typename std::iterator_traits<iterator_type>::difference_type;
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
         return hpx::parallel::v1::detail::count<difference_type>().call(
-            std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
+            std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), value, std::forward<Proj>(proj));
     }
 
@@ -231,15 +229,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<iterator_type>::value),
             "Required at least forward iterator.");
 
-        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
         using difference_type =
             typename std::iterator_traits<iterator_type>::difference_type;
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
         return hpx::parallel::v1::detail::count_if<difference_type>().call(
-            std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
+            std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), std::forward<F>(f), std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
@@ -274,13 +270,11 @@ namespace hpx { namespace ranges {
                 (hpx::traits::is_forward_iterator<iterator_type>::value),
                 "Required at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             using difference_type =
                 typename std::iterator_traits<iterator_type>::difference_type;
 
             return hpx::parallel::v1::detail::count<difference_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
+                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
                 hpx::util::end(rng), value, std::forward<Proj>(proj));
         }
 
@@ -300,13 +294,11 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Required at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             using difference_type =
                 typename std::iterator_traits<Iter>::difference_type;
 
             return hpx::parallel::v1::detail::count<difference_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last, value,
+                std::forward<ExPolicy>(policy), first, last, value,
                 std::forward<Proj>(proj));
         }
 
@@ -334,8 +326,8 @@ namespace hpx { namespace ranges {
                 typename std::iterator_traits<iterator_type>::difference_type;
 
             return hpx::parallel::v1::detail::count<difference_type>().call(
-                hpx::execution::seq, std::true_type(), hpx::util::begin(rng),
-                hpx::util::end(rng), value, std::forward<Proj>(proj));
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                value, std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -356,7 +348,7 @@ namespace hpx { namespace ranges {
                 typename std::iterator_traits<Iter>::difference_type;
 
             return hpx::parallel::v1::detail::count<difference_type>().call(
-                hpx::execution::seq, std::true_type(), first, last, value,
+                hpx::execution::seq, first, last, value,
                 std::forward<Proj>(proj));
         }
     } count{};
@@ -392,13 +384,11 @@ namespace hpx { namespace ranges {
                 (hpx::traits::is_forward_iterator<iterator_type>::value),
                 "Required at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             using difference_type =
                 typename std::iterator_traits<iterator_type>::difference_type;
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
+                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
                 hpx::util::end(rng), std::forward<F>(f),
                 std::forward<Proj>(proj));
         }
@@ -423,14 +413,12 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Required at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             using difference_type =
                 typename std::iterator_traits<Iter>::difference_type;
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last,
-                std::forward<F>(f), std::forward<Proj>(proj));
+                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+                std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -460,9 +448,8 @@ namespace hpx { namespace ranges {
                 typename std::iterator_traits<iterator_type>::difference_type;
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
-                hpx::execution::seq, std::true_type(), hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<F>(f),
-                std::forward<Proj>(proj));
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                std::forward<F>(f), std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -488,8 +475,8 @@ namespace hpx { namespace ranges {
                 typename std::iterator_traits<Iter>::difference_type;
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
-                hpx::execution::seq, std::true_type(), first, last,
-                std::forward<F>(f), std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, std::forward<F>(f),
+                std::forward<Proj>(proj));
         }
     } count_if{};
 

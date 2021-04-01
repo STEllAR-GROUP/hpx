@@ -35,4 +35,6 @@ namespace hpx { namespace execution {
     struct parallel_task_policy_shim;
 
     struct parallel_unsequenced_policy;
+
+    struct unsequenced_policy;
 }}    // namespace hpx::execution

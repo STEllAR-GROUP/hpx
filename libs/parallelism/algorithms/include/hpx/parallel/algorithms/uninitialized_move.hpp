@@ -228,10 +228,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         return detail::uninitialized_move<FwdIter2>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, last, dest);
+            std::forward<ExPolicy>(policy), first, last, dest);
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -365,8 +363,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         // if count is representing a negative value, we do nothing
         if (detail::is_negative(count))
         {
@@ -378,7 +374,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
             detail::uninitialized_move_n<std::pair<FwdIter1, FwdIter2>>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first,
-                std::size_t(count), dest));
+                std::forward<ExPolicy>(policy), first, std::size_t(count),
+                dest));
     }
 }}}    // namespace hpx::parallel::v1

@@ -327,11 +327,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
-        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
         return hpx::parallel::v1::detail::search<FwdIter, FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, last, s_first,
-            s_last, std::forward<Pred>(op), std::forward<Proj1>(proj1),
+            std::forward<ExPolicy>(policy), first, last, s_first, s_last,
+            std::forward<Pred>(op), std::forward<Proj1>(proj1),
             std::forward<Proj2>(proj2));
     }
 
@@ -360,11 +358,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
-        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
         return detail::search_n<FwdIter, FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, count, s_first,
-            s_last, std::forward<Pred>(op), std::forward<Proj1>(proj1),
+            std::forward<ExPolicy>(policy), first, count, s_first, s_last,
+            std::forward<Pred>(op), std::forward<Proj1>(proj1),
             std::forward<Proj2>(proj2));
     }
 }}}    // namespace hpx::parallel::v1
@@ -391,8 +387,8 @@ namespace hpx {
             FwdIter2 s_first, FwdIter2 s_last, Pred&& op = Pred())
         {
             return hpx::parallel::v1::detail::search<FwdIter, FwdIter>().call(
-                hpx::execution::seq, std::true_type{}, first, last, s_first,
-                s_last, std::forward<Pred>(op),
+                hpx::execution::seq, first, last, s_first, s_last,
+                std::forward<Pred>(op),
                 hpx::parallel::util::projection_identity{},
                 hpx::parallel::util::projection_identity{});
         }
@@ -415,11 +411,9 @@ namespace hpx {
         tag_invoke(hpx::search_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, FwdIter2 s_first, FwdIter2 s_last, Pred&& op = Pred())
         {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::search<FwdIter, FwdIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last, s_first,
-                s_last, std::forward<Pred>(op),
+                std::forward<ExPolicy>(policy), first, last, s_first, s_last,
+                std::forward<Pred>(op),
                 hpx::parallel::util::projection_identity{},
                 hpx::parallel::util::projection_identity{});
         }
@@ -447,8 +441,8 @@ namespace hpx {
             Pred&& op = Pred())
         {
             return hpx::parallel::v1::detail::search_n<FwdIter, FwdIter>().call(
-                hpx::execution::seq, std::true_type{}, first, count, s_first,
-                s_last, std::forward<Pred>(op),
+                hpx::execution::seq, first, count, s_first, s_last,
+                std::forward<Pred>(op),
                 hpx::parallel::util::projection_identity{},
                 hpx::parallel::util::projection_identity{});
         }
@@ -472,11 +466,9 @@ namespace hpx {
             std::size_t count, FwdIter2 s_first, FwdIter2 s_last,
             Pred&& op = Pred())
         {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::search_n<FwdIter, FwdIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, count, s_first,
-                s_last, std::forward<Pred>(op),
+                std::forward<ExPolicy>(policy), first, count, s_first, s_last,
+                std::forward<Pred>(op),
                 hpx::parallel::util::projection_identity{},
                 hpx::parallel::util::projection_identity{});
         }

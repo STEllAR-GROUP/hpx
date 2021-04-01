@@ -16,7 +16,36 @@
 namespace hpx { namespace util {
 
     namespace detail {
+#if defined(HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE)
+        template <std::size_t I, typename T>
+        struct member_leaf
+        {
+            HPX_NO_UNIQUE_ADDRESS T member;
 
+            member_leaf() = default;
+
+            template <typename U>
+            explicit constexpr member_leaf(std::piecewise_construct_t, U&& v)
+              : member(std::forward<U>(v))
+            {
+            }
+        };
+
+        template <std::size_t I, typename T>
+        T member_type(member_leaf<I, T> const& /*leaf*/) noexcept;
+
+        template <std::size_t I, typename T>
+        static constexpr T& member_get(member_leaf<I, T>& leaf) noexcept
+        {
+            return leaf.member;
+        }
+        template <std::size_t I, typename T>
+        static constexpr T const& member_get(
+            member_leaf<I, T> const& leaf) noexcept
+        {
+            return leaf.member;
+        }
+#else
         template <std::size_t I, typename T,
             bool Empty = std::is_empty<T>::value && !std::is_final<T>::value>
         struct member_leaf
@@ -69,7 +98,7 @@ namespace hpx { namespace util {
         {
             return leaf;
         }
-
+#endif
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////

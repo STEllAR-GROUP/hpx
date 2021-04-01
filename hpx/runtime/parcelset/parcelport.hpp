@@ -13,7 +13,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/async_distributed/applier_fwd.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/io_service.hpp>
@@ -23,6 +22,7 @@
 #include <hpx/runtime/parcelset/detail/per_action_data_counter.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
+#include <hpx/runtime_distributed/applier_fwd.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
 #include <atomic>

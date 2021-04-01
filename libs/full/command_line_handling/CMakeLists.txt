@@ -8,6 +8,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(command_line_handling_headers
     hpx/command_line_handling/command_line_handling.hpp
+    hpx/command_line_handling/late_command_line_handling.hpp
     hpx/command_line_handling/parse_command_line.hpp
 )
 
@@ -18,8 +19,9 @@ set(command_line_handling_compat_headers
 )
 # cmake-format: on
 
-set(command_line_handling_sources command_line_handling.cpp
-                                  parse_command_line.cpp
+set(command_line_handling_sources
+    command_line_handling.cpp late_command_line_handling.cpp
+    parse_command_line.cpp
 )
 
 if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
@@ -36,5 +38,5 @@ add_hpx_module(
   DEPENDENCIES hpx_core hpx_parallelism ${MPI_DEPS}
   MODULE_DEPENDENCIES hpx_batch_environments hpx_command_line_handling_local
                       hpx_program_options hpx_runtime_configuration
-  CMAKE_SUBDIRS
+  CMAKE_SUBDIRS tests
 )

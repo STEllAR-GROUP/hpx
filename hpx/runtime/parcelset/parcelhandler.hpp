@@ -13,7 +13,6 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/agas/agas_fwd.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
@@ -21,6 +20,8 @@
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
@@ -44,10 +45,6 @@
 
 namespace hpx { namespace parcelset
 {
-    // default callback for put_parcel
-    void default_write_handler(std::error_code const&,
-        parcel const& p);
-
     /// The \a parcelhandler is the representation of the parcelset inside a
     /// locality. It is built on top of a single parcelport. Several
     /// parcel-handlers may be connected to a single parcelport.

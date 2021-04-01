@@ -12,7 +12,6 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 
-#include <iostream>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -291,7 +290,6 @@ namespace hpx { namespace util { namespace plugin {
                 ::dlerror();    // Clear the error state.
                 dll_handle = MyLoadLibrary(
                     (dll_name.empty() ? nullptr : dll_name.c_str()));
-                // std::cout << "open\n";
                 if (!dll_handle)
                 {
                     std::ostringstream str;
@@ -356,8 +354,6 @@ namespace hpx { namespace util { namespace plugin {
                             ((intptr_t) probe_handle & (-4)))
                         {
                             result = path(image_name).parent_path().string();
-                            std::cout << "found directory: " << result
-                                      << std::endl;
                             break;
                         }
                     }

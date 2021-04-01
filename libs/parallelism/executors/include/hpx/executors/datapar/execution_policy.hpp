@@ -58,7 +58,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         };
 
         /// \cond NOINTERNAL
-        constexpr dataseq_task_policy() {}
+        constexpr dataseq_task_policy() = default;
         /// \endcond
 
         /// Create a new dataseq_task_policy from itself
@@ -157,7 +157,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        constexpr void serialize(Archive&, const unsigned int)
         {
         }
 
@@ -294,7 +294,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         }
 
         /// \cond NOINTERNAL
-        constexpr dataseq_task_policy_shim() {}
+        constexpr dataseq_task_policy_shim() = default;
 
         template <typename Executor_, typename Parameters_>
         constexpr dataseq_task_policy_shim(
@@ -310,7 +310,9 @@ namespace hpx { namespace execution { inline namespace v1 {
         template <typename Archive>
         void serialize(Archive& ar, const unsigned int version)
         {
-            ar& exec_& params_;
+            // clang-format off
+            ar & exec_ & params_;
+            // clang-format on
         }
 
     private:
@@ -348,11 +350,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         };
 
         /// \cond NOINTERNAL
-        constexpr dataseq_policy()
-          : exec_{}
-          , params_{}
-        {
-        }
+        constexpr dataseq_policy() = default;
         /// \endcond
 
         /// Create a new dataseq_task_policy.
@@ -462,7 +460,7 @@ namespace hpx { namespace execution { inline namespace v1 {
     };
 
     /// Default sequential execution policy object.
-    HPX_STATIC_CONSTEXPR dataseq_policy dataseq;
+    static constexpr dataseq_policy dataseq{};
 
     /// The class dataseq_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
@@ -586,7 +584,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         }
 
         /// \cond NOINTERNAL
-        constexpr dataseq_policy_shim() {}
+        constexpr dataseq_policy_shim() = default;
 
         template <typename Executor_, typename Parameters_>
         constexpr dataseq_policy_shim(Executor_&& exec, Parameters_&& params)
@@ -601,7 +599,9 @@ namespace hpx { namespace execution { inline namespace v1 {
         template <typename Archive>
         void serialize(Archive& ar, const unsigned int version)
         {
-            ar& exec_& params_;
+            // clang-format off
+            ar & exec_ & params_;
+            // clang-format on
         }
 
     private:
@@ -643,7 +643,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         };
 
         /// \cond NOINTERNAL
-        constexpr datapar_task_policy() {}
+        constexpr datapar_task_policy() = default;
         /// \endcond
 
         /// Create a new datapar_task_policy from itself
@@ -779,11 +779,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         };
 
         /// \cond NOINTERNAL
-        constexpr datapar_policy()
-          : exec_{}
-          , params_{}
-        {
-        }
+        constexpr datapar_policy() = default;
         /// \endcond
 
         /// Create a new datapar_policy referencing a chunk size.
@@ -886,7 +882,7 @@ namespace hpx { namespace execution { inline namespace v1 {
     };
 
     /// Default data-parallel execution policy object.
-    HPX_STATIC_CONSTEXPR datapar_policy datapar;
+    static constexpr datapar_policy datapar{};
 
     /// The class datapar_policy_shim is an execution policy type
     /// used as a unique type to disambiguate parallel algorithm overloading
@@ -1009,7 +1005,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         }
 
         /// \cond NOINTERNAL
-        constexpr datapar_policy_shim() {}
+        constexpr datapar_policy_shim() = default;
 
         template <typename Executor_, typename Parameters_>
         constexpr datapar_policy_shim(Executor_&& exec, Parameters_&& params)
@@ -1024,7 +1020,9 @@ namespace hpx { namespace execution { inline namespace v1 {
         template <typename Archive>
         void serialize(Archive& ar, const unsigned int version)
         {
-            ar& exec_& params_;
+            // clang-format off
+            ar & exec_ & params_;
+            // clang-format on
         }
 
     private:
@@ -1155,7 +1153,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         }
 
         /// \cond NOINTERNAL
-        constexpr datapar_task_policy_shim() {}
+        constexpr datapar_task_policy_shim() = default;
 
         template <typename Executor_, typename Parameters_>
         constexpr datapar_task_policy_shim(
@@ -1171,7 +1169,9 @@ namespace hpx { namespace execution { inline namespace v1 {
         template <typename Archive>
         void serialize(Archive& ar, const unsigned int version)
         {
-            ar& exec_& params_;
+            // clang-format off
+            ar & exec_ & params_;
+            // clang-format on
         }
 
     private:

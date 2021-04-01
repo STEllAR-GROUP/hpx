@@ -18,8 +18,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#include <iostream>
-
 namespace hpx { namespace components { namespace process { namespace posix {
 
 template <class Process>

@@ -186,5 +186,6 @@ namespace hpx {
     namespace detail {
         HPX_EXPORT void on_exit() noexcept;
         HPX_EXPORT void on_abort(int signal) noexcept;
+        HPX_EXPORT void handle_print_bind(std::size_t num_threads);
     }    // namespace detail
 }    // namespace hpx

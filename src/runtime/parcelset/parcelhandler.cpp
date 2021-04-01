@@ -15,7 +15,6 @@
 #include <hpx/config/endian.hpp>
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
@@ -37,6 +36,7 @@
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/runtime/parcelset/static_parcelports.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
+#include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/state.hpp>
 #include <hpx/synchronization/counting_semaphore.hpp>

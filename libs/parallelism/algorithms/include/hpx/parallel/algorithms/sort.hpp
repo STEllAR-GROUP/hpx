@@ -383,10 +383,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_random_access_iterator<RandomIt>::value),
             "Requires a random access iterator.");
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         return detail::sort<RandomIt>().call(std::forward<ExPolicy>(policy),
-            is_seq(), first, last, std::forward<Comp>(comp),
-            std::forward<Proj>(proj));
+            first, last, std::forward<Comp>(comp), std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1

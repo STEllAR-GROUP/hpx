@@ -326,50 +326,62 @@ int main()
     static_assert(!is_sender_to<sender_3, sender_3>::value,
         "sender_3 is not a sender to sender_3");
 
-    receiver r1;
-    hpx::execution::experimental::start(
-        hpx::execution::experimental::connect(sender_1{}, r1));
-    HPX_TEST_EQ(r1.i, 4711);
-    HPX_TEST_EQ(member_connect_calls, std::size_t(1));
-    HPX_TEST_EQ(tag_invoke_connect_calls, std::size_t(0));
+    {
+        receiver r1;
+        auto os = hpx::execution::experimental::connect(sender_1{}, r1);
+        hpx::execution::experimental::start(os);
+        HPX_TEST_EQ(r1.i, 4711);
+        HPX_TEST_EQ(member_connect_calls, std::size_t(1));
+        HPX_TEST_EQ(tag_invoke_connect_calls, std::size_t(0));
+    }
 
-    receiver r2;
-    hpx::execution::experimental::start(
-        hpx::execution::experimental::connect(sender_2{}, r2));
-    HPX_TEST_EQ(r2.i, 4711);
-    HPX_TEST_EQ(member_connect_calls, std::size_t(2));
-    HPX_TEST_EQ(tag_invoke_connect_calls, std::size_t(0));
+    {
+        receiver r2;
+        auto os = hpx::execution::experimental::connect(sender_2{}, r2);
+        hpx::execution::experimental::start(os);
+        HPX_TEST_EQ(r2.i, 4711);
+        HPX_TEST_EQ(member_connect_calls, std::size_t(2));
+        HPX_TEST_EQ(tag_invoke_connect_calls, std::size_t(0));
+    }
 
-    receiver r3;
-    hpx::execution::experimental::start(
-        hpx::execution::experimental::connect(sender_3{}, r3));
-    HPX_TEST_EQ(r3.i, 4711);
-    HPX_TEST_EQ(member_connect_calls, std::size_t(2));
-    HPX_TEST_EQ(tag_invoke_connect_calls, std::size_t(1));
+    {
+        receiver r3;
+        auto os = hpx::execution::experimental::connect(sender_3{}, r3);
+        hpx::execution::experimental::start(os);
+        HPX_TEST_EQ(r3.i, 4711);
+        HPX_TEST_EQ(member_connect_calls, std::size_t(2));
+        HPX_TEST_EQ(tag_invoke_connect_calls, std::size_t(1));
+    }
 
-    void_receiver vr1;
-    executor_1 ex1;
-    hpx::execution::experimental::start(
-        hpx::execution::experimental::connect(ex1, vr1));
-    HPX_TEST_EQ(void_receiver_set_value_calls, std::size_t(1));
-    HPX_TEST_EQ(member_execute_calls, std::size_t(1));
-    HPX_TEST_EQ(tag_invoke_execute_calls, std::size_t(0));
+    {
+        void_receiver vr1;
+        executor_1 ex1;
+        auto os = hpx::execution::experimental::connect(ex1, vr1);
+        hpx::execution::experimental::start(os);
+        HPX_TEST_EQ(void_receiver_set_value_calls, std::size_t(1));
+        HPX_TEST_EQ(member_execute_calls, std::size_t(1));
+        HPX_TEST_EQ(tag_invoke_execute_calls, std::size_t(0));
+    }
 
-    void_receiver vr2;
-    executor_2 ex2;
-    hpx::execution::experimental::start(
-        hpx::execution::experimental::connect(ex2, vr2));
-    HPX_TEST_EQ(void_receiver_set_value_calls, std::size_t(2));
-    HPX_TEST_EQ(member_execute_calls, std::size_t(2));
-    HPX_TEST_EQ(tag_invoke_execute_calls, std::size_t(0));
+    {
+        void_receiver vr2;
+        executor_2 ex2;
+        auto os = hpx::execution::experimental::connect(ex2, vr2);
+        hpx::execution::experimental::start(os);
+        HPX_TEST_EQ(void_receiver_set_value_calls, std::size_t(2));
+        HPX_TEST_EQ(member_execute_calls, std::size_t(2));
+        HPX_TEST_EQ(tag_invoke_execute_calls, std::size_t(0));
+    }
 
-    void_receiver vr3;
-    executor_3 ex3;
-    hpx::execution::experimental::start(
-        hpx::execution::experimental::connect(ex3, vr3));
-    HPX_TEST_EQ(void_receiver_set_value_calls, std::size_t(3));
-    HPX_TEST_EQ(member_execute_calls, std::size_t(2));
-    HPX_TEST_EQ(tag_invoke_execute_calls, std::size_t(1));
+    {
+        void_receiver vr3;
+        executor_3 ex3;
+        auto os = hpx::execution::experimental::connect(ex3, vr3);
+        hpx::execution::experimental::start(os);
+        HPX_TEST_EQ(void_receiver_set_value_calls, std::size_t(3));
+        HPX_TEST_EQ(member_execute_calls, std::size_t(2));
+        HPX_TEST_EQ(tag_invoke_execute_calls, std::size_t(1));
+    }
 
     return hpx::util::report_errors();
 }

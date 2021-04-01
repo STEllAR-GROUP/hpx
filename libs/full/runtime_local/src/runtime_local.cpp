@@ -7,6 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/command_line_handling/late_command_line_handling.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/debugging/backtrace.hpp>
@@ -44,6 +45,7 @@
 #include <cstring>
 #include <exception>
 #include <functional>
+#include <iomanip>
 #include <iostream>
 #include <list>
 #include <memory>
@@ -1225,6 +1227,65 @@ namespace hpx {
         }
     }
 
+    namespace detail {
+        void handle_print_bind(std::size_t num_threads)
+        {
+            threads::topology& top = threads::create_topology();
+            auto const& rp = hpx::resource::get_partitioner();
+            auto const& tm = get_runtime().get_thread_manager();
+
+            {
+                // make sure all output is kept together
+                std::ostringstream strm;
+
+                strm << std::string(79, '*') << '\n';
+                strm << "locality: " << hpx::get_locality_id() << '\n';
+                for (std::size_t i = 0; i != num_threads; ++i)
+                {
+                    // print the mask for the current PU
+                    threads::mask_cref_type pu_mask = rp.get_pu_mask(i);
+
+                    if (!threads::any(pu_mask))
+                    {
+                        strm << std::setw(4) << i    //-V112
+                             << ": thread binding disabled" << std::endl;
+                    }
+                    else
+                    {
+                        std::string pool_name = tm.get_pool(i).get_pool_name();
+                        top.print_affinity_mask(strm, i, pu_mask, pool_name);
+                    }
+
+                    // Make sure the mask does not contradict the CPU bindings
+                    // returned by the system (see #973: Would like option to
+                    // report HWLOC bindings).
+                    error_code ec(lightweight);
+                    std::thread& blob = tm.get_os_thread_handle(i);
+                    threads::mask_type boundcpu =
+                        top.get_cpubind_mask(blob, ec);
+
+                    // The masks reported by HPX must be the same as the ones
+                    // reported from HWLOC.
+                    if (!ec && threads::any(boundcpu) &&
+                        !threads::equal(boundcpu, pu_mask, num_threads))
+                    {
+                        std::string boundcpu_str = threads::to_string(boundcpu);
+                        std::string pu_mask_str = threads::to_string(pu_mask);
+                        HPX_THROW_EXCEPTION(invalid_status, "handle_print_bind",
+                            hpx::util::format(
+                                "unexpected mismatch between locality {1}: "
+                                "binding reported from HWLOC({2}) and HPX({3}) "
+                                "on thread {4}",
+                                hpx::get_locality_id(), boundcpu_str,
+                                pu_mask_str, i));
+                    }
+                }
+
+                std::cout << strm.str();
+            }
+        }
+    }    // namespace detail
+
     threads::thread_result_type runtime::run_helper(
         util::function_nonser<runtime::hpx_main_function_type> const& func,
         int& result, bool call_startup)
@@ -1232,6 +1293,24 @@ namespace hpx {
         bool caught_exception = false;
         try
         {
+            {
+                hpx::program_options::options_description options;
+                result = util::handle_late_commandline_options(
+                    get_config(), options, &detail::handle_print_bind);
+                if (result)
+                {
+                    lbt_ << "runtime_local::run_helper: bootstrap "
+                            "aborted, bailing out";
+
+                    set_state(state_running);
+                    finalize(-1.0);
+
+                    return threads::thread_result_type(
+                        threads::thread_schedule_state::terminated,
+                        threads::invalid_thread_id);
+                }
+            }
+
             if (call_startup)
             {
                 call_startup_functions(true);

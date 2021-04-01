@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/preprocessor/cat.hpp>
-#include <hpx/util/bind_action.hpp>
 
 #include <cstddef>
 #include <mutex>

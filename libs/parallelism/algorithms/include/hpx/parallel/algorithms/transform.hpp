@@ -349,11 +349,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
             return detail::transform<util::in_out_result<FwdIter1B, FwdIter2>>()
-                .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
-                    dest, std::forward<F>(f), std::forward<Proj>(proj));
+                .call(std::forward<ExPolicy>(policy), first, last, dest,
+                    std::forward<F>(f), std::forward<Proj>(proj));
         }
 
         /// forward declare the segmented version
@@ -551,13 +549,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static_assert((hpx::traits::is_forward_iterator<FwdIter3>::value),
                 "Requires at least forward iterator.");
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
             typedef util::in_in_out_result<FwdIter1B, FwdIter2, FwdIter3>
                 result_type;
 
             return detail::transform_binary<result_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
-                dest, std::forward<F>(f), std::forward<Proj1>(proj1),
+                std::forward<ExPolicy>(policy), first1, last1, first2, dest,
+                std::forward<F>(f), std::forward<Proj1>(proj1),
                 std::forward<Proj2>(proj2));
         }
 
@@ -679,13 +676,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static_assert((hpx::traits::is_forward_iterator<FwdIter3>::value),
                 "Requires at least forward iterator.");
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
             typedef util::in_in_out_result<FwdIter1B, FwdIter2E, FwdIter3>
                 result_type;
 
             return detail::transform_binary2<result_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
-                last2, dest, std::forward<F>(f), std::forward<Proj1>(proj1),
+                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
+                dest, std::forward<F>(f), std::forward<Proj1>(proj1),
                 std::forward<Proj2>(proj2));
         }
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,

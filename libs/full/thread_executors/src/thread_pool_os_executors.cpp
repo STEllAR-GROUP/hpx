@@ -26,7 +26,6 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
 #include <memory>
 #include <mutex>
 #include <string>

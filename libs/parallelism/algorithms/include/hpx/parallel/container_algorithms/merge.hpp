@@ -450,13 +450,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             (hpx::traits::is_random_access_iterator<RandIter3>::value),
             "Requires at least random access iterator.");
 
-        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
         using result_type =
             hpx::parallel::util::in_in_out_result<iterator_type1,
                 iterator_type2, RandIter3>;
 
         return hpx::parallel::v1::detail::merge<result_type>().call(
-            std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng1),
+            std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
             hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
             dest, std::forward<Comp>(comp), std::forward<Proj1>(proj1),
             std::forward<Proj2>(proj2));
@@ -501,11 +500,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_random_access_iterator<iterator_type>::value,
             "Required at least random access iterator.");
 
-        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
         return hpx::parallel::v1::detail::inplace_merge<RandIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
-            middle, hpx::util::end(rng), std::forward<Comp>(comp),
+            std::forward<ExPolicy>(policy), hpx::util::begin(rng), middle,
+            hpx::util::end(rng), std::forward<Comp>(comp),
             std::forward<Proj>(proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -564,16 +561,14 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_random_access_iterator<Iter3>::value,
                 "Requires at least random access iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
             using result_type = hpx::ranges::merge_result<iterator_type1,
                 iterator_type2, Iter3>;
 
             return hpx::parallel::v1::detail::merge<result_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                hpx::util::begin(rng1), hpx::util::end(rng1),
-                hpx::util::begin(rng2), hpx::util::end(rng2), dest,
-                std::forward<Comp>(comp), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                hpx::util::end(rng1), hpx::util::begin(rng2),
+                hpx::util::end(rng2), dest, std::forward<Comp>(comp),
+                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
 
         // clang-format off
@@ -608,13 +603,12 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_random_access_iterator<Iter3>::value,
                 "Requires at least random access iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
             using result_type = hpx::ranges::merge_result<Iter1, Iter2, Iter3>;
 
             return hpx::parallel::v1::detail::merge<result_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
-                last2, dest, std::forward<Comp>(comp),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
+                dest, std::forward<Comp>(comp), std::forward<Proj1>(proj1),
+                std::forward<Proj2>(proj2));
         }
 
         // clang-format off
@@ -660,7 +654,7 @@ namespace hpx { namespace ranges {
                 iterator_type2, Iter3>;
 
             return hpx::parallel::v1::detail::merge<result_type>().call(
-                hpx::execution::seq, std::true_type(), hpx::util::begin(rng1),
+                hpx::execution::seq, hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
                 hpx::util::end(rng2), dest, std::forward<Comp>(comp),
                 std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
@@ -700,9 +694,9 @@ namespace hpx { namespace ranges {
             using result_type = hpx::ranges::merge_result<Iter1, Iter2, Iter3>;
 
             return hpx::parallel::v1::detail::merge<result_type>().call(
-                hpx::execution::seq, std::true_type(), first1, last1, first2,
-                last2, dest, std::forward<Comp>(comp),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                hpx::execution::seq, first1, last1, first2, last2, dest,
+                std::forward<Comp>(comp), std::forward<Proj1>(proj1),
+                std::forward<Proj2>(proj2));
         }
     } merge{};
 
@@ -742,11 +736,9 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
                 "Required at least random access iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::inplace_merge<Iter>().call(
-                std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
-                middle, hpx::util::end(rng), std::forward<Comp>(comp),
+                std::forward<ExPolicy>(policy), hpx::util::begin(rng), middle,
+                hpx::util::end(rng), std::forward<Comp>(comp),
                 std::forward<Proj>(proj));
         }
 
@@ -772,10 +764,8 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
                 "Required at least random access iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::inplace_merge<Iter>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, middle, last,
+                std::forward<ExPolicy>(policy), first, middle, last,
                 std::forward<Comp>(comp), std::forward<Proj>(proj));
         }
 
@@ -808,8 +798,8 @@ namespace hpx { namespace ranges {
                 "Required at least random access iterator.");
 
             return hpx::parallel::v1::detail::inplace_merge<Iter>().call(
-                hpx::execution::seq, std::true_type(), hpx::util::begin(rng),
-                middle, hpx::util::end(rng), std::forward<Comp>(comp),
+                hpx::execution::seq, hpx::util::begin(rng), middle,
+                hpx::util::end(rng), std::forward<Comp>(comp),
                 std::forward<Proj>(proj));
         }
 
@@ -834,7 +824,7 @@ namespace hpx { namespace ranges {
                 "Required at least random access iterator.");
 
             return hpx::parallel::v1::detail::inplace_merge<Iter>().call(
-                hpx::execution::seq, std::true_type(), first, middle, last,
+                hpx::execution::seq, first, middle, last,
                 std::forward<Comp>(comp), std::forward<Proj>(proj));
         }
     } inplace_merge{};

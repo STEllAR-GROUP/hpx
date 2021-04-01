@@ -25,13 +25,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         typedef T type;
 
         // Obtain initiating function's return type.
-        static type get()
+        static constexpr type get()
         {
             return T();
         }
 
         template <typename T_>
-        static type get(T_&& t)
+        static constexpr type get(T_&& t)
         {
             return std::forward<T_>(t);
         }
@@ -50,9 +50,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         typedef void type;
 
         // Obtain initiating function's return type.
-        static void get() {}
+        static constexpr void get() {}
 
-        static void get(hpx::util::unused_type) {}
+        static constexpr void get(hpx::util::unused_type) {}
 
         static void get(hpx::future<void>&& t)
         {
@@ -256,8 +256,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename U, typename Conv,
         HPX_CONCEPT_REQUIRES_(hpx::is_invocable_v<Conv, U>)>
-    typename hpx::util::invoke_result<Conv, U>::type convert_to_result(
-        U&& val, Conv&& conv)
+    constexpr typename hpx::util::invoke_result<Conv, U>::type
+    convert_to_result(U&& val, Conv&& conv)
     {
         return HPX_INVOKE(conv, val);
     }

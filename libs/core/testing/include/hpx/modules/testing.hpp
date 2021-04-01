@@ -21,8 +21,8 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
 #include <mutex>
+#include <ostream>
 #include <sstream>
 
 namespace hpx { namespace util {
@@ -178,7 +178,8 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT int report_errors(std::ostream& stream = std::cerr);
+    HPX_CORE_EXPORT int report_errors();
+    HPX_CORE_EXPORT int report_errors(std::ostream& stream);
     HPX_CORE_EXPORT void print_cdash_timing(const char* name, double time);
     HPX_CORE_EXPORT void print_cdash_timing(
         const char* name, std::uint64_t time);

@@ -13,7 +13,7 @@
 #include <hpx/modules/format.hpp>
 
 #include <cstddef>
-#include <iostream>
+#include <ostream>
 
 namespace hpx { namespace execution_base {
 

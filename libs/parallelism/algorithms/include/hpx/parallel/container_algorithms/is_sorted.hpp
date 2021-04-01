@@ -525,8 +525,8 @@ namespace hpx { namespace ranges {
             Sent last, Pred&& pred = Pred(), Proj&& proj = Proj())
         {
             return hpx::parallel::v1::detail::is_sorted<FwdIter, Sent>().call(
-                hpx::execution::seq, std::true_type(), first, last,
-                std::forward<Pred>(pred), std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, std::forward<Pred>(pred),
+                std::forward<Proj>(proj));
         }
 
         template <typename ExPolicy, typename FwdIter, typename Sent,
@@ -550,10 +550,8 @@ namespace hpx { namespace ranges {
         tag_invoke(hpx::ranges::is_sorted_t, ExPolicy&& policy, FwdIter first,
             Sent last, Pred&& pred = Pred(), Proj&& proj = Proj())
         {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::is_sorted<FwdIter, Sent>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last,
+                std::forward<ExPolicy>(policy), first, last,
                 std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
 
@@ -576,9 +574,9 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::is_sorted<
                 typename hpx::traits::range_iterator<Rng>::type,
                 typename hpx::traits::range_iterator<Rng>::type>()
-                .call(hpx::execution::seq, std::true_type(),
-                    hpx::util::begin(rng), hpx::util::end(rng),
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(hpx::execution::seq, hpx::util::begin(rng),
+                    hpx::util::end(rng), std::forward<Pred>(pred),
+                    std::forward<Proj>(proj));
         }
 
         template <typename ExPolicy, typename Rng,
@@ -601,14 +599,12 @@ namespace hpx { namespace ranges {
         tag_invoke(hpx::ranges::is_sorted_t, ExPolicy&& policy, Rng&& rng,
             Pred&& pred = Pred(), Proj&& proj = Proj())
         {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::is_sorted<
                 typename hpx::traits::range_iterator<Rng>::type,
                 typename hpx::traits::range_iterator<Rng>::type>()
-                .call(std::forward<ExPolicy>(policy), is_seq(),
-                    hpx::util::begin(rng), hpx::util::end(rng),
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), std::forward<Pred>(pred),
+                    std::forward<Proj>(proj));
         }
     } is_sorted{};
 
@@ -635,7 +631,7 @@ namespace hpx { namespace ranges {
             Sent last, Pred&& pred = Pred(), Proj&& proj = Proj())
         {
             return hpx::parallel::v1::detail::is_sorted_until<FwdIter, Sent>()
-                .call(hpx::execution::seq, std::true_type(), first, last,
+                .call(hpx::execution::seq, first, last,
                     std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
 
@@ -661,10 +657,8 @@ namespace hpx { namespace ranges {
             FwdIter first, Sent last, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::is_sorted_until<FwdIter, Sent>()
-                .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
+                .call(std::forward<ExPolicy>(policy), first, last,
                     std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
 
@@ -688,9 +682,9 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::is_sorted_until<
                 typename hpx::traits::range_iterator<Rng>::type,
                 typename hpx::traits::range_iterator<Rng>::type>()
-                .call(hpx::execution::seq, std::true_type(),
-                    hpx::util::begin(rng), hpx::util::end(rng),
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(hpx::execution::seq, hpx::util::begin(rng),
+                    hpx::util::end(rng), std::forward<Pred>(pred),
+                    std::forward<Proj>(proj));
         }
 
         template <typename ExPolicy, typename Rng,
@@ -713,14 +707,12 @@ namespace hpx { namespace ranges {
         tag_invoke(hpx::ranges::is_sorted_until_t, ExPolicy&& policy, Rng&& rng,
             Pred&& pred = Pred(), Proj&& proj = Proj())
         {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::is_sorted_until<
                 typename hpx::traits::range_iterator<Rng>::type,
                 typename hpx::traits::range_iterator<Rng>::type>()
-                .call(std::forward<ExPolicy>(policy), is_seq(),
-                    hpx::util::begin(rng), hpx::util::end(rng),
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), std::forward<Pred>(pred),
+                    std::forward<Proj>(proj));
         }
     } is_sorted_until{};
 }}    // namespace hpx::ranges

@@ -12,7 +12,6 @@
 #include <hpx/actions_base/detail/action_factory.hpp>
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/modules/itt_notify.hpp>
@@ -20,6 +19,7 @@
 #include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/serialization/access.hpp>
 #include <hpx/serialization/detail/polymorphic_id_factory.hpp>

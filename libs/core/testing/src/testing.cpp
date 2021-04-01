@@ -71,6 +71,11 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
+    int report_errors()
+    {
+        return report_errors(std::cerr);
+    }
+
     int report_errors(std::ostream& stream)
     {
         std::size_t sanity = detail::global_fixture.get(counter_sanity),

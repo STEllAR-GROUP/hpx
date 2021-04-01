@@ -21,6 +21,7 @@
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/threading.hpp>
+#include <hpx/runtime/parcelset/connection_cache.hpp>
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
@@ -28,7 +29,6 @@
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/util/connection_cache.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
 

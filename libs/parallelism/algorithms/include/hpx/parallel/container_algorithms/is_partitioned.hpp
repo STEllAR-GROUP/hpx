@@ -273,7 +273,7 @@ namespace hpx { namespace ranges {
             Sent last, Pred&& pred, Proj&& proj = Proj())
         {
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, Sent>()
-                .call(hpx::execution::seq, std::false_type(), first, last,
+                .call(hpx::execution::seq, first, last,
                     std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
 
@@ -295,10 +295,8 @@ namespace hpx { namespace ranges {
         tag_invoke(hpx::ranges::is_partitioned_t, ExPolicy&& policy,
             FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj())
         {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, Sent>()
-                .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
+                .call(std::forward<ExPolicy>(policy), first, last,
                     std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
 
@@ -322,9 +320,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::is_partitioned<iterator_type,
                 iterator_type>()
-                .call(hpx::execution::seq, std::false_type(), std::begin(rng),
-                    std::end(rng), std::forward<Pred>(pred),
-                    std::forward<Proj>(proj));
+                .call(hpx::execution::seq, std::begin(rng), std::end(rng),
+                    std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -347,11 +344,10 @@ namespace hpx { namespace ranges {
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
             return hpx::parallel::v1::detail::is_partitioned<iterator_type,
                 iterator_type>()
-                .call(std::forward<ExPolicy>(policy), is_seq(), std::begin(rng),
+                .call(std::forward<ExPolicy>(policy), std::begin(rng),
                     std::end(rng), std::forward<Pred>(pred),
                     std::forward<Proj>(proj));
         }

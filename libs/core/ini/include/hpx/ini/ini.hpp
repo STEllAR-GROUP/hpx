@@ -14,9 +14,9 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/util/to_string.hpp>
 
-#include <iostream>
 #include <map>
 #include <mutex>
+#include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -134,7 +134,8 @@ namespace hpx { namespace util {
         void read(std::string const& filename);
         void merge(std::string const& second);
         void merge(section& second);
-        void dump(int ind = 0, std::ostream& strm = std::cout) const;
+        void dump(int ind = 0) const;
+        void dump(int ind, std::ostream& strm) const;
 
         void add_section(
             std::string const& sec_name, section& sec, section* root = nullptr)

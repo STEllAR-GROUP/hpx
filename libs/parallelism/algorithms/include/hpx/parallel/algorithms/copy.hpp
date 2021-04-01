@@ -431,8 +431,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         // if count is representing a negative value, we do nothing
         if (detail::is_negative(count))
         {
@@ -446,8 +444,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::copy_n<util::in_out_result<FwdIter1, FwdIter2>>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, std::size_t(count),
-            dest);
+            std::forward<ExPolicy>(policy), first, std::size_t(count), dest);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -615,14 +612,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::copy_if<util::in_out_result<FwdIter1, FwdIter2>>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
+            std::forward<ExPolicy>(policy), first, last, dest,
             std::forward<Pred>(pred), util::projection_identity{});
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -708,12 +703,10 @@ namespace hpx {
                     FwdIter2>::get(std::move(dest));
             }
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::copy_n<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(std::forward<ExPolicy>(policy), is_seq(), first,
+                    .call(std::forward<ExPolicy>(policy), first,
                         std::size_t(count), dest));
         }
 
@@ -743,8 +736,8 @@ namespace hpx {
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::copy_n<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(hpx::execution::seq, std::true_type{}, first,
-                        std::size_t(count), dest));
+                    .call(
+                        hpx::execution::seq, first, std::size_t(count), dest));
         }
     } copy_n{};
 
@@ -778,13 +771,11 @@ namespace hpx {
                         hpx::traits::is_output_iterator<FwdIter2>::value),
                 "Requires at least forward iterator or sequential execution.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::copy_if<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
-                        dest, std::forward<Pred>(pred),
+                    .call(std::forward<ExPolicy>(policy), first, last, dest,
+                        std::forward<Pred>(pred),
                         hpx::parallel::util::projection_identity{}));
         }
 
@@ -809,8 +800,8 @@ namespace hpx {
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::copy_if<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(hpx::execution::seq, std::true_type{}, first, last,
-                        dest, std::forward<Pred>(pred),
+                    .call(hpx::execution::seq, first, last, dest,
+                        std::forward<Pred>(pred),
                         hpx::parallel::util::projection_identity{}));
         }
     } copy_if{};

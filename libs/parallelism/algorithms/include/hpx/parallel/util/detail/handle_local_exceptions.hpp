@@ -21,6 +21,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util { namespace detail {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy>
     struct handle_local_exceptions
@@ -213,7 +214,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             for (hpx::future<T> const& f : workitems)
             {
                 if (f.has_exception())
+                {
                     parallel_exception_termination_handler();
+                }
             }
 #endif
         }
@@ -229,7 +232,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             for (hpx::shared_future<T> const& f : workitems)
             {
                 if (f.has_exception())
+                {
                     parallel_exception_termination_handler();
+                }
             }
 #endif
         }
@@ -246,7 +251,95 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             for (hpx::future<T> const& f : workitems)
             {
                 if (f.has_exception())
+                {
                     parallel_exception_termination_handler();
+                }
+            }
+#endif
+        }
+    };
+
+    template <>
+    struct handle_local_exceptions<hpx::execution::unsequenced_policy>
+    {
+        ///////////////////////////////////////////////////////////////////////
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        static void call(std::exception_ptr const&)
+        {
+            HPX_ASSERT(false);
+        }
+#else
+        HPX_NORETURN static void call(std::exception_ptr const&)
+        {
+            parallel_exception_termination_handler();
+        }
+#endif
+
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        static void call(
+            std::exception_ptr const&, std::list<std::exception_ptr>&)
+        {
+            HPX_ASSERT(false);
+        }
+#else
+        HPX_NORETURN static void call(
+            std::exception_ptr const&, std::list<std::exception_ptr>&)
+        {
+            parallel_exception_termination_handler();
+        }
+#endif
+
+        template <typename T>
+        static void call(std::vector<hpx::future<T>> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
+            HPX_ASSERT(false);
+#else
+            for (hpx::future<T> const& f : workitems)
+            {
+                if (f.has_exception())
+                {
+                    parallel_exception_termination_handler();
+                }
+            }
+#endif
+        }
+
+        template <typename T>
+        static void call(std::vector<hpx::shared_future<T>> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
+            HPX_ASSERT(false);
+#else
+            for (hpx::shared_future<T> const& f : workitems)
+            {
+                if (f.has_exception())
+                {
+                    parallel_exception_termination_handler();
+                }
+            }
+#endif
+        }
+
+        template <typename T, typename Cleanup>
+        static void call_with_cleanup(
+            std::vector<hpx::future<T>> const& workitems,
+            std::list<std::exception_ptr>&, Cleanup&&, bool = true)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
+            HPX_ASSERT(false);
+#else
+            for (hpx::future<T> const& f : workitems)
+            {
+                if (f.has_exception())
+                {
+                    parallel_exception_termination_handler();
+                }
             }
 #endif
         }

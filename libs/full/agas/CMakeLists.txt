@@ -21,7 +21,9 @@ set(agas_compat_headers
 )
 # cmake-format: on
 
-set(agas_sources addressing_service.cpp detail/interface.cpp state.cpp)
+set(agas_sources addressing_service.cpp detail/interface.cpp route.cpp
+                 state.cpp
+)
 
 include(HPX_AddModule)
 add_hpx_module(

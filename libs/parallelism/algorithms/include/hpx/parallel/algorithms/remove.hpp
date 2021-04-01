@@ -424,11 +424,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         return detail::remove_if<FwdIter>().call(std::forward<ExPolicy>(policy),
-            is_seq(), first, last, std::forward<Pred>(pred),
-            std::forward<Proj>(proj));
+            first, last, std::forward<Pred>(pred), std::forward<Proj>(proj));
     }
 
     // clang-format off
@@ -448,11 +445,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         typedef typename std::iterator_traits<FwdIter>::value_type Type;
 
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
         // Just utilize existing parallel remove_if.
         return detail::remove_if<FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, last,
+            std::forward<ExPolicy>(policy), first, last,
             [value](Type const& a) -> bool { return value == a; },
             std::forward<Proj>(proj));
     }
@@ -480,8 +475,8 @@ namespace hpx {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::remove_if<FwdIter>().call(
-                hpx::execution::sequenced_policy{}, std::true_type{}, first,
-                last, std::forward<Pred>(pred),
+                hpx::execution::sequenced_policy{}, first, last,
+                std::forward<Pred>(pred),
                 hpx::parallel::util::projection_identity());
         }
 
@@ -503,10 +498,8 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
             return hpx::parallel::v1::detail::remove_if<FwdIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last,
+                std::forward<ExPolicy>(policy), first, last,
                 std::forward<Pred>(pred),
                 hpx::parallel::util::projection_identity());
         }

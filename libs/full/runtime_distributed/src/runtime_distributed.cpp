@@ -10,7 +10,6 @@
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/async_distributed/apply.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
@@ -40,6 +39,7 @@
 #include <hpx/runtime_components/server/console_error_sink.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/big_boot_barrier.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/runtime_distributed/get_num_localities.hpp>

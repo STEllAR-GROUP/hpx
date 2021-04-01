@@ -24,6 +24,24 @@ ctest \
     -DCTEST_BUILD_CONFIGURATION_NAME="${configuration_name_with_build_type}" \
     -DCTEST_SOURCE_DIRECTORY="${src_dir}" \
     -DCTEST_BINARY_DIRECTORY="${build_dir}"
+
+if [[ "${install_hpx}" ]]; then
+    install_root="/work/jenkins/install"
+    install_dir="${install_root}/${configuration_name_with_build_type}-${GIT_COMMIT}"
+    install_dir_master="${install_root}/${configuration_name_with_build_type}"
+
+    # Install the current build into a directory suffixed by the commit hash
+    cmake "${build_dir}" -DCMAKE_INSTALL_PREFIX="${install_dir}"
+    cmake --build "${build_dir}" --target install
+
+    # Link the current build to a directory without the hash
+    rm -f "${install_dir_master}"
+    ln -s "${install_dir}" "${install_dir_master}"
+
+    # Delete all but the 10 newest builds
+    builds_to_keep=10
+    rm -rf $(ls -d --sort=time "${install_dir}-*" | head --lines=-${builds_to_keep})
+fi
 set -e
 
 # Things went wrong by default

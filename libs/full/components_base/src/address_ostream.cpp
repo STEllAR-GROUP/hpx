@@ -9,7 +9,7 @@
 #include <hpx/util/ios_flags_saver.hpp>
 
 #include <iomanip>
-#include <iostream>
+#include <ostream>
 
 namespace hpx { namespace naming {
 

@@ -10,7 +10,6 @@
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 
 #include <hpx/agas/addressing_service.hpp>
-#include <hpx/async_distributed/applier_fwd.hpp>
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/collectives/latch.hpp>
@@ -24,6 +23,7 @@
 #include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/runtime_support.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>

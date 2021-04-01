@@ -694,6 +694,11 @@ namespace hpx { namespace util {
             strm << "  ";
     }
 
+    void section::dump(int ind) const
+    {
+        return dump(ind, std::cout);
+    }
+
     void section::dump(int ind, std::ostream& strm) const
     {
         std::unique_lock<mutex_type> l(mtx_);

@@ -22,6 +22,19 @@ set(tests
     standalone_thread_pool_executor
 )
 
+if(HPX_CXX_STANDARD GREATER_EQUAL 17)
+  list(
+    APPEND
+    tests
+    algorithm_just
+    algorithm_just_on
+    algorithm_on
+    algorithm_sync_wait
+    algorithm_transform
+    algorithm_when_all
+  )
+endif()
+
 set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})

@@ -12,8 +12,10 @@
 namespace hpx { namespace parallel { namespace util { namespace detail {
     using parallel_exception_termination_handler_type =
         hpx::util::function_nonser<void()>;
+
     HPX_PARALLELISM_EXPORT void set_parallel_exception_termination_handler(
         parallel_exception_termination_handler_type f);
+
     HPX_NORETURN HPX_PARALLELISM_EXPORT void
     parallel_exception_termination_handler();
 }}}}    // namespace hpx::parallel::util::detail

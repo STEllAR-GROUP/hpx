@@ -1,15 +1,18 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/threading_base/thread_data.hpp>
+#include <hpx/runtime_configuration/register_locks_globally.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/type_support/static.hpp>
-#include <hpx/util/register_locks_globally.hpp>
 
 #include <map>
 #include <mutex>
@@ -17,11 +20,10 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
+
 #ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
-    namespace detail
-    {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         struct global_lock_data
         {
@@ -49,7 +51,9 @@ namespace hpx { namespace util
                 held_locks_map held_locks_;
             };
 
-            struct tls_tag {};
+            struct tls_tag
+            {
+            };
 
             static global_locks_data& get_global_locks_data()
             {
@@ -71,7 +75,7 @@ namespace hpx { namespace util
         };
 
         bool register_locks_globally::lock_detection_enabled_ = false;
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     void enable_global_lock_detection()
@@ -101,10 +105,12 @@ namespace hpx { namespace util
             register_locks_globally::held_locks_map::iterator it =
                 held_locks.find(lock);
             if (it != held_locks.end())
-                return false;     // this lock is already registered
+                return false;    // this lock is already registered
 
-            std::pair<register_locks_globally::held_locks_map::iterator, bool> p;
-            p = held_locks.insert(std::make_pair(lock, detail::global_lock_data()));
+            std::pair<register_locks_globally::held_locks_map::iterator, bool>
+                p;
+            p = held_locks.insert(
+                std::make_pair(lock, detail::global_lock_data()));
 
             return p.second;
         }
@@ -128,7 +134,7 @@ namespace hpx { namespace util
             register_locks_globally::held_locks_map::iterator it =
                 held_locks.find(lock);
             if (it == held_locks.end())
-                return false;           // this lock is not registered
+                return false;    // this lock is not registered
 
             held_locks.erase(lock);
         }
@@ -137,9 +143,7 @@ namespace hpx { namespace util
 
 #else
 
-    void enable_global_lock_detection()
-    {
-    }
+    void enable_global_lock_detection() {}
 
     bool register_lock_globally(void const*)
     {
@@ -152,4 +156,6 @@ namespace hpx { namespace util
     }
 
 #endif
-}}
+}}    // namespace hpx::util
+
+#endif

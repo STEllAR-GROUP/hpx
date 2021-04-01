@@ -275,8 +275,6 @@ namespace hpx { namespace ranges {
                 (hpx::traits::is_forward_iterator<iterator_type>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::v1::detail::is_negative(hpx::util::size(rng)))
             {
@@ -286,7 +284,7 @@ namespace hpx { namespace ranges {
             }
 
             return hpx::parallel::v1::detail::fill_n<iterator_type>().call(
-                std::forward<ExPolicy>(policy), is_seq{}, hpx::util::begin(rng),
+                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
                 hpx::util::size(rng), value);
         }
 
@@ -305,8 +303,6 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::v1::detail::is_negative(count))
             {
@@ -315,8 +311,8 @@ namespace hpx { namespace ranges {
             }
 
             return hpx::parallel::v1::detail::fill_n<FwdIter>().call(
-                std::forward<ExPolicy>(policy), is_seq{}, first,
-                std::size_t(count), value);
+                std::forward<ExPolicy>(policy), first, std::size_t(count),
+                value);
         }
 
         // clang-format off
@@ -342,7 +338,7 @@ namespace hpx { namespace ranges {
             }
 
             return hpx::parallel::v1::detail::fill_n<iterator_type>().call(
-                hpx::execution::seq, std::true_type{}, hpx::util::begin(rng),
+                hpx::execution::seq, hpx::util::begin(rng),
                 hpx::util::size(rng), value);
         }
 
@@ -365,8 +361,7 @@ namespace hpx { namespace ranges {
             }
 
             return hpx::parallel::v1::detail::fill_n<FwdIter>().call(
-                hpx::execution::seq, std::true_type{}, first,
-                std::size_t(count), value);
+                hpx::execution::seq, first, std::size_t(count), value);
         }
     } fill_n{};
 

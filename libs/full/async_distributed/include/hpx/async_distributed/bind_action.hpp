@@ -9,6 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
@@ -29,6 +31,7 @@
 namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Action, typename Is, typename... Ts>
         class bound_action;
@@ -37,9 +40,9 @@ namespace hpx { namespace util {
         class bound_action<Action, index_pack<Is...>, Ts...>
         {
         public:
-            typedef typename traits::promise_local_result<
-                typename hpx::traits::extract_action<
-                    Action>::remote_result_type>::type result_type;
+            using result_type =
+                typename traits::promise_local_result<typename hpx::traits::
+                        extract_action<Action>::remote_result_type>::type;
 
         public:
             // default constructor is needed for serialization
@@ -111,7 +114,9 @@ namespace hpx { namespace util {
             template <typename Archive>
             void serialize(Archive& ar, unsigned int const /*version*/)
             {
-                ar& _args;
+                // clang-format off
+                ar & _args;
+                // clang-format on
             }
 
         private:
@@ -128,10 +133,10 @@ namespace hpx { namespace util {
         typename std::decay<Ts>::type...>
     bind(Ts&&... vs)
     {
-        typedef detail::bound_action<typename std::decay<Action>::type,
-            typename util::make_index_pack<sizeof...(Ts)>::type,
-            typename std::decay<Ts>::type...>
-            result_type;
+        using result_type =
+            detail::bound_action<typename std::decay<Action>::type,
+                typename util::make_index_pack<sizeof...(Ts)>::type,
+                typename std::decay<Ts>::type...>;
 
         return result_type(Action(), std::forward<Ts>(vs)...);
     }
@@ -144,10 +149,9 @@ namespace hpx { namespace util {
     bind(hpx::actions::basic_action<Component, Signature, Derived> action,
         Ts&&... vs)
     {
-        typedef detail::bound_action<Derived,
+        using result_type = detail::bound_action<Derived,
             typename util::make_index_pack<sizeof...(Ts)>::type,
-            typename std::decay<Ts>::type...>
-            result_type;
+            typename std::decay<Ts>::type...>;
 
         return result_type(
             static_cast<Derived const&>(action), std::forward<Ts>(vs)...);
@@ -156,6 +160,7 @@ namespace hpx { namespace util {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Is, typename... Ts>
     struct is_bind_expression<util::detail::bound_action<Action, Is, Ts...>>
@@ -172,6 +177,7 @@ namespace hpx { namespace traits {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace serialization {
+
     // serialization of the bound action object
     template <typename Archive, typename F, typename... Ts>
     void serialize(Archive& ar,
@@ -182,3 +188,4 @@ namespace hpx { namespace serialization {
     }
 }}    // namespace hpx::serialization
 
+#endif

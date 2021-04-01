@@ -16,6 +16,7 @@
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/async_distributed/async_continue.hpp>
+#include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/async_distributed/detail/async_implementations.hpp>
 #include <hpx/async_local/async.hpp>
 #include <hpx/components/client_base.hpp>
@@ -29,7 +30,6 @@
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/type_support/lazy_enable_if.hpp>
-#include <hpx/util/bind_action.hpp>
 
 #include <type_traits>
 #include <utility>

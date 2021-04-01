@@ -323,8 +323,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIterB>::value),
             "Required at least forward iterator.");
 
-        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
         using difference_type =
             typename std::iterator_traits<FwdIterB>::difference_type;
 
@@ -333,7 +331,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return hpx::parallel::v1::detail::count<difference_type>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, last, value,
+            std::forward<ExPolicy>(policy), first, last, value,
             std::forward<Proj>(proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -422,8 +420,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIterB>::value),
             "Required at least forward iterator.");
 
-        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
         using difference_type =
             typename std::iterator_traits<FwdIterB>::difference_type;
 
@@ -432,8 +428,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return hpx::parallel::v1::detail::count_if<difference_type>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, last,
-            std::forward<F>(f), std::forward<Proj>(proj));
+            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+            std::forward<Proj>(proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -463,13 +459,11 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             using difference_type =
                 typename std::iterator_traits<FwdIter>::difference_type;
 
             return hpx::parallel::v1::detail::count<difference_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last, value,
+                std::forward<ExPolicy>(policy), first, last, value,
                 hpx::parallel::util::projection_identity{});
         }
 
@@ -489,7 +483,7 @@ namespace hpx {
                 typename std::iterator_traits<InIter>::difference_type;
 
             return hpx::parallel::v1::detail::count<difference_type>().call(
-                hpx::execution::seq, std::true_type(), first, last, value,
+                hpx::execution::seq, first, last, value,
                 hpx::parallel::util::projection_identity{});
         }
     } count{};
@@ -518,14 +512,12 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             using difference_type =
                 typename std::iterator_traits<FwdIter>::difference_type;
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last,
-                std::forward<F>(f), hpx::parallel::util::projection_identity{});
+                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+                hpx::parallel::util::projection_identity{});
         }
 
         // clang-format off
@@ -547,8 +539,8 @@ namespace hpx {
                 typename std::iterator_traits<InIter>::difference_type;
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
-                hpx::execution::seq, std::true_type(), first, last,
-                std::forward<F>(f), hpx::parallel::util::projection_identity{});
+                hpx::execution::seq, first, last, std::forward<F>(f),
+                hpx::parallel::util::projection_identity{});
         }
     } count_if{};
 
