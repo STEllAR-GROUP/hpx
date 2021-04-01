@@ -21,7 +21,7 @@ if [[ -z "${ghprbPullId:-}" ]]; then
     export git_local_branch=$(echo ${GIT_BRANCH} | cut -f2 -d'/')
     job_name="jenkins-hpx-${git_local_branch}-${configuration_name_with_build_type}"
 
-    if [[ "${git_local_branch}" -eq "master" ]]; then
+    if [[ "${git_local_branch}" == "master" ]]; then
         export install_hpx=1
     else
         export install_hpx=0
