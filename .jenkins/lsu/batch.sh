@@ -40,7 +40,7 @@ if [[ "${install_hpx}" ]]; then
 
     # Delete all but the 10 newest builds
     builds_to_keep=10
-    rm -rf $(ls -d --sort=time "${install_dir_master}-*" | head --lines=-${builds_to_keep})
+    rm -rf $(ls -d --sort=time --reverse ${install_dir_master}-* | head --lines=-${builds_to_keep})
 fi
 set -e
 
