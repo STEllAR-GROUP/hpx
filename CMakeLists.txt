@@ -1947,9 +1947,6 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # Self initialization is dangerous
     hpx_add_compile_flag_if_available(-Winit-self)
 
-    # For portability
-    hpx_add_compile_flag_if_available(-Wdouble-promotion)
-
     # Warn about casting that violates qualifiers or alignment
     hpx_add_compile_flag_if_available(-Wcast-qual)
     if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

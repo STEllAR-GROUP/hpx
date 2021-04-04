@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
     }
 
     {
-        HPX_TEST_EQ((format("{} {}", true, false)), "1 0");
+        HPX_TEST_EQ((format("{} {}", true, false)), "true false");
     }
 
     {

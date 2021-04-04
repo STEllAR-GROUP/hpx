@@ -1081,7 +1081,7 @@ namespace hpx { namespace threads {
 
     void threadmanager::stop(bool blocking)
     {
-        LTM_(info).format("stop: blocking({})", blocking ? "true" : "false");
+        LTM_(info).format("stop: blocking({})", blocking);
 
         std::unique_lock<mutex_type> lk(mtx_);
         for (auto& pool_iter : pools_)

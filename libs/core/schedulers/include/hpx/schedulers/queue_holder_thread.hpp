@@ -585,7 +585,7 @@ namespace hpx { namespace threads { namespace policies {
                 std::string map_size = std::to_string(thread_map_.size());
                 // threads::thread_id_type tid2 = *(p.first);
                 // threads::thread_data* td = get_thread_id_data(tid2);
-                // std::string prev = hpx::util::format("{}", td);
+                // std::string prev = hpx::util::to_string(td);
 
                 tq_deb.error(debug::str<>("map add"),
                     "Couldn't add new thread to the thread map",

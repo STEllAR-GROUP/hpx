@@ -5,22 +5,113 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/assert.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/type_support/unused.hpp>
+
+#include <hpx/assert.hpp>
 
 #include <boost/utility/string_ref.hpp>
 
 #include <algorithm>
+#include <cctype>
+#include <cstdarg>
 #include <cstddef>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <limits>
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <utility>
+#include <vector>
+
+namespace hpx { namespace util {
+    format_error::~format_error() = default;
+}}    // namespace hpx::util
 
 namespace hpx { namespace util { namespace detail {
+    ///////////////////////////////////////////////////////////////////////////
+    void sprintf_formatter::parse(
+        format_parse_context spec, char const* type_specifier)
+    {
+        // conversion specifier
+        char const* conv_spec = "";
+        if (spec.empty() || !std::isalpha(spec.back()))
+            conv_spec = type_specifier;
+
+        // copy spec to a null terminated buffer
+        std::snprintf(_format_str, sizeof(_format_str), "%%%.*s%s",
+            (int) spec.size(), spec.data(), conv_spec);
+    }
+
+    void sprintf_formatter::_format(std::ostream* os, ...) const
+    {
+        std::va_list arg1;
+        va_start(arg1, os);
+        std::va_list arg2;
+        va_copy(arg2, arg1);
+
+        std::size_t length = 0;
+        if (_buffer.empty())
+            _buffer.resize(32);
+
+        _buffer.resize(_buffer.capacity());
+        length =
+            std::vsnprintf(_buffer.data(), _buffer.size(), _format_str, arg1);
+        va_end(arg1);
+        if (length > _buffer.size())
+        {
+            _buffer.resize(length);
+            length = std::vsnprintf(
+                _buffer.data(), _buffer.size(), _format_str, arg2);
+        }
+        va_end(arg2);
+
+        os->write(_buffer.data(), length);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void string_formatter::format(
+        std::ostream& os, char const* value, std::size_t len) const
+    {
+        if (std::strcmp(_format_str, "%s") == 0)
+        {
+            os.write(value, len == std::size_t(-1) ? std::strlen(value) : len);
+            return;
+        }
+
+        return sprintf_formatter::_format(&os, value);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void strftime_formatter::parse(format_parse_context spec)
+    {
+        // conversion specifier
+        if (spec.empty())
+            spec = "%c";    // standard date and time string
+
+        // copy spec to a null terminated buffer
+        _format = spec.to_string();
+    }
+
+    void strftime_formatter::format(
+        std::ostream& os, std::tm const& value) const
+    {
+        std::size_t length = 0;
+        if (_buffer.empty())
+            _buffer.resize(32);
+        do
+        {
+            _buffer.resize(_buffer.capacity());
+            length = std::strftime(
+                _buffer.data(), _buffer.size(), _format.c_str(), &value);
+            if (length == 0)
+                _buffer.resize(_buffer.capacity() * 2);
+        } while (length == 0);
+
+        os.write(_buffer.data(), length);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     inline std::size_t format_atoi(
         boost::string_ref str, std::size_t* pos = nullptr) noexcept
@@ -97,8 +188,8 @@ namespace hpx { namespace util { namespace detail {
                     std::size_t const id =
                         field.arg_id ? field.arg_id - 1 : index;
                     HPX_ASSERT(id < count);
-                    HPX_UNUSED(count);
-                    args[id](os, field.spec);
+                    (void)count;
+                    args[id].formatter(os, field.spec, args[id].data);
                     ++index;
                 }
                 format_str.remove_prefix(2);
@@ -120,6 +211,6 @@ namespace hpx { namespace util { namespace detail {
     {
         std::ostringstream os;
         detail::format_to(os, format_str, args, count);
-        return os.str();
+        return std::move(os).str();
     }
 }}}    // namespace hpx::util::detail

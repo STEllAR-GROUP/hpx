@@ -11,8 +11,6 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/format.hpp>
 
-#include <boost/utility/string_ref.hpp>
-
 #include <cstddef>
 #include <functional>
 #include <iosfwd>
@@ -123,16 +121,6 @@ namespace hpx { namespace threads {
             return os;
         }
 
-        friend void format_value(
-            std::ostream& os, boost::string_ref spec, thread_id const& id)
-        {
-            // propagate spec
-            char format[16];
-            std::snprintf(
-                format, 16, "{:%.*s}", (int) spec.size(), spec.data());
-            hpx::util::format_to(os, format, id.get());
-        }
-
     private:
         thread_id_repr thrd_;
     };
@@ -146,3 +134,14 @@ namespace hpx { namespace threads {
 #endif
 
 }}    // namespace hpx::threads
+
+namespace hpx { namespace util {
+    template <>
+    struct formatter<hpx::threads::thread_id> : formatter<void const*>
+    {
+        void format(std::ostream& os, hpx::threads::thread_id const& id) const
+        {
+            return formatter<void const*>::format(os, id.get());
+        }
+    };
+}}    // namespace hpx::util

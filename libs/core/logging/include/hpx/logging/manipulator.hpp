@@ -18,9 +18,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/logging/message.hpp>
-#include <hpx/modules/format.hpp>
-
-#include <boost/utility/string_ref.hpp>
 
 #include <iosfwd>
 #include <string>
@@ -41,10 +38,11 @@ namespace hpx { namespace util { namespace logging {
         {
             virtual void operator()(std::ostream& to) const = 0;
 
-            friend void format_value(std::ostream& os,
-                boost::string_ref /*spec*/, manipulator const& value)
+            friend std::ostream& operator<<(
+                std::ostream& os, manipulator const& value)
             {
                 value(os);
+                return os;
             }
 
             /// @brief Override this if you want to allow configuration through

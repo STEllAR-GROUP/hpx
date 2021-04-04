@@ -17,8 +17,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/format.hpp>
 
-#include <boost/utility/string_ref.hpp>
+#include <string>
 
 namespace hpx { namespace util { namespace logging {
 
@@ -55,8 +56,16 @@ namespace hpx { namespace util { namespace logging {
         always = 6000
     };
 
-    ////////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT void format_value(
-        std::ostream& os, boost::string_ref spec, level value);
-
+    HPX_CORE_EXPORT std::string to_string(level value);
 }}}    // namespace hpx::util::logging
+
+namespace hpx { namespace util {
+    template <>
+    struct formatter<hpx::util::logging::level> : formatter<std::string>
+    {
+        void format(std::ostream& os, hpx::util::logging::level level) const
+        {
+            return formatter<std::string>::format(os, to_string(level));
+        }
+    };
+}}    // namespace hpx::util

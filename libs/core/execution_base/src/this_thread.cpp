@@ -12,8 +12,8 @@
 #include <hpx/execution_base/agent_base.hpp>
 #include <hpx/execution_base/context_base.hpp>
 #include <hpx/execution_base/this_thread.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/util/to_string.hpp>
 
 #include <condition_variable>
 #include <cstddef>
@@ -54,7 +54,7 @@ namespace hpx { namespace execution_base {
 
             std::string description() const override
             {
-                return hpx::util::format("{}", id_);
+                return hpx::util::to_string(id_);
             }
 
             default_context const& context() const override
