@@ -547,8 +547,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             util::in_in_out_result<FwdIter1, FwdIter2, FwdIter3>;
 
         return detail::transform_binary<result_type>().call(
-            std::forward<ExPolicy>(policy), first1, last1, first2,
-            dest, std::forward<F>(f), std::forward<Proj1>(proj1),
+            std::forward<ExPolicy>(policy), first1, last1, first2, dest,
+            std::forward<F>(f), std::forward<Proj1>(proj1),
             std::forward<Proj2>(proj2));
     }
 
@@ -648,8 +648,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             util::in_in_out_result<FwdIter1, FwdIter2, FwdIter3>;
 
         return detail::transform_binary2<result_type>().call(
-            std::forward<ExPolicy>(policy), first1, last1, first2,
-            last2, dest, std::forward<F>(f), std::forward<Proj1>(proj1),
+            std::forward<ExPolicy>(policy), first1, last1, first2, last2, dest,
+            std::forward<F>(f), std::forward<Proj1>(proj1),
             std::forward<Proj2>(proj2));
     }
 }}}    // namespace hpx::parallel::v1
@@ -762,8 +762,8 @@ namespace hpx {
             return parallel::util::get_second_element(
                 parallel::v1::detail::transform<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(hpx::execution::seq, first, last,
-                        dest, std::forward<F>(f),
+                    .call(hpx::execution::seq, first, last, dest,
+                        std::forward<F>(f),
                         hpx::parallel::util::projection_identity{}));
         }
 
@@ -787,8 +787,8 @@ namespace hpx {
             return parallel::util::get_second_element(
                 parallel::v1::detail::transform<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(std::forward<ExPolicy>(policy), first, last,
-                        dest, std::forward<F>(f),
+                    .call(std::forward<ExPolicy>(policy), first, last, dest,
+                        std::forward<F>(f),
                         hpx::parallel::util::projection_identity{}));
         }
 
@@ -814,8 +814,8 @@ namespace hpx {
 
             return parallel::util::get_third_element(
                 parallel::v1::detail::transform_binary<result_type>().call(
-                    hpx::execution::seq, first1, last1,
-                    first2, dest, std::forward<F>(f), proj_id(), proj_id()));
+                    hpx::execution::seq, first1, last1, first2, dest,
+                    std::forward<F>(f), proj_id(), proj_id()));
         }
 
         // clang-format off
@@ -845,8 +845,8 @@ namespace hpx {
 
             return parallel::util::get_third_element(
                 parallel::v1::detail::transform_binary<result_type>().call(
-                    std::forward<ExPolicy>(policy), first1, last1,
-                    first2, dest, std::forward<F>(f), proj_id(), proj_id()));
+                    std::forward<ExPolicy>(policy), first1, last1, first2, dest,
+                    std::forward<F>(f), proj_id(), proj_id()));
         }
 
     } transform{};
