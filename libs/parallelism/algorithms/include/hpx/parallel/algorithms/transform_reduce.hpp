@@ -428,10 +428,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         transform_reduce(ExPolicy&& policy, FwdIter first, FwdIter last, T init,
             Reduce&& red_op, Convert&& conv_op)
     {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+        static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
             "Requires at least forward iterator.");
 
-        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
         using init_type = typename std::decay<T>::type;
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -439,9 +438,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::transform_reduce<init_type>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, last,
-            std::forward<T>(init), std::forward<Reduce>(red_op),
-            std::forward<Convert>(conv_op));
+            std::forward<ExPolicy>(policy), first, last, std::forward<T>(init),
+            std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -655,10 +653,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
         transform_reduce(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, T init)
     {
-        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+        static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+            "Requires at least forward iterator.");
+        static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+            "Requires at least forward iterator.");
 
         return detail::transform_reduce_binary<T>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
+            std::forward<ExPolicy>(policy), first1, last1, first2,
             std::move(init), detail::plus(), detail::multiplies());
     }
 
@@ -692,10 +693,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
         transform_reduce(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, T init, Reduce&& red_op, Convert&& conv_op)
     {
-        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+        static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+            "Requires at least forward iterator.");
+        static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+            "Requires at least forward iterator.");
 
         return detail::transform_reduce_binary<T>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
+            std::forward<ExPolicy>(policy), first1, last1, first2,
             std::move(init), std::forward<Reduce>(red_op),
             std::forward<Convert>(conv_op));
     }
@@ -799,11 +803,10 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
                 "Requires at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
             using init_type = typename std::decay<T>::type;
 
             return hpx::parallel::v1::detail::transform_reduce<init_type>()
-                .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
+                .call(std::forward<ExPolicy>(policy), first, last,
                     std::forward<T>(init), std::forward<Reduce>(red_op),
                     std::forward<Convert>(conv_op));
         }
@@ -834,8 +837,8 @@ namespace hpx {
             using init_type = typename std::decay<T>::type;
 
             return hpx::parallel::v1::detail::transform_reduce<init_type>()
-                .call(hpx::execution::seq, std::true_type{}, first, last,
-                    std::forward<T>(init), std::forward<Reduce>(red_op),
+                .call(hpx::execution::seq, first, last, std::forward<T>(init),
+                    std::forward<Reduce>(red_op),
                     std::forward<Convert>(conv_op));
         }
 
@@ -858,10 +861,8 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
                 "Requires at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
+                std::forward<ExPolicy>(policy), first1, last1, first2,
                 std::move(init), hpx::parallel::v1::detail::plus(),
                 hpx::parallel::v1::detail::multiplies());
         }
@@ -882,8 +883,8 @@ namespace hpx {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                hpx::execution::seq, std::true_type{}, first1, last1, first2,
-                std::move(init), hpx::parallel::v1::detail::plus(),
+                hpx::execution::seq, first1, last1, first2, std::move(init),
+                hpx::parallel::v1::detail::plus(),
                 hpx::parallel::v1::detail::multiplies());
         }
 
@@ -921,10 +922,8 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
                 "Requires at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
+                std::forward<ExPolicy>(policy), first1, last1, first2,
                 std::move(init), std::forward<Reduce>(red_op),
                 std::forward<Convert>(conv_op));
         }
@@ -961,9 +960,8 @@ namespace hpx {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                hpx::execution::seq, std::true_type{}, first1, last1, first2,
-                std::move(init), std::forward<Reduce>(red_op),
-                std::forward<Convert>(conv_op));
+                hpx::execution::seq, first1, last1, first2, std::move(init),
+                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
         }
     } transform_reduce{};
 }    // namespace hpx

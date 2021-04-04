@@ -307,11 +307,10 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
                 "Requires at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
             using init_type = typename std::decay<T>::type;
 
             return hpx::parallel::v1::detail::transform_reduce<init_type>()
-                .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
+                .call(std::forward<ExPolicy>(policy), first, last,
                     std::forward<T>(init), std::forward<Reduce>(red_op),
                     std::forward<Convert>(conv_op));
         }
@@ -343,8 +342,8 @@ namespace hpx { namespace ranges {
             using init_type = typename std::decay<T>::type;
 
             return hpx::parallel::v1::detail::transform_reduce<init_type>()
-                .call(hpx::execution::seq, std::true_type{}, first, last,
-                    std::forward<T>(init), std::forward<Reduce>(red_op),
+                .call(hpx::execution::seq, first, last, std::forward<T>(init),
+                    std::forward<Reduce>(red_op),
                     std::forward<Convert>(conv_op));
         }
 
@@ -367,10 +366,8 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_forward_iterator<Iter2>::value,
                 "Requires at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last, first2,
+                std::forward<ExPolicy>(policy), first, last, first2,
                 std::move(init), hpx::parallel::v1::detail::plus(),
                 hpx::parallel::v1::detail::multiplies());
         }
@@ -391,8 +388,8 @@ namespace hpx { namespace ranges {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                hpx::execution::seq, std::true_type{}, first, last, first2,
-                std::move(init), hpx::parallel::v1::detail::plus(),
+                hpx::execution::seq, first, last, first2, std::move(init),
+                hpx::parallel::v1::detail::plus(),
                 hpx::parallel::v1::detail::multiplies());
         }
 
@@ -429,10 +426,8 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_forward_iterator<Iter2>::value,
                 "Requires at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last, first2,
+                std::forward<ExPolicy>(policy), first, last, first2,
                 std::move(init), std::forward<Reduce>(red_op),
                 std::forward<Convert>(conv_op));
         }
@@ -468,9 +463,8 @@ namespace hpx { namespace ranges {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                hpx::execution::seq, std::true_type{}, first, last, first2,
-                std::move(init), std::forward<Reduce>(red_op),
-                std::forward<Convert>(conv_op));
+                hpx::execution::seq, first, last, first2, std::move(init),
+                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
         }
 
         // range based versions
@@ -505,13 +499,12 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_forward_iterator<iterator_type>::value,
                 "Requires at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
             using init_type = typename std::decay<T>::type;
 
             return hpx::parallel::v1::detail::transform_reduce<init_type>()
-                .call(std::forward<ExPolicy>(policy), is_seq(),
-                    hpx::util::begin(rng), hpx::util::end(rng),
-                    std::forward<T>(init), std::forward<Reduce>(red_op),
+                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), std::forward<T>(init),
+                    std::forward<Reduce>(red_op),
                     std::forward<Convert>(conv_op));
         }
 
@@ -544,9 +537,9 @@ namespace hpx { namespace ranges {
             using init_type = typename std::decay<T>::type;
 
             return hpx::parallel::v1::detail::transform_reduce<init_type>()
-                .call(hpx::execution::seq, std::true_type{},
-                    hpx::util::begin(rng), hpx::util::end(rng),
-                    std::forward<T>(init), std::forward<Reduce>(red_op),
+                .call(hpx::execution::seq, hpx::util::begin(rng),
+                    hpx::util::end(rng), std::forward<T>(init),
+                    std::forward<Reduce>(red_op),
                     std::forward<Convert>(conv_op));
         }
 
@@ -572,10 +565,8 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_forward_iterator<Iter2>::value,
                 "Requires at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
+                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
                 hpx::util::end(rng), first2, std::move(init),
                 hpx::parallel::v1::detail::plus(),
                 hpx::parallel::v1::detail::multiplies());
@@ -600,9 +591,8 @@ namespace hpx { namespace ranges {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                hpx::execution::seq, std::true_type{}, hpx::util::begin(rng),
-                hpx::util::end(rng), first2, std::move(init),
-                hpx::parallel::v1::detail::plus(),
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                first2, std::move(init), hpx::parallel::v1::detail::plus(),
                 hpx::parallel::v1::detail::multiplies());
         }
 
@@ -643,10 +633,8 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_forward_iterator<Iter2>::value,
                 "Requires at least forward iterator.");
 
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                std::forward<ExPolicy>(policy), is_seq(), hpx::util::begin(rng),
+                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
                 hpx::util::end(rng), first2, std::move(init),
                 std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
         }
@@ -685,9 +673,9 @@ namespace hpx { namespace ranges {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                hpx::execution::seq, std::true_type{}, hpx::util::begin(rng),
-                hpx::util::end(rng), first2, std::move(init),
-                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                first2, std::move(init), std::forward<Reduce>(red_op),
+                std::forward<Convert>(conv_op));
         }
     } transform_reduce{};
 }}    // namespace hpx::ranges
