@@ -401,30 +401,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         }));
             }
         };
-
-        template <typename ExPolicy, typename Iter, typename Sent, typename T,
-            typename Reduce, typename Convert>
-        inline typename util::detail::algorithm_result<ExPolicy,
-            typename std::decay<T>::type>::type
-        transform_reduce_(ExPolicy&& policy, Iter first, Sent last, T&& init,
-            Reduce&& red_op, Convert&& conv_op, std::false_type)
-        {
-            using init_type = typename std::decay<T>::type;
-
-            return transform_reduce<init_type>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(init), std::forward<Reduce>(red_op),
-                std::forward<Convert>(conv_op));
-        }
-
-        // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename FwdIter, typename T,
-            typename Reduce, typename Convert>
-        typename util::detail::algorithm_result<ExPolicy,
-            typename std::decay<T>::type>::type
-        transform_reduce_(ExPolicy&& policy, FwdIter first, FwdIter last,
-            T&& init, Reduce&& red_op, Convert&& conv_op, std::true_type);
-
     }    // namespace detail
 
     // clang-format off
@@ -455,15 +431,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+        using init_type = typename std::decay<T>::type;
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::transform_reduce_(std::forward<ExPolicy>(policy), first,
-            last, std::move(init), std::forward<Reduce>(red_op),
-            std::forward<Convert>(conv_op), is_segmented());
+        return detail::transform_reduce<init_type>().call(
+            std::forward<ExPolicy>(policy), is_seq(), first, last,
+            std::forward<T>(init), std::forward<Reduce>(red_op),
+            std::forward<Convert>(conv_op));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -659,31 +637,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     });
             }
         };
-
-        template <typename ExPolicy, typename Iter, typename Sent,
-            typename Iter2, typename T, typename Reduce, typename Convert>
-        typename util::detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce_(ExPolicy&& policy, Iter first1, Sent last1,
-            Iter2 first2, T init, Reduce&& red_op, Convert&& conv_op,
-            std::false_type)
-        {
-            static_assert((hpx::traits::is_forward_iterator<Iter>::value),
-                "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<Iter>::value),
-                "Requires at least forward iterator.");
-
-            return detail::transform_reduce_binary<T>().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2,
-                std::move(init), std::forward<Reduce>(red_op),
-                std::forward<Convert>(conv_op));
-        }
-
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T, typename Reduce, typename Convert>
-        typename util::detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce_(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, T init, Reduce&& red_op, Convert&& conv_op,
-            std::true_type);
     }    // namespace detail
 
     // clang-format off
@@ -702,10 +655,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
         transform_reduce(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, T init)
     {
-        typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
-        return detail::transform_reduce_(std::forward<ExPolicy>(policy), first1,
-            last1, first2, std::move(init), detail::plus(),
-            detail::multiplies(), is_segmented());
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        return detail::transform_reduce_binary<T>().call(
+            std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
+            std::move(init), detail::plus(), detail::multiplies());
     }
 
     // clang-format off
@@ -738,10 +692,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         transform_reduce(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, T init, Reduce&& red_op, Convert&& conv_op)
     {
-        typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
-        return detail::transform_reduce_(std::forward<ExPolicy>(policy), first1,
-            last1, first2, std::move(init), std::forward<Reduce>(red_op),
-            std::forward<Convert>(conv_op), is_segmented());
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        return detail::transform_reduce_binary<T>().call(
+            std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
+            std::move(init), std::forward<Reduce>(red_op),
+            std::forward<Convert>(conv_op));
     }
 
 }}}    // namespace hpx::parallel::v1
@@ -813,7 +769,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::transform_reduce
     HPX_INLINE_CONSTEXPR_VARIABLE struct transform_reduce_t final
-      : hpx::functional::tag<transform_reduce_t>
+      : hpx::functional::tag_fallback<transform_reduce_t>
     {
     private:
         // clang-format off
@@ -836,49 +792,51 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_invoke(transform_reduce_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, T init, Reduce&& red_op, Convert&& conv_op)
+        tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
+            FwdIter first, FwdIter last, T init, Reduce&& red_op,
+            Convert&& conv_op)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
                 "Requires at least forward iterator.");
 
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+            using init_type = typename std::decay<T>::type;
 
-            return hpx::parallel::v1::detail::transform_reduce_(
-                std::forward<ExPolicy>(policy), first, last, std::move(init),
-                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
-                is_segmented());
+            return hpx::parallel::v1::detail::transform_reduce<init_type>()
+                .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
+                    std::forward<T>(init), std::forward<Reduce>(red_op),
+                    std::forward<Convert>(conv_op));
         }
 
         // clang-format off
-        template <typename FwdIter, typename T, typename Reduce,
+        template <typename InIter, typename T, typename Reduce,
             typename Convert,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter>::value &&
+                hpx::traits::is_iterator<InIter>::value &&
                 hpx::is_invocable_v<Convert,
-                   typename std::iterator_traits<FwdIter>::value_type> &&
+                   typename std::iterator_traits<InIter>::value_type> &&
                 hpx::is_invocable_v<Reduce,
                    typename hpx::util::invoke_result<Convert,
-                       typename std::iterator_traits<FwdIter>::value_type
+                       typename std::iterator_traits<InIter>::value_type
                    >::type,
                    typename hpx::util::invoke_result<Convert,
-                       typename std::iterator_traits<FwdIter>::value_type
+                       typename std::iterator_traits<InIter>::value_type
                    >::type
                 >
             )>
         // clang-format on
-        friend T tag_invoke(transform_reduce_t, FwdIter first, FwdIter last,
-            T init, Reduce&& red_op, Convert&& conv_op)
+        friend T tag_fallback_invoke(transform_reduce_t, InIter first,
+            InIter last, T init, Reduce&& red_op, Convert&& conv_op)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_input_iterator<InIter>::value,
+                "Requires at least input iterator.");
 
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
+            using init_type = typename std::decay<T>::type;
 
-            return hpx::parallel::v1::detail::transform_reduce_(
-                hpx::execution::seq, first, last, std::move(init),
-                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
-                is_segmented());
+            return hpx::parallel::v1::detail::transform_reduce<init_type>()
+                .call(hpx::execution::seq, std::true_type{}, first, last,
+                    std::forward<T>(init), std::forward<Reduce>(red_op),
+                    std::forward<Convert>(conv_op));
         }
 
         // clang-format off
@@ -892,33 +850,41 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_invoke(transform_reduce_t, ExPolicy&& policy, FwdIter1 first1,
-            FwdIter1 last1, FwdIter2 first2, T init)
+        tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
+            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, T init)
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter1>;
+            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+                "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+                "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::transform_reduce_(
-                std::forward<ExPolicy>(policy), first1, last1, first2,
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+            return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
                 std::move(init), hpx::parallel::v1::detail::plus(),
-                hpx::parallel::v1::detail::multiplies(), is_segmented());
+                hpx::parallel::v1::detail::multiplies());
         }
 
         // clang-format off
-        template <typename FwdIter1, typename FwdIter2, typename T,
+        template <typename InIter1, typename InIter2, typename T,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value
+                hpx::traits::is_iterator<InIter1>::value &&
+                hpx::traits::is_iterator<InIter2>::value
             )>
         // clang-format on
-        friend T tag_invoke(transform_reduce_t, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, T init)
+        friend T tag_fallback_invoke(transform_reduce_t, InIter1 first1,
+            InIter1 last1, InIter2 first2, T init)
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter1>;
+            static_assert(hpx::traits::is_input_iterator<InIter1>::value,
+                "Requires at least input iterator.");
+            static_assert(hpx::traits::is_input_iterator<InIter2>::value,
+                "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::transform_reduce_(
-                hpx::execution::seq, first1, last1, first2, std::move(init),
-                hpx::parallel::v1::detail::plus(),
-                hpx::parallel::v1::detail::multiplies(), is_segmented());
+            return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
+                hpx::execution::seq, std::true_type{}, first1, last1, first2,
+                std::move(init), hpx::parallel::v1::detail::plus(),
+                hpx::parallel::v1::detail::multiplies());
         }
 
         // clang-format off
@@ -946,49 +912,58 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_invoke(transform_reduce_t, ExPolicy&& policy, FwdIter1 first1,
-            FwdIter1 last1, FwdIter2 first2, T init, Reduce&& red_op,
-            Convert&& conv_op)
+        tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
+            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, T init,
+            Reduce&& red_op, Convert&& conv_op)
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter1>;
+            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+                "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+                "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::transform_reduce_(
-                std::forward<ExPolicy>(policy), first1, last1, first2,
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+            return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
                 std::move(init), std::forward<Reduce>(red_op),
-                std::forward<Convert>(conv_op), is_segmented());
+                std::forward<Convert>(conv_op));
         }
 
         // clang-format off
-        template <typename FwdIter1, typename FwdIter2, typename T,
+        template <typename InIter1, typename InIter2, typename T,
             typename Reduce, typename Convert,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::traits::is_iterator<InIter1>::value &&
+                hpx::traits::is_iterator<InIter2>::value &&
                 hpx::is_invocable_v<Convert,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter2>::value_type
+                    typename std::iterator_traits<InIter1>::value_type,
+                    typename std::iterator_traits<InIter2>::value_type
                 > &&
                 hpx::is_invocable_v<Reduce,
                     typename hpx::util::invoke_result<Convert,
-                        typename std::iterator_traits<FwdIter1>::value_type,
-                        typename std::iterator_traits<FwdIter2>::value_type
+                        typename std::iterator_traits<InIter1>::value_type,
+                        typename std::iterator_traits<InIter2>::value_type
                     >::type,
                     typename hpx::util::invoke_result<Convert,
-                        typename std::iterator_traits<FwdIter1>::value_type,
-                        typename std::iterator_traits<FwdIter2>::value_type
+                        typename std::iterator_traits<InIter1>::value_type,
+                        typename std::iterator_traits<InIter2>::value_type
                     >::type
                 >
             )>
         // clang-format on
-        friend T tag_invoke(transform_reduce_t, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, T init, Reduce&& red_op, Convert&& conv_op)
+        friend T tag_fallback_invoke(transform_reduce_t, InIter1 first1,
+            InIter1 last1, InIter2 first2, T init, Reduce&& red_op,
+            Convert&& conv_op)
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter1>;
+            static_assert(hpx::traits::is_input_iterator<InIter1>::value,
+                "Requires at least input iterator.");
+            static_assert(hpx::traits::is_input_iterator<InIter2>::value,
+                "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::transform_reduce_(
-                hpx::execution::seq, first1, last1, first2, std::move(init),
-                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
-                is_segmented());
+            return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
+                hpx::execution::seq, std::true_type{}, first1, last1, first2,
+                std::move(init), std::forward<Reduce>(red_op),
+                std::forward<Convert>(conv_op));
         }
     } transform_reduce{};
 }    // namespace hpx
