@@ -431,13 +431,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
             "Requires at least forward iterator.");
 
-        using init_type = typename std::decay<T>::type;
-
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::transform_reduce<init_type>().call(
+        return detail::transform_reduce<T>().call(
             std::forward<ExPolicy>(policy), first, last, std::forward<T>(init),
             std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -803,12 +801,10 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
                 "Requires at least forward iterator.");
 
-            using init_type = typename std::decay<T>::type;
-
-            return hpx::parallel::v1::detail::transform_reduce<init_type>()
-                .call(std::forward<ExPolicy>(policy), first, last,
-                    std::forward<T>(init), std::forward<Reduce>(red_op),
-                    std::forward<Convert>(conv_op));
+            return hpx::parallel::v1::detail::transform_reduce<T>().call(
+                std::forward<ExPolicy>(policy), first, last,
+                std::forward<T>(init), std::forward<Reduce>(red_op),
+                std::forward<Convert>(conv_op));
         }
 
         // clang-format off
@@ -834,12 +830,9 @@ namespace hpx {
             static_assert(hpx::traits::is_input_iterator<InIter>::value,
                 "Requires at least input iterator.");
 
-            using init_type = typename std::decay<T>::type;
-
-            return hpx::parallel::v1::detail::transform_reduce<init_type>()
-                .call(hpx::execution::seq, first, last, std::forward<T>(init),
-                    std::forward<Reduce>(red_op),
-                    std::forward<Convert>(conv_op));
+            return hpx::parallel::v1::detail::transform_reduce<T>().call(
+                hpx::execution::seq, first, last, std::forward<T>(init),
+                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
         }
 
         // clang-format off

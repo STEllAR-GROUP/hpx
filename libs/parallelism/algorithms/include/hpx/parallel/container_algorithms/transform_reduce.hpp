@@ -307,12 +307,10 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
                 "Requires at least forward iterator.");
 
-            using init_type = typename std::decay<T>::type;
-
-            return hpx::parallel::v1::detail::transform_reduce<init_type>()
-                .call(std::forward<ExPolicy>(policy), first, last,
-                    std::forward<T>(init), std::forward<Reduce>(red_op),
-                    std::forward<Convert>(conv_op));
+            return hpx::parallel::v1::detail::transform_reduce<T>().call(
+                std::forward<ExPolicy>(policy), first, last,
+                std::forward<T>(init), std::forward<Reduce>(red_op),
+                std::forward<Convert>(conv_op));
         }
 
         // clang-format off
@@ -339,12 +337,9 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_input_iterator<Iter>::value,
                 "Requires at least input iterator.");
 
-            using init_type = typename std::decay<T>::type;
-
-            return hpx::parallel::v1::detail::transform_reduce<init_type>()
-                .call(hpx::execution::seq, first, last, std::forward<T>(init),
-                    std::forward<Reduce>(red_op),
-                    std::forward<Convert>(conv_op));
+            return hpx::parallel::v1::detail::transform_reduce<T>().call(
+                hpx::execution::seq, first, last, std::forward<T>(init),
+                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
         }
 
         // clang-format off
@@ -499,13 +494,10 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_forward_iterator<iterator_type>::value,
                 "Requires at least forward iterator.");
 
-            using init_type = typename std::decay<T>::type;
-
-            return hpx::parallel::v1::detail::transform_reduce<init_type>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                    hpx::util::end(rng), std::forward<T>(init),
-                    std::forward<Reduce>(red_op),
-                    std::forward<Convert>(conv_op));
+            return hpx::parallel::v1::detail::transform_reduce<T>().call(
+                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                hpx::util::end(rng), std::forward<T>(init),
+                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
         }
 
         // clang-format off
@@ -534,13 +526,10 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_input_iterator<iterator_type>::value,
                 "Requires at least input iterator.");
 
-            using init_type = typename std::decay<T>::type;
-
-            return hpx::parallel::v1::detail::transform_reduce<init_type>()
-                .call(hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), std::forward<T>(init),
-                    std::forward<Reduce>(red_op),
-                    std::forward<Convert>(conv_op));
+            return hpx::parallel::v1::detail::transform_reduce<T>().call(
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                std::forward<T>(init), std::forward<Reduce>(red_op),
+                std::forward<Convert>(conv_op));
         }
 
         // clang-format off

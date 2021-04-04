@@ -460,15 +460,13 @@ namespace hpx { namespace segmented {
                 hpx::traits::is_input_iterator<FwdIter2>::value,
             "Requires at least input iterator.");
 
-        using init_type = typename std::decay<T>::type;
-
         if (first1 == last1)
         {
             return std::move(init);
         }
 
         return hpx::parallel::v1::detail::segmented_transform_reduce(
-            hpx::parallel::v1::detail::seg_transform_reduce_binary<init_type>(),
+            hpx::parallel::v1::detail::seg_transform_reduce_binary<T>(),
             hpx::execution::seq, first1, last1, first2, std::forward<T>(init),
             std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
             std::true_type{});
@@ -495,16 +493,15 @@ namespace hpx { namespace segmented {
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-        using init_type = typename std::decay<T>::type;
 
         if (first1 == last1)
         {
-            return parallel::util::detail::algorithm_result<ExPolicy,
-                init_type>::get(std::forward<T>(init));
+            return parallel::util::detail::algorithm_result<ExPolicy, T>::get(
+                std::forward<T>(init));
         }
 
         return hpx::parallel::v1::detail::segmented_transform_reduce(
-            hpx::parallel::v1::detail::seg_transform_reduce_binary<init_type>(),
+            hpx::parallel::v1::detail::seg_transform_reduce_binary<T>(),
             std::forward<ExPolicy>(policy), first1, last1, first2,
             std::forward<T>(init), std::forward<Reduce>(red_op),
             std::forward<Convert>(conv_op), is_seq());
