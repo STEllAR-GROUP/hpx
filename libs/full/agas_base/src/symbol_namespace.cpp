@@ -263,7 +263,8 @@ namespace hpx { namespace agas {
         localities.reserve(ids.size());
         for (auto id : ids)
         {
-            localities.push_back(naming::get_id_from_locality_id(id));
+            localities.push_back(hpx::id_type(
+                get_service_instance(id), hpx::id_type::unmanaged));
         }
 
         hpx::future<std::vector<return_type>> f =
