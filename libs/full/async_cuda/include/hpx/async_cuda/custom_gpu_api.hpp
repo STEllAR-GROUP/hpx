@@ -51,6 +51,7 @@
     #define cudaLaunchDevice hipLaunchDevice
     #define cudaLaunchKernel hipLaunchKernel
     #define cudaMalloc hipMalloc
+    #define cudaMallocHost hipHostMalloc
     #define cudaMemcpy hipMemcpy
     #define cudaMemcpyAsync hipMemcpyAsync
     #define cudaMemcpyDeviceToDevice hipMemcpyDeviceToDevice
