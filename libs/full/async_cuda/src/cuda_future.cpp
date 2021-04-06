@@ -184,48 +184,49 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
             hpx::cuda::experimental::cuda_event_pool::get_event_pool();
 
         // iterate over our list of events and see if any have completed
-        detail::future_data_ptr fdp;
-        using i_type = std::vector<future_data_ptr>::iterator;
-        for (i_type it = future_vec.begin(); it != future_vec.end();)
-        {
-            fdp = *it;
-            cudaError_t status = cudaEventQuery(fdp->event_);
-            if (status == cudaErrorNotReady)
-            {
-                // this event has not been triggered yet
-                ++it;
-                continue;
-            }
-            else if (status == cudaSuccess)
-            {
-                fdp->set_data(hpx::util::unused);
-                // clang-format off
+        future_vec.erase(
+            std::remove_if(future_vec.begin(), future_vec.end(),
+                [&](detail::future_data_ptr fdp) {
+                    cudaError_t status = cudaEventQuery(fdp->event_);
+                    if (status == cudaErrorNotReady)
+                    {
+                        // this event has not been triggered yet
+                        return false;
+                    }
+                    else if (status == cudaSuccess)
+                    {
+                        fdp->set_data(hpx::util::unused);
+                        // clang-format off
                 cud_debug.debug(debug::str<>("set ready vector")
                     , "event", debug::hex<8>(fdp->event_)
                     , "futures", debug::dec<3>(get_active_futures().size()));
-                // clang-format on
-                // drop future and reuse event
-                it = future_vec.erase(it);
-                pool.push(fdp->event_);
-            }
-            else
-            {
-                // clang-format off
+                        // clang-format on
+                        // drop future and reuse event
+                        pool.push(fdp->event_);
+                        return true;
+                    }
+                    else
+                    {
+                        // clang-format off
                 cud_debug.debug(debug::str<>("set exception vector")
                     , "event", debug::hex<8>(fdp->event_)
                     , "futures", debug::dec<3>(get_active_futures().size()));
-                // clang-format on
-                fdp->set_exception(std::make_exception_ptr(cuda_exception(
-                    std::string("cuda function returned error code :") +
-                        cudaGetErrorString(status),
-                    status)));
-                ++it;
-            }
-        }
+                        // clang-format on
+                        fdp->set_exception(
+                            std::make_exception_ptr(cuda_exception(
+                                std::string(
+                                    "cuda function returned error code :") +
+                                    cudaGetErrorString(status),
+                                status)));
+                        return true;
+                    }
+                }),
+            future_vec.end());
 
         // have any requests been made that need to be handled?
         // if so, move them all from the lockfree request list, onto the
         // polling list
+        detail::future_data_ptr fdp;
         while (detail::get_event_queue().try_dequeue(fdp))
         {
             cudaError_t status = cudaEventQuery(fdp->event_);
