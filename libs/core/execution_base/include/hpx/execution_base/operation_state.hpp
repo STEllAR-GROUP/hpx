@@ -39,7 +39,7 @@ namespace hpx { namespace execution { namespace experimental {
     /// `hpx::execution::experimental::start` can be called exactly once. Once it has
     /// been invoked, the caller needs to ensure that the receiver's completion
     /// signaling operations strongly happen before the destructor of the state
-    /// is called. The call to `hpx::basic_exceution::start` needs to happen
+    /// is called. The call to `hpx::execution::experimental::start` needs to happen
     /// strongly before the completion signaling operations.
     ///
     template <typename O>
