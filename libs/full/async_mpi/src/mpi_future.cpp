@@ -180,8 +180,10 @@ namespace hpx { namespace mpi { namespace experimental {
     // Background progress function for MPI async operations
     // Checks for completed MPI_Requests and sets mpi::experimental::future
     // ready when found
-    void poll()
+    hpx::threads::policies::detail::polling_status poll()
     {
+        using hpx::threads::policies::detail::polling_status;
+
         std::unique_lock<detail::mutex_type> lk(
             detail::get_vector_mtx(), std::try_to_lock);
         if (!lk.owns_lock())
@@ -197,7 +199,7 @@ namespace hpx { namespace mpi { namespace experimental {
                     "futures",
                     debug::dec<>(detail::get_active_futures().size()));
             }
-            return;
+            return polling_status::idle;
         }
 
         if (mpi_debug.is_enabled())
@@ -333,6 +335,9 @@ namespace hpx { namespace mpi { namespace experimental {
                     "nulls ", debug::dec<>(nulls));
             }
         }
+
+        return detail::get_active_futures().empty() ? polling_status::idle :
+                                                      polling_status::busy;
     }
 
     namespace detail {

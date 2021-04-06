@@ -37,6 +37,17 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies {
+    namespace detail {
+        enum class polling_status
+        {
+            /// Signals that a polling function currently has no more work to do
+            idle = 0,
+            /// Signals that a polling function still has outstanding work to
+            /// poll for
+            busy = 1
+        };
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// The scheduler_base defines the interface to be implemented by all
     /// scheduler policies
@@ -278,9 +289,12 @@ namespace hpx { namespace threads { namespace policies {
             return thread_queue_init_.small_stacksize_;
         }
 
-        using polling_function_ptr = void (*)();
+        using polling_function_ptr = detail::polling_status (*)();
 
-        static void null_polling_function() {}
+        static detail::polling_status null_polling_function()
+        {
+            return detail::polling_status::idle;
+        }
 
         void set_mpi_polling_function(polling_function_ptr mpi_func)
         {
@@ -304,14 +318,24 @@ namespace hpx { namespace threads { namespace policies {
                 &null_polling_function, std::memory_order_relaxed);
         }
 
-        inline void custom_polling_function() const
+        detail::polling_status custom_polling_function() const
         {
+            detail::polling_status status = detail::polling_status::idle;
 #if defined(HPX_HAVE_MODULE_ASYNC_MPI)
-            (*polling_function_mpi_.load(std::memory_order_relaxed))();
+            if ((*polling_function_mpi_.load(std::memory_order_relaxed))() ==
+                detail::polling_status::busy)
+            {
+                status = detail::polling_status::busy;
+            }
 #endif
 #if defined(HPX_HAVE_MODULE_ASYNC_CUDA)
-            (*polling_function_cuda_.load(std::memory_order_relaxed))();
+            if ((*polling_function_cuda_.load(std::memory_order_relaxed))() ==
+                detail::polling_status::busy)
+            {
+                status = detail::polling_status::busy;
+            }
 #endif
+            return status;
         }
 
     protected:

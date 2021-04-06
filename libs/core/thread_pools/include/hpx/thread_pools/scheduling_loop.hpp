@@ -977,7 +977,11 @@ namespace hpx { namespace threads { namespace detail {
                 }
             }
 
-            scheduler.custom_polling_function();
+            if (scheduler.custom_polling_function() ==
+                policies::detail::polling_status::busy)
+            {
+                idle_loop_count = params.max_idle_loop_count_;
+            }
 
             // something went badly wrong, give up
             if (HPX_UNLIKELY(this_state.load() == state_terminating))

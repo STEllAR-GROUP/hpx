@@ -178,7 +178,7 @@ namespace hpx { namespace mpi { namespace experimental {
     // Background progress function for MPI async operations
     // Checks for completed MPI_Requests and sets mpi::experimental::future ready
     // when found
-    HPX_EXPORT void poll();
+    HPX_EXPORT hpx::threads::policies::detail::polling_status poll();
 
     // -----------------------------------------------------------------
     // This is not completely safe as it will return when the request vector is

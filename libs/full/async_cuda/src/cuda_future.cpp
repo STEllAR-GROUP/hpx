@@ -144,8 +144,10 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
     // We process outstanding futures in the polling list first,
     // then any new future requests are polled and if not ready
     // added to the polling list (for next time)
-    void poll()
+    hpx::threads::policies::detail::polling_status poll()
     {
+        using hpx::threads::policies::detail::polling_status;
+
         // don't poll if another thread is already polling
         std::unique_lock<hpx::cuda::experimental::detail::mutex_type> lk(
             detail::get_list_mtx(), std::try_to_lock);
@@ -161,7 +163,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
                     "futures", debug::dec<3>(get_active_futures().size()));
                 // clang-format on
             }
-            return;
+            return polling_status::idle;
         }
 
         auto& future_vec = detail::get_active_futures();
@@ -256,6 +258,9 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
                     status)));
             }
         }
+
+        return get_active_futures().empty() ? polling_status::idle :
+                                              polling_status::busy;
     }
 
     // -------------------------------------------------------------
