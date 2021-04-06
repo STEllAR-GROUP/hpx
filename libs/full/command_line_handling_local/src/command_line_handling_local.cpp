@@ -690,19 +690,34 @@ namespace hpx { namespace local { namespace detail {
     void command_line_handling::store_command_line(int argc, char** argv)
     {
         // Collect the command line for diagnostic purposes.
+        std::string command;
         std::string cmd_line;
+        std::string options;
         for (int i = 0; i < argc; ++i)
         {
             // quote only if it contains whitespace
-            std::string arg(argv[i]);    //-V108
-            cmd_line += detail::encode_and_enquote(arg);
+            std::string arg = detail::encode_and_enquote(argv[i]);    //-V108
+
+            cmd_line += arg;
+            if (i == 0)
+            {
+                command = arg;
+            }
+            else
+            {
+                options += " " + arg;
+            }
 
             if ((i + 1) != argc)
+            {
                 cmd_line += " ";
+            }
         }
 
         // Store the program name and the command line.
         ini_config_.emplace_back("hpx.cmd_line!=" + cmd_line);
+        ini_config_.emplace_back("hpx.commandline.command!=" + command);
+        ini_config_.emplace_back("hpx.commandline.options!=" + options);
     }
 
     ///////////////////////////////////////////////////////////////////////////
