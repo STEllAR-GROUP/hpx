@@ -9,7 +9,6 @@
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS) && defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions_base/detail/invocation_count_registry.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/per_action_data_counter_discoverer.hpp>
@@ -100,10 +99,9 @@ namespace hpx { namespace performance_counters {
 
                 HPX_THROWS_IF(ec, bad_parameter,
                     "per_action_data_counter_registry::counter_discoverer",
-                    hpx::util::format(
-                        "action type {} does not match any known type, "
-                        "known action types: \n{}",
-                        p.parameters_, types));
+                    "action type {} does not match any known type, "
+                    "known action types: \n{}",
+                    p.parameters_, types);
                 return false;
             }
 
@@ -126,10 +124,9 @@ namespace hpx { namespace performance_counters {
 
             HPX_THROWS_IF(ec, bad_parameter,
                 "per_action_data_counter_registry::counter_discoverer",
-                hpx::util::format(
-                    "action type {} does not match any known type, "
-                    "known action types: \n{}",
-                    p.parameters_, types));
+                "action type {} does not match any known type, "
+                "known action types: \n{}",
+                p.parameters_, types);
             return false;
         }
 

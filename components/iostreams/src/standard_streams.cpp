@@ -54,8 +54,8 @@ namespace hpx { namespace iostreams { namespace detail
     hpx::future<naming::id_type>
     create_ostream(char const* cout_name, std::ostream& strm)
     {
-        LRT_(info) << "detail::create_ostream: creating '"
-                   << cout_name << "' stream object";
+        LRT_(info).format(
+            "detail::create_ostream: creating '{}' stream object", cout_name);
 
         if (agas::is_console())
         {
@@ -76,8 +76,8 @@ namespace hpx { namespace iostreams { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     void release_ostream(char const* name, naming::id_type const& /* id */)
     {
-        LRT_(info) << "detail::release_ostream: destroying '" << name
-                   << "' stream object";
+        LRT_(info).format(
+            "detail::release_ostream: destroying '{}' stream object", name);
 
         if (agas::is_console())
         {

@@ -52,8 +52,8 @@ namespace hpx { namespace lcos { namespace detail {
                     HPX_THROW_EXCEPTION(bad_parameter,
                         "hpx::lcos::detail::register_communicator_name",
                         "the given base name for the communicator "
-                        "operation was already registered: " +
-                            basename);
+                        "operation was already registered: {}",
+                        basename);
                 }
                 return target;
             });

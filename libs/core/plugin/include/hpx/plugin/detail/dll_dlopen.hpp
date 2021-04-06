@@ -11,10 +11,10 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <memory>
 #include <mutex>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -225,18 +225,17 @@ namespace hpx { namespace util { namespace plugin {
                 (SymbolType) MyGetProcAddress(dll_handle, symbol_name.c_str());
             if (nullptr == address)
             {
-                std::ostringstream str;
-                str << "Hpx.Plugin: Unable to locate the exported symbol name '"
-                    << symbol_name << "' in the shared library '" << dll_name
-                    << "' (dlerror: " << dlerror() << ")";
+                std::string str = hpx::util::format(
+                    "Hpx.Plugin: Unable to locate the exported symbol name "
+                    "'{}' in the shared library '{}' (dlerror: {})",
+                    symbol_name, dll_name, dlerror());
 
                 dlerror();
 
                 lock.unlock();
 
                 // report error
-                HPX_THROWS_IF(
-                    ec, dynamic_link_failure, "plugin::get", str.str());
+                HPX_THROWS_IF(ec, dynamic_link_failure, "plugin::get", str);
                 return std::pair<SymbolType, Deleter>();
             }
 
@@ -250,14 +249,15 @@ namespace hpx { namespace util { namespace plugin {
                 MyLoadLibrary((dll_name.empty() ? nullptr : dll_name.c_str()));
             if (!handle)
             {
-                std::ostringstream str;
-                str << "Hpx.Plugin: Could not open shared library '" << dll_name
-                    << "' (dlerror: " << dlerror() << ")";
+                std::string str =
+                    hpx::util::format("Hpx.Plugin: Could not open shared "
+                                      "library '{}' (dlerror: {})",
+                        dll_name, dlerror());
 
                 lock.unlock();
 
                 // report error
-                HPX_THROWS_IF(ec, filesystem_error, "plugin::get", str.str());
+                HPX_THROWS_IF(ec, filesystem_error, "plugin::get", str);
                 return std::pair<SymbolType, Deleter>();
             }
 
@@ -292,14 +292,15 @@ namespace hpx { namespace util { namespace plugin {
                     (dll_name.empty() ? nullptr : dll_name.c_str()));
                 if (!dll_handle)
                 {
-                    std::ostringstream str;
-                    str << "Hpx.Plugin: Could not open shared library '"
-                        << dll_name << "' (dlerror: " << dlerror() << ")";
+                    std::string str =
+                        hpx::util::format("Hpx.Plugin: Could not open shared "
+                                          "library '{}' (dlerror: {})",
+                            dll_name, dlerror());
 
                     lock.unlock();
 
                     HPX_THROWS_IF(
-                        ec, filesystem_error, "plugin::LoadLibrary", str.str());
+                        ec, filesystem_error, "plugin::LoadLibrary", str);
                     return;
                 }
 
@@ -322,16 +323,13 @@ namespace hpx { namespace util { namespace plugin {
             const_cast<dll&>(*this).LoadLibrary(ec);
             if (!ec && ::dlinfo(dll_handle, RTLD_DI_ORIGIN, directory) < 0)
             {
-                std::ostringstream str;
-                str << "Hpx.Plugin: Could not extract path the shared "
-                       "library '"
-                    << dll_name
-                    << "' has been loaded from "
-                       "(dlerror: "
-                    << dlerror() << ")";
+                std::string str = hpx::util::format(
+                    "Hpx.Plugin: Could not extract path the shared library "
+                    "'{}' has been loaded from (dlerror: {})",
+                    dll_name, dlerror());
 
                 HPX_THROWS_IF(
-                    ec, filesystem_error, "plugin::get_directory", str.str());
+                    ec, filesystem_error, "plugin::get_directory", str);
             }
             result = directory;
             ::dlerror();    // Clear the error state.

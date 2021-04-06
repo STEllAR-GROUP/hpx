@@ -10,6 +10,23 @@
 #include <sstream>
 #include <string>
 
+// clang-format off
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) ||                                 \
+    (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT <= 64)
+
+#define HPX_CPU_MASK_PREFIX "0x"
+
+#else
+
+#  if defined(HPX_HAVE_MAX_CPU_COUNT)
+#    define HPX_CPU_MASK_PREFIX "0b"
+#  else
+#    define HPX_CPU_MASK_PREFIX "0x"
+#  endif
+
+#endif
+// clang-format on
+
 namespace hpx { namespace threads {
     std::string to_string(mask_cref_type val)
     {

@@ -94,18 +94,18 @@ namespace hpx {
 
         // add type and library version
 #if defined(OPEN_MPI)
-        strm << "OpenMPI V" << OMPI_MAJOR_VERSION << "." << OMPI_MINOR_VERSION
-             << "." << OMPI_RELEASE_VERSION;
+        hpx::util::format_to(strm, "OpenMPI V{}.{}.{}", OMPI_MAJOR_VERSION,
+            OMPI_MINOR_VERSION, OMPI_RELEASE_VERSION);
 #elif defined(MPICH)
-        strm << "MPICH V" << MPICH_VERSION;
+        hpx::util::format_to(strm, "MPICH V{}", MPICH_VERSION);
 #elif defined(MVAPICH2_VERSION)
-        strm << "MVAPICH2 V" << MVAPICH2_VERSION;
+        hpx::util::format_to(strm, "MVAPICH2 V{}", MVAPICH2_VERSION);
 #else
         strm << "Unknown MPI";
 #endif
         // add general MPI version
 #if defined(MPI_VERSION) && defined(MPI_SUBVERSION)
-        strm << ", MPI V" << MPI_VERSION << "." << MPI_SUBVERSION;
+        hpx::util::format_to(strm, ", MPI V{}.{}", MPI_VERSION, MPI_SUBVERSION);
 #else
         strm << ", unknown MPI version";
 #endif
@@ -163,19 +163,20 @@ namespace hpx {
         strm << "Core library:\n";
 
 #if defined(HPX_AGAS_LOCAL_CACHE_SIZE)
-        strm << "  HPX_AGAS_LOCAL_CACHE_SIZE=" << HPX_AGAS_LOCAL_CACHE_SIZE
-             << "\n";
+        hpx::util::format_to(strm, "  HPX_AGAS_LOCAL_CACHE_SIZE={}\n",
+            HPX_AGAS_LOCAL_CACHE_SIZE);
 #endif
 #if defined(HPX_HAVE_MALLOC)
-        strm << "  HPX_HAVE_MALLOC=" << HPX_HAVE_MALLOC << "\n";
+        hpx::util::format_to(strm, "  HPX_HAVE_MALLOC={}\n", HPX_HAVE_MALLOC);
 #endif
 #if defined(HPX_PARCEL_MAX_CONNECTIONS)
-        strm << "  HPX_PARCEL_MAX_CONNECTIONS=" << HPX_PARCEL_MAX_CONNECTIONS
-             << "\n";
+        hpx::util::format_to(strm, "  HPX_PARCEL_MAX_CONNECTIONS={}\n",
+            HPX_PARCEL_MAX_CONNECTIONS);
 #endif
 #if defined(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY)
-        strm << "  HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY="
-             << HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY << "\n";
+        hpx::util::format_to(strm,
+            "  HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY={}\n",
+            HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY);
 #endif
 
         const char* prefix = util::hpx_prefix();

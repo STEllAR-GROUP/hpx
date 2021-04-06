@@ -102,7 +102,7 @@ namespace hpx { namespace components {
 
                     HPX_THROW_EXCEPTION(duplicate_component_address,
                         "fixed_component_base<Component>::get_base_gid",
-                        hpx::util::format("could not bind_gid(local): {}", g));
+                        "could not bind_gid(local): {}", g);
                 }
             }
             return gid_;

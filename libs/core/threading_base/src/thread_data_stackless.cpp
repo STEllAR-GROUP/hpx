@@ -17,10 +17,9 @@ namespace hpx { namespace threads {
 
     thread_data_stackless::~thread_data_stackless()
     {
-        LTM_(debug) << "~thread_data_stackless(" << this
-                    << "), description("    //-V128
-                    << this->get_description() << "), phase("
-                    << this->get_thread_phase() << ")";
+        LTM_(debug).format(
+            "~thread_data_stackless({}), description({}), phase({})", this,
+            this->get_description(), this->get_thread_phase());
     }
 
 }}    // namespace hpx::threads

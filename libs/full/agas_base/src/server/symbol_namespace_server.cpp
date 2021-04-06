@@ -110,10 +110,9 @@ namespace hpx { namespace agas { namespace server {
             // increase reference count
             if (raw_gid == gid)
             {
-                LAGAS_(info) << hpx::util::format(
+                LAGAS_(info).format(
                     "symbol_namespace::bind, key({1}), gid({2}), "
-                    "old_credit({3}), "
-                    "new_credit({4})",
+                    "old_credit({3}), new_credit({4})",
                     key, gid,
                     naming::detail::get_credit_from_gid(*(it->second)),
                     naming::detail::get_credit_from_gid(*(it->second)) +
@@ -128,7 +127,7 @@ namespace hpx { namespace agas { namespace server {
             if (LAGAS_ENABLED(info))
             {
                 naming::detail::add_credit_to_gid(gid, credits);
-                LAGAS_(info) << hpx::util::format(
+                LAGAS_(info).format(
                     "symbol_namespace::bind, key({1}), gid({2}), "
                     "response(no_success)",
                     key, gid);
@@ -198,7 +197,7 @@ namespace hpx { namespace agas { namespace server {
 
         l.unlock();
 
-        LAGAS_(info) << hpx::util::format(
+        LAGAS_(info).format(
             "symbol_namespace::bind, key({1}), gid({2})", key, gid);
 
         return true;
@@ -218,7 +217,7 @@ namespace hpx { namespace agas { namespace server {
 
         if (it == end)
         {
-            LAGAS_(info) << hpx::util::format(
+            LAGAS_(info).format(
                 "symbol_namespace::resolve, key({1}), response(no_success)",
                 key);
 
@@ -232,7 +231,7 @@ namespace hpx { namespace agas { namespace server {
         naming::gid_type gid =
             naming::detail::split_gid_if_needed(*current_gid).get();
 
-        LAGAS_(info) << hpx::util::format(
+        LAGAS_(info).format(
             "symbol_namespace::resolve, key({1}), gid({2})", key, gid);
 
         return gid;
@@ -251,7 +250,7 @@ namespace hpx { namespace agas { namespace server {
 
         if (it == end)
         {
-            LAGAS_(info) << hpx::util::format(
+            LAGAS_(info).format(
                 "symbol_namespace::unbind, key({1}), response(no_success)",
                 key);
 
@@ -262,7 +261,7 @@ namespace hpx { namespace agas { namespace server {
 
         gids_.erase(it);
 
-        LAGAS_(info) << hpx::util::format(
+        LAGAS_(info).format(
             "symbol_namespace::unbind, key({1}), gid({2})", key, gid);
 
         return gid;
@@ -317,7 +316,7 @@ namespace hpx { namespace agas { namespace server {
             }
         }
 
-        LAGAS_(info) << "symbol_namespace::iterate";
+        LAGAS_(info).format("symbol_namespace::iterate");
 
         return found;
     }    // }}}
@@ -368,7 +367,7 @@ namespace hpx { namespace agas { namespace server {
         }
         l.unlock();
 
-        LAGAS_(info) << "symbol_namespace::on_event";
+        LAGAS_(info).format("symbol_namespace::on_event");
 
         return true;
     }    // }}}

@@ -40,8 +40,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 "Please start the runtime if you haven't done so. If you "
                 "intended to not use the runtime make sure you have "
                 "implemented get_os_thread_count for your executor or install "
-                "a fallback "
-                "handler with "
+                "a fallback handler with "
                 "hpx::parallel::execution::detail::set_get_os_thread_count.");
             return std::size_t(-1);
         }

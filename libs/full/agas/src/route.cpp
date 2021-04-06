@@ -15,7 +15,6 @@
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
@@ -72,8 +71,7 @@ namespace hpx { namespace agas { namespace server {
                 l.unlock();
 
                 HPX_THROWS_IF(ec, no_success, "primary_namespace::route",
-                    hpx::util::format(
-                        "can't route parcel to unknown gid: {}", gid));
+                    "can't route parcel to unknown gid: {}", gid);
 
                 return;
             }

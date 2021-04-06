@@ -169,20 +169,17 @@ namespace hpx { namespace parcelset
     void parcelhandler::list_parcelport(std::ostringstream& strm,
         std::string const& ppname, int priority, bool bootstrap) const
     {
-        strm << "parcel port: " << ppname;
+        hpx::util::format_to(strm, "parcel port: {}", ppname);
 
-        std::string cfgkey("hpx.parcel." + ppname + ".enable");
-        std::string enabled = get_config_entry(cfgkey, "0");
-        strm << ", "
-             << (hpx::util::from_string<int>(enabled, 0) ? "" : "not ")
-             << "enabled";
+        std::string const cfgkey("hpx.parcel." + ppname + ".enable");
+        bool const enabled =
+            hpx::util::from_string<int>(get_config_entry(cfgkey, "0"), 0);
+        strm << (enabled ? ", enabled" : ", not enabled");
 
         if (bootstrap)
             strm << ", bootstrap";
 
-        strm << ", priority " << priority;
-
-        strm << '\n';
+        hpx::util::format_to(strm, ", priority {}\n", priority);
     }
 
     // list available parcel ports
@@ -383,7 +380,7 @@ namespace hpx { namespace parcelset
         HPX_THROW_EXCEPTION(network_error,
             "parcelhandler::find_appropriate_destination",
             "The locality gid cannot be resolved to a valid endpoint. "
-            "No valid parcelport configured. Detailed information:\n" +
+            "No valid parcelport configured. Detailed information:\n{}",
             strm.str());
         return std::pair<std::shared_ptr<parcelport>, locality>();
     }

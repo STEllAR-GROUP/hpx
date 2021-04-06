@@ -1117,19 +1117,16 @@ namespace hpx { namespace threads { namespace policies {
                 {
                     if (running)
                     {
-                        LTM_(error)    //-V128
-                            << "queue(" << num_thread << "): "
-                            << "no new work available, are we "
-                               "deadlocked?";
+                        LTM_(error).format("queue({}): no new work available, "
+                                           "are we deadlocked?",
+                            num_thread);
                     }
                     else
                     {
-                        LHPX_CONSOLE_(
-                            hpx::util::logging::level::error)    //-V128
-                            << "  [TM] "                         //-V128
-                            << "queue(" << num_thread << "): "
-                            << "no new work available, are we "
-                               "deadlocked?\n";
+                        LHPX_CONSOLE_(hpx::util::logging::level::error)
+                            .format("  [TM] queue({}): no new work available, "
+                                    "are we deadlocked?\n",
+                                num_thread);
                     }
                 }
             }

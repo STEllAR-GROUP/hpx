@@ -38,7 +38,6 @@
 #include <memory>
 #include <mutex>
 #include <numeric>
-#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -579,8 +578,8 @@ namespace hpx { namespace threads {
 
         //! FIXME Add names of available pools?
         HPX_THROW_EXCEPTION(bad_parameter, "threadmanager::get_pool",
-            "the resource partitioner does not own a thread pool named '" +
-                pool_name + "'. \n");
+            "the resource partitioner does not own a thread pool named '{}'.\n",
+            pool_name);
     }
 
     thread_pool_base& threadmanager::get_pool(pool_id_type const& pool_id) const
@@ -1047,7 +1046,7 @@ namespace hpx { namespace threads {
         init_tss(rp.get_num_threads());
 
 #ifdef HPX_HAVE_TIMER_POOL
-        LTM_(info) << "run: running timer pool";
+        LTM_(info).format("run: running timer pool");
         timer_pool_.run(false);
 #endif
 
@@ -1076,13 +1075,13 @@ namespace hpx { namespace threads {
                 sched->set_all_states(state_running);
         }
 
-        LTM_(info) << "run: running";
+        LTM_(info).format("run: running");
         return true;
     }
 
     void threadmanager::stop(bool blocking)
     {
-        LTM_(info) << "stop: blocking(" << std::boolalpha << blocking << ")";
+        LTM_(info).format("stop: blocking({})", blocking ? "true" : "false");
 
         std::unique_lock<mutex_type> lk(mtx_);
         for (auto& pool_iter : pools_)

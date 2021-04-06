@@ -30,7 +30,6 @@
 
 #include <ctime>
 #include <exception>
-#include <sstream>
 #include <system_error>
 
 #if defined(HPX_WINDOWS)
@@ -119,11 +118,9 @@ namespace hpx { namespace util {
         }
 
         // report errors
-        std::ostringstream strm;
-        strm << errors.get_message()
-             << " (while trying to resolve: " << hostname << ":" << port << ")";
-        HPX_THROW_EXCEPTION(
-            network_error, "util::resolve_hostname", strm.str());
+        HPX_THROW_EXCEPTION(network_error, "util::resolve_hostname",
+            "{} (while trying to resolve: {}:{})", errors.get_message(),
+            hostname, port);
         return tcp::endpoint();
     }
 
@@ -151,11 +148,9 @@ namespace hpx { namespace util {
         }
 
         // report errors
-        std::ostringstream strm;
-        strm << errors.get_message()
-             << " (while trying to resolve public ip address)";
-        HPX_THROW_EXCEPTION(
-            network_error, "util::resolve_public_ip_address", strm.str());
+        HPX_THROW_EXCEPTION(network_error, "util::resolve_public_ip_address",
+            "{} (while trying to resolve public ip address)",
+            errors.get_message());
         return "";
     }
 
@@ -248,12 +243,9 @@ namespace hpx { namespace util {
         }
 
         // report errors
-        std::ostringstream strm;
-        strm << errors.get_message()
-             << " (while trying to connect to: " << address << ":" << port
-             << ")";
-
-        HPX_THROW_EXCEPTION(network_error, "connect_begin", strm.str());
+        HPX_THROW_EXCEPTION(network_error, "connect_begin",
+            "{} (while trying to connect to: {}:{})", errors.get_message(),
+            address, port);
 
         return endpoint_iterator_type();
     }
@@ -314,11 +306,9 @@ namespace hpx { namespace util {
         }
 
         // report errors
-        std::ostringstream strm;
-        strm << errors.get_message() << " (while trying to resolve: " << address
-             << ":" << port << ")";
-
-        HPX_THROW_EXCEPTION(network_error, "accept_begin", strm.str());
+        HPX_THROW_EXCEPTION(network_error, "accept_begin",
+            "{} (while trying to resolve: {}:{}))", errors.get_message(),
+            address, port);
         return endpoint_iterator_type();
     }
 }}    // namespace hpx::util

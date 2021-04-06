@@ -14,6 +14,7 @@
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/modules/components_base.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
@@ -22,7 +23,6 @@
 #include <boost/utility/string_ref.hpp>
 
 #include <cstdlib>
-#include <sstream>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -39,10 +39,8 @@ namespace hpx { namespace actions {
         inline std::string make_component_action_name(
             boost::string_ref action_name, void const* lva)
         {
-            std::stringstream name;
-            name << "component action(" << action_name << ") lva(" << lva
-                 << ")";
-            return name.str();
+            return hpx::util::format(
+                "component action({}) lva({})", action_name, lva);
         }
 
         ///////////////////////////////////////////////////////////////////////

@@ -44,7 +44,7 @@ namespace hpx {
         HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
         if (e != success)
         {
-            LERR_(error) << "created exception: " << this->what();
+            LERR_(error).format("created exception: {}", this->what());
         }
     }
 
@@ -52,7 +52,7 @@ namespace hpx {
     exception::exception(std::system_error const& e)
       : std::system_error(e)
     {
-        LERR_(error) << "created exception: " << this->what();
+        LERR_(error).format("created exception: {}", this->what());
     }
 
     /// Construct a hpx::exception from a boost#system#error_code (this is
@@ -60,7 +60,7 @@ namespace hpx {
     exception::exception(std::error_code const& e)
       : std::system_error(e)
     {
-        LERR_(error) << "created exception: " << this->what();
+        LERR_(error).format("created exception: {}", this->what());
     }
 
     /// Construct a hpx::exception from a \a hpx::error and an error message.
@@ -80,7 +80,7 @@ namespace hpx {
         HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
         if (e != success)
         {
-            LERR_(error) << "created exception: " << this->what();
+            LERR_(error).format("created exception: {}", this->what());
         }
     }
 
@@ -101,7 +101,7 @@ namespace hpx {
         HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
         if (e != success)
         {
-            LERR_(error) << "created exception: " << this->what();
+            LERR_(error).format("created exception: {}", this->what());
         }
     }
 

@@ -16,7 +16,6 @@
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/format.hpp>
 
 #include <string>
 
@@ -39,10 +38,10 @@ public:
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
             (LPTSTR) &buffer, 0, nullptr))
         {
-            HPX_THROW_EXCEPTION(kernel_error,
-                "process::on_CreateProcess_error",
-                hpx::util::format("format message failed with {:x} (while "
-                    "retrieving message for {:x})", GetLastError(), hr));
+            HPX_THROW_EXCEPTION(kernel_error, "process::on_CreateProcess_error",
+                "format message failed with {:x} (while retrieving message for "
+                "{:x})",
+                GetLastError(), hr);
             return;
         }
 

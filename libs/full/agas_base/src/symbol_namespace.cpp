@@ -17,7 +17,6 @@
 #include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/collectives.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstdint>
@@ -71,9 +70,9 @@ namespace hpx { namespace agas {
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "symbol_namespace::get_service_instance",
-                hpx::util::format("can't retrieve a valid locality id from "
-                                  "global address ({1}): ",
-                    dest));
+                "can't retrieve a valid locality id from global address "
+                "({1}): ",
+                dest);
             return naming::gid_type();
         }
         return get_service_instance(service_locality_id);

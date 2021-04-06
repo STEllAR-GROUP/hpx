@@ -152,8 +152,8 @@ namespace hpx { namespace actions {
 
         void trigger_value(Result&& result)
         {
-            LLCO_(info) << "typed_continuation<Result>::trigger_value("
-                        << this->get_id() << ")";
+            LLCO_(info).format("typed_continuation<Result>::trigger_value({})",
+                this->get_id());
 
             if (f_.empty())
             {
@@ -266,8 +266,9 @@ namespace hpx { namespace actions {
 
         void trigger_value(RemoteResult&& result)
         {
-            LLCO_(info) << "typed_continuation<RemoteResult>::trigger_value("
-                        << this->get_id() << ")";
+            LLCO_(info).format(
+                "typed_continuation<RemoteResult>::trigger_value({})",
+                this->get_id());
 
             if (this->f_.empty())
             {

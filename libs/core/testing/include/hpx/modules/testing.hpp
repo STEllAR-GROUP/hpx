@@ -23,7 +23,6 @@
 #include <cstdint>
 #include <mutex>
 #include <ostream>
-#include <sstream>
 
 namespace hpx { namespace util {
 

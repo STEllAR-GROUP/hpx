@@ -13,7 +13,6 @@
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/format.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/serialization/vector.hpp>
@@ -111,9 +110,9 @@ namespace hpx { namespace agas {
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "primary_namespace::get_service_instance",
-                hpx::util::format("can't retrieve a valid locality id from "
-                                  "global address ({1}): ",
-                    dest));
+                "can't retrieve a valid locality id from global address "
+                "({1}): ",
+                dest);
             return naming::gid_type();
         }
         return get_service_instance(service_locality_id);

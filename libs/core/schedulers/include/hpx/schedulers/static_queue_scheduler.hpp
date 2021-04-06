@@ -140,9 +140,9 @@ namespace hpx { namespace threads { namespace policies {
 
                 if (HPX_UNLIKELY(suspended_only))
                 {
-                    LTM_(error)    //-V128
-                        << "queue(" << num_thread << "): "
-                        << "no new work available, are we deadlocked?";
+                    LTM_(error).format(
+                        "queue({}): no new work available, are we deadlocked?",
+                        num_thread);
                 }
             }
 #else

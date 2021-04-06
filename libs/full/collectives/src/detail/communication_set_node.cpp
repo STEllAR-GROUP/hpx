@@ -170,8 +170,8 @@ namespace hpx { namespace lcos { namespace detail {
                     HPX_THROW_EXCEPTION(bad_parameter,
                         "hpx::lcos::detail::register_communication_set_name",
                         "the given base name for the communication_set_node "
-                        "operation was already registered: " +
-                            basename);
+                        "operation was already registered: {}",
+                        basename);
                 }
                 return target;
             });

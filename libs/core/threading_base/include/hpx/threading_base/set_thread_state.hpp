@@ -27,7 +27,7 @@
 #include <cstddef>
 #include <functional>
 #include <memory>
-#include <sstream>
+#include <string>
 #include <system_error>
 
 namespace hpx { namespace threads { namespace detail {
@@ -60,13 +60,13 @@ namespace hpx { namespace threads { namespace detail {
             current_state != previous_state)
         {
             // NOLINTNEXTLINE(bugprone-branch-clone)
-            LTM_(warning)
-                << "set_active_state: thread is still active, however "
-                   "it was non-active since the original set_state "
-                   "request was issued, aborting state change, thread("
-                << thrd << "), description("
-                << get_thread_id_data(thrd)->get_description()
-                << "), new state(" << get_thread_state_name(newstate) << ")";
+            LTM_(warning).format(
+                "set_active_state: thread is still active, however it was "
+                "non-active since the original set_state request was issued, "
+                "aborting state change, thread({}), description({}), new "
+                "state({})",
+                thrd, get_thread_id_data(thrd)->get_description(),
+                get_thread_state_name(newstate));
             return thread_result_type(
                 thread_schedule_state::terminated, invalid_thread_id);
         }
@@ -98,10 +98,9 @@ namespace hpx { namespace threads { namespace detail {
         // set_state can't be used to force a thread into active state
         if (new_state == thread_schedule_state::active)
         {
-            std::ostringstream strm;
-            strm << "invalid new state: " << get_thread_state_name(new_state);
             HPX_THROWS_IF(ec, bad_parameter,
-                "threads::detail::set_thread_state", strm.str());
+                "threads::detail::set_thread_state", "invalid new state: {}",
+                new_state);
             return thread_state(
                 thread_schedule_state::unknown, thread_restart_state::unknown);
         }
@@ -117,13 +116,12 @@ namespace hpx { namespace threads { namespace detail {
             if (new_state == previous_state_val)
             {
                 // NOLINTNEXTLINE(bugprone-branch-clone)
-                LTM_(warning)
-                    << "set_thread_state: old thread state is the same as new "
-                       "thread state, aborting state change, thread("
-                    << thrd << "), description("
-                    << get_thread_id_data(thrd)->get_description()
-                    << "), new state(" << get_thread_state_name(new_state)
-                    << ")";
+                LTM_(warning).format(
+                    "set_thread_state: old thread state is the same as new "
+                    "thread state, aborting state change, thread({}), "
+                    "description({}), new state({})",
+                    thrd, get_thread_id_data(thrd)->get_description(),
+                    get_thread_state_name(new_state));
 
                 if (&ec != &throws)
                     ec = make_success_code();
@@ -141,13 +139,12 @@ namespace hpx { namespace threads { namespace detail {
                 {
                     // schedule a new thread to set the state
                     // NOLINTNEXTLINE(bugprone-branch-clone)
-                    LTM_(warning)
-                        << "set_thread_state: thread is currently active, "
-                           "scheduling new thread, thread("
-                        << thrd << "), description("
-                        << get_thread_id_data(thrd)->get_description()
-                        << "), new state(" << get_thread_state_name(new_state)
-                        << ")";
+                    LTM_(warning).format(
+                        "set_thread_state: thread is currently active, "
+                        "scheduling new thread, thread({}), description({}), "
+                        "new state({})",
+                        thrd, get_thread_id_data(thrd)->get_description(),
+                        get_thread_state_name(new_state));
 
                     thread_init_data data(
                         util::bind(&set_active_state, thrd, new_state,
@@ -163,14 +160,12 @@ namespace hpx { namespace threads { namespace detail {
                 else
                 {
                     // NOLINTNEXTLINE(bugprone-branch-clone)
-                    LTM_(warning)
-                        << "set_thread_state: thread is currently active, "
-                           "but not scheduling new thread because "
-                           "retry_on_active = false, thread("
-                        << thrd << "), description("
-                        << get_thread_id_data(thrd)->get_description()
-                        << "), new state(" << get_thread_state_name(new_state)
-                        << ")";
+                    LTM_(warning).format(
+                        "set_thread_state: thread is currently active, but not "
+                        "scheduling new thread because retry_on_active = "
+                        "false, thread({}), description({}), new state({})",
+                        thrd, get_thread_id_data(thrd)->get_description(),
+                        get_thread_state_name(new_state));
                     ec = make_success_code();
                 }
 
@@ -180,13 +175,11 @@ namespace hpx { namespace threads { namespace detail {
             case thread_schedule_state::terminated:
             {
                 // NOLINTNEXTLINE(bugprone-branch-clone)
-                LTM_(warning) << "set_thread_state: thread is terminated, "
-                                 "aborting state "
-                                 "change, thread("
-                              << thrd << "), description("
-                              << get_thread_id_data(thrd)->get_description()
-                              << "), new state("
-                              << get_thread_state_name(new_state) << ")";
+                LTM_(warning).format(
+                    "set_thread_state: thread is terminated, aborting state "
+                    "change, thread({}), description({}), new state({})",
+                    thrd, get_thread_id_data(thrd)->get_description(),
+                    get_thread_state_name(new_state));
 
                 if (&ec != &throws)
                     ec = make_success_code();
@@ -202,20 +195,18 @@ namespace hpx { namespace threads { namespace detail {
                 {
                     // we do not allow explicit resetting of a state to suspended
                     // without the thread being executed.
-                    std::ostringstream strm;
-                    strm << "set_thread_state: invalid new state, can't demote "
-                            "a "
-                            "pending thread, "
-                         << "thread(" << thrd << "), description("
-                         << get_thread_id_data(thrd)->get_description()
-                         << "), new state(" << get_thread_state_name(new_state)
-                         << ")";
+                    std::string str = hpx::util::format(
+                        "set_thread_state: invalid new state, can't demote a "
+                        "pending thread, thread({}), description({}), new "
+                        "state({})",
+                        thrd, get_thread_id_data(thrd)->get_description(),
+                        new_state);
 
                     // NOLINTNEXTLINE(bugprone-branch-clone)
-                    LTM_(fatal) << strm.str();
+                    LTM_(fatal) << str;
 
                     HPX_THROWS_IF(ec, bad_parameter,
-                        "threads::detail::set_thread_state", strm.str());
+                        "threads::detail::set_thread_state", str);
                     return thread_state(thread_schedule_state::unknown,
                         thread_restart_state::unknown);
                 }
@@ -226,12 +217,9 @@ namespace hpx { namespace threads { namespace detail {
                 HPX_FALLTHROUGH;
             default:
             {
-                std::ostringstream strm;
-                strm << "set_thread_state: previous state was "
-                     << get_thread_state_name(previous_state_val) << " ("
-                     << previous_state_val << ")";
-                HPX_ASSERT_MSG(
-                    false, strm.str().c_str());    // should not happen
+                HPX_ASSERT_MSG(false,
+                    hpx::util::format("set_thread_state: previous state was {}",
+                        previous_state_val));    // should not happen
                 break;
             }
             }
@@ -243,12 +231,11 @@ namespace hpx { namespace threads { namespace detail {
             // (if it's not pending anymore).
 
             // NOLINTNEXTLINE(bugprone-branch-clone)
-            LTM_(info) << "set_thread_state: thread(" << thrd
-                       << "), description("
-                       << get_thread_id_data(thrd)->get_description()
-                       << "), new state(" << get_thread_state_name(new_state)
-                       << "), old state("
-                       << get_thread_state_name(previous_state_val) << ")";
+            LTM_(info).format("set_thread_state: thread({}), description({}), "
+                              "new state({}), old state({})",
+                thrd, get_thread_id_data(thrd)->get_description(),
+                get_thread_state_name(new_state),
+                get_thread_state_name(previous_state_val));
 
             // So all what we do here is to set the new state.
             if (get_thread_id_data(thrd)->restore_state(
@@ -259,19 +246,12 @@ namespace hpx { namespace threads { namespace detail {
 
             // state has changed since we fetched it from the thread, retry
             // NOLINTNEXTLINE(bugprone-branch-clone)
-            LTM_(error) << "set_thread_state: state has been changed since it "
-                           "was fetched, "
-                           "retrying, thread("
-                        << thrd
-                        << "), "
-                           "description("
-                        << get_thread_id_data(thrd)->get_description()
-                        << "), "
-                           "new state("
-                        << get_thread_state_name(new_state)
-                        << "), "
-                           "old state("
-                        << get_thread_state_name(previous_state_val) << ")";
+            LTM_(error).format("set_thread_state: state has been changed since "
+                               "it was fetched, retrying, thread({}), "
+                               "description({}), new state({}), old state({})",
+                thrd, get_thread_id_data(thrd)->get_description(),
+                get_thread_state_name(new_state),
+                get_thread_state_name(previous_state_val));
         } while (true);
 
         thread_schedule_state previous_state_val = previous_state.state();

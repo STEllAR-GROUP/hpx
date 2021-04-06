@@ -236,27 +236,25 @@ namespace hpx
                     buffer.data_point_.serialization_time_ =
                         timer.elapsed_nanoseconds();
                 }
-                catch (hpx::exception const& e) {
-                    LPT_(fatal)
-                        << "encode_parcels: "
-                           "caught hpx::exception: "
-                        << e.what();
+                catch (hpx::exception const& e)
+                {
+                    LPT_(fatal).format(
+                        "encode_parcels: caught hpx::exception: {}", e.what());
                     hpx::report_error(std::current_exception());
                     return 0;
                 }
-                catch (std::system_error const& e) {
-                    LPT_(fatal)
-                        << "encode_parcels: "
-                           "caught std::system_error: "
-                        << e.what();
+                catch (std::system_error const& e)
+                {
+                    LPT_(fatal).format(
+                        "encode_parcels: caught std::system_error: {}",
+                        e.what());
                     hpx::report_error(std::current_exception());
                     return 0;
                 }
 #if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
                 catch (boost::exception const&) {
-                    LPT_(fatal)
-                        << "encode_parcels: "
-                           "caught boost::exception";
+                    LPT_(fatal).format(
+                        "encode_parcels: caught boost::exception");
                     hpx::report_error(std::current_exception());
                     return 0;
                 }
@@ -271,9 +269,7 @@ namespace hpx
                 }
             }
             catch (...) {
-                LPT_(fatal)
-                        << "encode_parcels: "
-                       "caught unknown exception";
+                LPT_(fatal).format("encode_parcels: caught unknown exception");
                 hpx::report_error(std::current_exception());
                     return 0;
             }

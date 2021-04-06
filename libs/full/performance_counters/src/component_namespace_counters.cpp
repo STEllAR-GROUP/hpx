@@ -130,7 +130,7 @@ namespace hpx { namespace agas { namespace server {
     naming::gid_type component_namespace_statistics_counter(
         component_namespace& service, std::string const& name)
     {    // statistics_counter implementation
-        LAGAS_(info) << "component_namespace::statistics_counter";
+        LAGAS_(info).format("component_namespace::statistics_counter");
 
         hpx::error_code ec;
 

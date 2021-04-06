@@ -12,7 +12,6 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/component_heap.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/naming_base/address.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -44,10 +43,10 @@ namespace hpx { namespace components { namespace server {
             // FIXME: should the component be re-bound ?
             HPX_THROW_EXCEPTION(hpx::unknown_component_address,
                 "destroy<Component>",
-                hpx::util::format("global id: {} is not bound to a component "
-                                  "instance of type: {}  (it is bound to a {})",
-                    gid, get_component_type_name(type),
-                    get_component_type_name(addr.type_)));
+                "global id: {} is not bound to a component "
+                "instance of type: {}  (it is bound to a {})",
+                gid, get_component_type_name(type),
+                get_component_type_name(addr.type_));
             return;
         }
 
@@ -68,9 +67,7 @@ namespace hpx { namespace components { namespace server {
         {
             HPX_THROW_EXCEPTION(hpx::unknown_component_address,
                 "destroy<Component>",
-                hpx::util::format(
-                    "global id: {} is not bound to any component instance",
-                    gid));
+                "global id: {} is not bound to any component instance", gid);
             return;
         }
 

@@ -12,7 +12,6 @@
 #include <hpx/components_base/server/component_heap.hpp>
 #include <hpx/components_base/server/create_component_fwd.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/naming_base/address.hpp>
 
 #include <cstddef>
@@ -32,9 +31,8 @@ namespace hpx { namespace components { namespace server {
         if (!enabled(type))
         {
             HPX_THROW_EXCEPTION(bad_request, "components::server::::create",
-                hpx::util::format(
-                    "the component is disabled for this locality ({})",
-                    get_component_type_name(type)));
+                "the component is disabled for this locality ({})",
+                get_component_type_name(type));
             return naming::invalid_gid;
         }
 
@@ -76,9 +74,8 @@ namespace hpx { namespace components { namespace server {
         {
             HPX_THROW_EXCEPTION(bad_request,
                 "components::server::create_migrated",
-                hpx::util::format(
-                    "the component is disabled for this locality ({})",
-                    get_component_type_name(type)));
+                "the component is disabled for this locality ({})",
+                get_component_type_name(type));
             return naming::invalid_gid;
         }
 
@@ -113,9 +110,9 @@ namespace hpx { namespace components { namespace server {
 
         HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
             "create<Component>(naming::gid_type, ctor)",
-            hpx::util::format("the global id {} is already bound to a "
-                              "different component instance",
-                gid));
+            "the global id {} is already bound to a different component "
+            "instance",
+            gid);
 
         return naming::invalid_gid;
     }
@@ -131,9 +128,8 @@ namespace hpx { namespace components { namespace server {
         if (!enabled(type))
         {
             HPX_THROW_EXCEPTION(bad_request, "components::server::bulk_create",
-                hpx::util::format(
-                    "the component is disabled for this locality ({})",
-                    get_component_type_name(type)));
+                "the component is disabled for this locality ({})",
+                get_component_type_name(type));
             return gids;
         }
 

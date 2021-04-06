@@ -5,11 +5,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/runtime_local/thread_stacktrace.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 
-#include <iomanip>
+#include <cstdint>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -61,15 +62,15 @@ namespace hpx { namespace util { namespace debug {
         int count = 0;
         for (const auto& data : tlist)
         {
-            tmp << "Stack trace "
-                << "" << std::dec << count << " : "
-                << "0x" << std::setfill('0') << std::setw(12) << std::noshowbase
-                << std::hex << (uintptr_t)(data) << " : \n"
+            hpx::util::format_to(tmp, "Stack trace {} : {:#012x} : \n{}\n\n\n",
+                count, reinterpret_cast<uintptr_t>(data),
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-                << data->backtrace() << "\n\n";
+                data->backtrace()
 #else
-                << "Enable HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION in CMake";
+                "Enable HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION in CMake"
 #endif
+
+            );
             ++count;
         }
         return tmp.str();
