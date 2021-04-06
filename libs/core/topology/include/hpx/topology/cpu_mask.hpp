@@ -132,8 +132,6 @@ namespace hpx { namespace threads {
         mask = 0ull;
     }
 
-#define HPX_CPU_MASK_PREFIX "0x"
-
 // clang-format off
 #else
 #  if defined(HPX_HAVE_MAX_CPU_COUNT)
@@ -203,12 +201,6 @@ namespace hpx { namespace threads {
         return mask.find_first();
 #  endif
     }
-
-#  if defined(HPX_HAVE_MAX_CPU_COUNT)
-#    define HPX_CPU_MASK_PREFIX "0b"
-#  else
-#    define HPX_CPU_MASK_PREFIX "0x"
-#  endif
     // clang-format on
 
     inline bool equal(mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0)

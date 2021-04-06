@@ -54,8 +54,7 @@ namespace hpx { namespace actions { namespace detail {
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "action_registry::register_typename",
-                "failed to insert " + type_name +
-                    " into typename to id registry.");
+                "failed to insert {} into typename to id registry.", type_name);
         }
 
         // populate cache
@@ -139,8 +138,8 @@ namespace hpx { namespace actions { namespace detail {
         if (id == invalid_id)
         {
             HPX_THROW_EXCEPTION(serialization_error, "action_registry::get_id",
-                "Unknown typename: " + type_name + "\n" +
-                    instance().collect_registered_typenames());
+                "Unknown typename: {}\n{}", type_name,
+                instance().collect_registered_typenames());
         }
 
         return id;

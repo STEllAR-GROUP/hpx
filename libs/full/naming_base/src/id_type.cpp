@@ -9,7 +9,6 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
-#include <iomanip>
 #include <ostream>
 #include <vector>
 

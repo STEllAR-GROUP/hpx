@@ -148,11 +148,10 @@ namespace hpx { namespace agas { namespace server {
             l.unlock();
 
             HPX_THROW_EXCEPTION(lock_error, "locality_namespace::allocate",
-                hpx::util::format(
-                    "partition table insertion failed due to a locking "
-                    "error or memory corruption, endpoint({1}), "
-                    "prefix({2})",
-                    endpoints, prefix));
+                "partition table insertion failed due to a locking "
+                "error or memory corruption, endpoint({1}), "
+                "prefix({2})",
+                endpoints, prefix);
         }
 
         // Now that we've inserted the locality into the partition table
@@ -166,15 +165,13 @@ namespace hpx { namespace agas { namespace server {
             if (!primary_->bind_gid(g, id, id))
             {
                 HPX_THROW_EXCEPTION(bad_request, "locality_namespace::allocate",
-                    hpx::util::format(
-                        "unable to bind prefix({1}) to a gid", prefix));
+                    "unable to bind prefix({1}) to a gid", prefix);
             }
             return prefix;
         }
 
-        LAGAS_(info) << hpx::util::format(
-            "locality_namespace::allocate, ep({1}), count({2}), "
-            "prefix({3})",
+        LAGAS_(info).format(
+            "locality_namespace::allocate, ep({1}), count({2}), prefix({3})",
             endpoints, count, prefix);
 
         return prefix;
@@ -258,19 +255,11 @@ namespace hpx { namespace agas { namespace server {
                 }
             }
 
-            /*
-            LAGAS_(info) << hpx::util::format(
-                "locality_namespace::free, ep({1})",
-                ep);
-            */
+            /*LAGAS_(info).format("locality_namespace::free, ep({1})", ep);*/
         }
 
-        /*
-        LAGAS_(info) << hpx::util::format(
-            "locality_namespace::free, ep({1}), "
-            "response(no_success)",
-            ep);
-        */
+        /*LAGAS_(info).format(
+            "locality_namespace::free, ep({1}), response(no_success)", ep);*/
     }    // }}}
 
     std::vector<std::uint32_t> locality_namespace::localities()
@@ -290,7 +279,7 @@ namespace hpx { namespace agas { namespace server {
         for (/**/; it != end; ++it)
             p.push_back(it->first);
 
-        LAGAS_(info) << hpx::util::format(
+        LAGAS_(info).format(
             "locality_namespace::localities, localities({1})", p.size());
 
         return p;
@@ -307,7 +296,7 @@ namespace hpx { namespace agas { namespace server {
         std::uint32_t num_localities =
             static_cast<std::uint32_t>(partitions_.size());
 
-        LAGAS_(info) << hpx::util::format(
+        LAGAS_(info).format(
             "locality_namespace::get_num_localities, localities({1})",
             num_localities);
 
@@ -328,7 +317,7 @@ namespace hpx { namespace agas { namespace server {
             num_threads.push_back(get<1>(it->second));
         }
 
-        LAGAS_(info) << hpx::util::format(
+        LAGAS_(info).format(
             "locality_namespace::get_num_threads, localities({1})",
             num_threads.size());
 
@@ -349,7 +338,7 @@ namespace hpx { namespace agas { namespace server {
             num_threads += get<1>(it->second);
         }
 
-        LAGAS_(info) << hpx::util::format(
+        LAGAS_(info).format(
             "locality_namespace::get_num_overall_threads, localities({1})",
             num_threads);
 

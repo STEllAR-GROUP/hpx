@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/components_base/component_type.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/util/ios_flags_saver.hpp>
 
-#include <iomanip>
 #include <ostream>
 
 namespace hpx { namespace naming {
@@ -17,10 +17,7 @@ namespace hpx { namespace naming {
     // components::get_component_type_name()
     std::ostream& operator<<(std::ostream& os, address const& addr)
     {
-        hpx::util::ios_flags_saver ifs(os);
-        os << "(" << addr.locality_ << ":"
-           << components::get_component_type_name(addr.type_) << ":"
-           << std::showbase << std::hex << addr.address_ << ")";
-        return os;
+        return hpx::util::format_to(os, "({}:{}:{:#x})", addr.locality_,
+            components::get_component_type_name(addr.type_), addr.address_);
     }
 }}    // namespace hpx::naming

@@ -11,7 +11,6 @@
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/unique_ptr.hpp>
@@ -35,9 +34,7 @@ namespace hpx { namespace util { namespace functional {
             {
                 HPX_THROW_EXCEPTION(hpx::no_success,
                     "extract_locality::operator()",
-                    hpx::util::format(
-                        "could not resolve colocated locality for id({1})",
-                        id));
+                    "could not resolve colocated locality for id({1})", id);
                 return naming::invalid_id;
             }
             return locality_id;

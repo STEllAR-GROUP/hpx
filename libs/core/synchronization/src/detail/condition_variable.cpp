@@ -31,8 +31,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
     {
         if (!queue_.empty())
         {
-            LERR_(fatal) << "~condition_variable: queue is not empty, "
-                            "aborting threads";
+            LERR_(fatal).format(
+                "~condition_variable: queue is not empty, aborting threads");
 
             local::no_mutex no_mtx;
             std::unique_lock<local::no_mutex> lock(no_mtx);
@@ -238,13 +238,13 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
                 if (HPX_UNLIKELY(!ctx))
                 {
-                    LERR_(fatal) << "condition_variable::abort_all:"
-                                 << " null thread id encountered";
+                    LERR_(fatal).format("condition_variable::abort_all: null "
+                                        "thread id encountered");
                     continue;
                 }
 
-                LERR_(fatal) << "condition_variable::abort_all:"
-                             << " pending thread: " << ctx;
+                LERR_(fatal).format(
+                    "condition_variable::abort_all: pending thread: {}", ctx);
 
                 // unlock while notifying thread as this can suspend
                 util::unlock_guard<std::unique_lock<Mutex>> unlock(lock);

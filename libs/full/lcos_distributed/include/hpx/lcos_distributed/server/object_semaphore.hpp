@@ -164,9 +164,8 @@ namespace hpx { namespace lcos { namespace server {
         {
             std::lock_guard<mutex_type> l(mtx_);
 
-            LLCO_(info) << "object_semaphore::abort_pending: thread_queue is "
-                           "not empty, "
-                           "aborting threads";
+            LLCO_(info).format("object_semaphore::abort_pending: thread_queue "
+                               "is not empty, aborting threads");
 
             while (!thread_queue_.empty())
             {
@@ -174,8 +173,8 @@ namespace hpx { namespace lcos { namespace server {
                 thread_queue_.front().id_ = naming::invalid_id;
                 thread_queue_.pop_front();
 
-                LLCO_(info)
-                    << "object_semaphore::abort_pending: pending thread " << id;
+                LLCO_(info).format(
+                    "object_semaphore::abort_pending: pending thread {}", id);
 
                 try
                 {
@@ -206,7 +205,8 @@ namespace hpx { namespace lcos { namespace server {
             {
                 naming::id_type id = it->id_;
 
-                LLCO_(info) << "object_semapohre::wait: waiting for " << id;
+                LLCO_(info).format(
+                    "object_semapohre::wait: waiting for {}", id);
 
                 hpx::apply<action_type>(id);
             }

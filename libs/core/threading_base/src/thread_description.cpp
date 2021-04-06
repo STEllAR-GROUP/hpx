@@ -6,13 +6,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/to_string.hpp>
 
 #include <ostream>
-#include <sstream>
 #include <string>
 
 namespace hpx { namespace util {
@@ -41,10 +41,7 @@ namespace hpx { namespace util {
         if (desc.kind() == util::thread_description::data_type_description)
             return desc ? desc.get_description() : "<unknown>";
 
-        std::stringstream strm;
-        strm << "address: 0x" << std::hex
-             << util::to_string(desc.get_address());
-        return strm.str();
+        return hpx::util::format("address: {:#x}", desc.get_address());
 #else
         HPX_UNUSED(desc);
         return "<unknown>";

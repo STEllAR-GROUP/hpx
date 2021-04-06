@@ -8,6 +8,7 @@
 #define HPX_NO_VERSION_CHECK
 
 #include <hpx/assert.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/util.hpp>
 
@@ -16,7 +17,7 @@
 #include <cstdint>
 #include <functional>
 #include <iostream>
-#include <sstream>
+#include <string>
 
 namespace hpx { namespace util {
     static test_failure_handler_type test_failure_handler;
@@ -95,12 +96,12 @@ namespace hpx { namespace util {
 
     void print_cdash_timing(const char* name, double time)
     {
-        // use stringstream followed by single cout for better multi-threaded
-        // output
-        std::stringstream temp;
-        temp << "<DartMeasurement name=\"" << name << "\" "
-             << "type=\"numeric/double\">" << time << "</DartMeasurement>";
-        std::cout << temp.str() << std::endl;
+        // use format followed by single cout for better multi-threaded output
+        std::string temp =
+            hpx::util::format("<DartMeasurement name=\"{}\" "
+                              "type=\"numeric/double\">{}</DartMeasurement>",
+                name, time);
+        std::cout << temp << std::endl;
     }
 
     void print_cdash_timing(const char* name, std::uint64_t time)

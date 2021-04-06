@@ -49,9 +49,9 @@ namespace hpx { namespace components { namespace server {
 
                 components::deleter(addr.type_)(gid, addr);
 
-                LRT_(info) << "successfully destroyed component " << gid
-                           << " of type: "
-                           << components::get_component_type_name(addr.type_);
+                LRT_(info).format(
+                    "successfully destroyed component {} of type: {}", gid,
+                    components::get_component_type_name(addr.type_));
 
                 return;
             }

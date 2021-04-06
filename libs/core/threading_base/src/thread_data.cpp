@@ -74,8 +74,8 @@ namespace hpx { namespace threads {
       , queue_(queue)
       , is_stackless_(is_stackless)
     {
-        LTM_(debug) << "thread::thread(" << this << "), description("
-                    << get_description() << ")";
+        LTM_(debug).format(
+            "thread::thread({}), description({})", this, get_description());
 
         HPX_ASSERT(stacksize_enum_ != threads::thread_stacksize::current);
 
@@ -176,9 +176,8 @@ namespace hpx { namespace threads {
 
     void thread_data::rebind_base(thread_init_data& init_data)
     {
-        LTM_(debug) << "~thread(" << this << "), description("    //-V128
-                    << get_description() << "), phase(" << get_thread_phase()
-                    << "), rebind";
+        LTM_(debug).format("~thread({}), description({}), phase({}), rebind",
+            this, get_description(), get_thread_phase());
 
         free_thread_exit_callbacks();
 
@@ -211,8 +210,8 @@ namespace hpx { namespace threads {
         HPX_ASSERT(stacksize_ == get_stack_size());
         HPX_ASSERT(stacksize_ != 0);
 
-        LTM_(debug) << "thread::thread(" << this << "), description("
-                    << get_description() << "), rebind";
+        LTM_(debug).format("thread::thread({}), description({}), rebind", this,
+            get_description());
 
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
         // store the thread id of the parent thread, mainly for debugging

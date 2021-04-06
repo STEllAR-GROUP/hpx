@@ -91,8 +91,8 @@ namespace hpx { namespace performance_counters { namespace detail {
             if (paths.parentinstance_is_basename_)
             {
                 HPX_THROWS_IF(ec, bad_parameter, "uptime_counter_creator",
-                    "invalid counter instance parent name: " +
-                        paths.parentinstancename_);
+                    "invalid counter instance parent name: {}",
+                    paths.parentinstancename_);
                 return naming::invalid_gid;
             }
 

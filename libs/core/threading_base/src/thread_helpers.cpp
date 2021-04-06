@@ -32,7 +32,6 @@
 #include <cstddef>
 #include <limits>
 #include <memory>
-#include <sstream>
 #include <string>
 #include <utility>
 
@@ -485,11 +484,9 @@ namespace hpx { namespace this_thread {
         // handle interrupt and abort
         if (statex == threads::thread_restart_state::abort)
         {
-            std::ostringstream strm;
-            strm << "thread(" << threads::get_self_id() << ", "
-                 << threads::get_thread_description(id)
-                 << ") aborted (yield returned wait_abort)";
-            HPX_THROWS_IF(ec, yield_aborted, "suspend", strm.str());
+            HPX_THROWS_IF(ec, yield_aborted, "suspend",
+                "thread({}, {}) aborted (yield returned wait_abort)",
+                threads::get_self_id(), threads::get_thread_description(id));
         }
 
         if (&ec != &throws)
@@ -581,11 +578,9 @@ namespace hpx { namespace this_thread {
         // handle interrupt and abort
         if (statex == threads::thread_restart_state::abort)
         {
-            std::ostringstream strm;
-            strm << "thread(" << threads::get_self_id() << ", "
-                 << threads::get_thread_description(id)
-                 << ") aborted (yield returned wait_abort)";
-            HPX_THROWS_IF(ec, yield_aborted, "suspend_at", strm.str());
+            HPX_THROWS_IF(ec, yield_aborted, "suspend_at",
+                "thread({}, {}) aborted (yield returned wait_abort)",
+                threads::get_self_id(), threads::get_thread_description(id));
         }
 
         if (&ec != &throws)

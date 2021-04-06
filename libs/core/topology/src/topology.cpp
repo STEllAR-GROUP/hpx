@@ -61,41 +61,37 @@ namespace hpx { namespace threads { namespace detail {
 
     void write_to_log(char const* valuename, std::size_t value)
     {
-        LTM_(debug) << "topology: " << valuename << ": " << value;    //-V128
+        LTM_(debug).format("topology: {}: {}", valuename, value);    //-V128
     }
 
     void write_to_log_mask(char const* valuename, mask_cref_type value)
     {
-        LTM_(debug) << "topology: " << valuename << ": " HPX_CPU_MASK_PREFIX
-                    << std::hex << value;
+        LTM_(debug).format(
+            "topology: {}: {}", valuename, hpx::threads::to_string(value));
     }
 
     void write_to_log(
         char const* valuename, std::vector<std::size_t> const& values)
     {
-        LTM_(debug) << "topology: " << valuename << "s, size: "    //-V128
-                    << values.size();
+        LTM_(debug).format("topology: {}s, size: {}", valuename, values.size());
 
         std::size_t i = 0;
         for (std::size_t value : values)
         {
-            LTM_(debug) << "topology: " << valuename    //-V128
-                        << "(" << i++ << "): " << value;
+            LTM_(debug).format("topology: {}({}): {}", valuename, i++, value);
         }
     }
 
     void write_to_log_mask(
         char const* valuename, std::vector<mask_type> const& values)
     {
-        LTM_(debug) << "topology: " << valuename << "s, size: "    //-V128
-                    << values.size();
+        LTM_(debug).format("topology: {}s, size: {}", valuename, values.size());
 
         std::size_t i = 0;
         for (mask_cref_type value : values)
         {
-            LTM_(debug) << "topology: " << valuename    //-V128
-                        << "(" << i++ << "): " HPX_CPU_MASK_PREFIX << std::hex
-                        << value;
+            LTM_(debug).format("topology: {}({}): {}", valuename, i++,
+                hpx::threads::to_string(value));
         }
     }
 
@@ -419,7 +415,7 @@ namespace hpx { namespace threads {
 
         HPX_THROWS_IF(ec, bad_parameter,
             "hpx::threads::topology::get_socket_affinity_mask",
-            hpx::util::format("thread number %1% is out of range", num_thread));
+            "thread number {1} is out of range", num_thread);
         return empty_mask;
     }    // }}}
 
@@ -438,7 +434,7 @@ namespace hpx { namespace threads {
 
         HPX_THROWS_IF(ec, bad_parameter,
             "hpx::threads::topology::get_numa_node_affinity_mask",
-            hpx::util::format("thread number %1% is out of range", num_thread));
+            "thread number {1} is out of range", num_thread);
         return empty_mask;
     }    // }}}
 
@@ -457,7 +453,7 @@ namespace hpx { namespace threads {
 
         HPX_THROWS_IF(ec, bad_parameter,
             "hpx::threads::topology::get_core_affinity_mask",
-            hpx::util::format("thread number %1% is out of range", num_thread));
+            "thread number {1} is out of range", num_thread);
         return empty_mask;
     }
 
@@ -476,7 +472,7 @@ namespace hpx { namespace threads {
 
         HPX_THROWS_IF(ec, bad_parameter,
             "hpx::threads::topology::get_thread_affinity_mask",
-            hpx::util::format("thread number %1% is out of range", num_thread));
+            "thread number {1} is out of range", num_thread);
         return empty_mask;
     }    // }}}
 
@@ -518,10 +514,8 @@ namespace hpx { namespace threads {
 
                     HPX_THROWS_IF(ec, kernel_error,
                         "hpx::threads::topology::set_thread_affinity_mask",
-                        hpx::util::format("failed to set thread affinity mask "
-                                          "(" HPX_CPU_MASK_PREFIX
-                                          "%x) for cpuset %s",
-                            mask, buffer.get()));
+                        "failed to set thread affinity mask ({}) for cpuset {}",
+                        hpx::threads::to_string(mask), buffer.get());
                     return;
                 }
             }
@@ -591,8 +585,8 @@ namespace hpx { namespace threads {
                 HPX_THROW_EXCEPTION(no_success,
                     "topology::get_thread_affinity_mask_from_lva",
                     "failed calling 'hwloc_get_area_membind_nodeset', "
-                    "reported error: " +
-                        errstr);
+                    "reported error: {}",
+                    errstr);
             }
         }
 
@@ -1368,7 +1362,7 @@ namespace hpx { namespace threads {
                 msg = "the binding cannot be enforced";
             HPX_THROW_EXCEPTION(kernel_error,
                 "hpx::threads::topology::set_area_membind_nodeset",
-                "hwloc_set_area_membind_nodeset failed : " + msg);
+                "hwloc_set_area_membind_nodeset failed : {}", msg);
             return false;
         }
 #endif
@@ -1441,7 +1435,7 @@ namespace hpx { namespace threads {
             std::string msg(strerror(errno));
             HPX_THROW_EXCEPTION(kernel_error,
                 "hpx::threads::topology::get_numa_domain",
-                "hwloc_get_area_memlocation failed " + msg);
+                "hwloc_get_area_memlocation failed {}", msg);
             return -1;
 #endif
         }
@@ -1516,7 +1510,7 @@ namespace hpx { namespace threads {
 
         for (std::size_t i = 0; i != s; i++)
         {
-            os << std::hex << HPX_CPU_MASK_PREFIX << v[i] << "\n";
+            os << hpx::threads::to_string(v[i]) << "\n";
         }
         os << "\n";
     }
@@ -1553,7 +1547,7 @@ namespace hpx { namespace threads {
         //! -------------------------------------- topology (affinity masks)
         os << "[HWLOC topology info] affinity masks :\n"
            << "machine               : \n"
-           << std::hex << HPX_CPU_MASK_PREFIX << machine_affinity_mask_ << "\n";
+           << hpx::threads::to_string(machine_affinity_mask_) << "\n";
 
         os << "socket                : \n";
         print_mask_vector(os, socket_affinity_masks_);

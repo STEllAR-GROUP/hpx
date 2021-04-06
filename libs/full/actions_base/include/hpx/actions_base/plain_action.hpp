@@ -14,6 +14,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/traits/component_type_database.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
@@ -23,7 +24,6 @@
 #include <boost/utility/string_ref.hpp>
 
 #include <cstdlib>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 #if defined(__NVCC__) || defined(__CUDACC__)
@@ -51,9 +51,7 @@ namespace hpx { namespace actions {
         ///////////////////////////////////////////////////////////////////////
         inline std::string make_plain_action_name(boost::string_ref action_name)
         {
-            std::stringstream name;
-            name << "plain action(" << action_name << ")";
-            return name.str();
+            return hpx::util::format("plain action({})", action_name);
         }
     }    // namespace detail
 

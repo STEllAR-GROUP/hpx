@@ -45,7 +45,13 @@ add_hpx_module(
   GLOBAL_HEADER_GEN OFF
   HEADERS ${plugin_headers}
   COMPAT_HEADERS ${plugin_compat_headers}
-  MODULE_DEPENDENCIES hpx_assertion hpx_config hpx_errors hpx_datastructures
-                      hpx_filesystem hpx_functional
+  MODULE_DEPENDENCIES
+    hpx_assertion
+    hpx_config
+    hpx_errors
+    hpx_datastructures
+    hpx_filesystem
+    hpx_format
+    hpx_functional
   CMAKE_SUBDIRS tests
 )

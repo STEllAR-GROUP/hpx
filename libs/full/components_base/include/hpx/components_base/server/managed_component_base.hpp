@@ -20,7 +20,6 @@
 #include <hpx/components_base/traits/managed_component_policies.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/format.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -377,11 +376,10 @@ namespace hpx { namespace components {
             {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "managed_component<Component, Derived>::get_checked",
-                    hpx::util::format(
-                        "component pointer ({}) is invalid (gid: {})",
-                        components::get_component_type_name(
-                            components::get_component_type<wrapped_type>()),
-                        get_base_gid()));
+                    "component pointer ({}) is invalid (gid: {})",
+                    components::get_component_type_name(
+                        components::get_component_type<wrapped_type>()),
+                    get_base_gid());
             }
             return get();
         }
@@ -392,11 +390,10 @@ namespace hpx { namespace components {
             {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "managed_component<Component, Derived>::get_checked",
-                    hpx::util::format(
-                        "component pointer ({}) is invalid (gid: {})",
-                        components::get_component_type_name(
-                            components::get_component_type<wrapped_type>()),
-                        get_base_gid()));
+                    "component pointer ({}) is invalid (gid: {})",
+                    components::get_component_type_name(
+                        components::get_component_type<wrapped_type>()),
+                    get_base_gid());
             }
             return get();
         }

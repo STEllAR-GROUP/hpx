@@ -14,7 +14,6 @@
 #include <hpx/threading_base/thread_init_data.hpp>
 
 #include <cstddef>
-#include <sstream>
 
 namespace hpx { namespace threads { namespace detail {
     inline void create_thread(policies::scheduler_base* scheduler,
@@ -36,11 +35,8 @@ namespace hpx { namespace threads { namespace detail {
 
         default:
         {
-            std::ostringstream strm;
-            strm << "invalid initial state: "
-                 << get_thread_state_name(data.initial_state);
             HPX_THROWS_IF(ec, bad_parameter, "threads::detail::create_thread",
-                strm.str());
+                "invalid initial state: {}", data.initial_state);
             return;
         }
         }
@@ -91,13 +87,13 @@ namespace hpx { namespace threads { namespace detail {
         scheduler->create_thread(data, &id, ec);
 
         // NOLINTNEXTLINE(bugprone-branch-clone)
-        LTM_(info) << "register_thread(" << id << "): initial_state("
-                   << get_thread_state_name(data.initial_state) << "), "
-                   << "run_now(" << (data.run_now ? "true" : "false")
+        LTM_(info)
+            .format("register_thread({}): initial_state({}), run_now({})", id,
+                get_thread_state_name(data.initial_state), data.run_now)
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-                   << "), description(" << data.description
+            .format(", description({})", data.description)
 #endif
-                   << ")";
+            ;
 
         // NOTE: Don't care if the hint is a NUMA hint, just want to wake up a
         // thread.

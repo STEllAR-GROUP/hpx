@@ -42,7 +42,6 @@
 #include <memory>
 #include <mutex>
 #include <random>
-#include <sstream>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -460,10 +459,9 @@ namespace hpx { namespace agas {
             naming::get_locality_id_from_gid(prefix) == 0)
         {
             HPX_THROW_EXCEPTION(internal_server_error, "agas::register_worker",
-                hpx::util::format(
-                    "worker node ({}) can't suggest locality_id zero, "
-                    "this is reserved for the console",
-                    header.endpoints));
+                "worker node ({}) can't suggest locality_id zero, "
+                "this is reserved for the console",
+                header.endpoints);
             return;
         }
 
@@ -471,9 +469,8 @@ namespace hpx { namespace agas {
                 header.endpoints, prefix, header.num_threads))
         {
             HPX_THROW_EXCEPTION(internal_server_error, "agas::register_worker",
-                hpx::util::format(
-                    "attempt to register locality {} more than once",
-                    header.endpoints));
+                "attempt to register locality {} more than once",
+                header.endpoints);
             return;
         }
 
@@ -562,10 +559,8 @@ namespace hpx { namespace agas {
 
         if (HPX_UNLIKELY(agas_client.get_status() != state_starting))
         {
-            std::ostringstream strm;
-            strm << "locality " << rt.here() << " has launched early";
-            HPX_THROW_EXCEPTION(
-                internal_server_error, "agas::notify_worker", strm.str());
+            HPX_THROW_EXCEPTION(internal_server_error, "agas::notify_worker",
+                "locality {} has launched early", rt.here());
         }
 
         util::runtime_configuration& cfg = rt.get_config();

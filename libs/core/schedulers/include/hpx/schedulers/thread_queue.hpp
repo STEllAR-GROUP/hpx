@@ -268,8 +268,7 @@ namespace hpx { namespace threads { namespace policies {
 
             if (added)
             {
-                LTM_(debug) << "add_new: added " << added
-                            << " tasks to queues";    //-V128
+                LTM_(debug).format("add_new: added {} tasks to queues", added);
             }
             return added;
         }

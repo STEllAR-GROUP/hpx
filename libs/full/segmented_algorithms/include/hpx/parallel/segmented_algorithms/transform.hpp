@@ -17,6 +17,7 @@
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -212,46 +213,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 },
                 std::move(segments)));
         }
-
-        ///////////////////////////////////////////////////////////////////////
-        // segmented implementation
-        template <typename ExPolicy, typename SegIter, typename OutIter,
-            typename F, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<SegIter, OutIter>>::type
-        transform_(ExPolicy&& policy, SegIter first, SegIter last, OutIter dest,
-            F&& f, Proj&& proj, std::true_type)
-        {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-            using result = util::detail::algorithm_result<ExPolicy,
-                util::in_out_result<SegIter, OutIter>>;
-
-            if (first == last)
-            {
-                return result::get(util::in_out_result<SegIter, OutIter>{
-                    std::move(last), std::move(dest)});
-            }
-
-            typedef hpx::traits::segmented_iterator_traits<SegIter>
-                iterator_traits1;
-            typedef hpx::traits::segmented_iterator_traits<OutIter>
-                iterator_traits2;
-
-            return segmented_transform(
-                transform<util::in_out_result<
-                    typename iterator_traits1::local_iterator,
-                    typename iterator_traits2::local_iterator>>(),
-                std::forward<ExPolicy>(policy), first, last, dest,
-                std::forward<F>(f), std::forward<Proj>(proj), is_seq());
-        }
-
-        // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename OutIter,
-            typename F, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<InIter, OutIter>>::type
-        transform_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-            F&& f, Proj&& proj, std::false_type);
 
         // Binary transform
 
@@ -477,55 +438,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 },
                 std::move(segments)));
         }
-
-        ///////////////////////////////////////////////////////////////////////
-        // segmented implementation
-        template <typename ExPolicy, typename InIter1, typename InIter2,
-            typename OutIter, typename F, typename Proj1, typename Proj2>
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_in_out_result<InIter1, InIter2, OutIter>>::type
-        transform_(ExPolicy&& policy, InIter1 first1, InIter1 last1,
-            InIter2 first2, OutIter dest, F&& f, Proj1&& proj1, Proj2&& proj2,
-            std::true_type)
-        {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-            using result = util::detail::algorithm_result<ExPolicy,
-                util::in_in_out_result<InIter1, InIter2, OutIter>>;
-
-            auto last2 = first2;
-            detail::advance(last2, std::distance(first1, last1));
-
-            if (first1 == last1)
-            {
-                return result::get(
-                    util::in_in_out_result<InIter1, InIter2, OutIter>{
-                        std::move(last1), std::move(last2), std::move(dest)});
-            }
-
-            typedef hpx::traits::segmented_iterator_traits<InIter1>
-                iterator1_traits;
-            typedef hpx::traits::segmented_iterator_traits<InIter2>
-                iterator2_traits;
-            typedef hpx::traits::segmented_iterator_traits<OutIter>
-                iterator3_traits;
-            return segmented_transform(
-                transform_binary<util::in_in_out_result<
-                    typename iterator1_traits::local_iterator,
-                    typename iterator2_traits::local_iterator,
-                    typename iterator3_traits::local_iterator>>(),
-                std::forward<ExPolicy>(policy), first1, last1, first2, dest,
-                std::forward<F>(f), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2), is_seq());
-        }
-
-        // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename InIter1, typename InIter2,
-            typename OutIter, typename F, typename Proj1, typename Proj2>
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_in_out_result<InIter1, InIter2, OutIter>>::type
-        transform_(ExPolicy&& policy, InIter1 first1, InIter1 last1,
-            InIter2 first2, OutIter dest, F&& f, Proj1&& proj1, Proj2&& proj2,
-            std::false_type);
 
         // Binary transform1
 
@@ -754,53 +666,284 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 },
                 std::move(segments)));
         }
-
-        ///////////////////////////////////////////////////////////////////////
-        // segmented implementation
-        template <typename ExPolicy, typename InIter1, typename InIter2,
-            typename OutIter, typename F, typename Proj1, typename Proj2>
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_in_out_result<InIter1, InIter2, OutIter>>::type
-        transform_(ExPolicy&& policy, InIter1 first1, InIter1 last1,
-            InIter2 first2, InIter2 last2, OutIter dest, F&& f, Proj1&& proj1,
-            Proj2&& proj2, std::true_type)
-        {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-            using result = util::detail::algorithm_result<ExPolicy,
-                util::in_in_out_result<InIter1, InIter2, OutIter>>;
-
-            if (first1 == last1)
-            {
-                return result::get(
-                    util::in_in_out_result<InIter1, InIter2, OutIter>{
-                        std::move(last1), std::move(last2), std::move(dest)});
-            }
-
-            typedef hpx::traits::segmented_iterator_traits<InIter1>
-                iterator1_traits;
-            typedef hpx::traits::segmented_iterator_traits<InIter2>
-                iterator2_traits;
-            typedef hpx::traits::segmented_iterator_traits<OutIter>
-                iterator3_traits;
-
-            return segmented_transform(
-                transform_binary2<util::in_in_out_result<
-                    typename iterator1_traits::local_iterator,
-                    typename iterator2_traits::local_iterator,
-                    typename iterator3_traits::local_iterator>>(),
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                dest, std::forward<F>(f), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2), is_seq());
-        }
-
-        // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename InIter1, typename InIter2,
-            typename OutIter, typename F, typename Proj1, typename Proj2>
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_in_out_result<InIter1, InIter2, OutIter>>::type
-        transform_(ExPolicy&& policy, InIter1 first1, InIter1 last1,
-            InIter2 first2, InIter2 last2, OutIter dest, F&& f, Proj1&& proj1,
-            Proj2&& proj2, std::false_type);
         /// \endcond
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1
+
+// The segmented iterators we support all live in namespace hpx::segmented
+namespace hpx { namespace segmented {
+
+    // clang-format off
+    template <typename SegIter, typename OutIter, typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_iterator<SegIter>::value &&
+            hpx::traits::is_segmented_iterator<SegIter>::value &&
+            hpx::traits::is_iterator<OutIter>::value &&
+            hpx::traits::is_segmented_iterator<OutIter>::value
+        )>
+    // clang-format on
+    hpx::parallel::util::in_out_result<SegIter, OutIter> tag_invoke(
+        hpx::transform_t, SegIter first, SegIter last, OutIter dest, F&& f)
+    {
+        static_assert(hpx::traits::is_input_iterator<SegIter>::value,
+            "Requires at least input iterator.");
+
+        if (first == last)
+        {
+            return hpx::parallel::util::in_out_result<SegIter, OutIter>{
+                std::move(first), std::move(dest)};
+        }
+
+        using iterator_traits1 =
+            hpx::traits::segmented_iterator_traits<SegIter>;
+        using iterator_traits2 =
+            hpx::traits::segmented_iterator_traits<OutIter>;
+
+        return hpx::parallel::v1::detail::segmented_transform(
+            hpx::parallel::v1::detail::transform<hpx::parallel::util::
+                    in_out_result<typename iterator_traits1::local_iterator,
+                        typename iterator_traits2::local_iterator>>(),
+            hpx::execution::seq, first, last, dest, std::forward<F>(f),
+            hpx::parallel::util::projection_identity{}, std::true_type{});
+    }
+
+    // clang-format off
+    template <typename ExPolicy, typename SegIter, typename OutIter,
+        typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<SegIter>::value &&
+            hpx::traits::is_segmented_iterator<SegIter>::value &&
+            hpx::traits::is_iterator<OutIter>::value &&
+            hpx::traits::is_segmented_iterator<OutIter>::value
+        )>
+    // clang-format on
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        hpx::parallel::util::in_out_result<SegIter, OutIter>>::type
+    tag_invoke(hpx::transform_t, ExPolicy&& policy, SegIter first, SegIter last,
+        OutIter dest, F&& f)
+    {
+        static_assert(hpx::traits::is_forward_iterator<SegIter>::value,
+            "Requires at least forward iterator.");
+
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+        using result = hpx::parallel::util::detail::algorithm_result<ExPolicy,
+            hpx::parallel::util::in_out_result<SegIter, OutIter>>;
+
+        if (first == last)
+        {
+            return result::get(
+                hpx::parallel::util::in_out_result<SegIter, OutIter>{
+                    std::move(first), std::move(dest)});
+        }
+
+        using iterator_traits1 =
+            hpx::traits::segmented_iterator_traits<SegIter>;
+        using iterator_traits2 =
+            hpx::traits::segmented_iterator_traits<OutIter>;
+
+        return hpx::parallel::v1::detail::segmented_transform(
+            hpx::parallel::v1::detail::transform<hpx::parallel::util::
+                    in_out_result<typename iterator_traits1::local_iterator,
+                        typename iterator_traits2::local_iterator>>(),
+            std::forward<ExPolicy>(policy), first, last, dest,
+            std::forward<F>(f), hpx::parallel::util::projection_identity{},
+            is_seq());
+    }
+
+    // clang-format off
+    template <typename InIter1, typename InIter2,
+        typename OutIter, typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_iterator<InIter1>::value &&
+            hpx::traits::is_segmented_iterator<InIter1>::value &&
+            hpx::traits::is_iterator<InIter2>::value &&
+            hpx::traits::is_segmented_iterator<InIter2>::value &&
+            hpx::traits::is_iterator<OutIter>::value &&
+            hpx::traits::is_segmented_iterator<OutIter>::value
+        )>
+    // clang-format on
+    hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter> tag_invoke(
+        hpx::transform_t, InIter1 first1, InIter1 last1, InIter2 first2,
+        OutIter dest, F&& f)
+    {
+        static_assert(hpx::traits::is_input_iterator<InIter1>::value &&
+                hpx::traits::is_input_iterator<InIter2>::value,
+            "Requires at least input iterator.");
+
+        auto last2 = first2;
+        hpx::parallel::v1::detail::advance(last2, std::distance(first1, last1));
+
+        if (first1 == last1)
+        {
+            return hpx::parallel::util::in_in_out_result<InIter1, InIter2,
+                OutIter>{std::move(first1), std::move(first2), std::move(dest)};
+        }
+
+        using iterator1_traits =
+            hpx::traits::segmented_iterator_traits<InIter1>;
+        using iterator2_traits =
+            hpx::traits::segmented_iterator_traits<InIter2>;
+        using iterator3_traits =
+            hpx::traits::segmented_iterator_traits<OutIter>;
+
+        using proj_id = hpx::parallel::util::projection_identity;
+
+        return hpx::parallel::v1::detail::segmented_transform(
+            hpx::parallel::v1::detail::transform_binary<hpx::parallel::util::
+                    in_in_out_result<typename iterator1_traits::local_iterator,
+                        typename iterator2_traits::local_iterator,
+                        typename iterator3_traits::local_iterator>>(),
+            hpx::execution::seq, first1, last1, first2, dest,
+            std::forward<F>(f), proj_id{}, proj_id{}, std::true_type{});
+    }
+
+    // clang-format off
+    template <typename ExPolicy, typename InIter1, typename InIter2,
+        typename OutIter, typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<InIter1>::value &&
+            hpx::traits::is_segmented_iterator<InIter1>::value &&
+            hpx::traits::is_iterator<InIter2>::value &&
+            hpx::traits::is_segmented_iterator<InIter2>::value &&
+            hpx::traits::is_iterator<OutIter>::value &&
+            hpx::traits::is_segmented_iterator<OutIter>::value
+        )>
+    // clang-format on
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter>>::type
+    tag_invoke(hpx::transform_t, ExPolicy&& policy, InIter1 first1,
+        InIter1 last1, InIter2 first2, OutIter dest, F&& f)
+    {
+        static_assert(hpx::traits::is_forward_iterator<InIter1>::value &&
+                hpx::traits::is_forward_iterator<InIter2>::value,
+            "Requires at least forward iterator.");
+
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+        using result = hpx::parallel::util::detail::algorithm_result<ExPolicy,
+            hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter>>;
+
+        auto last2 = first2;
+        hpx::parallel::v1::detail::advance(last2, std::distance(first1, last1));
+
+        if (first1 == last1)
+        {
+            return result::get(hpx::parallel::util::in_in_out_result<InIter1,
+                InIter2, OutIter>{
+                std::move(first1), std::move(first2), std::move(dest)});
+        }
+
+        using iterator1_traits =
+            hpx::traits::segmented_iterator_traits<InIter1>;
+        using iterator2_traits =
+            hpx::traits::segmented_iterator_traits<InIter2>;
+        using iterator3_traits =
+            hpx::traits::segmented_iterator_traits<OutIter>;
+
+        using proj_id = hpx::parallel::util::projection_identity;
+
+        return hpx::parallel::v1::detail::segmented_transform(
+            hpx::parallel::v1::detail::transform_binary<hpx::parallel::util::
+                    in_in_out_result<typename iterator1_traits::local_iterator,
+                        typename iterator2_traits::local_iterator,
+                        typename iterator3_traits::local_iterator>>(),
+            std::forward<ExPolicy>(policy), first1, last1, first2, dest,
+            std::forward<F>(f), proj_id{}, proj_id{}, is_seq());
+    }
+
+    // clang-format off
+    template <typename InIter1, typename InIter2,
+        typename OutIter, typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_iterator<InIter1>::value &&
+            hpx::traits::is_segmented_iterator<InIter1>::value &&
+            hpx::traits::is_iterator<InIter2>::value &&
+            hpx::traits::is_segmented_iterator<InIter2>::value &&
+            hpx::traits::is_iterator<OutIter>::value &&
+            hpx::traits::is_segmented_iterator<OutIter>::value
+        )>
+    // clang-format on
+    hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter> tag_invoke(
+        hpx::transform_t, InIter1 first1, InIter1 last1, InIter2 first2,
+        InIter2 last2, OutIter dest, F&& f)
+    {
+        static_assert(hpx::traits::is_input_iterator<InIter1>::value &&
+                hpx::traits::is_input_iterator<InIter2>::value,
+            "Requires at least input iterator.");
+
+        if (first1 == last1)
+        {
+            return hpx::parallel::util::in_in_out_result<InIter1, InIter2,
+                OutIter>{std::move(first1), std::move(first2), std::move(dest)};
+        }
+
+        using iterator1_traits =
+            hpx::traits::segmented_iterator_traits<InIter1>;
+        using iterator2_traits =
+            hpx::traits::segmented_iterator_traits<InIter2>;
+        using iterator3_traits =
+            hpx::traits::segmented_iterator_traits<OutIter>;
+
+        using proj_id = hpx::parallel::util::projection_identity;
+
+        return hpx::parallel::v1::detail::segmented_transform(
+            hpx::parallel::v1::detail::transform_binary2<hpx::parallel::util::
+                    in_in_out_result<typename iterator1_traits::local_iterator,
+                        typename iterator2_traits::local_iterator,
+                        typename iterator3_traits::local_iterator>>(),
+            hpx::execution::seq, first1, last1, first2, last2, dest,
+            std::forward<F>(f), proj_id{}, proj_id{}, std::true_type{});
+    }
+
+    // clang-format off
+    template <typename ExPolicy, typename InIter1, typename InIter2,
+        typename OutIter, typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<InIter1>::value &&
+            hpx::traits::is_segmented_iterator<InIter1>::value &&
+            hpx::traits::is_iterator<InIter2>::value &&
+            hpx::traits::is_segmented_iterator<InIter2>::value &&
+            hpx::traits::is_iterator<OutIter>::value &&
+            hpx::traits::is_segmented_iterator<OutIter>::value
+        )>
+    // clang-format on
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter>>::type
+    tag_invoke(hpx::transform_t, ExPolicy&& policy, InIter1 first1,
+        InIter1 last1, InIter2 first2, InIter2 last2, OutIter dest, F&& f)
+    {
+        static_assert(hpx::traits::is_forward_iterator<InIter1>::value &&
+                hpx::traits::is_forward_iterator<InIter2>::value,
+            "Requires at least forward iterator.");
+
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+        using result = hpx::parallel::util::detail::algorithm_result<ExPolicy,
+            hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter>>;
+
+        if (first1 == last1)
+        {
+            return result::get(hpx::parallel::util::in_in_out_result<InIter1,
+                InIter2, OutIter>{
+                std::move(first1), std::move(first2), std::move(dest)});
+        }
+
+        using iterator1_traits =
+            hpx::traits::segmented_iterator_traits<InIter1>;
+        using iterator2_traits =
+            hpx::traits::segmented_iterator_traits<InIter2>;
+        using iterator3_traits =
+            hpx::traits::segmented_iterator_traits<OutIter>;
+
+        using proj_id = hpx::parallel::util::projection_identity;
+
+        return hpx::parallel::v1::detail::segmented_transform(
+            hpx::parallel::v1::detail::transform_binary2<hpx::parallel::util::
+                    in_in_out_result<typename iterator1_traits::local_iterator,
+                        typename iterator2_traits::local_iterator,
+                        typename iterator3_traits::local_iterator>>(),
+            std::forward<ExPolicy>(policy), first1, last1, first2, last2, dest,
+            std::forward<F>(f), proj_id{}, proj_id{}, is_seq());
+    }
+}}    // namespace hpx::segmented

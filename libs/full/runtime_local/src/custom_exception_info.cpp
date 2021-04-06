@@ -409,9 +409,7 @@ namespace hpx { namespace detail {
 
             if (rts_state >= state_initialized && rts_state < state_stopped)
             {
-                std::ostringstream strm;
-                strm << get_runtime().here();
-                hostname = strm.str();
+                hostname = get_runtime().here();
             }
         }
 

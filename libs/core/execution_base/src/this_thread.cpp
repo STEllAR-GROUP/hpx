@@ -157,9 +157,7 @@ namespace hpx { namespace execution_base {
             if (aborted_)
             {
                 HPX_THROW_EXCEPTION(yield_aborted, "suspend",
-                    hpx::util::format(
-                        "std::thread({}) aborted (yield returned wait_abort)",
-                        id_));
+                    "std::thread({}) aborted (yield returned wait_abort)", id_);
             }
         }
 

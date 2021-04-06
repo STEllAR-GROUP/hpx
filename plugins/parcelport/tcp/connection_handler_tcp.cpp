@@ -34,7 +34,6 @@
 #include <exception>
 #include <memory>
 #include <mutex>
-#include <sstream>
 #include <string>
 #include <system_error>
 
@@ -73,7 +72,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         if (here_.type() != std::string("tcp")) {
             HPX_THROW_EXCEPTION(network_error, "tcp::parcelport::parcelport",
                 "this parcelport was instantiated to represent an unexpected "
-                "locality type: " + std::string(here_.type()));
+                "locality type: {}",
+                here_.type());
         }
     }
 
@@ -207,16 +207,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             sender_connection->socket().close();
             sender_connection.reset();
 
-            std::ostringstream strm;
-            strm << error.message() << " (while trying to connect to: "
-                  << l << ")";
-
             if (tolerate_node_faults())
                 return sender_connection;
 
             HPX_THROWS_IF(ec, network_error,
                 "tcp::connection_handler::get_connection",
-                strm.str());
+                "{} (while trying to connect to: {})", error.message(), l);
             return sender_connection;
         }
 
@@ -330,9 +326,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         if (e != asio::error::operation_aborted && e != asio::error::eof)
         {
-            LPT_(error)
-                << "handle read operation completion: error: "
-                << e.message();
+            LPT_(error).format(
+                "handle read operation completion: error: {}", e.message());
         }
 
         //if (!compat_error_code::equal(e, asio::error::eof))

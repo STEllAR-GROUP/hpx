@@ -35,6 +35,7 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -55,7 +56,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
-#include <sstream>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -105,8 +105,8 @@ namespace hpx { namespace actions {
             {
                 try
                 {
-                    LTM_(debug)
-                        << "Executing " << Action::get_action_name(lva_) << ".";
+                    LTM_(debug).format(
+                        "Executing {}.", Action::get_action_name(lva_));
 
                     // invoke the action, ignoring the return value
                     util::invoke_fused(action_invoke<Action>{lva_, comptype_},
@@ -118,17 +118,17 @@ namespace hpx { namespace actions {
                 }
                 catch (std::exception const& e)
                 {
-                    LTM_(error)
-                        << "Unhandled exception while executing "
-                        << Action::get_action_name(lva_) << ": " << e.what();
+                    LTM_(error).format(
+                        "Unhandled exception while executing {}: {}",
+                        Action::get_action_name(lva_), e.what());
 
                     // report this error to the console in any case
                     hpx::report_error(std::current_exception());
                 }
                 catch (...)
                 {
-                    LTM_(error) << "Unhandled exception while executing "
-                                << Action::get_action_name(lva_);
+                    LTM_(error).format("Unhandled exception while executing {}",
+                        Action::get_action_name(lva_));
 
                     // report this error to the console in any case
                     hpx::report_error(std::current_exception());
@@ -175,8 +175,8 @@ namespace hpx { namespace actions {
                     threads::thread_restart_state>::value>::type>
             threads::thread_result_type operator()(State)
             {
-                LTM_(debug) << "Executing " << Action::get_action_name(lva_)
-                            << " with continuation(" << cont_.get_id() << ")";
+                LTM_(debug).format("Executing {} with continuation({})",
+                    Action::get_action_name(lva_), cont_.get_id());
 
                 traits::action_trigger_continuation<
                     typename Action::continuation_type>::call(std::move(cont_),
@@ -210,9 +210,7 @@ namespace hpx { namespace actions {
         ///////////////////////////////////////////////////////////////////////
         inline std::string make_action_name(boost::string_ref action_name)
         {
-            std::stringstream name;
-            name << "action(" << action_name << ")";
-            return name.str();
+            return hpx::util::format("action({})", action_name);
         }
     }    // namespace detail
 
@@ -344,8 +342,8 @@ namespace hpx { namespace actions {
             naming::address_type lva, naming::component_type comptype,
             Ts&&... vs)
         {
-            LTM_(debug) << "basic_action::execute_function"
-                        << Derived::get_action_name(lva);
+            LTM_(debug).format("basic_action::execute_function {}",
+                Derived::get_action_name(lva));
 
             return invoker(lva, comptype, std::forward<Ts>(vs)...);
         }

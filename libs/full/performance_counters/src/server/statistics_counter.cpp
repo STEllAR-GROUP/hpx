@@ -9,7 +9,6 @@
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
@@ -501,9 +500,8 @@ namespace hpx { namespace performance_counters { namespace server {
                 // base counter could not be retrieved
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "statistics_counter<Statistic>::evaluate_base_counter",
-                    hpx::util::format(
-                        "could not get or create performance counter: '{}'",
-                        base_counter_name_));
+                    "could not get or create performance counter: '{}'",
+                    base_counter_name_);
                 return false;
             }
         }
@@ -759,8 +757,8 @@ namespace hpx { namespace performance_counters { namespace detail {
                     HPX_THROWS_IF(ec, bad_parameter,
                         "statistics_counter_creator",
                         "invalid parameter specification format for "
-                        "this counter: " +
-                            paths.parameters_);
+                        "this counter: {}",
+                        paths.parameters_);
                     return naming::invalid_gid;
                 }
                 if (paths.countername_.find("rolling") != std::string::npos)
@@ -770,8 +768,8 @@ namespace hpx { namespace performance_counters { namespace detail {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "statistics_counter_creator",
                             "too many parameter specifications for "
-                            "this counter: " +
-                                paths.parameters_);
+                            "this counter: {}",
+                            paths.parameters_);
                         return naming::invalid_gid;
                     }
                 }
@@ -780,8 +778,8 @@ namespace hpx { namespace performance_counters { namespace detail {
                     HPX_THROWS_IF(ec, bad_parameter,
                         "statistics_counter_creator",
                         "too many parameter specifications for "
-                        "this counter: " +
-                            paths.parameters_);
+                        "this counter: {}",
+                        paths.parameters_);
                     return naming::invalid_gid;
                 }
             }

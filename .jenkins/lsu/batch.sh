@@ -27,20 +27,24 @@ ctest \
 
 if [[ "${install_hpx}" ]]; then
     install_root="/work/jenkins/install"
-    install_dir="${install_root}/${configuration_name_with_build_type}-${GIT_COMMIT}"
-    install_dir_master="${install_root}/${configuration_name_with_build_type}"
+    install_dir_suffix_master="hpx-${configuration_name_with_build_type}"
+    install_dir_suffix_commit="${install_dir_suffix_master}-${GIT_COMMIT}"
+    install_dir_master="${install_root}/${install_dir_suffix_master}"
+    install_dir_commit="${install_root}/${install_dir_suffix_commit}"
 
     # Install the current build into a directory suffixed by the commit hash
-    cmake "${build_dir}" -DCMAKE_INSTALL_PREFIX="${install_dir}"
+    cmake "${build_dir}" -DCMAKE_INSTALL_PREFIX="${install_dir_commit}"
     cmake --build "${build_dir}" --target install
 
     # Link the current build to a directory without the hash
     rm -f "${install_dir_master}"
-    ln -s "${install_dir}" "${install_dir_master}"
+    ln -s "${install_dir_commit}" "${install_dir_master}"
 
     # Delete all but the 10 newest builds
     builds_to_keep=10
-    rm -rf $(ls -d --sort=time "${install_dir}-*" | head --lines=-${builds_to_keep})
+    rm -rf $(ls -d --sort=time --reverse ${install_dir_master}-* | head --lines=-${builds_to_keep})
+
+    module save "${install_dir_suffix_commit}"
 fi
 set -e
 

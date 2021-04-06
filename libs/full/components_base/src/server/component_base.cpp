@@ -12,7 +12,6 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
@@ -54,9 +53,8 @@ namespace hpx { namespace components { namespace detail {
 
                     HPX_THROW_EXCEPTION(duplicate_component_address,
                         "component_base<Component>::get_base_gid",
-                        hpx::util::format(
-                            "failed to bind id: {} to locality: {}", g,
-                            agas::get_locality_id()));
+                        "failed to bind id: {} to locality: {}", g,
+                        agas::get_locality_id());
                 }
             }
             else
@@ -72,9 +70,8 @@ namespace hpx { namespace components { namespace detail {
 
                     HPX_THROW_EXCEPTION(duplicate_component_address,
                         "component_base<Component>::get_base_gid",
-                        hpx::util::format(
-                            "failed to rebind id: {} to locality: {}", g,
-                            agas::get_locality_id()));
+                        "failed to rebind id: {} to locality: {}", g,
+                        agas::get_locality_id());
                 }
             }
         }

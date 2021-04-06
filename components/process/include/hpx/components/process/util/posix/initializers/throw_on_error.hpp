@@ -47,7 +47,7 @@ public:
         {
             HPX_THROW_EXCEPTION(kernel_error,
                 "throw_on_error::on_fork_setup",
-                "pipe(2) failed: " + extract_error_string(errno));
+                "pipe(2) failed: {}", extract_error_string(errno));
         }
         if (::fcntl(fds_[1], F_SETFD, FD_CLOEXEC) == -1)
         {
@@ -56,7 +56,7 @@ public:
 
             HPX_THROW_EXCEPTION(kernel_error,
                 "throw_on_error::on_fork_setup",
-                "fcntl(2) failed: " + extract_error_string(errno));
+                "fcntl(2) failed: {}", extract_error_string(errno));
         }
     }
 
@@ -68,7 +68,7 @@ public:
 
         HPX_THROW_EXCEPTION(kernel_error,
             "throw_on_error::on_fork_error",
-            "fork(2) failed: " + extract_error_string(errno));
+            "fork(2) failed: {}", extract_error_string(errno));
     }
 
     template <class PosixExecutor>
@@ -82,7 +82,7 @@ public:
 
             HPX_THROW_EXCEPTION(kernel_error,
                 "throw_on_error::on_fork_success",
-                "execve(2) failed: " + extract_error_string(code));
+                "execve(2) failed: {}", extract_error_string(code));
         }
         ::close(fds_[0]);
     }
