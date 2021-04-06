@@ -193,6 +193,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
             if (status == cudaErrorNotReady)
             {
                 // this event has not been triggered yet
+                ++it;
                 continue;
             }
             else if (status == cudaSuccess)
