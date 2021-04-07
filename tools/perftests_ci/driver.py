@@ -55,6 +55,7 @@ def build(build_type, environment, target, source_dir, build_dir, install_dir,
     # TODO: change back to default tcmalloc when switching to jenkins
     env.set_cmake_arg('PYUTILS_HPX_WITH_MALLOC', 'system')
     env.set_cmake_arg('PYUTILS_HPX_WITH_TESTS_BENCHMARKS', 'ON')
+    env.set_cmake_arg('PYUTILS_HPX_WITH_MAX_CPU_COUNT', '72')
     env.set_cmake_arg('PYUTILS_CMAKE_BUILD_TYPE', 'Release')
     env.set_cmake_arg('-GNinja', '')
 
