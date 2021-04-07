@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 export CRAYPE_LINK_TYPE=dynamic
+export CXX_STD="17"
 
 module load daint-mc
 module switch PrgEnv-cray PrgEnv-intel
@@ -18,6 +19,7 @@ export CC=`which cc`
 
 configure_extra_options="-DCMAKE_BUILD_TYPE=Debug"
 configure_extra_options+=" -DHPX_WITH_NETWORKING=OFF"
+configure_extra_options+=" -DHPX_WITH_CXX${CXX_STD}=ON"
 configure_extra_options+=" -DHPX_WITH_MAX_CPU_COUNT=128"
 configure_extra_options+=" -DHPX_WITH_MALLOC=system"
 configure_extra_options+=" -DHPX_WITH_FETCH_ASIO=ON"
