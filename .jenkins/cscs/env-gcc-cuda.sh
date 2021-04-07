@@ -16,7 +16,7 @@ module use /apps/daint/UES/jenkins/7.0.UP02/gpu/easybuild/modules/all
 module load daint-gpu
 module switch PrgEnv-cray PrgEnv-gnu
 module load cudatoolkit
-module load Boost/1.75.0-CrayGNU-20.08
+module load Boost/1.75.0-CrayGNU-20.11
 module load hwloc/.2.0.3
 spack load cmake
 spack load ninja
