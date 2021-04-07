@@ -640,6 +640,198 @@ void test_when_all()
 #endif
 }
 
+void test_future_sender()
+{
+    // futures as senders
+    {
+        std::atomic<bool> called{false};
+        auto f = hpx::async([&]() { called = true; });
+
+        static_assert(ex::is_sender_v<std::decay_t<decltype(f)>>,
+            "a future should be a sender");
+        static_assert(
+            std::is_void<decltype(ex::sync_wait(std::move(f)))>::value,
+            "sync_wait should return void");
+
+        ex::sync_wait(std::move(f));
+        HPX_TEST(called);
+
+        bool exception_thrown = false;
+        try
+        {
+            ex::sync_wait(std::move(f));
+        }
+        catch (...)
+        {
+            exception_thrown = true;
+        };
+        HPX_TEST(exception_thrown);
+    }
+
+    {
+        std::atomic<bool> called{false};
+        auto f = hpx::async([&]() {
+            called = true;
+            return 42;
+        });
+
+        static_assert(ex::is_sender_v<std::decay_t<decltype(f)>>,
+            "a future should be a sender");
+
+        HPX_TEST_EQ(ex::sync_wait(std::move(f)), 42);
+        HPX_TEST(called);
+
+        bool exception_thrown = false;
+        try
+        {
+            ex::sync_wait(std::move(f));
+        }
+        catch (...)
+        {
+            exception_thrown = true;
+        };
+        HPX_TEST(exception_thrown);
+    }
+
+    {
+        std::atomic<bool> called{false};
+        auto f = hpx::async([&]() {
+            called = true;
+            return 42;
+        });
+
+        HPX_TEST_EQ(ex::sync_wait(ex::transform(
+                        std::move(f), [](int x) { return x / 2; })),
+            21);
+        HPX_TEST(called);
+    }
+
+    {
+        std::atomic<std::size_t> calls{0};
+        auto sf = hpx::async([&]() { ++calls; }).share();
+
+        static_assert(ex::is_sender_v<std::decay_t<decltype(sf)>>,
+            "a shared_future should be a sender");
+        static_assert(
+            std::is_void<decltype(ex::sync_wait(std::move(sf)))>::value,
+            "sync_wait should return void");
+
+        ex::sync_wait(sf);
+        ex::sync_wait(sf);
+        ex::sync_wait(std::move(sf));
+        HPX_TEST_EQ(calls, std::size_t(1));
+
+        bool exception_thrown = false;
+        try
+        {
+            ex::sync_wait(sf);
+        }
+        catch (...)
+        {
+            exception_thrown = true;
+        };
+        HPX_TEST(exception_thrown);
+    }
+
+    {
+        std::atomic<std::size_t> calls{0};
+        auto sf = hpx::async([&]() {
+            ++calls;
+            return 42;
+        }).share();
+
+        static_assert(ex::is_sender_v<std::decay_t<decltype(sf)>>,
+            "a shared_future should be a sender");
+
+        HPX_TEST_EQ(ex::sync_wait(sf), 42);
+        HPX_TEST_EQ(ex::sync_wait(sf), 42);
+        HPX_TEST_EQ(ex::sync_wait(std::move(sf)), 42);
+        HPX_TEST_EQ(calls, std::size_t(1));
+
+        bool exception_thrown = false;
+        try
+        {
+            ex::sync_wait(sf);
+        }
+        catch (...)
+        {
+            exception_thrown = true;
+        };
+        HPX_TEST(exception_thrown);
+    }
+
+    // senders as futures
+    {
+        auto s = ex::just(3);
+        auto f = ex::make_future(std::move(s));
+        HPX_TEST_EQ(f.get(), 3);
+    }
+
+    {
+        auto s = ex::just_on(ex::executor{}, 3);
+        auto f = ex::make_future(std::move(s));
+        HPX_TEST_EQ(f.get(), 3);
+    }
+
+    {
+        std::atomic<bool> called{false};
+        auto s = ex::schedule(ex::executor{}) |
+            ex::transform([&] { called = true; });
+        auto f = ex::make_future(std::move(s));
+        f.get();
+        HPX_TEST(called);
+    }
+
+#if defined(HPX_HAVE_CXX17_STD_VARIANT)
+    {
+        auto s1 = ex::just_on(ex::executor{}, std::size_t(42));
+        auto s2 = ex::just_on(ex::executor{}, 3.14);
+        auto s3 = ex::just_on(ex::executor{}, std::string("hello"));
+        auto f = ex::make_future(ex::transform(
+            ex::when_all(std::move(s1), std::move(s2), std::move(s3)),
+            [](std::size_t x, double, std::string z) { return z.size() + x; }));
+        HPX_TEST_EQ(f.get(), std::size_t(47));
+    }
+#endif
+
+    // mixing senders and futures
+    {
+        HPX_TEST_EQ(
+            ex::sync_wait(ex::make_future(ex::just_on(ex::executor{}, 42))),
+            42);
+    }
+
+    {
+        HPX_TEST_EQ(ex::make_future(
+                        ex::on(hpx::async([]() { return 42; }), ex::executor{}))
+                        .get(),
+            42);
+    }
+
+#if defined(HPX_HAVE_CXX17_STD_VARIANT)
+    {
+        auto s1 = ex::just_on(ex::executor{}, std::size_t(42));
+        auto s2 = ex::just_on(ex::executor{}, 3.14);
+        auto s3 = ex::just_on(ex::executor{}, std::string("hello"));
+        auto f = ex::make_future(ex::transform(
+            ex::when_all(std::move(s1), std::move(s2), std::move(s3)),
+            [](std::size_t x, double, std::string z) { return z.size() + x; }));
+        auto sf = f.then([](auto&& f) { return f.get() - 40; }).share();
+        auto t1 = sf.then([](auto&& sf) { return sf.get() + 1; });
+        auto t2 = sf.then([](auto&& sf) { return sf.get() + 2; });
+        auto t1s =
+            ex::transform(std::move(t1), [](std::size_t x) { return x + 1; });
+        auto t1f = ex::make_future(std::move(t1s));
+        auto last = hpx::dataflow(
+            hpx::util::unwrapping(
+                [](std::size_t x, std::size_t y) { return x + y; }),
+            t1f, t2);
+
+        HPX_TEST_EQ(last.get(), std::size_t(18));
+    }
+#endif
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
@@ -660,6 +852,7 @@ int hpx_main()
     test_just_on_one_arg();
     test_just_on_two_args();
     test_when_all();
+    test_future_sender();
 
     return hpx::finalize();
 }

@@ -18,6 +18,7 @@ set(benchmarks
     benchmark_remove_if
     benchmark_unique
     benchmark_unique_copy
+    foreach_scaling
     transform_reduce_scaling
 )
 

@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <functional>
 #include <iterator>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -31,7 +32,9 @@
 #endif
 
 namespace hpx { namespace parallel { namespace util {
-    namespace detail {
+
+    namespace prefetching {
+
         template <typename Itr, typename... Ts>
         class prefetching_iterator
           : public std::iterator<std::random_access_iterator_tag,
@@ -137,31 +140,20 @@ namespace hpx { namespace parallel { namespace util {
                 // round up distance to cover all of underlying range
                 return (idx_ - rhs.idx_ + chunk_size_ - 1) / chunk_size_;
             }
-            inline prefetching_iterator operator+(difference_type rhs) const
+
+            friend inline prefetching_iterator operator+(
+                prefetching_iterator const& lhs, difference_type rhs)
             {
-                prefetching_iterator tmp(*this);
+                prefetching_iterator tmp(lhs);
                 tmp += rhs;
                 return tmp;
             }
-
-            // FIXME: What happens if the distance is not divisible by the
-            //        chunk_size? Should enforce this?
-            inline prefetching_iterator operator-(difference_type rhs) const
+            friend inline prefetching_iterator operator-(
+                prefetching_iterator const& lhs, difference_type rhs)
             {
-                prefetching_iterator tmp(*this);
+                prefetching_iterator tmp(lhs);
                 tmp -= rhs;
                 return tmp;
-            }
-
-            friend inline prefetching_iterator operator+(
-                const prefetching_iterator& lhs, difference_type rhs)
-            {
-                return rhs + lhs;
-            }
-            friend inline prefetching_iterator operator-(
-                const prefetching_iterator& lhs, difference_type rhs)
-            {
-                return lhs - rhs;
             }
 
             // FIXME: should other members be compared too?
@@ -279,10 +271,184 @@ namespace hpx { namespace parallel { namespace util {
 #endif
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Itr, typename... Ts>
-        struct loop<detail::prefetching_iterator<Itr, Ts...>>
+        struct loop_n_helper
         {
-            typedef detail::prefetching_iterator<Itr, Ts...> iterator_type;
+            template <typename Itr, typename... Ts, typename F, typename Pred>
+            static constexpr prefetching_iterator<Itr, Ts...> call(
+                prefetching_iterator<Itr, Ts...> it, std::size_t count, F&& f,
+                Pred)
+            {
+                using index_pack_type =
+                    typename hpx::util::make_index_pack<sizeof...(Ts)>::type;
+
+                for (/**/; count != 0; (void) --count, ++it)
+                {
+                    Itr base = it.base();
+                    std::size_t j = it.index();
+
+                    std::size_t last = (std::min)(
+                        it.index() + it.chunk_size(), it.range_size());
+
+                    for (/**/; j != last; (void) ++j, ++base)
+                    {
+                        f(base);
+                    }
+
+                    if (j != it.range_size())
+                    {
+                        prefetch_containers(it.ranges(), index_pack_type(), j);
+                    }
+                }
+                return it;
+            }
+
+            template <typename Itr, typename... Ts, typename CancelToken,
+                typename F, typename Pred>
+            static constexpr prefetching_iterator<Itr, Ts...> call(
+                prefetching_iterator<Itr, Ts...> it, std::size_t count,
+                CancelToken& tok, F&& f, Pred)
+            {
+                using index_pack_type =
+                    typename hpx::util::make_index_pack<sizeof...(Ts)>::type;
+
+                for (/**/; count != 0; (void) --count, ++it)
+                {
+                    if (tok.was_cancelled())
+                        break;
+
+                    Itr base = it.base();
+                    std::size_t j = it.index();
+
+                    std::size_t last = (std::min)(
+                        it.index() + it.chunk_size(), it.range_size());
+
+                    for (/**/; j != last; (void) ++j, ++base)
+                    {
+                        f(base);
+                    }
+
+                    if (j != it.range_size())
+                    {
+                        prefetch_containers(it.ranges(), index_pack_type(), j);
+                    }
+                }
+                return it;
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename ExPolicy, typename Itr, typename... Ts, typename F>
+        HPX_HOST_DEVICE
+            HPX_FORCEINLINE constexpr prefetching_iterator<Itr, Ts...>
+            tag_invoke(hpx::parallel::util::detail::loop_n_t<ExPolicy>,
+                prefetching_iterator<Itr, Ts...> it, std::size_t count, F&& f)
+        {
+            return loop_n_helper::call(
+                it, count, std::forward<F>(f), std::true_type());
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        struct loop_n_ind_helper
+        {
+            template <typename Itr, typename... Ts, typename F, typename Pred>
+            static constexpr prefetching_iterator<Itr, Ts...> call(
+                prefetching_iterator<Itr, Ts...> it, std::size_t count, F&& f,
+                Pred)
+            {
+                using index_pack_type =
+                    typename hpx::util::make_index_pack<sizeof...(Ts)>::type;
+
+                for (/**/; count != 0; (void) --count, ++it)
+                {
+                    Itr base = it.base();
+                    std::size_t j = it.index();
+
+                    std::size_t last = (std::min)(
+                        it.index() + it.chunk_size(), it.range_size());
+
+                    for (/**/; j != last; (void) ++j, ++base)
+                    {
+                        f(*base);
+                    }
+
+                    if (j != it.range_size())
+                    {
+                        prefetch_containers(it.ranges(), index_pack_type(), j);
+                    }
+                }
+                return it;
+            }
+
+            template <typename Itr, typename... Ts, typename CancelToken,
+                typename F, typename Pred>
+            static constexpr prefetching_iterator<Itr, Ts...> call(
+                prefetching_iterator<Itr, Ts...> it, std::size_t count,
+                CancelToken& tok, F&& f, Pred)
+            {
+                using index_pack_type =
+                    typename hpx::util::make_index_pack<sizeof...(Ts)>::type;
+
+                for (/**/; count != 0; (void) --count, ++it)
+                {
+                    if (tok.was_cancelled())
+                        break;
+
+                    Itr base = it.base();
+                    std::size_t j = it.index();
+
+                    std::size_t last = (std::min)(
+                        it.index() + it.chunk_size(), it.range_size());
+
+                    for (/**/; j != last; (void) ++j, ++base)
+                    {
+                        f(*base);
+                    }
+
+                    if (j != it.range_size())
+                    {
+                        prefetch_containers(it.ranges(), index_pack_type(), j);
+                    }
+                }
+                return it;
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename ExPolicy, typename Itr, typename... Ts, typename F>
+        HPX_HOST_DEVICE
+            HPX_FORCEINLINE constexpr prefetching_iterator<Itr, Ts...>
+            tag_invoke(hpx::parallel::util::detail::loop_n_ind_t<ExPolicy>,
+                prefetching_iterator<Itr, Ts...> it, std::size_t count, F&& f)
+        {
+            return loop_n_ind_helper::call(
+                it, count, std::forward<F>(f), std::true_type());
+        }
+    }    // namespace prefetching
+
+    ///////////////////////////////////////////////////////////////////////////
+    // function to create a prefetcher_context
+    template <typename Itr, typename... Ts>
+    prefetching::prefetcher_context<Itr, Ts const...> make_prefetcher_context(
+        Itr base_begin, Itr base_end, std::size_t p_factor, Ts const&... rngs)
+    {
+        static_assert(hpx::traits::is_random_access_iterator<Itr>::value,
+            "Iterators have to be of random access iterator category");
+        static_assert(hpx::util::all_of<hpx::traits::is_range<Ts>...>::value,
+            "All variadic parameters have to represent ranges");
+
+        using ranges_type = hpx::tuple<std::reference_wrapper<Ts const>...>;
+
+        auto&& ranges = ranges_type(std::cref(rngs)...);
+        return prefetching::prefetcher_context<Itr, Ts const...>(
+            base_begin, base_end, std::move(ranges), p_factor);
+    }
+
+    namespace detail {
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Itr, typename... Ts>
+        struct loop<prefetching::prefetching_iterator<Itr, Ts...>>
+        {
+            typedef prefetching::prefetching_iterator<Itr, Ts...> iterator_type;
             typedef typename iterator_type::base_iterator type;
             typedef typename hpx::util::make_index_pack<sizeof...(Ts)>::type
                 index_pack_type;
@@ -334,18 +500,17 @@ namespace hpx { namespace parallel { namespace util {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Itr, typename... Ts>
-        struct loop_n<detail::prefetching_iterator<Itr, Ts...>>
+        struct loop_ind<prefetching::prefetching_iterator<Itr, Ts...>>
         {
-            typedef detail::prefetching_iterator<Itr, Ts...> iterator_type;
+            typedef prefetching::prefetching_iterator<Itr, Ts...> iterator_type;
             typedef typename iterator_type::base_iterator type;
             typedef typename hpx::util::make_index_pack<sizeof...(Ts)>::type
                 index_pack_type;
 
-            template <typename F, typename Pred>
-            static iterator_type call(
-                iterator_type it, std::size_t count, F&& f, Pred)
+            template <typename End, typename F>
+            static iterator_type call(iterator_type it, End end, F&& f)
             {
-                for (/**/; count != 0; (void) --count, ++it)
+                for (/**/; it != end; ++it)
                 {
                     Itr base = it.base();
                     std::size_t j = it.index();
@@ -354,7 +519,7 @@ namespace hpx { namespace parallel { namespace util {
                         it.index() + it.chunk_size(), it.range_size());
 
                     for (/**/; j != last; (void) ++j, ++base)
-                        f(base);
+                        f(*base);
 
                     if (j != it.range_size())
                         prefetch_containers(it.ranges(), index_pack_type(), j);
@@ -362,11 +527,11 @@ namespace hpx { namespace parallel { namespace util {
                 return it;
             }
 
-            template <typename CancelToken, typename F, typename Pred>
-            static iterator_type call(iterator_type it, std::size_t count,
-                CancelToken& tok, F&& f, Pred)
+            template <typename End, typename CancelToken, typename F>
+            static iterator_type call(
+                iterator_type it, End end, CancelToken& tok, F&& f)
             {
-                for (/**/; count != 0; (void) --count, ++it)
+                for (/**/; it != end; ++it)
                 {
                     if (tok.was_cancelled())
                         break;
@@ -378,7 +543,7 @@ namespace hpx { namespace parallel { namespace util {
                         it.index() + it.chunk_size(), it.range_size());
 
                     for (/**/; j != last; (void) ++j, ++base)
-                        f(base);
+                        f(*base);
 
                     if (j != it.range_size())
                         prefetch_containers(it.ranges(), index_pack_type(), j);
@@ -387,22 +552,4 @@ namespace hpx { namespace parallel { namespace util {
             }
         };
     }    // namespace detail
-
-    ///////////////////////////////////////////////////////////////////////////
-    // function to create a prefetcher_context
-    template <typename Itr, typename... Ts>
-    detail::prefetcher_context<Itr, Ts const...> make_prefetcher_context(
-        Itr base_begin, Itr base_end, std::size_t p_factor, Ts const&... rngs)
-    {
-        static_assert(hpx::traits::is_random_access_iterator<Itr>::value,
-            "Iterators have to be of random access iterator category");
-        static_assert(hpx::util::all_of<hpx::traits::is_range<Ts>...>::value,
-            "All variadic parameters have to represent ranges");
-
-        typedef hpx::tuple<std::reference_wrapper<Ts const>...> ranges_type;
-
-        auto&& ranges = ranges_type(std::cref(rngs)...);
-        return detail::prefetcher_context<Itr, Ts const...>(
-            base_begin, base_end, std::move(ranges), p_factor);
-    }
-}}}    // namespace hpx::parallel::util
+}}}      // namespace hpx::parallel::util

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +15,7 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
@@ -27,6 +28,7 @@
 #include <vector>
 
 namespace hpx { namespace parallel { namespace util {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename VecOnly, typename F,
         typename... Iters>
@@ -48,7 +50,7 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-        ///////////////////////////////////////////////////////////////////////
+
         // Helper class to repeatedly call a function starting from a given
         // iterator position.
         template <typename Iterator>
@@ -60,8 +62,9 @@ namespace hpx { namespace parallel { namespace util {
                 Begin it, End end, F&& f)
             {
                 for (/**/; it != end; ++it)
-                    f(it);
-
+                {
+                    HPX_INVOKE(f, it);
+                }
                 return it;
             }
 
@@ -74,7 +77,7 @@ namespace hpx { namespace parallel { namespace util {
                 {
                     if (tok.was_cancelled())
                         break;
-                    f(it);
+                    HPX_INVOKE(f, it);
                 }
                 return it;
             }
@@ -98,7 +101,59 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-        ///////////////////////////////////////////////////////////////////////
+
+        // Helper class to repeatedly call a function starting from a given
+        // iterator position.
+        template <typename Iterator>
+        struct loop_ind
+        {
+            ///////////////////////////////////////////////////////////////////
+            template <typename Begin, typename End, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
+                Begin it, End end, F&& f)
+            {
+                for (/**/; it != end; ++it)
+                {
+                    HPX_INVOKE(f, *it);
+                }
+                return it;
+            }
+
+            template <typename Begin, typename End, typename CancelToken,
+                typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
+                Begin it, End end, CancelToken& tok, F&& f)
+            {
+                for (/**/; it != end; ++it)
+                {
+                    if (tok.was_cancelled())
+                        break;
+                    HPX_INVOKE(f, *it);
+                }
+                return it;
+            }
+        };
+    }    // namespace detail
+
+    template <typename ExPolicy, typename Begin, typename End, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin loop_ind(
+        ExPolicy&&, Begin begin, End end, F&& f)
+    {
+        return detail::loop_ind<Begin>::call(begin, end, std::forward<F>(f));
+    }
+
+    template <typename ExPolicy, typename Begin, typename End,
+        typename CancelToken, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin loop_ind(
+        ExPolicy&&, Begin begin, End end, CancelToken& tok, F&& f)
+    {
+        return detail::loop_ind<Begin>::call(
+            begin, end, tok, std::forward<F>(f));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail {
+
         // Helper class to repeatedly call a function starting from a given
         // iterator position.
         template <typename Iter1, typename Iter2>
@@ -113,7 +168,7 @@ namespace hpx { namespace parallel { namespace util {
             {
                 for (/**/; it1 != end1; (void) ++it1, ++it2)
                 {
-                    f(it1, it2);
+                    HPX_INVOKE(f, it1, it2);
                 }
 
                 return std::make_pair(std::move(it1), std::move(it2));
@@ -134,11 +189,10 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         // Helper class to repeatedly call a function a given number of times
         // starting from a given iterator position.
-
-        template <typename Iterator>
-        struct loop_n
+        struct loop_n_helper
         {
             ///////////////////////////////////////////////////////////////////
             // handle sequences of non-futures
@@ -150,14 +204,14 @@ namespace hpx { namespace parallel { namespace util {
                 for (std::size_t i = 0; i < count;
                      (void) ++it, i += 4)    // -V112
                 {
-                    f(it);
-                    f(++it);
-                    f(++it);
-                    f(++it);
+                    HPX_INVOKE(f, it);
+                    HPX_INVOKE(f, ++it);
+                    HPX_INVOKE(f, ++it);
+                    HPX_INVOKE(f, ++it);
                 }
                 for (/**/; count < num; (void) ++count, ++it)
                 {
-                    f(it);
+                    HPX_INVOKE(f, it);
                 }
                 return it;
             }
@@ -168,10 +222,10 @@ namespace hpx { namespace parallel { namespace util {
             {
                 while (num >= 4)
                 {
-                    f(it);
-                    f(it + 1);
-                    f(it + 2);
-                    f(it + 3);
+                    HPX_INVOKE(f, it);
+                    HPX_INVOKE(f, it + 1);
+                    HPX_INVOKE(f, it + 2);
+                    HPX_INVOKE(f, it + 3);
 
                     it += 4;
                     num -= 4;
@@ -180,18 +234,18 @@ namespace hpx { namespace parallel { namespace util {
                 switch (num)
                 {
                 case 3:
-                    f(it);
-                    f(it + 1);
-                    f(it + 2);
+                    HPX_INVOKE(f, it);
+                    HPX_INVOKE(f, it + 1);
+                    HPX_INVOKE(f, it + 2);
                     break;
 
                 case 2:
-                    f(it);
-                    f(it + 1);
+                    HPX_INVOKE(f, it);
+                    HPX_INVOKE(f, it + 1);
                     break;
 
                 case 1:
-                    f(it);
+                    HPX_INVOKE(f, it);
                     break;
 
                 default:
@@ -211,16 +265,16 @@ namespace hpx { namespace parallel { namespace util {
                 {
                     if (tok.was_cancelled())
                         break;
-                    f(it);
-                    f(++it);
-                    f(++it);
-                    f(++it);
+                    HPX_INVOKE(f, it);
+                    HPX_INVOKE(f, ++it);
+                    HPX_INVOKE(f, ++it);
+                    HPX_INVOKE(f, ++it);
                 }
                 for (/**/; count < num; (void) ++count, ++it)
                 {
                     if (tok.was_cancelled())
                         break;
-                    f(it);
+                    HPX_INVOKE(f, it);
                 }
                 return it;
             }
@@ -234,10 +288,10 @@ namespace hpx { namespace parallel { namespace util {
                     if (tok.was_cancelled())
                         return it;
 
-                    f(it);
-                    f(it + 1);
-                    f(it + 2);
-                    f(it + 3);
+                    HPX_INVOKE(f, it);
+                    HPX_INVOKE(f, it + 1);
+                    HPX_INVOKE(f, it + 2);
+                    HPX_INVOKE(f, it + 3);
 
                     it += 4;
                     num -= 4;
@@ -246,18 +300,18 @@ namespace hpx { namespace parallel { namespace util {
                 switch (num)
                 {
                 case 3:
-                    f(it);
-                    f(it + 1);
-                    f(it + 2);
+                    HPX_INVOKE(f, it);
+                    HPX_INVOKE(f, it + 1);
+                    HPX_INVOKE(f, it + 2);
                     break;
 
                 case 2:
-                    f(it);
-                    f(it + 1);
+                    HPX_INVOKE(f, it);
+                    HPX_INVOKE(f, it + 1);
                     break;
 
                 case 1:
-                    f(it);
+                    HPX_INVOKE(f, it);
                     break;
 
                 default:
@@ -267,6 +321,62 @@ namespace hpx { namespace parallel { namespace util {
                 return it + num;
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename ExPolicy>
+        struct loop_n_t final
+          : hpx::functional::tag_fallback<loop_n_t<ExPolicy>>
+        {
+        private:
+            template <typename Iter, typename F>
+            friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
+            tag_fallback_invoke(hpx::parallel::util::detail::loop_n_t<ExPolicy>,
+                Iter it, std::size_t count, F&& f)
+            {
+                using pred = std::integral_constant<bool,
+                    hpx::traits::is_random_access_iterator<Iter>::value ||
+                        std::is_integral<Iter>::value>;
+
+                return detail::loop_n_helper::call(
+                    it, count, std::forward<F>(f), pred());
+            }
+
+            template <typename Iter, typename CancelToken, typename F>
+            friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
+            tag_fallback_invoke(hpx::parallel::util::detail::loop_n_t<ExPolicy>,
+                Iter it, std::size_t count, CancelToken& tok, F&& f)
+            {
+                using pred = std::integral_constant<bool,
+                    hpx::traits::is_random_access_iterator<Iter>::value ||
+                        std::is_integral<Iter>::value>;
+
+                return detail::loop_n_helper::call(
+                    it, count, tok, std::forward<F>(f), pred());
+            }
+        };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        template <typename ExPolicy>
+        HPX_INLINE_CONSTEXPR_VARIABLE loop_n_t<ExPolicy> loop_n =
+            loop_n_t<ExPolicy>{};
+#else
+        template <typename ExPolicy, typename Iter, typename F>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter loop_n(
+            Iter it, std::size_t count, F&& f)
+        {
+            return hpx::parallel::util::detail::loop_n_t<ExPolicy>{}(
+                it, count, std::forward<F>(f));
+        }
+
+        template <typename ExPolicy, typename Iter, typename CancelToken,
+            typename F>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter loop_n(
+            Iter it, std::size_t count, CancelToken& tok, F&& f)
+        {
+            return hpx::parallel::util::detail::loop_n_t<ExPolicy>{}(
+                it, count, tok, std::forward<F>(f));
+        }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename T>
@@ -295,68 +405,200 @@ namespace hpx { namespace parallel { namespace util {
             return HPX_INVOKE(
                 std::forward<F>(f), std::forward<T1>(init), std::forward<T>(v));
         }
-    }    // namespace detail
 
-    template <typename ExPolicy, typename Iter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
-        !hpx::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
-    loop_n(Iter it, std::size_t count, F&& f)
-    {
-        using pred = std::integral_constant<bool,
-            hpx::traits::is_random_access_iterator<Iter>::value ||
-                std::is_integral<Iter>::value>;
+        ///////////////////////////////////////////////////////////////////////
+        // Helper class to repeatedly call a function a given number of times
+        // starting from a given iterator position.
+        struct loop_n_ind_helper
+        {
+            ///////////////////////////////////////////////////////////////////
+            // handle sequences of non-futures
+            template <typename Iter, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
+                Iter it, std::size_t num, F&& f, std::false_type)
+            {
+                std::size_t count(num & std::size_t(-4));    // -V112
+                for (std::size_t i = 0; i < count;
+                     (void) ++it, i += 4)    // -V112
+                {
+                    HPX_INVOKE(f, *it);
+                    HPX_INVOKE(f, *(++it));
+                    HPX_INVOKE(f, *(++it));
+                    HPX_INVOKE(f, *(++it));
+                }
+                for (/**/; count < num; (void) ++count, ++it)
+                {
+                    HPX_INVOKE(f, *it);
+                }
 
-        return detail::loop_n<Iter>::call(
-            it, count, std::forward<F>(f), pred());
-    }
+                return it;
+            }
 
-    template <typename ExPolicy, typename Iter, typename CancelToken,
-        typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
-        !hpx::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
-    loop_n(Iter it, std::size_t count, CancelToken& tok, F&& f)
-    {
-        using pred = std::integral_constant<bool,
-            hpx::traits::is_random_access_iterator<Iter>::value ||
-                std::is_integral<Iter>::value>;
+            template <typename Iter, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
+                Iter it, std::size_t num, F&& f, std::true_type)
+            {
+                while (num >= 4)
+                {
+                    HPX_INVOKE(f, *it);
+                    HPX_INVOKE(f, *(it + 1));
+                    HPX_INVOKE(f, *(it + 2));
+                    HPX_INVOKE(f, *(it + 3));
 
-        return detail::loop_n<Iter>::call(
-            it, count, tok, std::forward<F>(f), pred());
-    }
+                    it += 4;
+                    num -= 4;
+                }
 
-    ///////////////////////////////////////////////////////////////////////////
-    //     namespace detail
-    //     {
-    //         ///////////////////////////////////////////////////////////////////////
-    //         // Helper class to repeatedly call a function starting from a given
-    //         // iterator position.
-    //         template <typename Iter1, typename Iter2>
-    //         struct loop2_n
-    //         {
-    //             ///////////////////////////////////////////////////////////////////
-    //             template <typename Begin1, typename Begin2, typename F>
-    //             HPX_HOST_DEVICE HPX_FORCEINLINE
-    //             static std::pair<Begin1, Begin2>
-    //             call(Begin1 it1, std::size_t count, Begin2 it2, F && f)
-    //             {
-    //                 for (/**/; count != 0; (void) ++it1, ++it2, --count)
-    //                     f(it1, it2);
-    //
-    //                 return std::make_pair(it1, it2);
-    //             }
-    //         };
-    //     }
-    //
-    //     template <typename ExPolicy, typename Begin1, typename Begin2, typename F>
-    //     HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Begin1, Begin2>
-    //     loop2_n(ExPolicy&&, Begin1 begin1, std::size_t count, Begin2 begin2, F && f)
-    //     {
-    //         return detail::loop2_n<Begin1, Begin2>::call(begin1, count, begin2,
-    //             std::forward<F>(f));
-    //     }
+                switch (num)
+                {
+                case 3:
+                    HPX_INVOKE(f, *it);
+                    HPX_INVOKE(f, *(it + 1));
+                    HPX_INVOKE(f, *(it + 2));
+                    break;
 
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail {
+                case 2:
+                    HPX_INVOKE(f, *it);
+                    HPX_INVOKE(f, *(it + 1));
+                    break;
+
+                case 1:
+                    HPX_INVOKE(f, *it);
+                    break;
+
+                default:
+                    break;
+                }
+
+                return it + num;
+            }
+
+            template <typename Iter, typename CancelToken, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(Iter it,
+                std::size_t num, CancelToken& tok, F&& f, std::false_type)
+            {
+                std::size_t count(num & std::size_t(-4));    // -V112
+                for (std::size_t i = 0; i < count;
+                     (void) ++it, i += 4)    // -V112
+                {
+                    if (tok.was_cancelled())
+                        break;
+                    HPX_INVOKE(f, *it);
+                    HPX_INVOKE(f, *(++it));
+                    HPX_INVOKE(f, *(++it));
+                    HPX_INVOKE(f, *(++it));
+                }
+                for (/**/; count < num; (void) ++count, ++it)
+                {
+                    if (tok.was_cancelled())
+                        break;
+                    HPX_INVOKE(f, *it);
+                }
+                return it;
+            }
+
+            template <typename Iter, typename CancelToken, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(Iter it,
+                std::size_t num, CancelToken& tok, F&& f, std::true_type)
+            {
+                while (num >= 4)
+                {
+                    if (tok.was_cancelled())
+                        return it;
+
+                    HPX_INVOKE(f, *it);
+                    HPX_INVOKE(f, *(it + 1));
+                    HPX_INVOKE(f, *(it + 2));
+                    HPX_INVOKE(f, *(it + 3));
+
+                    it += 4;
+                    num -= 4;
+                }
+
+                switch (num)
+                {
+                case 3:
+                    HPX_INVOKE(f, *it);
+                    HPX_INVOKE(f, *(it + 1));
+                    HPX_INVOKE(f, *(it + 2));
+                    break;
+
+                case 2:
+                    HPX_INVOKE(f, *it);
+                    HPX_INVOKE(f, *(it + 1));
+                    break;
+
+                case 1:
+                    HPX_INVOKE(f, *it);
+                    break;
+
+                default:
+                    break;
+                }
+
+                return it + num;
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename ExPolicy>
+        struct loop_n_ind_t final
+          : hpx::functional::tag_fallback<loop_n_ind_t<ExPolicy>>
+        {
+        private:
+            template <typename Iter, typename F>
+            friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
+            tag_fallback_invoke(
+                hpx::parallel::util::detail::loop_n_ind_t<ExPolicy>, Iter it,
+                std::size_t count, F&& f)
+            {
+                using pred = std::integral_constant<bool,
+                    hpx::traits::is_random_access_iterator<Iter>::value ||
+                        std::is_integral<Iter>::value>;
+
+                return loop_n_ind_helper::call(
+                    it, count, std::forward<F>(f), pred());
+            }
+
+            template <typename Iter, typename CancelToken, typename F>
+            friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
+            tag_fallback_invoke(
+                hpx::parallel::util::detail::loop_n_ind_t<ExPolicy>, Iter it,
+                std::size_t count, CancelToken& tok, F&& f)
+            {
+                using pred = std::integral_constant<bool,
+                    hpx::traits::is_random_access_iterator<Iter>::value ||
+                        std::is_integral<Iter>::value>;
+
+                return loop_n_ind_helper::call(
+                    it, count, tok, std::forward<F>(f), pred());
+            }
+        };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        template <typename ExPolicy>
+        HPX_INLINE_CONSTEXPR_VARIABLE loop_n_ind_t<ExPolicy> loop_n_ind =
+            loop_n_ind_t<ExPolicy>{};
+#else
+        template <typename ExPolicy, typename Iter, typename F>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter loop_n_ind(
+            Iter it, std::size_t count, F&& f)
+        {
+            return hpx::parallel::util::detail::loop_n_ind_t<ExPolicy>{}(
+                it, count, std::forward<F>(f));
+        }
+
+        template <typename ExPolicy, typename Iter, typename CancelToken,
+            typename F>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter loop_n_ind(
+            Iter it, std::size_t count, CancelToken& tok, F&& f)
+        {
+            return hpx::parallel::util::detail::loop_n_ind_t<ExPolicy>{}(
+                it, count, tok, std::forward<F>(f));
+        }
+#endif
+
+        ///////////////////////////////////////////////////////////////////////
         // Helper class to repeatedly call a function a given number of times
         // starting from a given iterator position. If an exception is thrown,
         // the given cleanup function will be called.
@@ -372,7 +614,9 @@ namespace hpx { namespace parallel { namespace util {
                 try
                 {
                     for (/**/; it != last; ++it)
-                        f(it);
+                    {
+                        HPX_INVOKE(f, it);
+                    }
                     return it;
                 }
                 catch (...)
@@ -398,7 +642,9 @@ namespace hpx { namespace parallel { namespace util {
                 catch (...)
                 {
                     for (/**/; base != dest; ++base)
-                        cleanup(base);
+                    {
+                        HPX_INVOKE(cleanup, base);
+                    }
                     throw;
                 }
             }
@@ -410,7 +656,7 @@ namespace hpx { namespace parallel { namespace util {
     HPX_FORCEINLINE constexpr Iter loop_with_cleanup(
         Iter it, Iter last, F&& f, Cleanup&& cleanup)
     {
-        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        using cat = typename std::iterator_traits<Iter>::iterator_category;
         return detail::loop_with_cleanup<cat>::call(
             it, last, std::forward<F>(f), std::forward<Cleanup>(cleanup));
     }
@@ -419,13 +665,14 @@ namespace hpx { namespace parallel { namespace util {
     HPX_FORCEINLINE constexpr FwdIter loop_with_cleanup(
         Iter it, Iter last, FwdIter dest, F&& f, Cleanup&& cleanup)
     {
-        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        using cat = typename std::iterator_traits<Iter>::iterator_category;
         return detail::loop_with_cleanup<cat>::call(
             it, last, dest, std::forward<F>(f), std::forward<Cleanup>(cleanup));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         // Helper class to repeatedly call a function a given number of times
         // starting from a given iterator position.
         template <typename IterCat>
@@ -440,13 +687,17 @@ namespace hpx { namespace parallel { namespace util {
                 try
                 {
                     for (/**/; count != 0; (void) --count, ++it)
-                        f(it);
+                    {
+                        HPX_INVOKE(f, it);
+                    }
                     return it;
                 }
                 catch (...)
                 {
                     for (/**/; base != it; ++base)
-                        cleanup(base);
+                    {
+                        HPX_INVOKE(cleanup, base);
+                    }
                     throw;
                 }
             }
@@ -460,13 +711,17 @@ namespace hpx { namespace parallel { namespace util {
                 try
                 {
                     for (/**/; count != 0; (void) --count, ++it, ++dest)
-                        f(it, dest);
+                    {
+                        HPX_INVOKE(f, it, dest);
+                    }
                     return dest;
                 }
                 catch (...)
                 {
                     for (/**/; base != dest; ++base)
-                        cleanup(base);
+                    {
+                        HPX_INVOKE(cleanup, base);
+                    }
                     throw;
                 }
             }
@@ -484,7 +739,7 @@ namespace hpx { namespace parallel { namespace util {
                     {
                         if (tok.was_cancelled())
                             break;
-                        f(it);
+                        HPX_INVOKE(f, it);
                     }
                     return it;
                 }
@@ -492,7 +747,9 @@ namespace hpx { namespace parallel { namespace util {
                 {
                     tok.cancel();
                     for (/**/; base != it; ++base)
-                        cleanup(base);
+                    {
+                        HPX_INVOKE(cleanup, base);
+                    }
                     throw;
                 }
             }
@@ -509,7 +766,7 @@ namespace hpx { namespace parallel { namespace util {
                     {
                         if (tok.was_cancelled())
                             break;
-                        f(it, dest);
+                        HPX_INVOKE(f, it, dest);
                     }
                     return dest;
                 }
@@ -517,7 +774,9 @@ namespace hpx { namespace parallel { namespace util {
                 {
                     tok.cancel();
                     for (/**/; base != dest; ++base)
-                        cleanup(base);
+                    {
+                        HPX_INVOKE(cleanup, base);
+                    }
                     throw;
                 }
             }
@@ -529,7 +788,7 @@ namespace hpx { namespace parallel { namespace util {
     HPX_FORCEINLINE constexpr Iter loop_with_cleanup_n(
         Iter it, std::size_t count, F&& f, Cleanup&& cleanup)
     {
-        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        using cat = typename std::iterator_traits<Iter>::iterator_category;
         return detail::loop_with_cleanup_n<cat>::call(
             it, count, std::forward<F>(f), std::forward<Cleanup>(cleanup));
     }
@@ -538,7 +797,7 @@ namespace hpx { namespace parallel { namespace util {
     HPX_FORCEINLINE constexpr FwdIter loop_with_cleanup_n(
         Iter it, std::size_t count, FwdIter dest, F&& f, Cleanup&& cleanup)
     {
-        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        using cat = typename std::iterator_traits<Iter>::iterator_category;
         return detail::loop_with_cleanup_n<cat>::call(it, count, dest,
             std::forward<F>(f), std::forward<Cleanup>(cleanup));
     }
@@ -547,7 +806,7 @@ namespace hpx { namespace parallel { namespace util {
     HPX_FORCEINLINE constexpr Iter loop_with_cleanup_n_with_token(
         Iter it, std::size_t count, CancelToken& tok, F&& f, Cleanup&& cleanup)
     {
-        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        using cat = typename std::iterator_traits<Iter>::iterator_category;
         return detail::loop_with_cleanup_n<cat>::call_with_token(
             it, count, tok, std::forward<F>(f), std::forward<Cleanup>(cleanup));
     }
@@ -558,13 +817,14 @@ namespace hpx { namespace parallel { namespace util {
         std::size_t count, FwdIter dest, CancelToken& tok, F&& f,
         Cleanup&& cleanup)
     {
-        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        using cat = typename std::iterator_traits<Iter>::iterator_category;
         return detail::loop_with_cleanup_n<cat>::call_with_token(it, count,
             dest, tok, std::forward<F>(f), std::forward<Cleanup>(cleanup));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         // Helper class to repeatedly call a function a given number of times
         // starting from a given iterator position.
         template <typename IterCat>
@@ -581,14 +841,14 @@ namespace hpx { namespace parallel { namespace util {
                 for (std::size_t i = 0; i < count;
                      (void) ++it, i += 4)    // -V112
                 {
-                    f(*it, base_idx++);
-                    f(*++it, base_idx++);
-                    f(*++it, base_idx++);
-                    f(*++it, base_idx++);
+                    HPX_INVOKE(f, *it, base_idx++);
+                    HPX_INVOKE(f, *++it, base_idx++);
+                    HPX_INVOKE(f, *++it, base_idx++);
+                    HPX_INVOKE(f, *++it, base_idx++);
                 }
                 for (/**/; count < num; (void) ++count, ++it, ++base_idx)
                 {
-                    f(*it, base_idx);
+                    HPX_INVOKE(f, *it, base_idx);
                 }
                 return it;
             }
@@ -604,7 +864,7 @@ namespace hpx { namespace parallel { namespace util {
                     {
                         break;
                     }
-                    f(*it, base_idx);
+                    HPX_INVOKE(f, *it, base_idx);
                 }
                 return it;
             }
@@ -621,10 +881,10 @@ namespace hpx { namespace parallel { namespace util {
             {
                 while (num >= 4)
                 {
-                    f(it[0], base_idx++);
-                    f(it[1], base_idx++);
-                    f(it[2], base_idx++);
-                    f(it[3], base_idx++);
+                    HPX_INVOKE(f, *it, base_idx++);
+                    HPX_INVOKE(f, *(it + 1), base_idx++);
+                    HPX_INVOKE(f, *(it + 2), base_idx++);
+                    HPX_INVOKE(f, *(it + 3), base_idx++);
 
                     it += 4;
                     num -= 4;
@@ -633,18 +893,18 @@ namespace hpx { namespace parallel { namespace util {
                 switch (num)
                 {
                 case 3:
-                    f(it[0], base_idx++);
-                    f(it[1], base_idx++);
-                    f(it[2], base_idx);
+                    HPX_INVOKE(f, *it, base_idx++);
+                    HPX_INVOKE(f, *(it + 1), base_idx++);
+                    HPX_INVOKE(f, *(it + 2), base_idx++);
                     break;
 
                 case 2:
-                    f(it[0], base_idx++);
-                    f(it[1], base_idx);
+                    HPX_INVOKE(f, *it, base_idx++);
+                    HPX_INVOKE(f, *(it + 1), base_idx++);
                     break;
 
                 case 1:
-                    f(it[0], base_idx);
+                    HPX_INVOKE(f, *it, base_idx);
                     break;
 
                 default:
@@ -664,10 +924,10 @@ namespace hpx { namespace parallel { namespace util {
                     if (tok.was_cancelled(base_idx))
                         return it;
 
-                    f(it[0], base_idx++);
-                    f(it[1], base_idx++);
-                    f(it[2], base_idx++);
-                    f(it[3], base_idx++);
+                    HPX_INVOKE(f, *it, base_idx++);
+                    HPX_INVOKE(f, *(it + 1), base_idx++);
+                    HPX_INVOKE(f, *(it + 2), base_idx++);
+                    HPX_INVOKE(f, *(it + 3), base_idx++);
 
                     it += 4;
                     num -= 4;
@@ -676,18 +936,18 @@ namespace hpx { namespace parallel { namespace util {
                 switch (num)
                 {
                 case 3:
-                    f(it[0], base_idx++);
-                    f(it[1], base_idx++);
-                    f(it[2], base_idx);
+                    HPX_INVOKE(f, *it, base_idx++);
+                    HPX_INVOKE(f, *(it + 1), base_idx++);
+                    HPX_INVOKE(f, *(it + 2), base_idx++);
                     break;
 
                 case 2:
-                    f(it[0], base_idx++);
-                    f(it[1], base_idx);
+                    HPX_INVOKE(f, *it, base_idx++);
+                    HPX_INVOKE(f, *(it + 1), base_idx++);
                     break;
 
                 case 1:
-                    f(it[0], base_idx);
+                    HPX_INVOKE(f, *it, base_idx);
                     break;
 
                 default:
@@ -704,7 +964,7 @@ namespace hpx { namespace parallel { namespace util {
     HPX_FORCEINLINE constexpr Iter loop_idx_n(
         std::size_t base_idx, Iter it, std::size_t count, F&& f)
     {
-        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        using cat = typename std::iterator_traits<Iter>::iterator_category;
         return detail::loop_idx_n<cat>::call(
             base_idx, it, count, std::forward<F>(f));
     }
@@ -713,7 +973,7 @@ namespace hpx { namespace parallel { namespace util {
     HPX_FORCEINLINE constexpr Iter loop_idx_n(std::size_t base_idx, Iter it,
         std::size_t count, CancelToken& tok, F&& f)
     {
-        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        using cat = typename std::iterator_traits<Iter>::iterator_category;
         return detail::loop_idx_n<cat>::call(
             base_idx, it, count, tok, std::forward<F>(f));
     }
@@ -729,7 +989,9 @@ namespace hpx { namespace parallel { namespace util {
             static T call(Iter it, std::size_t count, T init, Pred&& f)
             {
                 for (/**/; count != 0; (void) --count, ++it)
-                    init = f(init, *it);
+                {
+                    init = HPX_INVOKE(f, init, *it);
+                }
                 return init;
             }
         };
@@ -739,7 +1001,7 @@ namespace hpx { namespace parallel { namespace util {
     template <typename Iter, typename T, typename Pred>
     HPX_FORCEINLINE T accumulate_n(Iter it, std::size_t count, T init, Pred&& f)
     {
-        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        using cat = typename std::iterator_traits<Iter>::iterator_category;
         return detail::accumulate_n<cat>::call(
             it, count, std::move(init), std::forward<Pred>(f));
     }

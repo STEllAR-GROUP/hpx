@@ -256,6 +256,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename util::detail::algorithm_result<ExPolicy, bool>::type
         none_of(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())
     {
+
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         using iterator_type = typename hpx::traits::range_iterator<Rng>::type;
 
         static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
@@ -263,6 +268,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         return none_of(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), std::forward<F>(f), std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -285,6 +293,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename util::detail::algorithm_result<ExPolicy, bool>::type
         any_of(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())
     {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         using iterator_type = typename hpx::traits::range_iterator<Rng>::type;
 
         static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
@@ -292,6 +304,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         return any_of(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), std::forward<F>(f), std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -314,6 +329,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename util::detail::algorithm_result<ExPolicy, bool>::type
         all_of(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())
     {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         using iterator_type = typename hpx::traits::range_iterator<Rng>::type;
 
         static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
@@ -321,6 +340,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         return all_of(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), std::forward<F>(f), std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
 }}}    // namespace hpx::parallel::v1

@@ -85,19 +85,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
             parallel(ExPolicy&& policy, FwdIter first, FwdIter last, Op&& op,
                 Conv&& conv)
             {
+                using execution_policy_type = std::decay_t<ExPolicy>;
                 return util::partitioner<ExPolicy, T>::call(
                     std::forward<ExPolicy>(policy), first,
                     std::distance(first, last),
-                    [op, policy, conv](
-                        FwdIter part_begin, std::size_t part_size) -> T {
-                        HPX_UNUSED(policy);
-
+                    [op, conv](FwdIter part_begin, std::size_t part_size) -> T {
                         T ret = hpx::util::invoke(conv, *part_begin);
                         if (part_size > 1)
                         {
                             // MSVC complains if 'op' is captured by reference
-                            util::loop_n<ExPolicy>(part_begin + 1,
-                                part_size - 1,
+                            util::detail::loop_n<execution_policy_type>(
+                                part_begin + 1, part_size - 1,
                                 [&ret, op, conv](FwdIter const& curr) {
                                     ret = hpx::util::invoke(op, ret,
                                         hpx::util::invoke(conv, *curr));
@@ -105,24 +103,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         }
                         return ret;
                     },
-                    hpx::util::unwrapping(
-                        [op, policy](std::vector<T>&& results) -> T {
-                            HPX_UNUSED(policy);
-
-                            T ret = *results.begin();
-                            if (results.size() > 1)
-                            {
-                                // MSVC complains if 'op' is captured by reference
-                                util::loop_n<ExPolicy>(results.begin() + 1,
-                                    results.size() - 1,
-                                    [&ret, op](
-                                        typename std::vector<T>::iterator const&
-                                            curr) {
-                                        ret = hpx::util::invoke(op, ret, *curr);
-                                    });
-                            }
-                            return ret;
-                        }));
+                    hpx::util::unwrapping([op](std::vector<T>&& results) -> T {
+                        T ret = *results.begin();
+                        if (results.size() > 1)
+                        {
+                            // MSVC complains if 'op' is captured by reference
+                            util::detail::loop_n<execution_policy_type>(
+                                results.begin() + 1, results.size() - 1,
+                                [&ret, op](
+                                    typename std::vector<T>::iterator const&
+                                        curr) {
+                                    ret = hpx::util::invoke(op, ret, *curr);
+                                });
+                        }
+                        return ret;
+                    }));
             }
         };
 
