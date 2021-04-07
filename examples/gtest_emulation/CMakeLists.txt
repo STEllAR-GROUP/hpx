@@ -25,6 +25,9 @@ if(EXISTS "${HPX_DIR}")
   add_executable(hpx_main_ext_main hpx_main_ext_main.cpp)
   target_link_libraries(hpx_main_ext_main PRIVATE hpx_helper_interface)
 
+  enable_testing()
+  add_test(hello_world_test hpx_main_ext_main)
+
 else()
   message(
     WARNING

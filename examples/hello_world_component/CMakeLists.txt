@@ -11,20 +11,22 @@ project(hello_world_client CXX)
 if(EXISTS "${HPX_DIR}")
   find_package(HPX REQUIRED)
 
-  add_library(hello_world_component SHARED hello_world_component.cpp)
+  if(HPX_WITH_DISTRIBUTED_RUNTIME)
+    add_library(hello_world_component SHARED hello_world_component.cpp)
+  endif()
 
   add_executable(hello_world_client hello_world_client.cpp)
   target_include_directories(hello_world_client PRIVATE ${test_SOURCE_DIR})
 
   if("${SETUP_TYPE}" STREQUAL "TARGETS")
-    target_link_libraries(
-      hello_world_component PUBLIC HPX::hpx HPX::iostreams_component
-    )
-    target_link_libraries(hello_world_component PRIVATE HPX::component)
-
-    target_link_libraries(
-      hello_world_client PRIVATE hello_world_component HPX::wrap_main
-    )
+    if(HPX_WITH_DISTRIBUTED_RUNTIME)
+      target_link_libraries(
+        hello_world_component PUBLIC HPX::hpx HPX::iostreams_component
+      )
+      target_link_libraries(hello_world_component PRIVATE HPX::component)
+      target_link_libraries(hello_world_client PRIVATE hello_world_component)
+    endif()
+    target_link_libraries(hello_world_client PRIVATE HPX::hpx HPX::wrap_main)
 
     # We still support not linking to HPX::wrap_main when
     # HPX_WITH_DYNAMIC_HPX_MAIN=OFF for legacy use. This can only be done using
@@ -41,17 +43,23 @@ if(EXISTS "${HPX_DIR}")
       )
     endif()
   elseif("${SETUP_TYPE}" STREQUAL "MACROS")
-    hpx_setup_target(
-      hello_world_component
-      COMPONENT_DEPENDENCIES iostreams
-      DEPENDENCIES HPX::wrap_main
-      TYPE COMPONENT
-    )
-
-    hpx_setup_target(hello_world_client DEPENDENCIES hello_world_component)
+    if(HPX_WITH_DISTRIBUTED_RUNTIME)
+      hpx_setup_target(
+        hello_world_component
+        COMPONENT_DEPENDENCIES iostreams
+        DEPENDENCIES HPX::wrap_main
+        TYPE COMPONENT
+      )
+      hpx_setup_target(hello_world_client DEPENDENCIES hello_world_component)
+    else()
+      hpx_setup_target(hello_world_client)
+    endif()
   else()
     message(FATAL_ERROR "Unknown SETUP_TYPE=\"${SETUP_TYPE}\"")
   endif()
+
+  enable_testing()
+  add_test(hello_world_test hello_world_client)
 else()
   message(
     WARNING
