@@ -135,8 +135,7 @@ namespace hpx { namespace execution { namespace experimental {
             using value_types =
                 typename hpx::execution::experimental::sender_traits<
                     S>::template value_types<hpx::util::pack, hpx::util::pack>;
-            using result_type =
-                typename sync_wait_single_result<value_types>::type;
+            using result_type = std::decay_t<single_result_t<value_types>>;
             using state_type =
                 typename detail::sync_wait_receiver<result_type>::state;
 
@@ -175,8 +174,7 @@ namespace hpx { namespace execution { namespace experimental {
             using value_types =
                 typename hpx::execution::experimental::sender_traits<
                     S>::template value_types<hpx::util::pack, hpx::util::pack>;
-            using result_type =
-                typename detail::sync_wait_single_result<value_types>::type;
+            using result_type = detail::single_result_t<value_types>;
 
             return detail::sync_wait_impl(
                 std::is_void<result_type>{}, std::forward<S>(s));

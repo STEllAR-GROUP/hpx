@@ -15,79 +15,54 @@ namespace hpx {
         namespace experimental {
             namespace detail {
     template <typename Variants>
-    struct sync_wait_single_result
+    struct single_result
     {
         static_assert(sizeof(Variants) == 0,
-            "sync_wait expects the predecessor sender to have a single variant "
-            "with a single type in sender_traits<>::value_types");
+            "expected a single variant with a single type in "
+            "sender_traits<>::value_types");
     };
 
     template <>
-    struct sync_wait_single_result<hpx::util::pack<hpx::util::pack<>>>
+    struct single_result<hpx::util::pack<hpx::util::pack<>>>
     {
         using type = void;
     };
 
     template <typename T>
-    struct sync_wait_single_result<hpx::util::pack<hpx::util::pack<T>>>
+    struct single_result<hpx::util::pack<hpx::util::pack<T>>>
     {
         using type = T;
     };
 
     template <typename T, typename U, typename... Ts>
-    struct sync_wait_single_result<
-        hpx::util::pack<hpx::util::pack<T, U, Ts...>>>
+    struct single_result<hpx::util::pack<hpx::util::pack<T, U, Ts...>>>
     {
         static_assert(sizeof(T) == 0,
-            "sync_wait expects the predecessor sender to have a single variant "
-            "with a single type in sender_traits<>::value_types (single "
-            "variant with two or more types given)");
+            "expected a single variant with a single type in "
+            "sender_traits<>::value_types (single variant with two or more "
+            "types given)");
     };
 
     template <typename T, typename U, typename... Ts>
-    struct sync_wait_single_result<hpx::util::pack<T, U, Ts...>>
+    struct single_result<hpx::util::pack<T, U, Ts...>>
     {
         static_assert(sizeof(T) == 0,
-            "sync_wait expects the predecessor sender to have a single variant "
-            "with a single type in sender_traits<>::value_types (two or more "
-            "variants given)");
+            "expected a single variant with a single type in "
+            "sender_traits<>::value_types (two or more variants)");
     };
 
     template <typename Variants>
-    struct when_all_single_result
+    using single_result_t = typename single_result<Variants>::type;
+
+    template <typename Variants>
+    struct single_result_non_void
     {
-        static_assert(sizeof(Variants) == 0,
-            "when_all expects the predecessor sender to have a single variant "
-            "with a single non-void type in sender_traits<>::value_types");
+        using type = typename single_result<Variants>::type;
+        static_assert(!std::is_void<type>::value,
+            "expected a non-void type in single_result");
     };
 
-    template <typename T>
-    struct when_all_single_result<hpx::util::pack<hpx::util::pack<T>>>
-    {
-        static_assert(!std::is_void<T>::value,
-            "when_all expects the predecessor sender to have a single variant "
-            "with a single non-void type in sender_traits<>::value_types (void "
-            "given)");
-
-        using type = T;
-    };
-
-    template <typename T, typename U, typename... Ts>
-    struct when_all_single_result<hpx::util::pack<hpx::util::pack<T, U, Ts...>>>
-    {
-        static_assert(sizeof(T) == 0,
-            "when_all expects the predecessor sender to have a single variant "
-            "with a single non-void type in sender_traits<>::value_types "
-            "(single variant with two or more types given)");
-    };
-
-    template <typename T, typename U, typename... Ts>
-    struct when_all_single_result<hpx::util::pack<T, U, Ts...>>
-    {
-        static_assert(sizeof(T) == 0,
-            "when_all expects the predecessor sender to have a single variant "
-            "with a single non-void type in sender_traits<>::value_types (two "
-            "or more "
-            "variants given)");
-    };
+    template <typename Variants>
+    using single_result_non_void_t =
+        typename single_result_non_void<Variants>::type;
 }}}}    // namespace hpx::execution::experimental::detail
