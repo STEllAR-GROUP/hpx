@@ -49,7 +49,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return it;
 
             FwdIter smallest = it;
-            util::loop_n<ExPolicy>(++it, count - 1,
+            util::detail::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
                 [&f, &smallest, &proj](FwdIter const& curr) -> void {
                     if (hpx::util::invoke(f, hpx::util::invoke(proj, *curr),
                             hpx::util::invoke(proj, *smallest)))
@@ -80,7 +80,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 typename std::iterator_traits<FwdIter>::value_type smallest =
                     *it;
-                util::loop_n<ExPolicy>(++it, count - 1,
+                util::detail::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
                     [&f, &smallest, &proj](FwdIter const& curr) -> void {
                         if (hpx::util::invoke(f,
                                 hpx::util::invoke(proj, **curr),
@@ -262,7 +262,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return it;
 
             FwdIter greatest = it;
-            util::loop_n<ExPolicy>(++it, count - 1,
+            util::detail::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
                 [&f, &greatest, &proj](FwdIter const& curr) -> void {
                     if (hpx::util::invoke(f, hpx::util::invoke(proj, *greatest),
                             hpx::util::invoke(proj, *curr)))
@@ -293,7 +293,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 typename std::iterator_traits<FwdIter>::value_type greatest =
                     *it;
-                util::loop_n<ExPolicy>(++it, count - 1,
+                util::detail::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
                     [&f, &greatest, &proj](FwdIter const& curr) -> void {
                         if (hpx::util::invoke(f,
                                 hpx::util::invoke(proj, *greatest),
@@ -477,7 +477,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             if (count == 0 || count == 1)
                 return result;
 
-            util::loop_n<ExPolicy>(++it, count - 1,
+            util::detail::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
                 [&f, &result, &proj](FwdIter const& curr) -> void {
                     if (hpx::util::invoke(f, hpx::util::invoke(proj, *curr),
                             hpx::util::invoke(proj, *result.first)))
@@ -515,7 +515,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 typename std::iterator_traits<PairIter>::value_type result =
                     *it;
-                util::loop_n<ExPolicy>(++it, count - 1,
+                util::detail::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
                     [&f, &result, &proj](PairIter const& curr) -> void {
                         if (hpx::util::invoke(f,
                                 hpx::util::invoke(proj, *curr->first),

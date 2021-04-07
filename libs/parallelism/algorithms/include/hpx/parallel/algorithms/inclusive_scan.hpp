@@ -138,18 +138,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using hpx::get;
                 using hpx::util::make_zip_iterator;
 
-                auto f3 = [op, policy](zip_iterator part_begin,
-                              std::size_t part_size, hpx::shared_future<T> curr,
+                auto f3 = [op](zip_iterator part_begin, std::size_t part_size,
+                              hpx::shared_future<T> curr,
                               hpx::shared_future<T> next) {
-                    HPX_UNUSED(policy);
-
                     next.get();    // rethrow exceptions
 
                     T val = curr.get();
                     FwdIter2 dst = get<1>(part_begin.get_iterator_tuple());
 
                     // MSVC 2015 fails if op is captured by reference
-                    util::loop_n<ExPolicy>(
+                    util::detail::loop_n<std::decay_t<ExPolicy>>(
                         dst, part_size, [=, &val](FwdIter2 it) {
                             *it = hpx::util::invoke(op, val, *it);
                         });

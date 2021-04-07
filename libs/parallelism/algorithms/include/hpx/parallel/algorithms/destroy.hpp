@@ -162,7 +162,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return util::foreach_partitioner<ExPolicy>::call(
                 std::forward<ExPolicy>(policy), first, count,
                 [](Iter first, std::size_t count, std::size_t) {
-                    return util::loop_n<ExPolicy>(
+                    return util::detail::loop_n<std::decay_t<ExPolicy>>(
                         first, count, [](Iter it) -> void {
                             using value_type =
                                 typename std::iterator_traits<Iter>::value_type;

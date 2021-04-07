@@ -58,7 +58,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
                 return data_[hpx::get_worker_thread_num()].data_;
             }
 
-            constexpr void next_iteration(std::size_t /*index*/) noexcept {}
+            constexpr void next_iteration() noexcept {}
 
             void exit_iteration(std::size_t /*index*/)
             {

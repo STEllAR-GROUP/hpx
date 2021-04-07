@@ -166,14 +166,13 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             HPX_ASSERT(!std::is_signed<Stride>::value || !is_negative(offset));
 
             // NVCC seems to have a bug with std::min...
-            Stride count =
+            offset =
                 Stride(max_count < std::size_t(offset) ? max_count : offset);
 
             // advance through the end or max number of elements
-            for (/**/; count != 0; (void) ++iter, --count)
+            for (Stride count = offset; count != 0; (void) ++iter, --count)
                 /**/;
 
-            offset -= count;
             return iter;
         }
     };

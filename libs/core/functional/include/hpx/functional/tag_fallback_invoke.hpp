@@ -122,7 +122,8 @@ namespace hpx { namespace functional {
         struct tag_fallback_invoke_t
         {
             template <typename Tag, typename... Ts>
-            constexpr HPX_FORCEINLINE auto operator()(Tag tag, Ts&&... ts) const
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+                Tag tag, Ts&&... ts) const
                 noexcept(noexcept(tag_fallback_invoke(
                     std::declval<Tag>(), std::forward<Ts>(ts)...)))
                     -> decltype(tag_fallback_invoke(
@@ -146,9 +147,14 @@ namespace hpx { namespace functional {
     }    // namespace tag_fallback_invoke_t_ns
 
     inline namespace tag_fallback_invoke_ns {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_INLINE_CONSTEXPR_VARIABLE
         tag_fallback_invoke_t_ns::tag_fallback_invoke_t tag_fallback_invoke =
             {};
+#else
+        HPX_DEVICE static tag_fallback_invoke_t_ns::tag_fallback_invoke_t const
+            tag_fallback_invoke = {};
+#endif
     }    // namespace tag_fallback_invoke_ns
 
     ///////////////////////////////////////////////////////////////////////////
@@ -227,7 +233,8 @@ namespace hpx { namespace functional {
     /// template <typename T> auto tag_fallback_invoke(tag_t, T&& t) {...}
     ///
     /// With the same user-defined tag_invoke overload, the user-defined
-    /// overload will now be used if is a match even if isn't an exact match.
+    /// overload will now be used if it is a match even if it isn't an exact
+    /// match.
     /// This is because tag_fallback will dispatch to tag_fallback_invoke only
     /// if there are no matching tag_invoke overloads.
     template <typename Tag>
@@ -237,7 +244,8 @@ namespace hpx { namespace functional {
         template <typename... Args,
             typename Enable = typename std::enable_if<
                 is_tag_invocable_v<Tag, Args&&...>>::type>
-        constexpr HPX_FORCEINLINE auto operator()(Args&&... args) const
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+            Args&&... args) const
             noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
                 -> tag_invoke_result_t<Tag, Args&&...>
         {
@@ -249,7 +257,8 @@ namespace hpx { namespace functional {
         template <typename... Args,
             typename Enable = typename std::enable_if<
                 !is_tag_invocable_v<Tag, Args&&...>>::type>
-        constexpr HPX_FORCEINLINE auto operator()(Args&&... args) const
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+            Args&&... args) const
             noexcept(is_nothrow_tag_fallback_invocable_v<Tag, Args...>)
                 -> tag_fallback_invoke_result_t<Tag, Args&&...>
         {
@@ -267,7 +276,7 @@ namespace hpx { namespace functional {
     private:
         // is nothrow tag-fallback invocable
         template <typename... Args>
-        constexpr HPX_FORCEINLINE auto tag_fallback_invoke_impl(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto tag_fallback_invoke_impl(
             std::true_type, Args&&... args) const noexcept
             -> tag_fallback_invoke_result_t<Tag, Args&&...>
         {
@@ -280,7 +289,8 @@ namespace hpx { namespace functional {
         template <typename... Args,
             typename Enable = typename std::enable_if<
                 is_nothrow_tag_invocable_v<Tag, Args&&...>>::type>
-        constexpr HPX_FORCEINLINE auto operator()(Args&&... args) const noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+            Args&&... args) const noexcept
             -> tag_invoke_result_t<Tag, Args&&...>
         {
             return hpx::functional::tag_invoke(
@@ -293,7 +303,8 @@ namespace hpx { namespace functional {
                 is_nothrow_tag_fallback_invocable<Tag, Args&&...>,
             typename Enable = typename std::enable_if<
                 !is_nothrow_tag_invocable_v<Tag, Args&&...>>::type>
-        constexpr HPX_FORCEINLINE auto operator()(Args&&... args) const noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+            Args&&... args) const noexcept
             -> decltype(tag_fallback_invoke_impl(
                 IsFallbackInvocable{}, std::forward<Args>(args)...))
         {

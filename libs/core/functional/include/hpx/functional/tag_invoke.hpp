@@ -120,7 +120,8 @@ namespace hpx { namespace functional {
         struct tag_invoke_t
         {
             template <typename Tag, typename... Ts>
-            constexpr HPX_FORCEINLINE auto operator()(Tag tag, Ts&&... ts) const
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+                Tag tag, Ts&&... ts) const
                 noexcept(noexcept(
                     tag_invoke(std::declval<Tag>(), std::forward<Ts>(ts)...)))
                     -> decltype(tag_invoke(
@@ -142,8 +143,12 @@ namespace hpx { namespace functional {
     }    // namespace tag_invoke_t_ns
 
     inline namespace tag_invoke_ns {
-        HPX_INLINE_CONSTEXPR_VARIABLE tag_invoke_t_ns::tag_invoke_t tag_invoke =
-            {};
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_INLINE_CONSTEXPR_VARIABLE
+        tag_invoke_t_ns::tag_invoke_t tag_invoke = {};
+#else
+        HPX_DEVICE static tag_invoke_t_ns::tag_invoke_t const tag_invoke = {};
+#endif
     }    // namespace tag_invoke_ns
 
     ///////////////////////////////////////////////////////////////////////////
@@ -199,7 +204,8 @@ namespace hpx { namespace functional {
     struct tag
     {
         template <typename... Args>
-        constexpr HPX_FORCEINLINE auto operator()(Args&&... args) const
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+            Args&&... args) const
             noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
                 -> tag_invoke_result_t<Tag, Args...>
         {
@@ -214,7 +220,8 @@ namespace hpx { namespace functional {
         template <typename... Args,
             typename Enable = typename std::enable_if<
                 is_nothrow_tag_invocable_v<Tag, Args...>>::type>
-        constexpr HPX_FORCEINLINE auto operator()(Args&&... args) const noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+            Args&&... args) const noexcept
             -> tag_invoke_result_t<Tag, decltype(args)...>
         {
             return hpx::functional::tag_invoke(
