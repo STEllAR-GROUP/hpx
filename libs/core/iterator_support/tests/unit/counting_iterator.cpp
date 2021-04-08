@@ -183,7 +183,7 @@ template <typename Container>
 void test_container(
     Container* = nullptr)    // default arg works around MSVC bug
 {
-    Container c(1 + (unsigned) rand() % 1673);
+    Container c(2 + (unsigned) rand() % 1673);
 
     typename Container::iterator const start = c.begin();
 
