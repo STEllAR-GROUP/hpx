@@ -44,6 +44,43 @@ int main(int argc, char* argv[])
         HPX_TEST(ran_hpx_main);
     }
 
+    // Back compatibility test
+    {
+        hpx::init_params iparams;
+        iparams.mode = hpx::runtime_mode::local;
+        ran_hpx_main = false;
+
+        hpx::util::function_nonser<int(hpx::program_options::variables_map&)> func =
+                static_cast<hpx::hpx_main_type>(::hpx_main);
+
+        hpx::init(func, argc, argv, iparams);
+        HPX_TEST(ran_hpx_main);
+    }
+
+    {
+        hpx::init_params iparams;
+        iparams.mode = hpx::runtime_mode::local;
+        ran_hpx_main = false;
+
+        std::function<int(hpx::program_options::variables_map&)> func =
+                static_cast<hpx::hpx_main_type>(::hpx_main);
+
+        hpx::init(func, argc, argv, iparams);
+        HPX_TEST(ran_hpx_main);
+    }
+
+    {
+        hpx::init_params iparams;
+        iparams.mode = hpx::runtime_mode::local;
+        ran_hpx_main = false;
+
+        std::function<int(hpx::program_options::variables_map&)> func =
+                static_cast<hpx::hpx_main_type>(::hpx_main);
+
+        hpx::init(std::move(func), argc, argv, iparams);
+        HPX_TEST(ran_hpx_main);
+    }
+
     // The distributed runtime (i.e. any non-runtime_mode::local mode) can only
     // be started when the distributed runtime has been enabled
     {

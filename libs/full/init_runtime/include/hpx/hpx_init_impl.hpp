@@ -51,7 +51,7 @@ namespace hpx {
     /// function. It will set up the HPX runtime environment and schedule the
     /// function given by \p f as a HPX thread.
     inline int init(
-        std::function<int(hpx::program_options::variables_map&)>&&
+        std::function<int(hpx::program_options::variables_map&)>
             f,
         int argc, char** argv, init_params const& params)
     {
@@ -82,7 +82,7 @@ namespace hpx {
     /// (or one of its overloads below) should be called from the users `main()`
     /// function. It will set up the HPX runtime environment and schedule the
     /// function given by \p f as a HPX thread.
-    inline int init(std::function<int(int, char**)>&& f, int argc,
+    inline int init(std::function<int(int, char**)> f, int argc,
         char** argv, init_params const& params)
     {
         std::function<int(hpx::program_options::variables_map&)>
@@ -151,7 +151,7 @@ namespace hpx {
         "The init overload used is deprecated. Please use"
         "the init overloads using the hpx::init_params struct.")
     inline int init(std::function<int(
-                        hpx::program_options::variables_map& vm)>&& f,
+                        hpx::program_options::variables_map& vm)> f,
         hpx::program_options::options_description const& desc_cmdline, int argc,
         char** argv, std::vector<std::string> const& cfg,
         startup_function_type startup, shutdown_function_type shutdown,
@@ -394,7 +394,7 @@ namespace hpx {
     HPX_DEPRECATED_V(1, 6,
         "The init overload used is deprecated. Please use"
         "the init overloads using the hpx::init_params struct.")
-    inline int init(std::function<int(int, char**)>&& f,
+    inline int init(std::function<int(int, char**)> f,
         std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
     {
@@ -412,7 +412,7 @@ namespace hpx {
     HPX_DEPRECATED_V(1, 6,
         "The init overload used is deprecated. Please use"
         "the init overloads using the hpx::init_params struct.")
-    inline int init(std::function<int(int, char**)>&& f, int argc,
+    inline int init(std::function<int(int, char**)> f, int argc,
         char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {
@@ -427,7 +427,7 @@ namespace hpx {
     HPX_DEPRECATED_V(1, 6,
         "The init overload used is deprecated. Please use"
         "the init overloads using the hpx::init_params struct.")
-    inline int init(std::function<int(int, char**)>&& f,
+    inline int init(std::function<int(int, char**)> f,
         std::vector<std::string> const& cfg, hpx::runtime_mode mode)
     {
         hpx::init_params iparams;
