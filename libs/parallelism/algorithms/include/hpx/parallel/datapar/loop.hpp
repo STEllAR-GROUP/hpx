@@ -356,7 +356,7 @@ namespace hpx { namespace parallel { namespace util {
             return hpx::parallel::util::detail::datapar_loop_n<Iter>::call(
                 it, count, std::forward<F>(f));
         }
-    }
-}}}    // namespace hpx::parallel::util
+    }    // namespace detail
+}}}      // namespace hpx::parallel::util
 
 #endif
