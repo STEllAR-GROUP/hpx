@@ -21,7 +21,8 @@ set(benchmarks
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(benchmarks ${benchmarks} transform_reduce_scaling)
+  set(benchmarks ${benchmarks} foreach_scaling transform_reduce_scaling)
+  set(foreach_scaling_FLAGS DEPENDENCIES iostreams_component)
   set(transform_reduce_scaling_FLAGS DEPENDENCIES iostreams_component)
 endif()
 

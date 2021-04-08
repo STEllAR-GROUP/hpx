@@ -13,7 +13,7 @@
 
 #include <cstdint>
 
-inline void worker_timed(std::uint64_t delay_ns)
+HPX_FORCEINLINE void worker_timed(std::uint64_t delay_ns)
 {
     if (delay_ns == 0)
         return;

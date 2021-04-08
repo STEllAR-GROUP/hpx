@@ -37,9 +37,10 @@ namespace hpx { namespace util {
     {
         HPX_NON_COPYABLE(annotate_function);
 
-        explicit annotate_function(char const*) {}
+        explicit constexpr annotate_function(char const*) noexcept {}
+
         template <typename F>
-        explicit HPX_HOST_DEVICE annotate_function(F&&)
+        explicit HPX_HOST_DEVICE constexpr annotate_function(F&&) noexcept
         {
         }
 
@@ -214,9 +215,10 @@ namespace hpx { namespace util {
     {
         HPX_NON_COPYABLE(annotate_function);
 
-        explicit annotate_function(char const* /*name*/) {}
+        explicit constexpr annotate_function(char const* /*name*/) noexcept {}
+
         template <typename F>
-        explicit HPX_HOST_DEVICE annotate_function(F&& /*f*/)
+        explicit HPX_HOST_DEVICE constexpr annotate_function(F&& /*f*/) noexcept
         {
         }
 
@@ -231,13 +233,13 @@ namespace hpx { namespace util {
     ///
     /// \param function
     template <typename F>
-    F&& annotated_function(F&& f, char const* = nullptr)
+    constexpr F&& annotated_function(F&& f, char const* = nullptr) noexcept
     {
         return std::forward<F>(f);
     }
 
     template <typename F>
-    F&& annotated_function(F&& f, std::string const&)
+    constexpr F&& annotated_function(F&& f, std::string const&) noexcept
     {
         return std::forward<F>(f);
     }

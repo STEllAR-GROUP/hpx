@@ -184,13 +184,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // count
     namespace detail {
+
         /// \cond NOINTERNAL
         template <typename ExPolicy, typename Op, typename Proj>
         struct count_iteration
         {
-            typedef typename std::decay<ExPolicy>::type execution_policy_type;
-            typedef typename std::decay<Proj>::type proj_type;
-            typedef typename std::decay<Op>::type op_type;
+            using execution_policy_type = typename std::decay<ExPolicy>::type;
+            using proj_type = typename std::decay<Proj>::type;
+            using op_type = typename std::decay<Op>::type;
 
             op_type op_;
             proj_type proj_;
@@ -226,18 +227,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
             count_iteration& operator=(count_iteration&&) = default;
 
             template <typename Iter>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr
                 typename std::iterator_traits<Iter>::difference_type
                 operator()(Iter part_begin, std::size_t part_size)
             {
                 typename std::iterator_traits<Iter>::difference_type ret = 0;
-                util::loop_n<execution_policy_type>(part_begin, part_size,
-                    hpx::util::bind_back(*this, std::ref(ret)));
+                util::detail::loop_n<execution_policy_type>(part_begin,
+                    part_size, hpx::util::bind_back(*this, std::ref(ret)));
                 return ret;
             }
 
             template <typename Iter>
-            HPX_HOST_DEVICE HPX_FORCEINLINE void operator()(Iter curr,
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(Iter curr,
                 typename std::iterator_traits<Iter>::difference_type& ret)
             {
                 ret += traits::count_bits(
@@ -267,7 +268,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 typename std::iterator_traits<InIterB>::difference_type ret = 0;
 
-                util::loop(policy, first, last,
+                util::loop(std::forward<ExPolicy>(policy), first, last,
                     hpx::util::bind_back(std::move(f1), std::ref(ret)));
 
                 return ret;
@@ -362,7 +363,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 typename std::iterator_traits<InIterB>::difference_type ret = 0;
 
-                util::loop(policy, first, last,
+                util::loop(std::forward<ExPolicy>(policy), first, last,
                     hpx::util::bind_back(std::move(f1), std::ref(ret)));
 
                 return ret;

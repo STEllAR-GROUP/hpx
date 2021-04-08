@@ -102,8 +102,7 @@ namespace hpx { namespace execution { namespace experimental {
                     typename hpx::execution::experimental::sender_traits<
                         Sender>::template value_types<hpx::util::pack,
                         hpx::util::pack>;
-                using type =
-                    typename detail::when_all_single_result<value_types>::type;
+                using type = detail::single_result_non_void_t<value_types>;
             };
 
             template <template <typename...> class Tuple,

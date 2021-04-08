@@ -318,8 +318,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               zip_iterator part_begin,
                               std::size_t part_size) -> std::size_t {
                     // MSVC complains if pred or proj is captured by ref below
-                    util::loop_n<ExPolicy>(part_begin, part_size,
-                        [pred, proj](zip_iterator it) mutable {
+                    util::detail::loop_n<std::decay_t<ExPolicy>>(part_begin,
+                        part_size, [pred, proj](zip_iterator it) mutable {
                             bool f = hpx::util::invoke(
                                 pred, hpx::util::invoke(proj, get<0>(*it)));
 
@@ -354,10 +354,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     Iter& dest = *dest_ptr;
 
+                    using execution_policy_type = std::decay_t<ExPolicy>;
                     if (dest == get<0>(part_begin.get_iterator_tuple()))
                     {
                         // Self-assignment must be detected.
-                        util::loop_n<ExPolicy>(
+                        util::detail::loop_n<execution_policy_type>(
                             part_begin, part_size, [&dest](zip_iterator it) {
                                 if (!get<1>(*it))
                                 {
@@ -371,7 +372,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     else
                     {
                         // Self-assignment can't be performed.
-                        util::loop_n<ExPolicy>(
+                        util::detail::loop_n<execution_policy_type>(
                             part_begin, part_size, [&dest](zip_iterator it) {
                                 if (!get<1>(*it))
                                     *dest++ = std::move(get<0>(*it));
@@ -443,13 +444,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
         remove(ExPolicy&& policy, FwdIter first, FwdIter last, T const& value,
             Proj&& proj = Proj())
     {
-        typedef typename std::iterator_traits<FwdIter>::value_type Type;
+
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+        using value_type = typename std::iterator_traits<FwdIter>::value_type;
 
         // Just utilize existing parallel remove_if.
         return detail::remove_if<FwdIter>().call(
             std::forward<ExPolicy>(policy), first, last,
-            [value](Type const& a) -> bool { return value == a; },
+            [value](value_type const& a) -> bool { return value == a; },
             std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
 

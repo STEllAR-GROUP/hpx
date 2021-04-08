@@ -191,12 +191,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         using difference_type =
             typename std::iterator_traits<iterator_type>::difference_type;
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
         return hpx::parallel::v1::detail::count<difference_type>().call(
             std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), value, std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     // clang-format off
@@ -231,12 +231,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         using difference_type =
             typename std::iterator_traits<iterator_type>::difference_type;
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
         return hpx::parallel::v1::detail::count_if<difference_type>().call(
             std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), std::forward<F>(f), std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
 
