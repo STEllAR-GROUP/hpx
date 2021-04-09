@@ -7,6 +7,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/modules/testing.hpp>
+#include <utility>
 
 static bool ran_hpx_main;
 

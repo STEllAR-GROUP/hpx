@@ -89,7 +89,8 @@ namespace hpx {
             main_f = util::bind_back(detail::init_helper, f);
         if (argc == 0 || argv == nullptr)
         {
-            return init(std::move(main_f), detail::dummy_argc, detail::dummy_argv, params);
+            return init(std::move(main_f), detail::dummy_argc,
+                    detail::dummy_argv, params);
         }
         return init(std::move(main_f), argc, argv, params);
     }
@@ -106,7 +107,8 @@ namespace hpx {
             main_f = static_cast<hpx_main_type>(::hpx_main);
         if (argc == 0 || argv == nullptr)
         {
-            return init(std::move(main_f), detail::dummy_argc, detail::dummy_argv, params);
+            return init(std::move(main_f), detail::dummy_argc,
+                    detail::dummy_argv, params);
         }
         return init(std::move(main_f), argc, argv, params);
     }
@@ -123,7 +125,8 @@ namespace hpx {
         std::function<int(hpx::program_options::variables_map&)> main_f;
         if (argc == 0 || argv == nullptr)
         {
-            return init(std::move(main_f), detail::dummy_argc, detail::dummy_argv, params);
+            return init(std::move(main_f), detail::dummy_argc,
+                    detail::dummy_argv, params);
         }
         return init(std::move(main_f), argc, argv, params);
     }
