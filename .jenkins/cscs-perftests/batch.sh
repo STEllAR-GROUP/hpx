@@ -16,7 +16,7 @@ build_dir="/dev/shm/hpx/build"
 # Copy source directory to /dev/shm for faster builds
 mkdir -p "${build_dir}"
 cp -r "${orig_src_dir}" "${src_dir}"
-envfile=${src_dir}/.jenkins/cscs/env-${configuration_name}.sh
+envfile=${src_dir}/.jenkins/cscs-perftests/env-${configuration_name}.sh
 # Copy the perftest utility in the build dir
 mkdir -p ${build_dir}/tools
 cp -r ${src_dir}/tools/perftests_ci ${build_dir}/tools
@@ -27,8 +27,6 @@ result_dir=${build_dir}/tools/perftests_ci/results
 mkdir -p $result_dir
 result=$result_dir/local-priority-fifo.json
 
-# FIXME: we can probably do this step as the other tests and use gridtools
-# script only for running and plotting
 # Build binaries for performance tests
 ${perftests_dir}/driver.py -v -l $logfile build -b release \
     -o build --source-dir ${src_dir} --build-dir ${build_dir} -e $envfile \

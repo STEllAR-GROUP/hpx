@@ -12,7 +12,7 @@ set -eux
 # Clean up old artifacts
 rm -f ./jenkins-hpx* ./*-Testing
 
-source .jenkins/cscs/slurm-constraint-${configuration_name}.sh
+source .jenkins/cscs-perftests/slurm-constraint-${configuration_name}.sh
 
 if [[ -z "${ghprbPullId:-}" ]]; then
     # Set name of branch if not building a pull request
@@ -37,7 +37,7 @@ sbatch \
     --time="01:30:00" \
     --output="jenkins-hpx-${configuration_name}.out" \
     --error="jenkins-hpx-${configuration_name}.err" \
-    --wait .jenkins/cscs/perftests/batch.sh
+    --wait .jenkins/cscs-perftests/batch.sh
 
 # Print slurm logs
 echo "= stdout =================================================="
@@ -72,7 +72,7 @@ if [[ -n "${ghprbPullId:-}" ]]; then
         "${github_commit_status}" \
         "${configuration_name}" \
         "${cdash_build_id}" \
-        "jenkins/cscs"
+        "jenkins/cscs-perftests"
 fi
 
 set -e

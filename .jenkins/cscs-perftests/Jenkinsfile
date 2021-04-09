@@ -53,7 +53,7 @@ pipeline {
                             dir('hpx') {
                                 sh '''
                                 #!/bin/bash -l
-                                .jenkins/cscs/perftests/entry.sh
+                                .jenkins/cscs-perftests/entry.sh
                                 '''
                             }
                         }

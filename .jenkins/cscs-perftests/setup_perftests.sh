@@ -12,7 +12,7 @@ set -eux
 rm -f ./jenkins-hpx* ./*-Testing
 
 # TMP! now using the envfile var in the python script
-source .jenkins/cscs/slurm-constraint-${configuration_name}.sh
+source .jenkins/cscs-perftests/slurm-constraint-${configuration_name}.sh
 
 #if [[ -z "${ghprbPullId:-}" ]]; then
 #    # Set name of branch if not building a pull request
@@ -38,7 +38,7 @@ build_dir="/dev/shm/hpx/build"
 # Copy source directory to /dev/shm for faster builds
 mkdir -p "${build_dir}"
 # Tmp! Will be handled by the python script later
-envfile=${src_dir}/.jenkins/cscs/env-${configuration_name}.sh
+envfile=${src_dir}/.jenkins/cscs-perftests/env-${configuration_name}.sh
 
 # Copy the perftest utility in the build dir
 mkdir -p ${build_dir}/tools/perftests_ci
@@ -137,7 +137,7 @@ if [[ -n "${ghprbPullId:-}" ]]; then
         "${github_commit_status}" \
         "${configuration_name}" \
         "${cdash_build_id}" \
-        "jenkins/cscs/perftests"
+        "jenkins/cscs-perftests"
 fi
 
 set -e
