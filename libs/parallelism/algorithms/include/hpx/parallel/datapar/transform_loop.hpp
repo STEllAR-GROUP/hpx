@@ -47,7 +47,7 @@ namespace hpx { namespace parallel { namespace util {
             {
                 std::size_t len = count;
 
-                for (/* */; is_data_aligned(first) && len != 0; --len)
+                for (/* */; !is_data_aligned(first) && len != 0; --len)
                 {
                     datapar_transform_loop_step::call1(f, first, dest);
                 }
@@ -174,7 +174,7 @@ namespace hpx { namespace parallel { namespace util {
             {
                 std::size_t len = count;
 
-                for (/* */; is_data_aligned(first1) && len != 0; --len)
+                for (/* */; !is_data_aligned(first1) && len != 0; --len)
                 {
                     datapar_transform_loop_step::call1(f, first1, first2, dest);
                 }
