@@ -159,15 +159,6 @@ int hpx_main()
     }
 #endif
 
-#if defined(HPX_HAVE_NETWORKING)
-    if (hpx::is_networking_enabled())
-    {
-        execution::service_executor exec(
-            service_executor_type::parcel_thread_pool);
-        test_service_executor(exec);
-    }
-#endif
-
 #if defined(HPX_HAVE_TIMER_POOL)
     {
         execution::service_executor exec(

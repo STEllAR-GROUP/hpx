@@ -125,8 +125,7 @@ namespace hpx { namespace resource {
 
     namespace detail {
         detail::partitioner& create_partitioner(
-            resource::partitioner_mode rpmode,
-            hpx::util::runtime_configuration rtcfg,
+            resource::partitioner_mode rpmode, hpx::util::section rtcfg,
             hpx::threads::policies::detail::affinity_data affinity_data)
         {
             std::unique_ptr<detail::partitioner>& rp =

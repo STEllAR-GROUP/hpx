@@ -8,7 +8,7 @@
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/apply.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
-#include <hpx/runtime_configuration/ini.hpp>
+#include <hpx/ini/ini.hpp>
 #include <hpx/serialization/vector.hpp>
 
 #include <cstdint>

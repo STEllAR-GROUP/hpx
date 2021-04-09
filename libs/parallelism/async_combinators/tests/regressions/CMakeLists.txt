@@ -7,13 +7,6 @@
 
 set(tests split_future_2246 when_all_vectors_1623)
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests} wait_all_hang_1946)
-endif()
-
-set(wait_all_hang_1946_PARAMETERS THREADS_PER_LOCALITY 8)
-set(wait_all_hang_1946_FLAGS DEPENDENCIES iostreams_component)
-
 foreach(test ${tests})
   set(sources ${test}.cpp)
 

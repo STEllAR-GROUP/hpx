@@ -9,6 +9,7 @@
 #include <hpx/command_line_handling/parse_command_line.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <cstddef>
@@ -138,6 +139,8 @@ namespace hpx { namespace util {
                     }
                     handle_list_parcelports();
                 }
+#else
+                HPX_UNUSED(handle_list_parcelports);
 #endif
                 if (vm.count("hpx:exit"))
                 {

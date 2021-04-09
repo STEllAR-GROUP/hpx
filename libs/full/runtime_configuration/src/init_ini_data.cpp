@@ -7,13 +7,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
-#include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_configuration/init_ini_data.hpp>
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/version.hpp>

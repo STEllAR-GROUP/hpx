@@ -7,13 +7,6 @@
 
 set(tests exception)
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests} handled_exception unhandled_exception)
-endif()
-
-set(exception_LIBS NOLIBS DEPENDENCIES hpx_core)
-set(unhandled_exception_PARAMETERS FAILURE_EXPECTED)
-
 foreach(test ${tests})
   set(sources ${test}.cpp)
 

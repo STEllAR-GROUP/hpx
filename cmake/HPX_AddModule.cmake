@@ -357,7 +357,7 @@ function(add_hpx_module libname modulename)
 
   # Install the headers from the source
   install(
-    DIRECTORY include/hpx
+    DIRECTORY include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT ${modulename}
   )

@@ -9,11 +9,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/ini/ini.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/runtime_configuration/agas_service_mode.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
-#include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/runtime_configuration/runtime_configuration_fwd.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>

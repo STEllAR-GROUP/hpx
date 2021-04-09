@@ -7,27 +7,6 @@
 
 set(tests)
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests} function_argument function_serialization_728)
-endif()
-
-set(function_argument_FLAGS DEPENDENCIES iostreams_component)
-set(function_serialization_728_dependencies iostreams_component)
-
-if(HPX_WITH_COMPRESSION_ZLIB)
-  set(function_serialization_728_dependencies
-      ${function_serialization_728_dependencies} compression_zlib
-  )
-endif()
-if(WITH_PARCEL_COALESCING)
-  set(function_serialization_728_dependencies
-      ${function_serialization_728_dependencies} parcel_coalescing
-  )
-endif()
-set(function_serialization_728_FLAGS DEPENDENCIES
-                                     ${function_serialization_728_dependencies}
-)
-
 foreach(test ${tests})
   set(sources ${test}.cpp)
 

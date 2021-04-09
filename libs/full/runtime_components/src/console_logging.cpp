@@ -14,6 +14,7 @@
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_components/console_logging.hpp>

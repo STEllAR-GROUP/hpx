@@ -5,10 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/command_line_handling/parse_command_line.hpp>
+#include <hpx/command_line_handling_local/parse_command_line_local.hpp>
 #include <hpx/datastructures/any.hpp>
+#include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
-#include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <cctype>

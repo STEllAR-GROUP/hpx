@@ -9,10 +9,9 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/ini/ini.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/runtime_configuration/runtime_mode.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -22,8 +21,7 @@
 
 namespace hpx { namespace resource { namespace detail {
     HPX_EXPORT partitioner& create_partitioner(
-        resource::partitioner_mode rpmode,
-        hpx::util::runtime_configuration rtcfg,
+        resource::partitioner_mode rpmode, hpx::util::section rtcfg,
         hpx::threads::policies::detail::affinity_data affinity_data);
 
 }}}    // namespace hpx::resource::detail

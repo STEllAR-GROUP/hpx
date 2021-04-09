@@ -5,11 +5,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests block_allocator)
-
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests} numa_allocator)
-endif()
+set(tests block_allocator numa_allocator)
 
 # NB. threads = -2 = threads = 'cores' NB. threads = -1 = threads = 'all'
 set(numa_allocator_PARAMETERS
@@ -21,9 +17,6 @@ set(numa_allocator_PARAMETERS
     --tiles-per-domain=2
     --col-proc=1
     --row-proc=1
-)
-set(numa_allocator_FLAGS DEPENDENCIES iostreams_component DEPENDENCIES PRIVATE
-                         Hwloc::hwloc
 )
 
 foreach(test ${tests})

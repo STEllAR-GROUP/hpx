@@ -24,8 +24,8 @@
 #include <vector>
 
 #include <hpx/assert.hpp>
+#include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/serialization/map.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/string_util/classification.hpp>
@@ -1018,10 +1018,10 @@ namespace hpx { namespace util {
     }
 
     // explicit instantiation for the correct archive types
-    template HPX_EXPORT void section::save(
+    template HPX_CORE_EXPORT void section::save(
         serialization::output_archive&, const unsigned int version) const;
 
-    template HPX_EXPORT void section::load(
+    template HPX_CORE_EXPORT void section::load(
         serialization::input_archive&, const unsigned int version);
 
 }}    // namespace hpx::util

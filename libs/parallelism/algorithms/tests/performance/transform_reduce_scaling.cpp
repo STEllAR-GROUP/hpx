@@ -9,7 +9,6 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/chrono.hpp>
-#include <hpx/iostream.hpp>
 #include <hpx/numeric.hpp>
 #include "worker_timed.hpp"
 
@@ -78,7 +77,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     test_count = vm["test_count"].as<int>();
     if (test_count < 0 || test_count == 0)
     {
-        hpx::cout << "test_count cannot be less than zero...\n" << hpx::flush;
+        std::cout << "test_count cannot be less than zero...\n" << std::flush;
     }
     else
     {
@@ -88,18 +87,18 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         if (csvoutput)
         {
-            hpx::cout << "," << tr_time / 1e9 << "," << tr_old_time / 1e9
+            std::cout << "," << tr_time / 1e9 << "," << tr_old_time / 1e9
                       << "\n"
-                      << hpx::flush;
+                      << std::flush;
         }
         else
         {
-            hpx::cout << "transform_reduce: " << std::right << std::setw(30)
+            std::cout << "transform_reduce: " << std::right << std::setw(30)
                       << tr_time / 1e9 << "\n"
-                      << hpx::flush;
-            hpx::cout << "old_transform_reduce" << std::right << std::setw(30)
+                      << std::flush;
+            std::cout << "old_transform_reduce" << std::right << std::setw(30)
                       << tr_old_time / 1e9 << "\n"
-                      << hpx::flush;
+                      << std::flush;
         }
     }
     return hpx::finalize();

@@ -8,30 +8,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/logging.hpp>
 
 #include <cstddef>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx {
+namespace hpx { namespace components {
 
-    ///////////////////////////////////////////////////////////////////////////
-    enum logging_destination
-    {
-        destination_hpx = 0,
-        destination_timing = 1,
-        destination_agas = 2,
-        destination_parcel = 3,
-        destination_app = 4,
-        destination_debuglog = 5
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace components {
-
-        HPX_EXPORT void console_logging(logging_destination dest,
-            std::size_t level, std::string const& msg);
-        HPX_EXPORT void cleanup_logging();
-        HPX_EXPORT void activate_logging();
-    }    // namespace components
-}    // namespace hpx
+    HPX_EXPORT void console_logging(
+        logging_destination dest, std::size_t level, std::string const& msg);
+    HPX_EXPORT void cleanup_logging();
+    HPX_EXPORT void activate_logging();
+}}    // namespace hpx::components

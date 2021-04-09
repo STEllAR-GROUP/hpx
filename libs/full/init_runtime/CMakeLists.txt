@@ -21,7 +21,7 @@ set(init_runtime_headers
     hpx/init_runtime/detail/init_logging.hpp
 )
 
-set(init_runtime_sources hpx_init.cpp hpx_main_winsocket.cpp init_logging.cpp)
+set(init_runtime_sources hpx_init.cpp hpx_main_winsocket.cpp)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(init_runtime_headers ${init_runtime_headers}
@@ -47,7 +47,8 @@ add_hpx_module(
   HEADERS ${init_runtime_headers}
   SOURCES ${init_runtime_sources}
   DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES hpx_program_options hpx_runtime_local hpx_threadmanager
-                      ${init_runtime_optional_module_dependencies}
+  MODULE_DEPENDENCIES
+    hpx_init_runtime_local hpx_program_options hpx_runtime_local
+    hpx_threadmanager ${init_runtime_optional_module_dependencies}
   CMAKE_SUBDIRS examples tests
 )

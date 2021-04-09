@@ -8,10 +8,10 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/include/parallel_task_block.hpp>
-#include <hpx/iostream.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -37,17 +37,17 @@ void define_task_block_test1()
 
         trh.run([&]() {
             task1_flag = true;
-            hpx::cout << "task1: " << s << hpx::endl;
+            std::cout << "task1: " << s << std::endl;
         });
 
         trh.run([&]() {
             task2_flag = true;
-            hpx::cout << "task2" << hpx::endl;
+            std::cout << "task2" << std::endl;
 
             define_task_block(par, [&](task_block<>& trh) {
                 trh.run([&]() {
                     task21_flag = true;
-                    hpx::cout << "task2.1" << hpx::endl;
+                    std::cout << "task2.1" << std::endl;
                 });
             });
         });
@@ -55,10 +55,10 @@ void define_task_block_test1()
         int i = 0, j = 10, k = 20;
         trh.run([=, &task3_flag]() {
             task3_flag = true;
-            hpx::cout << "task3: " << i << " " << j << " " << k << hpx::endl;
+            std::cout << "task3: " << i << " " << j << " " << k << std::endl;
         });
 
-        hpx::cout << "parent" << hpx::endl;
+        std::cout << "parent" << std::endl;
     });
 
     HPX_TEST(parent_flag);
@@ -85,17 +85,17 @@ void define_task_block_test2()
 
             trh.run([&]() {
                 task1_flag = true;
-                hpx::cout << "task1: " << s << hpx::endl;
+                std::cout << "task1: " << s << std::endl;
             });
 
             trh.run([&]() {
                 task2_flag = true;
-                hpx::cout << "task2" << hpx::endl;
+                std::cout << "task2" << std::endl;
 
                 define_task_block(par, [&](task_block<>& trh) {
                     trh.run([&]() {
                         task21_flag = true;
-                        hpx::cout << "task2.1" << hpx::endl;
+                        std::cout << "task2.1" << std::endl;
                     });
                 });
             });
@@ -103,11 +103,11 @@ void define_task_block_test2()
             int i = 0, j = 10, k = 20;
             trh.run([=, &task3_flag]() {
                 task3_flag = true;
-                hpx::cout << "task3: " << i << " " << j << " " << k
-                          << hpx::endl;
+                std::cout << "task3: " << i << " " << j << " " << k
+                          << std::endl;
             });
 
-            hpx::cout << "parent" << hpx::endl;
+            std::cout << "parent" << std::endl;
         });
 
     f.wait();
@@ -126,16 +126,16 @@ void define_task_block_exceptions_test1()
     {
         define_task_block(par, [](task_block<>& trh) {
             trh.run([]() {
-                hpx::cout << "task1" << hpx::endl;
+                std::cout << "task1" << std::endl;
                 throw 1;
             });
 
             trh.run([]() {
-                hpx::cout << "task2" << hpx::endl;
+                std::cout << "task2" << std::endl;
                 throw 2;
             });
 
-            hpx::cout << "parent" << hpx::endl;
+            std::cout << "parent" << std::endl;
             throw 100;
         });
 
@@ -156,16 +156,16 @@ void define_task_block_exceptions_test2()
     hpx::future<void> f =
         define_task_block(par(task), [](task_block<parallel_task_policy>& trh) {
             trh.run([]() {
-                hpx::cout << "task1" << hpx::endl;
+                std::cout << "task1" << std::endl;
                 throw 1;
             });
 
             trh.run([]() {
-                hpx::cout << "task2" << hpx::endl;
+                std::cout << "task2" << std::endl;
                 throw 2;
             });
 
-            hpx::cout << "parent" << hpx::endl;
+            std::cout << "parent" << std::endl;
             throw 100;
         });
 
