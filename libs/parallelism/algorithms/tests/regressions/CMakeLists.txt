@@ -8,6 +8,7 @@ set(tests
     count_3646
     fill_executor_5016
     for_each_annotated_function
+    for_each_datapar
     for_loop_2281
     minimal_findend
     reduce_3641
