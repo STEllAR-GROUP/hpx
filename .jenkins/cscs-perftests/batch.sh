@@ -55,6 +55,17 @@ ${perftests_dir}/driver.py -v -l $logfile build -b release \
       || { echo 'Plotting failed'; exit 1; }
 #done
 
+# Dummy ctest to upload the html report of the perftest
+set +e
+ctest \
+    --verbose \
+    -S ${src_dir}/.jenkins/cscs-perftests/ctest.cmake \
+    -DCTEST_CONFIGURE_EXTRA_OPTIONS="${configure_extra_options}" \
+    -DCTEST_BUILD_CONFIGURATION_NAME="${configuration_name}" \
+    -DCTEST_SOURCE_DIRECTORY="${src_dir}" \
+    -DCTEST_BINARY_DIRECTORY="${build_dir}"
+set -e
+
 # Copy the testing directory for saving as an artifact
 cp -r ${build_dir}/Testing ${orig_src_dir}/${configuration_name}-Testing
 cp -r ${build_dir}/reports ${orig_src_dir}/${configuration_name}-reports
