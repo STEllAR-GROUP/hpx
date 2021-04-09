@@ -466,7 +466,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::remove_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct remove_if_t final
-      : hpx::functional::tag<remove_if_t>
+      : hpx::functional::tag_fallback<remove_if_t>
     {
         // clang-format off
         template <typename FwdIter,
@@ -518,7 +518,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::remove
     HPX_INLINE_CONSTEXPR_VARIABLE struct remove_t final
-      : hpx::functional::tag<remove_t>
+      : hpx::functional::tag_fallback<remove_t>
     {
     private:
         // clang-format off

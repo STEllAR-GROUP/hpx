@@ -105,7 +105,7 @@ namespace hpx {
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -414,7 +414,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::make_heap
     HPX_INLINE_CONSTEXPR_VARIABLE struct make_heap_t final
-      : hpx::functional::tag<make_heap_t>
+      : hpx::functional::tag_fallback<make_heap_t>
     {
     private:
         // clang-format off
@@ -430,7 +430,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
             ExPolicy>::type
-        tag_invoke(make_heap_t, ExPolicy&& policy, RndIter first, RndIter last,
+        tag_fallback_invoke(make_heap_t, ExPolicy&& policy, RndIter first, RndIter last,
             Comp&& comp)
         {
             static_assert(
@@ -453,7 +453,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
             ExPolicy>::type
-        tag_invoke(make_heap_t, ExPolicy&& policy, RndIter first, RndIter last)
+        tag_fallback_invoke(make_heap_t, ExPolicy&& policy, RndIter first, RndIter last)
         {
             static_assert(
                 hpx::traits::is_random_access_iterator<RndIter>::value,
@@ -479,7 +479,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend void tag_invoke(
+        friend void tag_fallback_invoke(
             make_heap_t, RndIter first, RndIter last, Comp&& comp)
         {
             static_assert(
@@ -497,7 +497,7 @@ namespace hpx {
                 hpx::traits::is_iterator<RndIter>::value
             )>
         // clang-format on
-        friend void tag_invoke(make_heap_t, RndIter first, RndIter last)
+        friend void tag_fallback_invoke(make_heap_t, RndIter first, RndIter last)
         {
             static_assert(
                 hpx::traits::is_random_access_iterator<RndIter>::value,
