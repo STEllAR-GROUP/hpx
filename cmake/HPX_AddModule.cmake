@@ -198,26 +198,13 @@ function(add_hpx_module libname modulename)
   endif()
 
   # create library modules
-  if(${name}_CUDA
-     AND HPX_WITH_CUDA
-     AND NOT HPX_WITH_CUDA_CLANG
+  # cmake-format: off
+  add_library(
+    hpx_${modulename} ${module_library_type}
+    ${sources} ${config_entries_source} ${${modulename}_OBJECTS}
+    ${headers} ${generated_headers} ${compat_headers}
   )
-    # cmake-format: off
-    cuda_add_library(
-      hpx_${modulename} ${module_library_type}
-      ${sources} ${config_entries_source} ${${modulename}_OBJECTS}
-      ${headers} ${generated_headers} ${compat_headers}
-    )
-    # cmake-format: on
-  else()
-    # cmake-format: off
-    add_library(
-      hpx_${modulename} ${module_library_type}
-      ${sources} ${config_entries_source} ${${modulename}_OBJECTS}
-      ${headers} ${generated_headers} ${compat_headers}
-    )
-    # cmake-format: on
-  endif()
+  # cmake-format: on
 
   if(HPX_WITH_CHECK_MODULE_DEPENDENCIES)
     # verify that all dependencies are from the same module category
