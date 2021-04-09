@@ -2176,8 +2176,7 @@ include(HPX_SetupMPI) # must come before APEX
 
 # Setup packages and subprojects
 include(HPX_SetupHIP)
-include(HPX_SetupCUDA) # CUDA needs to come before Apex, to have
-                       # cuda_add_library available
+include(HPX_SetupCUDA)
 include(HPX_SetupApex)
 include(HPX_SetupPapi)
 include(HPX_SetupGooglePerfTools)

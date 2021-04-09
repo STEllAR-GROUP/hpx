@@ -222,17 +222,10 @@ function(add_hpx_library name)
     endforeach()
   endif()
 
-  if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
-    cuda_add_library(
-      ${name} ${${name}_linktype} ${exclude_from_all} ${${name}_SOURCES}
-      ${${name}_HEADERS} ${${name}_AUXILIARY}
-    )
-  else()
-    add_library(
-      ${name} ${${name}_linktype} ${exclude_from_all} ${${name}_SOURCES}
-              ${${name}_HEADERS} ${${name}_AUXILIARY}
-    )
-  endif()
+  add_library(
+    ${name} ${${name}_linktype} ${exclude_from_all} ${${name}_SOURCES}
+            ${${name}_HEADERS} ${${name}_AUXILIARY}
+  )
 
   if(${name}_OUTPUT_SUFFIX)
     if(MSVC)

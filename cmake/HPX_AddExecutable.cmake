@@ -193,15 +193,9 @@ function(add_hpx_executable name)
     endforeach()
   endif()
 
-  if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
-    cuda_add_executable(
-      ${name} ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY}
-    )
-  else()
-    add_executable(
-      ${name} ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY}
-    )
-  endif()
+  add_executable(
+    ${name} ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY}
+  )
 
   if(${name}_OUTPUT_SUFFIX)
     if(MSVC)
