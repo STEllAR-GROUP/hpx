@@ -512,8 +512,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend FwdIter tag_fallback_invoke(hpx::is_sorted_until_t, FwdIter first,
-            FwdIter last, Pred&& pred = Pred())
+        friend FwdIter tag_fallback_invoke(hpx::is_sorted_until_t,
+            FwdIter first, FwdIter last, Pred&& pred = Pred())
         {
             return hpx::parallel::v1::detail::is_sorted_until<FwdIter,
                 FwdIter>()
@@ -537,8 +537,8 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_invoke(hpx::is_sorted_until_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, Pred&& pred = Pred())
+        tag_fallback_invoke(hpx::is_sorted_until_t, ExPolicy&& policy,
+            FwdIter first, FwdIter last, Pred&& pred = Pred())
         {
             return hpx::parallel::v1::detail::is_sorted_until<FwdIter,
                 FwdIter>()

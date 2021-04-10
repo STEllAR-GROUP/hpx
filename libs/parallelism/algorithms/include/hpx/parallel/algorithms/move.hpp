@@ -203,8 +203,8 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_invoke(move_t, ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest)
+        tag_fallback_invoke(move_t, ExPolicy&& policy, FwdIter1 first,
+            FwdIter1 last, FwdIter2 dest)
         {
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::transfer<

@@ -851,8 +851,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend RandIter3 tag_fallback_invoke(merge_t, RandIter1 first1, RandIter1 last1,
-            RandIter2 first2, RandIter2 last2, RandIter3 dest,
+        friend RandIter3 tag_fallback_invoke(merge_t, RandIter1 first1,
+            RandIter1 last1, RandIter2 first2, RandIter2 last2, RandIter3 dest,
             Comp&& comp = Comp())
         {
             static_assert(
@@ -922,8 +922,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend void tag_fallback_invoke(inplace_merge_t, RandIter first, RandIter middle,
-            RandIter last, Comp&& comp = Comp())
+        friend void tag_fallback_invoke(inplace_merge_t, RandIter first,
+            RandIter middle, RandIter last, Comp&& comp = Comp())
         {
             static_assert(
                 (hpx::traits::is_random_access_iterator<RandIter>::value),

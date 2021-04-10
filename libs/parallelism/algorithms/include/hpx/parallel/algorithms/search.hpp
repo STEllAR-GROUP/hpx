@@ -383,8 +383,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend FwdIter tag_fallback_invoke(hpx::search_t, FwdIter first, FwdIter last,
-            FwdIter2 s_first, FwdIter2 s_last, Pred&& op = Pred())
+        friend FwdIter tag_fallback_invoke(hpx::search_t, FwdIter first,
+            FwdIter last, FwdIter2 s_first, FwdIter2 s_last, Pred&& op = Pred())
         {
             return hpx::parallel::v1::detail::search<FwdIter, FwdIter>().call(
                 hpx::execution::seq, first, last, s_first, s_last,

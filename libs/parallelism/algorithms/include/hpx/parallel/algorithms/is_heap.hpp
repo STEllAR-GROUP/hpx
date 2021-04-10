@@ -468,8 +468,8 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_invoke(is_heap_t, ExPolicy&& policy, RandIter first, RandIter last,
-            Comp&& comp = Comp())
+        tag_fallback_invoke(is_heap_t, ExPolicy&& policy, RandIter first,
+            RandIter last, Comp&& comp = Comp())
         {
             static_assert(
                 (hpx::traits::is_random_access_iterator<RandIter>::value),

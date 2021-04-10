@@ -430,8 +430,8 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
             ExPolicy>::type
-        tag_fallback_invoke(make_heap_t, ExPolicy&& policy, RndIter first, RndIter last,
-            Comp&& comp)
+        tag_fallback_invoke(make_heap_t, ExPolicy&& policy, RndIter first,
+            RndIter last, Comp&& comp)
         {
             static_assert(
                 hpx::traits::is_random_access_iterator<RndIter>::value,
@@ -453,7 +453,8 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
             ExPolicy>::type
-        tag_fallback_invoke(make_heap_t, ExPolicy&& policy, RndIter first, RndIter last)
+        tag_fallback_invoke(
+            make_heap_t, ExPolicy&& policy, RndIter first, RndIter last)
         {
             static_assert(
                 hpx::traits::is_random_access_iterator<RndIter>::value,
@@ -497,7 +498,8 @@ namespace hpx {
                 hpx::traits::is_iterator<RndIter>::value
             )>
         // clang-format on
-        friend void tag_fallback_invoke(make_heap_t, RndIter first, RndIter last)
+        friend void tag_fallback_invoke(
+            make_heap_t, RndIter first, RndIter last)
         {
             static_assert(
                 hpx::traits::is_random_access_iterator<RndIter>::value,

@@ -283,8 +283,8 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_invoke(hpx::is_partitioned_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, Pred&& pred)
+        tag_fallback_invoke(hpx::is_partitioned_t, ExPolicy&& policy,
+            FwdIter first, FwdIter last, Pred&& pred)
         {
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, FwdIter>()
                 .call(std::forward<ExPolicy>(policy), first, last,

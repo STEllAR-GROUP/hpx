@@ -514,8 +514,9 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             RandIter>::type
-        tag_fallback_invoke(hpx::partial_sort_t, ExPolicy&& policy, RandIter first,
-            RandIter middle, RandIter last, Comp&& comp = Comp())
+        tag_fallback_invoke(hpx::partial_sort_t, ExPolicy&& policy,
+            RandIter first, RandIter middle, RandIter last,
+            Comp&& comp = Comp())
         {
             static_assert(
                 hpx::traits::is_random_access_iterator<RandIter>::value,

@@ -1147,8 +1147,8 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_invoke(find_t, ExPolicy&& policy, FwdIter first, FwdIter last,
-            T const& val)
+        tag_fallback_invoke(find_t, ExPolicy&& policy, FwdIter first,
+            FwdIter last, T const& val)
         {
             using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
 
@@ -1210,7 +1210,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend FwdIter tag_fallback_invoke(find_if_t, FwdIter first, FwdIter last, F&& f)
+        friend FwdIter tag_fallback_invoke(
+            find_if_t, FwdIter first, FwdIter last, F&& f)
         {
             return hpx::parallel::v1::detail::find_if_(hpx::execution::seq,
                 first, last, std::forward<F>(f),
@@ -1339,8 +1340,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend FwdIter1 tag_fallback_invoke(find_end_t, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, Pred&& op)
+        friend FwdIter1 tag_fallback_invoke(find_end_t, FwdIter1 first1,
+            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Requires at least forward iterator.");
@@ -1361,8 +1362,8 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
         // clang-format on
-        friend FwdIter1 tag_fallback_invoke(find_end_t, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2)
+        friend FwdIter1 tag_fallback_invoke(find_end_t, FwdIter1 first1,
+            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Requires at least forward iterator.");

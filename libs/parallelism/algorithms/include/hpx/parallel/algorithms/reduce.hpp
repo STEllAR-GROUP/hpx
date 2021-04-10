@@ -483,7 +483,8 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend T tag_fallback_invoke(hpx::reduce_t, FwdIter first, FwdIter last, T init)
+        friend T tag_fallback_invoke(
+            hpx::reduce_t, FwdIter first, FwdIter last, T init)
         {
             using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
 
@@ -497,8 +498,8 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend typename std::iterator_traits<FwdIter>::value_type tag_fallback_invoke(
-            hpx::reduce_t, FwdIter first, FwdIter last)
+        friend typename std::iterator_traits<FwdIter>::value_type
+        tag_fallback_invoke(hpx::reduce_t, FwdIter first, FwdIter last)
         {
             using value_type =
                 typename std::iterator_traits<FwdIter>::value_type;
