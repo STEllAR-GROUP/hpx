@@ -20,308 +20,341 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_shift_left(ExPolicy policy, IteratorTag) {
-  static_assert(hpx::is_execution_policy<ExPolicy>::value,
-                "hpx::is_execution_policy<ExPolicy>::value");
+void test_shift_left(ExPolicy policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
-  typedef std::vector<std::size_t>::iterator base_iterator;
-  typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-  std::vector<std::size_t> c(10007);
-  std::vector<std::size_t> d1;
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d1;
 
-  std::iota(std::begin(c), std::end(c), std::rand());
-  std::copy(std::begin(c), std::end(c), std::back_inserter(d1));
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::copy(std::begin(c), std::end(c), std::back_inserter(d1));
 
-  std::size_t mid_pos = std::rand() % c.size(); //-V104
-  base_iterator mid = std::begin(c);
-  std::advance(mid, mid_pos);
+    std::size_t mid_pos = std::rand() % c.size();    //-V104
+    base_iterator mid = std::begin(c);
+    std::advance(mid, mid_pos);
 
-  hpx::parallel::shift_left(policy, iterator(std::begin(c)), iterator(mid),
-                            iterator(std::end(c)));
+    hpx::parallel::shift_left(
+        policy, iterator(std::begin(c)), iterator(mid), iterator(std::end(c)));
 
-  base_iterator mid1 = std::begin(d1);
-  std::advance(mid1, mid_pos);
-  std::shift_left(std::begin(d1), mid1, std::end(d1));
+    base_iterator mid1 = std::begin(d1);
+    std::advance(mid1, mid_pos);
+    std::shift_left(std::begin(d1), mid1, std::end(d1));
 
-  std::size_t count = 0;
-  HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d1),
-                      [&count](std::size_t v1, std::size_t v2) -> bool {
-                        HPX_TEST_EQ(v1, v2);
-                        ++count;
-                        return v1 == v2;
-                      }));
-  HPX_TEST_EQ(count, d1.size());
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d1),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d1.size());
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_shift_left_async(ExPolicy p, IteratorTag) {
-  typedef std::vector<std::size_t>::iterator base_iterator;
-  typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+void test_shift_left_async(ExPolicy p, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-  std::vector<std::size_t> c(10007);
-  std::vector<std::size_t> d1;
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d1;
 
-  std::iota(std::begin(c), std::end(c), std::rand());
-  std::copy(std::begin(c), std::end(c), std::back_inserter(d1));
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::copy(std::begin(c), std::end(c), std::back_inserter(d1));
 
-  std::size_t mid_pos = std::rand() % c.size(); //-V104
+    std::size_t mid_pos = std::rand() % c.size();    //-V104
 
-  base_iterator mid = std::begin(c);
-  std::advance(mid, mid_pos);
+    base_iterator mid = std::begin(c);
+    std::advance(mid, mid_pos);
 
-  auto f = hpx::parallel::shift_left(p, iterator(std::begin(c)), iterator(mid),
-                                     iterator(std::end(c)));
-  f.wait();
+    auto f = hpx::parallel::shift_left(
+        p, iterator(std::begin(c)), iterator(mid), iterator(std::end(c)));
+    f.wait();
 
-  base_iterator mid1 = std::begin(d1);
-  std::advance(mid1, mid_pos);
-  std::rotate(std::begin(d1), mid1, std::end(d1));
+    base_iterator mid1 = std::begin(d1);
+    std::advance(mid1, mid_pos);
+    std::rotate(std::begin(d1), mid1, std::end(d1));
 
-  std::size_t count = 0;
-  HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d1),
-                      [&count](std::size_t v1, std::size_t v2) -> bool {
-                        HPX_TEST_EQ(v1, v2);
-                        ++count;
-                        return v1 == v2;
-                      }));
-  HPX_TEST_EQ(count, d1.size());
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d1),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d1.size());
 }
 
-template <typename IteratorTag> void test_shift_left() {
-  using namespace hpx::execution;
-  test_shift_left(seq, IteratorTag());
-  test_shift_left(par, IteratorTag());
-  test_shift_left(par_unseq, IteratorTag());
+template <typename IteratorTag>
+void test_shift_left()
+{
+    using namespace hpx::execution;
+    test_shift_left(seq, IteratorTag());
+    test_shift_left(par, IteratorTag());
+    test_shift_left(par_unseq, IteratorTag());
 
-  test_shift_left_async(seq(task), IteratorTag());
-  test_shift_left_async(par(task), IteratorTag());
+    test_shift_left_async(seq(task), IteratorTag());
+    test_shift_left_async(par(task), IteratorTag());
 }
 
-void shift_left_test() {
-  test_shift_left<std::random_access_iterator_tag>();
-  test_shift_left<std::forward_iterator_tag>();
+void shift_left_test()
+{
+    test_shift_left<std::random_access_iterator_tag>();
+    test_shift_left<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_shift_left_exception(ExPolicy policy, IteratorTag) {
-  static_assert(hpx::is_execution_policy<ExPolicy>::value,
-                "hpx::is_execution_policy<ExPolicy>::value");
+void test_shift_left_exception(ExPolicy policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
-  typedef std::vector<std::size_t>::iterator base_iterator;
-  typedef test::decorated_iterator<base_iterator, IteratorTag>
-      decorated_iterator;
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
 
-  std::vector<std::size_t> c(10007);
-  std::iota(std::begin(c), std::end(c), std::rand());
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
 
-  base_iterator mid = std::begin(c);
+    base_iterator mid = std::begin(c);
 
-  // move at least one element to guarantee an exception to be thrown
-  std::size_t delta =
-      (std::max)(std::rand() % c.size(), std::size_t(2)); //-V104
-  std::advance(mid, delta);
+    // move at least one element to guarantee an exception to be thrown
+    std::size_t delta =
+        (std::max)(std::rand() % c.size(), std::size_t(2));    //-V104
+    std::advance(mid, delta);
 
-  bool caught_exception = false;
-  try {
-    hpx::parallel::shift_left(
-        policy,
-        decorated_iterator(std::begin(c),
-                           []() { throw std::runtime_error("test"); }),
-        decorated_iterator(mid), decorated_iterator(std::end(c)));
-    HPX_TEST(false);
-  } catch (hpx::exception_list const &e) {
-    caught_exception = true;
-    test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
-  } catch (...) {
-    HPX_TEST(false);
-  }
+    bool caught_exception = false;
+    try
+    {
+        hpx::parallel::shift_left(policy,
+            decorated_iterator(
+                std::begin(c), []() { throw std::runtime_error("test"); }),
+            decorated_iterator(mid), decorated_iterator(std::end(c)));
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
 
-  HPX_TEST(caught_exception);
+    HPX_TEST(caught_exception);
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_shift_left_exception_async(ExPolicy p, IteratorTag) {
-  typedef std::vector<std::size_t>::iterator base_iterator;
-  typedef test::decorated_iterator<base_iterator, IteratorTag>
-      decorated_iterator;
+void test_shift_left_exception_async(ExPolicy p, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
 
-  std::vector<std::size_t> c(10007);
-  std::iota(std::begin(c), std::end(c), std::rand());
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
 
-  base_iterator mid = std::begin(c);
+    base_iterator mid = std::begin(c);
 
-  // move at least one element to guarantee an exception to be thrown
-  std::size_t delta =
-      (std::max)(std::rand() % c.size(), std::size_t(2)); //-V104
-  std::advance(mid, delta);
+    // move at least one element to guarantee an exception to be thrown
+    std::size_t delta =
+        (std::max)(std::rand() % c.size(), std::size_t(2));    //-V104
+    std::advance(mid, delta);
 
-  bool caught_exception = false;
-  bool returned_from_algorithm = false;
-  try {
-    hpx::future<void> f = hpx::parallel::shift_left(
-        p,
-        decorated_iterator(std::begin(c),
-                           []() { throw std::runtime_error("test"); }),
-        decorated_iterator(mid), decorated_iterator(std::end(c)));
-    returned_from_algorithm = true;
-    f.get();
+    bool caught_exception = false;
+    bool returned_from_algorithm = false;
+    try
+    {
+        hpx::future<void> f = hpx::parallel::shift_left(p,
+            decorated_iterator(
+                std::begin(c), []() { throw std::runtime_error("test"); }),
+            decorated_iterator(mid), decorated_iterator(std::end(c)));
+        returned_from_algorithm = true;
+        f.get();
 
-    HPX_TEST(false);
-  } catch (hpx::exception_list const &e) {
-    caught_exception = true;
-    test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
-  } catch (...) {
-    HPX_TEST(false);
-  }
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
 
-  HPX_TEST(caught_exception);
-  HPX_TEST(returned_from_algorithm);
+    HPX_TEST(caught_exception);
+    HPX_TEST(returned_from_algorithm);
 }
 
-template <typename IteratorTag> void test_shift_left_exception() {
-  using namespace hpx::execution;
+template <typename IteratorTag>
+void test_shift_left_exception()
+{
+    using namespace hpx::execution;
 
-  // If the execution policy object is of type vector_execution_policy,
-  // std::terminate shall be called. therefore we do not test exceptions
-  // with a vector execution policy
-  test_shift_left_exception(seq, IteratorTag());
-  test_shift_left_exception(par, IteratorTag());
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
+    test_shift_left_exception(seq, IteratorTag());
+    test_shift_left_exception(par, IteratorTag());
 
-  test_shift_left_exception_async(seq(task), IteratorTag());
-  test_shift_left_exception_async(par(task), IteratorTag());
+    test_shift_left_exception_async(seq(task), IteratorTag());
+    test_shift_left_exception_async(par(task), IteratorTag());
 }
 
-void shift_left_exception_test() {
-  test_shift_left_exception<std::random_access_iterator_tag>();
-  test_shift_left_exception<std::forward_iterator_tag>();
+void shift_left_exception_test()
+{
+    test_shift_left_exception<std::random_access_iterator_tag>();
+    test_shift_left_exception<std::forward_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_shift_left_bad_alloc(ExPolicy policy, IteratorTag) {
-  static_assert(hpx::is_execution_policy<ExPolicy>::value,
-                "hpx::is_execution_policy<ExPolicy>::value");
+void test_shift_left_bad_alloc(ExPolicy policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
-  typedef std::vector<std::size_t>::iterator base_iterator;
-  typedef test::decorated_iterator<base_iterator, IteratorTag>
-      decorated_iterator;
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
 
-  std::vector<std::size_t> c(10007);
-  std::iota(std::begin(c), std::end(c), std::rand());
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
 
-  base_iterator mid = std::begin(c);
+    base_iterator mid = std::begin(c);
 
-  // move at least one element to guarantee an exception to be thrown
-  std::size_t delta =
-      (std::max)(std::rand() % c.size(), std::size_t(2)); //-V104
-  std::advance(mid, delta);
+    // move at least one element to guarantee an exception to be thrown
+    std::size_t delta =
+        (std::max)(std::rand() % c.size(), std::size_t(2));    //-V104
+    std::advance(mid, delta);
 
-  bool caught_bad_alloc = false;
-  try {
-    hpx::parallel::shift_left(
-        policy,
-        decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
-        decorated_iterator(mid), decorated_iterator(std::end(c)));
-    HPX_TEST(false);
-  } catch (std::bad_alloc const &) {
-    caught_bad_alloc = true;
-  } catch (...) {
-    HPX_TEST(false);
-  }
+    bool caught_bad_alloc = false;
+    try
+    {
+        hpx::parallel::shift_left(policy,
+            decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
+            decorated_iterator(mid), decorated_iterator(std::end(c)));
+        HPX_TEST(false);
+    }
+    catch (std::bad_alloc const&)
+    {
+        caught_bad_alloc = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
 
-  HPX_TEST(caught_bad_alloc);
+    HPX_TEST(caught_bad_alloc);
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_shift_left_bad_alloc_async(ExPolicy p, IteratorTag) {
-  typedef std::vector<std::size_t>::iterator base_iterator;
-  typedef test::decorated_iterator<base_iterator, IteratorTag>
-      decorated_iterator;
+void test_shift_left_bad_alloc_async(ExPolicy p, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
 
-  std::vector<std::size_t> c(10007);
-  std::iota(std::begin(c), std::end(c), std::rand());
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
 
-  base_iterator mid = std::begin(c);
+    base_iterator mid = std::begin(c);
 
-  // move at least one element to guarantee an exception to be thrown
-  std::size_t delta =
-      (std::max)(std::rand() % c.size(), std::size_t(2)); //-V104
-  std::advance(mid, delta);
+    // move at least one element to guarantee an exception to be thrown
+    std::size_t delta =
+        (std::max)(std::rand() % c.size(), std::size_t(2));    //-V104
+    std::advance(mid, delta);
 
-  bool caught_bad_alloc = false;
-  bool returned_from_algorithm = false;
-  try {
-    hpx::future<void> f = hpx::parallel::shift_left(
-        p, decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
-        decorated_iterator(mid), decorated_iterator(std::end(c)));
-    returned_from_algorithm = true;
-    f.get();
+    bool caught_bad_alloc = false;
+    bool returned_from_algorithm = false;
+    try
+    {
+        hpx::future<void> f = hpx::parallel::shift_left(p,
+            decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
+            decorated_iterator(mid), decorated_iterator(std::end(c)));
+        returned_from_algorithm = true;
+        f.get();
 
-    HPX_TEST(false);
-  } catch (std::bad_alloc const &) {
-    caught_bad_alloc = true;
-  } catch (...) {
-    HPX_TEST(false);
-  }
+        HPX_TEST(false);
+    }
+    catch (std::bad_alloc const&)
+    {
+        caught_bad_alloc = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
 
-  HPX_TEST(caught_bad_alloc);
-  HPX_TEST(returned_from_algorithm);
+    HPX_TEST(caught_bad_alloc);
+    HPX_TEST(returned_from_algorithm);
 }
 
-template <typename IteratorTag> void test_shift_left_bad_alloc() {
-  using namespace hpx::execution;
+template <typename IteratorTag>
+void test_shift_left_bad_alloc()
+{
+    using namespace hpx::execution;
 
-  // If the execution policy object is of type vector_execution_policy,
-  // std::terminate shall be called. therefore we do not test exceptions
-  // with a vector execution policy
-  test_shift_left_bad_alloc(seq, IteratorTag());
-  test_shift_left_bad_alloc(par, IteratorTag());
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
+    test_shift_left_bad_alloc(seq, IteratorTag());
+    test_shift_left_bad_alloc(par, IteratorTag());
 
-  test_shift_left_bad_alloc_async(seq(task), IteratorTag());
-  test_shift_left_bad_alloc_async(par(task), IteratorTag());
+    test_shift_left_bad_alloc_async(seq(task), IteratorTag());
+    test_shift_left_bad_alloc_async(par(task), IteratorTag());
 }
 
-void shift_left_bad_alloc_test() {
-  test_shift_left_bad_alloc<std::random_access_iterator_tag>();
-  test_shift_left_bad_alloc<std::forward_iterator_tag>();
+void shift_left_bad_alloc_test()
+{
+    test_shift_left_bad_alloc<std::random_access_iterator_tag>();
+    test_shift_left_bad_alloc<std::forward_iterator_tag>();
 }
 
-int hpx_main(hpx::program_options::variables_map &vm) {
-  unsigned int seed = (unsigned int)std::time(nullptr);
-  if (vm.count("seed"))
-    seed = vm["seed"].as<unsigned int>();
+int hpx_main(hpx::program_options::variables_map& vm)
+{
+    unsigned int seed = (unsigned int) std::time(nullptr);
+    if (vm.count("seed"))
+        seed = vm["seed"].as<unsigned int>();
 
-  std::cout << "using seed: " << seed << std::endl;
-  std::srand(seed);
+    std::cout << "using seed: " << seed << std::endl;
+    std::srand(seed);
 
-  shift_left_test();
-  shift_left_exception_test();
-  shift_left_bad_alloc_test();
-  return hpx::finalize();
+    shift_left_test();
+    shift_left_exception_test();
+    shift_left_bad_alloc_test();
+    return hpx::finalize();
 }
 
-int main(int argc, char *argv[]) {
-  // add command line option which controls the random number generator seed
-  using namespace hpx::program_options;
-  options_description desc_commandline("Usage: " HPX_APPLICATION_STRING
-                                       " [options]");
+int main(int argc, char* argv[])
+{
+    // add command line option which controls the random number generator seed
+    using namespace hpx::program_options;
+    options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
-  desc_commandline.add_options()(
-      "seed,s", value<unsigned int>(),
-      "the random number generator seed to use for this run");
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
-  // By default this test should run on all available cores
-  std::vector<std::string> const cfg = {"hpx.os_threads=all"};
+    // By default this test should run on all available cores
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
-  // Initialize and run HPX
-  hpx::init_params init_args;
-  init_args.desc_cmdline = desc_commandline;
-  init_args.cfg = cfg;
+    // Initialize and run HPX
+    hpx::init_params init_args;
+    init_args.desc_cmdline = desc_commandline;
+    init_args.cfg = cfg;
 
-  HPX_TEST_EQ_MSG(hpx::init(argc, argv, init_args), 0,
-                  "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(hpx::init(argc, argv, init_args), 0,
+        "HPX main exited with non-zero status");
 
-  return hpx::util::report_errors();
+    return hpx::util::report_errors();
 }
