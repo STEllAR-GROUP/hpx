@@ -50,9 +50,7 @@ namespace hpx {
     /// (or one of its overloads below) should be called from the users `main()`
     /// function. It will set up the HPX runtime environment and schedule the
     /// function given by \p f as a HPX thread.
-    inline int init(
-        std::function<int(hpx::program_options::variables_map&)>
-            f,
+    inline int init(std::function<int(hpx::program_options::variables_map&)> f,
         int argc, char** argv, init_params const& params)
     {
 #if defined(HPX_WINDOWS)
@@ -82,15 +80,15 @@ namespace hpx {
     /// (or one of its overloads below) should be called from the users `main()`
     /// function. It will set up the HPX runtime environment and schedule the
     /// function given by \p f as a HPX thread.
-    inline int init(std::function<int(int, char**)> f, int argc,
-        char** argv, init_params const& params)
+    inline int init(std::function<int(int, char**)> f, int argc, char** argv,
+        init_params const& params)
     {
-        std::function<int(hpx::program_options::variables_map&)>
-            main_f = util::bind_back(detail::init_helper, f);
+        std::function<int(hpx::program_options::variables_map&)> main_f =
+            util::bind_back(detail::init_helper, f);
         if (argc == 0 || argv == nullptr)
         {
             return init(std::move(main_f), detail::dummy_argc,
-                    detail::dummy_argv, params);
+                detail::dummy_argv, params);
         }
         return init(std::move(main_f), argc, argv, params);
     }
@@ -103,12 +101,12 @@ namespace hpx {
     /// function given by \p f as a HPX thread.
     inline int init(int argc, char** argv, init_params const& params)
     {
-        std::function<int(hpx::program_options::variables_map&)>
-            main_f = static_cast<hpx_main_type>(::hpx_main);
+        std::function<int(hpx::program_options::variables_map&)> main_f =
+            static_cast<hpx_main_type>(::hpx_main);
         if (argc == 0 || argv == nullptr)
         {
             return init(std::move(main_f), detail::dummy_argc,
-                    detail::dummy_argv, params);
+                detail::dummy_argv, params);
         }
         return init(std::move(main_f), argc, argv, params);
     }
@@ -126,7 +124,7 @@ namespace hpx {
         if (argc == 0 || argv == nullptr)
         {
             return init(std::move(main_f), detail::dummy_argc,
-                    detail::dummy_argv, params);
+                detail::dummy_argv, params);
         }
         return init(std::move(main_f), argc, argv, params);
     }
@@ -138,9 +136,10 @@ namespace hpx {
     /// console mode or worker mode depending on the command line settings).
     inline int init(init_params const& params)
     {
-        std::function<int(hpx::program_options::variables_map&)>
-            main_f = static_cast<hpx_main_type>(::hpx_main);
-        return init(std::move(main_f), detail::dummy_argc, detail::dummy_argv, params);
+        std::function<int(hpx::program_options::variables_map&)> main_f =
+            static_cast<hpx_main_type>(::hpx_main);
+        return init(
+            std::move(main_f), detail::dummy_argc, detail::dummy_argv, params);
     }
 
 #if defined(HPX_HAVE_INIT_START_OVERLOADS_COMPATIBILITY)
@@ -153,8 +152,8 @@ namespace hpx {
     HPX_DEPRECATED_V(1, 6,
         "The init overload used is deprecated. Please use"
         "the init overloads using the hpx::init_params struct.")
-    inline int init(std::function<int(
-                        hpx::program_options::variables_map& vm)> f,
+    inline int init(
+        std::function<int(hpx::program_options::variables_map& vm)> f,
         hpx::program_options::options_description const& desc_cmdline, int argc,
         char** argv, std::vector<std::string> const& cfg,
         startup_function_type startup, shutdown_function_type shutdown,
@@ -415,9 +414,8 @@ namespace hpx {
     HPX_DEPRECATED_V(1, 6,
         "The init overload used is deprecated. Please use"
         "the init overloads using the hpx::init_params struct.")
-    inline int init(std::function<int(int, char**)> f, int argc,
-        char** argv, std::vector<std::string> const& cfg,
-        hpx::runtime_mode mode)
+    inline int init(std::function<int(int, char**)> f, int argc, char** argv,
+        std::vector<std::string> const& cfg, hpx::runtime_mode mode)
     {
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
@@ -436,7 +434,8 @@ namespace hpx {
         hpx::init_params iparams;
         iparams.cfg = cfg;
         iparams.mode = mode;
-        return init(std::move(f), detail::dummy_argc, detail::dummy_argv, iparams);
+        return init(
+            std::move(f), detail::dummy_argc, detail::dummy_argv, iparams);
     }
 
     HPX_DEPRECATED_V(1, 6,
@@ -499,7 +498,8 @@ namespace hpx {
         hpx::init_params iparams;
         iparams.cfg = cfg;
         iparams.mode = mode;
-        return init(std::move(main_f), detail::dummy_argc, detail::dummy_argv, iparams);
+        return init(
+            std::move(main_f), detail::dummy_argc, detail::dummy_argv, iparams);
     }
 #endif
 

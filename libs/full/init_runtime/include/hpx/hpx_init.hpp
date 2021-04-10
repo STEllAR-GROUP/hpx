@@ -22,8 +22,8 @@
 #include <hpx/runtime_local/startup_function.hpp>
 
 #include <cstddef>
-#include <memory>
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -62,9 +62,7 @@ namespace hpx {
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    inline int init(
-        std::function<int(hpx::program_options::variables_map&)>
-            f,
+    inline int init(std::function<int(hpx::program_options::variables_map&)> f,
         int argc, char** argv, init_params const& params = init_params());
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -99,8 +97,8 @@ namespace hpx {
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    inline int init(std::function<int(int, char**)> f, int argc,
-        char** argv, init_params const& params = init_params());
+    inline int init(std::function<int(int, char**)> f, int argc, char** argv,
+        init_params const& params = init_params());
 
     /// \brief Main entry point for launching the HPX runtime system.
     ///
@@ -253,8 +251,8 @@ namespace hpx {
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    inline int init(std::function<int(
-                        hpx::program_options::variables_map& vm)> f,
+    inline int init(
+        std::function<int(hpx::program_options::variables_map& vm)> f,
         hpx::program_options::options_description const& desc_cmdline, int argc,
         char** argv, std::vector<std::string> const& cfg,
         startup_function_type startup = startup_function_type(),
@@ -786,8 +784,8 @@ namespace hpx {
     /// \note               The created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    inline int init(std::function<int(int, char**)> f, int argc,
-        char** argv, std::vector<std::string> const& cfg,
+    inline int init(std::function<int(int, char**)> f, int argc, char** argv,
+        std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode::default_);
 
     /// \brief Main entry point for launching the HPX runtime system.
