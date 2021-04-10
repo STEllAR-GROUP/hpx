@@ -506,28 +506,6 @@ namespace hpx {
             std::string const& appname,
             hpx::program_options::variables_map& vm);
     }    // namespace util
-
-    namespace threads {
-        /// \brief Returns the stack size name.
-        ///
-        /// Get the readable string representing the given stack size constant.
-        ///
-        /// \param size this represents the stack size
-        HPX_EXPORT char const* get_stack_size_name(std::ptrdiff_t size);
-
-        /// \brief Returns the default stack size.
-        ///
-        /// Get the default stack size in bytes.
-        HPX_EXPORT std::ptrdiff_t get_default_stack_size();
-
-        /// \brief Returns the stack size corresponding to the given stack size
-        ///        enumeration.
-        ///
-        /// Get the stack size corresponding to the given stack size enumeration.
-        ///
-        /// \param size this represents the stack size
-        HPX_EXPORT std::ptrdiff_t get_stack_size(thread_stacksize);
-    }    // namespace threads
 }    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>

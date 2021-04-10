@@ -8,6 +8,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(command_line_handling_headers
     hpx/command_line_handling/command_line_handling.hpp
+    hpx/command_line_handling/command_line_handling_fwd.hpp
     hpx/command_line_handling/late_command_line_handling.hpp
     hpx/command_line_handling/parse_command_line.hpp
 )

@@ -20,7 +20,6 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/threading.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>

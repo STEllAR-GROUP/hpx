@@ -13,7 +13,7 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/io_service.hpp>
-#include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/runtime_configuration/runtime_configuration_fwd.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/detail/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
@@ -181,6 +181,28 @@ namespace hpx {
         /// Get the global topology instance
         HPX_EXPORT topology const& get_topology();
         /// \endcond
+    }    // namespace threads
+
+    namespace threads {
+        /// \brief Returns the stack size name.
+        ///
+        /// Get the readable string representing the given stack size constant.
+        ///
+        /// \param size this represents the stack size
+        HPX_EXPORT char const* get_stack_size_name(std::ptrdiff_t size);
+
+        /// \brief Returns the default stack size.
+        ///
+        /// Get the default stack size in bytes.
+        HPX_EXPORT std::ptrdiff_t get_default_stack_size();
+
+        /// \brief Returns the stack size corresponding to the given stack size
+        ///        enumeration.
+        ///
+        /// Get the stack size corresponding to the given stack size enumeration.
+        ///
+        /// \param size this represents the stack size
+        HPX_EXPORT std::ptrdiff_t get_stack_size(thread_stacksize);
     }    // namespace threads
 
     namespace detail {

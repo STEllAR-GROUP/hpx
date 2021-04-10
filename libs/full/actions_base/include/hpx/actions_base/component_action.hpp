@@ -13,7 +13,8 @@
 #include <hpx/actions_base/traits/is_client.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/is_future.hpp>
-#include <hpx/modules/components_base.hpp>
+#include <hpx/components_base/get_lva.hpp>
+#include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/preprocessor/cat.hpp>

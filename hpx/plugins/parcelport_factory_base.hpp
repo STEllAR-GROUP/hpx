@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/command_line_handling.hpp>
+#include <hpx/command_line_handling/command_line_handling_fwd.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 
 #include <cstddef>
