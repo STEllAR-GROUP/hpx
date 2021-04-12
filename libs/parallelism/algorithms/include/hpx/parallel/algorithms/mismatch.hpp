@@ -175,6 +175,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>

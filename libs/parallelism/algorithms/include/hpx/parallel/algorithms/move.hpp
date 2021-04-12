@@ -74,7 +74,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
