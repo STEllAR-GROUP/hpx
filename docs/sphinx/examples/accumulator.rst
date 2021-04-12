@@ -130,18 +130,18 @@ Our accumulator class will need a data member to store its value in, so let's
 declare a data member:
 
 .. literalinclude:: ../../examples/accumulators/server/accumulator.hpp
-   :lines: 95
+   :lines: 97
 
 The constructor for this class simply initializes ``value_`` to 0:
 
 .. literalinclude:: ../../examples/accumulators/server/accumulator.hpp
-   :lines: 54
+   :lines: 56
 
 Next, let's look at the three methods of this component that we will be exposing
 as component actions:
 
 .. literalinclude:: ../../examples/accumulators/server/accumulator.hpp
-   :lines: 61-80
+   :lines: 61-83
 
 Here are the action types. These types wrap the methods we're exposing. The
 wrapping technique is very similar to the one used in the
