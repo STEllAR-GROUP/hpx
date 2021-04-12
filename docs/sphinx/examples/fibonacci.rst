@@ -71,7 +71,10 @@ The code needed to initialize the |hpx| runtime is the same as in the
 :ref:`previous example <examples_fibonacci_local>`:
 
 .. literalinclude:: ../../examples/quickstart/fibonacci.cpp
-   :lines: 80-99
+   :language: c++
+   :start-after: //[fib_main
+   :end-before: //]
+
 
 The :cpp:func:`hpx::init` function in ``main()`` starts the runtime system, and
 invokes ``hpx_main()`` as the first |hpx|-thread. The command line option
@@ -81,7 +84,9 @@ takes to do the computation, the ``fibonacci`` :term:`action` is invoked
 synchronously, and the answer is printed out.
 
 .. literalinclude:: ../../examples/quickstart/fibonacci.cpp
-   :lines: 57-77
+   :language: c++
+   :start-after: //[fib_hpx_main
+   :end-before: //]
 
 Upon a closer look we see that we've created a ``std::uint64_t`` to store the
 result of invoking our ``fibonacci_action`` ``fib``. This :term:`action` will
@@ -98,7 +103,9 @@ further understand this we turn to the code to find where ``fibonacci_action``
 was defined:
 
 .. literalinclude:: ../../examples/quickstart/fibonacci.cpp
-   :lines: 23-30
+   :language: c++
+   :start-after: //[fib_action
+   :end-before: //]
 
 A plain :term:`action` is the most basic form of :term:`action`. Plain
 :term:`action`\ s wrap simple global functions which are not associated with any
@@ -116,7 +123,9 @@ result of the function ``fibonacci()``. Now, let's look at the function
 ``fibonacci()``:
 
 .. literalinclude:: ../../examples/quickstart/fibonacci.cpp
-   :lines: 33-54
+   :language: c++
+   :start-after: //[fib_func
+   :end-before: //]
 
 This block of code is much more straightforward and should look familiar from
 the :ref:`previous example <examples_fibonacci_local>`. First, ``if (n < 2)``,
