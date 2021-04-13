@@ -89,12 +89,17 @@ rate, compound period, and time. It is important to note that the units of time
 for ``cp`` and ``time`` must be the same.
 
 .. literalinclude:: ../../examples/quickstart/interest_calculator.cpp
-   :lines: 102-115
+   :language: c++
+   :start-after: //[interest_main
+   :end-before: //]
 
 Next we look at hpx_main.
 
 .. literalinclude:: ../../examples/quickstart/interest_calculator.cpp
-   :lines: 47-97
+   :language: c++
+   :start-after: //[interest_hpx_main
+   :end-before: //]
+
 
 Here we find our command line variables read in, the rate is converted from a
 percent to a decimal, the number of calculation iterations is determined, and
@@ -115,7 +120,9 @@ To see how ``interest`` and ``principal`` are calculated in the loop, let us loo
 at ``calc_action`` and ``add_action``:
 
 .. literalinclude:: ../../examples/quickstart/interest_calculator.cpp
-   :lines: 31-42
+   :language: c++
+   :start-after: //[interest_calc_add_action
+   :end-before: //]
 
 After the shared future dependencies have been defined in hpx_main, we see the
 following statement:
