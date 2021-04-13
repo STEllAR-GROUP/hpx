@@ -88,7 +88,6 @@ int hpx_main()
         increment_type inc;
 
         using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
 
         hpx::apply(&increment_type::call, inc, 1);
         hpx::apply(hpx::util::bind(&increment_type::call, inc, 1));
@@ -99,7 +98,6 @@ int hpx_main()
         increment_function_object obj;
 
         using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
 
         hpx::apply(obj, 1);
         hpx::apply(hpx::util::bind(obj, 1));
@@ -108,7 +106,6 @@ int hpx_main()
 
     {
         using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
 
         hpx::apply(increment_lambda, 1);
         hpx::apply(hpx::util::bind(increment_lambda, 1));

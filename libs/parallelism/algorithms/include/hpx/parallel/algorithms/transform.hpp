@@ -638,6 +638,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             FwdIter2 first2, FwdIter3 dest, F&& f, Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
     {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
             "Requires at least forward iterator.");
         static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
@@ -650,6 +654,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<ExPolicy>(policy), first1, last1, first2, dest,
             std::forward<F>(f), std::forward<Proj1>(proj1),
             std::forward<Proj2>(proj2));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -739,6 +746,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, F&& f,
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
             "Requires at least forward iterator.");
         static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
@@ -751,6 +762,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<ExPolicy>(policy), first1, last1, first2, last2, dest,
             std::forward<F>(f), std::forward<Proj1>(proj1),
             std::forward<Proj2>(proj2));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
 

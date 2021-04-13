@@ -92,7 +92,6 @@ void test_apply_with_executor(Executor& exec)
         increment_type inc;
 
         using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
 
         hpx::apply(exec, &increment_type::call, inc, 1);
         hpx::apply(exec, hpx::util::bind(&increment_type::call, inc, 1));
@@ -103,7 +102,6 @@ void test_apply_with_executor(Executor& exec)
         increment_function_object obj;
 
         using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
 
         hpx::apply(exec, obj, 1);
         hpx::apply(exec, hpx::util::bind(obj, 1));
@@ -112,7 +110,6 @@ void test_apply_with_executor(Executor& exec)
 
     {
         using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
 
         hpx::apply(exec, increment_lambda, 1);
         hpx::apply(exec, hpx::util::bind(increment_lambda, 1));

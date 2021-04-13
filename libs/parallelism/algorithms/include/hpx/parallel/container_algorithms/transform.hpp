@@ -428,6 +428,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             OutIter>>::type transform(ExPolicy&& policy, Rng&& rng,
         OutIter dest, F&& f, Proj&& proj = Proj())
     {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         using iterator_type =
             typename hpx::traits::range_traits<Rng>::iterator_type;
 
@@ -437,6 +441,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         return transform(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), std::move(dest), std::forward<F>(f),
             std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     // clang-format off
@@ -464,6 +471,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         transform(ExPolicy&& policy, Rng&& rng, InIter2 first2, OutIter dest,
             F&& f, Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         using iterator_type =
             typename hpx::traits::range_traits<Rng>::iterator_type;
 
@@ -475,6 +486,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::util::end(rng), std::move(first2), std::move(dest),
             std::forward<F>(f), std::forward<Proj1>(proj1),
             std::forward<Proj2>(proj2));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     // clang-format off
@@ -501,6 +515,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         transform(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, OutIter dest,
             F&& f, Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         using iterator_type1 =
             typename hpx::traits::range_traits<Rng1>::iterator_type;
 
@@ -515,6 +533,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
             std::move(dest), std::forward<F>(f), std::forward<Proj1>(proj1),
             std::forward<Proj2>(proj2));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
 
