@@ -36,7 +36,11 @@
 template <typename T>
 extern void cuda_trivial_kernel(T, cudaStream_t stream);
 
-extern __global__ void saxpy(int n, float a, float* x, float* y);
+// Need to move the call to the saxpy device kernel in .cu, as the symbol change
+// from saxpy to __device_stub__saxpy when moving from Clang 10 to Clang 11
+extern void launch_saxpy_kernel(
+    hpx::cuda::experimental::cuda_executor& cudaexec, unsigned int& blocks,
+    unsigned int& threads, void** args);
 // -------------------------------------------------------------------------
 int test_saxpy(hpx::cuda::experimental::cuda_executor& cudaexec)
 {
@@ -77,13 +81,7 @@ int test_saxpy(hpx::cuda::experimental::cuda_executor& cudaexec)
 
     // now launch a kernel on the stream
     void* args[] = {&N, &ratio, &d_A, &d_B};
-#ifdef HPX_HAVE_HIP
-    hpx::apply(cudaexec, cudaLaunchKernel,
-#else
-    hpx::apply(cudaexec, cudaLaunchKernel<void>,
-#endif
-        reinterpret_cast<const void*>(&saxpy), dim3(blocks), dim3(threads),
-        args, std::size_t(0));
+    launch_saxpy_kernel(cudaexec, blocks, threads, args);
 
     // finally, perform a copy from the gpu back to the cpu all on the same stream
     // grab a future to when this completes
