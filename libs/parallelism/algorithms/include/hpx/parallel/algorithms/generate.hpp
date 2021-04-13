@@ -130,7 +130,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
@@ -316,7 +316,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::generate
     HPX_INLINE_CONSTEXPR_VARIABLE struct generate_t final
-      : hpx::functional::tag<generate_t>
+      : hpx::functional::tag_fallback<generate_t>
     {
     private:
         // clang-format off
@@ -328,7 +328,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_invoke(
+        tag_fallback_invoke(
             generate_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -347,7 +347,7 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_invoke(
+        friend FwdIter tag_fallback_invoke(
             generate_t, FwdIter first, FwdIter last, F&& f)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -361,7 +361,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::generate_n
     HPX_INLINE_CONSTEXPR_VARIABLE struct generate_n_t final
-      : hpx::functional::tag<generate_n_t>
+      : hpx::functional::tag_fallback<generate_n_t>
     {
     private:
         // clang-format off
@@ -373,7 +373,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_invoke(
+        tag_fallback_invoke(
             generate_n_t, ExPolicy&& policy, FwdIter first, Size count, F&& f)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -396,7 +396,7 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_invoke(
+        friend FwdIter tag_fallback_invoke(
             generate_n_t, FwdIter first, Size count, F&& f)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),

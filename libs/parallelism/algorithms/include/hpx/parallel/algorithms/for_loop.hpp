@@ -735,7 +735,7 @@ namespace hpx {
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/threading_base.hpp>
@@ -1328,7 +1328,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_t final
-      : hpx::functional::tag<for_loop_t>
+      : hpx::functional::tag_fallback<for_loop_t>
     {
     private:
         // clang-format off
@@ -1340,8 +1340,9 @@ namespace hpx {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_invoke(hpx::for_loop_t, ExPolicy&& policy, std::decay_t<I> first,
-            I last, Args&&... args)
+
+        tag_fallback_invoke(hpx::for_loop_t, ExPolicy&& policy,
+            std::decay_t<I> first, I last, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop must be called with at least a function object");
@@ -1360,7 +1361,8 @@ namespace hpx {
                 std::is_integral<I>::value
             )>
         // clang-format on
-        friend void tag_invoke(
+
+        friend void tag_fallback_invoke(
             hpx::for_loop_t, std::decay_t<I> first, I last, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
@@ -1375,7 +1377,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_strided_t final
-      : hpx::functional::tag<for_loop_strided_t>
+      : hpx::functional::tag_fallback<for_loop_strided_t>
     {
     private:
         // clang-format off
@@ -1388,7 +1390,8 @@ namespace hpx {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_invoke(hpx::for_loop_strided_t, ExPolicy&& policy,
+
+        tag_fallback_invoke(hpx::for_loop_strided_t, ExPolicy&& policy,
             std::decay_t<I> first, I last, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
@@ -1410,8 +1413,9 @@ namespace hpx {
                  std::is_integral<I>::value)
             )>
         // clang-format on
-        friend void tag_invoke(hpx::for_loop_strided_t, std::decay_t<I> first,
-            I last, S stride, Args&&... args)
+
+        friend void tag_fallback_invoke(hpx::for_loop_strided_t,
+            std::decay_t<I> first, I last, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_strided must be called with at least a function "
@@ -1427,7 +1431,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_n_t final
-      : hpx::functional::tag<for_loop_n_t>
+      : hpx::functional::tag_fallback<for_loop_n_t>
     {
     private:
         // clang-format off
@@ -1441,8 +1445,8 @@ namespace hpx {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_invoke(hpx::for_loop_n_t, ExPolicy&& policy, I first, Size size,
-            Args&&... args)
+        tag_fallback_invoke(hpx::for_loop_n_t, ExPolicy&& policy, I first,
+            Size size, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_n must be called with at least a function object");
@@ -1462,7 +1466,7 @@ namespace hpx {
                  std::is_integral<I>::value)
             )>
         // clang-format on
-        friend void tag_invoke(
+        friend void tag_fallback_invoke(
             hpx::for_loop_n_t, I first, Size size, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
@@ -1477,7 +1481,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_n_strided_t final
-      : hpx::functional::tag<for_loop_n_strided_t>
+      : hpx::functional::tag_fallback<for_loop_n_strided_t>
     {
     private:
         // clang-format off
@@ -1492,8 +1496,8 @@ namespace hpx {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_invoke(hpx::for_loop_n_strided_t, ExPolicy&& policy, I first,
-            Size size, S stride, Args&&... args)
+        tag_fallback_invoke(hpx::for_loop_n_strided_t, ExPolicy&& policy,
+            I first, Size size, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_n_strided must be called with at least a function "
@@ -1515,8 +1519,8 @@ namespace hpx {
                  std::is_integral<I>::value)
             )>
         // clang-format on
-        friend void tag_invoke(hpx::for_loop_n_strided_t, I first, Size size,
-            S stride, Args&&... args)
+        friend void tag_fallback_invoke(hpx::for_loop_n_strided_t, I first,
+            Size size, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_n_strided must be called with at least a function "

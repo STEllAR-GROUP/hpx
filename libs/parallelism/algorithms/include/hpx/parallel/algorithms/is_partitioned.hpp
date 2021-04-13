@@ -109,7 +109,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
@@ -255,7 +255,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     HPX_INLINE_CONSTEXPR_VARIABLE struct is_partitioned_t final
-      : hpx::functional::tag<is_partitioned_t>
+      : hpx::functional::tag_fallback<is_partitioned_t>
     {
     private:
         // clang-format off
@@ -264,7 +264,7 @@ namespace hpx {
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend bool tag_invoke(
+        friend bool tag_fallback_invoke(
             hpx::is_partitioned_t, FwdIter first, FwdIter last, Pred&& pred)
         {
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, FwdIter>()
@@ -283,8 +283,8 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_invoke(hpx::is_partitioned_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, Pred&& pred)
+        tag_fallback_invoke(hpx::is_partitioned_t, ExPolicy&& policy,
+            FwdIter first, FwdIter last, Pred&& pred)
         {
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, FwdIter>()
                 .call(std::forward<ExPolicy>(policy), first, last,

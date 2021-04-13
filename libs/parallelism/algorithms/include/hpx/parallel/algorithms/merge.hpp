@@ -170,7 +170,7 @@ namespace hpx {
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
@@ -794,7 +794,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::merge
     HPX_INLINE_CONSTEXPR_VARIABLE struct merge_t final
-      : hpx::functional::tag<merge_t>
+      : hpx::functional::tag_fallback<merge_t>
     {
     private:
         // clang-format off
@@ -813,7 +813,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             RandIter3>::type
-        tag_invoke(merge_t, ExPolicy&& policy, RandIter1 first1,
+        tag_fallback_invoke(merge_t, ExPolicy&& policy, RandIter1 first1,
             RandIter1 last1, RandIter2 first2, RandIter2 last2, RandIter3 dest,
             Comp&& comp = Comp())
         {
@@ -851,8 +851,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend RandIter3 tag_invoke(merge_t, RandIter1 first1, RandIter1 last1,
-            RandIter2 first2, RandIter2 last2, RandIter3 dest,
+        friend RandIter3 tag_fallback_invoke(merge_t, RandIter1 first1,
+            RandIter1 last1, RandIter2 first2, RandIter2 last2, RandIter3 dest,
             Comp&& comp = Comp())
         {
             static_assert(
@@ -880,7 +880,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::inplace_merge
     HPX_INLINE_CONSTEXPR_VARIABLE struct inplace_merge_t final
-      : hpx::functional::tag<inplace_merge_t>
+      : hpx::functional::tag_fallback<inplace_merge_t>
     {
     private:
         // clang-format off
@@ -897,7 +897,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
             ExPolicy>::type
-        tag_invoke(inplace_merge_t, ExPolicy&& policy, RandIter first,
+        tag_fallback_invoke(inplace_merge_t, ExPolicy&& policy, RandIter first,
             RandIter middle, RandIter last, Comp&& comp = Comp())
         {
             static_assert(
@@ -922,8 +922,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend void tag_invoke(inplace_merge_t, RandIter first, RandIter middle,
-            RandIter last, Comp&& comp = Comp())
+        friend void tag_fallback_invoke(inplace_merge_t, RandIter first,
+            RandIter middle, RandIter last, Comp&& comp = Comp())
         {
             static_assert(
                 (hpx::traits::is_random_access_iterator<RandIter>::value),
