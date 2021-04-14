@@ -14,6 +14,7 @@
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
@@ -218,24 +219,14 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename Futures_>
         HPX_FORCEINLINE void execute(std::false_type, Futures_&& futures)
         {
-            std::exception_ptr p;
-
-            try
-            {
-                this->set_data(util::invoke_fused(
-                    std::move(func_), std::forward<Futures_>(futures)));
-                return;
-            }
-            catch (...)
-            {
-                p = std::current_exception();
-            }
-
-            // The exception is set outside the catch block since
-            // set_exception may yield. Ending the catch block on a
-            // different worker thread than where it was started may lead
-            // to segfaults.
-            this->set_exception(std::move(p));
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    this->set_data(util::invoke_fused(
+                        std::move(func_), std::forward<Futures_>(futures)));
+                },
+                [&](std::exception_ptr ep) {
+                    this->set_exception(std::move(ep));
+                });
         }
 
         /// Passes the futures into the evaluation function and
@@ -243,26 +234,16 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename Futures_>
         HPX_FORCEINLINE void execute(std::true_type, Futures_&& futures)
         {
-            std::exception_ptr p;
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    util::invoke_fused(
+                        std::move(func_), std::forward<Futures_>(futures));
 
-            try
-            {
-                util::invoke_fused(
-                    std::move(func_), std::forward<Futures_>(futures));
-
-                this->set_data(util::unused_type());
-                return;
-            }
-            catch (...)
-            {
-                p = std::current_exception();
-            }
-
-            // The exception is set outside the catch block since
-            // set_exception may yield. Ending the catch block on a
-            // different worker thread than where it was started may lead
-            // to segfaults.
-            this->set_exception(std::move(p));
+                    this->set_data(util::unused_type());
+                },
+                [&](std::exception_ptr ep) {
+                    this->set_exception(std::move(ep));
+                });
         }
 
         ///////////////////////////////////////////////////////////////////////

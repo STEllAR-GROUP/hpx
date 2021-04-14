@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_CXX17_STD_VARIANT)
+#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/invoke_result.hpp>
@@ -171,20 +172,19 @@ namespace hpx { namespace execution { namespace experimental {
                     template <typename... Ts>
                     void set_value(Ts&&... ts) noexcept
                     {
-                        try
-                        {
-                            os.predecessor_ts
-                                .template emplace<std::tuple<Ts...>>(
-                                    std::forward<Ts>(ts)...);
-                            std::visit(set_value_visitor{std::move(r),
-                                           std::move(f), os},
-                                os.predecessor_ts);
-                        }
-                        catch (...)
-                        {
-                            hpx::execution::experimental::set_error(
-                                r, std::current_exception());
-                        }
+                        hpx::detail::try_catch_exception_ptr(
+                            [&]() {
+                                os.predecessor_ts
+                                    .template emplace<std::tuple<Ts...>>(
+                                        std::forward<Ts>(ts)...);
+                                std::visit(set_value_visitor{std::move(r),
+                                               std::move(f), os},
+                                    os.predecessor_ts);
+                            },
+                            [&](std::exception_ptr ep) {
+                                hpx::execution::experimental::set_error(
+                                    std::move(r), std::move(ep));
+                            });
                     }
                 };
 

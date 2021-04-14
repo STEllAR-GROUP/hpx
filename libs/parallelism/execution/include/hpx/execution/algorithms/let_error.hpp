@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_CXX17_STD_VARIANT)
+#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/invoke_result.hpp>
@@ -143,10 +144,10 @@ namespace hpx { namespace execution { namespace experimental {
                                     HPX_INVOKE(std::move(f), e),
                                     std::declval<R>()));
 
-                            // with_result_of is used to emplace the operation state
-                            // returned from connect without any intermediate copy
-                            // construction (the operation state is not required to be
-                            // copyable nor movable.
+                            // with_result_of is used to emplace the operation
+                            // state returned from connect without any
+                            // intermediate copy construction (the operation
+                            // state is not required to be copyable nor movable.
                             os.successor_os
                                 .template emplace<operation_state_type>(
                                     hpx::util::detail::with_result_of([&]() {
@@ -161,19 +162,22 @@ namespace hpx { namespace execution { namespace experimental {
                     template <typename E>
                     void set_error(E&& e) noexcept
                     {
-                        try
-                        {
-                            os.predecessor_e.template emplace<E>(
-                                std::forward<E>(e));
-                            std::visit(set_error_visitor{std::move(r),
-                                           std::move(f), os},
-                                os.predecessor_e);
-                        }
-                        catch (...)
-                        {
-                            hpx::execution::experimental::set_error(
-                                r, std::current_exception());
-                        }
+                        hpx::detail::try_catch_exception_ptr(
+                            [&]() {
+                                // TODO: Don't need to store the predecessor
+                                // error?
+                                // TODO: r is moved before the visit, but the
+                                // invoke inside the visit may throw.
+                                os.predecessor_e.template emplace<E>(
+                                    std::forward<E>(e));
+                                std::visit(set_error_visitor{std::move(r),
+                                               std::move(f), os},
+                                    os.predecessor_e);
+                            },
+                            [&](std::exception_ptr ep) {
+                                hpx::execution::experimental::set_error(
+                                    std::move(r), std::move(ep));
+                            });
                     }
 
                     void set_done() noexcept

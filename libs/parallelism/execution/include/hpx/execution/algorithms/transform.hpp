@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
+#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/tag_fallback_invoke.hpp>
@@ -47,31 +48,30 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename... Ts>
             void set_value_helper(std::true_type, Ts&&... ts) noexcept
             {
-                try
-                {
-                    HPX_INVOKE(f, std::forward<Ts>(ts)...);
-                    hpx::execution::experimental::set_value(std::move(r));
-                }
-                catch (...)
-                {
-                    hpx::execution::experimental::set_error(
-                        std::move(r), std::current_exception());
-                }
+                hpx::detail::try_catch_exception_ptr(
+                    [&]() {
+                        HPX_INVOKE(f, std::forward<Ts>(ts)...);
+                        hpx::execution::experimental::set_value(std::move(r));
+                    },
+                    [&](std::exception_ptr ep) {
+                        hpx::execution::experimental::set_error(
+                            std::move(r), std::move(ep));
+                    });
             }
 
             template <typename... Ts>
             void set_value_helper(std::false_type, Ts&&... ts) noexcept
             {
-                try
-                {
-                    hpx::execution::experimental::set_value(
-                        std::move(r), HPX_INVOKE(f, std::forward<Ts>(ts)...));
-                }
-                catch (...)
-                {
-                    hpx::execution::experimental::set_error(
-                        std::move(r), std::current_exception());
-                }
+                hpx::detail::try_catch_exception_ptr(
+                    [&]() {
+                        // TODO: r may be moved before f throws, if it throws.
+                        hpx::execution::experimental::set_value(std::move(r),
+                            HPX_INVOKE(f, std::forward<Ts>(ts)...));
+                    },
+                    [&](std::exception_ptr ep) {
+                        hpx::execution::experimental::set_error(
+                            std::move(r), std::move(ep));
+                    });
             }
 
             template <typename... Ts,

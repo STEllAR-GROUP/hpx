@@ -13,6 +13,7 @@
 #include <hpx/async_cuda/cuda_executor.hpp>
 #include <hpx/async_cuda/cuda_future.hpp>
 #include <hpx/async_cuda/target.hpp>
+#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/futures/future.hpp>
@@ -223,32 +224,25 @@ namespace hpx { namespace cuda { namespace experimental {
             std::is_same<cublasStatus_t, R>::value, void>::type>
         async(R (*cublas_function)(Params...), Args&&... args)
         {
-            hpx::future<void> result;
-            std::exception_ptr p;
-            try
-            {
-                // make sue we run on the correct device
-                check_cuda_error(cudaSetDevice(device_));
-                // make sure this operation takes place on our stream
-                check_cublas_error(cublasSetStream(handle_.get(), stream_));
-                // insert the cublas handle in the arg list and call the cublas function
-                detail::dispatch_helper<R, Params...> helper;
-                helper(cublas_function, handle_.get(),
-                    std::forward<Args>(args)...);
-                return get_future();
-            }
-            catch (const hpx::exception& e)
-            {
-                p = std::current_exception();
-            }
-
-            // The exception is set outside the catch block since
-            // set_exception may yield. Ending the catch block on a
-            // different worker thread than where it was started may lead
-            // to segfaults.
-            auto state = traits::detail::get_shared_state(result);
-            state->set_exception(std::move(p));
-            return result;
+            return hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    // make sure we run on the correct device
+                    check_cuda_error(cudaSetDevice(device_));
+                    // make sure this operation takes place on our stream
+                    check_cublas_error(cublasSetStream(handle_.get(), stream_));
+                    // insert the cublas handle in the arg list and call the
+                    // cublas function
+                    detail::dispatch_helper<R, Params...> helper;
+                    helper(cublas_function, handle_.get(),
+                        std::forward<Args>(args)...);
+                    return get_future();
+                },
+                [&](std::exception_ptr ep) {
+                    hpx::future<void> result;
+                    auto state = traits::detail::get_shared_state(result);
+                    state->set_exception(std::move(ep));
+                    return result;
+                });
         }
 
         // -------------------------------------------------------------------------

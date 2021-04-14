@@ -191,7 +191,7 @@ namespace hpx { namespace execution { namespace experimental {
                                         std::move(r),
                                         std::forward<decltype(e)>(e));
                                 },
-                                e.value());
+                                std::move(e.value()));
                         }
                         else
                         {

@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/member_pack.hpp>
+#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/tag_fallback_invoke.hpp>
@@ -64,16 +65,16 @@ namespace hpx { namespace execution { namespace experimental {
 
                 void start() noexcept
                 {
-                    try
-                    {
-                        hpx::execution::experimental::set_value(
-                            std::move(r), std::move(ts).template get<Is>()...);
-                    }
-                    catch (...)
-                    {
-                        hpx::execution::experimental::set_error(
-                            std::move(r), std::current_exception());
-                    }
+                    hpx::detail::try_catch_exception_ptr(
+                        [&]() {
+                            hpx::execution::experimental::set_value(
+                                std::move(r),
+                                std::move(ts).template get<Is>()...);
+                        },
+                        [&](std::exception_ptr ep) {
+                            hpx::execution::experimental::set_error(
+                                std::move(r), std::move(ep));
+                        });
                 }
             };
 

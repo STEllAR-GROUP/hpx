@@ -136,7 +136,7 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename E>
             void set_error(E&& e) noexcept
             {
-                st.v.template emplace<error_type>(e);
+                st.v.template emplace<error_type>(std::forward<E>(e));
                 signal_set_called();
             }
 
