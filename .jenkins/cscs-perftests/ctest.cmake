@@ -10,7 +10,6 @@ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 
 set(CTEST_TEST_TIMEOUT 300)
 set(CTEST_BUILD_PARALLELISM 20)
-set(CTEST_TEST_PARALLELISM 4)
 set(CTEST_SITE "cscs(daint)")
 set(CTEST_UPDATE_COMMAND "git")
 set(CTEST_UPDATE_VERSION_ONLY "ON")
@@ -28,3 +27,4 @@ else()
 endif()
 
 ctest_start(Experimental TRACK "${CTEST_TRACK}")
+ctest_update()
