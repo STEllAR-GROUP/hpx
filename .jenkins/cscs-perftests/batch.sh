@@ -23,15 +23,23 @@ cp -r ${src_dir}/tools/perftests_ci ${build_dir}/tools
 
 # Variables
 perftests_dir=${build_dir}/tools/perftests_ci
-result_dir=${build_dir}/tools/perftests_ci/results
+result_dir=${perftests_dir}/results
 mkdir -p $result_dir
 result=$result_dir/local-priority-fifo.json
+mkdir -p ${build_dir}/reports
+
+
+# Things went alright by default
+configure_build_errors=0
+test_errors=0
+plot_errors=0
 
 # Build binaries for performance tests
 ${perftests_dir}/driver.py -v -l $logfile build -b release \
     -o build --source-dir ${src_dir} --build-dir ${build_dir} -e $envfile \
     -t tests.performance.local.future_overhead_report \
-    || { echo 'Build failed'; exit 1; }
+    || { echo 'Build failed'; configure_build_errors=1; exit 1; }
+
 
 # TODO: make schedulers and other options vary
 #for domain in 128 256; do
@@ -40,19 +48,17 @@ ${perftests_dir}/driver.py -v -l $logfile build -b release \
   ${perftests_dir}/driver.py -v -l $logfile perftest run \
       --local True --scheduling-policy local-priority --run_output $result \
       --extra-opts ' --test-all --repetitions=15' \
-      || { echo 'Running failed'; exit 1; }
+      || { echo 'Running failed'; test_errors=1; exit 1; }
   # We add a space before --test-all because of the following issue
   # https://bugs.python.org/issue9334
 
-  # Create directory for reports
-  mkdir -p ${build_dir}/reports
   # Find references for same configuration (TODO: specify for scheduler etc.)
   reference=${perftests_dir}/perftest/references/daint_default/local-priority-fifo.json
 
   # Plot comparison of current result with references
   ${perftests_dir}/driver.py -v -l $logfile perftest plot compare \
       -i $reference $result -o ${build_dir}/reports/reports-comparison \
-      || { echo 'Plotting failed'; exit 1; }
+      || { echo 'Plotting failed'; plot_errors=1; exit 1; }
 #done
 
 # Dummy ctest to upload the html report of the perftest
@@ -70,30 +76,9 @@ set -e
 cp -r ${build_dir}/Testing ${orig_src_dir}/${configuration_name}-Testing
 cp -r ${build_dir}/reports ${orig_src_dir}/${configuration_name}-reports
 
-# Things went wrong by default
+# Do a catch block in case of exit
 ctest_exit_code=$?
-file_errors=1
-configure_errors=1
-build_errors=1
-test_errors=1
-# Temporary as the output files have not been set up
-if [[ -f ${build_dir}/Testing/TAG ]]; then
-    file_errors=0
-    tag="$(head -n 1 ${build_dir}/Testing/TAG)"
-
-    if [[ -f "${build_dir}/Testing/${tag}/Configure.xml" ]]; then
-        configure_errors=$(grep '<Error>' "${build_dir}/Testing/${tag}/Configure.xml" | wc -l)
-    fi
-
-    if [[ -f "${build_dir}/Testing/${tag}/Build.xml" ]]; then
-        build_errors=$(grep '<Error>' "${build_dir}/Testing/${tag}/Build.xml" | wc -l)
-    fi
-
-    if [[ -f "${build_dir}/Testing/${tag}/Test.xml" ]]; then
-        test_errors=$(grep '<Test Status=\"failed\">' "${build_dir}/Testing/${tag}/Test.xml" | wc -l)
-    fi
-fi
-ctest_status=$(( ctest_exit_code + file_errors + configure_errors + build_errors + test_errors ))
+ctest_status=$(( ctest_exit_code + configure_build_errors + test_errors + plot_errors ))
 
 echo "${ctest_status}" > "jenkins-hpx-${configuration_name}-ctest-status.txt"
 exit $ctest_status
