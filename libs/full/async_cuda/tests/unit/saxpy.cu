@@ -21,11 +21,13 @@ __global__ void saxpy(int n, float a, float* x, float* y)
 void launch_saxpy_kernel(hpx::cuda::experimental::cuda_executor& cudaexec,
         unsigned int& blocks, unsigned int& threads, void** args)
 {
+    // Invoking hpx::apply with cudaLaunchKernel<void> directly result in an
+    // error for NVCC with gcc configuration
 #ifdef HPX_HAVE_HIP
-    hpx::apply(cudaexec, cudaLaunchKernel,
+    auto launch_kernel = cudaLaunchKernel;
 #else
-    hpx::apply(cudaexec, cudaLaunchKernel<void>,
+    auto launch_kernel = cudaLaunchKernel<void>;
 #endif
-        reinterpret_cast<const void*>(&saxpy), dim3(blocks), dim3(threads),
-        args, std::size_t(0));
+    hpx::apply(cudaexec, launch_kernel, reinterpret_cast<const void*>(&saxpy),
+        dim3(blocks), dim3(threads), args, std::size_t(0));
 }
