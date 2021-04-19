@@ -16,12 +16,57 @@
 #include <string>
 #include <vector>
 
+#include "iter_sent.hpp"
 #include "test_utils.hpp"
 
 // FIXME: Intel 15 currently can not compile this code. This needs to be fixed. See #1408
 #if !(defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION == 1500)
 
 ////////////////////////////////////////////////////////////////////////////
+void test_generate_sent()
+{
+    std::vector<std::size_t> c(200);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    auto gen = []() { return std::size_t(10); };
+
+    hpx::ranges::generate(
+        std::begin(c), sentinel<std::size_t>{*(std::begin(c) + 100)}, gen);
+
+    // verify values
+    std::size_t count = 0;
+    std::for_each(
+        std::begin(c), std::begin(c) + 100, [&count](std::size_t v) -> void {
+            HPX_TEST_EQ(v, std::size_t(10));
+            ++count;
+        });
+    HPX_TEST_EQ(count, 100);
+}
+
+template <typename ExPolicy>
+void test_generate_sent(ExPolicy policy)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    std::vector<std::size_t> c(200);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    auto gen = []() { return std::size_t(10); };
+
+    hpx::ranges::generate(policy, std::begin(c),
+        sentinel<std::size_t>{*(std::begin(c) + 100)}, gen);
+
+    // verify values
+    std::size_t count = 0;
+    std::for_each(
+        std::begin(c), std::begin(c) + 100, [&count](std::size_t v) -> void {
+            HPX_TEST_EQ(v, std::size_t(10));
+            ++count;
+        });
+    HPX_TEST_EQ(count, 100);
+}
+
 template <typename IteratorTag>
 void test_generate(IteratorTag)
 {
@@ -107,6 +152,11 @@ void test_generate()
 
     test_generate_async(seq(task), IteratorTag());
     test_generate_async(par(task), IteratorTag());
+
+    test_generate_sent();
+    test_generate_sent(seq);
+    test_generate_sent(par);
+    test_generate_sent(par_unseq);
 }
 
 void generate_test()
