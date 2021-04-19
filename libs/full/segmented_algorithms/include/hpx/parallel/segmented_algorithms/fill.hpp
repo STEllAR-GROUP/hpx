@@ -52,42 +52,74 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // clang-format on
             }
         };
-
-        ///////////////////////////////////////////////////////////////////////
-        // segmented implementation
-        template <typename ExPolicy, typename InIter, typename T>
-        static typename util::detail::algorithm_result<ExPolicy, InIter>::type
-        fill_(ExPolicy&& policy, InIter first, InIter last, T const& value,
-            std::true_type)
-        {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
-            if (first == last)
-            {
-                using result =
-                    hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                        InIter>;
-                return result::get(std::move(first));
-            }
-
-            using iterator_traits =
-                hpx::traits::segmented_iterator_traits<InIter>;
-            using value_type =
-                typename std::iterator_traits<InIter>::value_type;
-
-            return segmented_for_each(
-                hpx::parallel::v1::detail::for_each<
-                    typename iterator_traits::local_iterator>(),
-                std::forward<ExPolicy>(policy), first, last,
-                fill_function<value_type>(value),
-                hpx::parallel::util::projection_identity(), is_seq());
-        }
-
-        // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename Sent, typename T>
-        static typename util::detail::algorithm_result<ExPolicy, InIter>::type
-        fill_(ExPolicy&& policy, InIter first, Sent last, T const& value,
-            std::false_type);
     }    // namespace detail
          /// \endcond
 }}}      // namespace hpx::parallel::v1
+
+namespace hpx { namespace segmented {
+
+    // clang-format off
+    template<typename SegIter, typename T,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_iterator<SegIter>::value &&
+            hpx::traits::is_segmented_iterator<SegIter>::value
+        )>
+    // clang-format on
+    SegIter tag_invoke(hpx::fill_t, SegIter first, SegIter last, T const& value)
+    {
+        static_assert(hpx::traits::is_forward_iterator<SegIter>::value,
+            "Requires at least forward iterator.");
+
+        if (first == last)
+        {
+            return std::move(first);
+        }
+
+        using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
+        using value_type = typename std::iterator_traits<SegIter>::value_type;
+
+        return hpx::parallel::v1::detail::segmented_for_each(
+            hpx::parallel::v1::detail::for_each<
+                typename iterator_traits::local_iterator>(),
+            hpx::execution::seq, first, last,
+            hpx::parallel::v1::detail::fill_function<value_type>(value),
+            hpx::parallel::util::projection_identity{}, std::true_type{});
+    }
+
+    // clang-format off
+    template <typename ExPolicy, typename SegIter, typename T,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<SegIter>::value &&
+            hpx::traits::is_segmented_iterator<SegIter>::value
+        )>
+    // clang-format on
+    static typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        SegIter>::type
+    tag_invoke(hpx::fill_t, ExPolicy&& policy, SegIter first, SegIter last,
+        T const& value)
+    {
+        static_assert(hpx::traits::is_forward_iterator<SegIter>::value,
+            "Requires at least forward iterator.");
+
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        if (first == last)
+        {
+            using result =
+                hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                    SegIter>;
+            return result::get(std::move(first));
+        }
+
+        using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
+        using value_type = typename std::iterator_traits<SegIter>::value_type;
+
+        return segmented_for_each(
+            hpx::parallel::v1::detail::for_each<
+                typename iterator_traits::local_iterator>(),
+            std::forward<ExPolicy>(policy), first, last,
+            hpx::parallel::v1::detail::fill_function<value_type>(value),
+            hpx::parallel::util::projection_identity{}, is_seq());
+    }
+}}    // namespace hpx::segmented

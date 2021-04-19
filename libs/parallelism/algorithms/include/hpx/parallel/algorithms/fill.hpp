@@ -190,22 +190,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::projection_identity());
             }
         };
-
-        template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename T>
-        static typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        fill_(ExPolicy&& policy, FwdIter first, Sent last, T const& value,
-            std::false_type)
-        {
-            return detail::fill<FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, last, value);
-        }
-
-        // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename FwdIter, typename T>
-        static typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        fill_(ExPolicy&& policy, FwdIter first, FwdIter last, T const& value,
-            std::true_type);
         /// \endcond
     }    // namespace detail
 
@@ -224,14 +208,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
-
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::fill_(
-            std::forward<ExPolicy>(policy), first, last, value, is_segmented());
+        return detail::fill<FwdIter>().call(
+            std::forward<ExPolicy>(policy), first, last, value);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -330,15 +312,13 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least forward iterator.");
 
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
             using result_type =
                 typename hpx::parallel::util::detail::algorithm_result<
                     ExPolicy>::type;
 
             return hpx::util::void_guard<result_type>(),
-                   hpx::parallel::v1::detail::fill_(
-                       std::forward<ExPolicy>(policy), first, last, value,
-                       is_segmented{});
+                   hpx::parallel::v1::detail::fill<FwdIter>().call(
+                       std::forward<ExPolicy>(policy), first, last, value);
         }
 
         // clang-format off
@@ -353,8 +333,8 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least forward iterator.");
 
-            hpx::parallel::v1::detail::fill_(
-                hpx::execution::seq, first, last, value, std::false_type{});
+            hpx::parallel::v1::detail::fill<FwdIter>().call(
+                hpx::execution::seq, first, last, value);
         }
     } fill{};
 

@@ -130,7 +130,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename util::detail::algorithm_result<ExPolicy>::type
         fill(ExPolicy&& policy, Rng&& rng, T value)
     {
-        return fill(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+        using iterator_type = typename hpx::traits::range_iterator<Rng>::type;
+
+        static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
+            "Requires at least forward iterator.");
+
+        return detail::fill<iterator_type>().call(
+            std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), value);
     }
 
@@ -147,8 +153,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename hpx::traits::range_traits<Rng>::iterator_type>::type
         fill_n(ExPolicy&& policy, Rng& rng, Size count, T value)
     {
-        return fill_n(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            count, value);
+        using iterator_type = typename hpx::traits::range_iterator<Rng>::type;
+
+        static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
+            "Requires at least forward iterator.");
+
+        return detail::fill_n<iterator_type>().call(
+            std::forward<ExPolicy>(policy), hpx::util::begin(rng), count,
+            value);
     }
 
 }}}    // namespace hpx::parallel::v1
@@ -158,7 +170,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::fill
     HPX_INLINE_CONSTEXPR_VARIABLE struct fill_t final
-      : hpx::functional::tag<fill_t>
+      : hpx::functional::tag_fallback<fill_t>
     {
     private:
         // clang-format off
@@ -170,21 +182,22 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_traits<Rng>::iterator_type>::type
-        tag_invoke(fill_t, ExPolicy&& policy, Rng&& rng, T const& value)
+        tag_fallback_invoke(
+            fill_t, ExPolicy&& policy, Rng&& rng, T const& value)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
             static_assert(
-                (hpx::traits::is_forward_iterator<iterator_type>::value),
+                hpx::traits::is_forward_iterator<iterator_type>::value,
                 "Requires at least forward iterator.");
 
             using is_segmented =
                 hpx::traits::is_segmented_iterator<iterator_type>;
 
-            return hpx::parallel::v1::detail::fill_(
+            return hpx::parallel::v1::detail::fill<iterator_type>().call(
                 std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), value, is_segmented{});
+                hpx::util::end(rng), value);
         }
 
         // clang-format off
@@ -196,17 +209,14 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_invoke(
+        tag_fallback_invoke(
             fill_t, ExPolicy&& policy, Iter first, Sent last, T const& value)
         {
-            static_assert((hpx::traits::is_forward_iterator<Iter>::value),
+            static_assert(hpx::traits::is_forward_iterator<Iter>::value,
                 "Requires at least forward iterator.");
 
-            using is_segmented = hpx::traits::is_segmented_iterator<Iter>;
-
-            return hpx::parallel::v1::detail::fill_(
-                std::forward<ExPolicy>(policy), first, last, value,
-                is_segmented{});
+            return hpx::parallel::v1::detail::fill<Iter>().call(
+                std::forward<ExPolicy>(policy), first, last, value);
         }
 
         // clang-format off
@@ -216,21 +226,18 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_traits<Rng>::iterator_type
-        tag_invoke(fill_t, Rng&& rng, T const& value)
+        tag_fallback_invoke(fill_t, Rng&& rng, T const& value)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
             static_assert(
-                (hpx::traits::is_forward_iterator<iterator_type>::value),
+                hpx::traits::is_forward_iterator<iterator_type>::value,
                 "Requires at least forward iterator.");
 
-            using is_segmented =
-                hpx::traits::is_segmented_iterator<iterator_type>;
-
-            return hpx::parallel::v1::detail::fill_(hpx::execution::seq,
-                hpx::util::begin(rng), hpx::util::end(rng), value,
-                is_segmented{});
+            return hpx::parallel::v1::detail::fill<iterator_type>().call(
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                value);
         }
 
         // clang-format off
@@ -239,22 +246,21 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
         // clang-format on
-        friend Iter tag_invoke(fill_t, Iter first, Sent last, T const& value)
+        friend Iter tag_fallback_invoke(
+            fill_t, Iter first, Sent last, T const& value)
         {
-            static_assert((hpx::traits::is_forward_iterator<Iter>::value),
+            static_assert(hpx::traits::is_forward_iterator<Iter>::value,
                 "Requires at least forward iterator.");
 
-            using is_segmented = hpx::traits::is_segmented_iterator<Iter>;
-
-            return hpx::parallel::v1::detail::fill_(
-                hpx::execution::seq, first, last, value, is_segmented{});
+            return hpx::parallel::v1::detail::fill<Iter>().call(
+                hpx::execution::seq, first, last, value);
         }
     } fill{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::fill_n
     HPX_INLINE_CONSTEXPR_VARIABLE struct fill_n_t final
-      : hpx::functional::tag<fill_n_t>
+      : hpx::functional::tag_fallback<fill_n_t>
     {
     private:
         // clang-format off
@@ -266,7 +272,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_traits<Rng>::iterator_type>::type
-        tag_invoke(fill_n_t, ExPolicy&& policy, Rng&& rng, T const& value)
+        tag_fallback_invoke(
+            fill_n_t, ExPolicy&& policy, Rng&& rng, T const& value)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -297,8 +304,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_invoke(fill_n_t, ExPolicy&& policy, FwdIter first, Size count,
-            T const& value)
+        tag_fallback_invoke(fill_n_t, ExPolicy&& policy, FwdIter first,
+            Size count, T const& value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least forward iterator.");
@@ -322,7 +329,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_traits<Rng>::iterator_type
-        tag_invoke(fill_n_t, Rng&& rng, T const& value)
+        tag_fallback_invoke(fill_n_t, Rng&& rng, T const& value)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -348,7 +355,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_invoke(
+        friend FwdIter tag_fallback_invoke(
             fill_n_t, FwdIter first, Size count, T const& value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
