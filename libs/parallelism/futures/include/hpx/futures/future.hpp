@@ -884,7 +884,8 @@ namespace hpx { namespace lcos {
             template <typename...> class Variant>
         using value_types = std::conditional_t<std::is_void<result_type>::value,
             Variant<Tuple<>>,
-            Variant<Tuple<std::add_rvalue_reference_t<result_type>>>>;
+            Variant<Tuple<
+                typename hpx::traits::future_traits<future>::result_type>>>;
 
         template <template <typename...> class Variant>
         using error_types = Variant<std::exception_ptr>;
@@ -1221,7 +1222,8 @@ namespace hpx { namespace lcos {
             template <typename...> class Variant>
         using value_types = std::conditional_t<std::is_void<result_type>::value,
             Variant<Tuple<>>,
-            Variant<Tuple<std::add_rvalue_reference_t<result_type>>>>;
+            Variant<Tuple<typename hpx::traits::future_traits<
+                shared_future>::result_type>>>;
 
         template <template <typename...> class Variant>
         using error_types = Variant<std::exception_ptr>;
