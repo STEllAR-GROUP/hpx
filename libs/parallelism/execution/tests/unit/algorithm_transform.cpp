@@ -66,6 +66,35 @@ int main()
 
     {
         std::atomic<bool> set_value_called{false};
+        auto s = ex::transform(
+            ex::just(custom_type_non_default_constructible{0}), [](auto x) {
+                ++(x.x);
+                return x;
+            });
+        auto f = [](auto x) { HPX_TEST_EQ(x.x, 1); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        auto s = ex::transform(
+            ex::just(custom_type_non_default_constructible_non_copyable{0}),
+            [](auto x) {
+                ++(x.x);
+                return x;
+            });
+        auto f = [](auto x) { HPX_TEST_EQ(x.x, 1); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
         auto s1 = ex::transform(ex::just(0), [](int x) { return ++x; });
         auto s2 = ex::transform(std::move(s1), [](int x) { return ++x; });
         auto s3 = ex::transform(std::move(s2), [](int x) { return ++x; });

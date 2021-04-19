@@ -135,7 +135,7 @@ namespace hpx { namespace execution { namespace experimental {
                 std::atomic<std::size_t> predecessors_remaining =
                     num_predecessors;
                 hpx::util::member_pack_for<
-                    std::decay_t<value_types_helper_t<Ss>>...>
+                    std::optional<std::decay_t<value_types_helper_t<Ss>>>...>
                     ts;
                 std::optional<error_types<std::variant>> e;
                 std::atomic<bool> set_done_error_called{false};
@@ -172,7 +172,7 @@ namespace hpx { namespace execution { namespace experimental {
                         ts)
                 {
                     hpx::execution::experimental::set_value(
-                        std::move(r), std::move(ts.template get<Is>())...);
+                        std::move(r), std::move(*(ts.template get<Is>()))...);
                 }
 
                 void finish() noexcept

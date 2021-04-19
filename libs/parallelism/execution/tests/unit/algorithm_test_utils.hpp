@@ -246,6 +246,46 @@ struct custom_sender
     }
 };
 
+template <typename T>
+struct custom_typed_sender
+{
+    std::decay_t<T> x;
+
+    std::atomic<bool>& start_called;
+    std::atomic<bool>& connect_called;
+    std::atomic<bool>& tag_invoke_overload_called;
+
+    template <template <class...> class Tuple,
+        template <class...> class Variant>
+    using value_types = Variant<Tuple<>>;
+
+    template <template <class...> class Variant>
+    using error_types = Variant<std::exception_ptr>;
+
+    static constexpr bool sends_done = false;
+
+    template <typename R>
+    struct operation_state
+    {
+        std::decay_t<T> x;
+        std::atomic<bool>& start_called;
+        std::decay_t<R> r;
+        void start() noexcept
+        {
+            start_called = true;
+            hpx::execution::experimental::set_value(std::move(r), std::move(x));
+        };
+    };
+
+    template <typename R>
+    auto connect(R&& r) &&
+    {
+        connect_called = true;
+        return operation_state<R>{
+            std::move(x), start_called, std::forward<R>(r)};
+    }
+};
+
 struct custom_sender2 : custom_sender
 {
     explicit custom_sender2(custom_sender s)
@@ -259,6 +299,38 @@ struct custom_type
 {
     std::atomic<bool>& tag_invoke_overload_called;
     std::decay_t<T> x;
+};
+
+struct custom_type_non_default_constructible
+{
+    int x;
+    custom_type_non_default_constructible() = delete;
+    custom_type_non_default_constructible(int x)
+      : x(x){};
+    custom_type_non_default_constructible(
+        custom_type_non_default_constructible&&) = default;
+    custom_type_non_default_constructible& operator=(
+        custom_type_non_default_constructible&&) = default;
+    custom_type_non_default_constructible(
+        custom_type_non_default_constructible const&) = default;
+    custom_type_non_default_constructible& operator=(
+        custom_type_non_default_constructible const&) = default;
+};
+
+struct custom_type_non_default_constructible_non_copyable
+{
+    int x;
+    custom_type_non_default_constructible_non_copyable() = delete;
+    custom_type_non_default_constructible_non_copyable(int x)
+      : x(x){};
+    custom_type_non_default_constructible_non_copyable(
+        custom_type_non_default_constructible_non_copyable&&) = default;
+    custom_type_non_default_constructible_non_copyable& operator=(
+        custom_type_non_default_constructible_non_copyable&&) = default;
+    custom_type_non_default_constructible_non_copyable(
+        custom_type_non_default_constructible_non_copyable const&) = delete;
+    custom_type_non_default_constructible_non_copyable& operator=(
+        custom_type_non_default_constructible_non_copyable const&) = delete;
 };
 
 struct scheduler

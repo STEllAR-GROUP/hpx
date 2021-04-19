@@ -49,6 +49,27 @@ int main()
 
     {
         std::atomic<bool> set_value_called{false};
+        auto s = ex::just(custom_type_non_default_constructible{42});
+        auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        auto s =
+            ex::just(custom_type_non_default_constructible_non_copyable{42});
+        auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
         auto s = ex::just(std::string("hello"), 3);
         auto f = [](std::string s, int x) {
             HPX_TEST_EQ(s, std::string("hello"));

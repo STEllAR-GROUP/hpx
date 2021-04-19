@@ -39,6 +39,40 @@ int main()
         HPX_TEST(!tag_invoke_overload_called);
     }
 
+    {
+        std::atomic<bool> start_called{false};
+        std::atomic<bool> connect_called{false};
+        std::atomic<bool> tag_invoke_overload_called{false};
+        ex::detach(custom_typed_sender<int>{
+            0, start_called, connect_called, tag_invoke_overload_called});
+        HPX_TEST(start_called);
+        HPX_TEST(connect_called);
+        HPX_TEST(!tag_invoke_overload_called);
+    }
+
+    {
+        std::atomic<bool> start_called{false};
+        std::atomic<bool> connect_called{false};
+        std::atomic<bool> tag_invoke_overload_called{false};
+        ex::detach(custom_typed_sender<custom_type_non_default_constructible>{
+            {0}, start_called, connect_called, tag_invoke_overload_called});
+        HPX_TEST(start_called);
+        HPX_TEST(connect_called);
+        HPX_TEST(!tag_invoke_overload_called);
+    }
+
+    {
+        std::atomic<bool> start_called{false};
+        std::atomic<bool> connect_called{false};
+        std::atomic<bool> tag_invoke_overload_called{false};
+        ex::detach(custom_typed_sender<
+            custom_type_non_default_constructible_non_copyable>{
+            {0}, start_called, connect_called, tag_invoke_overload_called});
+        HPX_TEST(start_called);
+        HPX_TEST(connect_called);
+        HPX_TEST(!tag_invoke_overload_called);
+    }
+
     // operator| overload
     {
         std::atomic<bool> start_called{false};

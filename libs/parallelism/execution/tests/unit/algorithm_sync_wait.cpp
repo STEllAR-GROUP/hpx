@@ -44,6 +44,22 @@ int main()
         HPX_TEST_EQ(ex::sync_wait(ex::just(3)), 3);
     }
 
+    {
+        HPX_TEST_EQ(
+            ex::sync_wait(ex::just(custom_type_non_default_constructible{42}))
+                .x,
+            42);
+    }
+
+    {
+        HPX_TEST_EQ(
+            ex::sync_wait(
+                ex::just(
+                    custom_type_non_default_constructible_non_copyable{42}))
+                .x,
+            42);
+    }
+
     // operator| overload
     {
         std::atomic<bool> start_called{false};

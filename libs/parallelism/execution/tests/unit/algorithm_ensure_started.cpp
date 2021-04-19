@@ -53,6 +53,29 @@ int main()
         HPX_TEST(set_value_called);
     }
 
+    {
+        std::atomic<bool> set_value_called{false};
+        auto s1 = ex::just(custom_type_non_default_constructible{42});
+        auto s2 = ex::ensure_started(std::move(s1));
+        auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s2), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        auto s1 =
+            ex::just(custom_type_non_default_constructible_non_copyable{42});
+        auto s2 = ex::ensure_started(std::move(s1));
+        auto f = [](auto& x) { HPX_TEST_EQ(x.x, 42); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s2), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
     // operator| overload
     {
         std::atomic<bool> set_value_called{false};

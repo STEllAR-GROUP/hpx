@@ -14,6 +14,7 @@
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/modules/memory.hpp>

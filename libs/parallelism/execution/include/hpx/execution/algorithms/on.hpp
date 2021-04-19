@@ -7,9 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/type_support/pack.hpp>
 
@@ -56,10 +59,14 @@ namespace hpx { namespace execution { namespace experimental {
                                 std::move(r), std::forward<Ts>(ts)...),
                     void())
             {
-                hpx::execution::experimental::execute(
-                    scheduler, [=, r = std::move(r)]() mutable {
-                        hpx::execution::experimental::set_value(
-                            std::move(r), std::forward<Ts>(ts)...);
+                hpx::tuple<Ts...> ts_pack{std::forward<Ts>(ts)...};
+                hpx::execution::experimental::execute(scheduler,
+                    [r = std::move(r), ts_pack = std::move(ts_pack)]() mutable {
+                        hpx::util::invoke_fused(
+                            hpx::util::bind_front(
+                                hpx::execution::experimental::set_value,
+                                std::move(r)),
+                            std::move(ts_pack));
                     });
             }
         };

@@ -64,6 +64,41 @@ int main()
         HPX_TEST(let_error_callback_called);
     }
 
+    {
+        std::atomic<bool> set_value_called{false};
+        std::atomic<bool> let_error_callback_called{false};
+        auto s1 = error_sender{};
+        auto s2 = ex::let_error(std::move(s1), [&](std::exception_ptr ep) {
+            check_exception_ptr(ep);
+            let_error_callback_called = true;
+            return ex::just(custom_type_non_default_constructible{42});
+        });
+        auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s2), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+        HPX_TEST(let_error_callback_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        std::atomic<bool> let_error_callback_called{false};
+        auto s1 = error_sender{};
+        auto s2 = ex::let_error(std::move(s1), [&](std::exception_ptr ep) {
+            check_exception_ptr(ep);
+            let_error_callback_called = true;
+            return ex::just(
+                custom_type_non_default_constructible_non_copyable{42});
+        });
+        auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s2), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+        HPX_TEST(let_error_callback_called);
+    }
+
     // operator| overload
     {
         std::atomic<bool> set_value_called{false};
@@ -115,6 +150,40 @@ int main()
             return ex::just(43);
         });
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s2), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+        HPX_TEST(!let_error_callback_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        std::atomic<bool> let_error_callback_called{false};
+        auto s1 = ex::just(custom_type_non_default_constructible{42});
+        auto s2 = ex::let_error(std::move(s1), [&](std::exception_ptr) {
+            HPX_TEST(false);
+            return ex::just(custom_type_non_default_constructible{43});
+        });
+        auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s2), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+        HPX_TEST(!let_error_callback_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        std::atomic<bool> let_error_callback_called{false};
+        auto s1 =
+            ex::just(custom_type_non_default_constructible_non_copyable{42});
+        auto s2 = ex::let_error(std::move(s1), [&](std::exception_ptr) {
+            HPX_TEST(false);
+            return ex::just(
+                custom_type_non_default_constructible_non_copyable{43});
+        });
+        auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s2), std::move(r));
         ex::start(os);
