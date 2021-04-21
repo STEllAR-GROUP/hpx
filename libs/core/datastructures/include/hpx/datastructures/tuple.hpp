@@ -37,7 +37,7 @@ namespace hpx {
     template <typename T>
     struct tuple_size;    // undefined
 
-    template <std::size_t I, typename T>
+    template <std::size_t I, typename T, typename Enable = void>
     struct tuple_element;    // undefined
 
     // Hide implementations of get<> inside an internal namespace to be able to
@@ -503,31 +503,34 @@ namespace hpx {
 
     // template <size_t I, class Tuple>
     // class tuple_element
-    template <std::size_t I, typename T>
+    template <std::size_t I, typename T, typename Enable>
     struct tuple_element
     {
     };
 
     template <std::size_t I, typename T>
-    struct tuple_element<I, const T>
+    struct tuple_element<I, const T,
+        typename util::always_void<typename tuple_element<I, T>::type>::type>
       : std::add_const<typename tuple_element<I, T>::type>
     {
     };
 
     template <std::size_t I, typename T>
-    struct tuple_element<I, volatile T>
+    struct tuple_element<I, volatile T,
+        typename util::always_void<typename tuple_element<I, T>::type>::type>
       : std::add_volatile<typename tuple_element<I, T>::type>
     {
     };
 
     template <std::size_t I, typename T>
-    struct tuple_element<I, const volatile T>
+    struct tuple_element<I, const volatile T,
+        typename util::always_void<typename tuple_element<I, T>::type>::type>
       : std::add_cv<typename tuple_element<I, T>::type>
     {
     };
 
     template <std::size_t I, typename... Ts>
-    struct tuple_element<I, tuple<Ts...>>
+    struct tuple_element<I, tuple<Ts...>, void>
     {
         using type = typename util::at_index<I, Ts...>::type;
 
@@ -545,7 +548,7 @@ namespace hpx {
     };
 
     template <typename T0, typename T1>
-    struct tuple_element<0, std::pair<T0, T1>>
+    struct tuple_element<0, std::pair<T0, T1>, void>
     {
         using type = T0;
 
@@ -563,7 +566,7 @@ namespace hpx {
     };
 
     template <typename T0, typename T1>
-    struct tuple_element<1, std::pair<T0, T1>>
+    struct tuple_element<1, std::pair<T0, T1>, void>
     {
         using type = T1;
 
@@ -581,7 +584,7 @@ namespace hpx {
     };
 
     template <std::size_t I, typename Type, std::size_t Size>
-    struct tuple_element<I, std::array<Type, Size>>
+    struct tuple_element<I, std::array<Type, Size>, void>
     {
         using type = Type;
 
@@ -607,7 +610,7 @@ namespace hpx {
 
 #if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE)
     template <std::size_t I, typename... Ts>
-    struct tuple_element<I, std::tuple<Ts...>>
+    struct tuple_element<I, std::tuple<Ts...>, void>
     {
         using type = typename std::tuple_element<I, std::tuple<Ts...>>::type;
 
