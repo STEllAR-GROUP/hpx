@@ -6,6 +6,9 @@
 
 if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
 
+  # cuda_std_17 not recognized for previous versions
+  cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
+
   find_package(CUDA REQUIRED)
   set(HPX_WITH_GPUBLAS ON)
   hpx_add_config_define(HPX_HAVE_GPUBLAS)
