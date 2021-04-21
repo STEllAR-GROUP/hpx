@@ -7,9 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if defined(HPX_HAVE_DATAPAR)
-#include <hpx/parallel/datapar/loop.hpp>
-#endif
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
@@ -1038,3 +1035,7 @@ namespace hpx { namespace parallel { namespace util {
         return val;
     }
 }}}    // namespace hpx::parallel::util
+
+#if defined(HPX_HAVE_DATAPAR)
+#include <hpx/parallel/datapar/loop.hpp>
+#endif
