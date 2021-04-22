@@ -574,6 +574,44 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                 std::forward<F>(f), it, dest);
         }
     };
+
+    struct datapar_transform_loop_step_ind
+    {
+        template <typename F, typename InIter, typename OutIter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void call1(
+            F&& f, InIter& it, OutIter& dest)
+        {
+            typedef
+                typename std::iterator_traits<InIter>::value_type value_type;
+
+            typedef typename traits::vector_pack_type<value_type, 1>::type V1;
+
+            invoke_vectorized_inout1_ind<V1>::call_aligned(
+                std::forward<F>(f), it, dest);
+        }
+
+        ///////////////////////////////////////////////////////////////////
+        template <typename F, typename InIter, typename OutIter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void callv(
+            F&& f, InIter& it, OutIter& dest)
+        {
+            typedef
+                typename std::iterator_traits<InIter>::value_type value_type;
+
+            typedef typename traits::vector_pack_type<value_type>::type V;
+
+            if (!is_data_aligned(it) || !is_data_aligned(dest))
+            {
+                invoke_vectorized_inout1_ind<V>::call_unaligned(
+                    std::forward<F>(f), it, dest);
+            }
+            else
+            {
+                invoke_vectorized_inout1_ind<V>::call_aligned(
+                    std::forward<F>(f), it, dest);
+            }
+        }
+    };
 }}}}    // namespace hpx::parallel::util::detail
 
 #endif
