@@ -314,10 +314,11 @@ namespace hpx { namespace parallel { namespace util {
     {
     private:
         template <typename Iter, typename OutIter, typename F>
-        friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::pair<Iter, OutIter>
-        tag_fallback_invoke(
-            hpx::parallel::util::transform_loop_n_ind_t<ExPolicy>,
-            Iter it, std::size_t count, OutIter dest, F&& f)
+        friend HPX_HOST_DEVICE
+            HPX_FORCEINLINE constexpr std::pair<Iter, OutIter>
+            tag_fallback_invoke(
+                hpx::parallel::util::transform_loop_n_ind_t<ExPolicy>, Iter it,
+                std::size_t count, OutIter dest, F&& f)
         {
             using pred = hpx::traits::is_random_access_iterator<Iter>;
 
@@ -327,18 +328,17 @@ namespace hpx { namespace parallel { namespace util {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        template <typename ExPolicy>
-        HPX_INLINE_CONSTEXPR_VARIABLE transform_loop_n_ind_t<ExPolicy> transform_loop_n_ind =
-            transform_loop_n_ind_t<ExPolicy>{};
+    template <typename ExPolicy>
+    HPX_INLINE_CONSTEXPR_VARIABLE transform_loop_n_ind_t<ExPolicy>
+        transform_loop_n_ind = transform_loop_n_ind_t<ExPolicy>{};
 #else
-        template <typename ExPolicy, typename Iter, typename OutIter, typename F>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::pair<Iter, OutIter>
-        transform_loop_n_ind(
-            Iter it, std::size_t count, OutIter dest, F&& f)
-        {
-            return hpx::parallel::util::transform_loop_n_ind_t<ExPolicy>{}(
-                it, count, std::forward<F>(f));
-        }
+    template <typename ExPolicy, typename Iter, typename OutIter, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::pair<Iter, OutIter>
+    transform_loop_n_ind(Iter it, std::size_t count, OutIter dest, F&& f)
+    {
+        return hpx::parallel::util::transform_loop_n_ind_t<ExPolicy>{}(
+            it, count, std::forward<F>(f));
+    }
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
