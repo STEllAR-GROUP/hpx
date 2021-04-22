@@ -354,6 +354,44 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
     };
 
+    template <typename V>
+    struct invoke_vectorized_inout1_ind
+    {
+        template <typename F, typename InIter, typename OutIter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void call_aligned(
+            F&& f, InIter& it, OutIter& dest)
+        {
+            typedef
+                typename std::iterator_traits<InIter>::value_type value_type;
+
+            V tmp(traits::vector_pack_load<V, value_type>::aligned(it));
+
+            auto ret = HPX_INVOKE(f, tmp);
+            traits::vector_pack_store<decltype(ret), value_type>::aligned(
+                ret, dest);
+
+            std::advance(it, traits::vector_pack_size<V>::value);
+            std::advance(dest, ret.size());
+        }
+
+        template <typename F, typename InIter, typename OutIter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void call_unaligned(
+            F&& f, InIter& it, OutIter& dest)
+        {
+            typedef
+                typename std::iterator_traits<InIter>::value_type value_type;
+
+            V tmp(traits::vector_pack_load<V, value_type>::unaligned(it));
+
+            auto ret = HPX_INVOKE(f, tmp);
+            traits::vector_pack_store<decltype(ret), value_type>::unaligned(
+                ret, dest);
+
+            std::advance(it, traits::vector_pack_size<V>::value);
+            std::advance(dest, ret.size());
+        }
+    };
+
     template <typename V1, typename V2>
     struct invoke_vectorized_inout2
     {
@@ -487,6 +525,44 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             {
                 invoke_vectorized_inout2<V1, V2>::call_aligned(
                     std::forward<F>(f), it1, it2, dest);
+            }
+        }
+    };
+
+    struct datapar_transform_loop_step_ind
+    {
+        template <typename F, typename InIter, typename OutIter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void call1(
+            F&& f, InIter& it, OutIter& dest)
+        {
+            typedef
+                typename std::iterator_traits<InIter>::value_type value_type;
+
+            typedef typename traits::vector_pack_type<value_type, 1>::type V1;
+
+            invoke_vectorized_inout1_ind<V1>::call_aligned(
+                std::forward<F>(f), it, dest);
+        }
+
+        ///////////////////////////////////////////////////////////////////
+        template <typename F, typename InIter, typename OutIter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void callv(
+            F&& f, InIter& it, OutIter& dest)
+        {
+            typedef
+                typename std::iterator_traits<InIter>::value_type value_type;
+
+            typedef typename traits::vector_pack_type<value_type>::type V;
+
+            if (!is_data_aligned(it) || !is_data_aligned(dest))
+            {
+                invoke_vectorized_inout1_ind<V>::call_unaligned(
+                    std::forward<F>(f), it, dest);
+            }
+            else
+            {
+                invoke_vectorized_inout1_ind<V>::call_aligned(
+                    std::forward<F>(f), it, dest);
             }
         }
     };
