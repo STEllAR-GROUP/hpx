@@ -22,8 +22,8 @@ export CC="${CLANG_ROOT}/bin/clang"
 export CPP="${CLANG_ROOT}/bin/clang -E"
 
 module load daint-mc
-spack load cmake
-spack load ninja
+spack load cmake@3.17.3
+spack load ninja@1.10.0
 
 configure_extra_options="-DCMAKE_BUILD_TYPE=Release"
 configure_extra_options+=" -DHPX_WITH_MAX_CPU_COUNT=128"
