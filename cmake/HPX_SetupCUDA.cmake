@@ -59,27 +59,29 @@ if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
 
   if(NOT HPX_WITH_CUDA_CLANG)
     if(NOT MSVC)
-      set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-w)
+      target_compile_options(Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:-w>)
     else()
       # Windows
       set(CUDA_PROPAGATE_HOST_FLAGS OFF)
-      set(CUDA_NVCC_FLAGS_DEBUG
-          ${CUDA_NVCC_FLAGS_DEBUG};-D_DEBUG;-O0;-g;-G;-Xcompiler=-MDd;-Xcompiler=-Od;-Xcompiler=-Zi;-Xcompiler=-bigobj
-      )
-      set(CUDA_NVCC_FLAGS_RELWITHDEBINFO
-          ${CUDA_NVCC_FLAGS_RELWITHDEBINFO};-DNDEBUG;-O2;-g;-Xcompiler=-MD,-O2,-Zi;-Xcompiler=-bigobj
-      )
-      set(CUDA_NVCC_FLAGS_MINSIZEREL
-          ${CUDA_NVCC_FLAGS_MINSIZEREL};-DNDEBUG;-O1;-Xcompiler=-MD,-O1;-Xcompiler=-bigobj
-      )
-      set(CUDA_NVCC_FLAGS_RELEASE
-          ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O2;-Xcompiler=-MD,-Ox;-Xcompiler=-bigobj
-      )
+      target_compile_options(Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:$<$<CONFIG:Debug>:
+        -D_DEBUG -O0 -g -G -Xcompiler=-MDd -Xcompiler=-Od -Xcompiler=-Zi -Xcompiler=-bigobj
+        >>)
+      target_compile_options(Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:$<$<CONFIG:RelWithDebInfo>:
+          -DNDEBUG -O2 -g -Xcompiler=-MD,-O2,-Zi -Xcompiler=-bigobj
+        >>)
+      target_compile_options(Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:$<$<CONFIG:MinSizeRel>:
+          -DNDEBUG -O1 -Xcompiler=-MD,-O1 -Xcompiler=-bigobj
+        >>)
+      target_compile_options(Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:$<$<CONFIG:Release>:
+          -DNDEBUG -O2 -Xcompiler=-MD,-Ox -Xcompiler=-bigobj
+        >>)
     endif()
     set(CUDA_SEPARABLE_COMPILATION ON)
-    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-relaxed-constexpr)
-    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-extended-lambda)
-    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--default-stream per-thread)
+    target_compile_options(Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:
+      --extended-lambda
+      --default-stream per-thread
+      --expt-relaxed-constexpr
+      >)
   else()
     if(NOT HPX_FIND_PACKAGE)
       hpx_add_target_compile_option(-DBOOST_THREAD_USES_MOVE PUBLIC)
