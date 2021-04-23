@@ -79,15 +79,36 @@ namespace hpx { namespace parallel { namespace util {
         };
     }    // namespace detail
 
+    struct transform_loop_ind_t final
+      : hpx::functional::tag_fallback<transform_loop_ind_t>
+    {
+    private:
+        template <typename ExPolicy, typename IterB, typename IterE,
+            typename OutIter, typename F>
+        friend HPX_HOST_DEVICE
+            HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
+            tag_fallback_invoke(hpx::parallel::util::transform_loop_ind_t,
+                ExPolicy&&, IterB it, IterE end, OutIter dest, F&& f)
+        {
+            return detail::transform_loop_ind<IterB>::call(
+                it, end, dest, std::forward<F>(f));
+        }
+    };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    HPX_INLINE_CONSTEXPR_VARIABLE transform_loop_ind_t transform_loop_ind =
+        transform_loop_ind_t{};
+#else
     template <typename ExPolicy, typename IterB, typename IterE,
         typename OutIter, typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         transform_loop_ind(ExPolicy&&, IterB it, IterE end, OutIter dest, F&& f)
     {
-        return detail::transform_loop_ind<IterB>::call(
-            it, end, dest, std::forward<F>(f));
+        return hpx::parallel::util::transform_loop_ind_t{}(
+            ExPolicy&&, it, end, dest, std::forward<F>(f));
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
