@@ -30,71 +30,85 @@ int main()
     // Success path
     {
         std::atomic<bool> set_value_called{false};
+        std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> scheduler_execute_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
         auto s = ex::on(ex::just(),
-            scheduler{scheduler_execute_called, tag_invoke_overload_called});
+            scheduler{scheduler_schedule_called, scheduler_execute_called,
+                tag_invoke_overload_called});
         auto f = [] {};
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
         HPX_TEST(!tag_invoke_overload_called);
-        HPX_TEST(scheduler_execute_called);
+        HPX_TEST(scheduler_schedule_called);
+        HPX_TEST(!scheduler_execute_called);
     }
 
     {
         std::atomic<bool> set_value_called{false};
+        std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> scheduler_execute_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
         auto s = ex::on(ex::just(3),
-            scheduler{scheduler_execute_called, tag_invoke_overload_called});
+            scheduler{scheduler_schedule_called, scheduler_execute_called,
+                tag_invoke_overload_called});
         auto f = [](int x) { HPX_TEST_EQ(x, 3); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
         HPX_TEST(!tag_invoke_overload_called);
-        HPX_TEST(scheduler_execute_called);
+        HPX_TEST(scheduler_schedule_called);
+        HPX_TEST(!scheduler_execute_called);
     }
 
     {
         std::atomic<bool> set_value_called{false};
+        std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> scheduler_execute_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
         auto s = ex::on(ex::just(custom_type_non_default_constructible{42}),
-            scheduler{scheduler_execute_called, tag_invoke_overload_called});
+            scheduler{scheduler_schedule_called, scheduler_execute_called,
+                tag_invoke_overload_called});
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
         HPX_TEST(!tag_invoke_overload_called);
-        HPX_TEST(scheduler_execute_called);
+        HPX_TEST(scheduler_schedule_called);
+        HPX_TEST(!scheduler_execute_called);
     }
 
     {
         std::atomic<bool> set_value_called{false};
+        std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> scheduler_execute_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
         auto s = ex::on(
             ex::just(custom_type_non_default_constructible_non_copyable{42}),
-            scheduler{scheduler_execute_called, tag_invoke_overload_called});
+            scheduler{scheduler_schedule_called, scheduler_execute_called,
+                tag_invoke_overload_called});
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
         HPX_TEST(!tag_invoke_overload_called);
-        HPX_TEST(scheduler_execute_called);
+        HPX_TEST(scheduler_schedule_called);
+        HPX_TEST(!scheduler_execute_called);
     }
 
     {
         std::atomic<bool> set_value_called{false};
         std::atomic<bool> scheduler_execute_called{false};
+        std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
         auto s = ex::on(ex::just(std::string("hello"), 3),
-            scheduler{scheduler_execute_called, tag_invoke_overload_called});
+            scheduler{scheduler_schedule_called, scheduler_execute_called,
+                tag_invoke_overload_called});
         auto f = [](std::string s, int x) {
             HPX_TEST_EQ(s, std::string("hello"));
             HPX_TEST_EQ(x, 3);
@@ -104,16 +118,18 @@ int main()
         ex::start(os);
         HPX_TEST(set_value_called);
         HPX_TEST(!tag_invoke_overload_called);
-        HPX_TEST(scheduler_execute_called);
+        HPX_TEST(!scheduler_execute_called);
+        HPX_TEST(scheduler_schedule_called);
     }
 
     // operator| overload
     {
         std::atomic<bool> set_value_called{false};
         std::atomic<bool> scheduler_execute_called{false};
+        std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
         auto s = ex::just(std::string("hello"), 3) |
-            ex::on(scheduler{
+            ex::on(scheduler{scheduler_schedule_called,
                 scheduler_execute_called, tag_invoke_overload_called});
         auto f = [](std::string s, int x) {
             HPX_TEST_EQ(s, std::string("hello"));
@@ -124,16 +140,18 @@ int main()
         ex::start(os);
         HPX_TEST(set_value_called);
         HPX_TEST(!tag_invoke_overload_called);
-        HPX_TEST(scheduler_execute_called);
+        HPX_TEST(scheduler_schedule_called);
+        HPX_TEST(!scheduler_execute_called);
     }
 
     // tag_invoke overload
     {
         std::atomic<bool> set_value_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
+        std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> scheduler_execute_called{false};
         auto s = ex::on(ex::just(),
-            scheduler2{scheduler{
+            scheduler2{scheduler{scheduler_schedule_called,
                 scheduler_execute_called, tag_invoke_overload_called}});
         auto f = [] {};
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
@@ -141,6 +159,7 @@ int main()
         ex::start(os);
         HPX_TEST(set_value_called);
         HPX_TEST(tag_invoke_overload_called);
+        HPX_TEST(!scheduler_schedule_called);
         HPX_TEST(!scheduler_execute_called);
     }
 
@@ -148,15 +167,18 @@ int main()
     {
         std::atomic<bool> set_error_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
+        std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> scheduler_execute_called{false};
         auto s = ex::on(error_sender{},
-            scheduler{scheduler_execute_called, tag_invoke_overload_called});
+            scheduler{scheduler_schedule_called, scheduler_execute_called,
+                tag_invoke_overload_called});
         auto r = error_callback_receiver<decltype(check_exception_ptr)>{
             check_exception_ptr, set_error_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(set_error_called);
         HPX_TEST(!tag_invoke_overload_called);
+        HPX_TEST(!scheduler_schedule_called);
         HPX_TEST(!scheduler_execute_called);
     }
 

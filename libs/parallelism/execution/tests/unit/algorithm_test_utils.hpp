@@ -335,6 +335,7 @@ struct custom_type_non_default_constructible_non_copyable
 
 struct scheduler
 {
+    std::atomic<bool>& schedule_called;
     std::atomic<bool>& execute_called;
     std::atomic<bool>& tag_invoke_overload_called;
 
@@ -389,8 +390,9 @@ struct scheduler
         }
     };
 
-    constexpr sender schedule() const
+    sender schedule()
     {
+        schedule_called = true;
         return {};
     }
 
