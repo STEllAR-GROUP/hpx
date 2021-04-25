@@ -586,7 +586,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             typedef typename traits::vector_pack_type<value_type, 1>::type V1;
 
-            invoke_vectorized_inout1_ind<V1>::call_aligned(
+            invoke_vectorized_inout1_ind<V1>::call_unaligned(
                 std::forward<F>(f), it, dest);
         }
 
@@ -600,16 +600,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             typedef typename traits::vector_pack_type<value_type>::type V;
 
-            if (!is_data_aligned(it) || !is_data_aligned(dest))
-            {
-                invoke_vectorized_inout1_ind<V>::call_unaligned(
-                    std::forward<F>(f), it, dest);
-            }
-            else
-            {
-                invoke_vectorized_inout1_ind<V>::call_aligned(
-                    std::forward<F>(f), it, dest);
-            }
+            HPX_ASSERT(is_data_aligned(it) && is_data_aligned(dest));
+            invoke_vectorized_inout1_ind<V>::call_aligned(
+                std::forward<F>(f), it, dest);
         }
     };
 }}}}    // namespace hpx::parallel::util::detail
