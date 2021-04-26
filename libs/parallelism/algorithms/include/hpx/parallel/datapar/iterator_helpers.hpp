@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
+#include <hpx/assert.hpp>
 #include <hpx/execution/traits/vector_pack_alignment_size.hpp>
 #include <hpx/execution/traits/vector_pack_load_store.hpp>
 #include <hpx/execution/traits/vector_pack_type.hpp>
