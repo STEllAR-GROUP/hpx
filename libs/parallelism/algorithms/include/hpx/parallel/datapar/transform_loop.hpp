@@ -190,7 +190,7 @@ namespace hpx { namespace parallel { namespace util {
                 std::pair<InIter, OutIter>>::type
             call(InIter first, InIter last, OutIter dest, F&& f)
             {
-                return util::transform_loop_n<hpx::execution::datapar_policy>(
+                return util::transform_loop_n<hpx::execution::dataseq_policy>(
                     first, std::distance(first, last), dest,
                     std::forward<F>(f));
             }
@@ -209,21 +209,34 @@ namespace hpx { namespace parallel { namespace util {
         };
     }    // namespace detail
 
-    template <typename Iter, typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Iter, OutIter> transform_loop(
-        hpx::execution::datapar_policy, Iter it, Iter end, OutIter dest, F&& f)
+    template <typename ExPolicy, typename IterB, typename IterE,
+        typename OutIter, typename F>
+    HPX_HOST_DEVICE
+        HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
+        tag_invoke(hpx::parallel::util::transform_loop_t,
+            hpx::execution::dataseq_policy, IterB it, IterE end, OutIter dest,
+            F&& f)
     {
-        return detail::datapar_transform_loop<Iter>::call(
+        auto ret = detail::datapar_transform_loop<IterB>::call(
             it, end, dest, std::forward<F>(f));
+
+        return util::in_out_result<IterB, OutIter>{
+            std::move(ret.first), std::move(ret.second)};
     }
 
-    template <typename Iter, typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Iter, OutIter> transform_loop(
-        hpx::execution::datapar_task_policy, Iter it, Iter end, OutIter dest,
-        F&& f)
+    template <typename ExPolicy, typename IterB, typename IterE,
+        typename OutIter, typename F>
+    HPX_HOST_DEVICE
+        HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
+        tag_invoke(hpx::parallel::util::transform_loop_t,
+            hpx::execution::dataseq_task_policy, IterB it, IterE end,
+            OutIter dest, F&& f)
     {
-        return detail::datapar_transform_loop<Iter>::call(
+        auto ret = detail::datapar_transform_loop<IterB>::call(
             it, end, dest, std::forward<F>(f));
+
+        return util::in_out_result<IterB, OutIter>{
+            std::move(ret.first), std::move(ret.second)};
     }
 
     namespace detail {
