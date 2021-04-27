@@ -91,7 +91,8 @@ namespace hpx { namespace parallel { namespace util {
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         hpx::is_vectorpack_execution_policy<ExPolicy>::value,
         std::pair<Iter, OutIter>>::type
-    tag_invoke(hpx::parallel::util::transform_loop_n_t<ExPolicy>, Iter it, std::size_t count, OutIter dest, F&& f)
+    tag_invoke(hpx::parallel::util::transform_loop_n_t<ExPolicy>, Iter it,
+        std::size_t count, OutIter dest, F&& f)
     {
         return detail::datapar_transform_loop_n<Iter>::call(
             it, count, dest, std::forward<F>(f));
@@ -319,7 +320,11 @@ namespace hpx { namespace parallel { namespace util {
             {
                 std::size_t len = count;
 
-                for (/* */; !is_data_aligned(first1) && len != 0; --len)
+                for (/* */;
+                     !(is_data_aligned(first1) && is_data_aligned(first2) &&
+                         is_data_aligned(dest)) &&
+                     len != 0;
+                     --len)
                 {
                     datapar_transform_loop_step::call1(f, first1, first2, dest);
                 }
@@ -366,7 +371,7 @@ namespace hpx { namespace parallel { namespace util {
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         hpx::is_vectorpack_execution_policy<ExPolicy>::value,
         hpx::tuple<InIter1, InIter2, OutIter>>::type
-    transform_binary_loop_n(
+    tag_invoke(hpx::parallel::util::transform_binary_loop_n_t<ExPolicy>,
         InIter1 first1, std::size_t count, InIter2 first2, OutIter dest, F&& f)
     {
         return detail::datapar_transform_binary_loop_n<InIter1, InIter2>::call(
