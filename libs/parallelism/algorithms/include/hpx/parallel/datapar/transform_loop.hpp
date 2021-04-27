@@ -495,7 +495,7 @@ namespace hpx { namespace parallel { namespace util {
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         hpx::is_vectorpack_execution_policy<ExPolicy>::value,
         util::in_in_out_result<InIter1, InIter2, OutIter>>::type
-    transform_binary_loop(
+    tag_invoke(hpx::parallel::util::transform_binary_loop_t<ExPolicy>,
         InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest, F&& f)
     {
         return detail::datapar_transform_binary_loop<InIter1, InIter2>::call(
@@ -507,8 +507,9 @@ namespace hpx { namespace parallel { namespace util {
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         hpx::is_vectorpack_execution_policy<ExPolicy>::value,
         util::in_in_out_result<InIter1, InIter2, OutIter>>::type
-    transform_binary_loop(InIter1 first1, InIter1 last1, InIter2 first2,
-        InIter2 last2, OutIter dest, F&& f)
+    tag_invoke(hpx::parallel::util::transform_binary_loop_t<ExPolicy>,
+        InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
+        OutIter dest, F&& f)
     {
         return detail::datapar_transform_binary_loop<InIter1, InIter2>::call(
             first1, last1, first2, last2, dest, std::forward<F>(f));
