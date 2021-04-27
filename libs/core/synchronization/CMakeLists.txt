@@ -15,6 +15,7 @@ set(synchronization_headers
     hpx/semaphore.hpp
     hpx/shared_mutex.hpp
     hpx/stop_token.hpp
+    hpx/synchronization/async_rw_mutex.hpp
     hpx/synchronization/barrier.hpp
     hpx/synchronization/channel_mpmc.hpp
     hpx/synchronization/channel_mpsc.hpp

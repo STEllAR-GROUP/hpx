@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,6 +28,11 @@ set(tests
     stop_token_cb2
 )
 
+if(HPX_CXX_STANDARD GREATER_EQUAL 17)
+  list(APPEND tests async_rw_mutex)
+endif()
+
+set(async_rw_mutex_PARAMETERS THREADS_PER_LOCALITY 4)
 set(barrier_cpp20_PARAMETERS THREADS_PER_LOCALITY 4)
 set(binary_semaphore_cpp20_PARAMETERS THREADS_PER_LOCALITY 4)
 set(channel_mpmc_fib_PARAMETERS THREADS_PER_LOCALITY 4)
