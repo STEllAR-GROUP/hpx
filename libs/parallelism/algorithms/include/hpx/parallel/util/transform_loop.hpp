@@ -408,17 +408,41 @@ namespace hpx { namespace parallel { namespace util {
         };
     }    // namespace detail
 
+    template <typename ExPolicy>
+    struct transform_binary_loop_n_t final
+      : hpx::functional::tag_fallback<transform_binary_loop_n_t<ExPolicy>>
+    {
+    private:
+        template <typename InIter1, typename InIter2, typename OutIter,
+            typename F>
+        friend HPX_HOST_DEVICE
+            HPX_FORCEINLINE constexpr hpx::tuple<InIter1, InIter2, OutIter>
+            tag_fallback_invoke(
+                hpx::parallel::util::transform_binary_loop_n_t<ExPolicy>,
+                InIter1 first1, std::size_t count, InIter2 first2, OutIter dest,
+                F&& f)
+        {
+            return detail::transform_binary_loop_n<InIter1, InIter2>::call(
+                first1, count, first2, dest, std::forward<F>(f));
+        }
+    };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    template <typename ExPolicy>
+    HPX_INLINE_CONSTEXPR_VARIABLE transform_binary_loop_n_t<ExPolicy>
+        transform_binary_loop_n = transform_binary_loop_n_t<ExPolicy>{};
+#else
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
-        !hpx::is_vectorpack_execution_policy<ExPolicy>::value,
-        hpx::tuple<InIter1, InIter2, OutIter>>::type
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::pair<Iter, OutIter>
     transform_binary_loop_n(
         InIter1 first1, std::size_t count, InIter2 first2, OutIter dest, F&& f)
     {
-        return detail::transform_binary_loop_n<InIter1, InIter2>::call(
-            first1, count, first2, dest, std::forward<F>(f));
+        return hpx::parallel::util::transform_binary_loop_n_t<ExPolicy>{}(
+            first, count, first2, dest, std::forward<F>(f));
     }
+#endif
+
 }}}    // namespace hpx::parallel::util
 
 #if defined(HPX_HAVE_DATAPAR)
