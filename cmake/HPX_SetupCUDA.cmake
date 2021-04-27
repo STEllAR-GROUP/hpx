@@ -82,6 +82,11 @@ if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
       --default-stream per-thread
       --expt-relaxed-constexpr
       >)
+    if(${CMAKE_CUDA_COMPILER_ID} STREQUAL "NVIDIA")
+      target_compile_definitions(Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:
+        ASIO_DISABLE_CONSTEXPR
+        >)
+    endif()
   else()
     if(NOT HPX_FIND_PACKAGE)
       hpx_add_target_compile_option(-DBOOST_THREAD_USES_MOVE PUBLIC)
