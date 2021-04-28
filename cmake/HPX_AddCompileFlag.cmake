@@ -174,7 +174,7 @@ endfunction()
 
 function(hpx_add_compile_flag)
   set(one_value_args)
-  hpx_add_target_compile_option(${ARGN} PRIVATE)
+  hpx_add_target_compile_option(${ARGN})
 endfunction()
 
 function(hpx_add_compile_flag_if_available FLAG)
