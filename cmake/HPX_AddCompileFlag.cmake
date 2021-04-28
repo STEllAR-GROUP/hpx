@@ -12,24 +12,24 @@ function(hpx_add_target_compile_option FLAG)
   set(one_value_args)
   set(multi_value_args CONFIGURATIONS LANGUAGES)
   cmake_parse_arguments(
-    HPX_ADD_TARGET_COMPILE_OPTION "${options}" "${one_value_args}"
+    target_compile_option "${options}" "${one_value_args}"
     "${multi_value_args}" ${ARGN}
   )
 
-  if(HPX_ADD_TARGET_COMPILE_OPTION_PUBLIC)
+  if(target_compile_option_PUBLIC)
     set(_dest hpx_public_flags)
   else()
     set(_dest hpx_private_flags)
   endif()
 
   set(_configurations "none")
-  if(HPX_ADD_TARGET_COMPILE_OPTION_CONFIGURATIONS)
-    set(_configurations ${HPX_ADD_TARGET_COMPILE_OPTION_CONFIGURATIONS})
+  if(target_compile_option_CONFIGURATIONS)
+    set(_configurations ${target_compile_option_CONFIGURATIONS})
   endif()
 
   set(_languages "CXX")
-  if(HPX_ADD_TARGET_COMPILE_OPTION_LANGUAGES)
-    set(_languages ${HPX_ADD_TARGET_COMPILE_OPTION_LANGUAGES})
+  if(target_compile_option_LANGUAGES)
+    set(_languages ${target_compile_option_LANGUAGES})
   endif()
 
   foreach(_lang ${_languages})
@@ -51,18 +51,18 @@ function(hpx_add_target_compile_option_if_available FLAG)
   set(one_value_args NAME)
   set(multi_value_args CONFIGURATIONS LANGUAGES)
   cmake_parse_arguments(
-    HPX_ADD_TARGET_COMPILE_OPTION_IA "${options}" "${one_value_args}"
+    target_compile_option_ia "${options}" "${one_value_args}"
     "${multi_value_args}" ${ARGN}
   )
 
-  if(HPX_ADD_TARGET_COMPILE_OPTION_IA_PUBLIC)
+  if(target_compile_option_ia_PUBLIC)
     set(_modifier PUBLIC)
   else()
     set(_modifier PRIVATE)
   endif()
 
-  if(HPX_ADD_TARGET_COMPILE_OPTION_IA_NAME)
-    string(TOUPPER ${HPX_ADD_TARGET_COMPILE_OPTION_IA_NAME} _name)
+  if(target_compile_option_ia_NAME)
+    string(TOUPPER ${target_compile_option_ia_NAME} _name)
   else()
     string(TOUPPER ${FLAG} _name)
   endif()
@@ -73,8 +73,8 @@ function(hpx_add_target_compile_option_if_available FLAG)
   string(REGEX REPLACE "\\+" "X" _name ${_name})
 
   set(_languages "CXX")
-  if(HPX_ADD_TARGET_COMPILE_OPTION_IA_LANGUAGES)
-    set(_languages ${HPX_ADD_TARGET_COMPILE_OPTION_IA_LANGUAGES})
+  if(target_compile_option_ia_LANGUAGES)
+    set(_languages ${target_compile_option_ia_LANGUAGES})
   endif()
 
   foreach(_lang ${_languages})
@@ -86,7 +86,7 @@ function(hpx_add_target_compile_option_if_available FLAG)
     if(HPX_WITH_${_lang}_FLAG_${_name})
       hpx_add_target_compile_option(
         ${FLAG} ${_modifier}
-        CONFIGURATIONS ${HPX_ADD_TARGET_COMPILE_OPTION_IA_CONFIGURATIONS}
+        CONFIGURATIONS ${target_compile_option_ia_CONFIGURATIONS}
         LANGUAGES ${_lang}
       )
     else()
