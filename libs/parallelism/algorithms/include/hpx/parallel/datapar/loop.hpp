@@ -161,6 +161,56 @@ namespace hpx { namespace parallel { namespace util {
         };
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Iterator>
+        struct datapar_loop_ind
+        {
+            typedef typename std::decay<Iterator>::type iterator_type;
+            typedef typename std::iterator_traits<iterator_type>::value_type
+                value_type;
+
+            typedef typename traits::vector_pack_type<value_type> V;
+
+            template <typename Begin, typename End, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
+                iterator_datapar_compatible<Begin>::value, Begin>::type
+            call(Begin first, End last, F&& f)
+            {
+                while (!is_data_aligned(first) && first != last)
+                {
+                    datapar_loop_step_ind<Begin>::call1(f, first);
+                }
+
+                static std::size_t constexpr size =
+                    traits::vector_pack_size<V>::value;
+
+                End const lastV = last - (size + 1);
+                while (first < lastV)
+                {
+                    datapar_loop_step_ind<Begin>::callv(f, first);
+                }
+
+                while (first != last)
+                {
+                    datapar_loop_step_ind<Begin>::call1(f, first);
+                }
+
+                return first;
+            }
+
+            template <typename Begin, typename End, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
+                !iterator_datapar_compatible<Begin>::value, Begin>::type
+            call(Begin it, End end, F&& f)
+            {
+                while (it != end)
+                {
+                    datapar_loop_step_ind<Begin>::call1(f, it);
+                }
+                return it;
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         // Helper class to repeatedly call a function starting from a given
         // iterator position.
         template <typename VecOnly, typename Iter1, typename Iter2>
@@ -381,6 +431,25 @@ namespace hpx { namespace parallel { namespace util {
         hpx::execution::datapar_task_policy, Begin begin, End end, F&& f)
     {
         return detail::datapar_loop<Begin>::call(
+            begin, end, std::forward<F>(f));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Begin, typename End, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+        hpx::parallel::util::loop_ind_t, hpx::execution::dataseq_policy,
+        Begin begin, End end, F&& f)
+    {
+        return detail::datapar_loop_ind<Begin>::call(
+            begin, end, std::forward<F>(f));
+    }
+
+    template <typename Begin, typename End, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+        hpx::parallel::util::loop_ind_t, hpx::execution::dataseq_task_policy,
+        Begin begin, End end, F&& f)
+    {
+        return detail::datapar_loop_ind<Begin>::call(
             begin, end, std::forward<F>(f));
     }
 
