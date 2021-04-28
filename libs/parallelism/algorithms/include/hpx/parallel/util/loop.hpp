@@ -132,11 +132,37 @@ namespace hpx { namespace parallel { namespace util {
         };
     }    // namespace detail
 
+    struct loop_ind_t final : hpx::functional::tag_fallback<loop_ind_t>
+    {
+    private:
+        template <typename ExPolicy, typename Begin, typename End, typename F>
+        friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin
+        tag_fallback_invoke(hpx::parallel::util::loop_ind_t, ExPolicy&&,
+            Begin begin, End end, F&& f)
+        {
+            return detail::loop_ind<Begin>::call(
+                begin, end, std::forward<F>(f));
+        }
+
+        template <typename ExPolicy, typename Begin, typename End,
+            typename CancelToken, typename F>
+        friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin
+        tag_fallback_invoke(hpx::parallel::util::loop_ind_t, ExPolicy&&,
+            Begin begin, End end, CancelToken& tok, F&& f)
+        {
+            return detail::loop_ind<Begin>::call(
+                begin, end, tok, std::forward<F>(f));
+        }
+    };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    HPX_INLINE_CONSTEXPR_VARIABLE loop_ind_t loop_ind = loop_ind_t{};
+#else
     template <typename ExPolicy, typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin loop_ind(
         ExPolicy&&, Begin begin, End end, F&& f)
     {
-        return detail::loop_ind<Begin>::call(begin, end, std::forward<F>(f));
+        return hpx::parallel::util::loop_ind_t{}(it, count, std::forward<F>(f));
     }
 
     template <typename ExPolicy, typename Begin, typename End,
@@ -144,9 +170,10 @@ namespace hpx { namespace parallel { namespace util {
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin loop_ind(
         ExPolicy&&, Begin begin, End end, CancelToken& tok, F&& f)
     {
-        return detail::loop_ind<Begin>::call(
-            begin, end, tok, std::forward<F>(f));
+        return hpx::parallel::util::loop_ind_t{}(
+            it, count, tok, std::forward<F>(f));
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
