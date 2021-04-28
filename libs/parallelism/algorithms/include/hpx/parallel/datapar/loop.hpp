@@ -279,6 +279,58 @@ namespace hpx { namespace parallel { namespace util {
                 return first;
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Iterator>
+        struct datapar_loop_n_ind
+        {
+            typedef typename std::decay<Iterator>::type iterator_type;
+            typedef typename std::iterator_traits<iterator_type>::value_type
+                value_type;
+
+            typedef typename traits::vector_pack_type<value_type>::type V;
+
+            template <typename InIter, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
+                iterator_datapar_compatible<InIter>::value, InIter>::type
+            call(InIter first, std::size_t count, F&& f)
+            {
+                std::size_t len = count;
+
+                for (/* */; !detail::is_data_aligned(first) && len != 0; --len)
+                {
+                    datapar_loop_step_ind<InIter>::call1(f, first);
+                }
+
+                static std::size_t constexpr size =
+                    traits::vector_pack_size<V>::value;
+
+                for (std::int64_t len_v = std::int64_t(len - (size + 1));
+                     len_v > 0; len_v -= size, len -= size)
+                {
+                    datapar_loop_step_ind<InIter>::callv(f, first);
+                }
+
+                for (/* */; len != 0; --len)
+                {
+                    datapar_loop_step_ind<InIter>::call1(f, first);
+                }
+
+                return first;
+            }
+
+            template <typename InIter, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
+                !iterator_datapar_compatible<InIter>::value, InIter>::type
+            call(InIter first, std::size_t count, F&& f)
+            {
+                for (/* */; count != 0; --count)
+                {
+                    datapar_loop_step_ind<InIter>::call1(f, first);
+                }
+                return first;
+            }
+        };
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -354,6 +406,16 @@ namespace hpx { namespace parallel { namespace util {
             std::size_t count, F&& f)
         {
             return hpx::parallel::util::detail::datapar_loop_n<Iter>::call(
+                it, count, std::forward<F>(f));
+        }
+
+        template <typename ExPolicy, typename Iter, typename F>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
+            hpx::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
+        tag_invoke(hpx::parallel::util::detail::loop_n_ind_t<ExPolicy>, Iter it,
+            std::size_t count, F&& f)
+        {
+            return hpx::parallel::util::detail::datapar_loop_n_ind<Iter>::call(
                 it, count, std::forward<F>(f));
         }
     }    // namespace detail
