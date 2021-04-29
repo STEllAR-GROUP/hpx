@@ -414,7 +414,8 @@ namespace hpx { namespace parallel { namespace util {
     template <typename ExPolicy, typename Iter, typename Sent>
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         hpx::is_vectorpack_execution_policy<ExPolicy>::value, bool>::type
-    loop_optimization(Iter first1, Sent last1)
+    tag_invoke(hpx::parallel::util::loop_optimization_t<ExPolicy>, Iter first1,
+        Sent last1)
     {
         return detail::loop_optimization<Iter>::call(first1, last1);
     }
