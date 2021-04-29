@@ -464,7 +464,8 @@ namespace hpx { namespace parallel { namespace util {
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         hpx::is_vectorpack_execution_policy<ExPolicy>::value,
         std::pair<Iter1, Iter2>>::type
-    loop2(VecOnly, Iter1 first1, Iter1 last1, Iter2 first2, F&& f)
+    tag_invoke(hpx::parallel::util::loop2_t<ExPolicy>, VecOnly, Iter1 first1,
+        Iter1 last1, Iter2 first2, F&& f)
     {
         return detail::datapar_loop2<VecOnly, Iter1, Iter2>::call(
             first1, last1, first2, std::forward<F>(f));
