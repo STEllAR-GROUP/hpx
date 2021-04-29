@@ -40,9 +40,7 @@ function(hpx_add_target_compile_option FLAG)
             "$<$<AND:$<CONFIG:${_config}>,$<COMPILE_LANGUAGE:${_lang}>>:${FLAG}>"
         )
       else()
-        set(_conf
-            "$<$<COMPILE_LANGUAGE:${_lang}>:${FLAG}>"
-        )
+        set(_conf "$<$<COMPILE_LANGUAGE:${_lang}>:${FLAG}>")
       endif()
       target_compile_options(${_dest} INTERFACE "${_conf}")
     endforeach()
