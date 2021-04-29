@@ -387,8 +387,9 @@ namespace hpx { namespace parallel { namespace util {
     template <typename ExPolicy, typename F, typename Iter1, typename Iter2,
         typename U = typename std::enable_if<
             hpx::is_vectorpack_execution_policy<ExPolicy>::value>::type>
-    HPX_HOST_DEVICE HPX_FORCEINLINE auto loop_step(
-        std::false_type, F&& f, Iter1& it1, Iter2& it2)
+    HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_invoke(
+        hpx::parallel::util::loop_step_t<ExPolicy>, std::false_type, F&& f,
+        Iter1& it1, Iter2& it2)
         -> decltype(detail::datapar_loop_step2<Iter1, Iter2>::call1(
             std::forward<F>(f), it1, it2))
     {
@@ -399,8 +400,9 @@ namespace hpx { namespace parallel { namespace util {
     template <typename ExPolicy, typename F, typename Iter1, typename Iter2,
         typename U = typename std::enable_if<
             hpx::is_vectorpack_execution_policy<ExPolicy>::value>::type>
-    HPX_HOST_DEVICE HPX_FORCEINLINE auto loop_step(
-        std::true_type, F&& f, Iter1& it1, Iter2& it2)
+    HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_invoke(
+        hpx::parallel::util::loop_step_t<ExPolicy>, std::true_type, F&& f,
+        Iter1& it1, Iter2& it2)
         -> decltype(detail::datapar_loop_step2<Iter1, Iter2>::callv(
             std::forward<F>(f), it1, it2))
     {
