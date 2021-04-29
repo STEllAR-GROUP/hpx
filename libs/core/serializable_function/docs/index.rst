@@ -7,9 +7,9 @@
 
 .. _modules_serializable_function:
 
-==========
+=====================
 serializable_function
-==========
+=====================
 
 This module provides function wrappers to support serialization of functions and their arguments.
 

@@ -17,10 +17,7 @@ set(serializable_function_headers
 
 # Default location is $HPX_ROOT/libs/serializable_function/include_compatibility
 # cmake-format: off
-set(serializable_function_compat_headers
-    hpx/util/serializable_function.hpp => hpx/serializable_function.hpp
-    hpx/util/serializable_unique_function.hpp => hpx/serializable_function.hpp
-)
+set(serializable_function_compat_headers)
 # cmake-format: on
 
 # Default location is $HPX_ROOT/libs/serializable_function/src
