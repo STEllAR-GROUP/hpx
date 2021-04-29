@@ -27,15 +27,36 @@
 namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename ExPolicy>
+    struct loop_step_t final
+      : hpx::functional::tag_fallback<loop_step_t<ExPolicy>>
+    {
+    private:
+        template <typename VecOnly, typename F, typename... Iters>
+        friend HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename hpx::util::invoke_result<F, Iters...>::type
+            tag_fallback_invoke(hpx::parallel::util::loop_step_t<ExPolicy>,
+                VecOnly, F&& f, Iters&... its)
+        {
+            return HPX_INVOKE(std::forward<F>(f), (its++)...);
+        }
+    };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    template <typename ExPolicy>
+    HPX_INLINE_CONSTEXPR_VARIABLE loop_step_t<ExPolicy> loop_step =
+        loop_step_t<ExPolicy>{};
+#else
     template <typename ExPolicy, typename VecOnly, typename F,
         typename... Iters>
-    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
-        !hpx::is_vectorpack_execution_policy<ExPolicy>::value,
-        typename hpx::util::invoke_result<F, Iters...>::type>::type
-    loop_step(VecOnly, F&& f, Iters&... its)
+    HPX_HOST_DEVICE HPX_FORCEINLINE
+        typename hpx::util::invoke_result<F, Iters...>::type
+        loop_step(VecOnly, F&& f, Iters&... its)
     {
-        return HPX_INVOKE(std::forward<F>(f), (its++)...);
+        return hpx::parallel::util::loop_step_t<ExPolicy>{}(
+            VecOnly, std::forward<F>(f), (its)...);
     }
+#endif
 
     template <typename ExPolicy, typename Iter>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
