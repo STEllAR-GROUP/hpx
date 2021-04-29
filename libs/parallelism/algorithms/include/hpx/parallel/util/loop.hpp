@@ -268,16 +268,36 @@ namespace hpx { namespace parallel { namespace util {
         };
     }    // namespace detail
 
+    template <typename ExPolicy>
+    struct loop2_t final : hpx::functional::tag_fallback<loop2_t<ExPolicy>>
+    {
+    private:
+        template <typename VecOnly, typename Begin1,
+            typename End1, typename Begin2, typename F>
+        friend HPX_HOST_DEVICE
+            HPX_FORCEINLINE constexpr std::pair<Begin1, Begin2>
+            tag_fallback_invoke(hpx::parallel::util::loop2_t<ExPolicy>, VecOnly,
+                Begin1 begin1, End1 end1, Begin2 begin2, F&& f)
+        {
+            return detail::loop2<Begin1, Begin2>::call(
+                begin1, end1, begin2, std::forward<F>(f));
+        }
+    };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    template <typename ExPolicy>
+    HPX_INLINE_CONSTEXPR_VARIABLE loop2_t<ExPolicy> loop2 = loop2_t<ExPolicy>{};
+#else
     template <typename ExPolicy, typename VecOnly, typename Begin1,
         typename End1, typename Begin2, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
-        !hpx::is_vectorpack_execution_policy<ExPolicy>::value,
-        std::pair<Begin1, Begin2>>::type
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr
+        std::pair<Begin1, Begin2>
     loop2(VecOnly, Begin1 begin1, End1 end1, Begin2 begin2, F&& f)
     {
-        return detail::loop2<Begin1, Begin2>::call(
-            begin1, end1, begin2, std::forward<F>(f));
+        return hpx::parallel::util::loop2_t<ExPolicy>{}(
+            VecOnly, begin1, end1, begin2, std::forward<F>(f));
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
