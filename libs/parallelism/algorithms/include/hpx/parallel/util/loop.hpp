@@ -272,8 +272,8 @@ namespace hpx { namespace parallel { namespace util {
     struct loop2_t final : hpx::functional::tag_fallback<loop2_t<ExPolicy>>
     {
     private:
-        template <typename VecOnly, typename Begin1,
-            typename End1, typename Begin2, typename F>
+        template <typename VecOnly, typename Begin1, typename End1,
+            typename Begin2, typename F>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr std::pair<Begin1, Begin2>
             tag_fallback_invoke(hpx::parallel::util::loop2_t<ExPolicy>, VecOnly,
@@ -290,9 +290,8 @@ namespace hpx { namespace parallel { namespace util {
 #else
     template <typename ExPolicy, typename VecOnly, typename Begin1,
         typename End1, typename Begin2, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr
-        std::pair<Begin1, Begin2>
-    loop2(VecOnly, Begin1 begin1, End1 end1, Begin2 begin2, F&& f)
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::pair<Begin1, Begin2> loop2(
+        VecOnly, Begin1 begin1, End1 end1, Begin2 begin2, F&& f)
     {
         return hpx::parallel::util::loop2_t<ExPolicy>{}(
             VecOnly, begin1, end1, begin2, std::forward<F>(f));
@@ -491,32 +490,80 @@ namespace hpx { namespace parallel { namespace util {
 #endif
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename T>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
-            !hpx::is_vectorpack_execution_policy<ExPolicy>::value,
-            T const&>::type
-        extract_value(T const& v)
+        template <typename ExPolicy>
+        struct extract_value_t
+          : hpx::functional::tag_fallback<extract_value_t<ExPolicy>>
         {
-            return v;
-        }
+        private:
+            template <typename T>
+            friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T const&
+            tag_fallback_invoke(
+                hpx::parallel::util::detail::extract_value_t<ExPolicy>,
+                T const& v)
+            {
+                return v;
+            }
+        };
 
-        template <typename ExPolicy, typename F, typename T>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
-            !hpx::is_vectorpack_execution_policy<ExPolicy>::value,
-            T const&>::type
-        accumulate_values(F&&, T const& v)
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        template <typename ExPolicy>
+        HPX_INLINE_CONSTEXPR_VARIABLE extract_value_t<ExPolicy> extract_value =
+            extract_value_t<ExPolicy>{};
+#else
+        template <typename ExPolicy, typename T>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T const& extract_value(
+            T const& v)
         {
-            return v;
+            return hpx::parallel::util::detail::extract_value_t<ExPolicy>{}(v);
+        }
+#endif
+
+        template <typename ExPolicy>
+        struct accumulate_values_t
+          : hpx::functional::tag_fallback<accumulate_values_t<ExPolicy>>
+        {
+        private:
+            template <typename F, typename T>
+            friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T const&
+            tag_fallback_invoke(
+                hpx::parallel::util::detail::accumulate_values_t<ExPolicy>, F&&,
+                T const& v)
+            {
+                return v;
+            }
+
+            template <typename F, typename T, typename T1>
+            friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T
+            tag_fallback_invoke(
+                hpx::parallel::util::detail::accumulate_values_t<ExPolicy>,
+                F&& f, T&& v, T1&& init)
+            {
+                return HPX_INVOKE(std::forward<F>(f), std::forward<T1>(init),
+                    std::forward<T>(v));
+            }
+        };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        template <typename ExPolicy>
+        HPX_INLINE_CONSTEXPR_VARIABLE accumulate_values_t<ExPolicy>
+            accumulate_values = accumulate_values_t<ExPolicy>{};
+#else
+        template <typename ExPolicy, typename F, typename T>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T const& accumulate_values(
+            F&&, T const& v)
+        {
+            return hpx::parallel::util::detail::accumulate_values_t<ExPolicy>{}(
+                F&&, v);
         }
 
         template <typename ExPolicy, typename F, typename T, typename T1>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
-            !hpx::is_vectorpack_execution_policy<ExPolicy>::value, T>::type
-        accumulate_values(F&& f, T&& v, T1&& init)
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T accumulate_values(
+            F&& f, T&& v, T1&& init)
         {
-            return HPX_INVOKE(
+            return hpx::parallel::util::detail::accumulate_values_t<ExPolicy>{}(
                 std::forward<F>(f), std::forward<T1>(init), std::forward<T>(v));
         }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         // Helper class to repeatedly call a function a given number of times
