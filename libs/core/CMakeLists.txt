@@ -41,6 +41,7 @@ set(_hpx_core_modules
     preprocessor
     properties
     schedulers
+    serializable_function
     serialization
     static_reinit
     statistics

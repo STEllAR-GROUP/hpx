@@ -120,7 +120,8 @@ add_hpx_module(
   HEADERS ${async_headers}
   COMPAT_HEADERS ${async_compat_headers}
   DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES hpx_actions hpx_naming hpx_runtime_configuration
-                      hpx_runtime_local hpx_threadmanager
+  MODULE_DEPENDENCIES
+    hpx_actions hpx_naming hpx_runtime_configuration hpx_runtime_local
+    hpx_serializable_function hpx_threadmanager
   CMAKE_SUBDIRS examples tests
 )

@@ -10,4 +10,4 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/functional/serialization/detail/serializable_basic_function.hpp>
+#include <hpx/serializable_function/serialization/detail/serializable_basic_function.hpp>

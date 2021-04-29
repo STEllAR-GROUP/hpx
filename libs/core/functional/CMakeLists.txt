@@ -34,11 +34,6 @@ set(functional_headers
     hpx/functional/tag_invoke.hpp
     hpx/functional/tag_priority_invoke.hpp
     hpx/functional/unique_function.hpp
-    hpx/functional/serialization/detail/serializable_basic_function.hpp
-    hpx/functional/serialization/detail/vtable/serializable_function_vtable.hpp
-    hpx/functional/serialization/detail/vtable/serializable_vtable.hpp
-    hpx/functional/serialization/serializable_function.hpp
-    hpx/functional/serialization/serializable_unique_function.hpp
     hpx/functional/traits/get_action_name.hpp
     hpx/functional/traits/get_function_address.hpp
     hpx/functional/traits/get_function_annotation.hpp
@@ -66,8 +61,6 @@ set(functional_compat_headers
     hpx/util/one_shot.hpp => hpx/functional.hpp
     hpx/util/protect.hpp => hpx/functional.hpp
     hpx/util/result_of.hpp => hpx/functional.hpp
-    hpx/util/serializable_function.hpp => hpx/functional.hpp
-    hpx/util/serializable_unique_function.hpp => hpx/functional.hpp
     hpx/util/unique_function.hpp => hpx/functional.hpp
 )
 # cmake-format: on
@@ -96,7 +89,6 @@ add_hpx_module(
     hpx_debugging
     hpx_errors
     hpx_itt_notify
-    hpx_serialization
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

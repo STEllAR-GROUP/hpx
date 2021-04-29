@@ -14,8 +14,8 @@
 #include <hpx/functional/detail/basic_function.hpp>
 #include <hpx/functional/detail/vtable/function_vtable.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
-#include <hpx/functional/serialization/detail/vtable/serializable_function_vtable.hpp>
-#include <hpx/functional/serialization/detail/vtable/serializable_vtable.hpp>
+#include <hpx/serializable_function/serialization/detail/vtable/serializable_function_vtable.hpp>
+#include <hpx/serializable_function/serialization/detail/vtable/serializable_vtable.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <string>
