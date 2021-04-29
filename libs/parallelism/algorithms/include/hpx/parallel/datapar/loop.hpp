@@ -36,7 +36,8 @@ namespace hpx { namespace parallel { namespace util {
         HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
             hpx::is_vectorpack_execution_policy<ExPolicy>::value,
             typename Vector::value_type>::type
-        extract_value(Vector const& value)
+        tag_invoke(hpx::parallel::util::detail::extract_value_t<ExPolicy>,
+            Vector const& value)
         {
             static_assert(traits::is_scalar_vector_pack<Vector>::value,
                 "this should be called with a scalar only");
@@ -49,7 +50,8 @@ namespace hpx { namespace parallel { namespace util {
             hpx::is_vectorpack_execution_policy<ExPolicy>::value,
             typename traits::vector_pack_type<
                 typename std::decay<Vector>::type::value_type, 1>::type>::type
-        accumulate_values(F&& f, Vector const& value)
+        tag_invoke(hpx::parallel::util::detail::accumulate_values_t<ExPolicy>,
+            F&& f, Vector const& value)
         {
             typedef typename std::decay<Vector>::type vector_type;
             typedef typename vector_type::value_type entry_type;
@@ -69,7 +71,8 @@ namespace hpx { namespace parallel { namespace util {
         HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
             hpx::is_vectorpack_execution_policy<ExPolicy>::value,
             typename traits::vector_pack_type<T, 1>::type>::type
-        accumulate_values(F&& f, Vector const& value, T accum)
+        tag_invoke(hpx::parallel::util::detail::accumulate_values_t<ExPolicy>,
+            F&& f, Vector const& value, T accum)
         {
             for (size_t i = 0; i != value.size(); ++i)
             {
