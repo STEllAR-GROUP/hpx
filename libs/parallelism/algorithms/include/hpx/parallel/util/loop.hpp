@@ -1197,7 +1197,3 @@ namespace hpx { namespace parallel { namespace util {
         return val;
     }
 }}}    // namespace hpx::parallel::util
-
-#if defined(HPX_HAVE_DATAPAR)
-#include <hpx/parallel/datapar/loop.hpp>
-#endif

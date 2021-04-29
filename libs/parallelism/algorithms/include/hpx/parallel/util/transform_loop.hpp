@@ -501,7 +501,3 @@ namespace hpx { namespace parallel { namespace util {
 #endif
 
 }}}    // namespace hpx::parallel::util
-
-#if defined(HPX_HAVE_DATAPAR)
-#include <hpx/parallel/datapar/transform_loop.hpp>
-#endif
