@@ -422,16 +422,18 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Begin, typename End, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Begin loop(
-        hpx::execution::datapar_policy, Begin begin, End end, F&& f)
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+        hpx::parallel::util::loop_t, hpx::execution::datapar_policy,
+        Begin begin, End end, F&& f)
     {
         return detail::datapar_loop<Begin>::call(
             begin, end, std::forward<F>(f));
     }
 
     template <typename Begin, typename End, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Begin loop(
-        hpx::execution::datapar_task_policy, Begin begin, End end, F&& f)
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+        hpx::parallel::util::loop_t, hpx::execution::datapar_task_policy,
+        Begin begin, End end, F&& f)
     {
         return detail::datapar_loop<Begin>::call(
             begin, end, std::forward<F>(f));
