@@ -58,13 +58,31 @@ namespace hpx { namespace parallel { namespace util {
     }
 #endif
 
-    template <typename ExPolicy, typename Iter>
-    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
-        !hpx::is_vectorpack_execution_policy<ExPolicy>::value, bool>::type
-        loop_optimization(Iter, Iter)
+    template <typename ExPolicy>
+    struct loop_optimization_t final
+      : hpx::functional::tag_fallback<loop_optimization_t<ExPolicy>>
     {
-        return false;
+    private:
+        template <typename Iter>
+        friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool
+            tag_fallback_invoke(
+                hpx::parallel::util::loop_optimization_t<ExPolicy>, Iter, Iter)
+        {
+            return false;
+        }
+    };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    template <typename ExPolicy>
+    HPX_INLINE_CONSTEXPR_VARIABLE loop_optimization_t<ExPolicy>
+        loop_optimization = loop_optimization_t<ExPolicy>{};
+#else
+    template <typename ExPolicy, typename Iter>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool loop_optimization(Iter, Iter)
+    {
+        return hpx::parallel::util::loop_optimization_t<ExPolicy>{}(Iter, Iter);
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
