@@ -214,7 +214,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::generate<Iter>().call(
+        return detail::generate<FwdIter>().call(
             std::forward<ExPolicy>(policy), first, last, std::forward<F>(f));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
