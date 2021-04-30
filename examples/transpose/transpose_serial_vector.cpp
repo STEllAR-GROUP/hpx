@@ -86,7 +86,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                         std::uint64_t j_max = (std::min)(order, j + tile_size);
                         for(std::uint64_t jt = j; jt < j_max; ++jt)
                         {
-                            B[it + order * jt] = A[jt + order * it];
+                            B[it + order * jt] = double(A[jt + order * it]);
                         }
                     }
                 }
@@ -98,7 +98,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             {
                 for(std::uint64_t j = 0; j < order; ++j)
                 {
-                    B[i + order * j] = A[j + order * i];
+                    B[i + order * j] = double(A[j + order * i]);
                 }
             }
         }
