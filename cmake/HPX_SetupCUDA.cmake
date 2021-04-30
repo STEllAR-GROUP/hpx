@@ -19,7 +19,7 @@ if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
   hpx_add_config_define(HPX_HAVE_GPUBLAS)
   # Check CUDA standard
   if(NOT DEFINED CMAKE_CUDA_STANDARD)
-    if (DEFINED CMAKE_CXX_STANDARD)
+    if(DEFINED CMAKE_CXX_STANDARD)
       set(CMAKE_CUDA_STANDARD ${CMAKE_CXX_STANDARD})
     else()
       set(CMAKE_CUDA_STANDARD 17)
@@ -45,47 +45,72 @@ if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
   add_library(Cuda::cuda INTERFACE IMPORTED)
   # Toolkit targets like CUDA::cudart, CUDA::cublas, CUDA::cufft, etc. available
   find_package(CUDAToolkit MODULE REQUIRED)
-  if (CUDAToolkit_FOUND)
+  if(CUDAToolkit_FOUND)
     target_link_libraries(Cuda::cuda INTERFACE CUDA::cudart)
     target_link_libraries(Cuda::cuda INTERFACE CUDA::cublas)
   endif()
   # Flag not working for CLANG CUDA
-  target_compile_features(Cuda::cuda INTERFACE $<$<CXX_COMPILER_ID:GNU>:
-    cuda_std_${CMAKE_CUDA_STANDARD}
-    >)
+  target_compile_features(
+    Cuda::cuda INTERFACE $<$<CXX_COMPILER_ID:GNU>:
+                         cuda_std_${CMAKE_CUDA_STANDARD} >
+  )
   set_target_properties(
     Cuda::cuda PROPERTIES INTERFACE_POSITION_INDEPENDENT_CODE ON
   )
 
   if(NOT HPX_WITH_CUDA_CLANG)
     if(NOT MSVC)
-      target_compile_options(Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:-w>)
+      target_compile_options(
+        Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:-w>
+      )
     else()
       # Windows
       set(CUDA_PROPAGATE_HOST_FLAGS OFF)
-      target_compile_options(Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:$<$<CONFIG:Debug>:
-        -D_DEBUG -O0 -g -G -Xcompiler=-MDd -Xcompiler=-Od -Xcompiler=-Zi -Xcompiler=-bigobj
-        >>)
-      target_compile_options(Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:$<$<CONFIG:RelWithDebInfo>:
-          -DNDEBUG -O2 -g -Xcompiler=-MD,-O2,-Zi -Xcompiler=-bigobj
-        >>)
-      target_compile_options(Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:$<$<CONFIG:MinSizeRel>:
-          -DNDEBUG -O1 -Xcompiler=-MD,-O1 -Xcompiler=-bigobj
-        >>)
-      target_compile_options(Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:$<$<CONFIG:Release>:
-          -DNDEBUG -O2 -Xcompiler=-MD,-Ox -Xcompiler=-bigobj
-        >>)
+      target_compile_options(
+        Cuda::cuda
+        INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:$<$<CONFIG:Debug>:
+                  -D_DEBUG
+                  -O0
+                  -g
+                  -G
+                  -Xcompiler=-MDd
+                  -Xcompiler=-Od
+                  -Xcompiler=-Zi
+                  -Xcompiler=-bigobj
+                  >>
+      )
+      target_compile_options(
+        Cuda::cuda
+        INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:$<$<CONFIG:RelWithDebInfo>:
+                  -DNDEBUG
+                  -O2
+                  -g
+                  -Xcompiler=-MD,-O2,-Zi
+                  -Xcompiler=-bigobj
+                  >>
+      )
+      target_compile_options(
+        Cuda::cuda
+        INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:$<$<CONFIG:MinSizeRel>: -DNDEBUG
+                  -O1 -Xcompiler=-MD,-O1 -Xcompiler=-bigobj >>
+      )
+      target_compile_options(
+        Cuda::cuda
+        INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:$<$<CONFIG:Release>: -DNDEBUG -O2
+                  -Xcompiler=-MD,-Ox -Xcompiler=-bigobj >>
+      )
     endif()
     set(CUDA_SEPARABLE_COMPILATION ON)
-    target_compile_options(Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:
-      --extended-lambda
-      --default-stream per-thread
-      --expt-relaxed-constexpr
-      >)
+    target_compile_options(
+      Cuda::cuda
+      INTERFACE $<$<COMPILE_LANGUAGE:CUDA>: --extended-lambda --default-stream
+                per-thread --expt-relaxed-constexpr >
+    )
     if(${CMAKE_CUDA_COMPILER_ID} STREQUAL "NVIDIA")
-      target_compile_definitions(Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:
-        ASIO_DISABLE_CONSTEXPR
-        >)
+      target_compile_definitions(
+        Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>: ASIO_DISABLE_CONSTEXPR
+                             >
+      )
     endif()
   else()
     if(NOT HPX_FIND_PACKAGE)
