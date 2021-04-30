@@ -364,7 +364,8 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
     cmake/templates/${template}.pc.in
     ${OUTPUT_DIR}${template}_${build_type}.pc.in @ONLY ESCAPE_QUOTES
   )
-  # Can't use generator expression directly as name of output file
+  # Can't use generator expression directly as name of output file (solved in
+  # CMake 3.20)
   file(
     GENERATE
     OUTPUT ${OUTPUT_DIR}/${template}_${build_type}.pc
