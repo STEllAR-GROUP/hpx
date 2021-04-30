@@ -6,4 +6,4 @@
 
 #pragma once
 
-#include <hpx/local/chrono.hpp>
+#include <hpx/datastructures/tuple.hpp>

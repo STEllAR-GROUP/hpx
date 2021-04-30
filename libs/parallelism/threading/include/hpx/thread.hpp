@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/threading/jthread.hpp>
-#include <hpx/threading/thread.hpp>
+#include <hpx/local/thread.hpp>

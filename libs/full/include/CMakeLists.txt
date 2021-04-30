@@ -103,9 +103,6 @@ set(include_headers
     hpx/include/traits.hpp
     hpx/include/util.hpp
     hpx/latch.hpp
-    hpx/local/execution.hpp
-    hpx/local/future.hpp
-    hpx/local/runtime.hpp
     hpx/memory.hpp
     hpx/numeric.hpp
     hpx/optional.hpp
@@ -133,7 +130,8 @@ add_hpx_module(
   GLOBAL_HEADER_GEN OFF
   HEADERS ${include_headers}
   DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES hpx_resource_partitioner hpx_thread_executors
-                      hpx_threadmanager ${include_optional_module_dependencies}
+  MODULE_DEPENDENCIES
+    hpx_compute hpx_include_local hpx_resource_partitioner hpx_thread_executors
+    hpx_threadmanager ${include_optional_module_dependencies}
   CMAKE_SUBDIRS tests
 )

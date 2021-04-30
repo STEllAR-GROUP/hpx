@@ -6,11 +6,4 @@
 
 #pragma once
 
-#include <hpx/parallel/task_block.hpp>
-
-namespace hpx {
-    using task_cancelled_exception = hpx::parallel::task_canceled_exception;
-    using hpx::parallel::define_task_block;
-    using hpx::parallel::define_task_block_restore_thread;
-    using hpx::parallel::task_block;
-}    // namespace hpx
+#include <hpx/local/task_block.hpp>

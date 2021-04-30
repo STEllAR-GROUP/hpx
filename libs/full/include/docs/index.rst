@@ -12,9 +12,7 @@ include
 =======
 
 This module provides no functionality in itself. Instead it provides headers
-that group together other headers that often appear together. The grouping is
-similar to that provided by modules. We intend to deprecate these headers in
-favor of `hpx/<modulename>.hpp` headers.
+that group together other headers that often appear together.
 
 See the :ref:`API reference <modules_include_api>` of this module for more
 details.
