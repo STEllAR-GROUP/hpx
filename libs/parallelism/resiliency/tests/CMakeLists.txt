@@ -41,6 +41,7 @@ if(HPX_WITH_TESTS)
       modules.resiliency
       HEADERS ${resiliency_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+      NOLIBS
       DEPENDENCIES hpx_resiliency
     )
   endif()

@@ -7,15 +7,14 @@
 // This test case demonstrates the issue described in #878: `future::unwrap`
 // triggers assertion
 
-#include <hpx/futures/future.hpp>
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <exception>
 #include <utility>
 
-int main()
+int hpx_main()
 {
     hpx::lcos::local::promise<hpx::future<int>> promise;
     hpx::future<hpx::future<int>> future = promise.get_future();
@@ -35,6 +34,14 @@ int main()
 
     hpx::future<int> inner(std::move(future));
     HPX_TEST(inner.has_exception());
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

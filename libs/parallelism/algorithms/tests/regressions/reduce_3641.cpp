@@ -8,14 +8,14 @@
 // #3641: Trouble with using ranges-v3 and hpx::parallel::reduce
 // #3646: Parallel algorithms should accept iterator/sentinel pairs
 
-#include <hpx/hpx_main.hpp>
-#include <hpx/include/parallel_reduce.hpp>
 #include <hpx/iterator_support/tests/iter_sent.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/container_algorithms/reduce.hpp>
 
 #include <cstdint>
 
-int main()
+int hpx_main()
 {
     std::int64_t result = hpx::ranges::reduce(hpx::execution::seq,
         iterator<std::int64_t>{0}, sentinel<int64_t>{100}, std::int64_t(0));
@@ -26,6 +26,14 @@ int main()
         sentinel<int64_t>{100}, std::int64_t(0));
 
     HPX_TEST_EQ(result, std::int64_t(4950));
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

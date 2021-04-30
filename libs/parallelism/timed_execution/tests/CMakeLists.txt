@@ -41,6 +41,7 @@ if(HPX_WITH_TESTS)
       modules.timed_execution
       HEADERS ${timed_execution_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+      NOLIBS
       DEPENDENCIES hpx_timed_execution
     )
   endif()

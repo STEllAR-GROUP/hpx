@@ -7,7 +7,6 @@
 #include <hpx/cache/entries/lru_entry.hpp>
 #include <hpx/cache/local_cache.hpp>
 #include <hpx/cache/statistics/local_statistics.hpp>
-#include <hpx/hpx_main.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>

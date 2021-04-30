@@ -7,9 +7,9 @@
 // see #4786: transform_inclusive_scan tries to implicitly convert between
 //            types, instead of using the provided `conv` function
 
-#include <hpx/hpx_main.hpp>
-#include <hpx/include/parallel_transform_scan.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
 
 #include <vector>
 
@@ -31,7 +31,7 @@ bool operator==(Integer lhs, Integer rhs)
     return lhs.integer == rhs.integer;
 }
 
-int main()
+int hpx_main()
 {
     std::vector<int> test{1, 10, 100, 1000};
     std::vector<Integer> output(test.size());
@@ -46,6 +46,14 @@ int main()
     std::vector<Integer> expected = {
         Integer{1}, Integer{11}, Integer{111}, Integer{1111}};
     HPX_TEST(output == expected);
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

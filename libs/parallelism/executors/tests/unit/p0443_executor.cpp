@@ -4,14 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/condition_variable.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/functional.hpp>
-#include <hpx/init.hpp>
-#include <hpx/local/future.hpp>
+#include <hpx/local/condition_variable.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/functional.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/mutex.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/mutex.hpp>
-#include <hpx/thread.hpp>
 
 #include <array>
 #include <atomic>
@@ -1451,13 +1450,13 @@ int hpx_main()
     test_let_error();
     test_detach();
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
 {
-    HPX_TEST_EQ_MSG(
-        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

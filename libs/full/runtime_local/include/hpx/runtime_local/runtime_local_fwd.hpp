@@ -25,6 +25,8 @@
 #include <hpx/runtime_local/report_error.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
+#include <hpx/runtime_local/thread_hooks.hpp>
+#include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threadmanager/threadmanager_fwd.hpp>
 

@@ -42,6 +42,7 @@ if(HPX_WITH_TESTS)
       HEADERS ${futures_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
       EXCLUDE ${excluded_headers}
+      NOLIBS
       DEPENDENCIES hpx_futures
     )
   endif()

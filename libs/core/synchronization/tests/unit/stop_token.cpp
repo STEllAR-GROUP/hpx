@@ -9,7 +9,7 @@
 //  Creative Commons Attribution 4.0 International License
 //  (http://creativecommons.org/licenses/by/4.0/).
 
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -352,12 +352,18 @@ void test_stoken(D dur)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main()
+int hpx_main()
 {
     test_stop_token_basic_api();
     test_stop_token_api();
     test_stoken(std::chrono::seconds{0});
     test_stoken(std::chrono::milliseconds{500});
 
+    hpx::local::finalize();
     return hpx::util::report_errors();
+}
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
 }

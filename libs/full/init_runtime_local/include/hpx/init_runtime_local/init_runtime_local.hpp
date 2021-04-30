@@ -165,6 +165,71 @@ namespace hpx {
             return init(main_f, argc, argv, params);
         }
 
+        inline int start(hpx::util::function_nonser<int(
+                             hpx::program_options::variables_map&)> const& f,
+            int argc, char** argv, init_params const& params = init_params())
+        {
+            util::set_hpx_prefix(HPX_PREFIX);
+#if defined(__FreeBSD__)
+            freebsd_environ = environ;
+#endif
+            // set a handler for std::abort
+            std::signal(SIGABRT, hpx::detail::on_abort);
+            std::atexit(hpx::detail::on_exit);
+#if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
+            std::at_quick_exit(hpx::detail::on_exit);
+#endif
+            return detail::run_or_start(f, argc, argv, params, false);
+        }
+
+        inline int start(util::function_nonser<int(int, char**)> const& f,
+            int argc, char** argv, init_params const& params = init_params())
+        {
+            hpx::util::function_nonser<int(
+                hpx::program_options::variables_map&)>
+                main_f = hpx::util::bind_back(hpx::detail::init_helper, f);
+
+            if (argc == 0 || argv == nullptr)
+            {
+                return start(
+                    main_f, detail::dummy_argc, detail::dummy_argv, params);
+            }
+
+            return start(main_f, argc, argv, params);
+        }
+
+        inline int start(util::function_nonser<int()> const& f, int argc,
+            char** argv, init_params const& params = init_params())
+        {
+            hpx::util::function_nonser<int(
+                hpx::program_options::variables_map&)>
+                main_f = hpx::util::bind(f);
+
+            if (argc == 0 || argv == nullptr)
+            {
+                return start(
+                    main_f, detail::dummy_argc, detail::dummy_argv, params);
+            }
+
+            return start(main_f, argc, argv, params);
+        }
+
+        inline int start(std::nullptr_t, int argc, char** argv,
+            init_params const& params = init_params())
+        {
+            hpx::util::function_nonser<int(
+                hpx::program_options::variables_map&)>
+                main_f;
+
+            if (argc == 0 || argv == nullptr)
+            {
+                return start(
+                    main_f, detail::dummy_argc, detail::dummy_argv, params);
+            }
+
+            return start(main_f, argc, argv, params);
+        }
+
         HPX_EXPORT int finalize(error_code& ec = throws);
         HPX_EXPORT int stop(error_code& ec = throws);
         HPX_EXPORT int suspend(error_code& ec = throws);

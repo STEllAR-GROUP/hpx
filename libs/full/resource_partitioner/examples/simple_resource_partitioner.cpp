@@ -7,26 +7,23 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-//
-#include <hpx/algorithm.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/runtime.hpp>
-//
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/runtime.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/thread_pools.hpp>
 #include <hpx/modules/topology.hpp>
-//
-//
+
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <memory>
 #include <set>
 #include <string>
 #include <utility>
-//
+
 #include "system_characteristics.hpp"
 
 // ------------------------------------------------------------------------
@@ -206,7 +203,7 @@ int hpx_main(hpx::program_options::variables_map&)
               << std::endl;
     thread_set.clear();
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 // -------------------------------------------------------------------------
@@ -254,9 +251,9 @@ void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
 }
 
 // ------------------------------------------------------------------------
-// the normal int main function that is called at startup and runs on an OS thread
-// the user must call hpx::init to start the hpx runtime which will execute hpx_main
-// on an hpx thread
+// the normal int main function that is called at startup and runs on an OS
+// thread the user must call hpx::local::init to start the hpx runtime which
+// will execute hpx_main on an hpx thread
 int main(int argc, char* argv[])
 {
     // clang-format off
@@ -268,12 +265,12 @@ int main(int argc, char* argv[])
     // clang-format on
 
     // Setup the init parameters
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_cmdline;
 
     // Set the callback to init the thread_pools
     init_args.rp_callback = &init_resource_partitioner_handler;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }
 #endif

@@ -41,6 +41,7 @@ if(HPX_WITH_TESTS)
       modules.runtime_local
       HEADERS ${runtime_local_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+      NOLIBS
       DEPENDENCIES hpx_runtime_local
     )
   endif()

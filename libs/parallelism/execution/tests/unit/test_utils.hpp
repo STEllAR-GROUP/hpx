@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <hpx/include/parallel_execution_policy.hpp>
-#include <hpx/include/util.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <algorithm>
 #include <atomic>

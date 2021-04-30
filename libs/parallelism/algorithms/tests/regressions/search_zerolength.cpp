@@ -4,10 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/parallel_search.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/algorithms/search.hpp>
 
 #include <numeric>
 #include <string>
@@ -37,17 +36,17 @@ void search_zero_dist_test()
 int hpx_main()
 {
     search_zero_dist_test();
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
 {
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.cfg = cfg;
 
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, init_args), 0,
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv, init_args), 0,
         "HPX main exted with non-zero status");
 
     return hpx::util::report_errors();

@@ -40,7 +40,6 @@ if(HPX_WITH_TESTS)
       HEADERS ${include_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
       DEPENDENCIES hpx_include
-      NOLIBS
       EXCLUDE hpx/include/compression.hpp
               hpx/include/compression_registration.hpp
     )

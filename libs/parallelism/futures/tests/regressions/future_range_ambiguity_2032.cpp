@@ -6,9 +6,8 @@
 
 // This tests verifies that #2032 remains fixed
 
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/traits.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/local/future.hpp>
 
 #include <vector>
 

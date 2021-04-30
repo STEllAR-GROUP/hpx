@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/parallel_for_each.hpp>
+#include <hpx/local/execution.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/algorithms/for_each.hpp>
 
 #include <cstddef>
 #include <iterator>

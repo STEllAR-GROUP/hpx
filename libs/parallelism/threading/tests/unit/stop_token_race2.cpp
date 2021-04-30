@@ -9,7 +9,7 @@
 //  Creative Commons Attribution 4.0 International License
 //  (http://creativecommons.org/licenses/by/4.0/).
 
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/threading.hpp>
 
@@ -61,10 +61,18 @@ void test_callback_throw()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main()
+int hpx_main()
 {
     // this test terminates execution
     test_callback_throw();
+
+    return hpx::util::report_errors();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

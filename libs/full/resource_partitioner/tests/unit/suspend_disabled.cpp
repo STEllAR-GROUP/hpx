@@ -6,10 +6,11 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/resource_partitioner.hpp>
-#include <hpx/include/threads.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/thread_pool_util/thread_pool_suspension_helpers.hpp>
 
 #include <cstddef>
 #include <stdexcept>
@@ -40,12 +41,12 @@ int hpx_main()
 
     HPX_TEST(exception_thrown);
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
 {
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
 
     init_args.cfg = {"hpx.os_threads=4"};
     init_args.rp_callback = [](auto& rp,
@@ -58,5 +59,5 @@ int main(int argc, char* argv[])
                 ~hpx::threads::policies::enable_elasticity));
     };
 
-    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
+    HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);
 }

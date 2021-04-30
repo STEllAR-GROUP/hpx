@@ -9,8 +9,9 @@
 #pragma once
 
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/include/parallel_execution_policy.hpp>
-#include <hpx/include/util.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/runtime.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <atomic>
 #include <cstddef>

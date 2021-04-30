@@ -6,10 +6,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_main.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/threads.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/thread.hpp>
 
 #include <chrono>
 #include <mutex>
@@ -209,7 +209,7 @@ void test_tss_cleanup_not_called_for_null_pointer()
     HPX_TEST(!tss_cleanup_called);
 }
 
-int main()
+int hpx_main()
 {
     test_tss();
     test_tss_with_custom_cleanup();
@@ -217,6 +217,14 @@ int main()
     test_tss_does_no_cleanup_with_null_cleanup_function();
     test_tss_does_not_call_cleanup_after_ptr_destroyed();
     test_tss_cleanup_not_called_for_null_pointer();
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

@@ -6,12 +6,13 @@
 
 //  This work is inspired by https://github.com/aprell/tasking-2.0
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
-#include <hpx/synchronization/channel_mpsc.hpp>
-
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/synchronization/channel_mpsc.hpp>
+#include <hpx/thread.hpp>
 
+#include <cstddef>
 #include <functional>
 #include <utility>
 #include <vector>
@@ -48,7 +49,7 @@ int thread_func(int i, hpx::lcos::local::channel_mpsc<int>& channel,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main()
+int hpx_main()
 {
     std::vector<hpx::lcos::local::channel_mpsc<int>> channels;
     channels.reserve(NUM_WORKERS);
@@ -74,5 +75,11 @@ int main()
         HPX_TEST_EQ((i + 1) % NUM_WORKERS, workers[i].get());
     }
 
+    hpx::local::finalize();
     return hpx::util::report_errors();
+}
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
 }

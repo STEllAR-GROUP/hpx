@@ -6,16 +6,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/chrono.hpp>
-#include <hpx/execution.hpp>
 #include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
-#include <hpx/functional.hpp>
-#include <hpx/future.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/functional.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/tuple.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/program_options.hpp>
-#include <hpx/tuple.hpp>
-#include <hpx/wrap_main.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -235,7 +235,7 @@ namespace hpx { namespace parallel { namespace execution {
     };
 }}}    // namespace hpx::parallel::execution
 
-int main()
+int hpx_main()
 {
     // We time the spawn and the wait. The wait should take significantly
     // longer than the spawn, and the wait should be long.
@@ -327,5 +327,13 @@ int main()
         HPX_TEST_LT(0.3, wait_time);
     }
 
-    return 0;
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
+
+    return hpx::util::report_errors();
 }

@@ -33,5 +33,6 @@ add_hpx_module(
   HEADERS ${pack_traversal_headers}
   COMPAT_HEADERS ${pack_traversal_compat_headers}
   DEPENDENCIES hpx_core
+  MODULE_DEPENDENCIES hpx_futures
   CMAKE_SUBDIRS examples tests
 )

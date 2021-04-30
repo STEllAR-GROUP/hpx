@@ -6,7 +6,6 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_main.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/serialization/serializable_any.hpp>
 
@@ -351,5 +350,6 @@ int main()
         (*begin_tests->test_func)();
         ++begin_tests;
     }
+
     return hpx::util::report_errors();
 }

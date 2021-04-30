@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/include/parallel_remove.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/algorithms/remove.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <algorithm>

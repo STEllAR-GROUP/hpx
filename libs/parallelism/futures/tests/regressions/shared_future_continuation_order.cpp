@@ -7,8 +7,8 @@
 // Making sure the continuations of a shared_future are invoked in the same
 // order as they have been attached.
 
-#include <hpx/hpx_main.hpp>
-#include <hpx/include/lcos_local.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
@@ -16,7 +16,7 @@
 std::atomic<int> invocation_count(0);
 
 ///////////////////////////////////////////////////////////////////////////////
-int main()
+int hpx_main()
 {
     hpx::lcos::local::promise<int> p;
     hpx::shared_future<int> f1 = p.get_future();
@@ -36,6 +36,14 @@ int main()
     HPX_TEST_EQ(f1.get(), 42);
     HPX_TEST_EQ(f2.get(), 1);
     HPX_TEST_EQ(f3.get(), 2);
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

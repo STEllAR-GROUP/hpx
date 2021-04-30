@@ -6,11 +6,9 @@
 
 #pragma once
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/parallel_is_sorted.hpp>
+#include <hpx/local/execution.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/algorithms/is_sorted.hpp>
 
 #include <cstddef>
 #include <iterator>

@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/runtime.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/runtime.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
@@ -25,7 +25,7 @@ bool on_thread_error(std::size_t, std::exception_ptr const&)
 int hpx_main()
 {
     HPX_THROW_EXCEPTION(hpx::invalid_status, "test", "test");
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     bool caught_exception = false;
     try
     {
-        hpx::init(argc, argv);
+        hpx::local::init(hpx_main, argc, argv);
         HPX_TEST(false);
     }
     catch (...)

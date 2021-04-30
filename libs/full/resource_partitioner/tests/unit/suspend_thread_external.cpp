@@ -6,14 +6,14 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/async.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/resource_partitioner.hpp>
-#include <hpx/include/threads.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/timing.hpp>
+#include <hpx/thread_pool_util/thread_pool_suspension_helpers.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 
 #include <cstddef>
@@ -143,13 +143,13 @@ int hpx_main()
         }
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 void test_scheduler(
     int argc, char* argv[], hpx::resource::scheduling_policy scheduler)
 {
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
 
     init_args.cfg = {"hpx.os_threads=4"};
     init_args.rp_callback = [scheduler](auto& rp,
@@ -178,7 +178,7 @@ void test_scheduler(
         }
     };
 
-    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
+    HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);
 }
 
 int main(int argc, char* argv[])

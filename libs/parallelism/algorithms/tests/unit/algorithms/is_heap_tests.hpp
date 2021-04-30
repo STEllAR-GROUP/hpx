@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <hpx/include/parallel_is_heap.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/algorithms/is_heap.hpp>
 
 #include <cstddef>
 #include <iostream>
