@@ -69,10 +69,11 @@ namespace hpx { namespace parallel { namespace util {
         typename OutIter, typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
-        transform_loop(ExPolicy&&, IterB it, IterE end, OutIter dest, F&& f)
+        transform_loop(
+            ExPolicy&& policy, IterB it, IterE end, OutIter dest, F&& f)
     {
         return hpx::parallel::util::transform_loop_t{}(
-            ExPolicy&&, it, end, dest, std::forward<F>(f));
+            std::forward<ExPolicy>(policy), it, end, dest, std::forward<F>(f));
     }
 #endif
 
@@ -124,10 +125,11 @@ namespace hpx { namespace parallel { namespace util {
         typename OutIter, typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
-        transform_loop_ind(ExPolicy&&, IterB it, IterE end, OutIter dest, F&& f)
+        transform_loop_ind(
+            ExPolicy&& policy, IterB it, IterE end, OutIter dest, F&& f)
     {
         return hpx::parallel::util::transform_loop_ind_t{}(
-            ExPolicy&&, it, end, dest, std::forward<F>(f));
+            std::forward<ExPolicy>(policy), it, end, dest, std::forward<F>(f));
     }
 #endif
 
@@ -332,7 +334,7 @@ namespace hpx { namespace parallel { namespace util {
     transform_loop_n(Iter it, std::size_t count, OutIter dest, F&& f)
     {
         return hpx::parallel::util::transform_loop_n_t<ExPolicy>{}(
-            it, count, std::forward<F>(f));
+            it, count, dest, std::forward<F>(f));
     }
 #endif
 
@@ -436,7 +438,7 @@ namespace hpx { namespace parallel { namespace util {
     transform_loop_n_ind(Iter it, std::size_t count, OutIter dest, F&& f)
     {
         return hpx::parallel::util::transform_loop_n_ind_t<ExPolicy>{}(
-            it, count, std::forward<F>(f));
+            it, count, dest, std::forward<F>(f));
     }
 #endif
 
@@ -491,12 +493,13 @@ namespace hpx { namespace parallel { namespace util {
 #else
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::pair<Iter, OutIter>
-    transform_binary_loop_n(
-        InIter1 first1, std::size_t count, InIter2 first2, OutIter dest, F&& f)
+    HPX_HOST_DEVICE
+        HPX_FORCEINLINE constexpr hpx::tuple<InIter1, InIter2, OutIter>
+        transform_binary_loop_n(InIter1 first1, std::size_t count,
+            InIter2 first2, OutIter dest, F&& f)
     {
         return hpx::parallel::util::transform_binary_loop_n_t<ExPolicy>{}(
-            first, count, first2, dest, std::forward<F>(f));
+            first1, count, first2, dest, std::forward<F>(f));
     }
 #endif
 
