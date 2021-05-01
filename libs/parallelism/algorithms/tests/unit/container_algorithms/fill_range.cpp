@@ -37,7 +37,7 @@ void test_fill_sent()
             ++count;
         });
 
-    HPX_TEST_EQ(count, 100);
+    HPX_TEST_EQ(count, (size_t) 100);
 }
 
 template <typename ExPolicy>
@@ -60,7 +60,7 @@ void test_fill_sent(ExPolicy policy)
             ++count;
         });
 
-    HPX_TEST_EQ(count, 100);
+    HPX_TEST_EQ(count, (size_t) 100);
 }
 
 template <typename IteratorTag>

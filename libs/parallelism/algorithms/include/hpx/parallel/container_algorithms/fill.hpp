@@ -127,17 +127,26 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format on
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::fill is deprecated, use hpx::ranges::fill instead")
-        typename util::detail::algorithm_result<ExPolicy>::type
+        typename util::detail::algorithm_result<ExPolicy,
+            typename hpx::traits::range_traits<Rng>::iterator_type>::type
         fill(ExPolicy&& policy, Rng&& rng, T value)
     {
-        using iterator_type = typename hpx::traits::range_iterator<Rng>::type;
+        using iterator_type =
+            typename hpx::traits::range_traits<Rng>::iterator_type;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
             "Requires at least forward iterator.");
 
         return detail::fill<iterator_type>().call(
             std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), value);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     // clang-format off
@@ -153,14 +162,22 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename hpx::traits::range_traits<Rng>::iterator_type>::type
         fill_n(ExPolicy&& policy, Rng& rng, Size count, T value)
     {
-        using iterator_type = typename hpx::traits::range_iterator<Rng>::type;
+        using iterator_type =
+            typename hpx::traits::range_traits<Rng>::iterator_type;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
             "Requires at least forward iterator.");
 
         return detail::fill_n<iterator_type>().call(
             std::forward<ExPolicy>(policy), hpx::util::begin(rng), count,
             value);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
 }}}    // namespace hpx::parallel::v1
@@ -191,9 +208,6 @@ namespace hpx { namespace ranges {
             static_assert(
                 hpx::traits::is_forward_iterator<iterator_type>::value,
                 "Requires at least forward iterator.");
-
-            using is_segmented =
-                hpx::traits::is_segmented_iterator<iterator_type>;
 
             return hpx::parallel::v1::detail::fill<iterator_type>().call(
                 std::forward<ExPolicy>(policy), hpx::util::begin(rng),

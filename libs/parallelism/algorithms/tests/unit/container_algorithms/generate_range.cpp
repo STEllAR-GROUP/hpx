@@ -40,7 +40,7 @@ void test_generate_sent()
             HPX_TEST_EQ(v, std::size_t(10));
             ++count;
         });
-    HPX_TEST_EQ(count, 100);
+    HPX_TEST_EQ(count, (size_t) 100);
 }
 
 template <typename ExPolicy>
@@ -64,7 +64,7 @@ void test_generate_sent(ExPolicy policy)
             HPX_TEST_EQ(v, std::size_t(10));
             ++count;
         });
-    HPX_TEST_EQ(count, 100);
+    HPX_TEST_EQ(count, (size_t) 100);
 }
 
 template <typename IteratorTag>
