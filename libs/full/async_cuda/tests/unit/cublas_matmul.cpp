@@ -254,9 +254,9 @@ void matrixMultiply(hpx::cuda::experimental::cublas_executor& cublas,
     });
 
     finished.get();
-    cudaFree(d_A);
-    cudaFree(d_B);
-    cudaFree(d_C);
+    ::hpx::cuda::experimental::check_cuda_error(cudaFree(d_A));
+    ::hpx::cuda::experimental::check_cuda_error(cudaFree(d_B));
+    ::hpx::cuda::experimental::check_cuda_error(cudaFree(d_C));
 }
 
 // -------------------------------------------------------------------------
