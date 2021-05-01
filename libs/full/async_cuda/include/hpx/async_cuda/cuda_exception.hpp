@@ -36,7 +36,7 @@ namespace hpx { namespace cuda { namespace experimental {
 
     // -------------------------------------------------------------------------
     // Error message handler for cuda calls
-    inline cudaError_t check_cuda_error(cudaError_t err)
+    inline void check_cuda_error(cudaError_t err)
     {
         if (err != cudaSuccess)
         {
@@ -44,6 +44,5 @@ namespace hpx { namespace cuda { namespace experimental {
                 cudaGetErrorString(err);
             throw cuda_exception(temp, err);
         }
-        return err;
     }
 }}}    // namespace hpx::cuda::experimental
