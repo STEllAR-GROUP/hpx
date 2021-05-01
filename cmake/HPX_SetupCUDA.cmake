@@ -50,10 +50,7 @@ if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
     target_link_libraries(Cuda::cuda INTERFACE CUDA::cublas)
   endif()
   # Flag not working for CLANG CUDA
-  target_compile_features(
-    Cuda::cuda INTERFACE $<$<CXX_COMPILER_ID:GNU>:
-                         cuda_std_${CMAKE_CUDA_STANDARD} >
-  )
+  target_compile_features(Cuda::cuda INTERFACE cuda_std_${CMAKE_CUDA_STANDARD})
   set_target_properties(
     Cuda::cuda PROPERTIES INTERFACE_POSITION_INDEPENDENT_CODE ON
   )
