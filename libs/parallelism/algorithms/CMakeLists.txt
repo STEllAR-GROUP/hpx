@@ -133,6 +133,7 @@ set(algorithms_headers
     hpx/parallel/spmd_block.hpp
     hpx/parallel/tagspec.hpp
     hpx/parallel/task_block.hpp
+    hpx/parallel/task_group.hpp
     hpx/parallel/util/cancellation_token.hpp
     hpx/parallel/util/compare_projected.hpp
     hpx/parallel/util/detail/algorithm_result.hpp

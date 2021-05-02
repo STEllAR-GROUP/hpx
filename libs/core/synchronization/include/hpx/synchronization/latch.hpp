@@ -33,7 +33,7 @@ namespace hpx { namespace lcos { namespace local {
         HPX_NON_COPYABLE(cpp20_latch);
 
     protected:
-        typedef lcos::local::spinlock mutex_type;
+        using mutex_type = lcos::local::spinlock;
 
     public:
         /// Initialize the latch
