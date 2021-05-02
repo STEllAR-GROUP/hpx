@@ -28,6 +28,10 @@ configure_extra_options+=" -DHPX_WITH_CXX${CXX_STD}=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
 configure_extra_options+=" -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=ON"
+# Necessity to specify the cuda compiler when switching from FindCUDA to
+# enable_language(CUDA)
+configure_extra_options+=" -DCMAKE_CUDA_COMPILER=$(which $CXX)"
+configure_extra_options+=" -DCMAKE_CUDA_ARCHITECTURES=60"
 
 # The build unit test with HPX in Debug and the hello_world project in Debug
 # mode hangs on this configuration Release-Debug, Debug-Release, and
