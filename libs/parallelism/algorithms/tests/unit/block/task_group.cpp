@@ -8,6 +8,8 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/task_group.hpp>
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 int fib(int n)
 {
@@ -19,16 +21,16 @@ int fib(int n)
     int x = 0, y = 0;
 
     hpx::execution::experimental::task_group g;
-    g.run([&] { x = fib(n - 1); });    // spawn a task
-    g.run([&] { y = fib(n - 2); });    // spawn another task
-    g.wait();                          // wait for both tasks to complete
+    g.run([&x, n] { x = fib(n - 1); });    // spawn a task
+    g.run([&y, n] { y = fib(n - 2); });    // spawn another task
+    g.wait();                              // wait for both tasks to complete
 
     return x + y;
 }
 
 void task_group_test1()
 {
-    HPX_TEST_EQ(fib(10), 55);
+    HPX_TEST_EQ(fib(22), 17711);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,8 +45,10 @@ int fib(Executor&& exec, int n)
     int x = 0, y = 0;
 
     hpx::execution::experimental::task_group g;
-    g.run(exec, [&](int n) { x = fib(exec, n); }, n - 1);
-    g.run(exec, [&](int n) { y = fib(exec, n); }, n - 2);
+    g.run(
+        exec, [&](int n) { x = fib(exec, n); }, n - 1);
+    g.run(
+        exec, [&](int n) { y = fib(exec, n); }, n - 2);
     g.wait();    // wait for both tasks to complete
 
     return x + y;
@@ -52,7 +56,35 @@ int fib(Executor&& exec, int n)
 
 void task_group_test2()
 {
-    HPX_TEST_EQ(fib(hpx::execution::parallel_executor{}, 10), 55);
+    HPX_TEST_EQ(fib(hpx::execution::parallel_executor{}, 22), 17711);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void task_group_test3()
+{
+    bool throws_exception = true;
+    bool caught_exception = false;
+    try
+    {
+        hpx::execution::experimental::task_group g;
+        g.run([] { throw std::runtime_error("test1"); });
+        g.run([] { throw std::runtime_error("test2"); });
+        throws_exception = false;
+
+        g.wait();    // rethrows after waiting for all tasks to finish
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& l)
+    {
+        caught_exception = true;
+        HPX_TEST_EQ(l.size(), std::size_t(2));
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+    HPX_TEST(!throws_exception);
+    HPX_TEST(caught_exception);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,6 +92,7 @@ int hpx_main()
 {
     task_group_test1();
     task_group_test2();
+    task_group_test3();
 
     return hpx::finalize();
 }

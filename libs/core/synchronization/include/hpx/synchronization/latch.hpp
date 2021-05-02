@@ -73,7 +73,7 @@ namespace hpx { namespace lcos { namespace local {
         ///                 supports.
         static constexpr std::ptrdiff_t(max)() noexcept
         {
-            return (std::numeric_limits<std::ptrdiff_t>::max)();
+            return (std::numeric_limits<std::ptrdiff_t>::max) ();
         }
 
         /// Decrements counter_ by n. Does not block.
@@ -96,7 +96,17 @@ namespace hpx { namespace lcos { namespace local {
             {
                 std::unique_lock<mutex_type> l(mtx_.data_);
                 notified_ = true;
-                cond_.data_.notify_all(std::move(l));    // release the threads
+
+                // Note: we use notify_one repeatedly instead of notify_all as we
+                // know that our implementation of condition_variable::notify_one
+                // relinquishes the lock before resuming the waiting thread
+                // which avoids suspension of this thread when it tries to
+                // re-lock the mutex while exiting from condition_variable::wait
+                while (cond_.data_.notify_one(
+                    std::move(l), threads::thread_priority::boost))
+                {
+                    l = std::unique_lock<mutex_type>(mtx_.data_);
+                }
             }
         }
 
@@ -131,13 +141,24 @@ namespace hpx { namespace lcos { namespace local {
 
             std::unique_lock<mutex_type> l(mtx_.data_);
 
-            std::ptrdiff_t new_count = (counter_ -= update);
-            HPX_ASSERT(new_count >= 0);
+            std::ptrdiff_t old_count =
+                counter_.fetch_sub(update, std::memory_order_relaxed);
+            HPX_ASSERT(old_count >= update);
 
-            if (new_count == 0)
+            if (old_count == update)
             {
                 notified_ = true;
-                cond_.data_.notify_all(std::move(l));    // release the threads
+
+                // Note: we use notify_one repeatedly instead of notify_all as we
+                // know that our implementation of condition_variable::notify_one
+                // relinquishes the lock before resuming the waiting thread
+                // which avoids suspension of this thread when it tries to
+                // re-lock the mutex while exiting from condition_variable::wait
+                while (cond_.data_.notify_one(
+                    std::move(l), threads::thread_priority::boost))
+                {
+                    l = std::unique_lock<mutex_type>(mtx_.data_);
+                }
             }
             else
             {
