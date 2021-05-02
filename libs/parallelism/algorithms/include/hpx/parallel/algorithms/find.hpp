@@ -492,8 +492,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::find<FwdIter>().call(std::forward<ExPolicy>(policy), first,
-            last, val, util::projection_identity());
+        return detail::find<FwdIter>().call(std::forward<ExPolicy>(policy),
+            first, last, val, util::projection_identity());
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -1156,7 +1156,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend FwdIter tag_fallback_invoke(
+        friend InIter tag_fallback_invoke(
             find_if_t, InIter first, InIter last, F&& f)
         {
             static_assert(hpx::traits::is_input_iterator<InIter>::value,
