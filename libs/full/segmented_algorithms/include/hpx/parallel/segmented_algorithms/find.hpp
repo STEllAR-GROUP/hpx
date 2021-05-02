@@ -298,7 +298,7 @@ namespace hpx { namespace segmented {
         static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
             "Requires at least input iterator.");
 
-        if (first1 == last1)
+        if (first == last)
         {
             return first;
         }
@@ -356,7 +356,7 @@ namespace hpx { namespace segmented {
         static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
             "Requires at least input iterator.");
 
-        if (first1 == last1)
+        if (first == last)
         {
             return first;
         }

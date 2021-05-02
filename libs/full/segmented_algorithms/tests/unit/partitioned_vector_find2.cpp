@@ -36,6 +36,13 @@ struct cond2
     }
 };
 
+template <typename T>
+void test_find(hpx::partitioned_vector<T>& xvalues, T val)
+{
+    auto last = hpx::find(xvalues.begin(), xvalues.end(), val);
+    HPX_TEST_EQ(*last, val);
+}
+
 template <typename ExPolicy, typename T>
 void test_find(ExPolicy&& policy, hpx::partitioned_vector<T>& xvalues, T val)
 {
@@ -48,6 +55,13 @@ void test_find_async(
     ExPolicy&& policy, hpx::partitioned_vector<T>& xvalues, T val)
 {
     auto last = hpx::find(policy, xvalues.begin(), xvalues.end(), val).get();
+    HPX_TEST_EQ(*last, val);
+}
+
+template <typename T>
+void test_find_if(hpx::partitioned_vector<T>& xvalues, T val)
+{
+    auto last = hpx::find_if(xvalues.begin(), xvalues.end(), cond1<T>());
     HPX_TEST_EQ(*last, val);
 }
 
@@ -65,6 +79,13 @@ void test_find_if_async(
 {
     auto last =
         hpx::find_if(policy, xvalues.begin(), xvalues.end(), cond1<T>()).get();
+    HPX_TEST_EQ(*last, val);
+}
+
+template <typename T>
+void test_find_if_not(hpx::partitioned_vector<T>& xvalues, T val)
+{
+    auto last = hpx::find_if_not(xvalues.begin(), xvalues.end(), cond2<T>());
     HPX_TEST_EQ(*last, val);
 }
 
@@ -96,11 +117,13 @@ void find_tests(std::vector<hpx::id_type>& localities)
     hpx::parallel::inclusive_scan(hpx::execution::seq, xvalues.begin(),
         xvalues.end(), xvalues.begin(), std::plus<T>(), T(0));
 
+    test_find(xvalues, T(512));
     test_find(hpx::execution::seq, xvalues, T(512));
     test_find(hpx::execution::par, xvalues, T(512));
     test_find_async(hpx::execution::seq(hpx::execution::task), xvalues, T(512));
     test_find_async(hpx::execution::par(hpx::execution::task), xvalues, T(512));
 
+    test_find_if(xvalues, T(512));
     test_find_if(hpx::execution::seq, xvalues, T(512));
     test_find_if(hpx::execution::par, xvalues, T(512));
     test_find_if_async(
@@ -108,6 +131,7 @@ void find_tests(std::vector<hpx::id_type>& localities)
     test_find_if_async(
         hpx::execution::par(hpx::execution::task), xvalues, T(512));
 
+    test_find_if_not(xvalues, T(512));
     test_find_if_not(hpx::execution::seq, xvalues, T(512));
     test_find_if_not(hpx::execution::par, xvalues, T(512));
     test_find_if_not_async(
