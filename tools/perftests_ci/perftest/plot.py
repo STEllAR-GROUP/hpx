@@ -140,7 +140,8 @@ def _add_comparison_table(report, cis):
                     try:
                         classification = [cis[_OutputKey(name=name,
                                            executor=executor)].classify()]
-                        if classification[0] == classification[1]:
+                        if (len(classification) <= 1) or (classification[0] ==
+                                classification[1]):
                             classification = classification[0]
                         else:
                             classification = ' '.join(classification)
