@@ -209,11 +209,11 @@ def _add_info(report, labels, data):
         with table.row() as row:
             row.fill('Property', *labels)
 
-        for k in {k for d in data for k in d['gridtools'].keys()}:
+        for k in {k for d in data for k in d['HPX'].keys()}:
             with table.row() as row:
-                row.cell('GridTools ' + k.title())
+                row.cell('HPX' + k.title())
                 for d in data:
-                    row.cell(d['gridtools'].get(k, '—'))
+                    row.cell(d['HPX'].get(k, '—'))
 
         for k in {k for d in data for k in d['environment'].keys()}:
             with table.row() as row:
@@ -252,7 +252,7 @@ class _Measurements(typing.NamedTuple):
 
 def _history_data(data, key, limit):
     def get_datetime(result):
-        source = 'gridtools' if key == 'commit' else 'environment'
+        source = 'hpx' if key == 'commit' else 'environment'
         return dateutil.parser.isoparse(result[source]['datetime'])
 
     data = sorted(data, key=get_datetime)
@@ -313,7 +313,7 @@ def _history_plot(title, dates, measurements, output):
 
 
 def history(data, output, key='job', limit=None):
-    title = 'GridTools Performance History'
+    title = 'HPX Performance History'
     with html.Report(output, title) as report:
         dates, measurements = _history_data(data, key, limit)
 
