@@ -11,10 +11,15 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assert.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/executors/parallel_executor.hpp>
+#include <hpx/functional/invoke_fused.hpp>
 #include <hpx/synchronization/latch.hpp>
 
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace execution { namespace experimental {
@@ -52,25 +57,39 @@ namespace hpx { namespace execution { namespace experimental {
 
     public:
         /// Spawns a task to compute f() and returns immediately.
-        template <typename F>
-        void run(F&& f)
+        // clang-format off
+        template <typename F, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                !hpx::traits::is_executor_any<std::decay_t<F>>::value
+            )>
+        // clang-format on
+        void run(F&& f, Ts&&... ts)
         {
             latch_.count_up(1);
             hpx::parallel::execution::post(execution::parallel_executor{},
-                [this, f = std::forward<F>(f)]() mutable {
+                [this, f = std::forward<F>(f),
+                    t = hpx::forward_as_tuple(
+                        std::forward<Ts>(ts)...)]() mutable {
                     on_exit _(latch_);
-                    f();
+                    hpx::util::invoke_fused(std::move(f), std::move(t));
                 });
         }
 
-        template <typename Executor, typename F>
-        void run(Executor&& exec, F&& f)
+        // clang-format off
+        template <typename Executor, typename F, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_any<std::decay_t<Executor>>::value
+            )>
+        // clang-format on
+        void run(Executor&& exec, F&& f, Ts&&... ts)
         {
             latch_.count_up(1);
             hpx::parallel::execution::post(std::forward<Executor>(exec),
-                [this, f = std::forward<F>(f)]() mutable {
+                [this, f = std::forward<F>(f),
+                    t = hpx::forward_as_tuple(
+                        std::forward<Ts>(ts)...)]() mutable {
                     on_exit _(latch_);
-                    f();
+                    hpx::util::invoke_fused(std::move(f), std::move(t));
                 });
         }
 
