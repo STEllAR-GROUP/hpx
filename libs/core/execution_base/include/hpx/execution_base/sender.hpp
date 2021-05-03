@@ -352,7 +352,7 @@ namespace hpx { namespace execution { namespace experimental {
         {
             return std::forward<Executor>(executor).execute(std::forward<F>(f));
         }
-    } execute;
+    } execute{};
 
     namespace detail {
         template <typename R, typename>
@@ -570,7 +570,7 @@ namespace hpx { namespace execution { namespace experimental {
                        std::forward<S>(s), std::forward<R>(r)})
                       ->state);
         }
-    } submit;
+    } submit{};
 
     namespace detail {
         template <typename F, typename E>
