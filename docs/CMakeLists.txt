@@ -24,7 +24,6 @@ set(doxygen_definition_list
     "BOOST_SYSTEM_NOEXCEPT="
     "HPX_EXCEPTION_EXPORT="
     "HPX_CORE_EXPORT="
-    "HPX_PARALLELISM_EXPORT="
     "HPX_FULL_EXPORT="
     "HPX_EXPORT="
     "HPX_ALWAYS_EXPORT="

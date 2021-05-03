@@ -37,9 +37,6 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx {
-    // Returns if HPX continues past connection signals caused by crashed nodes
-    HPX_EXPORT bool tolerate_node_faults();
-
     namespace detail {
 
         // Get access to the registry of registered message handlers

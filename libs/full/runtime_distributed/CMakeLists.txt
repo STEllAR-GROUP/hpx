@@ -74,14 +74,12 @@ add_hpx_module(
     hpx_async_colocated
     hpx_async_distributed
     hpx_collectives
+    hpx_command_line_handling
     hpx_distribution_policies
     ${MPI_DEPS}
     hpx_naming
     hpx_naming_base
     hpx_performance_counters
-    hpx_program_options
     hpx_runtime_components
-    hpx_runtime_local
-    hpx_threadmanager
   CMAKE_SUBDIRS examples tests
 )

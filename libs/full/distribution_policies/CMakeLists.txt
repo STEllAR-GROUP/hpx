@@ -4,8 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
-
 if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
   return()
 endif()
@@ -39,7 +37,7 @@ add_hpx_module(
   SOURCES ${distribution_policies_sources}
   HEADERS ${distribution_policies_headers}
   COMPAT_HEADERS ${distribution_policies_compat_headers}
-  DEPENDENCIES hpx_core hpx_parallelism
+  DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES hpx_actions_base hpx_async_distributed hpx_components
                       hpx_performance_counters
   CMAKE_SUBDIRS examples tests

@@ -54,7 +54,7 @@ set(CONFIG_STRINGS_MODULES_INCLUDES)
 set(CONFIG_STRINGS_MODULES_ENTRIES)
 
 set(HPX_LIBS
-    core full parallelism
+    core full
     CACHE INTERNAL "List of HPX libraries" FORCE
 )
 

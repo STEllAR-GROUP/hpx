@@ -109,6 +109,6 @@ add_hpx_module(
   HEADERS ${components_base_headers}
   COMPAT_HEADERS ${components_base_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_naming_base hpx_program_options hpx_runtime_local
+  MODULE_DEPENDENCIES hpx_naming_base
   CMAKE_SUBDIRS examples tests
 )
