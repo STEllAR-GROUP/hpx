@@ -80,6 +80,17 @@ namespace hpx { namespace mpi { namespace experimental {
             bool error_handler_initialized_ = false;
             int rank_ = -1;
             int size_ = -1;
+            // active futures holds the size of the future vector
+            // which is always the same as the mpi request vector
+            std::atomic<std::uint32_t> active_futures_size_;
+            // active requests returns the size of the request queue
+            std::atomic<std::uint32_t> request_queue_size_;
+            //
+            mpi_info()
+              : active_futures_size_{0}
+              , request_queue_size_{0}
+            {
+            }
         };
 
         // an instance of mpi_info that we store data in
@@ -126,7 +137,7 @@ namespace hpx { namespace mpi { namespace experimental {
         // too many mpi requests are being spawned at once
         // unfortunately, the lock-free queue can only return an estimate
         // of the queue size, so this is not guaranteed to be precise
-        HPX_EXPORT std::size_t get_number_of_enqueued_requests();
+        //        HPX_EXPORT std::size_t get_number_of_enqueued_requests();
 
         // -----------------------------------------------------------------
         // used internally to add a request to the main polling vector
@@ -193,7 +204,7 @@ namespace hpx { namespace mpi { namespace experimental {
             {
                 return true;
             }
-            return (detail::get_active_futures().size() > 0);
+            return (detail::get_mpi_info().active_futures_size_ > 0);
         });
     }
 
@@ -207,7 +218,7 @@ namespace hpx { namespace mpi { namespace experimental {
             {
                 return true;
             }
-            return (detail::get_active_futures().size() > 0) || f();
+            return (detail::get_mpi_info().active_futures_size_ > 0) || f();
         });
     }
 
