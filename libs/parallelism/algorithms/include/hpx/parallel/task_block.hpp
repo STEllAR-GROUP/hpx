@@ -9,18 +9,15 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_combinators/when_all.hpp>
-#include <hpx/async_local/dataflow.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/bind_back.hpp>
+#include <hpx/async_local/async.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/is_future.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/executors/exception_list.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/task_group.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
 #include <memory>    // std::addressof
@@ -32,27 +29,9 @@
 #include <vector>
 
 namespace hpx { namespace parallel { inline namespace v2 {
+
     namespace detail {
-        /// \cond NOINTERNAL
-        ///////////////////////////////////////////////////////////////////////
-        inline void handle_task_block_exceptions(
-            parallel::exception_list& errors)
-        {
-            try
-            {
-                std::rethrow_exception(std::current_exception());
-            }
-            catch (parallel::exception_list const& el)
-            {
-                for (std::exception_ptr const& e : el)
-                    errors.add(e);
-            }
-            catch (...)
-            {
-                errors.add(std::current_exception());
-            }
-        }
-        /// \endcond
+        struct define_task_block_impl;
     }    // namespace detail
 
     /// The class \a task_canceled_exception defines the type of objects thrown
@@ -117,11 +96,9 @@ namespace hpx { namespace parallel { inline namespace v2 {
     {
     private:
         /// \cond NOINTERNAL
-        typedef hpx::lcos::local::spinlock mutex_type;
+        using mutex_type = hpx::lcos::local::spinlock;
 
-        template <typename ExPolicy_, typename F>
-        friend typename util::detail::algorithm_result<ExPolicy_>::type
-        define_task_block(ExPolicy_&&, F&&);
+        friend struct detail::define_task_block_impl;
 
         explicit task_block(ExPolicy const& policy = ExPolicy())
           : id_(threads::get_self_id())
@@ -129,27 +106,20 @@ namespace hpx { namespace parallel { inline namespace v2 {
         {
         }
 
-        void wait_for_completion(std::false_type)
-        {
-            when();
-        }
-
-        void wait_for_completion(std::true_type)
-        {
-            when().wait();
-        }
-
         void wait_for_completion()
         {
-            typedef typename util::detail::algorithm_result<ExPolicy>::type
-                result_type;
-            typedef hpx::traits::is_future<result_type> is_fut;
-            wait_for_completion(is_fut());
+            tasks_.wait();
         }
 
         ~task_block()
         {
-            wait_for_completion();
+            try
+            {
+                tasks_.wait();
+            }
+            catch (...)
+            {
+            }
         }
 
         task_block(task_block const&) = delete;
@@ -157,50 +127,16 @@ namespace hpx { namespace parallel { inline namespace v2 {
 
         task_block* operator&() const = delete;
 
-        static void on_ready(std::vector<hpx::future<void>>&& results,
-            parallel::exception_list&& errors)
+        void add_exception(std::exception_ptr&& p)
         {
-            for (hpx::future<void>& f : results)
-            {
-                if (f.has_exception())
-                    errors.add(f.get_exception_ptr());
-            }
-            if (errors.size() != 0)
-                throw std::forward<parallel::exception_list>(errors);
-        }
-
-        // return future representing the execution of all tasks
-        typename util::detail::algorithm_result<ExPolicy>::type when(
-            bool throw_on_error = false)
-        {
-            std::vector<hpx::future<void>> tasks;
-            parallel::exception_list errors;
-
-            {
-                std::lock_guard<mutex_type> l(mtx_);
-                std::swap(tasks_, tasks);
-                std::swap(errors_, errors);
-            }
-
-            typedef util::detail::algorithm_result<ExPolicy> result;
-
-            if (tasks.empty() && errors.size() == 0)
-                return result::get();
-
-            if (!throw_on_error)
-                return result::get(hpx::when_all(tasks));
-
-            return result::get(
-                hpx::dataflow(hpx::util::one_shot(hpx::util::bind_back(
-                                  &task_block::on_ready, std::move(errors))),
-                    std::move(tasks)));
+            tasks_.add_exception(std::move(p));
         }
         /// \endcond
 
     public:
         /// Refers to the type of the execution policy used to create the
         /// \a task_block.
-        typedef ExPolicy execution_policy;
+        using execution_policy = ExPolicy;
 
         /// Return the execution policy instance used to create this
         /// \a task_block
@@ -250,12 +186,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
                     "the task_block is not active");
             }
 
-            hpx::future<void> result =
-                execution::async_execute(policy_.executor(), std::forward<F>(f),
-                    std::forward<Ts>(ts)...);
-
-            std::lock_guard<mutex_type> l(mtx_);
-            tasks_.push_back(std::move(result));
+            tasks_.run(policy_.executor(), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         /// Causes the expression f() to be invoked asynchronously using the
@@ -289,10 +221,12 @@ namespace hpx { namespace parallel { inline namespace v2 {
         ///       of f completes.
         ///
         /// \throw This function may throw \a task_canceled_exception, as
-        ///        described in Exception Handling.
+        ///        described in Exception Handling. The function will also
+        ///        throw a \a exception_list holding all exceptions that were
+        ///        caught while executing the tasks.
         ///
         template <typename Executor, typename F, typename... Ts>
-        void run(Executor& exec, F&& f, Ts&&... ts)
+        void run(Executor&& exec, F&& f, Ts&&... ts)
         {
             // The proposal requires that the task_block should be
             // 'active' to be usable.
@@ -302,11 +236,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
                     "the task_block is not active");
             }
 
-            hpx::future<void> result = execution::async_execute(
-                exec, std::forward<F>(f), std::forward<Ts>(ts)...);
-
-            std::lock_guard<mutex_type> l(mtx_);
-            tasks_.push_back(std::move(result));
+            tasks_.run(std::forward<Executor>(exec), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         /// Blocks until the tasks spawned using this task_block have
@@ -322,7 +253,9 @@ namespace hpx { namespace parallel { inline namespace v2 {
         ///       \a wait returns on the same thread.
         ///
         /// \throw This function may throw \a task_canceled_exception, as
-        ///        described in Exception Handling.
+        ///        described in Exception Handling. The function will also
+        ///        throw a \a exception_list holding all exceptions that were
+        ///        caught while executing the tasks.
         ///
         /// \code
         /// Example:
@@ -344,7 +277,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
                 return;
             }
 
-            wait_for_completion();
+            tasks_.wait();
         }
 
         /// Returns a reference to the execution policy used to construct this
@@ -368,12 +301,44 @@ namespace hpx { namespace parallel { inline namespace v2 {
         }
 
     private:
-        mutable mutex_type mtx_;
-        std::vector<hpx::future<void>> tasks_;
-        parallel::exception_list errors_;
+        hpx::execution::experimental::task_group tasks_;
         threads::thread_id_type id_;
         ExPolicy policy_;
     };
+
+    namespace detail {
+        /// \cond NOINTERNAL
+        struct define_task_block_impl
+        {
+            template <typename ExPolicy, typename F>
+            void operator()(ExPolicy&& policy, F&& f) const
+            {
+                static_assert(hpx::is_execution_policy<ExPolicy>::value,
+                    "hpx::is_execution_policy<ExPolicy>::value");
+
+                using policy_type = typename std::decay<ExPolicy>::type;
+                task_block<policy_type> trh(std::forward<ExPolicy>(policy));
+
+                // invoke the user supplied function
+                try
+                {
+                    f(trh);
+                }
+                catch (...)
+                {
+                    trh.add_exception(std::current_exception());
+                }
+
+                // regardless of whether f(trh) has thrown an exception we need
+                // to obey the contract and wait for all tasks to join
+                trh.wait_for_completion();
+            }
+        };
+
+        HPX_INLINE_CONSTEXPR_VARIABLE define_task_block_impl
+            define_task_block{};
+        /// \endcond
+    }    // namespace detail
 
     /// Constructs a \a task_block, \a tr, using the given execution policy
     /// \a policy,and invokes the expression
@@ -400,29 +365,28 @@ namespace hpx { namespace parallel { inline namespace v2 {
     /// \note It is expected (but not mandated) that f will (directly or
     ///       indirectly) call tr.run(_callable_object_).
     ///
-    template <typename ExPolicy, typename F>
-    typename util::detail::algorithm_result<ExPolicy>::type define_task_block(
-        ExPolicy&& policy, F&& f)
+    // clang-format off
+    template <typename ExPolicy, typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_async_execution_policy<std::decay_t<ExPolicy>>::value
+        )>
+    // clang-format on
+    hpx::future<void> define_task_block(ExPolicy&& policy, F&& f)
     {
-        static_assert(hpx::is_execution_policy<ExPolicy>::value,
-            "hpx::is_execution_policy<ExPolicy>::value");
+        return hpx::async(policy.executor(), detail::define_task_block,
+            std::forward<ExPolicy>(policy), std::forward<F>(f));
+    }
 
-        typedef typename std::decay<ExPolicy>::type policy_type;
-        task_block<policy_type> trh(std::forward<ExPolicy>(policy));
-
-        // invoke the user supplied function
-        try
-        {
-            f(trh);
-        }
-        catch (...)
-        {
-            detail::handle_task_block_exceptions(trh.errors_);
-        }
-
-        // regardless of whether f(trh) has thrown an exception we need to
-        // obey the contract and wait for all tasks to join
-        return trh.when(true);
+    // clang-format off
+    template <typename ExPolicy, typename F,
+        HPX_CONCEPT_REQUIRES_(
+            !hpx::is_async_execution_policy<std::decay_t<ExPolicy>>::value
+        )>
+    // clang-format on
+    void define_task_block(ExPolicy&& policy, F&& f)
+    {
+        detail::define_task_block(
+            std::forward<ExPolicy>(policy), std::forward<F>(f));
     }
 
     /// Constructs a \a task_block, tr, and invokes the expression
@@ -448,7 +412,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
     template <typename F>
     void define_task_block(F&& f)
     {
-        define_task_block(hpx::execution::par, std::forward<F>(f));
+        detail::define_task_block(hpx::execution::par, std::forward<F>(f));
     }
 
     /// Constructs a \a task_block, tr, and invokes the expression
