@@ -36,7 +36,7 @@ namespace hpx { namespace parallel { namespace util {
         friend HPX_HOST_DEVICE HPX_FORCEINLINE
             typename hpx::util::invoke_result<F, Iters...>::type
             tag_fallback_invoke(hpx::parallel::util::loop_step_t<ExPolicy>,
-                VecOnly, F&& f, Iters&... its)
+                VecOnly&&, F&& f, Iters&... its)
         {
             return HPX_INVOKE(std::forward<F>(f), (its++)...);
         }
@@ -51,11 +51,10 @@ namespace hpx { namespace parallel { namespace util {
         typename... Iters>
     HPX_HOST_DEVICE HPX_FORCEINLINE
         typename hpx::util::invoke_result<F, Iters...>::type
-        loop_step(VecOnly v, F&& f, Iters&... its)
+        loop_step(VecOnly&& v, F&& f, Iters&... its)
     {
         return hpx::parallel::util::loop_step_t<ExPolicy>{}(
-            std::forward<VecOnly>(v), std::forward<F>(f),
-            std::forward<Iters&...>((its)...));
+            std::forward<VecOnly>(v), std::forward<F>(f), (its)...);
     }
 #endif
 
@@ -82,8 +81,7 @@ namespace hpx { namespace parallel { namespace util {
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool loop_optimization(
         Iter it1, Iter it2)
     {
-        return hpx::parallel::util::loop_optimization_t<ExPolicy>{}(
-            std::forward<Iter>(it1), std::forward<Iter>(it2));
+        return hpx::parallel::util::loop_optimization_t<ExPolicy>{}(it1, it2);
     }
 #endif
 
@@ -279,8 +277,8 @@ namespace hpx { namespace parallel { namespace util {
             typename Begin2, typename F>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr std::pair<Begin1, Begin2>
-            tag_fallback_invoke(hpx::parallel::util::loop2_t<ExPolicy>, VecOnly,
-                Begin1 begin1, End1 end1, Begin2 begin2, F&& f)
+            tag_fallback_invoke(hpx::parallel::util::loop2_t<ExPolicy>,
+                VecOnly&&, Begin1 begin1, End1 end1, Begin2 begin2, F&& f)
         {
             return detail::loop2<Begin1, Begin2>::call(
                 begin1, end1, begin2, std::forward<F>(f));
@@ -294,7 +292,7 @@ namespace hpx { namespace parallel { namespace util {
     template <typename ExPolicy, typename VecOnly, typename Begin1,
         typename End1, typename Begin2, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::pair<Begin1, Begin2> loop2(
-        VecOnly v, Begin1 begin1, End1 end1, Begin2 begin2, F&& f)
+        VecOnly&& v, Begin1 begin1, End1 end1, Begin2 begin2, F&& f)
     {
         return hpx::parallel::util::loop2_t<ExPolicy>{}(
             std::forward<VecOnly>(v), begin1, end1, begin2, std::forward<F>(f));

@@ -37,11 +37,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             hpx::util::zip_iterator<Iter...> const& it,
             hpx::util::index_pack<Is...>)
         {
-            if (!sizeof...(Is))
-                return true;
             auto const& t = it.get_iterator_tuple();
-            bool const sequencer[] = {is_data_aligned(hpx::get<Is>(t))...};
-            return std::all_of(&sequencer[0], &sequencer[sizeof...(Is)],
+            bool const sequencer[] = {
+                true, is_data_aligned(hpx::get<Is>(t))...};
+            return std::all_of(&sequencer[1], &sequencer[sizeof...(Is) + 1],
                 [](bool val) { return val; });
         }
 
