@@ -67,6 +67,7 @@ pipeline {
         always {
             archiveArtifacts artifacts: 'hpx/jenkins-hpx-*', fingerprint: true
             archiveArtifacts artifacts: 'hpx/*-Testing/**', fingerprint: true
+            archiveArtifacts artifacts: 'hpx/*-reports/**', fingerprint: true
         }
     }
 }
