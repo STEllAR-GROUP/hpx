@@ -101,7 +101,8 @@ def clustername(local):
         'kesch'
     """
     if local:
-        return 'local'
+        # We only run on daint, the script is run in an sbatch
+        return 'daint'
     try:
         output = runtools.run(['scontrol', 'show', 'config'])
         m = re.compile(r'.*ClusterName\s*=\s*(\S*).*',
