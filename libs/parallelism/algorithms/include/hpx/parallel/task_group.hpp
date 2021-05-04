@@ -20,6 +20,7 @@
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/synchronization/latch.hpp>
 
+#include <exception>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -96,8 +97,7 @@ namespace hpx { namespace execution { namespace experimental {
 
             hpx::parallel::execution::post(std::forward<Executor>(exec),
                 [this, l = std::move(l), f = std::forward<F>(f),
-                    t = hpx::forward_as_tuple(
-                        std::forward<Ts>(ts)...)]() mutable {
+                    t = hpx::make_tuple(std::forward<Ts>(ts)...)]() mutable {
                     // latch needs to be released before the lambda exits
                     on_exit _(std::move(l));
                     std::exception_ptr p;

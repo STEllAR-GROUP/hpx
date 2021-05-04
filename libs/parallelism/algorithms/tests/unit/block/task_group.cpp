@@ -9,6 +9,8 @@
 #include <hpx/parallel/task_group.hpp>
 
 #include <cstddef>
+#include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 int fib(int n)

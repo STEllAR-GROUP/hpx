@@ -73,7 +73,7 @@ namespace hpx { namespace lcos { namespace local {
         ///                 supports.
         static constexpr std::ptrdiff_t(max)() noexcept
         {
-            return (std::numeric_limits<std::ptrdiff_t>::max) ();
+            return (std::numeric_limits<std::ptrdiff_t>::max)();
         }
 
         /// Decrements counter_ by n. Does not block.
@@ -129,6 +129,9 @@ namespace hpx { namespace lcos { namespace local {
             if (counter_.load(std::memory_order_relaxed) > 0 || !notified_)
             {
                 cond_.data_.wait(l, "hpx::local::cpp20_latch::wait");
+
+                HPX_ASSERT(counter_.load(std::memory_order_relaxed) == 0);
+                HPX_ASSERT(notified_);
             }
         }
 
@@ -145,7 +148,15 @@ namespace hpx { namespace lcos { namespace local {
                 counter_.fetch_sub(update, std::memory_order_relaxed);
             HPX_ASSERT(old_count >= update);
 
-            if (old_count == update)
+            if (old_count > update)
+            {
+                cond_.data_.wait(
+                    l, "hpx::local::cpp20_latch::count_down_and_wait");
+
+                HPX_ASSERT(counter_.load(std::memory_order_relaxed) == 0);
+                HPX_ASSERT(notified_);
+            }
+            else
             {
                 notified_ = true;
 
@@ -159,11 +170,6 @@ namespace hpx { namespace lcos { namespace local {
                 {
                     l = std::unique_lock<mutex_type>(mtx_.data_);
                 }
-            }
-            else
-            {
-                cond_.data_.wait(
-                    l, "hpx::local::cpp20_latch::count_down_and_wait");
             }
         }
 
