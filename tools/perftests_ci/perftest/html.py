@@ -6,8 +6,9 @@ Distributed under the Boost Software License, Version 1.0. (See accompanying
 file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 '''
 import contextlib
+import os
 import pathlib
-from xml.etree import ElementTree as et
+from lxml import etree as et
 
 from pyutils import log
 
@@ -117,7 +118,8 @@ class Report:
         return False
 
     def write(self):
-        et.ElementTree(self.html).write(self.data_dir / 'index.html',
+        et.ElementTree(self.html).write(str(os.path.join(self.data_dir,
+            'index.html')),
                                         encoding='utf-8',
                                         method='html')
         log.info(f'Successfully written HTML report to {self.data_dir}')

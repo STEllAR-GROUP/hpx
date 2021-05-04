@@ -17,7 +17,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 def mkdirp(absolute_path_file):
     # Create the directories of the run_output files if does not exist
     import ntpath
-    nested_dir, filename = ntpath.split(absolute_path_file)
+    nested_dir, _ = ntpath.split(absolute_path_file)
     if nested_dir != '' and not os.path.exists(nested_dir):
             os.makedirs(nested_dir)
 

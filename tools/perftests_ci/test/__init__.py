@@ -44,7 +44,6 @@ def run_perftests():
 
 def compile_and_run_examples(build_dir, verbose_ctest):
     import build
-    from pyutils import buildinfo
 
     source_dir = os.path.join(buildinfo.install_dir, 'examples')
     build_dir = os.path.abspath(build_dir)
