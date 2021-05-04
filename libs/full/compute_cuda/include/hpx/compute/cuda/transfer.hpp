@@ -172,9 +172,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
-            ::hpx::cuda::experimental::check_cuda_error(cudaMemcpyAsync(&(*dest),
-                        &(*first), bytes, cudaMemcpyDeviceToDevice,
-                        dest.target().native_handle().get_stream()));
+            ::hpx::cuda::experimental::check_cuda_error(cudaMemcpyAsync(
+                &(*dest), &(*first), bytes, cudaMemcpyDeviceToDevice,
+                dest.target().native_handle().get_stream()));
 
             std::advance(dest, count);
             return util::in_out_result<InIter, OutIter>{last, dest};
@@ -199,8 +199,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
-            ::hpx::cuda::experimental::check_cuda_error(cudaMemcpyAsync(&(*dest), (*first).device_ptr(), bytes,
-                cudaMemcpyDeviceToHost,
+            ::hpx::cuda::experimental::check_cuda_error(cudaMemcpyAsync(
+                &(*dest), (*first).device_ptr(), bytes, cudaMemcpyDeviceToHost,
                 first.target().native_handle().get_stream()));
 
             std::advance(dest, count);
@@ -226,8 +226,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
-            ::hpx::cuda::experimental::check_cuda_error(cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
-                cudaMemcpyHostToDevice,
+            ::hpx::cuda::experimental::check_cuda_error(cudaMemcpyAsync(
+                (*dest).device_ptr(), &(*first), bytes, cudaMemcpyHostToDevice,
                 dest.target().native_handle().get_stream()));
 
             std::advance(dest, count);
@@ -253,9 +253,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
-            ::hpx::cuda::experimental::check_cuda_error(cudaMemcpyAsync((*dest).device_ptr(), (*first).device_ptr(), bytes,
-                cudaMemcpyDeviceToDevice,
-                dest.target().native_handle().get_stream()));
+            ::hpx::cuda::experimental::check_cuda_error(
+                cudaMemcpyAsync((*dest).device_ptr(), (*first).device_ptr(),
+                    bytes, cudaMemcpyDeviceToDevice,
+                    dest.target().native_handle().get_stream()));
 
             std::advance(first, count);
             std::advance(dest, count);
@@ -280,8 +281,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
-            ::hpx::cuda::experimental::check_cuda_error(cudaMemcpyAsync(&(*dest), (*first).device_ptr(), bytes,
-                cudaMemcpyDeviceToHost,
+            ::hpx::cuda::experimental::check_cuda_error(cudaMemcpyAsync(
+                &(*dest), (*first).device_ptr(), bytes, cudaMemcpyDeviceToHost,
                 first.target().native_handle().get_stream()));
 
             std::advance(first, count);
@@ -307,8 +308,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
-            ::hpx::cuda::experimental::check_cuda_error(cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
-                cudaMemcpyHostToDevice,
+            ::hpx::cuda::experimental::check_cuda_error(cudaMemcpyAsync(
+                (*dest).device_ptr(), &(*first), bytes, cudaMemcpyHostToDevice,
                 dest.target().native_handle().get_stream()));
 
             std::advance(first, count);

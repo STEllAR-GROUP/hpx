@@ -60,8 +60,7 @@ namespace hpx { namespace cuda { namespace experimental {
         template <typename... Args>
         struct dispatch_helper<cudaError_t, Args...>
         {
-            inline void operator()(
-                cudaError_t (*f)(Args...), Args... args)
+            inline void operator()(cudaError_t (*f)(Args...), Args... args)
             {
                 check_cuda_error(f(args...));
             }
