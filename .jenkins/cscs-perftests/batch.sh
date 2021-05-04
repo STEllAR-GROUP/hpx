@@ -38,10 +38,8 @@ cp -r ${src_dir}/tools/perftests_ci ${build_dir}/tools
 
 # Variables
 perftests_dir=${build_dir}/tools/perftests_ci
-result_dir=${perftests_dir}/results
-mkdir -p $result_dir
-result=$result_dir/local-priority-fifo.json
 mkdir -p ${build_dir}/reports
+result=${build_dir}/reports/local-priority-fifo.json
 
 # Load python packages
 source /apps/daint/SSL/HPX/virtual_envs/perftests_env/bin/activate
