@@ -12,7 +12,7 @@ export HWLOC_ROOT="${APPS_ROOT}/hwloc-2.0.3-gcc-8.3.0"
 module load daint-gpu
 module load cudatoolkit/10.2.89_3.29-7.0.2.1_3.27__g67354b4
 module load Boost/1.75.0-CrayCCE-20.11
-spack load cmake@3.18.6 # Necessary to handle cuda_std_17 compiler feature
+spack load cmake@3.18.6
 spack load ninja@1.10.0
 
 export CXX=`which CC`
@@ -28,8 +28,6 @@ configure_extra_options+=" -DHPX_WITH_CXX${CXX_STD}=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
 configure_extra_options+=" -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=ON"
-# Necessity to specify the cuda compiler when switching from FindCUDA to
-# enable_language(CUDA)
 configure_extra_options+=" -DCMAKE_CUDA_COMPILER=$(which $CXX)"
 configure_extra_options+=" -DCMAKE_CUDA_ARCHITECTURES=60"
 
