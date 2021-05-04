@@ -198,13 +198,16 @@ function(add_hpx_module libname modulename)
   endif()
 
   # create library modules
-  # cmake-format: off
   add_library(
-    hpx_${modulename} ${module_library_type}
-    ${sources} ${config_entries_source} ${${modulename}_OBJECTS}
-    ${headers} ${generated_headers} ${compat_headers}
+    hpx_${modulename}
+    ${module_library_type}
+    ${sources}
+    ${config_entries_source}
+    ${${modulename}_OBJECTS}
+    ${headers}
+    ${generated_headers}
+    ${compat_headers}
   )
-  # cmake-format: on
 
   if(HPX_WITH_CHECK_MODULE_DEPENDENCIES)
     # verify that all dependencies are from the same module category
