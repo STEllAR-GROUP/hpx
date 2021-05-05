@@ -50,7 +50,7 @@ namespace hpx { namespace execution { namespace experimental {
     private:
         struct on_exit
         {
-            on_exit(hpx::lcos::local::latch& l)
+            explicit on_exit(hpx::lcos::local::latch& l)
               : latch_(&l)
             {
                 latch_->count_up(1);
@@ -117,8 +117,6 @@ namespace hpx { namespace execution { namespace experimental {
                     // lead to segfaults.
                     add_exception(std::move(p));
                 });
-
-            l.latch_ = nullptr;
         }
 
         // clang-format off

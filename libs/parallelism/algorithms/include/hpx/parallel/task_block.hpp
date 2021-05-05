@@ -115,7 +115,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
         {
             try
             {
-                tasks_.wait();
+                wait_for_completion();
             }
             catch (...)
             {
@@ -320,13 +320,19 @@ namespace hpx { namespace parallel { inline namespace v2 {
                 task_block<policy_type> trh(std::forward<ExPolicy>(policy));
 
                 // invoke the user supplied function
+                std::exception_ptr p;
                 try
                 {
                     f(trh);
                 }
                 catch (...)
                 {
-                    trh.add_exception(std::current_exception());
+                    p = std::current_exception();
+                }
+
+                if (p)
+                {
+                    trh.add_exception(std::move(p));
                 }
 
                 // regardless of whether f(trh) has thrown an exception we need
