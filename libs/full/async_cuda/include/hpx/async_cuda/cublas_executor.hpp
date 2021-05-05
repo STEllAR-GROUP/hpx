@@ -237,11 +237,8 @@ namespace hpx { namespace cuda { namespace experimental {
                         std::forward<Args>(args)...);
                     return get_future();
                 },
-                [&](std::exception_ptr ep) {
-                    hpx::future<void> result;
-                    auto state = traits::detail::get_shared_state(result);
-                    state->set_exception(std::move(ep));
-                    return result;
+                [&](std::exception_ptr&& ep) {
+                    return hpx::make_exceptional_future<void>(std::move(ep));
                 });
         }
 
