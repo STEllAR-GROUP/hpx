@@ -176,12 +176,14 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                     std::decay_t<Receiver> receiver;
 
-                    void operator()(std::monostate)
+                    void operator()(std::monostate) const
                     {
                         std::terminate();
                     }
 
-                    template <typename Ts>
+                    template <typename Ts,
+                        typename = std::enable_if_t<
+                            !std::is_same_v<std::decay_t<Ts>, std::monostate>>>
                     void operator()(Ts&& ts)
                     {
                         hpx::util::invoke_fused(

@@ -27,13 +27,13 @@ namespace hpx { namespace execution { namespace experimental {
     namespace detail {
         struct sync_wait_error_visitor
         {
-            void operator()(std::exception_ptr e)
+            void operator()(std::exception_ptr e) const
             {
                 std::rethrow_exception(e);
             }
 
             template <typename E>
-            void operator()(E& e)
+            void operator()(E& e) const
             {
                 throw e;
             }

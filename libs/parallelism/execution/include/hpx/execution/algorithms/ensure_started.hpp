@@ -193,7 +193,7 @@ namespace hpx { namespace execution { namespace experimental {
                         std::visit(value_visitor<R>{std::forward<R>(r)}, ts);
                     }
 
-                    void operator()(std::monostate)
+                    void operator()(std::monostate) const
                     {
                         std::terminate();
                     }

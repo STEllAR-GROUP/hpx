@@ -113,13 +113,13 @@ namespace hpx { namespace execution { namespace experimental {
 
                     struct start_visitor
                     {
-                        void operator()(std::monostate)
+                        void operator()(std::monostate) const
                         {
                             std::terminate();
                         }
 
                         template <typename OS_>
-                        void operator()(OS_& os)
+                        void operator()(OS_& os) const
                         {
                             hpx::execution::experimental::start(os);
                         }
@@ -131,12 +131,14 @@ namespace hpx { namespace execution { namespace experimental {
                         std::decay_t<F> f;
                         operation_state& os;
 
-                        void operator()(std::monostate)
+                        void operator()(std::monostate) const
                         {
                             std::terminate();
                         }
 
-                        template <typename E>
+                        template <typename E,
+                            typename = std::enable_if_t<!std::is_same_v<
+                                std::decay_t<E>, std::monostate>>>
                         void operator()(E& e)
                         {
                             using operation_state_type =
