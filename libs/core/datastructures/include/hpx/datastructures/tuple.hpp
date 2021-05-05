@@ -530,7 +530,7 @@ namespace hpx {
     };
 
     template <std::size_t I, typename... Ts>
-    struct tuple_element<I, tuple<Ts...>, void>
+    struct tuple_element<I, tuple<Ts...>>
     {
         using type = typename util::at_index<I, Ts...>::type;
 
@@ -548,7 +548,7 @@ namespace hpx {
     };
 
     template <typename T0, typename T1>
-    struct tuple_element<0, std::pair<T0, T1>, void>
+    struct tuple_element<0, std::pair<T0, T1>>
     {
         using type = T0;
 
@@ -566,7 +566,7 @@ namespace hpx {
     };
 
     template <typename T0, typename T1>
-    struct tuple_element<1, std::pair<T0, T1>, void>
+    struct tuple_element<1, std::pair<T0, T1>>
     {
         using type = T1;
 
@@ -584,7 +584,7 @@ namespace hpx {
     };
 
     template <std::size_t I, typename Type, std::size_t Size>
-    struct tuple_element<I, std::array<Type, Size>, void>
+    struct tuple_element<I, std::array<Type, Size>>
     {
         using type = Type;
 
@@ -610,7 +610,7 @@ namespace hpx {
 
 #if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE)
     template <std::size_t I, typename... Ts>
-    struct tuple_element<I, std::tuple<Ts...>, void>
+    struct tuple_element<I, std::tuple<Ts...>>
     {
         using type = typename std::tuple_element<I, std::tuple<Ts...>>::type;
 
