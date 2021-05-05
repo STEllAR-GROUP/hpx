@@ -33,7 +33,7 @@ namespace hpx { namespace util { namespace detail {
 
         operator type()
         {
-            return f();
+            return std::forward<F>(f)();
         }
     };
 
