@@ -122,6 +122,9 @@ namespace hpx { namespace execution { namespace experimental {
                     }
                 };
 
+                using allocator_type = typename std::allocator_traits<
+                    Allocator>::template rebind_alloc<shared_state>;
+                allocator_type alloc;
                 using mutex_type = hpx::util::spinlock;
                 mutex_type mtx;
                 hpx::util::atomic_count reference_count{0};
@@ -153,8 +156,9 @@ namespace hpx { namespace execution { namespace experimental {
                 template <typename S_,
                     typename = std::enable_if_t<
                         !std::is_same<std::decay_t<S_>, shared_state>::value>>
-                shared_state(S_&& s)
-                  : os(hpx::execution::experimental::connect(
+                shared_state(S_&& s, allocator_type const& alloc)
+                  : alloc(alloc)
+                  , os(hpx::execution::experimental::connect(
                         std::forward<S_>(s), ensure_started_receiver{this}))
                 {
                 }
@@ -164,11 +168,6 @@ namespace hpx { namespace execution { namespace experimental {
                     if (!start_called)
                     {
                         std::terminate();
-                    }
-
-                    if (--reference_count == 0)
-                    {
-                        delete this;
                     }
                 }
 
@@ -266,10 +265,13 @@ namespace hpx { namespace execution { namespace experimental {
 
                 friend void intrusive_ptr_release(shared_state* p)
                 {
-                    auto c = --p->reference_count;
-                    if (c == 0)
+                    if (--p->reference_count == 0)
                     {
-                        delete p;
+                        allocator_type other_alloc(p->alloc);
+                        std::allocator_traits<allocator_type>::destroy(
+                            other_alloc, p);
+                        std::allocator_traits<allocator_type>::deallocate(
+                            other_alloc, p, 1);
                     }
                 }
             };
@@ -290,7 +292,7 @@ namespace hpx { namespace execution { namespace experimental {
                 unique_ptr p(allocator_traits::allocate(alloc, 1),
                     hpx::util::allocator_deleter<other_allocator>{alloc});
 
-                new (p.get()) shared_state{std::forward<S_>(s)};
+                new (p.get()) shared_state{std::forward<S_>(s), a};
                 st = p.release();
 
                 // Eagerly start the work received until this point.

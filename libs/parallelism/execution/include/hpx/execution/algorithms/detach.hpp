@@ -27,7 +27,7 @@
 
 namespace hpx { namespace execution { namespace experimental {
     namespace detail {
-        template <typename S>
+        template <typename S, typename Allocator>
         struct operation_state_holder
         {
             struct detach_receiver
@@ -52,21 +52,27 @@ namespace hpx { namespace execution { namespace experimental {
                 }
             };
 
-            template <typename S_,
-                typename = std::enable_if_t<!std::is_same<std::decay_t<S_>,
-                    operation_state_holder>::value>>
-            explicit operation_state_holder(S_&& s)
-              : os(connect(std::forward<S_>(s), detach_receiver{this}))
-            {
-                start(os);
-            }
-
         private:
+            using allocator_type = typename std::allocator_traits<
+                Allocator>::template rebind_alloc<operation_state_holder>;
+            allocator_type alloc;
             hpx::util::atomic_count count{0};
 
             using operation_state_type = connect_result_t<S, detach_receiver>;
             std::decay_t<operation_state_type> os;
 
+        public:
+            template <typename S_,
+                typename = std::enable_if_t<!std::is_same<std::decay_t<S_>,
+                    operation_state_holder>::value>>
+            explicit operation_state_holder(S_&& s, allocator_type const& alloc)
+              : alloc(alloc)
+              , os(connect(std::forward<S_>(s), detach_receiver{this}))
+            {
+                start(os);
+            }
+
+        private:
             friend void intrusive_ptr_add_ref(operation_state_holder* p)
             {
                 ++p->count;
@@ -76,7 +82,11 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 if (--p->count == 0)
                 {
-                    delete p;
+                    allocator_type other_alloc(p->alloc);
+                    std::allocator_traits<allocator_type>::destroy(
+                        other_alloc, p);
+                    std::allocator_traits<allocator_type>::deallocate(
+                        other_alloc, p, 1);
                 }
             }
         };
@@ -92,7 +102,8 @@ namespace hpx { namespace execution { namespace experimental {
             detach_t, S&& s, Allocator&& a = Allocator{})
         {
             using allocator_type = Allocator;
-            using operation_state_type = detail::operation_state_holder<S>;
+            using operation_state_type =
+                detail::operation_state_holder<S, Allocator>;
             using other_allocator = typename std::allocator_traits<
                 allocator_type>::template rebind_alloc<operation_state_type>;
             using allocator_traits = std::allocator_traits<other_allocator>;
@@ -103,7 +114,7 @@ namespace hpx { namespace execution { namespace experimental {
             unique_ptr p(allocator_traits::allocate(alloc, 1),
                 hpx::util::allocator_deleter<other_allocator>{alloc});
 
-            new (p.get()) operation_state_type{std::forward<S>(s)};
+            new (p.get()) operation_state_type{std::forward<S>(s), alloc};
             p.release();
         }
 
