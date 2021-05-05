@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if defined(HPX_HAVE_GPU_SUPPORT) && defined(HPX_HAVE_GPUBLAS)
 #include <hpx/async_cuda/cuda_exception.hpp>
 #include <hpx/async_cuda/cuda_executor.hpp>
 #include <hpx/async_cuda/cuda_future.hpp>
@@ -291,3 +292,4 @@ namespace hpx { namespace parallel { namespace execution {
     };
     /// \endcond
 }}}    // namespace hpx::parallel::execution
+#endif
