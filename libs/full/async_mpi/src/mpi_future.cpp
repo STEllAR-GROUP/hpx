@@ -341,6 +341,23 @@ namespace hpx { namespace mpi { namespace experimental {
     }
 
     namespace detail {
+        std::size_t get_work_count()
+        {
+            std::size_t work_count = 0;
+            {
+                std::unique_lock<detail::mutex_type> lk(
+                    detail::get_vector_mtx(), std::try_to_lock);
+                if (lk.owns_lock())
+                {
+                    work_count += get_number_of_active_requests();
+                }
+            }
+
+            work_count += get_number_of_enqueued_requests();
+
+            return work_count;
+        }
+
         // -------------------------------------------------------------
         void register_polling(hpx::threads::thread_pool_base& pool)
         {
@@ -349,7 +366,8 @@ namespace hpx { namespace mpi { namespace experimental {
 #endif
             mpi_debug.debug(debug::str<>("enable polling"));
             auto* sched = pool.get_scheduler();
-            sched->set_mpi_polling_function(&hpx::mpi::experimental::poll);
+            sched->set_mpi_polling_functions(
+                &hpx::mpi::experimental::poll, &get_work_count);
         }
 
         // -------------------------------------------------------------

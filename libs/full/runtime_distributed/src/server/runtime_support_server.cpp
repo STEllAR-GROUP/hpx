@@ -364,16 +364,11 @@ namespace hpx { namespace components { namespace server {
         //
         // Rule 0: When active, machine nr.i + 1 keeps the token; when passive,
         // it hands over the token to machine nr.i.
-        applier::applier& appl = hpx::applier::get_applier();
-        threads::threadmanager& tm = appl.get_thread_manager();
+        threads::threadmanager& tm =
+            hpx::applier::get_applier().get_thread_manager();
 
-        util::yield_while(
-            [&tm]() -> bool {
-                tm.cleanup_terminated(true);
-                return tm.get_thread_count() >
-                    std::int64_t(1) + tm.get_background_thread_count();
-            },
-            "runtime_support::dijkstra_termination", false);
+        tm.wait();
+        tm.cleanup_terminated(true);
 
         // Now this locality has become passive, thus we can send the token
         // to the next locality.
@@ -457,13 +452,8 @@ namespace hpx { namespace components { namespace server {
             applier::applier& appl = hpx::applier::get_applier();
             threads::threadmanager& tm = appl.get_thread_manager();
 
-            util::yield_while(
-                [&tm]() -> bool {
-                    tm.cleanup_terminated(true);
-                    return tm.get_thread_count() >
-                        std::int64_t(1) + tm.get_background_thread_count();
-                },
-                "runtime_support::dijkstra_termination", false);
+            tm.wait();
+            tm.cleanup_terminated(true);
 
             HPX_UNUSED(locality_ids);
             return 0;
@@ -722,9 +712,6 @@ namespace hpx { namespace components { namespace server {
             threads::threadmanager& tm = appl.get_thread_manager();
             naming::resolver_client& agas_client = naming::get_agas_client();
 
-            hpx::chrono::high_resolution_timer t;
-            double start_time = t.elapsed();
-            bool timed_out = false;
             error_code ec(lightweight);
 
             stop_called_ = true;
@@ -732,44 +719,34 @@ namespace hpx { namespace components { namespace server {
             {
                 util::unlock_guard<std::mutex> ul(mtx_);
 
-                util::yield_while(
-                    [&tm, timeout, &t, start_time, &timed_out]() -> bool {
+                util::runtime_configuration& cfg = get_runtime().get_config();
+                std::size_t shutdown_check_count =
+                    util::get_entry_as<std::size_t>(
+                        cfg, "hpx.shutdown_check_count", 10);
+                bool success = util::detail::yield_while_count_timeout(
+                    [&tm] {
                         tm.cleanup_terminated(true);
-
-                        if (timeout >= 0.0 &&
-                            timeout < (t.elapsed() - start_time))
-                        {
-                            timed_out = true;
-                            return false;
-                        }
-
-                        return tm.get_thread_count() >
-                            std::int64_t(1) + tm.get_background_thread_count();
+                        return tm.is_busy();
                     },
+                    shutdown_check_count,
+                    std::chrono::duration<double>(timeout),
                     "runtime_support::stop", false);
 
                 // If it took longer than expected, kill all suspended threads as
                 // well.
-                if (timed_out)
+                if (!success)
                 {
                     // now we have to wait for all threads to be aborted
-                    start_time = t.elapsed();
-
-                    util::yield_while(
-                        [&tm, timeout, &t, start_time]() -> bool {
+                    success = util::detail::yield_while_count_timeout(
+                        [&tm] {
                             tm.abort_all_suspended_threads();
                             tm.cleanup_terminated(true);
-
-                            if (timeout >= 0.0 &&
-                                timeout < (t.elapsed() - start_time))
-                            {
-                                return false;
-                            }
-
-                            return tm.get_thread_count() > std::int64_t(1) +
-                                tm.get_background_thread_count();
+                            return tm.is_busy();
                         },
+                        shutdown_check_count,
+                        std::chrono::duration<double>(timeout),
                         "runtime_support::dijkstra_termination", false);
+                    HPX_UNUSED(success);
                 }
 
                 // Drop the locality from the partition table.

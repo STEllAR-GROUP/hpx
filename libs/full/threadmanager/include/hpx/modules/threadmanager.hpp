@@ -137,6 +137,10 @@ namespace hpx { namespace threads {
         ///
         void stop(bool blocking = true);
 
+        bool is_busy();
+        bool is_idle();
+        void wait();
+
         // \brief Suspend all thread pools.
         void suspend();
 

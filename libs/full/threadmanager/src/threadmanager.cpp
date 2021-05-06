@@ -1058,8 +1058,38 @@ namespace hpx { namespace threads {
         deinit_tss();
     }
 
+    bool threadmanager::is_busy()
+    {
+        bool busy = false;
+        for (auto& pool_iter : pools_)
+        {
+            busy = busy || pool_iter->is_busy();
+        }
+        return busy;
+    }
+
+    bool threadmanager::is_idle()
+    {
+        bool idle = true;
+        for (auto& pool_iter : pools_)
+        {
+            idle = idle && pool_iter->is_idle();
+        }
+        return idle;
+    }
+
+    void threadmanager::wait()
+    {
+        std::size_t shutdown_check_count = util::get_entry_as<std::size_t>(
+            rtcfg_, "hpx.shutdown_check_count", 10);
+        hpx::util::detail::yield_while_count(
+            [this]() { return is_busy(); }, shutdown_check_count);
+    }
+
     void threadmanager::suspend()
     {
+        wait();
+
         if (threads::get_self_ptr())
         {
             std::vector<hpx::future<void>> fs;

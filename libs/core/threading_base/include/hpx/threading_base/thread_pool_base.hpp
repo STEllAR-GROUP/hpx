@@ -127,6 +127,7 @@ namespace hpx { namespace threads {
         std::size_t max_background_threads_;
         std::size_t max_idle_loop_count_;
         std::size_t max_busy_loop_count_;
+        std::size_t shutdown_check_count_;
 
         thread_pool_init_parameters(std::string const& name, std::size_t index,
             policies::scheduler_mode mode, std::size_t num_threads,
@@ -138,7 +139,8 @@ namespace hpx { namespace threads {
                     hpx::threads::detail::network_background_callback_type(),
             std::size_t max_background_threads = std::size_t(-1),
             std::size_t max_idle_loop_count = HPX_IDLE_LOOP_COUNT_MAX,
-            std::size_t max_busy_loop_count = HPX_BUSY_LOOP_COUNT_MAX)
+            std::size_t max_busy_loop_count = HPX_BUSY_LOOP_COUNT_MAX,
+            std::size_t shutdown_check_count = 10)
           : name_(name)
           , index_(index)
           , mode_(mode)
@@ -150,6 +152,7 @@ namespace hpx { namespace threads {
           , max_background_threads_(max_background_threads)
           , max_idle_loop_count_(max_idle_loop_count)
           , max_busy_loop_count_(max_busy_loop_count)
+          , shutdown_check_count_(shutdown_check_count)
         {
         }
     };
@@ -173,6 +176,10 @@ namespace hpx { namespace threads {
 
         virtual void stop(
             std::unique_lock<std::mutex>& l, bool blocking = true) = 0;
+
+        virtual void wait() = 0;
+        virtual bool is_busy() = 0;
+        virtual bool is_idle() = 0;
 
         virtual void print_pool(std::ostream&) = 0;
 
