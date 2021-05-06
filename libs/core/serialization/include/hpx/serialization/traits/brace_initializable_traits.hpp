@@ -101,6 +101,7 @@ namespace hpx { namespace traits {
             return {};
         }
 
+#if !defined(HPX_HAVE_CXX20_STD_PAREN_INITIALIZATION_OF_AGGREGATES)
 #define MAKE_ARITY_FUNC(count)                                                 \
     template <typename T,                                                      \
         typename Enable = typename std::enable_if<                             \
@@ -129,6 +130,36 @@ namespace hpx { namespace traits {
         MAKE_ARITY_FUNC(15)
 
 #undef MAKE_ARITY_FUNC
+#else
+#define MAKE_ARITY_FUNC(count)                                                 \
+    template <typename T,                                                      \
+        typename Enable = typename std::enable_if<                             \
+            traits::is_brace_constructible<T, count>() &&                      \
+            !traits::is_brace_constructible<T, count + 1>() &&                 \
+            traits::is_paren_constructible<T, count>()>::type>                 \
+    constexpr size<count> arity()                                              \
+    {                                                                          \
+        return {};                                                             \
+    }
+
+        MAKE_ARITY_FUNC(1)
+        MAKE_ARITY_FUNC(2)
+        MAKE_ARITY_FUNC(3)
+        MAKE_ARITY_FUNC(4)
+        MAKE_ARITY_FUNC(5)
+        MAKE_ARITY_FUNC(6)
+        MAKE_ARITY_FUNC(7)
+        MAKE_ARITY_FUNC(8)
+        MAKE_ARITY_FUNC(9)
+        MAKE_ARITY_FUNC(10)
+        MAKE_ARITY_FUNC(11)
+        MAKE_ARITY_FUNC(12)
+        MAKE_ARITY_FUNC(13)
+        MAKE_ARITY_FUNC(14)
+        MAKE_ARITY_FUNC(15)
+
+#undef MAKE_ARITY_FUNC
+#endif
     }    // namespace detail
 }}       // namespace hpx::traits
 

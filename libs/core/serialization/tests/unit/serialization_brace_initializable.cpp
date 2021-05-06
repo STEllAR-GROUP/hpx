@@ -25,8 +25,14 @@ static_assert(hpx::traits::is_brace_constructible<A, 3>(),
     "hpx::traits::is_brace_constructible<A, 3>()");
 static_assert(!hpx::traits::is_brace_constructible<A, 4>(),
     "!hpx::traits::is_brace_constructible<A, 4>()");
+
+#if !defined(HPX_HAVE_CXX20_STD_PAREN_INITIALIZATION_OF_AGGREGATES)
 static_assert(!hpx::traits::is_paren_constructible<A, 3>(),
     "!hpx::traits::is_paren_constructible<A, 3>()");
+#else
+static_assert(hpx::traits::is_paren_constructible<A, 3>(),
+    "hpx::traits::is_paren_constructible<A, 3>()");
+#endif
 
 static_assert(hpx::traits::detail::arity<A>().value == 3,
     "hpx::traits::detail::arity<A>() == size<3>{}");
@@ -51,8 +57,14 @@ static_assert(hpx::traits::is_brace_constructible<B, 2>(),
     "hpx::traits::is_brace_constructible<B, 2>()");
 static_assert(!hpx::traits::is_brace_constructible<B, 3>(),
     "!hpx::traits::is_brace_constructible<B, 3>()");
+
+#if !defined(HPX_HAVE_CXX20_STD_PAREN_INITIALIZATION_OF_AGGREGATES)
 static_assert(!hpx::traits::is_paren_constructible<B, 2>(),
     "!hpx::traits::is_paren_constructible<B, 2>()");
+#else
+static_assert(hpx::traits::is_paren_constructible<B, 2>(),
+    "hpx::traits::is_paren_constructible<B, 2>()");
+#endif
 
 static_assert(hpx::traits::detail::arity<B>().value == 2,
     "hpx::traits::detail::arity<B>() == size<2>{}");

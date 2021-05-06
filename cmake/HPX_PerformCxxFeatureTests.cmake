@@ -117,6 +117,10 @@ function(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX20_STD_LAMBDA_CAPTURE
   )
 
+  hpx_check_for_cxx20_std_paren_initialization_of_aggregates(
+    DEFINITIONS HPX_HAVE_CXX20_STD_PAREN_INITIALIZATION_OF_AGGREGATES
+  )
+
   # Check the availability of certain C++ builtins
   hpx_check_for_builtin_integer_pack(DEFINITIONS HPX_HAVE_BUILTIN_INTEGER_PACK)
 
