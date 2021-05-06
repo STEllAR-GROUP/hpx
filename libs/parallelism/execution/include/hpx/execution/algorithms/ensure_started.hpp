@@ -216,9 +216,10 @@ namespace hpx { namespace execution { namespace experimental {
                 }
 
             public:
-                template <typename R,
-                    typename =
-                        std::enable_if_t<std::is_rvalue_reference_v<R&&>>>
+                template <typename R>
+                void add_continuation(R& r) = delete;
+
+                template <typename R>
                 void add_continuation(R&& r)
                 {
                     if (predecessor_done)
