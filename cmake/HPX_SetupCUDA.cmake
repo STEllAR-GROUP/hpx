@@ -31,6 +31,7 @@ if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
       )
     endif()
   endif()
+  set(CMAKE_CUDA_EXTENSIONS OFF)
 
   enable_language(CUDA)
 
