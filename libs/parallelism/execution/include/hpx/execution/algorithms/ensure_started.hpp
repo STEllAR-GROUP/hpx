@@ -202,10 +202,44 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                     predecessor_done = true;
 
-                    std::unique_lock<hpx::util::spinlock> l{mtx};
+                    {
+                        // We require taking the lock here to synchronize with
+                        // threads attempting to add continuations to the vector
+                        // of continuations. However, it is enough to take it
+                        // once and release it immediately.
+                        //
+                        // Without the lock we may not see writes to the vector.
+                        // With the lock threads attempting to add continuations
+                        // will either:
+                        // - See predecessor_done = true in which case they will
+                        //   call the continuation directly without adding it to
+                        //   the vector of continuations. Accessing the vector
+                        //   below without the lock is safe in this case because
+                        //   the vector is not modified.
+                        // - See predecessor_done = false and proceed to take
+                        //   the lock. If they see predecessor_done after taking
+                        //   the lock they can again release the lock and call
+                        //   the continuation directly. Accessing the vector
+                        //   without the lock is again safe because the vector
+                        //   is not modified.
+                        // - See predecessor_done = false and proceed to take
+                        //   the lock. If they see predecessor_done is still
+                        //   false after taking the lock, they will proceed to
+                        //   add a continuation to the vector. Since they keep
+                        //   the lock they can safely write to the vector. This
+                        //   thread will not proceed past the lock until they
+                        //   have finished writing to the vector.
+                        //
+                        // Importantly, once this thread has taken and released
+                        // this lock, threads attempting to add continuations to
+                        // the vector must see predecessor_done = true after
+                        // taking the lock in their threads and will not add
+                        // continuations to the vector.
+                        std::unique_lock<mutex_type> l{mtx};
+                    }
+
                     if (!continuations.empty())
                     {
-                        l.unlock();
                         for (auto const& continuation : continuations)
                         {
                             continuation();
@@ -224,20 +258,39 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                     if (predecessor_done)
                     {
+                        // If we read predecessor_done here it means that one of
+                        // set_error/set_done/set_value has been called and
+                        // values/errors have been stored into the shared state.
+                        // We can trigger the continuation directly.
                         std::visit(
                             done_error_value_visitor<R>{std::move(r)}, v);
                     }
                     else
                     {
+                        // If predecessor_done is false, we have to take the
+                        // lock to potentially add the continuation to the
+                        // vector of continuations.
                         std::unique_lock<mutex_type> l{mtx};
+
                         if (predecessor_done)
                         {
+                            // By the time the lock has been taken,
+                            // predecessor_done might already be true and we can
+                            // release the lock early and call the continuation
+                            // directly again.
                             l.unlock();
                             std::visit(
                                 done_error_value_visitor<R>{std::move(r)}, v);
                         }
                         else
                         {
+                            // If predecessor_done is still false, we add the
+                            // continuation to the vector of continuations. This
+                            // has to be done while holding the lock, since
+                            // other threads may also try to add continuations
+                            // to the vector and the vector is not threadsafe in
+                            // itself. The continuation will be called later
+                            // when set_error/set_done/set_value is called.
                             continuations.emplace_back([this,
                                                            r = std::move(r)]() {
                                 std::visit(
