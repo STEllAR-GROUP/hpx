@@ -35,8 +35,13 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::intrusive_ptr<operation_state_holder> os;
 
                 template <typename E>
-                void set_error(E&&) noexcept
+                HPX_NORETURN void set_error(E&&) && noexcept
                 {
+                    HPX_ASSERT_MSG(false,
+                        "set_error was called on the receiver of detach, "
+                        "terminating. If you want to allow errors from the "
+                        "predecessor sender, handle them first with e.g. "
+                        "let_error.");
                     std::terminate();
                 }
 

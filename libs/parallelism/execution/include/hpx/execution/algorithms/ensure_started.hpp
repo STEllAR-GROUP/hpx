@@ -165,10 +165,10 @@ namespace hpx { namespace execution { namespace experimental {
 
                 ~shared_state()
                 {
-                    if (!start_called)
-                    {
-                        std::terminate();
-                    }
+                    HPX_ASSERT_MSG(start_called,
+                        "start was never called on the operation state of "
+                        "ensure_started. Did you forget to connect the sender "
+                        "to a receiver, or call start on the operation state?");
                 }
 
             private:
@@ -176,6 +176,11 @@ namespace hpx { namespace execution { namespace experimental {
                 struct done_error_value_visitor
                 {
                     std::decay_t<R> r;
+
+                    HPX_NORETURN void operator()(std::monostate) const
+                    {
+                        HPX_UNREACHABLE;
+                    }
 
                     void operator()(done_type)
                     {
@@ -190,11 +195,6 @@ namespace hpx { namespace execution { namespace experimental {
                     void operator()(value_type const& ts)
                     {
                         std::visit(value_visitor<R>{std::forward<R>(r)}, ts);
-                    }
-
-                    void operator()(std::monostate) const
-                    {
-                        std::terminate();
                     }
                 };
 

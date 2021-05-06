@@ -122,12 +122,14 @@ namespace hpx { namespace execution { namespace experimental {
 
                     struct start_visitor
                     {
-                        void operator()(std::monostate) const
+                        HPX_NORETURN void operator()(std::monostate) const
                         {
-                            std::terminate();
+                            HPX_UNREACHABLE;
                         }
 
-                        template <typename OS_>
+                        template <typename OS_,
+                            typename = std::enable_if_t<!std::is_same_v<
+                                std::decay_t<OS_>, std::monostate>>>
                         void operator()(OS_& os) const
                         {
                             hpx::execution::experimental::start(os);
@@ -140,9 +142,9 @@ namespace hpx { namespace execution { namespace experimental {
                         std::decay_t<F> f;
                         operation_state& os;
 
-                        void operator()(std::monostate) const
+                        HPX_NORETURN void operator()(std::monostate) const
                         {
-                            std::terminate();
+                            HPX_UNREACHABLE;
                         }
 
                         template <typename T,

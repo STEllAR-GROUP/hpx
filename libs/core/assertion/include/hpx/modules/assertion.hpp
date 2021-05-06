@@ -20,6 +20,7 @@
 #if defined(HPX_COMPUTE_DEVICE_CODE)
 #include <assert.h>
 #endif
+#include <exception>
 #include <string>
 #include <type_traits>
 
@@ -78,4 +79,11 @@ namespace hpx { namespace assertion {
 #define HPX_ASSERT_MSG(expr, msg)
 #define HPX_NOEXCEPT_WITH_ASSERT noexcept
 #endif
+
+#define HPX_UNREACHABLE                                                        \
+    HPX_ASSERT_(false,                                                         \
+        "This code is meant to be unreachable. If you are seeing this error "  \
+        "message it means that you have found a bug in HPX. Please report it " \
+        "on the issue tracker: https://github.com/STEllAR-GROUP/hpx/issues."); \
+    std::terminate()
 #endif

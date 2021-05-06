@@ -114,13 +114,13 @@ namespace hpx { namespace execution { namespace experimental {
                     }
                     else if (std::holds_alternative<error_type>(v))
                     {
-                        // The visit will throw or terminate
                         std::visit(
                             sync_wait_error_visitor{}, std::get<error_type>(v));
                     }
 
-                    // If the variant holds a std::monostate we also terminate
-                    std::terminate();
+                    // If the variant holds a std::monostate something has gone
+                    // wrong and we terminate
+                    HPX_UNREACHABLE;
                 }
             };
 

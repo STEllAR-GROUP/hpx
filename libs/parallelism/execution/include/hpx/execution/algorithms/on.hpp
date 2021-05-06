@@ -176,9 +176,9 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                     std::decay_t<Receiver> receiver;
 
-                    void operator()(std::monostate) const
+                    HPX_NORETURN void operator()(std::monostate) const
                     {
-                        std::terminate();
+                        HPX_UNREACHABLE;
                     }
 
                     template <typename Ts,
