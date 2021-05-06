@@ -87,7 +87,7 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename R>
             auto connect(R&& r) &
             {
-                return operation_state<R>{r, ts};
+                return operation_state<R>{std::forward<R>(r), ts};
             }
         };
     }    // namespace detail
