@@ -1371,6 +1371,7 @@ namespace hpx { namespace agas {
         if (HPX_UNLIKELY(nullptr == threads::get_self_ptr()))
         {
             // reschedule this call as an HPX thread
+#if !defined(HPX_HAVE_CXX20_STD_LAMBDA_CAPTURE)
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(
                     [=]() -> void { return decref(raw, credit, throws); }),
@@ -1379,7 +1380,17 @@ namespace hpx { namespace agas {
                 threads::thread_stacksize::default_,
                 threads::thread_schedule_state::pending, true);
             threads::register_thread(data, ec);
-
+#else
+            threads::thread_init_data data(
+                threads::make_thread_function_nullary([=, this]() -> void {
+                    return decref(raw, credit, throws);
+                }),
+                "addressing_service::decref", threads::thread_priority::normal,
+                threads::thread_schedule_hint(),
+                threads::thread_stacksize::default_,
+                threads::thread_schedule_state::pending, true);
+            threads::register_thread(data, ec);
+#endif
             return;
         }
 
@@ -1628,7 +1639,7 @@ namespace hpx { namespace agas {
                 return;
             }
             threads::thread_init_data data(
-                threads::make_thread_function_nullary([=]() -> void {
+                threads::make_thread_function_nullary([=, this]() -> void {
                     return update_cache_entry(id, g, throws);
                 }),
                 "addressing_service::update_cache_entry",

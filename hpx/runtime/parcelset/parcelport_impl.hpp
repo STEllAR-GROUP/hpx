@@ -413,6 +413,7 @@ namespace hpx { namespace parcelset
         >::type
         send_early_parcel_impl(locality const & dest, parcel p)
         {
+#if !defined(HPX_HAVE_CXX20_STD_LAMBDA_CAPTURE)
             put_parcel(
                 dest
               , std::move(p)
@@ -420,6 +421,15 @@ namespace hpx { namespace parcelset
                     return early_pending_parcel_handler(ec, p);
                 }
             );
+#else
+            put_parcel(
+                dest
+              , std::move(p)
+              , [=, this](std::error_code const& ec, parcel const & p) -> void {
+                    return early_pending_parcel_handler(ec, p);
+                }
+            );
+#endif
         }
 
         template <typename ConnectionHandler_>

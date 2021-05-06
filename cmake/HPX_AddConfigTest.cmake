@@ -549,6 +549,15 @@ function(hpx_check_for_cxx20_std_execution_policies)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_cxx20_std_lambda_capture)
+  add_hpx_config_test(
+    HPX_WITH_CXX20_STD_LAMBDA_CAPTURE
+    SOURCE cmake/tests/cxx20_std_lambda_capture.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_builtin_integer_pack)
   add_hpx_config_test(
     HPX_WITH_BUILTIN_INTEGER_PACK
