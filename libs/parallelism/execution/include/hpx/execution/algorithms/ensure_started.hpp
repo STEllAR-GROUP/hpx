@@ -366,7 +366,7 @@ namespace hpx { namespace execution { namespace experimental {
             typename NewAllocator = hpx::util::internal_allocator<>>
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             ensure_started_t, detail::ensure_started_sender<S, Allocator> s,
-            Allocator const& = {})
+            NewAllocator const& = {})
         {
             return s;
         }
