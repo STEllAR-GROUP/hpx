@@ -107,7 +107,7 @@ namespace hpx { namespace execution { namespace experimental {
                     operation_state& os;
 
                     template <typename E>
-                    void set_error(E&& e) && noexcept
+                        void set_error(E&& e) && noexcept
                     {
                         os.set_error_predecessor_sender(std::forward<E>(e));
                     }
@@ -118,7 +118,7 @@ namespace hpx { namespace execution { namespace experimental {
                     };
 
                     template <typename... Ts>
-                    void set_value(Ts&&... ts) && noexcept
+                        void set_value(Ts&&... ts) && noexcept
                     {
                         os.set_value_predecessor_sender(
                             std::forward<Ts>(ts)...);
@@ -157,7 +157,7 @@ namespace hpx { namespace execution { namespace experimental {
                     operation_state& os;
 
                     template <typename E>
-                    void set_error(E&& e) && noexcept
+                        void set_error(E&& e) && noexcept
                     {
                         os.set_error_scheduler_sender(std::forward<E>(e));
                     }

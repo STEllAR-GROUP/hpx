@@ -97,7 +97,7 @@ namespace hpx { namespace execution { namespace experimental {
                     hpx::intrusive_ptr<shared_state> st;
 
                     template <typename E>
-                    void set_error(E&& e) && noexcept
+                        void set_error(E&& e) && noexcept
                     {
                         st->v.template emplace<error_type>(
                             error_type(std::forward<E>(e)));
@@ -112,7 +112,7 @@ namespace hpx { namespace execution { namespace experimental {
                     };
 
                     template <typename... Ts>
-                    void set_value(Ts&&... ts) && noexcept
+                        void set_value(Ts&&... ts) && noexcept
                     {
                         st->v.template emplace<value_type>(
                             hpx::make_tuple<>(std::forward<Ts>(ts)...));

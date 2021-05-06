@@ -39,7 +39,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename E>
-            void set_error(E&& e) && noexcept
+                void set_error(E&& e) && noexcept
             {
                 if (!os.set_done_error_called.exchange(true))
                 {
@@ -63,7 +63,7 @@ namespace hpx { namespace execution { namespace experimental {
             };
 
             template <typename T>
-            void set_value(T&& t) && noexcept
+                void set_value(T&& t) && noexcept
             {
                 if (!os.set_done_error_called)
                 {

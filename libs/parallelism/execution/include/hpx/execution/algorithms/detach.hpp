@@ -35,7 +35,7 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::intrusive_ptr<operation_state_holder> os;
 
                 template <typename E>
-                HPX_NORETURN void set_error(E&&) && noexcept
+                    HPX_NORETURN void set_error(E&&) && noexcept
                 {
                     HPX_ASSERT_MSG(false,
                         "set_error was called on the receiver of detach, "
@@ -51,7 +51,7 @@ namespace hpx { namespace execution { namespace experimental {
                 };
 
                 template <typename... Ts>
-                void set_value(Ts&&...) && noexcept
+                    void set_value(Ts&&...) && noexcept
                 {
                     os.reset();
                 }
