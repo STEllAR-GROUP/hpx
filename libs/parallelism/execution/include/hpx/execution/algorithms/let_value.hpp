@@ -109,13 +109,13 @@ namespace hpx { namespace execution { namespace experimental {
                     }
 
                     template <typename E>
-                    void set_error(E&& e) noexcept
+                    void set_error(E&& e) && noexcept
                     {
                         hpx::execution::experimental::set_error(
                             std::move(r), std::forward<E>(e));
                     }
 
-                    void set_done() noexcept
+                    void set_done() && noexcept
                     {
                         hpx::execution::experimental::set_done(std::move(r));
                     };
@@ -174,7 +174,7 @@ namespace hpx { namespace execution { namespace experimental {
                     };
 
                     template <typename... Ts>
-                    void set_value(Ts&&... ts) noexcept
+                    void set_value(Ts&&... ts) && noexcept
                     {
                         hpx::detail::try_catch_exception_ptr(
                             [&]() {
@@ -244,7 +244,7 @@ namespace hpx { namespace execution { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                void start() noexcept
+                void start() & noexcept
                 {
                     hpx::execution::experimental::start(predecessor_os);
                 }

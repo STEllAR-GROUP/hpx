@@ -39,7 +39,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename E>
-            void set_error(E&& e) noexcept
+            void set_error(E&& e) && noexcept
             {
                 if (!os.set_done_error_called.exchange(true))
                 {
@@ -56,14 +56,14 @@ namespace hpx { namespace execution { namespace experimental {
                 os.finish();
             }
 
-            void set_done() noexcept
+            void set_done() && noexcept
             {
                 os.set_done_error_called = true;
                 os.finish();
             };
 
             template <typename T>
-            void set_value(T&& t) noexcept
+            void set_value(T&& t) && noexcept
             {
                 if (!os.set_done_error_called)
                 {
@@ -159,9 +159,11 @@ namespace hpx { namespace execution { namespace experimental {
                 }
 
                 operation_state(operation_state&&) = delete;
+                operation_state& operator=(operation_state&&) = delete;
                 operation_state(operation_state const&) = delete;
+                operation_state& operator=(operation_state const&) = delete;
 
-                void start() noexcept
+                void start() & noexcept
                 {
                     hpx::execution::experimental::start(os);
                 }
@@ -225,9 +227,11 @@ namespace hpx { namespace execution { namespace experimental {
                 }
 
                 operation_state(operation_state&&) = delete;
+                operation_state& operator=(operation_state&&) = delete;
                 operation_state(operation_state const&) = delete;
+                operation_state& operator=(operation_state const&) = delete;
 
-                void start() noexcept
+                void start() & noexcept
                 {
                     base_type::start();
                     hpx::execution::experimental::start(os);

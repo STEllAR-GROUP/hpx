@@ -97,7 +97,7 @@ namespace hpx { namespace execution { namespace experimental {
                     hpx::intrusive_ptr<shared_state> st;
 
                     template <typename E>
-                    void set_error(E&& e) noexcept
+                    void set_error(E&& e) && noexcept
                     {
                         st->v.template emplace<error_type>(
                             error_type(std::forward<E>(e)));
@@ -105,14 +105,14 @@ namespace hpx { namespace execution { namespace experimental {
                         st.reset();
                     }
 
-                    void set_done() noexcept
+                    void set_done() && noexcept
                     {
                         st->set_predecessor_done();
                         st.reset();
                     };
 
                     template <typename... Ts>
-                    void set_value(Ts&&... ts) noexcept
+                    void set_value(Ts&&... ts) && noexcept
                     {
                         st->v.template emplace<value_type>(
                             hpx::make_tuple<>(std::forward<Ts>(ts)...));
@@ -238,20 +238,17 @@ namespace hpx { namespace execution { namespace experimental {
                         }
                         else
                         {
-                            continuations.emplace_back(
-                                [this,
-                                    // NOLINTNEXTLINE(bugprone-move-forwarding-reference)
-                                    r = std::move(r)]() {
-                                    std::visit(
-                                        done_error_value_visitor<R>{
-                                            std::move(r)},
-                                        v);
-                                });
+                            continuations.emplace_back([this,
+                                                           r = std::move(r)]() {
+                                std::visit(
+                                    done_error_value_visitor<R>{std::move(r)},
+                                    v);
+                            });
                         }
                     }
                 }
 
-                void start() noexcept
+                void start() & noexcept
                 {
                     if (!start_called.exchange(true))
                     {
@@ -327,7 +324,12 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                 }
 
-                void start() noexcept
+                operation_state(operation_state&&) = delete;
+                operation_state& operator=(operation_state&&) = delete;
+                operation_state(operation_state const&) = delete;
+                operation_state& operator=(operation_state const&) = delete;
+
+                void start() & noexcept
                 {
                     st->add_continuation(std::move(r));
                 }

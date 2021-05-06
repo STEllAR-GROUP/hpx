@@ -45,13 +45,13 @@ namespace hpx { namespace execution { namespace experimental {
                     std::terminate();
                 }
 
-                void set_done() noexcept
+                void set_done() && noexcept
                 {
                     os.reset();
                 };
 
                 template <typename... Ts>
-                void set_value(Ts&&...) noexcept
+                void set_value(Ts&&...) && noexcept
                 {
                     os.reset();
                 }

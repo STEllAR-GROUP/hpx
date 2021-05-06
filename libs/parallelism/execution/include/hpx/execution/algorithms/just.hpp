@@ -63,7 +63,7 @@ namespace hpx { namespace execution { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                void start() noexcept
+                void start() & noexcept
                 {
                     hpx::detail::try_catch_exception_ptr(
                         [&]() {

@@ -96,6 +96,7 @@ namespace hpx { namespace execution { namespace experimental {
                         predecessor_sender_receiver{*this}))
                 {
                 }
+
                 operation_state(operation_state&&) = delete;
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state&&) = delete;
@@ -106,18 +107,18 @@ namespace hpx { namespace execution { namespace experimental {
                     operation_state& os;
 
                     template <typename E>
-                    void set_error(E&& e) noexcept
+                    void set_error(E&& e) && noexcept
                     {
                         os.set_error_predecessor_sender(std::forward<E>(e));
                     }
 
-                    void set_done() noexcept
+                    void set_done() && noexcept
                     {
                         os.set_done_predecessor_sender();
                     };
 
                     template <typename... Ts>
-                    void set_value(Ts&&... ts) noexcept
+                    void set_value(Ts&&... ts) && noexcept
                     {
                         os.set_value_predecessor_sender(
                             std::forward<Ts>(ts)...);
@@ -156,17 +157,17 @@ namespace hpx { namespace execution { namespace experimental {
                     operation_state& os;
 
                     template <typename E>
-                    void set_error(E&& e) noexcept
+                    void set_error(E&& e) && noexcept
                     {
                         os.set_error_scheduler_sender(std::forward<E>(e));
                     }
 
-                    void set_done() noexcept
+                    void set_done() && noexcept
                     {
                         os.set_done_scheduler_sender();
                     };
 
-                    void set_value() noexcept
+                    void set_value() && noexcept
                     {
                         os.set_value_scheduler_sender();
                     }
@@ -216,7 +217,7 @@ namespace hpx { namespace execution { namespace experimental {
                         std::move(ts));
                 }
 
-                void start() noexcept
+                void start() & noexcept
                 {
                     hpx::execution::experimental::start(sender_os);
                 }

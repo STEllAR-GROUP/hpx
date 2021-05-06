@@ -164,12 +164,10 @@ namespace hpx { namespace execution { namespace experimental {
                     };
 
                     template <typename E>
-                    void set_error(E&& e) noexcept
+                    void set_error(E&& e) && noexcept
                     {
                         hpx::detail::try_catch_exception_ptr(
                             [&]() {
-                                // TODO: Don't need to store the predecessor
-                                // error?
                                 // TODO: r is moved before the visit, but the
                                 // invoke inside the visit may throw.
                                 os.predecessor_e.template emplace<E>(
@@ -184,13 +182,13 @@ namespace hpx { namespace execution { namespace experimental {
                             });
                     }
 
-                    void set_done() noexcept
+                    void set_done() && noexcept
                     {
                         hpx::execution::experimental::set_done(std::move(r));
                     };
 
                     template <typename... Ts>
-                    void set_value(Ts&&... ts) noexcept
+                    void set_value(Ts&&... ts) && noexcept
                     {
                         hpx::execution::experimental::set_value(
                             std::move(r), std::forward<Ts>(ts)...);
@@ -247,7 +245,7 @@ namespace hpx { namespace execution { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                void start() noexcept
+                void start() & noexcept
                 {
                     hpx::execution::experimental::start(predecessor_os);
                 }

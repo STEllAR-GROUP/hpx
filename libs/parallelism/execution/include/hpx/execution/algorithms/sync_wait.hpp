@@ -134,25 +134,25 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename E>
-            void set_error(E&& e) noexcept
+            void set_error(E&& e) && noexcept
             {
                 st.v.template emplace<error_type>(std::forward<E>(e));
                 signal_set_called();
             }
 
-            void set_done() noexcept
+            void set_done() && noexcept
             {
                 signal_set_called();
             };
 
-            void set_value() noexcept
+            void set_value() && noexcept
             {
                 st.v.template emplace<value_type>();
                 signal_set_called();
             }
 
             template <typename U>
-            void set_value(U&& u) noexcept
+            void set_value(U&& u) && noexcept
             {
                 st.v.template emplace<value_type>(std::forward<U>(u));
                 signal_set_called();
