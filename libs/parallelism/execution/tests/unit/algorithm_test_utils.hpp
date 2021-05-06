@@ -305,7 +305,7 @@ struct custom_type_non_default_constructible
 {
     int x;
     custom_type_non_default_constructible() = delete;
-    custom_type_non_default_constructible(int x)
+    explicit custom_type_non_default_constructible(int x)
       : x(x){};
     custom_type_non_default_constructible(
         custom_type_non_default_constructible&&) = default;
@@ -321,7 +321,7 @@ struct custom_type_non_default_constructible_non_copyable
 {
     int x;
     custom_type_non_default_constructible_non_copyable() = delete;
-    custom_type_non_default_constructible_non_copyable(int x)
+    explicit custom_type_non_default_constructible_non_copyable(int x)
       : x(x){};
     custom_type_non_default_constructible_non_copyable(
         custom_type_non_default_constructible_non_copyable&&) = default;
