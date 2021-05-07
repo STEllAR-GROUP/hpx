@@ -7,7 +7,7 @@
 // test for availability of Allow lambda-capture [=, this] (C++20)
 
 struct S
-{ 
+{
     void f()
     {
         [=, this]{};

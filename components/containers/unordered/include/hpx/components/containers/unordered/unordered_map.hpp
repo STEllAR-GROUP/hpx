@@ -345,17 +345,11 @@ namespace hpx
         {
             typedef typename base_type::server_component_type::get_action act;
 
-#if !defined(HPX_HAVE_CXX20_STD_LAMBDA_CAPTURE)
             return async(act(), id).then(
-                [=](future<server::unordered_map_config_data> && f) -> void {
+                [HPX_CXX20_CAPTURE_THIS(=)](
+                    future<server::unordered_map_config_data> && f) -> void {
                     get_data_helper(id, f.get());
                 });
-#else
-            return async(act(), id).then(
-                [=, this](future<server::unordered_map_config_data> && f) -> void {
-                    get_data_helper(id, f.get());
-                });
-#endif
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -502,17 +496,11 @@ namespace hpx
         future<void> connect_to(std::string const& symbolic_name)
         {
             this->base_type::connect_to(symbolic_name);
-#if !defined(HPX_HAVE_CXX20_STD_LAMBDA_CAPTURE)
             return this->base_type::share().then(
-                [=](shared_future<id_type>&& f) -> hpx::future<void> {
+                [HPX_CXX20_CAPTURE_THIS(=)](
+                    shared_future<id_type>&& f) -> hpx::future<void> {
                     return connect_to_helper(f.get());
                 });
-#else
-            return this->base_type::share().then(
-                [=, this](shared_future<id_type>&& f) -> hpx::future<void> {
-                    return connect_to_helper(f.get());
-                });
-#endif
         }
 
         // Register this unordered_map with AGAS using the given symbolic name

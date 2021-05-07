@@ -7,7 +7,7 @@
 // test for availability of Parenthesized initialization of aggregates (C++20)
 
 struct S
-{ 
+{
     int x;
     float y;
 };

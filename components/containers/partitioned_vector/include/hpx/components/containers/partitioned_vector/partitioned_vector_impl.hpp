@@ -102,17 +102,11 @@ namespace hpx
         typedef typename components::server::distributed_metadata_base<
             server::partitioned_vector_config_data>::get_action act;
 
-#if !defined(HPX_HAVE_CXX20_STD_LAMBDA_CAPTURE)
         return async(act(), id).then(
-            [=](future<server::partitioned_vector_config_data>&& f) -> void {
+            [HPX_CXX20_CAPTURE_THIS(=)](
+                future<server::partitioned_vector_config_data>&& f) -> void {
                 return get_data_helper(id, f.get());
             });
-#else
-        return async(act(), id).then(
-            [=, this](future<server::partitioned_vector_config_data>&& f) -> void {
-                return get_data_helper(id, f.get());
-            });
-#endif
 #else
         HPX_ASSERT(false);
         HPX_UNUSED(id);
@@ -125,17 +119,11 @@ namespace hpx
     partitioned_vector<T, Data>::connect_to(std::string const& symbolic_name)
     {
         this->base_type::connect_to(symbolic_name);
-#if !defined(HPX_HAVE_CXX20_STD_LAMBDA_CAPTURE)
         return this->base_type::share().then(
-            [=](shared_future<id_type>&& f) -> hpx::future<void> {
+            [HPX_CXX20_CAPTURE_THIS(=)](
+                shared_future<id_type>&& f) -> hpx::future<void> {
                 return connect_to_helper(f.get());
             });
-#else
-        return this->base_type::share().then(
-            [=, this](shared_future<id_type>&& f) -> hpx::future<void> {
-                return connect_to_helper(f.get());
-            });
-#endif
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -179,17 +167,11 @@ namespace hpx
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
     partitioned_vector<T, Data>::partitioned_vector(future<id_type>&& f)
     {
-#if !defined(HPX_HAVE_CXX20_STD_LAMBDA_CAPTURE)
         f.share().then(
-            [=](shared_future<id_type>&& f) -> hpx::future<void> {
+            [HPX_CXX20_CAPTURE_THIS(=)](
+                shared_future<id_type>&& f) -> hpx::future<void> {
                 return connect_to_helper(f.get());
             });
-#else
-        f.share().then(
-            [=, this](shared_future<id_type>&& f) -> hpx::future<void> {
-                return connect_to_helper(f.get());
-            });
-#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////

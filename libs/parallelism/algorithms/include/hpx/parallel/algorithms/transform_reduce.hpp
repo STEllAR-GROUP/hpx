@@ -339,21 +339,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     typename std::iterator_traits<Iter>::reference;
 
                 T val = hpx::util::invoke(convert_, *part_begin);
-#if !defined(HPX_HAVE_CXX20_STD_LAMBDA_CAPTURE)
                 return util::accumulate_n(++part_begin, --part_size,
                     std::move(val),
-                    [=](T const& res, reference next) mutable -> T {
+                    [HPX_CXX20_CAPTURE_THIS(=)](
+                        T const& res, reference next) mutable -> T {
                         return hpx::util::invoke(
                             reduce_, res, hpx::util::invoke(convert_, next));
                     });
-#else
-                return util::accumulate_n(++part_begin, --part_size,
-                    std::move(val),
-                    [=, this](T const& res, reference next) mutable -> T {
-                        return hpx::util::invoke(
-                            reduce_, res, hpx::util::invoke(convert_, next));
-                    });
-#endif
             }
         };
 

@@ -110,10 +110,10 @@ namespace hpx { namespace components {
                 }
 
                 // consolidate all results
-#if !defined(HPX_HAVE_CXX20_STD_LAMBDA_CAPTURE)
                 return hpx::dataflow(
                     hpx::launch::sync,
-                    [=](std::vector<hpx::future<std::vector<hpx::id_type>>>&&
+                    [HPX_CXX20_CAPTURE_THIS(=)](
+                        std::vector<hpx::future<std::vector<hpx::id_type>>>&&
                             v) mutable -> std::vector<bulk_locality_result> {
                         HPX_ASSERT(localities_.size() == v.size());
 
@@ -128,25 +128,6 @@ namespace hpx { namespace components {
                         return result;
                     },
                     std::move(objs));
-#else
-                return hpx::dataflow(
-                    hpx::launch::sync,
-                    [=, this](std::vector<hpx::future<std::vector<hpx::id_type>>>&&
-                            v) mutable -> std::vector<bulk_locality_result> {
-                        HPX_ASSERT(localities_.size() == v.size());
-
-                        std::vector<bulk_locality_result> result;
-                        result.reserve(v.size());
-
-                        for (std::size_t i = 0; i != v.size(); ++i)
-                        {
-                            result.emplace_back(
-                                std::move(localities_[i]), v[i].get());
-                        }
-                        return result;
-                    },
-                    std::move(objs));
-#endif
             }
 
             std::vector<hpx::id_type> const& localities_;
