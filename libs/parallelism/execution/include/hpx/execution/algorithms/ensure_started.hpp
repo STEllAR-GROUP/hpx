@@ -416,11 +416,10 @@ namespace hpx { namespace execution { namespace experimental {
                 std::forward<S>(s), a};
         }
 
-        template <typename S, typename Allocator,
-            typename NewAllocator = hpx::util::internal_allocator<>>
+        template <typename S, typename Allocator>
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             ensure_started_t, detail::ensure_started_sender<S, Allocator> s,
-            NewAllocator const& = {})
+            Allocator const& = {})
         {
             return s;
         }
