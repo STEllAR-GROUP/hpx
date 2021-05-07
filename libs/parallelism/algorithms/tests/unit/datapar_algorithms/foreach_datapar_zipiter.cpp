@@ -51,10 +51,10 @@ void for_each_zipiter_test(ExPolicy&& policy, IteratorTag)
     auto end = hpx::util::make_zip_iterator(
         iterator(std::end(c)), iterator(std::end(d)));
 
-    auto result =
-        hpx::for_each(std::forward<ExPolicy>(policy), begin, end, set_42());
+    // auto result =
+    hpx::for_each(std::forward<ExPolicy>(policy), begin, end, set_42());
 
-    HPX_TEST_EQ(result, end);
+    // HPX_TEST_EQ(result, end);
 
     // verify values
     std::size_t count = 0;
@@ -90,8 +90,8 @@ void for_each_zipiter_test()
 {
     using namespace hpx::execution;
 
-    for_each_zipiter_test(execution::datapar, IteratorTag());
-    //     test_for_each_async(execution::datapar(task), IteratorTag());
+    for_each_zipiter_test(datapar, IteratorTag());
+    //     test_for_each_async(datapar(task), IteratorTag());
 }
 
 void for_each_zipiter_test()
