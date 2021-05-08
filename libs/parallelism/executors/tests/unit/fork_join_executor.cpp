@@ -97,7 +97,7 @@ void test_bulk_sync_exception()
 
         HPX_TEST(false);
     }
-    catch (std::runtime_error const& e)
+    catch (std::runtime_error const& /*e*/)
     {
         caught_exception = true;
     }
@@ -129,7 +129,7 @@ void test_bulk_async_exception()
 
         HPX_TEST(false);
     }
-    catch (std::runtime_error const& e)
+    catch (std::runtime_error const& /*e*/)
     {
         caught_exception = true;
     }

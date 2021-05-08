@@ -27,6 +27,11 @@
 template <typename... Parameters>
 void parameters_test_impl(Parameters&&... params)
 {
+    static_assert(
+        hpx::util::all_of<
+            hpx::traits::is_executor_parameters<Parameters>...>::value,
+        "hpx::traits::is_executor_parameters<Parameters>::value");
+
     typedef std::random_access_iterator_tag iterator_tag;
     test_for_each(hpx::execution::seq.with(params...), iterator_tag());
     test_for_each(hpx::execution::par.with(params...), iterator_tag());

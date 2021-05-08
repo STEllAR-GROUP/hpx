@@ -87,7 +87,7 @@ namespace hpx { namespace parallel { namespace execution {
 
     template <typename T>
     struct is_executor_parameters
-      : detail::is_executor_parameters<typename std::decay<T>::type>
+      : detail::is_executor_parameters<std::decay_t<T>>
     {
     };
 
@@ -104,8 +104,7 @@ namespace hpx { namespace traits {
     // new executor framework
     template <typename Parameters, typename Enable>
     struct is_executor_parameters
-      : parallel::execution::is_executor_parameters<
-            typename std::decay<Parameters>::type>
+      : parallel::execution::is_executor_parameters<std::decay_t<Parameters>>
     {
     };
 

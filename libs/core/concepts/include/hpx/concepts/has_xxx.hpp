@@ -7,13 +7,23 @@
 
 #pragma once
 
-#include <hpx/type_support/always_void.hpp>
-
+#include <hpx/config.hpp>
 #include <hpx/preprocessor/cat.hpp>
+#include <hpx/type_support/always_void.hpp>
 
 #include <type_traits>
 
-/// This macro creates a boolean unary metafunction such that for
+#if defined(HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
+#define HPX_HAS_XXX_TRAIT_DEF_CXX17(Name)                                      \
+    template <typename T>                                                      \
+    constexpr bool HPX_PP_CAT(HPX_PP_CAT(has_, Name), _v) =                    \
+        HPX_PP_CAT(has_, Name)::value;                                         \
+    /**/
+#else
+#define HPX_HAS_XXX_TRAIT_DEF_CXX17(Name) /**/
+#endif
+
+/// This macro creates a boolean unary meta-function such that for
 /// any type X, has_name<X>::value == true if and only if X is a
 /// class type and has a nested type member x::name. The generated
 /// trait ends up in a namespace where the macro itself has been
@@ -30,4 +40,11 @@
         Name)<T, typename hpx::util::always_void<typename T::Name>::type>      \
       : std::true_type                                                         \
     {                                                                          \
-    } /**/
+    };                                                                         \
+                                                                               \
+    template <typename T>                                                      \
+    using HPX_PP_CAT(HPX_PP_CAT(has_, Name), _t) =                             \
+        typename HPX_PP_CAT(has_, Name)<T>::type;                              \
+                                                                               \
+    HPX_HAS_XXX_TRAIT_DEF_CXX17(Name)                                          \
+    /**/

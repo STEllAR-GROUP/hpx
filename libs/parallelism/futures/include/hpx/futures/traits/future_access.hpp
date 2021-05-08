@@ -36,28 +36,27 @@ namespace hpx { namespace traits {
         template <typename Result>
         struct shared_state_ptr_result
         {
-            typedef Result type;
+            using type = Result;
         };
 
         template <typename Result>
         struct shared_state_ptr_result<Result&>
         {
-            typedef Result& type;
+            using type = Result&;
         };
 
         template <>
         struct shared_state_ptr_result<void>
         {
-            typedef future_data_void type;
+            using type = future_data_void;
         };
 
         template <typename R>
         struct shared_state_ptr
         {
-            typedef typename shared_state_ptr_result<R>::type result_type;
-            typedef hpx::intrusive_ptr<
-                lcos::detail::future_data_base<result_type>>
-                type;
+            using result_type = typename shared_state_ptr_result<R>::type;
+            using type =
+                hpx::intrusive_ptr<lcos::detail::future_data_base<result_type>>;
         };
 
         template <typename Future, typename Enable = void>
@@ -84,8 +83,8 @@ namespace hpx { namespace traits {
         template <typename Future>
         struct shared_state_ptr_for<std::vector<Future>>
         {
-            typedef std::vector<typename shared_state_ptr_for<Future>::type>
-                type;
+            using type =
+                std::vector<typename shared_state_ptr_for<Future>::type>;
         };
 
         ///////////////////////////////////////////////////////////////////////

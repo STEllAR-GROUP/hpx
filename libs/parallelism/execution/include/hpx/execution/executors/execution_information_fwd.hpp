@@ -61,8 +61,7 @@ namespace hpx { namespace parallel { namespace execution {
             has_pending_closures_t, Executor&& exec)
         {
             return detail::has_pending_closures_fn_helper<
-                typename std::decay<Executor>::type>::call(0,
-                std::forward<Executor>(exec));
+                std::decay_t<Executor>>::call(0, std::forward<Executor>(exec));
         }
     } has_pending_closures{};
 
@@ -94,9 +93,8 @@ namespace hpx { namespace parallel { namespace execution {
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(get_pu_mask_t,
             Executor&& exec, threads::topology& topo, std::size_t thread_num)
         {
-            return detail::get_pu_mask_fn_helper<
-                typename std::decay<Executor>::type>::call(0,
-                std::forward<Executor>(exec), topo, thread_num);
+            return detail::get_pu_mask_fn_helper<std::decay_t<Executor>>::call(
+                0, std::forward<Executor>(exec), topo, thread_num);
         }
     } get_pu_mask{};
 
@@ -123,8 +121,8 @@ namespace hpx { namespace parallel { namespace execution {
             set_scheduler_mode_t, Executor&& exec, Mode const& mode)
         {
             return detail::set_scheduler_mode_fn_helper<
-                typename std::decay<Executor>::type>::call(0,
-                std::forward<Executor>(exec), mode);
+                std::decay_t<Executor>>::call(0, std::forward<Executor>(exec),
+                mode);
         }
     } set_scheduler_mode{};
 }}}    // namespace hpx::parallel::execution
