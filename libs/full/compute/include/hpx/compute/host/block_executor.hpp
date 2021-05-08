@@ -12,7 +12,7 @@
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/restricted_thread_pool_executor.hpp>
 #include <hpx/executors/thread_pool_attached_executors.hpp>
 #include <hpx/functional/deferred_call.hpp>

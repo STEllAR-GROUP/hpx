@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/type_support/detected.hpp>
 
 #include <cstddef>
@@ -117,8 +117,8 @@ namespace hpx { namespace parallel { namespace execution {
     template <typename Executor>
     struct executor_context
     {
-        using type = typename std::decay<decltype(
-            std::declval<Executor const&>().context())>::type;
+        using type = typename std::decay<
+            decltype(std::declval<Executor const&>().context())>::type;
     };
 
     ///////////////////////////////////////////////////////////////////////////

@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/traits/is_executor_parameters.hpp>
+#include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/serialization/serialize.hpp>
 

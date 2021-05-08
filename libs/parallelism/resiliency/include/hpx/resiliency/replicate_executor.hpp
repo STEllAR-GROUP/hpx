@@ -11,7 +11,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/current_executor.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -131,7 +131,7 @@ namespace hpx { namespace resiliency { namespace experimental {
             {
                 // spawn hierarchical tasks
                 std::size_t chunk_size = (size + num_spread) / num_spread - 1;
-                chunk_size = (std::max)(chunk_size, num_tasks);
+                chunk_size = (std::max) (chunk_size, num_tasks);
 
                 while (size > chunk_size)
                 {

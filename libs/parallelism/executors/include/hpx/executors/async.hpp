@@ -12,7 +12,7 @@
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/future.hpp>
@@ -29,11 +29,11 @@ namespace hpx { namespace detail {
         typename std::enable_if<!traits::is_action<Func>::value>::type>
     {
         template <typename Policy_, typename F, typename... Ts>
-        HPX_FORCEINLINE static auto
-        call(Policy_&& launch_policy, F&& f, Ts&&... ts) -> decltype(
-            async_launch_policy_dispatch<typename std::decay<F>::type>::call(
-                std::forward<Policy_>(launch_policy), std::forward<F>(f),
-                std::forward<Ts>(ts)...))
+        HPX_FORCEINLINE static auto call(
+            Policy_&& launch_policy, F&& f, Ts&&... ts)
+            -> decltype(async_launch_policy_dispatch<typename std::decay<
+                    F>::type>::call(std::forward<Policy_>(launch_policy),
+                std::forward<F>(f), std::forward<Ts>(ts)...))
         {
             return async_launch_policy_dispatch<typename std::decay<F>::type>::
                 call(std::forward<Policy_>(launch_policy), std::forward<F>(f),
