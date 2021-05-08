@@ -321,6 +321,7 @@ namespace hpx { namespace parallel { namespace execution {
                 }
                 catch (...)
                 {
+                    // note: constructor doesn't lock/suspend
                     throw hpx::exception_list(std::current_exception());
                 }
             }
@@ -762,7 +763,8 @@ namespace hpx { namespace parallel { namespace execution {
                 }
                 catch (...)
                 {
-                    throw exception_list(std::current_exception());
+                    // note: constructor doesn't lock/suspend
+                    throw hpx::exception_list(std::current_exception());
                 }
             }
 
@@ -784,7 +786,8 @@ namespace hpx { namespace parallel { namespace execution {
                 }
                 catch (...)
                 {
-                    throw exception_list(std::current_exception());
+                    // note: constructor doesn't lock/suspend
+                    throw hpx::exception_list(std::current_exception());
                 }
             }
 
@@ -867,7 +870,8 @@ namespace hpx { namespace parallel { namespace execution {
                 }
                 catch (...)
                 {
-                    throw exception_list(std::current_exception());
+                    // note: constructor doesn't lock/suspend
+                    throw hpx::exception_list(std::current_exception());
                 }
             }
 
@@ -899,7 +903,8 @@ namespace hpx { namespace parallel { namespace execution {
                 }
                 catch (...)
                 {
-                    throw exception_list(std::current_exception());
+                    // note: constructor doesn't lock/suspend
+                    throw hpx::exception_list(std::current_exception());
                 }
             }
 
