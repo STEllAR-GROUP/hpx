@@ -48,7 +48,7 @@ namespace hpx { namespace util {
             mutex_type mutex_;
 
         public:
-            fixture(std::ostream& stream)
+            explicit fixture(std::ostream& stream)
               : stream_(stream)
             {
             }

@@ -131,29 +131,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
                     return;
                 }
 
-                error_code local_ec;
-                {
-                    util::ignore_while_checking<std::unique_lock<mutex_type>>
-                        il(&lock);
-                    ctx.resume();
-                }
-
-                if (local_ec)
-                {
-                    prepend_entries(lock, queue);
-                    lock.unlock();
-
-                    if (&ec != &throws)
-                    {
-                        ec = std::move(local_ec);
-                    }
-                    else
-                    {
-                        std::rethrow_exception(
-                            hpx::detail::access_exception(local_ec));
-                    }
-                    return;
-                }
+                util::ignore_while_checking<std::unique_lock<mutex_type>> il(
+                    &lock);
+                ctx.resume();
 
             } while (!queue.empty());
         }

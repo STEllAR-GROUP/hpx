@@ -24,6 +24,7 @@ set(_hpx_full_modules
     checkpoint_base
     collectives
     command_line_handling
+    command_line_handling_local
     components
     components_base
     compute
@@ -32,6 +33,7 @@ set(_hpx_full_modules
     executors_distributed
     include
     init_runtime
+    init_runtime_local
     lcos_distributed
     mpi_base
     naming

@@ -13,6 +13,7 @@
 #include <hpx/thread_executors/guided_pool_executor.hpp>
 //#include <hpx/topology/cpu_mask.hpp>
 //#include <hpx/include/parallel_executors.hpp>
+#include <hpx/modules/async_local.hpp>
 
 // we should not need these
 #include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>

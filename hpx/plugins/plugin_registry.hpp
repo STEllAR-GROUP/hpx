@@ -10,13 +10,13 @@
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/plugins/unique_plugin_name.hpp>
 
+#include <hpx/ini/ini.hpp>
 #include <hpx/plugin/traits/plugin_config_data.hpp>
+#include <hpx/prefix/find_prefix.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/prefix/find_prefix.hpp>
-#include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>
 

@@ -261,7 +261,7 @@ namespace hpx {
     threads::policies::callback_notifier::on_error_type global_on_error_func;
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(util::runtime_configuration& rtcfg, bool initialize)
+    runtime::runtime(hpx::util::runtime_configuration& rtcfg, bool initialize)
       : rtcfg_(rtcfg)
       , instance_number_(++instance_number_counter_)
       , thread_support_(new util::thread_mapper)
@@ -309,23 +309,17 @@ namespace hpx {
         }
     }
 
-    runtime::runtime(util::runtime_configuration& rtcfg,
+    runtime::runtime(hpx::util::runtime_configuration& rtcfg,
         notification_policy_type&& notifier,
-        notification_policy_type&& main_pool_notifier
+        notification_policy_type&& main_pool_notifier,
 #ifdef HPX_HAVE_IO_POOL
-        ,
-        notification_policy_type&& io_pool_notifier
+        notification_policy_type&& io_pool_notifier,
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
-        ,
-        notification_policy_type&& timer_pool_notifier
+        notification_policy_type&& timer_pool_notifier,
 #endif
-#ifdef HPX_HAVE_NETWORKING
-        ,
         threads::detail::network_background_callback_type
-            network_background_callback
-#endif
-        ,
+            network_background_callback,
         bool initialize)
       : rtcfg_(rtcfg)
       , instance_number_(++instance_number_counter_)
@@ -353,12 +347,7 @@ namespace hpx {
 #ifdef HPX_HAVE_TIMER_POOL
             timer_pool_,
 #endif
-            notifier_
-#ifdef HPX_HAVE_NETWORKING
-            ,
-            network_background_callback
-#endif
-            ))
+            notifier_, network_background_callback))
       , stop_called_(false)
       , stop_done_(false)
     {
@@ -478,12 +467,12 @@ namespace hpx {
         return state_.load() == state_stopped;
     }
 
-    util::runtime_configuration& runtime::get_config()
+    hpx::util::runtime_configuration& runtime::get_config()
     {
         return rtcfg_;
     }
 
-    util::runtime_configuration const& runtime::get_config() const
+    hpx::util::runtime_configuration const& runtime::get_config() const
     {
         return rtcfg_;
     }
@@ -1096,7 +1085,7 @@ namespace hpx {
         return runtime::get_system_uptime();
     }
 
-    util::runtime_configuration const& get_config()
+    hpx::util::runtime_configuration const& get_config()
     {
         return get_runtime().get_config();
     }
@@ -1113,16 +1102,12 @@ namespace hpx {
     /// Return true if networking is enabled.
     bool is_networking_enabled()
     {
-#if defined(HPX_HAVE_NETWORKING)
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt)
         {
             return rt->is_networking_enabled();
         }
         return true;    // be on the safe side, enable networking
-#else
-        return false;
-#endif
     }
 }    // namespace hpx
 
@@ -2096,7 +2081,7 @@ namespace hpx {
         {
             thread_stacksize size_enum = thread_stacksize::unknown;
 
-            util::runtime_configuration const& rtcfg = hpx::get_config();
+            hpx::util::runtime_configuration const& rtcfg = hpx::get_config();
             if (rtcfg.get_stack_size(thread_stacksize::small_) == size)
                 size_enum = thread_stacksize::small_;
             else if (rtcfg.get_stack_size(thread_stacksize::medium) == size)

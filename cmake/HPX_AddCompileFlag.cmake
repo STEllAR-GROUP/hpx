@@ -35,11 +35,12 @@ function(hpx_add_target_compile_option FLAG)
 
   foreach(_lang ${_languages})
     foreach(_config ${_configurations})
-      set(_conf "${FLAG}")
       if(NOT _config STREQUAL "none")
         set(_conf
             "$<$<AND:$<CONFIG:${_config}>,$<COMPILE_LANGUAGE:${_lang}>>:${FLAG}>"
         )
+      else()
+        set(_conf "$<$<COMPILE_LANGUAGE:${_lang}>:${FLAG}>")
       endif()
       target_compile_options(${_dest} INTERFACE "${_conf}")
     endforeach()
@@ -174,7 +175,7 @@ endfunction()
 
 function(hpx_add_compile_flag)
   set(one_value_args)
-  hpx_add_target_compile_option(${ARGN} PRIVATE)
+  hpx_add_target_compile_option(${ARGN})
 endfunction()
 
 function(hpx_add_compile_flag_if_available FLAG)

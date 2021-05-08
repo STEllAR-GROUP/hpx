@@ -257,8 +257,9 @@ function(hpx_check_for_cxx11_std_atomic)
         LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
         FILE ${ARGN}
       )
-      if(NOT HPX_WITH_CXX11_ATOMIC_128BIT)
-        unset(HPX_WITH_CXX11_ATOMIC_128BIT CACHE)
+      if(NOT HPX_WITH_CXX11_ATOMIC)
+        unset(HPX_CXX11_STD_ATOMIC_LIBRARIES CACHE)
+        unset(HPX_WITH_CXX11_ATOMIC CACHE)
       endif()
     endif()
   endif()
@@ -288,6 +289,8 @@ function(hpx_check_for_cxx11_std_atomic_128bit)
         FILE ${ARGN}
       )
       if(NOT HPX_WITH_CXX11_ATOMIC_128BIT)
+        # Adding -latomic did not help, so we don't attempt to link to it later
+        unset(HPX_CXX11_STD_ATOMIC_LIBRARIES CACHE)
         unset(HPX_WITH_CXX11_ATOMIC_128BIT CACHE)
       endif()
     endif()

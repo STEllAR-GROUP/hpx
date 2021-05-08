@@ -14,7 +14,6 @@ set(threading_tests
     jthread1
     jthread2
     stack_check
-    start_stop_callbacks
     stop_token_cb1
     stop_token_race
     stop_token_race2
@@ -24,10 +23,6 @@ set(threading_tests
     thread_mf
     thread_yield
 )
-
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests} thread_affinity thread_stacksize)
-endif()
 
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
   set(threading_tests ${threading_tests} thread_stacksize_overflow)
@@ -47,13 +42,10 @@ set(jthread2_PARAMETERS THREADS_PER_LOCALITY 4)
 set(stop_token_cb1_PARAMETERS THREADS_PER_LOCALITY 4)
 set(stop_token_race_PARAMETERS THREADS_PER_LOCALITY 4)
 set(stop_token_race2_PARAMETERS THREADS_PER_LOCALITY 1)
-set(thread_affinity_PARAMETERS THREADS_PER_LOCALITY 4)
-set(thread_affinity_LIBRARIES DEPENDENCIES PRIVATE Hwloc::hwloc)
 set(thread_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_id_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_launching_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_mf_PARAMETERS THREADS_PER_LOCALITY 4)
-set(thread_stacksize_PARAMETERS LOCALITIES 2)
 set(tss_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${threading_tests})

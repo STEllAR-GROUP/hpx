@@ -74,7 +74,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
@@ -191,7 +191,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::move
     HPX_INLINE_CONSTEXPR_VARIABLE struct move_t final
-      : hpx::functional::tag<move_t>
+      : hpx::functional::tag_fallback<move_t>
     {
     private:
         // clang-format off
@@ -203,8 +203,8 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_invoke(move_t, ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest)
+        tag_fallback_invoke(move_t, ExPolicy&& policy, FwdIter1 first,
+            FwdIter1 last, FwdIter2 dest)
         {
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::transfer<
@@ -218,7 +218,7 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value)>
         // clang-format on
-        friend FwdIter2 tag_invoke(
+        friend FwdIter2 tag_fallback_invoke(
             move_t, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
             return std::move(first, last, dest);

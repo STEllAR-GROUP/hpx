@@ -554,15 +554,10 @@ hpx_option(
   "Enable IO counters (default: ${HPX_WITH_IO_COUNTERS_DEFAULT})"
   ${HPX_WITH_IO_COUNTERS_DEFAULT} ADVANCED CATEGORY "Build Targets"
 )
-if(HPX_WITH_IO_COUNTERS)
+if(HPX_WITH_IO_COUNTERS AND HPX_WITH_DISTRIBUTED_RUNTIME)
   if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
     hpx_error(
       "HPX_WITH_IO_COUNTERS was set to ON, but IO counters are only available on Linux (this is \"${CMAKE_SYSTEM_NAME}\")"
-    )
-  endif()
-  if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
-    hpx_error(
-      "HPX_WITH_IO_COUNTERS was set to ON, but performance counters cannot be used with HPX_WITH_DISTRIBUTED_RUNTIME=OFF"
     )
   endif()
   hpx_add_config_define(HPX_HAVE_IO_COUNTERS)
@@ -1962,7 +1957,12 @@ if(HPX_WITH_COMPILER_WARNINGS)
       hpx_add_compile_flag_if_available(-Wcast-align)
     endif()
 
-    hpx_add_compile_flag_if_available(-Werror=trampolines)
+    # False positive when build with Vc and Clang
+    if(NOT (HPX_WITH_DATAPAR_VC AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+           )
+    )
+      hpx_add_compile_flag_if_available(-Werror=trampolines)
+    endif()
     hpx_add_compile_flag_if_available(-Werror=parentheses)
     hpx_add_compile_flag_if_available(-Werror=reorder)
     hpx_add_compile_flag_if_available(-Werror=return-type)
@@ -2014,8 +2014,11 @@ else()
     hpx_add_compile_flag_if_available(-Wno-maybe-uninitialized)
   endif()
 
-  # Silence warning about __sync_fetch_and_nand changing semantics
-  hpx_add_compile_flag_if_available(-Wno-sync-nand)
+  # False positive when building with Vc and Clang
+  if(NOT (HPX_WITH_DATAPAR_VC AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+    # Silence warning about __sync_fetch_and_nand changing semantics
+    hpx_add_compile_flag_if_available(-Wno-sync-nand)
+  endif()
 
   # Silence warnings about deleting polymorphic objects with non-virtual dtors.
   # These come from within Boost.

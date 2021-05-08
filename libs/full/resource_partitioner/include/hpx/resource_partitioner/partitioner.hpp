@@ -8,10 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/ini/ini.hpp>
 #include <hpx/resource_partitioner/detail/create_partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 
 #include <cstddef>
@@ -127,8 +126,7 @@ namespace hpx { namespace resource {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         inline ::hpx::resource::partitioner make_partitioner(
-            resource::partitioner_mode rpmode,
-            hpx::util::runtime_configuration rtcfg,
+            resource::partitioner_mode rpmode, hpx::util::section rtcfg,
             hpx::threads::policies::detail::affinity_data affinity_data);
     }
 
@@ -136,12 +134,10 @@ namespace hpx { namespace resource {
     {
     private:
         friend ::hpx::resource::partitioner detail::make_partitioner(
-            resource::partitioner_mode rpmode,
-            hpx::util::runtime_configuration rtcfg,
+            resource::partitioner_mode rpmode, hpx::util::section rtcfg,
             hpx::threads::policies::detail::affinity_data affinity_data);
 
-        partitioner(resource::partitioner_mode rpmode,
-            hpx::util::runtime_configuration rtcfg,
+        partitioner(resource::partitioner_mode rpmode, hpx::util::section rtcfg,
             hpx::threads::policies::detail::affinity_data affinity_data)
           : partitioner_(
                 detail::create_partitioner(rpmode, rtcfg, affinity_data))
@@ -208,8 +204,7 @@ namespace hpx { namespace resource {
 
     namespace detail {
         ::hpx::resource::partitioner make_partitioner(
-            resource::partitioner_mode rpmode,
-            hpx::util::runtime_configuration rtcfg,
+            resource::partitioner_mode rpmode, hpx::util::section rtcfg,
             hpx::threads::policies::detail::affinity_data affinity_data)
         {
             return ::hpx::resource::partitioner(rpmode, rtcfg, affinity_data);

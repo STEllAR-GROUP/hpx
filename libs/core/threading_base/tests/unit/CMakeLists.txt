@@ -6,12 +6,6 @@
 
 set(tests)
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests} set_thread_state)
-endif()
-
-set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
-
 foreach(test ${tests})
   set(sources ${test}.cpp)
 

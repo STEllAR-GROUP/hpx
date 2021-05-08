@@ -74,10 +74,10 @@ namespace hpx {
 
         /// Construct a new HPX runtime instance
         explicit runtime(
-            util::runtime_configuration& rtcfg, bool initialize = true);
+            hpx::util::runtime_configuration& rtcfg, bool initialize = true);
 
     protected:
-        runtime(util::runtime_configuration& rtcfg,
+        runtime(hpx::util::runtime_configuration& rtcfg,
             notification_policy_type&& notifier,
             notification_policy_type&& main_pool_notifier,
 #ifdef HPX_HAVE_IO_POOL
@@ -86,10 +86,8 @@ namespace hpx {
 #ifdef HPX_HAVE_TIMER_POOL
             notification_policy_type&& timer_pool_notifier,
 #endif
-#ifdef HPX_HAVE_NETWORKING
             threads::detail::network_background_callback_type
                 network_background_callback,
-#endif
             bool initialize);
 
         /// Common initialization for different constructors
@@ -113,9 +111,9 @@ namespace hpx {
         bool stopped() const;
 
         /// \brief access configuration information
-        util::runtime_configuration& get_config();
+        hpx::util::runtime_configuration& get_config();
 
-        util::runtime_configuration const& get_config() const;
+        hpx::util::runtime_configuration const& get_config() const;
 
         std::size_t get_instance_number() const;
 
@@ -411,7 +409,7 @@ namespace hpx {
         on_exit_type on_exit_functions_;
         mutable std::mutex mtx_;
 
-        util::runtime_configuration rtcfg_;
+        hpx::util::runtime_configuration rtcfg_;
 
         long instance_number_;
         static std::atomic<int> instance_number_counter_;
@@ -492,6 +490,8 @@ namespace hpx {
         bool stop_done_;
         std::condition_variable wait_condition_;
     };
+
+    void set_error_handlers();
 
     namespace util {
         ///////////////////////////////////////////////////////////////////////////

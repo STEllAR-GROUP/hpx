@@ -7,11 +7,6 @@
 set(benchmarks serialization_performance)
 set(serialization_performance_PARAMETERS 100)
 
-if(HPX_WITH_NETWORKING)
-  set(benchmarks ${benchmarks} serialization_overhead)
-  set(serialization_overhead_FLAGS DEPENDENCIES iostreams_component)
-endif()
-
 foreach(benchmark ${benchmarks})
   set(sources ${benchmark}.cpp)
 

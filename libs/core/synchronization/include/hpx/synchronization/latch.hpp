@@ -33,7 +33,7 @@ namespace hpx { namespace lcos { namespace local {
         HPX_NON_COPYABLE(cpp20_latch);
 
     protected:
-        typedef lcos::local::spinlock mutex_type;
+        using mutex_type = lcos::local::spinlock;
 
     public:
         /// Initialize the latch
@@ -96,7 +96,17 @@ namespace hpx { namespace lcos { namespace local {
             {
                 std::unique_lock<mutex_type> l(mtx_.data_);
                 notified_ = true;
-                cond_.data_.notify_all(std::move(l));    // release the threads
+
+                // Note: we use notify_one repeatedly instead of notify_all as we
+                // know that our implementation of condition_variable::notify_one
+                // relinquishes the lock before resuming the waiting thread
+                // which avoids suspension of this thread when it tries to
+                // re-lock the mutex while exiting from condition_variable::wait
+                while (cond_.data_.notify_one(
+                    std::move(l), threads::thread_priority::boost))
+                {
+                    l = std::unique_lock<mutex_type>(mtx_.data_);
+                }
             }
         }
 
@@ -119,6 +129,9 @@ namespace hpx { namespace lcos { namespace local {
             if (counter_.load(std::memory_order_relaxed) > 0 || !notified_)
             {
                 cond_.data_.wait(l, "hpx::local::cpp20_latch::wait");
+
+                HPX_ASSERT(counter_.load(std::memory_order_relaxed) == 0);
+                HPX_ASSERT(notified_);
             }
         }
 
@@ -131,18 +144,32 @@ namespace hpx { namespace lcos { namespace local {
 
             std::unique_lock<mutex_type> l(mtx_.data_);
 
-            std::ptrdiff_t new_count = (counter_ -= update);
-            HPX_ASSERT(new_count >= 0);
+            std::ptrdiff_t old_count =
+                counter_.fetch_sub(update, std::memory_order_relaxed);
+            HPX_ASSERT(old_count >= update);
 
-            if (new_count == 0)
-            {
-                notified_ = true;
-                cond_.data_.notify_all(std::move(l));    // release the threads
-            }
-            else
+            if (old_count > update)
             {
                 cond_.data_.wait(
                     l, "hpx::local::cpp20_latch::count_down_and_wait");
+
+                HPX_ASSERT(counter_.load(std::memory_order_relaxed) == 0);
+                HPX_ASSERT(notified_);
+            }
+            else
+            {
+                notified_ = true;
+
+                // Note: we use notify_one repeatedly instead of notify_all as we
+                // know that our implementation of condition_variable::notify_one
+                // relinquishes the lock before resuming the waiting thread
+                // which avoids suspension of this thread when it tries to
+                // re-lock the mutex while exiting from condition_variable::wait
+                while (cond_.data_.notify_one(
+                    std::move(l), threads::thread_priority::boost))
+                {
+                    l = std::unique_lock<mutex_type>(mtx_.data_);
+                }
             }
         }
 

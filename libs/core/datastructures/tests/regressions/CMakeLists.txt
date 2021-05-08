@@ -6,10 +6,6 @@
 
 set(tests optional_swap_3200)
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests} tuple_serialization_803)
-endif()
-
 foreach(test ${tests})
   set(sources ${test}.cpp)
 

@@ -23,10 +23,6 @@ set(resource_partitioner_compat_headers
 
 set(resource_partitioner_sources detail_partitioner.cpp partitioner.cpp)
 
-if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
-  set(MPI_DEPS hpx_mpi_base)
-endif()
-
 include(HPX_AddModule)
 add_hpx_module(
   full resource_partitioner
@@ -36,6 +32,5 @@ add_hpx_module(
   COMPAT_HEADERS ${resource_partitioner_compat_headers}
   DEPENDENCIES hpx_core hpx_parallelism
   MODULE_DEPENDENCIES hpx_command_line_handling hpx_runtime_configuration
-                      ${MPI_DEPS}
   CMAKE_SUBDIRS examples tests
 )

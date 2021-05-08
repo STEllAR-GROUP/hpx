@@ -45,7 +45,9 @@ The first example is straight serial code. In this code we instantiate a vector
 ``stepper``.
 
 .. literalinclude:: ../../examples/1d_stencil/1d_stencil_1.cpp
-   :lines: 32-75
+   :language: c++
+   :start-after: //[stepper_1
+   :end-before: //]
 
 Each element in the vector of doubles represents a single grid point. To
 calculate the change in heat distribution, the temperature of each grid point,
@@ -64,7 +66,9 @@ and adding a ``.get()`` at the point where a value is actually needed. The code
 below shows how this technique was applied to the ``struct stepper``.
 
 .. literalinclude:: ../../examples/1d_stencil/1d_stencil_2.cpp
-   :lines: 51-107
+   :language: c++
+   :start-after: //[stepper_2
+   :end-before: //]
 
 In example 2, we redefine our partition type as a ``shared_future`` and, in
 ``main``, create the object ``result``, which is a future to a vector of
@@ -166,7 +170,9 @@ is accomplished in ``stepper::do_work()`` by passing the GID of the
 constructor.
 
 .. literalinclude:: ../../examples/1d_stencil/1d_stencil_6.cpp
-   :lines: 328-329
+   :language: c++
+   :start-after: //[do_work_6
+   :end-before: //]
 
 We distribute the partitions evenly based on the number of localities used,
 which is described in the function ``locidx``. Because some of the data needed
@@ -188,7 +194,9 @@ on the middle partition with that of the possibly remote call of ``get_data()``.
 This algorithmic change, which was implemented in example 7, can be seen below:
 
 .. literalinclude:: ../../examples/1d_stencil/1d_stencil_7.cpp
-   :lines: 257-310
+   :language: c++
+   :start-after: //[stepper_7
+   :end-before: //]
 
 Example 8 completes the futurization process and utilizes the full potential of
 |hpx| by distributing the program flow to multiple localities, usually defined as

@@ -124,37 +124,49 @@ template argument passed to locking_hook is used as its base class). The
 following snippet shows the corresponding code:
 
 .. literalinclude:: ../../examples/accumulators/server/accumulator.hpp
-   :lines: 45-47
+   :language: c++
+   :start-after: //[accumulator_server_inherit
+   :end-before: //]
 
 Our accumulator class will need a data member to store its value in, so let's
 declare a data member:
 
 .. literalinclude:: ../../examples/accumulators/server/accumulator.hpp
-   :lines: 95
+   :language: c++
+   :start-after: //[accumulator_server_data_member
+   :end-before: //]
 
 The constructor for this class simply initializes ``value_`` to 0:
 
 .. literalinclude:: ../../examples/accumulators/server/accumulator.hpp
-   :lines: 54
+   :language: c++
+   :start-after: //[accumulator_server_ctor
+   :end-before: //]
 
 Next, let's look at the three methods of this component that we will be exposing
 as component actions:
 
 .. literalinclude:: ../../examples/accumulators/server/accumulator.hpp
-   :lines: 61-80
+   :language: c++
+   :start-after: //[accumulator_components
+   :end-before: //]
 
 Here are the action types. These types wrap the methods we're exposing. The
 wrapping technique is very similar to the one used in the
 :ref:`examples_fibonacci` and the :ref:`examples_hello_world`:
 
 .. literalinclude:: ../../examples/accumulators/server/accumulator.hpp
-   :lines: 88-90
+   :language: c++
+   :start-after: //[accumulator_action_types
+   :end-before: //]
 
 The last piece of code in the server class header is the declaration of the
 action type registration code:
 
 .. literalinclude:: ../../examples/accumulators/server/accumulator.hpp
-   :lines: 101-111
+   :language: c++
+   :start-after: //[accumulator_registration_declarations
+   :end-before: //]
 
 .. note::
 
@@ -164,7 +176,10 @@ The rest of the registration code is in
 :download:`accumulator.cpp <../../examples/accumulators/accumulator.cpp>`
 
 .. literalinclude:: ../../examples/accumulators/accumulator.cpp
-   :lines: 13-34
+   :language: c++
+   :start-after: //[accumulator_registration_definitions
+   :end-before: //]
+
 
 .. note::
 
@@ -190,12 +205,16 @@ Clients, like servers, need to inherit from a base class, this time,
 :cpp:class:`hpx::components::client_base`:
 
 .. literalinclude:: ../../examples/accumulators/accumulator.hpp
-   :lines: 22-25
+   :language: c++
+   :start-after: //[accumulator_client_inherit
+   :end-before: //]
 
 For readability, we typedef the base class like so:
 
 .. literalinclude:: ../../examples/accumulators/accumulator.hpp
-   :lines: 29-31
+   :language: c++
+   :start-after: //[accumulator_base_type
+   :end-before: //]
 
 Here are examples of how to expose actions through a client class:
 
@@ -208,7 +227,9 @@ There are a few different ways of invoking actions:
   We use :cpp:func:`hpx::apply` to invoke an action in a non-blocking fashion.
 
 .. literalinclude:: ../../examples/accumulators/accumulator.hpp
-   :lines: 59-65
+   :language: c++
+   :start-after: //[accumulator_client_reset_non_blocking
+   :end-before: //]
 
 * **Asynchronous**: Futures, as demonstrated in :ref:`examples_fibonacci_local`,
   :ref:`examples_fibonacci`, and the :ref:`examples_hello_world`, enable
@@ -216,7 +237,9 @@ There are a few different ways of invoking actions:
   class:
 
 .. literalinclude:: ../../examples/accumulators/accumulator.hpp
-   :lines: 115-121
+   :language: c++
+   :start-after: //[accumulator_client_query_async
+   :end-before: //]
 
 * **Synchronous**: To invoke an action in a fully synchronous manner, we can
   simply call :cpp:func:`hpx::async`\ ``().get()`` (i.e., create a future and
@@ -224,7 +247,9 @@ There are a few different ways of invoking actions:
   client class:
 
 .. literalinclude:: ../../examples/accumulators/accumulator.hpp
-   :lines: 97-103
+   :language: c++
+   :start-after: //[accumulator_client_add_sync
+   :end-before: //]
 
 Note that ``this->get_id()`` references a data member of the
 :cpp:class:`hpx::components::client_base` base class which identifies the server

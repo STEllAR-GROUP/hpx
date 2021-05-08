@@ -19,6 +19,7 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/create_component.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/ini/ini.hpp>
 #include <hpx/lcos_local/packaged_task.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/collectives.hpp>
@@ -34,7 +35,6 @@
 #include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_configuration/component_commandline_base.hpp>
 #include <hpx/runtime_configuration/component_factory_base.hpp>
-#include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>

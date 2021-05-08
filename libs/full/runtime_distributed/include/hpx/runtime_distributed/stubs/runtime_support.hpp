@@ -11,9 +11,9 @@
 #include <hpx/async_colocated/async_colocated_fwd.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/type_support/decay.hpp>

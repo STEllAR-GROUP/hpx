@@ -24,7 +24,6 @@
 #include <hpx/topology/cpu_mask.hpp>
 //
 #include <hpx/include/runtime.hpp>
-#include <hpx/iostream.hpp>
 //
 #include <hpx/modules/testing.hpp>
 //

@@ -81,6 +81,7 @@ namespace hpx {
 #include <array>
 #include <cstddef>
 #include <exception>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -195,6 +196,24 @@ namespace hpx { namespace lcos {
         {
             return hpx::make_tuple(extract_nth_future<Is>(f)...);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+#if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE)
+        template <typename... Ts, std::size_t... Is>
+        HPX_FORCEINLINE std::tuple<hpx::future<Ts>...> split_future_helper(
+            hpx::future<std::tuple<Ts...>>&& f, hpx::util::index_pack<Is...>)
+        {
+            return std::make_tuple(extract_nth_future<Is>(f)...);
+        }
+
+        template <typename... Ts, std::size_t... Is>
+        HPX_FORCEINLINE std::tuple<hpx::future<Ts>...> split_future_helper(
+            hpx::shared_future<std::tuple<Ts...>>&& f,
+            hpx::util::index_pack<Is...>)
+        {
+            return std::make_tuple(extract_nth_future<Is>(f)...);
+        }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T1, typename T2>
@@ -341,6 +360,37 @@ namespace hpx { namespace lcos {
     {
         return hpx::make_tuple(hpx::make_future<void>(std::move(f)));
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE)
+    template <typename... Ts>
+    HPX_FORCEINLINE std::tuple<hpx::future<Ts>...> split_future(
+        hpx::future<std::tuple<Ts...>>&& f)
+    {
+        return detail::split_future_helper(std::move(f),
+            typename hpx::util::make_index_pack<sizeof...(Ts)>::type());
+    }
+
+    HPX_FORCEINLINE std::tuple<hpx::future<void>> split_future(
+        hpx::future<std::tuple<>>&& f)
+    {
+        return std::make_tuple(hpx::future<void>(std::move(f)));
+    }
+
+    template <typename... Ts>
+    HPX_FORCEINLINE std::tuple<hpx::future<Ts>...> split_future(
+        hpx::shared_future<std::tuple<Ts...>>&& f)
+    {
+        return detail::split_future_helper(std::move(f),
+            typename hpx::util::make_index_pack<sizeof...(Ts)>::type());
+    }
+
+    HPX_FORCEINLINE std::tuple<hpx::future<void>> split_future(
+        hpx::shared_future<std::tuple<>>&& f)
+    {
+        return std::make_tuple(hpx::make_future<void>(std::move(f)));
+    }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T1, typename T2>

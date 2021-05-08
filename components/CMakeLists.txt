@@ -10,6 +10,10 @@ include(HPX_Message)
 include(HPX_AddPseudoDependencies)
 include(HPX_AddPseudoTarget)
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
 # Variable used to add the components to the pkgconfig linking step
 set(HPX_COMPONENTS
     ""

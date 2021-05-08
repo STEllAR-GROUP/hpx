@@ -22,6 +22,10 @@ set(tests
     transform_inclusive_scan_4787
 )
 
+if(HPX_WITH_DATAPAR_VC)
+  list(APPEND tests for_each_datapar)
+endif()
+
 foreach(test ${tests})
   set(sources ${test}.cpp)
 

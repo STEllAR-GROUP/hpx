@@ -6,11 +6,11 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
@@ -190,13 +190,13 @@ int hpx_main()
         }
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 void test_scheduler(
     int argc, char* argv[], hpx::resource::scheduling_policy scheduler)
 {
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.cfg = {"hpx.os_threads=4"};
     init_args.rp_callback = [scheduler](auto& rp,
                                 hpx::program_options::variables_map const&) {
@@ -206,7 +206,7 @@ void test_scheduler(
                 hpx::threads::policies::enable_elasticity));
     };
 
-    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
+    HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);
 }
 
 int main(int argc, char* argv[])

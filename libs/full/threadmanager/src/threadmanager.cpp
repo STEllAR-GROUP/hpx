@@ -59,7 +59,7 @@ namespace hpx { namespace threads {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    threadmanager::threadmanager(util::runtime_configuration& rtcfg,
+    threadmanager::threadmanager(hpx::util::runtime_configuration& rtcfg,
 #ifdef HPX_HAVE_TIMER_POOL
         util::io_service_pool& timer_pool,
 #endif

@@ -12,7 +12,6 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
-#include <hpx/iostream.hpp>
 
 #include <hpx/executors/parallel_executor_aggregated.hpp>
 
@@ -21,6 +20,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iomanip>
+#include <iostream>
 #include <iterator>
 #include <memory>
 #include <numeric>
@@ -459,11 +459,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // verify that input is within domain of program
     if (test_count == 0 || test_count < 0)
     {
-        hpx::cout << "test_count cannot be zero or negative...\n" << hpx::flush;
+        std::cout << "test_count cannot be zero or negative...\n" << std::flush;
     }
     else if (delay < 0)
     {
-        hpx::cout << "delay cannot be a negative number...\n" << hpx::flush;
+        std::cout << "delay cannot be a negative number...\n" << std::flush;
     }
     else
     {
@@ -569,16 +569,16 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         if (csvoutput)
         {
-            hpx::cout << "," << seq_time_foreach / 1e9 << ","
+            std::cout << "," << seq_time_foreach / 1e9 << ","
                       << par_time_foreach / 1e9 << ","
                       << task_time_foreach / 1e9 << "\n"
-                      << hpx::flush;
+                      << std::flush;
         }
         else
         {
             // print results(Formatted). setw(x) assures that all output is
             // right justified
-            hpx::cout << std::left
+            std::cout << std::left
                       << "----------------Parameters---------------------\n"
                       << std::left
                       << "Vector size                       : " << std::right
@@ -592,9 +592,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
                       << std::left
                       << "Display time in                   : " << std::right
                       << std::setw(8) << "Seconds\n"
-                      << hpx::flush;
+                      << std::flush;
 
-            hpx::cout << "-------------Average-(for)---------------------\n"
+            std::cout << "-------------Average-(for)---------------------\n"
                       << std::left
                       << "Average execution time (unrolled) : " << std::right
                       << std::setw(8) << plain_time_for / 1e9 << "\n"
@@ -602,7 +602,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                       << "Average execution time (iter)     : " << std::right
                       << std::setw(8) << plain_time_for_iter / 1e9 << "\n";
 
-            hpx::cout << "-------------Average-(for_each)----------------\n"
+            std::cout << "-------------Average-(for_each)----------------\n"
                       << std::left
                       << "Average parallel execution time   : " << std::right
                       << std::setw(8) << par_time_foreach / 1e9 << "\n"
@@ -612,9 +612,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
                       << std::left
                       << "Average sequential execution time : " << std::right
                       << std::setw(8) << seq_time_foreach / 1e9 << "\n"
-                      << hpx::flush;
+                      << std::flush;
 
-            hpx::cout << "-----Execution Time Difference-(for_each)------\n"
+            std::cout << "-----Execution Time Difference-(for_each)------\n"
                       << std::left
                       << "Parallel Scale                    : " << std::right
                       << std::setw(8)
@@ -623,9 +623,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
                       << "Task Scale                        : " << std::right
                       << std::setw(8)
                       << (double(seq_time_foreach) / task_time_foreach) << "\n"
-                      << hpx::flush;
+                      << std::flush;
 
-            hpx::cout << "-------------Average-(for_loop)----------------\n"
+            std::cout << "-------------Average-(for_loop)----------------\n"
                       << std::left
                       << "Average parallel execution time   : " << std::right
                       << std::setw(8) << par_time_forloop / 1e9 << "\n"
@@ -635,9 +635,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
                       << std::left
                       << "Average sequential execution time : " << std::right
                       << std::setw(8) << seq_time_forloop / 1e9 << "\n"
-                      << hpx::flush;
+                      << std::flush;
 
-            hpx::cout << "-----Execution Time Difference-(for_loop)------\n"
+            std::cout << "-----Execution Time Difference-(for_loop)------\n"
                       << std::left
                       << "Parallel Scale                    : " << std::right
                       << std::setw(8)
