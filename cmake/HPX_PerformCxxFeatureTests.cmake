@@ -47,6 +47,10 @@ function(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE
   )
 
+  hpx_check_for_cxx17_nodiscard_attribute(
+    DEFINITIONS HPX_HAVE_CXX17_NODISCARD_ATTRIBUTE
+  )
+
   hpx_check_for_cxx17_hardware_destructive_interference_size(
     DEFINITIONS HPX_HAVE_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE
   )
