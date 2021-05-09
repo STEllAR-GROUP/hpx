@@ -186,36 +186,74 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 },
                 std::move(segments)));
         }
-
-        ///////////////////////////////////////////////////////////////////////
-        // segmented implementation
-        template <typename ExPolicy, typename InIterB, typename InIterE,
-            typename T, typename F>
-        typename util::detail::algorithm_result<ExPolicy, T>::type reduce_(
-            ExPolicy&& policy, InIterB first, InIterE last, T init, F&& f,
-            std::true_type)
-        {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-            typedef typename std::decay<T>::type init_type;
-
-            if (first == last)
-            {
-                return util::detail::algorithm_result<ExPolicy, init_type>::get(
-                    std::forward<T>(init));
-            }
-
-            return segmented_reduce(seg_reduce<init_type>(),
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(init), std::forward<F>(f), is_seq());
-        }
-
-        // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename InIterB, typename InIterE,
-            typename T, typename F>
-        typename util::detail::algorithm_result<ExPolicy, T>::type reduce_(
-            ExPolicy&& policy, InIterB first, InIterE last, T init, F&& f,
-            std::false_type);
-
         /// \endcond
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1
+
+// The segmented iterators we support all live in namespace hpx::segmented
+namespace hpx { namespace segmented {
+
+    // clang-format off
+    template <typename InIterB, typename InIterE,
+        typename T, typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_iterator<InIterB>::value &&
+            hpx::traits::is_segmented_iterator<InIterB>::value &&
+            hpx::traits::is_iterator<InIterE>::value &&
+            hpx::traits::is_segmented_iterator<InIterE>::value
+        )>
+    // clang-format on
+    T tag_invoke(hpx::reduce_t, InIterB first, InIterE last, T init, F&& f)
+    {
+        static_assert(hpx::traits::is_input_iterator<InIterB>::value,
+            "Requires at least input iterator.");
+
+        static_assert(hpx::traits::is_input_iterator<InIterE>::value,
+            "Requires at least input iterator.");
+
+        if (first == last)
+        {
+            return std::forward<T>(init);
+        }
+
+        return hpx::parallel::v1::detail::segmented_reduce(
+            hpx::parallel::v1::detail::seg_reduce<T>(), hpx::execution::seq,
+            first, last, std::forward<T>(init), std::forward<F>(f),
+            std::true_type{});
+    }
+
+    // clang-format off
+    template <typename ExPolicy, typename InIterB, typename InIterE,
+        typename T, typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<InIterB>::value &&
+            hpx::traits::is_segmented_iterator<InIterB>::value &&
+            hpx::traits::is_iterator<InIterE>::value &&
+            hpx::traits::is_segmented_iterator<InIterE>::value
+        )>
+    // clang-format on
+    typename parallel::util::detail::algorithm_result<ExPolicy, T>::type
+    tag_invoke(hpx::reduce_t, ExPolicy&& policy, InIterB first, InIterE last,
+        T init, F&& f)
+    {
+        static_assert(hpx::traits::is_input_iterator<InIterB>::value,
+            "Requires at least input iterator.");
+
+        static_assert(hpx::traits::is_input_iterator<InIterE>::value,
+            "Requires at least input iterator.");
+
+        if (first == last)
+        {
+            return parallel::util::detail::algorithm_result<ExPolicy, T>::get(
+                std::forward<T>(init));
+        }
+
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        return hpx::parallel::v1::detail::segmented_reduce(
+            hpx::parallel::v1::detail::seg_reduce<T>(),
+            std::forward<ExPolicy>(policy), first, last, std::forward<T>(init),
+            std::forward<F>(f), is_seq());
+    }
+}}    // namespace hpx::segmented

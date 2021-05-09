@@ -430,7 +430,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::reduce
     HPX_INLINE_CONSTEXPR_VARIABLE struct reduce_t final
-      : hpx::functional::tag<reduce_t>
+      : hpx::functional::tag_fallback<reduce_t>
     {
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Sent,
@@ -442,14 +442,15 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_invoke(hpx::ranges::reduce_t, ExPolicy&& policy, FwdIter first,
-            Sent last, T init, F&& f)
+        tag_fallback_invoke(hpx::ranges::reduce_t, ExPolicy&& policy,
+            FwdIter first, Sent last, T init, F&& f)
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
+            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+                "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::reduce_(
+            return hpx::parallel::v1::detail::reduce<T>().call(
                 std::forward<ExPolicy>(policy), first, last, std::move(init),
-                std::forward<F>(f), is_segmented{});
+                std::forward<F>(f));
         }
 
         // clang-format off
@@ -461,16 +462,17 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_invoke(
+        tag_fallback_invoke(
             hpx::ranges::reduce_t, ExPolicy&& policy, Rng&& rng, T init, F&& f)
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<
-                typename hpx::traits::range_traits<Rng>::iterator_type>;
+            static_assert(
+                hpx::traits::is_forward_iterator<typename hpx::traits::
+                        range_traits<Rng>::iterator_type>::value,
+                "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::reduce_(
+            return hpx::parallel::v1::detail::reduce<T>().call(
                 std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), std::move(init), std::forward<F>(f),
-                is_segmented{});
+                hpx::util::end(rng), std::move(init), std::forward<F>(f));
         }
 
         // clang-format off
@@ -483,14 +485,15 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_invoke(hpx::ranges::reduce_t, ExPolicy&& policy, FwdIter first,
-            Sent last, T init)
+        tag_fallback_invoke(hpx::ranges::reduce_t, ExPolicy&& policy,
+            FwdIter first, Sent last, T init)
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
+            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+                "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::reduce_(
+            return hpx::parallel::v1::detail::reduce<T>().call(
                 std::forward<ExPolicy>(policy), first, last, std::move(init),
-                std::plus<T>{}, is_segmented{});
+                std::plus<T>{});
         }
 
         // clang-format off
@@ -502,15 +505,17 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_invoke(hpx::ranges::reduce_t, ExPolicy&& policy, Rng&& rng, T init)
+        tag_fallback_invoke(
+            hpx::ranges::reduce_t, ExPolicy&& policy, Rng&& rng, T init)
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<
-                typename hpx::traits::range_traits<Rng>::iterator_type>;
+            static_assert(
+                hpx::traits::is_forward_iterator<typename hpx::traits::
+                        range_traits<Rng>::iterator_type>::value,
+                "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::reduce_(
+            return hpx::parallel::v1::detail::reduce<T>().call(
                 std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), std::move(init), std::plus<T>{},
-                is_segmented{});
+                hpx::util::end(rng), std::move(init), std::plus<T>{});
         }
 
         // clang-format off
@@ -522,17 +527,18 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<FwdIter>::value_type>::type
-        tag_invoke(
+        tag_fallback_invoke(
             hpx::ranges::reduce_t, ExPolicy&& policy, FwdIter first, Sent last)
         {
+            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+                "Requires at least forward iterator.");
+
             using value_type =
                 typename std::iterator_traits<FwdIter>::value_type;
 
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
-
-            return hpx::parallel::v1::detail::reduce_(
+            return hpx::parallel::v1::detail::reduce<value_type>().call(
                 std::forward<ExPolicy>(policy), first, last, value_type{},
-                std::plus<value_type>{}, is_segmented{});
+                std::plus<value_type>{});
         }
 
         // clang-format off
@@ -545,19 +551,20 @@ namespace hpx { namespace ranges {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<typename hpx::traits::range_traits<
                 Rng>::iterator_type>::value_type>::type
-        tag_invoke(hpx::ranges::reduce_t, ExPolicy&& policy, Rng&& rng)
+        tag_fallback_invoke(hpx::ranges::reduce_t, ExPolicy&& policy, Rng&& rng)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
             using value_type =
                 typename std::iterator_traits<iterator_type>::value_type;
-            using is_segmented =
-                hpx::traits::is_segmented_iterator<iterator_type>;
 
-            return hpx::parallel::v1::detail::reduce_(
+            static_assert(
+                hpx::traits::is_forward_iterator<iterator_type>::value,
+                "Requires at least forward iterator.");
+
+            return hpx::parallel::v1::detail::reduce<value_type>().call(
                 std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), value_type{}, std::plus<value_type>{},
-                is_segmented{});
+                hpx::util::end(rng), value_type{}, std::plus<value_type>{});
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -567,14 +574,15 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value
             )>
         // clang-format on
-        friend T tag_invoke(
+        friend T tag_fallback_invoke(
             hpx::ranges::reduce_t, FwdIter first, Sent last, T init, F&& f)
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
+            static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
+                "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::reduce_(hpx::execution::seq,
-                first, last, std::move(init), std::forward<F>(f),
-                is_segmented{});
+            return hpx::parallel::v1::detail::reduce<T>().call(
+                hpx::execution::seq, first, last, std::move(init),
+                std::forward<F>(f));
         }
 
         // clang-format off
@@ -583,14 +591,16 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend T tag_invoke(hpx::ranges::reduce_t, Rng&& rng, T init, F&& f)
+        friend T tag_fallback_invoke(
+            hpx::ranges::reduce_t, Rng&& rng, T init, F&& f)
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<
-                typename hpx::traits::range_traits<Rng>::iterator_type>;
+            static_assert(hpx::traits::is_input_iterator<typename hpx::traits::
+                                  range_traits<Rng>::iterator_type>::value,
+                "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::reduce_(hpx::execution::seq,
-                hpx::util::begin(rng), hpx::util::end(rng), std::move(init),
-                std::forward<F>(f), is_segmented{});
+            return hpx::parallel::v1::detail::reduce<T>().call(
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                std::move(init), std::forward<F>(f));
         }
 
         // clang-format off
@@ -600,13 +610,15 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value
             )>
         // clang-format on
-        friend T tag_invoke(
+        friend T tag_fallback_invoke(
             hpx::ranges::reduce_t, FwdIter first, Sent last, T init)
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
+            static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
+                "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::reduce_(hpx::execution::seq,
-                first, last, std::move(init), std::plus<T>{}, is_segmented{});
+            return hpx::parallel::v1::detail::reduce<T>().call(
+                hpx::execution::seq, first, last, std::move(init),
+                std::plus<T>{});
         }
 
         // clang-format off
@@ -615,14 +627,15 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend T tag_invoke(hpx::ranges::reduce_t, Rng&& rng, T init)
+        friend T tag_fallback_invoke(hpx::ranges::reduce_t, Rng&& rng, T init)
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<
-                typename hpx::traits::range_traits<Rng>::iterator_type>;
+            static_assert(hpx::traits::is_input_iterator<typename hpx::traits::
+                                  range_traits<Rng>::iterator_type>::value,
+                "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::reduce_(hpx::execution::seq,
-                hpx::util::begin(rng), hpx::util::end(rng), std::move(init),
-                std::plus<T>{}, is_segmented{});
+            return hpx::parallel::v1::detail::reduce<T>().call(
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                std::move(init), std::plus<T>{});
         }
 
         // clang-format off
@@ -631,17 +644,18 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value
             )>
         // clang-format on
-        friend typename std::iterator_traits<FwdIter>::value_type tag_invoke(
-            hpx::ranges::reduce_t, FwdIter first, Sent last)
+        friend typename std::iterator_traits<FwdIter>::value_type
+        tag_fallback_invoke(hpx::ranges::reduce_t, FwdIter first, Sent last)
         {
+            static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
+                "Requires at least input iterator.");
+
             using value_type =
                 typename std::iterator_traits<FwdIter>::value_type;
 
-            using is_segmented = hpx::traits::is_segmented_iterator<FwdIter>;
-
-            return hpx::parallel::v1::detail::reduce_(hpx::execution::seq,
-                first, last, value_type{}, std::plus<value_type>{},
-                is_segmented{});
+            return hpx::parallel::v1::detail::reduce<value_type>().call(
+                hpx::execution::seq, first, last, value_type{},
+                std::plus<value_type>{});
         }
 
         // clang-format off
@@ -652,18 +666,19 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename std::iterator_traits<
             typename hpx::traits::range_traits<Rng>::iterator_type>::value_type
-        tag_invoke(hpx::ranges::reduce_t, Rng&& rng)
+        tag_fallback_invoke(hpx::ranges::reduce_t, Rng&& rng)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
             using value_type =
                 typename std::iterator_traits<iterator_type>::value_type;
-            using is_segmented =
-                hpx::traits::is_segmented_iterator<iterator_type>;
 
-            return hpx::parallel::v1::detail::reduce_(hpx::execution::seq,
-                hpx::util::begin(rng), hpx::util::end(rng), value_type{},
-                std::plus<value_type>{}, is_segmented{});
+            static_assert(hpx::traits::is_input_iterator<iterator_type>::value,
+                "Requires at least input iterator.");
+
+            return hpx::parallel::v1::detail::reduce<value_type>().call(
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                value_type{}, std::plus<value_type>{});
         }
     } reduce{};
 }}    // namespace hpx::ranges
