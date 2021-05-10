@@ -213,10 +213,11 @@ function(add_hpx_library name)
   endif()
 
   # Manage files with .cu extension in case When Cuda Clang is used
-  if(HPX_WITH_CUDA_CLANG OR HPX_WITH_HIP)
+  if(HPX_WITH_CLANG_CUDA OR HPX_WITH_HIP)
     foreach(source ${${name}_SOURCES})
       get_filename_component(extension ${source} EXT)
       if(${extension} STREQUAL ".cu")
+        # TODO: Necessary for clang?
         set_source_files_properties(${source} PROPERTIES LANGUAGE CXX)
       endif()
     endforeach()

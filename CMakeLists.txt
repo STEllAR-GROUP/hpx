@@ -622,11 +622,6 @@ if(HPX_WITH_CUDA AND HPX_WITH_HIP)
   )
 endif()
 
-hpx_option(
-  HPX_WITH_CUDA_CLANG BOOL "Use clang to compile CUDA code (default: OFF)" OFF
-  ADVANCED
-)
-
 # ##############################################################################
 # pkgconfig file generation
 # ##############################################################################

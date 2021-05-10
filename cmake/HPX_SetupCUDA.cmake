@@ -6,10 +6,8 @@
 
 if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
 
-  if(HPX_WITH_CUDA_CLANG AND NOT (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
-    hpx_error(
-      "To use Cuda Clang, please select Clang as your default C++ compiler"
-    )
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(HPX_WITH_CLANG_CUDA ON)
   endif()
 
   # cuda_std_17 not recognized for previous versions
@@ -56,7 +54,7 @@ if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
     Cuda::cuda PROPERTIES INTERFACE_POSITION_INDEPENDENT_CODE ON
   )
 
-  if(NOT HPX_WITH_CUDA_CLANG)
+  if(NOT HPX_WITH_CLANG_CUDA)
     if(NOT MSVC)
       target_compile_options(
         Cuda::cuda INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:-w>
