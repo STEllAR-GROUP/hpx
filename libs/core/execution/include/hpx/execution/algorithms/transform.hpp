@@ -98,9 +98,8 @@ namespace hpx { namespace execution { namespace experimental {
             struct invoke_result_helper<Tuple<Ts...>>
             {
                 using result_type = hpx::util::invoke_result_t<F, Ts...>;
-                using type =
-                    typename std::conditional<std::is_void<result_type>::value,
-                        Tuple<>, Tuple<result_type>>::type;
+                using type = std::conditional_t<std::is_void<result_type>::value,
+                        Tuple<>, Tuple<result_type>>;
             };
 
             template <template <typename...> class Tuple,

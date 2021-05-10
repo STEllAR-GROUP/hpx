@@ -8,19 +8,40 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors/exception.hpp>
+#include <hpx/mpi_base/mpi.hpp>
 
+#include <cstddef>
+#include <memory>
 #include <string>
 
-namespace hpx { namespace mpi { namespace experimental {
+namespace hpx::mpi::experimental {
+
+    namespace detail {
+
+        // extract MPI error message
+        std::string error_message(int code)
+        {
+            int N = 1023;
+            std::unique_ptr<char[]> err_buff(new char[std::size_t(N) + 1]);
+            err_buff[0] = '\0';
+
+            MPI_Error_string(code, err_buff.get(), &N);
+
+            return err_buff.get();
+        }
+
+    }    // namespace detail
 
     // -------------------------------------------------------------------------
     // exception type for failed launch of MPI functions
     struct HPX_EXPORT mpi_exception : hpx::exception
     {
-        mpi_exception(const std::string& msg, int err_code)
-          : hpx::exception(hpx::bad_function_call, msg)
-          , err_code_(err_code)
+        mpi_exception(int err_code, const std::string& msg = "")
+          : err_code_(err_code)
         {
+            hpx::exception(hpx::bad_function_call,
+                msg + std::string(" MPI returned with error: ") +
+                    detail::error_message(err_code));
         }
 
         int get_mpi_errorcode()
@@ -32,4 +53,4 @@ namespace hpx { namespace mpi { namespace experimental {
         int err_code_;
     };
 
-}}}    // namespace hpx::mpi::experimental
+}    // namespace hpx::mpi::experimental
