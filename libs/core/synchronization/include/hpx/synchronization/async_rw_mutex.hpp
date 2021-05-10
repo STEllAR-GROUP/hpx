@@ -545,9 +545,9 @@ namespace hpx { namespace experimental {
             typename = std::enable_if_t<
                 !std::is_same<std::decay_t<U>, async_rw_mutex>::value>>
         explicit async_rw_mutex(U&& u, allocator_type const& alloc = {})
-          : alloc(alloc)
+          : value(std::forward<U>(u))
+          , alloc(alloc)
         {
-            value = std::forward<U>(u);
         }
         async_rw_mutex(async_rw_mutex&&) = default;
         async_rw_mutex& operator=(async_rw_mutex&&) = default;
