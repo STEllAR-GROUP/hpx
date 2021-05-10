@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_mpi/mpi_exception.hpp>
 #include <hpx/async_mpi/mpi_future.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/threading_base.hpp>
@@ -99,18 +100,6 @@ namespace hpx { namespace mpi { namespace experimental {
         {
             detail::add_to_request_callback_queue(
                 request_callback{request, std::move(callback)});
-        }
-
-        // extract MPI error message
-        std::string error_message(int code)
-        {
-            int N = 1023;
-            std::unique_ptr<char[]> err_buff(new char[std::size_t(N) + 1]);
-            err_buff[0] = '\0';
-
-            MPI_Error_string(code, err_buff.get(), &N);
-
-            return err_buff.get();
         }
 
         // mutex needed to protect mpi request vector, note that the

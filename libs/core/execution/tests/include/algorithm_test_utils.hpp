@@ -46,11 +46,12 @@ struct void_sender
     }
 };
 
+template <typename... Ts>
 struct error_sender
 {
     template <template <typename...> class Tuple,
         template <typename...> class Variant>
-    using value_types = Variant<Tuple<>>;
+    using value_types = Variant<Tuple<Ts...>>;
 
     template <template <typename...> class Variant>
     using error_types = Variant<std::exception_ptr>;

@@ -21,7 +21,7 @@ endif()
 # Default location is $HPX_ROOT/libs/mpi/include
 set(async_mpi_headers
     hpx/async_mpi/mpi_exception.hpp hpx/async_mpi/mpi_executor.hpp
-    hpx/async_mpi/mpi_future.hpp
+    hpx/async_mpi/mpi_future.hpp hpx/async_mpi/transform_mpi.hpp
 )
 
 # Default location is $HPX_ROOT/libs/mpi/src

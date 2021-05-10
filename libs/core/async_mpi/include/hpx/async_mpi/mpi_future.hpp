@@ -49,9 +49,6 @@ namespace hpx { namespace mpi { namespace experimental {
 
         using mutex_type = hpx::lcos::local::spinlock;
 
-        // extract MPI error message
-        HPX_CORE_EXPORT std::string error_message(int code);
-
         // mutex needed to protect mpi request vector, note that the
         // mpi poll function takes place inside the main scheduling loop
         // of hpx and not on an hpx worker thread, so we must use std:mutex
@@ -98,10 +95,7 @@ namespace hpx { namespace mpi { namespace experimental {
                         else
                         {
                             fdp->set_exception(
-                                std::make_exception_ptr(mpi_exception(
-                                    std::string(
-                                        "MPI function returned error code : "),
-                                    status)));
+                                std::make_exception_ptr(mpi_exception(status)));
                         }
                     },
                     request_);
@@ -251,10 +245,11 @@ namespace hpx { namespace mpi { namespace experimental {
     // handled elsewhere
     struct HPX_NODISCARD enable_user_polling
     {
-        enable_user_polling(std::string const& pool_name = "")
+        enable_user_polling(
+            std::string const& pool_name = "", bool init_errorhandler = false)
           : pool_name_(pool_name)
         {
-            mpi::experimental::init(false, pool_name);
+            mpi::experimental::init(false, pool_name, init_errorhandler);
         }
 
         ~enable_user_polling()
