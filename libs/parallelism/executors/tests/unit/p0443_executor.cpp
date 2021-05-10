@@ -8,6 +8,7 @@
 #include <hpx/execution.hpp>
 #include <hpx/functional.hpp>
 #include <hpx/init.hpp>
+#include <hpx/local/future.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/mutex.hpp>
 #include <hpx/thread.hpp>
@@ -22,6 +23,22 @@
 #include <thread>
 #include <type_traits>
 #include <utility>
+
+struct custom_type_non_default_constructible_non_copyable
+{
+    int x;
+    custom_type_non_default_constructible_non_copyable() = delete;
+    explicit custom_type_non_default_constructible_non_copyable(int x)
+      : x(x){};
+    custom_type_non_default_constructible_non_copyable(
+        custom_type_non_default_constructible_non_copyable&&) = default;
+    custom_type_non_default_constructible_non_copyable& operator=(
+        custom_type_non_default_constructible_non_copyable&&) = default;
+    custom_type_non_default_constructible_non_copyable(
+        custom_type_non_default_constructible_non_copyable const&) = delete;
+    custom_type_non_default_constructible_non_copyable& operator=(
+        custom_type_non_default_constructible_non_copyable const&) = delete;
+};
 
 namespace ex = hpx::execution::experimental;
 
@@ -1185,6 +1202,227 @@ void test_detach()
     }
 }
 
+void test_keep_future_sender()
+{
+    // the future should be passed to transform, not it's contained value
+    {
+        hpx::make_ready_future<void>() | ex::keep_future() |
+            ex::transform([](auto f) {
+                static_assert(std::is_same<std::decay_t<decltype(f)>,
+                                  hpx::future<void>>::value,
+                    "f should be a future<void>");
+                HPX_TEST(f.is_ready());
+            }) |
+            ex::sync_wait();
+    }
+
+    {
+        hpx::make_ready_future<void>().share() | ex::keep_future() |
+            ex::transform([](auto f) {
+                static_assert(std::is_same<std::decay_t<decltype(f)>,
+                                  hpx::shared_future<void>>::value,
+                    "f should be a shared_future<void>");
+                HPX_TEST(f.is_ready());
+            }) |
+            ex::sync_wait();
+    }
+
+    {
+        hpx::make_ready_future<int>(42) | ex::keep_future() |
+            ex::transform([](auto f) {
+                static_assert(std::is_same<std::decay_t<decltype(f)>,
+                                  hpx::future<int>>::value,
+                    "f should be a future<int>");
+                HPX_TEST(f.is_ready());
+                HPX_TEST_EQ(f.get(), 42);
+            }) |
+            ex::sync_wait();
+    }
+
+    {
+        hpx::make_ready_future<int>(42).share() | ex::keep_future() |
+            ex::transform([](auto f) {
+                static_assert(std::is_same<std::decay_t<decltype(f)>,
+                                  hpx::shared_future<int>>::value,
+                    "f should be a shared_future<int>");
+                HPX_TEST(f.is_ready());
+                HPX_TEST_EQ(f.get(), 42);
+            }) |
+            ex::sync_wait();
+    }
+
+    {
+        std::atomic<bool> called{false};
+        auto f = hpx::async([&]() { called = true; });
+
+        auto r = ex::sync_wait(std::move(f) | ex::keep_future());
+        static_assert(
+            std::is_same<std::decay_t<decltype(r)>, hpx::future<void>>::value,
+            "sync_wait should return future<void>");
+
+        HPX_TEST(called);
+        HPX_TEST(r.is_ready());
+
+        bool exception_thrown = false;
+        try
+        {
+            ex::sync_wait(std::move(f) | ex::keep_future());
+        }
+        catch (...)
+        {
+            exception_thrown = true;
+        };
+        HPX_TEST(exception_thrown);
+    }
+
+    {
+        std::atomic<bool> called{false};
+        auto f = hpx::async([&]() {
+            called = true;
+            return 42;
+        });
+
+        auto r = ex::sync_wait(std::move(f) | ex::keep_future());
+        static_assert(
+            std::is_same<std::decay_t<decltype(r)>, hpx::future<int>>::value,
+            "sync_wait should return future<int>");
+
+        HPX_TEST(called);
+        HPX_TEST(r.is_ready());
+        HPX_TEST_EQ(r.get(), 42);
+
+        bool exception_thrown = false;
+        try
+        {
+            ex::sync_wait(std::move(f) | ex::keep_future());
+        }
+        catch (...)
+        {
+            exception_thrown = true;
+        };
+        HPX_TEST(exception_thrown);
+    }
+
+    {
+        std::atomic<bool> called{false};
+        auto f = hpx::async([&]() {
+            called = true;
+            return 42;
+        });
+
+        HPX_TEST_EQ(
+            ex::sync_wait(ex::transform(std::move(f) | ex::keep_future(),
+                [](hpx::future<int>&& f) { return f.get() / 2; })),
+            21);
+        HPX_TEST(called);
+    }
+
+    {
+        std::atomic<std::size_t> calls{0};
+        auto sf = hpx::async([&]() { ++calls; }).share();
+
+        ex::sync_wait(sf | ex::keep_future());
+        ex::sync_wait(sf | ex::keep_future());
+        ex::sync_wait(std::move(sf) | ex::keep_future());
+        HPX_TEST_EQ(calls, std::size_t(1));
+
+        bool exception_thrown = false;
+        try
+        {
+            ex::sync_wait(sf | ex::keep_future());
+        }
+        catch (...)
+        {
+            exception_thrown = true;
+        };
+        HPX_TEST(exception_thrown);
+    }
+
+    {
+        std::atomic<std::size_t> calls{0};
+        auto sf = hpx::async([&]() {
+            ++calls;
+            return 42;
+        }).share();
+
+        HPX_TEST_EQ(ex::sync_wait(sf | ex::keep_future()).get(), 42);
+        HPX_TEST_EQ(ex::sync_wait(sf | ex::keep_future()).get(), 42);
+        HPX_TEST_EQ(ex::sync_wait(std::move(sf) | ex::keep_future()).get(), 42);
+        HPX_TEST_EQ(calls, std::size_t(1));
+
+        bool exception_thrown = false;
+        try
+        {
+            ex::sync_wait(sf | ex::keep_future());
+        }
+        catch (...)
+        {
+            exception_thrown = true;
+        };
+        HPX_TEST(exception_thrown);
+    }
+
+    // Keep future alive across on
+    {
+        auto f = hpx::async([&]() { return 42; });
+
+        auto r = std::move(f) | ex::keep_future() | ex::on(ex::executor{}) |
+            ex::sync_wait();
+        HPX_TEST(r.is_ready());
+        HPX_TEST_EQ(r.get(), 42);
+    }
+
+    {
+        auto sf = hpx::async([&]() { return 42; }).share();
+
+        auto r = std::move(sf) | ex::keep_future() | ex::on(ex::executor{}) |
+            ex::sync_wait();
+        HPX_TEST(r.is_ready());
+        HPX_TEST_EQ(r.get(), 42);
+    }
+
+    {
+        auto sf = hpx::async([&]() {
+            return custom_type_non_default_constructible_non_copyable{42};
+        }).share();
+
+        // NOTE: Without keep_future this should fail to compile, since
+        // sync_wait would receive a const& to the value which requires a copy
+        // or storing a const&. The copy is not possible because the type is
+        // noncopyable, and storing a reference is not acceptable since the
+        // reference may outlive the value.
+        auto r = std::move(sf) | ex::keep_future() | ex::on(ex::executor{}) |
+            ex::sync_wait();
+        HPX_TEST(r.is_ready());
+        HPX_TEST_EQ(r.get().x, 42);
+    }
+
+    // Use unwrapping with keep_future
+    {
+        auto f = hpx::async([]() { return 42; });
+        auto sf = hpx::async([]() { return 3.14; }).share();
+
+        auto fun = hpx::util::unwrapping(
+            [](int&& x, double const& y) { return x * 2 + (int(y) / 2); });
+        HPX_TEST_EQ(ex::when_all(std::move(f) | ex::keep_future(),
+                        sf | ex::keep_future()) |
+                ex::transform(fun) | ex::sync_wait(),
+            85);
+    }
+
+    {
+        auto f = hpx::async([]() { return 42; });
+        auto sf = hpx::async([]() { return 3.14; }).share();
+
+        auto fun = hpx::util::unwrapping(
+            [](int&& x, double const& y) { return x * 2 + (int(y) / 2); });
+        HPX_TEST_EQ(ex::when_all(std::move(f) | ex::keep_future(),
+                        sf | ex::keep_future()) |
+                ex::on(ex::executor{}) | ex::transform(fun) | ex::sync_wait(),
+            85);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
@@ -1206,6 +1444,7 @@ int hpx_main()
     test_just_on_two_args();
     test_when_all();
     test_future_sender();
+    test_keep_future_sender();
     test_ensure_started();
     test_ensure_started_when_all();
     test_let_value();
