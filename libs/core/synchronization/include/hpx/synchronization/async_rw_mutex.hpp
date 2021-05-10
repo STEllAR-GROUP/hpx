@@ -177,11 +177,16 @@ namespace hpx { namespace experimental {
             async_rw_mutex_access_wrapper& operator=(
                 async_rw_mutex_access_wrapper const&) = default;
 
-            operator ReadT&()
+            ReadT& get() const
             {
                 HPX_ASSERT(state);
                 HPX_ASSERT(state->value);
                 return state->value.value();
+            }
+
+            operator ReadT&() const
+            {
+                return get();
             }
         };
 
@@ -218,11 +223,16 @@ namespace hpx { namespace experimental {
             async_rw_mutex_access_wrapper& operator=(
                 async_rw_mutex_access_wrapper const&) = default;
 
-            operator ReadWriteT&()
+            ReadWriteT& get()
             {
                 HPX_ASSERT(state);
                 HPX_ASSERT(state->value);
                 return state->value.value();
+            }
+
+            operator ReadWriteT&()
+            {
+                return get();
             }
         };
 
