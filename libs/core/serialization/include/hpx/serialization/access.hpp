@@ -85,7 +85,6 @@ namespace hpx { namespace serialization {
         }
     };
 
-#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS)
     template <typename T>
     class has_struct_serialization
     {
@@ -138,7 +137,6 @@ namespace hpx { namespace serialization {
       : serialize_brace_initialized<T>
     {
     };
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     class access

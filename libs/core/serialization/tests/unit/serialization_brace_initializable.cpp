@@ -6,7 +6,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS)
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -105,9 +104,3 @@ int main()
 
     return hpx::util::report_errors();
 }
-#else
-int main()
-{
-    return 0;
-}
-#endif

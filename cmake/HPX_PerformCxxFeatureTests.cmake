@@ -39,55 +39,14 @@ function(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx17_filesystem(DEFINITIONS HPX_HAVE_CXX17_FILESYSTEM)
 
-  hpx_check_for_cxx17_fold_expressions(
-    DEFINITIONS HPX_HAVE_CXX17_FOLD_EXPRESSIONS
-  )
-
-  hpx_check_for_cxx17_fallthrough_attribute(
-    DEFINITIONS HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE
-  )
-
-  hpx_check_for_cxx17_nodiscard_attribute(
-    DEFINITIONS HPX_HAVE_CXX17_NODISCARD_ATTRIBUTE
-  )
-
   hpx_check_for_cxx17_hardware_destructive_interference_size(
     DEFINITIONS HPX_HAVE_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE
   )
 
-  hpx_check_for_cxx17_structured_bindings(
-    DEFINITIONS HPX_HAVE_CXX17_STRUCTURED_BINDINGS
-  )
-
-  hpx_check_for_cxx17_if_constexpr(DEFINITIONS HPX_HAVE_CXX17_IF_CONSTEXPR)
-
-  hpx_check_for_cxx17_inline_constexpr_variable(
-    DEFINITIONS HPX_HAVE_CXX17_INLINE_CONSTEXPR_VARIABLE
-  )
-
   hpx_check_for_cxx17_aligned_new(DEFINITIONS HPX_HAVE_CXX17_ALIGNED_NEW)
-
-  hpx_check_for_cxx17_std_in_place_type_t(
-    DEFINITIONS HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T
-  )
-
-  hpx_check_for_cxx17_std_variant(DEFINITIONS HPX_HAVE_CXX17_STD_VARIANT)
 
   hpx_check_for_cxx17_shared_ptr_array(
     DEFINITIONS HPX_HAVE_CXX17_SHARED_PTR_ARRAY
-  )
-
-  hpx_check_for_cxx17_maybe_unused(DEFINITIONS HPX_HAVE_CXX17_MAYBE_UNUSED)
-
-  hpx_check_for_cxx17_deduction_guides(
-    DEFINITIONS HPX_HAVE_CXX17_DEDUCTION_GUIDES
-  )
-
-  # we deliberately check for this functionality even for non-C++17
-  # configurations as some compilers (notable gcc V7.x) require for noexcept
-  # function specializations for actions even in C++11/14 mode
-  hpx_check_for_cxx17_noexcept_functions_as_nontype_template_arguments(
-    DEFINITIONS HPX_HAVE_CXX17_NOEXCEPT_FUNCTIONS_AS_NONTYPE_TEMPLATE_ARGUMENTS
   )
 
   hpx_check_for_cxx17_std_transform_scan(
@@ -95,10 +54,6 @@ function(hpx_perform_cxx_feature_tests)
   )
 
   hpx_check_for_cxx17_std_scan(DEFINITIONS HPX_HAVE_CXX17_STD_SCAN_ALGORITHMS)
-
-  hpx_check_for_cxx17_std_nontype_template_parameter_auto(
-    DEFINITIONS HPX_HAVE_CXX17_NONTYPE_TEMPLATE_PARAMETER_AUTO
-  )
 
   hpx_check_for_cxx17_copy_elision(DEFINITIONS HPX_HAVE_CXX17_COPY_ELISION)
 

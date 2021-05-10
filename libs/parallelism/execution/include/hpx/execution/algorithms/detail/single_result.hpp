@@ -11,9 +11,7 @@
 
 #include <type_traits>
 
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
 #include <variant>
-#endif
 
 namespace hpx {
     namespace execution {

@@ -28,11 +28,7 @@ endforeach()
 if(HPX_WITH_COMPILE_ONLY_TESTS)
 
   # add compile time tests
-  set(compile_tests)
-
-  if(HPX_WITH_CXX17_STD_VARIANT)
-    set(compile_tests ${compile_tests} std_variant_4448)
-  endif()
+  set(compile_tests std_variant_4448)
 
   if(HPX_WITH_FAIL_COMPILE_TESTS)
     set(fail_compile_tests)
