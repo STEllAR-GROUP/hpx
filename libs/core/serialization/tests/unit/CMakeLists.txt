@@ -6,6 +6,7 @@
 
 set(tests
     serialization_array
+    serialization_brace_initializable
     serialization_valarray
     serialization_builtins
     serialization_complex
@@ -22,14 +23,9 @@ set(tests
     serialization_unordered_map
     serialization_vector
     serialize_with_incompatible_signature
+    serialization_std_variant
 )
 
-if(HPX_WITH_CXX17_STRUCTURED_BINDINGS)
-  set(tests ${tests} serialization_brace_initializable)
-endif()
-if(HPX_WITH_CXX17_STD_VARIANT)
-  set(tests ${tests} serialization_std_variant)
-endif()
 if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
   set(tests ${tests} serialization_boost_variant)
 endif()

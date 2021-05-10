@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -309,5 +308,3 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } let_value{};
 }}}    // namespace hpx::execution::experimental
-
-#endif

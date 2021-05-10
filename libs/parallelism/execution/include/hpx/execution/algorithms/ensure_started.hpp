@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/traits/is_allocator.hpp>
 #include <hpx/assert.hpp>
@@ -468,4 +467,3 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } ensure_started{};
 }}}    // namespace hpx::execution::experimental
-#endif

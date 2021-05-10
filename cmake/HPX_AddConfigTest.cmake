@@ -369,109 +369,10 @@ function(hpx_check_for_cxx17_filesystem)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx17_fold_expressions)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_FOLD_EXPRESSIONS
-    SOURCE cmake/tests/cxx17_fold_expressions.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_fallthrough_attribute)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_FALLTHROUGH_ATTRIBUTE
-    SOURCE cmake/tests/cxx17_fallthrough_attribute.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_nodiscard_attribute)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_NODISCARD_ATTRIBUTE
-    SOURCE cmake/tests/cxx17_nodiscard_attribute.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_cxx17_hardware_destructive_interference_size)
   add_hpx_config_test(
     HPX_WITH_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE
     SOURCE cmake/tests/cxx17_hardware_destructive_interference_size.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_std_in_place_type_t)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_STD_IN_PLACE_TYPE_T
-    SOURCE cmake/tests/cxx17_std_in_place_type_t.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_maybe_unused)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_MAYBE_UNUSED
-    SOURCE cmake/tests/cxx17_maybe_unused.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_deduction_guides)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_DEDUCTION_GUIDES
-    SOURCE cmake/tests/cxx17_deduction_guides.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_structured_bindings)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_STRUCTURED_BINDINGS
-    SOURCE cmake/tests/cxx17_structured_bindings.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_if_constexpr)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_IF_CONSTEXPR
-    SOURCE cmake/tests/cxx17_if_constexpr.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_inline_constexpr_variable)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_INLINE_CONSTEXPR_VALUE
-    SOURCE cmake/tests/cxx17_inline_constexpr_variable.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_noexcept_functions_as_nontype_template_arguments)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_NOEXCEPT_FUNCTIONS_AS_NONTYPE_TEMPLATE_ARGUMENTS
-    SOURCE cmake/tests/cxx17_noexcept_function.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_std_variant)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_STD_VARIANT
-    SOURCE cmake/tests/cxx17_std_variant.cpp
     FILE ${ARGN}
   )
 endfunction()
@@ -499,15 +400,6 @@ function(hpx_check_for_cxx17_shared_ptr_array)
   add_hpx_config_test(
     HPX_WITH_CXX17_SHARED_PTR_ARRAY
     SOURCE cmake/tests/cxx17_shared_ptr_array.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_std_nontype_template_parameter_auto)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_NONTYPE_TEMPLATE_PARAMETER_AUTO
-    SOURCE cmake/tests/cxx17_std_nontype_template_parameter_auto.cpp
     FILE ${ARGN}
   )
 endfunction()

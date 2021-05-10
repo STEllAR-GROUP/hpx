@@ -110,10 +110,8 @@ namespace hpx { namespace functional {
 
 namespace hpx { namespace functional {
 
-#if defined(HPX_HAVE_CXX17_NONTYPE_TEMPLATE_PARAMETER_AUTO)
     template <auto& Tag>
     using tag_t = typename std::decay<decltype(Tag)>::type;
-#endif
 
     namespace tag_dispatch_t_ns {
 
