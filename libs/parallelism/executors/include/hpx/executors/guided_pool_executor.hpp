@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/assert.hpp>
 #include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/executors/dataflow.hpp>
@@ -300,8 +301,8 @@ namespace hpx { namespace parallel { namespace execution {
             // before passing the task onwards to the real executor
             return dataflow(launch::sync,
                 detail::pre_execution_async_domain_schedule<
-                    typename std::decay<typename std::remove_pointer<
-                        decltype(this)>::type>::type,
+                    typename std::decay<typename std::remove_pointer<decltype(
+                        this)>::type>::type,
                     pool_numa_hint<Tag>>{*this, hint_, hp_sync_},
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }

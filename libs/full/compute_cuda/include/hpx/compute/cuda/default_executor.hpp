@@ -52,7 +52,7 @@ namespace hpx { namespace cuda { namespace experimental {
                 std::size_t count = util::size(shape);
 
                 int threads_per_block =
-                    (std::min) (1024, static_cast<int>(count));
+                    (std::min)(1024, static_cast<int>(count));
                 int num_blocks = static_cast<int>(
                     (count + threads_per_block - 1) / threads_per_block);
 
@@ -115,7 +115,7 @@ namespace hpx { namespace cuda { namespace experimental {
 
                     // FIXME: make the 1024 to be configurable...
                     int threads_per_block =
-                        (std::min) (1024, static_cast<int>(chunk_size));
+                        (std::min)(1024, static_cast<int>(chunk_size));
                     int num_blocks =
                         static_cast<int>((chunk_size + threads_per_block - 1) /
                             threads_per_block);

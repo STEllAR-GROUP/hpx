@@ -82,9 +82,9 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename OneWayExecutor, typename F, typename... Ts>
             HPX_FORCEINLINE static auto call_impl(
                 std::false_type, OneWayExecutor&& exec, F&& f, Ts&&... ts)
-                -> hpx::future<decltype(sync_execute_dispatch(0,
-                    std::forward<OneWayExecutor>(exec), std::forward<F>(f),
-                    std::forward<Ts>(ts)...))>
+                -> hpx::future<decltype(
+                    sync_execute_dispatch(0, std::forward<OneWayExecutor>(exec),
+                        std::forward<F>(f), std::forward<Ts>(ts)...))>
             {
                 return hpx::lcos::make_ready_future(
                     sync_execute_dispatch(0, std::forward<OneWayExecutor>(exec),
@@ -106,9 +106,9 @@ namespace hpx { namespace parallel { namespace execution {
                 std::forward<OneWayExecutor>(exec), std::forward<F>(f),
                 std::forward<Ts>(ts)...))>
             {
-                typedef std::is_void<decltype(sync_execute_dispatch(0,
-                    std::forward<OneWayExecutor>(exec), std::forward<F>(f),
-                    std::forward<Ts>(ts)...))>
+                typedef std::is_void<decltype(
+                    sync_execute_dispatch(0, std::forward<OneWayExecutor>(exec),
+                        std::forward<F>(f), std::forward<Ts>(ts)...))>
                     is_void;
 
                 return call_impl(is_void(), exec, std::forward<F>(f),
@@ -182,9 +182,9 @@ namespace hpx { namespace parallel { namespace execution {
                 typename... Ts>
             struct result
             {
-                using type = decltype(call(std::declval<OneWayExecutor>(),
-                    std::declval<F>(), std::declval<Future>(),
-                    std::declval<Ts>()...));
+                using type = decltype(
+                    call(std::declval<OneWayExecutor>(), std::declval<F>(),
+                        std::declval<Future>(), std::declval<Ts>()...));
             };
         };
 
@@ -257,8 +257,8 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename TwoWayExecutor, typename F, typename... Ts>
         HPX_FORCEINLINE auto async_execute_dispatch(
             int, TwoWayExecutor&& exec, F&& f, Ts&&... ts)
-            -> decltype(exec.async_execute(
-                std::forward<F>(f), std::forward<Ts>(ts)...))
+            -> decltype(
+                exec.async_execute(std::forward<F>(f), std::forward<Ts>(ts)...))
         {
             return exec.async_execute(
                 std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -433,9 +433,9 @@ namespace hpx { namespace parallel { namespace execution {
                 typename... Ts>
             struct result
             {
-                using type = decltype(call(std::declval<TwoWayExecutor>(),
-                    std::declval<F>(), std::declval<Future>(),
-                    std::declval<Ts>()...));
+                using type = decltype(
+                    call(std::declval<TwoWayExecutor>(), std::declval<F>(),
+                        std::declval<Future>(), std::declval<Ts>()...));
             };
         };
 
@@ -641,9 +641,9 @@ namespace hpx { namespace parallel { namespace execution {
                 typename... Ts>
             struct result
             {
-                using type = decltype(call(std::declval<BulkExecutor>(),
-                    std::declval<F>(), std::declval<Shape const&>(),
-                    std::declval<Ts>()...));
+                using type = decltype(
+                    call(std::declval<BulkExecutor>(), std::declval<F>(),
+                        std::declval<Shape const&>(), std::declval<Ts>()...));
             };
         };
 
@@ -669,9 +669,9 @@ namespace hpx { namespace parallel { namespace execution {
                 typename... Ts>
             struct result
             {
-                using type = decltype(call(std::declval<BulkExecutor>(),
-                    std::declval<F>(), std::declval<Shape const&>(),
-                    std::declval<Ts>()...));
+                using type = decltype(
+                    call(std::declval<BulkExecutor>(), std::declval<F>(),
+                        std::declval<Shape const&>(), std::declval<Ts>()...));
             };
         };
 
@@ -830,9 +830,9 @@ namespace hpx { namespace parallel { namespace execution {
                 typename... Ts>
             struct result
             {
-                using type = decltype(call(std::declval<BulkExecutor>(),
-                    std::declval<F>(), std::declval<Shape const&>(),
-                    std::declval<Ts>()...));
+                using type = decltype(
+                    call(std::declval<BulkExecutor>(), std::declval<F>(),
+                        std::declval<Shape const&>(), std::declval<Ts>()...));
             };
         };
 
@@ -947,9 +947,9 @@ namespace hpx { namespace parallel { namespace execution {
                 typename... Ts>
             struct result
             {
-                using type = decltype(call(std::declval<BulkExecutor>(),
-                    std::declval<F>(), std::declval<Shape const&>(),
-                    std::declval<Ts>()...));
+                using type = decltype(
+                    call(std::declval<BulkExecutor>(), std::declval<F>(),
+                        std::declval<Shape const&>(), std::declval<Ts>()...));
             };
         };
 
@@ -975,9 +975,9 @@ namespace hpx { namespace parallel { namespace execution {
                 typename... Ts>
             struct result
             {
-                using type = decltype(call(std::declval<BulkExecutor>(),
-                    std::declval<F>(), std::declval<Shape const&>(),
-                    std::declval<Ts>()...));
+                using type = decltype(
+                    call(std::declval<BulkExecutor>(), std::declval<F>(),
+                        std::declval<Shape const&>(), std::declval<Ts>()...));
             };
         };
     }    // namespace detail

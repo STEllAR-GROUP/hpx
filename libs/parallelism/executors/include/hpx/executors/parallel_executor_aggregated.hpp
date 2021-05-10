@@ -126,7 +126,7 @@ namespace hpx { namespace parallel { namespace execution {
                 HPX_ASSERT(pool);
                 // lazily initialize once
                 static std::size_t global_num_tasks =
-                    (std::min) (std::size_t(128), pool->get_os_thread_count());
+                    (std::min)(std::size_t(128), pool->get_os_thread_count());
 
                 std::size_t num_tasks = (num_tasks_ == std::size_t(-1)) ?
                     global_num_tasks :
@@ -196,7 +196,7 @@ namespace hpx { namespace parallel { namespace execution {
                     // spawn hierarchical tasks
                     std::size_t chunk_size =
                         (size + num_spread_) / num_spread_ - 1;
-                    chunk_size = (std::max) (chunk_size, num_tasks);
+                    chunk_size = (std::max)(chunk_size, num_tasks);
 
                     while (size > chunk_size)
                     {
@@ -340,7 +340,7 @@ namespace hpx { namespace parallel { namespace execution {
                 HPX_ASSERT(pool);
                 // lazily initialize once
                 static std::size_t global_num_tasks =
-                    (std::min) (std::size_t(128), pool->get_os_thread_count());
+                    (std::min)(std::size_t(128), pool->get_os_thread_count());
 
                 std::size_t num_tasks = (num_tasks_ == std::size_t(-1)) ?
                     global_num_tasks :
@@ -417,7 +417,7 @@ namespace hpx { namespace parallel { namespace execution {
 
                     std::size_t chunk_size =
                         (size + num_spread_) / num_spread_ - 1;
-                    chunk_size = (std::max) (chunk_size, num_tasks);
+                    chunk_size = (std::max)(chunk_size, num_tasks);
 
                     while (size > chunk_size)
                     {

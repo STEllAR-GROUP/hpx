@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/async_mpi/mpi_future.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/execution_base/execution.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/modules/mpi_base.hpp>
 
 #include <cstddef>

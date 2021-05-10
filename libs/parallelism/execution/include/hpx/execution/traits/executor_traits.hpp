@@ -117,8 +117,8 @@ namespace hpx { namespace parallel { namespace execution {
     template <typename Executor>
     struct executor_context
     {
-        using type = typename std::decay<
-            decltype(std::declval<Executor const&>().context())>::type;
+        using type = typename std::decay<decltype(
+            std::declval<Executor const&>().context())>::type;
     };
 
     ///////////////////////////////////////////////////////////////////////////

@@ -87,9 +87,9 @@ namespace hpx { namespace parallel { namespace execution {
             HPX_FORCEINLINE static auto call(int, AnyParameters&& params,
                 Executor&& exec, F&& f, std::size_t cores,
                 std::size_t num_tasks)
-                -> decltype(exec.get_chunk_size(
-                    std::forward<AnyParameters>(params), std::forward<F>(f),
-                    cores, num_tasks))
+                -> decltype(
+                    exec.get_chunk_size(std::forward<AnyParameters>(params),
+                        std::forward<F>(f), cores, num_tasks))
             {
                 return exec.get_chunk_size(std::forward<AnyParameters>(params),
                     std::forward<F>(f), cores, num_tasks);
@@ -224,7 +224,7 @@ namespace hpx { namespace parallel { namespace execution {
 
             template <typename AnyParameters, typename Executor>
             HPX_FORCEINLINE static auto call_param(int, AnyParameters&& params,
-                Executor&&) -> decltype(params.reset_thread_distribution())
+                Executor &&) -> decltype(params.reset_thread_distribution())
             {
                 params.reset_thread_distribution();
             }
@@ -295,8 +295,8 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename AnyParameters, typename Executor>
             HPX_FORCEINLINE static auto call_param(
                 int, AnyParameters&& params, Executor&& exec)
-                -> decltype(params.processing_units_count(
-                    std::forward<Executor>(exec)))
+                -> decltype(
+                    params.processing_units_count(std::forward<Executor>(exec)))
             {
                 return params.processing_units_count(
                     std::forward<Executor>(exec));
@@ -364,8 +364,8 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename AnyParameters, typename Executor>
             HPX_FORCEINLINE static auto call_param(
                 int, AnyParameters&& params, Executor&& exec)
-                -> decltype(params.mark_begin_execution(
-                    std::forward<Executor>(exec)))
+                -> decltype(
+                    params.mark_begin_execution(std::forward<Executor>(exec)))
             {
                 params.mark_begin_execution(std::forward<Executor>(exec));
             }
@@ -433,8 +433,8 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename AnyParameters, typename Executor>
             HPX_FORCEINLINE static auto call_param(
                 int, AnyParameters&& params, Executor&& exec)
-                -> decltype(params.mark_end_of_scheduling(
-                    std::forward<Executor>(exec)))
+                -> decltype(
+                    params.mark_end_of_scheduling(std::forward<Executor>(exec)))
             {
                 params.mark_end_of_scheduling(std::forward<Executor>(exec));
             }
@@ -503,8 +503,8 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename AnyParameters, typename Executor>
             HPX_FORCEINLINE static auto call_param(
                 int, AnyParameters&& params, Executor&& exec)
-                -> decltype(params.mark_end_execution(
-                    std::forward<Executor>(exec)))
+                -> decltype(
+                    params.mark_end_execution(std::forward<Executor>(exec)))
             {
                 params.mark_end_execution(std::forward<Executor>(exec));
             }

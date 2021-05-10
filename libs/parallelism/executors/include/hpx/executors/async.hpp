@@ -29,11 +29,11 @@ namespace hpx { namespace detail {
         typename std::enable_if<!traits::is_action<Func>::value>::type>
     {
         template <typename Policy_, typename F, typename... Ts>
-        HPX_FORCEINLINE static auto call(
-            Policy_&& launch_policy, F&& f, Ts&&... ts)
-            -> decltype(async_launch_policy_dispatch<typename std::decay<
-                    F>::type>::call(std::forward<Policy_>(launch_policy),
-                std::forward<F>(f), std::forward<Ts>(ts)...))
+        HPX_FORCEINLINE static auto
+        call(Policy_&& launch_policy, F&& f, Ts&&... ts) -> decltype(
+            async_launch_policy_dispatch<typename std::decay<F>::type>::call(
+                std::forward<Policy_>(launch_policy), std::forward<F>(f),
+                std::forward<Ts>(ts)...))
         {
             return async_launch_policy_dispatch<typename std::decay<F>::type>::
                 call(std::forward<Policy_>(launch_policy), std::forward<F>(f),
