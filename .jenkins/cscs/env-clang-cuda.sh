@@ -44,3 +44,4 @@ configure_extra_options+=" -DHPX_WITH_TESTS_EXTERNAL_BUILD=OFF"
 # clang and nvcc compiler configurations, with the exception that
 # BOOST_HAS_FLOAT128 is unconditionally disabled.
 configure_extra_options+=" \"-DCMAKE_CXX_FLAGS=-I${src_dir}/.jenkins/cscs/ -DBOOST_USER_CONFIG='<boost_user_config_cray_clang.hpp>'\""
+configure_extra_options+=" \"-DCMAKE_CUDA_FLAGS=-I${src_dir}/.jenkins/cscs/ -DBOOST_USER_CONFIG='<boost_user_config_cray_clang.hpp>'\""
