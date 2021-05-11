@@ -58,6 +58,21 @@ if(EXISTS "${HPX_DIR}")
     message(FATAL_ERROR "Unknown SETUP_TYPE=\"${SETUP_TYPE}\"")
   endif()
 
+  if(MSVC)
+    # Only for the purposes of testing we output the executable and libraries to
+    # the output directory of HPX
+    set_target_properties(
+      hello_world_client PROPERTIES RUNTIME_OUTPUT_DIRECTORY
+                                    ${HPX_OUTPUT_DIRECTORY}
+    )
+    if(HPX_WITH_DISTRIBUTED_RUNTIME)
+      set_target_properties(
+        hello_world_component PROPERTIES RUNTIME_OUTPUT_DIRECTORY
+                                         ${HPX_OUTPUT_DIRECTORY}
+      )
+    endif()
+  endif()
+
   enable_testing()
   add_test(hello_world_test hello_world_client)
 else()

@@ -42,6 +42,11 @@ function(
     set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS}
                                  -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
     )
+  else()
+    set(ADDITIONAL_CMAKE_OPTIONS
+        ${ADDITIONAL_CMAKE_OPTIONS}
+        -DHPX_OUTPUT_DIRECTORY=${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin
+    )
   endif()
   set(test_dir "${PROJECT_SOURCE_DIR}/${test_dir}")
   add_custom_target(
