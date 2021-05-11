@@ -42,6 +42,9 @@ foreach(test ${tests})
     FOLDER "Tests/Regressions/Modules/Parallelism/Algorithms/"
   )
 
-  add_hpx_regression_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
+  target_link_libraries(
+    ${test}_test PRIVATE hpx_iterator_support_test_utilities
+  )
 
+  add_hpx_regression_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
 endforeach()

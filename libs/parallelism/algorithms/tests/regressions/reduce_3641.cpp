@@ -10,9 +10,8 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_reduce.hpp>
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/modules/testing.hpp>
-
-#include "libs/parallelism/algorithms/tests/util/iter_sent.hpp"
 
 #include <cstdint>
 

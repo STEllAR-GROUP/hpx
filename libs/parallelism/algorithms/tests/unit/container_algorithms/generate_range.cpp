@@ -8,6 +8,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -16,7 +17,6 @@
 #include <string>
 #include <vector>
 
-#include "iter_sent.hpp"
 #include "test_utils.hpp"
 
 // FIXME: Intel 15 currently can not compile this code. This needs to be fixed. See #1408

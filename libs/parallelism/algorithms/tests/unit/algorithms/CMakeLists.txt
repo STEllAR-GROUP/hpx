@@ -38,7 +38,6 @@ set(tests
     countif
     destroy
     destroyn
-    distance
     equal
     equal_binary
     exclusive_scan

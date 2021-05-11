@@ -8,13 +8,12 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_count.hpp>
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
-
-#include "libs/parallelism/algorithms/tests/util/iter_sent.hpp"
 
 struct bit_counting_iterator : public iterator<std::int64_t>
 {

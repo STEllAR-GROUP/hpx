@@ -78,8 +78,8 @@ Functions
 - :cpp:func:`hpx::replace_copy`
 - :cpp:func:`hpx::replace_copy_if`
 - :cpp:func:`hpx::replace_if`
-- :cpp:func:`hpx::parallel::v1::reverse`
-- :cpp:func:`hpx::parallel::v1::reverse_copy`
+- :cpp:func:`hpx::reverse`
+- :cpp:func:`hpx::reverse_copy`
 - :cpp:func:`hpx::parallel::v1::rotate`
 - :cpp:func:`hpx::parallel::v1::rotate_copy`
 - :cpp:func:`hpx::search`

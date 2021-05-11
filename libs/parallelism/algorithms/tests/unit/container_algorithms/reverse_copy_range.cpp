@@ -9,6 +9,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_reverse.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -18,7 +19,6 @@
 #include <string>
 #include <vector>
 
-#include "libs/parallelism/algorithms/tests/util/iter_sent.hpp"
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
