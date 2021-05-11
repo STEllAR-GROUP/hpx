@@ -20,7 +20,6 @@ export CC=`which cc`
 
 configure_extra_options="-DCMAKE_BUILD_TYPE=Debug"
 configure_extra_options+=" -DHPX_WITH_CUDA=ON"
-configure_extra_options+=" -DHPX_CUDA_CLANG_FLAGS=\"--cuda-gpu-arch=sm_60\""
 configure_extra_options+=" -DHPX_WITH_MALLOC=system"
 configure_extra_options+=" -DHPX_WITH_FETCH_ASIO=ON"
 configure_extra_options+=" -DHPX_WITH_CXX${CXX_STD}=ON"
@@ -44,4 +43,4 @@ configure_extra_options+=" -DHPX_WITH_TESTS_EXTERNAL_BUILD=OFF"
 # clang and nvcc compiler configurations, with the exception that
 # BOOST_HAS_FLOAT128 is unconditionally disabled.
 configure_extra_options+=" \"-DCMAKE_CXX_FLAGS=-I${src_dir}/.jenkins/cscs/ -DBOOST_USER_CONFIG='<boost_user_config_cray_clang.hpp>'\""
-configure_extra_options+=" \"-DCMAKE_CUDA_FLAGS=-I${src_dir}/.jenkins/cscs/ -DBOOST_USER_CONFIG='<boost_user_config_cray_clang.hpp>'\""
+configure_extra_options+=" \"-DCMAKE_CUDA_FLAGS=--cuda-gpu-arch=sm_60 -I${src_dir}/.jenkins/cscs/ -DBOOST_USER_CONFIG='<boost_user_config_cray_clang.hpp>'\""
