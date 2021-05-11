@@ -68,6 +68,8 @@ set(algorithms_headers
     hpx/parallel/algorithms/set_intersection.hpp
     hpx/parallel/algorithms/set_symmetric_difference.hpp
     hpx/parallel/algorithms/set_union.hpp
+    hpx/parallel/algorithms/shift_left.hpp
+    hpx/parallel/algorithms/shift_right.hpp
     hpx/parallel/algorithms/stable_sort.hpp
     hpx/parallel/algorithms/sort_by_key.hpp
     hpx/parallel/algorithms/sort.hpp
