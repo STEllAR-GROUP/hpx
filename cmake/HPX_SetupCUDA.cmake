@@ -13,8 +13,6 @@ if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
   # cuda_std_17 not recognized for previous versions
   cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
-  set(HPX_WITH_GPUBLAS ON)
-  hpx_add_config_define(HPX_HAVE_GPUBLAS)
   # Check CUDA standard
   if(NOT DEFINED CMAKE_CUDA_STANDARD)
     if(DEFINED CMAKE_CXX_STANDARD)
@@ -46,7 +44,13 @@ if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
   find_package(CUDAToolkit MODULE REQUIRED)
   if(CUDAToolkit_FOUND)
     target_link_libraries(Cuda::cuda INTERFACE CUDA::cudart)
-    target_link_libraries(Cuda::cuda INTERFACE CUDA::cublas)
+    if(TARGET CUDA::cublas)
+      set(HPX_WITH_GPUBLAS ON)
+      hpx_add_config_define(HPX_HAVE_GPUBLAS)
+      target_link_libraries(Cuda::cuda INTERFACE CUDA::cublas)
+    else()
+      set(HPX_WITH_GPUBLAS OFF)
+    endif()
   endif()
   # Flag not working for CLANG CUDA
   target_compile_features(Cuda::cuda INTERFACE cuda_std_${CMAKE_CUDA_STANDARD})
