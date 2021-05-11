@@ -9,7 +9,7 @@
 // clang-format off
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_HIP)
+#if defined(HPX_HAVE_HIP) && defined(HPX_HAVE_GPUBLAS)
 
     #include <hipblas.h>
 

@@ -7,6 +7,8 @@
 if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
 
   find_package(CUDA REQUIRED)
+  set(HPX_WITH_GPUBLAS ON)
+  hpx_add_config_define(HPX_HAVE_GPUBLAS)
   if(NOT HPX_FIND_PACKAGE)
     # The cmake variables are supposed to be cached no need to redefine them
     set(HPX_WITH_COMPUTE ON)

@@ -8,7 +8,10 @@ if(NOT HPX_WITH_ASYNC_CUDA)
   return()
 endif()
 
-set(tests cublas_matmul cuda_future)
+set(tests cuda_future)
+if(HPX_WITH_GPUBLAS)
+  set(benchmarks ${benchmarks} cublas_matmul)
+endif()
 
 set(cublas_matmul_PARAMETERS THREADS_PER_LOCALITY 4)
 set(cuda_future_PARAMETERS THREADS_PER_LOCALITY 4)

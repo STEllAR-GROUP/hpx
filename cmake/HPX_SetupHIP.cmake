@@ -21,10 +21,14 @@ if(HPX_WITH_HIP AND NOT TARGET roc::hipblas)
   # Setup hipblas (creates roc::hipblas)
   find_package(hipblas HINTS $ENV{HIPBLAS_ROOT} CONFIG)
   if(NOT hipblas_FOUND)
-    hpx_error(
-      "Hipblas could not be found, please specify HIPBLAS_ROOT to point to the \
-      correct location"
+    hpx_warn(
+      "Hipblas could not be found, the blas parts will therefore be disabled.\n\
+      You can reconfigure specifying HIPBLAS_ROOT to enable hipblas"
     )
+    set(HPX_WITH_GPUBLAS OFF)
+  else()
+    set(HPX_WITH_GPUBLAS ON)
+    hpx_add_config_define(HPX_HAVE_GPUBLAS)
   endif()
 
   if(NOT HPX_FIND_PACKAGE)

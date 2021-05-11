@@ -4,7 +4,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(benchmarks cuda_executor_throughput)
+set(benchmarks)
+if(HPX_WITH_GPUBLAS)
+  set(benchmarks ${benchmarks} cuda_executor_throughput)
+endif()
 
 set(cuda_executor_throughput_PARAMETERS THREADS_PER_LOCALITY 1)
 
