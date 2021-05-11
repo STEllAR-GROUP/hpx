@@ -642,7 +642,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_t final
-      : hpx::functional::tag<find_t>
+      : hpx::functional::tag_fallback<find_t>
     {
     private:
         // clang-format off
@@ -656,14 +656,15 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_invoke(find_t, ExPolicy&& policy, Iter first, Sent last,
+        tag_fallback_invoke(find_t, ExPolicy&& policy, Iter first, Sent last,
             T const& val, Proj&& proj = Proj())
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<Iter>;
+            static_assert(hpx::traits::is_forward_iterator<Iter>::value,
+                "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::find_(
+            return hpx::parallel::v1::detail::find<Iter>().call(
                 std::forward<ExPolicy>(policy), first, last, val,
-                std::forward<Proj>(proj), is_segmented());
+                std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -677,16 +678,19 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_invoke(find_t, ExPolicy&& policy, Rng&& rng, T const& val,
+        tag_fallback_invoke(find_t, ExPolicy&& policy, Rng&& rng, T const& val,
             Proj&& proj = Proj())
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<
-                typename hpx::traits::range_iterator<Rng>::type>;
+            using iterator_type =
+                typename hpx::traits::range_iterator<Rng>::type;
 
-            return hpx::parallel::v1::detail::find_(
+            static_assert(
+                hpx::traits::is_forward_iterator<iterator_type>::value,
+                "Requires at least forward iterator.");
+
+            return hpx::parallel::v1::detail::find<iterator_type>().call(
                 std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), val, std::forward<Proj>(proj),
-                is_segmented());
+                hpx::util::end(rng), val, std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -697,11 +701,15 @@ namespace hpx { namespace ranges {
                 hpx::parallel::traits::is_projected<Proj, Iter>::value
             )>
         // clang-format on
-        friend Iter tag_invoke(
+        friend Iter tag_fallback_invoke(
             find_t, Iter first, Sent last, T const& val, Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::find_(hpx::execution::seq, first,
-                last, val, std::forward<Proj>(proj), std::false_type());
+            static_assert(hpx::traits::is_input_iterator<Iter>::value,
+                "Requires at least input iterator.");
+
+            return hpx::parallel::v1::detail::find<Iter>().call(
+                hpx::execution::seq, first, last, val,
+                std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -712,19 +720,26 @@ namespace hpx { namespace ranges {
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value
             )>
         // clang-format on
-        friend typename hpx::traits::range_iterator<Rng>::type tag_invoke(
+        friend typename hpx::traits::range_iterator<Rng>::type
+        tag_fallback_invoke(
             find_t, Rng&& rng, T const& val, Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::find_(hpx::execution::seq,
-                hpx::util::begin(rng), hpx::util::end(rng), val,
-                std::forward<Proj>(proj), std::false_type());
+            using iterator_type =
+                typename hpx::traits::range_iterator<Rng>::type;
+
+            static_assert(hpx::traits::is_input_iterator<iterator_type>::value,
+                "Requires at least input iterator.");
+
+            return hpx::parallel::v1::detail::find<iterator_type>().call(
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                val, std::forward<Proj>(proj));
         }
     } find{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_if_t final
-      : hpx::functional::tag<find_if_t>
+      : hpx::functional::tag_fallback<find_if_t>
     {
     private:
         // clang-format off
@@ -741,15 +756,15 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_invoke(find_if_t, ExPolicy&& policy, Iter first, Sent last,
+        tag_fallback_invoke(find_if_t, ExPolicy&& policy, Iter first, Sent last,
             Pred&& pred, Proj&& proj = Proj())
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<Iter>;
+            static_assert(hpx::traits::is_forward_iterator<Iter>::value,
+                "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::find_if_(
+            return hpx::parallel::v1::detail::find_if<Iter>().call(
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<Pred>(pred), std::forward<Proj>(proj),
-                is_segmented());
+                std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -768,16 +783,20 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_invoke(find_if_t, ExPolicy&& policy, Rng&& rng, Pred&& pred,
-            Proj&& proj = Proj())
+        tag_fallback_invoke(find_if_t, ExPolicy&& policy, Rng&& rng,
+            Pred&& pred, Proj&& proj = Proj())
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<
-                typename hpx::traits::range_iterator<Rng>::type>;
+            using iterator_type =
+                typename hpx::traits::range_iterator<Rng>::type;
 
-            return hpx::parallel::v1::detail::find_if_(
+            static_assert(
+                hpx::traits::is_forward_iterator<iterator_type>::value,
+                "Requires at least forward iterator.");
+
+            return hpx::parallel::v1::detail::find_if<iterator_type>().call(
                 std::forward<ExPolicy>(policy), hpx::util::begin(rng),
                 hpx::util::end(rng), std::forward<Pred>(pred),
-                std::forward<Proj>(proj), is_segmented());
+                std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -791,12 +810,15 @@ namespace hpx { namespace ranges {
                 >
             )>
         // clang-format on
-        friend Iter tag_invoke(
+        friend Iter tag_fallback_invoke(
             find_if_t, Iter first, Sent last, Pred&& pred, Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::find_if_(hpx::execution::seq,
-                first, last, std::forward<Pred>(pred), std::forward<Proj>(proj),
-                std::false_type());
+            static_assert(hpx::traits::is_input_iterator<Iter>::value,
+                "Requires at least input iterator.");
+
+            return hpx::parallel::v1::detail::find_if<Iter>().call(
+                hpx::execution::seq, first, last, std::forward<Pred>(pred),
+                std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -812,20 +834,26 @@ namespace hpx { namespace ranges {
                 >
             )>
         // clang-format on
-        friend typename hpx::traits::range_iterator<Rng>::type tag_invoke(
+        friend typename hpx::traits::range_iterator<Rng>::type
+        tag_fallback_invoke(
             find_if_t, Rng&& rng, Pred&& pred, Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::find_if_(hpx::execution::seq,
-                hpx::util::begin(rng), hpx::util::end(rng),
-                std::forward<Pred>(pred), std::forward<Proj>(proj),
-                std::false_type());
+            using iterator_type =
+                typename hpx::traits::range_iterator<Rng>::type;
+
+            static_assert(hpx::traits::is_input_iterator<iterator_type>::value,
+                "Requires at least input iterator.");
+
+            return hpx::parallel::v1::detail::find_if<iterator_type>().call(
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
     } find_if{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find_if_not
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_if_not_t final
-      : hpx::functional::tag<find_if_not_t>
+      : hpx::functional::tag_fallback<find_if_not_t>
     {
     private:
         // clang-format off
@@ -842,15 +870,15 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_invoke(find_if_not_t, ExPolicy&& policy, Iter first, Sent last,
-            Pred&& pred, Proj&& proj = Proj())
+        tag_fallback_invoke(find_if_not_t, ExPolicy&& policy, Iter first,
+            Sent last, Pred&& pred, Proj&& proj = Proj())
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<Iter>;
+            static_assert(hpx::traits::is_forward_iterator<Iter>::value,
+                "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::find_if_not_(
+            return hpx::parallel::v1::detail::find_if_not<Iter>().call(
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<Pred>(pred), std::forward<Proj>(proj),
-                is_segmented());
+                std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -869,16 +897,20 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_invoke(find_if_not_t, ExPolicy&& policy, Rng&& rng, Pred&& pred,
-            Proj&& proj = Proj())
+        tag_fallback_invoke(find_if_not_t, ExPolicy&& policy, Rng&& rng,
+            Pred&& pred, Proj&& proj = Proj())
         {
-            using is_segmented = hpx::traits::is_segmented_iterator<
-                typename hpx::traits::range_iterator<Rng>::type>;
+            using iterator_type =
+                typename hpx::traits::range_iterator<Rng>::type;
 
-            return hpx::parallel::v1::detail::find_if_not_(
+            static_assert(
+                hpx::traits::is_forward_iterator<iterator_type>::value,
+                "Requires at least forward iterator.");
+
+            return hpx::parallel::v1::detail::find_if_not<iterator_type>().call(
                 std::forward<ExPolicy>(policy), hpx::util::begin(rng),
                 hpx::util::end(rng), std::forward<Pred>(pred),
-                std::forward<Proj>(proj), is_segmented());
+                std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -892,12 +924,15 @@ namespace hpx { namespace ranges {
                 >
             )>
         // clang-format on
-        friend Iter tag_invoke(find_if_not_t, Iter first, Sent last,
+        friend Iter tag_fallback_invoke(find_if_not_t, Iter first, Sent last,
             Pred&& pred, Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::find_if_not_(hpx::execution::seq,
-                first, last, std::forward<Pred>(pred), std::forward<Proj>(proj),
-                std::false_type());
+            static_assert(hpx::traits::is_input_iterator<Iter>::value,
+                "Requires at least input iterator.");
+
+            return hpx::parallel::v1::detail::find_if_not<Iter>().call(
+                hpx::execution::seq, first, last, std::forward<Pred>(pred),
+                std::forward<Proj>(proj));
         }
 
         // clang-format off
@@ -913,20 +948,26 @@ namespace hpx { namespace ranges {
                 >
             )>
         // clang-format on
-        friend typename hpx::traits::range_iterator<Rng>::type tag_invoke(
+        friend typename hpx::traits::range_iterator<Rng>::type
+        tag_fallback_invoke(
             find_if_not_t, Rng&& rng, Pred&& pred, Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::find_if_not_(hpx::execution::seq,
-                hpx::util::begin(rng), hpx::util::end(rng),
-                std::forward<Pred>(pred), std::forward<Proj>(proj),
-                std::false_type());
+            using iterator_type =
+                typename hpx::traits::range_iterator<Rng>::type;
+
+            static_assert(hpx::traits::is_input_iterator<iterator_type>::value,
+                "Requires at least input iterator.");
+
+            return hpx::parallel::v1::detail::find_if_not<iterator_type>().call(
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
     } find_if_not{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find_end
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_end_t final
-      : hpx::functional::tag<find_end_t>
+      : hpx::functional::tag_fallback<find_end_t>
     {
     private:
         // clang-format off
@@ -946,8 +987,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng1>::type>::type
-        tag_invoke(find_end_t, ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
-            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+        tag_fallback_invoke(find_end_t, ExPolicy&& policy, Rng1&& rng1,
+            Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
             using iterator_type =
@@ -985,8 +1026,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter1>::type
-        tag_invoke(find_end_t, ExPolicy&& policy, Iter1 first1, Sent1 last1,
-            Iter2 first2, Sent2 last2, Pred&& op = Pred(),
+        tag_fallback_invoke(find_end_t, ExPolicy&& policy, Iter1 first1,
+            Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             static_assert((hpx::traits::is_forward_iterator<Iter1>::value),
@@ -1014,9 +1055,10 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend typename hpx::traits::range_iterator<Rng1>::type tag_invoke(
-            find_end_t, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+        friend typename hpx::traits::range_iterator<Rng1>::type
+        tag_fallback_invoke(find_end_t, Rng1&& rng1, Rng2&& rng2,
+            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+            Proj2&& proj2 = Proj2())
         {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng1>::type;
@@ -1051,7 +1093,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend Iter1 tag_invoke(find_end_t, Iter1 first1, Sent1 last1,
+        friend Iter1 tag_fallback_invoke(find_end_t, Iter1 first1, Sent1 last1,
             Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -1070,7 +1112,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find_first_of
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_first_of_t final
-      : hpx::functional::tag<find_first_of_t>
+      : hpx::functional::tag_fallback<find_first_of_t>
     {
     private:
         // clang-format off
@@ -1090,8 +1132,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng1>::type>::type
-        tag_invoke(find_first_of_t, ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
-            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+        tag_fallback_invoke(find_first_of_t, ExPolicy&& policy, Rng1&& rng1,
+            Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
             using iterator_type =
@@ -1129,7 +1171,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter1>::type
-        tag_invoke(find_first_of_t, ExPolicy&& policy, Iter1 first1,
+        tag_fallback_invoke(find_first_of_t, ExPolicy&& policy, Iter1 first1,
             Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -1158,9 +1200,10 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend typename hpx::traits::range_iterator<Rng1>::type tag_invoke(
-            find_first_of_t, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+        friend typename hpx::traits::range_iterator<Rng1>::type
+        tag_fallback_invoke(find_first_of_t, Rng1&& rng1, Rng2&& rng2,
+            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+            Proj2&& proj2 = Proj2())
         {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng1>::type;
@@ -1195,8 +1238,8 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend Iter1 tag_invoke(find_first_of_t, Iter1 first1, Sent1 last1,
-            Iter2 first2, Sent2 last2, Pred&& op = Pred(),
+        friend Iter1 tag_fallback_invoke(find_first_of_t, Iter1 first1,
+            Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             static_assert((hpx::traits::is_forward_iterator<Iter1>::value),
