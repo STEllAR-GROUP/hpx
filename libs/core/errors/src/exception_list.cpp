@@ -21,7 +21,7 @@ namespace hpx {
         std::string indent_message(std::string const& msg_)
         {
             std::string result;
-            std::string msg(msg_);
+            std::string const& msg(msg_);
             std::string::size_type pos = msg.find_first_of('\n');
             std::string::size_type first_non_ws = msg.find_first_not_of(" \n");
             std::string::size_type pos1 = 0;
@@ -33,7 +33,9 @@ namespace hpx {
                     result += msg.substr(pos1, pos - pos1 + 1);
                     pos = msg.find_first_of('\n', pos1 = pos + 1);
                     if (std::string::npos != pos)
+                    {
                         result += "  ";
+                    }
                 }
                 else
                 {
@@ -62,11 +64,11 @@ namespace hpx {
       : hpx::exception(hpx::get_error(e), hpx::get_error_what(e))
       , mtx_()
     {
-        add(e);
+        add_no_lock(e);
     }
 
     exception_list::exception_list(exception_list_type&& l)
-      : hpx::exception(l.size() ? hpx::get_error(l.front()) : success)
+      : hpx::exception(!l.empty() ? hpx::get_error(l.front()) : success)
       , exceptions_(std::move(l))
       , mtx_()
     {
@@ -153,6 +155,17 @@ namespace hpx {
 
             // set the error code for our base class
             static_cast<hpx::exception&>(*this) = ex;
+        }
+        exceptions_.push_back(e);
+    }
+
+    void exception_list::add_no_lock(std::exception_ptr const& e)
+    {
+        if (exceptions_.empty())
+        {
+            // set the error code for our base class
+            static_cast<hpx::exception&>(*this) =
+                hpx::exception(hpx::get_error(e));
         }
         exceptions_.push_back(e);
     }

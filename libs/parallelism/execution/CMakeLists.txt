@@ -45,8 +45,6 @@ set(execution_headers
     hpx/execution/traits/executor_traits.hpp
     hpx/execution/traits/future_then_result_exec.hpp
     hpx/execution/traits/is_execution_policy.hpp
-    hpx/execution/traits/is_executor.hpp
-    hpx/execution/traits/is_executor_parameters.hpp
     hpx/execution/traits/vector_pack_alignment_size.hpp
     hpx/execution/traits/vector_pack_count_bits.hpp
     hpx/execution/traits/vector_pack_load_store.hpp
@@ -82,8 +80,6 @@ set(execution_compat_headers
     hpx/sync_launch_policy_dispatch.hpp => hpx/execution.hpp
     hpx/traits/executor_traits.hpp => hpx/execution.hpp
     hpx/traits/is_execution_policy.hpp => hpx/execution.hpp
-    hpx/traits/is_executor.hpp => hpx/execution.hpp
-    hpx/traits/is_executor_parameters.hpp => hpx/execution.hpp
 )
 # cmake-format: on
 

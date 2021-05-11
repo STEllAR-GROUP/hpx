@@ -17,7 +17,7 @@
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_traits.hpp>

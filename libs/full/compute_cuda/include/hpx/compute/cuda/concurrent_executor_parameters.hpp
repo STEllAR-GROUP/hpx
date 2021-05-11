@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_GPU_SUPPORT)
-#include <hpx/execution/traits/is_executor_parameters.hpp>
+#include <hpx/execution_base/traits/is_executor_parameters.hpp>
 
 #include <cstddef>
 #include <type_traits>

@@ -15,7 +15,7 @@
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/future_then_result_exec.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/detail/future_data.hpp>

@@ -15,8 +15,8 @@
 #include <hpx/concepts/has_xxx.hpp>
 #include <hpx/datastructures/traits/is_tuple_like.hpp>
 #include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/execution/traits/is_executor_parameters.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
+#include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/functional/traits/is_bind_expression.hpp>
