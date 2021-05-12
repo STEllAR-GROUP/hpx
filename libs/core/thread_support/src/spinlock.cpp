@@ -20,11 +20,13 @@ namespace hpx { namespace util { namespace detail {
         // Experiments on Windows and Fedora 32 show that a single pause,
         // followed by an immediate sleep, is best.
 
+#if defined(HPX_SMT_PAUSE)
         if (k == 0)
         {
             HPX_SMT_PAUSE;
         }
         else
+#endif
         {
             std::this_thread::sleep_for(std::chrono::microseconds(1));
         }
