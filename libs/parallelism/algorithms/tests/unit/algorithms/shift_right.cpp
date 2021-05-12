@@ -6,7 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/parallel/algorithm.hpp>
+#include <hpx/parallel/algorithms/shift_right.cpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
