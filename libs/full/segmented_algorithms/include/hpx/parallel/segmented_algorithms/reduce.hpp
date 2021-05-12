@@ -213,7 +213,7 @@ namespace hpx { namespace segmented {
 
         if (first == last)
         {
-            return std::forward<T>(init);
+            return init;
         }
 
         return hpx::parallel::v1::detail::segmented_reduce(
