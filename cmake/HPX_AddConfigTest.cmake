@@ -118,16 +118,17 @@ function(add_hpx_config_test variable)
 
     if(${variable}_EXECUTE)
       if(NOT CMAKE_CROSSCOMPILING)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
         # cmake-format: off
         try_run(
           ${variable}_RUN_RESULT ${variable}_COMPILE_RESULT
           ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests
           ${test_source}
+          COMPILE_DEFINITIONS ${CONFIG_TEST_COMPILE_DEFINITIONS}
           CMAKE_FLAGS
             "-DINCLUDE_DIRECTORIES=${CONFIG_TEST_INCLUDE_DIRS}"
             "-DLINK_DIRECTORIES=${CONFIG_TEST_LINK_DIRS}"
             "-DLINK_LIBRARIES=${CONFIG_TEST_LINK_LIBRARIES}"
-            "-DCOMPILE_DEFINITIONS=${CONFIG_TEST_COMPILE_DEFINITIONS}"
           CXX_STANDARD ${HPX_CXX_STANDARD}
           CXX_STANDARD_REQUIRED ON
           CXX_EXTENSIONS FALSE
@@ -144,16 +145,17 @@ function(add_hpx_config_test variable)
         set(${variable}_RESULT FALSE)
       endif()
     else()
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
       # cmake-format: off
       try_compile(
         ${variable}_RESULT
         ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests
         ${test_source}
+        COMPILE_DEFINITIONS ${CONFIG_TEST_COMPILE_DEFINITIONS}
         CMAKE_FLAGS
           "-DINCLUDE_DIRECTORIES=${CONFIG_TEST_INCLUDE_DIRS}"
           "-DLINK_DIRECTORIES=${CONFIG_TEST_LINK_DIRS}"
           "-DLINK_LIBRARIES=${CONFIG_TEST_LINK_LIBRARIES}"
-          "-DCOMPILE_DEFINITIONS=${CONFIG_TEST_COMPILE_DEFINITIONS}"
         OUTPUT_VARIABLE ${variable}_OUTPUT
         CXX_STANDARD ${HPX_CXX_STANDARD}
         CXX_STANDARD_REQUIRED ON
