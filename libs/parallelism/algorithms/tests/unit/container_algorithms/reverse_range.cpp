@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c)      2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +9,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_reverse.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -20,6 +22,67 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+void test_reverse_sent()
+{
+    std::size_t const size = 100;
+    std::vector<std::int16_t> c(size);
+    std::iota(std::begin(c), std::end(c), 0);
+
+    auto first = c.begin();
+    HPX_TEST(*first == 0);
+
+    hpx::ranges::reverse(std::begin(c), sentinel<std::int16_t>{50});
+    auto first_reversed = c.begin();
+
+    HPX_TEST(*first_reversed == 49);
+}
+
+template <typename ExPolicy>
+void test_reverse_sent(ExPolicy policy)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    std::size_t const size = 100;
+    std::vector<std::int16_t> c(size);
+    std::iota(std::begin(c), std::end(c), 0);
+
+    auto first = c.begin();
+    HPX_TEST(*first == 0);
+
+    hpx::ranges::reverse(policy, std::begin(c), sentinel<std::int16_t>{50});
+    auto first_reversed = c.begin();
+
+    HPX_TEST(*first_reversed == 49);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_reverse(IteratorTag)
+{
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag>
+        test_vector;
+
+    test_vector c(10007);
+    std::vector<std::size_t> d1;
+
+    std::iota(std::begin(c.base()), std::end(c.base()), std::rand());
+    std::copy(std::begin(c.base()), std::end(c.base()), std::back_inserter(d1));
+
+    hpx::ranges::reverse(c);
+
+    std::reverse(std::begin(d1), std::end(d1));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c.base()), std::end(c.base()),
+        std::begin(d1), [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d1.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_reverse(ExPolicy policy, IteratorTag)
 {
@@ -35,7 +98,7 @@ void test_reverse(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c.base()), std::end(c.base()), std::rand());
     std::copy(std::begin(c.base()), std::end(c.base()), std::back_inserter(d1));
 
-    hpx::parallel::reverse(policy, c);
+    hpx::ranges::reverse(policy, c);
 
     std::reverse(std::begin(d1), std::end(d1));
 
@@ -61,7 +124,7 @@ void test_reverse_async(ExPolicy p, IteratorTag)
     std::iota(std::begin(c.base()), std::end(c.base()), std::rand());
     std::copy(std::begin(c.base()), std::end(c.base()), std::back_inserter(d1));
 
-    auto f = hpx::parallel::reverse(p, c);
+    auto f = hpx::ranges::reverse(p, c);
     f.wait();
 
     std::reverse(std::begin(d1), std::end(d1));
@@ -80,12 +143,18 @@ template <typename IteratorTag>
 void test_reverse()
 {
     using namespace hpx::execution;
+    test_reverse(IteratorTag());
     test_reverse(seq, IteratorTag());
     test_reverse(par, IteratorTag());
     test_reverse(par_unseq, IteratorTag());
 
     test_reverse_async(seq(task), IteratorTag());
     test_reverse_async(par(task), IteratorTag());
+
+    test_reverse_sent();
+    test_reverse_sent(seq);
+    test_reverse_sent(par);
+    test_reverse_sent(par_unseq);
 }
 
 void reverse_test()
@@ -95,6 +164,39 @@ void reverse_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_reverse_exception(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::ranges::reverse(
+            hpx::util::make_iterator_range(decorated_iterator(std::begin(c)),
+                decorated_iterator(
+                    std::end(c), []() { throw std::runtime_error("test"); })));
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<hpx::execution::sequenced_policy,
+            IteratorTag>::call(hpx::execution::seq, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_reverse_exception(ExPolicy policy, IteratorTag)
 {
@@ -111,7 +213,7 @@ void test_reverse_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::reverse(policy,
+        hpx::ranges::reverse(policy,
             hpx::util::make_iterator_range(decorated_iterator(std::begin(c)),
                 decorated_iterator(
                     std::end(c), []() { throw std::runtime_error("test"); })));
@@ -144,7 +246,7 @@ void test_reverse_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::reverse(p,
+        auto f = hpx::ranges::reverse(p,
             hpx::util::make_iterator_range(decorated_iterator(std::begin(c)),
                 decorated_iterator(
                     std::end(c), []() { throw std::runtime_error("test"); })));
@@ -175,6 +277,7 @@ void test_reverse_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_reverse_exception(IteratorTag());
     test_reverse_exception(seq, IteratorTag());
     test_reverse_exception(par, IteratorTag());
 
@@ -189,6 +292,36 @@ void reverse_exception_test()
 }
 
 //////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_reverse_bad_alloc(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    bool caught_bad_alloc = false;
+    try
+    {
+        hpx::ranges::reverse(hpx::util::make_iterator_range(
+            decorated_iterator(std::begin(c)),
+            decorated_iterator(std::end(c), []() { throw std::bad_alloc(); })));
+        HPX_TEST(false);
+    }
+    catch (std::bad_alloc const&)
+    {
+        caught_bad_alloc = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_bad_alloc);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_reverse_bad_alloc(ExPolicy policy, IteratorTag)
 {
@@ -205,7 +338,7 @@ void test_reverse_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::reverse(policy,
+        hpx::ranges::reverse(policy,
             hpx::util::make_iterator_range(decorated_iterator(std::begin(c)),
                 decorated_iterator(
                     std::end(c), []() { throw std::bad_alloc(); })));
@@ -237,7 +370,7 @@ void test_reverse_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::reverse(p,
+        auto f = hpx::ranges::reverse(p,
             hpx::util::make_iterator_range(decorated_iterator(std::begin(c)),
                 decorated_iterator(
                     std::end(c), []() { throw std::bad_alloc(); })));
@@ -267,6 +400,7 @@ void test_reverse_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_reverse_bad_alloc(IteratorTag());
     test_reverse_bad_alloc(seq, IteratorTag());
     test_reverse_bad_alloc(par, IteratorTag());
 

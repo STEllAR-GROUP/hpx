@@ -10,8 +10,7 @@
 #pragma once
 
 #if defined(DOXYGEN)
-namespace hpx {
-
+namespace hpx { namespace ranges {
     /// Removes all elements that are equal to \a value from the range
     /// [first, last) and and returns a subrange [ret, last), where ret
     /// is a past-the-end iterator for the new end of the range.
@@ -464,7 +463,7 @@ namespace hpx {
         subrange_t<typename hpx::traits::range_iterator<Rng>::type>>::type
     remove_if(ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj());
 
-}    // namespace hpx
+}}    // namespace hpx::ranges
 
 #else    // DOXYGEN
 

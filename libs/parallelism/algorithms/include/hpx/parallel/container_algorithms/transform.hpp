@@ -10,7 +10,7 @@
 #pragma once
 
 #if defined(DOXYGEN)
-namespace hpx {
+namespace hpx { namespace ranges {
 
     /// Applies the given function \a f to the given range \a rng and stores
     /// the result in another range, beginning at dest.
@@ -388,7 +388,7 @@ namespace hpx {
         Rng2&& rng2, FwdIter dest, F&& f, Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2())
 
-}    // namespace hpx
+}}       // namespace hpx::ranges
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>

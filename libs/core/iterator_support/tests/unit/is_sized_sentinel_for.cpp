@@ -4,9 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 #include <hpx/modules/testing.hpp>
-#include "iter_sent.hpp"
 
 #include <cstdint>
 #include <string>

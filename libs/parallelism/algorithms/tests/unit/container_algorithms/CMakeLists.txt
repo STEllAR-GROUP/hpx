@@ -21,6 +21,7 @@ set(tests
     countif_range
     destroy_range
     destroyn_range
+    distance
     equal_range
     equal_binary_range
     fill_range
@@ -112,6 +113,10 @@ foreach(test ${tests})
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
     FOLDER "Tests/Unit/Modules/Parallelism/Algorithms/Container"
+  )
+
+  target_link_libraries(
+    ${test}_test PRIVATE hpx_iterator_support_test_utilities
   )
 
   add_hpx_unit_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
