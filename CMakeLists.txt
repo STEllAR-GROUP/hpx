@@ -315,15 +315,11 @@ endif()
 hpx_option(
   HPX_WITH_PRECOMPILED_HEADERS
   BOOL
-  "Enable precompiled headers for certain build targets (experimental, requires CMake 3.16 or newer) (default OFF)"
+  "Enable precompiled headers for certain build targets (experimental) (default OFF)"
   OFF
   ADVANCED
 )
 if(HPX_WITH_PRECOMPILED_HEADERS)
-  if(CMAKE_VERSION VERSION_LESS "3.16")
-    hpx_error("HPX_WITH_UNITY_BUILD=ON but this requires CMake 3.16 or newer.")
-  endif()
-
   set(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL ON)
 
   add_library(hpx_precompiled_headers OBJECT libs/src/dummy.cpp)
