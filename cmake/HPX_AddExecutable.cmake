@@ -8,6 +8,7 @@
 function(add_hpx_executable name)
   # retrieve arguments
   set(options
+      CUDA
       EXCLUDE_FROM_ALL
       EXCLUDE_FROM_DEFAULT_BUILD
       AUTOGLOB
@@ -217,6 +218,10 @@ function(add_hpx_executable name)
                            "${PROJECT_BINARY_DIR}/bin/${${name}_OUTPUT_SUFFIX}"
       )
     endif()
+  endif()
+
+  if(${name}_CUDA)
+    set_target_properties(${name} PROPERTIES LANGUAGE CUDA)
   endif()
 
   set_target_properties(
