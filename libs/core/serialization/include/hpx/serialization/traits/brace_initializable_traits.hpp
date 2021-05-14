@@ -101,7 +101,7 @@ namespace hpx { namespace traits {
             return {};
         }
 
-#if !defined(HPX_HAVE_CXX20_STD_PAREN_INITIALIZATION_OF_AGGREGATES)
+#if !defined(HPX_HAVE_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES)
 #define MAKE_ARITY_FUNC(count)                                                 \
     template <typename T,                                                      \
         typename Enable = typename std::enable_if<                             \

@@ -103,8 +103,16 @@ function(hpx_perform_cxx_feature_tests)
   # C++20 feature tests
   hpx_check_for_cxx20_coroutines(DEFINITIONS HPX_HAVE_CXX20_COROUTINES)
 
+  hpx_check_for_cxx20_lambda_capture(
+    DEFINITIONS HPX_HAVE_CXX20_LAMBDA_CAPTURE
+  )
+
   hpx_check_for_cxx20_no_unique_address_attribute(
     DEFINITIONS HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
+  )
+
+  hpx_check_for_cxx20_paren_initialization_of_aggregates(
+    DEFINITIONS HPX_HAVE_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES
   )
 
   hpx_check_for_cxx20_std_disable_sized_sentinel_for(
@@ -115,14 +123,6 @@ function(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx20_std_execution_policies(
     DEFINITIONS HPX_HAVE_CXX20_STD_EXECUTION_POLICES
-  )
-
-  hpx_check_for_cxx20_std_lambda_capture(
-    DEFINITIONS HPX_HAVE_CXX20_STD_LAMBDA_CAPTURE
-  )
-
-  hpx_check_for_cxx20_std_paren_initialization_of_aggregates(
-    DEFINITIONS HPX_HAVE_CXX20_STD_PAREN_INITIALIZATION_OF_AGGREGATES
   )
 
   # Check the availability of certain C++ builtins

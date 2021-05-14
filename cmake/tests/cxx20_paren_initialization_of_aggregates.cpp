@@ -14,6 +14,8 @@ struct S
 
 int main()
 {
-    S(1, 2.0f);
+    S s(1, 2.0f);
+    (void)s.x;
+    (void)s.y;
     return 0;
 }
