@@ -175,6 +175,7 @@ namespace hpx {
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -445,7 +446,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::uninitialized_value_construct
     HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_value_construct_t final
-      : hpx::functional::tag_fallback<uninitialized_value_construct_t>
+      : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_t>
     {
         // clang-format off
         template <typename FwdIter,
@@ -492,7 +493,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::uninitialized_value_construct_n
     HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_value_construct_n_t final
-      : hpx::functional::tag_fallback<uninitialized_value_construct_n_t>
+      : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_n_t>
     {
         // clang-format off
         template <typename FwdIter, typename Size,

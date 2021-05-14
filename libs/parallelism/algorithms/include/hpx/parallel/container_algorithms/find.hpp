@@ -642,7 +642,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::find
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_t final
-      : hpx::functional::tag_fallback<find_t>
+      : hpx::detail::tag_parallel_algorithm<find_t>
     {
     private:
         // clang-format off
@@ -739,7 +739,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::find_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_if_t final
-      : hpx::functional::tag_fallback<find_if_t>
+      : hpx::detail::tag_parallel_algorithm<find_if_t>
     {
     private:
         // clang-format off
@@ -853,7 +853,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::find_if_not
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_if_not_t final
-      : hpx::functional::tag_fallback<find_if_not_t>
+      : hpx::detail::tag_parallel_algorithm<find_if_not_t>
     {
     private:
         // clang-format off
@@ -967,7 +967,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::find_end
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_end_t final
-      : hpx::functional::tag_fallback<find_end_t>
+      : hpx::detail::tag_parallel_algorithm<find_end_t>
     {
     private:
         // clang-format off
@@ -1112,7 +1112,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::find_first_of
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_first_of_t final
-      : hpx::functional::tag_fallback<find_first_of_t>
+      : hpx::detail::tag_parallel_algorithm<find_first_of_t>
     {
     private:
         // clang-format off

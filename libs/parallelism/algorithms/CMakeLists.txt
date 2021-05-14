@@ -151,6 +151,7 @@ set(algorithms_headers
     hpx/parallel/util/detail/handle_remote_exceptions.hpp
     hpx/parallel/util/detail/partitioner_iteration.hpp
     hpx/parallel/util/detail/scoped_executor_parameters.hpp
+    hpx/parallel/util/detail/sender_util.hpp
     hpx/parallel/util/detail/select_partitioner.hpp
     hpx/parallel/util/foreach_partitioner.hpp
     hpx/parallel/util/invoke_projected.hpp

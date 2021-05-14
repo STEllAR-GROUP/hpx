@@ -182,6 +182,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
@@ -458,7 +459,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::equal
     HPX_INLINE_CONSTEXPR_VARIABLE struct equal_t final
-      : hpx::functional::tag_fallback<equal_t>
+      : hpx::detail::tag_parallel_algorithm<equal_t>
     {
     private:
         // clang-format off

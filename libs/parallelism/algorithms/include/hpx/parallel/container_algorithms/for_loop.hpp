@@ -718,13 +718,13 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/for_loop.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -734,7 +734,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx { namespace ranges {
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_t final
-      : hpx::functional::tag<for_loop_t>
+      : hpx::detail::tag_parallel_algorithm<for_loop_t>
     {
     private:
         // clang-format off
@@ -746,8 +746,8 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_dispatch(hpx::ranges::for_loop_t, ExPolicy&& policy, Iter first,
-            Sent last, Args&&... args)
+        tag_fallback_dispatch(hpx::ranges::for_loop_t, ExPolicy&& policy,
+            Iter first, Sent last, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop must be called with at least a function object");
@@ -766,7 +766,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
         // clang-format on
-        friend void tag_dispatch(
+        friend void tag_fallback_dispatch(
             hpx::ranges::for_loop_t, Iter first, Sent last, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
@@ -786,7 +786,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_dispatch(
+        tag_fallback_dispatch(
             hpx::ranges::for_loop_t, ExPolicy&& policy, R&& rng, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
@@ -806,7 +806,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend void tag_dispatch(
+        friend void tag_fallback_dispatch(
             hpx::ranges::for_loop_t, Rng&& rng, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
@@ -821,7 +821,7 @@ namespace hpx { namespace ranges {
     } for_loop{};
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_strided_t final
-      : hpx::functional::tag<for_loop_strided_t>
+      : hpx::detail::tag_parallel_algorithm<for_loop_strided_t>
     {
     private:
         // clang-format off
@@ -835,8 +835,8 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_dispatch(hpx::ranges::for_loop_strided_t, ExPolicy&& policy,
-            Iter first, Sent last, S stride, Args&&... args)
+        tag_fallback_dispatch(hpx::ranges::for_loop_strided_t,
+            ExPolicy&& policy, Iter first, Sent last, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_strided must be called with at least a function "
@@ -857,8 +857,8 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
         // clang-format on
-        friend void tag_dispatch(hpx::ranges::for_loop_strided_t, Iter first,
-            Sent last, S stride, Args&&... args)
+        friend void tag_fallback_dispatch(hpx::ranges::for_loop_strided_t,
+            Iter first, Sent last, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_strided must be called with at least a function "
@@ -880,8 +880,8 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_dispatch(hpx::ranges::for_loop_strided_t, ExPolicy&& policy,
-            Rng&& rng, S stride, Args&&... args)
+        tag_fallback_dispatch(hpx::ranges::for_loop_strided_t,
+            ExPolicy&& policy, Rng&& rng, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_strided must be called with at least a function "
@@ -902,8 +902,8 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend void tag_dispatch(hpx::ranges::for_loop_strided_t, Rng&& rng,
-            S stride, Args&&... args)
+        friend void tag_fallback_dispatch(hpx::ranges::for_loop_strided_t,
+            Rng&& rng, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_strided must be called with at least a function "

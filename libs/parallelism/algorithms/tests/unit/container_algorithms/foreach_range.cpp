@@ -27,6 +27,12 @@ void test_for_each()
 
     test_for_each_async(seq(task), IteratorTag());
     test_for_each_async(par(task), IteratorTag());
+
+    test_for_each_sender(seq, IteratorTag());
+    test_for_each_sender(par, IteratorTag());
+    test_for_each_sender(par_unseq, IteratorTag());
+    test_for_each_sender(seq(task), IteratorTag());
+    test_for_each_sender(par(task), IteratorTag());
 }
 
 void for_each_test()
@@ -51,6 +57,11 @@ void test_for_each_exception()
 
     test_for_each_exception_async(seq(task), IteratorTag());
     test_for_each_exception_async(par(task), IteratorTag());
+
+    test_for_each_exception_sender(seq, IteratorTag());
+    test_for_each_exception_sender(par, IteratorTag());
+    test_for_each_exception_sender(seq(task), IteratorTag());
+    test_for_each_exception_sender(par(task), IteratorTag());
 }
 
 void for_each_exception_test()
@@ -75,6 +86,11 @@ void test_for_each_bad_alloc()
 
     test_for_each_bad_alloc_async(seq(task), IteratorTag());
     test_for_each_bad_alloc_async(par(task), IteratorTag());
+
+    test_for_each_bad_alloc_sender(seq, IteratorTag());
+    test_for_each_bad_alloc_sender(par, IteratorTag());
+    test_for_each_bad_alloc_sender(seq(task), IteratorTag());
+    test_for_each_bad_alloc_sender(par(task), IteratorTag());
 }
 
 void for_each_bad_alloc_test()

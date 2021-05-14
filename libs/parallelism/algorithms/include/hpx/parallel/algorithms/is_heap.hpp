@@ -137,7 +137,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -451,7 +451,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::is_heap
     HPX_INLINE_CONSTEXPR_VARIABLE struct is_heap_t final
-      : hpx::functional::tag_fallback<is_heap_t>
+      : hpx::detail::tag_parallel_algorithm<is_heap_t>
     {
     private:
         // clang-format off
@@ -508,7 +508,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::is_heap_until
     HPX_INLINE_CONSTEXPR_VARIABLE struct is_heap_until_t final
-      : hpx::functional::tag_fallback<is_heap_until_t>
+      : hpx::detail::tag_parallel_algorithm<is_heap_until_t>
     {
     private:
         // clang-format off

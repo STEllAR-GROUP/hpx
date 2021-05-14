@@ -371,10 +371,10 @@ namespace hpx { namespace ranges {
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/lexicographical_compare.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -386,7 +386,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx { namespace ranges {
     HPX_INLINE_CONSTEXPR_VARIABLE struct lexicographical_compare_t final
-      : hpx::functional::tag_fallback<lexicographical_compare_t>
+      : hpx::detail::tag_parallel_algorithm<lexicographical_compare_t>
     {
     private:
         // clang-format off

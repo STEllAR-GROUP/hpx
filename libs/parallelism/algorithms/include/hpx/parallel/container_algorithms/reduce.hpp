@@ -408,7 +408,7 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
@@ -430,7 +430,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::reduce
     HPX_INLINE_CONSTEXPR_VARIABLE struct reduce_t final
-      : hpx::functional::tag_fallback<reduce_t>
+      : hpx::detail::tag_parallel_algorithm<reduce_t>
     {
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Sent,

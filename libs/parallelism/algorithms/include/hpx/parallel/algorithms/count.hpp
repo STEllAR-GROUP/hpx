@@ -157,10 +157,10 @@ namespace hpx {
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/traits/vector_pack_count_bits.hpp>
@@ -440,7 +440,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::count
     HPX_INLINE_CONSTEXPR_VARIABLE struct count_t final
-      : hpx::functional::tag_fallback<count_t>
+      : hpx::detail::tag_parallel_algorithm<count_t>
     {
     private:
         // clang-format off
@@ -491,7 +491,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::count_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct count_if_t final
-      : hpx::functional::tag_fallback<count_if_t>
+      : hpx::detail::tag_parallel_algorithm<count_if_t>
     {
     private:
         // clang-format off

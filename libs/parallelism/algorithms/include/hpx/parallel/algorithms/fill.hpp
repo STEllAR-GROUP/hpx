@@ -108,7 +108,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/void_guard.hpp>
@@ -294,7 +294,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::fill
     HPX_INLINE_CONSTEXPR_VARIABLE struct fill_t final
-      : hpx::functional::tag_fallback<fill_t>
+      : hpx::detail::tag_parallel_algorithm<fill_t>
     {
     private:
         // clang-format off
@@ -341,7 +341,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::fill_n
     HPX_INLINE_CONSTEXPR_VARIABLE struct fill_n_t final
-      : hpx::functional::tag_fallback<fill_n_t>
+      : hpx::detail::tag_parallel_algorithm<fill_n_t>
     {
     private:
         // clang-format off

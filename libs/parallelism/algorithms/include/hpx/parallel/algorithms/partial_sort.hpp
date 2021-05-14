@@ -54,8 +54,8 @@ namespace hpx {
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
@@ -473,7 +473,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct partial_sort_t final
-      : hpx::functional::tag_fallback<partial_sort_t>
+      : hpx::detail::tag_parallel_algorithm<partial_sort_t>
     {
     private:
         // clang-format off

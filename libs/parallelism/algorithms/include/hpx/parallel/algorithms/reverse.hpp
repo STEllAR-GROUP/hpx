@@ -180,8 +180,8 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/tagged_pair.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
@@ -366,7 +366,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::reverse
     HPX_INLINE_CONSTEXPR_VARIABLE struct reverse_t final
-      : hpx::functional::tag_fallback<reverse_t>
+      : hpx::detail::tag_parallel_algorithm<reverse_t>
     {
     private:
         // clang-format off
@@ -411,7 +411,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::reverse_copy
     HPX_INLINE_CONSTEXPR_VARIABLE struct reverse_copy_t final
-      : hpx::functional::tag_fallback<reverse_copy_t>
+      : hpx::detail::tag_parallel_algorithm<reverse_copy_t>
     {
     private:
         // clang-format off

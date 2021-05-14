@@ -735,10 +735,10 @@ namespace hpx {
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/threading_base.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -1316,7 +1316,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_t final
-      : hpx::functional::tag_fallback<for_loop_t>
+      : hpx::detail::tag_parallel_algorithm<for_loop_t>
     {
     private:
         // clang-format off
@@ -1365,7 +1365,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_strided_t final
-      : hpx::functional::tag_fallback<for_loop_strided_t>
+      : hpx::detail::tag_parallel_algorithm<for_loop_strided_t>
     {
     private:
         // clang-format off
@@ -1419,7 +1419,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_n_t final
-      : hpx::functional::tag_fallback<for_loop_n_t>
+      : hpx::detail::tag_parallel_algorithm<for_loop_n_t>
     {
     private:
         // clang-format off
@@ -1469,7 +1469,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_n_strided_t final
-      : hpx::functional::tag_fallback<for_loop_n_strided_t>
+      : hpx::detail::tag_parallel_algorithm<for_loop_n_strided_t>
     {
     private:
         // clang-format off

@@ -349,7 +349,7 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
@@ -378,7 +378,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::copy
     HPX_INLINE_CONSTEXPR_VARIABLE struct copy_t final
-      : hpx::functional::tag_fallback<copy_t>
+      : hpx::detail::tag_parallel_algorithm<copy_t>
     {
     private:
         // clang-format off
@@ -469,7 +469,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::copy_n
     HPX_INLINE_CONSTEXPR_VARIABLE struct copy_n_t final
-      : hpx::functional::tag_fallback<copy_n_t>
+      : hpx::detail::tag_parallel_algorithm<copy_n_t>
     {
     private:
         // clang-format off
@@ -536,7 +536,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::copy_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct copy_if_t final
-      : hpx::functional::tag_fallback<copy_if_t>
+      : hpx::detail::tag_parallel_algorithm<copy_if_t>
     {
     private:
         // clang-format off

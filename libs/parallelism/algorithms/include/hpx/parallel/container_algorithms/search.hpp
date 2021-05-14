@@ -18,6 +18,7 @@
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/detail/search.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -761,7 +762,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx { namespace ranges {
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct search_t final
-      : hpx::functional::tag<search_t>
+      : hpx::detail::tag_parallel_algorithm<search_t>
     {
     private:
         // clang-format off
@@ -784,9 +785,10 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend FwdIter tag_dispatch(hpx::ranges::search_t, FwdIter first,
-            Sent last, FwdIter2 s_first, Sent2 s_last, Pred&& op = Pred(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+        friend FwdIter tag_fallback_dispatch(hpx::ranges::search_t,
+            FwdIter first, Sent last, FwdIter2 s_first, Sent2 s_last,
+            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+            Proj2&& proj2 = Proj2())
         {
             return hpx::parallel::v1::detail::search<FwdIter, Sent>().call(
                 hpx::execution::seq, first, last, s_first, s_last,
@@ -817,9 +819,10 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_dispatch(hpx::ranges::search_t, ExPolicy&& policy, FwdIter first,
-            Sent last, FwdIter2 s_first, Sent2 s_last, Pred&& op = Pred(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+        tag_fallback_dispatch(hpx::ranges::search_t, ExPolicy&& policy,
+            FwdIter first, Sent last, FwdIter2 s_first, Sent2 s_last,
+            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+            Proj2&& proj2 = Proj2())
         {
             return hpx::parallel::v1::detail::search<FwdIter, Sent>().call(
                 std::forward<ExPolicy>(policy), first, last, s_first, s_last,
@@ -844,9 +847,10 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend typename hpx::traits::range_iterator<Rng1>::type tag_dispatch(
-            hpx::ranges::search_t, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+        friend typename hpx::traits::range_iterator<Rng1>::type
+        tag_fallback_dispatch(hpx::ranges::search_t, Rng1&& rng1, Rng2&& rng2,
+            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+            Proj2&& proj2 = Proj2())
         {
             using fwditer_type =
                 typename hpx::traits::range_iterator<Rng1>::type;
@@ -878,9 +882,9 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng1>::type>::type
-        tag_dispatch(hpx::ranges::search_t, ExPolicy&& policy, Rng1&& rng1,
-            Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+        tag_fallback_dispatch(hpx::ranges::search_t, ExPolicy&& policy,
+            Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             using fwditer_type =
                 typename hpx::traits::range_iterator<Rng1>::type;
@@ -896,7 +900,7 @@ namespace hpx { namespace ranges {
     } search{};
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct search_n_t final
-      : hpx::functional::tag<search_n_t>
+      : hpx::detail::tag_parallel_algorithm<search_n_t>
     {
     private:
         // clang-format off
@@ -917,8 +921,8 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend FwdIter tag_dispatch(hpx::ranges::search_n_t, FwdIter first,
-            std::size_t count, FwdIter2 s_first, Sent2 s_last,
+        friend FwdIter tag_fallback_dispatch(hpx::ranges::search_n_t,
+            FwdIter first, std::size_t count, FwdIter2 s_first, Sent2 s_last,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -949,8 +953,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_dispatch(hpx::ranges::search_n_t, ExPolicy&& policy, FwdIter first,
-            std::size_t count, FwdIter2 s_first, Sent2 s_last,
+        tag_fallback_dispatch(hpx::ranges::search_n_t, ExPolicy&& policy,
+            FwdIter first, std::size_t count, FwdIter2 s_first, Sent2 s_last,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -977,10 +981,10 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend typename hpx::traits::range_iterator<Rng1>::type tag_dispatch(
-            hpx::ranges::search_n_t, Rng1&& rng1, std::size_t count,
-            Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+        friend typename hpx::traits::range_iterator<Rng1>::type
+        tag_fallback_dispatch(hpx::ranges::search_n_t, Rng1&& rng1,
+            std::size_t count, Rng2&& rng2, Pred&& op = Pred(),
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             using fwditer_type =
                 typename hpx::traits::range_iterator<Rng1>::type;
@@ -1013,8 +1017,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng1>::type>::type
-        tag_dispatch(hpx::ranges::search_n_t, ExPolicy&& policy, Rng1&& rng1,
-            std::size_t count, Rng2&& rng2, Pred&& op = Pred(),
+        tag_fallback_dispatch(hpx::ranges::search_n_t, ExPolicy&& policy,
+            Rng1&& rng1, std::size_t count, Rng2&& rng2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             using fwditer_type =

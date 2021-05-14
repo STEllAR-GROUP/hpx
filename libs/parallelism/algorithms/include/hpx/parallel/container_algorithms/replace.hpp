@@ -1069,9 +1069,9 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/tagged_pair.hpp>
 
 #include <hpx/algorithms/traits/projected_range.hpp>
@@ -1206,7 +1206,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::replace_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_if_t final
-      : hpx::functional::tag_fallback<replace_if_t>
+      : hpx::detail::tag_parallel_algorithm<replace_if_t>
     {
     private:
         // clang-format off
@@ -1319,7 +1319,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::replace
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_t final
-      : hpx::functional::tag_fallback<replace_t>
+      : hpx::detail::tag_parallel_algorithm<replace_t>
     {
     private:
         // clang-format off
@@ -1434,7 +1434,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::replace_copy_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_copy_if_t final
-      : hpx::functional::tag_fallback<replace_copy_if_t>
+      : hpx::detail::tag_parallel_algorithm<replace_copy_if_t>
     {
     private:
         // clang-format off
@@ -1574,7 +1574,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::replace_copy
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_copy_t final
-      : hpx::functional::tag_fallback<replace_copy_t>
+      : hpx::detail::tag_parallel_algorithm<replace_copy_t>
     {
     private:
         // clang-format off
