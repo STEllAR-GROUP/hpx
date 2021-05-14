@@ -629,6 +629,25 @@ hpx_option(
 )
 
 # ##############################################################################
+# pkgconfig file generation
+# ##############################################################################
+set(HPX_WITH_PKGCONFIG_DEFAULT ON)
+if(MSVC
+   OR HPX_WITH_CUDA
+   OR HPX_WITH_HIP
+)
+  set(HPX_WITH_PKGCONFIG_DEFAULT OFF)
+endif()
+
+hpx_option(
+  HPX_WITH_PKGCONFIG
+  BOOL
+  "Enable generation of pkgconfig files (default: ON on Linux without CUDA/HIP, otherwise OFF)"
+  ${HPX_WITH_PKGCONFIG_DEFAULT}
+  ADVANCED
+)
+
+# ##############################################################################
 # HPX datapar configuration
 # ##############################################################################
 hpx_option(

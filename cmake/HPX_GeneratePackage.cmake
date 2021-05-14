@@ -58,43 +58,6 @@ install(
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
 )
 
-if(NOT MSVC)
-  add_library(hpx_pkgconfig_application INTERFACE)
-  target_link_libraries(
-    hpx_pkgconfig_application INTERFACE hpx hpx_wrap hpx_init
-  )
-  target_compile_definitions(
-    hpx_pkgconfig_application INTERFACE HPX_APPLICATION_EXPORTS
-  )
-  target_compile_options(
-    hpx_pkgconfig_application INTERFACE "-std=c++${HPX_CXX_STANDARD}"
-  )
-
-  add_library(hpx_pkgconfig_component INTERFACE)
-  target_compile_definitions(
-    hpx_pkgconfig_component INTERFACE HPX_COMPONENT_EXPORTS
-  )
-  target_link_libraries(hpx_pkgconfig_component INTERFACE hpx)
-  target_compile_options(
-    hpx_pkgconfig_component INTERFACE "-std=c++${HPX_CXX_STANDARD}"
-  )
-
-  # Generate the pkconfig files for HPX_APPLICATION (both for build and install)
-  hpx_generate_pkgconfig_from_target(
-    hpx_pkgconfig_application hpx_application TRUE EXCLUDE hpx_interface
-  )
-  hpx_generate_pkgconfig_from_target(
-    hpx_pkgconfig_application hpx_application FALSE EXCLUDE hpx_interface
-  )
-  # Generate the pkconfig files for HPX_COMPONENT (both for build and install)
-  hpx_generate_pkgconfig_from_target(
-    hpx_pkgconfig_component hpx_component TRUE EXCLUDE hpx_interface
-  )
-  hpx_generate_pkgconfig_from_target(
-    hpx_pkgconfig_component hpx_component FALSE EXCLUDE hpx_interface
-  )
-endif()
-
 # Install dir
 configure_file(
   cmake/templates/${HPX_PACKAGE_NAME}Config.cmake.in
@@ -143,8 +106,57 @@ install(
   COMPONENT cmake
 )
 
-string(TOLOWER ${CMAKE_BUILD_TYPE} build_type)
-if(NOT MSVC)
+install(
+  FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpxcxx"
+  DESTINATION ${CMAKE_INSTALL_BINDIR}
+  COMPONENT compiler_wrapper
+  PERMISSIONS
+    OWNER_READ
+    OWNER_WRITE
+    OWNER_EXECUTE
+    GROUP_READ
+    GROUP_EXECUTE
+    WORLD_READ
+    WORLD_EXECUTE
+)
+
+if(HPX_WITH_PKGCONFIG)
+  add_library(hpx_pkgconfig_application INTERFACE)
+  target_link_libraries(
+    hpx_pkgconfig_application INTERFACE hpx hpx_wrap hpx_init
+  )
+  target_compile_definitions(
+    hpx_pkgconfig_application INTERFACE HPX_APPLICATION_EXPORTS
+  )
+  target_compile_options(
+    hpx_pkgconfig_application INTERFACE "-std=c++${HPX_CXX_STANDARD}"
+  )
+
+  add_library(hpx_pkgconfig_component INTERFACE)
+  target_compile_definitions(
+    hpx_pkgconfig_component INTERFACE HPX_COMPONENT_EXPORTS
+  )
+  target_link_libraries(hpx_pkgconfig_component INTERFACE hpx)
+  target_compile_options(
+    hpx_pkgconfig_component INTERFACE "-std=c++${HPX_CXX_STANDARD}"
+  )
+
+  # Generate the pkconfig files for HPX_APPLICATION (both for build and install)
+  hpx_generate_pkgconfig_from_target(
+    hpx_pkgconfig_application hpx_application TRUE EXCLUDE hpx_interface
+  )
+  hpx_generate_pkgconfig_from_target(
+    hpx_pkgconfig_application hpx_application FALSE EXCLUDE hpx_interface
+  )
+  # Generate the pkconfig files for HPX_COMPONENT (both for build and install)
+  hpx_generate_pkgconfig_from_target(
+    hpx_pkgconfig_component hpx_component TRUE EXCLUDE hpx_interface
+  )
+  hpx_generate_pkgconfig_from_target(
+    hpx_pkgconfig_component hpx_component FALSE EXCLUDE hpx_interface
+  )
+
+  string(TOLOWER ${CMAKE_BUILD_TYPE} build_type)
   install(
     FILES ${OUTPUT_DIR_PC}/hpx_application_${build_type}.pc
           ${OUTPUT_DIR_PC}/hpx_component_${build_type}.pc
@@ -159,17 +171,3 @@ if(NOT MSVC)
     COMPONENT pkgconfig
   )
 endif()
-
-install(
-  FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpxcxx"
-  DESTINATION ${CMAKE_INSTALL_BINDIR}
-  COMPONENT compiler_wrapper
-  PERMISSIONS
-    OWNER_READ
-    OWNER_WRITE
-    OWNER_EXECUTE
-    GROUP_READ
-    GROUP_EXECUTE
-    WORLD_READ
-    WORLD_EXECUTE
-)
