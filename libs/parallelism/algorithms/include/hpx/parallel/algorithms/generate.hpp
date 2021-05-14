@@ -130,7 +130,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
@@ -296,7 +296,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::generate
     HPX_INLINE_CONSTEXPR_VARIABLE struct generate_t final
-      : hpx::functional::tag_fallback<generate_t>
+      : hpx::detail::tag_parallel_algorithm<generate_t>
     {
     private:
         // clang-format off
@@ -339,7 +339,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::generate_n
     HPX_INLINE_CONSTEXPR_VARIABLE struct generate_n_t final
-      : hpx::functional::tag_fallback<generate_n_t>
+      : hpx::detail::tag_parallel_algorithm<generate_n_t>
     {
     private:
         // clang-format off

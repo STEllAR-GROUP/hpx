@@ -384,8 +384,8 @@ namespace hpx { namespace ranges {
         ranges::binary_transform_result<
             typename hpx::traits::range_iterator<Rng1>::type,
             typename hpx::traits::range_iterator<Rng2>::type, FwdIter>>::type
-    tag_dispatch(hpx::ranges::transform_t, ExPolicy&& policy, Rng1&& rng1,
-        Rng2&& rng2, FwdIter dest, F&& f, Proj1&& proj1 = Proj1(),
+    tag_fallback_dispatch(hpx::ranges::transform_t, ExPolicy&& policy,
+        Rng1&& rng1, Rng2&& rng2, FwdIter dest, F&& f, Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2())
 
 }}       // namespace hpx::ranges
@@ -401,6 +401,7 @@ namespace hpx { namespace ranges {
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/transform.hpp>
 #include <hpx/parallel/tagspec.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <type_traits>
@@ -550,7 +551,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::transform
     HPX_INLINE_CONSTEXPR_VARIABLE struct transform_t final
-      : hpx::functional::tag_fallback<transform_t>
+      : hpx::detail::tag_parallel_algorithm<transform_t>
     {
     private:
         // clang-format off

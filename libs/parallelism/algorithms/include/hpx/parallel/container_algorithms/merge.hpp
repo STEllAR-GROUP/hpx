@@ -384,7 +384,6 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
@@ -393,6 +392,7 @@ namespace hpx { namespace ranges {
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/merge.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
@@ -518,7 +518,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::merge
     HPX_INLINE_CONSTEXPR_VARIABLE struct merge_t final
-      : hpx::functional::tag<merge_t>
+      : hpx::detail::tag_parallel_algorithm<merge_t>
     {
     private:
         // clang-format off
@@ -543,9 +543,9 @@ namespace hpx { namespace ranges {
             hpx::ranges::merge_result<
                 typename hpx::traits::range_iterator<Rng1>::type,
                 typename hpx::traits::range_iterator<Rng2>::type, Iter3>>::type
-        tag_dispatch(merge_t, ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
-            Iter3 dest, Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+        tag_fallback_dispatch(merge_t, ExPolicy&& policy, Rng1&& rng1,
+            Rng2&& rng2, Iter3 dest, Comp&& comp = Comp(),
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             using iterator_type1 =
                 typename hpx::traits::range_iterator<Rng1>::type;
@@ -592,9 +592,10 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             hpx::ranges::merge_result<Iter1, Iter2, Iter3>>::type
-        tag_dispatch(merge_t, ExPolicy&& policy, Iter1 first1, Sent1 last1,
-            Iter2 first2, Sent2 last2, Iter3 dest, Comp&& comp = Comp(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+        tag_fallback_dispatch(merge_t, ExPolicy&& policy, Iter1 first1,
+            Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest,
+            Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
+            Proj2&& proj2 = Proj2())
         {
             static_assert(hpx::traits::is_random_access_iterator<Iter1>::value,
                 "Required at least random access iterator.");
@@ -632,7 +633,7 @@ namespace hpx { namespace ranges {
         friend hpx::ranges::merge_result<
             typename hpx::traits::range_iterator<Rng1>::type,
             typename hpx::traits::range_iterator<Rng2>::type, Iter3>
-        tag_dispatch(merge_t, Rng1&& rng1, Rng2&& rng2, Iter3 dest,
+        tag_fallback_dispatch(merge_t, Rng1&& rng1, Rng2&& rng2, Iter3 dest,
             Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -679,10 +680,10 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend hpx::ranges::merge_result<Iter1, Iter2, Iter3> tag_dispatch(
-            merge_t, Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
-            Iter3 dest, Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+        friend hpx::ranges::merge_result<Iter1, Iter2, Iter3>
+        tag_fallback_dispatch(merge_t, Iter1 first1, Sent1 last1, Iter2 first2,
+            Sent2 last2, Iter3 dest, Comp&& comp = Comp(),
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             static_assert(hpx::traits::is_random_access_iterator<Iter1>::value,
                 "Required at least random access iterator.");
@@ -703,7 +704,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::inplace_merge
     HPX_INLINE_CONSTEXPR_VARIABLE struct inplace_merge_t final
-      : hpx::functional::tag<inplace_merge_t>
+      : hpx::detail::tag_parallel_algorithm<inplace_merge_t>
     {
     private:
         // clang-format off
@@ -724,8 +725,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_dispatch(inplace_merge_t, ExPolicy&& policy, Rng&& rng, Iter middle,
-            Comp&& comp = Comp(), Proj&& proj = Proj())
+        tag_fallback_dispatch(inplace_merge_t, ExPolicy&& policy, Rng&& rng,
+            Iter middle, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
@@ -758,7 +759,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_dispatch(inplace_merge_t, ExPolicy&& policy, Iter first,
+        tag_fallback_dispatch(inplace_merge_t, ExPolicy&& policy, Iter first,
             Iter middle, Sent last, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
@@ -785,8 +786,8 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend Iter tag_dispatch(inplace_merge_t, Rng&& rng, Iter middle,
-            Comp&& comp = Comp(), Proj&& proj = Proj())
+        friend Iter tag_fallback_dispatch(inplace_merge_t, Rng&& rng,
+            Iter middle, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
@@ -817,8 +818,8 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend Iter tag_dispatch(inplace_merge_t, Iter first, Iter middle,
-            Sent last, Comp&& comp = Comp(), Proj&& proj = Proj())
+        friend Iter tag_fallback_dispatch(inplace_merge_t, Iter first,
+            Iter middle, Sent last, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
                 "Required at least random access iterator.");

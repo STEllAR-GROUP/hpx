@@ -170,7 +170,7 @@ namespace hpx {
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
@@ -794,7 +794,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::merge
     HPX_INLINE_CONSTEXPR_VARIABLE struct merge_t final
-      : hpx::functional::tag_fallback<merge_t>
+      : hpx::detail::tag_parallel_algorithm<merge_t>
     {
     private:
         // clang-format off
@@ -880,7 +880,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::inplace_merge
     HPX_INLINE_CONSTEXPR_VARIABLE struct inplace_merge_t final
-      : hpx::functional::tag_fallback<inplace_merge_t>
+      : hpx::detail::tag_parallel_algorithm<inplace_merge_t>
     {
     private:
         // clang-format off

@@ -256,7 +256,7 @@ namespace hpx {
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -771,7 +771,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::transform_reduce
     HPX_INLINE_CONSTEXPR_VARIABLE struct transform_reduce_t final
-      : hpx::functional::tag_fallback<transform_reduce_t>
+      : hpx::detail::tag_parallel_algorithm<transform_reduce_t>
     {
     private:
         // clang-format off

@@ -105,7 +105,6 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 
@@ -117,6 +116,7 @@ namespace hpx { namespace ranges {
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -131,7 +131,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::destroy
     HPX_INLINE_CONSTEXPR_VARIABLE struct destroy_t final
-      : hpx::functional::tag<destroy_t>
+      : hpx::detail::tag_parallel_algorithm<destroy_t>
     {
     private:
         // clang-format off
@@ -143,7 +143,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_dispatch(destroy_t, ExPolicy&& policy, Rng&& rng)
+        tag_fallback_dispatch(destroy_t, ExPolicy&& policy, Rng&& rng)
         {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
@@ -166,7 +166,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_dispatch(destroy_t, ExPolicy&& policy, Iter first, Sent last)
+        tag_fallback_dispatch(
+            destroy_t, ExPolicy&& policy, Iter first, Sent last)
         {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Required at least forward iterator.");
@@ -181,8 +182,8 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend typename hpx::traits::range_iterator<Rng>::type tag_dispatch(
-            destroy_t, Rng&& rng)
+        friend typename hpx::traits::range_iterator<Rng>::type
+        tag_fallback_dispatch(destroy_t, Rng&& rng)
         {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
@@ -202,7 +203,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<Iter>::value
             )>
         // clang-format on
-        friend Iter tag_dispatch(destroy_t, Iter first, Sent last)
+        friend Iter tag_fallback_dispatch(destroy_t, Iter first, Sent last)
         {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Required at least forward iterator.");
@@ -215,7 +216,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::destroy_n
     HPX_INLINE_CONSTEXPR_VARIABLE struct destroy_n_t final
-      : hpx::functional::tag<destroy_n_t>
+      : hpx::detail::tag_parallel_algorithm<destroy_n_t>
     {
     private:
         // clang-format off
@@ -227,7 +228,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_dispatch(destroy_n_t, ExPolicy&& policy, FwdIter first, Size count)
+        tag_fallback_dispatch(
+            destroy_n_t, ExPolicy&& policy, FwdIter first, Size count)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least forward iterator.");
@@ -249,7 +251,8 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_dispatch(destroy_n_t, FwdIter first, Size count)
+        friend FwdIter tag_fallback_dispatch(
+            destroy_n_t, FwdIter first, Size count)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least forward iterator.");

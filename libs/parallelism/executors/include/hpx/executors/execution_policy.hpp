@@ -34,6 +34,24 @@ namespace hpx { namespace execution {
     /// Default sequential execution policy object.
     HPX_INLINE_CONSTEXPR_VARIABLE task_policy_tag task{};
 
+    namespace detail {
+        template <typename T, typename Enable = void>
+        struct has_async_execution_policy : std::false_type
+        {
+        };
+
+        template <typename T>
+        struct has_async_execution_policy<T,
+            std::void_t<decltype(std::declval<std::decay_t<T>>()(task))>>
+          : std::true_type
+        {
+        };
+
+        template <typename T>
+        inline constexpr bool has_async_execution_policy_v =
+            has_async_execution_policy<T>::value;
+    }    // namespace detail
+
     ///////////////////////////////////////////////////////////////////////////
     /// Extension: The class sequenced_task_policy is an execution
     /// policy type used as a unique type to disambiguate parallel algorithm
@@ -1222,18 +1240,6 @@ namespace hpx { namespace execution {
         constexpr parallel_unsequenced_policy() = default;
         /// \endcond
 
-        /// Create a new parallel_unsequenced_policy from itself
-        ///
-        /// \param tag [in] Specify that the corresponding asynchronous
-        ///            execution policy should be used
-        ///
-        /// \returns The new parallel_unsequenced_policy
-        ///
-        parallel_unsequenced_policy operator()(task_policy_tag /*tag*/) const
-        {
-            return *this;
-        }
-
     public:
         /// Return the associated executor object.
         executor_type& executor()
@@ -1297,18 +1303,6 @@ namespace hpx { namespace execution {
         constexpr unsequenced_policy() = default;
         /// \endcond
 
-        /// Create a new parallel_unsequenced_policy from itself
-        ///
-        /// \param tag [in] Specify that the corresponding asynchronous
-        ///            execution policy should be used
-        ///
-        /// \returns The new parallel_unsequenced_policy
-        ///
-        unsequenced_policy operator()(task_policy_tag /*tag*/) const
-        {
-            return *this;
-        }
-
     public:
         /// Return the associated executor object.
         executor_type& executor()
@@ -1369,51 +1363,62 @@ namespace hpx { namespace parallel { namespace execution {
         "hpx::execution::task instead.")
     HPX_INLINE_CONSTEXPR_VARIABLE hpx::execution::task_policy_tag task{};
     using parallel_executor HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::parallel_executor is deprecated. Please use "
+        "hpx::parallel::execution::parallel_executor is deprecated. Please "
+        "use "
         "hpx::execution::parallel_executor instead.") =
         hpx::execution::parallel_executor;
     using parallel_policy HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::parallel_policy is deprecated. Please use "
+        "hpx::parallel::execution::parallel_policy is deprecated. Please "
+        "use "
         "hpx::execution::parallel_policy instead.") =
         hpx::execution::parallel_policy;
     template <typename Executor, typename Parameters>
     using parallel_policy_shim HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::parallel_policy_shim is deprecated. Please "
+        "hpx::parallel::execution::parallel_policy_shim is deprecated. "
+        "Please "
         "use hpx::execution::parallel_policy_shim instead.") =
         hpx::execution::parallel_policy_shim<Executor, Parameters>;
     using parallel_task_policy HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::parallel_task_policy is deprecated. Please "
+        "hpx::parallel::execution::parallel_task_policy is deprecated. "
+        "Please "
         "use hpx::execution::parallel_task_policy instead.") =
         hpx::execution::parallel_task_policy;
     template <typename Executor, typename Parameters>
     using parallel_task_policy_shim HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::parallel_task_policy_shim is deprecated. "
+        "hpx::parallel::execution::parallel_task_policy_shim is "
+        "deprecated. "
         "Please use hpx::execution::parallel_task_policy_shim instead.") =
         hpx::execution::parallel_task_policy_shim<Executor, Parameters>;
     using parallel_unsequenced_policy HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::parallel_unsequenced_policy is deprecated. "
+        "hpx::parallel::execution::parallel_unsequenced_policy is "
+        "deprecated. "
         "Please use hpx::execution::parallel_unsequenced_policy instead.") =
         hpx::execution::parallel_unsequenced_policy;
     using sequenced_executor HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::sequenced_executor is deprecated. Please "
+        "hpx::parallel::execution::sequenced_executor is deprecated. "
+        "Please "
         "use hpx::execution::sequenced_executor instead.") =
         hpx::execution::sequenced_executor;
     using sequenced_policy HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::sequenced_policy is deprecated. Please use "
+        "hpx::parallel::execution::sequenced_policy is deprecated. Please "
+        "use "
         "hpx::execution::sequenced_policy instead.") =
         hpx::execution::sequenced_policy;
     template <typename Executor, typename Parameters>
     using sequenced_policy_shim HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::sequenced_policy_shim is deprecated. Please "
+        "hpx::parallel::execution::sequenced_policy_shim is deprecated. "
+        "Please "
         "use hpx::execution::sequenced_policy_shim instead.") =
         hpx::execution::sequenced_policy_shim<Executor, Parameters>;
     using sequenced_task_policy HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::sequenced_task_policy is deprecated. Please "
+        "hpx::parallel::execution::sequenced_task_policy is deprecated. "
+        "Please "
         "use hpx::execution::sequenced_task_policy instead.") =
         hpx::execution::sequenced_task_policy;
     template <typename Executor, typename Parameters>
     using sequenced_task_policy_shim HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::sequenced_task_policy_shim is deprecated. "
+        "hpx::parallel::execution::sequenced_task_policy_shim is "
+        "deprecated. "
         "Please use hpx::execution::sequenced_task_policy_shim instead.") =
         hpx::execution::sequenced_task_policy_shim<Executor, Parameters>;
 }}}    // namespace hpx::parallel::execution

@@ -12,11 +12,11 @@
 #include <hpx/config.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/search.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -369,7 +369,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct search_t final
-      : hpx::functional::tag_fallback<search_t>
+      : hpx::detail::tag_parallel_algorithm<search_t>
     {
     private:
         // clang-format off
@@ -422,7 +422,7 @@ namespace hpx {
     } search{};
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct search_n_t final
-      : hpx::functional::tag_fallback<search_n_t>
+      : hpx::detail::tag_parallel_algorithm<search_n_t>
     {
     private:
         // clang-format off

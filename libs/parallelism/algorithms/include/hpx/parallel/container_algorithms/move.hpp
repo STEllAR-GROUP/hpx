@@ -132,6 +132,7 @@ namespace hpx {
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
@@ -148,7 +149,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::move
     HPX_INLINE_CONSTEXPR_VARIABLE struct move_t final
-      : hpx::functional::tag<move_t>
+      : hpx::detail::tag_parallel_algorithm<move_t>
     {
     private:
         // clang-format off
@@ -162,7 +163,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             move_result<Iter1, Iter2>>::type
-        tag_dispatch(
+        tag_fallback_dispatch(
             move_t, ExPolicy&& policy, Iter1 first, Sent1 last, Iter2 dest)
         {
             return hpx::parallel::v1::detail::transfer<
@@ -181,7 +182,7 @@ namespace hpx { namespace ranges {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             move_result<typename hpx::traits::range_iterator<Rng>::type,
                 Iter2>>::type
-        tag_dispatch(move_t, ExPolicy&& policy, Rng&& rng, Iter2 dest)
+        tag_fallback_dispatch(move_t, ExPolicy&& policy, Rng&& rng, Iter2 dest)
         {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
@@ -199,7 +200,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<Iter2>::value
             )>
         // clang-format on
-        friend move_result<Iter1, Iter2> tag_dispatch(
+        friend move_result<Iter1, Iter2> tag_fallback_dispatch(
             move_t, Iter1 first, Sent1 last, Iter2 dest)
         {
             return hpx::parallel::v1::detail::transfer<
@@ -216,7 +217,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend move_result<typename hpx::traits::range_iterator<Rng>::type,
             Iter2>
-        tag_dispatch(move_t, Rng&& rng, Iter2 dest)
+        tag_fallback_dispatch(move_t, Rng&& rng, Iter2 dest)
         {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;

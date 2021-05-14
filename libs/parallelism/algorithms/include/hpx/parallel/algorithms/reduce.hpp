@@ -215,7 +215,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
@@ -385,7 +385,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::reduce
     HPX_INLINE_CONSTEXPR_VARIABLE struct reduce_t final
-      : hpx::functional::tag_fallback<reduce_t>
+      : hpx::detail::tag_parallel_algorithm<reduce_t>
     {
     private:
         // clang-format off

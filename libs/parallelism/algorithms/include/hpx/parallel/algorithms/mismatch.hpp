@@ -175,7 +175,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
@@ -497,7 +497,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::mismatch
     HPX_INLINE_CONSTEXPR_VARIABLE struct mismatch_t final
-      : hpx::functional::tag_fallback<mismatch_t>
+      : hpx::detail::tag_parallel_algorithm<mismatch_t>
     {
     private:
         // clang-format off

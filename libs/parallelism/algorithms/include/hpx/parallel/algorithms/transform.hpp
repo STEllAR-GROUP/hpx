@@ -180,9 +180,9 @@ namespace hpx {
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
@@ -904,7 +904,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::transform
     HPX_INLINE_CONSTEXPR_VARIABLE struct transform_t final
-      : hpx::functional::tag_fallback<transform_t>
+      : hpx::detail::tag_parallel_algorithm<transform_t>
     {
     private:
         // clang-format off

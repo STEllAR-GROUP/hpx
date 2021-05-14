@@ -122,11 +122,11 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/adjacent_find.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
@@ -246,7 +246,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     HPX_INLINE_CONSTEXPR_VARIABLE struct adjacent_find_t final
-      : hpx::functional::tag_fallback<adjacent_find_t>
+      : hpx::detail::tag_parallel_algorithm<adjacent_find_t>
     {
     private:
         // clang-format off

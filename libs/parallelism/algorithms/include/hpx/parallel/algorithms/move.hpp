@@ -74,7 +74,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
@@ -204,7 +204,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::move
     HPX_INLINE_CONSTEXPR_VARIABLE struct move_t final
-      : hpx::functional::tag_fallback<move_t>
+      : hpx::detail::tag_parallel_algorithm<move_t>
     {
     private:
         // clang-format off

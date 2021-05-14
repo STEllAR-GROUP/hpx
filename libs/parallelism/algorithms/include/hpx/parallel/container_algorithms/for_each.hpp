@@ -383,6 +383,7 @@ namespace hpx { namespace ranges {
 
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <type_traits>
@@ -421,7 +422,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::for_each
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_each_t final
-      : hpx::functional::tag_fallback<for_each_t>
+      : hpx::detail::tag_parallel_algorithm<for_each_t>
     {
         // clang-format off
         template <typename InIter, typename Sent, typename F,
@@ -530,7 +531,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::for_each_n
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_each_n_t final
-      : hpx::functional::tag_fallback<for_each_n_t>
+      : hpx::detail::tag_parallel_algorithm<for_each_n_t>
     {
         // clang-format off
         template <typename InIter, typename Size, typename F,

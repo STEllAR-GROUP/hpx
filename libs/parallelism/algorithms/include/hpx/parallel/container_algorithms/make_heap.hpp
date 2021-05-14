@@ -122,7 +122,6 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
@@ -131,6 +130,7 @@ namespace hpx { namespace ranges {
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/algorithms/make_heap.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
@@ -143,7 +143,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::make_heap
     HPX_INLINE_CONSTEXPR_VARIABLE struct make_heap_t final
-      : hpx::functional::tag<make_heap_t>
+      : hpx::detail::tag_parallel_algorithm<make_heap_t>
     {
     private:
         // clang-format off
@@ -161,8 +161,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_dispatch(make_heap_t, ExPolicy&& policy, Iter first, Sent last,
-            Comp&& comp, Proj&& proj = Proj{})
+        tag_fallback_dispatch(make_heap_t, ExPolicy&& policy, Iter first,
+            Sent last, Comp&& comp, Proj&& proj = Proj{})
         {
             static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
                 "Requires random access iterator.");
@@ -186,8 +186,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_dispatch(make_heap_t, ExPolicy&& policy, Rng& rng, Comp&& comp,
-            Proj&& proj = Proj{})
+        tag_fallback_dispatch(make_heap_t, ExPolicy&& policy, Rng& rng,
+            Comp&& comp, Proj&& proj = Proj{})
         {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
@@ -217,8 +217,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_dispatch(make_heap_t, ExPolicy&& policy, Iter first, Sent last,
-            Proj&& proj = Proj{})
+        tag_fallback_dispatch(make_heap_t, ExPolicy&& policy, Iter first,
+            Sent last, Proj&& proj = Proj{})
         {
             static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
                 "Requires random access iterator.");
@@ -247,7 +247,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_dispatch(
+        tag_fallback_dispatch(
             make_heap_t, ExPolicy&& policy, Rng&& rng, Proj&& proj = Proj{})
         {
             using iterator_type =
@@ -278,7 +278,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend Iter tag_dispatch(make_heap_t, Iter first, Sent last,
+        friend Iter tag_fallback_dispatch(make_heap_t, Iter first, Sent last,
             Comp&& comp, Proj&& proj = Proj{})
         {
             static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
@@ -301,7 +301,8 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend typename hpx::traits::range_iterator<Rng>::type tag_dispatch(
+        friend typename hpx::traits::range_iterator<Rng>::type
+        tag_fallback_dispatch(
             make_heap_t, Rng& rng, Comp&& comp, Proj&& proj = Proj{})
         {
             using iterator_type =
@@ -329,7 +330,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend Iter tag_dispatch(
+        friend Iter tag_fallback_dispatch(
             make_heap_t, Iter first, Sent last, Proj&& proj = Proj{})
         {
             static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
@@ -357,8 +358,8 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend typename hpx::traits::range_iterator<Rng>::type tag_dispatch(
-            make_heap_t, Rng&& rng, Proj&& proj = Proj{})
+        friend typename hpx::traits::range_iterator<Rng>::type
+        tag_fallback_dispatch(make_heap_t, Rng&& rng, Proj&& proj = Proj{})
         {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;

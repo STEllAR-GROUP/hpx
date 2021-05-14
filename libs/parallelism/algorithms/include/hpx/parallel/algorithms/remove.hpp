@@ -211,8 +211,8 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/tagged_pair.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -467,7 +467,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::remove_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct remove_if_t final
-      : hpx::functional::tag_fallback<remove_if_t>
+      : hpx::detail::tag_parallel_algorithm<remove_if_t>
     {
         // clang-format off
         template <typename FwdIter,
@@ -478,7 +478,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend FwdIter tag_dispatch(
+        friend FwdIter tag_fallback_dispatch(
             hpx::remove_if_t, FwdIter first, FwdIter last, Pred&& pred)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -502,8 +502,8 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_dispatch(hpx::remove_if_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, Pred&& pred)
+        tag_fallback_dispatch(hpx::remove_if_t, ExPolicy&& policy,
+            FwdIter first, FwdIter last, Pred&& pred)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
@@ -519,7 +519,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::remove
     HPX_INLINE_CONSTEXPR_VARIABLE struct remove_t final
-      : hpx::functional::tag_fallback<remove_t>
+      : hpx::detail::tag_parallel_algorithm<remove_t>
     {
     private:
         // clang-format off
@@ -528,7 +528,7 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_dispatch(
+        friend FwdIter tag_fallback_dispatch(
             hpx::remove_t, FwdIter first, FwdIter last, T const& value)
         {
             typedef typename std::iterator_traits<FwdIter>::value_type Type;
@@ -546,7 +546,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_dispatch(hpx::remove_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_dispatch(hpx::remove_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, T const& value)
         {
             typedef typename std::iterator_traits<FwdIter>::value_type Type;

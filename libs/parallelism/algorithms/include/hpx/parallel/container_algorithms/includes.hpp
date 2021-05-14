@@ -205,7 +205,6 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
@@ -216,6 +215,7 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/algorithms/includes.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/result_types.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -227,7 +227,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::includes
     HPX_INLINE_CONSTEXPR_VARIABLE struct includes_t final
-      : hpx::functional::tag<includes_t>
+      : hpx::detail::tag_parallel_algorithm<includes_t>
     {
     private:
         // clang-format off
@@ -250,8 +250,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_dispatch(includes_t, ExPolicy&& policy, Iter1 first1, Sent1 last1,
-            Iter2 first2, Sent2 last2, Pred&& op = Pred(),
+        tag_fallback_dispatch(includes_t, ExPolicy&& policy, Iter1 first1,
+            Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             static_assert((hpx::traits::is_forward_iterator<Iter1>::value),
@@ -282,7 +282,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend bool tag_dispatch(includes_t, Iter1 first1, Sent1 last1,
+        friend bool tag_fallback_dispatch(includes_t, Iter1 first1, Sent1 last1,
             Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -316,8 +316,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_dispatch(includes_t, ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
-            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+        tag_fallback_dispatch(includes_t, ExPolicy&& policy, Rng1&& rng1,
+            Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
             using iterator_type1 =
@@ -356,7 +356,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend bool tag_dispatch(includes_t, Rng1&& rng1, Rng2&& rng2,
+        friend bool tag_fallback_dispatch(includes_t, Rng1&& rng1, Rng2&& rng2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {

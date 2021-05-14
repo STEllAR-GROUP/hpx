@@ -376,7 +376,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
@@ -1073,7 +1073,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::find
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_t final
-      : hpx::functional::tag_fallback<find_t>
+      : hpx::detail::tag_parallel_algorithm<find_t>
     {
     private:
         // clang-format off
@@ -1118,7 +1118,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::find_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_if_t final
-      : hpx::functional::tag_fallback<find_if_t>
+      : hpx::detail::tag_parallel_algorithm<find_if_t>
     {
     private:
         // clang-format off
@@ -1169,7 +1169,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::find_if_not
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_if_not_t final
-      : hpx::functional::tag_fallback<find_if_not_t>
+      : hpx::detail::tag_parallel_algorithm<find_if_not_t>
     {
     private:
         // clang-format off
@@ -1220,7 +1220,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::find_end
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_end_t final
-      : hpx::functional::tag_fallback<find_end_t>
+      : hpx::detail::tag_parallel_algorithm<find_end_t>
     {
     private:
         // clang-format off
@@ -1331,7 +1331,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::find_first_of
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_first_of_t final
-      : hpx::functional::tag_fallback<find_first_of_t>
+      : hpx::detail::tag_parallel_algorithm<find_first_of_t>
     {
     private:
         // clang-format off
