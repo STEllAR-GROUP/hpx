@@ -219,9 +219,9 @@ namespace hpx { namespace experimental {
             async_rw_mutex_access_wrapper& operator=(
                 async_rw_mutex_access_wrapper&&) = default;
             async_rw_mutex_access_wrapper(
-                async_rw_mutex_access_wrapper const&) = default;
+                async_rw_mutex_access_wrapper const&) = delete;
             async_rw_mutex_access_wrapper& operator=(
-                async_rw_mutex_access_wrapper const&) = default;
+                async_rw_mutex_access_wrapper const&) = delete;
 
             ReadWriteT& get()
             {
@@ -284,9 +284,9 @@ namespace hpx { namespace experimental {
             async_rw_mutex_access_wrapper& operator=(
                 async_rw_mutex_access_wrapper&&) = default;
             async_rw_mutex_access_wrapper(
-                async_rw_mutex_access_wrapper const&) = default;
+                async_rw_mutex_access_wrapper const&) = delete;
             async_rw_mutex_access_wrapper& operator=(
-                async_rw_mutex_access_wrapper const&) = default;
+                async_rw_mutex_access_wrapper const&) = delete;
         };
     }    // namespace detail
 
