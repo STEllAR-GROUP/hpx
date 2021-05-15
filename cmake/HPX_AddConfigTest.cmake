@@ -116,9 +116,16 @@ function(add_hpx_config_test variable)
     )
     set(CONFIG_TEST_LINK_LIBRARIES ${_base_libraries} ${${variable}_LIBRARIES})
 
+    set(additional_cmake_flags)
+    if(MSVC)
+      set(additional_cmake_flags "-WX")
+    else()
+      set(additional_cmake_flags "-Werror")
+    endif()
+
     if(${variable}_EXECUTE)
       if(NOT CMAKE_CROSSCOMPILING)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${additional_cmake_flags}")
         # cmake-format: off
         try_run(
           ${variable}_RUN_RESULT ${variable}_COMPILE_RESULT
@@ -145,7 +152,7 @@ function(add_hpx_config_test variable)
         set(${variable}_RESULT FALSE)
       endif()
     else()
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${additional_cmake_flags}")
       # cmake-format: off
       try_compile(
         ${variable}_RESULT
@@ -567,7 +574,6 @@ function(hpx_check_for_cxx20_std_execution_policies)
     FILE ${ARGN}
   )
 endfunction()
-
 
 # ##############################################################################
 function(hpx_check_for_builtin_integer_pack)

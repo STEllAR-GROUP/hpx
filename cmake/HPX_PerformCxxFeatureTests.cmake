@@ -103,9 +103,7 @@ function(hpx_perform_cxx_feature_tests)
   # C++20 feature tests
   hpx_check_for_cxx20_coroutines(DEFINITIONS HPX_HAVE_CXX20_COROUTINES)
 
-  hpx_check_for_cxx20_lambda_capture(
-    DEFINITIONS HPX_HAVE_CXX20_LAMBDA_CAPTURE
-  )
+  hpx_check_for_cxx20_lambda_capture(DEFINITIONS HPX_HAVE_CXX20_LAMBDA_CAPTURE)
 
   hpx_check_for_cxx20_no_unique_address_attribute(
     DEFINITIONS HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
