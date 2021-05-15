@@ -11,7 +11,7 @@
 
 #if defined(DOXYGEN)
 
-namespace hpx {
+namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Replaces all elements satisfying specific criteria with \a new_value
@@ -1063,7 +1063,7 @@ namespace hpx {
     replace_copy_if(ExPolicy&& policy, Rng&& rng, FwdIter dest, Pred&& pred,
         T const& new_value, Proj&& proj = Proj());
 
-}    // namespace hpx
+}}    // namespace hpx::ranges
 
 #else    // DOXYGEN
 

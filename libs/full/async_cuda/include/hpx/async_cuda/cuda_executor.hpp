@@ -12,8 +12,8 @@
 #include <hpx/async_cuda/cuda_future.hpp>
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/errors/exception.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/execution_base/execution.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 

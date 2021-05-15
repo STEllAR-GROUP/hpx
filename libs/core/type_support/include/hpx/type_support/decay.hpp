@@ -14,6 +14,7 @@
 #include <utility>
 
 namespace hpx { namespace util {
+
     template <typename T>
     struct HPX_DEPRECATED_V(
         1, 6, "hpx::util::decay is deprecated, use std::decay instead.") decay
@@ -26,19 +27,21 @@ namespace hpx { namespace util {
         template <typename TD>
         struct decay_unwrap_impl
         {
-            typedef TD type;
+            using type = TD;
         };
 
         template <typename X>
         struct decay_unwrap_impl<::std::reference_wrapper<X>>
         {
-            typedef X& type;
+            using type = X&;
         };
     }    // namespace detail
 
     template <typename T>
-    struct decay_unwrap
-      : detail::decay_unwrap_impl<typename std::decay<T>::type>
+    struct decay_unwrap : detail::decay_unwrap_impl<std::decay_t<T>>
     {
     };
+
+    template <typename T>
+    using decay_unwrap_t = typename decay_unwrap<T>::type;
 }}    // namespace hpx::util

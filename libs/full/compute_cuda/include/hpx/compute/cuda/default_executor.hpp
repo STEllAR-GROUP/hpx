@@ -11,7 +11,7 @@
 #if defined(HPX_HAVE_GPU_SUPPORT)
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>

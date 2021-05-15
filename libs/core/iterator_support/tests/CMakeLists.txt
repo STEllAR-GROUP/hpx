@@ -12,6 +12,11 @@ if(NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
 endif()
 
 if(HPX_WITH_TESTS)
+  add_library(hpx_iterator_support_test_utilities INTERFACE)
+  target_include_directories(
+    hpx_iterator_support_test_utilities INTERFACE include/
+  )
+
   if(HPX_WITH_TESTS_UNIT)
     add_hpx_pseudo_target(tests.unit.modules.iterator_support)
     add_hpx_pseudo_dependencies(

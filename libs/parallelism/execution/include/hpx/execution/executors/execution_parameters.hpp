@@ -11,8 +11,8 @@
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/execution/traits/is_executor_parameters.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
+#include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
@@ -40,12 +40,11 @@ namespace hpx { namespace parallel { namespace execution {
         // customization point for interface get_chunk_size()
         template <typename Parameters, typename Executor_>
         struct get_chunk_size_fn_helper<Parameters, Executor_,
-            typename std::enable_if<
-                hpx::traits::is_executor_any<Executor_>::value
+            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
                 || hpx::traits::is_threads_executor<Executor_>::value
 #endif
-                >::type>
+                >>
         {
             // Check whether the parameter object implements this function
             template <typename AnyParameters, typename Executor, typename F>
@@ -130,12 +129,11 @@ namespace hpx { namespace parallel { namespace execution {
         // customization point for interface maximal_number_of_chunks()
         template <typename Parameters, typename Executor_>
         struct maximal_number_of_chunks_fn_helper<Parameters, Executor_,
-            typename std::enable_if<
-                hpx::traits::is_executor_any<Executor_>::value
+            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
                 || hpx::traits::is_threads_executor<Executor_>::value
 #endif
-                >::type>
+                >>
         {
             // Check whether the parameter object implements this function
             template <typename AnyParameters, typename Executor>
@@ -211,12 +209,11 @@ namespace hpx { namespace parallel { namespace execution {
         // customization point for interface reset_thread_distribution()
         template <typename Parameters, typename Executor_>
         struct reset_thread_distribution_fn_helper<Parameters, Executor_,
-            typename std::enable_if<
-                hpx::traits::is_executor_any<Executor_>::value
+            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
                 || hpx::traits::is_threads_executor<Executor_>::value
 #endif
-                >::type>
+                >>
         {
             // Check whether the parameter object implements this function
             template <typename AnyParameters, typename Executor>
@@ -281,8 +278,11 @@ namespace hpx { namespace parallel { namespace execution {
         // customization point for interface processing_units_count()
         template <typename Parameters, typename Executor_>
         struct processing_units_count_fn_helper<Parameters, Executor_,
-            typename std::enable_if<
-                hpx::traits::is_executor_any<Executor_>::value>::type>
+            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+                || hpx::traits::is_threads_executor<Executor_>::value
+#endif
+                >>
         {
             // Check whether the parameter object implements this function
             template <typename AnyParameters, typename Executor>
@@ -348,12 +348,11 @@ namespace hpx { namespace parallel { namespace execution {
         // customization point for interface mark_begin_execution()
         template <typename Parameters, typename Executor_>
         struct mark_begin_execution_fn_helper<Parameters, Executor_,
-            typename std::enable_if<
-                hpx::traits::is_executor_any<Executor_>::value
+            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
                 || hpx::traits::is_threads_executor<Executor_>::value
 #endif
-                >::type>
+                >>
         {
             // Check whether the parameter object implements this function
             template <typename AnyParameters, typename Executor>
@@ -418,12 +417,11 @@ namespace hpx { namespace parallel { namespace execution {
         // customization point for interface mark_end_of_scheduling()
         template <typename Parameters, typename Executor_>
         struct mark_end_of_scheduling_fn_helper<Parameters, Executor_,
-            typename std::enable_if<
-                hpx::traits::is_executor_any<Executor_>::value
+            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
                 || hpx::traits::is_threads_executor<Executor_>::value
 #endif
-                >::type>
+                >>
         {
             // Check whether the parameter object implements this function
             template <typename AnyParameters, typename Executor>
@@ -489,12 +487,11 @@ namespace hpx { namespace parallel { namespace execution {
         // customization point for interface mark_end_execution()
         template <typename Parameters, typename Executor_>
         struct mark_end_execution_fn_helper<Parameters, Executor_,
-            typename std::enable_if<
-                hpx::traits::is_executor_any<Executor_>::value
+            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
                 || hpx::traits::is_threads_executor<Executor_>::value
 #endif
-                >::type>
+                >>
         {
             // Check whether the parameter object implements this function
             template <typename AnyParameters, typename Executor>
@@ -584,8 +581,8 @@ namespace hpx { namespace parallel { namespace execution {
         {
             // default constructor is needed for serialization purposes
             template <typename Dependent = void,
-                typename Enable = typename std::enable_if<
-                    std::is_constructible<T>::value, Dependent>::type>
+                typename Enable = std::enable_if_t<
+                    std::is_constructible<T>::value, Dependent>>
             unwrapper()
               : T()
             {
@@ -593,8 +590,8 @@ namespace hpx { namespace parallel { namespace execution {
 
             // generic poor-man's forwarding constructor
             template <typename U,
-                typename Enable = typename std::enable_if<!std::is_same<
-                    typename std::decay<U>::type, unwrapper>::value>::type>
+                typename Enable = std::enable_if_t<
+                    !std::is_same<std::decay_t<U>, unwrapper>::value>>
             unwrapper(U&& u)
               : T(std::forward<U>(u))
             {
@@ -609,8 +606,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename T, typename Wrapper>
         struct maximal_number_of_chunks_call_helper<T, Wrapper,
-            typename std::enable_if<
-                has_maximal_number_of_chunks<T>::value>::type>
+            std::enable_if_t<has_maximal_number_of_chunks<T>::value>>
         {
             template <typename Executor>
             HPX_FORCEINLINE std::size_t maximal_number_of_chunks(
@@ -631,7 +627,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename T, typename Wrapper>
         struct get_chunk_size_call_helper<T, Wrapper,
-            typename std::enable_if<has_get_chunk_size<T>::value>::type>
+            std::enable_if_t<has_get_chunk_size<T>::value>>
         {
             template <typename Executor, typename F>
             HPX_FORCEINLINE std::size_t get_chunk_size(Executor&& exec, F&& f,
@@ -652,7 +648,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename T, typename Wrapper>
         struct mark_begin_execution_call_helper<T, Wrapper,
-            typename std::enable_if<has_mark_begin_execution<T>::value>::type>
+            std::enable_if_t<has_mark_begin_execution<T>::value>>
         {
             template <typename Executor>
             HPX_FORCEINLINE void mark_begin_execution(Executor&& exec)
@@ -671,7 +667,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename T, typename Wrapper>
         struct mark_end_of_scheduling_call_helper<T, Wrapper,
-            typename std::enable_if<has_mark_begin_execution<T>::value>::type>
+            std::enable_if_t<has_mark_begin_execution<T>::value>>
         {
             template <typename Executor>
             HPX_FORCEINLINE void mark_end_of_scheduling(Executor&& exec)
@@ -690,7 +686,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename T, typename Wrapper>
         struct mark_end_execution_call_helper<T, Wrapper,
-            typename std::enable_if<has_mark_begin_execution<T>::value>::type>
+            std::enable_if_t<has_mark_begin_execution<T>::value>>
         {
             template <typename Executor>
             HPX_FORCEINLINE void mark_end_execution(Executor&& exec)
@@ -709,7 +705,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename T, typename Wrapper>
         struct processing_units_count_call_helper<T, Wrapper,
-            typename std::enable_if<has_processing_units_count<T>::value>::type>
+            std::enable_if_t<has_processing_units_count<T>::value>>
         {
             template <typename Executor>
             HPX_FORCEINLINE std::size_t processing_units_count(Executor&& exec)
@@ -729,8 +725,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename T, typename Wrapper>
         struct reset_thread_distribution_call_helper<T, Wrapper,
-            typename std::enable_if<
-                has_reset_thread_distribution<T>::value>::type>
+            std::enable_if_t<has_reset_thread_distribution<T>::value>>
         {
             template <typename Executor>
             HPX_FORCEINLINE void reset_thread_distribution(Executor&& exec)
@@ -779,8 +774,7 @@ namespace hpx { namespace parallel { namespace execution {
     static_assert(                                                             \
         parameters_type_counter<                                               \
             HPX_PP_CAT(hpx::parallel::execution::detail::has_, func) <         \
-            typename hpx::util::decay_unwrap<Params>::type>::value... >        \
-            ::value <= 1,                                                      \
+            hpx::util::decay_unwrap_t<Params>>::value... > ::value <= 1,       \
         "Passing more than one executor parameters type "                      \
         "exposing " HPX_PP_STRINGIZE(func) " is not possible") /**/
 
@@ -788,7 +782,7 @@ namespace hpx { namespace parallel { namespace execution {
         struct executor_parameters : public unwrapper<Params>...
         {
             static_assert(hpx::util::all_of<hpx::traits::is_executor_parameters<
-                              typename std::decay<Params>::type>...>::value,
+                              std::decay_t<Params>>...>::value,
                 "All passed parameters must be a proper executor parameters "
                 "objects");
             static_assert(sizeof...(Params) >= 2,
@@ -805,9 +799,9 @@ namespace hpx { namespace parallel { namespace execution {
                 reset_thread_distribution);
 
             template <typename Dependent = void,
-                typename Enable = typename std::enable_if<
+                typename Enable = std::enable_if_t<
                     hpx::util::all_of<std::is_constructible<Params>...>::value,
-                    Dependent>::type>
+                    Dependent>>
             executor_parameters()
               : unwrapper<Params>()...
             {
@@ -815,8 +809,8 @@ namespace hpx { namespace parallel { namespace execution {
 
             template <typename... Params_,
                 typename Enable =
-                    typename std::enable_if<hpx::util::pack<Params...>::size ==
-                        hpx::util::pack<Params_...>::size>::type>
+                    std::enable_if_t<hpx::util::pack<Params...>::size ==
+                        hpx::util::pack<Params_...>::size>>
             executor_parameters(Params_&&... params)
               : unwrapper<Params>(std::forward<Params_>(params))...
             {
@@ -840,11 +834,18 @@ namespace hpx { namespace parallel { namespace execution {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
+    // specialize trait for the type-combiner
+    template <typename... Parameters>
+    struct is_executor_parameters<detail::executor_parameters<Parameters...>>
+      : hpx::util::all_of<hpx::traits::is_executor_parameters<Parameters>...>
+    {
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename... Params>
     struct executor_parameters_join
     {
-        using type =
-            detail::executor_parameters<typename std::decay<Params>::type...>;
+        using type = detail::executor_parameters<std::decay_t<Params>...>;
     };
 
     template <typename... Params>
@@ -866,8 +867,8 @@ namespace hpx { namespace parallel { namespace execution {
     template <typename Param>
     HPX_FORCEINLINE Param&& join_executor_parameters(Param&& param)
     {
-        static_assert(hpx::traits::is_executor_parameters<
-                          typename std::decay<Param>::type>::value,
+        static_assert(
+            hpx::traits::is_executor_parameters<std::decay_t<Param>>::value,
             "The passed parameter must be a proper executor parameters object");
 
         return std::forward<Param>(param);

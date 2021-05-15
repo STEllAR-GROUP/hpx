@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
 #include <hpx/modules/errors.hpp>
 
@@ -281,6 +282,17 @@ namespace hpx { namespace serialization {
         std::size_t size() const
         {
             return size_;
+        }
+
+        void resize_norealloc(std::size_t newsize)
+        {
+            HPX_ASSERT_MSG(newsize <= size_,
+                "serialize_buffer::resize_norealloc: new size shouldn't be "
+                "larger than current size");
+            if (newsize < size_)
+            {
+                size_ = newsize;
+            }
         }
 
     private:

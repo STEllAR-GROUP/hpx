@@ -1,6 +1,7 @@
 //  Copyright (c) 2019 Austin McCartney
 //  Copyright (c) 2019 Hartmut Kaiser
 //  Copyright (c) 2019 Piotr Mikolajczyk
+//  Copyright (c) 2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +9,7 @@
 
 #pragma once
 
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <cstddef>
 #include <iterator>
 
@@ -141,27 +143,9 @@ struct iterator
         return this->state == that.state;
     }
 
-    friend bool operator==(iterator i, sentinel<Value> s)
-    {
-        return i.state == s.get_stop();
-    }
-    friend bool operator==(sentinel<Value> s, iterator i)
-    {
-        return i.state == s.get_stop();
-    }
-
     bool operator!=(const iterator& that) const
     {
         return this->state != that.state;
-    }
-
-    friend bool operator!=(iterator i, sentinel<Value> s)
-    {
-        return i.state != s.get_stop();
-    }
-    friend bool operator!=(sentinel<Value> s, iterator i)
-    {
-        return i.state != s.get_stop();
     }
 
     bool operator<(const iterator& that) const

@@ -14,8 +14,8 @@
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors/exception_list.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/execution_base/execution.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/synchronization/latch.hpp>

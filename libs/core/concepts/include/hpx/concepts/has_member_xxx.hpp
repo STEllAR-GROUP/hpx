@@ -7,11 +7,22 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/preprocessor/cat.hpp>
 
 #include <type_traits>
 
-/// This macro creates a boolean unary metafunction which result is
+#if defined(HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
+#define HPX_HAS_MEMBER_XXX_TRAIT_DEF_CXX17(MEMBER)                             \
+    template <typename T>                                                      \
+    constexpr bool HPX_PP_CAT(HPX_PP_CAT(has_, MEMBER), _v) =                  \
+        HPX_PP_CAT(has_, MEMBER)::value;                                       \
+    /**/
+#else
+#define HPX_HAS_MEMBER_XXX_TRAIT_DEF_CXX17(MEMBER) /**/
+#endif
+
+/// This macro creates a boolean unary meta-function which result is
 /// true if and only if its parameter type has member function with
 /// MEMBER name (no matter static it is or not). The generated trait
 /// ends up in a namespace where the macro itself has been placed.
@@ -60,4 +71,10 @@
       : HPX_PP_CAT(HPX_PP_CAT(has_, MEMBER), _detail)::impl<T>                 \
     {                                                                          \
     };                                                                         \
+                                                                               \
+    template <typename T>                                                      \
+    using HPX_PP_CAT(HPX_PP_CAT(has_, MEMBER), _t) =                           \
+        typename HPX_PP_CAT(has_, MEMBER)<T>::type;                            \
+                                                                               \
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF_CXX17(MEMBER)                                 \
     /**/

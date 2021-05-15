@@ -7,6 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_remove.hpp>
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
@@ -18,7 +19,6 @@
 #include <string>
 #include <vector>
 
-#include "iter_sent.hpp"
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////

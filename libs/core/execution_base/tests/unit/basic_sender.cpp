@@ -265,6 +265,14 @@ constexpr bool unspecialized(
 
 int main()
 {
+    static_assert(
+        unspecialized<void>(nullptr), "void should not have sender_traits");
+    static_assert(unspecialized<std::nullptr_t>(nullptr),
+        "std::nullptr_t should not have sender_traits");
+    static_assert(unspecialized<int>(nullptr),
+        "non_sender_1 should not have sender_traits");
+    static_assert(unspecialized<double>(nullptr),
+        "non_sender_1 should not have sender_traits");
     static_assert(unspecialized<non_sender_1>(nullptr),
         "non_sender_1 should not have sender_traits");
     static_assert(unspecialized<non_sender_2>(nullptr),
@@ -289,6 +297,11 @@ int main()
     using hpx::execution::experimental::is_sender;
     using hpx::execution::experimental::is_sender_to;
 
+    static_assert(!is_sender<void>::value, "void is not a sender");
+    static_assert(
+        !is_sender<std::nullptr_t>::value, "std::nullptr_t is not a sender");
+    static_assert(!is_sender<int>::value, "int is not a sender");
+    static_assert(!is_sender<double>::value, "double is not a sender");
     static_assert(
         !is_sender<non_sender_1>::value, "non_sender_1 is not a sender");
     static_assert(

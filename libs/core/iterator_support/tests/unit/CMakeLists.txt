@@ -40,6 +40,9 @@ foreach(test ${tests})
     FOLDER "Tests/Unit/Modules/Core/IteratorSupport"
   )
 
-  add_hpx_unit_test("modules.iterator_support" ${test} ${${test}_PARAMETERS})
+  target_link_libraries(
+    ${test}_test PRIVATE hpx_iterator_support_test_utilities
+  )
 
+  add_hpx_unit_test("modules.iterator_support" ${test} ${${test}_PARAMETERS})
 endforeach()

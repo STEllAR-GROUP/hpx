@@ -10,7 +10,7 @@
 #pragma once
 
 #if defined(DOXYGEN)
-namespace hpx {
+namespace hpx { namespace ranges {
 
     /// Copies the elements in the range, defined by [first, last), to another
     /// range beginning at \a dest. Copies only the elements for which the
@@ -568,7 +568,7 @@ namespace hpx {
     ranges::remove_copy_if(ExPolicy&& policy, Rng&& rng, O dest, Pred&& pred,
         Proj&& proj = Proj());
 
-}    // namespace hpx
+}}    // namespace hpx::ranges
 
 #else    // DOXYGEN
 

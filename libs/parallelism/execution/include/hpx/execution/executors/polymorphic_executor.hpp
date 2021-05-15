@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/execution_base/execution.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/future.hpp>

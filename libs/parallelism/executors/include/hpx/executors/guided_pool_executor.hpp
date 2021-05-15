@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/assert.hpp>
 #include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/executors/dataflow.hpp>
@@ -67,9 +68,31 @@ namespace hpx { namespace parallel { namespace execution {
         };
 
         // --------------------------------------------------------------------
-        // For C++11 compatibility
-        template <bool B, typename T = void>
-        using enable_if_t = typename std::enable_if<B, T>::type;
+        // helper to get result from a ready future without invalidating it
+        // --------------------------------------------------------------------
+        template <typename T>
+        T const& peek_future_result(T const& t)
+        {
+            return t;
+        }
+
+        template <typename T,
+            typename Enable = std::enable_if_t<!std::is_void<T>::value>>
+        T const& peek_future_result(hpx::future<T> const& f)
+        {
+            HPX_ASSERT(f.is_ready());
+            auto shared_state =
+                hpx::traits::future_access<hpx::future<T>>::get_shared_state(f);
+            return *shared_state->get_result();
+        }
+
+        template <typename T,
+            typename Enable = std::enable_if_t<!std::is_void<T>::value>>
+        T const& peek_future_result(hpx::shared_future<T> const& f)
+        {
+            HPX_ASSERT(f.is_ready());
+            return f.get();
+        }
 
         // --------------------------------------------------------------------
         // helper : numa domain scheduling for async() execution
@@ -88,7 +111,7 @@ namespace hpx { namespace parallel { namespace execution {
 #ifdef GUIDED_POOL_EXECUTOR_FAKE_NOOP
                 int domain = -1;
 #else
-                int domain = numa_function_(ts...);
+                int domain = numa_function_(peek_future_result(ts)...);
 #endif
 
                 gpx_deb.debug(
@@ -277,11 +300,10 @@ namespace hpx { namespace parallel { namespace execution {
             // by using a dataflow operation, then call the scheduling hint
             // before passing the task onwards to the real executor
             return dataflow(launch::sync,
-                hpx::util::unwrapping(
-                    detail::pre_execution_async_domain_schedule<
-                        typename std::decay<typename std::remove_pointer<
-                            decltype(this)>::type>::type,
-                        pool_numa_hint<Tag>>{*this, hint_, hp_sync_}),
+                detail::pre_execution_async_domain_schedule<
+                    typename std::decay<typename std::remove_pointer<decltype(
+                        this)>::type>::type,
+                    pool_numa_hint<Tag>>{*this, hint_, hp_sync_},
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
@@ -290,8 +312,7 @@ namespace hpx { namespace parallel { namespace execution {
         // note that future<> and shared_future<> are both supported
         // --------------------------------------------------------------------
         template <typename F, typename Future, typename... Ts,
-            typename =
-                detail::enable_if_t<hpx::traits::is_future<Future>::value>>
+            typename = std::enable_if_t<hpx::traits::is_future<Future>::value>>
         auto then_execute(F&& f, Future&& predecessor, Ts&&... ts)
             -> future<typename hpx::util::detail::invoke_deferred_result<F,
                 Future, Ts...>::type>
@@ -344,10 +365,9 @@ namespace hpx { namespace parallel { namespace execution {
         // --------------------------------------------------------------------
         template <typename F, template <typename> class OuterFuture,
             typename... InnerFutures, typename... Ts,
-            typename =
-                detail::enable_if_t<detail::is_future_of_tuple_of_futures<
-                    OuterFuture<hpx::tuple<InnerFutures...>>>::value>,
-            typename = detail::enable_if_t<hpx::traits::is_future_tuple<
+            typename = std::enable_if_t<detail::is_future_of_tuple_of_futures<
+                OuterFuture<hpx::tuple<InnerFutures...>>>::value>,
+            typename = std::enable_if_t<hpx::traits::is_future_tuple<
                 hpx::tuple<InnerFutures...>>::value>>
         auto then_execute(F&& f,
             OuterFuture<hpx::tuple<InnerFutures...>>&& predecessor, Ts&&... ts)
@@ -411,7 +431,7 @@ namespace hpx { namespace parallel { namespace execution {
         // function type, result type and tuple of futures as arguments
         // --------------------------------------------------------------------
         template <typename F, typename... InnerFutures,
-            typename = detail::enable_if_t<hpx::traits::is_future_tuple<
+            typename = std::enable_if_t<hpx::traits::is_future_tuple<
                 hpx::tuple<InnerFutures...>>::value>>
         auto async_execute(F&& f, hpx::tuple<InnerFutures...>&& predecessor)
             -> future<typename hpx::util::detail::invoke_deferred_result<F,
@@ -541,8 +561,7 @@ namespace hpx { namespace parallel { namespace execution {
         // Continuation
         // --------------------------------------------------------------------
         template <typename F, typename Future, typename... Ts,
-            typename =
-                detail::enable_if_t<hpx::traits::is_future<Future>::value>>
+            typename = std::enable_if_t<hpx::traits::is_future<Future>::value>>
         auto then_execute(F&& f, Future&& predecessor, Ts&&... ts)
             -> future<typename hpx::util::detail::invoke_deferred_result<F,
                 Future, Ts...>::type>

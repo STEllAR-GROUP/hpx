@@ -19,7 +19,7 @@
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/future_then_result_exec.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/detail/invoke.hpp>
@@ -321,6 +321,7 @@ namespace hpx { namespace parallel { namespace execution {
                 }
                 catch (...)
                 {
+                    // note: constructor doesn't lock/suspend
                     throw hpx::exception_list(std::current_exception());
                 }
             }
@@ -762,7 +763,8 @@ namespace hpx { namespace parallel { namespace execution {
                 }
                 catch (...)
                 {
-                    throw exception_list(std::current_exception());
+                    // note: constructor doesn't lock/suspend
+                    throw hpx::exception_list(std::current_exception());
                 }
             }
 
@@ -784,7 +786,8 @@ namespace hpx { namespace parallel { namespace execution {
                 }
                 catch (...)
                 {
-                    throw exception_list(std::current_exception());
+                    // note: constructor doesn't lock/suspend
+                    throw hpx::exception_list(std::current_exception());
                 }
             }
 
@@ -867,7 +870,8 @@ namespace hpx { namespace parallel { namespace execution {
                 }
                 catch (...)
                 {
-                    throw exception_list(std::current_exception());
+                    // note: constructor doesn't lock/suspend
+                    throw hpx::exception_list(std::current_exception());
                 }
             }
 
@@ -899,7 +903,8 @@ namespace hpx { namespace parallel { namespace execution {
                 }
                 catch (...)
                 {
-                    throw exception_list(std::current_exception());
+                    // note: constructor doesn't lock/suspend
+                    throw hpx::exception_list(std::current_exception());
                 }
             }
 

@@ -8,13 +8,12 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_count.hpp>
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
-
-#include "iter_sent.hpp"
 
 struct bit_counting_iterator : public iterator<std::int64_t>
 {
@@ -27,42 +26,6 @@ struct bit_counting_iterator : public iterator<std::int64_t>
     explicit bit_counting_iterator(int64_t initialState)
       : iterator<int64_t>(initialState)
     {
-    }
-
-    std::int64_t operator*() const override
-    {
-        return countBits(this->state);
-    }
-
-    std::int64_t operator[](difference_type n) const override
-    {
-        return countBits(this->state + n);
-    }
-
-    bit_counting_iterator& operator++()
-    {
-        ++(this->state);
-        return *this;
-    }
-
-    bit_counting_iterator operator++(int)
-    {
-        auto copy = *this;
-        ++(*this);
-        return copy;
-    }
-
-    bit_counting_iterator& operator--()
-    {
-        --(this->state);
-        return *this;
-    }
-
-    bit_counting_iterator operator--(int)
-    {
-        auto copy = *this;
-        --(*this);
-        return copy;
     }
 
 private:
