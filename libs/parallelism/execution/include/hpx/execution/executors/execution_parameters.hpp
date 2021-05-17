@@ -43,6 +43,9 @@ namespace hpx { namespace parallel { namespace execution {
                 make_with_property_t<Property, CheckForProperty>>
         {
         private:
+            using derived_propery_t =
+                make_with_property_t<Property, CheckForProperty>;
+
             template <typename T>
             using check_for_property = CheckForProperty<std::decay_t<T>>;
 
@@ -54,8 +57,8 @@ namespace hpx { namespace parallel { namespace execution {
                 )>
             // clang-format on
             friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
-                make_with_property_t, Executor&& /*exec*/,
-                Parameters&& /*params*/, Property prop)
+                derived_propery_t, Executor&& /*exec*/, Parameters&& /*params*/,
+                Property prop)
             {
                 return std::make_pair(prop, prop);
             }
@@ -70,7 +73,7 @@ namespace hpx { namespace parallel { namespace execution {
                 )>
             // clang-format on
             friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
-                make_with_property_t, Executor&& exec, Parameters&& params,
+                derived_propery_t, Executor&& exec, Parameters&& params,
                 Property /*prop*/)
             {
                 return std::pair<Parameters&&, Executor&&>(
@@ -87,9 +90,8 @@ namespace hpx { namespace parallel { namespace execution {
                     check_for_property<Executor>::value
                 )>
             // clang-format on
-            friend HPX_FORCEINLINE decltype(auto) tag_invoke(
-                make_with_property_t, Executor&& exec, Parameters&& params,
-                Property /*prop*/)
+            friend HPX_FORCEINLINE decltype(auto) tag_invoke(derived_propery_t,
+                Executor&& exec, Parameters&& params, Property /*prop*/)
             {
                 return std::pair<Executor&&, Parameters&&>(
                     std::forward<Executor>(exec),
@@ -568,10 +570,10 @@ namespace hpx { namespace parallel { namespace execution {
         {
             template <typename Executor>
             HPX_FORCEINLINE std::size_t maximal_number_of_chunks(
-                Executor&& exec, std::size_t cores, std::size_t num_tasks)
+                Executor&& exec, std::size_t cores, std::size_t num_tasks) const
             {
                 auto& wrapped =
-                    static_cast<unwrapper<Wrapper>*>(this)->member_.get();
+                    static_cast<unwrapper<Wrapper> const*>(this)->member_.get();
                 return wrapped.maximal_number_of_chunks(
                     std::forward<Executor>(exec), cores, num_tasks);
             }
@@ -589,10 +591,10 @@ namespace hpx { namespace parallel { namespace execution {
         {
             template <typename Executor, typename F>
             HPX_FORCEINLINE std::size_t get_chunk_size(Executor&& exec, F&& f,
-                std::size_t cores, std::size_t num_tasks)
+                std::size_t cores, std::size_t num_tasks) const
             {
                 auto& wrapped =
-                    static_cast<unwrapper<Wrapper>*>(this)->member_.get();
+                    static_cast<unwrapper<Wrapper> const*>(this)->member_.get();
                 return wrapped.get_chunk_size(std::forward<Executor>(exec),
                     std::forward<F>(f), cores, num_tasks);
             }
@@ -666,7 +668,8 @@ namespace hpx { namespace parallel { namespace execution {
             std::enable_if_t<has_processing_units_count<T>::value>>
         {
             template <typename Executor>
-            HPX_FORCEINLINE std::size_t processing_units_count(Executor&& exec)
+            HPX_FORCEINLINE std::size_t processing_units_count(
+                Executor&& exec) const
             {
                 auto& wrapped =
                     static_cast<unwrapper<Wrapper>*>(this)->member_.get();

@@ -21,6 +21,7 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/futures/traits/future_access.hpp>
@@ -38,20 +39,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 // define customization point specializations for thread executors
 namespace hpx { namespace threads {
+
     ///////////////////////////////////////////////////////////////////////////
     // async_execute()
     template <typename Executor, typename F, typename... Ts>
-    HPX_FORCEINLINE typename std::enable_if<
+    HPX_FORCEINLINE std::enable_if_t<
         hpx::traits::is_threads_executor<Executor>::value,
-        hpx::lcos::future<typename hpx::util::detail::invoke_deferred_result<F,
-            Ts...>::type>>::type
-    async_execute(Executor&& exec, F&& f, Ts&&... ts)
+        hpx::lcos::future<
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>>
+    tag_invoke(hpx::parallel::execution::async_execute_t, Executor&& exec,
+        F&& f, Ts&&... ts)
     {
         typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
             result_type;
 
-        char const* annotation = hpx::traits::get_function_annotation<
-            typename std::decay<F>::type>::call(f);
+        char const* annotation =
+            hpx::traits::get_function_annotation<std::decay_t<F>>::call(f);
         lcos::local::futures_factory<result_type()> p(
             std::forward<Executor>(exec),
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
@@ -62,13 +65,14 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     // sync_execute()
     template <typename Executor, typename F, typename... Ts>
-    HPX_FORCEINLINE typename std::enable_if<
-        hpx::traits::is_threads_executor<Executor>::value,
-        typename hpx::util::detail::invoke_deferred_result<F,
-            Ts...>::type>::type
-    sync_execute(Executor&& exec, F&& f, Ts&&... ts)
+    HPX_FORCEINLINE
+        std::enable_if_t<hpx::traits::is_threads_executor<Executor>::value,
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
+        tag_invoke(hpx::parallel::execution::sync_execute_t, Executor&& exec,
+            F&& f, Ts&&... ts)
     {
-        return async_execute(std::forward<Executor>(exec), std::forward<F>(f),
+        return hpx::parallel::execution::async_execute(
+            std::forward<Executor>(exec), std::forward<F>(f),
             std::forward<Ts>(ts)...)
             .get();
     }
@@ -76,11 +80,12 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     // then_execute()
     template <typename Executor, typename F, typename Future, typename... Ts>
-    HPX_FORCEINLINE typename std::enable_if<
+    HPX_FORCEINLINE std::enable_if_t<
         hpx::traits::is_threads_executor<Executor>::value,
         hpx::lcos::future<typename hpx::util::detail::invoke_deferred_result<F,
-            Future, Ts...>::type>>::type
-    then_execute(Executor&& exec, F&& f, Future&& predecessor, Ts&&... ts)
+            Future, Ts...>::type>>
+    tag_invoke(hpx::parallel::execution::then_execute_t, Executor&& exec, F&& f,
+        Future&& predecessor, Ts&&... ts)
     {
         typedef typename hpx::util::detail::invoke_deferred_result<F, Future,
             Ts...>::type result_type;
@@ -100,26 +105,27 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     // post()
     template <typename Executor, typename F, typename... Ts>
-    HPX_FORCEINLINE typename std::enable_if<
-        hpx::traits::is_threads_executor<Executor>::value>::type
-    post(Executor&& exec, F&& f, Ts&&... ts)
+    HPX_FORCEINLINE
+        std::enable_if_t<hpx::traits::is_threads_executor<Executor>::value>
+        tag_invoke(hpx::parallel::execution::post_t, Executor&& exec, F&& f,
+            Ts&&... ts)
     {
-        char const* annotation = hpx::traits::get_function_annotation<
-            typename std::decay<F>::type>::call(f);
+        char const* annotation =
+            hpx::traits::get_function_annotation<std::decay_t<F>>::call(f);
         exec.add(
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
             annotation, threads::thread_schedule_state::pending, true,
             exec.get_stacksize(), threads::thread_schedule_hint(), throws);
     }
-    ///////////////////////////////////////////////////////////////////////////
+
     // post()
     template <typename Executor, typename F, typename Hint, typename... Ts>
-    HPX_FORCEINLINE typename std::enable_if<
-        hpx::traits::is_threads_executor<Executor>::value &&
-        std::is_same<typename std::decay<Hint>::type,
-            hpx::threads::thread_schedule_hint>::value>::type
-    post(
-        Executor&& exec, F&& f, Hint&& hint, const char* annotation, Ts&&... ts)
+    HPX_FORCEINLINE
+        std::enable_if_t<hpx::traits::is_threads_executor<Executor>::value &&
+            std::is_same<std::decay_t<Hint>,
+                hpx::threads::thread_schedule_hint>::value>
+        tag_invoke(hpx::parallel::execution::post_t, Executor&& exec, F&& f,
+            Hint&& hint, const char* annotation, Ts&&... ts)
     {
         exec.add(
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
@@ -130,10 +136,11 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     // bulk_async_execute()
     template <typename Executor, typename F, typename Shape, typename... Ts>
-    typename std::enable_if<hpx::traits::is_threads_executor<Executor>::value,
+    std::enable_if_t<hpx::traits::is_threads_executor<Executor>::value,
         std::vector<hpx::lcos::future<typename parallel::execution::detail::
-                bulk_function_result<F, Shape, Ts...>::type>>>::type
-    bulk_async_execute(Executor&& exec, F&& f, Shape const& shape, Ts&&... ts)
+                bulk_function_result<F, Shape, Ts...>::type>>>
+    tag_invoke(hpx::parallel::execution::bulk_async_execute_t, Executor&& exec,
+        F&& f, Shape const& shape, Ts&&... ts)
     {
         std::vector<hpx::future<typename parallel::execution::detail::
                 bulk_function_result<F, Shape, Ts...>::type>>
@@ -142,8 +149,8 @@ namespace hpx { namespace threads {
 
         for (auto const& elem : shape)
         {
-            results.push_back(
-                async_execute(exec, std::forward<F>(f), elem, ts...));
+            results.push_back(hpx::parallel::execution::async_execute(
+                exec, std::forward<F>(f), elem, ts...));
         }
 
         return results;
@@ -152,10 +159,11 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     // bulk_sync_execute()
     template <typename Executor, typename F, typename Shape, typename... Ts>
-    typename std::enable_if<hpx::traits::is_threads_executor<Executor>::value,
+    std::enable_if_t<hpx::traits::is_threads_executor<Executor>::value,
         typename parallel::execution::detail::bulk_execute_result<F, Shape,
-            Ts...>::type>::type
-    bulk_sync_execute(Executor&& exec, F&& f, Shape const& shape, Ts&&... ts)
+            Ts...>::type>
+    tag_invoke(hpx::parallel::execution::bulk_sync_execute_t, Executor&& exec,
+        F&& f, Shape const& shape, Ts&&... ts)
     {
         std::vector<hpx::future<typename parallel::execution::detail::
                 bulk_function_result<F, Shape, Ts...>::type>>
@@ -164,8 +172,8 @@ namespace hpx { namespace threads {
 
         for (auto const& elem : shape)
         {
-            results.push_back(
-                async_execute(exec, std::forward<F>(f), elem, ts...));
+            results.push_back(hpx::parallel::execution::async_execute(
+                exec, std::forward<F>(f), elem, ts...));
         }
 
         return hpx::util::unwrap(results);
@@ -175,17 +183,17 @@ namespace hpx { namespace threads {
     // bulk_then_execute()
     template <typename Executor, typename F, typename Shape, typename Future,
         typename... Ts>
-    HPX_FORCEINLINE typename std::enable_if<
-        hpx::traits::is_threads_executor<Executor>::value,
-        hpx::future<typename parallel::execution::detail::
-                bulk_then_execute_result<F, Shape, Future, Ts...>::type>>::type
-    bulk_then_execute(
-        Executor&& exec, F&& f, Shape const& shape, Future&& predecessor,
-        Ts&&...
+    HPX_FORCEINLINE
+        std::enable_if_t<hpx::traits::is_threads_executor<Executor>::value,
+            hpx::future<typename parallel::execution::detail::
+                    bulk_then_execute_result<F, Shape, Future, Ts...>::type>>
+        tag_invoke(hpx::parallel::execution::bulk_then_execute_t,
+            Executor&& exec, F&& f, Shape const& shape, Future&& predecessor,
+            Ts&&...
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        ts
+            ts
 #endif
-    )
+        )
     {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_UNUSED(exec);
@@ -216,7 +224,7 @@ namespace hpx { namespace threads {
         typedef typename hpx::traits::detail::shared_state_ptr<
             result_future_type>::type shared_state_type;
 
-        typedef typename std::decay<Future>::type future_type;
+        typedef std::decay_t<Future> future_type;
 
         thread_id_type id = hpx::threads::get_self_id();
         parallel::execution::current_executor exec_current =

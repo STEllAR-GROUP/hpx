@@ -10,6 +10,7 @@
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos_local/packaged_task.hpp>
 #include <hpx/modules/timed_execution.hpp>
@@ -20,12 +21,12 @@
 #include <vector>
 
 namespace hpx { namespace threads {
+
     ///////////////////////////////////////////////////////////////////////
     template <typename Executor, typename F, typename... Ts>
-    typename std::enable_if<
-        hpx::traits::is_threads_executor<Executor>::value>::type
-    post_at(Executor&& exec, hpx::chrono::steady_time_point const& abs_time,
-        F&& f, Ts&&... ts)
+    std::enable_if_t<hpx::traits::is_threads_executor<Executor>::value>
+    tag_invoke(hpx::parallel::execution::post_at_t, Executor&& exec,
+        hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         exec.add_at(abs_time,
             hpx::util::deferred_call(
@@ -34,10 +35,9 @@ namespace hpx { namespace threads {
     }
 
     template <typename Executor, typename F, typename... Ts>
-    typename std::enable_if<
-        hpx::traits::is_threads_executor<Executor>::value>::type
-    post_after(Executor&& exec, hpx::chrono::steady_duration const& rel_time,
-        F&& f, Ts&&... ts)
+    std::enable_if_t<hpx::traits::is_threads_executor<Executor>::value>
+    tag_invoke(hpx::parallel::execution::post_after_t, Executor&& exec,
+        hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
     {
         exec.add_after(rel_time,
             hpx::util::deferred_call(
@@ -47,10 +47,10 @@ namespace hpx { namespace threads {
 
     ///////////////////////////////////////////////////////////////////////
     template <typename Executor, typename F, typename... Ts>
-    typename std::enable_if<hpx::traits::is_threads_executor<Executor>::value,
-        hpx::future<typename hpx::util::detail::invoke_deferred_result<F,
-            Ts...>::type>>::type
-    async_execute_at(Executor&& exec,
+    std::enable_if_t<hpx::traits::is_threads_executor<Executor>::value,
+        hpx::future<
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>>
+    tag_invoke(hpx::parallel::execution::async_execute_at_t, Executor&& exec,
         hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         typedef
@@ -71,10 +71,10 @@ namespace hpx { namespace threads {
     }
 
     template <typename Executor, typename F, typename... Ts>
-    typename std::enable_if<hpx::traits::is_threads_executor<Executor>::value,
-        hpx::future<typename hpx::util::detail::invoke_deferred_result<F,
-            Ts...>::type>>::type
-    async_execute_after(Executor&& exec,
+    std::enable_if_t<hpx::traits::is_threads_executor<Executor>::value,
+        hpx::future<
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>>
+    tag_invoke(hpx::parallel::execution::async_execute_after_t, Executor&& exec,
         hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
     {
         typedef
@@ -94,26 +94,26 @@ namespace hpx { namespace threads {
 
     ///////////////////////////////////////////////////////////////////////
     template <typename Executor, typename F, typename... Ts>
-    typename std::enable_if<hpx::traits::is_threads_executor<Executor>::value,
-        typename hpx::util::detail::invoke_deferred_result<F,
-            Ts...>::type>::type
-    sync_execute_at(Executor&& exec,
+    std::enable_if_t<hpx::traits::is_threads_executor<Executor>::value,
+        typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
+    tag_invoke(hpx::parallel::execution::sync_execute_at_t, Executor&& exec,
         hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
-        return async_execute_at(std::forward<Executor>(exec), abs_time,
-            std::forward<F>(f), std::forward<Ts>(ts)...)
+        return parallel::execution::async_execute_at(
+            std::forward<Executor>(exec), abs_time, std::forward<F>(f),
+            std::forward<Ts>(ts)...)
             .get();
     }
 
     template <typename Executor, typename F, typename... Ts>
-    typename std::enable_if<hpx::traits::is_threads_executor<Executor>::value,
-        typename hpx::util::detail::invoke_deferred_result<F,
-            Ts...>::type>::type
-    sync_execute_after(Executor&& exec,
+    std::enable_if_t<hpx::traits::is_threads_executor<Executor>::value,
+        typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
+    tag_invoke(hpx::parallel::execution::sync_execute_after_t, Executor&& exec,
         hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
     {
-        return async_execute_after(std::forward<Executor>(exec), rel_time,
-            std::forward<F>(f), std::forward<Ts>(ts)...)
+        return parallel::execution::async_execute_after(
+            std::forward<Executor>(exec), rel_time, std::forward<F>(f),
+            std::forward<Ts>(ts)...)
             .get();
     }
 }}    // namespace hpx::threads

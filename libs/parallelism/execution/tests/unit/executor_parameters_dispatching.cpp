@@ -34,7 +34,7 @@ struct test_executor_get_chunk_size : hpx::execution::parallel_executor
     }
 
     template <typename Parameters, typename F>
-    std::size_t get_chunk_size(Parameters&& /* params */, F&& /* f */,
+    static std::size_t get_chunk_size(Parameters&& /* params */, F&& /* f */,
         std::size_t cores, std::size_t count)
     {
         ++exec_count;
@@ -52,7 +52,7 @@ namespace hpx { namespace parallel { namespace execution {
 struct test_chunk_size
 {
     template <typename Executor, typename F>
-    std::size_t get_chunk_size(Executor&& /* exec */, F&& /* f */,
+    static std::size_t get_chunk_size(Executor&& /* exec */, F&& /* f */,
         std::size_t cores, std::size_t count)
     {
         ++params_count;
@@ -109,7 +109,7 @@ struct test_executor_maximal_number_of_chunks
     }
 
     template <typename Parameters>
-    std::size_t maximal_number_of_chunks(
+    static std::size_t maximal_number_of_chunks(
         Parameters&&, std::size_t, std::size_t num_tasks)
     {
         ++exec_count;
@@ -182,7 +182,7 @@ struct test_executor_reset_thread_distribution
     }
 
     template <typename Parameters>
-    void reset_thread_distribution(Parameters&&)
+    static void reset_thread_distribution(Parameters&&)
     {
         ++exec_count;
     }
@@ -250,7 +250,7 @@ struct test_executor_processing_units_count : hpx::execution::parallel_executor
     }
 
     template <typename Parameters>
-    std::size_t processing_units_count(Parameters&&)
+    static std::size_t processing_units_count(Parameters&&)
     {
         ++exec_count;
         return 1;
@@ -268,7 +268,7 @@ namespace hpx { namespace parallel { namespace execution {
 struct test_processing_units
 {
     template <typename Executor>
-    std::size_t processing_units_count(Executor&&)
+    static std::size_t processing_units_count(Executor&&)
     {
         ++params_count;
         return 1;
