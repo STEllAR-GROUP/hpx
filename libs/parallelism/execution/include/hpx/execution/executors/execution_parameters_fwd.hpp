@@ -173,9 +173,9 @@ namespace hpx { namespace parallel { namespace execution {
     /// \param params [in] The executor parameters object to use as a
     ///              fallback if the executor does not expose
     ///
-    /// \note This calls params.processing_units_count() if it exists;
-    ///       otherwise it forwards the request to the executor parameters
-    ///       object.
+    /// \note This calls params.processing_units_count(Executor&&) if it
+    ///       exists; otherwise it forwards the request to the executor
+    ///       parameters object.
     ///
     HPX_INLINE_CONSTEXPR_VARIABLE struct processing_units_count_t final
       : hpx::functional::tag_fallback<processing_units_count_t>
