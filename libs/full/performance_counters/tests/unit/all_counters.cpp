@@ -113,7 +113,7 @@ void test_all_locality_thread_counters(char const* const* counter_names,
             else
             {
                 path.subinstancename_ = "total";
-                path.subinstanceindex_ = std::size_t(-1);
+                path.subinstanceindex_ = -1;
             }
         }
         else if (core != std::size_t(-1))
@@ -124,7 +124,7 @@ void test_all_locality_thread_counters(char const* const* counter_names,
         else
         {
             path.instancename_ = "total";
-            path.instanceindex_ = std::size_t(-1);
+            path.instanceindex_ = -1;
         }
 
         std::string name;

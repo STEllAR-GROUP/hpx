@@ -56,7 +56,7 @@ namespace hpx { namespace lcos { namespace detail {
       , arity_(hpx::util::from_string<std::size_t>(
             get_config_entry("hpx.lcos.collectives.arity", 32)))
       , cut_off_(hpx::util::from_string<std::size_t>(
-            get_config_entry("hpx.lcos.collectives.cut_off", -1)))
+            get_config_entry("hpx.lcos.collectives.cut_off", std::size_t(-1))))
       , local_barrier_(num)
     {
         if (num_ >= cut_off_)

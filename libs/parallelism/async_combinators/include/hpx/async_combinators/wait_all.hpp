@@ -360,7 +360,11 @@ namespace hpx { namespace lcos {
     }
 
     template <typename Future>
-    HPX_FORCEINLINE void wait_all(std::vector<Future>&& values)
+#if !defined(HPX_INTEL_VERSION)
+    HPX_FORCEINLINE
+#endif
+        void
+        wait_all(std::vector<Future>&& values)
     {
         lcos::wait_all(const_cast<std::vector<Future> const&>(values));
     }

@@ -38,8 +38,15 @@ namespace hpx { namespace util {
         {
             U const min = (std::numeric_limits<T>::min)();
             U const max = (std::numeric_limits<T>::max)();
+#if defined(HPX_INTEL_VERSION)
+#pragma warning(push)
+#pragma warning(disable : 186)
+#endif
             if (value < min || value > max)
                 throw std::out_of_range("from_string: out of range");
+#if defined(HPX_INTEL_VERSION)
+#pragma warning(pop)
+#endif
             return static_cast<T>(value);
         }
 

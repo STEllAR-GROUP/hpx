@@ -66,7 +66,8 @@ namespace hpx { namespace util { namespace detail {
             {
                 HPX_ASSERT(other.object != nullptr);
                 // reuse object storage
-                object = vptr->copy(object, -1, other.object, /*destroy*/ true);
+                object = vptr->copy(
+                    object, std::size_t(-1), other.object, /*destroy*/ true);
             }
         }
         else

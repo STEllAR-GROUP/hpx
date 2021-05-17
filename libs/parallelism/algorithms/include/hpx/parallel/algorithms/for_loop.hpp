@@ -1152,9 +1152,6 @@ namespace hpx {
                 ExPolicy&& policy, B first, Size size, S stride,
                 hpx::util::index_pack<Is...>, Args&&... args)
             {
-                // Size should be non-negative
-                HPX_ASSERT(size >= 0);
-
                 // stride shall not be zero
                 HPX_ASSERT(stride != 0);
 

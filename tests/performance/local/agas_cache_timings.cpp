@@ -167,7 +167,7 @@ void calculate_histogram(std::string const& prefix,
 void test_insert(gva_cache_type& cache, std::size_t num_entries)
 {
     hpx::naming::gid_type locality = hpx::get_locality();
-    std::uint32_t ct = hpx::components::component_invalid;
+    std::int32_t ct = hpx::components::component_invalid;
 
     std::vector<std::uint64_t> timings;
     timings.reserve(num_entries);
@@ -211,7 +211,7 @@ void test_get(gva_cache_type& cache, hpx::naming::gid_type first_key)
 void test_update(gva_cache_type& cache, hpx::naming::gid_type first_key)
 {
     hpx::naming::gid_type locality = hpx::get_locality();
-    std::uint32_t ct = hpx::components::component_invalid;
+    std::int32_t ct = hpx::components::component_invalid;
 
     std::vector<std::uint64_t> timings;
     timings.reserve(cache.size());

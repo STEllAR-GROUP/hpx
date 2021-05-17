@@ -34,7 +34,7 @@ sbatch \
     --constraint="${configuration_slurm_constraint}" \
     --partition="cscsci" \
     --account="djenkssl" \
-    --time="01:30:00" \
+    --time="03:00:00" \
     --output="jenkins-hpx-${configuration_name}.out" \
     --error="jenkins-hpx-${configuration_name}.err" \
     --wait .jenkins/cscs/batch.sh
