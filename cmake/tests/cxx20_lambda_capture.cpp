@@ -10,7 +10,7 @@ struct S
 {
     void f()
     {
-        [=, this]{};
+        (void)[=, this]{};
     };
 };
 
