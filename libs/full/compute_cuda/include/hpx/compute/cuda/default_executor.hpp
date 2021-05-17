@@ -175,7 +175,8 @@ namespace hpx { namespace cuda { namespace experimental {
         }
         /// \endcond
 
-        std::size_t processing_units_count() const
+        template <typename Parameters>
+        std::size_t processing_units_count(Parameters&&) const
         {
             return target_.native_handle().processing_units();
         }

@@ -121,7 +121,8 @@ namespace hpx { namespace execution {
                 std::forward<F>(f), shape, std::forward<Ts>(ts)...));
         }
 
-        std::size_t processing_units_count()
+        template <typename Parameters>
+        std::size_t processing_units_count(Parameters&&)
         {
             return 1;
         }

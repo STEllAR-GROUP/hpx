@@ -198,7 +198,8 @@ namespace hpx { namespace parallel { namespace execution {
 
 struct test_thread_distribution
 {
-    void reset_thread_distribution()
+    template <typename Executor>
+    void reset_thread_distribution(Executor&&)
     {
         ++params_count;
     }
@@ -248,7 +249,8 @@ struct test_executor_processing_units_count : hpx::execution::parallel_executor
     {
     }
 
-    std::size_t processing_units_count()
+    template <typename Parameters>
+    std::size_t processing_units_count(Parameters&&)
     {
         ++exec_count;
         return 1;

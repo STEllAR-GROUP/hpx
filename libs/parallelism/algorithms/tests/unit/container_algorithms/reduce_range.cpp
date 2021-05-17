@@ -17,11 +17,107 @@
 #include <string>
 #include <vector>
 
+#include "iter_sent.hpp"
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 int seed = std::random_device{}();
 std::mt19937 gen(seed);
+
+template <typename IteratorTag>
+void test_reduce_sent(IteratorTag)
+{
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), gen());
+
+    std::size_t val(42);
+    auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2 + val; };
+
+    std::size_t r1 = hpx::ranges::reduce(
+        std::begin(c), sentinel<std::size_t>{*(std::begin(c) + 100)}, val, op);
+
+    // verify values
+    std::size_t r2 =
+        std::accumulate(std::begin(c), std::begin(c) + 100, val, op);
+    HPX_TEST_EQ(r1, r2);
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_reduce_sent(ExPolicy policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), gen());
+
+    std::size_t val(42);
+    auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2 + val; };
+
+    std::size_t r1 = hpx::ranges::reduce(policy, std::begin(c),
+        sentinel<std::size_t>{*(std::begin(c) + 100)}, val, op);
+
+    // verify values
+    std::size_t r2 =
+        std::accumulate(std::begin(c), std::begin(c) + 100, val, op);
+    HPX_TEST_EQ(r1, r2);
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_reduce_sent_async(ExPolicy p, IteratorTag)
+{
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), gen());
+
+    std::size_t val(42);
+    auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2 + val; };
+
+    hpx::future<std::size_t> f = hpx::ranges::reduce(p, std::begin(c),
+        sentinel<std::size_t>{*(std::begin(c) + 100)}, val, op);
+    f.wait();
+
+    // verify values
+    std::size_t r2 =
+        std::accumulate(std::begin(c), std::begin(c) + 100, val, op);
+    HPX_TEST_EQ(f.get(), r2);
+}
+
+template <typename IteratorTag>
+void test_reduce_sent()
+{
+    using namespace hpx::execution;
+
+    test_reduce_sent(IteratorTag());
+    test_reduce_sent(seq, IteratorTag());
+    test_reduce_sent(par, IteratorTag());
+    test_reduce_sent(par_unseq, IteratorTag());
+
+    test_reduce_sent_async(seq(task), IteratorTag());
+    test_reduce_sent_async(par(task), IteratorTag());
+}
+
+void reduce_test_sent()
+{
+    test_reduce_sent<std::random_access_iterator_tag>();
+    test_reduce_sent<std::forward_iterator_tag>();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_reduce1(IteratorTag)
+{
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), gen());
+
+    std::size_t val(42);
+    auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2 + val; };
+
+    std::size_t r1 = hpx::ranges::reduce(c, val, op);
+
+    // verify values
+    std::size_t r2 = std::accumulate(std::begin(c), std::end(c), val, op);
+    HPX_TEST_EQ(r1, r2);
+}
 
 template <typename ExPolicy, typename IteratorTag>
 void test_reduce1(ExPolicy policy, IteratorTag)
@@ -64,6 +160,7 @@ void test_reduce1()
 {
     using namespace hpx::execution;
 
+    test_reduce1(IteratorTag());
     test_reduce1(seq, IteratorTag());
     test_reduce1(par, IteratorTag());
     test_reduce1(par_unseq, IteratorTag());
@@ -79,6 +176,20 @@ void reduce_test1()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_reduce2(IteratorTag)
+{
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), gen());
+
+    std::size_t const val(42);
+    std::size_t r1 = hpx::ranges::reduce(c, val);
+
+    // verify values
+    std::size_t r2 = std::accumulate(std::begin(c), std::end(c), val);
+    HPX_TEST_EQ(r1, r2);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_reduce2(ExPolicy policy, IteratorTag)
 {
@@ -116,6 +227,7 @@ void test_reduce2()
 {
     using namespace hpx::execution;
 
+    test_reduce2(IteratorTag());
     test_reduce2(seq, IteratorTag());
     test_reduce2(par, IteratorTag());
     test_reduce2(par_unseq, IteratorTag());
@@ -131,6 +243,20 @@ void reduce_test2()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_reduce3(IteratorTag)
+{
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), gen());
+
+    std::size_t r1 = hpx::ranges::reduce(c);
+
+    // verify values
+    std::size_t r2 =
+        std::accumulate(std::begin(c), std::end(c), std::size_t(0));
+    HPX_TEST_EQ(r1, r2);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_reduce3(ExPolicy policy, IteratorTag)
 {
@@ -168,6 +294,7 @@ void test_reduce3()
 {
     using namespace hpx::execution;
 
+    test_reduce3(IteratorTag());
     test_reduce3(seq, IteratorTag());
     test_reduce3(par, IteratorTag());
     test_reduce3(par_unseq, IteratorTag());
@@ -364,6 +491,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     gen.seed(seed);
 
+    reduce_test_sent();
     reduce_test1();
     reduce_test2();
     reduce_test3();
