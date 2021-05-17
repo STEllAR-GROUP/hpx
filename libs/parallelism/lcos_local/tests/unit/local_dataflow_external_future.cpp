@@ -8,6 +8,7 @@
 
 #include <hpx/chrono.hpp>
 #include <hpx/execution.hpp>
+#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/functional.hpp>
 #include <hpx/future.hpp>
 #include <hpx/modules/memory.hpp>
@@ -68,66 +69,46 @@ struct external_future_executor
     void dataflow_finalize_helper(
         std::true_type, Frame frame, F&& f, Futures&& futures)
     {
-        std::exception_ptr p;
+        hpx::detail::try_catch_exception_ptr(
+            [&]() {
+                hpx::util::invoke_fused(
+                    std::forward<F>(f), std::forward<Futures>(futures));
 
-        try
-        {
-            hpx::util::invoke_fused(
-                std::forward<F>(f), std::forward<Futures>(futures));
-
-            // Signal completion from another thread/task.
-            hpx::intrusive_ptr<typename std::remove_pointer<
-                typename std::decay<Frame>::type>::type>
-                frame_p(frame);
-            hpx::apply([frame_p = std::move(frame_p)]() {
-                hpx::util::yield_while([]() { return !done; });
-                frame_p->set_data(hpx::util::unused_type{});
+                // Signal completion from another thread/task.
+                hpx::intrusive_ptr<typename std::remove_pointer<
+                    typename std::decay<Frame>::type>::type>
+                    frame_p(frame);
+                hpx::apply([frame_p = std::move(frame_p)]() {
+                    hpx::util::yield_while([]() { return !done; });
+                    frame_p->set_data(hpx::util::unused_type{});
+                });
+            },
+            [&](std::exception_ptr ep) {
+                frame->set_exception(std::move(ep));
             });
-            return;
-        }
-        catch (...)
-        {
-            p = std::current_exception();
-        }
-
-        // The exception is set outside the catch block since
-        // set_exception may yield. Ending the catch block on a
-        // different worker thread than where it was started may lead
-        // to segfaults.
-        frame->set_exception(std::move(p));
     }
 
     template <typename Frame, typename F, typename Futures>
     void dataflow_finalize_helper(
         std::false_type, Frame frame, F&& f, Futures&& futures)
     {
-        std::exception_ptr p;
+        hpx::detail::try_catch_exception_ptr(
+            [&]() {
+                auto&& r = hpx::util::invoke_fused(
+                    std::forward<F>(f), std::forward<Futures>(futures));
 
-        try
-        {
-            auto&& r = hpx::util::invoke_fused(
-                std::forward<F>(f), std::forward<Futures>(futures));
-
-            // Signal completion from another thread/task.
-            hpx::intrusive_ptr<typename std::remove_pointer<
-                typename std::decay<Frame>::type>::type>
-                frame_p(frame);
-            hpx::apply([frame_p = std::move(frame_p), r = std::move(r)]() {
-                hpx::util::yield_while([]() { return !done; });
-                frame_p->set_data(std::move(r));
+                // Signal completion from another thread/task.
+                hpx::intrusive_ptr<typename std::remove_pointer<
+                    typename std::decay<Frame>::type>::type>
+                    frame_p(frame);
+                hpx::apply([frame_p = std::move(frame_p), r = std::move(r)]() {
+                    hpx::util::yield_while([]() { return !done; });
+                    frame_p->set_data(std::move(r));
+                });
+            },
+            [&](std::exception_ptr ep) {
+                frame->set_exception(std::move(ep));
             });
-            return;
-        }
-        catch (...)
-        {
-            p = std::current_exception();
-        }
-
-        // The exception is set outside the catch block since
-        // set_exception may yield. Ending the catch block on a
-        // different worker thread than where it was started may lead
-        // to segfaults.
-        frame->set_exception(std::move(p));
     }
 
     template <typename Frame, typename F, typename Futures>
@@ -185,68 +166,50 @@ struct external_future_additional_argument_executor
     void dataflow_finalize_helper(
         std::true_type, Frame frame, F&& f, Futures&& futures)
     {
-        std::exception_ptr p;
+        hpx::detail::try_catch_exception_ptr(
+            [&]() {
+                additional_argument a{};
+                hpx::util::invoke_fused(std::forward<F>(f),
+                    hpx::tuple_cat(
+                        hpx::tie(a), std::forward<Futures>(futures)));
 
-        try
-        {
-            additional_argument a{};
-            hpx::util::invoke_fused(std::forward<F>(f),
-                hpx::tuple_cat(hpx::tie(a), std::forward<Futures>(futures)));
-
-            // Signal completion from another thread/task.
-            hpx::intrusive_ptr<typename std::remove_pointer<
-                typename std::decay<Frame>::type>::type>
-                frame_p(frame);
-            hpx::apply([frame_p = std::move(frame_p)]() {
-                hpx::util::yield_while([]() { return !done; });
-                frame_p->set_data(hpx::util::unused_type{});
+                // Signal completion from another thread/task.
+                hpx::intrusive_ptr<typename std::remove_pointer<
+                    typename std::decay<Frame>::type>::type>
+                    frame_p(frame);
+                hpx::apply([frame_p = std::move(frame_p)]() {
+                    hpx::util::yield_while([]() { return !done; });
+                    frame_p->set_data(hpx::util::unused_type{});
+                });
+            },
+            [&](std::exception_ptr ep) {
+                frame->set_exception(std::move(ep));
             });
-            return;
-        }
-        catch (...)
-        {
-            p = std::current_exception();
-        }
-
-        // The exception is set outside the catch block since
-        // set_exception may yield. Ending the catch block on a
-        // different worker thread than where it was started may lead
-        // to segfaults.
-        frame->set_exception(std::move(p));
     }
 
     template <typename Frame, typename F, typename Futures>
     void dataflow_finalize_helper(
         std::false_type, Frame frame, F&& f, Futures&& futures)
     {
-        std::exception_ptr p;
+        hpx::detail::try_catch_exception_ptr(
+            [&]() {
+                additional_argument a{};
+                auto&& r = hpx::util::invoke_fused(std::forward<F>(f),
+                    hpx::tuple_cat(
+                        hpx::tie(a), std::forward<Futures>(futures)));
 
-        try
-        {
-            additional_argument a{};
-            auto&& r = hpx::util::invoke_fused(std::forward<F>(f),
-                hpx::tuple_cat(hpx::tie(a), std::forward<Futures>(futures)));
-
-            // Signal completion from another thread/task.
-            hpx::intrusive_ptr<typename std::remove_pointer<
-                typename std::decay<Frame>::type>::type>
-                frame_p(frame);
-            hpx::apply([frame_p = std::move(frame_p), r = std::move(r)]() {
-                hpx::util::yield_while([]() { return !done; });
-                frame_p->set_data(std::move(r));
+                // Signal completion from another thread/task.
+                hpx::intrusive_ptr<typename std::remove_pointer<
+                    typename std::decay<Frame>::type>::type>
+                    frame_p(frame);
+                hpx::apply([frame_p = std::move(frame_p), r = std::move(r)]() {
+                    hpx::util::yield_while([]() { return !done; });
+                    frame_p->set_data(std::move(r));
+                });
+            },
+            [&](std::exception_ptr ep) {
+                frame->set_exception(std::move(ep));
             });
-            return;
-        }
-        catch (...)
-        {
-            p = std::current_exception();
-        }
-
-        // The exception is set outside the catch block since
-        // set_exception may yield. Ending the catch block on a
-        // different worker thread than where it was started may lead
-        // to segfaults.
-        frame->set_exception(std::move(p));
     }
 
     template <typename Frame, typename F, typename Futures>

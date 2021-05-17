@@ -37,7 +37,7 @@ namespace hpx {
     template <typename T>
     struct tuple_size;    // undefined
 
-    template <std::size_t I, typename T>
+    template <std::size_t I, typename T, typename Enable = void>
     struct tuple_element;    // undefined
 
     // Hide implementations of get<> inside an internal namespace to be able to
@@ -503,25 +503,28 @@ namespace hpx {
 
     // template <size_t I, class Tuple>
     // class tuple_element
-    template <std::size_t I, typename T>
+    template <std::size_t I, typename T, typename Enable>
     struct tuple_element
     {
     };
 
     template <std::size_t I, typename T>
-    struct tuple_element<I, const T>
+    struct tuple_element<I, const T,
+        typename util::always_void<typename tuple_element<I, T>::type>::type>
       : std::add_const<typename tuple_element<I, T>::type>
     {
     };
 
     template <std::size_t I, typename T>
-    struct tuple_element<I, volatile T>
+    struct tuple_element<I, volatile T,
+        typename util::always_void<typename tuple_element<I, T>::type>::type>
       : std::add_volatile<typename tuple_element<I, T>::type>
     {
     };
 
     template <std::size_t I, typename T>
-    struct tuple_element<I, const volatile T>
+    struct tuple_element<I, const volatile T,
+        typename util::always_void<typename tuple_element<I, T>::type>::type>
       : std::add_cv<typename tuple_element<I, T>::type>
     {
     };

@@ -14,6 +14,7 @@
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
+#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/executors/current_executor.hpp>
 #include <hpx/functional/bind_front.hpp>
@@ -161,23 +162,11 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 
             void invoke()
             {
-                std::exception_ptr p;
-
-                try
-                {
-                    invoke_helper(std::is_void<Result>());
-                    return;
-                }
-                catch (...)
-                {
-                    p = std::current_exception();
-                }
-
-                // The exception is set outside the catch block since
-                // set_exception may yield. Ending the catch block on a
-                // different worker thread than where it was started may lead
-                // to segfaults.
-                p_.set_exception(std::move(p));
+                hpx::detail::try_catch_exception_ptr(
+                    [&]() { invoke_helper(std::is_void<Result>()); },
+                    [&](std::exception_ptr ep) {
+                        p_.set_exception(std::move(ep));
+                    });
             }
 
             void invoke_helper(std::true_type)
