@@ -32,7 +32,6 @@ set(execution_headers
     hpx/execution/executors/dynamic_chunk_size.hpp
     hpx/execution/executors/execution.hpp
     hpx/execution/executors/execution_information.hpp
-    hpx/execution/executors/execution_information_fwd.hpp
     hpx/execution/executors/execution_parameters.hpp
     hpx/execution/executors/execution_parameters_fwd.hpp
     hpx/execution/executors/fused_bulk_execute.hpp
