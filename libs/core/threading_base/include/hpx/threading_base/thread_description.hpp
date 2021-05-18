@@ -147,8 +147,8 @@ namespace hpx { namespace util {
                                util::itt::string_handle(get_description());
         }
 
-        util::itt::task get_task_itt(util::itt::domain const& domain) const
-            noexcept
+        util::itt::task get_task_itt(
+            util::itt::domain const& domain) const noexcept
         {
             switch (kind())
             {
@@ -241,8 +241,8 @@ namespace hpx { namespace util {
             return util::itt::string_handle(get_description());
         }
 
-        util::itt::task get_task_itt(util::itt::domain const& domain) const
-            noexcept
+        util::itt::task get_task_itt(
+            util::itt::domain const& domain) const noexcept
         {
             switch (kind())
             {
