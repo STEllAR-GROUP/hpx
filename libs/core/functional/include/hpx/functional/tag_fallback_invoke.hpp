@@ -116,7 +116,7 @@ namespace hpx { namespace functional {
     ///////////////////////////////////////////////////////////////////////////
     namespace tag_fallback_invoke_t_ns {
 
-        // MSVC needs this, don't ask
+        // poison pill
         void tag_fallback_invoke();
 
         struct tag_fallback_invoke_t
@@ -146,7 +146,7 @@ namespace hpx { namespace functional {
         };
     }    // namespace tag_fallback_invoke_t_ns
 
-    inline namespace tag_fallback_invoke_ns {
+    namespace tag_fallback_invoke_ns {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_INLINE_CONSTEXPR_VARIABLE
         tag_fallback_invoke_t_ns::tag_fallback_invoke_t tag_fallback_invoke =
@@ -160,7 +160,8 @@ namespace hpx { namespace functional {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Tag, typename... Args>
     using is_tag_fallback_invocable =
-        hpx::is_invocable<decltype(tag_fallback_invoke), Tag, Args...>;
+        hpx::is_invocable<decltype(tag_fallback_invoke_ns::tag_fallback_invoke),
+            Tag, Args...>;
 
     template <typename Tag, typename... Args>
     constexpr bool is_tag_fallback_invocable_v =
@@ -178,9 +179,10 @@ namespace hpx { namespace functional {
 
         template <typename Tag, typename... Args>
         struct is_nothrow_tag_fallback_invocable_impl<
-            decltype(hpx::functional::tag_fallback_invoke)(Tag, Args...), true>
+            decltype(tag_fallback_invoke_ns::tag_fallback_invoke)(Tag, Args...),
+            true>
           : std::integral_constant<bool,
-                noexcept(hpx::functional::tag_fallback_invoke(
+                noexcept(tag_fallback_invoke_ns::tag_fallback_invoke(
                     std::declval<Tag>(), std::declval<Args>()...))>
         {
         };
@@ -189,7 +191,7 @@ namespace hpx { namespace functional {
     template <typename Tag, typename... Args>
     struct is_nothrow_tag_fallback_invocable
       : detail::is_nothrow_tag_fallback_invocable_impl<
-            decltype(hpx::functional::tag_fallback_invoke)(Tag, Args...),
+            decltype(tag_fallback_invoke_ns::tag_fallback_invoke)(Tag, Args...),
             is_tag_fallback_invocable_v<Tag, Args...>>
     {
     };
@@ -199,119 +201,150 @@ namespace hpx { namespace functional {
         is_nothrow_tag_fallback_invocable<Tag, Args...>::value;
 
     template <typename Tag, typename... Args>
-    using tag_fallback_invoke_result =
-        hpx::util::invoke_result<decltype(hpx::functional::tag_fallback_invoke),
-            Tag, Args...>;
+    using tag_fallback_invoke_result = hpx::util::invoke_result<
+        decltype(tag_fallback_invoke_ns::tag_fallback_invoke), Tag, Args...>;
 
     template <typename Tag, typename... Args>
     using tag_fallback_invoke_result_t =
         typename tag_fallback_invoke_result<Tag, Args...>::type;
 
-    ///////////////////////////////////////////////////////////////////////////
-    /// Helper base class implementing the tag_invoke logic for CPOs that fall
-    /// back to directly invoke its fallback.
-    ///
-    /// This base class is in many cases preferable to the plain tag base class.
-    /// With the normal tag base class a default, unconstrained, default
-    /// tag_invoke overload will take precedence over user-defined tag_invoke
-    /// overloads that are not perfect matches. For example, with a default
-    /// overload:
-    ///
-    /// template <typename T> auto tag_invoke(tag_t, T&& t) {...}
-    ///
-    /// and a user-defined overload in another namespace:
-    ///
-    /// auto tag_invoke(my_type t)
-    ///
-    /// the user-defined overload will only be considered when it is an exact
-    /// match. This means const and reference qualifiers must match exactly, and
-    /// conversions to a base class are not considered.
-    ///
-    /// With tag_fallback one can define the default implementation in terms of
-    /// a tag_fallback_invoke overload instead of tag_invoke:
-    ///
-    /// template <typename T> auto tag_fallback_invoke(tag_t, T&& t) {...}
-    ///
-    /// With the same user-defined tag_invoke overload, the user-defined
-    /// overload will now be used if it is a match even if it isn't an exact
-    /// match.
-    /// This is because tag_fallback will dispatch to tag_fallback_invoke only
-    /// if there are no matching tag_invoke overloads.
-    template <typename Tag>
-    struct tag_fallback
-    {
-        // is tag-invocable
-        template <typename... Args,
-            typename Enable = typename std::enable_if<
-                is_tag_invocable_v<Tag, Args&&...>>::type>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
-            Args&&... args) const
-            noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
+    ///////////////////////////////////////////////////////////////////////////////
+    namespace tag_base_ns {
+
+        template <typename Tag, typename... Args>
+        struct not_tag_fallback_noexcept_invocable;
+
+        // poison pill
+        void tag_fallback_invoke();
+
+        ///////////////////////////////////////////////////////////////////////////
+        /// Helper base class implementing the tag_invoke logic for CPOs that fall
+        /// back to directly invoke its fallback.
+        ///
+        /// This base class is in many cases preferable to the plain tag base class.
+        /// With the normal tag base class a default, unconstrained, default
+        /// tag_invoke overload will take precedence over user-defined tag_invoke
+        /// overloads that are not perfect matches. For example, with a default
+        /// overload:
+        ///
+        /// template <typename T> auto tag_invoke(tag_t, T&& t) {...}
+        ///
+        /// and a user-defined overload in another namespace:
+        ///
+        /// auto tag_invoke(my_type t)
+        ///
+        /// the user-defined overload will only be considered when it is an exact
+        /// match. This means const and reference qualifiers must match exactly, and
+        /// conversions to a base class are not considered.
+        ///
+        /// With tag_fallback one can define the default implementation in terms of
+        /// a tag_fallback_invoke overload instead of tag_invoke:
+        ///
+        /// template <typename T> auto tag_fallback_invoke(tag_t, T&& t) {...}
+        ///
+        /// With the same user-defined tag_invoke overload, the user-defined
+        /// overload will now be used if it is a match even if it isn't an exact
+        /// match.
+        /// This is because tag_fallback will dispatch to tag_fallback_invoke only
+        /// if there are no matching tag_invoke overloads.
+        template <typename Tag>
+        struct tag_fallback
+        {
+            // is tag-invocable
+            template <typename... Args,
+                typename Enable = typename std::enable_if<
+                    is_tag_invocable_v<Tag, Args&&...>>::type>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+                Args&&... args) const
+                noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
+                    -> tag_invoke_result_t<Tag, Args&&...>
+            {
+                return tag_invoke(static_cast<Tag const&>(*this),
+                    std::forward<Args>(args)...);
+            }
+
+            // is not tag-invocable
+            template <typename... Args,
+                typename Enable = typename std::enable_if<
+                    !is_tag_invocable_v<Tag, Args&&...>>::type>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+                Args&&... args) const
+                noexcept(is_nothrow_tag_fallback_invocable_v<Tag, Args...>)
+                    -> tag_fallback_invoke_result_t<Tag, Args&&...>
+            {
+                return tag_fallback_invoke(static_cast<Tag const&>(*this),
+                    std::forward<Args>(args)...);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////////
+        // helper base class implementing the tag_invoke logic for CPOs that fall
+        // back to directly invoke its fallback. Either invocation has to be noexcept.
+        template <typename Tag>
+        struct tag_fallback_noexcept
+        {
+        private:
+            // is nothrow tag-fallback invocable
+            template <typename... Args>
+            HPX_HOST_DEVICE constexpr auto tag_fallback_invoke_impl(
+                std::false_type, Args&&... /*args*/) const noexcept
+                -> not_tag_fallback_noexcept_invocable<Tag, Args...>
+            {
+                return not_tag_fallback_noexcept_invocable<Tag, Args...>{};
+            }
+
+            template <typename... Args>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto
+            tag_fallback_invoke_impl(std::true_type, Args&&... args) const
+                noexcept -> tag_fallback_invoke_result_t<Tag, Args&&...>
+            {
+                return tag_fallback_invoke(static_cast<Tag const&>(*this),
+                    std::forward<Args>(args)...);
+            }
+
+        public:
+            // is nothrow tag-invocable
+            template <typename... Args,
+                typename Enable = typename std::enable_if<
+                    is_nothrow_tag_invocable_v<Tag, Args&&...>>::type>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+                Args&&... args) const noexcept
                 -> tag_invoke_result_t<Tag, Args&&...>
-        {
-            return hpx::functional::tag_invoke(
-                static_cast<Tag const&>(*this), std::forward<Args>(args)...);
-        }
+            {
+                return tag_invoke(static_cast<Tag const&>(*this),
+                    std::forward<Args>(args)...);
+            }
 
-        // is not tag-invocable
-        template <typename... Args,
-            typename Enable = typename std::enable_if<
-                !is_tag_invocable_v<Tag, Args&&...>>::type>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
-            Args&&... args) const
-            noexcept(is_nothrow_tag_fallback_invocable_v<Tag, Args...>)
-                -> tag_fallback_invoke_result_t<Tag, Args&&...>
-        {
-            return hpx::functional::tag_fallback_invoke(
-                static_cast<Tag const&>(*this), std::forward<Args>(args)...);
-        }
-    };
+            // is not nothrow tag-invocable
+            template <typename... Args,
+                typename IsFallbackInvocable =
+                    is_nothrow_tag_fallback_invocable<Tag, Args&&...>,
+                typename Enable = typename std::enable_if<
+                    !is_nothrow_tag_invocable_v<Tag, Args&&...>>::type>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+                Args&&... args) const noexcept
+                -> decltype(tag_fallback_invoke_impl(
+                    IsFallbackInvocable{}, std::forward<Args>(args)...))
+            {
+                return tag_fallback_invoke_impl(
+                    IsFallbackInvocable{}, std::forward<Args>(args)...);
+            }
+        };
+    }    // namespace tag_base_ns
 
-    ///////////////////////////////////////////////////////////////////////////
-    // helper base class implementing the tag_invoke logic for CPOs that fall
-    // back to directly invoke its fallback. Either invocation has to be noexcept.
-    template <typename Tag>
-    struct tag_fallback_noexcept
-    {
-    private:
-        // is nothrow tag-fallback invocable
-        template <typename... Args>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto tag_fallback_invoke_impl(
-            std::true_type, Args&&... args) const noexcept
-            -> tag_fallback_invoke_result_t<Tag, Args&&...>
-        {
-            return hpx::functional::tag_fallback_invoke(
-                static_cast<Tag const&>(*this), std::forward<Args>(args)...);
-        }
+    inline namespace tag_invoke_base_ns {
 
-    public:
-        // is nothrow tag-invocable
-        template <typename... Args,
-            typename Enable = typename std::enable_if<
-                is_nothrow_tag_invocable_v<Tag, Args&&...>>::type>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
-            Args&&... args) const noexcept
-            -> tag_invoke_result_t<Tag, Args&&...>
-        {
-            return hpx::functional::tag_invoke(
-                static_cast<Tag const&>(*this), std::forward<Args>(args)...);
-        }
+        template <typename Tag>
+        using tag_fallback = tag_base_ns::tag_fallback<Tag>;
 
-        // is not nothrow tag-invocable
-        template <typename... Args,
-            typename IsFallbackInvocable =
-                is_nothrow_tag_fallback_invocable<Tag, Args&&...>,
-            typename Enable = typename std::enable_if<
-                !is_nothrow_tag_invocable_v<Tag, Args&&...>>::type>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
-            Args&&... args) const noexcept
-            -> decltype(tag_fallback_invoke_impl(
-                IsFallbackInvocable{}, std::forward<Args>(args)...))
-        {
-            return tag_fallback_invoke_impl(
-                IsFallbackInvocable{}, std::forward<Args>(args)...);
-        }
-    };
-}}    // namespace hpx::functional
+        template <typename Tag>
+        using tag_fallback_noexcept = tag_base_ns::tag_fallback_noexcept<Tag>;
+    }    // namespace tag_invoke_base_ns
+
+    inline namespace tag_fallback_invoke_f_ns {
+
+        using tag_fallback_invoke_ns::tag_fallback_invoke;
+    }    // namespace tag_fallback_invoke_f_ns
+}}       // namespace hpx::functional
 
 #endif

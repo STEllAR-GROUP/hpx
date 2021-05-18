@@ -118,7 +118,7 @@ namespace hpx { namespace functional {
     ///////////////////////////////////////////////////////////////////////////
     namespace tag_override_invoke_t_ns {
 
-        // MSVC needs this, don't ask
+        // poison pill
         void tag_override_invoke();
 
         struct tag_override_invoke_t
@@ -148,7 +148,7 @@ namespace hpx { namespace functional {
         };
     }    // namespace tag_override_invoke_t_ns
 
-    inline namespace tag_override_invoke_ns {
+    namespace tag_override_invoke_ns {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_INLINE_CONSTEXPR_VARIABLE
         tag_override_invoke_t_ns::tag_override_invoke_t tag_override_invoke =
@@ -162,7 +162,8 @@ namespace hpx { namespace functional {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Tag, typename... Args>
     using is_tag_override_invocable =
-        hpx::is_invocable<decltype(tag_override_invoke), Tag, Args...>;
+        hpx::is_invocable<decltype(tag_override_invoke_ns::tag_override_invoke),
+            Tag, Args...>;
 
     template <typename Tag, typename... Args>
     constexpr bool is_tag_override_invocable_v =
@@ -180,9 +181,10 @@ namespace hpx { namespace functional {
 
         template <typename Tag, typename... Args>
         struct is_nothrow_tag_override_invocable_impl<
-            decltype(hpx::functional::tag_override_invoke)(Tag, Args...), true>
+            decltype(tag_override_invoke_ns::tag_override_invoke)(Tag, Args...),
+            true>
           : std::integral_constant<bool,
-                noexcept(hpx::functional::tag_override_invoke(
+                noexcept(tag_override_invoke_ns::tag_override_invoke(
                     std::declval<Tag>(), std::declval<Args>()...))>
         {
         };
@@ -191,7 +193,7 @@ namespace hpx { namespace functional {
     template <typename Tag, typename... Args>
     struct is_nothrow_tag_override_invocable
       : detail::is_nothrow_tag_override_invocable_impl<
-            decltype(hpx::functional::tag_override_invoke)(Tag, Args...),
+            decltype(tag_override_invoke_ns::tag_override_invoke)(Tag, Args...),
             is_tag_override_invocable_v<Tag, Args...>>
     {
     };
@@ -201,122 +203,142 @@ namespace hpx { namespace functional {
         is_nothrow_tag_override_invocable<Tag, Args...>::value;
 
     template <typename Tag, typename... Args>
-    using tag_override_invoke_result =
-        hpx::util::invoke_result<decltype(hpx::functional::tag_override_invoke),
-            Tag, Args...>;
+    using tag_override_invoke_result = hpx::util::invoke_result<
+        decltype(tag_override_invoke_ns::tag_override_invoke), Tag, Args...>;
 
     template <typename Tag, typename... Args>
     using tag_override_invoke_result_t =
         typename tag_override_invoke_result<Tag, Args...>::type;
 
-    ///////////////////////////////////////////////////////////////////////////
-    /// Helper base class implementing the tag_invoke logic for CPOs that allow
-    /// overriding user-defined tag_invoke overloads with tag_override_invoke,
-    /// and that allow setting a fallback with tag_fallback_invoke.
-    ///
-    /// This helper class is otherwise identical to tag_fallback, but allows
-    /// defining an implementation that will always take priority if it is
-    /// feasible. This is useful for example in cases where a member function
-    /// should always take priority over any free function tag_invoke overloads,
-    /// when available, like this:
-    ///
-    /// template <typename T>
-    /// auto tag_override_invoke(T&& t) -> decltype(t.foo()){ return t.foo(); }
-    template <typename Tag>
-    struct tag_priority
-    {
-        // Is tag-override-invocable
-        template <typename... Args,
-            typename Enable = typename std::enable_if<
-                is_tag_override_invocable_v<Tag, Args&&...>>::type>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
-            Args&&... args) const
-            noexcept(is_nothrow_tag_override_invocable_v<Tag, Args...>)
+    ///////////////////////////////////////////////////////////////////////////////
+    namespace tag_base_ns {
+
+        // poison pill
+        void tag_override_invoke();
+
+        ///////////////////////////////////////////////////////////////////////////
+        /// Helper base class implementing the tag_invoke logic for CPOs that allow
+        /// overriding user-defined tag_invoke overloads with tag_override_invoke,
+        /// and that allow setting a fallback with tag_fallback_invoke.
+        ///
+        /// This helper class is otherwise identical to tag_fallback, but allows
+        /// defining an implementation that will always take priority if it is
+        /// feasible. This is useful for example in cases where a member function
+        /// should always take priority over any free function tag_invoke overloads,
+        /// when available, like this:
+        ///
+        /// template <typename T>
+        /// auto tag_override_invoke(T&& t) -> decltype(t.foo()){ return t.foo(); }
+        template <typename Tag>
+        struct tag_priority
+        {
+            // Is tag-override-invocable
+            template <typename... Args,
+                typename Enable = typename std::enable_if<
+                    is_tag_override_invocable_v<Tag, Args&&...>>::type>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+                Args&&... args) const
+                noexcept(is_nothrow_tag_override_invocable_v<Tag, Args...>)
+                    -> tag_override_invoke_result_t<Tag, Args&&...>
+            {
+                return tag_override_invoke(static_cast<Tag const&>(*this),
+                    std::forward<Args>(args)...);
+            }
+
+            // Is not tag-override-invocable, but tag-invocable
+            template <typename... Args,
+                typename Enable = typename std::enable_if<
+                    !is_tag_override_invocable_v<Tag, Args&&...> &&
+                    is_tag_invocable_v<Tag, Args&&...>>::type>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+                Args&&... args) const
+                noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
+                    -> tag_invoke_result_t<Tag, Args&&...>
+            {
+                return tag_invoke(static_cast<Tag const&>(*this),
+                    std::forward<Args>(args)...);
+            }
+
+            // Is not tag-override-invocable, not tag-invocable, but
+            // tag-fallback-invocable
+            template <typename... Args,
+                typename Enable = typename std::enable_if<
+                    !is_tag_override_invocable_v<Tag, Args&&...> &&
+                    !is_tag_invocable_v<Tag, Args&&...> &&
+                    is_tag_fallback_invocable_v<Tag, Args&&...>>::type>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+                Args&&... args) const
+                noexcept(is_nothrow_tag_fallback_invocable_v<Tag, Args...>)
+                    -> tag_fallback_invoke_result_t<Tag, Args&&...>
+            {
+                return tag_fallback_invoke(static_cast<Tag const&>(*this),
+                    std::forward<Args>(args)...);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////////
+        // Helper base class implementing the tag_invoke logic for noexcept CPOs
+        // that allow overriding user-defined tag_invoke overloads with
+        // tag_override_invoke, and that allow setting a fallback with
+        // tag_fallback_invoke.
+        template <typename Tag>
+        struct tag_priority_noexcept
+        {
+            // Is nothrow tag-override-invocable
+            template <typename... Args,
+                typename Enable = typename std::enable_if<
+                    is_nothrow_tag_override_invocable_v<Tag, Args&&...>>::type>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+                Args&&... args) const noexcept
                 -> tag_override_invoke_result_t<Tag, Args&&...>
-        {
-            return hpx::functional::tag_override_invoke(
-                static_cast<Tag const&>(*this), std::forward<Args>(args)...);
-        }
+            {
+                return tag_override_invoke(static_cast<Tag const&>(*this),
+                    std::forward<Args>(args)...);
+            }
 
-        // Is not tag-override-invocable, but tag-invocable
-        template <typename... Args,
-            typename Enable = typename std::enable_if<
-                !is_tag_override_invocable_v<Tag, Args&&...> &&
-                is_tag_invocable_v<Tag, Args&&...>>::type>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
-            Args&&... args) const
-            noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
+            // Is not nothrow tag-override-invocable, but nothrow tag-invocable
+            template <typename... Args,
+                typename Enable = typename std::enable_if<
+                    !is_nothrow_tag_override_invocable_v<Tag, Args&&...> &&
+                    is_nothrow_tag_invocable_v<Tag, Args&&...>>::type>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+                Args&&... args) const noexcept
                 -> tag_invoke_result_t<Tag, Args&&...>
-        {
-            return hpx::functional::tag_invoke(
-                static_cast<Tag const&>(*this), std::forward<Args>(args)...);
-        }
+            {
+                return tag_invoke(static_cast<Tag const&>(*this),
+                    std::forward<Args>(args)...);
+            }
 
-        // Is not tag-override-invocable, not tag-invocable, but
-        // tag-fallback-invocable
-        template <typename... Args,
-            typename Enable = typename std::enable_if<
-                !is_tag_override_invocable_v<Tag, Args&&...> &&
-                !is_tag_invocable_v<Tag, Args&&...> &&
-                is_tag_fallback_invocable_v<Tag, Args&&...>>::type>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
-            Args&&... args) const
-            noexcept(is_nothrow_tag_fallback_invocable_v<Tag, Args...>)
+            // Is not nothrow tag-override-invocable, not nothrow tag-invocable, but
+            // nothrow tag-fallback-invocable
+            template <typename... Args,
+                typename Enable = typename std::enable_if<
+                    !is_nothrow_tag_override_invocable_v<Tag, Args&&...> &&
+                    !is_nothrow_tag_invocable_v<Tag, Args&&...> &&
+                    is_nothrow_tag_fallback_invocable_v<Tag, Args&&...>>::type>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+                Args&&... args) const noexcept
                 -> tag_fallback_invoke_result_t<Tag, Args&&...>
-        {
-            return hpx::functional::tag_fallback_invoke(
-                static_cast<Tag const&>(*this), std::forward<Args>(args)...);
-        }
-    };
+            {
+                return tag_fallback_invoke(static_cast<Tag const&>(*this),
+                    std::forward<Args>(args)...);
+            }
+        };
+    }    // namespace tag_base_ns
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Helper base class implementing the tag_invoke logic for noexcept CPOs
-    // that allow overriding user-defined tag_invoke overloads with
-    // tag_override_invoke, and that allow setting a fallback with
-    // tag_fallback_invoke.
-    template <typename Tag>
-    struct tag_priority_noexcept
-    {
-        // Is nothrow tag-override-invocable
-        template <typename... Args,
-            typename Enable = typename std::enable_if<
-                is_nothrow_tag_override_invocable_v<Tag, Args&&...>>::type>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
-            Args&&... args) const noexcept
-            -> tag_override_invoke_result_t<Tag, Args&&...>
-        {
-            return hpx::functional::tag_override_invoke(
-                static_cast<Tag const&>(*this), std::forward<Args>(args)...);
-        }
+    inline namespace tag_invoke_base_ns {
 
-        // Is not nothrow tag-override-invocable, but nothrow tag-invocable
-        template <typename... Args,
-            typename Enable = typename std::enable_if<
-                !is_nothrow_tag_override_invocable_v<Tag, Args&&...> &&
-                is_nothrow_tag_invocable_v<Tag, Args&&...>>::type>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
-            Args&&... args) const noexcept
-            -> tag_invoke_result_t<Tag, Args&&...>
-        {
-            return hpx::functional::tag_invoke(
-                static_cast<Tag const&>(*this), std::forward<Args>(args)...);
-        }
+        template <typename Tag>
+        using tag_priority = tag_base_ns::tag_priority<Tag>;
 
-        // Is not nothrow tag-override-invocable, not nothrow tag-invocable, but
-        // nothrow tag-fallback-invocable
-        template <typename... Args,
-            typename Enable = typename std::enable_if<
-                !is_nothrow_tag_override_invocable_v<Tag, Args&&...> &&
-                !is_nothrow_tag_invocable_v<Tag, Args&&...> &&
-                is_nothrow_tag_fallback_invocable_v<Tag, Args&&...>>::type>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
-            Args&&... args) const noexcept
-            -> tag_fallback_invoke_result_t<Tag, Args&&...>
-        {
-            return hpx::functional::tag_fallback_invoke(
-                static_cast<Tag const&>(*this), std::forward<Args>(args)...);
-        }
-    };
-}}    // namespace hpx::functional
+        template <typename Tag>
+        using tag_priority_noexcept = tag_base_ns::tag_priority_noexcept<Tag>;
+    }    // namespace tag_invoke_base_ns
+
+    inline namespace tag_override_invoke_f_ns {
+
+        using tag_override_invoke_ns::tag_override_invoke;
+    }    // namespace tag_override_invoke_f_ns
+}}       // namespace hpx::functional
 
 #endif
