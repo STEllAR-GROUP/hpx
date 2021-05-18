@@ -17,6 +17,7 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/pack.hpp>
 
+#include <atomic>
 #include <exception>
 #include <tuple>
 #include <type_traits>
@@ -88,11 +89,12 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 hpx::lcos::local::condition_variable cv;
                 mutex_type m;
-                bool set_called = false;
+                std::atomic<bool> set_called = false;
                 std::variant<std::monostate, error_type, value_type> v;
 
                 void wait()
                 {
+                    if (!set_called)
                     {
                         std::unique_lock<mutex_type> l(m);
                         if (!set_called)
@@ -133,6 +135,7 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 std::unique_lock<mutex_type> l(st.m);
                 st.set_called = true;
+                hpx::util::ignore_while_checking<decltype(l)> il(&l);
                 st.cv.notify_one();
             }
 
