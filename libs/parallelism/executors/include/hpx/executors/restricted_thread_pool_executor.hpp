@@ -107,7 +107,7 @@ namespace hpx { namespace parallel { namespace execution {
         {
             hpx::util::thread_description desc(f);
             return hpx::detail::async_launch_policy_dispatch<decltype(
-                launch::async)>::call(launch::async, pool_, desc, priority_,
+                launch::async)>::call(launch::async, desc, pool_, priority_,
                 stacksize_,
                 threads::thread_schedule_hint(get_next_thread_num()),
                 std::forward<F>(f), std::forward<Ts>(ts)...);

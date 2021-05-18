@@ -12,6 +12,7 @@
 #include <hpx/execution_base/execution.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
@@ -71,11 +72,11 @@ namespace hpx { namespace parallel { namespace execution {
     };
 
     //////////////////////////////////////////////////////////////////////////
-    struct create_rebound_policy
+    struct create_rebound_policy_t
     {
         template <typename ExPolicy, typename Executor, typename Parameters>
-        static constexpr decltype(auto) call(
-            ExPolicy&&, Executor&& exec, Parameters&& parameters)
+        constexpr decltype(auto) operator()(
+            ExPolicy&&, Executor&& exec, Parameters&& parameters) const
         {
             using rebound_type =
                 typename rebind_executor<ExPolicy, Executor, Parameters>::type;
@@ -84,4 +85,7 @@ namespace hpx { namespace parallel { namespace execution {
                 std::forward<Parameters>(parameters));
         }
     };
+
+    HPX_INLINE_CONSTEXPR_VARIABLE create_rebound_policy_t
+        create_rebound_policy{};
 }}}    // namespace hpx::parallel::execution

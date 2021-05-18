@@ -93,9 +93,10 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 for (std::size_t part_i = part_begin; part_i < part_end;
                      ++part_i)
                 {
-                    results[part_i] = hpx::detail::async_launch_policy_dispatch<
-                        decltype(policy)>::call(policy, desc, pool, priority,
-                        stacksize, hint, f, *it, ts...);
+                    results[part_i] =
+                        hpx::detail::async_launch_policy_dispatch<decltype(
+                            policy)>::call(policy, desc, pool, priority,
+                            stacksize, hint, f, *it, ts...);
                     ++it;
                 }
                 l.count_down(part_size);
