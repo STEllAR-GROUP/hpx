@@ -8,8 +8,6 @@
 
 #pragma once
 
-#if defined(__unix__)
-
 #include <cstdint>
 
 #include <time.h>
@@ -24,5 +22,3 @@ namespace hpx { namespace util { namespace hardware {
     }
 
 }}}    // namespace hpx::util::hardware
-
-#endif
