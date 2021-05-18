@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -83,6 +83,7 @@ namespace hpx { namespace util {
           : type_(data_type_description)
         {
             char const* name = traits::get_function_annotation<F>::call(f);
+
             // If a name exists, use it, not the altname.
             if (name != nullptr)    // -V547
             {
@@ -127,7 +128,7 @@ namespace hpx { namespace util {
 #endif
         }
 
-        data_type kind() const noexcept
+        constexpr data_type kind() const noexcept
         {
             return type_;
         }
@@ -146,8 +147,8 @@ namespace hpx { namespace util {
                                util::itt::string_handle(get_description());
         }
 
-        util::itt::task get_task_itt(util::itt::domain const& domain) const
-            noexcept
+        util::itt::task get_task_itt(
+            util::itt::domain const& domain) const noexcept
         {
             switch (kind())
             {
@@ -202,15 +203,15 @@ namespace hpx { namespace util {
         HPX_CORE_EXPORT void init_from_alternative_name(char const* altname);
 
     public:
-        thread_description() noexcept {}
+        thread_description() noexcept = default;
 
-        thread_description(char const* /*desc*/) noexcept {}
+        constexpr thread_description(char const* /*desc*/) noexcept {}
 
         template <typename F,
             typename = typename std::enable_if<
                 !std::is_same<F, thread_description>::value &&
                 !traits::is_action<F>::value>::type>
-        explicit thread_description(
+        explicit constexpr thread_description(
             F const& /*f*/, char const* /*altname*/ = nullptr) noexcept
         {
         }
@@ -218,17 +219,17 @@ namespace hpx { namespace util {
         template <typename Action,
             typename =
                 typename std::enable_if<traits::is_action<Action>::value>::type>
-        explicit thread_description(
+        explicit constexpr thread_description(
             Action, char const* /*altname*/ = nullptr) noexcept
         {
         }
 
-        data_type kind() const noexcept
+        constexpr data_type kind() const noexcept
         {
             return data_type_description;
         }
 
-        char const* get_description() const noexcept
+        constexpr char const* get_description() const noexcept
         {
             return "<unknown>";
         }
@@ -240,8 +241,8 @@ namespace hpx { namespace util {
             return util::itt::string_handle(get_description());
         }
 
-        util::itt::task get_task_itt(util::itt::domain const& domain) const
-            noexcept
+        util::itt::task get_task_itt(
+            util::itt::domain const& domain) const noexcept
         {
             switch (kind())
             {
@@ -260,17 +261,17 @@ namespace hpx { namespace util {
         }
 #endif
 
-        std::size_t get_address() const noexcept
+        constexpr std::size_t get_address() const noexcept
         {
             return 0;
         }
 
-        explicit operator bool() const noexcept
+        explicit constexpr operator bool() const noexcept
         {
             return valid();
         }
 
-        bool valid() const noexcept
+        constexpr bool valid() const noexcept
         {
             return true;
         }

@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Marcin Copik
-//  Copyright (c) 2016-2020 Hartmut Kaiser
+//  Copyright (c) 2016-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -674,7 +674,7 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename T>
         struct base_member_helper
         {
-            explicit base_member_helper(T t)
+            explicit constexpr base_member_helper(T t)
               : member_(t)
             {
             }
@@ -696,7 +696,7 @@ namespace hpx { namespace parallel { namespace execution {
         {
             using wrapper_type = std::reference_wrapper<T>;
 
-            unwrapper(wrapper_type wrapped_param)
+            constexpr unwrapper(wrapper_type wrapped_param)
               : base_member_helper<wrapper_type>(wrapped_param)
             {
             }
@@ -736,7 +736,7 @@ namespace hpx { namespace parallel { namespace execution {
                 typename Enable = std::enable_if_t<
                     hpx::util::all_of<std::is_constructible<Params>...>::value,
                     Dependent>>
-            executor_parameters()
+            constexpr executor_parameters()
               : unwrapper<Params>()...
             {
             }
@@ -745,7 +745,7 @@ namespace hpx { namespace parallel { namespace execution {
                 typename Enable =
                     std::enable_if_t<hpx::util::pack<Params...>::size ==
                         hpx::util::pack<Params_...>::size>>
-            executor_parameters(Params_&&... params)
+            constexpr executor_parameters(Params_&&... params)
               : unwrapper<Params>(std::forward<Params_>(params))...
             {
             }
@@ -783,7 +783,7 @@ namespace hpx { namespace parallel { namespace execution {
     };
 
     template <typename... Params>
-    HPX_FORCEINLINE typename executor_parameters_join<Params...>::type
+    constexpr HPX_FORCEINLINE typename executor_parameters_join<Params...>::type
     join_executor_parameters(Params&&... params)
     {
         using joined_params =
@@ -799,7 +799,7 @@ namespace hpx { namespace parallel { namespace execution {
     };
 
     template <typename Param>
-    HPX_FORCEINLINE Param&& join_executor_parameters(Param&& param)
+    constexpr HPX_FORCEINLINE Param&& join_executor_parameters(Param&& param)
     {
         static_assert(
             hpx::traits::is_executor_parameters<std::decay_t<Param>>::value,
@@ -810,6 +810,7 @@ namespace hpx { namespace parallel { namespace execution {
 }}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace execution { namespace experimental {
+
     HPX_INLINE_CONSTEXPR_VARIABLE struct make_with_priority_t
       : hpx::functional::tag<make_with_priority_t>
     {
@@ -839,4 +840,14 @@ namespace hpx { namespace execution { namespace experimental {
       : hpx::functional::tag<get_hint_t>
     {
     } get_hint{};
+
+    HPX_INLINE_CONSTEXPR_VARIABLE struct make_with_annotation_t
+      : hpx::functional::tag<make_with_annotation_t>
+    {
+    } make_with_annotation{};
+
+    HPX_INLINE_CONSTEXPR_VARIABLE struct get_annotation_t
+      : hpx::functional::tag<get_annotation_t>
+    {
+    } get_annotation{};
 }}}    // namespace hpx::execution::experimental

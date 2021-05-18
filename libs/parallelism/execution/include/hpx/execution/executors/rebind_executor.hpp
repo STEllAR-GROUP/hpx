@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2020 Hartmut Kaiser
+//  Copyright (c) 2016-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -49,23 +49,39 @@ namespace hpx { namespace parallel { namespace execution {
 
     /// Rebind the type of executor used by an execution policy. The execution
     /// category of Executor shall not be weaker than that of ExecutionPolicy.
-    template <typename ExecutionPolicy, typename Executor, typename Parameters>
+    template <typename ExPolicy, typename Executor, typename Parameters>
     struct rebind_executor
     {
         /// \cond NOINTERNAL
-        typedef typename std::decay<Executor>::type executor_type;
-        typedef typename std::decay<Parameters>::type parameters_type;
+        using policy_type = std::decay_t<ExPolicy>;
+        using executor_type = std::decay_t<Executor>;
+        using parameters_type = std::decay_t<Parameters>;
 
-        typedef typename ExecutionPolicy::execution_category category1;
-        typedef typename hpx::traits::executor_execution_category<
-            executor_type>::type category2;
+        using category1 = typename policy_type::execution_category;
+        using category2 = typename hpx::traits::executor_execution_category<
+            executor_type>::type;
 
         static_assert(detail::is_not_weaker<category2, category1>::value,
             "detail::is_not_weaker<category2, category1>::value");
         /// \endcond
 
         /// The type of the rebound execution policy
-        typedef typename ExecutionPolicy::template rebind<executor_type,
-            parameters_type>::type type;
+        using type = typename policy_type::template rebind<executor_type,
+            parameters_type>::type;
+    };
+
+    //////////////////////////////////////////////////////////////////////////
+    struct create_rebound_policy
+    {
+        template <typename ExPolicy, typename Executor, typename Parameters>
+        static constexpr decltype(auto) call(
+            ExPolicy&&, Executor&& exec, Parameters&& parameters)
+        {
+            using rebound_type =
+                typename rebind_executor<ExPolicy, Executor, Parameters>::type;
+
+            return rebound_type(std::forward<Executor>(exec),
+                std::forward<Parameters>(parameters));
+        }
     };
 }}}    // namespace hpx::parallel::execution

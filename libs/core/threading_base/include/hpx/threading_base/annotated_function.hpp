@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -140,6 +140,7 @@ namespace hpx { namespace util {
                 Ts...>::type
             operator()(Ts&&... ts)
             {
+                annotate_function annotate(get_function_annotation());
                 return HPX_INVOKE(f_, std::forward<Ts>(ts)...);
             }
 
@@ -156,8 +157,7 @@ namespace hpx { namespace util {
             ///
             /// This function returns the passed function address.
             /// \param none
-
-            std::size_t get_function_address() const
+            constexpr std::size_t get_function_address() const
             {
                 return traits::get_function_address<
                     typename util::decay_unwrap<F>::type>::call(f_);
@@ -171,7 +171,7 @@ namespace hpx { namespace util {
             /// is returned
             ///
             /// \param none
-            char const* get_function_annotation() const noexcept
+            constexpr char const* get_function_annotation() const noexcept
             {
                 return name_ ? name_ : typeid(f_).name();
             }
@@ -251,7 +251,7 @@ namespace hpx { namespace traits {
     template <typename F>
     struct get_function_address<util::detail::annotated_function<F>>
     {
-        static std::size_t call(
+        static constexpr std::size_t call(
             util::detail::annotated_function<F> const& f) noexcept
         {
             return f.get_function_address();
@@ -261,7 +261,7 @@ namespace hpx { namespace traits {
     template <typename F>
     struct get_function_annotation<util::detail::annotated_function<F>>
     {
-        static char const* call(
+        static constexpr char const* call(
             util::detail::annotated_function<F> const& f) noexcept
         {
             return f.get_function_annotation();

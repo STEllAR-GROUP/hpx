@@ -1,5 +1,5 @@
 //  Copyright (c)      2020 Mikael Simberg
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -105,8 +105,9 @@ namespace hpx { namespace parallel { namespace execution {
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
         async_execute(F&& f, Ts&&... ts)
         {
+            hpx::util::thread_description desc(f);
             return hpx::detail::async_launch_policy_dispatch<decltype(
-                launch::async)>::call(launch::async, pool_, priority_,
+                launch::async)>::call(launch::async, pool_, desc, priority_,
                 stacksize_,
                 threads::thread_schedule_hint(get_next_thread_num()),
                 std::forward<F>(f), std::forward<Ts>(ts)...);

@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,7 @@ namespace hpx { namespace traits {
     template <typename F, typename Enable = void>
     struct get_function_address
     {
-        static std::size_t call(F const& f) noexcept
+        static constexpr std::size_t call(F const& f) noexcept
         {
             return reinterpret_cast<std::size_t>(std::addressof(f));
         }
@@ -27,7 +27,7 @@ namespace hpx { namespace traits {
     template <typename R, typename... Ts>
     struct get_function_address<R (*)(Ts...)>
     {
-        static std::size_t call(R (*f)(Ts...)) noexcept
+        static constexpr std::size_t call(R (*f)(Ts...)) noexcept
         {
             return reinterpret_cast<std::size_t>(f);
         }

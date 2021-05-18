@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,7 @@ namespace hpx { namespace traits {
     template <typename F, typename Enable = void>
     struct get_function_annotation
     {
-        static char const* call(F const& /*f*/) noexcept
+        static constexpr char const* call(F const& /*f*/) noexcept
         {
             return nullptr;
         }

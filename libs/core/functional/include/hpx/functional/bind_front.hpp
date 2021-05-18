@@ -117,12 +117,12 @@ namespace hpx { namespace util {
                 ar& _args;
             }
 
-            std::size_t get_function_address() const
+            constexpr std::size_t get_function_address() const
             {
                 return traits::get_function_address<F>::call(_f);
             }
 
-            char const* get_function_annotation() const
+            constexpr char const* get_function_annotation() const
             {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
                 return traits::get_function_annotation<F>::call(_f);
@@ -178,7 +178,7 @@ namespace hpx { namespace traits {
     template <typename F, typename... Ts>
     struct get_function_address<util::detail::bound_front<F, Ts...>>
     {
-        static std::size_t call(
+        static constexpr std::size_t call(
             util::detail::bound_front<F, Ts...> const& f) noexcept
         {
             return f.get_function_address();
@@ -189,7 +189,7 @@ namespace hpx { namespace traits {
     template <typename F, typename... Ts>
     struct get_function_annotation<util::detail::bound_front<F, Ts...>>
     {
-        static char const* call(
+        static constexpr char const* call(
             util::detail::bound_front<F, Ts...> const& f) noexcept
         {
             return f.get_function_annotation();

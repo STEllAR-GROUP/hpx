@@ -1,4 +1,4 @@
-# Copyright (c) 2020 The STE||AR-Group
+# Copyright (c) 2020-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,7 @@ set(executors_headers
     hpx/executors/dataflow.hpp
     hpx/executors/detail/hierarchical_spawning.hpp
     hpx/executors/exception_list.hpp
+    hpx/executors/execution_policy_annotation.hpp
     hpx/executors/execution_policy_fwd.hpp
     hpx/executors/execution_policy.hpp
     hpx/executors/fork_join_executor.hpp

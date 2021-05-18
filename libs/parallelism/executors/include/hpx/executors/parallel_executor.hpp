@@ -1,5 +1,5 @@
 //  Copyright (c) 2019-2020 ETH Zurich
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -28,9 +28,8 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/synchronization/latch.hpp>
+#include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
@@ -46,7 +45,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     template <typename Policy>
     struct get_default_policy
     {
-        static constexpr Policy call()
+        static constexpr Policy call() noexcept
         {
             return Policy{};
         }
@@ -55,7 +54,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     template <>
     struct get_default_policy<hpx::launch>
     {
-        static constexpr hpx::launch::async_policy call()
+        static constexpr hpx::launch::async_policy call() noexcept
         {
             return hpx::launch::async_policy{};
         }
@@ -147,7 +146,8 @@ namespace hpx { namespace execution {
         {
         }
 
-        explicit parallel_policy_executor(threads::thread_pool_base* pool,
+        explicit constexpr parallel_policy_executor(
+            threads::thread_pool_base* pool,
             threads::thread_priority priority =
                 threads::thread_priority::default_,
             threads::thread_stacksize stacksize =
@@ -166,7 +166,8 @@ namespace hpx { namespace execution {
         {
         }
 
-        friend parallel_policy_executor tag_dispatch(
+        // property implementations
+        friend constexpr parallel_policy_executor tag_dispatch(
             hpx::execution::experimental::make_with_hint_t,
             parallel_policy_executor const& exec,
             hpx::threads::thread_schedule_hint hint)
@@ -176,15 +177,32 @@ namespace hpx { namespace execution {
             return exec_with_hint;
         }
 
-        friend hpx::threads::thread_schedule_hint tag_dispatch(
+        friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
             hpx::execution::experimental::get_hint_t,
-            parallel_policy_executor const& exec)
+            parallel_policy_executor const& exec) noexcept
         {
             return exec.schedulehint_;
         }
 
+        friend constexpr parallel_policy_executor tag_invoke(
+            hpx::execution::experimental::make_with_annotation_t,
+            parallel_policy_executor const& exec, char const* annotation)
+        {
+            auto exec_with_annotation = exec;
+            exec_with_annotation.annotation_ = annotation;
+            return exec_with_annotation;
+        }
+
+        friend constexpr hpx::threads::thread_schedule_hint tag_invoke(
+            hpx::execution::experimental::get_annotation_t,
+            parallel_policy_executor const& exec) noexcept
+        {
+            return exec.annotation_;
+        }
+
         /// \cond NOINTERNAL
-        bool operator==(parallel_policy_executor const& rhs) const noexcept
+        constexpr bool operator==(
+            parallel_policy_executor const& rhs) const noexcept
         {
             return policy_ == rhs.policy_ && pool_ == rhs.pool_ &&
                 priority_ == rhs.priority_ && stacksize_ == rhs.stacksize_ &&
@@ -192,12 +210,13 @@ namespace hpx { namespace execution {
                 hierarchical_threshold_ == rhs.hierarchical_threshold_;
         }
 
-        bool operator!=(parallel_policy_executor const& rhs) const noexcept
+        constexpr bool operator!=(
+            parallel_policy_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        parallel_policy_executor const& context() const noexcept
+        constexpr parallel_policy_executor const& context() const noexcept
         {
             return *this;
         }
@@ -207,10 +226,12 @@ namespace hpx { namespace execution {
 
         // OneWayExecutor interface
         template <typename F, typename... Ts>
-        static
-            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
-            sync_execute(F&& f, Ts&&... ts)
+        typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
+        sync_execute(F&& f, Ts&&... ts) const
         {
+            hpx::util::annotate_function annotate(annotation_ ?
+                    annotation_ :
+                    "parallel_policy_executor::sync_execute");
             return hpx::detail::sync_launch_policy_dispatch<Policy>::call(
                 launch::sync, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
@@ -221,10 +242,11 @@ namespace hpx { namespace execution {
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
         async_execute(F&& f, Ts&&... ts) const
         {
+            hpx::util::thread_description desc(f, annotation_);
             auto pool =
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();
             return hpx::detail::async_launch_policy_dispatch<Policy>::call(
-                policy_, pool, priority_, stacksize_, schedulehint_,
+                policy_, desc, pool, priority_, stacksize_, schedulehint_,
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
@@ -239,7 +261,8 @@ namespace hpx { namespace execution {
                     Ts...>::type;
 
             auto&& func = hpx::util::one_shot(hpx::util::bind_back(
-                std::forward<F>(f), std::forward<Ts>(ts)...));
+                hpx::util::annotated_function(std::forward<F>(f), annotation_),
+                std::forward<Ts>(ts)...));
 
             typename hpx::traits::detail::shared_state_ptr<result_type>::type
                 p = lcos::detail::make_continuation_alloc_nounwrap<result_type>(
@@ -255,8 +278,7 @@ namespace hpx { namespace execution {
         template <typename F, typename... Ts>
         void post(F&& f, Ts&&... ts) const
         {
-            hpx::util::thread_description desc(f);
-
+            hpx::util::thread_description desc(f, annotation_);
             auto pool =
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();
             parallel::execution::detail::post_policy_dispatch<Policy>::call(
@@ -270,10 +292,11 @@ namespace hpx { namespace execution {
                 bulk_function_result<F, S, Ts...>::type>>
         bulk_async_execute(F&& f, S const& shape, Ts&&... ts) const
         {
+            hpx::util::thread_description desc(f, annotation_);
             auto pool =
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();
             return parallel::execution::detail::
-                hierarchical_bulk_async_execute_helper(pool, priority_,
+                hierarchical_bulk_async_execute_helper(desc, pool, priority_,
                     stacksize_, schedulehint_, 0, pool->get_os_thread_count(),
                     hierarchical_threshold_, policy_, std::forward<F>(f), shape,
                     std::forward<Ts>(ts)...);
@@ -287,8 +310,10 @@ namespace hpx { namespace execution {
         {
             return parallel::execution::detail::
                 hierarchical_bulk_then_execute_helper(*this, policy_,
-                    std::forward<F>(f), shape,
-                    std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
+                    hpx::util::annotated_function(
+                        std::forward<F>(f), annotation_),
+                    shape, std::forward<Future>(predecessor),
+                    std::forward<Ts>(ts)...);
         }
         /// \endcond
 
@@ -315,6 +340,7 @@ namespace hpx { namespace execution {
         threads::thread_schedule_hint schedulehint_;
         Policy policy_;
         std::size_t hierarchical_threshold_ = hierarchical_threshold_default_;
+        char const* annotation_ = nullptr;
         /// \endcond
     };
 
