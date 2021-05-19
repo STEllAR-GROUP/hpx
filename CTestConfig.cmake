@@ -14,7 +14,6 @@
 set(CTEST_PROJECT_NAME "HPX")
 set(CTEST_NIGHTLY_START_TIME "00:00:00 GMT")
 
-set(CTEST_DROP_METHOD "https")
-set(CTEST_DROP_SITE "cdash.cscs.ch")
-set(CTEST_DROP_LOCATION "/submit.php?project=HPX")
-set(CTEST_DROP_SITE_CDASH TRUE)
+set(CTEST_SUBMIT_URL
+    "https://cdash.cscs.ch/submit.php?project=${CTEST_PROJECT_NAME}"
+)
