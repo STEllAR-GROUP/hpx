@@ -26,6 +26,6 @@ add_hpx_module(
   GLOBAL_HEADER_GEN OFF
   HEADERS ${include_local_headers}
   DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES hpx_runtime_local hpx_thread_executors
+  MODULE_DEPENDENCIES hpx_runtime_local
   CMAKE_SUBDIRS examples tests
 )

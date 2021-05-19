@@ -14,11 +14,11 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/iostream.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/iostream.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -85,7 +85,7 @@ void hello_world_foreman()
         // Each iteration, we create a task for each element in the set of
         // OS-threads that have not said "Hello world". Each of these tasks
         // is encapsulated in a future.
-        std::vector<hpx::lcos::future<std::size_t> > futures;
+        std::vector<hpx::lcos::future<std::size_t>> futures;
         futures.reserve(attendance.size());
 
         for (std::size_t worker : attendance)
@@ -95,7 +95,7 @@ void hello_world_foreman()
             // completed. We give the task a hint to run on a particular worker
             // thread, but no guarantees are given by the scheduler that the
             // task will actually run on that worker thread.
-            hpx::parallel::execution::default_executor exec(
+            hpx::execution::parallel_executor exec(
                 hpx::threads::thread_schedule_hint(
                     hpx::threads::thread_schedule_hint_mode::thread,
                     static_cast<std::int16_t>(worker)));
@@ -109,14 +109,13 @@ void hello_world_foreman()
         // return value of the future. hpx::lcos::wait_each doesn't return until
         // all the futures in the vector have returned.
         hpx::lcos::local::spinlock mtx;
-        hpx::lcos::wait_each(
-            hpx::util::unwrapping([&](std::size_t t) {
-                if (std::size_t(-1) != t)
-                {
-                    std::lock_guard<hpx::lcos::local::spinlock> lk(mtx);
-                    attendance.erase(t);
-                }
-            }),
+        hpx::lcos::wait_each(hpx::util::unwrapping([&](std::size_t t) {
+            if (std::size_t(-1) != t)
+            {
+                std::lock_guard<hpx::lcos::local::spinlock> lk(mtx);
+                attendance.erase(t);
+            }
+        }),
             futures);
     }
 }
@@ -135,11 +134,10 @@ HPX_PLAIN_ACTION(hello_world_foreman, hello_world_foreman_action);
 int main()
 {
     // Get a list of all available localities.
-    std::vector<hpx::naming::id_type> localities =
-        hpx::find_all_localities();
+    std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
 
     // Reserve storage space for futures, one for each locality.
-    std::vector<hpx::lcos::future<void> > futures;
+    std::vector<hpx::lcos::future<void>> futures;
     futures.reserve(localities.size());
 
     for (hpx::naming::id_type const& node : localities)

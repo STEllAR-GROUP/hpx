@@ -21,7 +21,6 @@ set(runtime_local_headers
     hpx/runtime_local/get_worker_thread_num.hpp
     hpx/runtime_local/interval_timer.hpp
     hpx/runtime_local/os_thread_type.hpp
-    hpx/runtime_local/pool_executor.hpp
     hpx/runtime_local/pool_timer.hpp
     hpx/runtime_local/report_error.hpp
     hpx/runtime_local/run_as_hpx_thread.hpp
@@ -43,7 +42,6 @@ set(runtime_local_headers
 # cmake-format: off
 set(runtime_local_compat_headers
     hpx/custom_exception_info.hpp => hpx/modules/runtime_local.hpp
-    hpx/parallel/executors/pool_executor.hpp => hpx/include/parallel_executors.hpp
     hpx/parallel/executors/service_executors.hpp => hpx/include/parallel_executors.hpp
     hpx/runtime/components/component_startup_shutdown_base.hpp => hpx/modules/runtime_local.hpp
     hpx/runtime/config_entry.hpp => hpx/modules/runtime_local.hpp
@@ -57,7 +55,6 @@ set(runtime_local_compat_headers
     hpx/runtime/startup_function.hpp => hpx/runtime.hpp
     hpx/runtime/thread_hooks.hpp => hpx/modules/runtime_local.hpp
     hpx/runtime/thread_pool_helpers.hpp => hpx/modules/runtime_local.hpp
-    hpx/runtime/threads/executors/pool_executor.hpp => hpx/modules/runtime_local.hpp
     hpx/runtime/threads/executors/service_executors.hpp => hpx/modules/runtime_local.hpp
     hpx/runtime/threads/run_as_hpx_thread.hpp => hpx/include/run_as.hpp
     hpx/runtime/threads/run_as_os_thread.hpp => hpx/include/run_as.hpp
@@ -97,6 +94,6 @@ add_hpx_module(
   DEPENDENCIES hpx_core hpx_parallelism
   MODULE_DEPENDENCIES
     hpx_command_line_handling hpx_program_options hpx_resource_partitioner
-    hpx_runtime_configuration hpx_threadmanager hpx_thread_executors
+    hpx_runtime_configuration hpx_threadmanager
   CMAKE_SUBDIRS examples tests
 )

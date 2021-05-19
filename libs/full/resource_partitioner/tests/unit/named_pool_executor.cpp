@@ -101,7 +101,7 @@ int hpx_main()
     }
 
     // check that the default executor still works
-    hpx::parallel::execution::default_executor large_stack_executor(
+    hpx::execution::parallel_executor large_stack_executor(
         hpx::threads::thread_stacksize::large);
 
     lotsa_futures.push_back(hpx::async(

@@ -235,7 +235,7 @@ struct test_async_executor
     }
 
 private:
-    parallel::execution::default_executor executor_;
+    hpx::execution::parallel_executor executor_;
 };
 
 // --------------------------------------------------------------------

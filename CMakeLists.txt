@@ -2098,33 +2098,6 @@ hpx_option(
   CATEGORY "Modules"
 )
 
-# Compatibility for embedded thread pools, introduced in V1.5.0
-hpx_option(
-  HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY BOOL
-  "Enable deprecated embedded thread pools (default: OFF)" OFF ADVANCED
-)
-if(HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
-endif()
-
-# Compatibility for thread pool os executors, introduced in V1.5.0
-hpx_option(
-  HPX_WITH_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY BOOL
-  "Enable deprecated thread pool executors (default: OFF)" OFF ADVANCED
-)
-if(HPX_WITH_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
-endif()
-
-# Compatibility for thread executors, introduced in V1.5.0
-hpx_option(
-  HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY BOOL
-  "Enable deprecated thread executors (default: OFF)" OFF ADVANCED
-)
-if(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-endif()
-
 # Compatibility for thread aware timer, introduced in V1.5.0
 hpx_option(
   HPX_WITH_THREAD_AWARE_TIMER_COMPATIBILITY BOOL
@@ -2132,15 +2105,6 @@ hpx_option(
 )
 if(HPX_WITH_THREAD_AWARE_TIMER_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_THREAD_AWARE_TIMER_COMPATIBILITY)
-endif()
-
-# Compatibility for pool executor, introduced in V1.5.0
-hpx_option(
-  HPX_WITH_POOL_EXECUTOR_COMPATIBILITY BOOL
-  "Enable deprecated pool executor (default: OFF)" OFF ADVANCED
-)
-if(HPX_WITH_POOL_EXECUTOR_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_POOL_EXECUTOR_COMPATIBILITY)
 endif()
 
 # Compatibility with using Boost.Iterator traversal tags, introduced in V1.7.0

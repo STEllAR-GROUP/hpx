@@ -51,5 +51,4 @@ Main |hpx| modules
    /libs/full/runtime_distributed/docs/index.rst
    /libs/full/runtime_local/docs/index.rst
    /libs/full/segmented_algorithms/docs/index.rst
-   /libs/full/thread_executors/docs/index.rst
    /libs/full/threadmanager/docs/index.rst
