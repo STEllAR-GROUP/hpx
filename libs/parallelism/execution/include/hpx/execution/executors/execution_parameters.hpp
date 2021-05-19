@@ -672,7 +672,7 @@ namespace hpx { namespace parallel { namespace execution {
                 Executor&& exec) const
             {
                 auto& wrapped =
-                    static_cast<unwrapper<Wrapper>*>(this)->member_.get();
+                    static_cast<unwrapper<Wrapper> const*>(this)->member_.get();
                 return wrapped.processing_units_count(
                     std::forward<Executor>(exec));
             }
