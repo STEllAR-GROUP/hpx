@@ -1538,10 +1538,10 @@ if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
 
-# HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY : introduced in V1.5.0?
+# HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY : introduced in V1.5.0
 hpx_option(
   HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY BOOL
-  "Enable deprecated init() and start() overloads functions (default: ON)" ON
+  "Enable deprecated init() and start() overloads functions (default: OFF)" OFF
   ADVANCED
 )
 if(HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY)
