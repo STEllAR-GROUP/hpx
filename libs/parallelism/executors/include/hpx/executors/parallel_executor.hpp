@@ -169,7 +169,7 @@ namespace hpx { namespace execution {
 
         // property implementations
         friend constexpr parallel_policy_executor tag_dispatch(
-            hpx::execution::experimental::make_with_hint_t,
+            hpx::execution::experimental::with_hint_t,
             parallel_policy_executor const& exec,
             hpx::threads::thread_schedule_hint hint)
         {
@@ -186,7 +186,7 @@ namespace hpx { namespace execution {
         }
 
         friend constexpr parallel_policy_executor tag_dispatch(
-            hpx::execution::experimental::make_with_annotation_t,
+            hpx::execution::experimental::with_annotation_t,
             parallel_policy_executor const& exec, char const* annotation)
         {
             auto exec_with_annotation = exec;

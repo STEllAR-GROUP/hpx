@@ -811,43 +811,62 @@ namespace hpx { namespace parallel { namespace execution {
 
 namespace hpx { namespace execution { namespace experimental {
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct make_with_priority_t
-      : hpx::functional::tag<make_with_priority_t>
-    {
-    } make_with_priority{};
+    namespace detail {
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct get_priority_t
-      : hpx::functional::tag<get_priority_t>
+        template <typename Tag, typename... Args>
+        struct property_not_supported;
+
+        template <typename Tag>
+        struct property_base : hpx::functional::tag_fallback<Tag>
+        {
+        private:
+            // attempt to improve error messages if property is not supported
+            template <typename... Args>
+            friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+                Tag, Args&&... /*args*/)
+            {
+                return property_not_supported<Tag, Args...>{};
+            }
+        };
+    }    // namespace detail
+
+    HPX_INLINE_CONSTEXPR_VARIABLE struct with_priority_t final
+      : detail::property_base<with_priority_t>
+    {
+    } with_priority{};
+
+    HPX_INLINE_CONSTEXPR_VARIABLE struct get_priority_t final
+      : detail::property_base<get_priority_t>
     {
     } get_priority{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct make_with_stacksize_t
-      : hpx::functional::tag<make_with_stacksize_t>
+    HPX_INLINE_CONSTEXPR_VARIABLE struct with_stacksize_t final
+      : detail::property_base<with_stacksize_t>
     {
-    } make_with_stacksize{};
+    } with_stacksize{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct get_stacksize_t
-      : hpx::functional::tag<get_stacksize_t>
+    HPX_INLINE_CONSTEXPR_VARIABLE struct get_stacksize_t final
+      : detail::property_base<get_stacksize_t>
     {
     } get_stacksize{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct make_with_hint_t
-      : hpx::functional::tag<make_with_hint_t>
+    HPX_INLINE_CONSTEXPR_VARIABLE struct with_hint_t final
+      : detail::property_base<with_hint_t>
     {
-    } make_with_hint{};
+    } with_hint{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct get_hint_t
-      : hpx::functional::tag<get_hint_t>
+    HPX_INLINE_CONSTEXPR_VARIABLE struct get_hint_t final
+      : detail::property_base<get_hint_t>
     {
     } get_hint{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct make_with_annotation_t
-      : hpx::functional::tag<make_with_annotation_t>
+    HPX_INLINE_CONSTEXPR_VARIABLE struct with_annotation_t final
+      : detail::property_base<with_annotation_t>
     {
-    } make_with_annotation{};
+    } with_annotation{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct get_annotation_t
-      : hpx::functional::tag<get_annotation_t>
+    HPX_INLINE_CONSTEXPR_VARIABLE struct get_annotation_t final
+      : detail::property_base<get_annotation_t>
     {
     } get_annotation{};
 }}}    // namespace hpx::execution::experimental

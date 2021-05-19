@@ -20,20 +20,20 @@
 
 namespace hpx { namespace execution { namespace experimental {
 
-    // make_with_annotation property implementation for execution policies
+    // with_annotation property implementation for execution policies
     // that simply forwards to the embedded executor
     template <typename ExPolicy,
         typename Enable =
             std::enable_if_t<hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::functional::is_tag_invocable<
-                    hpx::execution::experimental::make_with_annotation_t,
+                    hpx::execution::experimental::with_annotation_t,
                     typename std::decay_t<ExPolicy>::executor_type,
                     char const*>::value>>
     constexpr decltype(auto) tag_invoke(
-        hpx::execution::experimental::make_with_annotation_t, ExPolicy&& policy,
+        hpx::execution::experimental::with_annotation_t, ExPolicy&& policy,
         char const* annotation)
     {
-        auto exec = hpx::execution::experimental::make_with_annotation(
+        auto exec = hpx::execution::experimental::with_annotation(
             policy.executor(), annotation);
 
         return hpx::parallel::execution::create_rebound_policy(
