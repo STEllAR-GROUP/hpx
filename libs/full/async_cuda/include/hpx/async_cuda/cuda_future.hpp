@@ -61,7 +61,8 @@ namespace hpx { namespace cuda { namespace experimental {
         template <typename Allocator>
         struct release_on_exit
         {
-            release_on_exit(future_data<Allocator, callback_mode>* data)
+            explicit release_on_exit(
+                future_data<Allocator, callback_mode>* data)
               : data_(data)
             {
             }
