@@ -8,9 +8,12 @@ if(NOT HPX_WITH_ASYNC_CUDA)
   return()
 endif()
 
-set(tests cuda_future transform_stream)
+set(tests cuda_future)
 if(HPX_WITH_GPUBLAS)
   set(benchmarks ${benchmarks} cublas_matmul)
+endif()
+if(HPX_CXX_STANDARD GREATER_EQUAL 17)
+  list(APPEND tests transform_stream)
 endif()
 
 set(cublas_matmul_PARAMETERS THREADS_PER_LOCALITY 4)

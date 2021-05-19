@@ -6,6 +6,9 @@
 
 #pragma once
 
+// TODO: Remove once C++17 is required.
+#if __cpp_if_constexpr >= 201606
+
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_cuda/custom_gpu_api.hpp>
@@ -326,3 +329,4 @@ namespace hpx { namespace cuda { namespace experimental {
         }
     } transform_stream{};
 }}}    // namespace hpx::cuda::experimental
+#endif
