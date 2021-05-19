@@ -1538,27 +1538,6 @@ if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
 
-# HPX_WITH_REGISTER_THREAD_COMPATIBILITY: introduced in V1.4.0
-hpx_option(
-  HPX_WITH_REGISTER_THREAD_COMPATIBILITY
-  BOOL
-  "Enable deprecated register_thread/work functions in the hpx::applier namespace (default: OFF)"
-  OFF
-  ADVANCED
-)
-if(HPX_WITH_REGISTER_THREAD_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_REGISTER_THREAD_COMPATIBILITY)
-endif()
-
-# HPX_WITH_REGISTER_THREAD_OVERLOADS_COMPATIBILITY: introduced in V1.5.0
-hpx_option(
-  HPX_WITH_REGISTER_THREAD_OVERLOADS_COMPATIBILITY BOOL
-  "Enable deprecated register_thread/work overloads (default: ON)" ON ADVANCED
-)
-if(HPX_WITH_REGISTER_THREAD_OVERLOADS_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_REGISTER_THREAD_OVERLOADS_COMPATIBILITY)
-endif()
-
 # HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY : introduced in V1.5.0?
 hpx_option(
   HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY BOOL
