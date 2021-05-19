@@ -10,30 +10,6 @@
 // ../value_semantic.hpp.
 
 #include <hpx/program_options/config.hpp>
-
-#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-// hpxinspect:nodeprecatedinclude:boost/program_options/detail/value_semantic.hpp
-
-#include <boost/program_options/detail/value_semantic.hpp>
-
-namespace hpx { namespace program_options {
-
-    using boost::program_options::arg;
-
-    namespace validators {
-
-        using boost::program_options::validators::check_first_occurrence;
-        using boost::program_options::validators::get_single_string;
-    }    // namespace validators
-
-    using namespace validators;
-
-    using boost::program_options::validate;
-
-}}    // namespace hpx::program_options
-
-#else
-
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/datastructures/optional.hpp>
@@ -241,5 +217,3 @@ namespace hpx { namespace program_options {
     }
 
 }}    // namespace hpx::program_options
-
-#endif

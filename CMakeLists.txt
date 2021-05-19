@@ -2084,13 +2084,6 @@ set(HPX_WITH_TARGET_ARCHITECTURE
     CACHE INTERNAL "" FORCE
 )
 
-# Compatibility with using Boost.ProgramOptions, introduced in V1.4.0
-hpx_option(
-  HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY BOOL
-  "Enable Boost.ProgramOptions compatibility. (default: OFF)" OFF ADVANCED
-  CATEGORY "Modules"
-)
-
 # Compatibility with using Boost.FileSystem, introduced in V1.4.0
 set(__filesystem_compatibility_default ON)
 if(HPX_WITH_CXX17_FILESYSTEM)
@@ -2172,7 +2165,6 @@ endif()
 include(HPX_SetupBoost)
 include(HPX_SetupBoostFilesystem)
 include(HPX_SetupBoostIostreams)
-include(HPX_SetupBoostProgramOptions)
 
 # Set up standalone Asio
 include(HPX_SetupAsio)
