@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <hpx/include/parallel_container_algorithm.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/container_algorithms/for_each.hpp>
 
 #include <cstddef>
 #include <iostream>

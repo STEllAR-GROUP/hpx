@@ -9,15 +9,12 @@
 // The test is intended to be used with a task plotting/profiling
 // tool to verify that high priority tasks run before low ones.
 
-#include <hpx/hpx_init.hpp>
-
-#include <hpx/async_combinators/when_all.hpp>
-#include <hpx/include/parallel_execution.hpp>
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/threads.hpp>
-#include <hpx/modules/async_local.hpp>
-#include <hpx/modules/program_options.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/program_options.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 
 #include <atomic>
@@ -177,7 +174,7 @@ int hpx_main(variables_map& vm)
               << "Launch    : " << launch_count << "\n"
               << "Launch HP : " << hp_launch_count << std::endl;
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -204,10 +201,10 @@ int main(int argc, char* argv[])
     // clang-format on
 
     // Setup the init parameters
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
 
-    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
+    HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);
 
     return hpx::util::report_errors();
 }

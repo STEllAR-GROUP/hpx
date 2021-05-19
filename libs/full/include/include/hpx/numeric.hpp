@@ -6,14 +6,4 @@
 
 #pragma once
 
-#include <hpx/parallel/numeric.hpp>
-
-#include <hpx/parallel/container_numeric.hpp>
-
-namespace hpx {
-    using hpx::parallel::adjacent_difference;
-    using hpx::parallel::exclusive_scan;
-    using hpx::parallel::inclusive_scan;
-    using hpx::parallel::transform_exclusive_scan;
-    using hpx::parallel::transform_inclusive_scan;
-}    // namespace hpx
+#include <hpx/local/numeric.hpp>

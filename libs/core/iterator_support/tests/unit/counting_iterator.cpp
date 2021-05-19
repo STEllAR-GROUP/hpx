@@ -7,7 +7,7 @@
 //  This code is based on boost::iterators::counting_iterator
 // (C) Copyright David Abrahams 2001.
 
-#include <hpx/hpx_init.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
@@ -341,7 +341,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     test(hpx::util::make_counting_iterator(array),
         hpx::util::make_counting_iterator(array + 2000 - 1));
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -355,10 +355,10 @@ int main(int argc, char* argv[])
         "the random number generator seed to use for this run");
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, init_args), 0,
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv, init_args), 0,
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();

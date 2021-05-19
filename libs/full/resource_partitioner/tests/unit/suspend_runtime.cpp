@@ -6,15 +6,13 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
-#include <hpx/execution_base/this_thread.hpp>
-#include <hpx/hpx_start.hpp>
-#include <hpx/hpx_suspend.hpp>
-#include <hpx/include/apply.hpp>
-#include <hpx/include/runtime.hpp>
-#include <hpx/include/threadmanager.hpp>
-#include <hpx/include/threads.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/runtime.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/timing.hpp>
+#include <hpx/modules/threadmanager.hpp>
 
 #include <cstddef>
 #include <string>
@@ -24,7 +22,7 @@
 void test_scheduler(
     int argc, char* argv[], hpx::resource::scheduling_policy scheduler)
 {
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
 
     init_args.cfg = {"hpx.os_threads=4"};
     init_args.rp_callback = [scheduler](auto& rp,
@@ -32,14 +30,14 @@ void test_scheduler(
         rp.create_thread_pool("default", scheduler);
     };
 
-    hpx::start(nullptr, argc, argv, init_args);
-    hpx::suspend();
+    hpx::local::start(nullptr, argc, argv, init_args);
+    hpx::local::suspend();
 
     hpx::chrono::high_resolution_timer t;
 
     while (t.elapsed() < 2)
     {
-        hpx::resume();
+        hpx::local::resume();
 
         hpx::apply([]() {
             for (std::size_t i = 0; i < 10000; ++i)
@@ -48,12 +46,12 @@ void test_scheduler(
             }
         });
 
-        hpx::suspend();
+        hpx::local::suspend();
     }
 
-    hpx::resume();
-    hpx::apply([]() { hpx::finalize(); });
-    HPX_TEST_EQ(hpx::stop(), 0);
+    hpx::local::resume();
+    hpx::apply([]() { hpx::local::finalize(); });
+    HPX_TEST_EQ(hpx::local::stop(), 0);
 }
 
 int main(int argc, char* argv[])

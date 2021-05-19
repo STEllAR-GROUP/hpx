@@ -7,12 +7,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/barrier.hpp>
 #include <hpx/concurrency/detail/contiguous_index_queue.hpp>
-#include <hpx/future.hpp>
-#include <hpx/init.hpp>
+#include <hpx/local/barrier.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/optional.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/optional.hpp>
 #include <hpx/program_options.hpp>
 
 #include <algorithm>
@@ -202,18 +202,18 @@ int hpx_main(hpx::program_options::variables_map& vm)
     test_concurrent(pop_mode::left);
     test_concurrent(pop_mode::right);
     test_concurrent(pop_mode::random);
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char** argv)
 {
-    hpx::init_params i;
+    hpx::local::init_params i;
     hpx::program_options::options_description desc_cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
     desc_cmdline.add_options()("seed,s",
         hpx::program_options::value<unsigned int>(),
         "the random number generator seed to use for this run");
     i.desc_cmdline = desc_cmdline;
-    hpx::init(argc, argv, i);
+    hpx::local::init(hpx_main, argc, argv, i);
     return hpx::util::report_errors();
 }

@@ -10,7 +10,7 @@
 //  (http://creativecommons.org/licenses/by/4.0/).
 
 #include <hpx/functional/bind_back.hpp>
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/threading.hpp>
@@ -71,7 +71,7 @@ void test_cv(bool call_notify)
                 HPX_TEST(call_notify != it.stop_requested());
             });
 
-        hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
         if (call_notify)
         {
             {
@@ -121,7 +121,7 @@ void test_cv_pred(bool call_notify)
                 HPX_TEST(call_notify != st.stop_requested());
             });
 
-        hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
         if (call_notify)
         {
             {
@@ -161,9 +161,9 @@ void test_cv_thread_no_pred(bool call_notify)
             }
         });
 
-        hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
         HPX_TEST(!is.stop_requested());
-        hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         if (call_notify)
         {
@@ -209,9 +209,9 @@ void test_cv_thread_pred(bool call_notify)
                 HPX_TEST(call_notify != st.stop_requested());
             });
 
-        hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
         HPX_TEST(!is.stop_requested());
-        hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         if (call_notify)
         {
@@ -364,7 +364,7 @@ void test_timed_cv(bool call_notify, bool /* call_interrupt */, Dur dur)
                 ready = true;
             }    // release lock
 
-            hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
+            hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
             ready_cv.notify_one();
         }
         else
@@ -442,9 +442,9 @@ void test_timed_wait(bool call_notify, bool call_interrupt, Dur dur)
             }
         });
 
-        hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
         HPX_TEST(!t1.get_stop_source().stop_requested());
-        hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         if (call_notify)
         {
@@ -504,7 +504,7 @@ void test_many_cvs(bool call_notify, bool call_interrupt)
             std::ref(ready_mtx), std::ref(ready_cv), call_notify));
         {
             auto t0ssource = t0.get_stop_source();
-            hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
+            hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
 
             // starts thread concurrently calling request_stop() for the same
             // token
@@ -523,7 +523,7 @@ void test_many_cvs(bool call_notify, bool call_interrupt)
                 vthreads.push_back(std::move(t));
             }
 
-            hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
+            hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
 
             if (call_notify)
             {
@@ -564,7 +564,7 @@ void test_many_cvs(bool call_notify, bool call_interrupt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main()
+int hpx_main()
 {
     std::set_terminate([]() { HPX_TEST(false); });
 
@@ -627,5 +627,14 @@ int main()
     {
         HPX_TEST(false);
     }
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
+
     return hpx::util::report_errors();
 }

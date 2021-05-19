@@ -7,9 +7,10 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/async_local/apply.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/threads.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/shared_mutex.hpp>
+#include <hpx/local/thread.hpp>
 
 #include <hpx/modules/testing.hpp>
 
@@ -112,7 +113,7 @@ void test_only_one_writer_permitted()
                     simultaneous_running_count, max_simultaneous_running));
         }
 
-        hpx::this_thread::sleep_for(std::chrono::seconds(2));
+        hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
         CHECK_LOCKED_VALUE_EQUAL(unblocked_count_mutex, unblocked_count, 1u);
 
@@ -354,7 +355,7 @@ int hpx_main()
     test_unlocking_writer_unblocks_all_readers();
     test_unlocking_last_reader_only_unblocks_one_writer();
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -363,9 +364,9 @@ int main(int argc, char* argv[])
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.cfg = cfg;
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, init_args), 0,
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv, init_args), 0,
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();

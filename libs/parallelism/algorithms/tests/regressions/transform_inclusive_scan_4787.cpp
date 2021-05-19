@@ -7,9 +7,9 @@
 // see #4787: `transform_inclusive_scan` gives incorrect results for
 //            non-commutative operator
 
-#include <hpx/hpx_main.hpp>
-#include <hpx/include/parallel_transform_scan.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
 
 #include <vector>
 
@@ -24,7 +24,7 @@ bool operator==(Elem lhs, Elem rhs)
     return lhs.value == rhs.value;
 }
 
-int main()
+int hpx_main()
 {
     std::vector<Elem> test{
         Elem{1, true}, Elem{3, false}, Elem{2, true}, Elem{4, false}};
@@ -46,6 +46,14 @@ int main()
 
     std::vector<Elem> expected = {Elem{1}, Elem{4}, Elem{2}, Elem{6}};
     HPX_TEST(output == expected);
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

@@ -7,13 +7,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/resiliency.hpp>
 #include <hpx/modules/timing.hpp>
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <cstdlib>
 #include <iostream>
 #include <numeric>
@@ -211,7 +211,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::util::format_to(std::cout, "Time elapsed == {1}\n", elapsed);
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -228,8 +228,8 @@ int main(int argc, char* argv[])
         "Maximum number of repeat launches for a function f");
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }

@@ -9,14 +9,14 @@
 // Tasks should always report the right core number when they run.
 
 #include <hpx/debugging/print.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/future.hpp>
-#include <hpx/include/resource_partitioner.hpp>
-#include <hpx/init.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/runtime.hpp>
+#include <hpx/local/thread.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/runtime.hpp>
-#include <hpx/thread.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -96,14 +96,14 @@ int hpx_main()
 
     threadLoop();
 
-    hpx::finalize();
+    hpx::local::finalize();
     hpx::deb_schbin.debug(hpx::debug::str<15>("Finalized"));
     return hpx::util::report_errors();
 }
 
 int main(int argc, char* argv[])
 {
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
 
     init_args.rp_callback = [](auto& rp,
                                 hpx::program_options::variables_map const&) {
@@ -114,5 +114,5 @@ int main(int argc, char* argv[])
                 hpx::threads::policies::default_mode));
     };
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }

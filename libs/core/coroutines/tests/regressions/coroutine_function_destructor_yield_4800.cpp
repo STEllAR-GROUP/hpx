@@ -6,10 +6,11 @@
 
 // This test verifies that the destructor of a thread function may yield.
 
-#include <hpx/future.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/modules/threading.hpp>
-#include <hpx/thread.hpp>
-#include <hpx/wrap_main.hpp>
 
 #include <utility>
 
@@ -35,7 +36,7 @@ struct yielder
     }
 };
 
-int main()
+int hpx_main()
 {
     // We supply the thread function ourselves which means that the destructor
     // will be called late in the coroutine call operator.
@@ -72,5 +73,13 @@ int main()
         hpx::apply([y = std::move(y)]() {});
     }
 
-    return 0;
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
+
+    return hpx::util::report_errors();
 }

@@ -391,6 +391,15 @@ namespace hpx { namespace local { namespace detail {
                 ("hpx:dump-config", "print the final runtime configuration")
                 // enable debug output from command line handling
                 ("hpx:debug-clp", "debug command line processing")
+                ("hpx:debug-hpx-log", value<std::string>()->implicit_value("cout"),
+                  "enable all messages on the HPX log channel and send all "
+                  "HPX logs to the target destination")
+                ("hpx:debug-timing-log", value<std::string>()->implicit_value("cout"),
+                  "enable all messages on the timing log channel and send all "
+                  "timing logs to the target destination")
+                ("hpx:debug-app-log", value<std::string>()->implicit_value("cout"),
+                  "enable all messages on the application log channel and send all "
+                  "application logs to the target destination")
 #if defined(_POSIX_VERSION) || defined(HPX_WINDOWS)
                 ("hpx:attach-debugger",
                   value<std::string>()->implicit_value("startup"),

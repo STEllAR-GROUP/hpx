@@ -10,7 +10,12 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(synchronization_headers
     hpx/condition_variable.hpp
     hpx/local/barrier.hpp
+    hpx/local/condition_variable.hpp
     hpx/local/latch.hpp
+    hpx/local/mutex.hpp
+    hpx/local/semaphore.hpp
+    hpx/local/shared_mutex.hpp
+    hpx/local/stop_token.hpp
     hpx/mutex.hpp
     hpx/semaphore.hpp
     hpx/shared_mutex.hpp

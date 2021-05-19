@@ -7,9 +7,10 @@
 // This test case demonstrates the issue described in #2667: Ambiguity of
 // nested hpx::future<void>'s
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/thread.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -23,7 +24,7 @@ void do_more_work()
     was_run = true;
 }
 
-int main()
+int hpx_main()
 {
     hpx::future<hpx::future<void>> fut = hpx::async([]() -> hpx::future<void> {
         return hpx::async([]() -> void { do_more_work(); });
@@ -36,6 +37,14 @@ int main()
 
     HPX_TEST_LT(1.0, t.elapsed());
     HPX_TEST(was_run.load());
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

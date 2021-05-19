@@ -6,8 +6,8 @@
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(threading_headers hpx/thread.hpp hpx/threading/jthread.hpp
-                      hpx/threading/thread.hpp
+set(threading_headers hpx/local/thread.hpp hpx/thread.hpp
+                      hpx/threading/jthread.hpp hpx/threading/thread.hpp
 )
 
 # cmake-format: off

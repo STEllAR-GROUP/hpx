@@ -6,12 +6,11 @@
 
 // #3182: bulk_then_execute has unexpected return type/does not compile
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <hpx/include/parallel_algorithm.hpp>
-#include <hpx/include/parallel_executors.hpp>
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/execution.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -80,10 +79,10 @@ int hpx_main()
         test_bulk_then_execute(exec);
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
 {
-    return hpx::init(argc, argv);
+    return hpx::local::init(hpx_main, argc, argv);
 }

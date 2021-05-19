@@ -7,10 +7,10 @@
 // This test case demonstrates the issue described in #1481:
 // Sync primitives safe destruction
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
-#include <hpx/include/lcos_local.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/thread.hpp>
 
 #include <chrono>
 
@@ -38,8 +38,16 @@ void test_safe_destruction()
     t.join();
 }
 
-int main()
+int hpx_main()
 {
     test_safe_destruction();
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
+
     return hpx::util::report_errors();
 }

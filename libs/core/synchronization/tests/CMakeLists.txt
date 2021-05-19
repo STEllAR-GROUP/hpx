@@ -45,5 +45,6 @@ if(HPX_WITH_TESTS_HEADERS)
     HEADERS ${synchronization_headers}
     HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
     DEPENDENCIES hpx_synchronization
+    NOLIBS
   )
 endif()

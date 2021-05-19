@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/include/parallel_count.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/algorithms/count.hpp>
 
 #include <cstddef>
 #include <iostream>

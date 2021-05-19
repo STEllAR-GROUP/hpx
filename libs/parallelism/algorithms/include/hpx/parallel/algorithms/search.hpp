@@ -14,6 +14,7 @@
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/search.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 

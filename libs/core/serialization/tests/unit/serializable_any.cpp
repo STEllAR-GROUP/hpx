@@ -6,7 +6,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/serialization/serializable_any.hpp>
 
@@ -19,9 +18,6 @@
 
 #include "small_big_object.hpp"
 
-using hpx::finalize;
-using hpx::init;
-
 struct compare_any
 {
     bool operator()(hpx::any const& lhs, hpx::any const& rhs) const
@@ -31,7 +27,7 @@ struct compare_any
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-int hpx_main()
+int main()
 {
     {
         {
@@ -155,13 +151,5 @@ int hpx_main()
         }
     }
 
-    finalize();
     return hpx::util::report_errors();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
-{
-    // Initialize and run HPX
-    return init(argc, argv);
 }

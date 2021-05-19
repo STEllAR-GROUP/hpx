@@ -44,6 +44,7 @@ if(HPX_WITH_TESTS)
       EXCLUDE "hpx/threading_base/thread_data_stackful.hpp"
               "hpx/threading_base/thread_data_stackless.hpp"
       DEPENDENCIES hpx_threading_base
+      NOLIBS
     )
   endif()
 endif()

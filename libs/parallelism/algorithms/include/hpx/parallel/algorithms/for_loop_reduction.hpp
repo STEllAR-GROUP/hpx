@@ -11,10 +11,9 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/runtime_local/get_os_thread_count.hpp>
-#include <hpx/runtime_local/get_worker_thread_num.hpp>
-
 #include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/execution/detail/execution_parameter_callbacks.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>
@@ -41,7 +40,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
               : var_(var)
               , op_(std::forward<Op_>(op))
             {
-                std::size_t cores = hpx::get_os_thread_count();
+                std::size_t cores =
+                    hpx::parallel::execution::detail::get_os_thread_count();
                 data_.reset(new hpx::util::cache_line_data<T>[cores]);
                 for (std::size_t i = 0; i != cores; ++i)
                     data_[i].data_ = identity;
@@ -49,8 +49,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
 
             constexpr void init_iteration(std::size_t)
             {
-                HPX_ASSERT(
-                    hpx::get_worker_thread_num() < hpx::get_os_thread_count());
+                HPX_ASSERT(hpx::get_worker_thread_num() <
+                    hpx::parallel::execution::detail::get_os_thread_count());
             }
 
             constexpr T& iteration_value()
@@ -62,7 +62,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
 
             void exit_iteration(std::size_t /*index*/)
             {
-                std::size_t cores = hpx::get_os_thread_count();
+                std::size_t cores =
+                    hpx::parallel::execution::detail::get_os_thread_count();
                 for (std::size_t i = 0; i != cores; ++i)
                     var_ = op_(var_, data_[i].data_);
             }

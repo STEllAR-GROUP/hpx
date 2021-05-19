@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_main.hpp>
-
+#include <hpx/local/init.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/threading.hpp>
@@ -176,7 +175,7 @@ void test_semaphore_try_acquire_for_until()
     }
 }
 
-int main()
+int hpx_main()
 {
     test_semaphore_release_acquire();
     test_semaphore_try_acquire();
@@ -185,5 +184,11 @@ int main()
     test_semaphore_try_acquire_until();
     test_semaphore_try_acquire_for_until();
 
+    hpx::local::finalize();
     return hpx::util::report_errors();
+}
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
 }
