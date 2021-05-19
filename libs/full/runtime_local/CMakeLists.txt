@@ -32,7 +32,6 @@ set(runtime_local_headers
     hpx/runtime_local/state.hpp
     hpx/runtime_local/shutdown_function.hpp
     hpx/runtime_local/startup_function.hpp
-    hpx/runtime_local/thread_aware_timer.hpp
     hpx/runtime_local/thread_hooks.hpp
     hpx/runtime_local/thread_mapper.hpp
     hpx/runtime_local/thread_pool_helpers.hpp
@@ -78,7 +77,6 @@ set(runtime_local_sources
     runtime_local.cpp
     serialize_exception.cpp
     state.cpp
-    thread_aware_timer.cpp
     thread_mapper.cpp
     thread_pool_helpers.cpp
     thread_stacktrace.cpp

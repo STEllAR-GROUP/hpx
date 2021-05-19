@@ -26,7 +26,6 @@
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/runtime_local/interval_timer.hpp>
-#include <hpx/runtime_local/thread_aware_timer.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>

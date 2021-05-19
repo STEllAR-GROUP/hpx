@@ -2098,15 +2098,6 @@ hpx_option(
   CATEGORY "Modules"
 )
 
-# Compatibility for thread aware timer, introduced in V1.5.0
-hpx_option(
-  HPX_WITH_THREAD_AWARE_TIMER_COMPATIBILITY BOOL
-  "Enable deprecated thread_aware_timer (default: OFF)" OFF ADVANCED
-)
-if(HPX_WITH_THREAD_AWARE_TIMER_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_THREAD_AWARE_TIMER_COMPATIBILITY)
-endif()
-
 # Compatibility with using Boost.Iterator traversal tags, introduced in V1.7.0
 hpx_option(
   HPX_ITERATOR_SUPPORT_WITH_BOOST_ITERATOR_TRAVERSAL_TAG_COMPATIBILITY BOOL
