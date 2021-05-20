@@ -87,7 +87,7 @@ struct scheduler_2
     }
 };
 
-sender tag_invoke(hpx::execution::experimental::schedule_t, scheduler_2)
+sender tag_dispatch(hpx::execution::experimental::schedule_t, scheduler_2)
 {
     ++tag_invoke_schedule_calls;
     return {};
@@ -112,7 +112,7 @@ struct scheduler_3
     }
 };
 
-sender tag_invoke(hpx::execution::experimental::schedule_t, scheduler_3)
+sender tag_dispatch(hpx::execution::experimental::schedule_t, scheduler_3)
 {
     ++tag_invoke_schedule_calls;
     return {};

@@ -15,7 +15,7 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/type_support/detail/with_result_of.hpp>
 #include <hpx/type_support/pack.hpp>
 
@@ -244,7 +244,7 @@ namespace hpx { namespace execution { namespace experimental {
     {
     private:
         template <typename Sender, typename Scheduler>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             on_t, Sender&& predecessor_sender, Scheduler&& scheduler)
         {
             return detail::on_sender<Sender, Scheduler>{
@@ -253,7 +253,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         template <typename Scheduler>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             on_t, Scheduler&& scheduler)
         {
             return detail::partial_algorithm<on_t, Scheduler>{

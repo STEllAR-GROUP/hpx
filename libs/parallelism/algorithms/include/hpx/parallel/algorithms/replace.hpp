@@ -472,7 +472,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -878,7 +878,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::replace_if
+    // DPO for hpx::replace_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_if_t final
       : hpx::functional::tag_fallback<replace_if_t>
     {
@@ -892,7 +892,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend void tag_fallback_invoke(hpx::replace_if_t, Iter first,
+        friend void tag_fallback_dispatch(hpx::replace_if_t, Iter first,
             Iter last, Pred&& pred, T const& new_value)
         {
             static_assert((hpx::traits::is_input_iterator<Iter>::value),
@@ -916,7 +916,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             void>::type
-        tag_fallback_invoke(hpx::replace_if_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_dispatch(hpx::replace_if_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, Pred&& pred, T const& new_value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -931,7 +931,7 @@ namespace hpx {
     } replace_if{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::replace
+    // DPO for hpx::replace
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_t final
       : hpx::functional::tag_fallback<replace_t>
     {
@@ -942,7 +942,7 @@ namespace hpx {
                 hpx::traits::is_iterator<InIter>::value
             )>
         // clang-format on
-        friend void tag_fallback_invoke(hpx::replace_t, InIter first,
+        friend void tag_fallback_dispatch(hpx::replace_t, InIter first,
             InIter last, T const& old_value, T const& new_value)
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
@@ -965,7 +965,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             void>::type
-        tag_fallback_invoke(hpx::replace_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_dispatch(hpx::replace_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, T const& old_value, T const& new_value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -981,7 +981,7 @@ namespace hpx {
     } replace{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::replace_copy_if
+    // DPO for hpx::replace_copy_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_copy_if_t final
       : hpx::functional::tag_fallback<replace_copy_if_t>
     {
@@ -996,7 +996,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend OutIter tag_fallback_invoke(hpx::replace_copy_if_t, InIter first,
+        friend OutIter tag_fallback_dispatch(hpx::replace_copy_if_t, InIter first,
             InIter last, OutIter dest, Pred&& pred, T const& new_value)
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
@@ -1026,7 +1026,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_invoke(hpx::replace_copy_if_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::replace_copy_if_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred&& pred,
             T const& new_value)
         {
@@ -1046,7 +1046,7 @@ namespace hpx {
     } replace_copy_if{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::replace_copy
+    // DPO for hpx::replace_copy
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_copy_t final
       : hpx::functional::tag_fallback<replace_copy_t>
     {
@@ -1058,7 +1058,7 @@ namespace hpx {
                 hpx::traits::is_iterator<OutIter>::value
             )>
         // clang-format on
-        friend OutIter tag_fallback_invoke(hpx::replace_copy_t, InIter first,
+        friend OutIter tag_fallback_dispatch(hpx::replace_copy_t, InIter first,
             InIter last, OutIter dest, T const& old_value, T const& new_value)
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
@@ -1085,7 +1085,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_invoke(hpx::replace_copy_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::replace_copy_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, T const& old_value,
             T const& new_value)
         {

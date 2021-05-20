@@ -254,7 +254,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/util/tagged_pair.hpp>
 
@@ -453,7 +453,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::remove_copy_if
+    // DPO for hpx::remove_copy_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct remove_copy_if_t final
       : hpx::functional::tag_fallback<remove_copy_if_t>
     {
@@ -467,7 +467,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend OutIter tag_fallback_invoke(hpx::remove_copy_if_t, InIter first,
+        friend OutIter tag_fallback_dispatch(hpx::remove_copy_if_t, InIter first,
             InIter last, OutIter dest, Pred&& pred)
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
@@ -498,7 +498,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_invoke(hpx::remove_copy_if_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::remove_copy_if_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred&& pred)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -518,7 +518,7 @@ namespace hpx {
     } remove_copy_if{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::remove_copy
+    // DPO for hpx::remove_copy
     HPX_INLINE_CONSTEXPR_VARIABLE struct remove_copy_t final
       : hpx::functional::tag_fallback<remove_copy_t>
     {
@@ -530,7 +530,7 @@ namespace hpx {
                 hpx::traits::is_iterator<OutIter>::value
             )>
         // clang-format on
-        friend OutIter tag_fallback_invoke(hpx::remove_copy_t, InIter first,
+        friend OutIter tag_fallback_dispatch(hpx::remove_copy_t, InIter first,
             InIter last, OutIter dest, T const& value)
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
@@ -555,7 +555,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_invoke(hpx::remove_copy_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::remove_copy_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, T const& value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),

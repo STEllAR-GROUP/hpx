@@ -35,7 +35,7 @@ struct custom_transformer
 };
 
 template <typename S>
-auto tag_invoke(ex::transform_t, S&& s, custom_transformer t)
+auto tag_dispatch(ex::transform_t, S&& s, custom_transformer t)
 {
     t.tag_invoke_overload_called = true;
     return ex::transform(std::forward<S>(s), [t = std::move(t)]() { t(); });
@@ -134,7 +134,7 @@ int main()
         HPX_TEST(set_value_called);
     }
 
-    // tag_invoke overload
+    // tag_dispatch overload
     {
         std::atomic<bool> receiver_set_value_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};

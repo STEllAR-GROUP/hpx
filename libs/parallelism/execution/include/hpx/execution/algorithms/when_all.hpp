@@ -13,7 +13,7 @@
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <atomic>
@@ -258,7 +258,7 @@ namespace hpx { namespace execution { namespace experimental {
     {
     private:
         template <typename... Ss>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             when_all_t, Ss&&... ss)
         {
             return detail::when_all_sender<Ss...>{std::forward<Ss>(ss)...};

@@ -640,7 +640,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::find
+    // DPO for hpx::ranges::find
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_t final
       : hpx::functional::tag_fallback<find_t>
     {
@@ -656,7 +656,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_fallback_invoke(find_t, ExPolicy&& policy, Iter first, Sent last,
+        tag_fallback_dispatch(find_t, ExPolicy&& policy, Iter first, Sent last,
             T const& val, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
@@ -678,7 +678,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_fallback_invoke(find_t, ExPolicy&& policy, Rng&& rng, T const& val,
+        tag_fallback_dispatch(find_t, ExPolicy&& policy, Rng&& rng, T const& val,
             Proj&& proj = Proj())
         {
             using iterator_type =
@@ -701,7 +701,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::traits::is_projected<Proj, Iter>::value
             )>
         // clang-format on
-        friend Iter tag_fallback_invoke(
+        friend Iter tag_fallback_dispatch(
             find_t, Iter first, Sent last, T const& val, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_input_iterator<Iter>::value,
@@ -721,7 +721,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng>::type
-        tag_fallback_invoke(
+        tag_fallback_dispatch(
             find_t, Rng&& rng, T const& val, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -737,7 +737,7 @@ namespace hpx { namespace ranges {
     } find{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::find_if
+    // DPO for hpx::ranges::find_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_if_t final
       : hpx::functional::tag_fallback<find_if_t>
     {
@@ -756,7 +756,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_fallback_invoke(find_if_t, ExPolicy&& policy, Iter first, Sent last,
+        tag_fallback_dispatch(find_if_t, ExPolicy&& policy, Iter first, Sent last,
             Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
@@ -783,7 +783,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_fallback_invoke(find_if_t, ExPolicy&& policy, Rng&& rng,
+        tag_fallback_dispatch(find_if_t, ExPolicy&& policy, Rng&& rng,
             Pred&& pred, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -810,7 +810,7 @@ namespace hpx { namespace ranges {
                 >
             )>
         // clang-format on
-        friend Iter tag_fallback_invoke(
+        friend Iter tag_fallback_dispatch(
             find_if_t, Iter first, Sent last, Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_input_iterator<Iter>::value,
@@ -835,7 +835,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng>::type
-        tag_fallback_invoke(
+        tag_fallback_dispatch(
             find_if_t, Rng&& rng, Pred&& pred, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -851,7 +851,7 @@ namespace hpx { namespace ranges {
     } find_if{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::find_if_not
+    // DPO for hpx::ranges::find_if_not
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_if_not_t final
       : hpx::functional::tag_fallback<find_if_not_t>
     {
@@ -870,7 +870,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_fallback_invoke(find_if_not_t, ExPolicy&& policy, Iter first,
+        tag_fallback_dispatch(find_if_not_t, ExPolicy&& policy, Iter first,
             Sent last, Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
@@ -897,7 +897,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_fallback_invoke(find_if_not_t, ExPolicy&& policy, Rng&& rng,
+        tag_fallback_dispatch(find_if_not_t, ExPolicy&& policy, Rng&& rng,
             Pred&& pred, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -924,7 +924,7 @@ namespace hpx { namespace ranges {
                 >
             )>
         // clang-format on
-        friend Iter tag_fallback_invoke(find_if_not_t, Iter first, Sent last,
+        friend Iter tag_fallback_dispatch(find_if_not_t, Iter first, Sent last,
             Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_input_iterator<Iter>::value,
@@ -949,7 +949,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng>::type
-        tag_fallback_invoke(
+        tag_fallback_dispatch(
             find_if_not_t, Rng&& rng, Pred&& pred, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -965,7 +965,7 @@ namespace hpx { namespace ranges {
     } find_if_not{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::find_end
+    // DPO for hpx::ranges::find_end
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_end_t final
       : hpx::functional::tag_fallback<find_end_t>
     {
@@ -987,7 +987,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng1>::type>::type
-        tag_fallback_invoke(find_end_t, ExPolicy&& policy, Rng1&& rng1,
+        tag_fallback_dispatch(find_end_t, ExPolicy&& policy, Rng1&& rng1,
             Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -1026,7 +1026,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter1>::type
-        tag_fallback_invoke(find_end_t, ExPolicy&& policy, Iter1 first1,
+        tag_fallback_dispatch(find_end_t, ExPolicy&& policy, Iter1 first1,
             Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -1056,7 +1056,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng1>::type
-        tag_fallback_invoke(find_end_t, Rng1&& rng1, Rng2&& rng2,
+        tag_fallback_dispatch(find_end_t, Rng1&& rng1, Rng2&& rng2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -1093,7 +1093,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend Iter1 tag_fallback_invoke(find_end_t, Iter1 first1, Sent1 last1,
+        friend Iter1 tag_fallback_dispatch(find_end_t, Iter1 first1, Sent1 last1,
             Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -1110,7 +1110,7 @@ namespace hpx { namespace ranges {
     } find_end{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::find_first_of
+    // DPO for hpx::ranges::find_first_of
     HPX_INLINE_CONSTEXPR_VARIABLE struct find_first_of_t final
       : hpx::functional::tag_fallback<find_first_of_t>
     {
@@ -1132,7 +1132,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng1>::type>::type
-        tag_fallback_invoke(find_first_of_t, ExPolicy&& policy, Rng1&& rng1,
+        tag_fallback_dispatch(find_first_of_t, ExPolicy&& policy, Rng1&& rng1,
             Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -1171,7 +1171,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter1>::type
-        tag_fallback_invoke(find_first_of_t, ExPolicy&& policy, Iter1 first1,
+        tag_fallback_dispatch(find_first_of_t, ExPolicy&& policy, Iter1 first1,
             Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -1201,7 +1201,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng1>::type
-        tag_fallback_invoke(find_first_of_t, Rng1&& rng1, Rng2&& rng2,
+        tag_fallback_dispatch(find_first_of_t, Rng1&& rng1, Rng2&& rng2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -1238,7 +1238,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend Iter1 tag_fallback_invoke(find_first_of_t, Iter1 first1,
+        friend Iter1 tag_fallback_dispatch(find_first_of_t, Iter1 first1,
             Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {

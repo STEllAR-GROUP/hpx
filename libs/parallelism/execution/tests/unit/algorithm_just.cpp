@@ -19,7 +19,7 @@ namespace ex = hpx::execution::experimental;
 // This overload is only used to check dispatching. It is not a useful
 // implementation.
 template <typename T>
-auto tag_invoke(ex::just_t, custom_type<T> c)
+auto tag_dispatch(ex::just_t, custom_type<T> c)
 {
     c.tag_invoke_overload_called = true;
     return ex::just(c.x);

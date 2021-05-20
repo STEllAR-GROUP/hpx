@@ -10,7 +10,7 @@
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_priority_invoke.hpp>
+#include <hpx/functional/tag_priority_dispatch.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/type_support/equality.hpp>
 
@@ -62,7 +62,7 @@ namespace hpx { namespace execution { namespace experimental {
     ///             void set_done() noexcept {}
     ///           };
     ///
-    /// The customization is implemented in terms of `hpx::functional::tag_invoke`.
+    /// The customization is implemented in terms of `hpx::functional::tag_dispatch`.
     template <typename E, typename F>
     void execute(E&& e, F&& f);
 
@@ -124,7 +124,7 @@ namespace hpx { namespace execution { namespace experimental {
     ///     * Otherwise, the expression is ill-formed.
     ///
     /// The customization is implemented in terms of
-    /// `hpx::functional::tag_invoke`.
+    /// `hpx::functional::tag_dispatch`.
     template <typename S, typename R>
     void connect(S&& s, R&& r);
 
@@ -182,7 +182,7 @@ namespace hpx { namespace execution { namespace experimental {
     ///           };
     ///
     /// The customization is implemented in terms of
-    /// `hpx::functional::tag_invoke`.
+    /// `hpx::functional::tag_dispatch`.
     template <typename S, typename R>
     auto submit(S&& s, R&& r);
 
@@ -232,7 +232,7 @@ namespace hpx { namespace execution { namespace experimental {
     ///      * Otherwise, schedule(s) is ill-formed.
     ///
     /// The customization is implemented in terms of
-    /// `hpx::functional::tag_invoke`.
+    /// `hpx::functional::tag_dispatch`.
 
 #endif
 
@@ -342,7 +342,7 @@ namespace hpx { namespace execution { namespace experimental {
             typename =
                 std::enable_if_t<hpx::is_invocable<std::decay_t<F>&>::value &&
                     detail::is_executor_base<Executor>::value>>
-        friend constexpr HPX_FORCEINLINE auto tag_override_invoke(execute_t,
+        friend constexpr HPX_FORCEINLINE auto tag_override_dispatch(execute_t,
             Executor&& executor,
             F&& f) noexcept(noexcept(std::forward<Executor>(executor)
                                          .execute(std::forward<F>(f))))
@@ -437,7 +437,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename S, typename R,
             typename = std::enable_if_t<is_sender_v<S> && is_receiver_v<R>>>
         friend constexpr HPX_FORCEINLINE auto
-        tag_override_invoke(connect_t, S&& s, R&& r) noexcept(
+        tag_override_dispatch(connect_t, S&& s, R&& r) noexcept(
             noexcept(std::forward<S>(s).connect(std::forward<R>(r))))
             -> decltype(std::forward<S>(s).connect(std::forward<R>(r)))
         {
@@ -455,7 +455,7 @@ namespace hpx { namespace execution { namespace experimental {
                     is_receiver_of_v<R> &&
                     detail::is_executor_of_base_impl<std::decay_t<S>,
                         detail::as_invocable<std::decay_t<R>, S>>::value>>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(connect_t,
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(connect_t,
             S&& s, R&& r) noexcept(noexcept(detail::as_operation<S, R>{
             std::forward<S>(s), std::forward<R>(r)}))
             -> decltype(detail::as_operation<S, R>{
@@ -545,7 +545,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename S, typename R,
             typename = std::enable_if_t<is_sender_to<S, R>::value>>
         friend constexpr HPX_FORCEINLINE auto
-        tag_override_invoke(submit_t, S&& s, R&& r) noexcept(
+        tag_override_dispatch(submit_t, S&& s, R&& r) noexcept(
             noexcept(std::forward<S>(s).submit(std::forward<R>(r))))
             -> decltype(std::forward<S>(s).submit(std::forward<R>(r)))
         {
@@ -555,7 +555,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename S, typename R,
             typename =
                 std::enable_if_t<!detail::has_member_submit<S, R>::value>>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(submit_t,
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(submit_t,
             S&& s,
             R&& r) noexcept(noexcept(start((new detail::submit_state<S, R>{
                                                 std::forward<S>(s),
@@ -609,7 +609,7 @@ namespace hpx { namespace execution { namespace experimental {
             std::enable_if_t<hpx::is_invocable<std::decay_t<F>&>::value &&
                 !detail::has_member_execute<Executor, F>::value &&
                 !detail::is_as_invocable<F>::value>>
-    constexpr HPX_FORCEINLINE auto tag_fallback_invoke(execute_t,
+    constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(execute_t,
         Executor&& executor,
         F&& f) noexcept(noexcept(submit(std::forward<Executor>(executor),
         detail::as_receiver<std::decay_t<F>, Executor>{std::forward<F>(f)})))
@@ -715,7 +715,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename S,
             typename = std::enable_if_t<is_sender_v<
                 std::decay_t<decltype(std::declval<S>().schedule())>>>>
-        friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
+        friend constexpr HPX_FORCEINLINE auto tag_override_dispatch(
             schedule_t, S&& s) noexcept(noexcept(std::forward<S>(s).schedule()))
             -> decltype(std::forward<S>(s).schedule())
         {
@@ -724,7 +724,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename S,
             typename = std::enable_if_t<!detail::has_member_schedule<S>::value>>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(schedule_t,
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(schedule_t,
             S&& s) noexcept(noexcept(detail::as_sender<std::decay_t<S>>{
             std::forward<S>(s)}))
             -> decltype(detail::as_sender<std::decay_t<S>>{std::forward<S>(s)})

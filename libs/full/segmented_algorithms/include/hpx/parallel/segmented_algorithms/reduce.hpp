@@ -203,7 +203,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<InIterE>::value
         )>
     // clang-format on
-    T tag_invoke(hpx::reduce_t, InIterB first, InIterE last, T init, F&& f)
+    T tag_dispatch(hpx::reduce_t, InIterB first, InIterE last, T init, F&& f)
     {
         static_assert(hpx::traits::is_input_iterator<InIterB>::value,
             "Requires at least input iterator.");
@@ -234,7 +234,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy, T>::type
-    tag_invoke(hpx::reduce_t, ExPolicy&& policy, InIterB first, InIterE last,
+    tag_dispatch(hpx::reduce_t, ExPolicy&& policy, InIterB first, InIterE last,
         T init, F&& f)
     {
         static_assert(hpx::traits::is_input_iterator<InIterB>::value,

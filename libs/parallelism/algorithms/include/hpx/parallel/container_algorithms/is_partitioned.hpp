@@ -238,7 +238,7 @@ namespace hpx {
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/is_partitioned.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -269,7 +269,7 @@ namespace hpx { namespace ranges {
                     hpx::parallel::traits::projected<Proj, FwdIter>>::value
             )>
         // clang-format on
-        friend bool tag_invoke(hpx::ranges::is_partitioned_t, FwdIter first,
+        friend bool tag_dispatch(hpx::ranges::is_partitioned_t, FwdIter first,
             Sent last, Pred&& pred, Proj&& proj = Proj())
         {
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, Sent>()
@@ -292,7 +292,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_invoke(hpx::ranges::is_partitioned_t, ExPolicy&& policy,
+        tag_dispatch(hpx::ranges::is_partitioned_t, ExPolicy&& policy,
             FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj())
         {
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, Sent>()
@@ -312,7 +312,7 @@ namespace hpx { namespace ranges {
                     hpx::parallel::traits::projected_range<Proj, Rng>>::value
             )>
         // clang-format on
-        friend bool tag_invoke(hpx::ranges::is_partitioned_t, Rng&& rng,
+        friend bool tag_dispatch(hpx::ranges::is_partitioned_t, Rng&& rng,
             Pred&& pred, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -339,7 +339,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_invoke(hpx::ranges::is_partitioned_t, ExPolicy&& policy, Rng&& rng,
+        tag_dispatch(hpx::ranges::is_partitioned_t, ExPolicy&& policy, Rng&& rng,
             Pred&& pred, Proj&& proj = Proj())
         {
             using iterator_type =

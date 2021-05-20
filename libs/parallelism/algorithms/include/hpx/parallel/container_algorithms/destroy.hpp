@@ -105,7 +105,7 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 
@@ -129,7 +129,7 @@ namespace hpx { namespace ranges {
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::destroy
+    // DPO for hpx::ranges::destroy
     HPX_INLINE_CONSTEXPR_VARIABLE struct destroy_t final
       : hpx::functional::tag<destroy_t>
     {
@@ -143,7 +143,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_invoke(destroy_t, ExPolicy&& policy, Rng&& rng)
+        tag_dispatch(destroy_t, ExPolicy&& policy, Rng&& rng)
         {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
@@ -166,7 +166,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_invoke(destroy_t, ExPolicy&& policy, Iter first, Sent last)
+        tag_dispatch(destroy_t, ExPolicy&& policy, Iter first, Sent last)
         {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Required at least forward iterator.");
@@ -181,7 +181,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend typename hpx::traits::range_iterator<Rng>::type tag_invoke(
+        friend typename hpx::traits::range_iterator<Rng>::type tag_dispatch(
             destroy_t, Rng&& rng)
         {
             using iterator_type =
@@ -202,7 +202,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<Iter>::value
             )>
         // clang-format on
-        friend Iter tag_invoke(destroy_t, Iter first, Sent last)
+        friend Iter tag_dispatch(destroy_t, Iter first, Sent last)
         {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Required at least forward iterator.");
@@ -213,7 +213,7 @@ namespace hpx { namespace ranges {
     } destroy{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::destroy_n
+    // DPO for hpx::ranges::destroy_n
     HPX_INLINE_CONSTEXPR_VARIABLE struct destroy_n_t final
       : hpx::functional::tag<destroy_n_t>
     {
@@ -227,7 +227,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_invoke(destroy_n_t, ExPolicy&& policy, FwdIter first, Size count)
+        tag_dispatch(destroy_n_t, ExPolicy&& policy, FwdIter first, Size count)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least forward iterator.");
@@ -249,7 +249,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_invoke(destroy_n_t, FwdIter first, Size count)
+        friend FwdIter tag_dispatch(destroy_n_t, FwdIter first, Size count)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least forward iterator.");

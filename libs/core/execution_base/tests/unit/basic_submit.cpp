@@ -100,7 +100,7 @@ struct sender_2
     }
 };
 
-void tag_invoke(
+void tag_dispatch(
     hpx::execution::experimental::submit_t, sender_2 s, receiver_1& r)
 {
     ++tag_invoke_submit_calls;
@@ -135,7 +135,7 @@ struct sender_3
     }
 };
 
-void tag_invoke(
+void tag_dispatch(
     hpx::execution::experimental::submit_t, sender_3 s, receiver_1& r)
 {
     ++tag_invoke_submit_calls;

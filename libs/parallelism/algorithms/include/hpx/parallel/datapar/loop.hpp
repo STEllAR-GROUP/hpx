@@ -15,7 +15,7 @@
 #include <hpx/execution/traits/vector_pack_load_store.hpp>
 #include <hpx/execution/traits/vector_pack_type.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -36,7 +36,7 @@ namespace hpx { namespace parallel { namespace util {
         HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
             hpx::is_vectorpack_execution_policy<ExPolicy>::value,
             typename Vector::value_type>::type
-        tag_invoke(hpx::parallel::util::detail::extract_value_t<ExPolicy>,
+        tag_dispatch(hpx::parallel::util::detail::extract_value_t<ExPolicy>,
             Vector const& value)
         {
             static_assert(traits::is_scalar_vector_pack<Vector>::value,
@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { namespace util {
             hpx::is_vectorpack_execution_policy<ExPolicy>::value,
             typename traits::vector_pack_type<
                 typename std::decay<Vector>::type::value_type, 1>::type>::type
-        tag_invoke(hpx::parallel::util::detail::accumulate_values_t<ExPolicy>,
+        tag_dispatch(hpx::parallel::util::detail::accumulate_values_t<ExPolicy>,
             F&& f, Vector const& value)
         {
             typedef typename std::decay<Vector>::type vector_type;
@@ -71,7 +71,7 @@ namespace hpx { namespace parallel { namespace util {
         HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
             hpx::is_vectorpack_execution_policy<ExPolicy>::value,
             typename traits::vector_pack_type<T, 1>::type>::type
-        tag_invoke(hpx::parallel::util::detail::accumulate_values_t<ExPolicy>,
+        tag_dispatch(hpx::parallel::util::detail::accumulate_values_t<ExPolicy>,
             F&& f, Vector const& value, T accum)
         {
             for (size_t i = 0; i != value.size(); ++i)
@@ -390,7 +390,7 @@ namespace hpx { namespace parallel { namespace util {
     template <typename ExPolicy, typename F, typename Iter1, typename Iter2,
         typename U = typename std::enable_if<
             hpx::is_vectorpack_execution_policy<ExPolicy>::value>::type>
-    HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_invoke(
+    HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_dispatch(
         hpx::parallel::util::loop_step_t<ExPolicy>, std::false_type, F&& f,
         Iter1& it1, Iter2& it2)
         -> decltype(detail::datapar_loop_step2<Iter1, Iter2>::call1(
@@ -403,7 +403,7 @@ namespace hpx { namespace parallel { namespace util {
     template <typename ExPolicy, typename F, typename Iter1, typename Iter2,
         typename U = typename std::enable_if<
             hpx::is_vectorpack_execution_policy<ExPolicy>::value>::type>
-    HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_invoke(
+    HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_dispatch(
         hpx::parallel::util::loop_step_t<ExPolicy>, std::true_type, F&& f,
         Iter1& it1, Iter2& it2)
         -> decltype(detail::datapar_loop_step2<Iter1, Iter2>::callv(
@@ -417,7 +417,7 @@ namespace hpx { namespace parallel { namespace util {
     template <typename ExPolicy, typename Iter, typename Sent>
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         hpx::is_vectorpack_execution_policy<ExPolicy>::value, bool>::type
-    tag_invoke(hpx::parallel::util::loop_optimization_t<ExPolicy>, Iter first1,
+    tag_dispatch(hpx::parallel::util::loop_optimization_t<ExPolicy>, Iter first1,
         Sent last1)
     {
         return detail::loop_optimization<Iter>::call(first1, last1);
@@ -425,7 +425,7 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Begin, typename End, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_dispatch(
         hpx::parallel::util::loop_t, hpx::execution::datapar_policy,
         Begin begin, End end, F&& f)
     {
@@ -434,7 +434,7 @@ namespace hpx { namespace parallel { namespace util {
     }
 
     template <typename Begin, typename End, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_dispatch(
         hpx::parallel::util::loop_t, hpx::execution::datapar_task_policy,
         Begin begin, End end, F&& f)
     {
@@ -444,7 +444,7 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Begin, typename End, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_dispatch(
         hpx::parallel::util::loop_ind_t, hpx::execution::dataseq_policy,
         Begin begin, End end, F&& f)
     {
@@ -453,7 +453,7 @@ namespace hpx { namespace parallel { namespace util {
     }
 
     template <typename Begin, typename End, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_dispatch(
         hpx::parallel::util::loop_ind_t, hpx::execution::dataseq_task_policy,
         Begin begin, End end, F&& f)
     {
@@ -467,7 +467,7 @@ namespace hpx { namespace parallel { namespace util {
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         hpx::is_vectorpack_execution_policy<ExPolicy>::value,
         std::pair<Iter1, Iter2>>::type
-    tag_invoke(hpx::parallel::util::loop2_t<ExPolicy>, VecOnly&&, Iter1 first1,
+    tag_dispatch(hpx::parallel::util::loop2_t<ExPolicy>, VecOnly&&, Iter1 first1,
         Iter1 last1, Iter2 first2, F&& f)
     {
         return detail::datapar_loop2<VecOnly, Iter1, Iter2>::call(
@@ -480,7 +480,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename ExPolicy, typename Iter, typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
             hpx::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
-        tag_invoke(hpx::parallel::util::detail::loop_n_t<ExPolicy>, Iter it,
+        tag_dispatch(hpx::parallel::util::detail::loop_n_t<ExPolicy>, Iter it,
             std::size_t count, F&& f)
         {
             return hpx::parallel::util::detail::datapar_loop_n<Iter>::call(
@@ -490,7 +490,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename ExPolicy, typename Iter, typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
             hpx::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
-        tag_invoke(hpx::parallel::util::detail::loop_n_ind_t<ExPolicy>, Iter it,
+        tag_dispatch(hpx::parallel::util::detail::loop_n_ind_t<ExPolicy>, Iter it,
             std::size_t count, F&& f)
         {
             return hpx::parallel::util::detail::datapar_loop_n_ind<Iter>::call(

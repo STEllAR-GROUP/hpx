@@ -137,7 +137,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -449,7 +449,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::is_heap
+    // DPO for hpx::is_heap
     HPX_INLINE_CONSTEXPR_VARIABLE struct is_heap_t final
       : hpx::functional::tag_fallback<is_heap_t>
     {
@@ -468,7 +468,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_invoke(is_heap_t, ExPolicy&& policy, RandIter first,
+        tag_fallback_dispatch(is_heap_t, ExPolicy&& policy, RandIter first,
             RandIter last, Comp&& comp = Comp())
         {
             static_assert(
@@ -492,7 +492,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend bool tag_fallback_invoke(
+        friend bool tag_fallback_dispatch(
             is_heap_t, RandIter first, RandIter last, Comp&& comp = Comp())
         {
             static_assert(
@@ -506,7 +506,7 @@ namespace hpx {
     } is_heap{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::is_heap_until
+    // DPO for hpx::is_heap_until
     HPX_INLINE_CONSTEXPR_VARIABLE struct is_heap_until_t final
       : hpx::functional::tag_fallback<is_heap_until_t>
     {
@@ -525,7 +525,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             RandIter>::type
-        tag_fallback_invoke(is_heap_until_t, ExPolicy&& policy, RandIter first,
+        tag_fallback_dispatch(is_heap_until_t, ExPolicy&& policy, RandIter first,
             RandIter last, Comp&& comp = Comp())
         {
             static_assert(
@@ -549,7 +549,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend RandIter tag_fallback_invoke(is_heap_until_t, RandIter first,
+        friend RandIter tag_fallback_dispatch(is_heap_until_t, RandIter first,
             RandIter last, Comp&& comp = Comp())
         {
             static_assert(

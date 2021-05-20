@@ -59,7 +59,7 @@ struct executor_2
 };
 
 template <typename F>
-void tag_invoke(hpx::execution::experimental::execute_t, executor_2, F&&)
+void tag_dispatch(hpx::execution::experimental::execute_t, executor_2, F&&)
 {
     ++tag_invoke_execute_calls;
 }
@@ -84,7 +84,7 @@ struct executor_3
 };
 
 template <typename F>
-void tag_invoke(hpx::execution::experimental::execute_t, executor_3, F&&)
+void tag_dispatch(hpx::execution::experimental::execute_t, executor_3, F&&)
 {
     ++tag_invoke_execute_calls;
 }

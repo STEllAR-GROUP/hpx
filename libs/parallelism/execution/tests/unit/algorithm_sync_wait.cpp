@@ -20,8 +20,8 @@
 namespace ex = hpx::execution::experimental;
 
 // NOTE: This is not a conforming sync_wait implementation. It only exists to
-// check that the tag_invoke overload is called.
-void tag_invoke(ex::sync_wait_t, custom_sender2 s)
+// check that the tag_dispatch overload is called.
+void tag_dispatch(ex::sync_wait_t, custom_sender2 s)
 {
     s.tag_invoke_overload_called = true;
 }
@@ -77,7 +77,7 @@ int hpx_main()
         HPX_TEST_EQ(ex::just(3) | ex::sync_wait(), 3);
     }
 
-    // tag_invoke overload
+    // tag_dispatch overload
     {
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};

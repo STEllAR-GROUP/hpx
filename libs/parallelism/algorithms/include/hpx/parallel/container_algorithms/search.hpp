@@ -784,7 +784,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend FwdIter tag_invoke(hpx::ranges::search_t, FwdIter first,
+        friend FwdIter tag_dispatch(hpx::ranges::search_t, FwdIter first,
             Sent last, FwdIter2 s_first, Sent2 s_last, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -817,7 +817,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_invoke(hpx::ranges::search_t, ExPolicy&& policy, FwdIter first,
+        tag_dispatch(hpx::ranges::search_t, ExPolicy&& policy, FwdIter first,
             Sent last, FwdIter2 s_first, Sent2 s_last, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -844,7 +844,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend typename hpx::traits::range_iterator<Rng1>::type tag_invoke(
+        friend typename hpx::traits::range_iterator<Rng1>::type tag_dispatch(
             hpx::ranges::search_t, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -878,7 +878,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng1>::type>::type
-        tag_invoke(hpx::ranges::search_t, ExPolicy&& policy, Rng1&& rng1,
+        tag_dispatch(hpx::ranges::search_t, ExPolicy&& policy, Rng1&& rng1,
             Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -917,7 +917,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend FwdIter tag_invoke(hpx::ranges::search_n_t, FwdIter first,
+        friend FwdIter tag_dispatch(hpx::ranges::search_n_t, FwdIter first,
             std::size_t count, FwdIter2 s_first, Sent2 s_last,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -949,7 +949,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_invoke(hpx::ranges::search_n_t, ExPolicy&& policy, FwdIter first,
+        tag_dispatch(hpx::ranges::search_n_t, ExPolicy&& policy, FwdIter first,
             std::size_t count, FwdIter2 s_first, Sent2 s_last,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -977,7 +977,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend typename hpx::traits::range_iterator<Rng1>::type tag_invoke(
+        friend typename hpx::traits::range_iterator<Rng1>::type tag_dispatch(
             hpx::ranges::search_n_t, Rng1&& rng1, std::size_t count,
             Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -1013,7 +1013,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng1>::type>::type
-        tag_invoke(hpx::ranges::search_n_t, ExPolicy&& policy, Rng1&& rng1,
+        tag_dispatch(hpx::ranges::search_n_t, ExPolicy&& policy, Rng1&& rng1,
             std::size_t count, Rng2&& rng2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {

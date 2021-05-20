@@ -12,7 +12,7 @@
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/timed_execution/timed_executors.hpp>
 
@@ -74,7 +74,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(post_at_t,
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(post_at_t,
             Executor&& exec, hpx::chrono::steady_time_point const& abs_time,
             F&& f, Ts&&... ts)
         {
@@ -115,7 +115,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(post_after_t,
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(post_after_t,
             Executor&& exec, hpx::chrono::steady_duration const& rel_time,
             F&& f, Ts&&... ts)
         {
@@ -162,7 +162,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
             async_execute_at_t, Executor&& exec,
             hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
         {
@@ -203,7 +203,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
             async_execute_after_t, Executor&& exec,
             hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
         {
@@ -244,7 +244,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
             sync_execute_at_t, Executor&& exec,
             hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
         {
@@ -285,7 +285,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
             sync_execute_after_t, Executor&& exec,
             hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
         {

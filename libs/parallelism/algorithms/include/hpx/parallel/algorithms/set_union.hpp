@@ -111,7 +111,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
@@ -308,7 +308,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::set_union
+    // DPO for hpx::set_union
     HPX_INLINE_CONSTEXPR_VARIABLE struct set_union_t final
       : hpx::functional::tag_fallback<set_union_t>
     {
@@ -329,7 +329,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter3>::type
-        tag_fallback_invoke(set_union_t, ExPolicy&& policy, FwdIter1 first1,
+        tag_fallback_dispatch(set_union_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, FwdIter3 dest,
             Pred&& op = Pred())
         {
@@ -371,7 +371,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend FwdIter3 tag_fallback_invoke(set_union_t, FwdIter1 first1,
+        friend FwdIter3 tag_fallback_dispatch(set_union_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, FwdIter3 dest,
             Pred&& op = Pred())
         {

@@ -226,7 +226,7 @@ namespace hpx { namespace ranges {
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::equal
+    // DPO for hpx::equal
     HPX_INLINE_CONSTEXPR_VARIABLE struct equal_t final
       : hpx::functional::tag<equal_t>
     {
@@ -248,7 +248,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_invoke(equal_t, ExPolicy&& policy, Iter1 first1, Sent1 last1,
+        tag_dispatch(equal_t, ExPolicy&& policy, Iter1 first1, Sent1 last1,
             Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -282,7 +282,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_invoke(equal_t, ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
+        tag_dispatch(equal_t, ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -317,7 +317,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend bool tag_invoke(equal_t, Iter1 first1, Sent1 last1, Iter2 first2,
+        friend bool tag_dispatch(equal_t, Iter1 first1, Sent1 last1, Iter2 first2,
             Sent2 last2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -348,7 +348,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend bool tag_invoke(equal_t, Rng1&& rng1, Rng2&& rng2,
+        friend bool tag_dispatch(equal_t, Rng1&& rng1, Rng2&& rng2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {

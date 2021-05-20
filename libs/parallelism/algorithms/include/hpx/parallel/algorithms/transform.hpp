@@ -180,7 +180,7 @@ namespace hpx {
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/util/result_types.hpp>
@@ -854,7 +854,7 @@ namespace hpx { namespace traits {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::transform
+    // DPO for hpx::transform
     HPX_INLINE_CONSTEXPR_VARIABLE struct transform_t final
       : hpx::functional::tag_fallback<transform_t>
     {
@@ -867,7 +867,7 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
         // clang-format on
-        friend FwdIter2 tag_fallback_invoke(hpx::transform_t, FwdIter1 first,
+        friend FwdIter2 tag_fallback_dispatch(hpx::transform_t, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest, F&& f)
         {
             static_assert(hpx::traits::is_input_iterator<FwdIter1>::value,
@@ -892,7 +892,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_invoke(hpx::transform_t, ExPolicy&& policy, FwdIter1 first,
+        tag_fallback_dispatch(hpx::transform_t, ExPolicy&& policy, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest, F&& f)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
@@ -915,7 +915,7 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter3>::value
             )>
         // clang-format on
-        friend FwdIter3 tag_fallback_invoke(hpx::transform_t, FwdIter1 first1,
+        friend FwdIter3 tag_fallback_dispatch(hpx::transform_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter3 dest, F&& f)
         {
             static_assert(hpx::traits::is_input_iterator<FwdIter1>::value &&
@@ -945,7 +945,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter3>::type
-        tag_fallback_invoke(hpx::transform_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::transform_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter3 dest,
             F&& f)
         {

@@ -19,7 +19,7 @@ namespace ex = hpx::execution::experimental;
 // This overload is only used to check dispatching. It is not a useful
 // implementation.
 template <typename T>
-auto tag_invoke(ex::just_on_t, scheduler2 s, T&& t)
+auto tag_dispatch(ex::just_on_t, scheduler2 s, T&& t)
 {
     s.tag_invoke_overload_called = true;
     return ex::just_on(
@@ -125,7 +125,7 @@ int main()
         HPX_TEST(!scheduler_execute_called);
     }
 
-    // tag_invoke overload
+    // tag_dispatch overload
     {
         std::atomic<bool> set_value_called{false};
         std::atomic<bool> scheduler_schedule_called{false};

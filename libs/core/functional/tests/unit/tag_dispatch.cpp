@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <type_traits>
@@ -17,12 +17,12 @@ namespace mylib {
         // *this to work around a bug in GCC <= 8.
         template <typename T>
         constexpr auto operator()(T&& x) const
-            noexcept(noexcept(hpx::functional::tag_invoke(
+            noexcept(noexcept(hpx::functional::tag_dispatch(
                 std::declval<foo_fn>(), std::forward<T>(x))))
-                -> decltype(hpx::functional::tag_invoke(
+                -> decltype(hpx::functional::tag_dispatch(
                     std::declval<foo_fn>(), std::forward<T>(x)))
         {
-            return hpx::functional::tag_invoke(*this, std::forward<T>(x));
+            return hpx::functional::tag_dispatch(*this, std::forward<T>(x));
         }
     } foo;
 
@@ -31,19 +31,19 @@ namespace mylib {
         // See above for an explanation of std::declval<bar_fn>().
         template <typename T, typename U>
         constexpr auto operator()(T&& x, U&& u) const noexcept(
-            noexcept(hpx::functional::tag_invoke(std::declval<bar_fn>(),
+            noexcept(hpx::functional::tag_dispatch(std::declval<bar_fn>(),
                 std::forward<T>(x), std::forward<U>(u))))
-            -> decltype(hpx::functional::tag_invoke(
+            -> decltype(hpx::functional::tag_dispatch(
                 std::declval<bar_fn>(), std::forward<T>(x), std::forward<U>(u)))
         {
-            return hpx::functional::tag_invoke(
+            return hpx::functional::tag_dispatch(
                 *this, std::forward<T>(x), std::forward<U>(u));
         }
     } bar;
 
     struct tag_invocable
     {
-        friend constexpr bool tag_invoke(foo_fn, tag_invocable)
+        friend constexpr bool tag_dispatch(foo_fn, tag_invocable)
         {
             return true;
         }
@@ -51,7 +51,7 @@ namespace mylib {
 
     struct tag_invocable2
     {
-        friend constexpr bool tag_invoke(foo_fn, tag_invocable, int)
+        friend constexpr bool tag_dispatch(foo_fn, tag_invocable, int)
         {
             return true;
         }
@@ -59,7 +59,7 @@ namespace mylib {
 
     struct tag_invocable_noexcept
     {
-        friend constexpr bool tag_invoke(
+        friend constexpr bool tag_dispatch(
             foo_fn, tag_invocable_noexcept) noexcept
         {
             return false;
@@ -74,7 +74,7 @@ namespace mylib {
 namespace otherlib {
     struct tag_invocable
     {
-        friend constexpr bool tag_invoke(mylib::foo_fn, tag_invocable)
+        friend constexpr bool tag_dispatch(mylib::foo_fn, tag_invocable)
         {
             return true;
         }
@@ -82,7 +82,7 @@ namespace otherlib {
 
     struct tag_invocable_noexcept
     {
-        friend constexpr bool tag_invoke(
+        friend constexpr bool tag_dispatch(
             mylib::foo_fn, tag_invocable_noexcept) noexcept
         {
             return false;
@@ -97,19 +97,19 @@ namespace otherlib {
 namespace testlib {
     struct tag_invocable
     {
-        friend constexpr int tag_invoke(mylib::foo_fn, tag_invocable const&)
+        friend constexpr int tag_dispatch(mylib::foo_fn, tag_invocable const&)
         {
             return 0;
         }
-        friend constexpr int tag_invoke(mylib::foo_fn, tag_invocable&)
+        friend constexpr int tag_dispatch(mylib::foo_fn, tag_invocable&)
         {
             return 1;
         }
-        friend constexpr int tag_invoke(mylib::foo_fn, tag_invocable const&&)
+        friend constexpr int tag_dispatch(mylib::foo_fn, tag_invocable const&&)
         {
             return 2;
         }
-        friend constexpr int tag_invoke(mylib::foo_fn, tag_invocable&&)
+        friend constexpr int tag_dispatch(mylib::foo_fn, tag_invocable&&)
         {
             return 3;
         }
@@ -118,7 +118,7 @@ namespace testlib {
     struct tag_invocable2
     {
         template <typename T>
-        friend constexpr auto tag_invoke(mylib::bar_fn, tag_invocable2, T&& t)
+        friend constexpr auto tag_dispatch(mylib::bar_fn, tag_invocable2, T&& t)
             -> decltype(t)
         {
             return std::forward<T>(t);
@@ -129,50 +129,50 @@ namespace testlib {
 int main()
 {
     // Check if is_invocable trait works
-    static_assert(hpx::functional::is_tag_invocable_v<mylib::foo_fn,
+    static_assert(hpx::functional::is_tag_dispatchable_v<mylib::foo_fn,
                       mylib::tag_invocable>,
         "Should be tag invocable");
-    static_assert(hpx::functional::is_tag_invocable_v<mylib::foo_fn,
+    static_assert(hpx::functional::is_tag_dispatchable_v<mylib::foo_fn,
                       mylib::tag_invocable_noexcept>,
         "Should be tag invocable");
-    static_assert(!hpx::functional::is_tag_invocable_v<mylib::foo_fn,
+    static_assert(!hpx::functional::is_tag_dispatchable_v<mylib::foo_fn,
                       mylib::tag_not_invocable>,
         "Should not be tag invocable");
-    static_assert(!hpx::functional::is_tag_invocable_v<mylib::foo_fn,
+    static_assert(!hpx::functional::is_tag_dispatchable_v<mylib::foo_fn,
                       mylib::tag_invocable2>,
         "Should not be tag invocable");
 
-    static_assert(hpx::functional::is_tag_invocable_v<mylib::foo_fn,
+    static_assert(hpx::functional::is_tag_dispatchable_v<mylib::foo_fn,
                       otherlib::tag_invocable>,
         "Should be tag invocable");
-    static_assert(hpx::functional::is_tag_invocable_v<mylib::foo_fn,
+    static_assert(hpx::functional::is_tag_dispatchable_v<mylib::foo_fn,
                       otherlib::tag_invocable_noexcept>,
         "Should be tag invocable");
-    static_assert(!hpx::functional::is_tag_invocable_v<mylib::foo_fn,
+    static_assert(!hpx::functional::is_tag_dispatchable_v<mylib::foo_fn,
                       otherlib::tag_not_invocable>,
         "Should not be tag invocable");
 
     // Check if is_nothrow_invocable trait works
-    static_assert(!hpx::functional::is_nothrow_tag_invocable_v<mylib::foo_fn,
+    static_assert(!hpx::functional::is_nothrow_tag_dispatchable_v<mylib::foo_fn,
                       mylib::tag_invocable>,
         "Should not be nothrow tag invocable");
-    static_assert(hpx::functional::is_nothrow_tag_invocable_v<mylib::foo_fn,
+    static_assert(hpx::functional::is_nothrow_tag_dispatchable_v<mylib::foo_fn,
                       mylib::tag_invocable_noexcept>,
         "Should be nothrow tag invocable");
-    static_assert(!hpx::functional::is_nothrow_tag_invocable_v<mylib::foo_fn,
+    static_assert(!hpx::functional::is_nothrow_tag_dispatchable_v<mylib::foo_fn,
                       mylib::tag_not_invocable>,
         "Should not be nothrow tag invocable");
-    static_assert(!hpx::functional::is_nothrow_tag_invocable_v<mylib::foo_fn,
+    static_assert(!hpx::functional::is_nothrow_tag_dispatchable_v<mylib::foo_fn,
                       mylib::tag_invocable2>,
         "Should not be nothrow tag invocable");
 
-    static_assert(!hpx::functional::is_nothrow_tag_invocable_v<mylib::foo_fn,
+    static_assert(!hpx::functional::is_nothrow_tag_dispatchable_v<mylib::foo_fn,
                       otherlib::tag_invocable>,
         "Should not be nothrow tag invocable");
-    static_assert(hpx::functional::is_nothrow_tag_invocable_v<mylib::foo_fn,
+    static_assert(hpx::functional::is_nothrow_tag_dispatchable_v<mylib::foo_fn,
                       otherlib::tag_invocable_noexcept>,
         "Should be nothrow tag invocable");
-    static_assert(!hpx::functional::is_nothrow_tag_invocable_v<mylib::foo_fn,
+    static_assert(!hpx::functional::is_nothrow_tag_dispatchable_v<mylib::foo_fn,
                       otherlib::tag_not_invocable>,
         "Should not be nothrow tag invocable");
 
@@ -189,81 +189,81 @@ int main()
     // Needs to call the rvalue ref overload
     HPX_TEST_EQ(mylib::foo(std::move(dut1)), 3);
 
-    static_assert(hpx::functional::is_tag_invocable_v<mylib::bar_fn,
+    static_assert(hpx::functional::is_tag_dispatchable_v<mylib::bar_fn,
                       testlib::tag_invocable2, int>,
         "Should be tag invocable");
-    static_assert(hpx::functional::is_tag_invocable_v<mylib::bar_fn,
+    static_assert(hpx::functional::is_tag_dispatchable_v<mylib::bar_fn,
                       testlib::tag_invocable2, int&>,
         "Should be tag invocable");
-    static_assert(hpx::functional::is_tag_invocable_v<mylib::bar_fn,
+    static_assert(hpx::functional::is_tag_dispatchable_v<mylib::bar_fn,
                       testlib::tag_invocable2, int const&>,
         "Should be tag invocable");
-    static_assert(hpx::functional::is_tag_invocable_v<mylib::bar_fn,
+    static_assert(hpx::functional::is_tag_dispatchable_v<mylib::bar_fn,
                       testlib::tag_invocable2, int const&&>,
         "Should be tag invocable");
-    static_assert(hpx::functional::is_tag_invocable_v<mylib::bar_fn,
+    static_assert(hpx::functional::is_tag_dispatchable_v<mylib::bar_fn,
                       testlib::tag_invocable2, int&&>,
         "Should be tag invocable");
-    static_assert(!hpx::functional::is_tag_invocable_v<mylib::bar_fn,
+    static_assert(!hpx::functional::is_tag_dispatchable_v<mylib::bar_fn,
                       testlib::tag_invocable2>,
         "Should not be tag invocable");
-    static_assert(!hpx::functional::is_tag_invocable_v<mylib::bar_fn,
+    static_assert(!hpx::functional::is_tag_dispatchable_v<mylib::bar_fn,
                       testlib::tag_invocable2, int, int>,
         "Should not be tag invocable");
 
     int i = 0;
     HPX_TEST_EQ(&mylib::bar(testlib::tag_invocable2{}, i), &i);
     static_assert(
-        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+        std::is_same<hpx::functional::tag_dispatch_result_t<mylib::bar_fn,
                          testlib::tag_invocable2, int>,
             int&&>::value,
         "Result type needs to match");
     static_assert(
-        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+        std::is_same<hpx::functional::tag_dispatch_result_t<mylib::bar_fn,
                          testlib::tag_invocable2, int const&>,
             int const&>::value,
         "Result type needs to match");
     static_assert(
-        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+        std::is_same<hpx::functional::tag_dispatch_result_t<mylib::bar_fn,
                          testlib::tag_invocable2, int&>,
             int&>::value,
         "Result type needs to match");
     static_assert(
-        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+        std::is_same<hpx::functional::tag_dispatch_result_t<mylib::bar_fn,
                          testlib::tag_invocable2, int const&&>,
             int const&&>::value,
         "Result type needs to match");
     static_assert(
-        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+        std::is_same<hpx::functional::tag_dispatch_result_t<mylib::bar_fn,
                          testlib::tag_invocable2, int&&>,
             int&&>::value,
         "Result type needs to match");
     static_assert(
-        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+        std::is_same<hpx::functional::tag_dispatch_result_t<mylib::bar_fn,
                          testlib::tag_invocable2, int>,
             decltype(mylib::bar(
                 testlib::tag_invocable2{}, std::declval<int>()))>::value,
         "Result type needs to match");
     static_assert(
-        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+        std::is_same<hpx::functional::tag_dispatch_result_t<mylib::bar_fn,
                          testlib::tag_invocable2, int const&>,
             decltype(mylib::bar(
                 testlib::tag_invocable2{}, std::declval<int const&>()))>::value,
         "Result type needs to match");
     static_assert(
-        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+        std::is_same<hpx::functional::tag_dispatch_result_t<mylib::bar_fn,
                          testlib::tag_invocable2, int&>,
             decltype(mylib::bar(
                 testlib::tag_invocable2{}, std::declval<int&>()))>::value,
         "Result type needs to match");
     static_assert(
-        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+        std::is_same<hpx::functional::tag_dispatch_result_t<mylib::bar_fn,
                          testlib::tag_invocable2, int const&&>,
             decltype(mylib::bar(testlib::tag_invocable2{},
                 std::declval<int const&&>()))>::value,
         "Result type needs to match");
     static_assert(
-        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+        std::is_same<hpx::functional::tag_dispatch_result_t<mylib::bar_fn,
                          testlib::tag_invocable2, int&&>,
             decltype(mylib::bar(
                 testlib::tag_invocable2{}, std::declval<int&&>()))>::value,

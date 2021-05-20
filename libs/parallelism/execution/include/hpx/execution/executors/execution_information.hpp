@@ -14,7 +14,7 @@
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/modules/topology.hpp>
 
 #include <cstddef>
@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
             has_pending_closures_t, Executor&& /*exec*/)
         {
             return false;    // assume stateless scheduling
@@ -63,7 +63,7 @@ namespace hpx { namespace parallel { namespace execution {
                 has_has_pending_closures<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_invoke(
+        friend HPX_FORCEINLINE decltype(auto) tag_dispatch(
             has_pending_closures_t, Executor&& exec)
         {
             return exec.has_pending_closures();
@@ -95,7 +95,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(get_pu_mask_t,
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(get_pu_mask_t,
             Executor&& /*exec*/, threads::topology& topo,
             std::size_t thread_num)
         {
@@ -109,7 +109,7 @@ namespace hpx { namespace parallel { namespace execution {
                 has_get_pu_mask<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_invoke(get_pu_mask_t,
+        friend HPX_FORCEINLINE decltype(auto) tag_dispatch(get_pu_mask_t,
             Executor&& exec, threads::topology& topo, std::size_t thread_num)
         {
             return exec.get_pu_mask(topo, thread_num);
@@ -135,7 +135,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE void tag_fallback_invoke(
+        friend HPX_FORCEINLINE void tag_fallback_dispatch(
             set_scheduler_mode_t, Executor&& /*exec*/, Mode const& /*mode*/)
         {
         }
@@ -147,7 +147,7 @@ namespace hpx { namespace parallel { namespace execution {
                 has_set_scheduler_mode<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE void tag_invoke(
+        friend HPX_FORCEINLINE void tag_dispatch(
             set_scheduler_mode_t, Executor&& exec, Mode const& mode)
         {
             exec.set_scheduler_mode(mode);

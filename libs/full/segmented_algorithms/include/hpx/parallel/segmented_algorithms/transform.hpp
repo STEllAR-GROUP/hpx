@@ -682,7 +682,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<OutIter>::value
         )>
     // clang-format on
-    hpx::parallel::util::in_out_result<SegIter, OutIter> tag_invoke(
+    hpx::parallel::util::in_out_result<SegIter, OutIter> tag_dispatch(
         hpx::transform_t, SegIter first, SegIter last, OutIter dest, F&& f)
     {
         static_assert(hpx::traits::is_input_iterator<SegIter>::value,
@@ -720,7 +720,7 @@ namespace hpx { namespace segmented {
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         hpx::parallel::util::in_out_result<SegIter, OutIter>>::type
-    tag_invoke(hpx::transform_t, ExPolicy&& policy, SegIter first, SegIter last,
+    tag_dispatch(hpx::transform_t, ExPolicy&& policy, SegIter first, SegIter last,
         OutIter dest, F&& f)
     {
         static_assert(hpx::traits::is_forward_iterator<SegIter>::value,
@@ -763,7 +763,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<OutIter>::value
         )>
     // clang-format on
-    hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter> tag_invoke(
+    hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter> tag_dispatch(
         hpx::transform_t, InIter1 first1, InIter1 last1, InIter2 first2,
         OutIter dest, F&& f)
     {
@@ -813,7 +813,7 @@ namespace hpx { namespace segmented {
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter>>::type
-    tag_invoke(hpx::transform_t, ExPolicy&& policy, InIter1 first1,
+    tag_dispatch(hpx::transform_t, ExPolicy&& policy, InIter1 first1,
         InIter1 last1, InIter2 first2, OutIter dest, F&& f)
     {
         static_assert(hpx::traits::is_forward_iterator<InIter1>::value &&
@@ -864,7 +864,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<OutIter>::value
         )>
     // clang-format on
-    hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter> tag_invoke(
+    hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter> tag_dispatch(
         hpx::transform_t, InIter1 first1, InIter1 last1, InIter2 first2,
         InIter2 last2, OutIter dest, F&& f)
     {
@@ -911,7 +911,7 @@ namespace hpx { namespace segmented {
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter>>::type
-    tag_invoke(hpx::transform_t, ExPolicy&& policy, InIter1 first1,
+    tag_dispatch(hpx::transform_t, ExPolicy&& policy, InIter1 first1,
         InIter1 last1, InIter2 first2, InIter2 last2, OutIter dest, F&& f)
     {
         static_assert(hpx::traits::is_forward_iterator<InIter1>::value &&

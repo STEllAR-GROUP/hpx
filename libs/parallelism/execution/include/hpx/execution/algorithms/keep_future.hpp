@@ -11,7 +11,7 @@
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
@@ -144,14 +144,14 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Future,
             typename = std::enable_if_t<
                 hpx::traits::is_future<std::decay_t<Future>>::value>>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             keep_future_t, Future&& future)
         {
             return detail::keep_future_sender<std::decay_t<Future>>(
                 std::forward<Future>(future));
         }
 
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(keep_future_t)
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(keep_future_t)
         {
             return detail::partial_algorithm<keep_future_t>{};
         }

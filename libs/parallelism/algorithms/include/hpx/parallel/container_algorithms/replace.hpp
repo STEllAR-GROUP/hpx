@@ -1069,7 +1069,7 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/parallel/util/tagged_pair.hpp>
@@ -1204,7 +1204,7 @@ namespace hpx { namespace ranges {
     using replace_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::replace_if
+    // DPO for hpx::ranges::replace_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_if_t final
       : hpx::functional::tag_fallback<replace_if_t>
     {
@@ -1221,7 +1221,7 @@ namespace hpx { namespace ranges {
                 >
             )>
         // clang-format on
-        friend Iter tag_fallback_invoke(hpx::ranges::replace_if_t, Iter first,
+        friend Iter tag_fallback_dispatch(hpx::ranges::replace_if_t, Iter first,
             Sent sent, Pred&& pred, T const& new_value, Proj&& proj = Proj())
         {
             static_assert((hpx::traits::is_input_iterator<Iter>::value),
@@ -1246,7 +1246,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng>::type
-        tag_fallback_invoke(hpx::ranges::replace_if_t, Rng&& rng, Pred&& pred,
+        tag_fallback_dispatch(hpx::ranges::replace_if_t, Rng&& rng, Pred&& pred,
             T const& new_value, Proj&& proj = Proj())
         {
             static_assert(
@@ -1275,7 +1275,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_fallback_invoke(hpx::ranges::replace_if_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::ranges::replace_if_t, ExPolicy&& policy,
             Iter first, Sent sent, Pred&& pred, T const& new_value,
             Proj&& proj = Proj())
         {
@@ -1300,7 +1300,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_fallback_invoke(hpx::ranges::replace_if_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::ranges::replace_if_t, ExPolicy&& policy,
             Rng&& rng, Pred&& pred, T const& new_value, Proj&& proj = Proj())
         {
             static_assert(
@@ -1317,7 +1317,7 @@ namespace hpx { namespace ranges {
     } replace_if{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::replace
+    // DPO for hpx::ranges::replace
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_t final
       : hpx::functional::tag_fallback<replace_t>
     {
@@ -1331,7 +1331,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
         // clang-format on
-        friend Iter tag_fallback_invoke(hpx::ranges::replace_t, Iter first,
+        friend Iter tag_fallback_dispatch(hpx::ranges::replace_t, Iter first,
             Sent sent, T1 const& old_value, T2 const& new_value,
             Proj&& proj = Proj())
         {
@@ -1355,7 +1355,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng>::type
-        tag_fallback_invoke(hpx::ranges::replace_t, Rng&& rng,
+        tag_fallback_dispatch(hpx::ranges::replace_t, Rng&& rng,
             T1 const& old_value, T2 const& new_value, Proj&& proj = Proj())
         {
             static_assert(
@@ -1385,7 +1385,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_fallback_invoke(hpx::ranges::replace_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::ranges::replace_t, ExPolicy&& policy,
             Iter first, Sent sent, T1 const& old_value, T2 const& new_value,
             Proj&& proj = Proj())
         {
@@ -1411,7 +1411,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_fallback_invoke(hpx::ranges::replace_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::ranges::replace_t, ExPolicy&& policy,
             Rng&& rng, T1 const& old_value, T2 const& new_value,
             Proj&& proj = Proj())
         {
@@ -1432,7 +1432,7 @@ namespace hpx { namespace ranges {
     } replace{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::replace_copy_if
+    // DPO for hpx::ranges::replace_copy_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_copy_if_t final
       : hpx::functional::tag_fallback<replace_copy_if_t>
     {
@@ -1450,7 +1450,7 @@ namespace hpx { namespace ranges {
                 >
             )>
         // clang-format on
-        friend replace_copy_if_result<InIter, OutIter> tag_fallback_invoke(
+        friend replace_copy_if_result<InIter, OutIter> tag_fallback_dispatch(
             hpx::ranges::replace_copy_if_t, InIter first, Sent sent,
             OutIter dest, Pred&& pred, T const& new_value, Proj&& proj = Proj())
         {
@@ -1483,7 +1483,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend replace_copy_if_result<
             typename hpx::traits::range_iterator<Rng>::type, OutIter>
-        tag_fallback_invoke(hpx::ranges::replace_copy_if_t, Rng&& rng,
+        tag_fallback_dispatch(hpx::ranges::replace_copy_if_t, Rng&& rng,
             OutIter dest, Pred&& pred, T const& new_value, Proj&& proj = Proj())
         {
             static_assert(
@@ -1518,7 +1518,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             replace_copy_if_result<FwdIter1, FwdIter2>>::type
-        tag_fallback_invoke(hpx::ranges::replace_copy_if_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::ranges::replace_copy_if_t, ExPolicy&& policy,
             FwdIter1 first, Sent sent, FwdIter2 dest, Pred&& pred,
             T const& new_value, Proj&& proj = Proj())
         {
@@ -1550,7 +1550,7 @@ namespace hpx { namespace ranges {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             replace_copy_if_result<
                 typename hpx::traits::range_iterator<Rng>::type, FwdIter>>::type
-        tag_fallback_invoke(hpx::ranges::replace_copy_if_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::ranges::replace_copy_if_t, ExPolicy&& policy,
             Rng&& rng, FwdIter dest, Pred&& pred, T const& new_value,
             Proj&& proj = Proj())
         {
@@ -1572,7 +1572,7 @@ namespace hpx { namespace ranges {
     } replace_copy_if{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::replace_copy
+    // DPO for hpx::ranges::replace_copy
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_copy_t final
       : hpx::functional::tag_fallback<replace_copy_t>
     {
@@ -1587,7 +1587,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, InIter>::value
             )>
         // clang-format on
-        friend replace_copy_result<InIter, OutIter> tag_fallback_invoke(
+        friend replace_copy_result<InIter, OutIter> tag_fallback_dispatch(
             hpx::ranges::replace_copy_t, InIter first, Sent sent, OutIter dest,
             T1 const& old_value, T2 const& new_value, Proj&& proj = Proj())
         {
@@ -1616,7 +1616,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend replace_copy_result<
             typename hpx::traits::range_iterator<Rng>::type, OutIter>
-        tag_fallback_invoke(hpx::ranges::replace_copy_t, Rng&& rng,
+        tag_fallback_dispatch(hpx::ranges::replace_copy_t, Rng&& rng,
             OutIter dest, T1 const& old_value, T2 const& new_value,
             Proj&& proj = Proj())
         {
@@ -1653,7 +1653,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             replace_copy_result<FwdIter1, FwdIter2>>::type
-        tag_fallback_invoke(hpx::ranges::replace_copy_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::ranges::replace_copy_t, ExPolicy&& policy,
             FwdIter1 first, Sent sent, FwdIter2 dest, T1 const& old_value,
             T2 const& new_value, Proj&& proj = Proj())
         {
@@ -1684,7 +1684,7 @@ namespace hpx { namespace ranges {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             replace_copy_result<typename hpx::traits::range_iterator<Rng>::type,
                 FwdIter>>::type
-        tag_fallback_invoke(hpx::ranges::replace_copy_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::ranges::replace_copy_t, ExPolicy&& policy,
             Rng&& rng, FwdIter dest, T1 const& old_value, T2 const& new_value,
             Proj&& proj = Proj())
         {

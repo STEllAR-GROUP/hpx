@@ -21,7 +21,7 @@ namespace ex = hpx::execution::experimental;
 
 // This overload is only used to check dispatching. It is not a useful
 // implementation.
-void tag_invoke(ex::detach_t, custom_sender2 s)
+void tag_dispatch(ex::detach_t, custom_sender2 s)
 {
     s.tag_invoke_overload_called = true;
 }
@@ -88,7 +88,7 @@ int main()
         HPX_TEST(!tag_invoke_overload_called);
     }
 
-    // tag_invoke overload
+    // tag_dispatch overload
     {
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};

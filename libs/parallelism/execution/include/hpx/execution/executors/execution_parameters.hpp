@@ -13,7 +13,7 @@
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/serialization/base_object.hpp>
@@ -56,7 +56,7 @@ namespace hpx { namespace parallel { namespace execution {
                     !check_for_property<Parameters>::value
                 )>
             // clang-format on
-            friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+            friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
                 derived_propery_t, Executor&& /*exec*/, Parameters&& /*params*/,
                 Property prop)
             {
@@ -72,7 +72,7 @@ namespace hpx { namespace parallel { namespace execution {
                     check_for_property<Parameters>::value
                 )>
             // clang-format on
-            friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+            friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
                 derived_propery_t, Executor&& exec, Parameters&& params,
                 Property /*prop*/)
             {
@@ -90,7 +90,7 @@ namespace hpx { namespace parallel { namespace execution {
                     check_for_property<Executor>::value
                 )>
             // clang-format on
-            friend HPX_FORCEINLINE decltype(auto) tag_invoke(derived_propery_t,
+            friend HPX_FORCEINLINE decltype(auto) tag_dispatch(derived_propery_t,
                 Executor&& exec, Parameters&& params, Property /*prop*/)
             {
                 return std::pair<Executor&&, Parameters&&>(
