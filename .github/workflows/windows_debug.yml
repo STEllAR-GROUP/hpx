@@ -38,21 +38,11 @@ jobs:
       run: |
           cmake --build build --config Debug \
           --target ALL_BUILD \
-            cmake_debug_build_dir_targets_test \
-            cmake_debug_build_dir_macros_test \
           -- -maxcpucount -verbosity:minimal -nologo
     - name: Install
       shell: bash
       run: |
           cmake --install build --config Debug
-    - name: Build External
-      shell: bash
-      run: |
-          cmake --build build --config Debug \
-            --target \
-              cmake_debug_install_dir_targets_test \
-              cmake_debug_install_dir_macros_test \
-            -- -maxcpucount -verbosity:minimal -nologo
     - name: Test
       shell: bash
       run: |

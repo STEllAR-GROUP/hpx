@@ -109,48 +109,50 @@ else()
   endif()
 endif()
 
-foreach(build_type ${build_types})
-  string(TOLOWER "${build_type}" build_type_lc)
+if(NOT MSVC)
+  foreach(build_type ${build_types})
+    string(TOLOWER "${build_type}" build_type_lc)
 
-  create_cmake_test(
-    cmake_${build_type_lc}_build_dir_targets_test FALSE
-    "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" TARGETS ${build_type}
-    "examples/hello_world_component"
-  )
-
-  create_cmake_test(
-    cmake_${build_type_lc}_build_dir_macros_test FALSE
-    "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" MACROS ${build_type}
-    "examples/hello_world_component"
-  )
-
-  create_cmake_test(
-    cmake_${build_type_lc}_install_dir_targets_test TRUE
-    "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
-    ${build_type} "examples/hello_world_component"
-  )
-
-  create_cmake_test(
-    cmake_${build_type_lc}_install_dir_macros_test TRUE
-    "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" MACROS
-    ${build_type} "examples/hello_world_component"
-  )
-
-  if(HPX_WITH_DYNAMIC_HPX_MAIN)
-    # Google test emulation
     create_cmake_test(
-      cmake_${build_type_lc}_build_dir_gtest_emulation_test FALSE
+      cmake_${build_type_lc}_build_dir_targets_test FALSE
       "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" TARGETS
-      ${build_type} "examples/gtest_emulation"
+      ${build_type} "examples/hello_world_component"
     )
 
     create_cmake_test(
-      cmake_${build_type_lc}_install_dir_gtest_emulation_test TRUE
-      "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
-      ${build_type} "examples/gtest_emulation"
+      cmake_${build_type_lc}_build_dir_macros_test FALSE
+      "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" MACROS
+      ${build_type} "examples/hello_world_component"
     )
-  endif()
-endforeach()
+
+    create_cmake_test(
+      cmake_${build_type_lc}_install_dir_targets_test TRUE
+      "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
+      ${build_type} "examples/hello_world_component"
+    )
+
+    create_cmake_test(
+      cmake_${build_type_lc}_install_dir_macros_test TRUE
+      "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" MACROS
+      ${build_type} "examples/hello_world_component"
+    )
+
+    if(HPX_WITH_DYNAMIC_HPX_MAIN)
+      # Google test emulation
+      create_cmake_test(
+        cmake_${build_type_lc}_build_dir_gtest_emulation_test FALSE
+        "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" TARGETS
+        ${build_type} "examples/gtest_emulation"
+      )
+
+      create_cmake_test(
+        cmake_${build_type_lc}_install_dir_gtest_emulation_test TRUE
+        "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
+        ${build_type} "examples/gtest_emulation"
+      )
+    endif()
+  endforeach()
+endif()
 
 # PkgConfig
 if(NOT MSVC
