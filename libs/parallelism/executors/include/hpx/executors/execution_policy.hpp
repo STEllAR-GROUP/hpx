@@ -105,14 +105,7 @@ namespace hpx { namespace execution {
         {
             typedef typename std::decay<Executor>::type executor_type;
 
-            static_assert(
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                hpx::traits::is_threads_executor<executor_type>::value ||
-#endif
-                    hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                "hpx::traits::is_threads_executor<Executor>::value || "
-#endif
+            static_assert(hpx::traits::is_executor_any<executor_type>::value,
                 "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename parallel::execution::rebind_executor<
@@ -257,14 +250,7 @@ namespace hpx { namespace execution {
         {
             typedef typename std::decay<Executor>::type executor_type;
 
-            static_assert(
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                hpx::traits::is_threads_executor<executor_type>::value ||
-#endif
-                    hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                "hpx::traits::is_threads_executor<Executor>::value || "
-#endif
+            static_assert(hpx::traits::is_executor_any<executor_type>::value,
                 "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename parallel::execution::rebind_executor<
@@ -426,14 +412,7 @@ namespace hpx { namespace execution {
         {
             typedef typename std::decay<Executor>::type executor_type;
 
-            static_assert(
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                hpx::traits::is_threads_executor<executor_type>::value ||
-#endif
-                    hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                "hpx::traits::is_threads_executor<Executor>::value || "
-#endif
+            static_assert(hpx::traits::is_executor_any<executor_type>::value,
                 "hpx::traits::is_executor_any<Executor>::value");
 
             typedef
@@ -575,14 +554,7 @@ namespace hpx { namespace execution {
         {
             typedef typename std::decay<Executor>::type executor_type;
 
-            static_assert(
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                hpx::traits::is_threads_executor<executor_type>::value ||
-#endif
-                    hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                "hpx::traits::is_threads_executor<Executor>::value || "
-#endif
+            static_assert(hpx::traits::is_executor_any<executor_type>::value,
                 "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename parallel::execution::rebind_executor<
@@ -745,14 +717,7 @@ namespace hpx { namespace execution {
         {
             typedef typename std::decay<Executor>::type executor_type;
 
-            static_assert(
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                hpx::traits::is_threads_executor<executor_type>::value ||
-#endif
-                    hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                "hpx::traits::is_threads_executor<Executor>::value || "
-#endif
+            static_assert(hpx::traits::is_executor_any<executor_type>::value,
                 "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename parallel::execution::rebind_executor<
@@ -891,14 +856,7 @@ namespace hpx { namespace execution {
         {
             typedef typename std::decay<Executor>::type executor_type;
 
-            static_assert(
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                hpx::traits::is_threads_executor<executor_type>::value ||
-#endif
-                    hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                "hpx::traits::is_threads_executor<Executor>::value || "
-#endif
+            static_assert(hpx::traits::is_executor_any<executor_type>::value,
                 "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename parallel::execution::rebind_executor<
@@ -1054,14 +1012,7 @@ namespace hpx { namespace execution {
         {
             typedef typename std::decay<Executor>::type executor_type;
 
-            static_assert(
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                hpx::traits::is_threads_executor<executor_type>::value ||
-#endif
-                    hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                "hpx::traits::is_threads_executor<Executor>::value || "
-#endif
+            static_assert(hpx::traits::is_executor_any<executor_type>::value,
                 "hpx::traits::is_executor_any<Executor>::value");
 
             typedef
@@ -1201,14 +1152,7 @@ namespace hpx { namespace execution {
         {
             typedef typename std::decay<Executor>::type executor_type;
 
-            static_assert(
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                hpx::traits::is_threads_executor<executor_type>::value ||
-#endif
-                    hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                "hpx::traits::is_threads_executor<Executor>::value || "
-#endif
+            static_assert(hpx::traits::is_executor_any<executor_type>::value,
                 "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename parallel::execution::rebind_executor<

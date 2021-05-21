@@ -6,7 +6,6 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/thread_executors.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/modules/async_combinators.hpp>
 
@@ -62,7 +61,7 @@ int hpx_main(int argc, char ** argv)
 {
     {
         // Get a reference to one of the main thread
-        hpx::threads::executors::main_pool_executor scheduler;
+        hpx::parallel::execution::main_pool_executor scheduler;
         // run an async function on the main thread to start the Qt application
         hpx::future<void> qt_application
             = hpx::async(scheduler, qt_main, argc, argv);

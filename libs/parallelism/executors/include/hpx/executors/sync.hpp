@@ -81,11 +81,7 @@ namespace hpx { namespace detail {
     template <typename Executor>
     struct sync_dispatch<Executor,
         typename std::enable_if<traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-            || traits::is_threads_executor<Executor>::value
-#endif
-            >::type>
+            traits::is_two_way_executor<Executor>::value>::type>
     {
         template <typename Executor_, typename F, typename... Ts>
         HPX_FORCEINLINE static typename std::enable_if<

@@ -9,4 +9,3 @@
 #include <hpx/config.hpp>
 
 #include <hpx/execution/executors/execution_information.hpp>
-#include <hpx/thread_executors/thread_execution_information.hpp>

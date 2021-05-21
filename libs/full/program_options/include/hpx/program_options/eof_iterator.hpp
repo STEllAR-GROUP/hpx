@@ -8,19 +8,6 @@
 
 #include <hpx/program_options/config.hpp>
 
-#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-// hpxinspect:nodeprecatedinclude:boost/program_options/eof_iterator.hpp
-
-#include <boost/program_options/eof_iterator.hpp>
-
-namespace hpx { namespace program_options {
-
-    using boost::eof_iterator;
-
-}}    // namespace hpx::program_options
-
-#else
-
 #include <hpx/iterator_support/iterator_facade.hpp>
 
 #include <iterator>
@@ -109,5 +96,3 @@ namespace hpx { namespace program_options {
         ValueType m_value;
     };
 }}    // namespace hpx::program_options
-
-#endif

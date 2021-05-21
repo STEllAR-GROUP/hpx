@@ -92,12 +92,7 @@ namespace hpx { namespace execution { inline namespace v1 {
             Executor, executor_parameters_type>::type
         on(Executor&& exec) const
         {
-            static_assert(
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                hpx::traits::is_threads_executor<Executor>::value ||
-#endif
-                    hpx::traits::is_executor_any<Executor>::value,
-                "hpx::traits::is_threads_executor<Executor>::value || "
+            static_assert(hpx::traits::is_executor_any<Executor>::value,
                 "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename parallel::execution::rebind_executor<
@@ -239,12 +234,7 @@ namespace hpx { namespace execution { inline namespace v1 {
             Executor_, executor_parameters_type>::type
         on(Executor_&& exec) const
         {
-            static_assert(
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                hpx::traits::is_threads_executor<Executor_>::value ||
-#endif
-                    hpx::traits::is_executor_any<Executor_>::value,
-                "hpx::traits::is_threads_executor<Executor_>::value || "
+            static_assert(hpx::traits::is_executor_any<Executor_>::value,
                 "hpx::traits::is_executor_any<Executor_>::value");
 
             typedef typename parallel::execution::rebind_executor<
@@ -396,12 +386,7 @@ namespace hpx { namespace execution { inline namespace v1 {
             executor_parameters_type>::type
         on(Executor&& exec) const
         {
-            static_assert(
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                hpx::traits::is_threads_executor<Executor>::value ||
-#endif
-                    hpx::traits::is_executor_any<Executor>::value,
-                "hpx::traits::is_threads_executor<Executor>::value || "
+            static_assert(hpx::traits::is_executor_any<Executor>::value,
                 "hpx::traits::is_executor_any<Executor>::value");
 
             typedef
@@ -541,12 +526,7 @@ namespace hpx { namespace execution { inline namespace v1 {
             Executor_, executor_parameters_type>::type
         on(Executor_&& exec) const
         {
-            static_assert(
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                hpx::traits::is_threads_executor<Executor_>::value ||
-#endif
-                    hpx::traits::is_executor_any<Executor_>::value,
-                "hpx::traits::is_threads_executor<Executor_>::value || "
+            static_assert(hpx::traits::is_executor_any<Executor_>::value,
                 "hpx::traits::is_executor_any<Executor_>::value");
 
             typedef typename parallel::execution::rebind_executor<
@@ -700,12 +680,7 @@ namespace hpx { namespace execution { inline namespace v1 {
             Executor, executor_parameters_type>::type
         on(Executor&& exec) const
         {
-            static_assert(
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                hpx::traits::is_threads_executor<Executor>::value ||
-#endif
-                    hpx::traits::is_executor_any<Executor>::value,
-                "hpx::traits::is_threads_executor<Executor>::value || "
+            static_assert(hpx::traits::is_executor_any<Executor>::value,
                 "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename parallel::execution::rebind_executor<
@@ -838,12 +813,7 @@ namespace hpx { namespace execution { inline namespace v1 {
             executor_parameters_type>::type
         on(Executor&& exec) const
         {
-            static_assert(
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                hpx::traits::is_threads_executor<Executor>::value ||
-#endif
-                    hpx::traits::is_executor_any<Executor>::value,
-                "hpx::traits::is_threads_executor<Executor>::value || "
+            static_assert(hpx::traits::is_executor_any<Executor>::value,
                 "hpx::traits::is_executor_any<Executor>::value");
 
             typedef
@@ -981,12 +951,7 @@ namespace hpx { namespace execution { inline namespace v1 {
             Executor_, executor_parameters_type>::type
         on(Executor_&& exec) const
         {
-            static_assert(
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                hpx::traits::is_threads_executor<Executor_>::value ||
-#endif
-                    hpx::traits::is_executor_any<Executor_>::value,
-                "hpx::traits::is_threads_executor<Executor_>::value || "
+            static_assert(hpx::traits::is_executor_any<Executor_>::value,
                 "hpx::traits::is_executor_any<Executor_>::value");
 
             typedef typename parallel::execution::rebind_executor<
@@ -1134,12 +1099,7 @@ namespace hpx { namespace execution { inline namespace v1 {
             Executor_, executor_parameters_type>::type
         on(Executor_&& exec) const
         {
-            static_assert(
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                hpx::traits::is_threads_executor<Executor_>::value ||
-#endif
-                    hpx::traits::is_executor_any<Executor_>::value,
-                "hpx::traits::is_threads_executor<Executor_>::value || "
+            static_assert(hpx::traits::is_executor_any<Executor_>::value,
                 "hpx::traits::is_executor_any<Executor_>::value");
 
             typedef typename parallel::execution::rebind_executor<

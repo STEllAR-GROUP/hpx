@@ -84,7 +84,6 @@ endif()
 include(HPX_SetupBoost)
 include(HPX_SetupBoostFilesystem)
 include(HPX_SetupBoostIostreams)
-include(HPX_SetupBoostProgramOptions)
 
 # Asio
 if(NOT HPX_WITH_CLONED_ASIO)

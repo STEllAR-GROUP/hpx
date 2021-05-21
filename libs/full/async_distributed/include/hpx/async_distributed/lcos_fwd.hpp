@@ -58,16 +58,4 @@ namespace hpx {
             class promise;
         }    // namespace local
     }        // namespace lcos
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) &&                                   \
-    defined(HPX_HAVE_PROMISE_ALIAS_COMPATIBLILITY)
-    template <typename Result,
-        typename RemoteResult =
-            typename traits::promise_remote_result<Result>::type>
-    using promise HPX_DEPRECATED_V(1, 5,
-        "The alias hpx::promise to hpx::lcos::promise is deprecated. Please "
-        "use hpx::lcos::promise directly instead. "
-        "hpx::promise will refer to the local-only promise in the future.") =
-        lcos::promise<Result, RemoteResult>;
-#endif
 }    // namespace hpx

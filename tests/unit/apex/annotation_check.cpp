@@ -20,7 +20,6 @@
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/runtime_local/pool_executor.hpp>
 #include "apex_options.hpp"
 
 #include <atomic>
@@ -94,25 +93,10 @@ std::string policy_string(const hpx::launch& policy)
 template <typename Executor>
 std::string exec_string(const Executor&)
 {
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-    bool threaded = hpx::traits::is_threads_executor<Executor>::value;
-    return "Executor " + std::string(threaded ? "threaded" : "non-threaded");
-#else
     return "Executor non-threaded";
-#endif
 }
 
 // --------------------------------------------------------------------------
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-template <typename Executor>
-typename std::enable_if<hpx::traits::is_threads_executor<Executor>::value,
-    std::string>::type
-execution_string(const Executor& exec)
-{
-    return exec_string(exec);
-}
-#endif
-
 template <typename Executor>
 typename std::enable_if<hpx::traits::is_executor_any<Executor>::value,
     std::string>::type
@@ -197,11 +181,6 @@ hpx::future<void> test_none()
 int hpx_main()
 {
     // setup executors
-#if defined(HPX_HAVE_POOL_EXECUTOR_COMPATIBILITY)
-    hpx::parallel::execution::pool_executor NP_executor =
-        hpx::parallel::execution::pool_executor(
-            "default", hpx::threads::thread_priority::default_);
-#endif
     hpx::execution::parallel_executor par_exec{};
 
     test_none().get();
@@ -212,9 +191,6 @@ int hpx_main()
     test_execution(hpx::launch::fork).get();
     test_execution(hpx::launch::sync).get();
     //
-#if defined(HPX_HAVE_POOL_EXECUTOR_COMPATIBILITY)
-    test_execution(NP_executor).get();
-#endif
     test_execution(par_exec).get();
     //
     return hpx::finalize();

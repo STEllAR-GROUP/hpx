@@ -50,35 +50,8 @@ namespace hpx { namespace components {
 
         /// This is the default hook implementation for schedule_thread which
         /// forwards to the executor instance associated with this component.
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
         template <typename Executor_ = Executor>
-        static typename std::enable_if<
-            traits::is_threads_executor<Executor_>::value>::type
-        schedule_thread(hpx::naming::address::address_type lva,
-            naming::address::component_type /* comptype */,
-            hpx::threads::thread_init_data& data,
-            hpx::threads::thread_schedule_state /* initial_state */)
-        {
-            hpx::util::thread_description desc(&executor_component::execute);
-#ifdef HPX_HAVE_THREAD_DESCRIPTION
-            desc = data.description;
-#endif
-            hpx::parallel::execution::post(
-                hpx::get_lva<executor_component>::call(lva)->exec_,
-                hpx::util::annotated_function(
-                    &executor_component::execute, desc.get_description()),
-                std::move(data.func));
-        }
-#endif
-
-        template <typename Executor_ = Executor>
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-        static typename std::enable_if<
-            !traits::is_threads_executor<Executor_>::value>::type
-#else
-        static void
-#endif
-        schedule_thread(hpx::naming::address::address_type lva,
+        static void schedule_thread(hpx::naming::address::address_type lva,
             naming::address::component_type /* comptype */,
             hpx::threads::thread_init_data& data,
             hpx::threads::thread_schedule_state /* initial_state */)

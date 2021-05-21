@@ -128,30 +128,4 @@ namespace hpx { namespace threads { namespace detail {
     {
         return threads_.size();
     }
-
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-    ///////////////////////////////////////////////////////////////////////////
-    // detail::manage_executor implementation
-    std::size_t io_service_thread_pool::get_policy_element(
-        executor_parameter /* p */, error_code& /* ec */) const
-    {
-        return 0;
-    }
-
-    void io_service_thread_pool::get_statistics(
-        executor_statistics& /* stats */, error_code& /* ec */) const
-    {
-    }
-
-    void io_service_thread_pool::add_processing_unit(
-        std::size_t /* virt_core */, std::size_t /* thread_num */,
-        error_code& /* ec */)
-    {
-    }
-
-    void io_service_thread_pool::remove_processing_unit(
-        std::size_t /* thread_num */, error_code& /* ec */)
-    {
-    }
-#endif
 }}}    // namespace hpx::threads::detail

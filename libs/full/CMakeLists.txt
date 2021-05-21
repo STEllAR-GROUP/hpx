@@ -48,7 +48,6 @@ set(_hpx_full_modules
     runtime_distributed
     runtime_local
     segmented_algorithms
-    thread_executors
     threadmanager
 )
 # cmake-format: on

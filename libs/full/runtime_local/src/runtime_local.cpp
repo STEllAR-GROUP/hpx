@@ -29,7 +29,6 @@
 #include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/static_reinit/static_reinit.hpp>
-#include <hpx/thread_executors/thread_executor.hpp>
 #include <hpx/thread_support/set_thread_name.hpp>
 #include <hpx/threading_base/external_timer.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
@@ -912,27 +911,6 @@ namespace hpx {
         }
         return rt->get_config().get_os_thread_count();
     }
-
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-    std::size_t get_os_thread_count(threads::executor const& exec)
-    {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-        {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "hpx::get_os_thread_count(exec)",
-                "the runtime system has not been initialized yet");
-            return std::size_t(0);
-        }
-
-        if (!exec)
-            return rt->get_config().get_os_thread_count();
-
-        error_code ec(lightweight);
-        return exec.executor_data_->get_policy_element(
-            threads::detail::current_concurrency, ec);
-    }
-#endif
 
     bool is_scheduler_numa_sensitive()
     {

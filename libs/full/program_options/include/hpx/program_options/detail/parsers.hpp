@@ -7,21 +7,6 @@
 #pragma once
 
 #include <hpx/program_options/config.hpp>
-
-#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-// hpxinspect:nodeprecatedinclude:boost/program_options/detail/parsers.hpp
-
-#include <boost/program_options/detail/parsers.hpp>
-
-namespace hpx { namespace program_options {
-
-    using boost::program_options::collect_unrecognized;
-    using boost::program_options::parse_command_line;
-
-}}    // namespace hpx::program_options
-
-#else
-
 #include <hpx/program_options/detail/convert.hpp>
 #include <hpx/program_options/parsers.hpp>
 
@@ -149,5 +134,3 @@ namespace hpx { namespace program_options {
     }
 
 }}    // namespace hpx::program_options
-
-#endif

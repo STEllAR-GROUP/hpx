@@ -159,9 +159,6 @@ namespace hpx { namespace threads {
 
     /// \brief The base class used to manage a pool of OS threads.
     class HPX_CORE_EXPORT thread_pool_base
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-      : public detail::manage_executor
-#endif
     {
     public:
         /// \cond NOINTERNAL
@@ -521,29 +518,6 @@ namespace hpx { namespace threads {
         {
             notifier_.on_error(global_thread_num, e);
         }
-
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-        ///////////////////////////////////////////////////////////////////////
-        // detail::manage_executor implementation
-        /// \brief Return the requested policy element.
-        std::size_t get_policy_element(detail::executor_parameter p,
-            error_code& ec = throws) const override = 0;
-
-        // \brief Return statistics collected by this scheduler.
-        virtual void get_statistics(executor_statistics& stats,
-            error_code& ec = throws) const override = 0;
-
-        // \brief Provide the given processing unit to the scheduler.
-        virtual void add_processing_unit(std::size_t virt_core,
-            std::size_t thread_num, error_code& ec = throws) override = 0;
-
-        // \brief Remove the given processing unit from the scheduler.
-        virtual void remove_processing_unit(
-            std::size_t thread_num, error_code& ec = throws) override = 0;
-
-        // \brief Return the description string of the underlying scheduler.
-        char const* get_description() const override;
-#endif
 
         /// \endcond
 
