@@ -11,7 +11,6 @@
 #include <hpx/parallel/container_algorithms.hpp>
 
 namespace hpx {
-    using hpx::parallel::lexicographical_compare;
     using hpx::parallel::max_element;
     using hpx::parallel::min_element;
     using hpx::parallel::minmax_element;
