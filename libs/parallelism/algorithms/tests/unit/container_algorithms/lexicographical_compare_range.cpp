@@ -10,13 +10,13 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/container_algorithms/lexicographical_compare.hpp>
 
-#include <cstddef>
+#include <algorithm>
 #include <iostream>
 #include <iterator>
-#include <numeric>
+#include <random>
 #include <string>
+#include <unordered_set>
 #include <vector>
-#include <algorithm>
 
 #include "test_utils.hpp"
 
@@ -27,13 +27,31 @@ std::uniform_int_distribution<> dis(0, 25);
 
 void test_fill_sent()
 {
-    std::vector<char> c1(10);
-    std::generate(
-        std::begin(c1), std::end(c1), []() { return 'a' + dis(gen); });
+    // ensure all characters are unique
+    std::unordered_set<char> uset;
 
-    std::vector<char> c2(10);
-    std::generate(
-        std::begin(c2), std::end(c2), []() { return 'a' + dis(gen); });
+    std::vector<char> c1(7);
+    std::generate(std::begin(c1), std::end(c1), [&uset]() {
+        char c = 'a' + dis(gen);
+        while (uset.find(c) != uset.end())
+        {
+            c = 'a' + dis(gen);
+        }
+        uset.insert(c);
+        return c;
+    });
+
+    uset.clear();
+    std::vector<char> c2(7);
+    std::generate(std::begin(c2), std::end(c2), [&uset]() {
+        char c = 'a' + dis(gen);
+        while (uset.find(c) != uset.end())
+        {
+            c = 'a' + dis(gen);
+        }
+        uset.insert(c);
+        return c;
+    });
 
     bool actual_result1 = std::lexicographical_compare(
         std::begin(c1), std::begin(c1) + 5, std::begin(c2), std::begin(c2) + 5);
@@ -75,13 +93,31 @@ void test_fill_sent(ExPolicy policy)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    std::vector<char> c1(10);
-    std::generate(
-        std::begin(c1), std::end(c1), []() { return 'a' + dis(gen); });
+    // ensure all characters are unique
+    std::unordered_set<char> uset;
 
-    std::vector<char> c2(10);
-    std::generate(
-        std::begin(c2), std::end(c2), []() { return 'a' + dis(gen); });
+    std::vector<char> c1(7);
+    std::generate(std::begin(c1), std::end(c1), [&uset]() {
+        char c = 'a' + dis(gen);
+        while (uset.find(c) != uset.end())
+        {
+            c = 'a' + dis(gen);
+        }
+        uset.insert(c);
+        return c;
+    });
+
+    uset.clear();
+    std::vector<char> c2(7);
+    std::generate(std::begin(c2), std::end(c2), [&uset]() {
+        char c = 'a' + dis(gen);
+        while (uset.find(c) != uset.end())
+        {
+            c = 'a' + dis(gen);
+        }
+        uset.insert(c);
+        return c;
+    });
 
     bool actual_result1 = std::lexicographical_compare(
         std::begin(c1), std::begin(c1) + 5, std::begin(c2), std::begin(c2) + 5);
@@ -121,8 +157,8 @@ template <typename IteratorTag>
 void test_lexicographical_compare(IteratorTag)
 {
     std::vector<char> c1(10);
-    std::generate(std::begin(c1), std::end(c1),
-        []() { return 'a' + dis(gen); });
+    std::generate(
+        std::begin(c1), std::end(c1), []() { return 'a' + dis(gen); });
 
     std::vector<char> c2(10);
     std::generate(

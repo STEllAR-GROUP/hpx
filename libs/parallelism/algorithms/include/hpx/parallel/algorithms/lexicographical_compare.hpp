@@ -165,6 +165,7 @@ namespace hpx {
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/mismatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -226,8 +227,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     zip_iterator;
                 typedef typename zip_iterator::reference reference;
 
-                std::size_t count1 = std::distance(first1, last1);
-                std::size_t count2 = std::distance(first2, last2);
+                std::size_t count1 = detail::distance(first1, last1);
+                std::size_t count2 = detail::distance(first2, last2);
 
                 // An empty range is lexicographically less than any non-empty
                 // range
@@ -316,11 +317,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
             "Requires at least forward iterator.");
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::lexicographical_compare().call(
             std::forward<ExPolicy>(policy), first1, last1, first2, last2,
             std::forward<Pred>(pred),
             hpx::parallel::util::projection_identity{},
             hpx::parallel::util::projection_identity{});
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
 }}}    // namespace hpx::parallel::v1
