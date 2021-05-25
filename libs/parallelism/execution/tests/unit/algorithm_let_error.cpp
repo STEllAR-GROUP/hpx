@@ -57,7 +57,8 @@ int main()
             return ex::just(42);
         });
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
-        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto r = callback_receiver<void_callback_helper<decltype(f)>>{
+            void_callback_helper<decltype(f)>{f}, set_value_called};
         auto os = ex::connect(std::move(s2), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
@@ -74,7 +75,8 @@ int main()
             return ex::just(custom_type_non_default_constructible{42});
         });
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
-        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto r = callback_receiver<void_callback_helper<decltype(f)>>{
+            void_callback_helper<decltype(f)>{f}, set_value_called};
         auto os = ex::connect(std::move(s2), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
@@ -92,7 +94,8 @@ int main()
                 custom_type_non_default_constructible_non_copyable{42});
         });
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
-        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto r = callback_receiver<void_callback_helper<decltype(f)>>{
+            void_callback_helper<decltype(f)>{f}, set_value_called};
         auto os = ex::connect(std::move(s2), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
@@ -125,7 +128,8 @@ int main()
             return ex::just(42);
         });
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
-        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto r = callback_receiver<void_callback_helper<decltype(f)>>{
+            void_callback_helper<decltype(f)>{f}, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
@@ -150,7 +154,8 @@ int main()
             return ex::just(43);
         });
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
-        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto r = callback_receiver<void_callback_helper<decltype(f)>>{
+            void_callback_helper<decltype(f)>{f}, set_value_called};
         auto os = ex::connect(std::move(s2), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
@@ -166,7 +171,8 @@ int main()
             return ex::just(custom_type_non_default_constructible{43});
         });
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
-        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto r = callback_receiver<void_callback_helper<decltype(f)>>{
+            void_callback_helper<decltype(f)>{f}, set_value_called};
         auto os = ex::connect(std::move(s2), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
@@ -184,7 +190,8 @@ int main()
                 custom_type_non_default_constructible_non_copyable{43});
         });
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
-        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto r = callback_receiver<void_callback_helper<decltype(f)>>{
+            void_callback_helper<decltype(f)>{f}, set_value_called};
         auto os = ex::connect(std::move(s2), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
