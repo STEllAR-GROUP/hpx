@@ -16,7 +16,7 @@ import matplotlib
 from matplotlib import pyplot as plt
 import numpy as np
 
-from pyutils import log
+from pyutils import log, default_vars as var
 from perftest import html
 
 plt.style.use('ggplot')
@@ -209,11 +209,11 @@ def _add_info(report, labels, data):
         with table.row() as row:
             row.fill('Property', *labels)
 
-        for k in {k for d in data for k in d['HPX'].keys()}:
+        for k in {k for d in data for k in d[var._project_name].keys()}:
             with table.row() as row:
-                row.cell('HPX' + k.title())
+                row.cell(var._project_name + ' ' + k.title())
                 for d in data:
-                    row.cell(d['HPX'].get(k, '—'))
+                    row.cell(d[var._project_name].get(k, '—'))
 
         for k in {k for d in data for k in d['environment'].keys()}:
             with table.row() as row:
@@ -230,7 +230,7 @@ def compare(before, after, output):
         for k, v in after_outs.items() if k in before_outs
     }
 
-    title = 'HPX Performance'
+    title = var._project_name + ' Performance'
     with html.Report(output, title) as report:
         _add_comparison_table(report, cis)
         _add_comparison_plots(report, before_outs, after_outs, cis)
@@ -313,7 +313,7 @@ def _history_plot(title, dates, measurements, output):
 
 
 def history(data, output, key='job', limit=None):
-    title = 'HPX Performance History'
+    title = var._project_name + ' Performance History'
     with html.Report(output, title) as report:
         dates, measurements = _history_data(data, key, limit)
 
