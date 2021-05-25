@@ -22,6 +22,9 @@
 #include <cstdint>
 
 namespace hpx { namespace execution_base {
+    namespace detail {
+        HPX_CORE_EXPORT agent_base& get_default_agent();
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace this_thread {
