@@ -9,6 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/datastructures/variant.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/transform.hpp>
@@ -31,52 +33,6 @@ namespace hpx { namespace execution { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-        template <typename Receiver, typename Shape, typename F>
-        struct bulk_receiver
-        {
-            std::decay_t<Receiver> receiver;
-            std::decay_t<Shape> shape;
-            std::decay_t<F> f;
-
-            template <typename Receiver_, typename Shape_, typename F_>
-            bulk_receiver(Receiver_&& receiver, Shape_&& shape, F_&& f)
-              : receiver(std::forward<Receiver_>(receiver))
-              , shape(std::forward<Shape_>(shape))
-              , f(std::forward<F_>(f))
-            {
-            }
-
-            template <typename E>
-                void set_error(E&& e) && noexcept
-            {
-                hpx::execution::experimental::set_error(
-                    std::move(receiver), std::forward<E>(e));
-            }
-
-            void set_done() && noexcept
-            {
-                hpx::execution::experimental::set_done(std::move(receiver));
-            }
-
-            template <typename... Ts>
-                void set_value(Ts&&... ts) && noexcept
-            {
-                hpx::detail::try_catch_exception_ptr(
-                    [&]() {
-                        for (auto const& s : shape)
-                        {
-                            HPX_INVOKE(f, s, ts...);
-                        }
-                        hpx::execution::experimental::set_value(
-                            std::move(receiver), std::forward<Ts>(ts)...);
-                    },
-                    [&](std::exception_ptr ep) {
-                        hpx::execution::experimental::set_error(
-                            std::move(receiver), std::move(ep));
-                    });
-            }
-        };
-
         template <typename Sender, typename Shape, typename F>
         struct bulk_sender
         {
@@ -115,6 +71,63 @@ namespace hpx { namespace execution { namespace experimental {
                     bulk_receiver<Receiver, Shape, F>(
                         std::forward<Receiver>(receiver), shape, f));
             }
+
+            template <typename Receiver, typename Shape_, typename F_>
+            struct bulk_receiver
+            {
+                std::decay_t<Receiver> receiver;
+                std::decay_t<Shape_> shape;
+                std::decay_t<F_> f;
+
+                template <typename Receiver_, typename Shape__, typename F__>
+                bulk_receiver(Receiver_&& receiver, Shape__&& shape, F__&& f)
+                  : receiver(std::forward<Receiver_>(receiver))
+                  , shape(std::forward<Shape__>(shape))
+                  , f(std::forward<F__>(f))
+                {
+                }
+
+                template <typename E>
+                    void set_error(E&& e) && noexcept
+                {
+                    hpx::execution::experimental::set_error(
+                        std::move(receiver), std::forward<E>(e));
+                }
+
+                void set_done() && noexcept
+                {
+                    hpx::execution::experimental::set_done(std::move(receiver));
+                }
+
+                // The typedef is duplicated from parent struct as the parent one is
+                // not instantiated early enough to use it here.
+                using value_type =
+                    typename hpx::execution::experimental::sender_traits<
+                        Sender>::template value_types<hpx::tuple, hpx::variant>;
+
+                template <typename... Ts>
+                    auto set_value(Ts&&... ts) &&
+                    noexcept -> decltype(
+                        std::declval<hpx::variant<hpx::monostate, value_type>>()
+                            .template emplace<value_type>(
+                                hpx::make_tuple<>(std::forward<Ts>(ts)...)),
+                        void())
+                {
+                    hpx::detail::try_catch_exception_ptr(
+                        [&]() {
+                            for (auto const& s : shape)
+                            {
+                                HPX_INVOKE(f, s, ts...);
+                            }
+                            hpx::execution::experimental::set_value(
+                                std::move(receiver), std::forward<Ts>(ts)...);
+                        },
+                        [&](std::exception_ptr ep) {
+                            hpx::execution::experimental::set_error(
+                                std::move(receiver), std::move(ep));
+                        });
+                }
+            };
         };
 
         ///////////////////////////////////////////////////////////////////////
