@@ -124,9 +124,9 @@ namespace hpx { namespace lcos {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/async_distributed/async.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
