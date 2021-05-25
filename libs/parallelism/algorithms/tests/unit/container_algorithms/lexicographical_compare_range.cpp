@@ -28,11 +28,11 @@ std::uniform_int_distribution<> dis(0, 25);
 void test_fill_sent()
 {
     // ensure all characters are unique
-    std::unordered_set<char> uset;
+    std::unordered_set<unsigned char> uset;
 
     std::vector<char> c1(7);
     std::generate(std::begin(c1), std::end(c1), [&uset]() {
-        char c = 'a' + dis(gen);
+        unsigned char c = 'a' + dis(gen);
         while (uset.find(c) != uset.end())
         {
             c = 'a' + dis(gen);
@@ -44,7 +44,7 @@ void test_fill_sent()
     uset.clear();
     std::vector<char> c2(7);
     std::generate(std::begin(c2), std::end(c2), [&uset]() {
-        char c = 'a' + dis(gen);
+        unsigned char c = 'a' + dis(gen);
         while (uset.find(c) != uset.end())
         {
             c = 'a' + dis(gen);
@@ -94,11 +94,11 @@ void test_fill_sent(ExPolicy policy)
         "hpx::is_execution_policy<ExPolicy>::value");
 
     // ensure all characters are unique
-    std::unordered_set<char> uset;
+    std::unordered_set<unsigned char> uset;
 
     std::vector<char> c1(7);
     std::generate(std::begin(c1), std::end(c1), [&uset]() {
-        char c = 'a' + dis(gen);
+        unsigned char c = 'a' + dis(gen);
         while (uset.find(c) != uset.end())
         {
             c = 'a' + dis(gen);
@@ -110,7 +110,7 @@ void test_fill_sent(ExPolicy policy)
     uset.clear();
     std::vector<char> c2(7);
     std::generate(std::begin(c2), std::end(c2), [&uset]() {
-        char c = 'a' + dis(gen);
+        unsigned char c = 'a' + dis(gen);
         while (uset.find(c) != uset.end())
         {
             c = 'a' + dis(gen);
