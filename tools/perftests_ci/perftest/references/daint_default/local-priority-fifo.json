@@ -4,33 +4,33 @@
       "name": "future overhead - create_thread - latch",
       "executor": "no-executor",
       "series": [
-        0.251752,
-        0.23276,
-        0.239111,
-        0.245585,
-        0.231835,
-        0.234296,
-        0.231487,
-        0.230589,
-        0.233698,
-        0.237571,
-        0.233052,
-        0.23678,
-        0.248381,
-        0.234628,
-        0.234575
+        0.18457,
+        0.242473,
+        0.244323,
+        0.218957,
+        0.198541,
+        0.206756,
+        0.237844,
+        0.232606,
+        0.250669,
+        0.246289,
+        0.240677,
+        0.189725,
+        0.19184,
+        0.195851,
+        0.245588
       ]
     }
   ],
   "HPX": {
-    "commit": "4408251a9542ff54f24b4f1eb31fc8cc2f2f5d97",
-    "datetime": "2021-03-03T16:51:16+00:00"
+    "commit": "00d5c617df12d94f25d2e2e66ff721b8caeb73f5",
+    "datetime": "2021-05-25T13:11:25+00:00"
   },
   "environment": {
-    "hostname": "daint105",
+    "hostname": "nid00718",
     "clustername": "daint",
-    "compiler": "/opt/cray/pe/craype/2.7.0/bin/CC 10.0.0 ( )",
-    "datetime": "2020-09-25T10:46:25.829730+02:00",
-    "envfile": ""
+    "compiler": "/apps/daint/SSL/HPX/packages/llvm-11.0.0/bin/clang++ 11.0.0",
+    "datetime": "2021-05-25T15:29:00.701512+02:00",
+    "envfile": null
   }
 }
