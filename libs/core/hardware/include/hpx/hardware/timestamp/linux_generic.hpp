@@ -12,12 +12,11 @@
 
 #include <time.h>
 
+#include <hpx/config.hpp>
+
 namespace hpx { namespace util { namespace hardware {
 
-#if defined(HPX_HAVE_CUDA)
-    HPX_HOST_DEVICE
-#endif
-    inline std::uint64_t timestamp()
+    HPX_HOST_DEVICE inline std::uint64_t timestamp()
     {
 #if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
         std::uint64_t cur;
