@@ -9,13 +9,13 @@
 //
 // This test is supposed to fail compiling.
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 
 #include <chrono>
 #include <utility>
 
-int main()
+int hpx_main()
 {
     hpx::future<hpx::future<int>> fut = hpx::async([]() -> hpx::future<int> {
         return hpx::async([]() -> int { return 42; });
@@ -24,5 +24,13 @@ int main()
     hpx::future<void> fut2 = std::move(fut);
     fut2.get();
 
-    return 0;
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
+
+    return hpx::util::report_errors();
 }

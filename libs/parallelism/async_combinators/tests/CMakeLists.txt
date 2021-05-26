@@ -46,6 +46,7 @@ if(HPX_WITH_TESTS)
       HEADERS ${async_combinators_headers}
       EXCLUDE ${excluded_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+      NOLIBS
       DEPENDENCIES hpx_async_combinators
     )
   endif()

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/include/runtime.hpp>
+#include <hpx/local/runtime.hpp>
 #include <hpx/modules/threadmanager.hpp>
 
 #include <iostream>

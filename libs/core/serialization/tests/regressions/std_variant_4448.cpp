@@ -7,8 +7,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CXX17_STD_VARIANT)
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
 #include <hpx/modules/serialization.hpp>
 
 #include <cstddef>

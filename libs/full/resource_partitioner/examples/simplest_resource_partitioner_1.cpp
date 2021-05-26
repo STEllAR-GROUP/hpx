@@ -8,18 +8,17 @@
 // intended for inclusion in the documentation.
 
 //[body
-#include <hpx/hpx_init.hpp>
-#include <hpx/resource_partitioner/partitioner.hpp>
+#include <hpx/local/init.hpp>
 
 int hpx_main()
 {
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char** argv)
 {
     // Setup the init parameters
-    hpx::init_params init_args;
-    hpx::init(argc, argv, init_args);
+    hpx::local::init_params init_args;
+    hpx::local::init(hpx_main, argc, argv, init_args);
 }
 //body]

@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/program_options.hpp>
 
 #include <iostream>
 #include <string>
@@ -21,7 +21,7 @@ int hpx_main(variables_map& vm)
     std::cout << "Value of reqopt3: " << vm["reqopt3"].as<std::string>()
               << std::endl;
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -47,9 +47,9 @@ int main(int argc, char* argv[])
         ("reqopt3", value<std::string>()->required(), "Required option 3");
     // clang-format on
 
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
     init_args.cfg = cfg;
 
-    return hpx::init(argc + 1, newargv.data(), init_args);
+    return hpx::local::init(hpx_main, argc + 1, newargv.data(), init_args);
 }

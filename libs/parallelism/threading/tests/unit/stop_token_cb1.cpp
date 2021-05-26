@@ -9,9 +9,8 @@
 //  Creative Commons Attribution 4.0 International License
 //  (http://creativecommons.org/licenses/by/4.0/).
 
-#include <hpx/hpx_main.hpp>
-
 #include <hpx/datastructures/optional.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/threading.hpp>
@@ -415,7 +414,7 @@ void test_cancellation_single_thread_performance()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main()
+int hpx_main()
 {
     test_default_token_is_not_stoppable();
     test_requesting_stop_on_source_updates_token();
@@ -430,6 +429,14 @@ int main()
     test_callback_deregistration_doesnt_wait_for_others_to_finish_executing();
     test_callback_deregistration_blocks_until_callback_finishes();
     test_cancellation_single_thread_performance();
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

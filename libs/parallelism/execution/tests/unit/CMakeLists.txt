@@ -26,8 +26,12 @@ if(HPX_CXX_STANDARD GREATER_EQUAL 17)
   list(
     APPEND
     tests
+    algorithm_detach
+    algorithm_ensure_started
     algorithm_just
     algorithm_just_on
+    algorithm_let_value
+    algorithm_let_error
     algorithm_on
     algorithm_sync_wait
     algorithm_transform

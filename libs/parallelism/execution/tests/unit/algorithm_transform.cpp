@@ -7,6 +7,8 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include "algorithm_test_utils.hpp"
+
 #include <atomic>
 #include <exception>
 #include <stdexcept>
@@ -15,57 +17,6 @@
 #include <utility>
 
 namespace ex = hpx::execution::experimental;
-
-template <typename F>
-struct callback_receiver
-{
-    std::decay_t<F> f;
-    std::atomic<bool>& set_value_called;
-
-    template <typename E>
-    void set_error(E&&) noexcept
-    {
-        HPX_TEST(false);
-    }
-
-    void set_done() noexcept
-    {
-        HPX_TEST(false);
-    };
-
-    template <typename... Ts>
-    auto set_value(Ts&&... ts) noexcept
-        -> decltype(HPX_INVOKE(f, std::forward<Ts>(ts)...), void())
-    {
-        HPX_INVOKE(f, std::forward<Ts>(ts)...);
-        set_value_called = true;
-    }
-};
-
-template <typename F>
-struct error_callback_receiver
-{
-    std::decay_t<F> f;
-    std::atomic<bool>& set_error_called;
-
-    template <typename E>
-    void set_error(E&& e) noexcept
-    {
-        HPX_INVOKE(f, std::forward<E>(e));
-        set_error_called = true;
-    }
-
-    void set_done() noexcept
-    {
-        HPX_TEST(false);
-    };
-
-    template <typename... Ts>
-    void set_value(Ts&&...) noexcept
-    {
-        HPX_TEST(false);
-    }
-};
 
 struct custom_transformer
 {
@@ -90,18 +41,6 @@ auto tag_invoke(ex::transform_t, S&& s, custom_transformer t)
     return ex::transform(std::forward<S>(s), [t = std::move(t)]() { t(); });
 }
 
-void check_exception_ptr(std::exception_ptr eptr)
-{
-    try
-    {
-        std::rethrow_exception(eptr);
-    }
-    catch (const std::runtime_error& e)
-    {
-        HPX_TEST_EQ(std::string(e.what()), std::string("error"));
-    }
-};
-
 int main()
 {
     // Success path
@@ -119,6 +58,35 @@ int main()
         std::atomic<bool> set_value_called{false};
         auto s = ex::transform(ex::just(0), [](int x) { return ++x; });
         auto f = [](int x) { HPX_TEST_EQ(x, 1); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        auto s = ex::transform(
+            ex::just(custom_type_non_default_constructible{0}), [](auto x) {
+                ++(x.x);
+                return x;
+            });
+        auto f = [](auto x) { HPX_TEST_EQ(x.x, 1); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        auto s = ex::transform(
+            ex::just(custom_type_non_default_constructible_non_copyable{0}),
+            [](auto x) {
+                ++(x.x);
+                return x;
+            });
+        auto f = [](auto x) { HPX_TEST_EQ(x.x, 1); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);

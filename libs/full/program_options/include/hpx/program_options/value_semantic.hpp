@@ -7,46 +7,6 @@
 #pragma once
 
 #include <hpx/program_options/config.hpp>
-
-#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-// hpxinspect:nodeprecatedinclude:boost/program_options/value_semantic.hpp
-
-#include <boost/program_options/value_semantic.hpp>
-
-namespace hpx { namespace program_options {
-
-    using boost::program_options::value_semantic;
-    template <typename Char>
-    using value_semantic_codecvt_helper =
-        boost::program_options::value_semantic_codecvt_helper<Char>;
-
-    using boost::program_options::typed_value_base;
-    using boost::program_options::untyped_value;
-
-    template <typename T, typename Char = char>
-    using typed_value = boost::program_options::typed_value<T, Char>;
-
-    using boost::program_options::bool_switch;
-    using boost::program_options::value;
-    using boost::program_options::wvalue;
-
-    using boost::program_options::arg;
-
-    namespace validators {
-
-        using boost::program_options::validators::check_first_occurrence;
-        using boost::program_options::validators::get_single_string;
-
-    }    // namespace validators
-
-    using namespace validators;
-
-    using boost::program_options::validate;
-
-}}    // namespace hpx::program_options
-
-#else
-
 #include <hpx/datastructures/any.hpp>
 #include <hpx/program_options/errors.hpp>
 #include <hpx/util/to_string.hpp>
@@ -473,5 +433,3 @@ namespace hpx { namespace program_options {
 }}    // namespace hpx::program_options
 
 #include <hpx/program_options/detail/value_semantic.hpp>
-
-#endif

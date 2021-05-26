@@ -6,16 +6,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/parallel_copy.hpp>
-#include <hpx/include/parallel_generate.hpp>
-#include <hpx/include/parallel_remove.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
-
-#include <hpx/modules/program_options.hpp>
+#include <hpx/parallel/algorithms/copy.hpp>
+#include <hpx/parallel/algorithms/generate.hpp>
+#include <hpx/parallel/algorithms/remove.hpp>
 
 #include <algorithm>
 #include <array>
@@ -270,7 +268,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     run_benchmark(
         vector_size, test_count, random_range, iterator_tag_str, data_type_str);
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -297,11 +295,11 @@ int main(int argc, char* argv[])
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
     init_args.cfg = cfg;
 
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, init_args), 0,
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv, init_args), 0,
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();

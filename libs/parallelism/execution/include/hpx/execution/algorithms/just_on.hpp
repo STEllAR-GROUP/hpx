@@ -9,16 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/execution/algorithms/just.hpp>
 #include <hpx/execution/algorithms/on.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/tag_fallback_invoke.hpp>
-#include <hpx/type_support/pack.hpp>
 
-#include <atomic>
-#include <cstddef>
-#include <exception>
-#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace execution { namespace experimental {

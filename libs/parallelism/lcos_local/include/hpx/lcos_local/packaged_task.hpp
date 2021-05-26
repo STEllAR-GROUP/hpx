@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
@@ -134,46 +135,26 @@ namespace hpx { namespace lcos { namespace local {
         template <typename... Vs>
         void invoke_impl(/*is_void=*/std::false_type, Vs&&... vs)
         {
-            std::exception_ptr p;
-
-            try
-            {
-                promise_.set_value(function_(std::forward<Vs>(vs)...));
-                return;
-            }
-            catch (...)
-            {
-                p = std::current_exception();
-            }
-
-            // The exception is set outside the catch block since
-            // set_exception may yield. Ending the catch block on a
-            // different worker thread than where it was started may lead
-            // to segfaults.
-            promise_.set_exception(std::move(p));
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    promise_.set_value(function_(std::forward<Vs>(vs)...));
+                },
+                [&](std::exception_ptr ep) {
+                    promise_.set_exception(std::move(ep));
+                });
         }
 
         template <typename... Vs>
         void invoke_impl(/*is_void=*/std::true_type, Vs&&... vs)
         {
-            std::exception_ptr p;
-
-            try
-            {
-                function_(std::forward<Ts>(vs)...);
-                promise_.set_value();
-                return;
-            }
-            catch (...)
-            {
-                p = std::current_exception();
-            }
-
-            // The exception is set outside the catch block since
-            // set_exception may yield. Ending the catch block on a
-            // different worker thread than where it was started may lead
-            // to segfaults.
-            promise_.set_exception(std::move(p));
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    function_(std::forward<Ts>(vs)...);
+                    promise_.set_value();
+                },
+                [&](std::exception_ptr ep) {
+                    promise_.set_exception(std::move(ep));
+                });
         }
 
     private:

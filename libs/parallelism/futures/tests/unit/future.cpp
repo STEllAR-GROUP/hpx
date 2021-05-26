@@ -6,10 +6,9 @@
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/threadmanager.hpp>
-#include <hpx/include/threads.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <chrono>
@@ -601,7 +600,7 @@ int hpx_main(variables_map&)
         test_assign_to_void();
     }
 
-    hpx::finalize();
+    hpx::local::finalize();
     return hpx::util::report_errors();
 }
 
@@ -615,9 +614,9 @@ int main(int argc, char* argv[])
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
     init_args.cfg = cfg;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }

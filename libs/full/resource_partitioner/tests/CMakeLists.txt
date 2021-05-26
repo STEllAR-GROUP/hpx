@@ -41,6 +41,7 @@ if(HPX_WITH_TESTS)
       modules.resource_partitioner
       HEADERS ${resource_partitioner_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+      NOLIBS
       DEPENDENCIES hpx_resource_partitioner
     )
   endif()

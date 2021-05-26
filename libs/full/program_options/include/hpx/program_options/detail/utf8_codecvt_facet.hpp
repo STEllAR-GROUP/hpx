@@ -81,19 +81,6 @@
 
 #include <hpx/program_options/config.hpp>
 
-#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-// hpxinspect:nodeprecatedinclude:boost/program_options/detail/utf8_codecvt_facet.hpp
-
-#include <boost/program_options/detail/utf8_codecvt_facet.hpp>
-
-namespace hpx { namespace program_options { namespace detail {
-
-    using boost::program_options::detail::utf8_codecvt_facet;
-
-}}}    // namespace hpx::program_options::detail
-
-#else
-
 #include <cstddef>    // for std::size_t
 #include <cwchar>     // for mbstate_t
 #include <locale>
@@ -189,5 +176,3 @@ namespace hpx { namespace program_options { namespace detail {
     };
 
 }}}    // namespace hpx::program_options::detail
-
-#endif

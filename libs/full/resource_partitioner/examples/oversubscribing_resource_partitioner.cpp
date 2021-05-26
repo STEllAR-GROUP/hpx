@@ -6,17 +6,17 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/parallel_for_loop.hpp>
-#include <hpx/include/resource_partitioner.hpp>
-#include <hpx/include/runtime.hpp>
-#include <hpx/include/threads.hpp>
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/runtime.hpp>
+#include <hpx/local/thread.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
+#include <hpx/modules/schedulers.hpp>
 //
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <memory>
 #include <set>
@@ -215,7 +215,7 @@ int hpx_main(/*hpx::program_options::variables_map& vm*/)
               << std::endl;
     thread_set.clear();
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 // -------------------------------------------------------------------------
@@ -262,9 +262,9 @@ void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
     }
 }
 
-// the normal int main function that is called at startup and runs on an OS thread
-// the user must call hpx::init to start the hpx runtime which will execute hpx_main
-// on an hpx thread
+// the normal int main function that is called at startup and runs on an OS
+// thread the user must call hpx::local::init to start the hpx runtime which
+// will execute hpx_main on an hpx thread
 int main(int argc, char* argv[])
 {
     // clang-format off
@@ -276,12 +276,12 @@ int main(int argc, char* argv[])
             "Number of threads to assign to custom pool");
     // clang-format on
 
-    hpx::init_params iparams;
+    hpx::local::init_params iparams;
 
     iparams.desc_cmdline = desc_cmdline;
     iparams.rp_mode = hpx::resource::mode_allow_oversubscription;
     iparams.rp_callback = init_resource_partitioner_handler;
 
-    return hpx::init(argc, argv, iparams);
+    return hpx::local::init(hpx_main, argc, argv, iparams);
 }
 #endif

@@ -5,10 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/parallel_execution.hpp>
-#include <hpx/include/parallel_executors.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
@@ -75,7 +73,7 @@ int hpx_main()
     test_bulk_async(par_exec);
     test_bulk_async(par_fork_exec);
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -84,10 +82,10 @@ int main(int argc, char* argv[])
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.cfg = cfg;
 
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, init_args), 0,
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv, init_args), 0,
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();

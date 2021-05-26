@@ -16,10 +16,6 @@ set(tests
     threads_all_1422
 )
 
-if(HPX_WITH_THREAD_POOL_OS_EXECUTORS_COMPATIBILITY)
-  set(tests ${tests} thread_pool_executor_1114)
-endif()
-
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(tests ${tests} resume_priority thread_rescheduling)
 endif()

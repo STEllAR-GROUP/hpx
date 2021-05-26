@@ -6,7 +6,6 @@
 
 #include <hpx/datastructures/tagged_pair.hpp>
 #include <hpx/datastructures/tagged_tuple.hpp>
-#include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <type_traits>

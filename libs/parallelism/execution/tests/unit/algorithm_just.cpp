@@ -7,6 +7,8 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include "algorithm_test_utils.hpp"
+
 #include <atomic>
 #include <string>
 #include <type_traits>
@@ -14,43 +16,12 @@
 
 namespace ex = hpx::execution::experimental;
 
-template <typename F>
-struct callback_receiver
-{
-    std::decay_t<F> f;
-    std::atomic<bool>& set_value_called;
-
-    template <typename E>
-    void set_error(E&&) noexcept
-    {
-        HPX_TEST(false);
-    }
-
-    void set_done() noexcept
-    {
-        HPX_TEST(false);
-    };
-
-    template <typename... Ts>
-    auto set_value(Ts&&... ts) noexcept
-        -> decltype(HPX_INVOKE(f, std::forward<Ts>(ts)...), void())
-    {
-        HPX_INVOKE(f, std::forward<Ts>(ts)...);
-        set_value_called = true;
-    }
-};
-
-template <typename T>
-struct custom_type
-{
-    std::atomic<bool>& called;
-    std::decay_t<T> x;
-};
-
+// This overload is only used to check dispatching. It is not a useful
+// implementation.
 template <typename T>
 auto tag_invoke(ex::just_t, custom_type<T> c)
 {
-    c.called = true;
+    c.tag_invoke_overload_called = true;
     return ex::just(c.x);
 }
 
@@ -70,6 +41,27 @@ int main()
         std::atomic<bool> set_value_called{false};
         auto s = ex::just(3);
         auto f = [](int x) { HPX_TEST_EQ(x, 3); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        auto s = ex::just(custom_type_non_default_constructible{42});
+        auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        auto s =
+            ex::just(custom_type_non_default_constructible_non_copyable{42});
+        auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);

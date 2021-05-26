@@ -5,10 +5,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos_local.hpp>
-#include <hpx/include/threads.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
@@ -27,8 +28,8 @@ using hpx::this_thread::suspend;
 
 using hpx::lcos::local::event;
 
-using hpx::finalize;
-using hpx::init;
+using hpx::local::finalize;
+using hpx::local::init;
 
 using hpx::util::report_errors;
 
@@ -101,11 +102,11 @@ int main(int argc, char* argv[])
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
     init_args.cfg = cfg;
 
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, init_args), 0,
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv, init_args), 0,
         "HPX main exited with non-zero status");
     return report_errors();
 }

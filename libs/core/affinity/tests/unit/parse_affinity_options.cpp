@@ -4,10 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
-
 #include <hpx/affinity/parse_affinity_options.hpp>
-#include <hpx/include/threads.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
@@ -1110,26 +1108,12 @@ namespace test {
 }    // namespace test
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main()
+int main()
 {
     {
         test::good();
         test::bad();
     }
 
-    return hpx::finalize();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
-{
-    // We force this test to use 4 threads by default.
-    std::vector<std::string> const cfg = {"hpx.os_threads=4"};
-
-    // Initialize and run HPX
-    hpx::init_params init_args;
-    init_args.cfg = cfg;
-
-    HPX_TEST_EQ(0, hpx::init(argc, argv, init_args));
     return hpx::util::report_errors();
 }

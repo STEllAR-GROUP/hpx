@@ -307,9 +307,6 @@ namespace hpx { namespace threads {
         }
 
     public:
-        std::size_t shrink_pool(std::string const& pool_name);
-        std::size_t expand_pool(std::string const& pool_name);
-
         // performance counters
         std::int64_t get_queue_length(bool reset);
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME

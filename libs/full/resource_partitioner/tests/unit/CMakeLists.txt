@@ -26,7 +26,7 @@ set(scheduler_binding_check_PARAMETERS THREADS_PER_LOCALITY -1)
 
 set(named_pool_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(resource_partitioner_info_PARAMETERS THREADS_PER_LOCALITY 4)
-set(used_pus_PARAMETERS THREADS_PER_LOCALITY 4)
+set(used_pus_PARAMETERS THREADS_PER_LOCALITY 4 RUN_SERIAL)
 
 set(scheduler_priority_check_PARAMETERS THREADS_PER_LOCALITY -1)
 set(shutdown_suspended_pus_PARAMETERS THREADS_PER_LOCALITY 4)

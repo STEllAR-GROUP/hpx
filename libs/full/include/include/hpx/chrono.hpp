@@ -6,6 +6,4 @@
 
 #pragma once
 
-#include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#include <hpx/local/chrono.hpp>

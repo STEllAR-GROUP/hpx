@@ -4,9 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-
+#include <hpx/local/init.hpp>
+#include <hpx/local/tuple.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -14,6 +13,7 @@
 #include <numeric>
 #include <sstream>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -200,11 +200,11 @@ int hpx_main()
     test_stencil3_iterator();
     test_stencil3_iterator_custom();
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
 {
-    HPX_TEST_EQ(hpx::init(argc, argv), 0);
+    HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv), 0);
     return hpx::util::report_errors();
 }

@@ -80,15 +80,6 @@ namespace hpx { namespace threads {
         return active_os_thread_count;
     }
 
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-    ///////////////////////////////////////////////////////////////////////////
-    // detail::manage_executor interface implementation
-    char const* thread_pool_base::get_description() const
-    {
-        return id_.name().c_str();
-    }
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     void thread_pool_base::init_pool_time_scale()
     {

@@ -204,6 +204,10 @@ namespace hpx { namespace util {
             using type = Pack<typename Transformer<Ts>::type...>;
         };
 
+        /// Apply a meta-function to each element in a pack.
+        template <typename Pack, template <typename> class Transformer>
+        using transform_t = typename transform<Pack, Transformer>::type;
+
         template <typename PackUnique, typename PackRest>
         struct unique_helper;
 
@@ -216,16 +220,9 @@ namespace hpx { namespace util {
         template <template <typename...> class Pack, typename... Ts, typename U,
             typename... Us>
         struct unique_helper<Pack<Ts...>, Pack<U, Us...>>
-          : std::conditional<contains<Ts..., U>::value,
+          : std::conditional<contains<U, Ts...>::value,
                 unique_helper<Pack<Ts...>, Pack<Us...>>,
                 unique_helper<Pack<Ts..., U>, Pack<Us...>>>::type
-        {
-        };
-
-        template <template <typename...> class Pack, typename... Ts,
-            typename... Us>
-        struct unique_helper<Pack<Ts...>, Pack<Us...>>
-          : unique_helper<Pack<>, Pack<Ts...>>
         {
         };
 
@@ -237,20 +234,72 @@ namespace hpx { namespace util {
         {
         };
 
+        /// Remove duplicate types in the given pack.
+        template <typename Pack>
+        using unique_t = typename unique<Pack>::type;
+
         template <typename... Packs>
-        struct cat;
+        struct concat;
 
         template <template <typename...> class Pack, typename... Ts>
-        struct cat<Pack<Ts...>>
+        struct concat<Pack<Ts...>>
         {
             using type = Pack<Ts...>;
         };
 
         template <template <typename...> class Pack, typename... Ts,
             typename... Us, typename... Rest>
-        struct cat<Pack<Ts...>, Pack<Us...>, Rest...>
-          : cat<Pack<Ts..., Us...>, Rest...>
+        struct concat<Pack<Ts...>, Pack<Us...>, Rest...>
+          : concat<Pack<Ts..., Us...>, Rest...>
         {
         };
+
+        /// Concatenate the elements in the given packs into a single pack. The
+        /// packs must be of the same type.
+        template <typename... Packs>
+        using concat_t = typename concat<Packs...>::type;
+
+        template <typename Pack>
+        struct concat_pack_of_packs;
+
+        template <template <typename...> class Pack, typename... Ts>
+        struct concat_pack_of_packs<Pack<Ts...>>
+        {
+            using type = typename concat<Ts...>::type;
+        };
+
+        template <typename... Packs>
+        using unique_concat_t = unique_t<concat_t<Packs...>>;
+
+        /// Concatenate the packs in the given pack into a single pack.
+        template <typename Pack>
+        using concat_pack_of_packs_t =
+            typename concat_pack_of_packs<Pack>::type;
+
+        template <typename Pack, typename T>
+        struct prepend;
+
+        template <typename T, template <typename...> class Pack, typename... Ts>
+        struct prepend<Pack<Ts...>, T>
+        {
+            using type = Pack<T, Ts...>;
+        };
+
+        /// Prepend a given type to the given pack.
+        template <typename Pack, typename T>
+        using prepend_t = typename prepend<Pack, T>::type;
+
+        template <typename Pack, typename T>
+        struct append;
+
+        template <typename T, template <typename...> class Pack, typename... Ts>
+        struct append<Pack<Ts...>, T>
+        {
+            using type = Pack<Ts..., T>;
+        };
+
+        /// Append a given type to the given pack.
+        template <typename Pack, typename T>
+        using append_t = typename prepend<Pack, T>::type;
     }    // namespace detail
 }}       // namespace hpx::util

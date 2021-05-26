@@ -10,6 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
+#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/future_fwd.hpp>
 #include <hpx/futures/traits/future_access.hpp>
@@ -526,26 +527,9 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename T>
         void set_data(T&& result)
         {
-            std::exception_ptr p;
-
-            // set the received result, reset error status
-            try
-            {
-                // store the value
-                set_value(std::forward<T>(result));
-                return;
-            }
-            catch (...)
-            {
-                // store the error instead
-                p = std::current_exception();
-            }
-
-            // The exception is set outside the catch block since
-            // set_exception may yield. Ending the catch block on a
-            // different worker thread than where it was started may lead
-            // to segfaults.
-            set_exception(std::move(p));
+            hpx::detail::try_catch_exception_ptr(
+                [&]() { set_value(std::forward<T>(result)); },
+                [&](std::exception_ptr ep) { set_exception(std::move(ep)); });
         }
 
         // helper functions for setting data (if successful) or the error (if
@@ -553,54 +537,26 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename T>
         void set_remote_data(T&& result)
         {
-            std::exception_ptr p;
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    typedef typename std::decay<T>::type naked_type;
 
-            // set the received result, reset error status
-            try
-            {
-                typedef typename std::decay<T>::type naked_type;
+                    typedef traits::get_remote_result<result_type, naked_type>
+                        get_remote_result_type;
 
-                typedef traits::get_remote_result<result_type, naked_type>
-                    get_remote_result_type;
-
-                // store the value
-                set_value(std::move(
-                    get_remote_result_type::call(std::forward<T>(result))));
-                return;
-            }
-            catch (...)
-            {
-                // store the error instead
-                p = std::current_exception();
-            }
-
-            // The exception is set outside the catch block since
-            // set_exception may yield. Ending the catch block on a
-            // different worker thread than where it was started may lead
-            // to segfaults.
-            set_exception(std::move(p));
+                    // store the value
+                    set_value(std::move(
+                        get_remote_result_type::call(std::forward<T>(result))));
+                },
+                [&](std::exception_ptr ep) { set_exception(std::move(ep)); });
         }
 
         // trigger the future with the given error condition
         void set_error(error e, char const* f, char const* msg)
         {
-            std::exception_ptr p;
-
-            try
-            {
-                HPX_THROW_EXCEPTION(e, f, msg);
-            }
-            catch (...)
-            {
-                // store the error code
-                p = std::current_exception();
-            }
-
-            // The exception is set outside the catch block since
-            // set_exception may yield. Ending the catch block on a
-            // different worker thread than where it was started may lead
-            // to segfaults.
-            set_exception(std::move(p));
+            hpx::detail::try_catch_exception_ptr(
+                [&]() { HPX_THROW_EXCEPTION(e, f, msg); },
+                [&](std::exception_ptr ep) { set_exception(std::move(ep)); });
         }
 
         /// Reset the promise to allow to restart an asynchronous
@@ -1006,48 +962,39 @@ namespace hpx { namespace lcos { namespace detail {
         void cancel()
         {
             std::unique_lock<mutex_type> l(this->mtx_);
-            std::exception_ptr p;
-            try
-            {
-                if (!this->started_)
-                    HPX_THROW_THREAD_INTERRUPTED_EXCEPTION();
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    if (!this->started_)
+                        HPX_THROW_THREAD_INTERRUPTED_EXCEPTION();
 
-                if (this->is_ready())
-                    return;    // nothing we can do
+                    if (this->is_ready())
+                        return;    // nothing we can do
 
-                if (id_ != threads::invalid_thread_id)
-                {
-                    // interrupt the executing thread
-                    threads::interrupt_thread(id_);
+                    if (id_ != threads::invalid_thread_id)
+                    {
+                        // interrupt the executing thread
+                        threads::interrupt_thread(id_);
 
+                        this->started_ = true;
+
+                        l.unlock();
+                        this->set_error(future_cancelled,
+                            "task_base<Result>::cancel",
+                            "future has been canceled");
+                    }
+                    else
+                    {
+                        l.unlock();
+                        HPX_THROW_EXCEPTION(future_can_not_be_cancelled,
+                            "task_base<Result>::cancel",
+                            "future can't be canceled at this time");
+                    }
+                },
+                [&](std::exception_ptr ep) {
                     this->started_ = true;
-
-                    l.unlock();
-                    this->set_error(future_cancelled,
-                        "task_base<Result>::cancel",
-                        "future has been canceled");
-                }
-                else
-                {
-                    l.unlock();
-                    HPX_THROW_EXCEPTION(future_can_not_be_cancelled,
-                        "task_base<Result>::cancel",
-                        "future can't be canceled at this time");
-                }
-                return;
-            }
-            catch (...)
-            {
-                this->started_ = true;
-                p = std::current_exception();
-            }
-
-            // The exception is set outside the catch block since
-            // set_exception may yield. Ending the catch block on a
-            // different worker thread than where it was started may lead
-            // to segfaults.
-            this->set_exception(p);
-            std::rethrow_exception(std::move(p));
+                    this->set_exception(ep);
+                    std::rethrow_exception(std::move(ep));
+                });
         }
 
     protected:

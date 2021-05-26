@@ -6,8 +6,7 @@
 //
 // Demonstrating #1437: hpx::init() should strip HPX-related flags from argv
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 bool invoked_main = false;
@@ -18,14 +17,14 @@ int my_hpx_main(int argc, char**)
     HPX_TEST_EQ(argc, 1);
 
     invoked_main = true;
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char** argv)
 {
     HPX_TEST_LT(1, argc);
 
-    HPX_TEST_EQ(hpx::init(&my_hpx_main, argc, argv), 0);
+    HPX_TEST_EQ(hpx::local::init(&my_hpx_main, argc, argv), 0);
     HPX_TEST(invoked_main);
 
     return hpx::util::report_errors();

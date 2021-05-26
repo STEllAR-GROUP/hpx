@@ -42,6 +42,7 @@ if(HPX_WITH_TESTS_HEADERS)
     modules.lcos_local
     HEADERS ${lcos_local_headers}
     HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+    NOLIBS
     DEPENDENCIES hpx_lcos_local
   )
 endif()

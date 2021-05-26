@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/include/parallel_merge.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/algorithms/merge.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <algorithm>

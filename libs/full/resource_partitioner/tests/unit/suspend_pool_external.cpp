@@ -6,14 +6,15 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
-#include <hpx/hpx_start.hpp>
-#include <hpx/include/apply.hpp>
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/threadmanager.hpp>
-#include <hpx/include/threads.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/timing.hpp>
+#include <hpx/modules/threadmanager.hpp>
+#include <hpx/thread_pool_util/thread_pool_suspension_helpers.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 
@@ -28,7 +29,7 @@
 void test_scheduler(
     int argc, char* argv[], hpx::resource::scheduling_policy scheduler)
 {
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
 
     init_args.cfg = {"hpx.os_threads=4"};
     init_args.rp_callback = [scheduler](auto& rp,
@@ -36,7 +37,7 @@ void test_scheduler(
         rp.create_thread_pool("default", scheduler);
     };
 
-    hpx::start(nullptr, argc, argv, init_args);
+    hpx::local::start(nullptr, argc, argv, init_args);
 
     hpx::threads::thread_pool_base& default_pool =
         hpx::resource::get_thread_pool("default");
@@ -73,9 +74,9 @@ void test_scheduler(
         }
     }
 
-    hpx::apply([]() { hpx::finalize(); });
+    hpx::apply([]() { hpx::local::finalize(); });
 
-    HPX_TEST_EQ(hpx::stop(), 0);
+    HPX_TEST_EQ(hpx::local::stop(), 0);
 }
 
 int main(int argc, char* argv[])

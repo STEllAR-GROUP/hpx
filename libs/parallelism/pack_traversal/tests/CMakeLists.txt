@@ -41,6 +41,7 @@ if(HPX_WITH_TESTS)
       modules.pack_traversal
       HEADERS ${pack_traversal_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+      NOLIBS
       DEPENDENCIES hpx_pack_traversal
     )
   endif()

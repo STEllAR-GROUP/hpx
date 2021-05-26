@@ -20,18 +20,3 @@ namespace hpx { namespace traits {
         using remote_result_type = typename type::remote_result_type;
     };
 }}    // namespace hpx::traits
-
-#if defined(HPX_HAVE_ACTION_BASE_COMPATIBILITY)
-#include <hpx/type_support/always_void.hpp>
-
-namespace hpx { namespace traits {
-
-    template <typename Action>
-    struct extract_action<Action,
-        typename util::always_void<typename Action::type>::type>
-      : extract_action<typename Action::type>
-    {
-    };
-}}    // namespace hpx::traits
-
-#endif

@@ -7,8 +7,8 @@
 // This test case demonstrates the issue described in #1485:
 // `ignore_while_locked` doesn't support all Lockable types
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -87,8 +87,16 @@ void test_condition_with_mutex()
     HPX_TEST_EQ(data.woken, 1u);
 }
 
-int main()
+int hpx_main()
 {
     test_condition_with_mutex();
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
+
     return hpx::util::report_errors();
 }

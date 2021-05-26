@@ -18,13 +18,13 @@
 // computation. This example is still fully local but demonstrates nice
 // scalability on SMP machines.
 
-#include <hpx/algorithm.hpp>
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/resiliency.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <boost/range/irange.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
@@ -336,7 +336,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     //     std::cout << solution[i].get() << " ";
     // std::cout << std::endl;
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -370,8 +370,8 @@ int main(int argc, char* argv[])
         value<std::uint64_t>()->default_value(10), "Number of partitions");
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }

@@ -10,7 +10,6 @@
 
 // This is really an incomplete test; should be fleshed out.
 
-#include <hpx/hpx_main.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/testing.hpp>

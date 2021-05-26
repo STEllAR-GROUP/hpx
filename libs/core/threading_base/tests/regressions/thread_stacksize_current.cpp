@@ -10,7 +10,7 @@
 // thread_stacksize::minimal and thread_stacksize::maximal when a thread has been
 // created.
 
-#include <hpx/hpx_init.hpp>
+#include <hpx/local/init.hpp>
 
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/testing.hpp>
@@ -58,7 +58,7 @@ int hpx_main()
         test(stacksize);
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char** argv)
@@ -68,10 +68,10 @@ int main(int argc, char** argv)
         "abp-priority-lifo", "shared-priority"};
     for (auto const& scheduler : schedulers)
     {
-        hpx::init_params iparams;
+        hpx::local::init_params iparams;
         iparams.cfg = {"--hpx:queuing=" + std::string(scheduler)};
         std::cout << iparams.cfg[0] << std::endl;
-        hpx::init(argc, argv, iparams);
+        hpx::local::init(hpx_main, argc, argv, iparams);
     }
 
     return hpx::util::report_errors();

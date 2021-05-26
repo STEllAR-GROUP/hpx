@@ -217,7 +217,7 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      *
      *
    * * |boost_libraries|_
-     * 1.66.0
+     * 1.71.0
      *
    * * |hwloc|_
      * 1.5
@@ -249,7 +249,7 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      *
      *
    * * |boost|_
-     * 1.66.0
+     * 1.71.0
      *
    * * |hwloc|_
      * 1.5

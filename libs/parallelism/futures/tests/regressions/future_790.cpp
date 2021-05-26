@@ -7,17 +7,25 @@
 // This test case demonstrates the issue described in #790: wait_for() doesn't
 // compile
 
-#include <hpx/futures/future.hpp>
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <chrono>
 
-int main()
+int hpx_main()
 {
     hpx::lcos::future<int> future = hpx::lcos::make_ready_future(0);
     std::chrono::nanoseconds tn(static_cast<long long>(1000000000LL));
     future.wait_for(tn);
 
-    return 0;
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
+
+    return hpx::util::report_errors();
 }

@@ -6,19 +6,4 @@
 
 #pragma once
 
-#include <hpx/parallel/memory.hpp>
-
-#include <hpx/parallel/container_memory.hpp>
-
-namespace hpx {
-    using hpx::parallel::uninitialized_copy;
-    using hpx::parallel::uninitialized_copy_n;
-    using hpx::parallel::uninitialized_default_construct;
-    using hpx::parallel::uninitialized_default_construct_n;
-    using hpx::parallel::uninitialized_fill;
-    using hpx::parallel::uninitialized_fill_n;
-    using hpx::parallel::uninitialized_move;
-    using hpx::parallel::uninitialized_move_n;
-    using hpx::parallel::uninitialized_value_construct;
-    using hpx::parallel::uninitialized_value_construct_n;
-}    // namespace hpx
+#include <hpx/local/memory.hpp>

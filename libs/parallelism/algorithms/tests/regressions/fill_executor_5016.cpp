@@ -9,12 +9,10 @@
 // suppress deprecation warnings for algorithms
 #define HPX_HAVE_DEPRECATION_WARNINGS_V1_6 0
 
-#include <hpx/hpx_main.hpp>
-
-#include <hpx/include/compute.hpp>
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/parallel_fill.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/algorithms/fill.hpp>
 
 #include <algorithm>
 #include <vector>
@@ -37,8 +35,17 @@ void fill_example()
     HPX_TEST(vd1 == expected);
 }
 
-int main()
+int hpx_main()
 {
     fill_example();
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
+
     return hpx::util::report_errors();
 }

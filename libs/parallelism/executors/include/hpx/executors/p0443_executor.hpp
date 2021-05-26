@@ -144,6 +144,12 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 return {std::move(exec), std::forward<R>(r)};
             }
+
+            template <typename R>
+            operation_state<Executor, R> connect(R&& r) &
+            {
+                return {exec, std::forward<R>(r)};
+            }
         };
 
         template <template <class...> class Tuple,

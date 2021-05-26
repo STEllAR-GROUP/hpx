@@ -7,7 +7,7 @@
 // verify #706 is fixed (`hpx::init` removes portions of non-option command
 // line arguments before last `=` sign)
 
-#include <hpx/hpx_init.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 char const* argv[] = {"command_line_argument_test",
@@ -23,11 +23,11 @@ int hpx_main(int argc, char** argv_init)
         HPX_TEST_EQ(0, std::strcmp(argv[i + 1], argv_init[i]));
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main()
 {
-    HPX_TEST_EQ(hpx::init(4, const_cast<char**>(argv)), 0);
+    HPX_TEST_EQ(hpx::local::init(hpx_main, 4, const_cast<char**>(argv)), 0);
     return hpx::util::report_errors();
 }

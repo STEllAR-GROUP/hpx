@@ -7,13 +7,11 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/algorithm.hpp>
-#include <hpx/chrono.hpp>
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/parallel_executor_parameters.hpp>
-
 #include <hpx/executors/parallel_executor_aggregated.hpp>
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/init.hpp>
 
 #include "worker_timed.hpp"
 
@@ -27,6 +25,7 @@
 #include <random>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -649,7 +648,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -689,10 +688,10 @@ int main(int argc, char* argv[])
         ;
     // clang-format on
 
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
     init_args.cfg = cfg;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }
 #endif

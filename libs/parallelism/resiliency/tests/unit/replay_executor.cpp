@@ -4,10 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/algorithm.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/future.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/resiliency.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -73,12 +73,12 @@ int hpx_main()
         HPX_TEST(false);
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    HPX_TEST(hpx::init(argc, argv) == 0);
+    HPX_TEST(hpx::local::init(hpx_main, argc, argv) == 0);
     return hpx::util::report_errors();
 }

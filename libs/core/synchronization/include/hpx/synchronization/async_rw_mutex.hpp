@@ -177,11 +177,16 @@ namespace hpx { namespace experimental {
             async_rw_mutex_access_wrapper& operator=(
                 async_rw_mutex_access_wrapper const&) = default;
 
-            operator ReadT&()
+            ReadT& get() const
             {
                 HPX_ASSERT(state);
                 HPX_ASSERT(state->value);
                 return state->value.value();
+            }
+
+            operator ReadT&() const
+            {
+                return get();
             }
         };
 
@@ -214,15 +219,20 @@ namespace hpx { namespace experimental {
             async_rw_mutex_access_wrapper& operator=(
                 async_rw_mutex_access_wrapper&&) = default;
             async_rw_mutex_access_wrapper(
-                async_rw_mutex_access_wrapper const&) = default;
+                async_rw_mutex_access_wrapper const&) = delete;
             async_rw_mutex_access_wrapper& operator=(
-                async_rw_mutex_access_wrapper const&) = default;
+                async_rw_mutex_access_wrapper const&) = delete;
 
-            operator ReadWriteT&()
+            ReadWriteT& get()
             {
                 HPX_ASSERT(state);
                 HPX_ASSERT(state->value);
                 return state->value.value();
+            }
+
+            operator ReadWriteT&()
+            {
+                return get();
             }
         };
 
@@ -274,9 +284,9 @@ namespace hpx { namespace experimental {
             async_rw_mutex_access_wrapper& operator=(
                 async_rw_mutex_access_wrapper&&) = default;
             async_rw_mutex_access_wrapper(
-                async_rw_mutex_access_wrapper const&) = default;
+                async_rw_mutex_access_wrapper const&) = delete;
             async_rw_mutex_access_wrapper& operator=(
-                async_rw_mutex_access_wrapper const&) = default;
+                async_rw_mutex_access_wrapper const&) = delete;
         };
     }    // namespace detail
 
@@ -535,9 +545,9 @@ namespace hpx { namespace experimental {
             typename = std::enable_if_t<
                 !std::is_same<std::decay_t<U>, async_rw_mutex>::value>>
         explicit async_rw_mutex(U&& u, allocator_type const& alloc = {})
-          : alloc(alloc)
+          : value(std::forward<U>(u))
+          , alloc(alloc)
         {
-            value = std::forward<U>(u);
         }
         async_rw_mutex(async_rw_mutex&&) = default;
         async_rw_mutex& operator=(async_rw_mutex&&) = default;

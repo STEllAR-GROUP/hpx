@@ -6,20 +6,26 @@
 
 // This compile-only test case verifies that #2035 remains fixed
 
-#include <hpx/config.hpp>
-
-#include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/hpx_main.hpp>
-#include <hpx/include/future.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <array>
 
-int main()
+int hpx_main()
 {
     std::array<hpx::shared_future<int>, 1> future_array{
         {hpx::make_ready_future(0)}};
 
     hpx::wait_all(future_array.cbegin(), future_array.cend());
 
-    return 0;
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
+
+    return hpx::util::report_errors();
 }

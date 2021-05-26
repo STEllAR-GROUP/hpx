@@ -39,6 +39,7 @@ if(HPX_WITH_TESTS)
       modules.threading
       HEADERS ${threading_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+      NOLIBS
       DEPENDENCIES hpx_threading
     )
   endif()

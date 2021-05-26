@@ -35,6 +35,7 @@ Main |hpx| modules
    /libs/full/distribution_policies/docs/index.rst
    /libs/full/executors_distributed/docs/index.rst
    /libs/full/include/docs/index.rst
+   /libs/full/include_local/docs/index.rst
    /libs/full/init_runtime/docs/index.rst
    /libs/full/init_runtime_local/docs/index.rst
    /libs/full/lcos_distributed/docs/index.rst
@@ -50,5 +51,4 @@ Main |hpx| modules
    /libs/full/runtime_distributed/docs/index.rst
    /libs/full/runtime_local/docs/index.rst
    /libs/full/segmented_algorithms/docs/index.rst
-   /libs/full/thread_executors/docs/index.rst
    /libs/full/threadmanager/docs/index.rst
