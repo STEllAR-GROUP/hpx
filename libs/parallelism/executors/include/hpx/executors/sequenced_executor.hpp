@@ -122,7 +122,7 @@ namespace hpx { namespace execution {
         }
 
         template <typename Parameters>
-        std::size_t processing_units_count(Parameters&&)
+        std::size_t processing_units_count(Parameters&&) const
         {
             return 1;
         }
