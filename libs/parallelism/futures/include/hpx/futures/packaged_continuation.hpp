@@ -35,7 +35,10 @@ namespace hpx { namespace lcos { namespace detail {
         std::false_type, Source&& src, Destination& dest)
     {
         hpx::detail::try_catch_exception_ptr(
-            [&]() { dest.set_value(src.get()); },
+            [&]() {
+                traits::future_access<Source>::transfer_result(
+                    std::forward<Source>(src), dest);
+            },
             [&](std::exception_ptr ep) { dest.set_exception(std::move(ep)); });
     }
 

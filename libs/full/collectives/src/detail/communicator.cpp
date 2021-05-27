@@ -8,8 +8,11 @@
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
+#include <hpx/assert.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/components/basename_registration.hpp>
+#include <hpx/components/client.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/modules/async_distributed.hpp>
@@ -33,50 +36,30 @@ HPX_REGISTER_COMPONENT(collectives_component);
 namespace hpx { namespace lcos { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<hpx::id_type> register_communicator_name(
-        hpx::future<hpx::id_type>&& f, std::string basename, std::size_t site)
-    {
-        hpx::id_type target = f.get();
-
-        // Register unmanaged id to avoid cyclic dependencies, unregister
-        // is done after all data has been collected in the component above.
-        hpx::future<bool> result =
-            hpx::register_with_basename(basename, target, site);
-
-        return result.then(hpx::launch::sync,
-            [target = std::move(target), basename = std::move(basename)](
-                hpx::future<bool>&& f) -> hpx::id_type {
-                bool result = f.get();
-                if (!result)
-                {
-                    HPX_THROW_EXCEPTION(bad_parameter,
-                        "hpx::lcos::detail::register_communicator_name",
-                        "the given base name for the communicator "
-                        "operation was already registered: {}",
-                        basename);
-                }
-                return target;
-            });
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    hpx::future<hpx::id_type> create_communicator(char const* basename,
-        std::size_t num_sites, std::size_t generation, std::size_t this_site,
-        std::size_t num_values)
+    hpx::components::client<detail::communicator_server> create_communicator(
+        char const* basename, std::size_t num_sites, std::size_t generation,
+        std::size_t this_site, std::size_t root_site, std::size_t num_values)
     {
         if (num_sites == std::size_t(-1))
         {
             num_sites = static_cast<std::size_t>(
-                hpx::get_num_localities(hpx::launch::sync));
+                agas::get_num_localities(hpx::launch::sync));
         }
         if (this_site == std::size_t(-1))
         {
-            this_site = static_cast<std::size_t>(hpx::get_locality_id());
+            this_site = static_cast<std::size_t>(agas::get_locality_id());
+            if (root_site == std::size_t(-1))
+            {
+                root_site = this_site;
+            }
         }
         if (num_values == std::size_t(-1))
         {
             num_values = num_sites;
         }
+
+        HPX_ASSERT(this_site < num_sites);
+        HPX_ASSERT(root_site != std::size_t(-1) && root_site < num_sites);
 
         std::string name(basename);
         if (generation != std::size_t(-1))
@@ -84,14 +67,37 @@ namespace hpx { namespace lcos { namespace detail {
             name += std::to_string(generation) + "/";
         }
 
-        // create a new communicator_server
-        hpx::future<hpx::id_type> id = hpx::new_<detail::communicator_server>(
-            hpx::find_here(), num_sites, name, this_site, num_values);
+        using client_type =
+            hpx::components::client<detail::communicator_server>;
+        if (this_site == root_site)
+        {
+            // create a new communicator
+            client_type c =
+                hpx::local_new<client_type>(num_sites, this_site, num_values);
 
-        // register the communicator's id using the given basename
-        return id.then(hpx::launch::sync,
-            util::bind_back(&detail::register_communicator_name,
-                std::move(name), this_site));
+            // register the communicator's id using the given basename,
+            // this keeps the communicator alive
+            auto f = c.register_as(
+                hpx::detail::name_from_basename(std::move(name), this_site));
+
+            return f.then(hpx::launch::sync,
+                [target = std::move(c)](hpx::future<bool>&& f) {
+                    bool result = f.get();
+                    if (!result)
+                    {
+                        HPX_THROW_EXCEPTION(bad_parameter,
+                            "hpx::lcos::detail::create_communicator",
+                            hpx::util::format(
+                                "the given base name for the communicator "
+                                "operation was already registered: {}",
+                                target.registered_name()));
+                    }
+                    return target;
+                });
+        }
+
+        // find existing communicator
+        return hpx::find_from_basename<client_type>(std::move(name), root_site);
     }
 }}}    // namespace hpx::lcos::detail
 

@@ -163,6 +163,7 @@ namespace hpx { namespace lcos {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/async_local/dataflow.hpp>
@@ -197,7 +198,7 @@ namespace hpx { namespace traits {
       : std::enable_shared_from_this<
             communication_operation<Communicator, communication::gather_tag>>
     {
-        communication_operation(Communicator& comm)
+        explicit communication_operation(Communicator& comm)
           : communicator_(comm)
         {
         }
@@ -206,24 +207,26 @@ namespace hpx { namespace traits {
         Result get(std::size_t which, T&& t)
         {
             using arg_type = typename std::decay<T>::type;
+            using data_type = std::vector<arg_type>;
             using mutex_type = typename Communicator::mutex_type;
+            using lock_type = std::unique_lock<mutex_type>;
 
             auto this_ = this->shared_from_this();
-            auto on_ready =
-                [this_ = std::move(this_)](
-                    shared_future<void>&& f) -> std::vector<arg_type> {
+            auto on_ready = [this_ = std::move(this_)](
+                                shared_future<void>&& f) -> data_type {
+                HPX_UNUSED(this_);
                 f.get();    // propagate any exceptions
 
                 auto& communicator = this_->communicator_;
 
-                std::unique_lock<mutex_type> l(communicator.mtx_);
+                lock_type l(communicator.mtx_);
                 return communicator.template access_data<arg_type>(l);
             };
 
-            std::unique_lock<mutex_type> l(communicator_.mtx_);
-            util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
+            lock_type l(communicator_.mtx_);
+            util::ignore_while_checking<lock_type> il(&l);
 
-            hpx::future<std::vector<arg_type>> f =
+            hpx::future<data_type> f =
                 communicator_.gate_.get_shared_future(l).then(
                     hpx::launch::sync, std::move(on_ready));
 
@@ -232,50 +235,51 @@ namespace hpx { namespace traits {
             auto& data = communicator_.template access_data<arg_type>(l);
             data[which] = std::forward<T>(t);
 
-            if (communicator_.gate_.set(which, l))
+            if (communicator_.gate_.set(which, std::move(l)))
             {
                 HPX_ASSERT_DOESNT_OWN_LOCK(l);
-                {
-                    std::unique_lock<mutex_type> l(communicator_.mtx_);
-                    communicator_.invalidate_data(l);
-                }
 
-                // this is a one-shot object (generations counters are not
-                // supported), unregister ourselves (but only once)
-                hpx::unregister_with_basename(
-                    std::move(communicator_.name_), communicator_.site_)
-                    .get();
+                l = lock_type(communicator_.mtx_);
+                communicator_.invalidate_data(l);
             }
+
             return f;
         }
 
         template <typename Result, typename T>
-        void set(std::size_t which, T&& t)
+        Result set(std::size_t which, T&& t)
         {
             using arg_type = typename std::decay<T>::type;
             using mutex_type = typename Communicator::mutex_type;
+            using lock_type = std::unique_lock<mutex_type>;
 
-            std::unique_lock<mutex_type> l(communicator_.mtx_);
-            util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
+            auto this_ = this->shared_from_this();
+            auto on_ready = [this_ = std::move(this_)](
+                                shared_future<void>&& f) {
+                HPX_UNUSED(this_);
+                f.get();    // propagate any exceptions
+            };
+
+            lock_type l(communicator_.mtx_);
+            util::ignore_while_checking<lock_type> il(&l);
+
+            hpx::future<void> f = communicator_.gate_.get_shared_future(l).then(
+                hpx::launch::sync, std::move(on_ready));
 
             communicator_.gate_.synchronize(1, l);
 
-            communicator_.template access_data<arg_type>(l)[which] = t;
+            auto& data = communicator_.template access_data<arg_type>(l);
+            data[which] = std::forward<T>(t);
 
-            if (communicator_.gate_.set(which, l))
+            if (communicator_.gate_.set(which, std::move(l)))
             {
                 HPX_ASSERT_DOESNT_OWN_LOCK(l);
-                {
-                    std::unique_lock<mutex_type> l(communicator_.mtx_);
-                    communicator_.invalidate_data(l);
-                }
 
-                // this is a one-shot object (generations counters are not
-                // supported), unregister ourselves (but only once)
-                hpx::unregister_with_basename(
-                    std::move(communicator_.name_), communicator_.site_)
-                    .get();
+                l = lock_type(communicator_.mtx_);
+                communicator_.invalidate_data(l);
             }
+
+            return f;
         }
 
         Communicator& communicator_;
@@ -285,19 +289,19 @@ namespace hpx { namespace traits {
 namespace hpx { namespace lcos {
 
     ///////////////////////////////////////////////////////////////////////////
-    inline hpx::future<hpx::id_type> create_gatherer(char const* basename,
+    inline communicator create_gatherer(char const* basename,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
         return detail::create_communicator(
-            basename, num_sites, generation, this_site);
+            basename, num_sites, generation, this_site, root_site);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // destination site needs to be handled differently
     template <typename T>
-    hpx::future<std::vector<T>> gather_here(hpx::future<hpx::id_type>&& fid,
+    hpx::future<std::vector<T>> gather_here(communicator fid,
         hpx::future<T>&& result, std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
@@ -306,20 +310,20 @@ namespace hpx { namespace lcos {
         }
 
         auto gather_data =
-            [this_site](hpx::future<hpx::id_type>&& fid,
+            [this_site](communicator&& c,
                 hpx::future<T>&& local_result) -> hpx::future<std::vector<T>> {
             using action_type = typename detail::communicator_server::
                 template communication_get_action<
                     traits::communication::gather_tag,
                     hpx::future<std::vector<T>>, T>;
 
-            // make sure id is kept alive as long as the returned future
-            hpx::id_type id = fid.get();
-            auto result =
-                async(action_type(), id, this_site, local_result.get());
+            // make sure id is kept alive as long as the returned future,
+            // explicitly unwrap returned future
+            hpx::future<std::vector<T>> result =
+                async(action_type(), c, this_site, local_result.get());
 
             traits::detail::get_shared_state(result)->set_on_completed(
-                [id = std::move(id)]() { HPX_UNUSED(id); });
+                [client = std::move(c)]() { HPX_UNUSED(client); });
 
             return result;
         };
@@ -330,22 +334,12 @@ namespace hpx { namespace lcos {
 
     template <typename T>
     hpx::future<std::vector<T>> gather_here(char const* basename,
-        hpx::future<T> result, std::size_t num_sites = std::size_t(-1),
+        hpx::future<T>&& result, std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1))
     {
-        if (num_sites == std::size_t(-1))
-        {
-            num_sites = static_cast<std::size_t>(
-                agas::get_num_localities(hpx::launch::sync));
-        }
-        if (this_site == std::size_t(-1))
-        {
-            this_site = static_cast<std::size_t>(agas::get_locality_id());
-        }
-
-        return gather_here(
-            create_gatherer(basename, num_sites, generation, this_site),
+        return gather_here(create_gatherer(basename, num_sites, generation,
+                               this_site, this_site),
             std::move(result), this_site);
     }
 
@@ -353,7 +347,7 @@ namespace hpx { namespace lcos {
     // gather plain values
     template <typename T>
     hpx::future<std::vector<typename std::decay<T>::type>> gather_here(
-        hpx::future<hpx::id_type>&& fid, T&& local_result,
+        communicator fid, T&& local_result,
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
@@ -361,23 +355,23 @@ namespace hpx { namespace lcos {
             this_site = static_cast<std::size_t>(agas::get_locality_id());
         }
 
-        typedef typename std::decay<T>::type arg_type;
+        using arg_type = typename std::decay<T>::type;
 
         auto gather_data_direct =
-            [this_site](hpx::future<hpx::id_type>&& fid,
+            [this_site](communicator&& c,
                 T&& local_result) -> hpx::future<std::vector<arg_type>> {
             using action_type = typename detail::communicator_server::
                 template communication_get_action<
                     traits::communication::gather_tag,
                     hpx::future<std::vector<arg_type>>, arg_type>;
 
-            // make sure id is kept alive as long as the returned future
-            hpx::id_type id = fid.get();
-            auto result = async(
-                action_type(), id, this_site, std::forward<T>(local_result));
+            // make sure id is kept alive as long as the returned future,
+            // explicitly unwrap returned future
+            hpx::future<std::vector<arg_type>> result = async(
+                action_type(), c, this_site, std::forward<T>(local_result));
 
             traits::detail::get_shared_state(result)->set_on_completed(
-                [id = std::move(id)]() { HPX_UNUSED(id); });
+                [client = std::move(c)]() { HPX_UNUSED(client); });
 
             return result;
         };
@@ -393,24 +387,14 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1))
     {
-        if (num_sites == std::size_t(-1))
-        {
-            num_sites = static_cast<std::size_t>(
-                agas::get_num_localities(hpx::launch::sync));
-        }
-        if (this_site == std::size_t(-1))
-        {
-            this_site = static_cast<std::size_t>(agas::get_locality_id());
-        }
-
-        return gather_here(
-            create_gatherer(basename, num_sites, generation, this_site),
+        return gather_here(create_gatherer(basename, num_sites, generation,
+                               this_site, this_site),
             std::forward<T>(result), this_site);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    hpx::future<void> gather_there(hpx::future<hpx::id_type>&& fid,
+    hpx::future<void> gather_there(communicator fid,
         hpx::future<T>&& local_result, std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
@@ -419,19 +403,19 @@ namespace hpx { namespace lcos {
         }
 
         auto gather_there_data =
-            [this_site](hpx::future<hpx::id_type>&& fid,
+            [this_site](communicator&& c,
                 hpx::future<T>&& local_result) -> hpx::future<void> {
             using action_type = typename detail::communicator_server::
                 template communication_set_action<
-                    traits::communication::gather_tag, void, T>;
+                    traits::communication::gather_tag, hpx::future<void>, T>;
 
-            // make sure id is kept alive as long as the returned future
-            hpx::id_type id = fid.get();
-            auto result =
-                async(action_type(), id, this_site, local_result.get());
+            // make sure id is kept alive as long as the returned future,
+            // explicitly unwrap returned future
+            hpx::future<void> result =
+                async(action_type(), c, this_site, local_result.get());
 
             traits::detail::get_shared_state(result)->set_on_completed(
-                [id = std::move(id)]() { HPX_UNUSED(id); });
+                [client = std::move(c)]() { HPX_UNUSED(client); });
 
             return result;
         };
@@ -445,21 +429,17 @@ namespace hpx { namespace lcos {
         hpx::future<T>&& result, std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
-        std::string name(basename);
-        if (generation != std::size_t(-1))
-        {
-            name += std::to_string(generation) + "/";
-        }
-
-        return gather_there(hpx::find_from_basename(std::move(name), root_site),
+        HPX_ASSERT(this_site != root_site);
+        return gather_there(create_gatherer(basename, std::size_t(-1),
+                                generation, this_site, root_site),
             std::move(result), this_site);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // gather plain values
     template <typename T>
-    hpx::future<void> gather_there(hpx::future<hpx::id_type>&& fid,
-        T&& local_result, std::size_t this_site = std::size_t(-1))
+    hpx::future<void> gather_there(communicator fid, T&& local_result,
+        std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
         {
@@ -469,19 +449,20 @@ namespace hpx { namespace lcos {
         using arg_type = typename std::decay<T>::type;
 
         auto gather_there_data_direct =
-            [this_site](hpx::future<hpx::id_type>&& fid,
+            [this_site](communicator&& c,
                 arg_type&& local_result) -> hpx::future<void> {
             using action_type = typename detail::communicator_server::
                 template communication_set_action<
-                    traits::communication::gather_tag, void, arg_type>;
+                    traits::communication::gather_tag, hpx::future<void>,
+                    arg_type>;
 
-            // make sure id is kept alive as long as the returned future
-            hpx::id_type id = fid.get();
-            auto result = async(
-                action_type(), id, this_site, std::forward<T>(local_result));
+            // make sure id is kept alive as long as the returned future,
+            // explicitly unwrap returned future
+            hpx::future<void> result = async(
+                action_type(), c, this_site, std::forward<T>(local_result));
 
             traits::detail::get_shared_state(result)->set_on_completed(
-                [id = std::move(id)]() { HPX_UNUSED(id); });
+                [client = std::move(c)]() { HPX_UNUSED(client); });
 
             return result;
         };
@@ -495,13 +476,9 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
-        std::string name(basename);
-        if (generation != std::size_t(-1))
-        {
-            name += std::to_string(generation) + "/";
-        }
-
-        return gather_there(hpx::find_from_basename(std::move(name), root_site),
+        HPX_ASSERT(this_site != root_site);
+        return gather_there(create_gatherer(basename, std::size_t(-1),
+                                generation, this_site, root_site),
             std::forward<T>(local_result), this_site);
     }
 }}    // namespace hpx::lcos

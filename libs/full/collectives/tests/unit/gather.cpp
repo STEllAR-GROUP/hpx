@@ -22,10 +22,9 @@
 constexpr char const* gather_basename = "/test/gather/";
 constexpr char const* gather_direct_basename = "/test/gather_direct/";
 
-int hpx_main()
+void test_one_shot_use()
 {
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
-
     std::uint32_t this_locality = hpx::get_locality_id();
 
     // test functionality based on future<> of local result
@@ -74,6 +73,69 @@ int hpx_main()
             overall_result.get();
         }
     }
+}
+
+void test_multiple_use()
+{
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t this_locality = hpx::get_locality_id();
+
+    auto gather_client =
+        hpx::create_all_to_all(gather_basename, num_localities);
+
+    // test functionality based on future<> of local result
+    for (std::uint32_t i = 0; i != 10; ++i)
+    {
+        if (this_locality == 0)
+        {
+            hpx::future<std::vector<std::uint32_t>> overall_result =
+                hpx::gather_here(
+                    gather_client, hpx::make_ready_future(std::uint32_t(42)));
+
+            std::vector<std::uint32_t> sol = overall_result.get();
+            for (std::size_t j = 0; j != sol.size(); ++j)
+            {
+                HPX_TEST(j + 42 == sol[j]);
+            }
+        }
+        else
+        {
+            hpx::future<void> overall_result = hpx::gather_there(
+                gather_client, hpx::make_ready_future(this_locality + 42));
+            overall_result.get();
+        }
+    }
+
+    // test functionality based on immediate local result value
+    auto gather_direct_client =
+        hpx::create_all_to_all(gather_direct_basename, num_localities);
+
+    for (std::uint32_t i = 0; i != 10; ++i)
+    {
+        if (this_locality == 0)
+        {
+            hpx::future<std::vector<std::uint32_t>> overall_result =
+                hpx::gather_here(gather_direct_client, std::uint32_t(42));
+
+            std::vector<std::uint32_t> sol = overall_result.get();
+            for (std::size_t j = 0; j != sol.size(); ++j)
+            {
+                HPX_TEST(j + 42 == sol[j]);
+            }
+        }
+        else
+        {
+            hpx::future<void> overall_result =
+                hpx::gather_there(gather_direct_client, this_locality + 42);
+            overall_result.get();
+        }
+    }
+}
+
+int hpx_main()
+{
+    test_one_shot_use();
+    test_multiple_use();
 
     return hpx::finalize();
 }

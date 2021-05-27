@@ -15,6 +15,7 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/stub_base.hpp>
+#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_future.hpp>
@@ -24,6 +25,7 @@
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/naming_base/unmanaged.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/type_support/always_void.hpp>
 
@@ -35,6 +37,14 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Client objects are equivalent to futures
+namespace hpx { namespace lcos { namespace detail {
+
+    // Specialization for shared state of id_type, additionally (optionally)
+    // holds a registered name for the object it refers to.
+    template <>
+    struct future_data<id_type>;
+}}}    // namespace hpx::lcos::detail
+
 namespace hpx { namespace traits {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -105,6 +115,18 @@ namespace hpx { namespace traits {
             {
                 return f.shared_state_.get();
             }
+
+            template <typename Destination>
+            HPX_FORCEINLINE static void transfer_result(
+                Derived&& src, Destination& dest)
+            {
+                dest.set_value(src.get());
+
+                using future_data = lcos::detail::future_data<id_type>;
+                static_cast<future_data&>(dest).registered_name_ =
+                    std::move(static_cast<future_data*>(src.shared_state_.get())
+                                  ->registered_name_);
+            }
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -148,9 +170,6 @@ namespace hpx { namespace lcos { namespace detail {
         using result_type = id_type;
         using type = Derived;
     };
-}}}    // namespace hpx::lcos::detail
-
-namespace hpx { namespace lcos { namespace detail {
 
     // Specialization for shared state of id_type, additionally (optionally)
     // holds a registered name for the object it refers to.
@@ -199,18 +218,18 @@ namespace hpx { namespace lcos { namespace detail {
         {
             return registered_name_;
         }
-        void register_as(std::string const& name, bool manage_lifetime) override
+        bool register_as(std::string name, bool manage_lifetime) override
         {
             HPX_ASSERT(registered_name_.empty());    // call only once
-            registered_name_ = name;
-            if (manage_lifetime)
+            registered_name_ = std::move(name);
+            hpx::id_type id = *this->get_result();
+            if (!manage_lifetime)
             {
-                hpx::agas::register_name(
-                    launch::sync, name, *this->get_result());
+                id = hpx::naming::unmanaged(id);
             }
+            return hpx::agas::register_name(launch::sync, registered_name_, id);
         }
 
-    private:
         std::string registered_name_;
     };
 }}}    // namespace hpx::lcos::detail
@@ -506,7 +525,8 @@ namespace hpx { namespace components {
 
     public:
         template <typename F>
-        typename hpx::traits::future_then_result<Derived, F>::type then(F&& f)
+        typename hpx::traits::future_then_result<Derived, F>::type then(
+            launch l, F&& f)
         {
             using result_type =
                 typename hpx::traits::future_then_result<Derived,
@@ -527,24 +547,30 @@ namespace hpx { namespace components {
 
             shared_state_ptr p =
                 lcos::detail::make_continuation<continuation_result_type>(
-                    *static_cast<Derived const*>(this), launch::all,
-                    std::forward<F>(f));
+                    *static_cast<Derived const*>(this), l, std::forward<F>(f));
             return hpx::traits::future_access<future<result_type>>::create(
                 std::move(p));
         }
 
+        template <typename F>
+        typename hpx::traits::future_then_result<Derived, F>::type then(F&& f)
+        {
+            return then(launch::all, std::forward<F>(f));
+        }
+
     private:
         ///////////////////////////////////////////////////////////////////////
-        static void register_as_helper(client_base const& f,
-            std::string const& symbolic_name, bool manage_lifetime)
+        static bool register_as_helper(client_base const& f,
+            std::string symbolic_name, bool manage_lifetime)
         {
-            f.shared_state_->register_as(symbolic_name, manage_lifetime);
+            return f.shared_state_->register_as(
+                std::move(symbolic_name), manage_lifetime);
         }
 
     public:
         // Register our id with AGAS using the given name
-        future<void> register_as(
-            std::string const& symbolic_name, bool manage_lifetime = true)
+        future<bool> register_as(
+            std::string symbolic_name, bool manage_lifetime = true)
         {
             if (!shared_state_)
             {
@@ -552,14 +578,15 @@ namespace hpx { namespace components {
                     "this client_base has no valid shared state");
             }
 
-            typename hpx::traits::detail::shared_state_ptr<void>::type p =
-                lcos::detail::make_continuation<void>(
-                    *this, launch::sync, [=](client_base const& f) -> void {
+            typename hpx::traits::detail::shared_state_ptr<bool>::type p =
+                lcos::detail::make_continuation<bool>(*this, launch::sync,
+                    [=, symbolic_name = std::move(symbolic_name)](
+                        client_base const& f) mutable -> bool {
                         return register_as_helper(
-                            f, symbolic_name, manage_lifetime);
+                            f, std::move(symbolic_name), manage_lifetime);
                     });
 
-            return hpx::traits::future_access<future<void>>::create(
+            return hpx::traits::future_access<future<bool>>::create(
                 std::move(p));
         }
 
@@ -568,12 +595,6 @@ namespace hpx { namespace components {
         void connect_to(std::string const& symbolic_name)
         {
             *this = agas::on_symbol_namespace_event(symbolic_name, true);
-        }
-
-        // Make sure this instance does not manage the lifetime of the
-        // registered object anymore (obsolete).
-        HPX_DEPRECATED_V(1, 4, HPX_DEPRECATED_MSG) void reset_registered_name()
-        {
         }
 
         // Access registered name for the component

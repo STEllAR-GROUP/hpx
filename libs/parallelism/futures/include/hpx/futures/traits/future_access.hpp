@@ -167,6 +167,13 @@ namespace hpx { namespace traits {
         {
             return f.shared_state_.detach();
         }
+
+        template <typename Destination>
+        HPX_FORCEINLINE static void transfer_result(
+            lcos::future<R>&& src, Destination& dest)
+        {
+            dest.set_value(src.get());
+        }
     };
 
     template <typename R>
@@ -223,6 +230,13 @@ namespace hpx { namespace traits {
             detach_shared_state(lcos::shared_future<R> const& f)
         {
             return f.shared_state_.get();
+        }
+
+        template <typename Destination>
+        HPX_FORCEINLINE static void transfer_result(
+            lcos::shared_future<R>&& src, Destination& dest)
+        {
+            dest.set_value(src.get());
         }
     };
 

@@ -21,7 +21,7 @@
 constexpr char const* broadcast_basename = "/test/broadcast/";
 constexpr char const* broadcast_direct_basename = "/test/broadcast_direct/";
 
-int hpx_main()
+void test_one_shot_use()
 {
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
     HPX_TEST_LTE(std::uint32_t(2), num_localities);
@@ -64,6 +64,62 @@ int hpx_main()
             HPX_TEST_EQ(i + 42, result.get());
         }
     }
+}
+
+void test_multiple_use()
+{
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    HPX_TEST_LTE(std::uint32_t(2), num_localities);
+
+    auto broadcast_client =
+        hpx::create_all_to_all(broadcast_basename, num_localities);
+
+    // test functionality based on future<> of local result
+    for (std::uint32_t i = 0; i != 10; ++i)
+    {
+        if (hpx::get_locality_id() == 0)
+        {
+            hpx::future<std::uint32_t> result =
+                broadcast_to(broadcast_client, hpx::make_ready_future(i + 42));
+
+            HPX_TEST_EQ(i + 42, result.get());
+        }
+        else
+        {
+            hpx::future<std::uint32_t> result =
+                hpx::broadcast_from<std::uint32_t>(broadcast_client);
+
+            HPX_TEST_EQ(i + 42, result.get());
+        }
+    }
+
+    auto broadcast_direct_client =
+        hpx::create_all_to_all(broadcast_direct_basename, num_localities);
+
+    // test functionality based on immediate local result value
+    for (std::uint32_t i = 0; i != 10; ++i)
+    {
+        if (hpx::get_locality_id() == 0)
+        {
+            hpx::future<std::uint32_t> result =
+                hpx::broadcast_to(broadcast_direct_client, i + 42);
+
+            HPX_TEST_EQ(i + 42, result.get());
+        }
+        else
+        {
+            hpx::future<std::uint32_t> result =
+                hpx::broadcast_from<std::uint32_t>(broadcast_direct_client);
+
+            HPX_TEST_EQ(i + 42, result.get());
+        }
+    }
+}
+
+int hpx_main()
+{
+    test_one_shot_use();
+    test_multiple_use();
 
     return hpx::finalize();
 }

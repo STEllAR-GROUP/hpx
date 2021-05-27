@@ -22,7 +22,7 @@
 constexpr char const* scatter_basename = "/test/scatter/";
 constexpr char const* scatter_direct_basename = "/test/scatter_direct/";
 
-int hpx_main()
+void test_one_shot_use()
 {
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
     HPX_TEST_LTE(std::uint32_t(2), num_localities);
@@ -73,6 +73,70 @@ int hpx_main()
             HPX_TEST_EQ(i + 42 + this_locality, result.get());
         }
     }
+}
+
+void test_multiple_use()
+{
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    HPX_TEST_LTE(std::uint32_t(2), num_localities);
+
+    std::uint32_t this_locality = hpx::get_locality_id();
+
+    auto scatter_client =
+        hpx::create_all_to_all(scatter_basename, num_localities);
+
+    // test functionality based on future<> of local result
+    for (std::uint32_t i = 0; i != 10; ++i)
+    {
+        if (this_locality == 0)
+        {
+            std::vector<std::uint32_t> data(num_localities);
+            std::iota(data.begin(), data.end(), 42 + i);
+
+            hpx::future<std::uint32_t> result = hpx::scatter_to(
+                scatter_client, hpx::make_ready_future(std::move(data)));
+
+            HPX_TEST_EQ(i + 42 + this_locality, result.get());
+        }
+        else
+        {
+            hpx::future<std::uint32_t> result =
+                hpx::scatter_from<std::uint32_t>(scatter_client);
+
+            HPX_TEST_EQ(i + 42 + this_locality, result.get());
+        }
+    }
+
+    auto scatter_direct_client =
+        hpx::create_all_to_all(scatter_direct_basename, num_localities);
+
+    // test functionality based on immediate local result value
+    for (std::uint32_t i = 0; i != 10; ++i)
+    {
+        if (this_locality == 0)
+        {
+            std::vector<std::uint32_t> data(num_localities);
+            std::iota(data.begin(), data.end(), 42 + i);
+
+            hpx::future<std::uint32_t> result =
+                hpx::scatter_to(scatter_direct_client, std::move(data));
+
+            HPX_TEST_EQ(i + 42 + this_locality, result.get());
+        }
+        else
+        {
+            hpx::future<std::uint32_t> result =
+                hpx::scatter_from<std::uint32_t>(scatter_direct_client);
+
+            HPX_TEST_EQ(i + 42 + this_locality, result.get());
+        }
+    }
+}
+
+int hpx_main()
+{
+    test_one_shot_use();
+    test_multiple_use();
 
     return hpx::finalize();
 }

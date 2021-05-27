@@ -293,8 +293,7 @@ namespace hpx { namespace lcos { namespace detail {
                 "future_data_base::get_registered_name",
                 "this future does not support name registration");
         }
-        virtual void register_as(
-            std::string const& /*name*/, bool /*manage_lifetime*/)
+        virtual bool register_as(std::string /*name*/, bool /*manage_lifetime*/)
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "future_data_base::set_registered_name",

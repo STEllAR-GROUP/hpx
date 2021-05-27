@@ -13,7 +13,7 @@
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/components/basename_registration.hpp>
+#include <hpx/components/client.hpp>
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/functional/bind_back.hpp>
@@ -28,6 +28,7 @@
 #include <hpx/thread_support/assert_owns_lock.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -40,7 +41,6 @@ namespace hpx { namespace traits {
     // This type can be specialized for a particular collective operation
     template <typename Communicator, typename Operation>
     struct communication_operation;
-
 }}    // namespace hpx::traits
 
 namespace hpx { namespace lcos { namespace detail {
@@ -56,15 +56,15 @@ namespace hpx { namespace lcos { namespace detail {
           : num_values_(0)
           , num_sites_(0)
           , site_(0)
+          , needs_initialization_(false)
         {
             HPX_ASSERT(false);    // shouldn't ever be called
         }
 
-        communicator_server(std::size_t num_sites, std::string const& name,
+        communicator_server(std::size_t num_sites,
             std::size_t site, std::size_t num_values)
           : data_()
           , gate_(num_sites)
-          , name_(name)
           , num_values_(num_values)
           , num_sites_(num_sites)
           , site_(site)
@@ -152,7 +152,6 @@ namespace hpx { namespace lcos { namespace detail {
         mutex_type mtx_;
         hpx::unique_any_nonser data_;
         lcos::local::and_gate gate_;
-        std::string name_;
         std::size_t const num_values_;
         std::size_t const num_sites_;
         std::size_t const site_;
@@ -160,14 +159,24 @@ namespace hpx { namespace lcos { namespace detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT hpx::future<hpx::id_type> register_communicator_name(
-        hpx::future<hpx::id_type>&& f, std::string basename, std::size_t site);
-
-    HPX_EXPORT hpx::future<hpx::id_type> create_communicator(
-        char const* basename, std::size_t num_sites = std::size_t(-1),
+    HPX_EXPORT hpx::components::client<detail::communicator_server>
+    create_communicator(char const* basename,
+        std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0,
         std::size_t num_values = std::size_t(-1));
 }}}    // namespace hpx::lcos::detail
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace lcos {
+
+    using communicator = hpx::components::client<detail::communicator_server>;
+}}    // namespace hpx::lcos
+
+////////////////////////////////////////////////////////////////////////////////
+namespace hpx {
+
+    using lcos::communicator;
+}    // namespace hpx
 
 #endif    // COMPUTE_HOST_CODE

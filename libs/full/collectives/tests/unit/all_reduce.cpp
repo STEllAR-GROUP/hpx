@@ -21,7 +21,7 @@
 constexpr char const* all_reduce_basename = "/test/all_reduce/";
 constexpr char const* all_reduce_direct_basename = "/test/all_reduce_direct/";
 
-int hpx_main()
+void test_one_shot_use()
 {
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
 
@@ -59,6 +59,57 @@ int hpx_main()
         }
         HPX_TEST_EQ(sum, overall_result.get());
     }
+}
+
+void test_multiple_use()
+{
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+
+    auto all_reduce_client =
+        hpx::create_all_reduce(all_reduce_basename, num_localities);
+
+    // test functionality based on future<> of local result
+    for (int i = 0; i != 10; ++i)
+    {
+        hpx::future<std::uint32_t> value =
+            hpx::make_ready_future(hpx::get_locality_id());
+
+        hpx::future<std::uint32_t> overall_result = hpx::all_reduce(
+            all_reduce_client, std::move(value), std::plus<std::uint32_t>{});
+
+        std::uint32_t sum = 0;
+        for (std::uint32_t j = 0; j != num_localities; ++j)
+        {
+            sum += j;
+        }
+        HPX_TEST_EQ(sum, overall_result.get());
+    }
+
+    auto all_reduce_direct_client =
+        hpx::create_all_reduce(all_reduce_direct_basename, num_localities);
+
+    // test functionality based on immediate local result value
+    for (int i = 0; i != 10; ++i)
+    {
+        std::uint32_t value = hpx::get_locality_id();
+
+        hpx::future<std::uint32_t> overall_result =
+            hpx::all_reduce(all_reduce_direct_client, value,
+                std::plus<std::uint32_t>{});
+
+        std::uint32_t sum = 0;
+        for (std::uint32_t j = 0; j != num_localities; ++j)
+        {
+            sum += j;
+        }
+        HPX_TEST_EQ(sum, overall_result.get());
+    }
+}
+
+int hpx_main()
+{
+    test_one_shot_use();
+    test_multiple_use();
 
     return hpx::finalize();
 }

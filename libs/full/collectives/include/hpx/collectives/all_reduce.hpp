@@ -132,7 +132,7 @@ namespace hpx { namespace traits {
       : std::enable_shared_from_this<communication_operation<Communicator,
             communication::all_reduce_tag>>
     {
-        communication_operation(Communicator& comm)
+        explicit communication_operation(Communicator& comm)
           : communicator_(comm)
         {
         }
@@ -148,6 +148,7 @@ namespace hpx { namespace traits {
             auto on_ready =
                 [this_ = std::move(this_), op = std::forward<F>(op)](
                     hpx::shared_future<void> f) mutable -> arg_type {
+                HPX_UNUSED(this_);
                 f.get();    // propagate any exceptions
 
                 auto& communicator = this_->communicator_;
@@ -158,8 +159,7 @@ namespace hpx { namespace traits {
                 auto& data = communicator.template access_data<arg_type>(l);
 
                 auto it = data.begin();
-                return hpx::reduce(
-                    hpx::execution::par, ++it, data.end(), *data.begin(), op);
+                return hpx::reduce(++it, data.end(), *data.begin(), op);
             };
 
             lock_type l(communicator_.mtx_);
@@ -174,20 +174,14 @@ namespace hpx { namespace traits {
             auto& data = communicator_.template access_data<arg_type>(l);
             data[which] = std::forward<T>(t);
 
-            if (communicator_.gate_.set(which, l))
+            if (communicator_.gate_.set(which, std::move(l)))
             {
                 HPX_ASSERT_DOESNT_OWN_LOCK(l);
-                {
-                    lock_type l(communicator_.mtx_);
-                    communicator_.invalidate_data(l);
-                }
 
-                // this is a one-shot object (generations counters are not
-                // supported), unregister ourselves (but only once)
-                hpx::unregister_with_basename(
-                    std::move(communicator_.name_), communicator_.site_)
-                    .get();
+                l = lock_type(communicator_.mtx_);
+                communicator_.invalidate_data(l);
             }
+
             return f;
         }
 
@@ -198,21 +192,20 @@ namespace hpx { namespace traits {
 namespace hpx { namespace lcos {
 
     ///////////////////////////////////////////////////////////////////////////
-    inline hpx::future<hpx::id_type> create_all_reduce(char const* basename,
+    inline communicator create_all_reduce(char const* basename,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
         return detail::create_communicator(
-            basename, num_sites, generation, this_site);
+            basename, num_sites, generation, this_site, root_site);
     }
 
     ////////////////////////////////////////////////////////////////////////////
     // destination site needs to be handled differently
     template <typename T, typename F>
-    hpx::future<T> all_reduce(hpx::future<hpx::id_type>&& fid,
-        hpx::future<T>&& local_result, F&& op,
-        std::size_t this_site = std::size_t(-1))
+    hpx::future<T> all_reduce(communicator fid, hpx::future<T>&& local_result,
+        F&& op, std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
         {
@@ -220,7 +213,7 @@ namespace hpx { namespace lcos {
         }
 
         auto all_reduce_data =
-            [op = std::forward<F>(op), this_site](hpx::future<hpx::id_type>&& f,
+            [op = std::forward<F>(op), this_site](communicator&& c,
                 hpx::future<T>&& local_result) mutable -> hpx::future<T> {
             using func_type = typename std::decay<F>::type;
             using action_type = typename detail::communicator_server::
@@ -228,13 +221,13 @@ namespace hpx { namespace lcos {
                     traits::communication::all_reduce_tag, hpx::future<T>, T,
                     func_type>;
 
-            // make sure id is kept alive as long as the returned future
-            hpx::id_type id = f.get();
-            hpx::future<T> result = async(action_type(), id, this_site,
+            // make sure id is kept alive as long as the returned future,
+            // explicitly unwrap returned future
+            hpx::future<T> result = async(action_type(), c, this_site,
                 local_result.get(), std::forward<F>(op));
 
             traits::detail::get_shared_state(result)->set_on_completed(
-                [id = std::move(id)]() { HPX_UNUSED(id); });
+                [client = std::move(c)]() { HPX_UNUSED(client); });
 
             return result;
         };
@@ -250,39 +243,16 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
-        if (num_sites == std::size_t(-1))
-        {
-            num_sites = static_cast<std::size_t>(
-                agas::get_num_localities(hpx::launch::sync));
-        }
-        if (this_site == std::size_t(-1))
-        {
-            this_site = static_cast<std::size_t>(agas::get_locality_id());
-        }
-
-        if (this_site == root_site)
-        {
-            return all_reduce(
-                create_all_reduce(basename, num_sites, generation, root_site),
-                std::move(local_result), std::forward<F>(op), this_site);
-        }
-
-        std::string name(basename);
-        if (generation != std::size_t(-1))
-        {
-            name += std::to_string(generation) + "/";
-        }
-
-        return all_reduce(hpx::find_from_basename(std::move(name), root_site),
+        return all_reduce(create_all_reduce(basename, num_sites, generation,
+                              this_site, root_site),
             std::move(local_result), std::forward<F>(op), this_site);
     }
 
     ////////////////////////////////////////////////////////////////////////////
     // all_reduce plain values
     template <typename T, typename F>
-    hpx::future<typename std::decay<T>::type> all_reduce(
-        hpx::future<hpx::id_type>&& fid, T&& local_result, F&& op,
-        std::size_t this_site = std::size_t(-1))
+    hpx::future<typename std::decay<T>::type> all_reduce(communicator fid,
+        T&& local_result, F&& op, std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
         {
@@ -294,21 +264,20 @@ namespace hpx { namespace lcos {
         auto all_reduce_data_direct =
             [op = std::forward<F>(op),
                 local_result = std::forward<T>(local_result),
-                this_site](hpx::future<hpx::id_type>&& f) mutable
-            -> hpx::future<arg_type> {
+                this_site](communicator&& c) mutable -> hpx::future<arg_type> {
             using func_type = typename std::decay<F>::type;
             using action_type = typename detail::communicator_server::
                 template communication_get_action<
                     traits::communication::all_reduce_tag,
                     hpx::future<arg_type>, arg_type, func_type>;
 
-            // make sure id is kept alive as long as the returned future
-            hpx::id_type id = f.get();
-            hpx::future<arg_type> result = async(action_type(), id, this_site,
+            // make sure id is kept alive as long as the returned future,
+            // explicitly unwrap returned future
+            hpx::future<arg_type> result = async(action_type(), c, this_site,
                 std::forward<T>(local_result), std::forward<F>(op));
 
             traits::detail::get_shared_state(result)->set_on_completed(
-                [id = std::move(id)]() { HPX_UNUSED(id); });
+                [client = std::move(c)]() { HPX_UNUSED(client); });
 
             return result;
         };
@@ -322,28 +291,8 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
-        if (num_sites == std::size_t(-1))
-        {
-            num_sites = static_cast<std::size_t>(
-                agas::get_num_localities(hpx::launch::sync));
-        }
-        if (this_site == std::size_t(-1))
-        {
-            this_site = static_cast<std::size_t>(agas::get_locality_id());
-        }
-
-        if (this_site == root_site)
-        {
-            return all_reduce(
-                create_all_reduce(basename, num_sites, generation, root_site),
-                std::forward<T>(local_result), std::forward<F>(op), this_site);
-        }
-
-        std::string name(basename);
-        if (generation != std::size_t(-1))
-            name += std::to_string(generation) + "/";
-
-        return all_reduce(hpx::find_from_basename(std::move(name), root_site),
+        return all_reduce(create_all_reduce(basename, num_sites, generation,
+                              this_site, root_site),
             std::forward<T>(local_result), std::forward<F>(op), this_site);
     }
 }}    // namespace hpx::lcos
