@@ -8,19 +8,17 @@
 
 #pragma once
 
-#include <cstdint>
-
-#include <time.h>
+#include <cuda.h>
 
 #include <hpx/config.hpp>
 
 namespace hpx { namespace util { namespace hardware {
 
-    inline std::uint64_t timestamp()
+    HPX_HOST_DEVICE std::uint64_t timestamp()
     {
-        struct timespec res;
-        clock_gettime(CLOCK_MONOTONIC, &res);
-        return 1000 * res.tv_sec + res.tv_nsec / 1000000;
+        std::uint64_t cur;
+        asm volatile("mov.u64 %0, %%globaltimer;" : "=l"(cur));
+        return cur;
     }
 
 }}}    // namespace hpx::util::hardware

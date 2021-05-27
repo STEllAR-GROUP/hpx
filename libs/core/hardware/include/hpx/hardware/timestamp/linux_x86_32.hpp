@@ -14,13 +14,8 @@
 namespace hpx { namespace util { namespace hardware {
 
     // clang-format off
-    HPX_HOST_DEVICE inline std::uint64_t timestamp()
+    inline std::uint64_t timestamp()
     {
-#if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
-        std::uint64_t cur;
-        asm volatile("mov.u64 %0, %%globaltimer;" : "=l"(cur));
-        return cur;
-#else
         std::uint64_t r = 0;
 
         #if defined(HPX_HAVE_RDTSCP)
@@ -42,7 +37,6 @@ namespace hpx { namespace util { namespace hardware {
         #endif
 
         return r;
-#endif
     }
     // clang-format on
 
