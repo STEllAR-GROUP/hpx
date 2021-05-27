@@ -25,6 +25,7 @@ set(collectives_headers
     hpx/collectives/gather.hpp
     hpx/collectives/latch.hpp
     hpx/collectives/reduce.hpp
+    hpx/collectives/reduce_direct.hpp
     hpx/collectives/scatter.hpp
     hpx/collectives/spmd_block.hpp
     hpx/collectives/detail/barrier_node.hpp

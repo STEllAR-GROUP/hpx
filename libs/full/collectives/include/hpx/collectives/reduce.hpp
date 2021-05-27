@@ -1,434 +1,605 @@
-//  Copyright (c) 2013 Hartmut Kaiser
-//  Copyright (c) 2013 Thomas Heller
+//  Copyright (c) 2019-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file lcos/reduce.hpp
+/// \file reduce.hpp
 
 #pragma once
 
 #if defined(DOXYGEN)
+// clang-format off
 namespace hpx { namespace lcos {
 
-    /// \brief Perform a distributed reduction operation
+    /// Create a new communicator object usable with reduce_here and reduce_there
     ///
-    /// The function hpx::lcos::reduce performs a distributed reduction
-    /// operation over results returned from action invocations on a given set
-    /// of global identifiers. The action can be either a plain action (in
-    /// which case the global identifiers have to refer to localities) or a
-    /// component action (in which case the global identifiers have to refer
-    /// to instances of a component type which exposes the action.
+    /// This functions creates a new communicator object that can be called in
+    /// order to pre-allocate a communicator object usable with multiple
+    /// invocations of \a reduce_here and \a reduce_there.
     ///
-    /// \param ids       [in] A list of global identifiers identifying the
-    ///                  target objects for which the given action will be
-    ///                  invoked.
-    /// \param reduce_op [in] A binary function expecting two results as
-    ///                  returned from the action invocations. The function
-    ///                  (or function object) is expected to return the result
-    ///                  of the reduction operation performed on its arguments.
-    /// \param argN      [in] Any number of arbitrary arguments (passed by
-    ///                  by const reference) which will be forwarded to the
-    ///                  action invocation.
+    /// \param  basename    The base name identifying the all_reduce operation
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_reduce operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_reduce operation on the
+    ///                     given base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \params root_site   The site that is responsible for creating the
+    ///                     all_reduce support object. This value is optional
+    ///                     and defaults to '0' (zero).
     ///
-    /// \returns         This function returns a future representing the result
-    ///                  of the overall reduction operation.
+    /// \returns    This function returns a new communicator object usable
+    ///             with reduce_here and reduce_there
     ///
-    template <typename Action, typename ReduceOp, typename ArgN, ...>
-    hpx::future<decltype(Action(hpx::id_type, ArgN, ...))> reduce(
-        std::vector<hpx::id_type> const& ids, ReduceOp&& reduce_op, ArgN argN,
-        ...);
+    communicator create_reducer(char const* basename,
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
 
-    /// \brief Perform a distributed reduction operation
+    /// Reduce a set of values from different call sites
     ///
-    /// The function hpx::lcos::reduce_with_index performs a distributed reduction
-    /// operation over results returned from action invocations on a given set
-    /// of global identifiers. The action can be either plain action (in
-    /// which case the global identifiers have to refer to localities) or a
-    /// component action (in which case the global identifiers have to refer
-    /// to instances of a component type which exposes the action.
+    /// This function receives a set of values that are the result of applying
+    /// a given operator on values supplied from all call sites operating on
+    /// the given base name.
     ///
-    /// The function passes the index of the global identifier in the given
-    /// list of identifiers as the last argument to the action.
+    /// \param  basename    The base name identifying the all_reduce operation
+    /// \param  local_result A future referring to the value to reduce onall
+    ///                     participating sites from this call site.
+    /// \param  op          Reduction operation to apply to all values supplied
+    ///                     from all participating sites
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_reduce operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_reduce operation on the
+    ///                     given base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \params root_site   The site that is responsible for creating the
+    ///                     all_reduce support object. This value is optional
+    ///                     and defaults to '0' (zero).
     ///
-    /// \param ids       [in] A list of global identifiers identifying the
-    ///                  target objects for which the given action will be
-    ///                  invoked.
-    /// \param reduce_op [in] A binary function expecting two results as
-    ///                  returned from the action invocations. The function
-    ///                  (or function object) is expected to return the result
-    ///                  of the reduction operation performed on its arguments.
-    /// \param argN      [in] Any number of arbitrary arguments (passed by
-    ///                  by const reference) which will be forwarded to the
-    ///                  action invocation.
+    /// \returns    This function returns a future holding a value calculated
+    ///             based on the values send by all participating sites. It will
+    ///             become ready once the all_reduce operation has been completed.
     ///
-    /// \returns         This function returns a future representing the result
-    ///                  of the overall reduction operation.
+    template <typename T, typename F>
+    hpx::future<T> reduce_here(char const* basename, hpx::future<T> local_result,
+        F&& op, std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+
+    /// Reduce a set of values from different call sites
     ///
-    template <typename Action, typename ReduceOp, typename ArgN, ...>
-    hpx::future<decltype(Action(hpx::id_type, ArgN, ..., std::size_t))>
-    reduce_with_index(std::vector<hpx::id_type> const& ids,
-        ReduceOp&& reduce_op, ArgN argN, ...);
+    /// This function receives a set of values that are the result of applying
+    /// a given operator on values supplied from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  local_result A future referring to the value to reduce on the
+    ///                     central reduction point from this call site.
+    /// \param  op          Reduction operation to apply to all values supplied
+    ///                     from all participating sites
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a future holding a value calculated
+    ///             based on the values send by all participating sites. It will
+    ///             become ready once the all_reduce operation has been completed.
+    ///
+    template <typename T, typename F>
+    hpx::future<T> reduce_here(communicator comm, hpx::future<T> local_result,
+        F&& op, std::size_t this_site = std::size_t(-1));
+
+    /// Reduce a given value at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central reduce
+    /// site (where the corresponding \a reduce_here is executed)
+    ///
+    /// \param  basename    The base name identifying the reduction operation
+    /// \param  result      A future referring to the value to reduce on the
+    ///                     central reduction point from this call site.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the reduction operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the reduction operation on the given
+    ///                     base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param root_site    The sequence number of the central reduction point
+    ///                     (usually the locality id). This value is optional
+    ///                     and defaults to 0.
+    ///
+    /// \returns    This function returns a future<void>. It will become ready
+    ///             once the reduction operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<void> reduce_there(char const* basename, hpx::future<T> result,
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1),
+        std::size_t root_site = 0);
+
+    /// Reduce a given value at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central reduce
+    /// site (where the corresponding \a reduce_here is executed)
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  local_result A future referring to the value to reduce on the
+    ///                     central reduction point from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a future holding a value calculated
+    ///             based on the values send by all participating sites. It will
+    ///             become ready once the all_reduce operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<void> reduce_there(communicator comm, hpx::future<T> local_result,
+        std::size_t this_site = std::size_t(-1));
+
+    /// Reduce a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  basename    The base name identifying the all_reduce operation
+    /// \param  local_result A value to reduce on the central reduction point
+    ///                     from this call site.
+    /// \param  op          Reduction operation to apply to all values supplied
+    ///                     from all participating sites
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_reduce operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_reduce operation on the
+    ///                     given base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \params root_site   The site that is responsible for creating the
+    ///                     all_reduce support object. This value is optional
+    ///                     and defaults to '0' (zero).
+    ///
+    /// \note       Each all_reduce operation has to be accompanied with a unique
+    ///             usage of the \a HPX_REGISTER_ALLREDUCE macro to define the
+    ///             necessary internal facilities used by \a all_reduce.
+    ///
+    /// \returns    This function returns a future holding a vector with all
+    ///             values send by all participating sites. It will become
+    ///             ready once the all_reduce operation has been completed.
+    ///
+    template <typename T, typename F>
+    hpx::future<std::decay_t<T>> reduce_here(char const* basename, T&& result,
+        F&& op, std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+
+    /// Reduce a set of values from different call sites
+    ///
+    /// This function receives a set of values that are the result of applying
+    /// a given operator on values supplied from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  local_result A value to reduce on the root_site from this call site.
+    /// \param  op          Reduction operation to apply to all values supplied
+    ///                     from all participating sites
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a future holding a value calculated
+    ///             based on the values send by all participating sites. It will
+    ///             become ready once the all_reduce operation has been completed.
+    ///
+    template <typename T, typename F>
+    hpx::future<decay_t<T>> reduce_here(communicator comm, T&& local_result,
+        F&& op, std::size_t this_site = std::size_t(-1));
+
+    /// Reduce a given value at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central reduce
+    /// site (where the corresponding \a reduce_here is executed)
+    ///
+    /// \param  basename    The base name identifying the reduction operation
+    /// \param  result      A future referring to the value to transmit to the
+    ///                     central reduction point from this call site.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the reduction operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the reduction operation on the given
+    ///                     base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param root_site    The sequence number of the central reduction point
+    ///                     (usually the locality id). This value is optional
+    ///                     and defaults to 0.
+    ///
+    /// \returns    This function returns a future<void>. It will become ready
+    ///             once the reduction operation has been completed.
+    ///
+    template <typename T, typename F>
+    hpx::future<void> reduce_there(char const* basename, T&& result,
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1),
+        std::size_t root_site = 0);
+
+    /// Reduce a given value at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central reduce
+    /// site (where the corresponding \a reduce_here is executed)
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  local_result A value to reduce on the central reduction point
+    ///                     from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a future holding a value calculated
+    ///             based on the values send by all participating sites. It will
+    ///             become ready once the all_reduce operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<void> reduce_there(communicator comm, T&& local_result,
+        std::size_t this_site = std::size_t(-1));
 }}    // namespace hpx::lcos
+
+// clang-format on
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions_base/actions_base_support.hpp>
-#include <hpx/actions_base/traits/extract_action.hpp>
-#include <hpx/assert.hpp>
-#include <hpx/async_colocated/async_colocated.hpp>
-#include <hpx/async_combinators/when_all.hpp>
-#include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/datastructures/tuple.hpp>
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+
+#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/async_distributed/async.hpp>
+#include <hpx/async_local/dataflow.hpp>
+#include <hpx/collectives/detail/communicator.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
-#include <hpx/serialization/vector.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/util/calculate_fanout.hpp>
+#include <hpx/parallel/algorithms/reduce.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
+#include <memory>
+#include <mutex>
+#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-#if !defined(HPX_REDUCE_FANOUT)
-#define HPX_REDUCE_FANOUT 16
-#endif
+namespace hpx { namespace traits {
+
+    namespace communication {
+        struct reduce_tag;
+    }    // namespace communication
+
+    ///////////////////////////////////////////////////////////////////////////
+    // support for all_reduce
+    template <typename Communicator>
+    struct communication_operation<Communicator, communication::reduce_tag>
+      : std::enable_shared_from_this<
+            communication_operation<Communicator, communication::reduce_tag>>
+    {
+        explicit communication_operation(Communicator& comm)
+          : communicator_(comm)
+        {
+        }
+
+        template <typename Result, typename T, typename F>
+        Result get(std::size_t which, T&& t, F&& op)
+        {
+            using arg_type = std::decay_t<T>;
+            using mutex_type = typename Communicator::mutex_type;
+            using lock_type = std::unique_lock<mutex_type>;
+
+            auto this_ = this->shared_from_this();
+            auto on_ready =
+                [this_ = std::move(this_), op = std::forward<F>(op)](
+                    hpx::shared_future<void> f) mutable -> arg_type {
+                HPX_UNUSED(this_);
+                f.get();    // propagate any exceptions
+
+                auto& communicator = this_->communicator_;
+
+                lock_type l(communicator.mtx_);
+                util::ignore_while_checking<lock_type> il(&l);
+
+                auto& data = communicator.template access_data<arg_type>(l);
+
+                auto it = data.begin();
+                return hpx::reduce(++it, data.end(), *data.begin(), op);
+            };
+
+            lock_type l(communicator_.mtx_);
+            util::ignore_while_checking<lock_type> il(&l);
+
+            hpx::future<arg_type> f =
+                communicator_.gate_.get_shared_future(l).then(
+                    hpx::launch::sync, std::move(on_ready));
+
+            communicator_.gate_.synchronize(1, l);
+
+            auto& data = communicator_.template access_data<arg_type>(l);
+            data[which] = std::forward<T>(t);
+
+            if (communicator_.gate_.set(which, std::move(l)))
+            {
+                HPX_ASSERT_DOESNT_OWN_LOCK(l);
+
+                l = lock_type(communicator_.mtx_);
+                communicator_.invalidate_data(l);
+            }
+
+            return f;
+        }
+
+        template <typename Result, typename T>
+        Result set(std::size_t which, T&& t)
+        {
+            using arg_type = std::decay_t<T>;
+            using mutex_type = typename Communicator::mutex_type;
+            using lock_type = std::unique_lock<mutex_type>;
+
+            auto this_ = this->shared_from_this();
+            auto on_ready = [this_ = std::move(this_)](
+                                shared_future<void>&& f) {
+                HPX_UNUSED(this_);
+                f.get();    // propagate any exceptions
+            };
+
+            lock_type l(communicator_.mtx_);
+            util::ignore_while_checking<lock_type> il(&l);
+
+            hpx::future<void> f = communicator_.gate_.get_shared_future(l).then(
+                hpx::launch::sync, std::move(on_ready));
+
+            communicator_.gate_.synchronize(1, l);
+
+            auto& data = communicator_.template access_data<arg_type>(l);
+            data[which] = std::forward<T>(t);
+
+            if (communicator_.gate_.set(which, std::move(l)))
+            {
+                HPX_ASSERT_DOESNT_OWN_LOCK(l);
+
+                l = lock_type(communicator_.mtx_);
+                communicator_.invalidate_data(l);
+            }
+
+            return f;
+        }
+
+        Communicator& communicator_;
+    };
+}}    // namespace hpx::traits
 
 namespace hpx { namespace lcos {
 
-    namespace detail {
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action>
-        struct reduce_with_index
-        {
-            typedef typename Action::arguments_type arguments_type;
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action>
-        struct reduce_result
-          : traits::promise_local_result<typename hpx::traits::extract_action<
-                Action>::remote_result_type>
-        {
-        };
-
-        template <typename Action>
-        struct reduce_result<reduce_with_index<Action>> : reduce_result<Action>
-        {
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename ReduceOp, typename... Ts>
-        typename reduce_result<Action>::type reduce_impl(Action const& act,
-            std::vector<hpx::id_type> const& ids, ReduceOp&& reduce_op,
-            std::size_t global_idx, Ts const&... vs);
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename Futures, typename... Ts>
-        void reduce_invoke(Action, Futures& futures, hpx::id_type const& id,
-            std::size_t, Ts const&... vs)
-        {
-            futures.push_back(hpx::async<Action>(id, vs...));
-        }
-
-        template <typename Action, typename Futures, typename... Ts>
-        void reduce_invoke(reduce_with_index<Action>, Futures& futures,
-            hpx::id_type const& id, std::size_t global_idx, Ts const&... vs)
-        {
-            futures.push_back(hpx::async<Action>(id, vs..., global_idx));
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename ReduceOp, typename... Ts>
-        struct reduce_invoker
-        {
-            //static hpx::future<typename reduce_result<Action>::type>
-            static typename reduce_result<Action>::type call(Action const& act,
-                std::vector<hpx::id_type> const& ids, ReduceOp const& reduce_op,
-                std::size_t global_idx, Ts const&... vs)
-            {
-                return reduce_impl(act, ids, reduce_op, global_idx, vs...);
-            }
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename Is>
-        struct make_reduce_action_impl;
-
-        template <typename Action, std::size_t... Is>
-        struct make_reduce_action_impl<Action, util::index_pack<Is...>>
-        {
-            typedef typename reduce_result<Action>::type action_result;
-
-            template <typename ReduceOp>
-            struct reduce_invoker_helper
-            {
-                typedef typename std::decay<ReduceOp>::type reduce_op_type;
-
-                typedef detail::reduce_invoker<Action, reduce_op_type,
-                    typename hpx::tuple_element<Is,
-                        typename Action::arguments_type>::type...>
-                    reduce_invoker_type;
-
-                typedef typename HPX_MAKE_ACTION(
-                    reduce_invoker_type::call)::type type;
-            };
-        };
-
-        template <typename Action>
-        struct make_reduce_action
-          : make_reduce_action_impl<Action,
-                typename util::make_index_pack<Action::arity>::type>
-        {
-        };
-
-        template <typename Action>
-        struct make_reduce_action<reduce_with_index<Action>>
-          : make_reduce_action_impl<reduce_with_index<Action>,
-                typename util::make_index_pack<Action::arity - 1>::type>
-        {
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Result, typename ReduceOp>
-        struct perform_reduction
-        {
-            perform_reduction(ReduceOp const& reduce_op)
-              : reduce_op_(reduce_op)
-            {
-            }
-
-            Result operator()(
-                hpx::future<std::vector<hpx::future<Result>>> r) const
-            {
-                std::vector<hpx::future<Result>> fres = std::move(r.get());
-
-                HPX_ASSERT(!fres.empty());
-
-                if (fres.size() == 1)
-                    return fres[0].get();
-
-                Result res = reduce_op_(fres[0].get(), fres[1].get());
-                for (std::size_t i = 2; i != fres.size(); ++i)
-                    res = reduce_op_(res, fres[i].get());
-
-                return res;
-            }
-
-            ReduceOp const& reduce_op_;
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename ReduceOp, typename... Ts>
-        typename reduce_result<Action>::type reduce_impl(Action const& act,
-            std::vector<hpx::id_type> const& ids, ReduceOp&& reduce_op,
-            std::size_t global_idx, Ts const&... vs)
-        {
-            typedef typename reduce_result<Action>::type result_type;
-
-            if (ids.empty())
-                return result_type();
-
-            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
-            std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout =
-                util::calculate_fanout(ids.size(), local_fanout);
-
-            std::vector<hpx::future<result_type>> reduce_futures;
-            reduce_futures.reserve(local_size + (ids.size() / fanout) + 1);
-            for (std::size_t i = 0; i != local_size; ++i)
-            {
-                reduce_invoke(
-                    act, reduce_futures, ids[i], global_idx + i, vs...);
-            }
-
-            if (ids.size() > local_fanout)
-            {
-                std::size_t applied = local_fanout;
-                std::vector<hpx::id_type>::const_iterator it =
-                    ids.begin() + local_fanout;
-
-                typedef typename detail::make_reduce_action<
-                    Action>::template reduce_invoker_helper<ReduceOp>::type
-                    reduce_impl_action;
-
-                while (it != ids.end())
-                {
-                    HPX_ASSERT(ids.size() >= applied);
-
-                    std::size_t next_fan =
-                        (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
-
-                    hpx::id_type id(ids_next[0]);
-                    reduce_futures.push_back(
-                        hpx::detail::async_colocated<reduce_impl_action>(id,
-                            act, std::move(ids_next), reduce_op,
-                            global_idx + applied, vs...));
-
-                    applied += next_fan;
-                    it += next_fan;
-                }
-            }
-
-            return hpx::when_all(reduce_futures)
-                .then(perform_reduction<result_type, ReduceOp>(reduce_op))
-                .get();
-        }
-    }    // namespace detail
+    ///////////////////////////////////////////////////////////////////////////
+    inline communicator create_reducer(char const* basename,
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+    {
+        return detail::create_communicator(
+            basename, num_sites, generation, this_site, root_site);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename ReduceOp, typename... Ts>
-    hpx::future<typename detail::reduce_result<Action>::type> reduce(
-        std::vector<hpx::id_type> const& ids, ReduceOp&& reduce_op,
-        Ts const&... vs)
+    // destination site needs to be handled differently
+    template <typename T, typename F>
+    hpx::future<T> reduce_here(communicator fid, hpx::future<T>&& result,
+        F&& op, std::size_t this_site = std::size_t(-1))
     {
-        typedef typename detail::make_reduce_action<Action>::
-            template reduce_invoker_helper<ReduceOp>::type reduce_impl_action;
-
-        typedef typename detail::reduce_result<Action>::type action_result;
-
-        if (ids.empty())
+        if (this_site == std::size_t(-1))
         {
-            return hpx::make_exceptional_future<action_result>(
-                HPX_GET_EXCEPTION(bad_parameter, "hpx::lcos::reduce",
-                    "empty list of targets for reduce operation"));
+            this_site = static_cast<std::size_t>(agas::get_locality_id());
         }
 
-        return hpx::detail::async_colocated<reduce_impl_action>(
-            ids[0], Action(), ids, std::forward<ReduceOp>(reduce_op), 0, vs...);
+        auto reduction_data =
+            [op = std::forward<F>(op), this_site](communicator&& c,
+                hpx::future<T>&& local_result) mutable -> hpx::future<T> {
+            using func_type = std::decay_t<F>;
+            using action_type = typename detail::communicator_server::
+                template communication_get_action<
+                    traits::communication::reduce_tag, hpx::future<T>, T,
+                    func_type>;
+
+            // make sure id is kept alive as long as the returned future,
+            // explicitly unwrap returned future
+            hpx::future<T> result = async(action_type(), c, this_site,
+                local_result.get(), std::forward<F>(op));
+
+            traits::detail::get_shared_state(result)->set_on_completed(
+                [client = std::move(c)]() { HPX_UNUSED(client); });
+
+            return result;
+        };
+
+        return dataflow(hpx::launch::sync, std::move(reduction_data),
+            std::move(fid), std::move(result));
     }
 
-    template <typename Component, typename Signature, typename Derived,
-        typename ReduceOp, typename... Ts>
-    hpx::future<typename detail::reduce_result<Derived>::type> reduce(
-        hpx::actions::basic_action<Component, Signature, Derived> /* act */
-        ,
-        std::vector<hpx::id_type> const& ids, ReduceOp&& reduce_op,
-        Ts const&... vs)
+    template <typename T, typename F>
+    hpx::future<T> reduce_here(char const* basename, hpx::future<T>&& result,
+        F&& op, std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1))
     {
-        return reduce<Derived>(ids, std::forward<ReduceOp>(reduce_op), vs...);
+        return reduce_here(create_reducer(basename, num_sites, generation,
+                               this_site, this_site),
+            std::move(result), std::forward<F>(op), this_site);
     }
 
-    template <typename Action, typename ReduceOp, typename... Ts>
-    hpx::future<typename detail::reduce_result<Action>::type> reduce_with_index(
-        std::vector<hpx::id_type> const& ids, ReduceOp&& reduce_op,
-        Ts const&... vs)
+    ///////////////////////////////////////////////////////////////////////////
+    // reduce plain values
+    template <typename T, typename F>
+    hpx::future<std::decay_t<T>> reduce_here(communicator fid, T&& local_result,
+        F&& op, std::size_t this_site = std::size_t(-1))
     {
-        return reduce<detail::reduce_with_index<Action>>(
-            ids, std::forward<ReduceOp>(reduce_op), vs...);
+        if (this_site == std::size_t(-1))
+        {
+            this_site = static_cast<std::size_t>(agas::get_locality_id());
+        }
+
+        using arg_type = std::decay_t<T>;
+
+        auto reduction_data_direct =
+            [op = std::forward<F>(op),
+                local_result = std::forward<T>(local_result),
+                this_site](communicator&& c) mutable -> hpx::future<arg_type> {
+            using func_type = std::decay_t<F>;
+            using action_type = typename detail::communicator_server::
+                template communication_get_action<
+                    traits::communication::reduce_tag, hpx::future<arg_type>,
+                    arg_type, func_type>;
+
+            // make sure id is kept alive as long as the returned future,
+            // explicitly unwrap returned future
+            hpx::future<arg_type> result = async(action_type(), c, this_site,
+                std::forward<T>(local_result), std::forward<F>(op));
+
+            traits::detail::get_shared_state(result)->set_on_completed(
+                [client = std::move(c)]() { HPX_UNUSED(client); });
+
+            return result;
+        };
+
+        return fid.then(hpx::launch::sync, std::move(reduction_data_direct));
     }
 
-    template <typename Component, typename Signature, typename Derived,
-        typename ReduceOp, typename... Ts>
-    hpx::future<typename detail::reduce_result<Derived>::type>
-    reduce_with_index(
-        hpx::actions::basic_action<Component, Signature, Derived> /* act */
-        ,
-        std::vector<hpx::id_type> const& ids, ReduceOp&& reduce_op,
-        Ts const&... vs)
+    template <typename T, typename F>
+    hpx::future<std::decay_t<T>> reduce_here(char const* basename, T&& result,
+        F&& op, std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1))
     {
-        return reduce<detail::reduce_with_index<Derived>>(
-            ids, std::forward<ReduceOp>(reduce_op), vs...);
+        return reduce_here(create_reducer(basename, num_sites, generation,
+                               this_site, this_site),
+            std::forward<T>(result), std::forward<F>(op), this_site);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    hpx::future<void> reduce_there(communicator fid,
+        hpx::future<T>&& local_result, std::size_t this_site = std::size_t(-1))
+    {
+        if (this_site == std::size_t(-1))
+        {
+            this_site = static_cast<std::size_t>(agas::get_locality_id());
+        }
+
+        auto reduction_there_data =
+            [this_site](communicator&& c,
+                hpx::future<T>&& local_result) -> hpx::future<void> {
+            using action_type = typename detail::communicator_server::
+                template communication_set_action<
+                    traits::communication::reduce_tag, hpx::future<void>, T>;
+
+            // make sure id is kept alive as long as the returned future,
+            // explicitly unwrap returned future
+            hpx::future<void> result =
+                async(action_type(), c, this_site, local_result.get());
+
+            traits::detail::get_shared_state(result)->set_on_completed(
+                [client = std::move(c)]() { HPX_UNUSED(client); });
+
+            return result;
+        };
+
+        return dataflow(hpx::launch::sync, std::move(reduction_there_data),
+            std::move(fid), std::move(local_result));
+    }
+
+    template <typename T>
+    hpx::future<void> reduce_there(char const* basename,
+        hpx::future<T>&& result, std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+    {
+        HPX_ASSERT(this_site != root_site);
+        return reduce_there(create_reducer(basename, std::size_t(-1),
+                                generation, this_site, root_site),
+            std::move(result), this_site);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // reduce plain values
+    template <typename T>
+    hpx::future<void> reduce_there(communicator fid, T&& local_result,
+        std::size_t this_site = std::size_t(-1))
+    {
+        if (this_site == std::size_t(-1))
+        {
+            this_site = static_cast<std::size_t>(agas::get_locality_id());
+        }
+
+        using arg_type = std::decay_t<T>;
+
+        auto reduction_there_data_direct =
+            [this_site](communicator&& c,
+                arg_type&& local_result) -> hpx::future<void> {
+            using action_type = typename detail::communicator_server::
+                template communication_set_action<
+                    traits::communication::reduce_tag, hpx::future<void>,
+                    arg_type>;
+
+            // make sure id is kept alive as long as the returned future,
+            // explicitly unwrap returned future
+            hpx::future<void> result = async(
+                action_type(), c, this_site, std::forward<T>(local_result));
+
+            traits::detail::get_shared_state(result)->set_on_completed(
+                [client = std::move(c)]() { HPX_UNUSED(client); });
+
+            return result;
+        };
+
+        return dataflow(std::move(reduction_there_data_direct), std::move(fid),
+            std::forward<T>(local_result));
+    }
+
+    template <typename T>
+    hpx::future<void> reduce_there(char const* basename, T&& local_result,
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+    {
+        HPX_ASSERT(this_site != root_site);
+        return reduce_there(create_reducer(basename, std::size_t(-1),
+                                generation, this_site, root_site),
+            std::forward<T>(local_result), this_site);
     }
 }}    // namespace hpx::lcos
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_REDUCE_ACTION_DECLARATION(...)                            \
-    HPX_REGISTER_REDUCE_ACTION_DECLARATION_(__VA_ARGS__)                       \
-/**/
-#define HPX_REGISTER_REDUCE_ACTION_DECLARATION_(...)                           \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_REDUCE_ACTION_DECLARATION_,          \
-        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
-    /**/
+namespace hpx {
+    using lcos::create_reducer;
+    using lcos::reduce_here;
+    using lcos::reduce_there;
+}    // namespace hpx
 
-#define HPX_REGISTER_REDUCE_ACTION_DECLARATION_2(Action, ReduceOp)             \
-    HPX_REGISTER_ACTION_DECLARATION(                                           \
-        ::hpx::lcos::detail::make_reduce_action<                               \
-            Action>::reduce_invoker_helper<ReduceOp>::type,                    \
-        HPX_PP_CAT(HPX_PP_CAT(reduce_, Action), ReduceOp))                     \
-/**/
-#define HPX_REGISTER_REDUCE_ACTION_DECLARATION_3(Action, ReduceOp, Name)       \
-    HPX_REGISTER_ACTION_DECLARATION(                                           \
-        ::hpx::lcos::detail::make_reduce_action<                               \
-            Action>::reduce_invoker_helper<ReduceOp>::type,                    \
-        HPX_PP_CAT(reduce_, Name))                                             \
-/**/
+////////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_REDUCE_DECLARATION(...) /**/
 
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_REDUCE_ACTION(...)                                        \
-    HPX_REGISTER_REDUCE_ACTION_(__VA_ARGS__)                                   \
-/**/
-#define HPX_REGISTER_REDUCE_ACTION_(...)                                       \
-    HPX_PP_EXPAND(HPX_PP_CAT(                                                  \
-        HPX_REGISTER_REDUCE_ACTION_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))  \
-    /**/
+////////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_REDUCE(...)             /**/
 
-#define HPX_REGISTER_REDUCE_ACTION_2(Action, ReduceOp)                         \
-    HPX_REGISTER_ACTION(::hpx::lcos::detail::make_reduce_action<               \
-                            Action>::reduce_invoker_helper<ReduceOp>::type,    \
-        HPX_PP_CAT(HPX_PP_CAT(reduce_, Action), ReduceOp))                     \
-/**/
-#define HPX_REGISTER_REDUCE_ACTION_3(Action, ReduceOp, Name)                   \
-    HPX_REGISTER_ACTION(::hpx::lcos::detail::make_reduce_action<               \
-                            Action>::reduce_invoker_helper<ReduceOp>::type,    \
-        HPX_PP_CAT(reduce_, Name))                                             \
-/**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_DECLARATION(...)                 \
-    HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_DECLARATION_(__VA_ARGS__)            \
-/**/
-#define HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_DECLARATION_(...)                \
-    HPX_PP_EXPAND(                                                             \
-        HPX_PP_CAT(HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_DECLARATION_,         \
-            HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                           \
-    /**/
-
-#define HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_DECLARATION_2(Action, ReduceOp)  \
-    HPX_REGISTER_ACTION_DECLARATION(                                           \
-        ::hpx::lcos::detail::make_reduce_action<                               \
-            ::hpx::lcos::detail::reduce_with_index<Action>>::                  \
-            reduce_invoker_helper<ReduceOp>::type,                             \
-        HPX_PP_CAT(HPX_PP_CAT(reduce_, Action), ReduceOp))                     \
-/**/
-#define HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_DECLARATION_3(                   \
-    Action, ReduceOp, Name)                                                    \
-    HPX_REGISTER_ACTION_DECLARATION(                                           \
-        ::hpx::lcos::detail::make_reduce_action<                               \
-            ::hpx::lcos::detail::reduce_with_index<Action>>::                  \
-            reduce_invoker_helper<ReduceOp>::type,                             \
-        HPX_PP_CAT(reduce_, Name))                                             \
-/**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_REDUCE_WITH_INDEX_ACTION(...)                             \
-    HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_(__VA_ARGS__)                        \
-/**/
-#define HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_(...)                            \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_,           \
-        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
-    /**/
-
-#define HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_2(Action, ReduceOp)              \
-    HPX_REGISTER_ACTION(::hpx::lcos::detail::make_reduce_action<               \
-                            ::hpx::lcos::detail::reduce_with_index<Action>>::  \
-                            reduce_invoker_helper<ReduceOp>::type,             \
-        HPX_PP_CAT(HPX_PP_CAT(reduce_, Action), ReduceOp))                     \
-/**/
-#define HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_3(Action, ReduceOp, Name)        \
-    HPX_REGISTER_ACTION(::hpx::lcos::detail::make_reduce_action<               \
-                            ::hpx::lcos::detail::reduce_with_index<Action>>::  \
-                            reduce_invoker_helper<ReduceOp>::type,             \
-        HPX_PP_CAT(reduce_, Name))                                             \
-    /**/
-
+#endif    // COMPUTE_HOST_CODE
 #endif    // DOXYGEN

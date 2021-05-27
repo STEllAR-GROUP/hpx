@@ -121,11 +121,9 @@ namespace hpx { namespace traits {
                 Derived&& src, Destination& dest)
             {
                 dest.set_value(src.get());
-
-                using future_data = lcos::detail::future_data<id_type>;
-                static_cast<future_data&>(dest).registered_name_ =
-                    std::move(static_cast<future_data*>(src.shared_state_.get())
-                                  ->registered_name_);
+                dest.set_registered_name(
+                    src.shared_state_->get_registered_name());
+                src.shared_state_->set_registered_name("");
             }
         };
 
@@ -217,6 +215,10 @@ namespace hpx { namespace lcos { namespace detail {
         std::string const& get_registered_name() const override
         {
             return registered_name_;
+        }
+        void set_registered_name(std::string name) override
+        {
+            registered_name_ = std::move(name);
         }
         bool register_as(std::string name, bool manage_lifetime) override
         {

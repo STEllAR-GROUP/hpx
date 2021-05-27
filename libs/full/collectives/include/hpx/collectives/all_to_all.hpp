@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2020 Hartmut Kaiser
+//  Copyright (c) 2019-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -81,7 +81,7 @@ namespace hpx { namespace lcos {
     ///             ready once the all_to_all operation has been completed.
     ///
     template <typename T>
-    hpx::future<std::vector<typename std::decay<T>::type>> all_to_all(
+    hpx::future<std::vector<std::decay_t<T>>> all_to_all(
         char const* basename, T&& result,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
@@ -99,10 +99,8 @@ namespace hpx { namespace lcos {
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
-#include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
@@ -137,7 +135,7 @@ namespace hpx { namespace traits {
         template <typename Result, typename T>
         Result get(std::size_t which, std::vector<T>&& t)
         {
-            using arg_type = typename std::decay<T>::type;
+            using arg_type = std::decay_t<T>;
             using data_type = std::vector<arg_type>;
             using mutex_type = typename Communicator::mutex_type;
             using lock_type = std::unique_lock<mutex_type>;

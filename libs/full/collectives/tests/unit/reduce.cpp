@@ -1,5 +1,4 @@
-//  Copyright (c) 2013 Hartmut Kaiser
-//  Copyright (c) 2013 Thomas Heller
+//  Copyright (c) 2019-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,120 +6,158 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/runtime.hpp>
 #include <hpx/modules/collectives.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
+#include <string>
+#include <utility>
 #include <vector>
 
-std::uint32_t f1()
+constexpr char const* reduce_basename = "/test/reduce/";
+constexpr char const* reduce_direct_basename = "/test/reduce_direct/";
+
+void test_one_shot_use()
 {
-    return hpx::get_locality_id();
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t this_locality = hpx::get_locality_id();
+
+    // test functionality based on future<> of local result
+    for (int i = 0; i != 10; ++i)
+    {
+        hpx::future<std::uint32_t> value =
+            hpx::make_ready_future(hpx::get_locality_id());
+
+        if (this_locality == 0)
+        {
+            hpx::future<std::uint32_t> overall_result =
+                hpx::reduce_here(reduce_basename, std::move(value),
+                    std::plus<std::uint32_t>{}, num_localities, i);
+
+            std::uint32_t sum = 0;
+            for (std::uint32_t j = 0; j != num_localities; ++j)
+            {
+                sum += j;
+            }
+            HPX_TEST_EQ(sum, overall_result.get());
+        }
+        else
+        {
+            hpx::future<void> overall_result =
+                hpx::reduce_there(reduce_basename, std::move(value), i);
+            overall_result.get();
+        }
+    }
+
+    // test functionality based on immediate local result value
+    for (int i = 0; i != 10; ++i)
+    {
+        std::uint32_t value = hpx::get_locality_id();
+
+        if (this_locality == 0)
+        {
+            hpx::future<std::uint32_t> overall_result =
+                hpx::reduce_here(reduce_direct_basename, value,
+                    std::plus<std::uint32_t>{}, num_localities, i);
+
+            std::uint32_t sum = 0;
+            for (std::uint32_t j = 0; j != num_localities; ++j)
+            {
+                sum += j;
+            }
+            HPX_TEST_EQ(sum, overall_result.get());
+        }
+        else
+        {
+            hpx::future<void> overall_result =
+                hpx::reduce_there(reduce_direct_basename, std::move(value), i);
+            overall_result.get();
+        }
+    }
 }
-HPX_PLAIN_ACTION(f1);
 
-typedef std::plus<std::uint32_t> std_plus_type;
-HPX_REGISTER_REDUCE_ACTION_DECLARATION(f1_action, std_plus_type)
-HPX_REGISTER_REDUCE_ACTION(f1_action, std_plus_type)
-
-std::uint32_t f3(std::uint32_t i)
+void test_multiple_use()
 {
-    return hpx::get_locality_id() + i;
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t this_locality = hpx::get_locality_id();
+
+    auto reduce_client = hpx::create_reducer(reduce_basename, num_localities);
+
+    // test functionality based on future<> of local result
+    for (int i = 0; i != 10; ++i)
+    {
+        hpx::future<std::uint32_t> value =
+            hpx::make_ready_future(hpx::get_locality_id());
+
+        if (this_locality == 0)
+        {
+            hpx::future<std::uint32_t> overall_result = hpx::reduce_here(
+                reduce_client, std::move(value), std::plus<std::uint32_t>{});
+
+            std::uint32_t sum = 0;
+            for (std::uint32_t j = 0; j != num_localities; ++j)
+            {
+                sum += j;
+            }
+            HPX_TEST_EQ(sum, overall_result.get());
+        }
+        else
+        {
+            hpx::future<void> overall_result =
+                hpx::reduce_there(reduce_client, std::move(value));
+            overall_result.get();
+        }
+    }
+
+    auto reduce_direct_client =
+        hpx::create_reducer(reduce_direct_basename, num_localities);
+
+    // test functionality based on immediate local result value
+    for (int i = 0; i != 10; ++i)
+    {
+        std::uint32_t value = hpx::get_locality_id();
+
+        if (this_locality == 0)
+        {
+            hpx::future<std::uint32_t> overall_result = hpx::reduce_here(
+                reduce_direct_client, value, std::plus<std::uint32_t>{});
+
+            std::uint32_t sum = 0;
+            for (std::uint32_t j = 0; j != num_localities; ++j)
+            {
+                sum += j;
+            }
+            HPX_TEST_EQ(sum, overall_result.get());
+        }
+        else
+        {
+            hpx::future<void> overall_result =
+                hpx::reduce_there(reduce_direct_client, std::move(value));
+            overall_result.get();
+        }
+    }
 }
-HPX_PLAIN_ACTION(f3);
 
-HPX_REGISTER_REDUCE_ACTION_DECLARATION(f3_action, std_plus_type)
-HPX_REGISTER_REDUCE_ACTION(f3_action, std_plus_type)
-
-std::uint32_t f1_idx(std::size_t idx)
-{
-    return hpx::get_locality_id() + std::uint32_t(idx);
-}
-HPX_PLAIN_ACTION(f1_idx);
-
-HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_DECLARATION(f1_idx_action, std_plus_type)
-HPX_REGISTER_REDUCE_WITH_INDEX_ACTION(f1_idx_action, std_plus_type)
-
-std::uint32_t f3_idx(std::uint32_t i, std::size_t idx)
-{
-    return hpx::get_locality_id() + i + std::uint32_t(idx);
-}
-HPX_PLAIN_ACTION(f3_idx);
-
-HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_DECLARATION(f3_idx_action, std_plus_type)
-HPX_REGISTER_REDUCE_WITH_INDEX_ACTION(f3_idx_action, std_plus_type)
-
-///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    hpx::id_type here = hpx::find_here();
-    hpx::id_type there = here;
-    std::vector<hpx::id_type> localities = hpx::find_all_localities();
-
-    {
-        std::uint32_t f1_res =
-            hpx::lcos::reduce<f1_action>(localities, std::plus<std::uint32_t>())
-                .get();
-
-        std::uint32_t f1_result = 0;
-        for (std::size_t i = 0; i != localities.size(); ++i)
-        {
-            f1_result += hpx::naming::get_locality_id_from_id(localities[i]);
-        }
-        HPX_TEST_EQ(f1_res, f1_result);
-
-        std::uint32_t f3_res = hpx::lcos::reduce<f3_action>(
-            localities, std::plus<std::uint32_t>(), 1)
-                                   .get();
-
-        std::uint32_t f3_result = 0;
-        for (std::size_t i = 0; i != localities.size(); ++i)
-        {
-            f3_result +=
-                hpx::naming::get_locality_id_from_id(localities[i]) + 1;
-        }
-        HPX_TEST_EQ(f3_res, f3_result);
-    }
-
-    {
-        std::uint32_t f1_res = hpx::lcos::reduce_with_index<f1_idx_action>(
-            localities, std::plus<std::uint32_t>())
-                                   .get();
-
-        std::uint32_t f1_result = 0;
-        for (std::size_t i = 0; i != localities.size(); ++i)
-        {
-            f1_result += hpx::naming::get_locality_id_from_id(localities[i]) +
-                std::uint32_t(i);
-        }
-        HPX_TEST_EQ(f1_res, f1_result);
-
-        std::uint32_t f3_res = hpx::lcos::reduce_with_index<f3_idx_action>(
-            localities, std::plus<std::uint32_t>(), 1)
-                                   .get();
-
-        std::uint32_t f3_result = 0;
-        for (std::size_t i = 0; i != localities.size(); ++i)
-        {
-            f3_result += hpx::naming::get_locality_id_from_id(localities[i]) +
-                std::uint32_t(i) + 1;
-        }
-        HPX_TEST_EQ(f3_res, f3_result);
-    }
+    test_one_shot_use();
+    test_multiple_use();
 
     return hpx::finalize();
 }
 
 int main(int argc, char* argv[])
 {
-    // Initialize and run HPX
-    HPX_TEST_EQ_MSG(
-        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
+    std::vector<std::string> const cfg = {"hpx.run_hpx_main!=1"};
 
+    hpx::init_params init_args;
+    init_args.cfg = cfg;
+
+    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
     return hpx::util::report_errors();
 }
 #endif

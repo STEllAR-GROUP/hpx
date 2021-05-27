@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 Hartmut Kaiser
+# Copyright (c) 2019-2021 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,19 +9,20 @@ set(tests
     all_reduce
     all_to_all
     barrier
-    broadcast_direct
+    broadcast
     broadcast_apply
     broadcast_component
     communication_set
     fold
     gather
-    reduce
-    remote_latch
     global_spmd_block
+    reduce
+    reduce_direct
+    remote_latch
 )
 
 if(HPX_WITH_NETWORKING)
-  set(tests ${tests} broadcast scatter)
+  set(tests ${tests} broadcast_direct scatter)
 endif()
 
 foreach(test ${tests})

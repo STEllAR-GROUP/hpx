@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -128,10 +128,8 @@ namespace hpx { namespace lcos {
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
-#include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -204,7 +202,7 @@ namespace hpx { namespace traits {
         template <typename Result, typename T>
         Result set(std::size_t which, T&& t)
         {
-            using arg_type = typename std::decay<T>::type;
+            using arg_type = std::decay_t<T>;
             using mutex_type = typename Communicator::mutex_type;
             using lock_type = std::unique_lock<mutex_type>;
 
@@ -305,7 +303,7 @@ namespace hpx { namespace lcos {
     }
 
     template <typename T>
-    hpx::future<typename std::decay<T>::type> broadcast_to(communicator fid,
+    hpx::future<std::decay_t<T>> broadcast_to(communicator fid,
         T&& local_result, std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
@@ -313,7 +311,7 @@ namespace hpx { namespace lcos {
             this_site = static_cast<std::size_t>(agas::get_locality_id());
         }
 
-        using arg_type = typename std::decay<T>::type;
+        using arg_type = std::decay_t<T>;
 
         auto broadcast_data =
             [this_site](communicator&& c,
@@ -339,7 +337,7 @@ namespace hpx { namespace lcos {
     }
 
     template <typename T>
-    hpx::future<typename std::decay<T>::type> broadcast_to(char const* basename,
+    hpx::future<std::decay_t<T>> broadcast_to(char const* basename,
         T&& local_result, std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1))

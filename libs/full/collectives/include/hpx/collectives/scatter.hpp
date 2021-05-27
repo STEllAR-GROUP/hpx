@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2014-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -171,10 +171,8 @@ namespace hpx { namespace lcos {
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
-#include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
