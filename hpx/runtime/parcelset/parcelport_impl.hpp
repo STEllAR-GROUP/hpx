@@ -416,7 +416,8 @@ namespace hpx { namespace parcelset
             put_parcel(
                 dest
               , std::move(p)
-              , [=](std::error_code const& ec, parcel const & p) -> void {
+              , [HPX_CXX20_CAPTURE_THIS(=)](
+                std::error_code const& ec, parcel const & p) -> void {
                     return early_pending_parcel_handler(ec, p);
                 }
             );

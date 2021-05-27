@@ -341,7 +341,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 T val = hpx::util::invoke(convert_, *part_begin);
                 return util::accumulate_n(++part_begin, --part_size,
                     std::move(val),
-                    [=](T const& res, reference next) mutable -> T {
+                    [HPX_CXX20_CAPTURE_THIS(=)](
+                        T const& res, reference next) mutable -> T {
                         return hpx::util::invoke(
                             reduce_, res, hpx::util::invoke(convert_, next));
                     });

@@ -346,7 +346,8 @@ namespace hpx
             typedef typename base_type::server_component_type::get_action act;
 
             return async(act(), id).then(
-                [=](future<server::unordered_map_config_data> && f) -> void {
+                [HPX_CXX20_CAPTURE_THIS(=)](
+                    future<server::unordered_map_config_data> && f) -> void {
                     get_data_helper(id, f.get());
                 });
         }
@@ -496,7 +497,8 @@ namespace hpx
         {
             this->base_type::connect_to(symbolic_name);
             return this->base_type::share().then(
-                [=](shared_future<id_type>&& f) -> hpx::future<void> {
+                [HPX_CXX20_CAPTURE_THIS(=)](
+                    shared_future<id_type>&& f) -> hpx::future<void> {
                     return connect_to_helper(f.get());
                 });
         }

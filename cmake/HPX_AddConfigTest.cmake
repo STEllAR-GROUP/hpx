@@ -116,18 +116,26 @@ function(add_hpx_config_test variable)
     )
     set(CONFIG_TEST_LINK_LIBRARIES ${_base_libraries} ${${variable}_LIBRARIES})
 
+    set(additional_cmake_flags)
+    if(MSVC)
+      set(additional_cmake_flags "-WX")
+    else()
+      set(additional_cmake_flags "-Werror")
+    endif()
+
     if(${variable}_EXECUTE)
       if(NOT CMAKE_CROSSCOMPILING)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${additional_cmake_flags}")
         # cmake-format: off
         try_run(
           ${variable}_RUN_RESULT ${variable}_COMPILE_RESULT
           ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests
           ${test_source}
+          COMPILE_DEFINITIONS ${CONFIG_TEST_COMPILE_DEFINITIONS}
           CMAKE_FLAGS
             "-DINCLUDE_DIRECTORIES=${CONFIG_TEST_INCLUDE_DIRS}"
             "-DLINK_DIRECTORIES=${CONFIG_TEST_LINK_DIRS}"
             "-DLINK_LIBRARIES=${CONFIG_TEST_LINK_LIBRARIES}"
-            "-DCOMPILE_DEFINITIONS=${CONFIG_TEST_COMPILE_DEFINITIONS}"
           CXX_STANDARD ${HPX_CXX_STANDARD}
           CXX_STANDARD_REQUIRED ON
           CXX_EXTENSIONS FALSE
@@ -144,16 +152,17 @@ function(add_hpx_config_test variable)
         set(${variable}_RESULT FALSE)
       endif()
     else()
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${additional_cmake_flags}")
       # cmake-format: off
       try_compile(
         ${variable}_RESULT
         ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests
         ${test_source}
+        COMPILE_DEFINITIONS ${CONFIG_TEST_COMPILE_DEFINITIONS}
         CMAKE_FLAGS
           "-DINCLUDE_DIRECTORIES=${CONFIG_TEST_INCLUDE_DIRS}"
           "-DLINK_DIRECTORIES=${CONFIG_TEST_LINK_DIRS}"
           "-DLINK_LIBRARIES=${CONFIG_TEST_LINK_LIBRARIES}"
-          "-DCOMPILE_DEFINITIONS=${CONFIG_TEST_COMPILE_DEFINITIONS}"
         OUTPUT_VARIABLE ${variable}_OUTPUT
         CXX_STANDARD ${HPX_CXX_STANDARD}
         CXX_STANDARD_REQUIRED ON
@@ -513,10 +522,28 @@ function(hpx_check_for_cxx20_coroutines)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_cxx20_lambda_capture)
+  add_hpx_config_test(
+    HPX_WITH_CXX20_LAMBDA_CAPTURE
+    SOURCE cmake/tests/cxx20_lambda_capture.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_cxx20_no_unique_address_attribute)
   add_hpx_config_test(
     HPX_WITH_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
     SOURCE cmake/tests/cxx20_no_unique_address_attribute.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx20_paren_initialization_of_aggregates)
+  add_hpx_config_test(
+    HPX_WITH_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES
+    SOURCE cmake/tests/cxx20_paren_initialization_of_aggregates.cpp
     FILE ${ARGN}
   )
 endfunction()

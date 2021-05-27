@@ -103,7 +103,8 @@ namespace hpx
             server::partitioned_vector_config_data>::get_action act;
 
         return async(act(), id).then(
-            [=](future<server::partitioned_vector_config_data>&& f) -> void {
+            [HPX_CXX20_CAPTURE_THIS(=)](
+                future<server::partitioned_vector_config_data>&& f) -> void {
                 return get_data_helper(id, f.get());
             });
 #else
@@ -119,7 +120,8 @@ namespace hpx
     {
         this->base_type::connect_to(symbolic_name);
         return this->base_type::share().then(
-            [=](shared_future<id_type>&& f) -> hpx::future<void> {
+            [HPX_CXX20_CAPTURE_THIS(=)](
+                shared_future<id_type>&& f) -> hpx::future<void> {
                 return connect_to_helper(f.get());
             });
     }
@@ -166,7 +168,8 @@ namespace hpx
     partitioned_vector<T, Data>::partitioned_vector(future<id_type>&& f)
     {
         f.share().then(
-            [=](shared_future<id_type>&& f) -> hpx::future<void> {
+            [HPX_CXX20_CAPTURE_THIS(=)](
+                shared_future<id_type>&& f) -> hpx::future<void> {
                 return connect_to_helper(f.get());
             });
     }
