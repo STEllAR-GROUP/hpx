@@ -294,12 +294,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::partitioner<ExPolicy, difference_type>::call(
                     std::forward<ExPolicy>(policy), first,
                     detail::distance(first, last), std::move(f1),
-                    hpx::util::unwrapping(
-                        [](std::vector<difference_type>&& results) {
-                            return util::accumulate_n(hpx::util::begin(results),
-                                hpx::util::size(results), difference_type(0),
-                                std::plus<difference_type>());
-                        }));
+                    hpx::unwrapping([](std::vector<difference_type>&& results) {
+                        return util::accumulate_n(hpx::util::begin(results),
+                            hpx::util::size(results), difference_type(0),
+                            std::plus<difference_type>());
+                    }));
             }
         };
         /// \endcond
@@ -388,12 +387,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::partitioner<ExPolicy, difference_type>::call(
                     std::forward<ExPolicy>(policy), first,
                     detail::distance(first, last), std::move(f1),
-                    hpx::util::unwrapping(
-                        [](std::vector<difference_type>&& results) {
-                            return util::accumulate_n(hpx::util::begin(results),
-                                hpx::util::size(results), difference_type(0),
-                                std::plus<difference_type>());
-                        }));
+                    hpx::unwrapping([](std::vector<difference_type>&& results) {
+                        return util::accumulate_n(hpx::util::begin(results),
+                            hpx::util::size(results), difference_type(0),
+                            std::plus<difference_type>());
+                    }));
             }
         };
         /// \endcond

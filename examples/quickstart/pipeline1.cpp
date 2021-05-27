@@ -31,11 +31,9 @@ struct pipeline
                 };
 
                 hpx::async(trim, std::move(item))
-                    .then(hpx::util::unwrapping(
-                        [](std::string const& tc)
-                        {
-                            std::cout << "->" << tc << std::endl;
-                        }));
+                    .then(hpx::unwrapping([](std::string const& tc) {
+                        std::cout << "->" << tc << std::endl;
+                    }));
             }
         };
 

@@ -192,7 +192,7 @@ void test_communication_set(std::size_t size, std::size_t arity)
     }
 
     // verify that all leaf-nodes are connected to the proper parent
-    std::vector<hpx::id_type> node_ids = hpx::util::unwrap(nodes);
+    std::vector<hpx::id_type> node_ids = hpx::unwrap(nodes);
     for (std::size_t i = 0; i < size; i += arity)
     {
         for (std::size_t j = 1; j != arity && i + j < size; ++j)
@@ -253,7 +253,7 @@ void test_communication_set(std::size_t size, std::size_t arity)
     }
 
     // rethrow exceptions
-    hpx::util::unwrap(futures);
+    hpx::unwrap(futures);
 }
 
 int hpx_main()

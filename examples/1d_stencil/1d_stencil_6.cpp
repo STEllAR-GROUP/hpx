@@ -281,7 +281,7 @@ struct stepper
         partition const& right)
     {
         using hpx::dataflow;
-        using hpx::util::unwrapping;
+        using hpx::unwrapping;
 
         return dataflow(
             hpx::launch::async,

@@ -117,7 +117,7 @@ namespace hpx { namespace execution {
             Ts...>::type
         bulk_sync_execute(F&& f, S const& shape, Ts&&... ts)
         {
-            return hpx::util::unwrap(bulk_async_execute(
+            return hpx::unwrap(bulk_async_execute(
                 std::forward<F>(f), shape, std::forward<Ts>(ts)...));
         }
 

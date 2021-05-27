@@ -144,7 +144,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                     std::forward<Future>(predecessor), exec_current,
                     [func = std::move(func)](future_type&& predecessor) mutable
                     -> vector_result_type {
-                        return hpx::util::unwrap(func(std::move(predecessor)));
+                        return hpx::unwrap(func(std::move(predecessor)));
                     });
 
             return hpx::traits::future_access<result_future_type>::create(

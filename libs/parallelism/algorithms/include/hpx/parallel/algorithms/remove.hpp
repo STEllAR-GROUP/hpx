@@ -333,7 +333,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return 0u;
                 };
 
-                auto f2 = hpx::util::unwrapping(
+                auto f2 = hpx::unwrapping(
                     [](std::size_t, std::size_t) -> std::size_t {
                         // There is no need to propagate the partition
                         // results. But, the scan_partitioner doesn't

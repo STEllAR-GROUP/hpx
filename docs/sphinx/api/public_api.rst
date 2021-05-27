@@ -762,6 +762,35 @@ Classes
 - :cpp:struct:`hpx::is_invocable`
 - :cpp:struct:`hpx::is_invocable_r`
 
+Header ``hpx/unwrap.hpp``
+=========================
+
+This header includes :ref:`public_api_header_hpx_local_unwrap`.
+
+.. _public_api_header_hpx_local_unwrap:
+
+Header ``hpx/local/unwrap.hpp``
+===============================
+
+Contains utilities for unwrapping futures.
+
+Classes
+-------
+
+- :cpp:struct:`hpx::functional::unwrap`
+- :cpp:struct:`hpx::functional::unwrap_n`
+- :cpp:struct:`hpx::functional::unwrap_all`
+
+Functions
+---------
+
+- :cpp:func:`hpx::unwrap`
+- :cpp:func:`hpx::unwrap_n`
+- :cpp:func:`hpx::unwrap_all`
+- :cpp:func:`hpx::unwrapping`
+- :cpp:func:`hpx::unwrapping_n`
+- :cpp:func:`hpx::unwrapping_all`
+
 Header ``hpx/version.hpp``
 ==========================
 

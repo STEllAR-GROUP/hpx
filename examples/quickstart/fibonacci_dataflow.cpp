@@ -40,15 +40,10 @@ hpx::future<std::uint64_t> fibonacci(std::uint64_t n)
     hpx::future<std::uint64_t> lhs_future = hpx::async(&fibonacci, n-1);
     hpx::future<std::uint64_t> rhs_future = fibonacci(n-2);
 
-    return
-        hpx::dataflow(
-            hpx::util::unwrapping(
-            [](std::uint64_t lhs, std::uint64_t rhs)
-            {
-                return lhs + rhs;
-            })
-          , std::move(lhs_future), std::move(rhs_future)
-        );
+    return hpx::dataflow(
+        hpx::unwrapping(
+            [](std::uint64_t lhs, std::uint64_t rhs) { return lhs + rhs; }),
+        std::move(lhs_future), std::move(rhs_future));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

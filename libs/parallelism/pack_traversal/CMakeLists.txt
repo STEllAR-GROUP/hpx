@@ -7,14 +7,16 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(pack_traversal_headers
+    hpx/local/unwrap.hpp
     hpx/pack_traversal/detail/container_category.hpp
-    hpx/pack_traversal/detail/pack_traversal_impl.hpp
     hpx/pack_traversal/detail/pack_traversal_async_impl.hpp
+    hpx/pack_traversal/detail/pack_traversal_impl.hpp
     hpx/pack_traversal/detail/unwrap_impl.hpp
     hpx/pack_traversal/pack_traversal.hpp
     hpx/pack_traversal/pack_traversal_async.hpp
     hpx/pack_traversal/traits/pack_traversal_rebind_container.hpp
     hpx/pack_traversal/unwrap.hpp
+    hpx/unwrap.hpp
 )
 
 # cmake-format: off

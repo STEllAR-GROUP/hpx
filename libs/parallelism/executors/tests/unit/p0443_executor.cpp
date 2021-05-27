@@ -829,8 +829,7 @@ void test_future_sender()
             ex::transform(std::move(t1), [](std::size_t x) { return x + 1; });
         auto t1f = ex::make_future(std::move(t1s));
         auto last = hpx::dataflow(
-            hpx::util::unwrapping(
-                [](std::size_t x, std::size_t y) { return x + y; }),
+            hpx::unwrapping([](std::size_t x, std::size_t y) { return x + y; }),
             t1f, t2);
 
         HPX_TEST_EQ(last.get(), std::size_t(18));
@@ -1401,7 +1400,7 @@ void test_keep_future_sender()
         auto f = hpx::async([]() { return 42; });
         auto sf = hpx::async([]() { return 3.14; }).share();
 
-        auto fun = hpx::util::unwrapping(
+        auto fun = hpx::unwrapping(
             [](int&& x, double const& y) { return x * 2 + (int(y) / 2); });
         HPX_TEST_EQ(ex::when_all(std::move(f) | ex::keep_future(),
                         sf | ex::keep_future()) |
@@ -1413,7 +1412,7 @@ void test_keep_future_sender()
         auto f = hpx::async([]() { return 42; });
         auto sf = hpx::async([]() { return 3.14; }).share();
 
-        auto fun = hpx::util::unwrapping(
+        auto fun = hpx::unwrapping(
             [](int&& x, double const& y) { return x * 2 + (int(y) / 2); });
         HPX_TEST_EQ(ex::when_all(std::move(f) | ex::keep_future(),
                         sf | ex::keep_future()) |

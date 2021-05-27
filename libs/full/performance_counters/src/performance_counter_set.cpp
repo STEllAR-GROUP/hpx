@@ -180,7 +180,7 @@ namespace hpx { namespace performance_counters {
     {
         try
         {
-            auto v = hpx::util::unwrap(start());
+            auto v = hpx::unwrap(start());
             return std::all_of(
                 v.begin(), v.end(), [](bool val) { return val; });
         }
@@ -217,7 +217,7 @@ namespace hpx { namespace performance_counters {
     {
         try
         {
-            auto v = hpx::util::unwrap(stop());
+            auto v = hpx::unwrap(stop());
             return std::all_of(
                 v.begin(), v.end(), [](bool val) { return val; });
         }
@@ -254,7 +254,7 @@ namespace hpx { namespace performance_counters {
     {
         try
         {
-            hpx::util::unwrap(reset());
+            hpx::unwrap(reset());
         }
         catch (hpx::exception const& e)
         {
@@ -289,7 +289,7 @@ namespace hpx { namespace performance_counters {
     {
         try
         {
-            hpx::util::unwrap(reinit(reset));
+            hpx::unwrap(reinit(reset));
         }
         catch (hpx::exception const& e)
         {
@@ -333,7 +333,7 @@ namespace hpx { namespace performance_counters {
     {
         try
         {
-            return hpx::util::unwrap(get_counter_values(reset));
+            return hpx::unwrap(get_counter_values(reset));
         }
         catch (hpx::exception const& e)
         {
@@ -380,7 +380,7 @@ namespace hpx { namespace performance_counters {
     {
         try
         {
-            return hpx::util::unwrap(get_counter_values_array(reset));
+            return hpx::unwrap(get_counter_values_array(reset));
         }
         catch (hpx::exception const& e)
         {

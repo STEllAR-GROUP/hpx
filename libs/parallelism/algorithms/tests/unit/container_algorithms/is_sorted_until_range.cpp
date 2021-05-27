@@ -1588,8 +1588,8 @@ int hpx_main()
     std::vector<int> c(100);
     hpx::future<void> f =
         hpx::dataflow(hpx::ranges::is_sorted, hpx::execution::par, c);
-    f = hpx::dataflow(hpx::util::unwrapping(hpx::ranges::is_sorted),
-        hpx::execution::par, c, f);
+    f = hpx::dataflow(
+        hpx::unwrapping(hpx::ranges::is_sorted), hpx::execution::par, c, f);
     f.get();
 
     return hpx::local::finalize();

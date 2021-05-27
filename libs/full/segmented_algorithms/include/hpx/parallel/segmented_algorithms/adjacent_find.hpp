@@ -256,7 +256,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::list<std::exception_ptr> errors;
                     parallel::util::detail::handle_remote_exceptions<
                         ExPolicy>::call(r, errors);
-                    std::vector<FwdIter> res = hpx::util::unwrap(std::move(r));
+                    std::vector<FwdIter> res = hpx::unwrap(std::move(r));
                     auto it = res.begin();
                     int i = 0;
                     while (it != res.end())
