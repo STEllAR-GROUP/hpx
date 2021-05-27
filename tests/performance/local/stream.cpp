@@ -17,21 +17,16 @@
 #define BOOST_NO_CXX11_ALLOCATOR
 #endif
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/compute.hpp>
-#include <hpx/include/parallel_copy.hpp>
-#include <hpx/include/parallel_executor_parameters.hpp>
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/parallel_fill.hpp>
-#include <hpx/include/parallel_transform.hpp>
-#include <hpx/include/threads.hpp>
-#include <hpx/include/util.hpp>
+#include <hpx/init.hpp>
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/thread.hpp>
+#include <hpx/modules/compute.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/version.hpp>
-#if defined(HPX_HAVE_MODULE_ASYNC_CUDA)
-#include <hpx/async_cuda/cuda_future.hpp>
-#include <hpx/async_cuda/target.hpp>
+#if defined(HPX_HAVE_MODULE_COMPUTE_CUDA)
+#include <hpx/modules/compute_cuda.hpp>
 #endif
 
 #include <cstddef>

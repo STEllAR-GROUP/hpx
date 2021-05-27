@@ -7,7 +7,6 @@
 // This example demonstrates how the HPX serialization archives could be used
 // to directly store/load to/from a file.
 
-#include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/modules/serialization.hpp>
 

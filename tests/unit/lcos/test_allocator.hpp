@@ -7,10 +7,6 @@
 
 #pragma once
 
-#include <hpx/hpx_main.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/modules/testing.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <memory>

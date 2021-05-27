@@ -28,6 +28,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #if defined(__FreeBSD__)
@@ -100,8 +101,8 @@ namespace hpx {
                 bool blocking);
         }    // namespace detail
 
-        inline int init(hpx::util::function_nonser<int(
-                            hpx::program_options::variables_map&)> const& f,
+        inline int init(
+            std::function<int(hpx::program_options::variables_map&)> f,
             int argc, char** argv, init_params const& params = init_params())
         {
             util::set_hpx_prefix(HPX_PREFIX);
@@ -117,12 +118,11 @@ namespace hpx {
             return detail::run_or_start(f, argc, argv, params, true);
         }
 
-        inline int init(util::function_nonser<int(int, char**)> const& f,
-            int argc, char** argv, init_params const& params = init_params())
+        inline int init(std::function<int(int, char**)> f, int argc,
+            char** argv, init_params const& params = init_params())
         {
-            hpx::util::function_nonser<int(
-                hpx::program_options::variables_map&)>
-                main_f = hpx::util::bind_back(hpx::detail::init_helper, f);
+            std::function<int(hpx::program_options::variables_map&)> main_f =
+                hpx::util::bind_back(hpx::detail::init_helper, f);
 
             if (argc == 0 || argv == nullptr)
             {
@@ -133,12 +133,11 @@ namespace hpx {
             return init(main_f, argc, argv, params);
         }
 
-        inline int init(util::function_nonser<int()> const& f, int argc,
-            char** argv, init_params const& params = init_params())
+        inline int init(std::function<int()> f, int argc, char** argv,
+            init_params const& params = init_params())
         {
-            hpx::util::function_nonser<int(
-                hpx::program_options::variables_map&)>
-                main_f = hpx::util::bind(f);
+            std::function<int(hpx::program_options::variables_map&)> main_f =
+                hpx::util::bind(f);
 
             if (argc == 0 || argv == nullptr)
             {
@@ -152,9 +151,7 @@ namespace hpx {
         inline int init(std::nullptr_t, int argc, char** argv,
             init_params const& params = init_params())
         {
-            hpx::util::function_nonser<int(
-                hpx::program_options::variables_map&)>
-                main_f;
+            std::function<int(hpx::program_options::variables_map&)> main_f;
 
             if (argc == 0 || argv == nullptr)
             {
@@ -165,8 +162,8 @@ namespace hpx {
             return init(main_f, argc, argv, params);
         }
 
-        inline int start(hpx::util::function_nonser<int(
-                             hpx::program_options::variables_map&)> const& f,
+        inline int start(
+            std::function<int(hpx::program_options::variables_map&)> f,
             int argc, char** argv, init_params const& params = init_params())
         {
             util::set_hpx_prefix(HPX_PREFIX);
@@ -182,12 +179,11 @@ namespace hpx {
             return detail::run_or_start(f, argc, argv, params, false);
         }
 
-        inline int start(util::function_nonser<int(int, char**)> const& f,
-            int argc, char** argv, init_params const& params = init_params())
+        inline int start(std::function<int(int, char**)> f, int argc,
+            char** argv, init_params const& params = init_params())
         {
-            hpx::util::function_nonser<int(
-                hpx::program_options::variables_map&)>
-                main_f = hpx::util::bind_back(hpx::detail::init_helper, f);
+            std::function<int(hpx::program_options::variables_map&)> main_f =
+                hpx::util::bind_back(hpx::detail::init_helper, f);
 
             if (argc == 0 || argv == nullptr)
             {
@@ -198,12 +194,11 @@ namespace hpx {
             return start(main_f, argc, argv, params);
         }
 
-        inline int start(util::function_nonser<int()> const& f, int argc,
-            char** argv, init_params const& params = init_params())
+        inline int start(std::function<int()> f, int argc, char** argv,
+            init_params const& params = init_params())
         {
-            hpx::util::function_nonser<int(
-                hpx::program_options::variables_map&)>
-                main_f = hpx::util::bind(f);
+            std::function<int(hpx::program_options::variables_map&)> main_f =
+                hpx::util::bind(f);
 
             if (argc == 0 || argv == nullptr)
             {
@@ -217,9 +212,7 @@ namespace hpx {
         inline int start(std::nullptr_t, int argc, char** argv,
             init_params const& params = init_params())
         {
-            hpx::util::function_nonser<int(
-                hpx::program_options::variables_map&)>
-                main_f;
+            std::function<int(hpx::program_options::variables_map&)> main_f;
 
             if (argc == 0 || argv == nullptr)
             {

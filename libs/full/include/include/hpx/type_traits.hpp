@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedname:hpx::util::result_of
-
 #pragma once
 
+#include <hpx/distributed/type_traits.hpp>
 #include <hpx/local/type_traits.hpp>

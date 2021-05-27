@@ -6,8 +6,5 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/distributed/algorithm.hpp>
 #include <hpx/local/algorithm.hpp>
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/parallel/segmented_algorithm.hpp>
-#endif

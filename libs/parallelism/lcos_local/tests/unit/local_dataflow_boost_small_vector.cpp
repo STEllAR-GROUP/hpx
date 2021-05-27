@@ -7,9 +7,9 @@
 
 #include <hpx/local/future.hpp>
 #include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/thread.hpp>
 
 #include <atomic>
 #include <cstddef>

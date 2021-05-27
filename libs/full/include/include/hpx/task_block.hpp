@@ -6,4 +6,5 @@
 
 #pragma once
 
+#include <hpx/distributed/task_block.hpp>
 #include <hpx/local/task_block.hpp>

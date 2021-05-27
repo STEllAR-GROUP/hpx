@@ -10,18 +10,15 @@
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/async_distributed/continuation.hpp>
+#include <hpx/future.hpp>
+#include <hpx/runtime.hpp>
 #endif
-#include <hpx/async_combinators/wait_each.hpp>
-#include <hpx/execution_base/this_thread.hpp>
-#include <hpx/executors/limiting_executor.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/apply.hpp>
-#include <hpx/include/async.hpp>
-#include <hpx/include/parallel_execution.hpp>
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/parallel_for_loop.hpp>
-#include <hpx/include/runtime.hpp>
-#include <hpx/include/threads.hpp>
+#include <hpx/init.hpp>
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/runtime.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>

@@ -8,9 +8,9 @@
 
 #include <hpx/local/future.hpp>
 #include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/synchronization/channel_mpmc.hpp>
-#include <hpx/thread.hpp>
 
 #include <cstddef>
 #include <cstdint>

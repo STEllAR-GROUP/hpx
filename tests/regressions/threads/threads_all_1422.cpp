@@ -7,8 +7,9 @@
 // This test demonstrates the issue described in #1422: hpx:threads=all
 // allocates too many os threads
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/init.hpp>
+#include <hpx/local/runtime.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -30,15 +31,13 @@ int hpx_main()
     return hpx::finalize();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     // Get number of cores from OS
     num_cores = hpx::threads::hardware_concurrency();
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     hpx::init_params init_args;

@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/init.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/mutex.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/mutex.hpp>
 #include <hpx/synchronization/async_rw_mutex.hpp>
 
 #include <atomic>
@@ -279,12 +279,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
     test_multiple_accesses(
         async_rw_mutex<mytype, mytype_base>{mytype{}}, iterations);
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
 {
-    hpx::init_params i;
+    hpx::local::init_params i;
     hpx::program_options::options_description desc_cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
     desc_cmdline.add_options()("seed,s",
@@ -292,6 +292,6 @@ int main(int argc, char* argv[])
         "the random number generator seed to use for this run");
     i.desc_cmdline = desc_cmdline;
 
-    HPX_TEST_EQ(hpx::init(argc, argv, i), 0);
+    HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, i), 0);
     return hpx::util::report_errors();
 }

@@ -18,6 +18,14 @@ sub-namespaces will eventually be removed.
 Header ``hpx/algorithm.hpp``
 ============================
 
+This header includes :ref:`public_api_header_hpx_local_algorithm` and
+:ref:`public_api_header_hpx_distributed_algorithm`.
+
+.. _public_api_header_hpx_local_algorithm:
+
+Header ``hpx/local/algorithm.hpp``
+==================================
+
 Corresponds to the C++ standard library header :cppreference-header:`algorithm`.
 See :ref:`parallel_algorithms` for more information about the parallel
 algorithms.
@@ -138,8 +146,22 @@ Functions
 - :cpp:func:`hpx::ranges::for_loop`
 - :cpp:func:`hpx::ranges::for_loop_strided`
 
+Header ``hpx/distributed/algorithm.hpp``
+========================================
+
+This header provides overloads of the algorithms in
+:ref:`public_api_header_hpx_local_algorithm` for segmented iterators.
+
 Header ``hpx/any.hpp``
 ======================
+
+This header includes :ref:`public_api_header_hpx_local_any` and
+:ref:`public_api_header_hpx_distributed_any`.
+
+.. _public_api_header_hpx_local_any:
+
+Header ``hpx/local/any.hpp``
+============================
 
 Corresponds to the C++ standard library header :cppreference-header:`any`.
 :cpp:type:`hpx::any` is compatible with ``std::any``.
@@ -159,6 +181,11 @@ Functions
 - :cpp:func:`hpx::make_any`
 - :cpp:func:`hpx::make_any_nonser`
 - :cpp:func:`hpx::make_unique_any_nonser`
+
+Header ``hpx/distributed/any.hpp``
+==================================
+
+This header includes :ref:`public_api_header_hpx_local_any`.
 
 Header ``hpx/assert.hpp``
 =========================
@@ -240,6 +267,13 @@ Classes
 Header ``hpx/chrono.hpp``
 =========================
 
+This header includes :ref:`public_api_header_hpx_local_chrono`.
+
+.. _public_api_header_hpx_local_chrono:
+
+Header ``hpx/local/chrono.hpp``
+===============================
+
 Corresponds to the C++ standard library header :cppreference-header:`chrono`.
 The following replacements and extensions are provided compared to
 :cppreference-header:`chrono`. The classes below are also available in the
@@ -252,8 +286,21 @@ Classes
 - :cpp:class:`hpx::chrono::high_resolution_timer`
 - :cpp:class:`hpx::chrono::steady_time_point`
 
+Header ``hpx/distributed/chrono.hpp``
+=====================================
+
+This header includes :ref:`public_api_header_hpx_local_chrono`.
+
 Header ``hpx/condition_variable.hpp``
 =====================================
+
+This header includes :ref:`public_api_header_hpx_local_condition_variable` and
+:ref:`public_api_header_hpx_distributed_condition_variablex`.
+
+.. _public_api_header_hpx_local_condition_variable:
+
+Header ``hpx/local/condition_variable.hpp``
+===========================================
 
 Corresponds to the C++ standard library header
 :cppreference-header:`condition_variable`.
@@ -265,8 +312,21 @@ Classes
 - :cpp:class:`hpx::lcos::local::condition_variable_any`
 - :cpp:class:`hpx::lcos::local::cv_status`
 
+Header ``hpx/distributed/condition_variable.hpp``
+=================================================
+
+This header includes :ref:`public_api_header_hpx_local_condition_variable`.
+
 Header ``hpx/exception.hpp``
 ============================
+
+This header includes :ref:`public_api_header_hpx_local_exception` and
+:ref:`public_api_header_hpx_distributed_exception`.
+
+.. _public_api_header_hpx_local_exception:
+
+Header ``hpx/local/exception.hpp``
+==================================
 
 Corresponds to the C++ standard library header :cppreference-header:`exception`.
 :cpp:class:`hpx::exception` extends ``std::exception`` and is the base class for
@@ -283,8 +343,21 @@ Classes
 
 - :cpp:class:`hpx::exception`
 
+Header ``hpx/distributed/exception.hpp``
+========================================
+
+This header includes :ref:`public_api_header_hpx_local_exception`.
+
 Header ``hpx/execution.hpp``
 ============================
+
+This header includes :ref:`public_api_header_hpx_local_execution` and
+:ref:`public_api_header_hpx_distributed_execution`.
+
+.. _public_api_header_hpx_local_execution:
+
+Header ``hpx/local/execution.hpp``
+==================================
 
 Corresponds to the C++ standard library header :cppreference-header:`execution`.
 See :ref:`parallel`, :ref:`parallel_algorithms` and :ref:`executor_parameters`
@@ -317,8 +390,21 @@ Classes
 - :cpp:class:`hpx::execution::persistent_auto_chunk_size`
 - :cpp:class:`hpx::execution::static_chunk_size`
 
+Header ``hpx/distributed/execution.hpp``
+========================================
+
+This header includes :ref:`public_api_header_hpx_local_execution`.
+
 Header ``hpx/functional.hpp``
 =============================
+
+This header includes :ref:`public_api_header_hpx_local_functional` and
+:ref:`public_api_header_hpx_distributed_functional`.
+
+.. _public_api_header_hpx_local_functional:
+
+Header ``hpx/local/functional.hpp``
+===================================
 
 Corresponds to the C++ standard library header
 :cppreference-header:`functional`. :cpp:class:`hpx::util::function` is a more
@@ -355,6 +441,11 @@ Functions
 - :cpp:func:`hpx::util::invoke`
 - :cpp:func:`hpx::util::invoke_fused`
 - :cpp:func:`hpx::util::mem_fn`
+
+Header ``hpx/distributed/functional.hpp``
+=========================================
+
+This header includes :ref:`public_api_header_hpx_local_functional`.
 
 Header ``hpx/future.hpp``
 =========================
@@ -500,6 +591,14 @@ Classes
 Header ``hpx/mutex.hpp``
 ========================
 
+This header includes :ref:`public_api_header_hpx_local_mutex` and
+:ref:`public_api_header_hpx_distributed_mutex`.
+
+.. _public_api_header_hpx_local_mutex:
+
+Header ``hpx/local/mutex.hpp``
+==============================
+
 Corresponds to the C++ standard library header :cppreference-header:`mutex`.
 
 Classes
@@ -518,8 +617,21 @@ Functions
 
 - :cpp:func:`hpx::lcos::local::call_once`
 
+Header ``hpx/distributed/mutex.hpp``
+====================================
+
+This header includes :ref:`public_api_header_hpx_local_mutex`.
+
 Header ``hpx/memory.hpp``
 =========================
+
+This header includes :ref:`public_api_header_hpx_local_memory` and
+:ref:`public_api_header_hpx_distributed_memory`.
+
+.. _public_api_header_hpx_local_memory:
+
+Header ``hpx/local/memory.hpp``
+===============================
 
 Corresponds to the C++ standard library header :cppreference-header:`memory`. It
 contains parallel versions of the copy, fill, move, and construct helper
@@ -540,8 +652,21 @@ Functions
 - :cpp:func:`hpx::parallel::v1::uninitialized_value_construct`
 - :cpp:func:`hpx::parallel::v1::uninitialized_value_construct_n`
 
+Header ``hpx/distributed/memory.hpp``
+=====================================
+
+This header includes :ref:`public_api_header_hpx_local_memory`.
+
 Header ``hpx/numeric.hpp``
 ==========================
+
+This header includes :ref:`public_api_header_hpx_local_numeric` and
+:ref:`public_api_header_hpx_distributed_numeric`.
+
+.. _public_api_header_hpx_local_numeric:
+
+Header ``hpx/local/numeric.hpp``
+================================
 
 Corresponds to the C++ standard library header :cppreference-header:`numeric`.
 See :ref:`parallel_algorithms` for more information about the parallel
@@ -558,8 +683,21 @@ Functions
 - :cpp:func:`hpx::parallel::v1::transform_inclusive_scan`
 - :cpp:func:`hpx::transform_reduce`
 
+Header ``hpx/distributed/numeric.hpp``
+======================================
+
+This header includes :ref:`public_api_header_hpx_local_numeric`.
+
 Header ``hpx/optional.hpp``
 ===========================
+
+This header includes :ref:`public_api_header_hpx_local_optional` and
+:ref:`public_api_header_hpx_distributed_optional`.
+
+.. _public_api_header_hpx_local_optional:
+
+Header ``hpx/local/optional.hpp``
+=================================
 
 Corresponds to the C++ standard library header :cppreference-header:`optional`.
 :cpp:type:`hpx::util::optional` is compatible with ``std::optional``.
@@ -580,6 +718,11 @@ Functions
 ---------
 
 - :cpp:func:`hpx::util::make_optional`
+
+Header ``hpx/distributed/optional.hpp``
+=================================================
+
+This header includes :ref:`public_api_header_hpx_local_optional`.
 
 Header ``hpx/runtime.hpp``
 ==========================
@@ -633,6 +776,14 @@ Functions
 Header ``hpx/system_error.hpp``
 ===============================
 
+This header includes :ref:`public_api_header_hpx_local_system_error` and
+:ref:`public_api_header_hpx_distributed_system_error`.
+
+.. _public_api_header_hpx_local_system_error:
+
+Header ``hpx/local/system_error.hpp``
+=====================================
+
 Corresponds to the C++ standard library header
 :cppreference-header:`system_error`.
 
@@ -641,8 +792,21 @@ Classes
 
 - :cpp:class:`hpx::error_code`
 
+Header ``hpx/distributed/system_error.hpp``
+===========================================
+
+This header includes :ref:`public_api_header_hpx_local_system_error`.
+
 Header ``hpx/task_block.hpp``
 =============================
+
+This header includes :ref:`public_api_header_hpx_local_task_block` and
+:ref:`public_api_header_hpx_distributed_task_block`.
+
+.. _public_api_header_hpx_local_task_block:
+
+Header ``hpx/local/task_black.hpp``
+===================================
 
 Corresponds to the ``task_block`` feature in |cpp11_n4088|_. See
 :ref:`using_task_block` for more details on using task blocks.
@@ -659,8 +823,21 @@ Functions
 - :cpp:func:`hpx::parallel::v2::define_task_block`
 - :cpp:func:`hpx::parallel::v2::define_task_block_restore_thread`
 
+Header ``hpx/distributed/task_block.hpp``
+=================================================
+
+This header includes :ref:`public_api_header_hpx_local_task_block`.
+
 Header ``hpx/thread.hpp``
 =========================
+
+This header includes :ref:`public_api_header_hpx_local_thread` and
+:ref:`public_api_header_hpx_distributed_thread`.
+
+.. _public_api_header_hpx_local_thread:
+
+Header ``hpx/local/thread.hpp``
+===============================
 
 Corresponds to the C++ standard library header :cppreference-header:`thread`.
 The functionality in this header is equivalent to the standard library thread
@@ -681,8 +858,21 @@ Functions
 - :cpp:func:`hpx::this_thread::sleep_for`
 - :cpp:func:`hpx::this_thread::sleep_until`
 
+Header ``hpx/distributed/thread.hpp``
+=====================================
+
+This header includes :ref:`public_api_header_hpx_local_thread`.
+
 Header ``hpx/semaphore.hpp``
 ============================
+
+This header includes :ref:`public_api_header_hpx_local_semaphore` and
+:ref:`public_api_header_hpx_distributed_semaphore`.
+
+.. _public_api_header_hpx_local_semaphore:
+
+Header ``hpx/local/semaphore.hpp``
+==================================
 
 Corresponds to the C++ standard library header
 :cppreference-header:`semaphore`.
@@ -693,8 +883,21 @@ Classes
 - :cpp:class:`hpx::lcos::local::cpp20_binary_semaphore`
 - :cpp:class:`hpx::lcos::local::cpp20_counting_semaphore`
 
+Header ``hpx/distributed/semaphore.hpp``
+========================================
+
+This header includes :ref:`public_api_header_hpx_local_semaphore`.
+
 Header ``hpx/shared_mutex.hpp``
 ===============================
+
+This header includes :ref:`public_api_header_hpx_local_shared_mutex` and
+:ref:`public_api_header_hpx_distributed_shared_mutex`.
+
+.. _public_api_header_hpx_local_shared_mutex:
+
+Header ``hpx/local/shared_mutex.hpp``
+=====================================
 
 Corresponds to the C++ standard library header
 :cppreference-header:`shared_mutex`.
@@ -704,8 +907,21 @@ Classes
 
 - :cpp:class:`hpx::lcos::local::shared_mutex`
 
+Header ``hpx/distributed/shared_mutex.hpp``
+===========================================
+
+This header includes :ref:`public_api_header_hpx_local_shared_mutex`.
+
 Header ``hpx/stop_token.hpp``
 =============================
+
+This header includes :ref:`public_api_header_hpx_local_stop_token` and
+:ref:`public_api_header_hpx_distributed_stop_token`.
+
+.. _public_api_header_hpx_local_stop_token:
+
+Header ``hpx/local/stop_token.hpp``
+===================================
 
 Corresponds to the C++ standard library header
 :cppreference-header:`stop_token`.
@@ -723,8 +939,21 @@ Classes
 - :cpp:class:`hpx::stop_token`
 - :cpp:struct:`hpx::nostopstate_t`
 
+Header ``hpx/distributed/stop_token.hpp``
+=========================================
+
+This header includes :ref:`public_api_header_hpx_local_stop_token`.
+
 Header ``hpx/tuple.hpp``
 ========================
+
+This header includes :ref:`public_api_header_hpx_local_tuple` and
+:ref:`public_api_header_hpx_distributed_tuple`.
+
+.. _public_api_header_hpx_local_tuple:
+
+Header ``hpx/local/tuple.hpp``
+==============================
 
 Corresponds to the C++ standard library header :cppreference-header:`tuple`.
 :cpp:class:`hpx::tuple` can be used in CUDA device code, unlike ``std::tuple``.
@@ -750,8 +979,21 @@ Functions
 - :cpp:func:`hpx::tuple_cat`
 - :cpp:func:`hpx::get`
 
+Header ``hpx/distributed/tuple.hpp``
+====================================
+
+This header includes :ref:`public_api_header_hpx_local_tuple`.
+
 Header ``hpx/type_traits.hpp``
 ==============================
+
+This header includes :ref:`public_api_header_hpx_local_type_traits` and
+:ref:`public_api_header_hpx_distributed_type_traits`.
+
+.. _public_api_header_hpx_local_type_traits:
+
+Header ``hpx/local/type_traits.hpp``
+====================================
 
 Corresponds to the C++ standard library header
 :cppreference-header:`type_traits`.
@@ -761,6 +1003,11 @@ Classes
 
 - :cpp:struct:`hpx::is_invocable`
 - :cpp:struct:`hpx::is_invocable_r`
+
+Header ``hpx/distributed/type_traits.hpp``
+==========================================
+
+This header includes :ref:`public_api_header_hpx_local_type_traits`.
 
 Header ``hpx/unwrap.hpp``
 =========================
@@ -790,6 +1037,11 @@ Functions
 - :cpp:func:`hpx::unwrapping`
 - :cpp:func:`hpx::unwrapping_n`
 - :cpp:func:`hpx::unwrapping_all`
+
+Header ``hpx/distributed/unwrap.hpp``
+=====================================
+
+This header includes :ref:`public_api_header_hpx_local_unwrap`.
 
 Header ``hpx/version.hpp``
 ==========================

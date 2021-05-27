@@ -4,6 +4,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(include_headers
@@ -12,8 +16,34 @@ set(include_headers
     hpx/barrier.hpp
     hpx/channel.hpp
     hpx/chrono.hpp
+    hpx/condition_variable.hpp
+    hpx/distributed/algorithm.hpp
+    hpx/distributed/any.hpp
+    hpx/distributed/barrier.hpp
+    hpx/distributed/channel.hpp
+    hpx/distributed/chrono.hpp
+    hpx/distributed/condition_variable.hpp
+    hpx/distributed/exception.hpp
+    hpx/distributed/execution.hpp
+    hpx/distributed/functional.hpp
     hpx/distributed/future.hpp
+    hpx/distributed/latch.hpp
+    hpx/distributed/memory.hpp
+    hpx/distributed/mutex.hpp
+    hpx/distributed/numeric.hpp
+    hpx/distributed/object_semaphore.hpp
+    hpx/distributed/optional.hpp
     hpx/distributed/runtime.hpp
+    hpx/distributed/semaphore.hpp
+    hpx/distributed/shared_mutex.hpp
+    hpx/distributed/stop_token.hpp
+    hpx/distributed/system_error.hpp
+    hpx/distributed/task_block.hpp
+    hpx/distributed/thread.hpp
+    hpx/distributed/tuple.hpp
+    hpx/distributed/type_traits.hpp
+    hpx/distributed/unwrap.hpp
+    hpx/exception.hpp
     hpx/execution.hpp
     hpx/functional.hpp
     hpx/future.hpp
@@ -103,12 +133,20 @@ set(include_headers
     hpx/include/util.hpp
     hpx/latch.hpp
     hpx/memory.hpp
+    hpx/mutex.hpp
     hpx/numeric.hpp
+    hpx/object_semaphore.hpp
     hpx/optional.hpp
     hpx/runtime.hpp
+    hpx/semaphore.hpp
+    hpx/shared_mutex.hpp
+    hpx/stop_token.hpp
+    hpx/system_error.hpp
     hpx/task_block.hpp
+    hpx/thread.hpp
     hpx/tuple.hpp
     hpx/type_traits.hpp
+    hpx/unwrap.hpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)

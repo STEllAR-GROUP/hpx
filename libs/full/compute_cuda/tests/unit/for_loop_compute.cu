@@ -7,13 +7,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/algorithm.hpp>
 #include <hpx/async_cuda/target.hpp>
-#include <hpx/include/compute.hpp>
-
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/modules/compute_cuda.hpp>
 #include <hpx/modules/testing.hpp>
-
-#include <hpx/hpx_init.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -100,7 +98,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // Run tests:
     test_for_loop(exec, d_A, d_B, d_C, h_C_ref);
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -114,10 +112,10 @@ int main(int argc, char* argv[])
         "the random number generator seed to use for this run");
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
-    hpx::init(argc, argv, init_args);
+    hpx::local::init(hpx_main, argc, argv, init_args);
 
     return hpx::util::report_errors();
 }

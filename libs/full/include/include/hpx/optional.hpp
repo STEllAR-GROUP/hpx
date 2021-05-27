@@ -6,4 +6,5 @@
 
 #pragma once
 
+#include <hpx/distributed/optional.hpp>
 #include <hpx/local/optional.hpp>

@@ -6,8 +6,8 @@
 //
 // Checking that #582 was fixed
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/init.hpp>
+#include <hpx/local/exception.hpp>
 #include <hpx/modules/testing.hpp>
 
 int hpx_main()

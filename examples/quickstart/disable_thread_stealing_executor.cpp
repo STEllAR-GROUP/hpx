@@ -9,11 +9,10 @@
 // thread stealing for the duration of the execution of a parallel algorithm
 // it is used with.
 
-#include <hpx/hpx_main.hpp>
-
-#include <hpx/algorithm.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution.hpp>
+#include <hpx/hpx_main.hpp>
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/execution.hpp>
 
 #include <algorithm>
 #include <atomic>

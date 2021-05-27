@@ -76,9 +76,9 @@ namespace hpx {
             /// \cond NOINTERNAL
             template <typename... Args>
             auto operator()(Args&&... args)
-                -> decltype(unwrap(std::forward<Args>(args)...))
+                -> decltype(hpx::unwrap(std::forward<Args>(args)...))
             {
-                return unwrap(std::forward<Args>(args)...);
+                return hpx::unwrap(std::forward<Args>(args)...);
             }
             /// \endcond
         };
@@ -111,9 +111,9 @@ namespace hpx {
             /// \cond NOINTERNAL
             template <typename... Args>
             auto operator()(Args&&... args)
-                -> decltype(unwrap_n<Depth>(std::forward<Args>(args)...))
+                -> decltype(hpx::unwrap_n<Depth>(std::forward<Args>(args)...))
             {
-                return unwrap_n<Depth>(std::forward<Args>(args)...);
+                return hpx::unwrap_n<Depth>(std::forward<Args>(args)...);
             }
             /// \endcond
         };
@@ -141,9 +141,9 @@ namespace hpx {
             /// \cond NOINTERNAL
             template <typename... Args>
             auto operator()(Args&&... args)
-                -> decltype(unwrap_all(std::forward<Args>(args)...))
+                -> decltype(hpx::unwrap_all(std::forward<Args>(args)...))
             {
-                return unwrap_all(std::forward<Args>(args)...);
+                return hpx::unwrap_all(std::forward<Args>(args)...);
             }
             /// \endcond
         };

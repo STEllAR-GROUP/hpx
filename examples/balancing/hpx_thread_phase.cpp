@@ -4,12 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/barrier.hpp>
-#include <hpx/include/threadmanager.hpp>
-#include <hpx/include/util.hpp>
-#include <hpx/mutex.hpp>
+#include <hpx/init.hpp>
+#include <hpx/local/barrier.hpp>
+#include <hpx/local/mutex.hpp>
+#include <hpx/local/thread.hpp>
 
 #include <boost/lockfree/queue.hpp>
 

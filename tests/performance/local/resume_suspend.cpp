@@ -8,32 +8,31 @@
 // runtime. This is meant to be compared to start_stop and
 // openmp_parallel_region.
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_start.hpp>
-#include <hpx/hpx_suspend.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/init.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/future.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/timing.hpp>
 
 #include <hpx/modules/program_options.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
     hpx::program_options::options_description desc_commandline;
-    desc_commandline.add_options()
-        ("repetitions",
-         hpx::program_options::value<std::uint64_t>()->default_value(100),
-         "Number of repetitions");
+    desc_commandline.add_options()("repetitions",
+        hpx::program_options::value<std::uint64_t>()->default_value(100),
+        "Number of repetitions");
 
     hpx::program_options::variables_map vm;
     hpx::program_options::store(
         hpx::program_options::command_line_parser(argc, argv)
-        .allow_unregistered()
-        .options(desc_commandline)
-        .run(),
+            .allow_unregistered()
+            .options(desc_commandline)
+            .run(),
         vm);
 
     std::uint64_t repetitions = vm["repetitions"].as<std::uint64_t>();
@@ -46,12 +45,10 @@ int main(int argc, char ** argv)
 
     std::uint64_t threads = hpx::resource::get_num_threads("default");
 
-    std::cout
-        << "threads, resume [s], apply [s], suspend [s]"
-        << std::endl;
+    std::cout << "threads, resume [s], apply [s], suspend [s]" << std::endl;
 
     double suspend_time = 0;
-    double resume_time  = 0;
+    double resume_time = 0;
     hpx::chrono::high_resolution_timer timer;
 
     for (std::size_t i = 0; i < repetitions; ++i)
@@ -64,7 +61,7 @@ int main(int argc, char ** argv)
 
         for (std::size_t thread = 0; thread < threads; ++thread)
         {
-            hpx::apply([](){});
+            hpx::apply([]() {});
         }
 
         auto t_apply = timer.elapsed();
@@ -73,15 +70,11 @@ int main(int argc, char ** argv)
         auto t_suspend = timer.elapsed();
         suspend_time += t_suspend;
 
-        std::cout
-            << threads << ", "
-            << t_resume << ", "
-            << t_apply << ", "
-            << t_suspend
-            << std::endl;
+        std::cout << threads << ", " << t_resume << ", " << t_apply << ", "
+                  << t_suspend << std::endl;
     }
 
-    hpx::util::print_cdash_timing("ResumeTime",  resume_time);
+    hpx::util::print_cdash_timing("ResumeTime", resume_time);
     hpx::util::print_cdash_timing("SuspendTime", suspend_time);
 
     hpx::resume();

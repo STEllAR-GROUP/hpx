@@ -4,22 +4,21 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-
-#include <hpx/futures/future.hpp>
-#include <hpx/modules/async_local.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/async_mpi.hpp>
-#include <hpx/modules/execution.hpp>
-#include <hpx/modules/executors.hpp>
-#include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/program_options.hpp>
 
 #include <array>
 #include <atomic>
+#include <cstdint>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include <mpi.h>
 
@@ -165,7 +164,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         // let the user polling go out of scope
     }
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 // the normal int main function that is called at startup and runs on an OS thread
@@ -199,11 +198,11 @@ int main(int argc, char* argv[])
     // clang-format on
 
     // Initialize and run HPX.
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
     init_args.cfg = cfg;
 
-    auto result = hpx::init(argc, argv, init_args);
+    auto result = hpx::local::init(hpx_main, argc, argv, init_args);
 
     // Finalize MPI
     MPI_Finalize();

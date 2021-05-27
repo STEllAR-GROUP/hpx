@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2021 ETH Zurich
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,4 +6,5 @@
 
 #pragma once
 
-#include <hpx/local/thread.hpp>
+#include <hpx/distributed/semaphore.hpp>
+#include <hpx/local/semaphore.hpp>

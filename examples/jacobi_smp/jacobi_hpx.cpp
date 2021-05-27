@@ -7,9 +7,8 @@
 
 #include "jacobi.hpp"
 
-#include <hpx/hpx.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/util.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/future.hpp>
 
 #include <cstddef>
 #include <functional>
@@ -20,35 +19,29 @@
 
 namespace jacobi_smp {
 
-    void jacobi_kernel_wrap(range const & y_range, std::size_t n,
-        std::vector<double> & dst, std::vector<double> const & src)
+    void jacobi_kernel_wrap(range const& y_range, std::size_t n,
+        std::vector<double>& dst, std::vector<double> const& src)
     {
-        for(std::size_t y = y_range.begin(); y < y_range.end(); ++y)
+        for (std::size_t y = y_range.begin(); y < y_range.end(); ++y)
         {
-                  double * dst_ptr = &dst[y * n];
-            const double * src_ptr = &src[y * n];
-            jacobi_kernel(
-                dst_ptr
-              , src_ptr
-              , n
-            );
+            double* dst_ptr = &dst[y * n];
+            const double* src_ptr = &src[y * n];
+            jacobi_kernel(dst_ptr, src_ptr, n);
         }
     }
 
-    void jacobi(
-        std::size_t n
-      , std::size_t iterations, std::size_t block_size
-      , std::string const& output_filename)
+    void jacobi(std::size_t n, std::size_t iterations, std::size_t block_size,
+        std::string const& output_filename)
     {
         typedef std::vector<double> vector;
 
         std::shared_ptr<vector> grid_new(new vector(n * n, 1));
         std::shared_ptr<vector> grid_old(new vector(n * n, 1));
 
-        typedef std::vector<hpx::shared_future<void> > deps_vector;
+        typedef std::vector<hpx::shared_future<void>> deps_vector;
 
-        std::size_t n_block = static_cast<std::size_t>(std::ceil(double(n)/block_size));
-
+        std::size_t n_block =
+            static_cast<std::size_t>(std::ceil(double(n) / block_size));
 
         std::shared_ptr<deps_vector> deps_new(
             new deps_vector(n_block, hpx::make_ready_future()));
@@ -56,16 +49,18 @@ namespace jacobi_smp {
             new deps_vector(n_block, hpx::make_ready_future()));
 
         hpx::chrono::high_resolution_timer t;
-        for(std::size_t i = 0; i < iterations; ++i)
+        for (std::size_t i = 0; i < iterations; ++i)
         {
-            for(std::size_t y = 1, j = 0; y < n -1; y += block_size, ++j)
+            for (std::size_t y = 1, j = 0; y < n - 1; y += block_size, ++j)
             {
                 std::size_t y_end = (std::min)(y + block_size, n - 1);
-                std::vector<hpx::shared_future<void> > trigger;
+                std::vector<hpx::shared_future<void>> trigger;
                 trigger.reserve(3);
                 trigger.push_back((*deps_old)[j]);
-                if(j > 0) trigger.push_back((*deps_old)[j-1]);
-                if(j + 1 < n_block) trigger.push_back((*deps_old)[j+1]);
+                if (j > 0)
+                    trigger.push_back((*deps_old)[j - 1]);
+                if (j + 1 < n_block)
+                    trigger.push_back((*deps_old)[j + 1]);
 
                 /*
                  * FIXME: dataflow seems to have some raceconditions
@@ -83,16 +78,11 @@ namespace jacobi_smp {
                     );
                 */
 
-                (*deps_new)[j] = hpx::when_all(std::move(trigger)).then(
-                    hpx::launch::async,
-                    hpx::util::bind(
-                        jacobi_kernel_wrap
-                      , range(y, y_end)
-                      , n
-                      , std::ref(*grid_new)
-                      , std::cref(*grid_old)
-                    )
-                );
+                (*deps_new)[j] =
+                    hpx::when_all(std::move(trigger))
+                        .then(hpx::launch::async,
+                            hpx::util::bind(jacobi_kernel_wrap, range(y, y_end),
+                                n, std::ref(*grid_new), std::cref(*grid_old)));
             }
 
             std::swap(grid_new, grid_old);
@@ -103,5 +93,5 @@ namespace jacobi_smp {
 
         report_timing(n, iterations, t.elapsed());
         output_grid(output_filename, *grid_old, n);
-   }
-}
+    }
+}    // namespace jacobi_smp

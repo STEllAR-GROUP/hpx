@@ -4,9 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/util.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/modules/string_util.hpp>
 
 #include <iostream>
 #include <iterator>
@@ -20,13 +20,11 @@ struct pipeline
     static void process(std::vector<std::string> const& input)
     {
         // job for first stage
-        auto grep = [](std::string const& re, std::string const& item)
-        {
+        auto grep = [](std::string const& re, std::string const& item) {
             std::regex regex(re);
             if (std::regex_match(item, regex))
             {
-                auto trim = [](std::string const& s)
-                {
+                auto trim = [](std::string const& s) {
                     return hpx::string_util::trim_copy(s);
                 };
 
@@ -37,8 +35,8 @@ struct pipeline
             }
         };
 
-        std::vector<hpx::future<void> > tasks;
-        for(auto s: input)
+        std::vector<hpx::future<void>> tasks;
+        for (auto s : input)
         {
             tasks.push_back(hpx::async(grep, "Error.*", std::move(s)));
         }
@@ -49,17 +47,11 @@ struct pipeline
 
 int main()
 {
-    std::string inputs[] = {
-        "Error: foobar",
-        "Error. foo",
-        " Warning: barbaz",
-        "Notice: qux",
-        "\tError: abc"
-      };
+    std::string inputs[] = {"Error: foobar", "Error. foo", " Warning: barbaz",
+        "Notice: qux", "\tError: abc"};
     std::vector<std::string> input(std::begin(inputs), std::end(inputs));
 
     pipeline::process(input);
 
     return 0;
 }
-

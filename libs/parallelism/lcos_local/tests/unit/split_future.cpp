@@ -6,8 +6,8 @@
 
 #include <hpx/local/future.hpp>
 #include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/thread.hpp>
 
 #include <array>
 #include <chrono>

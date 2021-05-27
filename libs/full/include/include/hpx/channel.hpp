@@ -6,8 +6,5 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/local/channel.hpp>
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/distributed/channel.hpp>
-#endif
+#include <hpx/local/channel.hpp>

@@ -6,8 +6,5 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/local/future.hpp>
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/distributed/future.hpp>
-#endif
+#include <hpx/local/future.hpp>
