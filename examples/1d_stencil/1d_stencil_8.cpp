@@ -628,8 +628,6 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
     return U_[nt % 2];
 }
 
-HPX_REGISTER_GATHER(stepper_server::space, stepper_server_space_gatherer);
-
 ///////////////////////////////////////////////////////////////////////////////
 void do_all_work(std::uint64_t nt, std::uint64_t nx, std::uint64_t np,
     std::uint64_t nd)

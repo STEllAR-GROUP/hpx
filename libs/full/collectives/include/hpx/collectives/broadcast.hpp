@@ -12,6 +12,35 @@
 // clang-format off
 namespace hpx { namespace lcos {
 
+    /// Create a new communicator object usable with broadcast_to and broadcast_from
+    ///
+    /// This functions creates a new communicator object that can be called in
+    /// order to pre-allocate a communicator object usable with multiple
+    /// invocations of \a broadcast.
+    ///
+    /// \param  basename    The base name identifying the broadcast operation
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the broadcast operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the broadcast operation on the
+    ///                     given base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \params root_site   The site that is responsible for creating the
+    ///                     broadcast support object. This value is optional
+    ///                     and defaults to '0' (zero).
+    ///
+    /// \returns    This function returns a new communicator object usable
+    ///             with broadcast_to and broadcast_from
+    ///
+    communicator create_broadcast(char const* basename,
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+
     /// Broadcast a value to different call sites
     ///
     /// This function sends a set of values to all call sites operating on
@@ -34,10 +63,6 @@ namespace hpx { namespace lcos {
     ///                     broadcast support object. This value is optional
     ///                     and defaults to '0' (zero).
     ///
-    /// \note       Each broadcast operation has to be accompanied with a unique
-    ///             usage of the \a HPX_REGISTER_BROADCAST macro to define the
-    ///             necessary internal facilities used by \a broadcast.
-    ///
     /// \returns    This function returns a future that will become
     ///             ready once the broadcast operation has been completed.
     ///
@@ -48,6 +73,26 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1),
         std::size_t root_site = 0)
+
+    /// Broadcast a value to different call sites
+    ///
+    /// This function sends a set of values to all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  local_result A future referring to the value to transmit to all
+    ///                     participating sites from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a future that will become
+    ///             ready once the broadcast operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<void> broadcast_to(communicator comm,
+        hpx::future<T>&& local_result,
+        std::size_t this_site = std::size_t(-1))
 
     /// Broadcast a value to different call sites
     ///
@@ -71,10 +116,6 @@ namespace hpx { namespace lcos {
     ///                     broadcast support object. This value is optional
     ///                     and defaults to '0' (zero).
     ///
-    /// \note       Each broadcast operation has to be accompanied with a unique
-    ///             usage of the \a HPX_REGISTER_BROADCAST macro to define the
-    ///             necessary internal facilities used by \a broadcast.
-    ///
     /// \returns    This function returns a future that will become
     ///             ready once the broadcast operation has been completed.
     ///
@@ -85,6 +126,26 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1),
         std::size_t root_site = 0)
+
+    /// Broadcast a value to different call sites
+    ///
+    /// This function sends a set of values to all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  local_result A value to transmit to all
+    ///                     participating sites from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a future that will become
+    ///             ready once the broadcast operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<void> broadcast_to(communicator comm,
+        T&& local_result,
+        std::size_t this_site = std::size_t(-1))
 
     /// Receive a value that was broadcast to different call sites
     ///
@@ -101,10 +162,6 @@ namespace hpx { namespace lcos {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
-    /// \note       Each broadcast operation has to be accompanied with a unique
-    ///             usage of the \a HPX_REGISTER_BROADCAST macro to define the
-    ///             necessary internal facilities used by \a broadcast.
-    ///
     /// \returns    This function returns a future holding the value that was
     ///             sent to all participating sites. It will become
     ///             ready once the broadcast operation has been completed.
@@ -114,6 +171,23 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1))
 
+    /// Receive a value that was broadcast to different call sites
+    ///
+    /// This function sends a set of values to all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a future holding the value that was
+    ///             sent to all participating sites. It will become
+    ///             ready once the broadcast operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<T> broadcast_from(communicator comm,
+        std::size_t this_site = std::size_t(-1))
 }}    // namespace hpx::lcos
 
 // clang-format on
@@ -190,8 +264,6 @@ namespace hpx { namespace traits {
 
             if (communicator_.gate_.set(which, std::move(l)))
             {
-                HPX_ASSERT_DOESNT_OWN_LOCK(l);
-
                 l = lock_type(communicator_.mtx_);
                 communicator_.invalidate_data(l);
             }
@@ -232,8 +304,6 @@ namespace hpx { namespace traits {
 
             if (communicator_.gate_.set(which, std::move(l)))
             {
-                HPX_ASSERT_DOESNT_OWN_LOCK(l);
-
                 l = lock_type(communicator_.mtx_);
                 communicator_.invalidate_data(l);
             }

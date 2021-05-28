@@ -18,19 +18,19 @@ namespace hpx { namespace lcos {
     /// order to pre-allocate a communicator object usable with multiple
     /// invocations of \a reduce_here and \a reduce_there.
     ///
-    /// \param  basename    The base name identifying the all_reduce operation
+    /// \param  basename    The base name identifying the reduce operation
     /// \param  num_sites   The number of participating sites (default: all
     ///                     localities).
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_reduce operation performed on the
+    ///                     number of the reduce operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_reduce operation on the
+    ///                     supplied only if the reduce operation on the
     ///                     given base name has to be performed more than once.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \params root_site   The site that is responsible for creating the
-    ///                     all_reduce support object. This value is optional
+    ///                     reduce support object. This value is optional
     ///                     and defaults to '0' (zero).
     ///
     /// \returns    This function returns a new communicator object usable
@@ -172,10 +172,6 @@ namespace hpx { namespace lcos {
     ///                     all_reduce support object. This value is optional
     ///                     and defaults to '0' (zero).
     ///
-    /// \note       Each all_reduce operation has to be accompanied with a unique
-    ///             usage of the \a HPX_REGISTER_ALLREDUCE macro to define the
-    ///             necessary internal facilities used by \a all_reduce.
-    ///
     /// \returns    This function returns a future holding a vector with all
     ///             values send by all participating sites. It will become
     ///             ready once the all_reduce operation has been completed.
@@ -265,6 +261,7 @@ namespace hpx { namespace lcos {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/async_local/dataflow.hpp>
@@ -274,7 +271,6 @@ namespace hpx { namespace lcos {
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
@@ -342,8 +338,6 @@ namespace hpx { namespace traits {
 
             if (communicator_.gate_.set(which, std::move(l)))
             {
-                HPX_ASSERT_DOESNT_OWN_LOCK(l);
-
                 l = lock_type(communicator_.mtx_);
                 communicator_.invalidate_data(l);
             }
@@ -378,8 +372,6 @@ namespace hpx { namespace traits {
 
             if (communicator_.gate_.set(which, std::move(l)))
             {
-                HPX_ASSERT_DOESNT_OWN_LOCK(l);
-
                 l = lock_type(communicator_.mtx_);
                 communicator_.invalidate_data(l);
             }
@@ -594,12 +586,6 @@ namespace hpx {
     using lcos::reduce_here;
     using lcos::reduce_there;
 }    // namespace hpx
-
-////////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_REDUCE_DECLARATION(...) /**/
-
-////////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_REDUCE(...)             /**/
 
 #endif    // COMPUTE_HOST_CODE
 #endif    // DOXYGEN

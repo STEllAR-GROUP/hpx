@@ -29,7 +29,7 @@ namespace hpx {
             std::string const& basename, std::size_t idx);
         HPX_EXPORT std::string name_from_basename(
             std::string&& basename, std::size_t idx);
-    }
+    }    // namespace detail
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////

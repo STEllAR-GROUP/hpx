@@ -93,9 +93,8 @@ void test_multiple_use()
     {
         std::uint32_t value = hpx::get_locality_id();
 
-        hpx::future<std::uint32_t> overall_result =
-            hpx::all_reduce(all_reduce_direct_client, value,
-                std::plus<std::uint32_t>{});
+        hpx::future<std::uint32_t> overall_result = hpx::all_reduce(
+            all_reduce_direct_client, value, std::plus<std::uint32_t>{});
 
         std::uint32_t sum = 0;
         for (std::uint32_t j = 0; j != num_localities; ++j)

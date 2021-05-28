@@ -12,14 +12,41 @@
 // clang-format off
 namespace hpx { namespace lcos {
 
+    /// Create a new communicator object usable with scatter_from and scatter_to
+    ///
+    /// This functions creates a new communicator object that can be called in
+    /// order to pre-allocate a communicator object usable with multiple
+    /// invocations of \a scatter_from and \a scatter_to.
+    ///
+    /// \param  basename    The base name identifying the scatter operation
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the scatter operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the scatter operation on the
+    ///                     given base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \params root_site   The site that is responsible for creating the
+    ///                     scatter support object. This value is optional
+    ///                     and defaults to '0' (zero).
+    ///
+    /// \returns    This function returns a new communicator object usable
+    ///             with scatter_from and scatter_to
+    ///
+    communicator create_scatterer(char const* basename,
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+
     /// Scatter (receive) a set of values to different call sites
     ///
     /// This function receives an element of a set of values operating on
     /// the given base name.
     ///
     /// \param  basename    The base name identifying the scatter operation
-    /// \param  result      A future referring to the value to transmit to the
-    ///                     central scatter point from this call site.
     /// \param  generation  The generational counter identifying the sequence
     ///                     number of the scatter operation performed on the
     ///                     given base name. This is optional and needs to be
@@ -32,11 +59,6 @@ namespace hpx { namespace lcos {
     ///                     (usually the locality id). This value is optional
     ///                     and defaults to 0.
     ///
-    /// \note       Each scatter operation has to be accompanied with a unique
-    ///             usage of the \a HPX_REGISTER_SCATTER macro to define the
-    ///             necessary internal facilities used by \a scatter_from and
-    ///             \a scatter_to
-    ///
     /// \returns    This function returns a future holding a the
     ///             scattered value. It will become ready once the scatter
     ///             operation has been completed.
@@ -46,6 +68,24 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1),
         std::size_t root_site = 0);
+
+    /// Scatter (receive) a set of values to different call sites
+    ///
+    /// This function receives an element of a set of values operating on
+    /// the given base name.
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a future holding a the
+    ///             scattered value. It will become ready once the scatter
+    ///             operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<T> scatter_from(communicator comm,
+        std::size_t this_site = std::size_t(-1));
 
     /// Scatter (send) a part of the value set at the given call site
     ///
@@ -65,11 +105,6 @@ namespace hpx { namespace lcos {
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
-    ///
-    /// \note       Each scatter operation has to be accompanied with a unique
-    ///             usage of the \a HPX_REGISTER_SCATTER macro to define the
-    ///             necessary internal facilities used by \a scatter_from and
-    ///             \a scatter_to
     ///
     /// \returns    This function returns a future holding a the
     ///             scattered value. It will become ready once the scatter
@@ -81,14 +116,40 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1));
 
+    /// Scatter (send) a part of the value set at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central scatter
+    /// site (where the corresponding \a scatter_from is executed)
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  result      A future referring to the value to transmit to the
+    ///                     central scatter point from this call site.
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the scatter operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the scatter operation on the given
+    ///                     base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a future holding a the
+    ///             scattered value. It will become ready once the scatter
+    ///             operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<T> scatter_to(communicator comm,
+        hpx::future<std::vector<T>> result,
+        std::size_t this_site = std::size_t(-1));
+
     /// Scatter (receive) a set of values to different call sites
     ///
     /// This function receives an element of a set of values operating on
     /// the given base name.
     ///
     /// \param  basename    The base name identifying the scatter operation
-    /// \param  result      The value to transmit to the central scatter point
-    ///                     from this call site.
     /// \param  generation  The generational counter identifying the sequence
     ///                     number of the scatter operation performed on the
     ///                     given base name. This is optional and needs to be
@@ -101,11 +162,6 @@ namespace hpx { namespace lcos {
     ///                     (usually the locality id). This value is optional
     ///                     and defaults to 0.
     ///
-    /// \note       Each scatter operation has to be accompanied with a unique
-    ///             usage of the \a HPX_REGISTER_SCATTER macro to define the
-    ///             necessary internal facilities used by \a scatter_from and
-    ///             \a scatter_to
-    ///
     /// \returns    This function returns a future holding a the
     ///             scattered value. It will become ready once the scatter
     ///             operation has been completed.
@@ -115,6 +171,24 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1),
         std::size_t root_site = 0);
+
+    /// Scatter (receive) a set of values to different call sites
+    ///
+    /// This function receives an element of a set of values operating on
+    /// the given base name.
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a future holding a the
+    ///             scattered value. It will become ready once the scatter
+    ///             operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<T> scatter_from(communicator comm,
+        std::size_t this_site = std::size_t(-1));
 
     /// Scatter (send) a part of the value set at the given call site
     ///
@@ -135,27 +209,36 @@ namespace hpx { namespace lcos {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
-    /// \note       Each scatter operation has to be accompanied with a unique
-    ///             usage of the \a HPX_REGISTER_SCATTER macro to define the
-    ///             necessary internal facilities used by \a scatter_from and
-    ///             \a scatter_to
-    ///
     /// \returns    This function returns a future holding a the
     ///             scattered value. It will become ready once the scatter
     ///             operation has been completed.
     ///
     template <typename T>
     hpx::future<T> scatter_to(char const* basename,
-        std::vector<T> const& result,
+        std::vector<T>&& result,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1));
 
+    /// Scatter (send) a part of the value set at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central scatter
+    /// site (where the corresponding \a scatter_from is executed)
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a future holding a the
+    ///             scattered value. It will become ready once the scatter
+    ///             operation has been completed.
+    ///
     template <typename T>
-    hpx::future<T> scatter_to(char const* basename,
+    hpx::future<T> scatter_to(communicator comm,
         std::vector<T>&& result,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1));
 }}    // namespace hpx::lcos
 
@@ -175,7 +258,6 @@ namespace hpx { namespace lcos {
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
@@ -236,8 +318,6 @@ namespace hpx { namespace traits {
 
             if (communicator_.gate_.set(which, std::move(l)))
             {
-                HPX_ASSERT_DOESNT_OWN_LOCK(l);
-
                 l = lock_type(communicator_.mtx_);
                 communicator_.invalidate_data(l);
             }
@@ -278,8 +358,6 @@ namespace hpx { namespace traits {
 
             if (communicator_.gate_.set(which, std::move(l)))
             {
-                HPX_ASSERT_DOESNT_OWN_LOCK(l);
-
                 l = lock_type(communicator_.mtx_);
                 communicator_.invalidate_data(l);
             }

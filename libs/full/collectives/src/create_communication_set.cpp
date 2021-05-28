@@ -10,6 +10,7 @@
 #include <hpx/collectives/communication_set.hpp>
 #include <hpx/collectives/detail/communication_set_node.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
+#include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>

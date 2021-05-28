@@ -10,13 +10,13 @@
 #include <hpx/actions_base/traits/action_remote_result.hpp>
 #include <hpx/actions_base/traits/is_client.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/components/basename_registration.hpp>
 #include <hpx/components/components_fwd.hpp>
 #include <hpx/components/make_client.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/stub_base.hpp>
 #include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
-#include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_future.hpp>
 #include <hpx/futures/traits/future_access.hpp>

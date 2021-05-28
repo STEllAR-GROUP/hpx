@@ -61,8 +61,8 @@ namespace hpx { namespace lcos { namespace detail {
             HPX_ASSERT(false);    // shouldn't ever be called
         }
 
-        communicator_server(std::size_t num_sites,
-            std::size_t site, std::size_t num_values)
+        communicator_server(
+            std::size_t num_sites, std::size_t site, std::size_t num_values)
           : data_()
           , gate_(num_sites)
           , num_values_(num_values)

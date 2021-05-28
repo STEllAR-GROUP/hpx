@@ -22,8 +22,6 @@
 
 char const* gather_basename = "/test/gather/";
 
-HPX_REGISTER_GATHER(std::uint32_t, test_gather);
-
 int hpx_main()
 {
     for (int i = 0; i < 10; ++i)

@@ -12,6 +12,35 @@
 // clang-format off
 namespace hpx { namespace lcos {
 
+    /// Create a new communicator object usable with all_to_all
+    ///
+    /// This functions creates a new communicator object that can be called in
+    /// order to pre-allocate a communicator object usable with multiple
+    /// invocations of \a all_to_all.
+    ///
+    /// \param  basename    The base name identifying the all_to_all operation
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_to_all operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_to_all operation on the
+    ///                     given base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \params root_site   The site that is responsible for creating the
+    ///                     all_to_all support object. This value is optional
+    ///                     and defaults to '0' (zero).
+    ///
+    /// \returns    This function returns a new communicator object usable
+    ///             with all_to_all
+    ///
+    communicator create_all_to_all(char const* basename,
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+
     /// AllToAll a set of values from different call sites
     ///
     /// This function receives a set of values from all call sites operating on
@@ -34,21 +63,40 @@ namespace hpx { namespace lcos {
     ///                     all_to_all support object. This value is optional
     ///                     and defaults to '0' (zero).
     ///
-    /// \note       Each all_to_all operation has to be accompanied with a unique
-    ///             usage of the \a HPX_REGISTER_ALLTOALL macro to define the
-    ///             necessary internal facilities used by \a all_to_all.
+    /// \returns    This function returns a future holding a vector with all
+    ///             values send by all participating sites. It will become
+    ///             ready once the all_to_all operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<std::vector<T>>
+    all_to_all(char const* basename,
+        hpx::future<std::vector<T>>&& result,
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1),
+        std::size_t root_site = 0);
+
+    /// AllToAll a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  local_result A future referring to the value to transmit to all
+    ///                     participating sites from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
     /// \returns    This function returns a future holding a vector with all
     ///             values send by all participating sites. It will become
     ///             ready once the all_to_all operation has been completed.
     ///
     template <typename T>
-    hpx::future<std::vector<T>> all_to_all(char const* basename,
+    hpx::future<std::vector<T>>
+    all_to_all(communicator comm,
         hpx::future<std::vector<T>>&& result,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t root_site = 0);
+        std::size_t this_site = std::size_t(-1));
 
     /// AllToAll a set of values from different call sites
     ///
@@ -72,20 +120,37 @@ namespace hpx { namespace lcos {
     ///                     all_to_all support object. This value is optional
     ///                     and defaults to '0' (zero).
     ///
-    /// \note       Each all_to_all operation has to be accompanied with a unique
-    ///             usage of the \a HPX_REGISTER_ALLTOALL macro to define the
-    ///             necessary internal facilities used by \a all_to_all.
+    /// \returns    This function returns a future holding a vector with all
+    ///             values send by all participating sites. It will become
+    ///             ready once the all_to_all operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<std::vector<std::decay_t<T>>>
+    all_to_all(char const* basename, T&& result,
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+
+    /// AllToAll a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  local_result The value to transmit to all
+    ///                     participating sites from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
     /// \returns    This function returns a future holding a vector with all
     ///             values send by all participating sites. It will become
     ///             ready once the all_to_all operation has been completed.
     ///
     template <typename T>
-    hpx::future<std::vector<std::decay_t<T>>> all_to_all(
-        char const* basename, T&& result,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+    hpx::future<std::vector<std::decay_t<T>>>
+    all_to_all(communicator comm, T&& result,
+        std::size_t this_site = std::size_t(-1)0);
 }}    // namespace hpx::lcos
 
 // clang-format on
@@ -103,7 +168,6 @@ namespace hpx { namespace lcos {
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
@@ -178,8 +242,6 @@ namespace hpx { namespace traits {
 
             if (communicator_.gate_.set(which, std::move(l)))
             {
-                HPX_ASSERT_DOESNT_OWN_LOCK(l);
-
                 l = lock_type(communicator_.mtx_);
                 communicator_.invalidate_data(l);
             }

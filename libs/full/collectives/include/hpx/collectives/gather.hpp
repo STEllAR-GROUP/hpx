@@ -12,6 +12,35 @@
 // clang-format off
 namespace hpx { namespace lcos {
 
+    /// Create a new communicator object usable with gather_here and gather_there
+    ///
+    /// This functions creates a new communicator object that can be called in
+    /// order to pre-allocate a communicator object usable with multiple
+    /// invocations of \a gather_here and \a gather_there.
+    ///
+    /// \param  basename    The base name identifying the gather operation
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the gather operation on the
+    ///                     given base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \params root_site   The site that is responsible for creating the
+    ///                     gather support object. This value is optional
+    ///                     and defaults to '0' (zero).
+    ///
+    /// \returns    This function returns a new communicator object usable
+    ///             with gather_here and gather_there
+    ///
+    communicator create_gatherer(char const* basename,
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+
     /// Gather a set of values from different call sites
     ///
     /// This function receives a set of values from all call sites operating on
@@ -30,11 +59,6 @@ namespace hpx { namespace lcos {
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
-    ///
-    /// \note       Each gather operation has to be accompanied with a unique
-    ///             usage of the \a HPX_REGISTER_GATHER macro to define the
-    ///             necessary internal facilities used by \a gather_here and
-    ///             \a gather_there
     ///
     /// \returns    This function returns a future holding a vector with all
     ///             gathered values. It will become ready once the gather
@@ -47,6 +71,27 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1));
 
+    /// Gather a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  result      A future referring to the value to transmit to the
+    ///                     central gather point from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a future holding a vector with all
+    ///             gathered values. It will become ready once the gather
+    ///             operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<std::vector<T>> gather_here(communicator comm,
+        hpx::future<T> result,
+        std::size_t this_site = std::size_t(-1));
+
     /// Gather a given value at the given call site
     ///
     /// This function transmits the value given by \a result to a central gather
@@ -67,11 +112,6 @@ namespace hpx { namespace lcos {
     ///                     (usually the locality id). This value is optional
     ///                     and defaults to 0.
     ///
-    /// \note       Each gather operation has to be accompanied with a unique
-    ///             usage of the \a HPX_REGISTER_GATHER macro to define the
-    ///             necessary internal facilities used by \a gather_here and
-    ///             \a gather_there
-    ///
     /// \returns    This function returns a future holding a vector with all
     ///             gathered values. It will become ready once the gather
     ///             operation has been completed.
@@ -82,6 +122,27 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1),
         std::size_t root_site = 0);
+
+    /// Gather a given value at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central gather
+    /// site (where the corresponding \a gather_here is executed)
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  result      A future referring to the value to transmit to the
+    ///                     central gather point from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a future holding a vector with all
+    ///             gathered values. It will become ready once the gather
+    ///             operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<std::vector<T>> gather_there(communicator comm,
+        hpx::future<T> result,
+        std::size_t this_site = std::size_t(-1));
 
     /// Gather a set of values from different call sites
     ///
@@ -102,11 +163,6 @@ namespace hpx { namespace lcos {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
-    /// \note       Each gather operation has to be accompanied with a unique
-    ///             usage of the \a HPX_REGISTER_GATHER macro to define the
-    ///             necessary internal facilities used by \a gather_here and
-    ///             \a gather_there
-    ///
     /// \returns    This function returns a future holding a vector with all
     ///             gathered values. It will become ready once the gather
     ///             operation has been completed.
@@ -116,6 +172,27 @@ namespace hpx { namespace lcos {
         char const* basename, T&& result,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1));
+
+    /// Gather a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  result      The value to transmit to the central gather point
+    ///                     from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a future holding a vector with all
+    ///             gathered values. It will become ready once the gather
+    ///             operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<std::vector<decay_t<T>>> gather_here(
+        communicator comm, T&& result,
         std::size_t this_site = std::size_t(-1));
 
     /// Gather a given value at the given call site
@@ -138,11 +215,6 @@ namespace hpx { namespace lcos {
     ///                     (usually the locality id). This value is optional
     ///                     and defaults to 0.
     ///
-    /// \note       Each gather operation has to be accompanied with a unique
-    ///             usage of the \a HPX_REGISTER_GATHER macro to define the
-    ///             necessary internal facilities used by \a gather_here and
-    ///             \a gather_there
-    ///
     /// \returns    This function returns a future holding a vector with all
     ///             gathered values. It will become ready once the gather
     ///             operation has been completed.
@@ -154,6 +226,27 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1),
         std::size_t root_site = 0);
+
+    /// Gather a given value at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central gather
+    /// site (where the corresponding \a gather_here is executed)
+    ///
+    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  result      The value to transmit to the central gather point
+    ///                     from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a future holding a vector with all
+    ///             gathered values. It will become ready once the gather
+    ///             operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<std::vector<decay_t<T>>>
+    gather_there(communicator comm, T&& result,
+        std::size_t this_site = std::size_t(-1));
 }}    // namespace hpx::lcos
 
 // clang-format on
@@ -172,7 +265,6 @@ namespace hpx { namespace lcos {
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
@@ -235,8 +327,6 @@ namespace hpx { namespace traits {
 
             if (communicator_.gate_.set(which, std::move(l)))
             {
-                HPX_ASSERT_DOESNT_OWN_LOCK(l);
-
                 l = lock_type(communicator_.mtx_);
                 communicator_.invalidate_data(l);
             }
@@ -271,8 +361,6 @@ namespace hpx { namespace traits {
 
             if (communicator_.gate_.set(which, std::move(l)))
             {
-                HPX_ASSERT_DOESNT_OWN_LOCK(l);
-
                 l = lock_type(communicator_.mtx_);
                 communicator_.invalidate_data(l);
             }
