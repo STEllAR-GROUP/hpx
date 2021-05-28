@@ -15,7 +15,9 @@
 #include <hpx/mpi_base/mpi.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
 
+#include <atomic>
 #include <cstddef>
+#include <cstdint>
 #include <iosfwd>
 #include <string>
 #include <utility>
