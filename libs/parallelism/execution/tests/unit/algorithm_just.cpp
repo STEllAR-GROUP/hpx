@@ -21,7 +21,7 @@ namespace ex = hpx::execution::experimental;
 template <typename T>
 auto tag_dispatch(ex::just_t, custom_type<T> c)
 {
-    c.tag_invoke_overload_called = true;
+    c.tag_dispatch_overload_called = true;
     return ex::just(c.x);
 }
 
@@ -83,15 +83,15 @@ int main()
 
     {
         std::atomic<bool> set_value_called{false};
-        std::atomic<bool> tag_invoke_overload_called{false};
-        custom_type<int> c{tag_invoke_overload_called, 3};
+        std::atomic<bool> tag_dispatch_overload_called{false};
+        custom_type<int> c{tag_dispatch_overload_called, 3};
         auto s = ex::just(c);
         auto f = [](int x) { HPX_TEST_EQ(x, 3); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
-        HPX_TEST(tag_invoke_overload_called);
+        HPX_TEST(tag_dispatch_overload_called);
     }
 
     return hpx::util::report_errors();

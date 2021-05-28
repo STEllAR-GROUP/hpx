@@ -13,7 +13,7 @@
 #include <type_traits>
 
 static std::size_t member_schedule_calls = 0;
-static std::size_t tag_invoke_schedule_calls = 0;
+static std::size_t tag_dispatch_schedule_calls = 0;
 
 struct sender
 {
@@ -89,7 +89,7 @@ struct scheduler_2
 
 sender tag_dispatch(hpx::execution::experimental::schedule_t, scheduler_2)
 {
-    ++tag_invoke_schedule_calls;
+    ++tag_dispatch_schedule_calls;
     return {};
 }
 
@@ -114,7 +114,7 @@ struct scheduler_3
 
 sender tag_dispatch(hpx::execution::experimental::schedule_t, scheduler_3)
 {
-    ++tag_invoke_schedule_calls;
+    ++tag_dispatch_schedule_calls;
     return {};
 }
 
@@ -139,19 +139,19 @@ int main()
     sender snd1 = hpx::execution::experimental::schedule(s1);
     HPX_UNUSED(snd1);
     HPX_TEST_EQ(member_schedule_calls, std::size_t(1));
-    HPX_TEST_EQ(tag_invoke_schedule_calls, std::size_t(0));
+    HPX_TEST_EQ(tag_dispatch_schedule_calls, std::size_t(0));
 
     scheduler_2 s2;
     sender snd2 = hpx::execution::experimental::schedule(s2);
     HPX_UNUSED(snd2);
     HPX_TEST_EQ(member_schedule_calls, std::size_t(1));
-    HPX_TEST_EQ(tag_invoke_schedule_calls, std::size_t(1));
+    HPX_TEST_EQ(tag_dispatch_schedule_calls, std::size_t(1));
 
     scheduler_3 s3;
     sender snd3 = hpx::execution::experimental::schedule(s3);
     HPX_UNUSED(snd3);
     HPX_TEST_EQ(member_schedule_calls, std::size_t(2));
-    HPX_TEST_EQ(tag_invoke_schedule_calls, std::size_t(1));
+    HPX_TEST_EQ(tag_dispatch_schedule_calls, std::size_t(1));
 
     return hpx::util::report_errors();
 }

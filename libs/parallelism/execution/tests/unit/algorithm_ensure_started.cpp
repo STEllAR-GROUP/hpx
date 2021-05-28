@@ -21,10 +21,10 @@ namespace ex = hpx::execution::experimental;
 // This overload is only used to check dispatching. It is not a useful
 // implementation.
 template <typename Allocator = hpx::util::internal_allocator<>>
-auto tag_dispatch(ex::ensure_started_t, custom_sender_tag_invoke s,
+auto tag_dispatch(ex::ensure_started_t, custom_sender_tag_dispatch s,
     Allocator const& = Allocator{})
 {
-    s.tag_invoke_overload_called = true;
+    s.tag_dispatch_overload_called = true;
     return void_sender{};
 }
 
@@ -90,15 +90,15 @@ int main()
     // tag_dispatch overload
     {
         std::atomic<bool> receiver_set_value_called{false};
-        std::atomic<bool> tag_invoke_overload_called{false};
-        auto s = custom_sender_tag_invoke{tag_invoke_overload_called} |
+        std::atomic<bool> tag_dispatch_overload_called{false};
+        auto s = custom_sender_tag_dispatch{tag_dispatch_overload_called} |
             ex::ensure_started();
         auto f = [] {};
         auto r = callback_receiver<decltype(f)>{f, receiver_set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(receiver_set_value_called);
-        HPX_TEST(tag_invoke_overload_called);
+        HPX_TEST(tag_dispatch_overload_called);
     }
 
     // Failure path

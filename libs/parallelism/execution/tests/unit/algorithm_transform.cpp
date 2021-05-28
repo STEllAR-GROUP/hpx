@@ -20,7 +20,7 @@ namespace ex = hpx::execution::experimental;
 
 struct custom_transformer
 {
-    std::atomic<bool>& tag_invoke_overload_called;
+    std::atomic<bool>& tag_dispatch_overload_called;
     std::atomic<bool>& call_operator_called;
     bool throws;
 
@@ -37,7 +37,7 @@ struct custom_transformer
 template <typename S>
 auto tag_dispatch(ex::transform_t, S&& s, custom_transformer t)
 {
-    t.tag_invoke_overload_called = true;
+    t.tag_dispatch_overload_called = true;
     return ex::transform(std::forward<S>(s), [t = std::move(t)]() { t(); });
 }
 
@@ -137,17 +137,17 @@ int main()
     // tag_dispatch overload
     {
         std::atomic<bool> receiver_set_value_called{false};
-        std::atomic<bool> tag_invoke_overload_called{false};
+        std::atomic<bool> tag_dispatch_overload_called{false};
         std::atomic<bool> custom_transformer_call_operator_called{false};
         auto s = ex::transform(ex::just(),
-            custom_transformer{tag_invoke_overload_called,
+            custom_transformer{tag_dispatch_overload_called,
                 custom_transformer_call_operator_called, false});
         auto f = [] {};
         auto r = callback_receiver<decltype(f)>{f, receiver_set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(receiver_set_value_called);
-        HPX_TEST(tag_invoke_overload_called);
+        HPX_TEST(tag_dispatch_overload_called);
         HPX_TEST(custom_transformer_call_operator_called);
     }
 
@@ -187,17 +187,17 @@ int main()
 
     {
         std::atomic<bool> receiver_set_error_called{false};
-        std::atomic<bool> tag_invoke_overload_called{false};
+        std::atomic<bool> tag_dispatch_overload_called{false};
         std::atomic<bool> custom_transformer_call_operator_called{false};
         auto s = ex::transform(ex::just(),
-            custom_transformer{tag_invoke_overload_called,
+            custom_transformer{tag_dispatch_overload_called,
                 custom_transformer_call_operator_called, true});
         auto r = error_callback_receiver<decltype(check_exception_ptr)>{
             check_exception_ptr, receiver_set_error_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(receiver_set_error_called);
-        HPX_TEST(tag_invoke_overload_called);
+        HPX_TEST(tag_dispatch_overload_called);
         HPX_TEST(custom_transformer_call_operator_called);
     }
 

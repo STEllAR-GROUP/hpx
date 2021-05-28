@@ -23,7 +23,7 @@ namespace ex = hpx::execution::experimental;
 // check that the tag_dispatch overload is called.
 void tag_dispatch(ex::sync_wait_t, custom_sender2 s)
 {
-    s.tag_invoke_overload_called = true;
+    s.tag_dispatch_overload_called = true;
 }
 
 int hpx_main()
@@ -32,12 +32,12 @@ int hpx_main()
     {
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};
-        std::atomic<bool> tag_invoke_overload_called{false};
+        std::atomic<bool> tag_dispatch_overload_called{false};
         ex::sync_wait(custom_sender{
-            start_called, connect_called, tag_invoke_overload_called});
+            start_called, connect_called, tag_dispatch_overload_called});
         HPX_TEST(start_called);
         HPX_TEST(connect_called);
-        HPX_TEST(!tag_invoke_overload_called);
+        HPX_TEST(!tag_dispatch_overload_called);
     }
 
     {
@@ -64,13 +64,13 @@ int hpx_main()
     {
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};
-        std::atomic<bool> tag_invoke_overload_called{false};
+        std::atomic<bool> tag_dispatch_overload_called{false};
         custom_sender{
-            start_called, connect_called, tag_invoke_overload_called} |
+            start_called, connect_called, tag_dispatch_overload_called} |
             ex::sync_wait();
         HPX_TEST(start_called);
         HPX_TEST(connect_called);
-        HPX_TEST(!tag_invoke_overload_called);
+        HPX_TEST(!tag_dispatch_overload_called);
     }
 
     {
@@ -81,12 +81,12 @@ int hpx_main()
     {
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};
-        std::atomic<bool> tag_invoke_overload_called{false};
+        std::atomic<bool> tag_dispatch_overload_called{false};
         ex::sync_wait(custom_sender2{custom_sender{
-            start_called, connect_called, tag_invoke_overload_called}});
+            start_called, connect_called, tag_dispatch_overload_called}});
         HPX_TEST(!start_called);
         HPX_TEST(!connect_called);
-        HPX_TEST(tag_invoke_overload_called);
+        HPX_TEST(tag_dispatch_overload_called);
     }
 
     // Failure path

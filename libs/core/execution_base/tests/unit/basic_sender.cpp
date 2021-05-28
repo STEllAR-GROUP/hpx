@@ -15,7 +15,7 @@
 #include <utility>
 
 static std::size_t member_connect_calls = 0;
-static std::size_t tag_invoke_connect_calls = 0;
+static std::size_t tag_dispatch_connect_calls = 0;
 
 struct non_sender_1
 {
@@ -135,7 +135,7 @@ struct sender_2
 sender_2::operation_state tag_dispatch(
     hpx::execution::experimental::connect_t, sender_2, receiver& r)
 {
-    ++tag_invoke_connect_calls;
+    ++tag_dispatch_connect_calls;
     return {r};
 }
 
@@ -163,7 +163,7 @@ struct sender_3
 sender_3::operation_state tag_dispatch(
     hpx::execution::experimental::connect_t, sender_3, receiver& r)
 {
-    ++tag_invoke_connect_calls;
+    ++tag_dispatch_connect_calls;
     return {r};
 }
 
@@ -180,7 +180,7 @@ struct void_receiver
 };
 
 static std::size_t member_execute_calls = 0;
-static std::size_t tag_invoke_execute_calls = 0;
+static std::size_t tag_dispatch_execute_calls = 0;
 
 struct executor_1
 {
@@ -225,7 +225,7 @@ struct executor_2
 template <typename F>
 void tag_dispatch(hpx::execution::experimental::execute_t, executor_2, F&& f)
 {
-    ++tag_invoke_execute_calls;
+    ++tag_dispatch_execute_calls;
     hpx::util::invoke(f);
 }
 
@@ -245,7 +245,7 @@ struct executor_3
 template <typename F>
 void tag_dispatch(hpx::execution::experimental::execute_t, executor_3, F&& f)
 {
-    ++tag_invoke_execute_calls;
+    ++tag_dispatch_execute_calls;
     hpx::util::invoke(f);
 }
 
@@ -345,7 +345,7 @@ int main()
         hpx::execution::experimental::start(os);
         HPX_TEST_EQ(r1.i, 4711);
         HPX_TEST_EQ(member_connect_calls, std::size_t(1));
-        HPX_TEST_EQ(tag_invoke_connect_calls, std::size_t(0));
+        HPX_TEST_EQ(tag_dispatch_connect_calls, std::size_t(0));
     }
 
     {
@@ -354,7 +354,7 @@ int main()
         hpx::execution::experimental::start(os);
         HPX_TEST_EQ(r2.i, 4711);
         HPX_TEST_EQ(member_connect_calls, std::size_t(2));
-        HPX_TEST_EQ(tag_invoke_connect_calls, std::size_t(0));
+        HPX_TEST_EQ(tag_dispatch_connect_calls, std::size_t(0));
     }
 
     {
@@ -363,7 +363,7 @@ int main()
         hpx::execution::experimental::start(os);
         HPX_TEST_EQ(r3.i, 4711);
         HPX_TEST_EQ(member_connect_calls, std::size_t(2));
-        HPX_TEST_EQ(tag_invoke_connect_calls, std::size_t(1));
+        HPX_TEST_EQ(tag_dispatch_connect_calls, std::size_t(1));
     }
 
     {
@@ -373,7 +373,7 @@ int main()
         hpx::execution::experimental::start(os);
         HPX_TEST_EQ(void_receiver_set_value_calls, std::size_t(1));
         HPX_TEST_EQ(member_execute_calls, std::size_t(1));
-        HPX_TEST_EQ(tag_invoke_execute_calls, std::size_t(0));
+        HPX_TEST_EQ(tag_dispatch_execute_calls, std::size_t(0));
     }
 
     {
@@ -383,7 +383,7 @@ int main()
         hpx::execution::experimental::start(os);
         HPX_TEST_EQ(void_receiver_set_value_calls, std::size_t(2));
         HPX_TEST_EQ(member_execute_calls, std::size_t(2));
-        HPX_TEST_EQ(tag_invoke_execute_calls, std::size_t(0));
+        HPX_TEST_EQ(tag_dispatch_execute_calls, std::size_t(0));
     }
 
     {
@@ -393,7 +393,7 @@ int main()
         hpx::execution::experimental::start(os);
         HPX_TEST_EQ(void_receiver_set_value_calls, std::size_t(3));
         HPX_TEST_EQ(member_execute_calls, std::size_t(2));
-        HPX_TEST_EQ(tag_invoke_execute_calls, std::size_t(1));
+        HPX_TEST_EQ(tag_dispatch_execute_calls, std::size_t(1));
     }
 
     return hpx::util::report_errors();

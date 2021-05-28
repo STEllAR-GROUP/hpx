@@ -16,7 +16,7 @@
 static std::size_t start_calls = 0;
 static std::size_t connect_calls = 0;
 static std::size_t member_submit_calls = 0;
-static std::size_t tag_invoke_submit_calls = 0;
+static std::size_t tag_dispatch_submit_calls = 0;
 
 struct receiver_1
 {
@@ -103,7 +103,7 @@ struct sender_2
 void tag_dispatch(
     hpx::execution::experimental::submit_t, sender_2 s, receiver_1& r)
 {
-    ++tag_invoke_submit_calls;
+    ++tag_dispatch_submit_calls;
     std::move(s).connect(r).start();
 }
 
@@ -138,7 +138,7 @@ struct sender_3
 void tag_dispatch(
     hpx::execution::experimental::submit_t, sender_3 s, receiver_1& r)
 {
-    ++tag_invoke_submit_calls;
+    ++tag_dispatch_submit_calls;
     std::move(s).connect(r).start();
 }
 
@@ -181,7 +181,7 @@ int main()
     HPX_TEST_EQ(start_calls, std::size_t(1));
     HPX_TEST_EQ(connect_calls, std::size_t(1));
     HPX_TEST_EQ(member_submit_calls, std::size_t(1));
-    HPX_TEST_EQ(tag_invoke_submit_calls, std::size_t(0));
+    HPX_TEST_EQ(tag_dispatch_submit_calls, std::size_t(0));
 
     receiver_1 r2;
     hpx::execution::experimental::submit(sender_2{}, r2);
@@ -190,7 +190,7 @@ int main()
     HPX_TEST_EQ(start_calls, std::size_t(2));
     HPX_TEST_EQ(connect_calls, std::size_t(2));
     HPX_TEST_EQ(member_submit_calls, std::size_t(2));
-    HPX_TEST_EQ(tag_invoke_submit_calls, std::size_t(0));
+    HPX_TEST_EQ(tag_dispatch_submit_calls, std::size_t(0));
 
     receiver_1 r3;
     hpx::execution::experimental::submit(sender_3{}, r3);
@@ -199,7 +199,7 @@ int main()
     HPX_TEST_EQ(start_calls, std::size_t(3));
     HPX_TEST_EQ(connect_calls, std::size_t(3));
     HPX_TEST_EQ(member_submit_calls, std::size_t(2));
-    HPX_TEST_EQ(tag_invoke_submit_calls, std::size_t(1));
+    HPX_TEST_EQ(tag_dispatch_submit_calls, std::size_t(1));
 
     receiver_1 r4;
     hpx::execution::experimental::submit(sender_4{}, r4);
@@ -208,7 +208,7 @@ int main()
     HPX_TEST_EQ(start_calls, std::size_t(4));
     HPX_TEST_EQ(connect_calls, std::size_t(4));
     HPX_TEST_EQ(member_submit_calls, std::size_t(2));
-    HPX_TEST_EQ(tag_invoke_submit_calls, std::size_t(1));
+    HPX_TEST_EQ(tag_dispatch_submit_calls, std::size_t(1));
 
     return hpx::util::report_errors();
 }
