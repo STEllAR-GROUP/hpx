@@ -58,6 +58,12 @@ namespace hpx { namespace threads {
 
                 // run and free all registered exit functions for this thread
                 auto* p = get_self_id_data();
+
+                // reset thread descriptions to avoid dangling pointers
+                util::thread_description desc;
+                p->set_description(desc);
+                p->set_lco_description(desc);
+
                 p->run_thread_exit_callbacks();
                 p->free_thread_exit_callbacks();
 
@@ -85,6 +91,12 @@ namespace hpx { namespace threads {
 
                 // run and free all registered exit functions for this thread
                 auto* p = get_self_id_data();
+
+                // reset thread descriptions to avoid dangling pointers
+                util::thread_description desc;
+                p->set_description(desc);
+                p->set_lco_description(desc);
+
                 p->run_thread_exit_callbacks();
                 p->free_thread_exit_callbacks();
 
