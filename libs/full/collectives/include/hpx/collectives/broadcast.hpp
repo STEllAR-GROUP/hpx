@@ -10,7 +10,7 @@
 
 #if defined(DOXYGEN)
 // clang-format off
-namespace hpx { namespace lcos {
+namespace hpx { namespace collectives {
 
     /// Create a new communicator object usable with broadcast_to and broadcast_from
     ///
@@ -40,59 +40,6 @@ namespace hpx { namespace lcos {
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
-
-    /// Broadcast a value to different call sites
-    ///
-    /// This function sends a set of values to all call sites operating on
-    /// the given base name.
-    ///
-    /// \param  basename    The base name identifying the broadcast operation
-    /// \param  local_result A future referring to the value to transmit to all
-    ///                     participating sites from this call site.
-    /// \param  num_sites   The number of participating sites (default: all
-    ///                     localities).
-    /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the broadcast operation performed on the
-    ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the broadcast operation on the
-    ///                     given base name has to be performed more than once.
-    /// \param this_site    The sequence number of this invocation (usually
-    ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \params root_site   The site that is responsible for creating the
-    ///                     broadcast support object. This value is optional
-    ///                     and defaults to '0' (zero).
-    ///
-    /// \returns    This function returns a future that will become
-    ///             ready once the broadcast operation has been completed.
-    ///
-    template <typename T>
-    hpx::future<void> broadcast_to(char const* basename,
-        hpx::future<T>&& local_result,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t root_site = 0)
-
-    /// Broadcast a value to different call sites
-    ///
-    /// This function sends a set of values to all call sites operating on
-    /// the given base name.
-    ///
-    /// \param  comm        A communicator object returned from \a create_reducer
-    /// \param  local_result A future referring to the value to transmit to all
-    ///                     participating sites from this call site.
-    /// \param this_site    The sequence number of this invocation (usually
-    ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_locality_id() returns.
-    ///
-    /// \returns    This function returns a future that will become
-    ///             ready once the broadcast operation has been completed.
-    ///
-    template <typename T>
-    hpx::future<void> broadcast_to(communicator comm,
-        hpx::future<T>&& local_result,
-        std::size_t this_site = std::size_t(-1))
 
     /// Broadcast a value to different call sites
     ///
@@ -188,7 +135,7 @@ namespace hpx { namespace lcos {
     template <typename T>
     hpx::future<T> broadcast_from(communicator comm,
         std::size_t this_site = std::size_t(-1))
-}}    // namespace hpx::lcos
+}}    // namespace hpx::collectives
 
 // clang-format on
 #else
@@ -315,7 +262,7 @@ namespace hpx { namespace traits {
     };
 }}    // namespace hpx::traits
 
-namespace hpx { namespace lcos {
+namespace hpx { namespace collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     inline communicator create_broadcast(char const* basename,
@@ -326,50 +273,6 @@ namespace hpx { namespace lcos {
         // everybody waits for exactly one value
         return detail::create_communicator(
             basename, num_sites, generation, this_site, root_site, 1);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // destination site needs to be handled differently
-    template <typename T>
-    hpx::future<T> broadcast_to(communicator fid, hpx::future<T>&& local_result,
-        std::size_t this_site = std::size_t(-1))
-    {
-        if (this_site == std::size_t(-1))
-        {
-            this_site = static_cast<std::size_t>(agas::get_locality_id());
-        }
-
-        auto broadcast_data =
-            [this_site](communicator&& c,
-                hpx::future<T>&& local_result) -> hpx::future<T> {
-            using action_type = typename detail::communicator_server::
-                template communication_set_action<
-                    traits::communication::broadcast_tag, hpx::future<T>, T>;
-
-            // make sure id is kept alive as long as the returned future,
-            // explicitly unwrap returned future
-            hpx::future<T> result =
-                async(action_type(), c, this_site, local_result.get());
-
-            traits::detail::get_shared_state(result)->set_on_completed(
-                [client = std::move(c)]() { HPX_UNUSED(client); });
-
-            return result;
-        };
-
-        return dataflow(hpx::launch::sync, std::move(broadcast_data),
-            std::move(fid), std::move(local_result));
-    }
-
-    template <typename T>
-    hpx::future<T> broadcast_to(char const* basename,
-        hpx::future<T>&& local_result, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
-    {
-        return broadcast_to(create_broadcast(basename, num_sites, generation,
-                                this_site, this_site),
-            std::move(local_result), this_site);
     }
 
     template <typename T>
@@ -457,14 +360,7 @@ namespace hpx { namespace lcos {
                                      generation, this_site, root_site),
             this_site);
     }
-}}    // namespace hpx::lcos
-
-////////////////////////////////////////////////////////////////////////////////
-namespace hpx {
-    using lcos::broadcast_from;
-    using lcos::broadcast_to;
-    using lcos::create_broadcast;
-}    // namespace hpx
+}}    // namespace hpx::collectives
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_BROADCAST_DECLARATION(...) /**/

@@ -19,7 +19,6 @@
 #include <utility>
 #include <vector>
 
-constexpr char const* scatter_basename = "/test/scatter/";
 constexpr char const* scatter_direct_basename = "/test/scatter_direct/";
 
 void test_one_shot_use()
@@ -29,29 +28,6 @@ void test_one_shot_use()
 
     std::uint32_t this_locality = hpx::get_locality_id();
 
-    // test functionality based on future<> of local result
-    for (std::uint32_t i = 0; i != 10; ++i)
-    {
-        if (this_locality == 0)
-        {
-            std::vector<std::uint32_t> data(num_localities);
-            std::iota(data.begin(), data.end(), 42 + i);
-
-            hpx::future<std::uint32_t> result =
-                hpx::scatter_to(scatter_basename,
-                    hpx::make_ready_future(std::move(data)), num_localities, i);
-
-            HPX_TEST_EQ(i + 42 + this_locality, result.get());
-        }
-        else
-        {
-            hpx::future<std::uint32_t> result =
-                hpx::scatter_from<std::uint32_t>(scatter_basename, i);
-
-            HPX_TEST_EQ(i + 42 + this_locality, result.get());
-        }
-    }
-
     // test functionality based on immediate local result value
     for (std::uint32_t i = 0; i != 10; ++i)
     {
@@ -60,7 +36,7 @@ void test_one_shot_use()
             std::vector<std::uint32_t> data(num_localities);
             std::iota(data.begin(), data.end(), 42 + i);
 
-            hpx::future<std::uint32_t> result = hpx::scatter_to(
+            hpx::future<std::uint32_t> result = hpx::collectives::scatter_to(
                 scatter_direct_basename, std::move(data), num_localities, i);
 
             HPX_TEST_EQ(i + 42 + this_locality, result.get());
@@ -68,7 +44,8 @@ void test_one_shot_use()
         else
         {
             hpx::future<std::uint32_t> result =
-                hpx::scatter_from<std::uint32_t>(scatter_direct_basename, i);
+                hpx::collectives::scatter_from<std::uint32_t>(
+                    scatter_direct_basename, i);
 
             HPX_TEST_EQ(i + 42 + this_locality, result.get());
         }
@@ -82,33 +59,8 @@ void test_multiple_use()
 
     std::uint32_t this_locality = hpx::get_locality_id();
 
-    auto scatter_client =
-        hpx::create_all_to_all(scatter_basename, num_localities);
-
-    // test functionality based on future<> of local result
-    for (std::uint32_t i = 0; i != 10; ++i)
-    {
-        if (this_locality == 0)
-        {
-            std::vector<std::uint32_t> data(num_localities);
-            std::iota(data.begin(), data.end(), 42 + i);
-
-            hpx::future<std::uint32_t> result = hpx::scatter_to(
-                scatter_client, hpx::make_ready_future(std::move(data)));
-
-            HPX_TEST_EQ(i + 42 + this_locality, result.get());
-        }
-        else
-        {
-            hpx::future<std::uint32_t> result =
-                hpx::scatter_from<std::uint32_t>(scatter_client);
-
-            HPX_TEST_EQ(i + 42 + this_locality, result.get());
-        }
-    }
-
-    auto scatter_direct_client =
-        hpx::create_all_to_all(scatter_direct_basename, num_localities);
+    auto scatter_direct_client = hpx::collectives::create_scatterer(
+        scatter_direct_basename, num_localities);
 
     // test functionality based on immediate local result value
     for (std::uint32_t i = 0; i != 10; ++i)
@@ -118,15 +70,16 @@ void test_multiple_use()
             std::vector<std::uint32_t> data(num_localities);
             std::iota(data.begin(), data.end(), 42 + i);
 
-            hpx::future<std::uint32_t> result =
-                hpx::scatter_to(scatter_direct_client, std::move(data));
+            hpx::future<std::uint32_t> result = hpx::collectives::scatter_to(
+                scatter_direct_client, std::move(data));
 
             HPX_TEST_EQ(i + 42 + this_locality, result.get());
         }
         else
         {
             hpx::future<std::uint32_t> result =
-                hpx::scatter_from<std::uint32_t>(scatter_direct_client);
+                hpx::collectives::scatter_from<std::uint32_t>(
+                    scatter_direct_client);
 
             HPX_TEST_EQ(i + 42 + this_locality, result.get());
         }

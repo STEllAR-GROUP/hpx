@@ -21,8 +21,10 @@ set(collectives_headers
     hpx/collectives/communication_set.hpp
     hpx/collectives/detail/communication_set_node.hpp
     hpx/collectives/detail/communicator.hpp
+    hpx/collectives/exclusive_scan.hpp
     hpx/collectives/fold.hpp
     hpx/collectives/gather.hpp
+    hpx/collectives/inclusive_scan.hpp
     hpx/collectives/latch.hpp
     hpx/collectives/reduce.hpp
     hpx/collectives/reduce_direct.hpp

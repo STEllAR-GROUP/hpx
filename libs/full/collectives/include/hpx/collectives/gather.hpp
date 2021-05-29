@@ -10,7 +10,7 @@
 
 #if defined(DOXYGEN)
 // clang-format off
-namespace hpx { namespace lcos {
+namespace hpx { namespace collectives {
 
     /// Create a new communicator object usable with gather_here and gather_there
     ///
@@ -40,109 +40,6 @@ namespace hpx { namespace lcos {
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
-
-    /// Gather a set of values from different call sites
-    ///
-    /// This function receives a set of values from all call sites operating on
-    /// the given base name.
-    ///
-    /// \param  basename    The base name identifying the gather operation
-    /// \param  result      A future referring to the value to transmit to the
-    ///                     central gather point from this call site.
-    /// \param  num_sites   The number of participating sites (default: all
-    ///                     localities).
-    /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the gather operation performed on the
-    ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the gather operation on the given
-    ///                     base name has to be performed more than once.
-    /// \param this_site    The sequence number of this invocation (usually
-    ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_locality_id() returns.
-    ///
-    /// \returns    This function returns a future holding a vector with all
-    ///             gathered values. It will become ready once the gather
-    ///             operation has been completed.
-    ///
-    template <typename T>
-    hpx::future<std::vector<T>> gather_here(char const* basename,
-        hpx::future<T> result,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1));
-
-    /// Gather a set of values from different call sites
-    ///
-    /// This function receives a set of values from all call sites operating on
-    /// the given base name.
-    ///
-    /// \param  comm        A communicator object returned from \a create_reducer
-    /// \param  result      A future referring to the value to transmit to the
-    ///                     central gather point from this call site.
-    /// \param this_site    The sequence number of this invocation (usually
-    ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_locality_id() returns.
-    ///
-    /// \returns    This function returns a future holding a vector with all
-    ///             gathered values. It will become ready once the gather
-    ///             operation has been completed.
-    ///
-    template <typename T>
-    hpx::future<std::vector<T>> gather_here(communicator comm,
-        hpx::future<T> result,
-        std::size_t this_site = std::size_t(-1));
-
-    /// Gather a given value at the given call site
-    ///
-    /// This function transmits the value given by \a result to a central gather
-    /// site (where the corresponding \a gather_here is executed)
-    ///
-    /// \param  basename    The base name identifying the gather operation
-    /// \param  result      A future referring to the value to transmit to the
-    ///                     central gather point from this call site.
-    /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the gather operation performed on the
-    ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the gather operation on the given
-    ///                     base name has to be performed more than once.
-    /// \param this_site    The sequence number of this invocation (usually
-    ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \param root_site    The sequence number of the central gather point
-    ///                     (usually the locality id). This value is optional
-    ///                     and defaults to 0.
-    ///
-    /// \returns    This function returns a future holding a vector with all
-    ///             gathered values. It will become ready once the gather
-    ///             operation has been completed.
-    ///
-    template <typename T>
-    hpx::future<std::vector<T>> gather_there(char const* basename,
-        hpx::future<T> result,
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t root_site = 0);
-
-    /// Gather a given value at the given call site
-    ///
-    /// This function transmits the value given by \a result to a central gather
-    /// site (where the corresponding \a gather_here is executed)
-    ///
-    /// \param  comm        A communicator object returned from \a create_reducer
-    /// \param  result      A future referring to the value to transmit to the
-    ///                     central gather point from this call site.
-    /// \param this_site    The sequence number of this invocation (usually
-    ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_locality_id() returns.
-    ///
-    /// \returns    This function returns a future holding a vector with all
-    ///             gathered values. It will become ready once the gather
-    ///             operation has been completed.
-    ///
-    template <typename T>
-    hpx::future<std::vector<T>> gather_there(communicator comm,
-        hpx::future<T> result,
-        std::size_t this_site = std::size_t(-1));
 
     /// Gather a set of values from different call sites
     ///
@@ -221,8 +118,7 @@ namespace hpx { namespace lcos {
     ///
     template <typename T>
     hpx::future<std::vector<decay_t<T>>>
-    gather_there(char const* basename,
-        T&& result,
+    gather_there(char const* basename, T&& result,
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1),
         std::size_t root_site = 0);
@@ -247,7 +143,7 @@ namespace hpx { namespace lcos {
     hpx::future<std::vector<decay_t<T>>>
     gather_there(communicator comm, T&& result,
         std::size_t this_site = std::size_t(-1));
-}}    // namespace hpx::lcos
+}}    // namespace hpx::collectives
 
 // clang-format on
 #else
@@ -259,12 +155,9 @@ namespace hpx { namespace lcos {
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
-#include <hpx/async_local/dataflow.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/modules/execution_base.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
@@ -372,7 +265,7 @@ namespace hpx { namespace traits {
     };
 }}    // namespace hpx::traits
 
-namespace hpx { namespace lcos {
+namespace hpx { namespace collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     inline communicator create_gatherer(char const* basename,
@@ -382,51 +275,6 @@ namespace hpx { namespace lcos {
     {
         return detail::create_communicator(
             basename, num_sites, generation, this_site, root_site);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // destination site needs to be handled differently
-    template <typename T>
-    hpx::future<std::vector<T>> gather_here(communicator fid,
-        hpx::future<T>&& result, std::size_t this_site = std::size_t(-1))
-    {
-        if (this_site == std::size_t(-1))
-        {
-            this_site = static_cast<std::size_t>(agas::get_locality_id());
-        }
-
-        auto gather_data =
-            [this_site](communicator&& c,
-                hpx::future<T>&& local_result) -> hpx::future<std::vector<T>> {
-            using action_type = typename detail::communicator_server::
-                template communication_get_action<
-                    traits::communication::gather_tag,
-                    hpx::future<std::vector<T>>, T>;
-
-            // make sure id is kept alive as long as the returned future,
-            // explicitly unwrap returned future
-            hpx::future<std::vector<T>> result =
-                async(action_type(), c, this_site, local_result.get());
-
-            traits::detail::get_shared_state(result)->set_on_completed(
-                [client = std::move(c)]() { HPX_UNUSED(client); });
-
-            return result;
-        };
-
-        return dataflow(hpx::launch::sync, std::move(gather_data),
-            std::move(fid), std::move(result));
-    }
-
-    template <typename T>
-    hpx::future<std::vector<T>> gather_here(char const* basename,
-        hpx::future<T>&& result, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
-    {
-        return gather_here(create_gatherer(basename, num_sites, generation,
-                               this_site, this_site),
-            std::move(result), this_site);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -477,49 +325,6 @@ namespace hpx { namespace lcos {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    hpx::future<void> gather_there(communicator fid,
-        hpx::future<T>&& local_result, std::size_t this_site = std::size_t(-1))
-    {
-        if (this_site == std::size_t(-1))
-        {
-            this_site = static_cast<std::size_t>(agas::get_locality_id());
-        }
-
-        auto gather_there_data =
-            [this_site](communicator&& c,
-                hpx::future<T>&& local_result) -> hpx::future<void> {
-            using action_type = typename detail::communicator_server::
-                template communication_set_action<
-                    traits::communication::gather_tag, hpx::future<void>, T>;
-
-            // make sure id is kept alive as long as the returned future,
-            // explicitly unwrap returned future
-            hpx::future<void> result =
-                async(action_type(), c, this_site, local_result.get());
-
-            traits::detail::get_shared_state(result)->set_on_completed(
-                [client = std::move(c)]() { HPX_UNUSED(client); });
-
-            return result;
-        };
-
-        return dataflow(hpx::launch::sync, std::move(gather_there_data),
-            std::move(fid), std::move(local_result));
-    }
-
-    template <typename T>
-    hpx::future<void> gather_there(char const* basename,
-        hpx::future<T>&& result, std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
-    {
-        HPX_ASSERT(this_site != root_site);
-        return gather_there(create_gatherer(basename, std::size_t(-1),
-                                generation, this_site, root_site),
-            std::move(result), this_site);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     // gather plain values
     template <typename T>
     hpx::future<void> gather_there(communicator fid, T&& local_result,
@@ -565,14 +370,7 @@ namespace hpx { namespace lcos {
                                 generation, this_site, root_site),
             std::forward<T>(local_result), this_site);
     }
-}}    // namespace hpx::lcos
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx {
-    using lcos::create_gatherer;
-    using lcos::gather_here;
-    using lcos::gather_there;
-}    // namespace hpx
+}}    // namespace hpx::collectives
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_GATHER_DECLARATION(...) /**/

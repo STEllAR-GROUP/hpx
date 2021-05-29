@@ -10,7 +10,7 @@
 
 #if defined(DOXYGEN)
 // clang-format off
-namespace hpx { namespace lcos {
+namespace hpx { namespace collectives {
 
     /// Create a new communicator object usable with reduce_here and reduce_there
     ///
@@ -40,113 +40,6 @@ namespace hpx { namespace lcos {
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
-
-    /// Reduce a set of values from different call sites
-    ///
-    /// This function receives a set of values that are the result of applying
-    /// a given operator on values supplied from all call sites operating on
-    /// the given base name.
-    ///
-    /// \param  basename    The base name identifying the all_reduce operation
-    /// \param  local_result A future referring to the value to reduce onall
-    ///                     participating sites from this call site.
-    /// \param  op          Reduction operation to apply to all values supplied
-    ///                     from all participating sites
-    /// \param  num_sites   The number of participating sites (default: all
-    ///                     localities).
-    /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_reduce operation performed on the
-    ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_reduce operation on the
-    ///                     given base name has to be performed more than once.
-    /// \param this_site    The sequence number of this invocation (usually
-    ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \params root_site   The site that is responsible for creating the
-    ///                     all_reduce support object. This value is optional
-    ///                     and defaults to '0' (zero).
-    ///
-    /// \returns    This function returns a future holding a value calculated
-    ///             based on the values send by all participating sites. It will
-    ///             become ready once the all_reduce operation has been completed.
-    ///
-    template <typename T, typename F>
-    hpx::future<T> reduce_here(char const* basename, hpx::future<T> local_result,
-        F&& op, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
-
-    /// Reduce a set of values from different call sites
-    ///
-    /// This function receives a set of values that are the result of applying
-    /// a given operator on values supplied from all call sites operating on
-    /// the given base name.
-    ///
-    /// \param  comm        A communicator object returned from \a create_reducer
-    /// \param  local_result A future referring to the value to reduce on the
-    ///                     central reduction point from this call site.
-    /// \param  op          Reduction operation to apply to all values supplied
-    ///                     from all participating sites
-    /// \param this_site    The sequence number of this invocation (usually
-    ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_locality_id() returns.
-    ///
-    /// \returns    This function returns a future holding a value calculated
-    ///             based on the values send by all participating sites. It will
-    ///             become ready once the all_reduce operation has been completed.
-    ///
-    template <typename T, typename F>
-    hpx::future<T> reduce_here(communicator comm, hpx::future<T> local_result,
-        F&& op, std::size_t this_site = std::size_t(-1));
-
-    /// Reduce a given value at the given call site
-    ///
-    /// This function transmits the value given by \a result to a central reduce
-    /// site (where the corresponding \a reduce_here is executed)
-    ///
-    /// \param  basename    The base name identifying the reduction operation
-    /// \param  result      A future referring to the value to reduce on the
-    ///                     central reduction point from this call site.
-    /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the reduction operation performed on the
-    ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the reduction operation on the given
-    ///                     base name has to be performed more than once.
-    /// \param this_site    The sequence number of this invocation (usually
-    ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \param root_site    The sequence number of the central reduction point
-    ///                     (usually the locality id). This value is optional
-    ///                     and defaults to 0.
-    ///
-    /// \returns    This function returns a future<void>. It will become ready
-    ///             once the reduction operation has been completed.
-    ///
-    template <typename T>
-    hpx::future<void> reduce_there(char const* basename, hpx::future<T> result,
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t root_site = 0);
-
-    /// Reduce a given value at the given call site
-    ///
-    /// This function transmits the value given by \a result to a central reduce
-    /// site (where the corresponding \a reduce_here is executed)
-    ///
-    /// \param  comm        A communicator object returned from \a create_reducer
-    /// \param  local_result A future referring to the value to reduce on the
-    ///                     central reduction point from this call site.
-    /// \param this_site    The sequence number of this invocation (usually
-    ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_locality_id() returns.
-    ///
-    /// \returns    This function returns a future holding a value calculated
-    ///             based on the values send by all participating sites. It will
-    ///             become ready once the all_reduce operation has been completed.
-    ///
-    template <typename T>
-    hpx::future<void> reduce_there(communicator comm, hpx::future<T> local_result,
-        std::size_t this_site = std::size_t(-1));
 
     /// Reduce a set of values from different call sites
     ///
@@ -252,7 +145,7 @@ namespace hpx { namespace lcos {
     template <typename T>
     hpx::future<void> reduce_there(communicator comm, T&& local_result,
         std::size_t this_site = std::size_t(-1));
-}}    // namespace hpx::lcos
+}}    // namespace hpx::collectives
 
 // clang-format on
 #else
@@ -264,12 +157,9 @@ namespace hpx { namespace lcos {
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
-#include <hpx/async_local/dataflow.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/modules/execution_base.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -383,7 +273,7 @@ namespace hpx { namespace traits {
     };
 }}    // namespace hpx::traits
 
-namespace hpx { namespace lcos {
+namespace hpx { namespace collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     inline communicator create_reducer(char const* basename,
@@ -393,52 +283,6 @@ namespace hpx { namespace lcos {
     {
         return detail::create_communicator(
             basename, num_sites, generation, this_site, root_site);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // destination site needs to be handled differently
-    template <typename T, typename F>
-    hpx::future<T> reduce_here(communicator fid, hpx::future<T>&& result,
-        F&& op, std::size_t this_site = std::size_t(-1))
-    {
-        if (this_site == std::size_t(-1))
-        {
-            this_site = static_cast<std::size_t>(agas::get_locality_id());
-        }
-
-        auto reduction_data =
-            [op = std::forward<F>(op), this_site](communicator&& c,
-                hpx::future<T>&& local_result) mutable -> hpx::future<T> {
-            using func_type = std::decay_t<F>;
-            using action_type = typename detail::communicator_server::
-                template communication_get_action<
-                    traits::communication::reduce_tag, hpx::future<T>, T,
-                    func_type>;
-
-            // make sure id is kept alive as long as the returned future,
-            // explicitly unwrap returned future
-            hpx::future<T> result = async(action_type(), c, this_site,
-                local_result.get(), std::forward<F>(op));
-
-            traits::detail::get_shared_state(result)->set_on_completed(
-                [client = std::move(c)]() { HPX_UNUSED(client); });
-
-            return result;
-        };
-
-        return dataflow(hpx::launch::sync, std::move(reduction_data),
-            std::move(fid), std::move(result));
-    }
-
-    template <typename T, typename F>
-    hpx::future<T> reduce_here(char const* basename, hpx::future<T>&& result,
-        F&& op, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
-    {
-        return reduce_here(create_reducer(basename, num_sites, generation,
-                               this_site, this_site),
-            std::move(result), std::forward<F>(op), this_site);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -490,49 +334,6 @@ namespace hpx { namespace lcos {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    hpx::future<void> reduce_there(communicator fid,
-        hpx::future<T>&& local_result, std::size_t this_site = std::size_t(-1))
-    {
-        if (this_site == std::size_t(-1))
-        {
-            this_site = static_cast<std::size_t>(agas::get_locality_id());
-        }
-
-        auto reduction_there_data =
-            [this_site](communicator&& c,
-                hpx::future<T>&& local_result) -> hpx::future<void> {
-            using action_type = typename detail::communicator_server::
-                template communication_set_action<
-                    traits::communication::reduce_tag, hpx::future<void>, T>;
-
-            // make sure id is kept alive as long as the returned future,
-            // explicitly unwrap returned future
-            hpx::future<void> result =
-                async(action_type(), c, this_site, local_result.get());
-
-            traits::detail::get_shared_state(result)->set_on_completed(
-                [client = std::move(c)]() { HPX_UNUSED(client); });
-
-            return result;
-        };
-
-        return dataflow(hpx::launch::sync, std::move(reduction_there_data),
-            std::move(fid), std::move(local_result));
-    }
-
-    template <typename T>
-    hpx::future<void> reduce_there(char const* basename,
-        hpx::future<T>&& result, std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
-    {
-        HPX_ASSERT(this_site != root_site);
-        return reduce_there(create_reducer(basename, std::size_t(-1),
-                                generation, this_site, root_site),
-            std::move(result), this_site);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     // reduce plain values
     template <typename T>
     hpx::future<void> reduce_there(communicator fid, T&& local_result,
@@ -578,14 +379,7 @@ namespace hpx { namespace lcos {
                                 generation, this_site, root_site),
             std::forward<T>(local_result), this_site);
     }
-}}    // namespace hpx::lcos
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx {
-    using lcos::create_reducer;
-    using lcos::reduce_here;
-    using lcos::reduce_there;
-}    // namespace hpx
+}}    // namespace hpx::collectives
 
 #endif    // COMPUTE_HOST_CODE
 #endif    // DOXYGEN

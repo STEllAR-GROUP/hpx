@@ -16,14 +16,8 @@
 #include <hpx/components/client.hpp>
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/datastructures/any.hpp>
-#include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos_local/and_gate.hpp>
-#include <hpx/modules/execution.hpp>
-#include <hpx/modules/execution_base.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/parallel/algorithms/reduce.hpp>
-#include <hpx/runtime_distributed/get_num_localities.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 
@@ -43,7 +37,7 @@ namespace hpx { namespace traits {
     struct communication_operation;
 }}    // namespace hpx::traits
 
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx { namespace collectives { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     class communicator_server
@@ -57,6 +51,7 @@ namespace hpx { namespace lcos { namespace detail {
           , num_sites_(0)
           , site_(0)
           , needs_initialization_(false)
+          , data_available_(false)
         {
             HPX_ASSERT(false);    // shouldn't ever be called
         }
@@ -69,6 +64,7 @@ namespace hpx { namespace lcos { namespace detail {
           , num_sites_(num_sites)
           , site_(site)
           , needs_initialization_(true)
+          , data_available_(false)
         {
             HPX_ASSERT(num_values != 0);
             HPX_ASSERT(num_sites != 0);
@@ -121,6 +117,7 @@ namespace hpx { namespace lcos { namespace detail {
             if (needs_initialization_)
             {
                 needs_initialization_ = false;
+                data_available_ = false;
                 data_ = std::vector<T>(num_values_);
             }
         }
@@ -137,9 +134,10 @@ namespace hpx { namespace lcos { namespace detail {
         void invalidate_data(Lock& l)
         {
             HPX_ASSERT_OWNS_LOCK(l);
-            if (needs_initialization_)
+            if (!needs_initialization_)
             {
                 needs_initialization_ = true;
+                data_available_ = false;
                 data_.reset();
             }
         }
@@ -156,6 +154,7 @@ namespace hpx { namespace lcos { namespace detail {
         std::size_t const num_sites_;
         std::size_t const site_;
         bool needs_initialization_;
+        bool data_available_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -165,18 +164,12 @@ namespace hpx { namespace lcos { namespace detail {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0,
         std::size_t num_values = std::size_t(-1));
-}}}    // namespace hpx::lcos::detail
+}}}    // namespace hpx::collectives::detail
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos {
+namespace hpx { namespace collectives {
 
     using communicator = hpx::components::client<detail::communicator_server>;
-}}    // namespace hpx::lcos
-
-////////////////////////////////////////////////////////////////////////////////
-namespace hpx {
-
-    using lcos::communicator;
-}    // namespace hpx
+}}    // namespace hpx::collectives
 
 #endif    // COMPUTE_HOST_CODE

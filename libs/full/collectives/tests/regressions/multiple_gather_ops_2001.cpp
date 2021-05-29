@@ -26,13 +26,12 @@ int hpx_main()
 {
     for (int i = 0; i < 10; ++i)
     {
-        hpx::future<std::uint32_t> value =
-            hpx::make_ready_future(hpx::get_locality_id());
+        std::uint32_t value = hpx::get_locality_id();
 
         if (hpx::get_locality_id() == 0)
         {
             hpx::future<std::vector<std::uint32_t>> overall_result =
-                hpx::lcos::gather_here(gather_basename, std::move(value),
+                hpx::collectives::gather_here(gather_basename, std::move(value),
                     hpx::get_num_localities(hpx::launch::sync), i);
 
             std::vector<std::uint32_t> sol = overall_result.get();
@@ -44,8 +43,8 @@ int hpx_main()
         }
         else
         {
-            hpx::future<void> overall_result =
-                hpx::lcos::gather_there(gather_basename, std::move(value), i);
+            hpx::future<void> overall_result = hpx::collectives::gather_there(
+                gather_basename, std::move(value), i);
 
             overall_result.get();
         }

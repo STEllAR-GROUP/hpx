@@ -11,11 +11,11 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/modules/collectives.hpp>
-#include <hpx/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
+#include <hpx/serialization.hpp>
 
 #include <boost/shared_array.hpp>
 
@@ -32,11 +32,11 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables
-bool header = true; // print csv heading
+bool header = true;    // print csv heading
 bool print_results = false;
-double k = 0.5;     // heat transfer coefficient
-double dt = 1.;     // time step
-double dx = 1.;     // grid spacing
+double k = 0.5;    // heat transfer coefficient
+double dt = 1.;    // time step
+double dx = 1.;    // grid spacing
 
 char const* stepper_basename = "/1d_stencil_8/stepper/";
 char const* gather_basename = "/1d_stencil_8/gather/";
@@ -53,7 +53,8 @@ private:
 public:
     explicit partition_allocator(std::size_t max_size = std::size_t(-1))
       : max_size_(max_size)
-    {}
+    {
+    }
 
     ~partition_allocator()
     {
@@ -62,7 +63,7 @@ public:
         {
             T* p = heap_.top();
             heap_.pop();
-            delete [] p;
+            delete[] p;
         }
     }
 
@@ -82,10 +83,11 @@ public:
     void deallocate(T* p)
     {
         std::lock_guard<mutex_type> l(mtx_);
-        if (max_size_ == static_cast<std::size_t>(-1) || heap_.size() < max_size_)
+        if (max_size_ == static_cast<std::size_t>(-1) ||
+            heap_.size() < max_size_)
             heap_.push(p);
         else
-            delete [] p;
+            delete[] p;
     }
 
 private:
@@ -104,9 +106,10 @@ private:
     {
         hold_reference(buffer_type const& data)
           : data_(data)
-        {}
+        {
+        }
 
-        void operator()(double*) {}     // no deletion necessary
+        void operator()(double*) {}    // no deletion necessary
 
         buffer_type data_;
     };
@@ -122,22 +125,24 @@ public:
     partition_data()
       : size_(0)
       , min_index_(0)
-    {}
+    {
+    }
 
     // Create a new (uninitialized) partition of the given size.
     explicit partition_data(std::size_t size)
       : data_(alloc_.allocate(size), size, buffer_type::take,
-            &partition_data::deallocate),
-        size_(size),
-        min_index_(0)
-    {}
+            &partition_data::deallocate)
+      , size_(size)
+      , min_index_(0)
+    {
+    }
 
     // Create a new (initialized) partition of the given size.
     partition_data(std::size_t size, double initial_value)
       : data_(alloc_.allocate(size), size, buffer_type::take,
-            &partition_data::deallocate),
-        size_(size),
-        min_index_(0)
+            &partition_data::deallocate)
+      , size_(size)
+      , min_index_(0)
     {
         double base_value = double(initial_value * size);
         for (std::size_t i = 0; i != size; ++i)
@@ -148,18 +153,28 @@ public:
     // The proxy is assumed to refer to either the left or the right boundary
     // element.
     partition_data(partition_data const& base, std::size_t min_index)
-      : data_(base.data_.data()+min_index, 1, buffer_type::reference,
-            hold_reference(base.data_)),      // keep referenced partition alive
-        size_(base.size()),
-        min_index_(min_index)
+      : data_(base.data_.data() + min_index, 1, buffer_type::reference,
+            hold_reference(base.data_))
+      ,    // keep referenced partition alive
+      size_(base.size())
+      , min_index_(min_index)
     {
         HPX_ASSERT(min_index < base.size());
     }
 
-    double& operator[](std::size_t idx) { return data_[index(idx)]; }
-    double operator[](std::size_t idx) const { return data_[index(idx)]; }
+    double& operator[](std::size_t idx)
+    {
+        return data_[index(idx)];
+    }
+    double operator[](std::size_t idx) const
+    {
+        return data_[index(idx)];
+    }
 
-    std::size_t size() const { return size_; }
+    std::size_t size() const
+    {
+        return size_;
+    }
 
 private:
     std::size_t index(std::size_t idx) const
@@ -206,9 +221,9 @@ std::ostream& operator<<(std::ostream& os, partition_data const& c)
 ///////////////////////////////////////////////////////////////////////////////
 inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 {
-    if(i == 0 && dir == -1)
-        return size-1;
-    if(i == size-1 && dir == +1)
+    if (i == 0 && dir == -1)
+        return size - 1;
+    if (i == size - 1 && dir == +1)
         return 0;
 
     HPX_ASSERT((i + dir) < size);
@@ -220,12 +235,13 @@ inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 // This is the server side representation of the data. We expose this as a HPX
 // component which allows for it to be created and accessed remotely through
 // a global address (hpx::id_type).
-struct partition_server
-  : hpx::components::component_base<partition_server>
+struct partition_server : hpx::components::component_base<partition_server>
 {
     enum partition_type
     {
-        left_partition, middle_partition, right_partition
+        left_partition,
+        middle_partition,
+        right_partition
     };
 
     // construct new instances
@@ -233,11 +249,13 @@ struct partition_server
 
     explicit partition_server(partition_data const& data)
       : data_(data)
-    {}
+    {
+    }
 
     partition_server(std::size_t size, double initial_value)
       : data_(size, initial_value)
-    {}
+    {
+    }
 
     // Access data. The parameter specifies what part of the data should be
     // accessed. As long as the result is used locally, no data is copied,
@@ -248,7 +266,7 @@ struct partition_server
         switch (t)
         {
         case left_partition:
-            return partition_data(data_, data_.size()-1);
+            return partition_data(data_, data_.size() - 1);
 
         case middle_partition:
             break;
@@ -267,7 +285,8 @@ struct partition_server
     // wrapped into a component action. The macro below defines a new type
     // 'get_data_action' which represents the (possibly remote) member function
     // partition::get_data().
-    HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_server, get_data, get_data_action);
+    HPX_DEFINE_COMPONENT_DIRECT_ACTION(
+        partition_server, get_data, get_data_action);
 
 private:
     partition_data data_;
@@ -298,29 +317,34 @@ struct partition : hpx::components::client_base<partition, partition_server>
     // Create new component on locality 'where' and initialize the held data
     partition(hpx::id_type where, std::size_t size, double initial_value)
       : base_type(hpx::new_<partition_server>(where, size, initial_value))
-    {}
+    {
+    }
 
     // Create a new component on the locality co-located to the id 'where'. The
     // new instance will be initialized from the given partition_data.
     partition(hpx::id_type where, partition_data const& data)
       : base_type(hpx::new_<partition_server>(hpx::colocated(where), data))
-    {}
+    {
+    }
 
     // Attach a future representing a (possibly remote) partition.
-    partition(hpx::future<hpx::id_type> && id) noexcept
+    partition(hpx::future<hpx::id_type>&& id) noexcept
       : base_type(std::move(id))
-    {}
+    {
+    }
 
     // Unwrap a future<partition> (a partition already is a future to the
     // id of the referenced object, thus unwrapping accesses this inner future).
-    partition(hpx::future<partition> && c) noexcept
+    partition(hpx::future<partition>&& c) noexcept
       : base_type(std::move(c))
-    {}
+    {
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // Invoke the (remote) member function which gives us access to the data.
     // This is a pure helper function hiding the async.
-    hpx::future<partition_data> get_data(partition_server::partition_type t) const
+    hpx::future<partition_data> get_data(
+        partition_server::partition_type t) const
     {
         partition_server::get_data_action act;
         return hpx::async(act, get_id(), t);
@@ -338,16 +362,17 @@ struct stepper_server : hpx::components::component_base<stepper_server>
 
     explicit stepper_server(std::size_t nl)
       : left_(hpx::find_from_basename(
-            stepper_basename, idx(hpx::get_locality_id(), -1, nl))),
-        right_(hpx::find_from_basename(
-            stepper_basename, idx(hpx::get_locality_id(), +1, nl))),
-        U_(2)
-    {}
+            stepper_basename, idx(hpx::get_locality_id(), -1, nl)))
+      , right_(hpx::find_from_basename(
+            stepper_basename, idx(hpx::get_locality_id(), +1, nl)))
+      , U_(2)
+    {
+    }
 
     // Do all the work on 'np' partitions, 'nx' data points each, for 'nt'
     // time steps, limit depth of dependency tree to 'nd'.
-    space do_work(std::size_t local_np, std::size_t nx, std::size_t nt,
-        std::uint64_t nd);
+    space do_work(
+        std::size_t local_np, std::size_t nx, std::size_t nt, std::uint64_t nd);
 
     HPX_DEFINE_COMPONENT_ACTION(stepper_server, do_work, do_work_action);
 
@@ -373,20 +398,20 @@ struct stepper_server : hpx::components::component_base<stepper_server>
         right_ = hpx::shared_future<hpx::id_type>();
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(stepper_server, release_dependencies,
-        release_dependencies_action);
+    HPX_DEFINE_COMPONENT_ACTION(
+        stepper_server, release_dependencies, release_dependencies_action);
 
 protected:
     // Our operator
     static double heat(double left, double middle, double right)
     {
-        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
+        return middle + (k * dt / (dx * dx)) * (left - 2 * middle + right);
     }
 
     // The partitioned operator, it invokes the heat operator above on all
     // elements of a partition.
-    static partition heat_part(partition const& left, partition const& middle,
-        partition const& right);
+    static partition heat_part(
+        partition const& left, partition const& middle, partition const& right);
 
     // Helper functions to receive the left and right boundary elements from
     // the neighbors.
@@ -453,25 +478,26 @@ struct stepper : hpx::components::client_base<stepper, stepper_server>
     explicit stepper(std::size_t num_localities)
       : base_type(hpx::new_<stepper_server>(hpx::find_here(), num_localities))
     {
-        hpx::register_with_basename(stepper_basename, get_id(),
-            hpx::get_locality_id());
+        hpx::register_with_basename(
+            stepper_basename, get_id(), hpx::get_locality_id());
     }
 
-    stepper(hpx::future<hpx::id_type> && id) noexcept
+    stepper(hpx::future<hpx::id_type>&& id) noexcept
       : base_type(std::move(id))
-    {}
+    {
+    }
 
     ~stepper()
     {
         // break cyclic dependencies
-        hpx::future<void> f1 = hpx::async(
-            release_dependencies_action(), get_id());
+        hpx::future<void> f1 =
+            hpx::async(release_dependencies_action(), get_id());
 
         // release the reference held by AGAS
         hpx::future<void> f2 = hpx::unregister_with_basename(
             stepper_basename, hpx::get_locality_id());
 
-        hpx::wait_all(f1, f2);       // ignore exceptions
+        hpx::wait_all(f1, f2);    // ignore exceptions
     }
 
     hpx::future<stepper_server::space> do_work(
@@ -484,54 +510,45 @@ struct stepper : hpx::components::client_base<stepper, stepper_server>
 ///////////////////////////////////////////////////////////////////////////////
 // The partitioned operator, it invokes the heat operator above on all elements
 // of a partition.
-partition stepper_server::heat_part(partition const& left,
-    partition const& middle, partition const& right)
+partition stepper_server::heat_part(
+    partition const& left, partition const& middle, partition const& right)
 {
     hpx::shared_future<partition_data> middle_data =
         middle.get_data(partition_server::middle_partition);
 
-    hpx::future<partition_data> next_middle = middle_data.then(
-        hpx::util::unwrapping(
-            [middle](partition_data const& m) -> partition_data
-            {
+    hpx::future<partition_data> next_middle =
+        middle_data.then(hpx::util::unwrapping(
+            [middle](partition_data const& m) -> partition_data {
                 HPX_UNUSED(middle);
 
                 // All local operations are performed once the middle data of
                 // the previous time step becomes available.
                 std::size_t size = m.size();
                 partition_data next(size);
-                for (std::size_t i = 1; i != size-1; ++i)
-                    next[i] = heat(m[i-1], m[i], m[i+1]);
+                for (std::size_t i = 1; i != size - 1; ++i)
+                    next[i] = heat(m[i - 1], m[i], m[i + 1]);
                 return next;
-            }
-        )
-    );
+            }));
 
-    return hpx::dataflow(
-        hpx::launch::async,
+    return hpx::dataflow(hpx::launch::async,
         hpx::util::unwrapping(
             [left, middle, right](partition_data next, partition_data const& l,
-                partition_data const& m, partition_data const& r) -> partition
-            {
+                partition_data const& m, partition_data const& r) -> partition {
                 HPX_UNUSED(left);
                 HPX_UNUSED(right);
 
                 // Calculate the missing boundary elements once the
                 // corresponding data has become available.
                 std::size_t size = m.size();
-                next[0] = heat(l[size-1], m[0], m[1]);
-                next[size-1] = heat(m[size-2], m[size-1], r[0]);
+                next[0] = heat(l[size - 1], m[0], m[1]);
+                next[size - 1] = heat(m[size - 2], m[size - 1], r[0]);
 
                 // The new partition_data will be allocated on the same locality
                 // as 'middle'.
                 return partition(middle.get_id(), next);
-            }
-        ),
-        std::move(next_middle),
-        left.get_data(partition_server::left_partition),
-        middle_data,
-        right.get_data(partition_server::right_partition)
-    );
+            }),
+        std::move(next_middle), left.get_data(partition_server::left_partition),
+        middle_data, right.get_data(partition_server::right_partition));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -539,11 +556,11 @@ partition stepper_server::heat_part(partition const& left,
 //
 // Do all the work on 'np' partitions, 'nx' data points each, for 'nt'
 // time steps, limit depth of dependency tree to 'nd'.
-stepper_server::space stepper_server::do_work(std::size_t local_np,
-    std::size_t nx, std::size_t nt, std::uint64_t nd)
+stepper_server::space stepper_server::do_work(
+    std::size_t local_np, std::size_t nx, std::size_t nt, std::uint64_t nd)
 {
     // U[t][i] is the state of position i at time t.
-    for (space& s: U_)
+    for (space& s : U_)
         s.resize(local_np);
 
     // Initial conditions: f(0, i) = i
@@ -555,7 +572,7 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
     if (nt != 0)
     {
         send_left(0, U_[0][0]);
-        send_right(0, U_[0][local_np-1]);
+        send_right(0, U_[0][local_np - 1]);
     }
 
     // limit depth of dependency tree
@@ -569,13 +586,12 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
         // handle special case (one partition per locality) in a special way
         if (local_np == 1)
         {
-            next[0] = hpx::dataflow(
-                    hpx::launch::async, &stepper_server::heat_part,
-                    receive_left(t), current[0], receive_right(t)
-                );
+            next[0] =
+                hpx::dataflow(hpx::launch::async, &stepper_server::heat_part,
+                    receive_left(t), current[0], receive_right(t));
 
             // send to left and right if not last time step
-            if (t != nt-1)
+            if (t != nt - 1)
             {
                 send_left(t + 1, next[0]);
                 send_right(t + 1, next[0]);
@@ -583,41 +599,38 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
         }
         else
         {
-            next[0] = hpx::dataflow(
-                    hpx::launch::async, &stepper_server::heat_part,
-                    receive_left(t), current[0], current[1]
-                );
+            next[0] =
+                hpx::dataflow(hpx::launch::async, &stepper_server::heat_part,
+                    receive_left(t), current[0], current[1]);
 
             // send to left if not last time step
-            if (t != nt-1) send_left(t + 1, next[0]);
+            if (t != nt - 1)
+                send_left(t + 1, next[0]);
 
-            for (std::size_t i = 1; i != local_np-1; ++i)
+            for (std::size_t i = 1; i != local_np - 1; ++i)
             {
-                next[i] = hpx::dataflow(
-                        hpx::launch::async, &stepper_server::heat_part,
-                        current[i-1], current[i], current[i+1]
-                    );
+                next[i] = hpx::dataflow(hpx::launch::async,
+                    &stepper_server::heat_part, current[i - 1], current[i],
+                    current[i + 1]);
             }
 
-            next[local_np-1] = hpx::dataflow(
-                    hpx::launch::async, &stepper_server::heat_part,
-                    current[local_np-2], current[local_np-1], receive_right(t)
-                );
+            next[local_np - 1] = hpx::dataflow(hpx::launch::async,
+                &stepper_server::heat_part, current[local_np - 2],
+                current[local_np - 1], receive_right(t));
 
             // send to right if not last time step
-            if (t != nt-1) send_right(t + 1, next[local_np-1]);
+            if (t != nt - 1)
+                send_right(t + 1, next[local_np - 1]);
         }
 
         // every nd time steps, attach additional continuation which will
         // trigger the semaphore once computation has reached this point
         if ((t % nd) == 0)
         {
-            next[0].then(
-                [&sem, t](partition &&)
-                {
-                    // inform semaphore about new lower limit
-                    sem.signal(t);
-                });
+            next[0].then([&sem, t](partition&&) {
+                // inform semaphore about new lower limit
+                sem.signal(t);
+            });
         }
 
         // suspend if the tree has become too deep, the continuation above
@@ -629,16 +642,17 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void do_all_work(std::uint64_t nt, std::uint64_t nx, std::uint64_t np,
-    std::uint64_t nd)
+void do_all_work(
+    std::uint64_t nt, std::uint64_t nx, std::uint64_t np, std::uint64_t nd)
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
-    std::size_t nl = localities.size();                    // Number of localities
+    std::size_t nl = localities.size();    // Number of localities
 
     if (np < nl)
     {
         std::cout << "The number of partitions should not be smaller than "
-                     "the number of localities" << std::endl;
+                     "the number of localities"
+                  << std::endl;
         return;
     }
 
@@ -649,15 +663,19 @@ void do_all_work(std::uint64_t nt, std::uint64_t nx, std::uint64_t np,
     std::uint64_t t = hpx::chrono::high_resolution_clock::now();
 
     // Perform all work and wait for it to finish
-    hpx::future<stepper_server::space> result = step.do_work(np/nl, nx, nt, nd);
+    hpx::future<stepper_server::space> result =
+        step.do_work(np / nl, nx, nt, nd);
 
     // Gather results from all localities
     if (0 == hpx::get_locality_id())
     {
         std::uint64_t const num_worker_threads = hpx::get_num_worker_threads();
 
-        hpx::future<std::vector<stepper_server::space> > overall_result =
-            hpx::lcos::gather_here(gather_basename, std::move(result), nl);
+        hpx::future<std::vector<stepper_server::space>> overall_result =
+            result.then([&](hpx::future<stepper_server::space>&& result) {
+                return hpx::collectives::gather_here(
+                    gather_basename, result.get(), nl);
+            });
 
         std::vector<stepper_server::space> solution = overall_result.get();
         for (std::size_t i = 0; i != nl; ++i)
@@ -665,7 +683,7 @@ void do_all_work(std::uint64_t nt, std::uint64_t nx, std::uint64_t np,
             stepper_server::space const& s = solution[i];
             for (std::size_t i = 0; i != s.size(); ++i)
             {
-                s[i].get_data(partition_server::middle_partition).wait();
+                s[i].get_data(partition_server::middle_partition).get();
             }
         }
 
@@ -679,29 +697,37 @@ void do_all_work(std::uint64_t nt, std::uint64_t nx, std::uint64_t np,
                 stepper_server::space const& s = solution[i];
                 for (std::size_t j = 0; j != s.size(); ++j)
                 {
-                    std::cout << "U[" << i*(s.size()) + j << "] = "
-                        << s[j].get_data(partition_server::middle_partition).get()
+                    std::cout
+                        << "U[" << i * (s.size()) + j << "] = "
+                        << s[j].get_data(partition_server::middle_partition)
+                               .get()
                         << std::endl;
                 }
             }
         }
 
-        print_time_results(std::uint32_t(nl), num_worker_threads, elapsed,
-            nx, np, nt, header);
+        print_time_results(
+            std::uint32_t(nl), num_worker_threads, elapsed, nx, np, nt, header);
     }
     else
     {
-        hpx::lcos::gather_there(gather_basename, std::move(result)).wait();
+        result
+            .then([&](hpx::future<stepper_server::space>&& result) {
+                hpx::collectives::gather_there(gather_basename, result.get());
+            })
+            .get();
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
-    std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
-    std::uint64_t np = vm["np"].as<std::uint64_t>();   // Number of partitions.
-    std::uint64_t nd = vm["nd"].as<std::uint64_t>();   // Max depth of dep tree.
+    std::uint64_t nt = vm["nt"].as<std::uint64_t>();    // Number of steps.
+    std::uint64_t nx =
+        vm["nx"].as<std::uint64_t>();    // Number of grid points.
+    std::uint64_t np = vm["np"].as<std::uint64_t>();    // Number of partitions.
+    std::uint64_t nd =
+        vm["nd"].as<std::uint64_t>();    // Max depth of dep tree.
 
     if (vm.count("no-header"))
         header = false;
@@ -718,30 +744,26 @@ int main(int argc, char* argv[])
     using namespace hpx::program_options;
 
     options_description desc_commandline;
-    desc_commandline.add_options()
-        ("results", "print generated results (default: false)")
-        ("nx", value<std::uint64_t>()->default_value(10),
-         "Local x dimension (of each partition)")
-        ("nt", value<std::uint64_t>()->default_value(45),
-         "Number of time steps")
-        ("nd", value<std::uint64_t>()->default_value(10),
-         "Number of time steps to allow the dependency tree to grow to")
-        ("np", value<std::uint64_t>()->default_value(10),
-         "Number of partitions")
-        ("k", value<double>(&k)->default_value(0.5),
-         "Heat transfer coefficient (default: 0.5)")
-        ("dt", value<double>(&dt)->default_value(1.0),
-         "Timestep unit (default: 1.0[s])")
-        ("dx", value<double>(&dx)->default_value(1.0),
-         "Local x dimension")
-        ( "no-header", "do not print out the csv header row")
-    ;
+    desc_commandline.add_options()(
+        "results", "print generated results (default: false)")("nx",
+        value<std::uint64_t>()->default_value(10),
+        "Local x dimension (of each partition)") ("nt",
+        value<std::uint64_t>()->default_value(45),
+        "Number of time steps") ("nd",
+        value<std::uint64_t>()->default_value(10),
+        "Number of time steps to allow the dependency tree to grow to") ("np",
+        value<std::uint64_t>()->default_value(10),
+        "Number of partitions") ("k", value<double>(&k)->default_value(0.5),
+        "Heat transfer coefficient (default: 0.5)") ("dt",
+        value<double>(&dt)->default_value(1.0),
+        "Timestep unit (default: 1.0[s])") ("dx",
+        value<double>(&dx)->default_value(1.0),
+        "Local x dimension") ("no-header",
+        "do not print out the csv header row");
 
     // Initialize and run HPX, this example requires to run hpx_main on all
     // localities
-    std::vector<std::string> const cfg = {
-        "hpx.run_hpx_main!=1"
-    };
+    std::vector<std::string> const cfg = {"hpx.run_hpx_main!=1"};
 
     hpx::init_params init_args;
     init_args.desc_cmdline = desc_commandline;

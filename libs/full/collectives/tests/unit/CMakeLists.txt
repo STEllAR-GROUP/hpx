@@ -13,9 +13,11 @@ set(tests
     broadcast_apply
     broadcast_component
     communication_set
+    exclusive_scan_
     fold
     gather
     global_spmd_block
+    inclusive_scan_
     reduce
     reduce_direct
     remote_latch

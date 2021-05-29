@@ -17,10 +17,8 @@
 #include <hpx/exception.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
 #include <hpx/runtime_components/new.hpp>
-#include <hpx/runtime_distributed/find_here.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
 
 #include <cstddef>
@@ -29,11 +27,11 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 using collectives_component =
-    hpx::components::component<hpx::lcos::detail::communicator_server>;
+    hpx::components::component<hpx::collectives::detail::communicator_server>;
 
 HPX_REGISTER_COMPONENT(collectives_component);
 
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx { namespace collectives { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::components::client<detail::communicator_server> create_communicator(
@@ -86,7 +84,7 @@ namespace hpx { namespace lcos { namespace detail {
                     if (!result)
                     {
                         HPX_THROW_EXCEPTION(bad_parameter,
-                            "hpx::lcos::detail::create_communicator",
+                            "hpx::collectives::detail::create_communicator",
                             hpx::util::format(
                                 "the given base name for the communicator "
                                 "operation was already registered: {}",
@@ -99,6 +97,6 @@ namespace hpx { namespace lcos { namespace detail {
         // find existing communicator
         return hpx::find_from_basename<client_type>(std::move(name), root_site);
     }
-}}}    // namespace hpx::lcos::detail
+}}}    // namespace hpx::collectives::detail
 
 #endif

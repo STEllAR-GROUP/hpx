@@ -18,40 +18,12 @@
 #include <utility>
 #include <vector>
 
-constexpr char const* reduce_basename = "/test/reduce/";
 constexpr char const* reduce_direct_basename = "/test/reduce_direct/";
 
 void test_one_shot_use()
 {
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
     std::uint32_t this_locality = hpx::get_locality_id();
-
-    // test functionality based on future<> of local result
-    for (int i = 0; i != 10; ++i)
-    {
-        hpx::future<std::uint32_t> value =
-            hpx::make_ready_future(hpx::get_locality_id());
-
-        if (this_locality == 0)
-        {
-            hpx::future<std::uint32_t> overall_result =
-                hpx::reduce_here(reduce_basename, std::move(value),
-                    std::plus<std::uint32_t>{}, num_localities, i);
-
-            std::uint32_t sum = 0;
-            for (std::uint32_t j = 0; j != num_localities; ++j)
-            {
-                sum += j;
-            }
-            HPX_TEST_EQ(sum, overall_result.get());
-        }
-        else
-        {
-            hpx::future<void> overall_result =
-                hpx::reduce_there(reduce_basename, std::move(value), i);
-            overall_result.get();
-        }
-    }
 
     // test functionality based on immediate local result value
     for (int i = 0; i != 10; ++i)
@@ -61,7 +33,7 @@ void test_one_shot_use()
         if (this_locality == 0)
         {
             hpx::future<std::uint32_t> overall_result =
-                hpx::reduce_here(reduce_direct_basename, value,
+                hpx::collectives::reduce_here(reduce_direct_basename, value,
                     std::plus<std::uint32_t>{}, num_localities, i);
 
             std::uint32_t sum = 0;
@@ -73,8 +45,8 @@ void test_one_shot_use()
         }
         else
         {
-            hpx::future<void> overall_result =
-                hpx::reduce_there(reduce_direct_basename, std::move(value), i);
+            hpx::future<void> overall_result = hpx::collectives::reduce_there(
+                reduce_direct_basename, std::move(value), i);
             overall_result.get();
         }
     }
@@ -85,36 +57,8 @@ void test_multiple_use()
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
     std::uint32_t this_locality = hpx::get_locality_id();
 
-    auto reduce_client = hpx::create_reducer(reduce_basename, num_localities);
-
-    // test functionality based on future<> of local result
-    for (int i = 0; i != 10; ++i)
-    {
-        hpx::future<std::uint32_t> value =
-            hpx::make_ready_future(hpx::get_locality_id());
-
-        if (this_locality == 0)
-        {
-            hpx::future<std::uint32_t> overall_result = hpx::reduce_here(
-                reduce_client, std::move(value), std::plus<std::uint32_t>{});
-
-            std::uint32_t sum = 0;
-            for (std::uint32_t j = 0; j != num_localities; ++j)
-            {
-                sum += j;
-            }
-            HPX_TEST_EQ(sum, overall_result.get());
-        }
-        else
-        {
-            hpx::future<void> overall_result =
-                hpx::reduce_there(reduce_client, std::move(value));
-            overall_result.get();
-        }
-    }
-
-    auto reduce_direct_client =
-        hpx::create_reducer(reduce_direct_basename, num_localities);
+    auto reduce_direct_client = hpx::collectives::create_reducer(
+        reduce_direct_basename, num_localities);
 
     // test functionality based on immediate local result value
     for (int i = 0; i != 10; ++i)
@@ -123,8 +67,9 @@ void test_multiple_use()
 
         if (this_locality == 0)
         {
-            hpx::future<std::uint32_t> overall_result = hpx::reduce_here(
-                reduce_direct_client, value, std::plus<std::uint32_t>{});
+            hpx::future<std::uint32_t> overall_result =
+                hpx::collectives::reduce_here(
+                    reduce_direct_client, value, std::plus<std::uint32_t>{});
 
             std::uint32_t sum = 0;
             for (std::uint32_t j = 0; j != num_localities; ++j)
@@ -135,8 +80,8 @@ void test_multiple_use()
         }
         else
         {
-            hpx::future<void> overall_result =
-                hpx::reduce_there(reduce_direct_client, std::move(value));
+            hpx::future<void> overall_result = hpx::collectives::reduce_there(
+                reduce_direct_client, std::move(value));
             overall_result.get();
         }
     }
