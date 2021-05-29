@@ -716,11 +716,11 @@ Parallel algorithms
      * Destroys a range of objects.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`destroy_n`
-   * * :cpp:func:`hpx::parallel::v1::uninitialized_copy`
+   * * :cpp:func:`hpx::uninitialized_copy`
      * Copies a range of objects to an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_copy`
-   * * :cpp:func:`hpx::parallel::v1::uninitialized_copy_n`
+   * * :cpp:func:`hpx::uninitialized_copy_n`
      * Copies a number of objects to an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_copy_n`
