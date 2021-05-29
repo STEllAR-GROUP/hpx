@@ -58,7 +58,7 @@ Functions
 - :cpp:func:`hpx::is_partitioned`
 - :cpp:func:`hpx::is_sorted`
 - :cpp:func:`hpx::is_sorted_until`
-- :cpp:func:`hpx::parallel::v1::lexicographical_compare`
+- :cpp:func:`hpx::lexicographical_compare`
 - :cpp:func:`hpx::make_heap`
 - :cpp:func:`hpx::parallel::v1::max_element`
 - :cpp:func:`hpx::merge`
