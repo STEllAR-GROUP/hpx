@@ -62,7 +62,7 @@ ${perftests_dir}/driver.py -v -l $logfile build -b release \
   # Run performance tests
   ${perftests_dir}/driver.py -v -l $logfile perftest run \
       --local True --scheduling-policy local-priority --run_output $result \
-      --extra-opts ' --test-all --repetitions=15' \
+      --extra-opts ' --test-all --repetitions=100' \
       || { echo 'Running failed'; test_errors=1; exit 1; }
   # We add a space before --test-all because of the following issue
   # https://bugs.python.org/issue9334
