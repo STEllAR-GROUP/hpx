@@ -12,36 +12,7 @@
 // clang-format off
 namespace hpx { namespace collectives {
 
-    /// Create a new communicator object usable with all_gather
-    ///
-    /// This functions creates a new communicator object that can be called in
-    /// order to pre-allocate a communicator object usable with multiple
-    /// invocations of \a all_gather.
-    ///
-    /// \param  basename    The base name identifying the all_gather operation
-    /// \param  num_sites   The number of participating sites (default: all
-    ///                     localities).
-    /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_gather operation performed on the
-    ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_gather operation on the
-    ///                     given base name has to be performed more than once.
-    /// \param this_site    The sequence number of this invocation (usually
-    ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \params root_site   The site that is responsible for creating the
-    ///                     all_gather support object. This value is optional
-    ///                     and defaults to '0' (zero).
-    ///
-    /// \returns    This function returns a new communicator object usable
-    ///             with all_gather
-    ///
-    communicator create_all_gather(char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
-
-    /// AllToAll a set of values from different call sites
+    /// AllGather a set of values from different call sites
     ///
     /// This function receives a set of values from all call sites operating on
     /// the given base name.
@@ -76,7 +47,7 @@ namespace hpx { namespace collectives {
         std::size_t this_site = std::size_t(-1),
         std::size_t root_site = 0);
 
-    /// AllToAll a set of values from different call sites
+    /// AllGather a set of values from different call sites
     ///
     /// This function receives a set of values from all call sites operating on
     /// the given base name.
@@ -108,7 +79,7 @@ namespace hpx { namespace collectives {
 
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
-#include <hpx/collectives/detail/communicator.hpp>
+#include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -116,7 +87,6 @@ namespace hpx { namespace collectives {
 #include <cstddef>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -186,16 +156,6 @@ namespace hpx { namespace traits {
 namespace hpx { namespace collectives {
 
     ///////////////////////////////////////////////////////////////////////////
-    inline communicator create_all_gather(char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
-    {
-        return detail::create_communicator(
-            basename, num_sites, generation, this_site, root_site);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     // all_gather plain values
     template <typename T>
     hpx::future<std::vector<std::decay_t<T>>> all_gather(communicator fid,
@@ -236,7 +196,7 @@ namespace hpx { namespace collectives {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
-        return all_gather(create_all_gather(basename, num_sites, generation,
+        return all_gather(create_communicator(basename, num_sites, generation,
                               this_site, root_site),
             std::forward<T>(local_result), this_site);
     }
@@ -248,5 +208,5 @@ namespace hpx { namespace collectives {
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_ALLGATHER(...)             /**/
 
-#endif    // COMPUTE_HOST_CODE
+#endif    // !HPX_COMPUTE_DEVICE_CODE
 #endif    // DOXYGEN

@@ -22,10 +22,8 @@
 #include <hpx/thread_support/assert_owns_lock.hpp>
 
 #include <cstddef>
-#include <cstdint>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -47,8 +45,7 @@ namespace hpx { namespace collectives { namespace detail {
 
     public:
         communicator_server()    //-V730
-          : num_values_(0)
-          , num_sites_(0)
+          : num_sites_(0)
           , site_(0)
           , needs_initialization_(false)
           , data_available_(false)
@@ -56,17 +53,14 @@ namespace hpx { namespace collectives { namespace detail {
             HPX_ASSERT(false);    // shouldn't ever be called
         }
 
-        communicator_server(
-            std::size_t num_sites, std::size_t site, std::size_t num_values)
+        communicator_server(std::size_t num_sites, std::size_t site)
           : data_()
           , gate_(num_sites)
-          , num_values_(num_values)
           , num_sites_(num_sites)
           , site_(site)
           , needs_initialization_(true)
           , data_available_(false)
         {
-            HPX_ASSERT(num_values != 0);
             HPX_ASSERT(num_sites != 0);
         }
 
@@ -111,22 +105,24 @@ namespace hpx { namespace collectives { namespace detail {
     private:
         // re-initialize data
         template <typename T, typename Lock>
-        void reinitialize_data(Lock& l)
+        void reinitialize_data(Lock& l, std::size_t num_values)
         {
             HPX_ASSERT_OWNS_LOCK(l);
             if (needs_initialization_)
             {
                 needs_initialization_ = false;
                 data_available_ = false;
-                data_ = std::vector<T>(num_values_);
+                data_ = std::vector<T>(
+                    num_values == std::size_t(-1) ? num_sites_ : num_values);
             }
         }
 
         template <typename T, typename Lock>
-        std::vector<T>& access_data(Lock& l)
+        std::vector<T>& access_data(
+            Lock& l, std::size_t num_values = std::size_t(-1))
         {
             HPX_ASSERT_OWNS_LOCK(l);
-            reinitialize_data<T>(l);
+            reinitialize_data<T>(l, num_values);
             return hpx::any_cast<std::vector<T>&>(data_);
         }
 
@@ -150,26 +146,11 @@ namespace hpx { namespace collectives { namespace detail {
         mutex_type mtx_;
         hpx::unique_any_nonser data_;
         lcos::local::and_gate gate_;
-        std::size_t const num_values_;
         std::size_t const num_sites_;
         std::size_t const site_;
         bool needs_initialization_;
         bool data_available_;
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT hpx::components::client<detail::communicator_server>
-    create_communicator(char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0,
-        std::size_t num_values = std::size_t(-1));
 }}}    // namespace hpx::collectives::detail
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace collectives {
-
-    using communicator = hpx::components::client<detail::communicator_server>;
-}}    // namespace hpx::collectives
 
 #endif    // COMPUTE_HOST_CODE

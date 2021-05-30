@@ -59,7 +59,7 @@ void test_multiple_use()
 
     std::uint32_t this_locality = hpx::get_locality_id();
 
-    auto scatter_direct_client = hpx::collectives::create_scatterer(
+    auto scatter_direct_client = hpx::collectives::create_communicator(
         scatter_direct_basename, num_localities);
 
     // test functionality based on immediate local result value

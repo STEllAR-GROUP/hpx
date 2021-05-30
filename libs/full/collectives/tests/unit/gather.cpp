@@ -56,7 +56,7 @@ void test_multiple_use()
     std::uint32_t this_locality = hpx::get_locality_id();
 
     // test functionality based on immediate local result value
-    auto gather_direct_client = hpx::collectives::create_gatherer(
+    auto gather_direct_client = hpx::collectives::create_communicator(
         gather_direct_basename, num_localities);
 
     for (std::uint32_t i = 0; i != 10; ++i)

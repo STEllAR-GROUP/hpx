@@ -12,35 +12,6 @@
 // clang-format off
 namespace hpx { namespace collectives {
 
-    /// Create a new communicator object usable with scatter_from and scatter_to
-    ///
-    /// This functions creates a new communicator object that can be called in
-    /// order to pre-allocate a communicator object usable with multiple
-    /// invocations of \a scatter_from and \a scatter_to.
-    ///
-    /// \param  basename    The base name identifying the scatter operation
-    /// \param  num_sites   The number of participating sites (default: all
-    ///                     localities).
-    /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the scatter operation performed on the
-    ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the scatter operation on the
-    ///                     given base name has to be performed more than once.
-    /// \param this_site    The sequence number of this invocation (usually
-    ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \params root_site   The site that is responsible for creating the
-    ///                     scatter support object. This value is optional
-    ///                     and defaults to '0' (zero).
-    ///
-    /// \returns    This function returns a new communicator object usable
-    ///             with scatter_from and scatter_to
-    ///
-    communicator create_scatterer(char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
-
     /// Scatter (receive) a set of values to different call sites
     ///
     /// This function receives an element of a set of values operating on
@@ -148,7 +119,7 @@ namespace hpx { namespace collectives {
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
-#include <hpx/collectives/detail/communicator.hpp>
+#include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -156,7 +127,6 @@ namespace hpx { namespace collectives {
 #include <cstddef>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -265,16 +235,6 @@ namespace hpx { namespace traits {
 namespace hpx { namespace collectives {
 
     ///////////////////////////////////////////////////////////////////////////
-    inline communicator create_scatterer(char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
-    {
-        return detail::create_communicator(
-            basename, num_sites, generation, this_site, root_site);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     // destination site needs to be handled differently
     template <typename T>
     hpx::future<T> scatter_from(
@@ -309,7 +269,7 @@ namespace hpx { namespace collectives {
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
         HPX_ASSERT(this_site != root_site);
-        return scatter_from<T>(create_scatterer(basename, std::size_t(-1),
+        return scatter_from<T>(create_communicator(basename, std::size_t(-1),
                                    generation, this_site, root_site),
             this_site);
     }
@@ -354,7 +314,7 @@ namespace hpx { namespace collectives {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1))
     {
-        return scatter_to(create_scatterer(basename, num_sites, generation,
+        return scatter_to(create_communicator(basename, num_sites, generation,
                               this_site, this_site),
             std::move(local_result), this_site);
     }
@@ -366,5 +326,5 @@ namespace hpx { namespace collectives {
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_SCATTER(...)             /**/
 
-#endif    // COMPUTE_HOST_CODE
+#endif    // !HPX_COMPUTE_DEVICE_CODE
 #endif    // DOXYGEN

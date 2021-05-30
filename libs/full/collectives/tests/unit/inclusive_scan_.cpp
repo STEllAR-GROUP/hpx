@@ -46,7 +46,7 @@ void test_multiple_use()
 {
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
 
-    auto all_reduce_direct_client = hpx::collectives::create_inclusive_scan(
+    auto all_reduce_direct_client = hpx::collectives::create_communicator(
         all_reduce_direct_basename, num_localities);
 
     // test functionality based on immediate local result value

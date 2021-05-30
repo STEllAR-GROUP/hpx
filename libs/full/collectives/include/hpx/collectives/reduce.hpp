@@ -12,35 +12,6 @@
 // clang-format off
 namespace hpx { namespace collectives {
 
-    /// Create a new communicator object usable with reduce_here and reduce_there
-    ///
-    /// This functions creates a new communicator object that can be called in
-    /// order to pre-allocate a communicator object usable with multiple
-    /// invocations of \a reduce_here and \a reduce_there.
-    ///
-    /// \param  basename    The base name identifying the reduce operation
-    /// \param  num_sites   The number of participating sites (default: all
-    ///                     localities).
-    /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the reduce operation performed on the
-    ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the reduce operation on the
-    ///                     given base name has to be performed more than once.
-    /// \param this_site    The sequence number of this invocation (usually
-    ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \params root_site   The site that is responsible for creating the
-    ///                     reduce support object. This value is optional
-    ///                     and defaults to '0' (zero).
-    ///
-    /// \returns    This function returns a new communicator object usable
-    ///             with reduce_here and reduce_there
-    ///
-    communicator create_reducer(char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
-
     /// Reduce a set of values from different call sites
     ///
     /// This function receives a set of values from all call sites operating on
@@ -81,7 +52,7 @@ namespace hpx { namespace collectives {
     /// a given operator on values supplied from all call sites operating on
     /// the given base name.
     ///
-    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  comm        A communicator object returned from \a create_communicator
     /// \param  local_result A value to reduce on the root_site from this call site.
     /// \param  op          Reduction operation to apply to all values supplied
     ///                     from all participating sites
@@ -131,7 +102,7 @@ namespace hpx { namespace collectives {
     /// This function transmits the value given by \a result to a central reduce
     /// site (where the corresponding \a reduce_here is executed)
     ///
-    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  comm        A communicator object returned from \a create_communicator
     /// \param  local_result A value to reduce on the central reduction point
     ///                     from this call site.
     /// \param this_site    The sequence number of this invocation (usually
@@ -157,7 +128,7 @@ namespace hpx { namespace collectives {
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
-#include <hpx/collectives/detail/communicator.hpp>
+#include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
@@ -166,7 +137,6 @@ namespace hpx { namespace collectives {
 #include <cstddef>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -276,16 +246,6 @@ namespace hpx { namespace traits {
 namespace hpx { namespace collectives {
 
     ///////////////////////////////////////////////////////////////////////////
-    inline communicator create_reducer(char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
-    {
-        return detail::create_communicator(
-            basename, num_sites, generation, this_site, root_site);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     // reduce plain values
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> reduce_here(communicator fid, T&& local_result,
@@ -328,7 +288,7 @@ namespace hpx { namespace collectives {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1))
     {
-        return reduce_here(create_reducer(basename, num_sites, generation,
+        return reduce_here(create_communicator(basename, num_sites, generation,
                                this_site, this_site),
             std::forward<T>(result), std::forward<F>(op), this_site);
     }
@@ -375,11 +335,11 @@ namespace hpx { namespace collectives {
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
         HPX_ASSERT(this_site != root_site);
-        return reduce_there(create_reducer(basename, std::size_t(-1),
+        return reduce_there(create_communicator(basename, std::size_t(-1),
                                 generation, this_site, root_site),
             std::forward<T>(local_result), this_site);
     }
 }}    // namespace hpx::collectives
 
-#endif    // COMPUTE_HOST_CODE
+#endif    // !HPX_COMPUTE_DEVICE_CODE
 #endif    // DOXYGEN

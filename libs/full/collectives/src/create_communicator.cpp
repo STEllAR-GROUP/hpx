@@ -9,7 +9,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/assert.hpp>
-#include <hpx/collectives/detail/communicator.hpp>
+#include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/components/client.hpp>
 #include <hpx/components_base/agas_interface.hpp>
@@ -31,12 +31,12 @@ using collectives_component =
 
 HPX_REGISTER_COMPONENT(collectives_component);
 
-namespace hpx { namespace collectives { namespace detail {
+namespace hpx { namespace collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::components::client<detail::communicator_server> create_communicator(
         char const* basename, std::size_t num_sites, std::size_t generation,
-        std::size_t this_site, std::size_t root_site, std::size_t num_values)
+        std::size_t this_site, std::size_t root_site)
     {
         if (num_sites == std::size_t(-1))
         {
@@ -50,10 +50,6 @@ namespace hpx { namespace collectives { namespace detail {
             {
                 root_site = this_site;
             }
-        }
-        if (num_values == std::size_t(-1))
-        {
-            num_values = num_sites;
         }
 
         HPX_ASSERT(this_site < num_sites);
@@ -70,8 +66,7 @@ namespace hpx { namespace collectives { namespace detail {
         if (this_site == root_site)
         {
             // create a new communicator
-            client_type c =
-                hpx::local_new<client_type>(num_sites, this_site, num_values);
+            client_type c = hpx::local_new<client_type>(num_sites, this_site);
 
             // register the communicator's id using the given basename,
             // this keeps the communicator alive
@@ -97,6 +92,6 @@ namespace hpx { namespace collectives { namespace detail {
         // find existing communicator
         return hpx::find_from_basename<client_type>(std::move(name), root_site);
     }
-}}}    // namespace hpx::collectives::detail
+}}    // namespace hpx::collectives
 
-#endif
+#endif    // !HPX_COMPUTE_DEVICE_CODE
