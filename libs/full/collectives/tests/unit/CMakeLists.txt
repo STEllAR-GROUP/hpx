@@ -9,13 +9,11 @@ set(tests
     all_reduce
     all_to_all
     barrier
-    broadcast
     broadcast_apply
     broadcast_component
     communication_set
     exclusive_scan_
     fold
-    gather
     global_spmd_block
     inclusive_scan_
     reduce
@@ -24,7 +22,7 @@ set(tests
 )
 
 if(HPX_WITH_NETWORKING)
-  set(tests ${tests} broadcast_direct scatter)
+  set(tests ${tests} broadcast broadcast_direct gather scatter)
 endif()
 
 foreach(test ${tests})

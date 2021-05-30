@@ -78,7 +78,7 @@ namespace hpx { namespace collectives {
 
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
-#include <hpx/collectives/detail/communicator.hpp>
+#include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>

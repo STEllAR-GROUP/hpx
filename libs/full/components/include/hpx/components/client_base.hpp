@@ -61,15 +61,14 @@ namespace hpx { namespace traits {
         ///////////////////////////////////////////////////////////////////////
         template <typename Derived>
         struct is_future_customization_point<Derived,
-            typename std::enable_if<is_client<Derived>::value>::type>
-          : std::true_type
+            std::enable_if_t<is_client<Derived>::value>> : std::true_type
         {
         };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Derived>
         struct future_traits_customization_point<Derived,
-            typename std::enable_if<is_client<Derived>::value>::type>
+            std::enable_if_t<is_client<Derived>::value>>
         {
             using type = id_type;
             using result_type = id_type;
@@ -78,7 +77,7 @@ namespace hpx { namespace traits {
         ///////////////////////////////////////////////////////////////////////
         template <typename Derived>
         struct future_access_customization_point<Derived,
-            typename std::enable_if<is_client<Derived>::value>::type>
+            std::enable_if_t<is_client<Derived>::value>>
         {
             template <typename SharedState>
             HPX_FORCEINLINE static Derived create(
@@ -102,15 +101,15 @@ namespace hpx { namespace traits {
                     hpx::intrusive_ptr<SharedState>(shared_state, addref)));
             }
 
-            HPX_FORCEINLINE static
-                typename traits::detail::shared_state_ptr<id_type>::type const&
-                get_shared_state(Derived const& client)
+            HPX_FORCEINLINE static traits::detail::shared_state_ptr_t<
+                id_type> const&
+            get_shared_state(Derived const& client)
             {
                 return client.shared_state_;
             }
 
-            HPX_FORCEINLINE static typename traits::detail::shared_state_ptr<
-                id_type>::type::element_type*
+            HPX_FORCEINLINE static typename traits::detail::shared_state_ptr_t<
+                id_type>::element_type*
             detach_shared_state(Derived const& f)
             {
                 return f.shared_state_.get();
@@ -123,14 +122,14 @@ namespace hpx { namespace traits {
                 dest.set_value(src.get());
                 dest.set_registered_name(
                     src.shared_state_->get_registered_name());
-                src.shared_state_->set_registered_name("");
+                src.shared_state_->set_registered_name(std::string());
             }
         };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Derived>
         struct acquire_future_impl<Derived,
-            typename std::enable_if<is_client<Derived>::value>::type>
+            std::enable_if_t<is_client<Derived>::value>>
         {
             using type = Derived;
 
@@ -144,8 +143,8 @@ namespace hpx { namespace traits {
         ///////////////////////////////////////////////////////////////////////
         template <typename Derived>
         struct shared_state_ptr_for<Derived,
-            typename std::enable_if<is_client<Derived>::value>::type>
-          : shared_state_ptr<typename traits::future_traits<Derived>::type>
+            std::enable_if_t<is_client<Derived>::value>>
+          : shared_state_ptr<traits::future_traits_t<Derived>>
         {
         };
     }    // namespace detail
@@ -155,7 +154,7 @@ namespace hpx { namespace lcos { namespace detail {
 
     template <typename Derived>
     struct future_unwrap_result<Derived,
-        typename std::enable_if<traits::is_client<Derived>::value>::type>
+        std::enable_if_t<traits::is_client<Derived>::value>>
     {
         using result_type = id_type;
         using type = Derived;
@@ -163,7 +162,7 @@ namespace hpx { namespace lcos { namespace detail {
 
     template <typename Derived>
     struct future_unwrap_result<future<Derived>,
-        typename std::enable_if<traits::is_client<Derived>::value>::type>
+        std::enable_if_t<traits::is_client<Derived>::value>>
     {
         using result_type = id_type;
         using type = Derived;
@@ -544,8 +543,7 @@ namespace hpx { namespace components {
             using continuation_result_type =
                 typename hpx::util::invoke_result<F, Derived>::type;
             using shared_state_ptr =
-                typename hpx::traits::detail::shared_state_ptr<
-                    result_type>::type;
+                hpx::traits::detail::shared_state_ptr_t<result_type>;
 
             shared_state_ptr p =
                 lcos::detail::make_continuation<continuation_result_type>(
@@ -580,7 +578,7 @@ namespace hpx { namespace components {
                     "this client_base has no valid shared state");
             }
 
-            typename hpx::traits::detail::shared_state_ptr<bool>::type p =
+            hpx::traits::detail::shared_state_ptr_t<bool> p =
                 lcos::detail::make_continuation<bool>(*this, launch::sync,
                     [=, symbolic_name = std::move(symbolic_name)](
                         client_base const& f) mutable -> bool {

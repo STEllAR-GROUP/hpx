@@ -33,12 +33,20 @@ void test_one_shot_use()
             hpx::collectives::exclusive_scan(all_reduce_direct_basename, value,
                 std::plus<std::uint32_t>{}, num_localities, i);
 
-        std::uint32_t sum = 0;
-        for (std::uint32_t j = 0; j != value; ++j)
+        if (value == 0)
         {
-            sum += j;
+            // root_site is special
+            HPX_TEST_EQ(std::uint32_t(0), overall_result.get());
         }
-        HPX_TEST_EQ(sum, overall_result.get());
+        else
+        {
+            std::uint32_t sum = 0;
+            for (std::uint32_t j = 0; j != value; ++j)
+            {
+                sum += j;
+            }
+            HPX_TEST_EQ(sum, overall_result.get());
+        }
     }
 }
 
@@ -58,12 +66,20 @@ void test_multiple_use()
             hpx::collectives::exclusive_scan(
                 all_reduce_direct_client, value, std::plus<std::uint32_t>{});
 
-        std::uint32_t sum = 0;
-        for (std::uint32_t j = 0; j != value; ++j)
+        if (value == 0)
         {
-            sum += j;
+            // root_site is special
+            HPX_TEST_EQ(std::uint32_t(0), overall_result.get());
         }
-        HPX_TEST_EQ(sum, overall_result.get());
+        else
+        {
+            std::uint32_t sum = 0;
+            for (std::uint32_t j = 0; j != value; ++j)
+            {
+                sum += j;
+            }
+            HPX_TEST_EQ(sum, overall_result.get());
+        }
     }
 }
 

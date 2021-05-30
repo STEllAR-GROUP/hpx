@@ -36,6 +36,10 @@ namespace hpx { namespace collectives {
     ///                     exclusive_scan support object. This value is optional
     ///                     and defaults to '0' (zero).
     ///
+    /// \note       The result returned on the root_site is always the same as
+    ///             the result returned on thus_site == 1 and is the same as the
+    ///             value provided by the thje root_site.
+    ///
     /// \returns    This function returns a future holding a vector with all
     ///             values send by all participating sites. It will become
     ///             ready once the exclusive_scan operation has been completed.
@@ -59,6 +63,10 @@ namespace hpx { namespace collectives {
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \note       The result returned on the root_site is always the same as
+    ///             the result returned on thus_site == 1 and is the same as the
+    ///             value provided by the thje root_site.
     ///
     /// \returns    This function returns a future holding a vector with all
     ///             values send by all participating sites. It will become
@@ -137,7 +145,7 @@ namespace hpx { namespace traits {
                     dest.resize(data.size());
 
                     auto it = data.begin();
-                    hpx::parallel::exclusive_scan(hpx::execution::seq, ++it,
+                    hpx::parallel::exclusive_scan(hpx::execution::seq, it,
                         data.end(), dest.begin(), *it, std::forward<F>(op));
 
                     std::swap(data, dest);
