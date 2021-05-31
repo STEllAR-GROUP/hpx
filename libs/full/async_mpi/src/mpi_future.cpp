@@ -61,7 +61,10 @@ namespace hpx { namespace mpi { namespace experimental {
         HPX_EXPORT std::ostream& operator<<(std::ostream& os, mpi_info const&)
         {
             os << "R " << debug::dec<3>(get_mpi_info().rank_) << "/"
-               << debug::dec<3>(get_mpi_info().size_);
+               << debug::dec<3>(get_mpi_info().size_) << " active futures "
+               << debug::dec<3>(get_mpi_info().active_futures_size_)
+               << " queued requests "
+               << debug::dec<3>(get_mpi_info().request_queue_size_);
             return os;
         }
 
@@ -98,10 +101,10 @@ namespace hpx { namespace mpi { namespace experimental {
         {
             // place this future data request in our queue for handling
             get_request_queue().enqueue(data);
+            ++(get_mpi_info().request_queue_size_);
 
             mpi_debug.debug(debug::str<>("request queued"), get_mpi_info(),
-                "request", debug::hex<8>(data->request_), "active futures",
-                debug::dec<3>(get_active_futures().size()));
+                "request", debug::hex<8>(static_cast<void*>(data->request_)));
         }
 
         // used internally to add a request to the main polling vector
@@ -111,19 +114,12 @@ namespace hpx { namespace mpi { namespace experimental {
             // this will make a copy and increment the ref count
             get_active_futures().push_back(data);
             get_active_requests().push_back(data->request_);
-
-            mpi_debug.debug(debug::str<>("push_back"), get_mpi_info(),
-                "req_ptr", debug::ptr(get_active_requests().data()));
+            get_mpi_info().active_futures_size_ = get_active_futures().size();
 
             mpi_debug.debug(debug::str<>("add request"), get_mpi_info(),
-                "request", debug::hex<8>(data->request_), "vector size",
-                debug::dec<3>(get_active_futures().size()), "non null",
-                debug::dec<3>(get_number_of_active_requests()));
-        }
-
-        std::size_t get_number_of_enqueued_requests()
-        {
-            return get_request_queue().size_approx();
+                "request", debug::hex<8>(static_cast<void*>(data->request_)),
+                "vector size", debug::dec<3>(get_active_futures().size()),
+                "non null", debug::dec<3>(get_number_of_active_requests()));
         }
 
         std::size_t get_number_of_active_requests()
@@ -190,27 +186,22 @@ namespace hpx { namespace mpi { namespace experimental {
         {
             if (mpi_debug.is_enabled())
             {
-                // for debugging
-                static auto poll_deb = mpi_debug.make_timer(1,
-                    debug::str<>("Poll - lock failed"), detail::get_mpi_info());
-
-                mpi_debug.timed(poll_deb, "requests",
-                    debug::dec<>(detail::get_active_requests().size()),
-                    "futures",
-                    debug::dec<>(detail::get_active_futures().size()));
+                // for debugging, create a timer
+                static auto poll_deb =
+                    mpi_debug.make_timer(1, debug::str<>("Poll - lock failed"));
+                // output mpi debug info every N seconds
+                mpi_debug.timed(poll_deb, detail::get_mpi_info());
             }
             return polling_status::idle;
         }
 
         if (mpi_debug.is_enabled())
         {
-            // for debugging
-            static auto poll_deb = mpi_debug.make_timer(
-                1, debug::str<>("Poll - lock success"), detail::get_mpi_info());
-
-            mpi_debug.timed(poll_deb, "requests",
-                debug::dec<>(detail::get_active_requests().size()), "futures",
-                debug::dec<>(detail::get_active_futures().size()));
+            // for debugging, create a timer
+            static auto poll_deb =
+                mpi_debug.make_timer(1, debug::str<>("Poll - lock success"));
+            // output mpi debug info every N seconds
+            mpi_debug.timed(poll_deb, detail::get_mpi_info());
         }
 
         // have any requests been made that need to be handled?
@@ -218,6 +209,7 @@ namespace hpx { namespace mpi { namespace experimental {
         detail::future_data_ptr val;
         while (detail::get_request_queue().try_dequeue(val))
         {
+            --(detail::get_mpi_info().request_queue_size_);
             add_to_request_vector(std::move(val));
         }
 
@@ -236,17 +228,16 @@ namespace hpx { namespace mpi { namespace experimental {
             {
                 if (mpi_debug.is_enabled())
                 {
-                    static auto poll_deb = mpi_debug.make_timer(1,
-                        debug::str<>("Poll - success"), detail::get_mpi_info());
+                    static auto poll_deb =
+                        mpi_debug.make_timer(1, debug::str<>("Poll - success"));
 
                     // clang-format off
                     mpi_debug.timed(poll_deb,
+                        detail::get_mpi_info(),
                         debug::str<>("Success"),
                         "index", debug::dec<>(index == MPI_UNDEFINED ? -1 : index),
                         "flag", debug::dec<>(flag),
-                        "status", debug::hex(status.MPI_ERROR),
-                        "requests", debug::dec<>(detail::get_active_requests().size()),
-                        "futures", debug::dec<>(detail::get_active_futures().size()));
+                        "status", debug::hex(status.MPI_ERROR));
                     // clang-format on
                 }
 
@@ -260,8 +251,8 @@ namespace hpx { namespace mpi { namespace experimental {
                         detail::get_active_requests()[std::size_t(index)];
 
                     mpi_debug.debug(debug::str<>("MPI_Testany(set)"),
-                        detail::get_mpi_info(), "request", debug::hex<8>(req),
-                        "vector size",
+                        detail::get_mpi_info(), "request",
+                        debug::hex<8>(static_cast<void*>(req)), "vector size",
                         debug::dec<3>(detail::get_active_futures().size()),
                         "non null",
                         debug::dec<3>(detail::get_number_of_active_requests()));
@@ -283,11 +274,12 @@ namespace hpx { namespace mpi { namespace experimental {
 
                 if (mpi_debug.is_enabled())
                 {
-                    auto poll_deb = mpi_debug.make_timer(1,
-                        debug::str<>("Poll - <ERR>"), detail::get_mpi_info());
+                    auto poll_deb =
+                        mpi_debug.make_timer(1, debug::str<>("Poll - <ERR>"));
 
                     // clang-format off
                     mpi_debug.error(poll_deb,
+                        detail::get_mpi_info(),
                         debug::str<>("Poll <ERR>"),
                         "MPI_ERROR", detail::error_message(status.MPI_ERROR),
                         "status", debug::dec<>(status.MPI_ERROR),
@@ -329,10 +321,11 @@ namespace hpx { namespace mpi { namespace experimental {
                         "Fatal Error: Mismatch in vectors");
                 }
 
+                detail::get_mpi_info().active_futures_size_ =
+                    detail::get_active_futures().size();
+
                 mpi_debug.debug(debug::str<>("MPI_REQUEST_NULL"),
-                    detail::get_mpi_info(), "vector size",
-                    debug::dec<3>(detail::get_active_futures().size()),
-                    "nulls ", debug::dec<>(nulls));
+                    detail::get_mpi_info(), "nulls ", debug::dec<>(nulls));
             }
         }
 
