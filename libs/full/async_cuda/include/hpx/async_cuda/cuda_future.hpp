@@ -39,7 +39,7 @@ namespace hpx { namespace cuda { namespace experimental {
         // This version supports 2 modes of operation
         // 1) a callback based future that is made ready
         // by a cuda callback when the stream event occurs
-        // 2) an even based callback that must be polled/queried by
+        // 2) an event based callback that must be polled/queried by
         // the runtime to set the future ready state
         template <typename Allocator, typename Mode>
         struct future_data;
