@@ -8,7 +8,7 @@
 
 #include <experimental/simd>
 
-int main() 
+int main()
 {
     std::experimental::simd<int> s = std::experimental::simd<int>();
     (void) s;

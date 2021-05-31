@@ -19,11 +19,11 @@ void test_for_each()
 {
     using namespace hpx::execution;
 
-    test_for_each(dataseq, IteratorTag());
-    test_for_each(datapar, IteratorTag());
+    test_for_each(simd, IteratorTag());
+    test_for_each(simdpar, IteratorTag());
 
-    test_for_each_async(dataseq(task), IteratorTag());
-    test_for_each_async(datapar(task), IteratorTag());
+    test_for_each_async(simd(task), IteratorTag());
+    test_for_each_async(simdpar(task), IteratorTag());
 }
 
 void for_each_test()
@@ -38,11 +38,11 @@ void test_for_each_exception()
 {
     using namespace hpx::execution;
 
-    test_for_each_exception(dataseq, IteratorTag());
-    test_for_each_exception(datapar, IteratorTag());
+    test_for_each_exception(simd, IteratorTag());
+    test_for_each_exception(simdpar, IteratorTag());
 
-    test_for_each_exception_async(dataseq(task), IteratorTag());
-    test_for_each_exception_async(datapar(task), IteratorTag());
+    test_for_each_exception_async(simd(task), IteratorTag());
+    test_for_each_exception_async(simdpar(task), IteratorTag());
 }
 
 void for_each_exception_test()
@@ -57,11 +57,11 @@ void test_for_each_bad_alloc()
 {
     using namespace hpx::execution;
 
-    test_for_each_bad_alloc(dataseq, IteratorTag());
-    test_for_each_bad_alloc(datapar, IteratorTag());
+    test_for_each_bad_alloc(simd, IteratorTag());
+    test_for_each_bad_alloc(simdpar, IteratorTag());
 
-    test_for_each_bad_alloc_async(dataseq(task), IteratorTag());
-    test_for_each_bad_alloc_async(datapar(task), IteratorTag());
+    test_for_each_bad_alloc_async(simd(task), IteratorTag());
+    test_for_each_bad_alloc_async(simdpar(task), IteratorTag());
 }
 
 void for_each_bad_alloc_test()
