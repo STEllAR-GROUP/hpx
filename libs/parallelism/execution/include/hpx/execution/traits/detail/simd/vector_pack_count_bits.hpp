@@ -1,3 +1,4 @@
+//  Copyright (c) 2021 Srinivas Yadav
 //  Copyright (c) 2016-2017 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,21 +9,19 @@
 
 #include <hpx/config.hpp>
 
+#if defined(HPX_HAVE_CXX20_EXPERIMENTAL_SIMD)
 #include <cstddef>
 
-///////////////////////////////////////////////////////////////////////////////
+#include <experimental/simd>
+
 namespace hpx { namespace parallel { namespace traits {
-    HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t count_bits(bool value)
+    ///////////////////////////////////////////////////////////////////////
+    template <typename T, typename Abi>
+    HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t count_bits(
+        std::experimental::simd_mask<T, Abi> const& mask)
     {
-        return value ? 1 : 0;
+        return std::experimental::popcount(mask);
     }
 }}}    // namespace hpx::parallel::traits
-
-#if defined(HPX_HAVE_DATAPAR)
-
-#if !defined(__CUDACC__)
-#include <hpx/execution/traits/detail/simd/vector_pack_count_bits.hpp>
-#include <hpx/execution/traits/detail/vc/vector_pack_count_bits.hpp>
-#endif
 
 #endif
