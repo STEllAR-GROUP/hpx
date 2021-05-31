@@ -95,8 +95,8 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(get_pu_mask_t,
-            Executor&& /*exec*/, threads::topology& topo,
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+            get_pu_mask_t, Executor&& /*exec*/, threads::topology& topo,
             std::size_t thread_num)
         {
             return detail::get_pu_mask(topo, thread_num);

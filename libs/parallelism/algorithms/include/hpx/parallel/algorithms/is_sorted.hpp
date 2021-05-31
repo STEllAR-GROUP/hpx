@@ -487,8 +487,8 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(hpx::is_sorted_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, Pred&& pred = Pred())
+        tag_fallback_dispatch(hpx::is_sorted_t, ExPolicy&& policy,
+            FwdIter first, FwdIter last, Pred&& pred = Pred())
         {
             return hpx::parallel::v1::detail::is_sorted<FwdIter, FwdIter>()
                 .call(std::forward<ExPolicy>(policy), first, last,

@@ -678,8 +678,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_fallback_dispatch(find_t, ExPolicy&& policy, Rng&& rng, T const& val,
-            Proj&& proj = Proj())
+        tag_fallback_dispatch(find_t, ExPolicy&& policy, Rng&& rng,
+            T const& val, Proj&& proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
@@ -756,8 +756,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_fallback_dispatch(find_if_t, ExPolicy&& policy, Iter first, Sent last,
-            Pred&& pred, Proj&& proj = Proj())
+        tag_fallback_dispatch(find_if_t, ExPolicy&& policy, Iter first,
+            Sent last, Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
                 "Requires at least forward iterator.");
@@ -1093,8 +1093,8 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend Iter1 tag_fallback_dispatch(find_end_t, Iter1 first1, Sent1 last1,
-            Iter2 first2, Sent2 last2, Pred&& op = Pred(),
+        friend Iter1 tag_fallback_dispatch(find_end_t, Iter1 first1,
+            Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             static_assert((hpx::traits::is_forward_iterator<Iter1>::value),

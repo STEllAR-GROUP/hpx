@@ -159,9 +159,10 @@ namespace hpx { namespace functional {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Tag, typename... Args>
-    using is_tag_fallback_dispatchable = hpx::is_invocable<
-        decltype(tag_fallback_dispatch_ns::tag_fallback_dispatch), Tag,
-        Args...>;
+    using is_tag_fallback_dispatchable =
+        hpx::is_invocable<decltype(
+                              tag_fallback_dispatch_ns::tag_fallback_dispatch),
+            Tag, Args...>;
 
     template <typename Tag, typename... Args>
     constexpr bool is_tag_fallback_dispatchable_v =
@@ -298,9 +299,8 @@ namespace hpx { namespace functional {
 
             template <typename... Args>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto
-            tag_fallback_dispatch_impl(
-                std::true_type, Args&&... args) const noexcept
-                -> tag_fallback_dispatch_result_t<Tag, Args&&...>
+            tag_fallback_dispatch_impl(std::true_type, Args&&... args) const
+                noexcept -> tag_fallback_dispatch_result_t<Tag, Args&&...>
             {
                 return tag_fallback_dispatch(static_cast<Tag const&>(*this),
                     std::forward<Args>(args)...);

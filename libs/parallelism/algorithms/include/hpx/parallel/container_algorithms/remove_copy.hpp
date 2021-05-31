@@ -772,8 +772,8 @@ namespace hpx { namespace ranges {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             remove_copy_if_result<
                 typename hpx::traits::range_iterator<Rng>::type, O>>::type
-        tag_dispatch(hpx::ranges::remove_copy_if_t, ExPolicy&& policy, Rng&& rng,
-            O dest, Pred&& pred, Proj&& proj = Proj())
+        tag_dispatch(hpx::ranges::remove_copy_if_t, ExPolicy&& policy,
+            Rng&& rng, O dest, Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(
                 (hpx::traits::is_forward_iterator<

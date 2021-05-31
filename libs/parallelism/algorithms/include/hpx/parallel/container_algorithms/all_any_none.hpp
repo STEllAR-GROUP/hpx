@@ -400,8 +400,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(none_of_t, ExPolicy&& policy, Iter first, Sent last,
-            F&& f, Proj&& proj = Proj())
+        tag_fallback_dispatch(none_of_t, ExPolicy&& policy, Iter first,
+            Sent last, F&& f, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
                 "Required at least forward iterator.");
@@ -513,8 +513,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(any_of_t, ExPolicy&& policy, Iter first, Sent last,
-            F&& f, Proj&& proj = Proj())
+        tag_fallback_dispatch(any_of_t, ExPolicy&& policy, Iter first,
+            Sent last, F&& f, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
                 "Required at least forward iterator.");
@@ -625,8 +625,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(all_of_t, ExPolicy&& policy, Iter first, Sent last,
-            F&& f, Proj&& proj = Proj())
+        tag_fallback_dispatch(all_of_t, ExPolicy&& policy, Iter first,
+            Sent last, F&& f, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
                 "Required at least forward iterator.");

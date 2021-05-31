@@ -916,8 +916,8 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             void>::type
-        tag_fallback_dispatch(hpx::replace_if_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, Pred&& pred, T const& new_value)
+        tag_fallback_dispatch(hpx::replace_if_t, ExPolicy&& policy,
+            FwdIter first, FwdIter last, Pred&& pred, T const& new_value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
@@ -996,8 +996,9 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend OutIter tag_fallback_dispatch(hpx::replace_copy_if_t, InIter first,
-            InIter last, OutIter dest, Pred&& pred, T const& new_value)
+        friend OutIter tag_fallback_dispatch(hpx::replace_copy_if_t,
+            InIter first, InIter last, OutIter dest, Pred&& pred,
+            T const& new_value)
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
                 "Required at least input iterator.");

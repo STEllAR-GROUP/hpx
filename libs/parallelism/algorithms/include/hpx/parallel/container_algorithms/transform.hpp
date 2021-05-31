@@ -770,8 +770,8 @@ namespace hpx { namespace ranges {
         friend ranges::binary_transform_result<
             typename hpx::traits::range_iterator<Rng1>::type,
             typename hpx::traits::range_iterator<Rng2>::type, FwdIter>
-        tag_fallback_dispatch(hpx::ranges::transform_t, Rng1&& rng1, Rng2&& rng2,
-            FwdIter dest, F&& f, Proj1&& proj1 = Proj1(),
+        tag_fallback_dispatch(hpx::ranges::transform_t, Rng1&& rng1,
+            Rng2&& rng2, FwdIter dest, F&& f, Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
             using iterator_type1 =

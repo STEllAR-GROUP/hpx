@@ -393,10 +393,10 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend set_difference_result<Iter1, Iter3> tag_dispatch(set_difference_t,
-            Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest,
-            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+        friend set_difference_result<Iter1, Iter3> tag_dispatch(
+            set_difference_t, Iter1 first1, Sent1 last1, Iter2 first2,
+            Sent2 last2, Iter3 dest, Pred&& op = Pred(),
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             static_assert((hpx::traits::is_input_iterator<Iter1>::value),
                 "Requires at least input iterator.");

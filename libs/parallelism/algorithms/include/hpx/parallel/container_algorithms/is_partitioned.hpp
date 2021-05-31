@@ -339,8 +339,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_dispatch(hpx::ranges::is_partitioned_t, ExPolicy&& policy, Rng&& rng,
-            Pred&& pred, Proj&& proj = Proj())
+        tag_dispatch(hpx::ranges::is_partitioned_t, ExPolicy&& policy,
+            Rng&& rng, Pred&& pred, Proj&& proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;

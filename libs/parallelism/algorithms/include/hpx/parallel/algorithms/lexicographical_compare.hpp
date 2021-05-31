@@ -159,13 +159,12 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/mismatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -244,7 +243,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         false);
                 }
 
-                std::size_t count = (std::min)(count1, count2);
+                std::size_t count = (std::min) (count1, count2);
                 util::cancellation_token<std::size_t> tok(count);
 
                 auto f1 = [tok, pred, proj1, proj2](zip_iterator it,
@@ -351,7 +350,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend bool tag_fallback_invoke(hpx::lexicographical_compare_t,
+        friend bool tag_fallback_dispatch(hpx::lexicographical_compare_t,
             InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
             Pred&& pred = Pred())
         {
@@ -382,7 +381,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_invoke(hpx::lexicographical_compare_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::lexicographical_compare_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
             Pred&& pred = Pred())
         {

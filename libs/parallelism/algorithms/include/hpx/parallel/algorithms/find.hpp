@@ -1352,8 +1352,9 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter1>::type
-        tag_fallback_dispatch(find_first_of_t, ExPolicy&& policy, FwdIter1 first,
-            FwdIter1 last, FwdIter2 s_first, FwdIter2 s_last, Pred&& op)
+        tag_fallback_dispatch(find_first_of_t, ExPolicy&& policy,
+            FwdIter1 first, FwdIter1 last, FwdIter2 s_first, FwdIter2 s_last,
+            Pred&& op)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Requires at least forward iterator.");
@@ -1377,8 +1378,8 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter1>::type
-        tag_fallback_dispatch(find_first_of_t, ExPolicy&& policy, FwdIter1 first,
-            FwdIter1 last, FwdIter2 s_first, FwdIter2 s_last)
+        tag_fallback_dispatch(find_first_of_t, ExPolicy&& policy,
+            FwdIter1 first, FwdIter1 last, FwdIter2 s_first, FwdIter2 s_last)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Requires at least forward iterator.");

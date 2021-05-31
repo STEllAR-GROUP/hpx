@@ -331,8 +331,8 @@ namespace hpx { namespace ranges {
                 >
             )>
         // clang-format on
-        friend T tag_fallback_dispatch(transform_reduce_t, Iter first, Sent last,
-            T init, Reduce&& red_op, Convert&& conv_op)
+        friend T tag_fallback_dispatch(transform_reduce_t, Iter first,
+            Sent last, T init, Reduce&& red_op, Convert&& conv_op)
         {
             static_assert(hpx::traits::is_input_iterator<Iter>::value,
                 "Requires at least input iterator.");
@@ -449,8 +449,8 @@ namespace hpx { namespace ranges {
                 >
             )>
         // clang-format on
-        friend T tag_fallback_dispatch(transform_reduce_t, Iter first, Sent last,
-            Iter2 first2, T init, Reduce&& red_op, Convert&& conv_op)
+        friend T tag_fallback_dispatch(transform_reduce_t, Iter first,
+            Sent last, Iter2 first2, T init, Reduce&& red_op, Convert&& conv_op)
         {
             static_assert(hpx::traits::is_input_iterator<Iter>::value,
                 "Requires at least input iterator.");

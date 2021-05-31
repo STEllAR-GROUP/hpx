@@ -435,7 +435,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename std::iterator_traits<typename hpx::traits::range_traits<
             Rng>::iterator_type>::difference_type
-        tag_fallback_dispatch(count_if_t, Rng&& rng, F&& f, Proj&& proj = Proj())
+        tag_fallback_dispatch(
+            count_if_t, Rng&& rng, F&& f, Proj&& proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;

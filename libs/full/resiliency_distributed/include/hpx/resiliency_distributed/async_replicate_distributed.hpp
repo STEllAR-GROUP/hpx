@@ -170,8 +170,9 @@ namespace hpx { namespace resiliency { namespace experimental {
     template <typename Action, typename... Ts>
     hpx::future<typename hpx::util::detail::invoke_deferred_result<Action,
         hpx::naming::id_type, Ts...>::type>
-    tag_dispatch(async_replicate_t, const std::vector<hpx::naming::id_type>& ids,
-        Action&& action, Ts&&... ts)
+    tag_dispatch(async_replicate_t,
+        const std::vector<hpx::naming::id_type>& ids, Action&& action,
+        Ts&&... ts)
     {
         HPX_ASSERT(ids.size() > 0);
 

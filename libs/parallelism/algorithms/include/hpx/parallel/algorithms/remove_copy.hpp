@@ -467,8 +467,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend OutIter tag_fallback_dispatch(hpx::remove_copy_if_t, InIter first,
-            InIter last, OutIter dest, Pred&& pred)
+        friend OutIter tag_fallback_dispatch(hpx::remove_copy_if_t,
+            InIter first, InIter last, OutIter dest, Pred&& pred)
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
                 "Required input iterator.");

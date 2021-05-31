@@ -442,8 +442,9 @@ namespace hpx { namespace parallel { namespace util {
         private:
             template <typename Iter, typename F>
             friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
-            tag_fallback_dispatch(hpx::parallel::util::detail::loop_n_t<ExPolicy>,
-                Iter it, std::size_t count, F&& f)
+            tag_fallback_dispatch(
+                hpx::parallel::util::detail::loop_n_t<ExPolicy>, Iter it,
+                std::size_t count, F&& f)
             {
                 using pred = std::integral_constant<bool,
                     hpx::traits::is_random_access_iterator<Iter>::value ||
@@ -455,8 +456,9 @@ namespace hpx { namespace parallel { namespace util {
 
             template <typename Iter, typename CancelToken, typename F>
             friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
-            tag_fallback_dispatch(hpx::parallel::util::detail::loop_n_t<ExPolicy>,
-                Iter it, std::size_t count, CancelToken& tok, F&& f)
+            tag_fallback_dispatch(
+                hpx::parallel::util::detail::loop_n_t<ExPolicy>, Iter it,
+                std::size_t count, CancelToken& tok, F&& f)
             {
                 using pred = std::integral_constant<bool,
                     hpx::traits::is_random_access_iterator<Iter>::value ||

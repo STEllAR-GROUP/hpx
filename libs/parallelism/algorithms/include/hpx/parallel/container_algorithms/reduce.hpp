@@ -551,7 +551,8 @@ namespace hpx { namespace ranges {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<typename hpx::traits::range_traits<
                 Rng>::iterator_type>::value_type>::type
-        tag_fallback_dispatch(hpx::ranges::reduce_t, ExPolicy&& policy, Rng&& rng)
+        tag_fallback_dispatch(
+            hpx::ranges::reduce_t, ExPolicy&& policy, Rng&& rng)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;

@@ -487,8 +487,9 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend RandIter tag_fallback_dispatch(hpx::partial_sort_t, RandIter first,
-            RandIter middle, RandIter last, Comp&& comp = Comp())
+        friend RandIter tag_fallback_dispatch(hpx::partial_sort_t,
+            RandIter first, RandIter middle, RandIter last,
+            Comp&& comp = Comp())
         {
             static_assert(
                 hpx::traits::is_random_access_iterator<RandIter>::value,

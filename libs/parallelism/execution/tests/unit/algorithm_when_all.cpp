@@ -83,7 +83,8 @@ int main()
         std::atomic<bool> receiver_set_value_called{false};
         std::atomic<bool> tag_dispatch_overload_called{false};
         auto s = ex::when_all(
-            custom_sender_tag_dispatch{tag_dispatch_overload_called}, ex::just(42));
+            custom_sender_tag_dispatch{tag_dispatch_overload_called},
+            ex::just(42));
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
         auto r = callback_receiver<decltype(f)>{f, receiver_set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));

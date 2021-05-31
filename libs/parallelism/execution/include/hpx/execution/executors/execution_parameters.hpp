@@ -90,8 +90,9 @@ namespace hpx { namespace parallel { namespace execution {
                     check_for_property<Executor>::value
                 )>
             // clang-format on
-            friend HPX_FORCEINLINE decltype(auto) tag_dispatch(derived_propery_t,
-                Executor&& exec, Parameters&& params, Property /*prop*/)
+            friend HPX_FORCEINLINE decltype(auto) tag_dispatch(
+                derived_propery_t, Executor&& exec, Parameters&& params,
+                Property /*prop*/)
             {
                 return std::pair<Executor&&, Parameters&&>(
                     std::forward<Executor>(exec),

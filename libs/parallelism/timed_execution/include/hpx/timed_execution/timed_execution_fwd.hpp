@@ -115,9 +115,9 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(post_after_t,
-            Executor&& exec, hpx::chrono::steady_duration const& rel_time,
-            F&& f, Ts&&... ts)
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+            post_after_t, Executor&& exec,
+            hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
         {
             return detail::
                 timed_post_fn_helper<typename std::decay<Executor>::type>::call(

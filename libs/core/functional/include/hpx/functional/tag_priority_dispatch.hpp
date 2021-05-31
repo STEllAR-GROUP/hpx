@@ -161,9 +161,10 @@ namespace hpx { namespace functional {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Tag, typename... Args>
-    using is_tag_override_dispatchable = hpx::is_invocable<
-        decltype(tag_override_dispatch_ns::tag_override_dispatch), Tag,
-        Args...>;
+    using is_tag_override_dispatchable =
+        hpx::is_invocable<decltype(
+                              tag_override_dispatch_ns::tag_override_dispatch),
+            Tag, Args...>;
 
     template <typename Tag, typename... Args>
     constexpr bool is_tag_override_dispatchable_v =

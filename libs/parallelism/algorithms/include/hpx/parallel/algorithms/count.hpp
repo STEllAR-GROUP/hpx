@@ -475,7 +475,8 @@ namespace hpx {
             )>
         // clang-format on
         friend typename std::iterator_traits<InIter>::difference_type
-        tag_fallback_dispatch(count_t, InIter first, InIter last, T const& value)
+        tag_fallback_dispatch(
+            count_t, InIter first, InIter last, T const& value)
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
                 "Required at least input iterator.");

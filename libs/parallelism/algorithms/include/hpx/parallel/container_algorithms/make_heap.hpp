@@ -278,8 +278,8 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend Iter tag_dispatch(make_heap_t, Iter first, Sent last, Comp&& comp,
-            Proj&& proj = Proj{})
+        friend Iter tag_dispatch(make_heap_t, Iter first, Sent last,
+            Comp&& comp, Proj&& proj = Proj{})
         {
             static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
                 "Requires random access iterator.");

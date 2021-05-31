@@ -317,9 +317,9 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend bool tag_dispatch(equal_t, Iter1 first1, Sent1 last1, Iter2 first2,
-            Sent2 last2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+        friend bool tag_dispatch(equal_t, Iter1 first1, Sent1 last1,
+            Iter2 first2, Sent2 last2, Pred&& op = Pred(),
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             static_assert((hpx::traits::is_forward_iterator<Iter1>::value),
                 "Requires at least forward iterator.");

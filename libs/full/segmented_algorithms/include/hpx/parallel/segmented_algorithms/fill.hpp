@@ -66,7 +66,8 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<SegIter>::value
         )>
     // clang-format on
-    SegIter tag_dispatch(hpx::fill_t, SegIter first, SegIter last, T const& value)
+    SegIter tag_dispatch(
+        hpx::fill_t, SegIter first, SegIter last, T const& value)
     {
         static_assert(hpx::traits::is_forward_iterator<SegIter>::value,
             "Requires at least forward iterator.");

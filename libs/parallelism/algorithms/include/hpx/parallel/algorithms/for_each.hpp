@@ -773,8 +773,8 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::for_each_n_t, ExPolicy&& policy, FwdIter first,
-            Size count, F&& f)
+        tag_fallback_dispatch(hpx::for_each_n_t, ExPolicy&& policy,
+            FwdIter first, Size count, F&& f)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least forward iterator.");

@@ -758,8 +758,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_dispatch(inplace_merge_t, ExPolicy&& policy, Iter first, Iter middle,
-            Sent last, Comp&& comp = Comp(), Proj&& proj = Proj())
+        tag_dispatch(inplace_merge_t, ExPolicy&& policy, Iter first,
+            Iter middle, Sent last, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
                 "Required at least random access iterator.");
