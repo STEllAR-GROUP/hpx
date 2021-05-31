@@ -12,26 +12,26 @@
 #if defined(HPX_HAVE_DATAPAR)
 namespace hpx { namespace execution { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
-    struct dataseq_policy;
+    struct simd_policy;
 
     template <typename Executor, typename Parameters>
-    struct dataseq_policy_shim;
+    struct simd_policy_shim;
 
-    struct dataseq_task_policy;
+    struct simd_task_policy;
 
     template <typename Executor, typename Parameters>
-    struct dataseq_task_policy_shim;
+    struct simd_task_policy_shim;
 
     ///////////////////////////////////////////////////////////////////////////
-    struct datapar_policy;
+    struct simdpar_policy;
 
     template <typename Executor, typename Parameters>
-    struct datapar_policy_shim;
+    struct simdpar_policy_shim;
 
-    struct datapar_task_policy;
+    struct simdpar_task_policy;
 
     template <typename Executor, typename Parameters>
-    struct datapar_task_policy_shim;
+    struct simdpar_task_policy_shim;
 }}}    // namespace hpx::execution::v1
 
 #endif
