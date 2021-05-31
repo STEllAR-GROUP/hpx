@@ -44,14 +44,14 @@ namespace hpx { namespace execution { namespace experimental {
         typename Enable =
             std::enable_if_t<hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::functional::is_tag_invocable<
-                    hpx::execution::experimental::make_with_annotation_t,
+                    hpx::execution::experimental::with_annotation_t,
                     typename std::decay_t<ExPolicy>::executor_type,
                     std::string>::value>>
     decltype(auto) tag_invoke(
-        hpx::execution::experimental::make_with_annotation_t, ExPolicy&& policy,
+        hpx::execution::experimental::with_annotation_t, ExPolicy&& policy,
         std::string annotation)
     {
-        auto exec = hpx::execution::experimental::make_with_annotation(
+        auto exec = hpx::execution::experimental::with_annotation(
             policy.executor(), std::move(annotation));
 
         return hpx::parallel::execution::create_rebound_policy(

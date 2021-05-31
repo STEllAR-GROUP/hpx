@@ -195,7 +195,7 @@ namespace hpx { namespace execution {
         }
 
         friend parallel_policy_executor tag_dispatch(
-            hpx::execution::experimental::make_with_annotation_t,
+            hpx::execution::experimental::with_annotation_t,
             parallel_policy_executor const& exec, std::string annotation)
         {
             auto exec_with_annotation = exec;
