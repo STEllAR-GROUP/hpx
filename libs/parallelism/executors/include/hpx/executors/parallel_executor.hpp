@@ -37,6 +37,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -190,6 +191,16 @@ namespace hpx { namespace execution {
         {
             auto exec_with_annotation = exec;
             exec_with_annotation.annotation_ = annotation;
+            return exec_with_annotation;
+        }
+
+        friend parallel_policy_executor tag_invoke(
+            hpx::execution::experimental::make_with_annotation_t,
+            parallel_policy_executor const& exec, std::string annotation)
+        {
+            auto exec_with_annotation = exec;
+            exec_with_annotation.annotation_ =
+                util::detail::store_function_annotation(std::move(annotation));
             return exec_with_annotation;
         }
 

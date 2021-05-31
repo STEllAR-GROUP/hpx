@@ -226,6 +226,12 @@ namespace hpx { namespace util {
         HPX_HOST_DEVICE ~annotate_function() {}
     };
 
+    namespace detail {
+
+        HPX_CORE_EXPORT char const* store_function_annotation(
+            std::string&& name);
+    }    // namespace detail
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Given a function as an argument, the user can annotate_function
     /// as well.

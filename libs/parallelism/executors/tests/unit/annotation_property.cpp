@@ -44,7 +44,7 @@ void test_post()
     {
         auto exec = hpx::experimental::prefer(
             hpx::execution::experimental::make_with_annotation, executor{},
-            desc.c_str());
+            desc);
 
         hpx::lcos::local::latch l(2);
         hpx::parallel::execution::post(exec, &test_post_f, 42, std::ref(l));
@@ -56,7 +56,7 @@ void test_post()
     {
         annotation.clear();
         auto exec = hpx::execution::experimental::make_with_annotation(
-            executor{}, desc.c_str());
+            executor{}, desc);
 
         hpx::lcos::local::latch l(2);
         hpx::parallel::execution::post(exec, &test_post_f, 42, std::ref(l));
@@ -85,7 +85,7 @@ void test_sync()
     {
         auto exec = hpx::experimental::prefer(
             hpx::execution::experimental::make_with_annotation, executor{},
-            desc.c_str());
+            desc);
 
         HPX_TEST(hpx::parallel::execution::sync_execute(exec, &test, 42) ==
             hpx::this_thread::get_id());
@@ -95,7 +95,7 @@ void test_sync()
     {
         annotation.clear();
         auto exec = hpx::execution::experimental::make_with_annotation(
-            executor{}, desc.c_str());
+            executor{}, desc);
 
         HPX_TEST(hpx::parallel::execution::sync_execute(exec, &test, 42) ==
             hpx::this_thread::get_id());
@@ -111,7 +111,7 @@ void test_async()
     {
         auto exec = hpx::experimental::prefer(
             hpx::execution::experimental::make_with_annotation, executor{},
-            desc.c_str());
+            desc);
 
         HPX_TEST(
             hpx::parallel::execution::async_execute(exec, &test, 42).get() !=
@@ -122,7 +122,7 @@ void test_async()
     {
         annotation.clear();
         auto exec = hpx::execution::experimental::make_with_annotation(
-            executor{}, desc.c_str());
+            executor{}, desc);
 
         HPX_TEST(
             hpx::parallel::execution::async_execute(exec, &test, 42).get() !=
@@ -157,7 +157,7 @@ void test_then()
     {
         auto exec = hpx::experimental::prefer(
             hpx::execution::experimental::make_with_annotation, executor{},
-            desc.c_str());
+            desc);
 
         HPX_TEST(hpx::parallel::execution::then_execute(exec, &test_f, f, 42)
                      .get() != hpx::this_thread::get_id());
@@ -167,7 +167,7 @@ void test_then()
     {
         annotation.clear();
         auto exec = hpx::execution::experimental::make_with_annotation(
-            executor{}, desc.c_str());
+            executor{}, desc);
 
         HPX_TEST(hpx::parallel::execution::then_execute(exec, &test_f, f, 42)
                      .get() != hpx::this_thread::get_id());
@@ -202,7 +202,7 @@ void test_bulk_sync()
     {
         auto exec = hpx::experimental::prefer(
             hpx::execution::experimental::make_with_annotation, executor{},
-            desc.c_str());
+            desc);
 
         hpx::parallel::execution::bulk_sync_execute(
             exec, hpx::util::bind(&bulk_test, _1, tid, _2), 107, 42);
@@ -216,7 +216,7 @@ void test_bulk_sync()
 
     {
         auto exec = hpx::execution::experimental::make_with_annotation(
-            executor{}, desc.c_str());
+            executor{}, desc);
 
         annotation.clear();
         hpx::parallel::execution::bulk_sync_execute(
@@ -244,7 +244,7 @@ void test_bulk_async()
     {
         auto exec = hpx::experimental::prefer(
             hpx::execution::experimental::make_with_annotation, executor{},
-            desc.c_str());
+            desc);
 
         hpx::when_all(hpx::parallel::execution::bulk_async_execute(exec,
                           hpx::util::bind(&bulk_test, _1, tid, _2), 107, 42))
@@ -260,7 +260,7 @@ void test_bulk_async()
 
     {
         auto exec = hpx::execution::experimental::make_with_annotation(
-            executor{}, desc.c_str());
+            executor{}, desc);
 
         annotation.clear();
         hpx::when_all(hpx::parallel::execution::bulk_async_execute(exec,
@@ -311,7 +311,7 @@ void test_bulk_then()
     {
         auto exec = hpx::experimental::prefer(
             hpx::execution::experimental::make_with_annotation, executor{},
-            desc.c_str());
+            desc);
 
         hpx::parallel::execution::bulk_then_execute(
             exec, hpx::util::bind(&bulk_test_f, _1, _2, tid, _3), 107, f, 42)
@@ -327,7 +327,7 @@ void test_bulk_then()
 
     {
         auto exec = hpx::execution::experimental::make_with_annotation(
-            executor{}, desc.c_str());
+            executor{}, desc);
 
         annotation.clear();
         hpx::parallel::execution::bulk_then_execute(
@@ -349,7 +349,7 @@ void test_post_policy_prefer()
     std::string desc("test_post_policy_prefer");
     auto policy = hpx::experimental::prefer(
         hpx::execution::experimental::make_with_annotation, hpx::execution::par,
-        desc.c_str());
+        desc);
 
     hpx::lcos::local::latch l(2);
     hpx::parallel::execution::post(
@@ -363,7 +363,7 @@ void test_post_policy()
 {
     std::string desc("test_post_policy");
     auto policy = hpx::execution::experimental::make_with_annotation(
-        hpx::execution::par, desc.c_str());
+        hpx::execution::par, desc);
 
     hpx::lcos::local::latch l(2);
     hpx::parallel::execution::post(
