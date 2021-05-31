@@ -611,7 +611,8 @@ namespace hpx { namespace util {
 
     void command_line_handling::check_pu_step() const
     {
-        if (pu_step_ == 0 || pu_step_ >= hpx::threads::hardware_concurrency())
+        if (hpx::threads::hardware_concurrency() > 1 &&
+            (pu_step_ == 0 || pu_step_ >= hpx::threads::hardware_concurrency()))
         {
             throw hpx::detail::command_line_error(
                 "Invalid command line option "
