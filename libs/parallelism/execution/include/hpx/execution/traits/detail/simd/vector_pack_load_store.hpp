@@ -25,13 +25,13 @@ namespace hpx { namespace parallel { namespace traits {
     struct vector_pack_load
     {
         template <typename Iter>
-        static V aligned(Iter& iter)
+        static V aligned(Iter const& iter)
         {
             return V(std::addressof(*iter), std::experimental::vector_aligned);
         }
 
         template <typename Iter>
-        static V unaligned(Iter& iter)
+        static V unaligned(Iter const& iter)
         {
             return V(std::addressof(*iter), std::experimental::element_aligned);
         }
@@ -42,14 +42,14 @@ namespace hpx { namespace parallel { namespace traits {
     struct vector_pack_store
     {
         template <typename Iter>
-        static void aligned(V& value, Iter& iter)
+        static void aligned(V& value, Iter const& iter)
         {
             value.copy_to(
                 std::addressof(*iter), std::experimental::vector_aligned);
         }
 
         template <typename Iter>
-        static void unaligned(V& value, Iter& iter)
+        static void unaligned(V& value, Iter const& iter)
         {
             value.copy_to(
                 std::addressof(*iter), std::experimental::element_aligned);
