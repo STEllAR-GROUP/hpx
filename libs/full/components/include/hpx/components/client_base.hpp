@@ -61,14 +61,14 @@ namespace hpx { namespace traits {
         ///////////////////////////////////////////////////////////////////////
         template <typename Derived>
         struct is_future_customization_point<Derived,
-            std::enable_if_t<is_client<Derived>::value>> : std::true_type
+            std::enable_if_t<is_client_v<Derived>>> : std::true_type
         {
         };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Derived>
         struct future_traits_customization_point<Derived,
-            std::enable_if_t<is_client<Derived>::value>>
+            std::enable_if_t<is_client_v<Derived>>>
         {
             using type = id_type;
             using result_type = id_type;
@@ -77,7 +77,7 @@ namespace hpx { namespace traits {
         ///////////////////////////////////////////////////////////////////////
         template <typename Derived>
         struct future_access_customization_point<Derived,
-            std::enable_if_t<is_client<Derived>::value>>
+            std::enable_if_t<is_client_v<Derived>>>
         {
             template <typename SharedState>
             HPX_FORCEINLINE static Derived create(
@@ -129,7 +129,7 @@ namespace hpx { namespace traits {
         ///////////////////////////////////////////////////////////////////////
         template <typename Derived>
         struct acquire_future_impl<Derived,
-            std::enable_if_t<is_client<Derived>::value>>
+            std::enable_if_t<is_client_v<Derived>>>
         {
             using type = Derived;
 
@@ -143,7 +143,7 @@ namespace hpx { namespace traits {
         ///////////////////////////////////////////////////////////////////////
         template <typename Derived>
         struct shared_state_ptr_for<Derived,
-            std::enable_if_t<is_client<Derived>::value>>
+            std::enable_if_t<is_client_v<Derived>>>
           : shared_state_ptr<traits::future_traits_t<Derived>>
         {
         };
@@ -154,7 +154,7 @@ namespace hpx { namespace lcos { namespace detail {
 
     template <typename Derived>
     struct future_unwrap_result<Derived,
-        std::enable_if_t<traits::is_client<Derived>::value>>
+        std::enable_if_t<traits::is_client_v<Derived>>>
     {
         using result_type = id_type;
         using type = Derived;
@@ -162,7 +162,7 @@ namespace hpx { namespace lcos { namespace detail {
 
     template <typename Derived>
     struct future_unwrap_result<future<Derived>,
-        std::enable_if_t<traits::is_client<Derived>::value>>
+        std::enable_if_t<traits::is_client_v<Derived>>>
     {
         using result_type = id_type;
         using type = Derived;
@@ -360,20 +360,20 @@ namespace hpx { namespace components {
             return *this;
         }
 
-        client_base& operator=(shared_future<id_type> const& f)
+        client_base& operator=(shared_future<id_type> const& f) noexcept
         {
             shared_state_ =
                 hpx::traits::future_access<future_type>::get_shared_state(f);
             return *this;
         }
-        client_base& operator=(shared_future<id_type>&& f)
+        client_base& operator=(shared_future<id_type>&& f) noexcept
         {
             shared_state_ =
                 hpx::traits::future_access<future_type>::get_shared_state(
                     std::move(f));
             return *this;
         }
-        client_base& operator=(future<id_type>&& f)
+        client_base& operator=(future<id_type>&& f) noexcept
         {
             shared_state_ =
                 hpx::traits::future_access<future_type>::get_shared_state(
@@ -381,12 +381,12 @@ namespace hpx { namespace components {
             return *this;
         }
 
-        client_base& operator=(client_base const& rhs)
+        client_base& operator=(client_base const& rhs) noexcept
         {
             shared_state_ = rhs.shared_state_;
             return *this;
         }
-        client_base& operator=(client_base&& rhs)
+        client_base& operator=(client_base&& rhs) noexcept
         {
             shared_state_ = std::move(rhs.shared_state_);
             return *this;
@@ -526,8 +526,7 @@ namespace hpx { namespace components {
 
     public:
         template <typename F>
-        typename hpx::traits::future_then_result<Derived, F>::type then(
-            launch l, F&& f)
+        hpx::traits::future_then_result_t<Derived, F> then(launch l, F&& f)
         {
             using result_type =
                 typename hpx::traits::future_then_result<Derived,
@@ -541,7 +540,7 @@ namespace hpx { namespace components {
             }
 
             using continuation_result_type =
-                typename hpx::util::invoke_result<F, Derived>::type;
+                hpx::util::invoke_result_t<F, Derived>;
             using shared_state_ptr =
                 hpx::traits::detail::shared_state_ptr_t<result_type>;
 
@@ -553,7 +552,7 @@ namespace hpx { namespace components {
         }
 
         template <typename F>
-        typename hpx::traits::future_then_result<Derived, F>::type then(F&& f)
+        hpx::traits::future_then_result_t<Derived, F> then(F&& f)
         {
             return then(launch::all, std::forward<F>(f));
         }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -25,8 +25,11 @@ namespace hpx { namespace lcos { namespace detail {
         typename hpx::util::always_void<
             typename std::iterator_traits<Iterator>::value_type>::type>
     {
-        typedef typename std::iterator_traits<Iterator>::value_type type;
-
-        typedef hpx::traits::future_traits<type> traits_type;
+        using type = typename std::iterator_traits<Iterator>::value_type;
+        using traits_type = hpx::traits::future_traits<type>;
     };
+
+    template <typename Iter>
+    using future_iterator_traits_t =
+        typename future_iterator_traits<Iter>::type;
 }}}    // namespace hpx::lcos::detail

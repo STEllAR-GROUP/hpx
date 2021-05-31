@@ -183,7 +183,7 @@ namespace hpx { namespace lcos {
 
         template <typename Future>
         struct future_or_shared_state_result<Future,
-            std::enable_if_t<traits::is_future<Future>::value>>
+            std::enable_if_t<traits::is_future_v<Future>>>
           : traits::future_traits<Future>
         {
         };
@@ -246,16 +246,15 @@ namespace hpx { namespace lcos {
                 using future_type =
                     typename std::iterator_traits<Iter>::value_type;
                 using future_result_type =
-                    typename detail::future_or_shared_state_result<
-                        future_type>::type;
+                    detail::future_or_shared_state_result_t<future_type>;
 
                 hpx::intrusive_ptr<wait_all_frame> this_(this);
 
                 for (/**/; next != end; ++next)
                 {
-                    typename traits::detail::shared_state_ptr<
-                        future_result_type>::type next_future_data =
-                        traits::detail::get_shared_state(*next);
+                    traits::detail::shared_state_ptr_t<future_result_type>
+                        next_future_data =
+                            traits::detail::get_shared_state(*next);
 
                     if (next_future_data.get() != nullptr &&
                         !next_future_data->is_ready())
@@ -307,16 +306,15 @@ namespace hpx { namespace lcos {
             template <std::size_t I>
             HPX_FORCEINLINE void await_next(std::true_type, std::false_type)
             {
-                using future_type = typename util::decay_unwrap<
-                    typename hpx::tuple_element<I, Tuple>::type>::type;
+                using future_type = util::decay_unwrap_t<
+                    typename hpx::tuple_element<I, Tuple>::type>;
                 using future_result_type =
-                    typename detail::future_or_shared_state_result<
-                        future_type>::type;
+                    detail::future_or_shared_state_result_t<future_type>;
 
                 hpx::intrusive_ptr<wait_all_frame> this_(this);
-                typename traits::detail::shared_state_ptr<
-                    future_result_type>::type next_future_data =
-                    traits::detail::get_shared_state(hpx::get<I>(t_));
+                traits::detail::shared_state_ptr_t<future_result_type>
+                    next_future_data =
+                        traits::detail::get_shared_state(hpx::get<I>(t_));
 
                 if (next_future_data.get() != nullptr &&
                     !next_future_data->is_ready())
@@ -345,14 +343,13 @@ namespace hpx { namespace lcos {
             template <std::size_t I>
             HPX_FORCEINLINE void do_await(std::false_type)
             {
-                using future_type = typename util::decay_unwrap<
-                    typename hpx::tuple_element<I, Tuple>::type>::type;
+                using future_type = util::decay_unwrap_t<
+                    typename hpx::tuple_element<I, Tuple>::type>;
 
-                using is_future = typename detail::is_future_or_shared_state<
-                    future_type>::type;
+                using is_future =
+                    detail::is_future_or_shared_state_t<future_type>;
                 using is_range =
-                    typename detail::is_future_or_shared_state_range<
-                        future_type>::type;
+                    detail::is_future_or_shared_state_range_t<future_type>;
 
                 await_next<I>(is_future(), is_range());
             }
@@ -434,13 +431,12 @@ namespace hpx { namespace lcos {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
     typename util::always_void<
-        typename lcos::detail::future_iterator_traits<Iterator>::type>::type
+        lcos::detail::future_iterator_traits_t<Iterator>>::type
     wait_all(Iterator begin, Iterator end)
     {
-        using future_type =
-            typename lcos::detail::future_iterator_traits<Iterator>::type;
+        using future_type = lcos::detail::future_iterator_traits_t<Iterator>;
         using shared_state_ptr =
-            typename traits::detail::shared_state_ptr_for<future_type>::type;
+            traits::detail::shared_state_ptr_for_t<future_type>;
         using result_type = std::vector<shared_state_ptr>;
 
         result_type values;
@@ -453,10 +449,9 @@ namespace hpx { namespace lcos {
     template <typename Iterator>
     Iterator wait_all_n(Iterator begin, std::size_t count)
     {
-        using future_type =
-            typename lcos::detail::future_iterator_traits<Iterator>::type;
+        using future_type = lcos::detail::future_iterator_traits_t<Iterator>;
         using shared_state_ptr =
-            typename traits::detail::shared_state_ptr_for<future_type>::type;
+            traits::detail::shared_state_ptr_for_t<future_type>;
         using result_type = std::vector<shared_state_ptr>;
 
         result_type values;
@@ -479,8 +474,8 @@ namespace hpx { namespace lcos {
     template <typename... Ts>
     void wait_all(Ts&&... ts)
     {
-        using result_type = hpx::tuple<
-            typename traits::detail::shared_state_ptr_for<Ts>::type...>;
+        using result_type =
+            hpx::tuple<traits::detail::shared_state_ptr_for_t<Ts>...>;
         using frame_type = detail::wait_all_frame<result_type>;
         using init_no_addref = typename frame_type::init_no_addref;
 

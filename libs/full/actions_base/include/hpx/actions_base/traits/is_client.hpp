@@ -19,6 +19,9 @@ namespace hpx { namespace traits {
     {
     };
 
+    template <typename T>
+    constexpr bool is_client_v = is_client<T>::value;
+
     template <typename T, typename Enable = void>
     struct is_client_or_client_array : is_client<T>
     {
@@ -33,4 +36,8 @@ namespace hpx { namespace traits {
     struct is_client_or_client_array<T[N]> : is_client<T>
     {
     };
+
+    template <typename T>
+    constexpr bool is_client_or_client_array_v =
+        is_client_or_client_array<T>::value;
 }}    // namespace hpx::traits

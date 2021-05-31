@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,4 +20,7 @@ namespace hpx { namespace traits {
     {
         typedef hpx::util::unused_type type;
     };
+
+    template <typename Result>
+    using promise_remote_result_t = typename promise_remote_result<Result>::type;
 }}    // namespace hpx::traits
