@@ -23,7 +23,7 @@ if(NOT TARGET ASIO::standalone_asio)
       )
 
       if(NOT HPX_WITH_ASIO_TAG)
-        set(HPX_WITH_ASIO_TAG "asio-1-18-1")
+        set(HPX_WITH_ASIO_TAG "asio-1-18-2")
       endif()
 
       include(FetchContent)
