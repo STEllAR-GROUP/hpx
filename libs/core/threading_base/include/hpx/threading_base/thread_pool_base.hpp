@@ -127,6 +127,7 @@ namespace hpx { namespace threads {
         std::size_t max_background_threads_;
         std::size_t max_idle_loop_count_;
         std::size_t max_busy_loop_count_;
+        std::size_t shutdown_check_count_;
 
         thread_pool_init_parameters(std::string const& name, std::size_t index,
             policies::scheduler_mode mode, std::size_t num_threads,
@@ -138,7 +139,8 @@ namespace hpx { namespace threads {
                     hpx::threads::detail::network_background_callback_type(),
             std::size_t max_background_threads = std::size_t(-1),
             std::size_t max_idle_loop_count = HPX_IDLE_LOOP_COUNT_MAX,
-            std::size_t max_busy_loop_count = HPX_BUSY_LOOP_COUNT_MAX)
+            std::size_t max_busy_loop_count = HPX_BUSY_LOOP_COUNT_MAX,
+            std::size_t shutdown_check_count = 10)
           : name_(name)
           , index_(index)
           , mode_(mode)
@@ -150,6 +152,7 @@ namespace hpx { namespace threads {
           , max_background_threads_(max_background_threads)
           , max_idle_loop_count_(max_idle_loop_count)
           , max_busy_loop_count_(max_busy_loop_count)
+          , shutdown_check_count_(shutdown_check_count)
         {
         }
     };
@@ -159,9 +162,6 @@ namespace hpx { namespace threads {
 
     /// \brief The base class used to manage a pool of OS threads.
     class HPX_CORE_EXPORT thread_pool_base
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-      : public detail::manage_executor
-#endif
     {
     public:
         /// \cond NOINTERNAL
@@ -176,6 +176,10 @@ namespace hpx { namespace threads {
 
         virtual void stop(
             std::unique_lock<std::mutex>& l, bool blocking = true) = 0;
+
+        virtual void wait() = 0;
+        virtual bool is_busy() = 0;
+        virtual bool is_idle() = 0;
 
         virtual void print_pool(std::ostream&) = 0;
 
@@ -521,29 +525,6 @@ namespace hpx { namespace threads {
         {
             notifier_.on_error(global_thread_num, e);
         }
-
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-        ///////////////////////////////////////////////////////////////////////
-        // detail::manage_executor implementation
-        /// \brief Return the requested policy element.
-        std::size_t get_policy_element(detail::executor_parameter p,
-            error_code& ec = throws) const override = 0;
-
-        // \brief Return statistics collected by this scheduler.
-        virtual void get_statistics(executor_statistics& stats,
-            error_code& ec = throws) const override = 0;
-
-        // \brief Provide the given processing unit to the scheduler.
-        virtual void add_processing_unit(std::size_t virt_core,
-            std::size_t thread_num, error_code& ec = throws) override = 0;
-
-        // \brief Remove the given processing unit from the scheduler.
-        virtual void remove_processing_unit(
-            std::size_t thread_num, error_code& ec = throws) override = 0;
-
-        // \brief Return the description string of the underlying scheduler.
-        char const* get_description() const override;
-#endif
 
         /// \endcond
 

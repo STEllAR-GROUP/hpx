@@ -1003,39 +1003,6 @@ namespace hpx { namespace threads {
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    std::size_t threadmanager::shrink_pool(std::string const& pool_name)
-    {
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-        return resource::get_partitioner().shrink_pool(
-            pool_name, [this, &pool_name](std::size_t virt_core) {
-                get_pool(pool_name).remove_processing_unit(virt_core);
-            });
-#else
-        HPX_UNUSED(pool_name);
-        HPX_THROW_EXCEPTION(no_success, "threadmanager::shrink_pool",
-            "shrink_pool is not available because "
-            "HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY=OFF");
-#endif
-    }
-
-    std::size_t threadmanager::expand_pool(std::string const& pool_name)
-    {
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-        return resource::get_partitioner().expand_pool(
-            pool_name, [this, &pool_name](std::size_t virt_core) {
-                thread_pool_base& pool = get_pool(pool_name);
-                pool.add_processing_unit(
-                    virt_core, pool.get_thread_offset() + virt_core);
-            });
-#else
-        HPX_UNUSED(pool_name);
-        HPX_THROW_EXCEPTION(no_success, "threadmanager::shrink_pool",
-            "shrink_pool is not available because "
-            "HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY=OFF");
-#endif
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     bool threadmanager::run()
     {
         std::unique_lock<mutex_type> lk(mtx_);
@@ -1091,8 +1058,38 @@ namespace hpx { namespace threads {
         deinit_tss();
     }
 
+    bool threadmanager::is_busy()
+    {
+        bool busy = false;
+        for (auto& pool_iter : pools_)
+        {
+            busy = busy || pool_iter->is_busy();
+        }
+        return busy;
+    }
+
+    bool threadmanager::is_idle()
+    {
+        bool idle = true;
+        for (auto& pool_iter : pools_)
+        {
+            idle = idle && pool_iter->is_idle();
+        }
+        return idle;
+    }
+
+    void threadmanager::wait()
+    {
+        std::size_t shutdown_check_count = util::get_entry_as<std::size_t>(
+            rtcfg_, "hpx.shutdown_check_count", 10);
+        hpx::util::detail::yield_while_count(
+            [this]() { return is_busy(); }, shutdown_check_count);
+    }
+
     void threadmanager::suspend()
     {
+        wait();
+
         if (threads::get_self_ptr())
         {
             std::vector<hpx::future<void>> fs;

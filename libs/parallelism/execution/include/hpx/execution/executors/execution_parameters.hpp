@@ -13,7 +13,7 @@
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/serialization/base_object.hpp>
@@ -37,21 +37,81 @@ namespace hpx { namespace parallel { namespace execution {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        // customization point for interface get_chunk_size()
-        template <typename Parameters, typename Executor_>
-        struct get_chunk_size_fn_helper<Parameters, Executor_,
-            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                || hpx::traits::is_threads_executor<Executor_>::value
-#endif
-                >>
+        template <typename Property, template <typename> class CheckForProperty>
+        struct make_with_property_t final
+          : hpx::functional::tag_fallback<
+                make_with_property_t<Property, CheckForProperty>>
         {
-            // Check whether the parameter object implements this function
-            template <typename AnyParameters, typename Executor, typename F>
-            HPX_FORCEINLINE static std::size_t call_param(
-                hpx::traits::detail::wrap_int, AnyParameters&& /* params */,
-                Executor&& /* exec */, F&& /* f */, std::size_t /* cores */,
-                std::size_t /* num_tasks */)
+        private:
+            using derived_propery_t =
+                make_with_property_t<Property, CheckForProperty>;
+
+            template <typename T>
+            using check_for_property = CheckForProperty<std::decay_t<T>>;
+
+            // clang-format off
+            template <typename Executor, typename Parameters,
+                HPX_CONCEPT_REQUIRES_(
+                    !hpx::traits::is_executor_parameters<Parameters>::value ||
+                    !check_for_property<Parameters>::value
+                )>
+            // clang-format on
+            friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+                derived_propery_t, Executor&& /*exec*/, Parameters&& /*params*/,
+                Property prop)
+            {
+                return std::make_pair(prop, prop);
+            }
+
+            ///////////////////////////////////////////////////////////////////
+            // Executor directly supports get_chunk_size
+            // clang-format off
+            template <typename Executor, typename Parameters,
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::traits::is_executor_parameters<Parameters>::value &&
+                    check_for_property<Parameters>::value
+                )>
+            // clang-format on
+            friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+                derived_propery_t, Executor&& exec, Parameters&& params,
+                Property /*prop*/)
+            {
+                return std::pair<Parameters&&, Executor&&>(
+                    std::forward<Parameters>(params),
+                    std::forward<Executor>(exec));
+            }
+
+            ///////////////////////////////////////////////////////////////////
+            // Executor directly supports get_chunk_size
+            // clang-format off
+            template <typename Executor, typename Parameters,
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::traits::is_executor_any<Executor>::value &&
+                    check_for_property<Executor>::value
+                )>
+            // clang-format on
+            friend HPX_FORCEINLINE decltype(auto) tag_dispatch(
+                derived_propery_t, Executor&& exec, Parameters&& params,
+                Property /*prop*/)
+            {
+                return std::pair<Executor&&, Parameters&&>(
+                    std::forward<Executor>(exec),
+                    std::forward<Parameters>(params));
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        // define member traits
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_chunk_size);
+
+        ///////////////////////////////////////////////////////////////////////
+        // default property implementation allowing to handle get_chunk_size
+        struct get_chunk_size_property
+        {
+            // default implementation
+            template <typename Target, typename F>
+            HPX_FORCEINLINE static std::size_t get_chunk_size(Target, F&& /*f*/,
+                std::size_t /*cores*/, std::size_t /*num_tasks*/)
             {
                 // return zero for the chunk-size which will tell the
                 // implementation to calculate the chunk size either based
@@ -59,48 +119,33 @@ namespace hpx { namespace parallel { namespace execution {
                 // internal rule (if no maximum number of chunks was given)
                 return 0;
             }
+        };
 
-            template <typename AnyParameters, typename Executor, typename F>
-            HPX_FORCEINLINE static auto call_param(int, AnyParameters&& params,
-                Executor&& exec, F&& f, std::size_t cores,
-                std::size_t num_tasks)
-                -> decltype(params.get_chunk_size(std::forward<Executor>(exec),
-                    std::forward<F>(f), cores, num_tasks))
-            {
-                return params.get_chunk_size(std::forward<Executor>(exec),
-                    std::forward<F>(f), cores, num_tasks);
-            }
+        //////////////////////////////////////////////////////////////////////
+        // Generate a type that is guaranteed to support get_chunk_size
+        using make_with_get_chunk_size_t =
+            make_with_property_t<get_chunk_size_property, has_get_chunk_size_t>;
 
-            // Check whether this function is implemented by the executor
-            template <typename AnyParameters, typename Executor, typename F>
-            HPX_FORCEINLINE static std::size_t call(
-                hpx::traits::detail::wrap_int, AnyParameters&& params,
-                Executor&& exec, F&& f, std::size_t cores,
-                std::size_t num_tasks)
-            {
-                return call_param(0, std::forward<AnyParameters>(params),
-                    std::forward<Executor>(exec), std::forward<F>(f), cores,
-                    num_tasks);
-            }
+        HPX_INLINE_CONSTEXPR_VARIABLE make_with_get_chunk_size_t
+            make_with_get_chunk_size{};
 
-            template <typename AnyParameters, typename Executor, typename F>
-            HPX_FORCEINLINE static auto call(int, AnyParameters&& params,
-                Executor&& exec, F&& f, std::size_t cores,
-                std::size_t num_tasks)
-                -> decltype(
-                    exec.get_chunk_size(std::forward<AnyParameters>(params),
-                        std::forward<F>(f), cores, num_tasks))
-            {
-                return exec.get_chunk_size(std::forward<AnyParameters>(params),
-                    std::forward<F>(f), cores, num_tasks);
-            }
-
+        //////////////////////////////////////////////////////////////////////
+        // customization point for interface get_chunk_size()
+        template <typename Parameters, typename Executor_>
+        struct get_chunk_size_fn_helper<Parameters, Executor_,
+            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value>>
+        {
             template <typename Executor, typename F>
             HPX_FORCEINLINE static std::size_t call(Parameters& params,
                 Executor&& exec, F&& f, std::size_t cores,
                 std::size_t num_tasks)
             {
-                return call(0, params, std::forward<Executor>(exec),
+                auto withprop =
+                    make_with_get_chunk_size(std::forward<Executor>(exec),
+                        params, get_chunk_size_property{});
+
+                return withprop.first.get_chunk_size(
+                    std::forward<decltype(withprop.second)>(withprop.second),
                     std::forward<F>(f), cores, num_tasks);
             }
 
@@ -109,37 +154,25 @@ namespace hpx { namespace parallel { namespace execution {
                 Executor&& exec, F&& f, std::size_t cores,
                 std::size_t num_tasks)
             {
-                return call(0, static_cast<Parameters&>(params),
+                return call(static_cast<Parameters&>(params),
                     std::forward<Executor>(exec), std::forward<F>(f), cores,
                     num_tasks);
             }
-
-            template <typename AnyParameters, typename Executor, typename F>
-            struct result
-            {
-                using type = decltype(call(std::declval<AnyParameters>(),
-                    std::declval<Executor>(), std::declval<F>(),
-                    std::declval<std::size_t>(), std::declval<std::size_t>()));
-            };
         };
 
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_chunk_size)
+        ///////////////////////////////////////////////////////////////////////
+        // define member traits
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(maximal_number_of_chunks)
 
         ///////////////////////////////////////////////////////////////////////
-        // customization point for interface maximal_number_of_chunks()
-        template <typename Parameters, typename Executor_>
-        struct maximal_number_of_chunks_fn_helper<Parameters, Executor_,
-            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                || hpx::traits::is_threads_executor<Executor_>::value
-#endif
-                >>
+        // default property implementation allowing to handle
+        // maximal_number_of_chunks
+        struct maximal_number_of_chunks_property
         {
-            // Check whether the parameter object implements this function
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static std::size_t call_param(
-                hpx::traits::detail::wrap_int, AnyParameters&&, Executor&&,
-                std::size_t, std::size_t)
+            // default implementation
+            template <typename Target>
+            HPX_FORCEINLINE static std::size_t maximal_number_of_chunks(
+                Target, std::size_t, std::size_t)
             {
                 // return zero chunks which will tell the implementation to
                 // calculate the number of chunks either based on a
@@ -147,43 +180,35 @@ namespace hpx { namespace parallel { namespace execution {
                 // chunk-size was given)
                 return 0;
             }
+        };
 
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static auto call_param(int, AnyParameters&& params,
-                Executor&& exec, std::size_t cores, std::size_t num_tasks)
-                -> decltype(params.maximal_number_of_chunks(
-                    std::forward<Executor>(exec), cores, num_tasks))
-            {
-                return params.maximal_number_of_chunks(
-                    std::forward<Executor>(exec), cores, num_tasks);
-            }
+        //////////////////////////////////////////////////////////////////////
+        // Generate a type that is guaranteed to support
+        // maximal_number_of_chunks
+        using make_with_maximal_number_of_chunks_t =
+            make_with_property_t<maximal_number_of_chunks_property,
+                has_maximal_number_of_chunks_t>;
 
-            // Check whether this function is implemented by the executor
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static std::size_t call(
-                hpx::traits::detail::wrap_int, AnyParameters&& params,
-                Executor&& exec, std::size_t cores, std::size_t num_tasks)
-            {
-                return call_param(0, std::forward<AnyParameters>(params),
-                    std::forward<Executor>(exec), cores, num_tasks);
-            }
+        HPX_INLINE_CONSTEXPR_VARIABLE make_with_maximal_number_of_chunks_t
+            make_with_maximal_number_of_chunks{};
 
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static auto call(int, AnyParameters&& params,
-                Executor&& exec, std::size_t cores, std::size_t num_tasks)
-                -> decltype(exec.maximal_number_of_chunks(
-                    std::forward<AnyParameters>(params), cores, num_tasks))
-            {
-                return exec.maximal_number_of_chunks(
-                    std::forward<AnyParameters>(params), cores, num_tasks);
-            }
-
+        ///////////////////////////////////////////////////////////////////////
+        // customization point for interface maximal_number_of_chunks()
+        template <typename Parameters, typename Executor_>
+        struct maximal_number_of_chunks_fn_helper<Parameters, Executor_,
+            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value>>
+        {
             template <typename Executor>
             HPX_FORCEINLINE static std::size_t call(Parameters& params,
                 Executor&& exec, std::size_t cores, std::size_t num_tasks)
             {
-                return call(
-                    0, params, std::forward<Executor>(exec), cores, num_tasks);
+                auto withprop = make_with_maximal_number_of_chunks(
+                    std::forward<Executor>(exec), params,
+                    maximal_number_of_chunks_property{});
+
+                return withprop.first.maximal_number_of_chunks(
+                    std::forward<decltype(withprop.second)>(withprop.second),
+                    cores, num_tasks);
             }
 
             template <typename AnyParameters, typename Executor>
@@ -193,67 +218,50 @@ namespace hpx { namespace parallel { namespace execution {
                 return call(static_cast<Parameters&>(params),
                     std::forward<Executor>(exec), cores, num_tasks);
             }
-
-            template <typename AnyParameters, typename Executor>
-            struct result
-            {
-                using type = decltype(call(std::declval<AnyParameters>(),
-                    std::declval<Executor>(), std::declval<std::size_t>(),
-                    std::declval<std::size_t>()));
-            };
         };
 
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(maximal_number_of_chunks)
+        ///////////////////////////////////////////////////////////////////////
+        // define member traits
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(reset_thread_distribution)
+
+        ///////////////////////////////////////////////////////////////////////
+        // default property implementation allowing to handle
+        // reset_thread_distribution
+        struct reset_thread_distribution_property
+        {
+            // default implementation
+            template <typename Target>
+            HPX_FORCEINLINE static void reset_thread_distribution(Target)
+            {
+            }
+        };
+
+        //////////////////////////////////////////////////////////////////////
+        // Generate a type that is guaranteed to support
+        // reset_thread_distribution
+        using make_with_reset_thread_distribution_t =
+            make_with_property_t<reset_thread_distribution_property,
+                has_reset_thread_distribution_t>;
+
+        HPX_INLINE_CONSTEXPR_VARIABLE make_with_reset_thread_distribution_t
+            make_with_reset_thread_distribution{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface reset_thread_distribution()
         template <typename Parameters, typename Executor_>
         struct reset_thread_distribution_fn_helper<Parameters, Executor_,
-            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                || hpx::traits::is_threads_executor<Executor_>::value
-#endif
-                >>
+            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value>>
         {
-            // Check whether the parameter object implements this function
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static void call_param(
-                hpx::traits::detail::wrap_int, AnyParameters&&, Executor&&)
-            {
-            }
-
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static auto call_param(int, AnyParameters&& params,
-                Executor &&) -> decltype(params.reset_thread_distribution())
-            {
-                params.reset_thread_distribution();
-            }
-
-            // Check whether this function is implemented by the executor
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static void call(hpx::traits::detail::wrap_int,
-                AnyParameters&& params, Executor&& exec)
-            {
-                call_param(0, std::forward<AnyParameters>(params),
-                    std::forward<Executor>(exec));
-            }
-
-            // Check whether this function is implemented by the executor
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static auto call(
-                int, AnyParameters&& params, Executor&& exec)
-                -> decltype(exec.reset_thread_distribution(
-                    std::forward<AnyParameters>(params)))
-            {
-                exec.reset_thread_distribution(
-                    std::forward<AnyParameters>(params));
-            }
-
             template <typename Executor>
             HPX_FORCEINLINE static void call(
                 Parameters& params, Executor&& exec)
             {
-                call(0, params, std::forward<Executor>(exec));
+                auto withprop = make_with_reset_thread_distribution(
+                    std::forward<Executor>(exec), params,
+                    reset_thread_distribution_property{});
+
+                withprop.first.reset_thread_distribution(
+                    std::forward<decltype(withprop.second)>(withprop.second));
             }
 
             template <typename AnyParameters, typename Executor>
@@ -263,67 +271,51 @@ namespace hpx { namespace parallel { namespace execution {
                 call(static_cast<Parameters&>(params),
                     std::forward<Executor>(exec));
             }
-
-            template <typename AnyParameters, typename Executor>
-            struct result
-            {
-                using type = decltype(call(
-                    std::declval<AnyParameters>(), std::declval<Executor>()));
-            };
         };
 
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(reset_thread_distribution)
+        ///////////////////////////////////////////////////////////////////////
+        // define member traits
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(processing_units_count)
+
+        ///////////////////////////////////////////////////////////////////////
+        // default property implementation allowing to handle
+        // reset_thread_distribution
+        struct processing_units_count_property
+        {
+            // default implementation
+            template <typename Target>
+            HPX_FORCEINLINE static std::size_t processing_units_count(Target)
+            {
+                return get_os_thread_count();
+            }
+        };
+
+        //////////////////////////////////////////////////////////////////////
+        // Generate a type that is guaranteed to support
+        // reset_thread_distribution
+        using make_with_processing_units_count_t =
+            make_with_property_t<processing_units_count_property,
+                has_processing_units_count_t>;
+
+        HPX_INLINE_CONSTEXPR_VARIABLE make_with_processing_units_count_t
+            make_with_processing_units_count{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface processing_units_count()
         template <typename Parameters, typename Executor_>
         struct processing_units_count_fn_helper<Parameters, Executor_,
-            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                || hpx::traits::is_threads_executor<Executor_>::value
-#endif
-                >>
+            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value>>
         {
-            // Check whether the parameter object implements this function
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static std::size_t call_param(
-                hpx::traits::detail::wrap_int, AnyParameters&&, Executor&&)
-            {
-                return get_os_thread_count();
-            }
-
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static auto call_param(
-                int, AnyParameters&& params, Executor&& exec)
-                -> decltype(
-                    params.processing_units_count(std::forward<Executor>(exec)))
-            {
-                return params.processing_units_count(
-                    std::forward<Executor>(exec));
-            }
-
-            // Check whether this function is implemented by the executor
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static std::size_t call(
-                hpx::traits::detail::wrap_int, AnyParameters&& params,
-                Executor&& exec)
-            {
-                return call_param(0, std::forward<AnyParameters>(params),
-                    std::forward<Executor>(exec));
-            }
-
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static auto call(int, AnyParameters&& /* params */,
-                Executor&& exec) -> decltype(exec.processing_units_count())
-            {
-                return exec.processing_units_count();
-            }
-
             template <typename Executor>
             HPX_FORCEINLINE static std::size_t call(
                 Parameters& params, Executor&& exec)
             {
-                return call(0, params, std::forward<Executor>(exec));
+                auto withprop = make_with_processing_units_count(
+                    std::forward<Executor>(exec), params,
+                    processing_units_count_property{});
+
+                return withprop.first.processing_units_count(
+                    std::forward<decltype(withprop.second)>(withprop.second));
             }
 
             template <typename AnyParameters, typename Executor>
@@ -333,66 +325,50 @@ namespace hpx { namespace parallel { namespace execution {
                 return call(static_cast<Parameters&>(params),
                     std::forward<Executor>(exec));
             }
-
-            template <typename AnyParameters, typename Executor>
-            struct result
-            {
-                using type = decltype(call(
-                    std::declval<AnyParameters>(), std::declval<Executor>()));
-            };
         };
 
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(processing_units_count)
+        ///////////////////////////////////////////////////////////////////////
+        // define member traits
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_begin_execution)
+
+        ///////////////////////////////////////////////////////////////////////
+        // default property implementation allowing to handle
+        // mark_begin_execution
+        struct mark_begin_execution_property
+        {
+            // default implementation
+            template <typename Target>
+            HPX_FORCEINLINE static void mark_begin_execution(Target)
+            {
+            }
+        };
+
+        //////////////////////////////////////////////////////////////////////
+        // Generate a type that is guaranteed to support
+        // mark_begin_execution
+        using make_with_mark_begin_execution_t =
+            make_with_property_t<mark_begin_execution_property,
+                has_mark_begin_execution_t>;
+
+        HPX_INLINE_CONSTEXPR_VARIABLE make_with_mark_begin_execution_t
+            make_with_mark_begin_execution{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface mark_begin_execution()
         template <typename Parameters, typename Executor_>
         struct mark_begin_execution_fn_helper<Parameters, Executor_,
-            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                || hpx::traits::is_threads_executor<Executor_>::value
-#endif
-                >>
+            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value>>
         {
-            // Check whether the parameter object implements this function
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static void call_param(
-                hpx::traits::detail::wrap_int, AnyParameters&&, Executor&&)
-            {
-            }
-
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static auto call_param(
-                int, AnyParameters&& params, Executor&& exec)
-                -> decltype(
-                    params.mark_begin_execution(std::forward<Executor>(exec)))
-            {
-                params.mark_begin_execution(std::forward<Executor>(exec));
-            }
-
-            // Check whether this function is implemented by the executor
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static void call(hpx::traits::detail::wrap_int,
-                AnyParameters&& params, Executor&& exec)
-            {
-                call_param(0, std::forward<AnyParameters>(params),
-                    std::forward<Executor>(exec));
-            }
-
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static auto call(
-                int, AnyParameters&& params, Executor&& exec)
-                -> decltype(exec.mark_begin_execution(
-                    std::forward<AnyParameters>(params)))
-            {
-                exec.mark_begin_execution(std::forward<AnyParameters>(params));
-            }
-
             template <typename Executor>
             HPX_FORCEINLINE static void call(
                 Parameters& params, Executor&& exec)
             {
-                call(0, params, std::forward<Executor>(exec));
+                auto withprop =
+                    make_with_mark_begin_execution(std::forward<Executor>(exec),
+                        params, mark_begin_execution_property{});
+
+                withprop.first.mark_begin_execution(
+                    std::forward<decltype(withprop.second)>(withprop.second));
             }
 
             template <typename AnyParameters, typename Executor>
@@ -402,67 +378,50 @@ namespace hpx { namespace parallel { namespace execution {
                 call(static_cast<Parameters&>(params),
                     std::forward<Executor>(exec));
             }
-
-            template <typename AnyParameters, typename Executor>
-            struct result
-            {
-                using type = decltype(call(
-                    std::declval<AnyParameters>(), std::declval<Executor>()));
-            };
         };
 
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_begin_execution)
+        ///////////////////////////////////////////////////////////////////////
+        // define member traits
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_end_of_scheduling)
+
+        ///////////////////////////////////////////////////////////////////////
+        // default property implementation allowing to handle
+        // mark_end_of_scheduling
+        struct mark_end_of_scheduling_property
+        {
+            // default implementation
+            template <typename Target>
+            HPX_FORCEINLINE static void mark_end_of_scheduling(Target)
+            {
+            }
+        };
+
+        //////////////////////////////////////////////////////////////////////
+        // Generate a type that is guaranteed to support
+        // mark_end_of_scheduling
+        using make_with_mark_end_of_scheduling_t =
+            make_with_property_t<mark_end_of_scheduling_property,
+                has_mark_end_of_scheduling_t>;
+
+        HPX_INLINE_CONSTEXPR_VARIABLE make_with_mark_end_of_scheduling_t
+            make_with_mark_end_of_scheduling{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface mark_end_of_scheduling()
         template <typename Parameters, typename Executor_>
         struct mark_end_of_scheduling_fn_helper<Parameters, Executor_,
-            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                || hpx::traits::is_threads_executor<Executor_>::value
-#endif
-                >>
+            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value>>
         {
-            // Check whether the parameter object implements this function
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static void call_param(
-                hpx::traits::detail::wrap_int, AnyParameters&&, Executor&&)
-            {
-            }
-
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static auto call_param(
-                int, AnyParameters&& params, Executor&& exec)
-                -> decltype(
-                    params.mark_end_of_scheduling(std::forward<Executor>(exec)))
-            {
-                params.mark_end_of_scheduling(std::forward<Executor>(exec));
-            }
-
-            // Check whether this function is implemented by the executor
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static void call(hpx::traits::detail::wrap_int,
-                AnyParameters&& params, Executor&& exec)
-            {
-                call_param(0, std::forward<AnyParameters>(params),
-                    std::forward<Executor>(exec));
-            }
-
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static auto call(
-                int, AnyParameters&& params, Executor&& exec)
-                -> decltype(exec.mark_end_of_scheduling(
-                    std::forward<AnyParameters>(params)))
-            {
-                exec.mark_end_of_scheduling(
-                    std::forward<AnyParameters>(params));
-            }
-
             template <typename Executor>
             HPX_FORCEINLINE static void call(
                 Parameters& params, Executor&& exec)
             {
-                call(0, params, std::forward<Executor>(exec));
+                auto withprop = make_with_mark_end_of_scheduling(
+                    std::forward<Executor>(exec), params,
+                    mark_end_of_scheduling_property{});
+
+                withprop.first.mark_end_of_scheduling(
+                    std::forward<decltype(withprop.second)>(withprop.second));
             }
 
             template <typename AnyParameters, typename Executor>
@@ -472,66 +431,50 @@ namespace hpx { namespace parallel { namespace execution {
                 call(static_cast<Parameters&>(params),
                     std::forward<Executor>(exec));
             }
-
-            template <typename AnyParameters, typename Executor>
-            struct result
-            {
-                using type = decltype(call(
-                    std::declval<AnyParameters>(), std::declval<Executor>()));
-            };
         };
 
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_end_of_scheduling)
+        ///////////////////////////////////////////////////////////////////////
+        // define member traits
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_end_execution)
+
+        ///////////////////////////////////////////////////////////////////////
+        // default property implementation allowing to handle
+        // mark_end_execution
+        struct mark_end_execution_property
+        {
+            // default implementation
+            template <typename Target>
+            HPX_FORCEINLINE static void mark_end_execution(Target)
+            {
+            }
+        };
+
+        //////////////////////////////////////////////////////////////////////
+        // Generate a type that is guaranteed to support
+        // mark_end_execution
+        using make_with_mark_end_execution_t =
+            make_with_property_t<mark_end_execution_property,
+                has_mark_end_execution_t>;
+
+        HPX_INLINE_CONSTEXPR_VARIABLE make_with_mark_end_execution_t
+            make_with_mark_end_execution{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface mark_end_execution()
         template <typename Parameters, typename Executor_>
         struct mark_end_execution_fn_helper<Parameters, Executor_,
-            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                || hpx::traits::is_threads_executor<Executor_>::value
-#endif
-                >>
+            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value>>
         {
-            // Check whether the parameter object implements this function
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static void call_param(
-                hpx::traits::detail::wrap_int, AnyParameters&&, Executor&&)
-            {
-            }
-
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static auto call_param(
-                int, AnyParameters&& params, Executor&& exec)
-                -> decltype(
-                    params.mark_end_execution(std::forward<Executor>(exec)))
-            {
-                params.mark_end_execution(std::forward<Executor>(exec));
-            }
-
-            // Check whether this function is implemented by the executor
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static void call(hpx::traits::detail::wrap_int,
-                AnyParameters&& params, Executor&& exec)
-            {
-                call_param(0, std::forward<AnyParameters>(params),
-                    std::forward<Executor>(exec));
-            }
-
-            template <typename AnyParameters, typename Executor>
-            HPX_FORCEINLINE static auto call(
-                int, AnyParameters&& params, Executor&& exec)
-                -> decltype(exec.mark_end_execution(
-                    std::forward<AnyParameters>(params)))
-            {
-                exec.mark_end_execution(std::forward<AnyParameters>(params));
-            }
-
             template <typename Executor>
             HPX_FORCEINLINE static void call(
                 Parameters& params, Executor&& exec)
             {
-                call(0, params, std::forward<Executor>(exec));
+                auto withprop =
+                    make_with_mark_end_execution(std::forward<Executor>(exec),
+                        params, mark_end_execution_property{});
+
+                withprop.first.mark_end_execution(
+                    std::forward<decltype(withprop.second)>(withprop.second));
             }
 
             template <typename AnyParameters, typename Executor>
@@ -541,17 +484,7 @@ namespace hpx { namespace parallel { namespace execution {
                 call(static_cast<Parameters&>(params),
                     std::forward<Executor>(exec));
             }
-
-            template <typename AnyParameters, typename Executor>
-            struct result
-            {
-                using type = decltype(call(
-                    std::declval<AnyParameters>(), std::declval<Executor>()));
-            };
         };
-
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_end_execution)
-
         /// \endcond
     }    // namespace detail
 
@@ -610,10 +543,10 @@ namespace hpx { namespace parallel { namespace execution {
         {
             template <typename Executor>
             HPX_FORCEINLINE std::size_t maximal_number_of_chunks(
-                Executor&& exec, std::size_t cores, std::size_t num_tasks)
+                Executor&& exec, std::size_t cores, std::size_t num_tasks) const
             {
                 auto& wrapped =
-                    static_cast<unwrapper<Wrapper>*>(this)->member_.get();
+                    static_cast<unwrapper<Wrapper> const*>(this)->member_.get();
                 return wrapped.maximal_number_of_chunks(
                     std::forward<Executor>(exec), cores, num_tasks);
             }
@@ -631,10 +564,10 @@ namespace hpx { namespace parallel { namespace execution {
         {
             template <typename Executor, typename F>
             HPX_FORCEINLINE std::size_t get_chunk_size(Executor&& exec, F&& f,
-                std::size_t cores, std::size_t num_tasks)
+                std::size_t cores, std::size_t num_tasks) const
             {
                 auto& wrapped =
-                    static_cast<unwrapper<Wrapper>*>(this)->member_.get();
+                    static_cast<unwrapper<Wrapper> const*>(this)->member_.get();
                 return wrapped.get_chunk_size(std::forward<Executor>(exec),
                     std::forward<F>(f), cores, num_tasks);
             }
@@ -708,10 +641,11 @@ namespace hpx { namespace parallel { namespace execution {
             std::enable_if_t<has_processing_units_count<T>::value>>
         {
             template <typename Executor>
-            HPX_FORCEINLINE std::size_t processing_units_count(Executor&& exec)
+            HPX_FORCEINLINE std::size_t processing_units_count(
+                Executor&& exec) const
             {
                 auto& wrapped =
-                    static_cast<unwrapper<Wrapper>*>(this)->member_.get();
+                    static_cast<unwrapper<Wrapper> const*>(this)->member_.get();
                 return wrapped.processing_units_count(
                     std::forward<Executor>(exec));
             }

@@ -494,7 +494,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<InIter>::value
         )>
     // clang-format on
-    bool tag_invoke(hpx::none_of_t, InIter first, InIter last, F&& f)
+    bool tag_dispatch(hpx::none_of_t, InIter first, InIter last, F&& f)
     {
         static_assert(hpx::traits::is_input_iterator<InIter>::value,
             "Requires at least input iterator.");
@@ -515,7 +515,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
-    tag_invoke(
+    tag_dispatch(
         hpx::none_of_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
         static_assert(hpx::traits::is_forward_iterator<SegIter>::value,
@@ -537,7 +537,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<InIter>::value
         )>
     // clang-format on
-    bool tag_invoke(hpx::any_of_t, InIter first, InIter last, F&& f)
+    bool tag_dispatch(hpx::any_of_t, InIter first, InIter last, F&& f)
     {
         static_assert(hpx::traits::is_input_iterator<InIter>::value,
             "Requires at least input iterator.");
@@ -558,7 +558,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
-    tag_invoke(
+    tag_dispatch(
         hpx::any_of_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
         static_assert(hpx::traits::is_forward_iterator<SegIter>::value,
@@ -580,7 +580,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<InIter>::value
         )>
     // clang-format on
-    bool tag_invoke(hpx::all_of_t, InIter first, InIter last, F&& f)
+    bool tag_dispatch(hpx::all_of_t, InIter first, InIter last, F&& f)
     {
         static_assert(hpx::traits::is_input_iterator<InIter>::value,
             "Requires at least input iterator.");
@@ -601,7 +601,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
-    tag_invoke(
+    tag_dispatch(
         hpx::all_of_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
         static_assert(hpx::traits::is_forward_iterator<SegIter>::value,

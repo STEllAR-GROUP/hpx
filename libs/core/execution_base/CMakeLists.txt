@@ -9,6 +9,7 @@ set(execution_base_headers
     hpx/execution_base/agent_ref.hpp
     hpx/execution_base/context_base.hpp
     hpx/execution_base/detail/spinlock_deadlock_detection.hpp
+    hpx/execution_base/detail/try_catch_exception_ptr.hpp
     hpx/execution_base/execution.hpp
     hpx/execution_base/operation_state.hpp
     hpx/execution_base/receiver.hpp

@@ -104,6 +104,7 @@ namespace hpx { namespace threads { namespace detail {
       , max_background_threads_(init.max_background_threads_)
       , max_idle_loop_count_(init.max_idle_loop_count_)
       , max_busy_loop_count_(init.max_busy_loop_count_)
+      , shutdown_check_count_(init.shutdown_check_count_)
     {
         sched_->set_parent_pool(this);
     }
@@ -178,6 +179,37 @@ namespace hpx { namespace threads { namespace detail {
     }
 
     template <typename Scheduler>
+    bool scheduled_thread_pool<Scheduler>::is_busy()
+    {
+        // If we are currently on an HPX thread, which runs on the current pool,
+        // we ignore it for the purposes of checking if the pool is busy (i.e.
+        // this returns true only if there is *other* work left on this pool).
+        std::int64_t hpx_thread_offset =
+            (threads::get_self_ptr() && this_thread::get_pool() == this) ? 1 :
+                                                                           0;
+        bool have_hpx_threads =
+            get_thread_count_unknown(std::size_t(-1), false) >
+            sched_->Scheduler::get_background_thread_count() +
+                hpx_thread_offset;
+        bool have_polling_work =
+            sched_->Scheduler::get_polling_work_count() > 0;
+        return have_hpx_threads || have_polling_work;
+    }
+
+    template <typename Scheduler>
+    bool scheduled_thread_pool<Scheduler>::is_idle()
+    {
+        return !is_busy();
+    }
+
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::wait()
+    {
+        hpx::util::detail::yield_while_count(
+            [this]() { return is_busy(); }, shutdown_check_count_);
+    }
+
+    template <typename Scheduler>
     template <typename Lock>
     void scheduled_thread_pool<Scheduler>::stop_locked(Lock& l, bool blocking)
     {
@@ -185,6 +217,13 @@ namespace hpx { namespace threads { namespace detail {
 
         if (!threads_.empty())
         {
+            // wait for all work to be done before requesting threads to shut
+            // down
+            if (blocking)
+            {
+                wait();
+            }
+
             // wake up if suspended
             resume_internal(blocking, throws);
 
@@ -1803,47 +1842,6 @@ namespace hpx { namespace threads { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-    template <typename Scheduler>
-    std::size_t scheduled_thread_pool<Scheduler>::get_policy_element(
-        executor_parameter p, error_code& ec) const
-    {
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        switch (p)
-        {
-        case threads::detail::min_concurrency:
-            HPX_FALLTHROUGH;
-        case threads::detail::max_concurrency:
-            break;
-
-        case threads::detail::current_concurrency:
-            return thread_count_;
-
-        default:
-            break;
-        }
-
-        HPX_THROWS_IF(ec, bad_parameter,
-            "thread_pool_executor::get_policy_element",
-            "requested value of invalid policy element");
-        return std::size_t(-1);
-    }
-
-    template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::get_statistics(
-        executor_statistics& s, error_code& ec) const
-    {
-        s.queue_length_ = sched_->Scheduler::get_queue_length();
-        s.tasks_scheduled_ = tasks_scheduled_;
-        s.tasks_completed_ = get_executed_threads();
-
-        if (&ec != &throws)
-            ec = make_success_code();
-    }
-#endif
-
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::add_processing_unit_internal(
         std::size_t virt_core, std::size_t thread_num,
@@ -1877,43 +1875,6 @@ namespace hpx { namespace threads { namespace detail {
         if (&ec != &throws)
             ec = make_success_code();
     }
-
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-    template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::add_processing_unit(
-        std::size_t virt_core, std::size_t thread_num, error_code& ec)
-    {
-        if (!get_scheduler()->has_scheduler_mode(policies::enable_elasticity))
-        {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "scheduled_thread_pool<Scheduler>::add_processing_unit",
-                "this thread pool does not support dynamically adding "
-                "processing units");
-        }
-
-        std::shared_ptr<util::barrier> startup =
-            std::make_shared<util::barrier>(2);
-
-        add_processing_unit_internal(virt_core, thread_num, startup, ec);
-
-        startup->wait();
-    }
-
-    template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::remove_processing_unit(
-        std::size_t virt_core, error_code& ec)
-    {
-        if (!get_scheduler()->has_scheduler_mode(policies::enable_elasticity))
-        {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "scheduled_thread_pool<Scheduler>::remove_processing_unit",
-                "this thread pool does not support dynamically removing "
-                "processing units");
-        }
-
-        remove_processing_unit_internal(virt_core, ec);
-    }
-#endif
 
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::remove_processing_unit_internal(

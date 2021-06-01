@@ -70,7 +70,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             {
                 // reuse object storage
                 HPX_ASSERT(other.object != nullptr);
-                object = vptr->copy(object, -1, other.object, true);
+                object =
+                    vptr->copy(object, std::size_t(-1), other.object, true);
             }
         }
         else

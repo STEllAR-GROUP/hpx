@@ -112,7 +112,8 @@ namespace hpx { namespace components {
                 // consolidate all results
                 return hpx::dataflow(
                     hpx::launch::sync,
-                    [=](std::vector<hpx::future<std::vector<hpx::id_type>>>&&
+                    [HPX_CXX20_CAPTURE_THIS(=)](
+                        std::vector<hpx::future<std::vector<hpx::id_type>>>&&
                             v) mutable -> std::vector<bulk_locality_result> {
                         HPX_ASSERT(localities_.size() == v.size());
 

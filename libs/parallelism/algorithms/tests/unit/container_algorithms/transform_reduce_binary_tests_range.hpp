@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/include/parallel_transform_reduce.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/container_algorithms/transform_reduce.hpp>
 
 #include <algorithm>
 #include <cstddef>

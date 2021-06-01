@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/resiliency/config.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/modules/async_local.hpp>
 
 #include <utility>
@@ -15,14 +15,14 @@
 namespace hpx { namespace resiliency { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    // helper base class implementing the deferred tag_invoke logic for CPOs
+    // helper base class implementing the deferred tag_dispatch logic for DPOs
     template <typename Tag, typename BaseTag>
     struct tag_deferred : hpx::functional::tag<Tag>
     {
         // force unwrapping of the inner future on return
         template <typename... Args>
-        friend HPX_FORCEINLINE auto tag_invoke(Tag, Args&&... args) ->
-            typename hpx::functional::tag_invoke_result<BaseTag,
+        friend HPX_FORCEINLINE auto tag_dispatch(Tag, Args&&... args) ->
+            typename hpx::functional::tag_dispatch_result<BaseTag,
                 Args&&...>::type
         {
             return hpx::dataflow(BaseTag{}, std::forward<Args>(args)...);

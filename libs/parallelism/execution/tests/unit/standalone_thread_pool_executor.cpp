@@ -11,8 +11,8 @@
 // HPX runtime*. This test fails if thread pools, schedulers etc. assume that
 // the global runtime (configuration, thread manager, etc.) always exists.
 
-#include <hpx/execution.hpp>
-#include <hpx/future.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/future.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/thread_pools.hpp>
@@ -198,10 +198,7 @@ int main()
         // run the tests for us.
         hpx::apply(exec, &test_thread_pool_os_executor, exec);
 
-        // Stop the pool. First wait for all tasks to run.
-        hpx::util::yield_while([&pool]() {
-            return pool.get_thread_count_unknown(std::size_t(-1), false) != 0;
-        });
+        // Stop the pool.
         pool.stop(l, true);
     }
 

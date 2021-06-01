@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2020 Hartmut Kaiser
+//  Copyright (c) 2017-2021 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,127 +8,149 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
+#include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/topology/topology.hpp>
-#include <hpx/type_support/detail/wrap_int.hpp>
-
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/execution_information_fwd.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/modules/topology.hpp>
 
 #include <cstddef>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v3 { namespace detail {
-    /// \cond NOINTERNAL
-    template <typename Parameters, typename Executor>
-    std::size_t call_processing_units_parameter_count(
-        Parameters&& params, Executor&& exec);
-    /// \endcond
-}}}}    // namespace hpx::parallel::v3::detail
+namespace hpx { namespace parallel { namespace execution {
 
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace execution { namespace detail {
-    /// \cond NOINTERNAL
+    ///////////////////////////////////////////////////////////////////////////
+    // define member traits
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(has_pending_closures);
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_pu_mask);
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(set_scheduler_mode);
 
-    ///////////////////////////////////////////////////////////////////////
-    // customization point for interface has_pending_closures()
-    template <typename Executor>
-    struct has_pending_closures_fn_helper<Executor,
-        typename std::enable_if<
-            hpx::traits::is_one_way_executor<Executor>::value ||
-            hpx::traits::is_two_way_executor<Executor>::value ||
-            hpx::traits::is_never_blocking_one_way_executor<Executor>::value>::
-            type>
+    ///////////////////////////////////////////////////////////////////////////
+    // define customization points
+
+    /// Retrieve whether this executor has operations pending or not.
+    ///
+    /// \param exec  [in] The executor object to use to extract the
+    ///              requested information for.
+    ///
+    /// \note If the executor does not expose this information, this call
+    ///       will always return \a false
+    ///
+    HPX_INLINE_CONSTEXPR_VARIABLE struct has_pending_closures_t final
+      : hpx::functional::tag_fallback<has_pending_closures_t>
     {
-        template <typename AnyExecutor>
-        HPX_FORCEINLINE static bool call(
-            hpx::traits::detail::wrap_int, AnyExecutor&& /* exec */)
+    private:
+        // clang-format off
+        template <typename Executor,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_any<Executor>::value
+            )>
+        // clang-format on
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+            has_pending_closures_t, Executor&& /*exec*/)
         {
             return false;    // assume stateless scheduling
         }
 
-        template <typename AnyExecutor>
-        HPX_FORCEINLINE static auto call(int, AnyExecutor&& exec)
-            -> decltype(exec.has_pending_closures())
+        // clang-format off
+        template <typename Executor,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_any<Executor>::value &&
+                has_has_pending_closures<Executor>::value
+            )>
+        // clang-format on
+        friend HPX_FORCEINLINE decltype(auto) tag_dispatch(
+            has_pending_closures_t, Executor&& exec)
         {
             return exec.has_pending_closures();
         }
+    } has_pending_closures{};
 
-        template <typename AnyExecutor>
-        struct result
-        {
-            using type = decltype(call(0, std::declval<AnyExecutor>()));
-        };
-    };
-
-    ///////////////////////////////////////////////////////////////////////
-    // customization point for interface get_pu_mask()
-    template <typename Executor>
-    struct get_pu_mask_fn_helper<Executor,
-        typename std::enable_if<
-            hpx::traits::is_one_way_executor<Executor>::value ||
-            hpx::traits::is_two_way_executor<Executor>::value ||
-            hpx::traits::is_never_blocking_one_way_executor<Executor>::value>::
-            type>
+    /// Retrieve the bitmask describing the processing units the given
+    /// thread is allowed to run on
+    ///
+    /// All threads::executors invoke sched.get_pu_mask().
+    ///
+    /// \param exec  [in] The executor object to use for querying the
+    ///              number of pending tasks.
+    /// \param topo  [in] The topology object to use to extract the
+    ///              requested information.
+    /// \param thream_num [in] The sequence number of the thread to
+    ///              retrieve information for.
+    ///
+    /// \note If the executor does not support this operation, this call
+    ///       will always invoke hpx::threads::get_pu_mask()
+    ///
+    HPX_INLINE_CONSTEXPR_VARIABLE struct get_pu_mask_t final
+      : hpx::functional::tag_fallback<get_pu_mask_t>
     {
-        template <typename AnyExecutor>
-        HPX_FORCEINLINE static threads::mask_cref_type call(
-            hpx::traits::detail::wrap_int, AnyExecutor&& /* exec */,
-            threads::topology& topo, std::size_t thread_num)
+    private:
+        // clang-format off
+        template <typename Executor,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_any<Executor>::value
+            )>
+        // clang-format on
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+            get_pu_mask_t, Executor&& /*exec*/, threads::topology& topo,
+            std::size_t thread_num)
         {
-            return get_pu_mask(topo, thread_num);
+            return detail::get_pu_mask(topo, thread_num);
         }
 
-        template <typename AnyExecutor>
-        HPX_FORCEINLINE static auto call(int, AnyExecutor&& exec,
-            threads::topology& topo, std::size_t thread_num)
-            -> decltype(exec.get_pu_mask(topo, thread_num))
+        // clang-format off
+        template <typename Executor,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_any<Executor>::value &&
+                has_get_pu_mask<Executor>::value
+            )>
+        // clang-format on
+        friend HPX_FORCEINLINE decltype(auto) tag_dispatch(get_pu_mask_t,
+            Executor&& exec, threads::topology& topo, std::size_t thread_num)
         {
             return exec.get_pu_mask(topo, thread_num);
         }
+    } get_pu_mask{};
 
-        template <typename AnyExecutor>
-        struct result
-        {
-            using type = decltype(call(0, std::declval<AnyExecutor>(),
-                std::declval<threads::topology&>(),
-                std::declval<std::size_t>()));
-        };
-    };
-
-    ///////////////////////////////////////////////////////////////////////
-    // customization point for interface set_scheduler_mode()
-    template <typename Executor>
-    struct set_scheduler_mode_fn_helper<Executor,
-        typename std::enable_if<
-            hpx::traits::is_one_way_executor<Executor>::value ||
-            hpx::traits::is_two_way_executor<Executor>::value ||
-            hpx::traits::is_never_blocking_one_way_executor<Executor>::value>::
-            type>
+    /// Set various modes of operation on the scheduler underneath the
+    /// given executor.
+    ///
+    /// \param exec     [in] The executor object to use.
+    /// \param mode     [in] The new mode for the scheduler to pick up
+    ///
+    /// \note This calls exec.set_scheduler_mode(mode) if it exists;
+    ///       otherwise it does nothing.
+    ///
+    HPX_INLINE_CONSTEXPR_VARIABLE struct set_scheduler_mode_t final
+      : hpx::functional::tag_fallback<set_scheduler_mode_t>
     {
-        template <typename AnyExecutor, typename Mode>
-        HPX_FORCEINLINE static void call(hpx::traits::detail::wrap_int,
-            AnyExecutor&& /* exec */, Mode const& /* mode */)
+    private:
+        // clang-format off
+        template <typename Executor, typename Mode,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_any<Executor>::value
+            )>
+        // clang-format on
+        friend HPX_FORCEINLINE void tag_fallback_dispatch(
+            set_scheduler_mode_t, Executor&& /*exec*/, Mode const& /*mode*/)
         {
         }
 
-        template <typename AnyExecutor, typename Mode>
-        HPX_FORCEINLINE static auto call(int, AnyExecutor&& exec,
-            Mode const& mode) -> decltype(exec.set_scheduler_mode(mode))
+        // clang-format off
+        template <typename Executor, typename Mode,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_any<Executor>::value &&
+                has_set_scheduler_mode<Executor>::value
+            )>
+        // clang-format on
+        friend HPX_FORCEINLINE void tag_dispatch(
+            set_scheduler_mode_t, Executor&& exec, Mode const& mode)
         {
             exec.set_scheduler_mode(mode);
         }
-
-        template <typename AnyExecutor, typename Mode>
-        struct result
-        {
-            using type = decltype(call(
-                0, std::declval<AnyExecutor>(), std::declval<Mode const&>()));
-        };
-    };
-
-    /// \endcond
-}}}}    // namespace hpx::parallel::execution::detail
+    } set_scheduler_mode{};
+}}}    // namespace hpx::parallel::execution

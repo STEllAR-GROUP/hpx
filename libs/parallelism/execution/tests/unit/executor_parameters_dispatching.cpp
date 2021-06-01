@@ -4,13 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/parallel_executor_parameters.hpp>
-#include <hpx/include/parallel_executors.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
+#include <cstddef>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -34,7 +33,7 @@ struct test_executor_get_chunk_size : hpx::execution::parallel_executor
     }
 
     template <typename Parameters, typename F>
-    std::size_t get_chunk_size(Parameters&& /* params */, F&& /* f */,
+    static std::size_t get_chunk_size(Parameters&& /* params */, F&& /* f */,
         std::size_t cores, std::size_t count)
     {
         ++exec_count;
@@ -52,7 +51,7 @@ namespace hpx { namespace parallel { namespace execution {
 struct test_chunk_size
 {
     template <typename Executor, typename F>
-    std::size_t get_chunk_size(Executor&& /* exec */, F&& /* f */,
+    static std::size_t get_chunk_size(Executor&& /* exec */, F&& /* f */,
         std::size_t cores, std::size_t count)
     {
         ++params_count;
@@ -109,7 +108,7 @@ struct test_executor_maximal_number_of_chunks
     }
 
     template <typename Parameters>
-    std::size_t maximal_number_of_chunks(
+    static std::size_t maximal_number_of_chunks(
         Parameters&&, std::size_t, std::size_t num_tasks)
     {
         ++exec_count;
@@ -182,7 +181,7 @@ struct test_executor_reset_thread_distribution
     }
 
     template <typename Parameters>
-    void reset_thread_distribution(Parameters&&)
+    static void reset_thread_distribution(Parameters&&)
     {
         ++exec_count;
     }
@@ -198,7 +197,8 @@ namespace hpx { namespace parallel { namespace execution {
 
 struct test_thread_distribution
 {
-    void reset_thread_distribution()
+    template <typename Executor>
+    void reset_thread_distribution(Executor&&)
     {
         ++params_count;
     }
@@ -248,7 +248,8 @@ struct test_executor_processing_units_count : hpx::execution::parallel_executor
     {
     }
 
-    std::size_t processing_units_count()
+    template <typename Parameters>
+    static std::size_t processing_units_count(Parameters&&)
     {
         ++exec_count;
         return 1;
@@ -266,7 +267,7 @@ namespace hpx { namespace parallel { namespace execution {
 struct test_processing_units
 {
     template <typename Executor>
-    std::size_t processing_units_count(Executor&&)
+    static std::size_t processing_units_count(Executor&&)
     {
         ++params_count;
         return 1;
@@ -457,7 +458,7 @@ int hpx_main()
     test_mark_end_of_scheduling();
     test_mark_end_execution();
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -466,10 +467,10 @@ int main(int argc, char* argv[])
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.cfg = cfg;
 
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, init_args), 0,
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv, init_args), 0,
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();

@@ -8,9 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
+#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <exception>
@@ -19,22 +20,6 @@
 
 namespace hpx { namespace execution { namespace experimental {
     namespace detail {
-        template <typename Variant>
-        struct value_types_result;
-
-        template <>
-        struct value_types_result<hpx::util::pack<hpx::util::pack<>>>
-        {
-            using type = void;
-        };
-
-        template <typename T, typename... Variants>
-        struct value_types_result<
-            hpx::util::pack<hpx::util::pack<T>, Variants...>>
-        {
-            using type = T;
-        };
-
         template <typename R, typename F>
         struct transform_receiver
         {
@@ -49,13 +34,13 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename E>
-            void set_error(E&& e) noexcept
+                void set_error(E&& e) && noexcept
             {
                 hpx::execution::experimental::set_error(
                     std::move(r), std::forward<E>(e));
             }
 
-            void set_done() noexcept
+            void set_done() && noexcept
             {
                 hpx::execution::experimental::set_done(std::move(r));
             };
@@ -63,39 +48,38 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename... Ts>
             void set_value_helper(std::true_type, Ts&&... ts) noexcept
             {
-                try
-                {
-                    HPX_INVOKE(f, std::forward<Ts>(ts)...);
-                    hpx::execution::experimental::set_value(std::move(r));
-                }
-                catch (...)
-                {
-                    hpx::execution::experimental::set_error(
-                        std::move(r), std::current_exception());
-                }
+                hpx::detail::try_catch_exception_ptr(
+                    [&]() {
+                        HPX_INVOKE(f, std::forward<Ts>(ts)...);
+                        hpx::execution::experimental::set_value(std::move(r));
+                    },
+                    [&](std::exception_ptr ep) {
+                        hpx::execution::experimental::set_error(
+                            std::move(r), std::move(ep));
+                    });
             }
 
             template <typename... Ts>
             void set_value_helper(std::false_type, Ts&&... ts) noexcept
             {
-                try
-                {
-                    hpx::execution::experimental::set_value(
-                        std::move(r), HPX_INVOKE(f, std::forward<Ts>(ts)...));
-                }
-                catch (...)
-                {
-                    hpx::execution::experimental::set_error(
-                        std::move(r), std::current_exception());
-                }
+                hpx::detail::try_catch_exception_ptr(
+                    [&]() {
+                        // TODO: r may be moved before f throws, if it throws.
+                        hpx::execution::experimental::set_value(std::move(r),
+                            HPX_INVOKE(f, std::forward<Ts>(ts)...));
+                    },
+                    [&](std::exception_ptr ep) {
+                        hpx::execution::experimental::set_error(
+                            std::move(r), std::move(ep));
+                    });
             }
 
             template <typename... Ts,
                 typename = std::enable_if_t<hpx::is_invocable_v<F, Ts...>>>
-            void set_value(Ts&&... ts) noexcept
+                void set_value(Ts&&... ts) && noexcept
             {
-                using is_void_result = std::is_void<
-                    typename hpx::util::invoke_result<F, Ts...>::type>;
+                using is_void_result =
+                    std::is_void<hpx::util::invoke_result_t<F, Ts...>>;
                 set_value_helper(is_void_result{}, std::forward<Ts>(ts)...);
             }
         };
@@ -112,8 +96,7 @@ namespace hpx { namespace execution { namespace experimental {
             template <template <typename...> class Tuple, typename... Ts>
             struct invoke_result_helper<Tuple<Ts...>>
             {
-                using result_type =
-                    typename hpx::util::invoke_result<F, Ts...>::type;
+                using result_type = hpx::util::invoke_result_t<F, Ts...>;
                 using type =
                     typename std::conditional<std::is_void<result_type>::value,
                         Tuple<>, Tuple<result_type>>::type;
@@ -121,24 +104,33 @@ namespace hpx { namespace execution { namespace experimental {
 
             template <template <typename...> class Tuple,
                 template <typename...> class Variant>
-            using value_types = typename hpx::util::detail::unique<
-                typename hpx::util::detail::transform<
+            using value_types =
+                hpx::util::detail::unique_t<hpx::util::detail::transform_t<
                     typename hpx::execution::experimental::sender_traits<
                         S>::template value_types<Tuple, Variant>,
-                    invoke_result_helper>::type>::type;
+                    invoke_result_helper>>;
 
             template <template <typename...> class Variant>
             using error_types =
-                typename hpx::execution::experimental::sender_traits<
-                    S>::template error_types<Variant>;
+                hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
+                    typename hpx::execution::experimental::sender_traits<
+                        S>::template error_types<Variant>,
+                    std::exception_ptr>>;
 
             static constexpr bool sends_done = false;
 
             template <typename R>
-            auto connect(R&& r)
+            auto connect(R&& r) &&
             {
                 return hpx::execution::experimental::connect(std::move(s),
                     transform_receiver<R, F>(std::forward<R>(r), std::move(f)));
+            }
+
+            template <typename R>
+            auto connect(R&& r) &
+            {
+                return hpx::execution::experimental::connect(
+                    s, transform_receiver<R, F>(std::forward<R>(r), f));
             }
         };
     }    // namespace detail
@@ -148,7 +140,7 @@ namespace hpx { namespace execution { namespace experimental {
     {
     private:
         template <typename S, typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             transform_t, S&& s, F&& f)
         {
             return detail::transform_sender<S, F>{
@@ -156,7 +148,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         template <typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             transform_t, F&& f)
         {
             return detail::partial_algorithm<transform_t, F>{

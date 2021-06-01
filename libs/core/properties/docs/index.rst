@@ -13,7 +13,7 @@ properties
 
 This module implements the ``prefer`` customization point for properties in
 terms of |p2220|_. This differs from |p1393|_ in that it relies fully on
-``tag_invoke`` overloads and fewer base customization points. Actual properties
+``tag_dispatch`` overloads and fewer base customization points. Actual properties
 are defined in modules. All functionality is experimental and can be accessed
 through the ``hpx::experimental`` namespace.
 

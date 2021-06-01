@@ -54,7 +54,9 @@
 #endif
 
 #if defined(__FreeBSD__) ||                                                    \
-    (defined(_XOPEN_UNIX) && defined(_XOPEN_VERSION) && _XOPEN_VERSION >= 500)
+    (defined(_XOPEN_UNIX) && defined(_XOPEN_VERSION) &&                        \
+        _XOPEN_VERSION >= 500) ||                                              \
+    defined(__bgq__) || defined(__powerpc__) || defined(__s390x__)
 
 // OS X 10.4 -- despite passing the test above -- doesn't support
 // swapcontext() et al. Use GNU Pth workalike functions.

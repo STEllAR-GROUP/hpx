@@ -13,16 +13,14 @@
 // cross pool injection of tasks does not cause segfaults or other
 // problems such as lockups.
 
-#include <hpx/hpx_init.hpp>
-
-#include <hpx/execution.hpp>
-#include <hpx/functional.hpp>
-#include <hpx/future.hpp>
-#include <hpx/include/resource_partitioner.hpp>
-#include <hpx/include/threadmanager.hpp>
-#include <hpx/modules/async_local.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/functional.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/thread.hpp>
+#include <hpx/modules/threadmanager.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -204,7 +202,7 @@ int hpx_main()
         hpx::this_thread::yield();
     } while (counter > 0);
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
@@ -258,10 +256,10 @@ void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
 void test_scheduler(
     int argc, char* argv[], hpx::resource::scheduling_policy scheduler)
 {
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.rp_callback =
         hpx::bind_back(init_resource_partitioner_handler, scheduler);
-    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
+    HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);
 }
 
 int main(int argc, char* argv[])

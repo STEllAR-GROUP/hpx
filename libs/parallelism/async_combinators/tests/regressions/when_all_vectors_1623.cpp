@@ -7,8 +7,8 @@
 // This test case demonstrates the issue described in #1623: hpx::wait_all()
 // invoked with two vector<future<T>> fails
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <vector>
@@ -70,7 +70,7 @@ void test_wait_some()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main()
+int hpx_main()
 {
     test_when_all();
     test_when_any();
@@ -79,6 +79,14 @@ int main()
     test_wait_all();
     test_wait_any();
     test_wait_some();
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

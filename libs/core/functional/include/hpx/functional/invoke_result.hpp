@@ -54,4 +54,7 @@ namespace hpx { namespace util {
     struct invoke_result : detail::invoke_result_impl<F && (Ts && ...)>
     {
     };
+
+    template <typename F, typename... Ts>
+    using invoke_result_t = typename invoke_result<F, Ts...>::type;
 }}    // namespace hpx::util

@@ -871,7 +871,7 @@ namespace hpx { namespace segmented
 }}
 
 // Starting V1.7 we have moved the iterators into the segmented namespace such
-// that the tag_invoke overload for the segmented algorithms will be found.
+// that the tag_dispatch overload for the segmented algorithms will be found.
 namespace hpx {
 
     template <typename T, typename Data, typename BaseIter>

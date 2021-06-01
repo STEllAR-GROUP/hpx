@@ -55,7 +55,8 @@ class simple_profiler {
         if (this->_parent) {
           this->_parent->addProfile(this->_title, std::make_tuple(elapsed,0,1));
           std::for_each(this->_profiles.begin(), this->_profiles.end(),
-            [=](std::map<const char *, valtype>::value_type &p) {
+            [HPX_CXX20_CAPTURE_THIS(=)](
+              std::map<const char *, valtype>::value_type &p) {
               this->_parent->addProfile(p.first, p.second);
             }
           );

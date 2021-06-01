@@ -9,14 +9,14 @@
 // intended for inclusion in the documentation.
 
 //[body
-#include <hpx/hpx_init.hpp>
-#include <hpx/resource_partitioner/partitioner.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 
 #include <iostream>
 
 int hpx_main()
 {
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
@@ -47,9 +47,9 @@ void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
 int main(int argc, char* argv[])
 {
     // Set the callback to init the thread_pools
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.rp_callback = &init_resource_partitioner_handler;
 
-    hpx::init(argc, argv, init_args);
+    hpx::local::init(hpx_main, argc, argv, init_args);
 }
 //body]

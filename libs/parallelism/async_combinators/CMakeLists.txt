@@ -41,6 +41,6 @@ add_hpx_module(
   HEADERS ${async_combinators_headers}
   COMPAT_HEADERS ${async_combinators_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_async_base
+  MODULE_DEPENDENCIES hpx_async_base hpx_futures hpx_pack_traversal
   CMAKE_SUBDIRS examples tests
 )

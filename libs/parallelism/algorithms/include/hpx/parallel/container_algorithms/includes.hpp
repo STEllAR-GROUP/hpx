@@ -205,7 +205,7 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
@@ -225,7 +225,7 @@ namespace hpx { namespace ranges {
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::includes
+    // DPO for hpx::ranges::includes
     HPX_INLINE_CONSTEXPR_VARIABLE struct includes_t final
       : hpx::functional::tag<includes_t>
     {
@@ -250,7 +250,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_invoke(includes_t, ExPolicy&& policy, Iter1 first1, Sent1 last1,
+        tag_dispatch(includes_t, ExPolicy&& policy, Iter1 first1, Sent1 last1,
             Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -282,7 +282,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend bool tag_invoke(includes_t, Iter1 first1, Sent1 last1,
+        friend bool tag_dispatch(includes_t, Iter1 first1, Sent1 last1,
             Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -316,7 +316,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_invoke(includes_t, ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
+        tag_dispatch(includes_t, ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -356,7 +356,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend bool tag_invoke(includes_t, Rng1&& rng1, Rng2&& rng2,
+        friend bool tag_dispatch(includes_t, Rng1&& rng1, Rng2&& rng2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {

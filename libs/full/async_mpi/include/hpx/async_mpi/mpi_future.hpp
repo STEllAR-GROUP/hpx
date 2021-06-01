@@ -15,7 +15,9 @@
 #include <hpx/mpi_base/mpi.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
 
+#include <atomic>
 #include <cstddef>
+#include <cstdint>
 #include <iosfwd>
 #include <string>
 #include <utility>
@@ -80,6 +82,11 @@ namespace hpx { namespace mpi { namespace experimental {
             bool error_handler_initialized_ = false;
             int rank_ = -1;
             int size_ = -1;
+            // active futures holds the size of the future vector
+            // which is always the same as the mpi request vector
+            std::atomic<std::uint32_t> active_futures_size_{0};
+            // active requests returns the size of the request queue
+            std::atomic<std::uint32_t> request_queue_size_{0};
         };
 
         // an instance of mpi_info that we store data in
@@ -119,14 +126,6 @@ namespace hpx { namespace mpi { namespace experimental {
         // that will be used by the polling routines to check when requests
         // have completed
         HPX_EXPORT void add_to_request_queue(future_data_ptr data);
-
-        // -----------------------------------------------------------------
-        // used internally to query how many requests are 'in flight'
-        // the limiting executor can use this to throttle back a task if
-        // too many mpi requests are being spawned at once
-        // unfortunately, the lock-free queue can only return an estimate
-        // of the queue size, so this is not guaranteed to be precise
-        HPX_EXPORT std::size_t get_number_of_enqueued_requests();
 
         // -----------------------------------------------------------------
         // used internally to add a request to the main polling vector
@@ -193,7 +192,7 @@ namespace hpx { namespace mpi { namespace experimental {
             {
                 return true;
             }
-            return (detail::get_active_futures().size() > 0);
+            return (detail::get_mpi_info().active_futures_size_ > 0);
         });
     }
 
@@ -207,7 +206,7 @@ namespace hpx { namespace mpi { namespace experimental {
             {
                 return true;
             }
-            return (detail::get_active_futures().size() > 0) || f();
+            return (detail::get_mpi_info().active_futures_size_ > 0) || f();
         });
     }
 

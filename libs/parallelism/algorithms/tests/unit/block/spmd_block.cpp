@@ -5,11 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/spmd_block.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
 
 #include <array>
 #include <atomic>
@@ -89,7 +87,7 @@ void bulk_test_function(
     }
 }
 
-int main()
+int hpx_main()
 {
     using hpx::execution::par;
     using hpx::execution::task;
@@ -115,5 +113,11 @@ int main()
 
     hpx::parallel::define_spmd_block(num_images, bulk_test_function, c3.data());
 
-    return 0;
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv), 0);
+    return hpx::util::report_errors();
 }

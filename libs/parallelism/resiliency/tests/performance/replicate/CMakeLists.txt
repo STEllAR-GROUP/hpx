@@ -7,15 +7,15 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(benchmarks
-    1d_stencil_replicate
-    1d_stencil_replicate_checksum
-    async_replicate
-    async_replicate_validate
-    async_replicate_vote
-    async_replicate_vote_validate
-    pure_async_for_replicate
+set(benchmarks async_replicate async_replicate_validate async_replicate_vote
+               async_replicate_vote_validate pure_async_for_replicate
 )
+
+# The Intel compiler version 19.1.1.217 does not manage to compile these. Other
+# versions have not been tested.
+if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  list(APPEND benchmarks 1d_stencil_replicate 1d_stencil_replicate_checksum)
+endif()
 
 foreach(benchmark ${benchmarks})
 

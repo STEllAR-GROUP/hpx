@@ -167,11 +167,12 @@ namespace hpx { namespace lcos {
                         traits::detail::get_shared_state(lazy_values_[i]);
 
                     current->execute_deferred();
-                    current->set_on_completed([=]() -> void {
-                        using is_void = std::is_void<
-                            typename traits::future_traits<Future>::type>;
-                        return on_future_ready(is_void{}, i, ctx);
-                    });
+                    current->set_on_completed(
+                        [HPX_CXX20_CAPTURE_THIS(=)]() -> void {
+                            using is_void = std::is_void<
+                                typename traits::future_traits<Future>::type>;
+                            return on_future_ready(is_void{}, i, ctx);
+                        });
                 }
 
                 // If all of the requested futures are already set then our

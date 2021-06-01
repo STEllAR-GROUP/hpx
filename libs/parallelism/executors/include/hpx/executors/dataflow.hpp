@@ -14,6 +14,7 @@
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
@@ -130,11 +131,8 @@ namespace hpx { namespace lcos { namespace detail {
     struct dataflow_return_impl<
         /*IsAction=*/false, Policy, F, Args,
         typename std::enable_if<traits::is_one_way_executor<Policy>::value ||
-            traits::is_two_way_executor<Policy>::value
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-            || traits::is_threads_executor<Policy>::value
-#endif
-            >::type> : dataflow_return_impl_executor<Policy, F, Args>
+            traits::is_two_way_executor<Policy>::value>::type>
+      : dataflow_return_impl_executor<Policy, F, Args>
     {
     };
 
@@ -218,24 +216,14 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename Futures_>
         HPX_FORCEINLINE void execute(std::false_type, Futures_&& futures)
         {
-            std::exception_ptr p;
-
-            try
-            {
-                this->set_data(util::invoke_fused(
-                    std::move(func_), std::forward<Futures_>(futures)));
-                return;
-            }
-            catch (...)
-            {
-                p = std::current_exception();
-            }
-
-            // The exception is set outside the catch block since
-            // set_exception may yield. Ending the catch block on a
-            // different worker thread than where it was started may lead
-            // to segfaults.
-            this->set_exception(std::move(p));
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    this->set_data(util::invoke_fused(
+                        std::move(func_), std::forward<Futures_>(futures)));
+                },
+                [&](std::exception_ptr ep) {
+                    this->set_exception(std::move(ep));
+                });
         }
 
         /// Passes the futures into the evaluation function and
@@ -243,26 +231,16 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename Futures_>
         HPX_FORCEINLINE void execute(std::true_type, Futures_&& futures)
         {
-            std::exception_ptr p;
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    util::invoke_fused(
+                        std::move(func_), std::forward<Futures_>(futures));
 
-            try
-            {
-                util::invoke_fused(
-                    std::move(func_), std::forward<Futures_>(futures));
-
-                this->set_data(util::unused_type());
-                return;
-            }
-            catch (...)
-            {
-                p = std::current_exception();
-            }
-
-            // The exception is set outside the catch block since
-            // set_exception may yield. Ending the catch block on a
-            // different worker thread than where it was started may lead
-            // to segfaults.
-            this->set_exception(std::move(p));
+                    this->set_data(util::unused_type());
+                },
+                [&](std::exception_ptr ep) {
+                    this->set_exception(std::move(ep));
+                });
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -349,11 +327,7 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename Executor, typename Futures_>
         HPX_FORCEINLINE typename std::enable_if<
             (traits::is_one_way_executor<Executor>::value ||
-                traits::is_two_way_executor<Executor>::value
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                || traits::is_threads_executor<Executor>::value
-#endif
-                ) &&
+                traits::is_two_way_executor<Executor>::value) &&
             !has_dataflow_finalize<Executor, dataflow_frame, Func,
                 Futures_>::value>::type
         finalize(Executor&& exec, Futures_&& futures)
@@ -367,11 +341,7 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename Executor, typename Futures_>
         HPX_FORCEINLINE typename std::enable_if<
             (traits::is_one_way_executor<Executor>::value ||
-                traits::is_two_way_executor<Executor>::value
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                || traits::is_threads_executor<Executor>::value
-#endif
-                ) &&
+                traits::is_two_way_executor<Executor>::value) &&
             has_dataflow_finalize<Executor, dataflow_frame, Func,
                 Futures_>::value>::type
         finalize(Executor&& exec, Futures_&& futures)
@@ -515,11 +485,7 @@ namespace hpx { namespace lcos { namespace detail {
     template <typename Executor>
     struct dataflow_dispatch<Executor,
         typename std::enable_if<traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-            || traits::is_threads_executor<Executor>::value
-#endif
-            >::type>
+            traits::is_two_way_executor<Executor>::value>::type>
     {
         template <typename Allocator, typename Executor_, typename F,
             typename... Ts>
@@ -537,11 +503,7 @@ namespace hpx { namespace lcos { namespace detail {
     struct dataflow_dispatch_impl<false, FD,
         typename std::enable_if<!traits::is_launch_policy<FD>::value &&
             !(traits::is_one_way_executor<FD>::value ||
-                traits::is_two_way_executor<FD>::value
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                || traits::is_threads_executor<FD>::value
-#endif
-                )>::type>
+                traits::is_two_way_executor<FD>::value)>::type>
     {
         template <typename Allocator, typename F, typename... Ts,
             typename Enable = typename std::enable_if<
@@ -559,11 +521,7 @@ namespace hpx { namespace lcos { namespace detail {
     struct dataflow_dispatch<FD,
         typename std::enable_if<!traits::is_launch_policy<FD>::value &&
             !(traits::is_one_way_executor<FD>::value ||
-                traits::is_two_way_executor<FD>::value
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-                || traits::is_threads_executor<FD>::value
-#endif
-                )>::type>
+                traits::is_two_way_executor<FD>::value)>::type>
     {
         template <typename Allocator, typename F, typename... Ts>
         HPX_FORCEINLINE static auto call(

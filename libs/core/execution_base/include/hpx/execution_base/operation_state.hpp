@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config/constexpr.hpp>
-#include <hpx/functional/tag_priority_invoke.hpp>
+#include <hpx/functional/tag_priority_dispatch.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 
 #include <type_traits>
@@ -25,7 +25,7 @@ namespace hpx { namespace execution { namespace experimental {
     ///       `void start();`
     ///     * Otherwise, the expression is ill-formed.
     ///
-    /// The customization is implemented in terms of `hpx::functional::tag_invoke`.
+    /// The customization is implemented in terms of `hpx::functional::tag_dispatch`.
     template <typename O>
     void start(O&& o);
 #endif
@@ -50,12 +50,11 @@ namespace hpx { namespace execution { namespace experimental {
     {
     private:
         template <typename OperationState>
-        friend constexpr HPX_FORCEINLINE auto
-        tag_override_invoke(start_t, OperationState& o) noexcept(
-            noexcept(std::declval<OperationState&&>().start()))
-            -> decltype(std::declval<OperationState&&>().start())
+        friend constexpr HPX_FORCEINLINE auto tag_override_dispatch(
+            start_t, OperationState& o) noexcept(noexcept(o.start()))
+            -> decltype(o.start())
         {
-            return std::forward<OperationState>(o).start();
+            return o.start();
         }
     } start{};
 

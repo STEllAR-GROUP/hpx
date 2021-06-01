@@ -53,7 +53,7 @@ namespace hpx { namespace parallel { namespace util {
             typename OutIter, typename F>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
-            tag_fallback_invoke(hpx::parallel::util::transform_loop_t,
+            tag_fallback_dispatch(hpx::parallel::util::transform_loop_t,
                 ExPolicy&&, IterB it, IterE end, OutIter dest, F&& f)
         {
             return detail::transform_loop<IterB>::call(
@@ -109,7 +109,7 @@ namespace hpx { namespace parallel { namespace util {
             typename OutIter, typename F>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
-            tag_fallback_invoke(hpx::parallel::util::transform_loop_ind_t,
+            tag_fallback_dispatch(hpx::parallel::util::transform_loop_ind_t,
                 ExPolicy&&, IterB it, IterE end, OutIter dest, F&& f)
         {
             return detail::transform_loop_ind<IterB>::call(
@@ -183,7 +183,7 @@ namespace hpx { namespace parallel { namespace util {
             typename OutIter, typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr util::in_in_out_result<
             InIter1B, InIter2, OutIter>
-        tag_fallback_invoke(
+        tag_fallback_dispatch(
             hpx::parallel::util::transform_binary_loop_t<ExPolicy>,
             InIter1B first1, InIter1E last1, InIter2 first2, OutIter dest,
             F&& f)
@@ -196,7 +196,7 @@ namespace hpx { namespace parallel { namespace util {
             typename InIter2E, typename OutIter, typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr util::in_in_out_result<
             InIter1B, InIter2B, OutIter>
-        tag_fallback_invoke(
+        tag_fallback_dispatch(
             hpx::parallel::util::transform_binary_loop_t<ExPolicy>,
             InIter1B first1, InIter1E last1, InIter2B first2, InIter2E last2,
             OutIter dest, F&& f)
@@ -313,7 +313,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename Iter, typename OutIter, typename F>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr std::pair<Iter, OutIter>
-            tag_fallback_invoke(
+            tag_fallback_dispatch(
                 hpx::parallel::util::transform_loop_n_t<ExPolicy>, Iter it,
                 std::size_t count, OutIter dest, F&& f)
         {
@@ -417,7 +417,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename Iter, typename OutIter, typename F>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr std::pair<Iter, OutIter>
-            tag_fallback_invoke(
+            tag_fallback_dispatch(
                 hpx::parallel::util::transform_loop_n_ind_t<ExPolicy>, Iter it,
                 std::size_t count, OutIter dest, F&& f)
         {
@@ -476,7 +476,7 @@ namespace hpx { namespace parallel { namespace util {
             typename F>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr hpx::tuple<InIter1, InIter2, OutIter>
-            tag_fallback_invoke(
+            tag_fallback_dispatch(
                 hpx::parallel::util::transform_binary_loop_n_t<ExPolicy>,
                 InIter1 first1, std::size_t count, InIter2 first2, OutIter dest,
                 F&& f)

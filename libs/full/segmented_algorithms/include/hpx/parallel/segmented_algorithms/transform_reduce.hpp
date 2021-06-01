@@ -388,7 +388,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<SegIter>::value
         )>
     // clang-format on
-    std::decay<T> tag_invoke(hpx::transform_reduce_t, SegIter first,
+    std::decay<T> tag_dispatch(hpx::transform_reduce_t, SegIter first,
         SegIter last, T&& init, Reduce&& red_op, Convert&& conv_op)
     {
         static_assert(hpx::traits::is_input_iterator<SegIter>::value,
@@ -420,7 +420,7 @@ namespace hpx { namespace segmented {
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy,
         typename std::decay<T>::type>::type
-    tag_invoke(hpx::transform_reduce_t, ExPolicy&& policy, SegIter first,
+    tag_dispatch(hpx::transform_reduce_t, ExPolicy&& policy, SegIter first,
         SegIter last, T&& init, Reduce&& red_op, Convert&& conv_op)
     {
         static_assert(hpx::traits::is_forward_iterator<SegIter>::value,
@@ -453,7 +453,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<FwdIter2>::value
         )>
     // clang-format on
-    T tag_invoke(hpx::transform_reduce_t, FwdIter1 first1, FwdIter1 last1,
+    T tag_dispatch(hpx::transform_reduce_t, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, T init, Reduce&& red_op, Convert&& conv_op)
     {
         static_assert(hpx::traits::is_input_iterator<FwdIter1>::value &&
@@ -484,7 +484,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy, T>::type
-    tag_invoke(hpx::transform_reduce_t, ExPolicy&& policy, FwdIter1 first1,
+    tag_dispatch(hpx::transform_reduce_t, ExPolicy&& policy, FwdIter1 first1,
         FwdIter1 last1, FwdIter2 first2, T init, Reduce&& red_op,
         Convert&& conv_op)
     {

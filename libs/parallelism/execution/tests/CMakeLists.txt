@@ -41,6 +41,7 @@ if(HPX_WITH_TESTS)
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
       EXCLUDE "hpx/parallel/executors/timed_execution_fwd.hpp"
               "hpx/parallel/executors/parallel_executor.hpp"
+      NOLIBS
       DEPENDENCIES hpx_execution
     )
   endif()

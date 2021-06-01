@@ -9,10 +9,10 @@
 // processing unit) for a thread which is created by calling hpx::apply() or
 // hpx::async().
 
+#include <hpx/execution.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/iostream.hpp>
-#include <hpx/execution.hpp>
 
 #include <algorithm>
 
@@ -24,16 +24,16 @@ void run_with_large_stack()
     // Allocating a huge array on the stack would normally cause problems.
     // For this reason, this function is scheduled on a thread using a large
     // stack (see below).
-    char large_array[array_size];      // allocate 1 MByte of memory
+    char large_array[array_size];    // allocate 1 MByte of memory
 
     std::fill(large_array, &large_array[array_size], '\0');
 
     hpx::cout << "This thread runs with a "
               << hpx::threads::get_stack_size_name(
-                    hpx::this_thread::get_stack_size())
+                     hpx::this_thread::get_stack_size())
               << " stack and "
               << hpx::threads::get_thread_priority_name(
-                    hpx::this_thread::get_priority())
+                     hpx::this_thread::get_priority())
               << " priority." << hpx::endl;
 }
 
@@ -42,7 +42,7 @@ void run_with_high_priority()
 {
     hpx::cout << "This thread runs with "
               << hpx::threads::get_thread_priority_name(
-                    hpx::this_thread::get_priority())
+                     hpx::this_thread::get_priority())
               << " priority." << hpx::endl;
 }
 
@@ -51,7 +51,7 @@ int main()
 {
     // run a thread on a large stack
     {
-        hpx::parallel::execution::default_executor large_stack_executor(
+        hpx::execution::parallel_executor large_stack_executor(
             hpx::threads::thread_stacksize::large);
 
         hpx::future<void> f =
@@ -61,7 +61,7 @@ int main()
 
     // run a thread with high priority
     {
-        hpx::parallel::execution::default_executor high_priority_executor(
+        hpx::execution::parallel_executor high_priority_executor(
             hpx::threads::thread_priority::high);
 
         hpx::future<void> f =
@@ -71,12 +71,11 @@ int main()
 
     // combine both
     {
-        hpx::parallel::execution::default_executor fancy_executor(
+        hpx::execution::parallel_executor fancy_executor(
             hpx::threads::thread_priority::high,
             hpx::threads::thread_stacksize::large);
 
-        hpx::future<void> f =
-            hpx::async(fancy_executor, &run_with_large_stack);
+        hpx::future<void> f = hpx::async(fancy_executor, &run_with_large_stack);
         f.wait();
     }
 

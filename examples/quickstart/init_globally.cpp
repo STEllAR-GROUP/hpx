@@ -18,8 +18,8 @@
 // library and the main executable might not even be aware of this.
 
 #include <hpx/hpx.hpp>
-#include <hpx/include/run_as.hpp>
 #include <hpx/hpx_start.hpp>
+#include <hpx/include/run_as.hpp>
 
 #include <mutex>
 #include <string>
@@ -40,8 +40,8 @@ void set_argc_argv(int argc, char* argv[], char*[])
     __argv = argv;
 }
 
-__attribute__((section(".preinit_array")))
-    void (*set_global_argc_argv)(int, char*[], char*[]) = &set_argc_argv;
+__attribute__((section(".preinit_array"))) void (*set_global_argc_argv)(
+    int, char*[], char*[]) = &set_argc_argv;
 
 #elif defined(__APPLE__)
 
@@ -52,7 +52,7 @@ inline int get_arraylen(char** argv)
     int count = 0;
     if (nullptr != argv)
     {
-        while(nullptr != argv[count])
+        while (nullptr != argv[count])
             ++count;
     }
     return count;
@@ -63,20 +63,12 @@ char** __argv = *_NSGetArgv();
 
 #endif
 
-///////////////////////////////////////////////////////////////////////////////
-// This class demonstrates how to initialize a console instance of HPX
-// (locality 0). In order to create an HPX instance which connects to a running
-// HPX application two changes have to be made:
-//
-//  - replace hpx::runtime_mode::default_ with hpx::runtime_mode::connect
-//  - replace hpx::finalize() with hpx::disconnect()
-//
-// Note that the mode runtime_mode::default_ corresponds to runtime_mode::console
-// if the distributed runtime is enabled, and runtime_mode::local otherwise.
-struct manage_global_runtime
+class manage_global_runtime_impl
 {
-    manage_global_runtime()
-      : running_(false), rts_(nullptr)
+public:
+    manage_global_runtime_impl()
+      : running_(false)
+      , rts_(nullptr)
     {
 #if defined(HPX_WINDOWS)
         hpx::detail::init_winsocket();
@@ -88,13 +80,13 @@ struct manage_global_runtime
             // allow for unknown command line options
             "hpx.commandline.allow_unknown!=1",
             // disable HPX' short options
-            "hpx.commandline.aliasing!=0"
-        };
+            "hpx.commandline.aliasing!=0"};
 
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;
         hpx::util::function_nonser<int(int, char**)> start_function =
-            hpx::util::bind(&manage_global_runtime::hpx_main, this, _1, _2);
+            hpx::util::bind(
+                &manage_global_runtime_impl::hpx_main, this, _1, _2);
         hpx::init_params init_args;
         init_args.cfg = cfg;
         init_args.mode = hpx::runtime_mode::default_;
@@ -112,15 +104,15 @@ struct manage_global_runtime
             startup_cond_.wait(lk);
     }
 
-    ~manage_global_runtime()
+    ~manage_global_runtime_impl()
     {
         // notify hpx_main above to tear down the runtime
         {
             std::lock_guard<hpx::lcos::local::spinlock> lk(mtx_);
-            rts_ = nullptr;               // reset pointer
+            rts_ = nullptr;    // reset pointer
         }
 
-        cond_.notify_one();     // signal exit
+        cond_.notify_one();    // signal exit
 
         // wait for the runtime to exit
         hpx::stop();
@@ -173,6 +165,48 @@ private:
     bool running_;
 
     hpx::runtime* rts_;
+};
+
+// This class demonstrates how to initialize a console instance of HPX
+// (locality 0). In order to create an HPX instance which connects to a running
+// HPX application two changes have to be made:
+//
+//  - replace hpx::runtime_mode::default_ with hpx::runtime_mode::connect
+//  - replace hpx::finalize() with hpx::disconnect()
+//
+// Note that the mode runtime_mode::default_ corresponds to runtime_mode::console
+// if the distributed runtime is enabled, and runtime_mode::local otherwise.
+//
+// The separation of the implementation into manage_global_runtime and
+// manage_global_runtime_impl ensures that the manage_global_runtime_impl
+// destructor is called before the thread_local default agent is destructed,
+// allowing the former to call yield if necessary while waiting for the runtime
+// to shut down. This is done by accessing the default agent before accessing
+// the manage_global_runtime object. Although the latter is thread_local, only
+// one instance will be created. It is thread_local only to ensure the correct
+// sequencing of destructors.
+class manage_global_runtime
+{
+    manage_global_runtime_impl& get()
+    {
+        static thread_local manage_global_runtime_impl m;
+        return m;
+    }
+
+    hpx::execution_base::agent_base& agent =
+        hpx::execution_base::detail::get_default_agent();
+    manage_global_runtime_impl& m = get();
+
+public:
+    void register_thread(char const* name)
+    {
+        m.register_thread(name);
+    }
+
+    void unregister_thread()
+    {
+        m.unregister_thread();
+    }
 };
 
 // This global object will initialize HPX in its constructor and make sure HPX

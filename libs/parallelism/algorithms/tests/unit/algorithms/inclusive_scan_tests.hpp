@@ -6,12 +6,10 @@
 
 #pragma once
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/parallel_scan.hpp>
+#include <hpx/local/execution.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/algorithms/inclusive_scan.hpp>
 
 #include <cstddef>
 #include <iostream>

@@ -349,7 +349,7 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
@@ -376,7 +376,7 @@ namespace hpx { namespace ranges {
     using copy_if_result = parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::copy
+    // DPO for hpx::ranges::copy
     HPX_INLINE_CONSTEXPR_VARIABLE struct copy_t final
       : hpx::functional::tag_fallback<copy_t>
     {
@@ -393,7 +393,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             ranges::copy_result<FwdIter1, FwdIter>>::type
-        tag_fallback_invoke(hpx::ranges::copy_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::ranges::copy_t, ExPolicy&& policy,
             FwdIter1 iter, Sent1 sent, FwdIter dest)
         {
             using copy_iter_t =
@@ -415,7 +415,7 @@ namespace hpx { namespace ranges {
             ranges::copy_result<
                 typename hpx::traits::range_traits<Rng>::iterator_type,
                 FwdIter>>::type
-        tag_fallback_invoke(
+        tag_fallback_dispatch(
             hpx::ranges::copy_t, ExPolicy&& policy, Rng&& rng, FwdIter dest)
         {
             using copy_iter_t = hpx::parallel::v1::detail::copy_iter<
@@ -435,7 +435,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend ranges::copy_result<FwdIter1, FwdIter> tag_fallback_invoke(
+        friend ranges::copy_result<FwdIter1, FwdIter> tag_fallback_dispatch(
             hpx::ranges::copy_t, FwdIter1 iter, Sent1 sent, FwdIter dest)
         {
             using copy_iter_t =
@@ -454,7 +454,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend ranges::copy_result<
             typename hpx::traits::range_traits<Rng>::iterator_type, FwdIter>
-        tag_fallback_invoke(hpx::ranges::copy_t, Rng&& rng, FwdIter dest)
+        tag_fallback_dispatch(hpx::ranges::copy_t, Rng&& rng, FwdIter dest)
         {
             using copy_iter_t = hpx::parallel::v1::detail::copy_iter<
                 typename hpx::traits::range_traits<Rng>::iterator_type,
@@ -467,7 +467,7 @@ namespace hpx { namespace ranges {
     } copy{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::copy_n
+    // DPO for hpx::ranges::copy_n
     HPX_INLINE_CONSTEXPR_VARIABLE struct copy_n_t final
       : hpx::functional::tag_fallback<copy_n_t>
     {
@@ -482,7 +482,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             ranges::copy_n_result<FwdIter1, FwdIter2>>::type
-        tag_fallback_invoke(hpx::ranges::copy_n_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::ranges::copy_n_t, ExPolicy&& policy,
             FwdIter1 first, Size count, FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -512,7 +512,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value)>
         // clang-format on
-        friend ranges::copy_n_result<FwdIter1, FwdIter2> tag_fallback_invoke(
+        friend ranges::copy_n_result<FwdIter1, FwdIter2> tag_fallback_dispatch(
             hpx::ranges::copy_n_t, FwdIter1 first, Size count, FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -534,7 +534,7 @@ namespace hpx { namespace ranges {
     } copy_n{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::copy_if
+    // DPO for hpx::ranges::copy_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct copy_if_t final
       : hpx::functional::tag_fallback<copy_if_t>
     {
@@ -556,7 +556,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             ranges::copy_if_result<FwdIter1, FwdIter>>::type
-        tag_fallback_invoke(hpx::ranges::copy_if_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::ranges::copy_if_t, ExPolicy&& policy,
             FwdIter1 iter, Sent1 sent, FwdIter dest, Pred&& pred,
             Proj&& proj = Proj())
         {
@@ -592,7 +592,7 @@ namespace hpx { namespace ranges {
             ranges::copy_if_result<
                 typename hpx::traits::range_traits<Rng>::iterator_type,
                 FwdIter>>::type
-        tag_fallback_invoke(hpx::ranges::copy_if_t, ExPolicy&& policy,
+        tag_fallback_dispatch(hpx::ranges::copy_if_t, ExPolicy&& policy,
             Rng&& rng, FwdIter dest, Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value ||
@@ -624,7 +624,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend ranges::copy_if_result<FwdIter1, FwdIter> tag_fallback_invoke(
+        friend ranges::copy_if_result<FwdIter1, FwdIter> tag_fallback_dispatch(
             hpx::ranges::copy_if_t, FwdIter1 iter, Sent1 sent, FwdIter dest,
             Pred&& pred, Proj&& proj = Proj())
         {
@@ -655,7 +655,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend ranges::copy_if_result<
             typename hpx::traits::range_traits<Rng>::iterator_type, FwdIter>
-        tag_fallback_invoke(hpx::ranges::copy_if_t, Rng&& rng, FwdIter dest,
+        tag_fallback_dispatch(hpx::ranges::copy_if_t, Rng&& rng, FwdIter dest,
             Pred&& pred, Proj&& proj = Proj())
         {
             static_assert((hpx::traits::is_output_iterator<FwdIter>::value),

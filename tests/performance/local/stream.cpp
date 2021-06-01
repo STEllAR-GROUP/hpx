@@ -26,6 +26,7 @@
 #include <hpx/include/parallel_fill.hpp>
 #include <hpx/include/parallel_transform.hpp>
 #include <hpx/include/threads.hpp>
+#include <hpx/include/util.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/version.hpp>
 #if defined(HPX_HAVE_MODULE_ASYNC_CUDA)
@@ -131,7 +132,6 @@ void check_results(std::size_t iterations, Vector const& a_res,
         aSumErr += std::abs(a[j] - aj);
         bSumErr += std::abs(b[j] - bj);
         cSumErr += std::abs(c[j] - cj);
-        // if (j == 417) printf("Index 417: c[j]: %f, cj: %f\n",c[j],cj);   // MCCALPIN
     }
     aAvgErr = aSumErr / (STREAM_TYPE) a.size();
     bAvgErr = bSumErr / (STREAM_TYPE) a.size();
@@ -147,7 +147,8 @@ void check_results(std::size_t iterations, Vector const& a_res,
     }
     else
     {
-        printf("WEIRD: sizeof(STREAM_TYPE) = %zu\n", sizeof(STREAM_TYPE));
+        hpx::util::format_to(std::cout, "WEIRD: sizeof(STREAM_TYPE) = {}\n",
+            sizeof(STREAM_TYPE));
         epsilon = 1.e-6;
     }
 
@@ -155,9 +156,11 @@ void check_results(std::size_t iterations, Vector const& a_res,
     if (std::abs(aAvgErr / aj) > epsilon)
     {
         err++;
-        printf("Failed Validation on array a[], AvgRelAbsErr > epsilon (%e)\n",
+        hpx::util::format_to(std::cout,
+            "Failed Validation on array a[], AvgRelAbsErr > epsilon ({})\n",
             epsilon);
-        printf("     Expected Value: %e, AvgAbsErr: %e, AvgRelAbsErr: %e\n", aj,
+        hpx::util::format_to(std::cout,
+            "     Expected Value: {}, AvgAbsErr: {}, AvgRelAbsErr: {}\n", aj,
             aAvgErr, std::abs(aAvgErr) / aj);
         ierr = 0;
         for (std::size_t j = 0; j < a.size(); j++)
@@ -168,24 +171,29 @@ void check_results(std::size_t iterations, Vector const& a_res,
 #ifdef VERBOSE
                 if (ierr < 10)
                 {
-                    printf("         array a: index: %ld, expected: %e, "
-                           "observed: %e, relative error: %e\n",
+                    hpx::util::format_to(std::cout,
+                        "         array a: index: {}, expected: {}, "
+                        "observed: {}, relative error: {}\n",
                         (unsigned long) j, aj, a[j],
                         (double) std::abs((aj - a[j]) / aAvgErr));
                 }
 #endif
             }
         }
-        printf("     For array a[], %d errors were found.\n", ierr);
+        hpx::util::format_to(
+            std::cout, "     For array a[], {} errors were found.\n", ierr);
     }
     if (std::abs(bAvgErr / bj) > epsilon)
     {
         err++;
-        printf("Failed Validation on array b[], AvgRelAbsErr > epsilon (%e)\n",
+        hpx::util::format_to(std::cout,
+            "Failed Validation on array b[], AvgRelAbsErr > epsilon ({})\n",
             epsilon);
-        printf("     Expected Value: %e, AvgAbsErr: %e, AvgRelAbsErr: %e\n", bj,
+        hpx::util::format_to(std::cout,
+            "     Expected Value: {}, AvgAbsErr: {}, AvgRelAbsErr: {}\n", bj,
             bAvgErr, std::abs(bAvgErr) / bj);
-        printf("     AvgRelAbsErr > Epsilon (%e)\n", epsilon);
+        hpx::util::format_to(
+            std::cout, "     AvgRelAbsErr > Epsilon ({})\n", epsilon);
         ierr = 0;
         for (std::size_t j = 0; j < a.size(); j++)
         {
@@ -195,24 +203,29 @@ void check_results(std::size_t iterations, Vector const& a_res,
 #ifdef VERBOSE
                 if (ierr < 10)
                 {
-                    printf("         array b: index: %ld, expected: %e, "
-                           "observed: %e, relative error: %e\n",
+                    hpx::util::format_to(std::cout,
+                        "         array b: index: {}, expected: {}, "
+                        "observed: {}, relative error: {}\n",
                         (unsigned long) j, bj, b[j],
                         (double) std::abs((bj - b[j]) / bAvgErr));
                 }
 #endif
             }
         }
-        printf("     For array b[], %d errors were found.\n", ierr);
+        hpx::util::format_to(
+            std::cout, "     For array b[], {} errors were found.\n", ierr);
     }
     if (std::abs(cAvgErr / cj) > epsilon)
     {
         err++;
-        printf("Failed Validation on array c[], AvgRelAbsErr > epsilon (%e)\n",
+        hpx::util::format_to(std::cout,
+            "Failed Validation on array c[], AvgRelAbsErr > epsilon ({})\n",
             epsilon);
-        printf("     Expected Value: %e, AvgAbsErr: %e, AvgRelAbsErr: %e\n", cj,
+        hpx::util::format_to(std::cout,
+            "     Expected Value: {}, AvgAbsErr: {}, AvgRelAbsErr: {}\n", cj,
             cAvgErr, std::abs(cAvgErr) / cj);
-        printf("     AvgRelAbsErr > Epsilon (%e)\n", epsilon);
+        hpx::util::format_to(
+            std::cout, "     AvgRelAbsErr > Epsilon ({})\n", epsilon);
         ierr = 0;
         for (std::size_t j = 0; j < a.size(); j++)
         {
@@ -222,30 +235,35 @@ void check_results(std::size_t iterations, Vector const& a_res,
 #ifdef VERBOSE
                 if (ierr < 10)
                 {
-                    printf("         array c: index: %ld, expected: %e, "
-                           "observed: %e, relative error: %e\n",
+                    hpx::util::format_to(std::cout,
+                        "         array c: index: {}, expected: {}, "
+                        "observed: {}, relative error: {}\n",
                         (unsigned long) j, cj, c[j],
                         (double) std::abs((cj - c[j]) / cAvgErr));
                 }
 #endif
             }
         }
-        printf("     For array c[], %d errors were found.\n", ierr);
+        hpx::util::format_to(
+            std::cout, "     For array c[], {} errors were found.\n", ierr);
     }
     if (err == 0)
     {
         if (!csv)
         {
-            printf("Solution Validates: avg error less than %e on all three "
-                   "arrays\n",
+            hpx::util::format_to(std::cout,
+                "Solution Validates: avg error less than {} on all three "
+                "arrays\n",
                 epsilon);
         }
     }
 #ifdef VERBOSE
-    printf("Results Validation Verbose Results: \n");
-    printf("    Expected a(1), b(1), c(1): %f %f %f \n", aj, bj, cj);
-    printf("    Observed a(1), b(1), c(1): %f %f %f \n", a[1], b[1], c[1]);
-    printf("    Rel Errors on a, b, c:     %e %e %e \n",
+    hpx::util::format_to(std::cout, "Results Validation Verbose Results:\n");
+    hpx::util::format_to(
+        std::cout, "    Expected a(1), b(1), c(1): {} {} {}\n", aj, bj, cj);
+    hpx::util::format_to(std::cout, "    Observed a(1), b(1), c(1): {} {} {}\n",
+        a[1], b[1], c[1]);
+    hpx::util::format_to(std::cout, "    Rel Errors on a, b, c:     {} {} {}\n",
         (double) std::abs(aAvgErr / aj), (double) std::abs(bAvgErr / bj),
         (double) std::abs(cAvgErr / cj));
 #endif
@@ -585,22 +603,21 @@ int hpx_main(hpx::program_options::variables_map& vm)
     {
         if (header)
         {
-            printf(
+            hpx::util::format_to(std::cout,
                 "executor,threads,vector_size,copy_bytes,copy_bw,copy_avg,copy_"
                 "min,copy_max,scale_bytes,scale_bw,scale_avg,scale_min,scale_"
                 "max,add_bytes,add_bw,add_avg,add_min,add_max,triad_bytes,"
-                "triad_"
-                "bw,triad_avg,triad_min,triad_max\n");
+                "triad_bw,triad_avg,triad_min,triad_max\n");
         }
         std::size_t const num_executors = 5;
         const char* executors[num_executors] = {"parallel-serial", "block",
             "parallel-parallel", "fork_join_executor"};
-        printf("%s,%zu,%zu,", executors[executor], hpx::get_os_thread_count(),
-            vector_size);
+        hpx::util::format_to(std::cout, "{},{},{},", executors[executor],
+            hpx::get_os_thread_count(), vector_size);
     }
     else
     {
-        printf(
+        hpx::util::format_to(std::cout,
             "Function    Best Rate MB/s  Avg time     Min time     Max time\n");
     }
 
@@ -610,14 +627,14 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         if (csv)
         {
-            printf("%.0f,%.2f,%.9f,%.9f,%.9f", bytes[j],
-                1.0E-06 * bytes[j] / mintime[j], avgtime[j], mintime[j],
-                maxtime[j]);
-            printf(j < num_stream_tests - 1 ? "," : "\n");
+            hpx::util::format_to(std::cout, "{:.0},{:.2},{:.9},{:.9},{:.9}{}",
+                bytes[j], 1.0E-06 * bytes[j] / mintime[j], avgtime[j],
+                mintime[j], maxtime[j], j < num_stream_tests - 1 ? "," : "\n");
         }
         else
         {
-            printf("%s%12.1f  %11.6f  %11.6f  %11.6f\n", label[j],
+            hpx::util::format_to(std::cout,
+                "{}{:12.1}  {:11.6}  {:11.6}  {:11.6}\n", label[j],
                 1.0E-06 * bytes[j] / mintime[j], avgtime[j], mintime[j],
                 maxtime[j]);
         }

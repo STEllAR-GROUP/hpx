@@ -4,9 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/execution.hpp>
-#include <hpx/hpx.hpp>
-#include <hpx/init.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/parallel/algorithms/partial_sort.hpp>
 
 #include <algorithm>
@@ -14,6 +13,7 @@
 #include <cstdint>
 #include <iostream>
 #include <random>
+#include <string>
 #include <vector>
 
 ////////////////////////////////////////////////////////////////////////////
@@ -134,7 +134,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     function01();
     function02();
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -151,9 +151,9 @@ int main(int argc, char* argv[])
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
     init_args.cfg = cfg;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }

@@ -1023,7 +1023,7 @@ if(HPX_WITH_APEX)
     "Do not update code from remote APEX repository." OFF CATEGORY "Profiling"
   )
   hpx_option(
-    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.3.1"
+    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.4.0"
     CATEGORY "Profiling"
   )
 endif()
@@ -1538,63 +1538,14 @@ if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
 
-# HPX_WITH_ACTION_BASE_COMPATIBILITY: introduced in V1.4.0
-hpx_option(
-  HPX_WITH_ACTION_BASE_COMPATIBILITY BOOL
-  "Enable deprecated action bases (default: OFF)" OFF ADVANCED
-)
-if(HPX_WITH_ACTION_BASE_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_ACTION_BASE_COMPATIBILITY)
-endif()
-
-# HPX_WITH_REGISTER_THREAD_COMPATIBILITY: introduced in V1.4.0
-hpx_option(
-  HPX_WITH_REGISTER_THREAD_COMPATIBILITY
-  BOOL
-  "Enable deprecated register_thread/work functions in the hpx::applier namespace (default: OFF)"
-  OFF
-  ADVANCED
-)
-if(HPX_WITH_REGISTER_THREAD_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_REGISTER_THREAD_COMPATIBILITY)
-endif()
-
-# HPX_WITH_REGISTER_THREAD_OVERLOADS_COMPATIBILITY: introduced in V1.5.0
-hpx_option(
-  HPX_WITH_REGISTER_THREAD_OVERLOADS_COMPATIBILITY BOOL
-  "Enable deprecated register_thread/work overloads (default: ON)" ON ADVANCED
-)
-if(HPX_WITH_REGISTER_THREAD_OVERLOADS_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_REGISTER_THREAD_OVERLOADS_COMPATIBILITY)
-endif()
-
-# HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY : introduced in V1.5.0?
+# HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY : introduced in V1.5.0
 hpx_option(
   HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY BOOL
-  "Enable deprecated init() and start() overloads functions (default: ON)" ON
+  "Enable deprecated init() and start() overloads functions (default: OFF)" OFF
   ADVANCED
 )
 if(HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_INIT_START_OVERLOADS_COMPATIBILITY)
-endif()
-
-# HPX_WITH_PROMISE_ALIAS_COMPATIBILITY : introduced in V1.5.0?
-hpx_option(
-  HPX_WITH_PROMISE_ALIAS_COMPATIBILITY BOOL
-  "Enable deprecated alias of hpx::promise to hpx::lcos::promise (default: OFF)"
-  OFF ADVANCED
-)
-if(HPX_WITH_PROMISE_ALIAS_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_PROMISE_ALIAS_COMPATIBILITY)
-endif()
-
-# HPX_WITH_UNSCOPED_ENUM_COMPATIBILITY : introduced in V1.5.0
-hpx_option(
-  HPX_WITH_UNSCOPED_ENUM_COMPATIBILITY BOOL
-  "Enable deprecated unscoped enums (default: OFF)" OFF ADVANCED
-)
-if(HPX_WITH_UNSCOPED_ENUM_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_UNSCOPED_ENUM_COMPATIBILITY)
 endif()
 
 # ##############################################################################
@@ -2069,6 +2020,8 @@ else()
     hpx_add_compile_flag_if_available(-wd2203)
     # #2536: cannot specify explicit initializer for arrays
     hpx_add_compile_flag_if_available(-wd2536)
+    # #1286: invalid attribute
+    hpx_add_compile_flag_if_available(-wd1286)
   endif()
 
   set(__has_timestamp_support OFF)
@@ -2131,13 +2084,6 @@ set(HPX_WITH_TARGET_ARCHITECTURE
     CACHE INTERNAL "" FORCE
 )
 
-# Compatibility with using Boost.ProgramOptions, introduced in V1.4.0
-hpx_option(
-  HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY BOOL
-  "Enable Boost.ProgramOptions compatibility. (default: OFF)" OFF ADVANCED
-  CATEGORY "Modules"
-)
-
 # Compatibility with using Boost.FileSystem, introduced in V1.4.0
 set(__filesystem_compatibility_default ON)
 if(HPX_WITH_CXX17_FILESYSTEM)
@@ -2151,51 +2097,6 @@ hpx_option(
   ADVANCED
   CATEGORY "Modules"
 )
-
-# Compatibility for embedded thread pools, introduced in V1.5.0
-hpx_option(
-  HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY BOOL
-  "Enable deprecated embedded thread pools (default: OFF)" OFF ADVANCED
-)
-if(HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
-endif()
-
-# Compatibility for thread pool os executors, introduced in V1.5.0
-hpx_option(
-  HPX_WITH_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY BOOL
-  "Enable deprecated thread pool executors (default: OFF)" OFF ADVANCED
-)
-if(HPX_WITH_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
-endif()
-
-# Compatibility for thread executors, introduced in V1.5.0
-hpx_option(
-  HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY BOOL
-  "Enable deprecated thread executors (default: OFF)" OFF ADVANCED
-)
-if(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-endif()
-
-# Compatibility for thread aware timer, introduced in V1.5.0
-hpx_option(
-  HPX_WITH_THREAD_AWARE_TIMER_COMPATIBILITY BOOL
-  "Enable deprecated thread_aware_timer (default: OFF)" OFF ADVANCED
-)
-if(HPX_WITH_THREAD_AWARE_TIMER_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_THREAD_AWARE_TIMER_COMPATIBILITY)
-endif()
-
-# Compatibility for pool executor, introduced in V1.5.0
-hpx_option(
-  HPX_WITH_POOL_EXECUTOR_COMPATIBILITY BOOL
-  "Enable deprecated pool executor (default: OFF)" OFF ADVANCED
-)
-if(HPX_WITH_POOL_EXECUTOR_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_POOL_EXECUTOR_COMPATIBILITY)
-endif()
 
 # Compatibility with using Boost.Iterator traversal tags, introduced in V1.7.0
 hpx_option(
@@ -2219,7 +2120,6 @@ endif()
 include(HPX_SetupBoost)
 include(HPX_SetupBoostFilesystem)
 include(HPX_SetupBoostIostreams)
-include(HPX_SetupBoostProgramOptions)
 
 # Set up standalone Asio
 include(HPX_SetupAsio)

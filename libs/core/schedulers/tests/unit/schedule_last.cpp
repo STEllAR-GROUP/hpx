@@ -4,10 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/async.hpp>
-#include <hpx/include/resource_partitioner.hpp>
-#include <hpx/include/threads.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
@@ -34,13 +33,13 @@ int hpx_main()
 
     HPX_TEST(run);
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 template <typename Scheduler>
 void test_scheduler(int argc, char* argv[])
 {
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
 
     init_args.cfg = {"hpx.os_threads=1"};
     init_args.rp_callback = [](auto& rp,
@@ -69,7 +68,7 @@ void test_scheduler(int argc, char* argv[])
             });
     };
 
-    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
+    HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);
 }
 
 int main(int argc, char* argv[])

@@ -15,15 +15,17 @@ if(HPX_WITH_EXAMPLES)
     )
   endif()
 
-  set(example_programs
-      1d_stencil_replay_exception
-      1d_stencil_replay_validate
-      async_replay
-      async_replicate
-      async_replicate_vote
-      dataflow_replicate
-      version
+  set(example_programs async_replay async_replicate async_replicate_vote
+                       version
   )
+
+  # The Intel compiler version 19.1.1.217 does not manage to compile these.
+  # Other compilers have not been tested.
+  if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+    set(example_programs ${example_programs} 1d_stencil_replay_exception
+                         1d_stencil_replay_validate dataflow_replicate
+    )
+  endif()
 
   foreach(example_program ${example_programs})
 

@@ -196,15 +196,3 @@ namespace hpx { namespace parallel { namespace execution {
     };
     /// \endcond
 }}}    // namespace hpx::parallel::execution
-
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-namespace hpx { namespace threads { namespace executors {
-    using parallel::execution::service_executor_type;
-
-    using parallel::execution::io_pool_executor;
-    using parallel::execution::main_pool_executor;
-    using parallel::execution::parcel_pool_executor;
-    using parallel::execution::service_executor;
-    using parallel::execution::timer_pool_executor;
-}}}    // namespace hpx::threads::executors
-#endif

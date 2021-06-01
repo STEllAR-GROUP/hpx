@@ -4,29 +4,18 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/threadmanager.hpp>
 #define GUIDED_EXECUTOR_DEBUG 1
-#include <hpx/futures/packaged_continuation.hpp>
-#include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/thread_executors/guided_pool_executor.hpp>
-//#include <hpx/topology/cpu_mask.hpp>
-//#include <hpx/include/parallel_executors.hpp>
-#include <hpx/modules/async_local.hpp>
 
-// we should not need these
-#include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>
-
-#include <hpx/async_combinators/when_all.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/debugging/demangle_helper.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/invoke_result.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/functional.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/tuple.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/pack_traversal/pack_traversal.hpp>
-//
+
 #include <chrono>
 #include <complex>
 #include <cstddef>
@@ -36,8 +25,6 @@
 #include <string>
 #include <type_traits>
 #include <utility>
-
-#include <hpx/modules/testing.hpp>
 
 // --------------------------------------------------------------------
 // custom executor async/then/when/dataflow specialization example
@@ -248,7 +235,7 @@ struct test_async_executor
     }
 
 private:
-    parallel::execution::default_executor executor_;
+    hpx::execution::parallel_executor executor_;
 };
 
 // --------------------------------------------------------------------
@@ -527,14 +514,14 @@ int hpx_main()
     }
 
     std::cout << "Tests done \n";
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(
-        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

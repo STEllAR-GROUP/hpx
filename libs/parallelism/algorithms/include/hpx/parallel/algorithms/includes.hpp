@@ -96,7 +96,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
@@ -342,7 +342,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::includes
+    // DPO for hpx::includes
     HPX_INLINE_CONSTEXPR_VARIABLE struct includes_t final
       : hpx::functional::tag_fallback<includes_t>
     {
@@ -362,7 +362,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_invoke(includes_t, ExPolicy&& policy, FwdIter1 first1,
+        tag_fallback_dispatch(includes_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred())
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -389,7 +389,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend bool tag_fallback_invoke(includes_t, FwdIter1 first1,
+        friend bool tag_fallback_dispatch(includes_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred())
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),

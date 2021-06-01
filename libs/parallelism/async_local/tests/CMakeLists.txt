@@ -41,6 +41,7 @@ if(HPX_WITH_TESTS)
       modules.async_local
       HEADERS ${async_local_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+      NOLIBS
       DEPENDENCIES hpx_async_local
     )
   endif()

@@ -12,8 +12,9 @@
 #include <hpx/config.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/search.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
@@ -383,7 +384,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend FwdIter tag_fallback_invoke(hpx::search_t, FwdIter first,
+        friend FwdIter tag_fallback_dispatch(hpx::search_t, FwdIter first,
             FwdIter last, FwdIter2 s_first, FwdIter2 s_last, Pred&& op = Pred())
         {
             return hpx::parallel::v1::detail::search<FwdIter, FwdIter>().call(
@@ -408,7 +409,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_invoke(hpx::search_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_dispatch(hpx::search_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, FwdIter2 s_first, FwdIter2 s_last, Pred&& op = Pred())
         {
             return hpx::parallel::v1::detail::search<FwdIter, FwdIter>().call(
@@ -436,7 +437,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend FwdIter tag_fallback_invoke(hpx::search_n_t, FwdIter first,
+        friend FwdIter tag_fallback_dispatch(hpx::search_n_t, FwdIter first,
             std::size_t count, FwdIter2 s_first, FwdIter2 s_last,
             Pred&& op = Pred())
         {
@@ -462,7 +463,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_invoke(hpx::search_n_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_dispatch(hpx::search_n_t, ExPolicy&& policy, FwdIter first,
             std::size_t count, FwdIter2 s_first, FwdIter2 s_last,
             Pred&& op = Pred())
         {

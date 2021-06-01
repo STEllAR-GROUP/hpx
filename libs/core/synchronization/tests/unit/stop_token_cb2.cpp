@@ -9,7 +9,7 @@
 //  Creative Commons Attribution 4.0 International License
 //  (http://creativecommons.org/licenses/by/4.0/).
 
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -147,7 +147,7 @@ void test_stop_callback_inits()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main()
+int hpx_main()
 {
     try
     {
@@ -157,5 +157,11 @@ int main()
     {
         HPX_TEST(false);
     }
+    hpx::local::finalize();
     return hpx::util::report_errors();
+}
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
 }

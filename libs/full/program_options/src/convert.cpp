@@ -5,8 +5,6 @@
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
-
-#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
 #include <hpx/program_options/detail/convert.hpp>
 #include <hpx/program_options/detail/utf8_codecvt_facet.hpp>
 
@@ -132,5 +130,3 @@ namespace hpx { namespace program_options {
         return to_utf8(s);
     }
 }}    // namespace hpx::program_options
-
-#endif

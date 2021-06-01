@@ -7,7 +7,6 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/datastructures/any.hpp>
-#include <hpx/hpx_main.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include "small_big_object.hpp"

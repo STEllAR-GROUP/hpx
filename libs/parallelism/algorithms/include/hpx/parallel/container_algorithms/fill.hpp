@@ -185,7 +185,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::fill
+    // DPO for hpx::ranges::fill
     HPX_INLINE_CONSTEXPR_VARIABLE struct fill_t final
       : hpx::functional::tag_fallback<fill_t>
     {
@@ -199,7 +199,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_traits<Rng>::iterator_type>::type
-        tag_fallback_invoke(
+        tag_fallback_dispatch(
             fill_t, ExPolicy&& policy, Rng&& rng, T const& value)
         {
             using iterator_type =
@@ -223,7 +223,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_fallback_invoke(
+        tag_fallback_dispatch(
             fill_t, ExPolicy&& policy, Iter first, Sent last, T const& value)
         {
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
@@ -240,7 +240,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_traits<Rng>::iterator_type
-        tag_fallback_invoke(fill_t, Rng&& rng, T const& value)
+        tag_fallback_dispatch(fill_t, Rng&& rng, T const& value)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -260,7 +260,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
         // clang-format on
-        friend Iter tag_fallback_invoke(
+        friend Iter tag_fallback_dispatch(
             fill_t, Iter first, Sent last, T const& value)
         {
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
@@ -272,7 +272,7 @@ namespace hpx { namespace ranges {
     } fill{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::fill_n
+    // DPO for hpx::ranges::fill_n
     HPX_INLINE_CONSTEXPR_VARIABLE struct fill_n_t final
       : hpx::functional::tag_fallback<fill_n_t>
     {
@@ -286,7 +286,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_traits<Rng>::iterator_type>::type
-        tag_fallback_invoke(
+        tag_fallback_dispatch(
             fill_n_t, ExPolicy&& policy, Rng&& rng, T const& value)
         {
             using iterator_type =
@@ -318,7 +318,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_invoke(fill_n_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_dispatch(fill_n_t, ExPolicy&& policy, FwdIter first,
             Size count, T const& value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -343,7 +343,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_traits<Rng>::iterator_type
-        tag_fallback_invoke(fill_n_t, Rng&& rng, T const& value)
+        tag_fallback_dispatch(fill_n_t, Rng&& rng, T const& value)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -369,7 +369,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_invoke(
+        friend FwdIter tag_fallback_dispatch(
             fill_n_t, FwdIter first, Size count, T const& value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),

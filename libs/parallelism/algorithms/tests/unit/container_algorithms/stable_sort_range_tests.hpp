@@ -7,7 +7,13 @@
 
 #pragma once
 
-//
+#include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/parallel/algorithms/sort.hpp>
+#include <hpx/parallel/algorithms/stable_sort.hpp>
+#include <hpx/parallel/container_algorithms/sort.hpp>
+
 #include <cstddef>
 #include <cstdint>
 #include <iomanip>
@@ -19,14 +25,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-//
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/parallel_container_algorithm.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
-#include <hpx/modules/format.hpp>
-#include <hpx/modules/testing.hpp>
-//
+
 #include "test_utils.hpp"
 
 #if !defined(HPX_SORT_TEST_SIZE_STRINGS)

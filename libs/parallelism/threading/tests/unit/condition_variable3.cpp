@@ -9,7 +9,7 @@
 //  Creative Commons Attribution 4.0 International License
 //  (http://creativecommons.org/licenses/by/4.0/).
 
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/threading.hpp>
@@ -30,7 +30,7 @@ void test_cv_callback()
     {
         hpx::jthread t1{[&](hpx::stop_token stoken) {
             auto f = [&] {
-                hpx::this_thread::sleep_for(std::chrono::seconds(1));
+                hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
                 cb_called = true;
             };
             hpx::stop_callback<std::function<void()>> cb(stoken, std::move(f));
@@ -39,13 +39,13 @@ void test_cv_callback()
             ready_cv.wait(lg, stoken, [&ready] { return ready; });
         }};
 
-        hpx::this_thread::sleep_for(std::chrono::seconds(1));
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
     }    // leave scope of t1 without join() or detach() (signals cancellation)
     HPX_TEST(cb_called);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main()
+int hpx_main()
 {
     std::set_terminate([]() { HPX_TEST(false); });
     try
@@ -56,5 +56,14 @@ int main()
     {
         HPX_TEST(false);
     }
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
+
     return hpx::util::report_errors();
 }

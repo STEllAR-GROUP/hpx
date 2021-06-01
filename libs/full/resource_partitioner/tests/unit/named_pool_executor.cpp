@@ -7,14 +7,11 @@
 // Simple test verifying basic resource partitioner
 // pool and executor
 
-#include <hpx/hpx_init.hpp>
-
-#include <hpx/async_combinators/when_all.hpp>
-#include <hpx/include/parallel_execution.hpp>
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/resource_partitioner.hpp>
-#include <hpx/include/threads.hpp>
-#include <hpx/modules/async_local.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -104,7 +101,7 @@ int hpx_main()
     }
 
     // check that the default executor still works
-    hpx::parallel::execution::default_executor large_stack_executor(
+    hpx::execution::parallel_executor large_stack_executor(
         hpx::threads::thread_stacksize::large);
 
     lotsa_futures.push_back(hpx::async(
@@ -113,7 +110,7 @@ int hpx_main()
     // just wait until everything is done
     when_all(lotsa_futures).get();
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 void init_resource_partitioner_handler(
@@ -155,12 +152,12 @@ void init_resource_partitioner_handler(
 // this test must be run with 4 threads
 int main(int argc, char* argv[])
 {
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.cfg = {"hpx.os_threads=" + std::to_string(max_threads)};
     // Set the callback to init the thread_pools
     init_args.rp_callback = &init_resource_partitioner_handler;
 
     // now run the test
-    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
+    HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);
     return hpx::util::report_errors();
 }

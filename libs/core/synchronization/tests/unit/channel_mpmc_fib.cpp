@@ -6,11 +6,11 @@
 
 //  This work is inspired by https://github.com/aprell/tasking-2.0
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
-#include <hpx/synchronization/channel_mpmc.hpp>
-
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/synchronization/channel_mpmc.hpp>
+#include <hpx/thread.hpp>
 
 #include <functional>
 #include <utility>
@@ -85,7 +85,7 @@ void consume_numbers(int n, hpx::lcos::local::channel_mpmc<bool>& c1,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main()
+int hpx_main()
 {
     hpx::lcos::local::channel_mpmc<bool> c1(1);
     hpx::lcos::local::channel_mpmc<int> c2(1);
@@ -101,5 +101,11 @@ int main()
 
     HPX_TEST(channel_get(c1));
 
+    hpx::local::finalize();
     return hpx::util::report_errors();
+}
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
 }

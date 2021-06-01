@@ -212,6 +212,9 @@ namespace hpx { namespace parallel { namespace execution {
         HPX_NORETURN inline R throw_bad_polymorphic_executor()
         {
             throw_bad_polymorphic_executor();
+#if defined(HPX_INTEL_VERSION)
+            return {};
+#endif
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -350,6 +353,7 @@ namespace hpx { namespace parallel { namespace execution {
                 void*, sync_execute_function_type&&, Ts&&...)
             {
                 throw_bad_polymorphic_executor<R>();
+                return {};
             }
 
             constexpr oneway_vtable(
@@ -408,12 +412,14 @@ namespace hpx { namespace parallel { namespace execution {
                 async_execute_function_type&& /* f */, Ts&&... /* ts */)
             {
                 throw_bad_polymorphic_executor<R>();
+                return {};
             }
             static hpx::future<R> _empty_then_execute(void*,
                 then_execute_function_type&&, hpx::shared_future<void> const&,
                 Ts&&...)
             {
                 throw_bad_polymorphic_executor<R>();
+                return {};
             }
 
             constexpr twoway_vtable(
@@ -459,6 +465,7 @@ namespace hpx { namespace parallel { namespace execution {
                 bulk_sync_execute_function_type&&, range_proxy const&, Ts&&...)
             {
                 throw_bad_polymorphic_executor<R>();
+                return {};
             }
 
             constexpr bulk_oneway_vtable(
@@ -521,6 +528,7 @@ namespace hpx { namespace parallel { namespace execution {
                 bulk_async_execute_function_type&&, range_proxy const&, Ts&&...)
             {
                 throw_bad_polymorphic_executor<R>();
+                return {};
             }
 
             static hpx::future<std::vector<R>> _empty_bulk_then_execute(void*,
@@ -528,6 +536,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::shared_future<void> const&, Ts&&...)
             {
                 throw_bad_polymorphic_executor<R>();
+                return {};
             }
 
             constexpr bulk_twoway_vtable(

@@ -6,10 +6,10 @@
 
 // #3646: Parallel algorithms should accept iterator/sentinel pairs
 
-#include <hpx/hpx_main.hpp>
-#include <hpx/include/parallel_count.hpp>
 #include <hpx/iterator_support/tests/iter_sent.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/container_algorithms/count.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -79,9 +79,18 @@ void test_count_if()
     HPX_TEST_EQ(result, stdResult);
 }
 
-int main()
+int hpx_main()
 {
     test_count();
     test_count_if();
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
+
     return hpx::util::report_errors();
 }

@@ -6,11 +6,9 @@
 
 #pragma once
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/parallel_uninitialized_default_construct.hpp>
+#include <hpx/local/execution.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/algorithms/uninitialized_default_construct.hpp>
 
 #include <atomic>
 #include <cstddef>

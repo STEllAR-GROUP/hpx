@@ -25,6 +25,9 @@ namespace examples { namespace server
 #if defined(HPX_CLANG_VERSION) && (HPX_CLANG_VERSION >= 100000)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#elif defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvolatile"
 #endif
         double volatile d = 0.;
         for (int i = 0; i < c; ++i)
@@ -32,6 +35,8 @@ namespace examples { namespace server
         (void) d;
 #if defined(HPX_CLANG_VERSION) && (HPX_CLANG_VERSION >= 100000)
 #pragma clang diagnostic pop
+#elif defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
 #endif
     }
 

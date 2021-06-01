@@ -9,16 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/execution/algorithms/just.hpp>
 #include <hpx/execution/algorithms/on.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 
-#include <atomic>
-#include <cstddef>
-#include <exception>
-#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace execution { namespace experimental {
@@ -27,7 +19,7 @@ namespace hpx { namespace execution { namespace experimental {
     {
     private:
         template <typename Scheduler, typename... Ts>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             just_on_t, Scheduler&& scheduler, Ts&&... ts)
         {
             return on(just(std::forward<Ts>(ts)...),

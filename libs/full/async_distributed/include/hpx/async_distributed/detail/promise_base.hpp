@@ -13,6 +13,7 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component_heap.hpp>
 #include <hpx/components_base/server/managed_component_base.hpp>
+#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
@@ -59,24 +60,15 @@ namespace hpx {
                 if (!f_)
                     return;    // do nothing if no deferred task is given
 
-                std::exception_ptr p;
-
-                try
-                {
-                    f_();            // trigger action
-                    this->wait();    // wait for value to come back
-                    return;
-                }
-                catch (...)
-                {
-                    p = std::current_exception();
-                }
-
-                // The exception is set outside the catch block since
-                // set_exception may yield. Ending the catch block on a
-                // different worker thread than where it was started may lead
-                // to segfaults.
-                this->set_exception(std::move(p));
+                hpx::detail::try_catch_exception_ptr(
+                    [&]() {
+                        f_();            // trigger action
+                        this->wait();    // wait for value to come back
+                        return;
+                    },
+                    [&](std::exception_ptr ep) {
+                        this->set_exception(std::move(ep));
+                    });
             }
 
             util::unique_function_nonser<void()> f_;

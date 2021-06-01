@@ -38,29 +38,11 @@ jobs:
       run: |
           cmake --build build --config Debug \
           --target ALL_BUILD \
-            cmake_debug_build_dir_targets_test.make_build_dir \
-            cmake_debug_build_dir_targets_test.make_configure \
-            cmake_debug_build_dir_targets_test.make_compile   \
-            cmake_debug_build_dir_macros_test.make_build_dir \
-            cmake_debug_build_dir_macros_test.make_configure \
-            cmake_debug_build_dir_macros_test.make_compile   \
           -- -maxcpucount -verbosity:minimal -nologo
     - name: Install
       shell: bash
       run: |
           cmake --install build --config Debug
-    - name: Build External
-      shell: bash
-      run: |
-          cmake --build build --config Debug \
-            --target \
-              cmake_debug_install_dir_targets_test.make_build_dir \
-              cmake_debug_install_dir_targets_test.make_configure \
-              cmake_debug_install_dir_targets_test.make_compile   \
-              cmake_debug_install_dir_macros_test.make_build_dir \
-              cmake_debug_install_dir_macros_test.make_configure \
-              cmake_debug_install_dir_macros_test.make_compile   \
-            -- -maxcpucount -verbosity:minimal -nologo
     - name: Test
       shell: bash
       run: |
@@ -103,5 +85,4 @@ jobs:
           tests.examples.quickstart.1d_wave_equation|\
           tests.examples.quickstart.partitioned_vector_spmd_foreach|\
           tests.examples.quickstart.sort_by_key_demo|\
-          tests.examples.thread_aware_timer.thread_aware_timer|\
           tests.examples.transpose.transpose_block_numa"

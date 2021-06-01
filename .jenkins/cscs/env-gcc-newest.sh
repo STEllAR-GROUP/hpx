@@ -9,7 +9,7 @@ source $SPACK_ROOT/share/spack/setup-env.sh
 export CRAYPE_LINK_TYPE=dynamic
 export APPS_ROOT="/apps/daint/SSL/HPX/packages"
 export GCC_VER="11.1.0"
-export CXX_STD="17"
+export CXX_STD="20"
 export BOOST_VER="1.76.0"
 export HWLOC_VER="2.2.0"
 export GCC_ROOT="${APPS_ROOT}/gcc-${GCC_VER}"

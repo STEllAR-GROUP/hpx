@@ -407,7 +407,7 @@ Parallel algorithms
      * Applies a function to a number of elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`for_each_n`
-   * * :cpp:func:`hpx::parallel::v1::lexicographical_compare`
+   * * :cpp:func:`hpx::lexicographical_compare`
      * Checks if a range of values is lexicographically less than another range of values.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`lexicographical_compare`
@@ -1013,4 +1013,3 @@ function enables this use case::
 without an explicit executor object. In this case the task will be run using the
 executor associated with the execution policy that was used to call
 :cpp:func:`hpx::parallel::v2::define_task_block`.
-

@@ -12,10 +12,6 @@ if(HPX_CXX_STANDARD GREATER_EQUAL 17)
   list(APPEND tests p0443_executor)
 endif()
 
-if(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY)
-  set(tests ${tests} thread_pool_attached_executors)
-endif()
-
 if(HPX_WITH_CXX17_STD_EXECUTION_POLICES)
   set(tests ${tests} std_execution_policies)
 endif()

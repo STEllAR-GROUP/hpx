@@ -289,7 +289,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<InIter>::value
         )>
     // clang-format on
-    InIter tag_invoke(
+    InIter tag_dispatch(
         hpx::adjacent_find_t, InIter first, InIter last, Pred&& pred = Pred())
     {
         static_assert((hpx::traits::is_input_iterator<InIter>::value),
@@ -321,7 +321,7 @@ namespace hpx { namespace segmented {
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         SegIter>::type
-    tag_invoke(hpx::adjacent_find_t, ExPolicy&& policy, SegIter first,
+    tag_dispatch(hpx::adjacent_find_t, ExPolicy&& policy, SegIter first,
         SegIter last, Pred&& pred)
     {
         static_assert((hpx::traits::is_forward_iterator<SegIter>::value),

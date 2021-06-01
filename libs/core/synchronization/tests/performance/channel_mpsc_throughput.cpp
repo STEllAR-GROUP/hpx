@@ -6,14 +6,17 @@
 
 //  This work is inspired by https://github.com/aprell/tasking-2.0
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
-
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/synchronization/channel_mpsc.hpp>
+#include <hpx/thread.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <functional>
+#include <iostream>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 struct data
@@ -88,7 +91,7 @@ double thread_func_1(hpx::lcos::local::channel_mpsc<data>& c)
     return static_cast<double>(end - start) / 1e9;
 }
 
-int main()
+int hpx_main()
 {
     hpx::lcos::local::channel_mpsc<data> c(10000);
 
@@ -103,5 +106,10 @@ int main()
     std::cout << "Consumer throughput: " << (NUM_TESTS / consumer_time)
               << " [op/s] (" << (consumer_time / NUM_TESTS) << " [s/op])\n";
 
-    return 0;
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
 }

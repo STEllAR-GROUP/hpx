@@ -24,7 +24,6 @@ set(subdirs
     random_mem_access
     spell_check
     startup_shutdown
-    thread_aware_timer
     throttle
     tuplespace
     transpose

@@ -10,10 +10,6 @@ if(NOT HPX_WITH_TESTS_EXTERNAL_BUILD)
   return()
 endif()
 
-if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
-  return()
-endif()
-
 # Try building an external cmake based project ...
 function(
   create_cmake_test
@@ -25,11 +21,6 @@ function(
   test_dir
 )
   set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/${name}")
-  add_custom_target(
-    ${name}.make_build_dir
-    COMMAND "${CMAKE_COMMAND}" -E make_directory "${build_dir}"
-    VERBATIM
-  )
   set(ADDITIONAL_CMAKE_OPTIONS -DUSING_INSTALL_DIR=${using_install_dir})
   set(ADDITIONAL_CMAKE_OPTIONS -DSETUP_TYPE=${setup_type})
   if(CMAKE_TOOLCHAIN_FILE)
@@ -47,51 +38,36 @@ function(
                                  -DCMAKE_SYSROOT=${CMAKE_SYSROOT}
     )
   endif()
-  if(WIN32)
-    set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS} -G
-                                 "${CMAKE_GENERATOR}"
-    )
-  endif()
   if(NOT MSVC)
     set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS}
                                  -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
     )
+  else()
+    set(ADDITIONAL_CMAKE_OPTIONS
+        ${ADDITIONAL_CMAKE_OPTIONS}
+        -DHPX_OUTPUT_DIRECTORY=${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin
+    )
   endif()
   set(test_dir "${PROJECT_SOURCE_DIR}/${test_dir}")
   add_custom_target(
-    ${name}.make_configure
+    ${name}
     COMMAND
-      "${CMAKE_COMMAND}" -E chdir "${build_dir}" "${CMAKE_COMMAND}" ${test_dir}
+      "${CMAKE_CTEST_COMMAND}" --build-and-test "${test_dir}" "${build_dir}"
+      --build-generator "${CMAKE_GENERATOR}" --build-noclean --build-options
       -DHPX_DIR=${hpx_dir} -DBOOST_ROOT=${BOOST_ROOT}
       ${ADDITIONAL_CMAKE_OPTIONS} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
-      -DCMAKE_BUILD_TYPE=${build_type}
+      -DCMAKE_BUILD_TYPE=${build_type} --test-command "${CMAKE_CTEST_COMMAND}"
+      --output-on-failure
     VERBATIM
   )
-  add_dependencies(
-    ${name}.make_configure ${name}.make_build_dir hpx hpx_init hpx_wrap
-    iostreams_component
-  )
-  add_custom_target(
-    ${name}.make_compile
-    COMMAND "${CMAKE_COMMAND}" --build "${build_dir}" --config ${build_type}
-    VERBATIM
-  )
-  add_dependencies(${name}.make_compile ${name}.make_configure)
-  add_hpx_pseudo_target(${name})
-  add_hpx_pseudo_dependencies_no_shortening(${name} ${name}.make_compile)
+  add_dependencies(${name} hpx hpx_init hpx_wrap)
+  if(HPX_WITH_DISTRIBUTED_RUNTIME)
+    add_dependencies(${name} iostreams_component)
+  endif()
 
   if(MSVC)
-    set_target_properties(
-      ${name}.make_build_dir PROPERTIES FOLDER "Tests/Unit/Build"
-    )
-    set_target_properties(
-      ${name}.make_configure PROPERTIES FOLDER "Tests/Unit/Build"
-    )
-    set_target_properties(
-      ${name}.make_compile PROPERTIES FOLDER "Tests/Unit/Build"
-    )
+    set_target_properties(${name} PROPERTIES FOLDER "Tests/Unit/Build")
   endif()
-  # add_hpx_unit_test( "build" ${name} EXECUTABLE "${build_dir}/test" )
 endfunction()
 
 function(create_pkgconfig_test name hpx_dir)
@@ -112,13 +88,13 @@ function(create_pkgconfig_test name hpx_dir)
       BUILD_TYPE=$<CONFIGURATION>
     VERBATIM
   )
-  add_dependencies(
-    ${name}.make_compile ${name}.make_build_dir hpx hpx_init
-    iostreams_component
-  )
+  add_dependencies(${name}.make_compile ${name}.make_build_dir hpx hpx_init)
+  if(HPX_WITH_DISTRIBUTED_RUNTIME)
+    add_dependencies(${name}.make_compile iostreams_component)
+  endif()
+
   add_hpx_pseudo_target(${name})
   add_hpx_pseudo_dependencies(${name} ${name}.make_compile)
-
 endfunction()
 
 if(MSVC)
@@ -133,70 +109,78 @@ else()
   endif()
 endif()
 
-foreach(build_type ${build_types})
-  string(TOLOWER "${build_type}" build_type_lc)
+if(NOT MSVC)
+  foreach(build_type ${build_types})
+    string(TOLOWER "${build_type}" build_type_lc)
 
-  create_cmake_test(
-    cmake_${build_type_lc}_build_dir_targets_test FALSE
-    "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" TARGETS ${build_type}
-    "examples/hello_world_component"
-  )
-
-  create_cmake_test(
-    cmake_${build_type_lc}_build_dir_macros_test FALSE
-    "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" MACROS ${build_type}
-    "examples/hello_world_component"
-  )
-
-  create_cmake_test(
-    cmake_${build_type_lc}_install_dir_targets_test TRUE
-    "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
-    ${build_type} "examples/hello_world_component"
-  )
-
-  create_cmake_test(
-    cmake_${build_type_lc}_install_dir_macros_test TRUE
-    "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" MACROS
-    ${build_type} "examples/hello_world_component"
-  )
-
-  if(HPX_WITH_DYNAMIC_HPX_MAIN)
-    # Google test emulation
     create_cmake_test(
-      cmake_${build_type_lc}_build_dir_gtest_emulation_test FALSE
+      cmake_${build_type_lc}_build_dir_targets_test FALSE
       "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" TARGETS
-      ${build_type} "examples/gtest_emulation"
+      ${build_type} "examples/hello_world_component"
     )
 
     create_cmake_test(
-      cmake_${build_type_lc}_install_dir_gtest_emulation_test TRUE
+      cmake_${build_type_lc}_build_dir_macros_test FALSE
+      "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" MACROS
+      ${build_type} "examples/hello_world_component"
+    )
+
+    create_cmake_test(
+      cmake_${build_type_lc}_install_dir_targets_test TRUE
       "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
-      ${build_type} "examples/gtest_emulation"
+      ${build_type} "examples/hello_world_component"
+    )
+
+    create_cmake_test(
+      cmake_${build_type_lc}_install_dir_macros_test TRUE
+      "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" MACROS
+      ${build_type} "examples/hello_world_component"
+    )
+
+    if(HPX_WITH_DYNAMIC_HPX_MAIN)
+      # Google test emulation
+      create_cmake_test(
+        cmake_${build_type_lc}_build_dir_gtest_emulation_test FALSE
+        "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" TARGETS
+        ${build_type} "examples/gtest_emulation"
+      )
+
+      create_cmake_test(
+        cmake_${build_type_lc}_install_dir_gtest_emulation_test TRUE
+        "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
+        ${build_type} "examples/gtest_emulation"
+      )
+    endif()
+  endforeach()
+endif()
+
+# PkgConfig
+if(NOT MSVC
+   AND NOT APPLE
+   AND NOT HPX_WITH_HIP
+   AND HPX_WITH_DISTRIBUTED_RUNTIME
+)
+  # Disabling test for hipcc since the workaround for one of its bug resulted in
+  # breaking clang-7 CI (with -DHPX_WITH_DYNAMIC_MAIN=OFF)
+  # https://github.com/ROCm-Developer-Tools/HIP/issues/2167#issuecomment-712286173
+  find_package(PkgConfig)
+  if(PKGCONFIG_FOUND)
+    create_pkgconfig_test(
+      pkgconfig_build_dir_test "${PROJECT_BINARY_DIR}/lib/pkgconfig"
+    )
+
+    create_pkgconfig_test(
+      pkgconfig_install_dir_test "${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig"
     )
   endif()
-endforeach()
+endif()
 
-# TODO: Support pkgconfig? PkgConfig if(NOT MSVC AND NOT APPLE AND NOT
-# HPX_WITH_HIP ) # Disabling test for hipcc since the workaround for one of its
-# bug resulted in # breaking clang-7 CI (with -DHPX_WITH_DYNAMIC_MAIN=OFF) #
-# https://github.com/ROCm-Developer-Tools/HIP/issues/2167#issuecomment-712286173
-# find_package(PkgConfig) if(PKGCONFIG_FOUND) create_pkgconfig_test(
-# pkgconfig_build_dir_test "${PROJECT_BINARY_DIR}/lib/pkgconfig" )
-#
-# create_pkgconfig_test( pkgconfig_install_dir_test
-# "${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig" ) endif() endif()
-
-set(build_systems cmake)
 set(cmake_tests build_dir_targets install_dir_targets build_dir_macros
                 install_dir_macros
 )
 if(HPX_WITH_DYNAMIC_HPX_MAIN)
   list(APPEND cmake_tests build_dir_gtest_emulation install_dir_gtest_emulation)
 endif()
-# if(NOT CMAKE_TOOLCHAIN_FILE AND PKGCONFIG_FOUND AND NOT MSVC AND NOT APPLE AND
-# NOT HPX_WITH_HIP ) set(build_systems ${build_systems} pkgconfig)
-# set(pkgconfig_tests build_dir install_dir) endif()
-
 set(system cmake)
 add_hpx_pseudo_target(tests.unit.build.${system})
 foreach(build_type ${build_types})
@@ -219,15 +203,24 @@ foreach(build_type ${build_types})
 endforeach()
 add_hpx_pseudo_dependencies(tests.unit.build tests.unit.build.${system})
 
-set(system pkgconfig)
-add_hpx_pseudo_target(tests.unit.build.${system})
-foreach(test ${${system}_tests})
-  add_hpx_pseudo_target(tests.unit.build.${system}.${test})
-  add_hpx_pseudo_dependencies(
-    tests.unit.build.${system}.${test} ${system}_${test}_test
-  )
-  add_hpx_pseudo_dependencies(
-    tests.unit.build.${system} tests.unit.build.${system}.${test}
-  )
-endforeach()
-add_hpx_pseudo_dependencies(tests.unit.build tests.unit.build.${system})
+if(NOT CMAKE_TOOLCHAIN_FILE
+   AND PKGCONFIG_FOUND
+   AND NOT MSVC
+   AND NOT APPLE
+   AND NOT HPX_WITH_HIP
+   AND HPX_WITH_DISTRIBUTED_RUNTIME
+)
+  set(pkgconfig_tests build_dir install_dir)
+  set(system pkgconfig)
+  add_hpx_pseudo_target(tests.unit.build.${system})
+  foreach(test ${${system}_tests})
+    add_hpx_pseudo_target(tests.unit.build.${system}.${test})
+    add_hpx_pseudo_dependencies(
+      tests.unit.build.${system}.${test} ${system}_${test}_test
+    )
+    add_hpx_pseudo_dependencies(
+      tests.unit.build.${system} tests.unit.build.${system}.${test}
+    )
+  endforeach()
+  add_hpx_pseudo_dependencies(tests.unit.build tests.unit.build.${system})
+endif()

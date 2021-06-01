@@ -6,4 +6,4 @@
 
 #pragma once
 
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/local/tuple.hpp>

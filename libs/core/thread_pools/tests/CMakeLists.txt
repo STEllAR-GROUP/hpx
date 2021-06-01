@@ -42,6 +42,7 @@ if(HPX_WITH_TESTS)
       HEADERS ${thread_pools_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
       DEPENDENCIES hpx_thread_pools
+      NOLIBS
     )
   endif()
 endif()

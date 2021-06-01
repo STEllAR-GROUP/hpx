@@ -105,7 +105,7 @@ namespace hpx {
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -412,7 +412,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::make_heap
+    // DPO for hpx::make_heap
     HPX_INLINE_CONSTEXPR_VARIABLE struct make_heap_t final
       : hpx::functional::tag_fallback<make_heap_t>
     {
@@ -430,7 +430,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
             ExPolicy>::type
-        tag_fallback_invoke(make_heap_t, ExPolicy&& policy, RndIter first,
+        tag_fallback_dispatch(make_heap_t, ExPolicy&& policy, RndIter first,
             RndIter last, Comp&& comp)
         {
             static_assert(
@@ -453,7 +453,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
             ExPolicy>::type
-        tag_fallback_invoke(
+        tag_fallback_dispatch(
             make_heap_t, ExPolicy&& policy, RndIter first, RndIter last)
         {
             static_assert(
@@ -480,7 +480,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend void tag_fallback_invoke(
+        friend void tag_fallback_dispatch(
             make_heap_t, RndIter first, RndIter last, Comp&& comp)
         {
             static_assert(
@@ -498,7 +498,7 @@ namespace hpx {
                 hpx::traits::is_iterator<RndIter>::value
             )>
         // clang-format on
-        friend void tag_fallback_invoke(
+        friend void tag_fallback_dispatch(
             make_heap_t, RndIter first, RndIter last)
         {
             static_assert(

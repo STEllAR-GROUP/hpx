@@ -7,14 +7,14 @@
 // This test case demonstrates the issue described in #1702: Shared_mutex does
 // not compile with no_mutex cond_var
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>
 
 #include <mutex>
 #include <shared_mutex>
 
-int main()
+int hpx_main()
 {
     typedef hpx::lcos::local::shared_mutex shared_mutex_type;
 
@@ -32,5 +32,13 @@ int main()
         HPX_UNUSED(i);
     }
 
-    return 0;
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
+
+    return hpx::util::report_errors();
 }

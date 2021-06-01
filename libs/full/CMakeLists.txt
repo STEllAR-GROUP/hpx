@@ -32,6 +32,7 @@ set(_hpx_full_modules
     distribution_policies
     executors_distributed
     include
+    include_local
     init_runtime
     init_runtime_local
     lcos_distributed
@@ -47,7 +48,6 @@ set(_hpx_full_modules
     runtime_distributed
     runtime_local
     segmented_algorithms
-    thread_executors
     threadmanager
 )
 # cmake-format: on

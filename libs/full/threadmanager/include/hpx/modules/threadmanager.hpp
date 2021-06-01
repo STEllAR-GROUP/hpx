@@ -137,6 +137,10 @@ namespace hpx { namespace threads {
         ///
         void stop(bool blocking = true);
 
+        bool is_busy();
+        bool is_idle();
+        void wait();
+
         // \brief Suspend all thread pools.
         void suspend();
 
@@ -307,9 +311,6 @@ namespace hpx { namespace threads {
         }
 
     public:
-        std::size_t shrink_pool(std::string const& pool_name);
-        std::size_t expand_pool(std::string const& pool_name);
-
         // performance counters
         std::int64_t get_queue_length(bool reset);
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME

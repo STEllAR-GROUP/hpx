@@ -65,6 +65,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
@@ -101,25 +102,17 @@ namespace hpx { namespace lcos {
                 typename traits::detail::shared_state_ptr_for<T>::type const&
                     state)
             {
-                std::exception_ptr p;
-
-                try
-                {
-                    typedef typename traits::future_traits<T>::type result_type;
-                    result_type* result = state->get_result();
-                    this->base_type::set_value(std::move(hpx::get<I>(*result)));
-                    return;
-                }
-                catch (...)
-                {
-                    p = std::current_exception();
-                }
-
-                // The exception is set outside the catch block since
-                // set_exception may yield. Ending the catch block on a
-                // different worker thread than where it was started may lead
-                // to segfaults.
-                this->base_type::set_exception(std::move(p));
+                hpx::detail::try_catch_exception_ptr(
+                    [&]() {
+                        typedef
+                            typename traits::future_traits<T>::type result_type;
+                        result_type* result = state->get_result();
+                        this->base_type::set_value(
+                            std::move(hpx::get<I>(*result)));
+                    },
+                    [&](std::exception_ptr ep) {
+                        this->base_type::set_exception(std::move(ep));
+                    });
             }
 
         public:
@@ -244,31 +237,22 @@ namespace hpx { namespace lcos {
                 typename traits::detail::shared_state_ptr_for<T>::type const&
                     state)
             {
-                std::exception_ptr p;
-
-                try
-                {
-                    typedef typename traits::future_traits<T>::type result_type;
-                    result_type* result = state->get_result();
-                    if (i >= result->size())
-                    {
-                        HPX_THROW_EXCEPTION(length_error,
-                            "split_continuation::on_ready",
-                            "index out of bounds");
-                    }
-                    this->base_type::set_value(std::move((*result)[i]));
-                    return;
-                }
-                catch (...)
-                {
-                    p = std::current_exception();
-                }
-
-                // The exception is set outside the catch block since
-                // set_exception may yield. Ending the catch block on a
-                // different worker thread than where it was started may lead
-                // to segfaults.
-                this->base_type::set_exception(std::move(p));
+                hpx::detail::try_catch_exception_ptr(
+                    [&]() {
+                        typedef
+                            typename traits::future_traits<T>::type result_type;
+                        result_type* result = state->get_result();
+                        if (i >= result->size())
+                        {
+                            HPX_THROW_EXCEPTION(length_error,
+                                "split_continuation::on_ready",
+                                "index out of bounds");
+                        }
+                        this->base_type::set_value(std::move((*result)[i]));
+                    },
+                    [&](std::exception_ptr ep) {
+                        this->base_type::set_exception(std::move(ep));
+                    });
             }
 
         public:

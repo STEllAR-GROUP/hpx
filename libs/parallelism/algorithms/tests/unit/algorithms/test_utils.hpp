@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <hpx/include/lcos_local.hpp>
-#include <hpx/include/parallel_execution_policy.hpp>
-#include <hpx/include/util.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <algorithm>
 #include <atomic>

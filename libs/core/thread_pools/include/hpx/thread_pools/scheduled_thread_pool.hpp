@@ -135,6 +135,10 @@ namespace hpx { namespace threads { namespace detail {
         void stop(
             std::unique_lock<std::mutex>& l, bool blocking = true) override;
 
+        void wait() override;
+        bool is_busy() override;
+        bool is_idle() override;
+
         void suspend_direct(error_code& ec = throws) override;
         void resume_direct(error_code& ec = throws) override;
 
@@ -279,26 +283,6 @@ namespace hpx { namespace threads { namespace detail {
         std::int64_t get_busy_loop_count(std::size_t num, bool reset) override;
         std::int64_t get_scheduler_utilization() const override;
 
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-        ///////////////////////////////////////////////////////////////////////
-        // detail::manage_executor implementation
-
-        // Return the requested policy element
-        std::size_t get_policy_element(
-            executor_parameter p, error_code&) const override;
-
-        // Return statistics collected by this scheduler
-        void get_statistics(executor_statistics& s, error_code&) const override;
-
-        // Provide the given processing unit to the scheduler.
-        void add_processing_unit(std::size_t virt_core, std::size_t thread_num,
-            error_code& = hpx::throws) override;
-
-        // Remove the given processing unit from the scheduler.
-        void remove_processing_unit(
-            std::size_t virt_core, error_code& = hpx::throws) override;
-#endif
-
     protected:
         friend struct init_tss_helper<Scheduler>;
 
@@ -412,6 +396,7 @@ namespace hpx { namespace threads { namespace detail {
         std::size_t max_background_threads_;
         std::size_t max_idle_loop_count_;
         std::size_t max_busy_loop_count_;
+        std::size_t shutdown_check_count_;
     };
 }}}    // namespace hpx::threads::detail
 
