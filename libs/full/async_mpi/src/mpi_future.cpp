@@ -104,7 +104,7 @@ namespace hpx { namespace mpi { namespace experimental {
             ++(get_mpi_info().request_queue_size_);
 
             mpi_debug.debug(debug::str<>("request queued"), get_mpi_info(),
-                "request", debug::hex<8>(static_cast<void*>(data->request_)));
+                "request", debug::hex<8>(data->request_));
         }
 
         // used internally to add a request to the main polling vector
@@ -117,9 +117,9 @@ namespace hpx { namespace mpi { namespace experimental {
             get_mpi_info().active_futures_size_ = get_active_futures().size();
 
             mpi_debug.debug(debug::str<>("add request"), get_mpi_info(),
-                "request", debug::hex<8>(static_cast<void*>(data->request_)),
-                "vector size", debug::dec<3>(get_active_futures().size()),
-                "non null", debug::dec<3>(get_number_of_active_requests()));
+                "request", debug::hex<8>(data->request_), "vector size",
+                debug::dec<3>(get_active_futures().size()), "non null",
+                debug::dec<3>(get_number_of_active_requests()));
         }
 
         std::size_t get_number_of_active_requests()
@@ -251,8 +251,8 @@ namespace hpx { namespace mpi { namespace experimental {
                         detail::get_active_requests()[std::size_t(index)];
 
                     mpi_debug.debug(debug::str<>("MPI_Testany(set)"),
-                        detail::get_mpi_info(), "request",
-                        debug::hex<8>(static_cast<void*>(req)), "vector size",
+                        detail::get_mpi_info(), "request", debug::hex<8>(req),
+                        "vector size",
                         debug::dec<3>(detail::get_active_futures().size()),
                         "non null",
                         debug::dec<3>(detail::get_number_of_active_requests()));
@@ -346,7 +346,7 @@ namespace hpx { namespace mpi { namespace experimental {
                 }
             }
 
-            work_count += get_number_of_enqueued_requests();
+            work_count += get_mpi_info().request_queue_size_;
 
             return work_count;
         }
