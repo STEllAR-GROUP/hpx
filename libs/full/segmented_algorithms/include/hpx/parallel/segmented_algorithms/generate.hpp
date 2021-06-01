@@ -188,7 +188,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<SegIter>::value
         )>
     // clang-format on
-    SegIter tag_invoke(hpx::generate_t, SegIter first, SegIter last, F&& f)
+    SegIter tag_dispatch(hpx::generate_t, SegIter first, SegIter last, F&& f)
     {
         static_assert(hpx::traits::is_forward_iterator<SegIter>::value,
             "Requires at least forward iterator.");
@@ -216,7 +216,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy, SegIter>::type
-    tag_invoke(
+    tag_dispatch(
         hpx::generate_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
         static_assert(hpx::traits::is_forward_iterator<SegIter>::value,

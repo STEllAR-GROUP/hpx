@@ -9,17 +9,17 @@
 #if defined(DOXYGEN)
 namespace hpx { namespace functional {
     inline namespace unspecified {
-        /// The `hpx::functional::tag_invoke` name defines a constexpr object
+        /// The `hpx::functional::tag_dispatch` name defines a constexpr object
         /// that is invocable with one or more arguments. The first argument
-        /// is a 'tag' (typically a CPO). It is only invocable if an overload
-        /// of tag_invoke() that accepts the same arguments could be found via
+        /// is a 'tag' (typically a DPO). It is only invocable if an overload
+        /// of tag_dispatch() that accepts the same arguments could be found via
         /// ADL.
         ///
-        /// The evaluation of the expression `hpx::tag_invoke(tag, args...)` is
+        /// The evaluation of the expression `hpx::tag_dispatch(tag, args...)` is
         /// equivalent to evaluating the unqualified call to
-        /// `tag_invoke(decay-copy(tag), std::forward<Args>(args)...)`.
+        /// `tag_dispatch(decay-copy(tag), std::forward<Args>(args)...)`.
         ///
-        /// `hpx::functional::tag_invoke` is implemented against P1895.
+        /// `hpx::functional::tag_dispatch` is implemented against P1895.
         ///
         /// Example:
         /// Defining a new customization point `foo`:
@@ -38,7 +38,7 @@ namespace hpx { namespace functional {
         /// {
         ///     int x = 42;
         ///
-        ///     friend constexpr int tag_invoke(mylib::foo_fn, bar const& x)
+        ///     friend constexpr int tag_dispatch(mylib::foo_fn, bar const& x)
         ///     {
         ///         return b.x;
         ///     }
@@ -49,41 +49,44 @@ namespace hpx { namespace functional {
         /// ```
         /// static_assert(42 == mylib::foo(bar{}), "The answer is 42");
         /// ```
-        inline constexpr unspecified tag_invoke = unspecified;
+        inline constexpr unspecified tag_dispatch = unspecified;
     }    // namespace unspecified
 
-    /// `hpx::functional::is_tag_invocable<Tag, Args...>` is std::true_type if
-    /// an overload of `tag_invoke(tag, args...)` can be found via ADL.
+    /// `hpx::functional::is_tag_dispatchable<Tag, Args...>` is std::true_type if
+    /// an overload of `tag_dispatch(tag, args...)` can be found via ADL.
     template <typename Tag, typename... Args>
-    struct is_tag_invocable;
+    struct is_tag_dispatchable;
 
-    /// `hpx::functional::is_tag_invocable_v<Tag, Args...>` evaluates to
-    /// `hpx::functional::is_tag_invocable<Tag, Args...>::value`
+    /// `hpx::functional::is_tag_dispatchable_v<Tag, Args...>` evaluates to
+    /// `hpx::functional::is_tag_dispatchable<Tag, Args...>::value`
     template <typename Tag, typename... Args>
-    constexpr bool is_tag_invocable_v = is_tag_invocable<Tag, Args...>::value;
+    constexpr bool is_tag_dispatchable_v =
+        is_tag_dispatchable<Tag, Args...>::value;
 
-    /// `hpx::functional::is_nothrow_tag_invocable<Tag, Args...>` is
-    /// std::true_type if an overload of `tag_invoke(tag, args...)` can be
+    /// `hpx::functional::is_nothrow_tag_dispatchable<Tag, Args...>` is
+    /// std::true_type if an overload of `tag_dispatch(tag, args...)` can be
     /// found via ADL and is noexcept.
     template <typename Tag, typename... Args>
-    struct is_nothrow_tag_invocable;
+    struct is_nothrow_tag_dispatchable;
 
-    /// `hpx::functional::is_tag_invocable_v<Tag, Args...>` evaluates to
-    /// `hpx::functional::is_tag_invocable<Tag, Args...>::value`
+    /// `hpx::functional::is_tag_dispatchable_v<Tag, Args...>` evaluates to
+    /// `hpx::functional::is_tag_dispatchable<Tag, Args...>::value`
     template <typename Tag, typename... Args>
-    constexpr bool is_nothrow_tag_invocable_v =
-        is_nothrow_tag_invocable<Tag, Args...>::value;
+    constexpr bool is_nothrow_tag_dispatchable_v =
+        is_nothrow_tag_dispatchable<Tag, Args...>::value;
 
-    /// `hpx::functional::tag_invoke_result<Tag, Args...>` is the trait
-    /// returning the result type of the call hpx::functioanl::tag_invoke. This
+    /// `hpx::functional::tag_dispatch_result<Tag, Args...>` is the trait
+    /// returning the result type of the call hpx::functioanl::tag_dispatch. This
     /// can be used in a SFINAE context.
     template <typename Tag, typename... Args>
-    using tag_invoke_result = invoke_result<decltype(tag_invoke), Tag, Args...>;
+    using tag_dispatch_result =
+        invoke_result<decltype(tag_dispatch), Tag, Args...>;
 
-    /// `hpx::functional::tag_invoke_result_t<Tag, Args...>` evaluates to
-    /// `hpx::functional::tag_invoke_result_t<Tag, Args...>::type`
+    /// `hpx::functional::tag_dispatch_result_t<Tag, Args...>` evaluates to
+    /// `hpx::functional::tag_dispatch_result_t<Tag, Args...>::type`
     template <typename Tag, typename... Args>
-    using tag_invoke_result_t = typename tag_invoke_result<Tag, Args...>::type;
+    using tag_dispatch_result_t =
+        typename tag_dispatch_result<Tag, Args...>::type;
 
     /// `hpx::functional::tag<Tag>` defines a base class that implements
     /// the necessary tag dispatching functionality for a given type `Tag`
@@ -112,110 +115,114 @@ namespace hpx { namespace functional {
     using tag_t = typename std::decay<decltype(Tag)>::type;
 #endif
 
-    namespace tag_invoke_t_ns {
+    namespace tag_dispatch_t_ns {
 
         // poison pill
-        void tag_invoke();
+        void tag_dispatch();
 
-        struct tag_invoke_t
+        struct tag_dispatch_t
         {
             template <typename Tag, typename... Ts>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Tag tag, Ts&&... ts) const
                 noexcept(noexcept(
-                    tag_invoke(std::declval<Tag>(), std::forward<Ts>(ts)...)))
-                    -> decltype(tag_invoke(
+                    tag_dispatch(std::declval<Tag>(), std::forward<Ts>(ts)...)))
+                    -> decltype(tag_dispatch(
                         std::declval<Tag>(), std::forward<Ts>(ts)...))
             {
-                return tag_invoke(tag, std::forward<Ts>(ts)...);
+                return tag_dispatch(tag, std::forward<Ts>(ts)...);
             }
 
-            friend constexpr bool operator==(tag_invoke_t, tag_invoke_t)
+            friend constexpr bool operator==(tag_dispatch_t, tag_dispatch_t)
             {
                 return true;
             }
 
-            friend constexpr bool operator!=(tag_invoke_t, tag_invoke_t)
+            friend constexpr bool operator!=(tag_dispatch_t, tag_dispatch_t)
             {
                 return false;
             }
         };
-    }    // namespace tag_invoke_t_ns
+    }    // namespace tag_dispatch_t_ns
 
-    namespace tag_invoke_ns {
+    namespace tag_dispatch_ns {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_INLINE_CONSTEXPR_VARIABLE
-        tag_invoke_t_ns::tag_invoke_t tag_invoke = {};
+        tag_dispatch_t_ns::tag_dispatch_t tag_dispatch = {};
 #else
-        HPX_DEVICE static tag_invoke_t_ns::tag_invoke_t const tag_invoke = {};
+        HPX_DEVICE static tag_dispatch_t_ns::tag_dispatch_t const tag_dispatch =
+            {};
 #endif
-    }    // namespace tag_invoke_ns
+    }    // namespace tag_dispatch_ns
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Tag, typename... Args>
-    using is_tag_invocable =
-        hpx::is_invocable<decltype(tag_invoke_ns::tag_invoke), Tag, Args...>;
+    using is_tag_dispatchable =
+        hpx::is_invocable<decltype(tag_dispatch_ns::tag_dispatch), Tag,
+            Args...>;
 
     template <typename Tag, typename... Args>
-    constexpr bool is_tag_invocable_v = is_tag_invocable<Tag, Args...>::value;
+    constexpr bool is_tag_dispatchable_v =
+        is_tag_dispatchable<Tag, Args...>::value;
 
     namespace detail {
-        template <typename Sig, bool Invocable>
-        struct is_nothrow_tag_invocable_impl;
+        template <typename Sig, bool Dispatchable>
+        struct is_nothrow_tag_dispatchable_impl;
 
         template <typename Sig>
-        struct is_nothrow_tag_invocable_impl<Sig, false> : std::false_type
+        struct is_nothrow_tag_dispatchable_impl<Sig, false> : std::false_type
         {
         };
 
         template <typename Tag, typename... Args>
-        struct is_nothrow_tag_invocable_impl<
-            decltype(tag_invoke_ns::tag_invoke)(Tag, Args...), true>
+        struct is_nothrow_tag_dispatchable_impl<
+            decltype(tag_dispatch_ns::tag_dispatch)(Tag, Args...), true>
           : std::integral_constant<bool,
-                noexcept(tag_invoke_ns::tag_invoke(
+                noexcept(tag_dispatch_ns::tag_dispatch(
                     std::declval<Tag>(), std::declval<Args>()...))>
         {
         };
     }    // namespace detail
 
     template <typename Tag, typename... Args>
-    struct is_nothrow_tag_invocable
-      : detail::is_nothrow_tag_invocable_impl<
-            decltype(tag_invoke_ns::tag_invoke)(Tag, Args...),
-            is_tag_invocable_v<Tag, Args...>>
+    struct is_nothrow_tag_dispatchable
+      : detail::is_nothrow_tag_dispatchable_impl<
+            decltype(tag_dispatch_ns::tag_dispatch)(Tag, Args...),
+            is_tag_dispatchable_v<Tag, Args...>>
     {
     };
 
     template <typename Tag, typename... Args>
-    constexpr bool is_nothrow_tag_invocable_v =
-        is_nothrow_tag_invocable<Tag, Args...>::value;
+    constexpr bool is_nothrow_tag_dispatchable_v =
+        is_nothrow_tag_dispatchable<Tag, Args...>::value;
 
     template <typename Tag, typename... Args>
-    using tag_invoke_result =
-        hpx::util::invoke_result<decltype(tag_invoke_ns::tag_invoke), Tag,
+    using tag_dispatch_result =
+        hpx::util::invoke_result<decltype(tag_dispatch_ns::tag_dispatch), Tag,
             Args...>;
 
     template <typename Tag, typename... Args>
-    using tag_invoke_result_t = typename tag_invoke_result<Tag, Args...>::type;
+    using tag_dispatch_result_t =
+        typename tag_dispatch_result<Tag, Args...>::type;
 
     ///////////////////////////////////////////////////////////////////////////////
     namespace tag_base_ns {
 
         // poison pill
-        void tag_invoke();
+        void tag_dispatch();
 
         ///////////////////////////////////////////////////////////////////////////
-        // helper base class implementing the tag_invoke logic for CPOs
+        // helper base class implementing the tag_dispatch logic for DPOs
         template <typename Tag>
         struct tag
         {
             template <typename... Args>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
-                noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
-                    -> tag_invoke_result_t<Tag, Args...>
+                noexcept(is_nothrow_tag_dispatchable_v<Tag, Args...>)
+                    -> tag_dispatch_result_t<Tag, Args...>
             {
-                return tag_invoke(static_cast<Tag const&>(*this),
+                return tag_dispatch(static_cast<Tag const&>(*this),
                     std::forward<Args>(args)...);
             }
         };
@@ -225,30 +232,30 @@ namespace hpx { namespace functional {
         {
             template <typename... Args,
                 typename Enable = typename std::enable_if<
-                    is_nothrow_tag_invocable_v<Tag, Args...>>::type>
+                    is_nothrow_tag_dispatchable_v<Tag, Args...>>::type>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
-                -> tag_invoke_result_t<Tag, decltype(args)...>
+                -> tag_dispatch_result_t<Tag, decltype(args)...>
             {
-                return tag_invoke(static_cast<Tag const&>(*this),
+                return tag_dispatch(static_cast<Tag const&>(*this),
                     std::forward<Args>(args)...);
             }
         };
     }    // namespace tag_base_ns
 
-    inline namespace tag_invoke_base_ns {
+    inline namespace tag_dispatch_base_ns {
 
         template <typename Tag>
         using tag = tag_base_ns::tag<Tag>;
 
         template <typename Tag>
         using tag_noexcept = tag_base_ns::tag_noexcept<Tag>;
-    }    // namespace tag_invoke_base_ns
+    }    // namespace tag_dispatch_base_ns
 
-    inline namespace tag_invoke_f_ns {
+    inline namespace tag_dispatch_f_ns {
 
-        using tag_invoke_ns::tag_invoke;
-    }    // namespace tag_invoke_f_ns
+        using tag_dispatch_ns::tag_dispatch;
+    }    // namespace tag_dispatch_f_ns
 }}       // namespace hpx::functional
 
 #endif

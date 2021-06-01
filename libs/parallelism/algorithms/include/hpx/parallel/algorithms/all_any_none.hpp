@@ -229,7 +229,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/void_guard.hpp>
@@ -558,7 +558,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::none_of
+    // DPO for hpx::none_of
     HPX_INLINE_CONSTEXPR_VARIABLE struct none_of_t final
       : hpx::functional::tag_fallback<none_of_t>
     {
@@ -572,7 +572,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_invoke(
+        tag_fallback_dispatch(
             none_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -589,7 +589,7 @@ namespace hpx {
                 hpx::traits::is_iterator<InIter>::value
             )>
         // clang-format on
-        friend bool tag_fallback_invoke(
+        friend bool tag_fallback_dispatch(
             none_of_t, InIter first, InIter last, F&& f)
         {
             static_assert(hpx::traits::is_input_iterator<InIter>::value,
@@ -602,7 +602,7 @@ namespace hpx {
     } none_of{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::any_of
+    // DPO for hpx::any_of
     HPX_INLINE_CONSTEXPR_VARIABLE struct any_of_t final
       : hpx::functional::tag_fallback<any_of_t>
     {
@@ -616,7 +616,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_invoke(
+        tag_fallback_dispatch(
             any_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -633,7 +633,7 @@ namespace hpx {
                 hpx::traits::is_iterator<InIter>::value
             )>
         // clang-format on
-        friend bool tag_fallback_invoke(
+        friend bool tag_fallback_dispatch(
             any_of_t, InIter first, InIter last, F&& f)
         {
             static_assert(hpx::traits::is_input_iterator<InIter>::value,
@@ -646,7 +646,7 @@ namespace hpx {
     } any_of{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::all_of
+    // DPO for hpx::all_of
     HPX_INLINE_CONSTEXPR_VARIABLE struct all_of_t final
       : hpx::functional::tag_fallback<all_of_t>
     {
@@ -660,7 +660,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_invoke(
+        tag_fallback_dispatch(
             all_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -677,7 +677,7 @@ namespace hpx {
                 hpx::traits::is_iterator<InIter>::value
             )>
         // clang-format on
-        friend bool tag_fallback_invoke(
+        friend bool tag_fallback_dispatch(
             all_of_t, InIter first, InIter last, F&& f)
         {
             static_assert(hpx::traits::is_input_iterator<InIter>::value,

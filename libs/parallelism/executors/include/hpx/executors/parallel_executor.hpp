@@ -166,7 +166,7 @@ namespace hpx { namespace execution {
         {
         }
 
-        friend parallel_policy_executor tag_invoke(
+        friend parallel_policy_executor tag_dispatch(
             hpx::execution::experimental::make_with_hint_t,
             parallel_policy_executor const& exec,
             hpx::threads::thread_schedule_hint hint)
@@ -176,7 +176,7 @@ namespace hpx { namespace execution {
             return exec_with_hint;
         }
 
-        friend hpx::threads::thread_schedule_hint tag_invoke(
+        friend hpx::threads::thread_schedule_hint tag_dispatch(
             hpx::execution::experimental::get_hint_t,
             parallel_policy_executor const& exec)
         {

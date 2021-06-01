@@ -11,7 +11,7 @@
 #include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <exception>
@@ -140,7 +140,7 @@ namespace hpx { namespace execution { namespace experimental {
     {
     private:
         template <typename S, typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             transform_t, S&& s, F&& f)
         {
             return detail::transform_sender<S, F>{
@@ -148,7 +148,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         template <typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             transform_t, F&& f)
         {
             return detail::partial_algorithm<transform_t, F>{

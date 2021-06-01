@@ -237,7 +237,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<SegIter>::value
         )>
     // clang-format on
-    SegIter tag_invoke(hpx::find_t, SegIter first, SegIter last, T const& val)
+    SegIter tag_dispatch(hpx::find_t, SegIter first, SegIter last, T const& val)
     {
         static_assert(hpx::traits::is_input_iterator<SegIter>::value,
             "Requires at least input iterator.");
@@ -264,7 +264,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy, SegIter>::type
-    tag_invoke(hpx::find_t, ExPolicy&& policy, SegIter first, SegIter last,
+    tag_dispatch(hpx::find_t, ExPolicy&& policy, SegIter first, SegIter last,
         T const& val)
     {
         static_assert(hpx::traits::is_forward_iterator<SegIter>::value,
@@ -293,7 +293,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<FwdIter>::value
         )>
     // clang-format on
-    FwdIter tag_invoke(hpx::find_if_t, FwdIter first, FwdIter last, F&& f)
+    FwdIter tag_dispatch(hpx::find_if_t, FwdIter first, FwdIter last, F&& f)
     {
         static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
             "Requires at least input iterator.");
@@ -321,7 +321,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    tag_invoke(
+    tag_dispatch(
         hpx::find_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
     {
         static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -351,7 +351,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<FwdIter>::value
         )>
     // clang-format on
-    FwdIter tag_invoke(hpx::find_if_not_t, FwdIter first, FwdIter last, F&& f)
+    FwdIter tag_dispatch(hpx::find_if_not_t, FwdIter first, FwdIter last, F&& f)
     {
         static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
             "Requires at least input iterator.");
@@ -379,7 +379,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    tag_invoke(hpx::find_if_not_t, ExPolicy&& policy, FwdIter first,
+    tag_dispatch(hpx::find_if_not_t, ExPolicy&& policy, FwdIter first,
         FwdIter last, F&& f)
     {
         static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,

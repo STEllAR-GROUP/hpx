@@ -189,8 +189,9 @@ namespace hpx { namespace resiliency { namespace experimental {
             hpx::traits::is_two_way_executor<Executor>::value
         )>
     // clang-format on
-    decltype(auto) tag_invoke(async_replicate_vote_validate_t, Executor&& exec,
-        std::size_t n, Vote&& vote, Pred&& pred, F&& f, Ts&&... ts)
+    decltype(auto) tag_dispatch(async_replicate_vote_validate_t,
+        Executor&& exec, std::size_t n, Vote&& vote, Pred&& pred, F&& f,
+        Ts&&... ts)
     {
         using result_type =
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
@@ -213,7 +214,7 @@ namespace hpx { namespace resiliency { namespace experimental {
             hpx::traits::is_two_way_executor<Executor>::value
         )>
     // clang-format on
-    decltype(auto) tag_invoke(async_replicate_vote_t, Executor&& exec,
+    decltype(auto) tag_dispatch(async_replicate_vote_t, Executor&& exec,
         std::size_t n, Vote&& vote, F&& f, Ts&&... ts)
     {
         using result_type =
@@ -236,7 +237,7 @@ namespace hpx { namespace resiliency { namespace experimental {
             hpx::traits::is_two_way_executor<Executor>::value
         )>
     // clang-format on
-    decltype(auto) tag_invoke(async_replicate_validate_t, Executor&& exec,
+    decltype(auto) tag_dispatch(async_replicate_validate_t, Executor&& exec,
         std::size_t n, Pred&& pred, F&& f, Ts&&... ts)
     {
         using result_type =
@@ -259,7 +260,7 @@ namespace hpx { namespace resiliency { namespace experimental {
             hpx::traits::is_two_way_executor<Executor>::value
         )>
     // clang-format on
-    decltype(auto) tag_invoke(
+    decltype(auto) tag_dispatch(
         async_replicate_t, Executor&& exec, std::size_t n, F&& f, Ts&&... ts)
     {
         using result_type =

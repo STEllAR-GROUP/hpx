@@ -181,9 +181,9 @@ void check_exception_ptr(std::exception_ptr eptr)
     }
 };
 
-struct custom_sender_tag_invoke
+struct custom_sender_tag_dispatch
 {
-    std::atomic<bool>& tag_invoke_overload_called;
+    std::atomic<bool>& tag_dispatch_overload_called;
 
     template <template <typename...> class Tuple,
         template <typename...> class Variant>
@@ -215,7 +215,7 @@ struct custom_sender
 {
     std::atomic<bool>& start_called;
     std::atomic<bool>& connect_called;
-    std::atomic<bool>& tag_invoke_overload_called;
+    std::atomic<bool>& tag_dispatch_overload_called;
 
     template <template <class...> class Tuple,
         template <class...> class Variant>
@@ -253,7 +253,7 @@ struct custom_typed_sender
 
     std::atomic<bool>& start_called;
     std::atomic<bool>& connect_called;
-    std::atomic<bool>& tag_invoke_overload_called;
+    std::atomic<bool>& tag_dispatch_overload_called;
 
     template <template <class...> class Tuple,
         template <class...> class Variant>
@@ -297,7 +297,7 @@ struct custom_sender2 : custom_sender
 template <typename T>
 struct custom_type
 {
-    std::atomic<bool>& tag_invoke_overload_called;
+    std::atomic<bool>& tag_dispatch_overload_called;
     std::decay_t<T> x;
 };
 
@@ -337,7 +337,7 @@ struct scheduler
 {
     std::atomic<bool>& schedule_called;
     std::atomic<bool>& execute_called;
-    std::atomic<bool>& tag_invoke_overload_called;
+    std::atomic<bool>& tag_dispatch_overload_called;
 
     template <typename F>
     void execute(F&& f) const

@@ -14,7 +14,7 @@
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 
@@ -104,7 +104,7 @@ namespace hpx { namespace execution { namespace experimental {
     private:
         template <typename S,
             typename Allocator = hpx::util::internal_allocator<>>
-        friend constexpr HPX_FORCEINLINE void tag_fallback_invoke(
+        friend constexpr HPX_FORCEINLINE void tag_fallback_dispatch(
             detach_t, S&& s, Allocator&& a = Allocator{})
         {
             using allocator_type = Allocator;
@@ -124,7 +124,7 @@ namespace hpx { namespace execution { namespace experimental {
             p.release();
         }
 
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(detach_t)
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(detach_t)
         {
             return detail::partial_algorithm<detach_t>{};
         }

@@ -12,7 +12,7 @@
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/type_support/pack.hpp>
@@ -165,7 +165,7 @@ namespace hpx { namespace execution { namespace experimental {
     {
     private:
         template <typename S>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             sync_wait_t, S&& s)
         {
             using receiver_type = detail::sync_wait_receiver<S>;
@@ -180,7 +180,7 @@ namespace hpx { namespace execution { namespace experimental {
             return st.get_value();
         }
 
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(sync_wait_t)
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(sync_wait_t)
         {
             return detail::partial_algorithm<sync_wait_t>{};
         }

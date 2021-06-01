@@ -12,7 +12,7 @@
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/type_support/detail/with_result_of.hpp>
 #include <hpx/type_support/pack.hpp>
 
@@ -264,7 +264,7 @@ namespace hpx { namespace execution { namespace experimental {
     {
     private:
         template <typename PS, typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             let_value_t, PS&& ps, F&& f)
         {
             return detail::let_value_sender<PS, F>{
@@ -272,7 +272,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         template <typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             let_value_t, F&& f)
         {
             return detail::partial_algorithm<let_value_t, F>{

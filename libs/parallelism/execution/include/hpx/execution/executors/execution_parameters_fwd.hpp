@@ -12,7 +12,7 @@
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/functional/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <cstddef>
@@ -89,7 +89,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
             get_chunk_size_t, Parameters&& params, Executor&& exec, F&& f,
             std::size_t cores, std::size_t num_tasks)
         {
@@ -125,7 +125,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
             maximal_number_of_chunks_t, Parameters&& params, Executor&& exec,
             std::size_t cores, std::size_t num_tasks)
         {
@@ -157,7 +157,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
             reset_thread_distribution_t, Parameters&& params, Executor&& exec)
         {
             return detail::reset_thread_distribution_fn_helper<
@@ -188,7 +188,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
             processing_units_count_t, Parameters&& params, Executor&& exec)
         {
             return detail::processing_units_count_fn_helper<
@@ -217,7 +217,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
             mark_begin_execution_t, Parameters&& params, Executor&& exec)
         {
             return detail::mark_begin_execution_fn_helper<
@@ -246,7 +246,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
             mark_end_of_scheduling_t, Parameters&& params, Executor&& exec)
         {
             return detail::mark_end_of_scheduling_fn_helper<
@@ -275,7 +275,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
             mark_end_execution_t, Parameters&& params, Executor&& exec)
         {
             return detail::mark_end_execution_fn_helper<

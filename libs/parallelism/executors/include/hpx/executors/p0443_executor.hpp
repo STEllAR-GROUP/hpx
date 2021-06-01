@@ -36,7 +36,7 @@ namespace hpx { namespace execution { namespace experimental {
             return !(*this == rhs);
         }
 
-        friend executor tag_invoke(
+        friend executor tag_dispatch(
             hpx::execution::experimental::make_with_priority_t,
             executor const& exec, hpx::threads::thread_priority priority)
         {
@@ -45,13 +45,13 @@ namespace hpx { namespace execution { namespace experimental {
             return exec_with_priority;
         }
 
-        friend hpx::threads::thread_priority tag_invoke(
+        friend hpx::threads::thread_priority tag_dispatch(
             hpx::execution::experimental::get_priority_t, executor const& exec)
         {
             return exec.priority_;
         }
 
-        friend executor tag_invoke(
+        friend executor tag_dispatch(
             hpx::execution::experimental::make_with_stacksize_t,
             executor const& exec, hpx::threads::thread_stacksize stacksize)
         {
@@ -60,13 +60,13 @@ namespace hpx { namespace execution { namespace experimental {
             return exec_with_stacksize;
         }
 
-        friend hpx::threads::thread_stacksize tag_invoke(
+        friend hpx::threads::thread_stacksize tag_dispatch(
             hpx::execution::experimental::get_stacksize_t, executor const& exec)
         {
             return exec.stacksize_;
         }
 
-        friend executor tag_invoke(
+        friend executor tag_dispatch(
             hpx::execution::experimental::make_with_hint_t,
             executor const& exec, hpx::threads::thread_schedule_hint hint)
         {
@@ -75,7 +75,7 @@ namespace hpx { namespace execution { namespace experimental {
             return exec_with_hint;
         }
 
-        friend hpx::threads::thread_schedule_hint tag_invoke(
+        friend hpx::threads::thread_schedule_hint tag_dispatch(
             hpx::execution::experimental::get_hint_t, executor const& exec)
         {
             return exec.schedulehint_;

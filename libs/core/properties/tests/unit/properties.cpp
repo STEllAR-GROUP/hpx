@@ -37,14 +37,14 @@ struct type4
     property1 p1{};
 };
 
-type1 tag_invoke(make_with_property_t, type1 const& t, property1 p)
+type1 tag_dispatch(make_with_property_t, type1 const& t, property1 p)
 {
     auto tt = t;
     tt.p1 = p;
     return tt;
 }
 
-type3 tag_invoke(hpx::experimental::prefer_t, make_with_property_t,
+type3 tag_dispatch(hpx::experimental::prefer_t, make_with_property_t,
     type3 const& t, property1 p)
 {
     auto tt = t;
@@ -53,7 +53,7 @@ type3 tag_invoke(hpx::experimental::prefer_t, make_with_property_t,
     return tt;
 }
 
-type4 tag_invoke(hpx::experimental::prefer_t, make_with_property_t,
+type4 tag_dispatch(hpx::experimental::prefer_t, make_with_property_t,
     type4 const& t, property1 p)
 {
     auto tt = t;
@@ -62,7 +62,7 @@ type4 tag_invoke(hpx::experimental::prefer_t, make_with_property_t,
     return tt;
 }
 
-type4 tag_invoke(make_with_property_t, type4 const& t, property1 p)
+type4 tag_dispatch(make_with_property_t, type4 const& t, property1 p)
 {
     auto tt = t;
     tt.p1 = p;

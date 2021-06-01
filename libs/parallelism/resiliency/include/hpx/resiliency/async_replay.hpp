@@ -136,7 +136,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     template <typename Pred, typename F, typename... Ts>
     hpx::future<
         typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
-    tag_invoke(
+    tag_dispatch(
         async_replay_validate_t, std::size_t n, Pred&& pred, F&& f, Ts&&... ts)
     {
         using result_type =
@@ -155,7 +155,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     template <typename F, typename... Ts>
     hpx::future<
         typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
-    tag_invoke(async_replay_t, std::size_t n, F&& f, Ts&&... ts)
+    tag_dispatch(async_replay_t, std::size_t n, F&& f, Ts&&... ts)
     {
         using result_type =
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;

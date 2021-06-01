@@ -233,7 +233,7 @@ namespace hpx { namespace ranges {
     using mismatch_result = hpx::parallel::util::in_in_result<Iter1, Iter2>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::mismatch
+    // DPO for hpx::ranges::mismatch
     HPX_INLINE_CONSTEXPR_VARIABLE struct mismatch_t final
       : hpx::functional::tag<mismatch_t>
     {
@@ -255,7 +255,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             mismatch_result<Iter1, Iter2>>::type
-        tag_invoke(mismatch_t, ExPolicy&& policy, Iter1 first1, Sent1 last1,
+        tag_dispatch(mismatch_t, ExPolicy&& policy, Iter1 first1, Sent1 last1,
             Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -292,7 +292,7 @@ namespace hpx { namespace ranges {
             mismatch_result<
                 typename hpx::traits::range_traits<Rng1>::iterator_type,
                 typename hpx::traits::range_traits<Rng2>::iterator_type>>::type
-        tag_invoke(mismatch_t, ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
+        tag_dispatch(mismatch_t, ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -331,7 +331,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend mismatch_result<Iter1, Iter2> tag_invoke(mismatch_t,
+        friend mismatch_result<Iter1, Iter2> tag_dispatch(mismatch_t,
             Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -367,7 +367,7 @@ namespace hpx { namespace ranges {
         friend mismatch_result<
             typename hpx::traits::range_traits<Rng1>::iterator_type,
             typename hpx::traits::range_traits<Rng2>::iterator_type>
-        tag_invoke(mismatch_t, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
+        tag_dispatch(mismatch_t, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             static_assert(

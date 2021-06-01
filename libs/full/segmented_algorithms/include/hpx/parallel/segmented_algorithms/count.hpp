@@ -361,7 +361,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<InIter>::value
         )>
     // clang-format on
-    typename std::iterator_traits<InIter>::difference_type tag_invoke(
+    typename std::iterator_traits<InIter>::difference_type tag_dispatch(
         hpx::count_t, InIter first, InIter last, T const& value)
     {
         static_assert((hpx::traits::is_input_iterator<InIter>::value),
@@ -392,7 +392,7 @@ namespace hpx { namespace segmented {
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename std::iterator_traits<SegIter>::difference_type>::type
-    tag_invoke(hpx::count_t, ExPolicy&& policy, SegIter first, SegIter last,
+    tag_dispatch(hpx::count_t, ExPolicy&& policy, SegIter first, SegIter last,
         T const& value)
     {
         static_assert((hpx::traits::is_forward_iterator<SegIter>::value),
@@ -423,7 +423,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<InIter>::value
         )>
     // clang-format on
-    typename std::iterator_traits<InIter>::difference_type tag_invoke(
+    typename std::iterator_traits<InIter>::difference_type tag_dispatch(
         hpx::count_if_t, InIter first, InIter last, F&& f)
     {
         static_assert((hpx::traits::is_input_iterator<InIter>::value),
@@ -454,7 +454,7 @@ namespace hpx { namespace segmented {
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename std::iterator_traits<SegIter>::difference_type>::type
-    tag_invoke(
+    tag_dispatch(
         hpx::count_if_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
         static_assert((hpx::traits::is_forward_iterator<SegIter>::value),

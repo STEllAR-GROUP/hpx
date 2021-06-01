@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config/constexpr.hpp>
-#include <hpx/functional/tag_priority_invoke.hpp>
+#include <hpx/functional/tag_priority_dispatch.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 
 #include <exception>
@@ -28,7 +28,7 @@ namespace hpx { namespace execution { namespace experimental {
     ///       `void set_value();`
     ///     * Otherwise, the expression is ill-formed.
     ///
-    /// The customization is implemented in terms of `hpx::functional::tag_invoke`.
+    /// The customization is implemented in terms of `hpx::functional::tag_dispatch`.
     template <typename R, typename... As>
     void set_value(R&& r, As&&... as);
 
@@ -42,7 +42,7 @@ namespace hpx { namespace execution { namespace experimental {
     ///       `void set_done();`
     ///     * Otherwise, the expression is ill-formed.
     ///
-    /// The customization is implemented in terms of `hpx::functional::tag_invoke`.
+    /// The customization is implemented in terms of `hpx::functional::tag_dispatch`.
     template <typename R>
     void set_done(R&& r);
 
@@ -56,7 +56,7 @@ namespace hpx { namespace execution { namespace experimental {
     ///       `void set_error();`
     ///     * Otherwise, the expression is ill-formed.
     ///
-    /// The customization is implemented in terms of `hpx::functional::tag_invoke`.
+    /// The customization is implemented in terms of `hpx::functional::tag_dispatch`.
     template <typename R, typename E>
     void set_error(R&& r, E&& e);
 #endif
@@ -107,7 +107,7 @@ namespace hpx { namespace execution { namespace experimental {
     private:
         template <typename R, typename... Args>
         friend constexpr HPX_FORCEINLINE auto
-        tag_override_invoke(set_value_t, R&& r, Args&&... args) noexcept(
+        tag_override_dispatch(set_value_t, R&& r, Args&&... args) noexcept(
             noexcept(std::forward<R>(r).set_value(std::forward<Args>(args)...)))
             -> decltype(
                 std::forward<R>(r).set_value(std::forward<Args>(args)...))
@@ -122,7 +122,7 @@ namespace hpx { namespace execution { namespace experimental {
     private:
         template <typename R, typename E>
         friend constexpr HPX_FORCEINLINE auto
-        tag_override_invoke(set_error_t, R&& r, E&& e) noexcept(
+        tag_override_dispatch(set_error_t, R&& r, E&& e) noexcept(
             noexcept(std::declval<R&&>().set_error(std::forward<E>(e))))
             -> decltype(std::declval<R&&>().set_error(std::forward<E>(e)))
         {
@@ -135,7 +135,7 @@ namespace hpx { namespace execution { namespace experimental {
     {
     private:
         template <typename R>
-        friend constexpr HPX_FORCEINLINE auto tag_override_invoke(set_done_t,
+        friend constexpr HPX_FORCEINLINE auto tag_override_dispatch(set_done_t,
             R&& r) noexcept(noexcept(std::declval<R&&>().set_done()))
             -> decltype(std::declval<R&&>().set_done())
         {
