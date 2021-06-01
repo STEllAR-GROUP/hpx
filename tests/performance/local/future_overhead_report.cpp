@@ -141,6 +141,75 @@ void measure_function_futures_create_thread(std::uint64_t count, const int repet
         });
 }
 
+void measure_function_futures_create_thread_hierarchical_placement(
+    std::uint64_t count, const int repetitions)
+{
+    auto sched = hpx::threads::get_self_id_data()->get_scheduler_base();
+
+    if (std::string("core-shared_priority_queue_scheduler") ==
+        sched->get_description())
+    {
+        sched->add_remove_scheduler_mode(
+            hpx::threads::policies::scheduler_mode(
+                hpx::threads::policies::assign_work_thread_parent),
+            hpx::threads::policies::scheduler_mode(
+                hpx::threads::policies::enable_stealing |
+                hpx::threads::policies::enable_stealing_numa |
+                hpx::threads::policies::assign_work_round_robin |
+                hpx::threads::policies::steal_after_local |
+                hpx::threads::policies::steal_high_priority_first));
+    }
+    auto const desc = hpx::util::thread_description();
+    auto prio = hpx::threads::thread_priority::normal;
+    auto const stack_size = hpx::threads::thread_stacksize::small_;
+    auto const num_threads = hpx::get_num_worker_threads();
+    hpx::error_code ec;
+
+    hpx::util::perf_test_report(
+        "future overhead - create_thread_hierarchical - latch", "no-executor",
+        repetitions, [&]() -> void {
+            hpx::lcos::local::latch l(count);
+
+            auto const func = [&l]() {
+                null_function();
+                l.count_down(1);
+            };
+            auto const thread_func =
+                hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
+            for (std::size_t t = 0; t < num_threads; ++t)
+            {
+                auto const hint = hpx::threads::thread_schedule_hint(
+                    static_cast<std::int16_t>(t));
+                auto spawn_func = [&thread_func, sched, hint, t, count,
+                                      num_threads, desc, prio]() {
+                    std::uint64_t const count_start = t * count / num_threads;
+                    std::uint64_t const count_end =
+                        (t + 1) * count / num_threads;
+                    hpx::error_code ec;
+                    for (std::uint64_t i = count_start; i < count_end; ++i)
+                    {
+                        hpx::threads::thread_init_data init(
+                            hpx::threads::thread_function_type(thread_func),
+                            desc, prio, hint, stack_size,
+                            hpx::threads::thread_schedule_state::pending, false,
+                            sched);
+                        sched->create_thread(init, nullptr, ec);
+                    }
+                };
+                auto const thread_spawn_func =
+                    hpx::threads::detail::thread_function_nullary<decltype(
+                        spawn_func)>{spawn_func};
+
+                hpx::threads::thread_init_data init(
+                    hpx::threads::thread_function_type(thread_spawn_func), desc,
+                    prio, hint, stack_size,
+                    hpx::threads::thread_schedule_state::pending, false, sched);
+                sched->create_thread(init, nullptr, ec);
+            }
+            l.wait();
+        });
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
@@ -170,7 +239,9 @@ int hpx_main(variables_map& vm)
         if (test_all)
         {
             //measure_function_futures_wait_each(count, par, repetitions);
-            measure_function_futures_create_thread(count, repetitions);
+            //measure_function_futures_create_thread(count, repetitions);
+            measure_function_futures_create_thread_hierarchical_placement(
+                count, repetitions);
         }
     }
 
