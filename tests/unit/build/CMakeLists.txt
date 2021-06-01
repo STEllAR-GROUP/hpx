@@ -154,73 +154,55 @@ if(NOT MSVC)
   endforeach()
 endif()
 
-# PkgConfig
-if(NOT MSVC
-   AND NOT APPLE
-   AND NOT HPX_WITH_HIP
-   AND HPX_WITH_DISTRIBUTED_RUNTIME
-)
-  # Disabling test for hipcc since the workaround for one of its bug resulted in
-  # breaking clang-7 CI (with -DHPX_WITH_DYNAMIC_MAIN=OFF)
-  # https://github.com/ROCm-Developer-Tools/HIP/issues/2167#issuecomment-712286173
-  find_package(PkgConfig)
-  if(PKGCONFIG_FOUND)
-    create_pkgconfig_test(
-      pkgconfig_build_dir_test "${PROJECT_BINARY_DIR}/lib/pkgconfig"
-    )
-
-    create_pkgconfig_test(
-      pkgconfig_install_dir_test "${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig"
-    )
-  endif()
-endif()
-
 set(cmake_tests build_dir_targets install_dir_targets build_dir_macros
                 install_dir_macros
 )
 if(HPX_WITH_DYNAMIC_HPX_MAIN)
   list(APPEND cmake_tests build_dir_gtest_emulation install_dir_gtest_emulation)
 endif()
-set(system cmake)
-add_hpx_pseudo_target(tests.unit.build.${system})
+
+add_hpx_pseudo_target(tests.unit.build.cmake)
 foreach(build_type ${build_types})
   string(TOLOWER "${build_type}" build_type_lc)
-  add_hpx_pseudo_target(tests.unit.build.${system}.${build_type_lc})
-  foreach(test ${${system}_tests})
-    add_hpx_pseudo_target(tests.unit.build.${system}.${build_type_lc}.${test})
+  add_hpx_pseudo_target(tests.unit.build.cmake.${build_type_lc})
+  foreach(test ${cmake_tests})
+    add_hpx_pseudo_target(tests.unit.build.cmake.${build_type_lc}.${test})
     add_hpx_pseudo_dependencies(
-      tests.unit.build.${system}.${build_type_lc}.${test}
-      ${system}_${build_type_lc}_${test}_test
+      tests.unit.build.cmake.${build_type_lc}.${test}
+      cmake_${build_type_lc}_${test}_test
     )
     add_hpx_pseudo_dependencies(
-      tests.unit.build.${system}.${build_type_lc}
-      tests.unit.build.${system}.${build_type_lc}.${test}
+      tests.unit.build.cmake.${build_type_lc}
+      tests.unit.build.cmake.${build_type_lc}.${test}
     )
   endforeach()
   add_hpx_pseudo_dependencies(
-    tests.unit.build.${system} tests.unit.build.${system}.${build_type_lc}
+    tests.unit.build.cmake tests.unit.build.cmake.${build_type_lc}
   )
 endforeach()
-add_hpx_pseudo_dependencies(tests.unit.build tests.unit.build.${system})
+add_hpx_pseudo_dependencies(tests.unit.build tests.unit.build.cmake)
 
-if(NOT CMAKE_TOOLCHAIN_FILE
-   AND PKGCONFIG_FOUND
-   AND NOT MSVC
-   AND NOT APPLE
-   AND NOT HPX_WITH_HIP
-   AND HPX_WITH_DISTRIBUTED_RUNTIME
-)
-  set(pkgconfig_tests build_dir install_dir)
-  set(system pkgconfig)
-  add_hpx_pseudo_target(tests.unit.build.${system})
-  foreach(test ${${system}_tests})
-    add_hpx_pseudo_target(tests.unit.build.${system}.${test})
-    add_hpx_pseudo_dependencies(
-      tests.unit.build.${system}.${test} ${system}_${test}_test
+if(HPX_WITH_PKGCONFIG AND HPX_WITH_DISTRIBUTED_RUNTIME)
+  find_package(PkgConfig)
+  if(PKGCONFIG_FOUND)
+    create_pkgconfig_test(
+      pkgconfig_build_dir_test "${PROJECT_BINARY_DIR}/lib/pkgconfig"
     )
-    add_hpx_pseudo_dependencies(
-      tests.unit.build.${system} tests.unit.build.${system}.${test}
+    create_pkgconfig_test(
+      pkgconfig_install_dir_test "${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig"
     )
-  endforeach()
-  add_hpx_pseudo_dependencies(tests.unit.build tests.unit.build.${system})
+
+    set(pkgconfig_tests build_dir install_dir)
+    add_hpx_pseudo_target(tests.unit.build.pkgconfig)
+    foreach(test ${pkgconfig_tests})
+      add_hpx_pseudo_target(tests.unit.build.pkgconfig.${test})
+      add_hpx_pseudo_dependencies(
+        tests.unit.build.pkgconfig.${test} pkgconfig_${test}_test
+      )
+      add_hpx_pseudo_dependencies(
+        tests.unit.build.pkgconfig tests.unit.build.pkgconfig.${test}
+      )
+    endforeach()
+    add_hpx_pseudo_dependencies(tests.unit.build tests.unit.build.pkgconfig)
+  endif()
 endif()
