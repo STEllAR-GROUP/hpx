@@ -137,6 +137,16 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         // clang-format on
     }
 
+    std::size_t get_number_of_enqueued_events()
+    {
+        return get_event_queue().size_approx();
+    }
+
+    std::size_t get_number_of_active_events()
+    {
+        return get_active_futures().size();
+    }
+
     // -------------------------------------------------------------
     // Background progress function for async CUDA operations
     // Checks for completed cudaEvent_t and sets cuda::future
@@ -265,6 +275,22 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
                                               polling_status::busy;
     }
 
+    std::size_t get_work_count()
+    {
+        std::size_t work_count = 0;
+        {
+            std::unique_lock<mutex_type> lk(get_list_mtx(), std::try_to_lock);
+            if (lk.owns_lock())
+            {
+                work_count += get_number_of_active_events();
+            }
+        }
+
+        work_count += get_number_of_enqueued_events();
+
+        return work_count;
+    }
+
     // -------------------------------------------------------------
     void register_polling(hpx::threads::thread_pool_base& pool)
     {
@@ -273,8 +299,8 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
 #endif
         cud_debug.debug(debug::str<>("enable polling"));
         auto* sched = pool.get_scheduler();
-        sched->set_cuda_polling_function(
-            &hpx::cuda::experimental::detail::poll);
+        sched->set_cuda_polling_functions(
+            &hpx::cuda::experimental::detail::poll, &get_work_count);
     }
 
     // -------------------------------------------------------------

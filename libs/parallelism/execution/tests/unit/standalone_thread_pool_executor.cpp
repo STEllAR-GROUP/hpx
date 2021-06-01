@@ -198,10 +198,7 @@ int main()
         // run the tests for us.
         hpx::apply(exec, &test_thread_pool_os_executor, exec);
 
-        // Stop the pool. First wait for all tasks to run.
-        hpx::util::yield_while([&pool]() {
-            return pool.get_thread_count_unknown(std::size_t(-1), false) != 0;
-        });
+        // Stop the pool.
         pool.stop(l, true);
     }
 

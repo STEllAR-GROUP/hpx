@@ -123,6 +123,7 @@ namespace hpx { namespace util {
 #endif
             "finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}",
             "shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}",
+            "shutdown_check_count = ${HPX_SHUTDOWN_CHECK_COUNT:10}",
 #ifdef HPX_HAVE_VERIFY_LOCKS
 #if defined(HPX_DEBUG)
             "lock_detection = ${HPX_LOCK_DETECTION:1}",

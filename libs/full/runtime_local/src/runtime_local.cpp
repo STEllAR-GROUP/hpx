@@ -1491,13 +1491,7 @@ namespace hpx {
         // block main thread
         t.join();
 
-        util::yield_while(
-            [this]() {
-                return thread_manager_->get_thread_count() >
-                    1 + thread_manager_->get_background_thread_count() &&
-                    state_.load() < state_shutdown;
-            },
-            "runtime::wait");
+        thread_manager_->wait();
 
         LRT_(info).format("runtime_local: exiting wait state");
         return result_;
@@ -1599,13 +1593,6 @@ namespace hpx {
                 "Can only suspend runtime from running state");
             return -1;
         }
-
-        util::yield_while(
-            [this]() {
-                return thread_manager_->get_thread_count() >
-                    thread_manager_->get_background_thread_count();
-            },
-            "runtime::suspend");
 
         thread_manager_->suspend();
 

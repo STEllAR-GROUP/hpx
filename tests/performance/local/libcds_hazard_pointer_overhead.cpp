@@ -149,45 +149,6 @@ struct scratcher
     }
 };
 
-template <typename Executor>
-void measure_function_futures_thread_count(
-    std::uint64_t count, bool csv, Executor& exec, bool uselibcds)
-{
-    std::atomic<std::uint64_t> sanity_check(count);
-    auto this_pool = hpx::this_thread::get_pool();
-
-    // start the clock
-    high_resolution_timer walltime;
-    for (std::uint64_t i = 0; i < count; ++i)
-    {
-        hpx::apply(exec, [&]() {
-            null_function(uselibcds);
-            sanity_check--;
-        });
-    }
-
-    // Yield until there is only this and background threads left.
-    hpx::util::yield_while([this_pool]() {
-        auto u = this_pool->get_thread_count_unknown(std::size_t(-1), false);
-        auto b = this_pool->get_background_thread_count() + 1;
-        return u > b;
-    });
-
-    // stop the clock
-    const double duration = walltime.elapsed();
-
-    if (sanity_check != 0)
-    {
-        auto count =
-            this_pool->get_thread_count_unknown(std::size_t(-1), false);
-        throw std::runtime_error(
-            "This test is faulty " + std::to_string(count));
-    }
-
-    print_stats("apply", "ThreadCount", exec_name(exec), count, duration, csv,
-        uselibcds);
-}
-
 void measure_function_futures_create_thread_hierarchical_placement(
     std::uint64_t count, bool csv, bool uselibcds)
 {
@@ -313,10 +274,6 @@ int hpx_main(variables_map& vm)
             {
                 measure_function_futures_create_thread_hierarchical_placement(
                     count, csv, bool(cds));
-                measure_function_futures_thread_count(
-                    count, csv, par, bool(cds));
-                measure_function_futures_thread_count(
-                    count, csv, par_agg, bool(cds));
             }
         }
     }
