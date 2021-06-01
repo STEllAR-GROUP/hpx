@@ -212,8 +212,8 @@ namespace hpx { namespace execution {
         }
 
         /// \cond NOINTERNAL
-        constexpr bool operator==(parallel_policy_executor const& rhs) const
-            noexcept
+        constexpr bool operator==(
+            parallel_policy_executor const& rhs) const noexcept
         {
             return policy_ == rhs.policy_ && pool_ == rhs.pool_ &&
                 priority_ == rhs.priority_ && stacksize_ == rhs.stacksize_ &&
@@ -221,8 +221,8 @@ namespace hpx { namespace execution {
                 hierarchical_threshold_ == rhs.hierarchical_threshold_;
         }
 
-        constexpr bool operator!=(parallel_policy_executor const& rhs) const
-            noexcept
+        constexpr bool operator!=(
+            parallel_policy_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }

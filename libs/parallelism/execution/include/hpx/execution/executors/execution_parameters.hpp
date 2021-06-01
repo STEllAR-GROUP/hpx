@@ -38,13 +38,13 @@ namespace hpx { namespace parallel { namespace execution {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Property, template <typename> class CheckForProperty>
-        struct make_with_property_t final
+        struct with_property_t final
           : hpx::functional::tag_fallback<
-                make_with_property_t<Property, CheckForProperty>>
+                with_property_t<Property, CheckForProperty>>
         {
         private:
             using derived_propery_t =
-                make_with_property_t<Property, CheckForProperty>;
+                with_property_t<Property, CheckForProperty>;
 
             template <typename T>
             using check_for_property = CheckForProperty<std::decay_t<T>>;
@@ -123,11 +123,11 @@ namespace hpx { namespace parallel { namespace execution {
 
         //////////////////////////////////////////////////////////////////////
         // Generate a type that is guaranteed to support get_chunk_size
-        using make_with_get_chunk_size_t =
-            make_with_property_t<get_chunk_size_property, has_get_chunk_size_t>;
+        using with_get_chunk_size_t =
+            with_property_t<get_chunk_size_property, has_get_chunk_size_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE make_with_get_chunk_size_t
-            make_with_get_chunk_size{};
+        HPX_INLINE_CONSTEXPR_VARIABLE with_get_chunk_size_t
+            with_get_chunk_size{};
 
         //////////////////////////////////////////////////////////////////////
         // customization point for interface get_chunk_size()
@@ -141,8 +141,8 @@ namespace hpx { namespace parallel { namespace execution {
                 std::size_t num_tasks)
             {
                 auto withprop =
-                    make_with_get_chunk_size(std::forward<Executor>(exec),
-                        params, get_chunk_size_property{});
+                    with_get_chunk_size(std::forward<Executor>(exec), params,
+                        get_chunk_size_property{});
 
                 return withprop.first.get_chunk_size(
                     std::forward<decltype(withprop.second)>(withprop.second),
@@ -185,12 +185,12 @@ namespace hpx { namespace parallel { namespace execution {
         //////////////////////////////////////////////////////////////////////
         // Generate a type that is guaranteed to support
         // maximal_number_of_chunks
-        using make_with_maximal_number_of_chunks_t =
-            make_with_property_t<maximal_number_of_chunks_property,
+        using with_maximal_number_of_chunks_t =
+            with_property_t<maximal_number_of_chunks_property,
                 has_maximal_number_of_chunks_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE make_with_maximal_number_of_chunks_t
-            make_with_maximal_number_of_chunks{};
+        HPX_INLINE_CONSTEXPR_VARIABLE with_maximal_number_of_chunks_t
+            with_maximal_number_of_chunks{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface maximal_number_of_chunks()
@@ -202,9 +202,9 @@ namespace hpx { namespace parallel { namespace execution {
             HPX_FORCEINLINE static std::size_t call(Parameters& params,
                 Executor&& exec, std::size_t cores, std::size_t num_tasks)
             {
-                auto withprop = make_with_maximal_number_of_chunks(
-                    std::forward<Executor>(exec), params,
-                    maximal_number_of_chunks_property{});
+                auto withprop =
+                    with_maximal_number_of_chunks(std::forward<Executor>(exec),
+                        params, maximal_number_of_chunks_property{});
 
                 return withprop.first.maximal_number_of_chunks(
                     std::forward<decltype(withprop.second)>(withprop.second),
@@ -239,12 +239,12 @@ namespace hpx { namespace parallel { namespace execution {
         //////////////////////////////////////////////////////////////////////
         // Generate a type that is guaranteed to support
         // reset_thread_distribution
-        using make_with_reset_thread_distribution_t =
-            make_with_property_t<reset_thread_distribution_property,
+        using with_reset_thread_distribution_t =
+            with_property_t<reset_thread_distribution_property,
                 has_reset_thread_distribution_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE make_with_reset_thread_distribution_t
-            make_with_reset_thread_distribution{};
+        HPX_INLINE_CONSTEXPR_VARIABLE with_reset_thread_distribution_t
+            with_reset_thread_distribution{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface reset_thread_distribution()
@@ -256,9 +256,9 @@ namespace hpx { namespace parallel { namespace execution {
             HPX_FORCEINLINE static void call(
                 Parameters& params, Executor&& exec)
             {
-                auto withprop = make_with_reset_thread_distribution(
-                    std::forward<Executor>(exec), params,
-                    reset_thread_distribution_property{});
+                auto withprop =
+                    with_reset_thread_distribution(std::forward<Executor>(exec),
+                        params, reset_thread_distribution_property{});
 
                 withprop.first.reset_thread_distribution(
                     std::forward<decltype(withprop.second)>(withprop.second));
@@ -293,12 +293,12 @@ namespace hpx { namespace parallel { namespace execution {
         //////////////////////////////////////////////////////////////////////
         // Generate a type that is guaranteed to support
         // reset_thread_distribution
-        using make_with_processing_units_count_t =
-            make_with_property_t<processing_units_count_property,
+        using with_processing_units_count_t =
+            with_property_t<processing_units_count_property,
                 has_processing_units_count_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE make_with_processing_units_count_t
-            make_with_processing_units_count{};
+        HPX_INLINE_CONSTEXPR_VARIABLE with_processing_units_count_t
+            with_processing_units_count{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface processing_units_count()
@@ -310,9 +310,9 @@ namespace hpx { namespace parallel { namespace execution {
             HPX_FORCEINLINE static std::size_t call(
                 Parameters& params, Executor&& exec)
             {
-                auto withprop = make_with_processing_units_count(
-                    std::forward<Executor>(exec), params,
-                    processing_units_count_property{});
+                auto withprop =
+                    with_processing_units_count(std::forward<Executor>(exec),
+                        params, processing_units_count_property{});
 
                 return withprop.first.processing_units_count(
                     std::forward<decltype(withprop.second)>(withprop.second));
@@ -346,12 +346,12 @@ namespace hpx { namespace parallel { namespace execution {
         //////////////////////////////////////////////////////////////////////
         // Generate a type that is guaranteed to support
         // mark_begin_execution
-        using make_with_mark_begin_execution_t =
-            make_with_property_t<mark_begin_execution_property,
+        using with_mark_begin_execution_t =
+            with_property_t<mark_begin_execution_property,
                 has_mark_begin_execution_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE make_with_mark_begin_execution_t
-            make_with_mark_begin_execution{};
+        HPX_INLINE_CONSTEXPR_VARIABLE with_mark_begin_execution_t
+            with_mark_begin_execution{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface mark_begin_execution()
@@ -364,7 +364,7 @@ namespace hpx { namespace parallel { namespace execution {
                 Parameters& params, Executor&& exec)
             {
                 auto withprop =
-                    make_with_mark_begin_execution(std::forward<Executor>(exec),
+                    with_mark_begin_execution(std::forward<Executor>(exec),
                         params, mark_begin_execution_property{});
 
                 withprop.first.mark_begin_execution(
@@ -399,12 +399,12 @@ namespace hpx { namespace parallel { namespace execution {
         //////////////////////////////////////////////////////////////////////
         // Generate a type that is guaranteed to support
         // mark_end_of_scheduling
-        using make_with_mark_end_of_scheduling_t =
-            make_with_property_t<mark_end_of_scheduling_property,
+        using with_mark_end_of_scheduling_t =
+            with_property_t<mark_end_of_scheduling_property,
                 has_mark_end_of_scheduling_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE make_with_mark_end_of_scheduling_t
-            make_with_mark_end_of_scheduling{};
+        HPX_INLINE_CONSTEXPR_VARIABLE with_mark_end_of_scheduling_t
+            with_mark_end_of_scheduling{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface mark_end_of_scheduling()
@@ -416,9 +416,9 @@ namespace hpx { namespace parallel { namespace execution {
             HPX_FORCEINLINE static void call(
                 Parameters& params, Executor&& exec)
             {
-                auto withprop = make_with_mark_end_of_scheduling(
-                    std::forward<Executor>(exec), params,
-                    mark_end_of_scheduling_property{});
+                auto withprop =
+                    with_mark_end_of_scheduling(std::forward<Executor>(exec),
+                        params, mark_end_of_scheduling_property{});
 
                 withprop.first.mark_end_of_scheduling(
                     std::forward<decltype(withprop.second)>(withprop.second));
@@ -452,12 +452,12 @@ namespace hpx { namespace parallel { namespace execution {
         //////////////////////////////////////////////////////////////////////
         // Generate a type that is guaranteed to support
         // mark_end_execution
-        using make_with_mark_end_execution_t =
-            make_with_property_t<mark_end_execution_property,
+        using with_mark_end_execution_t =
+            with_property_t<mark_end_execution_property,
                 has_mark_end_execution_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE make_with_mark_end_execution_t
-            make_with_mark_end_execution{};
+        HPX_INLINE_CONSTEXPR_VARIABLE with_mark_end_execution_t
+            with_mark_end_execution{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface mark_end_execution()
@@ -470,7 +470,7 @@ namespace hpx { namespace parallel { namespace execution {
                 Parameters& params, Executor&& exec)
             {
                 auto withprop =
-                    make_with_mark_end_execution(std::forward<Executor>(exec),
+                    with_mark_end_execution(std::forward<Executor>(exec),
                         params, mark_end_execution_property{});
 
                 withprop.first.mark_end_execution(

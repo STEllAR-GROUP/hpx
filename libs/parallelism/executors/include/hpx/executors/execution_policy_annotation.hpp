@@ -25,11 +25,11 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename ExPolicy,
         typename Enable =
             std::enable_if_t<hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::functional::is_tag_invocable<
+                hpx::functional::is_tag_dispatchable<
                     hpx::execution::experimental::with_annotation_t,
                     typename std::decay_t<ExPolicy>::executor_type,
                     char const*>::value>>
-    constexpr decltype(auto) tag_invoke(
+    constexpr decltype(auto) tag_dispatch(
         hpx::execution::experimental::with_annotation_t, ExPolicy&& policy,
         char const* annotation)
     {
@@ -43,13 +43,12 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename ExPolicy,
         typename Enable =
             std::enable_if_t<hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::functional::is_tag_invocable<
+                hpx::functional::is_tag_dispatchable<
                     hpx::execution::experimental::with_annotation_t,
                     typename std::decay_t<ExPolicy>::executor_type,
                     std::string>::value>>
-    decltype(auto) tag_invoke(
-        hpx::execution::experimental::with_annotation_t, ExPolicy&& policy,
-        std::string annotation)
+    decltype(auto) tag_dispatch(hpx::execution::experimental::with_annotation_t,
+        ExPolicy&& policy, std::string annotation)
     {
         auto exec = hpx::execution::experimental::with_annotation(
             policy.executor(), std::move(annotation));
@@ -63,7 +62,7 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename ExPolicy,
         typename Enable =
             std::enable_if_t<hpx::is_execution_policy<ExPolicy>::value>>
-    constexpr decltype(auto) tag_invoke(
+    constexpr decltype(auto) tag_dispatch(
         hpx::execution::experimental::get_annotation_t, ExPolicy&& policy)
     {
         return hpx::execution::experimental::get_annotation(policy.executor());

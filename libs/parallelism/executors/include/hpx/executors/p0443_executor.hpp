@@ -66,8 +66,7 @@ namespace hpx { namespace execution { namespace experimental {
             return exec.stacksize_;
         }
 
-        friend executor tag_dispatch(
-            hpx::execution::experimental::with_hint_t,
+        friend executor tag_dispatch(hpx::execution::experimental::with_hint_t,
             executor const& exec, hpx::threads::thread_schedule_hint hint)
         {
             auto exec_with_hint = exec;
