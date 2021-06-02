@@ -532,11 +532,13 @@ endfunction()
 
 # ##############################################################################
 function(hpx_check_for_cxx20_experimental_simd)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_EXPERIMENTAL_SIMD
-    SOURCE cmake/tests/cxx20_experimental_simd.cpp
-    FILE ${ARGN}
-  )
+  if(CMAKE_COMPILER_IS_GNUCXX)
+    add_hpx_config_test(
+      HPX_WITH_CXX20_EXPERIMENTAL_SIMD
+      SOURCE cmake/tests/cxx20_experimental_simd.cpp
+      FILE ${ARGN}
+    )
+  endif()
 endfunction()
 
 # ##############################################################################
