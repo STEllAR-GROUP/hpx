@@ -229,8 +229,8 @@ namespace hpx { namespace parallel { namespace util {
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_dispatch(hpx::parallel::util::transform_loop_t,
-            hpx::execution::simd_task_policy, IterB it, IterE end,
-            OutIter dest, F&& f)
+            hpx::execution::simd_task_policy, IterB it, IterE end, OutIter dest,
+            F&& f)
     {
         auto ret = detail::datapar_transform_loop<IterB>::call(
             it, end, dest, std::forward<F>(f));
@@ -259,9 +259,9 @@ namespace hpx { namespace parallel { namespace util {
                 std::pair<InIter, OutIter>>::type
             call(InIter first, InIter last, OutIter dest, F&& f)
             {
-                return util::transform_loop_n_ind<
-                    hpx::execution::simd_policy>(first,
-                    std::distance(first, last), dest, std::forward<F>(f));
+                return util::transform_loop_n_ind<hpx::execution::simd_policy>(
+                    first, std::distance(first, last), dest,
+                    std::forward<F>(f));
             }
 
             template <typename InIter, typename OutIter, typename F>
@@ -298,8 +298,8 @@ namespace hpx { namespace parallel { namespace util {
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_dispatch(hpx::parallel::util::transform_loop_ind_t,
-            hpx::execution::simd_task_policy, IterB it, IterE end,
-            OutIter dest, F&& f)
+            hpx::execution::simd_task_policy, IterB it, IterE end, OutIter dest,
+            F&& f)
     {
         auto ret = detail::datapar_transform_loop_ind<IterB>::call(
             it, end, dest, std::forward<F>(f));
