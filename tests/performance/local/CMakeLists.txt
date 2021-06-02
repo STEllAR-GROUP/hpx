@@ -14,6 +14,7 @@ set(benchmarks
     delay_baseline_threaded
     function_object_wrapper_overhead
     future_overhead
+    grain_size_benchmarks
     hpx_tls_overhead
     native_tls_overhead
     print_heterogeneous_payloads
@@ -130,6 +131,7 @@ set(parent_vs_child_stealing_FLAGS DEPENDENCIES iostreams_component)
 set(skynet_FLAGS DEPENDENCIES iostreams_component)
 set(wait_all_timings_FLAGS DEPENDENCIES iostreams_component)
 set(future_overhead_FLAGS DEPENDENCIES)
+set(grain_size_benchmarks_FLAGS DEPENDENCIES iostreams_component)
 set(sizeof_FLAGS DEPENDENCIES iostreams_component)
 set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component)
 set(spinlock_overhead2_FLAGS DEPENDENCIES iostreams_component)
