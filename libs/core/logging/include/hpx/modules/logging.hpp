@@ -18,7 +18,7 @@ namespace hpx {
         destination_app = 4,
         destination_debuglog = 5
     };
-}
+}    // namespace hpx
 
 #if defined(HPX_HAVE_LOGGING)
 
@@ -42,6 +42,7 @@ namespace hpx {
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
+
     ////////////////////////////////////////////////////////////////////////////
     namespace detail {
         HPX_CORE_EXPORT hpx::util::logging::level get_log_level(

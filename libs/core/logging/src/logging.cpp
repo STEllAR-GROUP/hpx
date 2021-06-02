@@ -96,4 +96,17 @@ namespace hpx { namespace util { namespace logging {
 
 }}}    // namespace hpx::util::logging
 
+#else
+
+namespace hpx { namespace util {
+
+    //////////////////////////////////////////////////////////////////////////
+    void enable_logging(
+        logging_destination, std::string const&, std::string, std::string)
+    {
+    }
+
+    void disable_logging(logging_destination dest) {}
+}}    // namespace hpx::util
+
 #endif    // HPX_HAVE_LOGGING

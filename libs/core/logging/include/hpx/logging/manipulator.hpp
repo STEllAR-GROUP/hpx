@@ -39,7 +39,7 @@ namespace hpx { namespace util { namespace logging {
         /// @brief What to use as base class, for your formatter classes
         struct HPX_CORE_EXPORT manipulator
         {
-            virtual void operator()(std::ostream& to) const = 0;
+            virtual void operator()(std::ostream&) const = 0;
 
             friend void format_value(std::ostream& os,
                 boost::string_ref /*spec*/, manipulator const& value)
@@ -72,7 +72,7 @@ namespace hpx { namespace util { namespace logging {
         /// @brief What to use as base class, for your destination classes
         struct HPX_CORE_EXPORT manipulator
         {
-            virtual void operator()(message const& val) = 0;
+            virtual void operator()(message const&) = 0;
 
             /// @brief Override this if you want to allow configuration through
             /// scripting.
