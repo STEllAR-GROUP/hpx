@@ -315,15 +315,11 @@ endif()
 hpx_option(
   HPX_WITH_PRECOMPILED_HEADERS
   BOOL
-  "Enable precompiled headers for certain build targets (experimental, requires CMake 3.16 or newer) (default OFF)"
+  "Enable precompiled headers for certain build targets (experimental) (default OFF)"
   OFF
   ADVANCED
 )
 if(HPX_WITH_PRECOMPILED_HEADERS)
-  if(CMAKE_VERSION VERSION_LESS "3.16")
-    hpx_error("HPX_WITH_UNITY_BUILD=ON but this requires CMake 3.16 or newer.")
-  endif()
-
   set(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL ON)
 
   add_library(hpx_precompiled_headers OBJECT libs/src/dummy.cpp)
@@ -625,6 +621,25 @@ endif()
 
 hpx_option(
   HPX_WITH_CUDA_CLANG BOOL "Use clang to compile CUDA code (default: OFF)" OFF
+  ADVANCED
+)
+
+# ##############################################################################
+# pkgconfig file generation
+# ##############################################################################
+set(HPX_WITH_PKGCONFIG_DEFAULT ON)
+if(MSVC
+   OR HPX_WITH_CUDA
+   OR HPX_WITH_HIP
+)
+  set(HPX_WITH_PKGCONFIG_DEFAULT OFF)
+endif()
+
+hpx_option(
+  HPX_WITH_PKGCONFIG
+  BOOL
+  "Enable generation of pkgconfig files (default: ON on Linux without CUDA/HIP, otherwise OFF)"
+  ${HPX_WITH_PKGCONFIG_DEFAULT}
   ADVANCED
 )
 

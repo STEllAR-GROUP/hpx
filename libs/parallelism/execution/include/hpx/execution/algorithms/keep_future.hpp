@@ -151,7 +151,8 @@ namespace hpx { namespace execution { namespace experimental {
                 std::forward<Future>(future));
         }
 
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(keep_future_t)
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+            keep_future_t)
         {
             return detail::partial_algorithm<keep_future_t>{};
         }
