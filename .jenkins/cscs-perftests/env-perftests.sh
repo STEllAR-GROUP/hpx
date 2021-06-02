@@ -22,6 +22,7 @@ export CXX="${CLANG_ROOT}/bin/clang++"
 export CC="${CLANG_ROOT}/bin/clang"
 export CPP="${CLANG_ROOT}/bin/clang -E"
 
+module load cray-jemalloc/5.1.0.3
 module load daint-mc
 spack load cmake@3.17.3
 spack load ninja@1.10.0
