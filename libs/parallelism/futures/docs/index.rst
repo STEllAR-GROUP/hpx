@@ -12,7 +12,7 @@ futures
 =======
 
 This module defines the :cpp:class:`hpx::lcos::future` and
-:cpp:class:`hpx:lcos::shared_future` classes corresponding to the C++ standard
+:cpp:class:`hpx::lcos::shared_future` classes corresponding to the C++ standard
 library classes ``std::future`` and ``std::shared_future``. Note that the
 specializations of :cpp:func:`hpx::lcos::future::then` for executors and
 execution policies are defined in the :ref:`modules_execution` module.
