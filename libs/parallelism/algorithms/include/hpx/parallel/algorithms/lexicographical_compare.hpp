@@ -243,7 +243,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         false);
                 }
 
-                std::size_t count = (std::min) (count1, count2);
+                std::size_t count = (std::min)(count1, count2);
                 util::cancellation_token<std::size_t> tok(count);
 
                 auto f1 = [tok, pred, proj1, proj2](zip_iterator it,
