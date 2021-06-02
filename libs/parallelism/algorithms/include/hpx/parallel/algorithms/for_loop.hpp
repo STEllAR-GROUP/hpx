@@ -1538,7 +1538,7 @@ namespace hpx { namespace traits {
     struct get_function_address<
         parallel::v2::detail::part_iterations<F, S, Tuple>>
     {
-        static std::size_t call(
+        static constexpr std::size_t call(
             parallel::v2::detail::part_iterations<F, S, Tuple> const&
                 f) noexcept
         {
@@ -1550,7 +1550,7 @@ namespace hpx { namespace traits {
     struct get_function_annotation<
         parallel::v2::detail::part_iterations<F, S, Tuple>>
     {
-        static char const* call(
+        static constexpr char const* call(
             parallel::v2::detail::part_iterations<F, S, Tuple> const&
                 f) noexcept
         {

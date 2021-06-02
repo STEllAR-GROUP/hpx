@@ -5,7 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#if defined(HPX_HAVE_THREAD_DESCRIPTION) && defined(HPX_HAVE_APEX)
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #include <hpx/threading_base/annotated_function.hpp>
 
 #include <string>
@@ -16,8 +17,20 @@ namespace hpx { namespace util { namespace detail {
     char const* store_function_annotation(std::string&& name)
     {
         static thread_local std::unordered_set<std::string> names;
-        auto r = names.insert(std::move(name));
+        auto r = names.emplace(std::move(name));
         return (*std::get<0>(r)).c_str();
     }
 }}}    // namespace hpx::util::detail
+
+#else
+
+#include <string>
+
+namespace hpx { namespace util { namespace detail {
+    char const* store_function_annotation(std::string&&)
+    {
+        return "<unknown>";
+    }
+}}}    // namespace hpx::util::detail
+
 #endif

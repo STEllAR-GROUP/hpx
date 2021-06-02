@@ -774,7 +774,7 @@ namespace hpx { namespace traits {
     struct get_function_address<
         parallel::v1::detail::transform_iteration<ExPolicy, F, Proj>>
     {
-        static std::size_t call(
+        static constexpr std::size_t call(
             parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> const&
                 f) noexcept
         {
@@ -787,7 +787,7 @@ namespace hpx { namespace traits {
     struct get_function_annotation<
         parallel::v1::detail::transform_iteration<ExPolicy, F, Proj>>
     {
-        static char const* call(
+        static constexpr char const* call(
             parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> const&
                 f) noexcept
         {
@@ -800,7 +800,7 @@ namespace hpx { namespace traits {
     struct get_function_address<parallel::v1::detail::
             transform_binary_iteration<ExPolicy, F, Proj1, Proj2>>
     {
-        static std::size_t call(
+        static constexpr std::size_t call(
             parallel::v1::detail::transform_binary_iteration<ExPolicy, F, Proj1,
                 Proj2> const& f) noexcept
         {
@@ -813,7 +813,7 @@ namespace hpx { namespace traits {
     struct get_function_annotation<parallel::v1::detail::
             transform_binary_iteration<ExPolicy, F, Proj1, Proj2>>
     {
-        static char const* call(
+        static constexpr char const* call(
             parallel::v1::detail::transform_binary_iteration<ExPolicy, F, Proj1,
                 Proj2> const& f) noexcept
         {

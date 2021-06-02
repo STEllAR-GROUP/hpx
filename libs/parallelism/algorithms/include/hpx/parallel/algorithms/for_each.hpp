@@ -800,7 +800,7 @@ namespace hpx { namespace traits {
     struct get_function_address<
         parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj>>
     {
-        static std::size_t call(
+        static constexpr std::size_t call(
             parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const&
                 f) noexcept
         {
@@ -812,7 +812,7 @@ namespace hpx { namespace traits {
     struct get_function_annotation<
         parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj>>
     {
-        static char const* call(
+        static constexpr char const* call(
             parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const&
                 f) noexcept
         {

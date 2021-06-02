@@ -14,6 +14,7 @@
 #include <utility>
 
 namespace hpx { namespace experimental {
+
     HPX_INLINE_CONSTEXPR_VARIABLE struct prefer_t
       : hpx::functional::tag_fallback<prefer_t>
     {
