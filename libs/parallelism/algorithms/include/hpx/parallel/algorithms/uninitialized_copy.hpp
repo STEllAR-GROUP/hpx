@@ -217,6 +217,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner_with_cleanup.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -229,162 +230,237 @@ namespace hpx {
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
-    ///////////////////////////////////////////////////////////////////////////
-    // uninitialized_copy
-    namespace detail {
-        /// \cond NOINTERNAL
+namespace hpx { namespace parallel {
+    inline namespace v1 {
+        ///////////////////////////////////////////////////////////////////////////
+        // uninitialized_copy
+        namespace detail {
+            /// \cond NOINTERNAL
 
-        // provide our own implementation of std::uninitialized_copy as some
-        // versions of MSVC horribly fail at compiling it for some types T
-        template <typename InIter1, typename Sent, typename InIter2>
-        InIter2 std_uninitialized_copy(
-            InIter1 first, Sent last, InIter2 d_first)
-        {
-            using value_type =
-                typename std::iterator_traits<InIter2>::value_type;
-
-            InIter2 current = d_first;
-            try
+            // provide our own implementation of std::uninitialized_copy as some
+            // versions of MSVC horribly fail at compiling it for some types T
+            template <typename InIter1, typename Sent, typename InIter2>
+            util::in_out_result<InIter1, InIter2> std_uninitialized_copy(
+                InIter1 first, Sent last, InIter2 d_first)
             {
-                for (/* */; first != last; (void) ++first, ++current)
+                using value_type =
+                    typename std::iterator_traits<InIter2>::value_type;
+
+                InIter2 current = d_first;
+                try
                 {
-                    ::new (std::addressof(*current)) value_type(*first);
+                    for (/* */; first != last; (void) ++first, ++current)
+                    {
+                        ::new (std::addressof(*current)) value_type(*first);
+                    }
+                    return util::in_out_result<InIter1, InIter2>{
+                        first, current};
                 }
-                return current;
-            }
-            catch (...)
-            {
-                for (/* */; d_first != current; ++d_first)
+                catch (...)
                 {
-                    (*d_first).~value_type();
+                    for (/* */; d_first != current; ++d_first)
+                    {
+                        (*d_first).~value_type();
+                    }
+                    throw;
                 }
-                throw;
             }
-        }
 
-        ///////////////////////////////////////////////////////////////////////
-        template <typename InIter1, typename InIter2>
-        InIter2 sequential_uninitialized_copy_n(InIter1 first,
-            std::size_t count, InIter2 dest,
-            util::cancellation_token<util::detail::no_data>& tok)
-        {
-            typedef
-                typename std::iterator_traits<InIter2>::value_type value_type;
-
-            return util::loop_with_cleanup_n_with_token(
-                first, count, dest, tok,
-                [](InIter1 it, InIter2 dest) -> void {
-                    ::new (std::addressof(*dest)) value_type(*it);
-                },
-                [](InIter2 dest) -> void { (*dest).~value_type(); });
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename Iter, typename FwdIter2>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-        parallel_sequential_uninitialized_copy_n(
-            ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
-        {
-            if (count == 0)
+            ///////////////////////////////////////////////////////////////////////
+            template <typename InIter1, typename InIter2>
+            util::in_out_result<InIter1, InIter2>
+            sequential_uninitialized_copy_n(InIter1 first,
+                std::size_t count, InIter2 dest,
+                util::cancellation_token<util::detail::no_data>& tok)
             {
-                return util::detail::algorithm_result<ExPolicy, FwdIter2>::get(
-                    std::move(dest));
+                typedef typename std::iterator_traits<InIter2>::value_type
+                    value_type;
+
+                return {std::next(first, count),
+                    util::loop_with_cleanup_n_with_token(
+                        first, count, dest, tok,
+                        [](InIter1 it, InIter2 dest)
+                            -> void {
+                            ::new (std::addressof(*dest)) value_type(*it);
+                        }[](InIter2 dest)
+                                   ->void { (*dest).~value_type(); })};
             }
 
-            typedef hpx::util::zip_iterator<Iter, FwdIter2> zip_iterator;
-            typedef std::pair<FwdIter2, FwdIter2> partition_result_type;
-            typedef
-                typename std::iterator_traits<FwdIter2>::value_type value_type;
+            ///////////////////////////////////////////////////////////////////////
+            template <typename ExPolicy, typename Iter, typename FwdIter2>
+            typename util::detail::algorithm_result<ExPolicy,
+                util::in_out_result<Iter, FwdIter2>>::type
+            parallel_sequential_uninitialized_copy_n(
+                ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
+            {
+                if (count == 0)
+                {
+                    return util::detail::algorithm_result<ExPolicy,
+                        util::in_out_result<Iter, FwdIter2>>::
+                        get({std::move(first), std::move(dest)});
+                }
 
-            util::cancellation_token<util::detail::no_data> tok;
-            return util::partitioner_with_cleanup<ExPolicy, FwdIter2,
-                partition_result_type>::
-                call(
-                    std::forward<ExPolicy>(policy),
-                    hpx::util::make_zip_iterator(first, dest), count,
-                    [tok](zip_iterator t, std::size_t part_size) mutable
-                    -> partition_result_type {
+                typedef hpx::util::zip_iterator<Iter, FwdIter2> zip_iterator;
+                typedef std::pair<FwdIter2, FwdIter2> partition_result_type;
+                typedef typename std::iterator_traits<FwdIter2>::value_type
+                    value_type;
+
+                util::cancellation_token<util::detail::no_data> tok;
+
+                return util::partitioner_with_cleanup<ExPolicy,
+                        util::in_out_result<Iter, FwdIter2>,
+                        partition_result_type>::
+                        call(
+                            std::forward<ExPolicy>(policy),
+                            hpx::util::make_zip_iterator(first, dest), count,
+                            [tok](zip_iterator t, std::size_t part_size) mutable
+                            -> partition_result_type {
                         using hpx::get;
                         auto iters = t.get_iterator_tuple();
                         FwdIter2 dest = get<1>(iters);
                         return std::make_pair(dest,
                             sequential_uninitialized_copy_n(
                                 get<0>(iters), part_size, dest, tok));
-                    },
-                    // finalize, called once if no error occurred
-                    [dest, count](std::vector<
-                        hpx::future<partition_result_type>>&&) mutable
-                    -> FwdIter2 {
+                            },
+                            // finalize, called once if no error occurred
+                            [dest, first, count](std::vector<
+                                hpx::future<partition_result_type>>&&) mutable
+                            -> util::in_out_result<Iter, FwdIter2> {
+                        std::advance(first, count);
                         std::advance(dest, count);
-                        return dest;
-                    },
-                    // cleanup function, called for each partition which
-                    // didn't fail, but only if at least one failed
-                    [](partition_result_type&& r) -> void {
+                        return util::in_out_result{first, dest};
+                            },
+                            // cleanup function, called for each partition which
+                            // didn't fail, but only if at least one failed
+                            [](partition_result_type&& r) -> void {
                         while (r.first != r.second)
                         {
                             (*r.first).~value_type();
                             ++r.first;
                         }
-                    });
-        }
+                            }));
+            }
 
-        ///////////////////////////////////////////////////////////////////////
-        template <typename FwdIter2>
-        struct uninitialized_copy
-          : public detail::algorithm<uninitialized_copy<FwdIter2>, FwdIter2>
+            ///////////////////////////////////////////////////////////////////////
+            template <typename FwdIter2>
+            struct uninitialized_copy
+              : public detail::algorithm<uninitialized_copy<FwdIter2>, FwdIter2>
+            {
+                uninitialized_copy()
+                  : uninitialized_copy::algorithm("uninitialized_copy")
+                {
+                }
+
+                template <typename ExPolicy, typename InIter1, typename Sent>
+                static util::in_out_result<InIter1, FwdIter2> sequential(
+                    ExPolicy, InIter1 first, Sent last, FwdIter2 dest)
+                {
+                    return std_uninitialized_copy(first, last, dest);
+                }
+
+                template <typename ExPolicy, typename Iter, typename Sent>
+                static typename util::detail::algorithm_result<ExPolicy,
+                    util::in_out_result<Iter, FwdIter2>>::type
+                parallel(
+                    ExPolicy&& policy, Iter first, Sent last, FwdIter2 dest)
+                {
+                    return parallel_sequential_uninitialized_copy_n(
+                        std::forward<ExPolicy>(policy), first,
+                        detail::distance(first, last), dest);
+                }
+            };
+            /// \endcond
+        }    // namespace detail
+
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
+        HPX_DEPRECATED_V(1, 7,
+            "hpx::parallel::uninitialized_copy is deprecated, use "
+            "hpx::uninitialized_copy "
+            "instead")
+        inline
+            typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
+                typename util::detail::algorithm_result<ExPolicy,
+                    FwdIter2>::type>::type uninitialized_copy(ExPolicy&& policy,
+                FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
-            uninitialized_copy()
-              : uninitialized_copy::algorithm("uninitialized_copy")
-            {
-            }
-
-            template <typename ExPolicy, typename InIter1, typename Sent>
-            static FwdIter2 sequential(
-                ExPolicy, InIter1 first, Sent last, FwdIter2 dest)
-            {
-                return std_uninitialized_copy(first, last, dest);
-            }
-
-            template <typename ExPolicy, typename Iter, typename Sent>
-            static typename util::detail::algorithm_result<ExPolicy,
-                FwdIter2>::type
-            parallel(ExPolicy&& policy, Iter first, Sent last, FwdIter2 dest)
-            {
-                return parallel_sequential_uninitialized_copy_n(
-                    std::forward<ExPolicy>(policy), first,
-                    detail::distance(first, last), dest);
-            }
-        };
-        /// \endcond
-    }    // namespace detail
-
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::uninitialized_copy is deprecated, use "
-        "hpx::uninitialized_copy "
-        "instead")
-    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
-        uninitialized_copy(
-            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
-            "Required at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
-            "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+                "Required at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+                "Requires at least forward iterator.");
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::uninitialized_copy<FwdIter2>().call(
-            std::forward<ExPolicy>(policy), first, last, dest);
+            return detail::uninitialized_copy<FwdIter2>().call(
+                std::forward<ExPolicy>(policy), first, last, dest).out;
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
-    }
+        }
+
+        /////////////////////////////////////////////////////////////////////////////
+        // uninitialized_copy_sent
+        namespace detail {
+            /// \cond NOINTERNAL
+            template <typename FwdIter2>
+            struct uninitialized_copy_sent
+              : public detail::algorithm<uninitialized_copy_sent<FwdIter2>,
+                    FwdIter2>
+            {
+                uninitialized_copy_sent()
+                  : uninitialized_copy_sent::algorithm(
+                        "uninitialized_copy_sent")
+                {
+                }
+
+                template <typename ExPolicy, typename InIter1, typename Sent1,
+                    typename Sent2>
+                static util::in_out_result<InIter1, FwdIter2>
+                sequential(ExPolicy, InIter1 first, Sent1 last, FwdIter2 dest,
+                    Sent2 last_d)
+                {
+                    using value_type =
+                        typename std::iterator_traits<FwdIter2>::value_type;
+
+                    FwdIter2 current = dest;
+                    try
+                    {
+                        for (/* */; !(first == last || current == last_d);
+                             (void) ++first, ++current)
+                        {
+                            ::new (std::addressof(*current)) value_type(*first);
+                        }
+                        return util::in_out_result{first, current};
+                    }
+                    catch (...)
+                    {
+                        for (/* */; dest != current; ++dest)
+                        {
+                            (*dest).~value_type();
+                        }
+                        throw;
+                    }
+                }
+
+                template <typename ExPolicy, typename Iter, typename Sent1,
+                    typename Sent2>
+                static typename util::detail::algorithm_result<ExPolicy,
+                    util::in_out_result<Iter, FwdIter2>>::type
+                parallel(ExPolicy&& policy, Iter first, Sent1 last,
+                    FwdIter2 dest, Sent2 last_d)
+                {
+                    auto N = std::min(detail::distance(first, last),
+                        detail::distance(dest, last_d));
+
+                    return parallel_sequential_uninitialized_copy_n(
+                        std::forward<ExPolicy>(policy), first, N, dest);
+                }
+            };
+            /// \endcond
+        }    // namespace detail
+        /// \endcond
+    }    // namespace v1
 
     /////////////////////////////////////////////////////////////////////////////
     // uninitialized_copy_n
@@ -400,7 +476,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             template <typename ExPolicy, typename InIter>
-            static FwdIter2 sequential(
+            static util::in_out_result<InIter, FwdIter2> sequential(
                 ExPolicy, InIter first, std::size_t count, FwdIter2 dest)
             {
                 return std::uninitialized_copy_n(first, count, dest);
@@ -408,7 +484,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename Iter>
             static typename util::detail::algorithm_result<ExPolicy,
-                FwdIter2>::type
+                util::in_out_result<Iter, FwdIter2>>::type
             parallel(
                 ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
             {
@@ -426,7 +502,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         "hpx::uninitialized_copy_n "
         "instead")
     inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
+        typename util::detail::algorithm_result<ExPolicy,
+            parallel::util::in_out_result<FwdIter1, FwdIter2>>::type>::type
         uninitialized_copy_n(
             ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest)
     {
@@ -438,7 +515,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         // if count is representing a negative value, we do nothing
         if (detail::is_negative(count))
         {
-            return util::detail::algorithm_result<ExPolicy, FwdIter2>::get(
+            return util::detail::algorithm_result<ExPolicy,
+                parallel::util::in_out_result<FwdIter1,
+                    FwdIter2>>::get(
                 std::move(dest));
         }
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -451,7 +530,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic pop
 #endif
     }
-}}}    // namespace hpx::parallel::v1
+}}    // namespace hpx::parallel
+}    // namespace hpx::parallel::v1
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
@@ -475,7 +555,7 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::uninitialized_copy<FwdIter>()
-                .call(hpx::execution::seq, first, last, dest);
+                .call(hpx::execution::seq, first, last, dest).out;
         }
 
         // clang-format off
@@ -497,7 +577,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::uninitialized_copy<FwdIter2>()
-                .call(std::forward<ExPolicy>(policy), first, last, dest);
+                .call(std::forward<ExPolicy>(policy), first, last, dest)
+                .out;
         }
 
     } uninitialized_copy{};
@@ -530,7 +611,8 @@ namespace hpx {
             }
 
             return hpx::parallel::v1::detail::uninitialized_copy_n<FwdIter2>()
-                .call(hpx::execution::seq, first, std::size_t(count), dest);
+                .call(hpx::execution::seq, first, std::size_t(count), dest)
+                .out;
         }
 
         // clang-format off
@@ -560,7 +642,7 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::uninitialized_copy_n<FwdIter2>()
                 .call(std::forward<ExPolicy>(policy), first, std::size_t(count),
-                    dest);
+                    dest).out;
         }
 
     } uninitialized_copy_n{};
