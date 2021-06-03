@@ -24,6 +24,7 @@
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
+#include <hpx/threading_base/set_thread_state_timed.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>

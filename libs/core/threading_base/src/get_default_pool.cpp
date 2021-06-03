@@ -7,17 +7,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
-#include <hpx/threading_base/register_thread.hpp>
+#include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-
-#include <asio/io_context.hpp>
-
-#include <cstddef>
-#include <limits>
-#include <string>
-#include <utility>
 
 // The following implementation has been divided for Linux and Mac OSX
 #if defined(HPX_HAVE_DYNAMIC_HPX_MAIN) &&                                      \
@@ -86,42 +79,5 @@ namespace hpx { namespace threads { namespace detail {
                 }
 
                 return pool;
-            }
-
-            static get_default_timer_service_type get_default_timer_service_f;
-
-            void set_get_default_timer_service(get_default_timer_service_type f)
-            {
-                get_default_timer_service_f = f;
-            }
-
-            asio::io_context* get_default_timer_service()
-            {
-                asio::io_context* timer_service = nullptr;
-                if (detail::get_default_timer_service_f)
-                {
-                    timer_service = detail::get_default_timer_service_f();
-                    HPX_ASSERT(timer_service);
-                }
-                else
-                {
-#if defined(HPX_HAVE_TIMER_POOL)
-                    HPX_THROW_EXCEPTION(invalid_status,
-                        "hpx::threads::detail::get_default_timer_service",
-                        "No timer service installed. When running timed "
-                        "threads without a runtime a timer service has to be "
-                        "installed manually using "
-                        "hpx::threads::detail::set_get_default_timer_service.");
-#else
-                    HPX_THROW_EXCEPTION(invalid_status,
-                        "hpx::threads::detail::get_default_timer_service",
-                        "No timer service installed. Rebuild HPX with "
-                        "HPX_WITH_TIMER_POOL=ON or provide a timer service "
-                        "manually using "
-                        "hpx::threads::detail::set_get_default_timer_service.");
-#endif
-                }
-
-                return timer_service;
             }
 }}}    // namespace hpx::threads::detail

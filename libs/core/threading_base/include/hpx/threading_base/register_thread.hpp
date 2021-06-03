@@ -10,15 +10,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/config/asio.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-
-#include <asio/io_context.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -110,19 +108,6 @@ namespace hpx { namespace threads {
         return {detail::thread_function_nullary<typename std::decay<F>::type>{
             std::forward<F>(f)}};
     }
-
-    namespace detail {
-        using get_default_pool_type =
-            util::function_nonser<thread_pool_base*()>;
-        HPX_CORE_EXPORT void set_get_default_pool(get_default_pool_type f);
-        HPX_CORE_EXPORT thread_pool_base* get_self_or_default_pool();
-
-        using get_default_timer_service_type =
-            util::function_nonser<asio::io_context*()>;
-        HPX_CORE_EXPORT void set_get_default_timer_service(
-            get_default_timer_service_type f);
-        HPX_CORE_EXPORT asio::io_context* get_default_timer_service();
-    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given data.
