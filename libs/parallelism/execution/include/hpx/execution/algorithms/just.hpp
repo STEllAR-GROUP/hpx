@@ -37,7 +37,7 @@ namespace hpx { namespace execution { namespace experimental {
 
             template <template <typename...> class Tuple,
                 template <typename...> class Variant>
-            using value_types = Variant<Tuple<Ts...>>;
+            using value_types = Variant<Tuple<std::decay_t<Ts>...>>;
 
             template <template <typename...> class Variant>
             using error_types = Variant<std::exception_ptr>;
