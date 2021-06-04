@@ -45,6 +45,10 @@ namespace hpx { namespace components {
           : base_type(std::move(f))
         {
         }
+        client(future<client>&& c) noexcept
+          : base_type(std::move(c))
+        {
+        }
 
         client(client const& rhs)
           : base_type(rhs.shared_state_)

@@ -10,6 +10,7 @@
 #include <hpx/collectives/communication_set.hpp>
 #include <hpx/collectives/detail/communication_set_node.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
+#include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -58,7 +59,7 @@ namespace hpx { namespace lcos {
         if (num_sites == std::size_t(-1))
         {
             num_sites = static_cast<std::size_t>(
-                hpx::get_num_localities(hpx::launch::sync));
+                agas::get_num_localities(hpx::launch::sync));
         }
         if (this_site == std::size_t(-1))
         {

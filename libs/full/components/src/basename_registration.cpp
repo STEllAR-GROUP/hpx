@@ -28,13 +28,40 @@ namespace hpx {
             HPX_ASSERT(!basename.empty());
 
             std::string name;
-
             if (basename[0] != '/')
-                name += '/';
+            {
+                name = '/';
+            }
 
             name += basename;
             if (name[name.size() - 1] != '/')
+            {
                 name += '/';
+            }
+            name += std::to_string(idx);
+
+            return name;
+        }
+
+        std::string name_from_basename(std::string&& basename, std::size_t idx)
+        {
+            HPX_ASSERT(!basename.empty());
+
+            std::string name;
+            if (basename[0] != '/')
+            {
+                name = '/';
+                name += std::move(basename);
+            }
+            else
+            {
+                name = std::move(basename);
+            }
+
+            if (name[name.size() - 1] != '/')
+            {
+                name += '/';
+            }
             name += std::to_string(idx);
 
             return name;
@@ -92,10 +119,11 @@ namespace hpx {
 
         if (sequence_nr == ~static_cast<std::size_t>(0))
         {
-            sequence_nr = std::size_t(agas::get_locality_id());
+            sequence_nr = static_cast<std::size_t>(agas::get_locality_id());
         }
 
-        std::string name = detail::name_from_basename(basename, sequence_nr);
+        std::string name =
+            detail::name_from_basename(std::move(basename), sequence_nr);
         return agas::on_symbol_namespace_event(std::move(name), true);
     }
 
@@ -110,10 +138,11 @@ namespace hpx {
 
         if (sequence_nr == ~static_cast<std::size_t>(0))
         {
-            sequence_nr = std::size_t(agas::get_locality_id());
+            sequence_nr = static_cast<std::size_t>(agas::get_locality_id());
         }
 
-        std::string name = detail::name_from_basename(basename, sequence_nr);
+        std::string name =
+            detail::name_from_basename(std::move(basename), sequence_nr);
         return agas::register_name(std::move(name), id);
     }
 
@@ -139,10 +168,11 @@ namespace hpx {
 
         if (sequence_nr == ~static_cast<std::size_t>(0))
         {
-            sequence_nr = std::size_t(agas::get_locality_id());
+            sequence_nr = static_cast<std::size_t>(agas::get_locality_id());
         }
 
-        std::string name = detail::name_from_basename(basename, sequence_nr);
+        std::string name =
+            detail::name_from_basename(std::move(basename), sequence_nr);
         return agas::unregister_name(std::move(name));
     }
 }    // namespace hpx

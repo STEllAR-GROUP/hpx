@@ -118,10 +118,8 @@ namespace hpx { namespace traits {
 
             communicator_.gate_.synchronize(1, l);
 
-            if (communicator_.gate_.set(communicator_.which_++, l))
-            {
-                HPX_ASSERT_DOESNT_OWN_LOCK(l);
-            }
+            communicator_.gate_.set(communicator_.which_++, std::move(l));
+
             return f;
         }
 
