@@ -119,6 +119,8 @@ namespace hpx { namespace collectives {
         friend hpx::future<void> set(channel_communicator, std::size_t, T&&);
 
     public:
+        HPX_EXPORT channel_communicator();
+
         HPX_EXPORT channel_communicator(char const* basename,
             std::size_t num_sites, std::size_t this_site,
             components::client<detail::channel_communicator_server>&& here);
@@ -130,6 +132,8 @@ namespace hpx { namespace collectives {
         channel_communicator(channel_communicator&& rhs) noexcept = default;
         channel_communicator& operator=(
             channel_communicator&& rhs) noexcept = default;
+
+        HPX_EXPORT void free();
 
     private:
         std::shared_ptr<detail::channel_communicator> comm_;

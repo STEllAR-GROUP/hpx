@@ -27,12 +27,19 @@
 namespace hpx { namespace collectives {
 
     ///////////////////////////////////////////////////////////////////////////
+    channel_communicator::channel_communicator() = default;
+
     channel_communicator::channel_communicator(char const* basename,
         std::size_t num_sites, std::size_t this_site,
         components::client<detail::channel_communicator_server>&& here)
       : comm_(std::make_shared<detail::channel_communicator>(
             basename, num_sites, this_site, std::move(here)))
     {
+    }
+
+    void channel_communicator::free()
+    {
+        comm_.reset();
     }
 
     ///////////////////////////////////////////////////////////////////////////
