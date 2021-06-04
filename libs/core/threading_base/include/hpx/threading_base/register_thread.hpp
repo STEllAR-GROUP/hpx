@@ -58,6 +58,7 @@ namespace hpx { namespace threads {
 
                 // run and free all registered exit functions for this thread
                 auto* p = get_self_id_data();
+
                 p->run_thread_exit_callbacks();
                 p->free_thread_exit_callbacks();
 
@@ -85,6 +86,7 @@ namespace hpx { namespace threads {
 
                 // run and free all registered exit functions for this thread
                 auto* p = get_self_id_data();
+
                 p->run_thread_exit_callbacks();
                 p->free_thread_exit_callbacks();
 

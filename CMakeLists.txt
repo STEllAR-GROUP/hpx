@@ -628,7 +628,8 @@ hpx_option(
 # pkgconfig file generation
 # ##############################################################################
 set(HPX_WITH_PKGCONFIG_DEFAULT ON)
-if(MSVC
+if(APPLE
+   OR MSVC
    OR HPX_WITH_CUDA
    OR HPX_WITH_HIP
 )

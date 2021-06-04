@@ -277,7 +277,7 @@ void test_properties()
 
     for (auto const prio : priorities)
     {
-        auto exec_prop = ex::make_with_priority(exec, prio);
+        auto exec_prop = ex::with_priority(exec, prio);
         HPX_TEST_EQ(ex::get_priority(exec_prop), prio);
 
         auto check = [prio]() {
@@ -303,7 +303,7 @@ void test_properties()
 
     for (auto const stacksize : stacksizes)
     {
-        auto exec_prop = ex::make_with_stacksize(exec, stacksize);
+        auto exec_prop = ex::with_stacksize(exec, stacksize);
         HPX_TEST_EQ(ex::get_stacksize(exec_prop), stacksize);
 
         auto check = [stacksize]() {
@@ -333,7 +333,7 @@ void test_properties()
 
     for (auto const hint : hints)
     {
-        auto exec_prop = ex::make_with_hint(exec, hint);
+        auto exec_prop = ex::with_hint(exec, hint);
         HPX_TEST(ex::get_hint(exec_prop) == hint);
 
         // A hint is not guaranteed to be respected, so we only check that the

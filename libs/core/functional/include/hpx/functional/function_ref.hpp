@@ -207,7 +207,8 @@ namespace hpx { namespace traits {
     template <typename Sig>
     struct get_function_address<util::function_ref<Sig>>
     {
-        static std::size_t call(util::function_ref<Sig> const& f) noexcept
+        static constexpr std::size_t call(
+            util::function_ref<Sig> const& f) noexcept
         {
             return f.get_function_address();
         }
@@ -216,7 +217,8 @@ namespace hpx { namespace traits {
     template <typename Sig>
     struct get_function_annotation<util::function_ref<Sig>>
     {
-        static char const* call(util::function_ref<Sig> const& f) noexcept
+        static constexpr char const* call(
+            util::function_ref<Sig> const& f) noexcept
         {
             return f.get_function_annotation();
         }

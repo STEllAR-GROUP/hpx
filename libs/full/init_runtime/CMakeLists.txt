@@ -21,7 +21,7 @@ set(init_runtime_headers
     hpx/init_runtime/detail/init_logging.hpp
 )
 
-set(init_runtime_sources hpx_init.cpp hpx_main_winsocket.cpp)
+set(init_runtime_sources hpx_init.cpp hpx_main_winsocket.cpp init_logging.cpp)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(init_runtime_headers ${init_runtime_headers}

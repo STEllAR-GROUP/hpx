@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -55,7 +55,7 @@ namespace hpx { namespace traits {
     {
         using function_type = typename Frame::function_type;
         //
-        static char const* call(
+        static constexpr char const* call(
             lcos::detail::dataflow_finalization<Frame> const& f) noexcept
         {
             char const* annotation = hpx::traits::get_function_annotation<

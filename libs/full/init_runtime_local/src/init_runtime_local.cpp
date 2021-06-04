@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -258,9 +258,11 @@ namespace hpx {
                 util::detail::set_spinlock_deadlock_detection_limit(
                     cmdline.rtcfg_.get_spinlock_deadlock_detection_limit());
 #endif
-
-                util::detail::init_logging<util::console_local>(cmdline.rtcfg_,
-                    true, util::detail::define_formatters_local);
+#if defined(HPX_HAVE_LOGGING)
+                util::detail::init_logging_local(cmdline.rtcfg_);
+#else
+                util::detail::warn_if_logging_requested(cmdline.rtcfg_);
+#endif
             }
 
             ///////////////////////////////////////////////////////////////////////

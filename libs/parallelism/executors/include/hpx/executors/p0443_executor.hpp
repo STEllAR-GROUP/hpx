@@ -37,8 +37,8 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         friend executor tag_dispatch(
-            hpx::execution::experimental::make_with_priority_t,
-            executor const& exec, hpx::threads::thread_priority priority)
+            hpx::execution::experimental::with_priority_t, executor const& exec,
+            hpx::threads::thread_priority priority)
         {
             auto exec_with_priority = exec;
             exec_with_priority.priority_ = priority;
@@ -52,7 +52,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         friend executor tag_dispatch(
-            hpx::execution::experimental::make_with_stacksize_t,
+            hpx::execution::experimental::with_stacksize_t,
             executor const& exec, hpx::threads::thread_stacksize stacksize)
         {
             auto exec_with_stacksize = exec;
@@ -66,8 +66,7 @@ namespace hpx { namespace execution { namespace experimental {
             return exec.stacksize_;
         }
 
-        friend executor tag_dispatch(
-            hpx::execution::experimental::make_with_hint_t,
+        friend executor tag_dispatch(hpx::execution::experimental::with_hint_t,
             executor const& exec, hpx::threads::thread_schedule_hint hint)
         {
             auto exec_with_hint = exec;

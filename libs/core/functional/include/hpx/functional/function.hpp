@@ -80,7 +80,7 @@ namespace hpx { namespace traits {
     template <typename Sig, bool Serializable>
     struct get_function_address<util::function<Sig, Serializable>>
     {
-        static std::size_t call(
+        static constexpr std::size_t call(
             util::function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_address();
@@ -90,7 +90,7 @@ namespace hpx { namespace traits {
     template <typename Sig, bool Serializable>
     struct get_function_annotation<util::function<Sig, Serializable>>
     {
-        static char const* call(
+        static constexpr char const* call(
             util::function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_annotation();

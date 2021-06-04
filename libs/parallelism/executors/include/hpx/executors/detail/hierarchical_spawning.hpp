@@ -1,5 +1,5 @@
 //  Copyright (c) 2019-2020 ETH Zurich
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -38,17 +38,15 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     template <typename F, typename S, typename... Ts>
     std::vector<
         hpx::future<typename detail::bulk_function_result<F, S, Ts...>::type>>
-    hierarchical_bulk_async_execute_helper(threads::thread_pool_base* pool,
-        threads::thread_priority priority, threads::thread_stacksize stacksize,
-        threads::thread_schedule_hint, std::size_t first_thread,
-        std::size_t num_threads, std::size_t hierarchical_threshold,
-        launch policy, F&& f, S const& shape, Ts&&... ts)
+    hierarchical_bulk_async_execute_helper(
+        hpx::util::thread_description const& desc,
+        threads::thread_pool_base* pool, threads::thread_priority priority,
+        threads::thread_stacksize stacksize, threads::thread_schedule_hint,
+        std::size_t first_thread, std::size_t num_threads,
+        std::size_t hierarchical_threshold, launch policy, F&& f,
+        S const& shape, Ts&&... ts)
     {
         HPX_ASSERT(pool);
-
-        hpx::util::thread_description const desc(f,
-            "hpx::parallel::execution::detail::hierarchical_bulk_async_execute_"
-            "helper");
 
         typedef std::vector<hpx::future<
             typename detail::bulk_function_result<F, S, Ts...>::type>>
@@ -81,7 +79,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                         {
                             results[part_i] =
                                 hpx::detail::async_launch_policy_dispatch<
-                                    decltype(policy)>::call(policy, pool,
+                                    decltype(policy)>::call(policy, desc, pool,
                                     priority, stacksize, hint, f, *it, ts...);
                             ++it;
                         }
@@ -97,8 +95,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 {
                     results[part_i] =
                         hpx::detail::async_launch_policy_dispatch<decltype(
-                            policy)>::call(policy, pool, priority, stacksize,
-                            hint, f, *it, ts...);
+                            policy)>::call(policy, desc, pool, priority,
+                            stacksize, hint, f, *it, ts...);
                     ++it;
                 }
                 l.count_down(part_size);
@@ -110,6 +108,24 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         l.wait();
 
         return results;
+    }
+
+    template <typename F, typename S, typename... Ts>
+    std::vector<
+        hpx::future<typename detail::bulk_function_result<F, S, Ts...>::type>>
+    hierarchical_bulk_async_execute_helper(threads::thread_pool_base* pool,
+        threads::thread_priority priority, threads::thread_stacksize stacksize,
+        threads::thread_schedule_hint hint, std::size_t first_thread,
+        std::size_t num_threads, std::size_t hierarchical_threshold,
+        launch policy, F&& f, S const& shape, Ts&&... ts)
+    {
+        hpx::util::thread_description const desc(f,
+            "hpx::parallel::execution::detail::hierarchical_bulk_async_execute_"
+            "helper");
+
+        return hierarchical_bulk_async_execute_helper(desc, pool, priority,
+            stacksize, hint, first_thread, num_threads, hierarchical_threshold,
+            policy, std::forward<F>(f), shape, std::forward<Ts>(ts)...);
     }
 
     template <typename Executor, typename F, typename S, typename Future,

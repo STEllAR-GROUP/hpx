@@ -714,7 +714,7 @@ namespace hpx { namespace traits {
     struct get_function_address<parallel::v1::detail::
             transform_reduce_iteration<T, ExPolicy, Reduce, Convert>>
     {
-        static char const* call(
+        static constexpr char const* call(
             parallel::v1::detail::transform_reduce_iteration<T, ExPolicy,
                 Reduce, Convert> const& f) noexcept
         {
@@ -733,7 +733,7 @@ namespace hpx { namespace traits {
     struct get_function_annotation<parallel::v1::detail::
             transform_reduce_iteration<T, ExPolicy, Reduce, Convert>>
     {
-        static char const* call(
+        static constexpr char const* call(
             parallel::v1::detail::transform_reduce_iteration<T, ExPolicy,
                 Reduce, Convert> const& f) noexcept
         {
