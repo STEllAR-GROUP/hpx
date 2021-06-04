@@ -47,8 +47,9 @@ namespace hpx { namespace collectives {
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> exclusive_scan(char const* basename, T&& result,
         F&& op, std::size_t num_sites = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+        std::size_t root_site = 0);
 
     /// Exclusive scan a set of values from different call sites
     ///
@@ -221,11 +222,11 @@ namespace hpx { namespace collectives {
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> exclusive_scan(char const* basename,
         T&& local_result, F&& op, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+        std::size_t this_site = std::size_t(-1),
+        std::size_t generation = std::size_t(-1), std::size_t root_site = 0)
     {
         return exclusive_scan(create_communicator(basename, num_sites,
-                                  generation, this_site, root_site),
+                                  this_site, generation, root_site),
             std::forward<T>(local_result), std::forward<F>(op), this_site);
     }
 }}    // namespace hpx::collectives

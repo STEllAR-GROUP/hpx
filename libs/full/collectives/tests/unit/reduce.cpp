@@ -28,13 +28,13 @@ void test_one_shot_use()
     // test functionality based on immediate local result value
     for (int i = 0; i != 10; ++i)
     {
-        std::uint32_t value = hpx::get_locality_id();
+        std::uint32_t value = this_locality;
 
         if (this_locality == 0)
         {
             hpx::future<std::uint32_t> overall_result =
                 hpx::collectives::reduce_here(reduce_direct_basename, value,
-                    std::plus<std::uint32_t>{}, num_localities, i);
+                    std::plus<std::uint32_t>{}, num_localities, this_locality, i);
 
             std::uint32_t sum = 0;
             for (std::uint32_t j = 0; j != num_localities; ++j)
@@ -46,7 +46,7 @@ void test_one_shot_use()
         else
         {
             hpx::future<void> overall_result = hpx::collectives::reduce_there(
-                reduce_direct_basename, std::move(value), i);
+                reduce_direct_basename, std::move(value), this_locality, i);
             overall_result.get();
         }
     }
@@ -58,7 +58,7 @@ void test_multiple_use()
     std::uint32_t this_locality = hpx::get_locality_id();
 
     auto reduce_direct_client = hpx::collectives::create_communicator(
-        reduce_direct_basename, num_localities);
+        reduce_direct_basename, num_localities, this_locality);
 
     // test functionality based on immediate local result value
     for (int i = 0; i != 10; ++i)

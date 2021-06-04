@@ -41,8 +41,8 @@ namespace hpx { namespace collectives {
     hpx::future<void> broadcast_to(char const* basename,
         T&& local_result,
         std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
         std::size_t root_site = 0)
 
     /// Broadcast a value to different call sites
@@ -86,8 +86,8 @@ namespace hpx { namespace collectives {
     ///
     template <typename T>
     hpx::future<T> broadcast_from(char const* basename,
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
+        std::size_t this_site = std::size_t(-1),
+        std::size_t generation = std::size_t(-1))
 
     /// Receive a value that was broadcast to different call sites
     ///
@@ -271,11 +271,11 @@ namespace hpx { namespace collectives {
     template <typename T>
     hpx::future<std::decay_t<T>> broadcast_to(char const* basename,
         T&& local_result, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
+        std::size_t this_site = std::size_t(-1),
+        std::size_t generation = std::size_t(-1))
     {
-        return broadcast_to(create_communicator(basename, num_sites, generation,
-                                this_site, this_site),
+        return broadcast_to(create_communicator(basename, num_sites, this_site,
+                                generation, this_site),
             std::forward<T>(local_result), this_site);
     }
 
@@ -311,12 +311,12 @@ namespace hpx { namespace collectives {
 
     template <typename T>
     hpx::future<T> broadcast_from(char const* basename,
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+        std::size_t this_site = std::size_t(-1),
+        std::size_t generation = std::size_t(-1), std::size_t root_site = 0)
     {
         HPX_ASSERT(this_site != root_site);
         return broadcast_from<T>(create_communicator(basename, std::size_t(-1),
-                                     generation, this_site, root_site),
+                                     this_site, generation, root_site),
             this_site);
     }
 }}    // namespace hpx::collectives

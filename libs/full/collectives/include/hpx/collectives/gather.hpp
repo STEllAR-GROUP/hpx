@@ -39,8 +39,8 @@ namespace hpx { namespace collectives {
     hpx::future<std::vector<decay_t<T>>> gather_here(
         char const* basename, T&& result,
         std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1));
+        std::size_t this_site = std::size_t(-1),
+        std::size_t generation = std::size_t(-1));
 
     /// Gather a set of values from different call sites
     ///
@@ -90,8 +90,8 @@ namespace hpx { namespace collectives {
     template <typename T>
     hpx::future<std::vector<decay_t<T>>>
     gather_there(char const* basename, T&& result,
-        std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
         std::size_t root_site = 0);
 
     /// Gather a given value at the given call site
@@ -276,11 +276,11 @@ namespace hpx { namespace collectives {
     template <typename T>
     hpx::future<std::vector<std::decay_t<T>>> gather_here(char const* basename,
         T&& result, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
+        std::size_t this_site = std::size_t(-1),
+        std::size_t generation = std::size_t(-1))
     {
-        return gather_here(create_communicator(basename, num_sites, generation,
-                               this_site, this_site),
+        return gather_here(create_communicator(basename, num_sites, this_site,
+                               generation, this_site),
             std::forward<T>(result), this_site);
     }
 
@@ -322,12 +322,12 @@ namespace hpx { namespace collectives {
 
     template <typename T>
     hpx::future<void> gather_there(char const* basename, T&& local_result,
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+        std::size_t this_site = std::size_t(-1),
+        std::size_t generation = std::size_t(-1), std::size_t root_site = 0)
     {
         HPX_ASSERT(this_site != root_site);
         return gather_there(create_communicator(basename, std::size_t(-1),
-                                generation, this_site, root_site),
+                                this_site, generation, root_site),
             std::forward<T>(local_result), this_site);
     }
 }}    // namespace hpx::collectives

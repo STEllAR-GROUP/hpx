@@ -41,8 +41,9 @@ namespace hpx { namespace collectives {
     ///
     communicator create_communicator(char const* basename,
         std::size_t num_sites = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+        std::size_t root_site = 0);
 }}
 // clang-format on
 
@@ -64,8 +65,8 @@ namespace hpx { namespace collectives {
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT communicator create_communicator(char const* basename,
         std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+        std::size_t this_site = std::size_t(-1),
+        std::size_t generation = std::size_t(-1), std::size_t root_site = 0);
 
 }}    // namespace hpx::collectives
 

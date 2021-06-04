@@ -25,13 +25,15 @@ void test_one_shot_use()
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
     HPX_TEST_LTE(std::uint32_t(2), num_localities);
 
+    std::uint32_t here = hpx::get_locality_id();
+
     // test functionality based on immediate local result value
     for (std::uint32_t i = 0; i != 10; ++i)
     {
-        if (hpx::get_locality_id() == 0)
+        if (here == 0)
         {
             hpx::future<std::uint32_t> result = hpx::collectives::broadcast_to(
-                broadcast_direct_basename, i + 42, num_localities, i);
+                broadcast_direct_basename, i + 42, num_localities, here, i);
 
             HPX_TEST_EQ(i + 42, result.get());
         }
@@ -39,7 +41,7 @@ void test_one_shot_use()
         {
             hpx::future<std::uint32_t> result =
                 hpx::collectives::broadcast_from<std::uint32_t>(
-                    broadcast_direct_basename, i);
+                    broadcast_direct_basename, here, i);
 
             HPX_TEST_EQ(i + 42, result.get());
         }
@@ -51,13 +53,15 @@ void test_multiple_use()
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
     HPX_TEST_LTE(std::uint32_t(2), num_localities);
 
+    std::uint32_t here = hpx::get_locality_id();
+
     auto broadcast_direct_client = hpx::collectives::create_communicator(
-        broadcast_direct_basename, num_localities);
+        broadcast_direct_basename, num_localities, here);
 
     // test functionality based on immediate local result value
     for (std::uint32_t i = 0; i != 10; ++i)
     {
-        if (hpx::get_locality_id() == 0)
+        if (here == 0)
         {
             hpx::future<std::uint32_t> result =
                 hpx::collectives::broadcast_to(broadcast_direct_client, i + 42);

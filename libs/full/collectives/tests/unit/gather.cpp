@@ -33,7 +33,7 @@ void test_one_shot_use()
         {
             hpx::future<std::vector<std::uint32_t>> overall_result =
                 hpx::collectives::gather_here(gather_direct_basename,
-                    std::uint32_t(42), num_localities, i);
+                    std::uint32_t(42), num_localities, this_locality, i);
 
             std::vector<std::uint32_t> sol = overall_result.get();
             for (std::size_t j = 0; j != sol.size(); ++j)
@@ -44,7 +44,7 @@ void test_one_shot_use()
         else
         {
             hpx::future<void> overall_result = hpx::collectives::gather_there(
-                gather_direct_basename, this_locality + 42, i);
+                gather_direct_basename, this_locality + 42, this_locality, i);
             overall_result.get();
         }
     }
@@ -57,7 +57,7 @@ void test_multiple_use()
 
     // test functionality based on immediate local result value
     auto gather_direct_client = hpx::collectives::create_communicator(
-        gather_direct_basename, num_localities);
+        gather_direct_basename, num_localities, this_locality);
 
     for (std::uint32_t i = 0; i != 10; ++i)
     {

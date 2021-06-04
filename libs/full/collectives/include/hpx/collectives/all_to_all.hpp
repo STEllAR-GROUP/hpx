@@ -42,8 +42,9 @@ namespace hpx { namespace collectives {
     hpx::future<std::vector<std::decay_t<T>>>
     all_to_all(char const* basename, T&& result,
         std::size_t num_sites = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+        std::size_t root_site = 0);
 
     /// AllToAll a set of values from different call sites
     ///
@@ -200,11 +201,11 @@ namespace hpx { namespace collectives {
     template <typename T>
     hpx::future<std::vector<T>> all_to_all(char const* basename,
         std::vector<T>&& local_result, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+        std::size_t this_site = std::size_t(-1),
+        std::size_t generation = std::size_t(-1), std::size_t root_site = 0)
     {
-        return all_to_all(create_communicator(basename, num_sites, generation,
-                              this_site, root_site),
+        return all_to_all(create_communicator(basename, num_sites, this_site,
+                              generation, root_site),
             std::move(local_result), this_site);
     }
 }}    // namespace hpx::collectives

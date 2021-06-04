@@ -34,7 +34,7 @@ void test_one_shot_use()
 
         hpx::future<std::vector<std::uint32_t>> overall_result =
             hpx::collectives::all_to_all(all_to_all_direct_basename,
-                std::move(values), num_localities, i);
+                std::move(values), num_localities, this_locality, i);
 
         std::vector<std::uint32_t> r = overall_result.get();
         HPX_TEST_EQ(r.size(), num_localities);
@@ -48,11 +48,11 @@ void test_one_shot_use()
 
 void test_multiple_use()
 {
-    std::uint32_t this_locality = hpx::get_locality_id();
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t this_locality = hpx::get_locality_id();
 
     auto all_to_all_direct_client = hpx::collectives::create_communicator(
-        all_to_all_direct_basename, num_localities);
+        all_to_all_direct_basename, num_localities, this_locality);
 
     // test functionality based on immediate local result value
     for (int i = 0; i != 10; ++i)

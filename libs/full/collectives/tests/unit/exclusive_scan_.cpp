@@ -23,17 +23,18 @@ constexpr char const* all_reduce_direct_basename = "/test/all_reduce_direct/";
 void test_one_shot_use()
 {
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t here = hpx::get_locality_id();
 
     // test functionality based on immediate local result value
     for (int i = 0; i != 10; ++i)
     {
-        std::uint32_t value = hpx::get_locality_id();
+        std::uint32_t value = here;
 
         hpx::future<std::uint32_t> overall_result =
             hpx::collectives::exclusive_scan(all_reduce_direct_basename, value,
-                std::plus<std::uint32_t>{}, num_localities, i);
+                std::plus<std::uint32_t>{}, num_localities, here, i);
 
-        if (value == 0)
+        if (here == 0)
         {
             // root_site is special
             HPX_TEST_EQ(std::uint32_t(0), overall_result.get());
@@ -53,20 +54,21 @@ void test_one_shot_use()
 void test_multiple_use()
 {
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t here = hpx::get_locality_id();
 
     auto all_reduce_direct_client = hpx::collectives::create_communicator(
-        all_reduce_direct_basename, num_localities);
+        all_reduce_direct_basename, num_localities, here);
 
     // test functionality based on immediate local result value
     for (int i = 0; i != 10; ++i)
     {
-        std::uint32_t value = hpx::get_locality_id();
+        std::uint32_t value = here;
 
         hpx::future<std::uint32_t> overall_result =
             hpx::collectives::exclusive_scan(
                 all_reduce_direct_client, value, std::plus<std::uint32_t>{});
 
-        if (value == 0)
+        if (here == 0)
         {
             // root_site is special
             HPX_TEST_EQ(std::uint32_t(0), overall_result.get());
