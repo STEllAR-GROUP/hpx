@@ -20,6 +20,9 @@
 #include <utility>
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
+    class tss_storage;
+
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
     //////////////////////////////////////////////////////////////////////////
     struct tss_cleanup_function
     {
@@ -195,7 +198,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         void* tss_data = nullptr, bool cleanup_existing = false);
 
     //////////////////////////////////////////////////////////////////////////
-    class tss_storage;
 
     HPX_CORE_EXPORT tss_storage* create_tss_storage();
     HPX_CORE_EXPORT void delete_tss_storage(tss_storage*& storage);
@@ -203,4 +205,5 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     HPX_CORE_EXPORT std::size_t get_tss_thread_data(tss_storage* storage);
     HPX_CORE_EXPORT std::size_t set_tss_thread_data(
         tss_storage* storage, std::size_t);
+#endif
 }}}}    // namespace hpx::threads::coroutines::detail
