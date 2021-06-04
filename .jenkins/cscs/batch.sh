@@ -16,6 +16,7 @@ build_dir="/dev/shm/hpx/build"
 mkdir -p "${build_dir}"
 cp -r "${orig_src_dir}" "${src_dir}"
 
+source ${src_dir}/.jenkins/cscs/env-common.sh
 source ${src_dir}/.jenkins/cscs/env-${configuration_name}.sh
 
 set +e
