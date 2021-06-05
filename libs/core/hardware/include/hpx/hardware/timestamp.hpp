@@ -10,12 +10,7 @@
 
 #include <hpx/config.hpp>
 
-// clang-format off
-// nvcc complains about multiple definition error for same function prototype
-// irrespective of __host__, __device__, and __host__ __device__ attributes. 
-#if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
-    #include <hpx/hardware/timestamp/cuda.hpp>
-#elif defined(HPX_MSVC)
+#if defined(HPX_MSVC)
   #include <hpx/hardware/timestamp/msvc.hpp>
 #elif defined(__amd64__) || defined(__amd64) || defined(__x86_64__) ||         \
     defined(__x86_64) || defined(_M_X64)

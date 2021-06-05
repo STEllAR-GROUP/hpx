@@ -14,13 +14,21 @@
 
 #include <hpx/config.hpp>
 
+#if define(HPX_HAVE_CUDA)
+#include <hpx/hardware/timestamp/cuda.hpp>
+#endif
+
 namespace hpx { namespace util { namespace hardware {
 
-    inline std::uint64_t timestamp()
+    HPX_HOST_DEVICE std::uint64_t timestamp()
     {
+#if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
+        return timestamp_cuda();
+#else
         struct timespec res;
         clock_gettime(CLOCK_MONOTONIC, &res);
         return 1000 * res.tv_sec + res.tv_nsec / 1000000;
+#endif
     }
 
 }}}    // namespace hpx::util::hardware

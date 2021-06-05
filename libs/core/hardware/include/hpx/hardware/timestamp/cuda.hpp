@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2012 Thomas Heller
+//  Copyright (c) 2021 Nikunj Gupta
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,13 +8,11 @@
 
 #pragma once
 
-#include <cuda.h>
-
 #include <hpx/config.hpp>
 
 namespace hpx { namespace util { namespace hardware {
 
-    HPX_HOST_DEVICE std::uint64_t timestamp()
+    HPX_DEVICE std::uint64_t timestamp_cuda()
     {
         std::uint64_t cur;
         asm volatile("mov.u64 %0, %%globaltimer;" : "=l"(cur));

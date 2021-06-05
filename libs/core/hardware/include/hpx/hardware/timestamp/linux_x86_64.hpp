@@ -11,11 +11,18 @@
 #include <cstdint>
 #include <hpx/config.hpp>
 
+#if define(HPX_HAVE_CUDA)
+#include <hpx/hardware/timestamp/cuda.hpp>
+#endif
+
 namespace hpx { namespace util { namespace hardware {
 
     // clang-format off
     inline std::uint64_t timestamp()
     {
+#if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
+        return timestamp_cuda();
+#else
         std::uint32_t lo = 0, hi = 0;
         #if defined(HPX_HAVE_RDTSCP)
             __asm__ __volatile__(
@@ -32,6 +39,7 @@ namespace hpx { namespace util { namespace hardware {
                 : "rbx", "rcx");
         #endif
         return ((static_cast<std::uint64_t>(hi)) << 32) | lo;
+#endif
     }
     // clang-format on
 
