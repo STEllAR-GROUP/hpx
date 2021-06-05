@@ -24,15 +24,17 @@ char const* gather_basename = "/test/gather/";
 
 int hpx_main()
 {
+    std::uint32_t here = hpx::get_locality_id();
+
     for (int i = 0; i < 10; ++i)
     {
         std::uint32_t value = hpx::get_locality_id();
 
-        if (hpx::get_locality_id() == 0)
+        if (here == 0)
         {
             hpx::future<std::vector<std::uint32_t>> overall_result =
                 hpx::collectives::gather_here(gather_basename, std::move(value),
-                    hpx::get_num_localities(hpx::launch::sync), i);
+                    hpx::get_num_localities(hpx::launch::sync), here, i);
 
             std::vector<std::uint32_t> sol = overall_result.get();
 
@@ -44,7 +46,7 @@ int hpx_main()
         else
         {
             hpx::future<void> overall_result = hpx::collectives::gather_there(
-                gather_basename, std::move(value), i);
+                gather_basename, std::move(value), here, i);
 
             overall_result.get();
         }

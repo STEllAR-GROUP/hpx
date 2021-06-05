@@ -34,7 +34,8 @@ void test_one_shot_use()
         {
             hpx::future<std::uint32_t> overall_result =
                 hpx::collectives::reduce_here(reduce_direct_basename, value,
-                    std::plus<std::uint32_t>{}, num_localities, this_locality, i);
+                    std::plus<std::uint32_t>{}, num_localities, this_locality,
+                    i);
 
             std::uint32_t sum = 0;
             for (std::uint32_t j = 0; j != num_localities; ++j)

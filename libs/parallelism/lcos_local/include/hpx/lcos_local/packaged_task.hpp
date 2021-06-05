@@ -129,7 +129,7 @@ namespace hpx { namespace lcos { namespace local {
     private:
         // synchronous execution
         template <typename... Vs>
-        void invoke_impl(/*is_void=*/std::false_type, Vs&&... vs) noexcept
+        void invoke_impl(/*is_void=*/std::false_type, Vs&&... vs)
         {
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
@@ -141,7 +141,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         template <typename... Vs>
-        void invoke_impl(/*is_void=*/std::true_type, Vs&&... vs) noexcept
+        void invoke_impl(/*is_void=*/std::true_type, Vs&&... vs)
         {
             hpx::detail::try_catch_exception_ptr(
                 [&]() {

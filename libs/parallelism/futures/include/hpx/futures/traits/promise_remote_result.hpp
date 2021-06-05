@@ -22,5 +22,6 @@ namespace hpx { namespace traits {
     };
 
     template <typename Result>
-    using promise_remote_result_t = typename promise_remote_result<Result>::type;
+    using promise_remote_result_t =
+        typename promise_remote_result<Result>::type;
 }}    // namespace hpx::traits
