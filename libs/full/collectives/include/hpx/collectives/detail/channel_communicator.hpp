@@ -123,6 +123,11 @@ namespace hpx { namespace collectives { namespace detail {
                 std::forward<T>(value));
         }
 
+        std::pair<std::size_t, std::size_t> get_info() const noexcept
+        {
+            return std::make_pair(clients_.size(), this_site_);
+        }
+
     private:
         std::size_t this_site_;
         std::vector<client_type> clients_;

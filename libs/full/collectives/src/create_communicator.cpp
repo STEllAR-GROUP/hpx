@@ -34,9 +34,9 @@ HPX_REGISTER_COMPONENT(collectives_component);
 namespace hpx { namespace collectives {
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::components::client<detail::communicator_server> create_communicator(
-        char const* basename, std::size_t num_sites, std::size_t this_site,
-        std::size_t generation, std::size_t root_site)
+    communicator create_communicator(char const* basename,
+        std::size_t num_sites, std::size_t this_site, std::size_t generation,
+        std::size_t root_site)
     {
         if (num_sites == std::size_t(-1))
         {
@@ -61,12 +61,10 @@ namespace hpx { namespace collectives {
             name += std::to_string(generation) + "/";
         }
 
-        using client_type =
-            hpx::components::client<detail::communicator_server>;
         if (this_site == root_site)
         {
             // create a new communicator
-            client_type c = hpx::local_new<client_type>(num_sites, this_site);
+            communicator c = hpx::local_new<communicator>(num_sites);
 
             // register the communicator's id using the given basename,
             // this keeps the communicator alive
@@ -74,7 +72,7 @@ namespace hpx { namespace collectives {
                 hpx::detail::name_from_basename(std::move(name), this_site));
 
             return f.then(hpx::launch::sync,
-                [target = std::move(c)](hpx::future<bool>&& f) {
+                [=, target = std::move(c)](hpx::future<bool>&& f) mutable {
                     bool result = f.get();
                     if (!result)
                     {
@@ -85,12 +83,14 @@ namespace hpx { namespace collectives {
                                 "operation was already registered: {}",
                                 target.registered_name()));
                     }
+                    target.set_info(num_sites, this_site);
                     return target;
                 });
         }
 
         // find existing communicator
-        return hpx::find_from_basename<client_type>(std::move(name), root_site);
+        return hpx::find_from_basename<communicator>(
+            std::move(name), root_site);
     }
 }}    // namespace hpx::collectives
 
