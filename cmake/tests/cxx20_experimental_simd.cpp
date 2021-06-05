@@ -6,7 +6,11 @@
 
 // test for availability of std experimental simd (C++20)
 
+// Enable this test only for GCC Compilers as simd header is not
+// completely implemented for other compilers.
+#if defined(__GNUC__) && !defined(__clang__)
 #include <experimental/simd>
+#endif
 
 int main()
 {
