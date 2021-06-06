@@ -28,7 +28,7 @@ void test_uninitialized_copy_n_sent(IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
     std::copy(std::begin(c), std::end(c), std::rbegin(d));
-    auto sent_len = (std::rand() % 10007) + 1;
+    std::size_t sent_len = (std::rand() % 10007) + 1;
     hpx::ranges::uninitialized_copy_n(std::begin(c), sent_len, std::begin(d),
         sentinel<std::size_t>{*(std::begin(d) + sent_len)});
 
@@ -55,7 +55,7 @@ void test_uninitialized_copy_n_sent(ExPolicy&& policy, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
     std::copy(std::begin(c), std::end(c), std::rbegin(d));
-    auto sent_len = (std::rand() % 10007) + 1;
+    std::size_t sent_len = (std::rand() % 10007) + 1;
     hpx::ranges::uninitialized_copy_n(policy, std::begin(c), sent_len,
         std::begin(d), sentinel<std::size_t>{*(std::begin(d) + sent_len)});
 
@@ -79,7 +79,7 @@ void test_uninitialized_copy_n_sent_async(ExPolicy&& p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
     std::copy(std::begin(c), std::end(c), std::rbegin(d));
-    auto sent_len = (std::rand() % 10007) + 1;
+    std::size_t sent_len = (std::rand() % 10007) + 1;
     auto f = hpx::ranges::uninitialized_copy_n(p, std::begin(c), sent_len,
         std::begin(d), sentinel<std::size_t>{*(std::begin(d) + sent_len)});
     f.wait();
