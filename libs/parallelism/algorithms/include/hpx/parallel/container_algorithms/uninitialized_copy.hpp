@@ -13,276 +13,147 @@
 
 namespace hpx { namespace ranges {
 
-    /// Checks if the first range [first1, last1) is lexicographically less than
-    /// the second range [first2, last2). uses a provided predicate to compare
-    /// elements.
+    /// Copies the elements in the range, defined by [first, last), to an
+    /// uninitialized memory area beginning at \a dest. If an exception is
+    /// thrown during the copy operation, the function has no effects.
     ///
-    /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation, where N1 = std::distance(first1, last)
-    ///         and N2 = std::distance(first2, last2).
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
-    /// \tparam InIter1     The type of the source iterators used for the
-    ///                     first range (deduced).
+    /// \tparam InIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
     /// \tparam Sent1       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for InIter1.
-    /// \tparam InIter2     The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     sentinel type must be a sentinel for InIter.
+    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
     /// \tparam Sent2       The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter2.
-    /// \tparam Pred        The type of an optional function/function object to use.
-    ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a lexicographical_compare requires \a Pred to
-    ///                     meet the requirements of \a CopyConstructible. This defaults
-    ///                     to std::less<>
-    /// \tparam Proj1       The type of an optional projection function for FwdIter1. This
-    ///                     defaults to \a util::projection_identity
-    /// \tparam Proj2       The type of an optional projection function for FwdIter2. This
-    ///                     defaults to \a util::projection_identity
     ///
     /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     of the first range the algorithm will be applied to.
-    /// \param last1        Refers to the end of the sequence of elements of
-    ///                     the first range the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the sequence of elements
-    ///                     of the second range the algorithm will be applied to.
-    /// \param last2        Refers to the end of the sequence of elements of
-    ///                     the second range the algorithm will be applied to.
-    /// \param pred         Refers to the comparison function that the first
-    ///                     and second ranges will be applied to
-    /// \param proj1        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the first range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
-    /// \param proj2        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the second range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
+    ///                     that will be copied from
+    /// \param last1        Refers to sentinel value denoting the end of the
+    ///                     sequence of elements the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the destination range.
+    /// \param last2        Refers to sentinel value denoting the end of the
+    ///                     second range the algorithm will be applied to.
     ///
-    /// The comparison operations in the parallel \a lexicographical_compare
-    /// algorithm invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
+    /// The assignments in the parallel \a uninitialized_copy algorithm invoked
+    /// without an execution policy object will execute in sequential order in
+    /// the calling thread.
     ///
-    /// The comparison operations in the parallel \a lexicographical_compare
-    /// algorithm invoked with an execution policy object of type
-    /// \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
+    /// \returns  The \a uninitialized_copy algorithm returns an
+    ///           \a in_out_result<InIter, FwdIter>.
+    ///            The \a uninitialized_copy algorithm returns the input iterator
+    ///           to one past the last element copied from and the output
+    ///           iterator to the element in the destination range, one past
+    ///           the last element copied.
     ///
-    /// \note     Lexicographical comparison is an operation with the
-    ///           following properties
-    ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range
-    ///               is lexicographically
-    ///               \a less or \a greater than the other
-    ///             - If one range is a prefix of another, the shorter range is
-    ///               lexicographically \a less than the other
-    ///             - If two ranges have equivalent elements and are of the same length,
-    ///               then the ranges are lexicographically \a equal
-    ///             - An empty range is lexicographically \a less than any non-empty
-    ///               range
-    ///             - Two empty ranges are lexicographically \a equal
-    ///
-    /// \returns  The \a lexicographically_compare algorithm returns a
-    ///           \a hpx::future<bool> if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a bool otherwise.
-    ///           The \a lexicographically_compare algorithm returns true
-    ///           if the first range is lexicographically less, otherwise
-    ///           it returns false.
-    ///           range [first2, last2), it returns false.
-    template <typename InIter1, typename Sent1, typename InIter2,
-        typename Sent2,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = detail::less>
-    bool lexicographical_compare(InIter1 first1, Sent1 last1, InIter2 first2,
-        Sent2 last2, Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
-        Proj2&& proj2 = Proj2());
+    template <typename InIter, typename Sent1, typename FwdIter, typename Sent2>
+    hpx::parallel::util::in_out_result<InIter, FwdIter> uninitialized_copy(
+        InIter first1, Sent1 last1, FwdIter first2, Sent2 last2);
 
-    /// Checks if the first range [first1, last1) is lexicographically less than
-    /// the second range [first2, last2). uses a provided predicate to compare
-    /// elements.
+    /// Copies the elements in the range, defined by [first, last), to an
+    /// uninitialized memory area beginning at \a dest. If an exception is
+    /// thrown during the copy operation, the function has no effects.
     ///
-    /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation, where N1 = std::distance(first1, last)
-    ///         and N2 = std::distance(first2, last2).
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used for the
-    ///                     first range (deduced).
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     input iterator.
     /// \tparam Sent1       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter1.
-    /// \tparam FwdIter2    The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     sentinel type must be a sentinel for InIter.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Sent2       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter2.
-    /// \tparam Pred        The type of an optional function/function object to use.
-    ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a lexicographical_compare requires \a Pred to
-    ///                     meet the requirements of \a CopyConstructible. This defaults
-    ///                     to std::less<>
-    /// \tparam Proj1       The type of an optional projection function for FwdIter1. This
-    ///                     defaults to \a util::projection_identity
-    /// \tparam Proj2       The type of an optional projection function for FwdIter2. This
-    ///                     defaults to \a util::projection_identity
+    ///                     sentinel type must be a sentinel for InIter2.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     of the first range the algorithm will be applied to.
-    /// \param last1        Refers to the end of the sequence of elements of
-    ///                     the first range the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the sequence of elements
-    ///                     of the second range the algorithm will be applied to.
-    /// \param last2        Refers to the end of the sequence of elements of
-    ///                     the second range the algorithm will be applied to.
-    /// \param pred         Refers to the comparison function that the first
-    ///                     and second ranges will be applied to
-    /// \param proj1        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the first range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
-    /// \param proj2        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the second range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
+    ///                     that will be copied from
+    /// \param last1        Refers to sentinel value denoting the end of the
+    ///                     sequence of elements the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the destination range.
+    /// \param last2        Refers to sentinel value denoting the end of the
+    ///                     second range the algorithm will be applied to.
     ///
-    /// The comparison operations in the parallel \a lexicographical_compare
-    /// algorithm invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
+    /// The assignments in the parallel \a uninitialized_copy algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
     ///
-    /// The comparison operations in the parallel \a lexicographical_compare
-    /// algorithm invoked with an execution policy object of type
-    /// \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
+    /// The assignments in the parallel \a uninitialized_copy algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an
+    /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     Lexicographical comparison is an operation with the
-    ///           following properties
-    ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range
-    ///               is lexicographically
-    ///               \a less or \a greater than the other
-    ///             - If one range is a prefix of another, the shorter range is
-    ///               lexicographically \a less than the other
-    ///             - If two ranges have equivalent elements and are of the same length,
-    ///               then the ranges are lexicographically \a equal
-    ///             - An empty range is lexicographically \a less than any non-empty
-    ///               range
-    ///             - Two empty ranges are lexicographically \a equal
-    ///
-    /// \returns  The \a lexicographically_compare algorithm returns a
-    ///           \a hpx::future<bool> if the execution policy is of type
+    /// \returns  The \a uninitialized_copy algorithm returns a
+    ///           \a hpx::future<in_out_result<InIter, FwdIter>>, if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a bool otherwise.
-    ///           The \a lexicographically_compare algorithm returns true
-    ///           if the first range is lexicographically less, otherwise
-    ///           it returns false.
-    ///           range [first2, last2), it returns false.
-
-    template <typename ExPolicy, typename FwdIter1, typename Sent1,
-        typename FwdIter2, typename Sent2,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = detail::less>
-    typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
-    lexicographical_compare(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
-        FwdIter2 first2, Sent2 last2, Pred&& pred = Pred(),
-        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
-
-    /// Checks if the first range rng1 is lexicographically less than
-    /// the second range rng2. uses a provided predicate to compare
-    /// elements.
+    ///           returns \a in_out_result<InIter, FwdIter> otherwise.
+    ///            The \a uninitialized_copy algorithm returns the input iterator
+    ///           to one past the last element copied from and the output
+    ///           iterator to the element in the destination range, one past
+    ///           the last element copied.
     ///
-    /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation, where N1 = std::distance(std::begin(rng1), std::end(rng1))
-    ///         and N2 = std::distance(std::begin(rng2), std::end(rng2)).
+    template <typename ExPolicy, typename FwdIter1, typename Sent1,
+        typename FwdIter2, typename Sent2>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
+    uninitialized_copy(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
+        FwdIter2 first2, Sent2 last2);
+
+    /// Copies the elements in the range, defined by [first, last), to an
+    /// uninitialized memory area beginning at \a dest. If an exception is
+    /// thrown during the copy operation, the function has no effects.
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
     /// \tparam Rng1        The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
-    /// \tparam Rng2        The type of the source range used (deduced).
+    /// \tparam Rng2        The type of the destination range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Pred        The type of an optional function/function object to use.
-    ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a lexicographical_compare requires \a Pred to
-    ///                     meet the requirements of \a CopyConstructible. This defaults
-    ///                     to std::less<>
-    /// \tparam Proj1       The type of an optional projection function for elements of the first range.
-    ///                     This defaults to \a util::projection_identity
-    /// \tparam Proj2       The type of an optional projection function for elements of the second range.
-    ///                     This defaults to \a util::projection_identity
+    ///                     meet the requirements of an forward iterator.
     ///
-    /// \param rng1         Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param rng2         Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param pred         Refers to the comparison function that the first
-    ///                     and second ranges will be applied to
-    /// \param proj1        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the first range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
-    /// \param proj2        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the second range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
+    /// \param rng1         Refers to the range from which the elements
+    ///                     will be copied from
+    /// \param rng2         Refers to the range to which the elements
+    ///                     will be copied to
     ///
-    /// The comparison operations in the parallel \a lexicographical_compare
-    /// algorithm invoked without an execution policy object  execute in sequential
-    /// order in the calling thread.
+    /// The assignments in the parallel \a uninitialized_copy algorithm invoked
+    /// without an execution policy object will execute in sequential order in
+    /// the calling thread.
     ///
-    /// \note     Lexicographical comparison is an operation with the
-    ///           following properties
-    ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range
-    ///               is lexicographically
-    ///               \a less or \a greater than the other
-    ///             - If one range is a prefix of another, the shorter range is
-    ///               lexicographically \a less than the other
-    ///             - If two ranges have equivalent elements and are of the same length,
-    ///               then the ranges are lexicographically \a equal
-    ///             - An empty range is lexicographically \a less than any non-empty
-    ///               range
-    ///             - Two empty ranges are lexicographically \a equal
+    /// \returns  The \a uninitialized_copy algorithm returns an
+    ///           \a in_out_result<typename hpx::traits::range_traits<Rng1>::iterator_type,
+    ///           typename hpx::traits::range_traits<Rng2>::iterator_type>.
+    ///           The \a uninitialized_copy algorithm returns the input iterator
+    ///           to one past the last element copied from and the output
+    ///           iterator to the element in the destination range, one past
+    ///           the last element copied.
     ///
-    /// \returns  The \a lexicographically_compare algorithm returns \a bool.
-    ///           The \a lexicographically_compare algorithm returns true
-    ///           if the first range is lexicographically less, otherwise
-    ///           it returns false.
-    ///           range [first2, last2), it returns false.
-    template <typename Rng1, typename Rng2,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = detail::less>
-    bool lexicographical_compare(Rng1&& rng1, Rng2&& rng2, Pred&& pred = Pred(),
-        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
+    template <typename Rng1, typename Rng2>
+    hpx::parallel::util::in_out_result<
+        typename hpx::traits::range_traits<Rng1>::iterator_type,
+        typename hpx::traits::range_traits<Rng2>::iterator_type>
+    uninitialized_copy(Rng1&& rng1, Rng2&& rng2);
 
-    /// Checks if the first range rng1 is lexicographically less than
-    /// the second range rng2. uses a provided predicate to compare
-    /// elements.
+    /// Copies the elements in the range, defined by [first, last), to an
+    /// uninitialized memory area beginning at \a dest. If an exception is
+    /// thrown during the copy operation, the function has no effects.
     ///
-    /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation, where N1 = std::distance(std::begin(rng1), std::end(rng1))
-    ///         and N2 = std::distance(std::begin(rng2), std::end(rng2)).
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -291,79 +162,147 @@ namespace hpx { namespace ranges {
     /// \tparam Rng1        The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
-    /// \tparam Rng2        The type of the source range used (deduced).
+    /// \tparam Rng2        The type of the destination range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Pred        The type of an optional function/function object to use.
-    ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a lexicographical_compare requires \a Pred to
-    ///                     meet the requirements of \a CopyConstructible. This defaults
-    ///                     to std::less<>
-    /// \tparam Proj1       The type of an optional projection function for elements of the first range.
-    ///                     This defaults to \a util::projection_identity
-    /// \tparam Proj2       The type of an optional projection function for elements of the second range.
-    ///                     This defaults to \a util::projection_identity
+    ///                     meet the requirements of an forward iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param rng1         Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param rng2         Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param pred         Refers to the comparison function that the first
-    ///                     and second ranges will be applied to
-    /// \param proj1        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the first range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
-    /// \param proj2        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the second range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
+    /// \param rng1         Refers to the range from which the elements
+    ///                     will be copied from
+    /// \param rng2         Refers to the range to which the elements
+    ///                     will be copied to
     ///
-    /// The comparison operations in the parallel \a lexicographical_compare
-    /// algorithm invoked with an execution policy object of type
+    /// The assignments in the parallel \a uninitialized_copy algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a uninitialized_copy algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an
+    /// unordered fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a uninitialized_copy algorithm returns a
+    ///           \a hpx::future<in_out_result<InIter, FwdIter>>, if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a in_out_result<typename hpx::traits::range_traits<Rng1>::iterator_type
+    ///           , typename hpx::traits::range_traits<Rng2>::iterator_type> otherwise.
+    ///            The \a uninitialized_copy algorithm returns the input iterator
+    ///           to one past the last element copied from and the output
+    ///           iterator to the element in the destination range, one past
+    ///           the last element copied.
+    ///
+    template <typename ExPolicy, typename Rng1, typename Rng2>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        hpx::parallel::util::in_out_result<
+            typename hpx::traits::range_traits<Rng1>::iterator_type,
+            typename hpx::traits::range_traits<Rng2>::iterator_type>>::type
+    uninitialized_copy(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2);
+
+    /// Copies the elements in the range [first, first + count), starting from
+    /// first and proceeding to first + count - 1., to another range beginning
+    /// at dest. If an exception is thrown during the copy operation, the
+    /// function has no effects.
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    ///
+    /// \tparam InIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     elements to apply \a f to.
+    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam Sent2       The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for FwdIter.
+    ///
+    /// \param first1       Refers to the beginning of the sequence of elements
+    ///                     that will be copied from
+    /// \param count        Refers to the number of elements starting at
+    ///                     \a first the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the destination range.
+    /// \param last2        Refers to sentinel value denoting the end of the
+    ///                     second range the algorithm will be applied to.
+    ///
+    /// The assignments in the parallel \a uninitialized_copy_n algorithm
+    /// invoked with an execution policy object of type
     /// \a sequenced_policy execute in sequential order in the
     /// calling thread.
     ///
-    /// The comparison operations in the parallel \a lexicographical_compare
-    /// algorithm invoked with an execution policy object of type
-    /// \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
+    /// \returns  The \a uninitialized_copy_n algorithm returns
+    ///           \a in_out_result<InIter, FwdIter>.
+    ///           The \a uninitialized_copy_n algorithm returns the output
+    ///           iterator to the element in the destination range, one past
+    ///           the last element copied.
+    ///
+    template <typename InIter, typename Size, typename FwdIter, typename Sent2>
+    hpx::parallel::util::in_out_result<InIter, FwdIter> uninitialized_copy_n(
+        InIter first1, Size count, FwdIter first2, Sent2 last2);
+
+    /// Copies the elements in the range [first, first + count), starting from
+    /// first and proceeding to first + count - 1., to another range beginning
+    /// at dest. If an exception is thrown during the copy operation, the
+    /// function has no effects.
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     elements to apply \a f to.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam Sent2       The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for InIter2.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first1       Refers to the beginning of the sequence of elements
+    ///                     that will be copied from
+    /// \param count        Refers to the number of elements starting at
+    ///                     \a first the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the destination range.
+    /// \param last1        Refers to sentinel value denoting the end of the
+    ///                     second range the algorithm will be applied to.
+    ///
+    /// The assignments in the parallel \a uninitialized_copy_n algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequenced_policy execute in sequential order in the
+    /// calling thread.
+    ///
+    /// The assignments in the parallel \a uninitialized_copy_n algorithm
+    /// invoked with an execution policy object of type
+    /// \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an
+    /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     Lexicographical comparison is an operation with the
-    ///           following properties
-    ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range
-    ///               is lexicographically
-    ///               \a less or \a greater than the other
-    ///             - If one range is a prefix of another, the shorter range is
-    ///               lexicographically \a less than the other
-    ///             - If two ranges have equivalent elements and are of the same length,
-    ///               then the ranges are lexicographically \a equal
-    ///             - An empty range is lexicographically \a less than any non-empty
-    ///               range
-    ///             - Two empty ranges are lexicographically \a equal
-    ///
-    /// \returns  The \a lexicographically_compare algorithm returns a
-    ///           \a hpx::future<bool> if the execution policy is of type
-    ///           \a sequenced_task_policy or
+    /// \returns  The \a uninitialized_copy_n algorithm returns a
+    ///           \a hpx::future<in_out_result<FwdIter1, FwdIter2>> if the execution
+    ///           policy is of type \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a bool otherwise.
-    ///           The \a lexicographically_compare algorithm returns true
-    ///           if the first range is lexicographically less, otherwise
-    ///           it returns false.
-    ///           range [first2, last2), it returns false.
-
-    template <typename ExPolicy, typename Rng1, typename Rng2,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = detail::less>
-    typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
-    lexicographical_compare(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
-        Pred&& pred = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
+    ///           returns \a FwdIter2 otherwise.
+    ///           The \a uninitialized_copy_n algorithm returns the output
+    ///           iterator to the element in the destination range, one past
+    ///           the last element copied.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename Size,
+        typename FwdIter2, typename Sent2>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
+    uninitialized_copy_n(ExPolicy&& policy, FwdIter1 first1, Size count,
+        FwdIter2 first2, Sent2 last2);
 }}    // namespace hpx::ranges
 #else
 
@@ -407,8 +346,8 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::uninitialized_copy_sent<
-                    parallel::util::in_out_result<InIter, FwdIter>>()
-                    .call(hpx::execution::seq, first1, last1, first2, last2);
+                parallel::util::in_out_result<InIter, FwdIter>>()
+                .call(hpx::execution::seq, first1, last1, first2, last2);
         }
 
         // clang-format off
@@ -529,7 +468,8 @@ namespace hpx { namespace ranges {
             std::size_t d = parallel::v1::detail::distance(first2, last2);
             return hpx::parallel::v1::detail::uninitialized_copy_n<
                 parallel::util::in_out_result<InIter, FwdIter>>()
-                .call(hpx::execution::seq, first1, count <= d ? count : d, first2);
+                .call(hpx::execution::seq, first1, count <= d ? count : d,
+                    first2);
         }
 
         // clang-format off
@@ -556,9 +496,8 @@ namespace hpx { namespace ranges {
             std::size_t d = parallel::v1::detail::distance(first2, last2);
             return hpx::parallel::v1::detail::uninitialized_copy_n<
                 parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(std::forward<ExPolicy>(policy), first1,
-                        count <= d ? count : d,
-                    first2);
+                .call(std::forward<ExPolicy>(policy), first1,
+                    count <= d ? count : d, first2);
         }
     } uninitialized_copy_n{};
 }}    // namespace hpx::ranges

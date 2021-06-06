@@ -427,7 +427,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     {
                         ::new (std::addressof(*current)) value_type(*first);
                     }
-                    return util::in_out_result<InIter1, FwdIter2>{first, current};
+                    return util::in_out_result<InIter1, FwdIter2>{
+                        first, current};
                 }
                 catch (...)
                 {
@@ -484,7 +485,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     {
                         ::new (std::addressof(*current)) value_type(*first);
                     }
-                    return util::in_out_result<InIter, FwdIter2>{first, current};
+                    return util::in_out_result<InIter, FwdIter2>{
+                        first, current};
                 }
                 catch (...)
                 {
