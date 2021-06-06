@@ -73,7 +73,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename FwdIter, typename F,
                 typename Proj>
             static constexpr typename std::iterator_traits<FwdIter>::value_type
-            sequential_min_element_ind(ExPolicy&&, FwdIter it,
+            sequential_minmax_element_ind(ExPolicy&&, FwdIter it,
                 std::size_t count, F const& f, Proj const& proj)
             {
                 HPX_ASSERT(count != 0);
@@ -133,7 +133,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto f2 = [policy, f = std::forward<F>(f),
                               proj = std::forward<Proj>(proj)](
                               std::vector<FwdIter>&& positions) -> FwdIter {
-                    return min_element::sequential_min_element_ind(
+                    return min_element::sequential_minmax_element_ind(
                         policy, positions.begin(), positions.size(), f, proj);
                 };
 
@@ -290,7 +290,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename FwdIter, typename F,
                 typename Proj>
             static constexpr typename std::iterator_traits<FwdIter>::value_type
-            sequential_max_element_ind(ExPolicy&&, FwdIter it,
+            sequential_minmax_element_ind(ExPolicy&&, FwdIter it,
                 std::size_t count, F const& f, Proj const& proj)
             {
                 HPX_ASSERT(count != 0);
@@ -350,7 +350,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto f2 = [policy, f = std::forward<F>(f),
                               proj = std::forward<Proj>(proj)](
                               std::vector<FwdIter>&& positions) -> FwdIter {
-                    return max_element::sequential_max_element_ind(
+                    return max_element::sequential_minmax_element_ind(
                         policy, positions.begin(), positions.size(), f, proj);
                 };
 

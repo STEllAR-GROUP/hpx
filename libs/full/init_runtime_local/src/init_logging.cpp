@@ -1062,12 +1062,21 @@ namespace hpx { namespace util {
 #else
 
 #include <hpx/init_runtime_local/detail/init_logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/util/get_entry_as.hpp>
 
 #include <iostream>
 #include <string>
 
 namespace hpx { namespace util {
+
+    //////////////////////////////////////////////////////////////////////////
+    void enable_logging(
+        logging_destination, std::string const&, std::string, std::string)
+    {
+    }
+
+    void disable_logging(logging_destination dest) {}
 
     //////////////////////////////////////////////////////////////////////////
     namespace detail {
