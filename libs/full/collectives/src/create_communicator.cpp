@@ -35,8 +35,8 @@ namespace hpx { namespace collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     communicator create_communicator(char const* basename,
-        std::size_t num_sites, std::size_t this_site, std::size_t generation,
-        std::size_t root_site)
+        num_sites_arg num_sites, this_site_arg this_site,
+        generation_arg generation, root_site_arg root_site)
     {
         if (num_sites == std::size_t(-1))
         {

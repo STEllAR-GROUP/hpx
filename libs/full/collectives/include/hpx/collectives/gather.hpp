@@ -38,9 +38,9 @@ namespace hpx { namespace collectives {
     template <typename T>
     hpx::future<std::vector<decay_t<T>>> gather_here(
         char const* basename, T&& result,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t generation = std::size_t(-1));
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
 
     /// Gather a set of values from different call sites
     ///
@@ -60,8 +60,7 @@ namespace hpx { namespace collectives {
     ///
     template <typename T>
     hpx::future<std::vector<decay_t<T>>> gather_here(
-        communicator comm, T&& result,
-        std::size_t this_site = std::size_t(-1));
+        communicator comm, T&& result, this_site_arg this_site = this_site_arg());
 
     /// Gather a given value at the given call site
     ///
@@ -90,9 +89,9 @@ namespace hpx { namespace collectives {
     template <typename T>
     hpx::future<std::vector<decay_t<T>>>
     gather_there(char const* basename, T&& result,
-        std::size_t this_site = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t root_site = 0);
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
 
     /// Gather a given value at the given call site
     ///
@@ -113,7 +112,7 @@ namespace hpx { namespace collectives {
     template <typename T>
     hpx::future<std::vector<decay_t<T>>>
     gather_there(communicator comm, T&& result,
-        std::size_t this_site = std::size_t(-1));
+        this_site_arg this_site = this_site_arg());
 }}    // namespace hpx::collectives
 
 // clang-format on
@@ -126,6 +125,7 @@ namespace hpx { namespace collectives {
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
+#include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
@@ -241,7 +241,7 @@ namespace hpx { namespace collectives {
     // gather plain values
     template <typename T>
     hpx::future<std::vector<std::decay_t<T>>> gather_here(communicator fid,
-        T&& local_result, std::size_t this_site = std::size_t(-1))
+        T&& local_result, this_site_arg this_site = this_site_arg())
     {
         if (this_site == std::size_t(-1))
         {
@@ -275,12 +275,12 @@ namespace hpx { namespace collectives {
 
     template <typename T>
     hpx::future<std::vector<std::decay_t<T>>> gather_here(char const* basename,
-        T&& result, std::size_t num_sites = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t generation = std::size_t(-1))
+        T&& result, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
     {
         return gather_here(create_communicator(basename, num_sites, this_site,
-                               generation, this_site),
+                               generation, root_site_arg(this_site.this_site_)),
             std::forward<T>(result), this_site);
     }
 
@@ -288,7 +288,7 @@ namespace hpx { namespace collectives {
     // gather plain values
     template <typename T>
     hpx::future<void> gather_there(communicator fid, T&& local_result,
-        std::size_t this_site = std::size_t(-1))
+        this_site_arg this_site = this_site_arg())
     {
         if (this_site == std::size_t(-1))
         {
@@ -322,11 +322,12 @@ namespace hpx { namespace collectives {
 
     template <typename T>
     hpx::future<void> gather_there(char const* basename, T&& local_result,
-        std::size_t this_site = std::size_t(-1),
-        std::size_t generation = std::size_t(-1), std::size_t root_site = 0)
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
     {
         HPX_ASSERT(this_site != root_site);
-        return gather_there(create_communicator(basename, std::size_t(-1),
+        return gather_there(create_communicator(basename, num_sites_arg(),
                                 this_site, generation, root_site),
             std::forward<T>(local_result), this_site);
     }

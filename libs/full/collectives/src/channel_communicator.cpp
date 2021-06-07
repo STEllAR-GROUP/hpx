@@ -30,10 +30,10 @@ namespace hpx { namespace collectives {
     channel_communicator::channel_communicator() = default;
 
     channel_communicator::channel_communicator(char const* basename,
-        std::size_t num_sites, std::size_t this_site,
+        num_sites_arg num_sites, this_site_arg this_site,
         components::client<detail::channel_communicator_server>&& here)
-      : comm_(std::make_shared<detail::channel_communicator>(
-            basename, num_sites, this_site, std::move(here)))
+      : comm_(std::make_shared<detail::channel_communicator>(basename,
+            num_sites.num_sites_, this_site.this_site_, std::move(here)))
     {
     }
 
@@ -44,7 +44,7 @@ namespace hpx { namespace collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::future<channel_communicator> create_channel_communicator(
-        char const* basename, std::size_t num_sites, std::size_t this_site)
+        char const* basename, num_sites_arg num_sites, this_site_arg this_site)
     {
         if (num_sites == std::size_t(-1))
         {
@@ -62,12 +62,12 @@ namespace hpx { namespace collectives {
             hpx::components::client<detail::channel_communicator_server>;
 
         // create a new communicator on each locality
-        client_type c = hpx::local_new<client_type>(num_sites);
+        client_type c = hpx::local_new<client_type>(num_sites.num_sites_);
 
         // register the communicator's id using the given basename,
         // this keeps the communicator alive
-        auto f =
-            c.register_as(hpx::detail::name_from_basename(basename, this_site));
+        auto f = c.register_as(
+            hpx::detail::name_from_basename(basename, this_site.this_site_));
 
         return f.then(hpx::launch::sync,
             [=, target = std::move(c)](hpx::future<bool>&& f) mutable {
@@ -87,7 +87,7 @@ namespace hpx { namespace collectives {
     }
 
     channel_communicator create_channel_communicator(hpx::launch::sync_policy,
-        char const* basename, std::size_t num_sites, std::size_t this_site)
+        char const* basename, num_sites_arg num_sites, this_site_arg this_site)
     {
         return create_channel_communicator(basename, num_sites, this_site)
             .get();

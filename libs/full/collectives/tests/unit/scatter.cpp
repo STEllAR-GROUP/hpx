@@ -19,6 +19,8 @@
 #include <utility>
 #include <vector>
 
+using namespace hpx::collectives;
+
 constexpr char const* scatter_direct_basename = "/test/scatter_direct/";
 
 void test_one_shot_use()
@@ -37,16 +39,17 @@ void test_one_shot_use()
             std::iota(data.begin(), data.end(), 42 + i);
 
             hpx::future<std::uint32_t> result =
-                hpx::collectives::scatter_to(scatter_direct_basename,
-                    std::move(data), num_localities, this_locality, i);
+                scatter_to(scatter_direct_basename, std::move(data),
+                    num_sites_arg(num_localities), this_site_arg(this_locality),
+                    generation_arg(i));
 
             HPX_TEST_EQ(i + 42 + this_locality, result.get());
         }
         else
         {
             hpx::future<std::uint32_t> result =
-                hpx::collectives::scatter_from<std::uint32_t>(
-                    scatter_direct_basename, this_locality, i);
+                scatter_from<std::uint32_t>(scatter_direct_basename,
+                    this_site_arg(this_locality), generation_arg(i));
 
             HPX_TEST_EQ(i + 42 + this_locality, result.get());
         }
@@ -60,8 +63,9 @@ void test_multiple_use()
 
     std::uint32_t this_locality = hpx::get_locality_id();
 
-    auto scatter_direct_client = hpx::collectives::create_communicator(
-        scatter_direct_basename, num_localities, this_locality);
+    auto scatter_direct_client =
+        hpx::collectives::create_communicator(scatter_direct_basename,
+            num_sites_arg(num_localities), this_site_arg(this_locality));
 
     // test functionality based on immediate local result value
     for (std::uint32_t i = 0; i != 10; ++i)
@@ -71,16 +75,15 @@ void test_multiple_use()
             std::vector<std::uint32_t> data(num_localities);
             std::iota(data.begin(), data.end(), 42 + i);
 
-            hpx::future<std::uint32_t> result = hpx::collectives::scatter_to(
-                scatter_direct_client, std::move(data));
+            hpx::future<std::uint32_t> result =
+                scatter_to(scatter_direct_client, std::move(data));
 
             HPX_TEST_EQ(i + 42 + this_locality, result.get());
         }
         else
         {
             hpx::future<std::uint32_t> result =
-                hpx::collectives::scatter_from<std::uint32_t>(
-                    scatter_direct_client);
+                scatter_from<std::uint32_t>(scatter_direct_client);
 
             HPX_TEST_EQ(i + 42 + this_locality, result.get());
         }

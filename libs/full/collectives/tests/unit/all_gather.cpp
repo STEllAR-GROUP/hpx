@@ -18,6 +18,8 @@
 #include <utility>
 #include <vector>
 
+using namespace hpx::collectives;
+
 constexpr char const* all_gather_direct_basename = "/test/all_gather_direct/";
 
 void test_one_shot_use()
@@ -30,9 +32,9 @@ void test_one_shot_use()
     {
         std::uint32_t value = here;
 
-        hpx::future<std::vector<std::uint32_t>> overall_result =
-            hpx::collectives::all_gather(
-                all_gather_direct_basename, value, num_localities, here, i);
+        hpx::future<std::vector<std::uint32_t>> overall_result = all_gather(
+            all_gather_direct_basename, value, num_sites_arg(num_localities),
+            this_site_arg(here), generation_arg(i));
 
         std::vector<std::uint32_t> r = overall_result.get();
         HPX_TEST_EQ(r.size(), num_localities);
@@ -50,15 +52,16 @@ void test_multiple_use()
     std::uint32_t here = hpx::get_locality_id();
 
     // test functionality based on immediate local result value
-    auto all_gather_direct_client = hpx::collectives::create_communicator(
-        all_gather_direct_basename, num_localities, here);
+    auto all_gather_direct_client =
+        create_communicator(all_gather_direct_basename,
+            num_sites_arg(num_localities), this_site_arg(here));
 
     for (int i = 0; i != 10; ++i)
     {
         std::uint32_t value = here;
 
         hpx::future<std::vector<std::uint32_t>> overall_result =
-            hpx::collectives::all_gather(all_gather_direct_client, value);
+            all_gather(all_gather_direct_client, value);
 
         std::vector<std::uint32_t> r = overall_result.get();
         HPX_TEST_EQ(r.size(), num_localities);

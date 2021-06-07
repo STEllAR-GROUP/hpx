@@ -673,8 +673,8 @@ void do_all_work(
 
         hpx::future<std::vector<stepper_server::space>> overall_result =
             result.then([&](hpx::future<stepper_server::space>&& result) {
-                return hpx::collectives::gather_here(
-                    gather_basename, result.get(), nl);
+                return hpx::collectives::gather_here(gather_basename,
+                    result.get(), hpx::collectives::num_sites_arg(nl));
             });
 
         std::vector<stepper_server::space> solution = overall_result.get();

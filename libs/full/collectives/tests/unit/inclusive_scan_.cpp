@@ -18,6 +18,8 @@
 #include <utility>
 #include <vector>
 
+using namespace hpx::collectives;
+
 constexpr char const* all_reduce_direct_basename = "/test/all_reduce_direct/";
 
 void test_one_shot_use()
@@ -31,8 +33,9 @@ void test_one_shot_use()
         std::uint32_t value = here;
 
         hpx::future<std::uint32_t> overall_result =
-            hpx::collectives::inclusive_scan(all_reduce_direct_basename, value,
-                std::plus<std::uint32_t>{}, num_localities, here, i);
+            inclusive_scan(all_reduce_direct_basename, value,
+                std::plus<std::uint32_t>{}, num_sites_arg(num_localities),
+                this_site_arg(here), generation_arg(i));
 
         std::uint32_t sum = 0;
         for (std::uint32_t j = 0; j != value + 1; ++j)
@@ -48,17 +51,17 @@ void test_multiple_use()
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
     std::uint32_t here = hpx::get_locality_id();
 
-    auto all_reduce_direct_client = hpx::collectives::create_communicator(
-        all_reduce_direct_basename, num_localities, here);
+    auto all_reduce_direct_client =
+        create_communicator(all_reduce_direct_basename,
+            num_sites_arg(num_localities), this_site_arg(here));
 
     // test functionality based on immediate local result value
     for (int i = 0; i != 10; ++i)
     {
         std::uint32_t value = here;
 
-        hpx::future<std::uint32_t> overall_result =
-            hpx::collectives::inclusive_scan(
-                all_reduce_direct_client, value, std::plus<std::uint32_t>{});
+        hpx::future<std::uint32_t> overall_result = inclusive_scan(
+            all_reduce_direct_client, value, std::plus<std::uint32_t>{});
 
         std::uint32_t sum = 0;
         for (std::uint32_t j = 0; j != value + 1; ++j)

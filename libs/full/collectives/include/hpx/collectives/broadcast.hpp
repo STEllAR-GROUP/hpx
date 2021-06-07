@@ -30,20 +30,15 @@ namespace hpx { namespace collectives {
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \params root_site   The site that is responsible for creating the
-    ///                     broadcast support object. This value is optional
-    ///                     and defaults to '0' (zero).
     ///
     /// \returns    This function returns a future that will become
     ///             ready once the broadcast operation has been completed.
     ///
     template <typename T>
-    hpx::future<void> broadcast_to(char const* basename,
-        T&& local_result,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t root_site = 0)
+    hpx::future<void> broadcast_to(char const* basename, T&& local_result,
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
 
     /// Broadcast a value to different call sites
     ///
@@ -62,8 +57,7 @@ namespace hpx { namespace collectives {
     ///
     template <typename T>
     hpx::future<void> broadcast_to(communicator comm,
-        T&& local_result,
-        std::size_t this_site = std::size_t(-1))
+        T&& local_result, this_site_arg this_site = this_site_arg());
 
     /// Receive a value that was broadcast to different call sites
     ///
@@ -86,8 +80,8 @@ namespace hpx { namespace collectives {
     ///
     template <typename T>
     hpx::future<T> broadcast_from(char const* basename,
-        std::size_t this_site = std::size_t(-1),
-        std::size_t generation = std::size_t(-1))
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
 
     /// Receive a value that was broadcast to different call sites
     ///
@@ -105,7 +99,7 @@ namespace hpx { namespace collectives {
     ///
     template <typename T>
     hpx::future<T> broadcast_from(communicator comm,
-        std::size_t this_site = std::size_t(-1))
+        this_site_arg this_site = this_site_arg());
 }}    // namespace hpx::collectives
 
 // clang-format on
@@ -119,6 +113,7 @@ namespace hpx { namespace collectives {
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/async_local/dataflow.hpp>
+#include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
@@ -236,7 +231,7 @@ namespace hpx { namespace collectives {
 
     template <typename T>
     hpx::future<std::decay_t<T>> broadcast_to(communicator fid,
-        T&& local_result, std::size_t this_site = std::size_t(-1))
+        T&& local_result, this_site_arg this_site = this_site_arg())
     {
         if (this_site == std::size_t(-1))
         {
@@ -270,19 +265,20 @@ namespace hpx { namespace collectives {
 
     template <typename T>
     hpx::future<std::decay_t<T>> broadcast_to(char const* basename,
-        T&& local_result, std::size_t num_sites = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t generation = std::size_t(-1))
+        T&& local_result, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
     {
-        return broadcast_to(create_communicator(basename, num_sites, this_site,
-                                generation, this_site),
+        return broadcast_to(
+            create_communicator(basename, num_sites, this_site, generation,
+                root_site_arg(this_site.this_site_)),
             std::forward<T>(local_result), this_site);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     hpx::future<T> broadcast_from(
-        communicator fid, std::size_t this_site = std::size_t(-1))
+        communicator fid, this_site_arg this_site = this_site_arg())
     {
         if (this_site == std::size_t(-1))
         {
@@ -311,11 +307,12 @@ namespace hpx { namespace collectives {
 
     template <typename T>
     hpx::future<T> broadcast_from(char const* basename,
-        std::size_t this_site = std::size_t(-1),
-        std::size_t generation = std::size_t(-1), std::size_t root_site = 0)
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
     {
         HPX_ASSERT(this_site != root_site);
-        return broadcast_from<T>(create_communicator(basename, std::size_t(-1),
+        return broadcast_from<T>(create_communicator(basename, num_sites_arg(),
                                      this_site, generation, root_site),
             this_site);
     }

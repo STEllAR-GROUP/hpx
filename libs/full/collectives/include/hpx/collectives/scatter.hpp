@@ -36,9 +36,9 @@ namespace hpx { namespace collectives {
     ///
     template <typename T>
     hpx::future<T> scatter_from(char const* basename,
-        std::size_t this_site = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t root_site = 0);
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
 
     /// Scatter (receive) a set of values to different call sites
     ///
@@ -56,7 +56,7 @@ namespace hpx { namespace collectives {
     ///
     template <typename T>
     hpx::future<T> scatter_from(communicator comm,
-        std::size_t this_site = std::size_t(-1));
+        this_site_arg this_site = this_site_arg());
 
     /// Scatter (send) a part of the value set at the given call site
     ///
@@ -84,9 +84,9 @@ namespace hpx { namespace collectives {
     template <typename T>
     hpx::future<T> scatter_to(char const* basename,
         std::vector<T>&& result,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t generation = std::size_t(-1));
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
 
     /// Scatter (send) a part of the value set at the given call site
     ///
@@ -106,7 +106,7 @@ namespace hpx { namespace collectives {
     ///
     template <typename T>
     hpx::future<T> scatter_to(communicator comm,
-        std::vector<T>&& result, std::size_t this_site = std::size_t(-1));
+        std::vector<T>&& result, this_site_arg this_site = this_site_arg());
 }}    // namespace hpx::collectives
 
 // clang-format on
@@ -119,6 +119,7 @@ namespace hpx { namespace collectives {
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
+#include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
@@ -238,7 +239,7 @@ namespace hpx { namespace collectives {
     // destination site needs to be handled differently
     template <typename T>
     hpx::future<T> scatter_from(
-        communicator fid, std::size_t this_site = std::size_t(-1))
+        communicator fid, this_site_arg this_site = this_site_arg())
     {
         if (this_site == std::size_t(-1))
         {
@@ -265,11 +266,12 @@ namespace hpx { namespace collectives {
 
     template <typename T>
     hpx::future<T> scatter_from(char const* basename,
-        std::size_t this_site = std::size_t(-1),
-        std::size_t generation = std::size_t(-1), std::size_t root_site = 0)
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
     {
         HPX_ASSERT(this_site != root_site);
-        return scatter_from<T>(create_communicator(basename, std::size_t(-1),
+        return scatter_from<T>(create_communicator(basename, num_sites_arg(),
                                    this_site, generation, root_site),
             this_site);
     }
@@ -278,7 +280,7 @@ namespace hpx { namespace collectives {
     // scatter plain values
     template <typename T>
     hpx::future<T> scatter_to(communicator fid, std::vector<T>&& local_result,
-        std::size_t this_site = std::size_t(-1))
+        this_site_arg this_site = this_site_arg())
     {
         if (this_site == std::size_t(-1))
         {
@@ -310,12 +312,13 @@ namespace hpx { namespace collectives {
 
     template <typename T>
     hpx::future<T> scatter_to(char const* basename,
-        std::vector<T>&& local_result, std::size_t num_sites = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t generation = std::size_t(-1))
+        std::vector<T>&& local_result,
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
     {
         return scatter_to(create_communicator(basename, num_sites, this_site,
-                              generation, this_site),
+                              generation, root_site_arg(this_site.this_site_)),
             std::move(local_result), this_site);
     }
 }}    // namespace hpx::collectives

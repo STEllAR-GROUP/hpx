@@ -40,10 +40,10 @@ namespace hpx { namespace collectives {
     ///             with the collective operation.
     ///
     communicator create_communicator(char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t root_site = 0);
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
 }}
 // clang-format on
 
@@ -52,6 +52,7 @@ namespace hpx { namespace collectives {
 #include <hpx/config.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/components/client_base.hpp>
 
@@ -109,9 +110,10 @@ namespace hpx { namespace collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT communicator create_communicator(char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t generation = std::size_t(-1), std::size_t root_site = 0);
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
 
 }}    // namespace hpx::collectives
 

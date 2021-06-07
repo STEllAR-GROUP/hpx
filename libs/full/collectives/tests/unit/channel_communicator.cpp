@@ -15,6 +15,8 @@
 #include <utility>
 #include <vector>
 
+using namespace hpx::collectives;
+
 ///////////////////////////////////////////////////////////////////////////////
 constexpr char const* channel_communicator_basename =
     "/test/channel_communicator/";
@@ -32,7 +34,7 @@ void test_channel_communicator_set_first_comm(
 
     for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
     {
-        sets.push_back(hpx::collectives::set(comm, i, std::make_pair(i, site)));
+        sets.push_back(set(comm, that_site_arg(i), std::make_pair(i, site)));
     }
 
     // receive the values sent above
@@ -41,7 +43,7 @@ void test_channel_communicator_set_first_comm(
 
     for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
     {
-        gets.push_back(hpx::collectives::get<data_type>(comm, i));
+        gets.push_back(get<data_type>(comm, that_site_arg(i)));
     }
 
     hpx::wait_all(sets, gets);
@@ -59,8 +61,9 @@ void test_channel_communicator_set_first_comm(
 void test_channel_communicator_set_first_single_use(std::size_t site)
 {
     // for each site, create new channel_communicator
-    auto comm = hpx::collectives::create_channel_communicator(hpx::launch::sync,
-        channel_communicator_basename, NUM_CHANNEL_COMMUNICATOR_SITES, site);
+    auto comm = create_channel_communicator(hpx::launch::sync,
+        channel_communicator_basename,
+        num_sites_arg(NUM_CHANNEL_COMMUNICATOR_SITES), this_site_arg(site));
 
     test_channel_communicator_set_first_comm(site, comm);
 }
@@ -91,9 +94,10 @@ void test_multi_use_set_first()
 
         for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
         {
-            comms.push_back(hpx::collectives::create_channel_communicator(
-                hpx::launch::sync, channel_communicator_basename,
-                NUM_CHANNEL_COMMUNICATOR_SITES, i));
+            comms.push_back(create_channel_communicator(hpx::launch::sync,
+                channel_communicator_basename,
+                num_sites_arg(NUM_CHANNEL_COMMUNICATOR_SITES),
+                this_site_arg(i)));
         }
 
         std::vector<hpx::future<void>> tasks;
@@ -121,7 +125,7 @@ void test_channel_communicator_get_first_comm(
 
     for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
     {
-        gets.push_back(hpx::collectives::get<data_type>(comm, i));
+        gets.push_back(get<data_type>(comm, that_site_arg(i)));
     }
 
     // send a value to each of the participating sites
@@ -130,7 +134,7 @@ void test_channel_communicator_get_first_comm(
 
     for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
     {
-        sets.push_back(hpx::collectives::set(comm, i, std::make_pair(i, site)));
+        sets.push_back(set(comm, that_site_arg(i), std::make_pair(i, site)));
     }
 
     hpx::wait_all(sets, gets);
@@ -148,8 +152,9 @@ void test_channel_communicator_get_first_comm(
 void test_channel_communicator_get_first_single_use(std::size_t site)
 {
     // for each site, create new channel_communicator
-    auto comm = hpx::collectives::create_channel_communicator(hpx::launch::sync,
-        channel_communicator_basename, NUM_CHANNEL_COMMUNICATOR_SITES, site);
+    auto comm = create_channel_communicator(hpx::launch::sync,
+        channel_communicator_basename,
+        num_sites_arg(NUM_CHANNEL_COMMUNICATOR_SITES), this_site_arg(site));
 
     test_channel_communicator_get_first_comm(site, comm);
 }
@@ -181,9 +186,10 @@ void test_multi_use_get_first()
 
         for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
         {
-            comms.push_back(hpx::collectives::create_channel_communicator(
-                hpx::launch::sync, channel_communicator_basename,
-                NUM_CHANNEL_COMMUNICATOR_SITES, i));
+            comms.push_back(create_channel_communicator(hpx::launch::sync,
+                channel_communicator_basename,
+                num_sites_arg(NUM_CHANNEL_COMMUNICATOR_SITES),
+                this_site_arg(i)));
         }
 
         std::vector<hpx::future<void>> tasks;

@@ -32,8 +32,8 @@ namespace hpx { namespace collectives {
     ///
     hpx::future<channel_communicator> create_channel_communicator(
         char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1));
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg());
 
     /// Create a new communicator object usable with peer-to-peer channel-based operations
     ///
@@ -53,8 +53,8 @@ namespace hpx { namespace collectives {
     ///
     channel_communicator create_channel_communicator(
         hpx::launch::sync_policy, char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1));
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg());
 
     /// Send a value to the given site
     ///
@@ -69,7 +69,8 @@ namespace hpx { namespace collectives {
     ///             data transfer operation has finished.
     ///
     template <typename T>
-    hpx::future<void> set(channel_communicator comm, std::size_t site, T&& value);
+    hpx::future<void> set(channel_communicator comm,
+        that_site_arg site, T&& value);
 
     /// Send a value to the given site
     ///
@@ -84,7 +85,7 @@ namespace hpx { namespace collectives {
     ///             received value.
     ///
     template <typename T>
-    hpx::future<T> get(channel_communicator comm, std::size_t site);
+    hpx::future<T> get(channel_communicator comm, that_site_arg site);
 
 }}
 // clang-format on
@@ -96,6 +97,7 @@ namespace hpx { namespace collectives {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
+#include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/detail/channel_communicator.hpp>
 #include <hpx/components/client.hpp>
 #include <hpx/futures/future.hpp>
@@ -112,18 +114,23 @@ namespace hpx { namespace collectives {
     class channel_communicator
     {
     private:
-        template <typename T>
-        friend hpx::future<T> get(channel_communicator, std::size_t);
+        friend HPX_EXPORT hpx::future<channel_communicator>
+        create_channel_communicator(char const* basename,
+            num_sites_arg num_sites, this_site_arg this_site);
 
         template <typename T>
-        friend hpx::future<void> set(channel_communicator, std::size_t, T&&);
+        friend hpx::future<T> get(channel_communicator, that_site_arg);
+
+        template <typename T>
+        friend hpx::future<void> set(channel_communicator, that_site_arg, T&&);
+
+    private:
+        HPX_EXPORT channel_communicator(char const* basename,
+            num_sites_arg num_sites, this_site_arg this_site,
+            components::client<detail::channel_communicator_server>&& here);
 
     public:
         HPX_EXPORT channel_communicator();
-
-        HPX_EXPORT channel_communicator(char const* basename,
-            std::size_t num_sites, std::size_t this_site,
-            components::client<detail::channel_communicator_server>&& here);
 
         channel_communicator(channel_communicator const& rhs) = default;
         channel_communicator& operator=(
@@ -141,26 +148,26 @@ namespace hpx { namespace collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT hpx::future<channel_communicator> create_channel_communicator(
-        char const* basename, std::size_t num_sites = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1));
+        char const* basename, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg());
 
     HPX_EXPORT channel_communicator create_channel_communicator(
         hpx::launch::sync_policy, char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1));
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg());
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    hpx::future<T> get(channel_communicator comm, std::size_t site)
+    hpx::future<T> get(channel_communicator comm, that_site_arg site)
     {
-        return comm.comm_->template get<T>(site);
+        return comm.comm_->template get<T>(site.that_site_);
     }
 
     template <typename T>
     hpx::future<void> set(
-        channel_communicator comm, std::size_t site, T&& value)
+        channel_communicator comm, that_site_arg site, T&& value)
     {
-        return comm.comm_->set(site, std::forward<T>(value));
+        return comm.comm_->set(site.that_site_, std::forward<T>(value));
     }
 }}    // namespace hpx::collectives
 

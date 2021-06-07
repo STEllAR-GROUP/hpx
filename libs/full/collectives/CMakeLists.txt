@@ -15,6 +15,7 @@ set(collectives_headers
     hpx/collectives/all_gather.hpp
     hpx/collectives/all_reduce.hpp
     hpx/collectives/all_to_all.hpp
+    hpx/collectives/argument_types.hpp
     hpx/collectives/barrier.hpp
     hpx/collectives/broadcast.hpp
     hpx/collectives/broadcast_direct.hpp

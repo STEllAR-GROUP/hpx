@@ -42,10 +42,10 @@ namespace hpx { namespace collectives {
     ///
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> all_reduce(char const* basename, T&& result,
-        F&& op, std::size_t num_sites = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t root_site = 0);
+        F&& op, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
 
     /// AllReduce a set of values from different call sites
     ///
@@ -68,7 +68,7 @@ namespace hpx { namespace collectives {
     template <typename T, typename F>
     hpx::future<std::decay_t<T>>
     all_reduce(communicator comm,
-        T&& result, F&& op, std::size_t this_site = std::size_t(-1));
+        T&& result, F&& op, this_site_arg this_site = this_site_arg());
 }}    // namespace hpx::collectives
 
 // clang-format on
@@ -80,6 +80,7 @@ namespace hpx { namespace collectives {
 
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
+#include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
@@ -172,7 +173,7 @@ namespace hpx { namespace collectives {
     // all_reduce plain values
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> all_reduce(communicator fid, T&& local_result,
-        F&& op, std::size_t this_site = std::size_t(-1))
+        F&& op, this_site_arg this_site = this_site_arg())
     {
         if (this_site == std::size_t(-1))
         {
@@ -207,9 +208,10 @@ namespace hpx { namespace collectives {
 
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> all_reduce(char const* basename,
-        T&& local_result, F&& op, std::size_t num_sites = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t generation = std::size_t(-1), std::size_t root_site = 0)
+        T&& local_result, F&& op, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
     {
         return all_reduce(create_communicator(basename, num_sites, this_site,
                               generation, root_site),
