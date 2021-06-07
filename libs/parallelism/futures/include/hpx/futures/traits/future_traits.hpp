@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -68,6 +68,9 @@ namespace hpx { namespace traits {
         typedef void result_type;
     };
 
+    template <typename Future>
+    using future_traits_t = typename future_traits<Future>::type;
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename Enable = void>
     struct is_future_void : std::false_type
@@ -75,9 +78,8 @@ namespace hpx { namespace traits {
     };
 
     template <typename Future>
-    struct is_future_void<Future,
-        typename std::enable_if<is_future<Future>::value>::type>
-      : std::is_void<typename future_traits<Future>::type>
+    struct is_future_void<Future, std::enable_if_t<is_future<Future>::value>>
+      : std::is_void<future_traits_t<Future>>
     {
     };
 }}    // namespace hpx::traits

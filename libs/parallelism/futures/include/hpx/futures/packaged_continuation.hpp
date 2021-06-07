@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -30,39 +30,21 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail {
-    template <typename Source, typename Destination>
-    HPX_FORCEINLINE void transfer_result_impl(
-        std::false_type, Source&& src, Destination& dest)
-    {
-        hpx::intrusive_ptr<Destination> keep_alive(&dest);
-        hpx::detail::try_catch_exception_ptr(
-            [&]() { dest.set_value(src.get()); },
-            [&](std::exception_ptr ep) { dest.set_exception(std::move(ep)); });
-    }
-
-    template <typename Source, typename Destination>
-    HPX_FORCEINLINE void transfer_result_impl(
-        std::true_type, Source&& src, Destination& dest)
-    {
-        hpx::intrusive_ptr<Destination> keep_alive(&dest);
-        hpx::detail::try_catch_exception_ptr(
-            [&]() {
-                src.get();
-                dest.set_value(util::unused);
-            },
-            [&](std::exception_ptr ep) { dest.set_exception(std::move(ep)); });
-    }
 
     template <typename Future, typename SourceState, typename DestinationState>
     HPX_FORCEINLINE void transfer_result(
         SourceState&& src, DestinationState const& dest)
     {
-        using is_void =
-            std::is_void<typename traits::future_traits<Future>::type>;
-        transfer_result_impl(is_void{},
-            traits::future_access<Future>::create(
-                std::forward<SourceState>(src)),
-            *dest);
+        hpx::detail::try_catch_exception_ptr(
+            [&]() {
+                traits::future_access<Future>::transfer_result(
+                    traits::future_access<Future>::create(
+                        std::forward<SourceState>(src)),
+                    *dest);
+            },
+            [&](std::exception_ptr ep) {
+                (*dest).set_exception(std::move(ep));
+            });
     }
 
     template <typename Func, typename Future, typename Continuation>
@@ -89,12 +71,11 @@ namespace hpx { namespace lcos { namespace detail {
     }
 
     template <typename Func, typename Future, typename Continuation>
-    typename std::enable_if<!traits::detail::is_unique_future<
-        typename util::invoke_result<Func, Future>::type>::value>::type
+    std::enable_if_t<!traits::detail::is_unique_future<
+        util::invoke_result_t<Func, Future>>::value>
     invoke_continuation(Func& func, Future&& future, Continuation& cont)
     {
-        typedef std::is_void<typename util::invoke_result<Func, Future>::type>
-            is_void;
+        using is_void = std::is_void<util::invoke_result_t<Func, Future>>;
 
         hpx::util::annotate_function annotate(func);
         invoke_continuation_nounwrap(
@@ -102,16 +83,15 @@ namespace hpx { namespace lcos { namespace detail {
     }
 
     template <typename Func, typename Future, typename Continuation>
-    typename std::enable_if<traits::detail::is_unique_future<
-        typename util::invoke_result<Func, Future>::type>::value>::type
+    std::enable_if_t<traits::detail::is_unique_future<
+        util::invoke_result_t<Func, Future>>::value>
     invoke_continuation(Func& func, Future&& future, Continuation& cont)
     {
         hpx::detail::try_catch_exception_ptr(
             [&]() {
-                typedef typename util::invoke_result<Func, Future>::type
-                    inner_future;
-                typedef typename traits::detail::shared_state_ptr_for<
-                    inner_future>::type inner_shared_state_ptr;
+                using inner_future = util::invoke_result_t<Func, Future>;
+                using inner_shared_state_ptr =
+                    traits::detail::shared_state_ptr_for_t<inner_future>;
 
                 // take by value, as the future may go away immediately
                 inner_shared_state_ptr inner_state =
@@ -144,13 +124,13 @@ namespace hpx { namespace lcos { namespace detail {
     template <typename ContResult>
     struct continuation_result
     {
-        typedef ContResult type;
+        using type = ContResult;
     };
 
     template <typename ContResult>
     struct continuation_result<future<ContResult>>
     {
-        typedef ContResult type;
+        using type = ContResult;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -158,10 +138,10 @@ namespace hpx { namespace lcos { namespace detail {
     class continuation : public detail::future_data<ContResult>
     {
     private:
-        typedef future_data<ContResult> base_type;
+        using base_type = future_data<ContResult>;
 
-        typedef typename base_type::mutex_type mutex_type;
-        typedef typename base_type::result_type result_type;
+        using mutex_type = typename base_type::mutex_type;
+        using result_type = typename base_type::result_type;
 
     protected:
         threads::thread_id_type get_id() const
@@ -191,11 +171,11 @@ namespace hpx { namespace lcos { namespace detail {
         };
 
     public:
-        typedef typename base_type::init_no_addref init_no_addref;
+        using init_no_addref = typename base_type::init_no_addref;
 
         template <typename Func,
-            typename Enable = typename std::enable_if<!std::is_same<
-                typename std::decay<Func>::type, continuation>::value>::type>
+            typename Enable = std::enable_if_t<
+                !std::is_same<std::decay_t<Func>, continuation>::value>>
         // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
         continuation(Func&& f)
           : started_(false)
@@ -214,18 +194,16 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
     protected:
-        void run_impl(
-            typename traits::detail::shared_state_ptr_for<Future>::type&& f)
+        void run_impl(traits::detail::shared_state_ptr_for_t<Future>&& f)
         {
             Future future = traits::future_access<Future>::create(std::move(f));
             invoke_continuation(f_, std::move(future), *this);
         }
 
         void run_impl_nounwrap(
-            typename traits::detail::shared_state_ptr_for<Future>::type&& f)
+            traits::detail::shared_state_ptr_for_t<Future>&& f)
         {
-            using is_void =
-                std::is_void<typename util::invoke_result<F, Future>::type>;
+            using is_void = std::is_void<util::invoke_result_t<F, Future>>;
 
             Future future = traits::future_access<Future>::create(std::move(f));
             invoke_continuation_nounwrap(
@@ -233,8 +211,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
     public:
-        void run(
-            typename traits::detail::shared_state_ptr_for<Future>::type&& f,
+        void run(traits::detail::shared_state_ptr_for_t<Future>&& f,
             error_code& ec = throws)
         {
             {
@@ -254,8 +231,7 @@ namespace hpx { namespace lcos { namespace detail {
                 ec = make_success_code();
         }
 
-        void run_nounwrap(
-            typename traits::detail::shared_state_ptr_for<Future>::type&& f,
+        void run_nounwrap(traits::detail::shared_state_ptr_for_t<Future>&& f,
             error_code& ec = throws)
         {
             {
@@ -277,8 +253,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
     protected:
-        void async_impl(
-            typename traits::detail::shared_state_ptr_for<Future>::type&& f)
+        void async_impl(traits::detail::shared_state_ptr_for_t<Future>&& f)
         {
             reset_id r(*this);
 
@@ -287,10 +262,9 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         void async_impl_nounwrap(
-            typename traits::detail::shared_state_ptr_for<Future>::type&& f)
+            traits::detail::shared_state_ptr_for_t<Future>&& f)
         {
-            using is_void =
-                std::is_void<typename util::invoke_result<F, Future>::type>;
+            using is_void = std::is_void<util::invoke_result_t<F, Future>>;
 
             reset_id r(*this);
 
@@ -302,8 +276,7 @@ namespace hpx { namespace lcos { namespace detail {
     public:
         ///////////////////////////////////////////////////////////////////////
         template <typename Spawner>
-        void async(
-            typename traits::detail::shared_state_ptr_for<Future>::type&& f,
+        void async(traits::detail::shared_state_ptr_for_t<Future>&& f,
             Spawner&& spawner, error_code& ec = hpx::throws)
         {
             {
@@ -333,8 +306,7 @@ namespace hpx { namespace lcos { namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Spawner>
-        void async_nounwrap(
-            typename traits::detail::shared_state_ptr_for<Future>::type&& f,
+        void async_nounwrap(traits::detail::shared_state_ptr_for_t<Future>&& f,
             Spawner&& spawner, error_code& ec = hpx::throws)
         {
             {
@@ -412,11 +384,11 @@ namespace hpx { namespace lcos { namespace detail {
         // TODO: Reduce duplication!
         template <typename Spawner, typename Policy>
         void attach(Future const& future,
-            typename std::remove_reference<Spawner>::type& spawner,
-            Policy&& policy, error_code& /*ec*/ = throws)
+            std::remove_reference_t<Spawner>& spawner, Policy&& policy,
+            error_code& /*ec*/ = throws)
         {
-            typedef typename traits::detail::shared_state_ptr_for<Future>::type
-                shared_state_ptr;
+            using shared_state_ptr =
+                traits::detail::shared_state_ptr_for_t<Future>;
 
             // bind an on_completed handler to this future which will invoke
             // the continuation
@@ -448,11 +420,11 @@ namespace hpx { namespace lcos { namespace detail {
 
         template <typename Spawner, typename Policy>
         void attach(Future const& future,
-            typename std::remove_reference<Spawner>::type&& spawner,
-            Policy&& policy, error_code& /*ec*/ = throws)
+            std::remove_reference_t<Spawner>&& spawner, Policy&& policy,
+            error_code& /*ec*/ = throws)
         {
-            typedef typename traits::detail::shared_state_ptr_for<Future>::type
-                shared_state_ptr;
+            using shared_state_ptr =
+                traits::detail::shared_state_ptr_for_t<Future>;
 
             // bind an on_completed handler to this future which will invoke
             // the continuation
@@ -485,11 +457,11 @@ namespace hpx { namespace lcos { namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename Spawner, typename Policy>
         void attach_nounwrap(Future const& future,
-            typename std::remove_reference<Spawner>::type& spawner,
-            Policy&& policy, error_code& /*ec*/ = throws)
+            std::remove_reference_t<Spawner>& spawner, Policy&& policy,
+            error_code& /*ec*/ = throws)
         {
-            typedef typename traits::detail::shared_state_ptr_for<Future>::type
-                shared_state_ptr;
+            using shared_state_ptr =
+                traits::detail::shared_state_ptr_for_t<Future>;
 
             // bind an on_completed handler to this future which will invoke
             // the continuation
@@ -521,11 +493,11 @@ namespace hpx { namespace lcos { namespace detail {
 
         template <typename Spawner, typename Policy>
         void attach_nounwrap(Future const& future,
-            typename std::remove_reference<Spawner>::type&& spawner,
-            Policy&& policy, error_code& /*ec*/ = throws)
+            std::remove_reference_t<Spawner>&& spawner, Policy&& policy,
+            error_code& /*ec*/ = throws)
         {
-            typedef typename traits::detail::shared_state_ptr_for<Future>::type
-                shared_state_ptr;
+            using shared_state_ptr =
+                traits::detail::shared_state_ptr_for_t<Future>;
 
             // bind an on_completed handler to this future which will invoke
             // the continuation
@@ -558,21 +530,20 @@ namespace hpx { namespace lcos { namespace detail {
     protected:
         bool started_;
         threads::thread_id_type id_;
-        typename std::decay<F>::type f_;
+        std::decay_t<F> f_;
     };
 
     template <typename Allocator, typename Future, typename F,
         typename ContResult>
     class continuation_allocator : public continuation<Future, F, ContResult>
     {
-        typedef continuation<Future, F, ContResult> base_type;
+        using base_type = continuation<Future, F, ContResult>;
 
-        typedef typename std::allocator_traits<
-            Allocator>::template rebind_alloc<continuation_allocator>
-            other_allocator;
+        using other_allocator = typename std::allocator_traits<
+            Allocator>::template rebind_alloc<continuation_allocator>;
 
     public:
-        typedef typename base_type::init_no_addref init_no_addref;
+        using init_no_addref = typename base_type::init_no_addref;
 
         template <typename Func>
         continuation_allocator(other_allocator const& alloc, Func&& f)
@@ -592,7 +563,7 @@ namespace hpx { namespace lcos { namespace detail {
     private:
         void destroy() override
         {
-            typedef std::allocator_traits<other_allocator> traits;
+            using traits = std::allocator_traits<other_allocator>;
 
             other_allocator alloc(alloc_);
             traits::destroy(alloc, this);
@@ -609,9 +580,8 @@ namespace hpx { namespace traits { namespace detail {
     struct shared_state_allocator<
         lcos::detail::continuation<Future, F, ContResult>, Allocator>
     {
-        typedef lcos::detail::continuation_allocator<Allocator, Future, F,
-            ContResult>
-            type;
+        using type = lcos::detail::continuation_allocator<Allocator, Future, F,
+            ContResult>;
     };
 }}}    // namespace hpx::traits::detail
 
@@ -624,24 +594,18 @@ namespace hpx { namespace lcos { namespace detail {
     private:
         template <typename Inner>
         void on_inner_ready(
-            typename traits::detail::shared_state_ptr_for<Inner>::type&&
-                inner_state)
+            traits::detail::shared_state_ptr_for_t<Inner>&& inner_state)
         {
-            hpx::detail::try_catch_exception_ptr(
-                [&]() { transfer_result<Inner>(std::move(inner_state), this); },
-                [&](std::exception_ptr ep) {
-                    this->set_exception(std::move(ep));
-                });
+            transfer_result<Inner>(std::move(inner_state), this);
         }
 
         template <typename Outer>
         void on_outer_ready(
-            typename traits::detail::shared_state_ptr_for<Outer>::type&&
-                outer_state)
+            traits::detail::shared_state_ptr_for_t<Outer>&& outer_state)
         {
-            typedef typename traits::future_traits<Outer>::type inner_future;
-            typedef typename traits::detail::shared_state_ptr_for<
-                inner_future>::type inner_shared_state_ptr;
+            using inner_future = traits::future_traits_t<Outer>;
+            using inner_shared_state_ptr =
+                traits::detail::shared_state_ptr_for_t<inner_future>;
 
             // Bind an on_completed handler to this future which will transfer
             // its result to the new future.
@@ -681,9 +645,9 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
     public:
-        typedef typename future_data<ContResult>::init_no_addref init_no_addref;
+        using init_no_addref = typename future_data<ContResult>::init_no_addref;
 
-        unwrap_continuation() {}
+        unwrap_continuation() = default;
 
         unwrap_continuation(init_no_addref no_addref)
           : future_data<ContResult>(no_addref)
@@ -693,8 +657,8 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename Future>
         void attach(Future&& future)
         {
-            typedef typename traits::detail::shared_state_ptr_for<Future>::type
-                outer_shared_state_ptr;
+            using outer_shared_state_ptr =
+                traits::detail::shared_state_ptr_for_t<Future>;
 
             // Bind an on_completed handler to this future which will wait for
             // the inner future and will transfer its result to the new future.
@@ -748,7 +712,7 @@ namespace hpx { namespace lcos { namespace detail {
     private:
         void destroy() override
         {
-            typedef std::allocator_traits<other_allocator> traits;
+            using traits = std::allocator_traits<other_allocator>;
 
             other_allocator alloc(alloc_);
             traits::destroy(alloc, this);
@@ -771,8 +735,8 @@ namespace hpx { namespace traits { namespace detail {
 
 namespace hpx { namespace lcos { namespace detail {
     template <typename Allocator, typename Future>
-    inline typename traits::detail::shared_state_ptr<
-        typename future_unwrap_result<Future>::result_type>::type
+    inline traits::detail::shared_state_ptr_t<
+        typename future_unwrap_result<Future>::result_type>
     unwrap_impl_alloc(Allocator const& a, Future&& future, error_code& /*ec*/)
     {
         using base_allocator = Allocator;
@@ -797,16 +761,16 @@ namespace hpx { namespace lcos { namespace detail {
         traits::construct(alloc, p.get(), init_no_addref{}, alloc);
 
         // create a continuation
-        typename hpx::traits::detail::shared_state_ptr<result_type>::type
-            result(p.release(), false);
+        hpx::traits::detail::shared_state_ptr_t<result_type> result(
+            p.release(), false);
         static_cast<shared_state*>(result.get())
             ->attach(std::forward<Future>(future));
         return result;
     }
 
     template <typename Future>
-    inline typename traits::detail::shared_state_ptr<
-        typename future_unwrap_result<Future>::result_type>::type
+    inline traits::detail::shared_state_ptr_t<
+        typename future_unwrap_result<Future>::result_type>
     unwrap_impl(Future&& future, error_code& ec)
     {
         return unwrap_impl_alloc(
@@ -814,16 +778,16 @@ namespace hpx { namespace lcos { namespace detail {
     }
 
     template <typename Allocator, typename Future>
-    inline typename traits::detail::shared_state_ptr<
-        typename future_unwrap_result<Future>::result_type>::type
+    inline traits::detail::shared_state_ptr_t<
+        typename future_unwrap_result<Future>::result_type>
     unwrap_alloc(Allocator const& a, Future&& future, error_code& ec)
     {
         return unwrap_impl_alloc(a, std::forward<Future>(future), ec);
     }
 
     template <typename Future>
-    inline typename traits::detail::shared_state_ptr<
-        typename future_unwrap_result<Future>::result_type>::type
+    inline traits::detail::shared_state_ptr_t<
+        typename future_unwrap_result<Future>::result_type>
     unwrap(Future&& future, error_code& ec)
     {
         return unwrap_impl(std::forward<Future>(future), ec);
