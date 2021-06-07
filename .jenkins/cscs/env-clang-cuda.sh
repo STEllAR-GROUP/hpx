@@ -30,6 +30,11 @@ configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
 configure_extra_options+=" -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=ON"
 
+# The build unit test with HPX in Debug and the hello_world project in Debug
+# mode hangs on this configuration Release-Debug, Debug-Release, and
+# Release-Release do not hang.
+configure_extra_options+=" -DHPX_WITH_TESTS_EXTERNAL_BUILD=OFF"
+
 # This is a workaround for a bug in the Cray clang compiler and/or Boost. When
 # compiling in device mode, Boost detects that float128 is available, but
 # compilation later fails with an error message saying float128 is not
