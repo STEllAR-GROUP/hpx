@@ -15,6 +15,7 @@
 #include <iterator>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
@@ -523,4 +524,52 @@ namespace hpx { namespace traits {
     template <typename Iter>
     HPX_INLINE_CONSTEXPR_VARIABLE bool is_zip_iterator_v =
         is_zip_iterator<Iter>::value;
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Iterators are contiguous if they are pointers (without concepts we have
+    // no generic way of determining whether an iterator is contigous)
+
+    namespace detail {
+
+        // Iterators returned from std::vector are contiguous (bydefinition)
+        template <typename Iter,
+            typename T = typename std::iterator_traits<Iter>::value_type>
+        struct is_vector_iterator
+          : std::integral_constant<bool,
+                std::is_same<decltype(std::declval<std::vector<T>&>().begin()),
+                    Iter>::value ||
+                    std::is_same<decltype(
+                                     std::declval<std::vector<T>&>().cbegin()),
+                        Iter>::value>
+        {
+        };
+    }    // namespace detail
+
+    template <typename Iter,
+        bool not_vector = !detail::is_vector_iterator<Iter>::value>
+    struct is_contiguous_iterator : std::is_pointer<Iter>::type
+    {
+    };
+
+    template <typename Iter>
+    struct is_contiguous_iterator<Iter, false> : std::true_type
+    {
+    };
+
+    template <typename Iter>
+    using is_contiguous_iterator_t =
+        typename is_contiguous_iterator<Iter>::type;
+
+    template <typename Iter>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_contiguous_iterator_v =
+        is_contiguous_iterator<Iter>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iter>
+    using iter_value_t = typename std::iterator_traits<Iter>::value_type;
+
+    template <typename Iter>
+    using iter_ref_t = typename std::iterator_traits<Iter>::reference;
+
 }}    // namespace hpx::traits

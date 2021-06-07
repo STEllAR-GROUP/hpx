@@ -37,18 +37,48 @@ namespace hpx { namespace parallel { namespace util {
         struct move_n_helper;
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename T>
+        HPX_FORCEINLINE std::enable_if_t<std::is_pointer<T>::value, char*>
+        to_address(T ptr) noexcept
+        {
+            return const_cast<char*>(
+                reinterpret_cast<char volatile const*>(ptr));
+        }
+
+        template <typename T>
+        HPX_FORCEINLINE std::enable_if_t<std::is_pointer<T>::value, char const*>
+        to_const_address(T ptr) noexcept
+        {
+            return const_cast<char const*>(
+                reinterpret_cast<char volatile const*>(ptr));
+        }
+
+        template <typename Iter>
+        HPX_FORCEINLINE std::enable_if_t<!std::is_pointer<Iter>::value, char*>
+        to_address(Iter ptr) noexcept
+        {
+            return const_cast<char*>(
+                reinterpret_cast<char volatile const*>(&*ptr));
+        }
+
+        template <typename Iter>
+        HPX_FORCEINLINE
+            std::enable_if_t<!std::is_pointer<Iter>::value, char const*>
+            to_const_address(Iter ptr) noexcept
+        {
+            return const_cast<char const*>(
+                reinterpret_cast<char volatile const*>(&*ptr));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename InIter, typename OutIter>
         HPX_FORCEINLINE static in_out_result<InIter, OutIter> copy_memmove(
             InIter first, std::size_t count, OutIter dest)
         {
-            static_assert(std::is_pointer<InIter>::value &&
-                    std::is_pointer<OutIter>::value,
-                "optimized copy is possible for pointer-iterators only");
+            using data_type = typename std::iterator_traits<InIter>::value_type;
 
-            typedef typename std::iterator_traits<InIter>::value_type data_type;
-
-            const char* const first_ch = reinterpret_cast<const char*>(first);
-            char* const dest_ch = reinterpret_cast<char*>(dest);
+            char const* const first_ch = to_const_address(first);
+            char* const dest_ch = to_address(dest);
 
             std::memmove(dest_ch, first_ch, count * sizeof(data_type));
 
@@ -65,7 +95,7 @@ namespace hpx { namespace parallel { namespace util {
         {
             template <typename InIter, typename Sent, typename OutIter>
             HPX_HOST_DEVICE
-                HPX_FORCEINLINE static in_out_result<InIter, OutIter>
+                HPX_FORCEINLINE static constexpr in_out_result<InIter, OutIter>
                 call(InIter first, Sent last, OutIter dest)
             {
                 while (first != last)
@@ -89,13 +119,13 @@ namespace hpx { namespace parallel { namespace util {
     }    // namespace detail
 
     template <typename InIter, typename Sent, typename OutIter>
-    HPX_FORCEINLINE in_out_result<InIter, OutIter> copy(
+    HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> copy(
         InIter first, Sent last, OutIter dest)
     {
-        typedef typename hpx::traits::pointer_category<
-            typename std::decay<typename hpx::traits::
-                    remove_const_iterator_value_type<InIter>::type>::type,
-            typename std::decay<OutIter>::type>::type category;
+        using category = hpx::traits::pointer_copy_category_t<
+            std::decay_t<
+                hpx::traits::remove_const_iterator_value_type_t<InIter>>,
+            std::decay_t<OutIter>>;
         return detail::copy_helper<category>::call(first, last, dest);
     }
 
@@ -107,11 +137,22 @@ namespace hpx { namespace parallel { namespace util {
         {
             template <typename InIter, typename OutIter>
             HPX_HOST_DEVICE
-                HPX_FORCEINLINE static in_out_result<InIter, OutIter>
-                call(InIter first, std::size_t count, OutIter dest)
+                HPX_FORCEINLINE static constexpr in_out_result<InIter, OutIter>
+                call(InIter first, std::size_t num, OutIter dest)
             {
-                for (std::size_t i = 0; i != count; ++i)
-                    *dest++ = *first++;
+                std::size_t count(num & std::size_t(-4));    // -V112
+                for (std::size_t i = 0; i < count;
+                     (void) ++first, ++dest, i += 4)
+                {
+                    *dest = *first;
+                    *++dest = *++first;
+                    *++dest = *++first;
+                    *++dest = *++first;
+                }
+                for (/**/; count < num; (void) ++first, ++dest, ++count)
+                {
+                    *dest = *first;
+                }
                 return in_out_result<InIter, OutIter>{
                     std::move(first), std::move(dest)};
             }
@@ -130,13 +171,13 @@ namespace hpx { namespace parallel { namespace util {
     }    // namespace detail
 
     template <typename InIter, typename OutIter>
-    HPX_HOST_DEVICE HPX_FORCEINLINE in_out_result<InIter, OutIter> copy_n(
-        InIter first, std::size_t count, OutIter dest)
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter>
+    copy_n(InIter first, std::size_t count, OutIter dest)
     {
-        typedef typename hpx::traits::pointer_category<
-            typename std::decay<typename hpx::traits::
-                    remove_const_iterator_value_type<InIter>::type>::type,
-            typename std::decay<OutIter>::type>::type category;
+        using category = hpx::traits::pointer_copy_category_t<
+            std::decay_t<
+                hpx::traits::remove_const_iterator_value_type_t<InIter>>,
+            std::decay_t<OutIter>>;
         return detail::copy_n_helper<category>::call(first, count, dest);
     }
 
@@ -147,7 +188,8 @@ namespace hpx { namespace parallel { namespace util {
         struct copy_synchronize_helper
         {
             template <typename InIter, typename OutIter>
-            HPX_FORCEINLINE static void call(InIter const&, OutIter const&)
+            HPX_FORCEINLINE static constexpr void call(
+                InIter const&, OutIter const&) noexcept
             {
                 // do nothing by default (std::memmove is already synchronous)
             }
@@ -155,12 +197,12 @@ namespace hpx { namespace parallel { namespace util {
     }    // namespace detail
 
     template <typename InIter, typename OutIter>
-    HPX_FORCEINLINE void copy_synchronize(
+    HPX_FORCEINLINE constexpr void copy_synchronize(
         InIter const& first, OutIter const& dest)
     {
-        typedef typename hpx::traits::pointer_category<
-            typename std::decay<InIter>::type,
-            typename std::decay<OutIter>::type>::type category;
+        using category =
+            hpx::traits::pointer_copy_category_t<std::decay_t<InIter>,
+                std::decay_t<OutIter>>;
         detail::copy_synchronize_helper<category>::call(first, dest);
     }
 
@@ -171,8 +213,8 @@ namespace hpx { namespace parallel { namespace util {
         struct move_helper
         {
             template <typename InIter, typename Sent, typename OutIter>
-            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
-                InIter first, Sent last, OutIter dest)
+            HPX_FORCEINLINE static constexpr in_out_result<InIter, OutIter>
+            call(InIter first, Sent last, OutIter dest)
             {
                 while (first != last)
                     *dest++ = std::move(*first++);
@@ -195,12 +237,12 @@ namespace hpx { namespace parallel { namespace util {
     }    // namespace detail
 
     template <typename InIter, typename Sent, typename OutIter>
-    HPX_FORCEINLINE in_out_result<InIter, OutIter> move(
+    HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> move(
         InIter first, Sent last, OutIter dest)
     {
-        typedef typename hpx::traits::pointer_category<
-            typename std::decay<InIter>::type,
-            typename std::decay<OutIter>::type>::type category;
+        using category =
+            hpx::traits::pointer_move_category_t<std::decay_t<InIter>,
+                std::decay_t<OutIter>>;
         return detail::move_helper<category>::call(first, last, dest);
     }
 
@@ -211,11 +253,22 @@ namespace hpx { namespace parallel { namespace util {
         struct move_n_helper
         {
             template <typename InIter, typename OutIter>
-            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
-                InIter first, std::size_t count, OutIter dest)
+            HPX_FORCEINLINE static constexpr in_out_result<InIter, OutIter>
+            call(InIter first, std::size_t num, OutIter dest)
             {
-                for (std::size_t i = 0; i != count; ++i)
-                    *dest++ = std::move(*first++);
+                std::size_t count(num & std::size_t(-4));    // -V112
+                for (std::size_t i = 0; i < count;
+                     (void) ++first, ++dest, i += 4)
+                {
+                    *dest = std::move(*first);
+                    *++dest = std::move(*++first);
+                    *++dest = std::move(*++first);
+                    *++dest = std::move(*++first);
+                }
+                for (/**/; count < num; (void) ++first, ++dest, ++count)
+                {
+                    *dest = std::move(*first);
+                }
                 return in_out_result<InIter, OutIter>{
                     std::move(first), std::move(dest)};
             }
@@ -234,12 +287,12 @@ namespace hpx { namespace parallel { namespace util {
     }    // namespace detail
 
     template <typename InIter, typename OutIter>
-    HPX_FORCEINLINE in_out_result<InIter, OutIter> move_n(
+    HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> move_n(
         InIter first, std::size_t count, OutIter dest)
     {
-        typedef typename hpx::traits::pointer_category<
-            typename std::decay<InIter>::type,
-            typename std::decay<OutIter>::type>::type category;
+        using category =
+            hpx::traits::pointer_move_category_t<std::decay_t<InIter>,
+                std::decay_t<OutIter>>;
         return detail::move_n_helper<category>::call(first, count, dest);
     }
 }}}    // namespace hpx::parallel::util
