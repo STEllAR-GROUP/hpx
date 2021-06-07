@@ -1076,7 +1076,7 @@ namespace hpx { namespace util {
     {
     }
 
-    void disable_logging(logging_destination dest) {}
+    void disable_logging(logging_destination) {}
 
     //////////////////////////////////////////////////////////////////////////
     namespace detail {
