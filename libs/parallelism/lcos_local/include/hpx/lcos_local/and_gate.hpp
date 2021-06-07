@@ -37,7 +37,7 @@ namespace hpx { namespace lcos { namespace local {
         /// \brief This constructor initializes the base_and_gate object from the
         ///        the number of participants to synchronize the control flow
         ///        with.
-        base_and_gate(std::size_t count = 0)
+        explicit base_and_gate(std::size_t count = 0)
           : received_segments_(count)
           , generation_(0)
         {
@@ -184,8 +184,10 @@ namespace hpx { namespace lcos { namespace local {
         /// \brief Set the data which has to go into the segment \a which.
         template <typename OuterLock>
         bool set(
-            std::size_t which, OuterLock& outer_lock, error_code& ec = throws)
+            std::size_t which, OuterLock outer_lock, error_code& ec = throws)
         {
+            HPX_ASSERT_OWNS_LOCK(outer_lock);
+
             std::unique_lock<mutex_type> l(mtx_);
             if (which >= received_segments_.size())
             {
@@ -237,7 +239,7 @@ namespace hpx { namespace lcos { namespace local {
         {
             no_mutex mtx;
             std::unique_lock<no_mutex> lk(mtx);
-            return set(which, lk, ec);
+            return set(which, std::move(lk), ec);
         }
 
     protected:
@@ -382,12 +384,12 @@ namespace hpx { namespace lcos { namespace local {
         {
         }
 
-        and_gate(and_gate&& rhs)
+        and_gate(and_gate&& rhs) noexcept
           : base_type(std::move(static_cast<base_type&>(rhs)))
         {
         }
 
-        and_gate& operator=(and_gate&& rhs)
+        and_gate& operator=(and_gate&& rhs) noexcept
         {
             if (this != &rhs)
                 static_cast<base_type&>(*this) = std::move(rhs);
@@ -413,9 +415,9 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         template <typename Lock>
-        bool set(std::size_t which, Lock& l, error_code& ec = throws)
+        bool set(std::size_t which, Lock l, error_code& ec = throws)
         {
-            return this->base_type::set(which, l, ec);
+            return this->base_type::set(which, std::move(l), ec);
         }
 
         template <typename Lock>

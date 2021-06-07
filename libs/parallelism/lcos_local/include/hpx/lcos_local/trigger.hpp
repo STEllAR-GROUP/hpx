@@ -38,7 +38,7 @@ namespace hpx { namespace lcos { namespace local {
         {
         }
 
-        base_trigger(base_trigger&& rhs)
+        base_trigger(base_trigger&& rhs) noexcept
           : mtx_()
           , promise_(std::move(rhs.promise_))
           , generation_(rhs.generation_)
@@ -47,7 +47,7 @@ namespace hpx { namespace lcos { namespace local {
             rhs.generation_ = std::size_t(-1);
         }
 
-        base_trigger& operator=(base_trigger&& rhs)
+        base_trigger& operator=(base_trigger&& rhs) noexcept
         {
             if (this != &rhs)
             {
@@ -148,7 +148,7 @@ namespace hpx { namespace lcos { namespace local {
         /// \brief Wait for the generational counter to reach the requested
         ///        stage.
         void synchronize(std::size_t generation_value,
-            char const* function_name = "base_and_gate<>::synchronize",
+            char const* function_name = "trigger::synchronize",
             error_code& ec = throws)
         {
             std::unique_lock<mutex_type> l(mtx_);
@@ -158,7 +158,7 @@ namespace hpx { namespace lcos { namespace local {
     protected:
         template <typename Lock>
         void synchronize(std::size_t generation_value, Lock& l,
-            char const* function_name = "base_and_gate<>::synchronize",
+            char const* function_name = "trigger::synchronize",
             error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(l);
@@ -226,12 +226,12 @@ namespace hpx { namespace lcos { namespace local {
     public:
         trigger() {}
 
-        trigger(trigger&& rhs)
+        trigger(trigger&& rhs) noexcept
           : base_type(std::move(static_cast<base_type&>(rhs)))
         {
         }
 
-        trigger& operator=(trigger&& rhs)
+        trigger& operator=(trigger&& rhs) noexcept
         {
             if (this != &rhs)
                 static_cast<base_type&>(*this) = std::move(rhs);
