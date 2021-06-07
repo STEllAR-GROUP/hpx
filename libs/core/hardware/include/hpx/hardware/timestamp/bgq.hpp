@@ -17,11 +17,20 @@
 
 #include <cstdint>
 
+#include <hpx/config.hpp>
+#if defined(HPX_HAVE_CUDA)
+#include <hpx/hardware/timestamp/cuda.hpp>
+#endif
+
 namespace hpx { namespace util { namespace hardware {
 
-    inline std::uint64_t timestamp()
+    HPX_HOST_DEVICE std::uint64_t timestamp()
     {
+#if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
+        return timestamp_cuda();
+#else
         return GetTimeBase();
+#endif
     }
 
 }}}    // namespace hpx::util::hardware

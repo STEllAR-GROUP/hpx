@@ -14,7 +14,7 @@
 
 #include <hpx/config.hpp>
 
-#if define(HPX_HAVE_CUDA)
+#if defined(HPX_HAVE_CUDA)
 #include <hpx/hardware/timestamp/cuda.hpp>
 #endif
 
