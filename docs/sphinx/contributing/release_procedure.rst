@@ -92,8 +92,8 @@ are completed to avoid confusion.
 #. Update the minimum required versions if necessary (compilers, dependencies,
    etc.) in ``building_hpx.rst``.
 
-#. Verify that the jenkins setup for the release branch on rostam is running
-   and does not display any errors.
+#. Verify that the Jenkins setups for the release branch on Rostam and Piz Daint
+   are running and do not display any errors.
 
 #. Repeat the following steps until satisfied with the release.
 
