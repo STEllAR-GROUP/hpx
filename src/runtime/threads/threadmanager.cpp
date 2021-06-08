@@ -20,6 +20,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
+#include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
@@ -726,6 +727,21 @@ namespace hpx { namespace threads
         }
 
         return total_count;
+    }
+
+    mask_type threadmanager::get_idle_core_mask()
+    {
+        mask_type mask = mask_type();
+        resize(mask, hardware_concurrency());
+
+        std::lock_guard<mutex_type> lk(mtx_);
+
+        for (auto& pool_iter : pools_)
+        {
+            pool_iter->get_idle_core_mask(mask);
+        }
+
+        return mask;
     }
 
     std::int64_t threadmanager::get_background_thread_count()
@@ -1899,6 +1915,11 @@ namespace hpx { namespace threads
     std::int64_t get_idle_core_count()
     {
         return get_thread_manager().get_idle_core_count();
+    }
+
+    mask_type get_idle_core_mask()
+    {
+        return get_thread_manager().get_idle_core_mask();
     }
 
     ///////////////////////////////////////////////////////////////////////////

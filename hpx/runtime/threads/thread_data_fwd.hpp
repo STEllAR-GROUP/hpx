@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine_fwd.hpp>
+#include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_id_type.hpp>
 #include <hpx/util_fwd.hpp>
@@ -163,6 +164,10 @@ namespace hpx { namespace threads
     /// The function \a get_idle_core_count returns the number of currently
     /// idling threads (cores).
     HPX_API_EXPORT std::int64_t get_idle_core_count();
+
+     /// The function \a get_idle_core_mask returns a bit-mask representing the
+    /// currently idling threads (cores).
+    HPX_API_EXPORT mask_type get_idle_core_mask();
 
     HPX_API_EXPORT bool enumerate_threads(
         util::function_nonser<bool(thread_id_type)> const& f,

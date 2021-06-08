@@ -9,6 +9,7 @@
 #define HPX_RUNTIME_THREAD_POOL_HELPERS_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads/cpu_mask.hpp>
 
 #include <cstddef>
 #include <string>

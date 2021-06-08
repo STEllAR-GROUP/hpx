@@ -124,7 +124,8 @@ void measure_function_futures_for_loopctr(std::uint64_t count, bool csv,
 }
 
 void measure_function_futures_for_loop_sptctr(std::uint64_t count, bool csv,
-    std::uint64_t iter_length, std::string split_type)
+    std::uint64_t iter_length,
+    hpx::parallel::execution::splittable_mode split_type)
 {
     // start the clock
     high_resolution_timer walltime;
@@ -138,12 +139,14 @@ void measure_function_futures_for_loop_sptctr(std::uint64_t count, bool csv,
     hpx::evaluate_active_counters(false, "Done");
     // stop the clock
     const double duration = walltime.elapsed();
-    std::cout<<"split type:"<<split_type<<std::endl;
+    std::cout << "split type:" << get_splittable_mode_name(split_type)
+              << std::endl;
     print_stats("for_loop", "par", "splittable_executor", count, duration, csv);
 }
 
 void measure_function_futures_for_loop_spt(std::uint64_t count, bool csv,
-    std::uint64_t iter_length, std::string split_type)
+    std::uint64_t iter_length,
+    hpx::parallel::execution::splittable_mode split_type)
 {
     // start the clock
     high_resolution_timer walltime;
@@ -154,7 +157,8 @@ void measure_function_futures_for_loop_spt(std::uint64_t count, bool csv,
 
     // stop the clock
     const double duration = walltime.elapsed();
-//    std::cout<<"split type:"<<split_type<<std::endl;
+    std::cout << "split type:" << get_splittable_mode_name(split_type)
+              << std::endl;
 
     print_stats("for_loop", "par", "splittable_executor", count, duration, csv);
 }
@@ -171,29 +175,44 @@ int hpx_main(variables_map& vm)
         else
             numa_sensitive = 0;
 
-        const int repetitions = vm["repetitions"].as<int>();
+        int const repetitions = vm["repetitions"].as<int>();
 
         num_threads = hpx::get_num_worker_threads();
 
-        const std::uint64_t chunk_size = vm["chunk_size"].as<std::uint64_t>();
-        const std::uint64_t iter_length = vm["iter_length"].as<std::uint64_t>();
+        std::uint64_t const chunk_size = vm["chunk_size"].as<std::uint64_t>();
+        std::uint64_t const iter_length = vm["iter_length"].as<std::uint64_t>();
 
-        const std::uint64_t count = vm["num_iterations"].as<std::uint64_t>();
+        std::uint64_t const count = vm["num_iterations"].as<std::uint64_t>();
+        if (HPX_UNLIKELY(0 == count))
+        {
+            throw std::logic_error("error: count of 0 futures specified\n");
+        }
+
         bool csv = vm.count("csv") != 0;
         bool spt = vm.count("spt") != 0;
         bool ctr = vm.count("counter") != 0;
-        const std::string split_type = vm["split_type"].as<std::string>();
-        if (HPX_UNLIKELY(0 == count))
-            throw std::logic_error("error: count of 0 futures specified\n");
 
         if (spt)
         {
+            std::string const split_type = vm["split_type"].as<std::string>();
+            hpx::parallel::execution::splittable_mode split_mode =
+                hpx::parallel::execution::splittable_mode::all;
+            if (split_type == "idle")
+            {
+                split_mode = hpx::parallel::execution::splittable_mode::idle;
+            }
+            else if (split_type == "idle_mask")
+            {
+                split_mode =
+                    hpx::parallel::execution::splittable_mode::idle_mask;
+            }
+
             if (ctr)
             {
                 for (int i = 0; i < repetitions; i++)
                 {
                     measure_function_futures_for_loop_sptctr(
-                        count, csv, iter_length, split_type);
+                        count, csv, iter_length, split_mode);
                 }
             }
             else
@@ -201,7 +220,7 @@ int hpx_main(variables_map& vm)
                 for (int i = 0; i < repetitions; i++)
                 {
                     measure_function_futures_for_loop_spt(
-                        count, csv, iter_length, split_type);
+                        count, csv, iter_length, split_mode);
                 }
             }
         }
@@ -237,19 +256,19 @@ int main(int argc, char* argv[])
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
     // clang-format off
-    cmdline.add_options()("num_iterations",
-                          value<std::uint64_t>()->default_value(500000),
-                          "number of iterations to invoke")
-
+    cmdline.add_options()
+        ("num_iterations", value<std::uint64_t>()->default_value(500000),
+            "number of iterations to invoke")
         ("csv", "output results as csv (format: count,duration)")
         ("repetitions", value<int>()->default_value(1),
-         "number of repetitions of the full benchmark")
+            "number of repetitions of the full benchmark")
         ("spt","run using splittable executor")
-        ("split_type",value<std::string>()->default_value("all"), "split tasks based on idle cores  or all cores")
-        ("iter_length",value<std::uint64_t>()->default_value(1), "length of each iteration")
-        ("chunk_size",value<std::uint64_t>()->default_value(1), "chunk size")
-        ("counter","print data collected from performance counters");
-
+        ("split_type", value<std::string>()->default_value("all"),
+            "split tasks based on idle cores  or all cores")
+        ("iter_length", value<std::uint64_t>()->default_value(1),
+            "length of each iteration")
+        ("chunk_size", value<std::uint64_t>()->default_value(1), "chunk size")
+        ("counter", "print data collected from performance counters");
     // clang-format on
 
     // Initialize and run HPX.
