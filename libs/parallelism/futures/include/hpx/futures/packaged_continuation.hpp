@@ -51,6 +51,7 @@ namespace hpx { namespace lcos { namespace detail {
     void invoke_continuation_nounwrap(
         Func& func, Future&& future, Continuation& cont, std::false_type)
     {
+        hpx::intrusive_ptr<Continuation> keep_alive(&cont);
         hpx::detail::try_catch_exception_ptr(
             [&]() { cont.set_value(func(std::forward<Future>(future))); },
             [&](std::exception_ptr ep) { cont.set_exception(std::move(ep)); });
@@ -60,6 +61,7 @@ namespace hpx { namespace lcos { namespace detail {
     void invoke_continuation_nounwrap(
         Func& func, Future&& future, Continuation& cont, std::true_type)
     {
+        hpx::intrusive_ptr<Continuation> keep_alive(&cont);
         hpx::detail::try_catch_exception_ptr(
             [&]() {
                 func(std::forward<Future>(future));
