@@ -122,6 +122,7 @@ set(benchmarks ${benchmarks}
     transform_reduce_scaling
     partitioned_vector_foreach
     grain_size
+    grain_size_benchmarks
    )
 
 set(foreach_scaling_FLAGS DEPENDENCIES iostreams_component)
@@ -133,6 +134,7 @@ set(transform_reduce_scaling_FLAGS DEPENDENCIES iostreams_component)
 set(partitioned_vector_foreach_FLAGS
   DEPENDENCIES iostreams_component partitioned_vector_component)
 set(grain_size_FLAGS DEPENDENCIES iostreams_component)
+set(grain_size_benchmarks_FLAGS DEPENDENCIES iostreams_component)
 set(future_overhead_PARAMETERS THREADS_PER_LOCALITY 4)
 
 # These tests do not run on hpx threads, so we don't want to pass hpx params into them
