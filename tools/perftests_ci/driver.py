@@ -169,8 +169,9 @@ def _load_json(filename):
 def compare(output, input):
     mkdirp(output)
     from perftest import plot
-    plot.compare(*(_load_json(i) for i in input), output)
-
+    exitcode = plot.compare(*(_load_json(i) for i in input), output)
+    print("exit code in compare function " + str(exitcode))
+    raise SystemExit(exitcode)
 
 @plot.command(description='plot performance history')
 @args.arg('--output', '-o', required=True, help='output directory')

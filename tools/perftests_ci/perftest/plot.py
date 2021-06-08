@@ -118,15 +118,20 @@ class _ConfidenceInterval(typing.NamedTuple):
 def _add_comparison_table(report, cis):
     names = list(sorted(set(k.name for k in cis.keys())))
     executors = list(sorted(set(k.executor for k in cis.keys())))
+    exitcode = 0
 
     def css_class(classification):
         if '-' in classification:
-            return 'bad'
+            exitcode = 1
+            return 'bad', exitcode
         if '?' in classification:
-            return 'unknown'
+            exitcode = 1
+            return 'unknown', exitcode
         if '+' in classification:
-            return 'good'
-        return ''
+            exitcode = 0
+            return 'good', exitcode
+        exitcode = 0
+        return '', exitcode
 
     with report.table('Comparison') as table:
         with table.row() as row:
@@ -148,9 +153,11 @@ def _add_comparison_table(report, cis):
                     except KeyError:
                         classification = ''
                     row_classification += classification
-                    row.cell(classification).set('class',
-                                                 css_class(classification))
-                name_cell.set('class', css_class(row_classification))
+                    class_qualifier = css_class(classification)
+                    row.cell(classification).set('class', class_qualifier[0])
+                row_class_qualifier = css_class(row_classification)
+                name_cell.set('class', row_class_qualifier[0])
+                exitcode = exitcode or row_class_qualifier[1]
 
     with report.table('Explanation of Symbols') as table:
 
@@ -176,6 +183,7 @@ def _add_comparison_table(report, cis):
         add_help('???', 'Something unexpected…')
 
     log.debug('Generated performance comparison table')
+    return exitcode
 
 
 def _histogram_plot(title, before, after, output):
@@ -232,9 +240,10 @@ def compare(before, after, output):
 
     title = var._project_name + ' Performance'
     with html.Report(output, title) as report:
-        _add_comparison_table(report, cis)
+        exitcode = _add_comparison_table(report, cis)
         _add_comparison_plots(report, before_outs, after_outs, cis)
         _add_info(report, ['Before', 'After'], [before, after])
+    return exitcode
 
 
 class _Measurements(typing.NamedTuple):

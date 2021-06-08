@@ -73,7 +73,7 @@ ${perftests_dir}/driver.py -v -l $logfile build -b release \
   # Plot comparison of current result with references
   ${perftests_dir}/driver.py -v -l $logfile perftest plot compare \
       -i $reference $result -o ${build_dir}/reports/reports-comparison \
-      || { echo 'Plotting failed'; plot_errors=1; exit 1; }
+      || { echo 'Plotting failed: performance drop or unknown'; plot_errors=1; exit 1; }
 #done
 
 # Dummy ctest to upload the html report of the perftest
