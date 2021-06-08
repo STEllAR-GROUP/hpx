@@ -57,6 +57,10 @@ namespace hpx { namespace parallel { namespace util {
         HPX_FORCEINLINE std::enable_if_t<!std::is_pointer<Iter>::value, char*>
         to_address(Iter ptr) noexcept
         {
+            static_assert(hpx::traits::is_contiguous_iterator_v<Iter>,
+                "optimized copy/move is possible for contiguous-iterators "
+                "only");
+
             return const_cast<char*>(
                 reinterpret_cast<char volatile const*>(&*ptr));
         }
@@ -66,6 +70,10 @@ namespace hpx { namespace parallel { namespace util {
             std::enable_if_t<!std::is_pointer<Iter>::value, char const*>
             to_const_address(Iter ptr) noexcept
         {
+            static_assert(hpx::traits::is_contiguous_iterator_v<Iter>,
+                "optimized copy/move is possible for contiguous-iterators "
+                "only");
+
             return const_cast<char const*>(
                 reinterpret_cast<char volatile const*>(&*ptr));
         }

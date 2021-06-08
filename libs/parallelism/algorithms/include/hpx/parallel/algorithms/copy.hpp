@@ -265,11 +265,26 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter, typename Sent,
                 typename OutIter>
-            static constexpr util::in_out_result<InIter, OutIter> sequential(
-                ExPolicy, InIter first, Sent last, OutIter dest)
+            static constexpr std::enable_if_t<
+                !hpx::traits::is_random_access_iterator_v<InIter>,
+                util::in_out_result<InIter, OutIter>>
+            sequential(ExPolicy, InIter first, Sent last, OutIter dest)
             {
                 util::in_out_result<InIter, OutIter> result =
                     util::copy(first, last, dest);
+                util::copy_synchronize(first, dest);
+                return result;
+            }
+
+            template <typename ExPolicy, typename InIter, typename Sent,
+                typename OutIter>
+            static constexpr std::enable_if_t<
+                hpx::traits::is_random_access_iterator_v<InIter>,
+                util::in_out_result<InIter, OutIter>>
+            sequential(ExPolicy, InIter first, Sent last, OutIter dest)
+            {
+                util::in_out_result<InIter, OutIter> result =
+                    util::copy_n(first, detail::distance(first, last), dest);
                 util::copy_synchronize(first, dest);
                 return result;
             }
