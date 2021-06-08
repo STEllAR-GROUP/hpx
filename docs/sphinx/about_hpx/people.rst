@@ -108,6 +108,12 @@ Acknowledgements
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
+* Srinivas Yadav, for his work on SIMD support in algorithms before and during
+  Google Summer of Code 2021.
+* Akhil Nair, for his work on adapting algorithms to C++20 before and during
+  Google Summer of Code 2021.
+* Alexander Toktarev, for updating the parallel algorithm customization points
+  to use ``tag_fallback_invoke`` for the default implementations.
 * Brice Goglin, for reporting and helping fix issues related to the integration
   of hwloc in |hpx|.
 * Giannis Gonidelis, for his work on the ranges adaptation during the
