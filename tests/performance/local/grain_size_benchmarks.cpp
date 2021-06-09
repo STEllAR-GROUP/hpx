@@ -37,7 +37,7 @@ using hpx::async;
 using hpx::future;
 using hpx::lcos::wait_each;
 
-using hpx::util::high_resolution_timer;
+using hpx::chrono::high_resolution_timer;
 
 using hpx::cout;
 using hpx::flush;
@@ -63,7 +63,7 @@ void print_stats(const char* title, const char* wait, const char* exec,
     std::cout << temp.str() << std::endl;
 }
 
-const char* ExecName(const hpx::parallel::execution::parallel_executor& exec)
+const char* ExecName(const hpx::execution::parallel_executor& exec)
 {
     return "parallel_executor";
 }
@@ -123,8 +123,6 @@ struct daxpy : benchmark
 void measure_function_futures_for_loop(
     std::uint64_t array_size, std::uint64_t chunk_size)
 {
-    const double a = 3.0;
-
     std::vector<double> x(array_size, 0.0), y(array_size, 0.0),
         z(array_size, 0.0);
     initialize(x, y, z, array_size);
@@ -132,9 +130,9 @@ void measure_function_futures_for_loop(
     daxpy f;
     // start the clock
     high_resolution_timer walltime;
-    hpx::parallel::for_loop(
-        hpx::parallel::execution::par.with(
-            hpx::parallel::execution::dynamic_chunk_size(chunk_size)),
+    hpx::for_loop(
+        hpx::execution::par.with(
+            hpx::execution::dynamic_chunk_size(chunk_size)),
         0, array_size, [&](std::uint64_t i) { f(x[i], y[i]); });
 
     // stop the clock
