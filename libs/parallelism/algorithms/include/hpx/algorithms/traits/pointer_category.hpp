@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2020 Hartmut Kaiser
+//  Copyright (c) 2016-2021 Hartmut Kaiser
 //  Copyright (c) 2016 John Biddiscombe
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -47,16 +47,16 @@ namespace hpx { namespace traits {
             using source = typename unwrap_enum<Source>::type;
             using dest = typename unwrap_enum<Dest>::type;
 
-            using type = std::conditional_t<
-                std::integral_constant<bool,
-                    sizeof(source) == sizeof(dest)>::value &&
-                    std::is_integral<source>::value &&
-                    std::is_integral<dest>::value &&
-                    !std::is_volatile<source>::value &&
-                    !std::is_volatile<dest>::value &&
-                    (std::is_same<bool, source>::value ==
-                        std::is_same<bool, dest>::value),
-                trivially_copyable_pointer_tag, general_pointer_tag>;
+            using type =
+                std::conditional_t<std::integral_constant<bool,
+                                       sizeof(source) == sizeof(dest)>::value &&
+                        std::is_integral<source>::value &&
+                        std::is_integral<dest>::value &&
+                        !std::is_volatile<source>::value &&
+                        !std::is_volatile<dest>::value &&
+                        (std::is_same<bool, source>::value ==
+                            std::is_same<bool, dest>::value),
+                    trivially_copyable_pointer_tag, general_pointer_tag>;
         };
 
         // every type is layout-compatible with itself

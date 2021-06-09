@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -39,7 +39,7 @@ namespace hpx { namespace parallel { namespace util {
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         HPX_FORCEINLINE std::enable_if_t<std::is_pointer<T>::value, char*>
-        to_address(T ptr) noexcept
+        to_ptr(T ptr) noexcept
         {
             return const_cast<char*>(
                 reinterpret_cast<char volatile const*>(ptr));
@@ -47,7 +47,7 @@ namespace hpx { namespace parallel { namespace util {
 
         template <typename T>
         HPX_FORCEINLINE std::enable_if_t<std::is_pointer<T>::value, char const*>
-        to_const_address(T ptr) noexcept
+        to_const_ptr(T ptr) noexcept
         {
             return const_cast<char const*>(
                 reinterpret_cast<char volatile const*>(ptr));
@@ -55,7 +55,7 @@ namespace hpx { namespace parallel { namespace util {
 
         template <typename Iter>
         HPX_FORCEINLINE std::enable_if_t<!std::is_pointer<Iter>::value, char*>
-        to_address(Iter ptr) noexcept
+        to_ptr(Iter ptr) noexcept
         {
             static_assert(hpx::traits::is_contiguous_iterator_v<Iter>,
                 "optimized copy/move is possible for contiguous-iterators "
@@ -68,7 +68,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename Iter>
         HPX_FORCEINLINE
             std::enable_if_t<!std::is_pointer<Iter>::value, char const*>
-            to_const_address(Iter ptr) noexcept
+            to_const_ptr(Iter ptr) noexcept
         {
             static_assert(hpx::traits::is_contiguous_iterator_v<Iter>,
                 "optimized copy/move is possible for contiguous-iterators "
@@ -85,8 +85,8 @@ namespace hpx { namespace parallel { namespace util {
         {
             using data_type = typename std::iterator_traits<InIter>::value_type;
 
-            char const* const first_ch = to_const_address(first);
-            char* const dest_ch = to_address(dest);
+            char const* const first_ch = to_const_ptr(first);
+            char* const dest_ch = to_ptr(dest);
 
             std::memmove(dest_ch, first_ch, count * sizeof(data_type));
 

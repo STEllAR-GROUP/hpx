@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2019 Austin McCartney
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -525,10 +525,9 @@ namespace hpx { namespace traits {
     HPX_INLINE_CONSTEXPR_VARIABLE bool is_zip_iterator_v =
         is_zip_iterator<Iter>::value;
 
-
     ///////////////////////////////////////////////////////////////////////////
     // Iterators are contiguous if they are pointers (without concepts we have
-    // no generic way of determining whether an iterator is contigous)
+    // no generic way of determining whether an iterator is contiguous)
 
     namespace detail {
 

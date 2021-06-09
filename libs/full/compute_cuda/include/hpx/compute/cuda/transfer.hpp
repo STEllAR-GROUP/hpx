@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2016-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -50,7 +50,7 @@ namespace hpx { namespace traits {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    struct pointer_category<
+    struct pointer_copy_category<
         compute::detail::iterator<T, cuda::experimental::allocator<T>>,
         compute::detail::iterator<T, cuda::experimental::allocator<T>>,
         typename std::enable_if<!std::is_trivially_copyable<
@@ -60,7 +60,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename Source, typename T>
-    struct pointer_category<Source,
+    struct pointer_copy_category<Source,
         compute::detail::iterator<T, cuda::experimental::allocator<T>>,
         typename std::enable_if<!std::is_trivially_copyable<typename hpx::util::
                                         decay<T>::type>::value &&
@@ -78,7 +78,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename T, typename U, typename Dest>
-    struct pointer_category<
+    struct pointer_copy_category<
         compute::detail::iterator<T, cuda::experimental::allocator<U>>, Dest,
         typename std::enable_if<!std::is_trivially_copyable<typename hpx::util::
                                         decay<T>::type>::value &&
@@ -108,7 +108,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    struct pointer_category<
+    struct pointer_copy_category<
         compute::detail::iterator<T, cuda::experimental::allocator<T>>,
         compute::detail::iterator<T, cuda::experimental::allocator<T>>,
         typename std::enable_if<std::is_trivially_copyable<
@@ -118,7 +118,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename Source, typename T>
-    struct pointer_category<Source,
+    struct pointer_copy_category<Source,
         compute::detail::iterator<T, cuda::experimental::allocator<T>>,
         typename std::enable_if<std::is_trivially_copyable<typename hpx::util::
                                         decay<T>::type>::value &&
@@ -136,7 +136,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename T, typename U, typename Dest>
-    struct pointer_category<
+    struct pointer_copy_category<
         compute::detail::iterator<T, cuda::experimental::allocator<U>>, Dest,
         typename std::enable_if<std::is_trivially_copyable<typename hpx::util::
                                         decay<T>::type>::value &&
