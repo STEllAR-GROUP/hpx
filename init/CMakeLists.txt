@@ -111,3 +111,7 @@ endif()
 hpx_export_internal_targets(hpx_init)
 
 add_hpx_pseudo_dependencies(core hpx_init)
+
+if(HPX_WITH_PRECOMPILED_HEADERS)
+  target_precompile_headers(hpx_init REUSE_FROM hpx_precompiled_headers)
+endif()
