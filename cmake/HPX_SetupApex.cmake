@@ -28,13 +28,22 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
       set(HPX_APEX_ROOT ${APEX_ROOT})
 
     else()
-      # If APEX_ROOT not specified, local clone into hpx source dir
+      # If APEX_ROOT not specified, local clone into hpx source dir or
+      # use existing source as specified by APEX_SOURCE_DIR
       include(FetchContent)
-      fetchcontent_declare(
-        apex
-        GIT_REPOSITORY https://github.com/khuck/xpress-apex.git
-        GIT_TAG ${HPX_WITH_APEX_TAG}
-      )
+      if(APEX_SOURCE_DIR)
+        fetchcontent_declare(
+          apex
+          SOURCE_DIR
+          ${APEX_SOURCE_DIR}
+        )
+      else()
+        fetchcontent_declare(
+          apex
+          GIT_REPOSITORY https://github.com/khuck/xpress-apex.git
+          GIT_TAG ${HPX_WITH_APEX_TAG}
+        )
+      endif()
 
       fetchcontent_getproperties(apex)
       if(NOT apex_POPULATED)
@@ -52,7 +61,11 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
       endif()
       set(APEX_ROOT ${apex_SOURCE_DIR})
 
-      hpx_info("APEX_ROOT is not set. Cloning APEX into ${apex_SOURCE_DIR}.")
+      if(APEX_SOURCE_DIR)
+        hpx_info("APEX_SOURCE_DIR is set. Using APEX from ${apex_SOURCE_DIR}.")
+      else()
+        hpx_info("APEX_ROOT is not set. Cloning APEX into ${apex_SOURCE_DIR}.")
+      endif()
     endif()
 
     list(APPEND CMAKE_MODULE_PATH "${APEX_ROOT}/cmake/Modules")

@@ -17,6 +17,9 @@ if(NOT TARGET ASIO::standalone_asio)
       )
       set(HPX_ASIO_ROOT ${ASIO_ROOT})
     else()
+      # If ASIO_ROOT not specified, local clone into hpx source dir or
+      # use existing source as specified by ASIO_SOURCE_DIR
+
       set(HPX_WITH_CLONED_ASIO
           TRUE
           CACHE INTERNAL ""
@@ -27,11 +30,21 @@ if(NOT TARGET ASIO::standalone_asio)
       endif()
 
       include(FetchContent)
-      fetchcontent_declare(
-        asio
-        GIT_REPOSITORY https://github.com/chriskohlhoff/asio.git
-        GIT_TAG ${HPX_WITH_ASIO_TAG}
-      )
+      if(ASIO_SOURCE_DIR)
+        # Use the existing ASIO checkout at ASIO_SOURCE_DIR instead of
+        # checking it out from github
+        fetchcontent_declare(
+          asio
+          SOURCE_DIR
+          ${ASIO_SOURCE_DIR}
+        )
+      else()
+        fetchcontent_declare(
+          asio
+          GIT_REPOSITORY https://github.com/chriskohlhoff/asio.git
+          GIT_TAG ${HPX_WITH_ASIO_TAG}
+        )
+      endif()
 
       fetchcontent_getproperties(asio)
       if(NOT asio_POPULATED)
@@ -39,7 +52,11 @@ if(NOT TARGET ASIO::standalone_asio)
       endif()
       set(ASIO_ROOT ${asio_SOURCE_DIR})
 
-      hpx_info("ASIO_ROOT is not set. Cloning Asio into ${asio_SOURCE_DIR}.")
+      if(ASIO_SOURCE_DIR)
+        hpx_info("ASIO_SOURCE_DIR is set. Using Asio from ${asio_SOURCE_DIR}.")
+      else()
+        hpx_info("ASIO_ROOT is not set. Cloning Asio into ${asio_SOURCE_DIR}.")
+      endif()
 
       add_library(standalone_asio INTERFACE)
       target_include_directories(
