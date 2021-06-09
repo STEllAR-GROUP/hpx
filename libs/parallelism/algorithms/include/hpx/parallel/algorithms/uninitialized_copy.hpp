@@ -265,6 +265,35 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename InIter1, typename Sent1, typename FwdIter2,
+            typename Sent2>
+        util::in_out_result<InIter1, FwdIter2> std_uninitialized_copy_sent(
+            InIter1 first, Sent1 last, FwdIter2 dest, Sent2 last_d)
+        {
+            using value_type =
+                typename std::iterator_traits<FwdIter2>::value_type;
+
+            FwdIter2 current = dest;
+            try
+            {
+                for (/* */; !(first == last || current == last_d);
+                     (void) ++first, ++current)
+                {
+                    ::new (std::addressof(*current)) value_type(*first);
+                }
+                return util::in_out_result<InIter1, FwdIter2>{first, current};
+            }
+            catch (...)
+            {
+                for (/* */; dest != current; ++dest)
+                {
+                    (*dest).~value_type();
+                }
+                throw;
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename InIter1, typename InIter2>
         util::in_out_result<InIter1, InIter2> sequential_uninitialized_copy_n(
             InIter1 first, std::size_t count, InIter2 dest,
@@ -416,28 +445,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static util::in_out_result<InIter1, FwdIter2> sequential(ExPolicy,
                 InIter1 first, Sent1 last, FwdIter2 dest, Sent2 last_d)
             {
-                using value_type =
-                    typename std::iterator_traits<FwdIter2>::value_type;
-
-                FwdIter2 current = dest;
-                try
-                {
-                    for (/* */; !(first == last || current == last_d);
-                         (void) ++first, ++current)
-                    {
-                        ::new (std::addressof(*current)) value_type(*first);
-                    }
-                    return util::in_out_result<InIter1, FwdIter2>{
-                        first, current};
-                }
-                catch (...)
-                {
-                    for (/* */; dest != current; ++dest)
-                    {
-                        (*dest).~value_type();
-                    }
-                    throw;
-                }
+                return std_uninitialized_copy_sent(first, last, dest, last_d);
             }
 
             template <typename ExPolicy, typename Iter, typename Sent1,

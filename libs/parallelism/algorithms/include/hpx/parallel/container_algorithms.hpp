@@ -44,5 +44,4 @@
 #include <hpx/parallel/container_algorithms/sort.hpp>
 #include <hpx/parallel/container_algorithms/stable_sort.hpp>
 #include <hpx/parallel/container_algorithms/transform.hpp>
-#include <hpx/parallel/container_algorithms/uninitialized_copy.hpp>
 #include <hpx/parallel/container_algorithms/unique.hpp>

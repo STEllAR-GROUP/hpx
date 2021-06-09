@@ -34,7 +34,7 @@ namespace hpx { namespace ranges {
     /// \param first1       Refers to the beginning of the sequence of elements
     ///                     that will be copied from
     /// \param last1        Refers to sentinel value denoting the end of the
-    ///                     sequence of elements the algorithm will be applied to.
+    ///                     sequence of elements the algorithm will be applied
     /// \param first2       Refers to the beginning of the destination range.
     /// \param last2        Refers to sentinel value denoting the end of the
     ///                     second range the algorithm will be applied to.
@@ -45,7 +45,7 @@ namespace hpx { namespace ranges {
     ///
     /// \returns  The \a uninitialized_copy algorithm returns an
     ///           \a in_out_result<InIter, FwdIter>.
-    ///            The \a uninitialized_copy algorithm returns the input iterator
+    ///           The \a uninitialized_copy algorithm returns an input iterator
     ///           to one past the last element copied from and the output
     ///           iterator to the element in the destination range, one past
     ///           the last element copied.
@@ -81,7 +81,7 @@ namespace hpx { namespace ranges {
     /// \param first1       Refers to the beginning of the sequence of elements
     ///                     that will be copied from
     /// \param last1        Refers to sentinel value denoting the end of the
-    ///                     sequence of elements the algorithm will be applied to.
+    ///                     sequence of elements the algorithm will be applied.
     /// \param first2       Refers to the beginning of the destination range.
     /// \param last2        Refers to sentinel value denoting the end of the
     ///                     second range the algorithm will be applied to.
@@ -97,11 +97,11 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a uninitialized_copy algorithm returns a
-    ///           \a hpx::future<in_out_result<InIter, FwdIter>>, if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
+    ///           \a hpx::future<in_out_result<InIter, FwdIter>>, if the
+    ///           execution policy is of type \a sequenced_task_policy
+    ///           or \a parallel_task_policy and
     ///           returns \a in_out_result<InIter, FwdIter> otherwise.
-    ///            The \a uninitialized_copy algorithm returns the input iterator
+    ///           The \a uninitialized_copy algorithm returns an input iterator
     ///           to one past the last element copied from and the output
     ///           iterator to the element in the destination range, one past
     ///           the last element copied.
@@ -136,9 +136,10 @@ namespace hpx { namespace ranges {
     /// the calling thread.
     ///
     /// \returns  The \a uninitialized_copy algorithm returns an
-    ///           \a in_out_result<typename hpx::traits::range_traits<Rng1>::iterator_type,
-    ///           typename hpx::traits::range_traits<Rng2>::iterator_type>.
-    ///           The \a uninitialized_copy algorithm returns the input iterator
+    ///           \a in_out_result<typename hpx::traits::range_traits<Rng1>
+    ///           ::iterator_type, typename hpx::traits::range_traits<Rng2>
+    ///           ::iterator_type>.
+    ///           The \a uninitialized_copy algorithm returns an input iterator
     ///           to one past the last element copied from and the output
     ///           iterator to the element in the destination range, one past
     ///           the last element copied.
@@ -184,15 +185,16 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a uninitialized_copy algorithm returns a
-    ///           \a hpx::future<in_out_result<InIter, FwdIter>>, if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a in_out_result<typename hpx::traits::range_traits<Rng1>::iterator_type
-    ///           , typename hpx::traits::range_traits<Rng2>::iterator_type> otherwise.
-    ///            The \a uninitialized_copy algorithm returns the input iterator
-    ///           to one past the last element copied from and the output
-    ///           iterator to the element in the destination range, one past
-    ///           the last element copied.
+    ///           \a hpx::future<in_out_result<InIter, FwdIter>>, if the
+    ///           execution policy is of type \a sequenced_task_policy
+    ///           or \a parallel_task_policy and
+    ///           returns \a in_out_result<
+    ///             typename hpx::traits::range_traits<Rng1>::iterator_type
+    ///           , typename hpx::traits::range_traits<Rng2>::iterator_type>
+    ///           otherwise. The \a uninitialized_copy algorithm returns the
+    ///           input iterator to one past the last element copied from and
+    ///           the output iterator to the element in the destination range,
+    ///           one past the last element copied.
     ///
     template <typename ExPolicy, typename Rng1, typename Rng2>
     typename parallel::util::detail::algorithm_result<ExPolicy,
@@ -289,8 +291,8 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a uninitialized_copy_n algorithm returns a
-    ///           \a hpx::future<in_out_result<FwdIter1, FwdIter2>> if the execution
-    ///           policy is of type \a sequenced_task_policy or
+    ///           \a hpx::future<in_out_result<FwdIter1, FwdIter2>> if the
+    ///           execution policy is of type \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns \a FwdIter2 otherwise.
     ///           The \a uninitialized_copy_n algorithm returns the output
