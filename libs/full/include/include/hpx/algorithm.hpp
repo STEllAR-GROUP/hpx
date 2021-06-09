@@ -6,5 +6,5 @@
 
 #pragma once
 
-#include <hpx/distributed/algorithm.hpp>
 #include <hpx/local/algorithm.hpp>
+#include <hpx/parallel/segmented_algorithm.hpp>

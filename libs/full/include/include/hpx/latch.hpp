@@ -6,5 +6,9 @@
 
 #pragma once
 
-#include <hpx/distributed/latch.hpp>
+#include <hpx/collectives/latch.hpp>
 #include <hpx/local/latch.hpp>
+
+namespace hpx { namespace distributed {
+    using hpx::lcos::latch;
+}}    // namespace hpx::distributed

@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/distributed/shared_mutex.hpp>
 #include <hpx/local/shared_mutex.hpp>

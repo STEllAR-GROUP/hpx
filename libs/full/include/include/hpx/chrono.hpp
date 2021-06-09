@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/distributed/chrono.hpp>
 #include <hpx/local/chrono.hpp>

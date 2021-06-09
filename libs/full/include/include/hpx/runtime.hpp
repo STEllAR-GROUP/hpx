@@ -6,5 +6,5 @@
 
 #pragma once
 
-#include <hpx/distributed/runtime.hpp>
 #include <hpx/local/runtime.hpp>
+#include <hpx/runtime_distributed/runtime_fwd.hpp>

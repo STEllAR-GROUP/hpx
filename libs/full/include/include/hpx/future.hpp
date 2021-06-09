@@ -6,5 +6,14 @@
 
 #pragma once
 
-#include <hpx/distributed/future.hpp>
+#include <hpx/async_colocated/async_colocated.hpp>
+#include <hpx/async_colocated/async_colocated_callback.hpp>
+#include <hpx/async_distributed/async.hpp>
+#include <hpx/async_distributed/async_callback.hpp>
+#include <hpx/async_distributed/async_continue_callback.hpp>
+#include <hpx/async_distributed/promise.hpp>
 #include <hpx/local/future.hpp>
+
+namespace hpx { namespace distributed {
+    using hpx::lcos::promise;
+}}    // namespace hpx::distributed

@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/distributed/memory.hpp>
 #include <hpx/local/memory.hpp>

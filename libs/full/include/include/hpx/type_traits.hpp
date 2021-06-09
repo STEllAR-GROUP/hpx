@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/distributed/type_traits.hpp>
 #include <hpx/local/type_traits.hpp>

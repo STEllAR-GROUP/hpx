@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/distributed/execution.hpp>
 #include <hpx/local/execution.hpp>

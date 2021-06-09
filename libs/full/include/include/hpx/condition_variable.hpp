@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/distributed/condition_variable.hpp>
 #include <hpx/local/condition_variable.hpp>

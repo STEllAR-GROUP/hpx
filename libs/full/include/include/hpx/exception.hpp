@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/distributed/exception.hpp>
 #include <hpx/local/exception.hpp>

@@ -6,4 +6,8 @@
 
 #pragma once
 
-#include <hpx/distributed/object_semaphore.hpp>
+#include <hpx/lcos_distributed/object_semaphore.hpp>
+
+namespace hpx { namespace distributed {
+    using hpx::lcos::object_semaphore;
+}}    // namespace hpx::distributed

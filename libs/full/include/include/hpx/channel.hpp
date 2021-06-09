@@ -6,5 +6,9 @@
 
 #pragma once
 
-#include <hpx/distributed/channel.hpp>
+#include <hpx/lcos_distributed/channel.hpp>
 #include <hpx/local/channel.hpp>
+
+namespace hpx { namespace distributed {
+    using hpx::lcos::channel;
+}}    // namespace hpx::distributed

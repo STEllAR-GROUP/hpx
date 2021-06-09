@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/distributed/semaphore.hpp>
 #include <hpx/local/semaphore.hpp>

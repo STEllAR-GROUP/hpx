@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/distributed/system_error.hpp>
 #include <hpx/local/system_error.hpp>

@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/distributed/thread.hpp>
 #include <hpx/local/thread.hpp>

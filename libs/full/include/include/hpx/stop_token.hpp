@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/distributed/stop_token.hpp>
 #include <hpx/local/stop_token.hpp>

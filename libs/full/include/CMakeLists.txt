@@ -17,32 +17,6 @@ set(include_headers
     hpx/channel.hpp
     hpx/chrono.hpp
     hpx/condition_variable.hpp
-    hpx/distributed/algorithm.hpp
-    hpx/distributed/any.hpp
-    hpx/distributed/barrier.hpp
-    hpx/distributed/channel.hpp
-    hpx/distributed/chrono.hpp
-    hpx/distributed/condition_variable.hpp
-    hpx/distributed/exception.hpp
-    hpx/distributed/execution.hpp
-    hpx/distributed/functional.hpp
-    hpx/distributed/future.hpp
-    hpx/distributed/latch.hpp
-    hpx/distributed/memory.hpp
-    hpx/distributed/mutex.hpp
-    hpx/distributed/numeric.hpp
-    hpx/distributed/object_semaphore.hpp
-    hpx/distributed/optional.hpp
-    hpx/distributed/runtime.hpp
-    hpx/distributed/semaphore.hpp
-    hpx/distributed/shared_mutex.hpp
-    hpx/distributed/stop_token.hpp
-    hpx/distributed/system_error.hpp
-    hpx/distributed/task_block.hpp
-    hpx/distributed/thread.hpp
-    hpx/distributed/tuple.hpp
-    hpx/distributed/type_traits.hpp
-    hpx/distributed/unwrap.hpp
     hpx/exception.hpp
     hpx/execution.hpp
     hpx/functional.hpp

@@ -6,5 +6,5 @@
 
 #pragma once
 
-#include <hpx/distributed/any.hpp>
 #include <hpx/local/any.hpp>
+#include <hpx/serialization/serializable_any.hpp>
