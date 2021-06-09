@@ -32,17 +32,10 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
-//
-#include <hpx/async_cuda/cublas_executor.hpp>
-#include <hpx/async_cuda/cuda_executor.hpp>
-#include <hpx/async_cuda/target.hpp>
+#include <hpx/modules/async_cuda.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 
-// CUDA runtime
-#include <hpx/async_cuda/custom_blas_api.hpp>
-#include <hpx/async_cuda/custom_gpu_api.hpp>
-//
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
