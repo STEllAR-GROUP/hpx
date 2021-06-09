@@ -42,9 +42,10 @@ namespace hpx { namespace collectives {
     ///
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> inclusive_scan(char const* basename, T&& result,
-        F&& op, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+        F&& op, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
 
     /// Inclusive inclusive_scan a set of values from different call sites
     ///
@@ -66,7 +67,7 @@ namespace hpx { namespace collectives {
     ///
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> inclusive_scan(communicator comm,
-        T&& result, F&& op, std::size_t this_site = std::size_t(-1));
+        T&& result, F&& op, this_site_arg this_site = this_site_arg());
 }}    // namespace hpx::collectives
 
 // clang-format on
@@ -78,6 +79,7 @@ namespace hpx { namespace collectives {
 
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
+#include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
@@ -176,7 +178,7 @@ namespace hpx { namespace collectives {
     // inclusive_scan plain values
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> inclusive_scan(communicator fid,
-        T&& local_result, F&& op, std::size_t this_site = std::size_t(-1))
+        T&& local_result, F&& op, this_site_arg this_site = this_site_arg())
     {
         if (this_site == std::size_t(-1))
         {
@@ -211,12 +213,13 @@ namespace hpx { namespace collectives {
 
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> inclusive_scan(char const* basename,
-        T&& local_result, F&& op, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+        T&& local_result, F&& op, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
     {
         return inclusive_scan(create_communicator(basename, num_sites,
-                                  generation, this_site, root_site),
+                                  this_site, generation, root_site),
             std::forward<T>(local_result), std::forward<F>(op), this_site);
     }
 }}    // namespace hpx::collectives

@@ -13,4 +13,7 @@ namespace hpx { namespace util {
     struct lazy_conditional : std::conditional<Enable, C1, C2>::type
     {
     };
+
+    template <bool Enable, typename C1, typename C2>
+    using lazy_conditional_t = typename lazy_conditional<Enable, C1, C2>::type;
 }}    // namespace hpx::util

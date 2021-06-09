@@ -11,6 +11,7 @@ set(tests
     barrier
     broadcast_apply
     broadcast_component
+    channel_communicator
     communication_set
     exclusive_scan_
     fold

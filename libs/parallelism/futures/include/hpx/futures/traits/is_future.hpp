@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -51,6 +51,9 @@ namespace hpx { namespace traits {
     {
     };
 
+    template <typename R>
+    constexpr bool is_future_v = is_future<R>::value;
+
     template <typename Future>
     struct is_ref_wrapped_future : std::false_type
     {
@@ -61,4 +64,7 @@ namespace hpx { namespace traits {
       : is_future<Future>
     {
     };
+
+    template <typename R>
+    constexpr bool is_ref_wrapped_future_v = is_ref_wrapped_future<R>::value;
 }}    // namespace hpx::traits

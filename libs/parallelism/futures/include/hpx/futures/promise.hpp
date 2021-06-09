@@ -228,14 +228,11 @@ namespace hpx { namespace lcos { namespace local {
     template <typename R>
     class promise : public detail::promise_base<R>
     {
-        typedef detail::promise_base<R> base_type;
+        using base_type = detail::promise_base<R>;
 
     public:
         // Effects: constructs a promise object and a shared state.
-        promise()
-          : base_type()
-        {
-        }
+        promise() = default;
 
         // Effects: constructs a promise object and a shared state. The
         // constructor uses the allocator a to allocate the memory for the
@@ -250,22 +247,15 @@ namespace hpx { namespace lcos { namespace local {
         //          the shared state of other (if any) to the newly-
         //          constructed object.
         // Postcondition: other has no shared state.
-        promise(promise&& other) noexcept
-          : base_type(std::move(other))
-        {
-        }
+        promise(promise&& other) noexcept = default;
 
         // Effects: Abandons any shared state
-        ~promise() {}
+        ~promise() = default;
 
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).
         // Returns: *this.
-        promise& operator=(promise&& other) noexcept
-        {
-            base_type::operator=(std::move(other));
-            return *this;
-        }
+        promise& operator=(promise&& other) noexcept = default;
 
         // Effects: Exchanges the shared state of *this and other.
         // Postcondition: *this has the shared state (if any) that other had
@@ -277,10 +267,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         // Returns: true only if *this refers to a shared state.
-        bool valid() const noexcept
-        {
-            return base_type::valid();
-        }
+        using base_type::valid;
 
         // Returns: A future<R> object with the same shared state as *this.
         // Throws: future_error if *this has no shared state or if get_future
@@ -366,23 +353,17 @@ namespace hpx { namespace lcos { namespace local {
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(std::exception_ptr e)
-        {
-            base_type::set_exception(std::move(e));
-        }
+        using base_type::set_exception;
     };
 
     template <typename R>
     class promise<R&> : public detail::promise_base<R&>
     {
-        typedef detail::promise_base<R&> base_type;
+        using base_type = detail::promise_base<R&>;
 
     public:
         // Effects: constructs a promise object and a shared state.
-        promise()
-          : base_type()
-        {
-        }
+        promise() = default;
 
         // Effects: constructs a promise object and a shared state. The
         // constructor uses the allocator a to allocate the memory for the
@@ -397,22 +378,15 @@ namespace hpx { namespace lcos { namespace local {
         //          the shared state of other (if any) to the newly-
         //          constructed object.
         // Postcondition: other has no shared state.
-        promise(promise&& other) noexcept
-          : base_type(std::move(other))
-        {
-        }
+        promise(promise&& other) noexcept = default;
 
         // Effects: Abandons any shared state
-        ~promise() {}
+        ~promise() = default;
 
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).
         // Returns: *this.
-        promise& operator=(promise&& other) noexcept
-        {
-            base_type::operator=(std::move(other));
-            return *this;
-        }
+        promise& operator=(promise&& other) noexcept = default;
 
         // Effects: Exchanges the shared state of *this and other.
         // Postcondition: *this has the shared state (if any) that other had
@@ -424,10 +398,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         // Returns: true only if *this refers to a shared state.
-        bool valid() const noexcept
-        {
-            return base_type::valid();
-        }
+        using base_type::valid;
 
         // Returns: A future<R&> object with the same shared state as *this.
         // Throws: future_error if *this has no shared state or if get_future
@@ -472,23 +443,17 @@ namespace hpx { namespace lcos { namespace local {
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(std::exception_ptr e)
-        {
-            base_type::set_exception(std::move(e));
-        }
+        using base_type::set_exception;
     };
 
     template <>
     class promise<void> : public detail::promise_base<void>
     {
-        typedef detail::promise_base<void> base_type;
+        using base_type = detail::promise_base<void>;
 
     public:
         // Effects: constructs a promise object and a shared state.
-        promise()
-          : base_type()
-        {
-        }
+        promise() = default;
 
         // Effects: constructs a promise object and a shared state. The
         // constructor uses the allocator a to allocate the memory for the
@@ -503,22 +468,15 @@ namespace hpx { namespace lcos { namespace local {
         //          the shared state of other (if any) to the newly-
         //          constructed object.
         // Postcondition: other has no shared state.
-        promise(promise&& other) noexcept
-          : base_type(std::move(other))
-        {
-        }
+        promise(promise&& other) noexcept = default;
 
         // Effects: Abandons any shared state
-        ~promise() {}
+        ~promise() = default;
 
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).
         // Returns: *this.
-        promise& operator=(promise&& other) noexcept
-        {
-            base_type::operator=(std::move(other));
-            return *this;
-        }
+        promise& operator=(promise&& other) noexcept = default;
 
         // Effects: Exchanges the shared state of *this and other.
         // Postcondition: *this has the shared state (if any) that other had
@@ -530,10 +488,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         // Returns: true only if *this refers to a shared state.
-        bool valid() const noexcept
-        {
-            return base_type::valid();
-        }
+        using base_type::valid;
 
         // Returns: A future<R> object with the same shared state as *this.
         // Throws: future_error if *this has no shared state or if get_future
@@ -580,10 +535,7 @@ namespace hpx { namespace lcos { namespace local {
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(std::exception_ptr e)
-        {
-            base_type::set_exception(std::move(e));
-        }
+        using base_type::set_exception;
     };
 
     template <typename R>

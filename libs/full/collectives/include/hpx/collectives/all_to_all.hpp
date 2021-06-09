@@ -41,9 +41,10 @@ namespace hpx { namespace collectives {
     template <typename T>
     hpx::future<std::vector<std::decay_t<T>>>
     all_to_all(char const* basename, T&& result,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
 
     /// AllToAll a set of values from different call sites
     ///
@@ -64,7 +65,7 @@ namespace hpx { namespace collectives {
     template <typename T>
     hpx::future<std::vector<std::decay_t<T>>>
     all_to_all(communicator comm, T&& result,
-        std::size_t this_site = std::size_t(-1)0);
+        this_site_arg this_site = this_site_arg());
 }}    // namespace hpx::collectives
 
 // clang-format on
@@ -76,6 +77,7 @@ namespace hpx { namespace collectives {
 
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
+#include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
@@ -168,7 +170,8 @@ namespace hpx { namespace collectives {
     // all_to_all plain values
     template <typename T>
     hpx::future<std::vector<T>> all_to_all(communicator fid,
-        std::vector<T>&& local_result, std::size_t this_site = std::size_t(-1))
+        std::vector<T>&& local_result,
+        this_site_arg this_site = this_site_arg())
     {
         if (this_site == std::size_t(-1))
         {
@@ -199,12 +202,14 @@ namespace hpx { namespace collectives {
 
     template <typename T>
     hpx::future<std::vector<T>> all_to_all(char const* basename,
-        std::vector<T>&& local_result, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+        std::vector<T>&& local_result,
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
     {
-        return all_to_all(create_communicator(basename, num_sites, generation,
-                              this_site, root_site),
+        return all_to_all(create_communicator(basename, num_sites, this_site,
+                              generation, root_site),
             std::move(local_result), this_site);
     }
 }}    // namespace hpx::collectives

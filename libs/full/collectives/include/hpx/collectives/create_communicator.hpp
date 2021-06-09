@@ -40,9 +40,10 @@ namespace hpx { namespace collectives {
     ///             with the collective operation.
     ///
     communicator create_communicator(char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
 }}
 // clang-format on
 
@@ -51,21 +52,68 @@ namespace hpx { namespace collectives {
 #include <hpx/config.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
-#include <hpx/components/client.hpp>
+#include <hpx/components/client_base.hpp>
 
 #include <cstddef>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace collectives {
 
-    using communicator = hpx::components::client<detail::communicator_server>;
+    ///////////////////////////////////////////////////////////////////////////
+    struct communicator
+      : hpx::components::client_base<communicator, detail::communicator_server>
+    {
+        using base_type =
+            client_base<communicator, detail::communicator_server>;
+        using future_type = typename base_type::future_type;
+
+    public:
+        // construction
+        communicator() = default;
+
+        explicit communicator(naming::id_type&& id)
+          : base_type(std::move(id))
+        {
+        }
+        explicit communicator(future<hpx::id_type>&& id) noexcept
+          : base_type(std::move(id))
+        {
+        }
+        communicator(future<communicator>&& c)
+          : base_type(std::move(c))
+        {
+        }
+
+        void set_info(std::size_t num_sites, std::size_t this_site) noexcept
+        {
+            num_sites_ = num_sites;
+            this_site_ = this_site;
+        }
+
+        std::pair<std::size_t, std::size_t> get_info() const noexcept
+        {
+            return std::make_pair(num_sites_, this_site_);
+        }
+
+        bool is_root() const
+        {
+            return !base_type::registered_name().empty();
+        }
+
+    private:
+        std::size_t num_sites_ = std::size_t(-1);
+        std::size_t this_site_ = std::size_t(-1);
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT communicator create_communicator(char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
 
 }}    // namespace hpx::collectives
 

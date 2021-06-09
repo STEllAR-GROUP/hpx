@@ -50,22 +50,22 @@ namespace hpx { namespace traits {
     template <typename R>
     struct future_traits<lcos::future<R>>
     {
-        typedef R type;
-        typedef R result_type;
+        using type = R;
+        using result_type = R;
     };
 
     template <typename R>
     struct future_traits<lcos::shared_future<R>>
     {
-        typedef R type;
-        typedef R const& result_type;
+        using type = R;
+        using result_type = R const&;
     };
 
     template <>
     struct future_traits<lcos::shared_future<void>>
     {
-        typedef void type;
-        typedef void result_type;
+        using type = void;
+        using result_type = void;
     };
 
     template <typename Future>
@@ -78,7 +78,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename Future>
-    struct is_future_void<Future, std::enable_if_t<is_future<Future>::value>>
+    struct is_future_void<Future, std::enable_if_t<is_future_v<Future>>>
       : std::is_void<future_traits_t<Future>>
     {
     };

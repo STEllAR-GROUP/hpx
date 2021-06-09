@@ -18,18 +18,18 @@ namespace hpx { namespace util { namespace detail {
     HPX_HAS_MEMBER_XXX_TRAIT_DEF(owns_lock)
 
     template <typename Lock>
-    void assert_owns_lock(Lock const&, int)
+    constexpr void assert_owns_lock(Lock const&, int) noexcept
     {
     }
 
     template <typename Lock>
-    void assert_doesnt_own_lock(Lock const&, int)
+    constexpr void assert_doesnt_own_lock(Lock const&, int) noexcept
     {
     }
 
     template <typename Lock>
     typename std::enable_if<has_owns_lock<Lock>::value>::type assert_owns_lock(
-        Lock const& l, long)
+        Lock const& l, long) HPX_NOEXCEPT_WITH_ASSERT
     {
         HPX_ASSERT(l.owns_lock());
         HPX_UNUSED(l);
@@ -37,7 +37,7 @@ namespace hpx { namespace util { namespace detail {
 
     template <typename Lock>
     typename std::enable_if<has_owns_lock<Lock>::value>::type
-    assert_doesnt_own_lock(Lock const& l, long)
+    assert_doesnt_own_lock(Lock const& l, long) HPX_NOEXCEPT_WITH_ASSERT
     {
         HPX_ASSERT(!l.owns_lock());
         HPX_UNUSED(l);

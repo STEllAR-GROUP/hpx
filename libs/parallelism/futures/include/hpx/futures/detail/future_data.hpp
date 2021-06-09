@@ -466,7 +466,9 @@ namespace hpx { namespace lcos { namespace detail {
 
             // invoke the callback (continuation) function
             if (!on_completed.empty())
+            {
                 handle_on_completed(std::move(on_completed));
+            }
         }
 
         void set_exception(std::exception_ptr data) override
@@ -523,7 +525,9 @@ namespace hpx { namespace lcos { namespace detail {
 
             // invoke the callback (continuation) function
             if (!on_completed.empty())
+            {
                 handle_on_completed(std::move(on_completed));
+            }
         }
 
         // helper functions for setting data (if successful) or the error (if
