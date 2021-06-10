@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <ostream>
 #include <string>
 #include <thread>
 
@@ -106,5 +107,14 @@ namespace hpx { namespace threads {
         std::size_t /* pool_threads */, std::size_t threads_offset)
     {
         thread_offset_ = threads_offset;
+    }
+
+    std::ostream& operator<<(
+        std::ostream& os, thread_pool_base const& thread_pool)
+    {
+        auto id = thread_pool.get_pool_id();
+        os << id.name() << "(" << id.index() << ")";
+
+        return os;
     }
 }}    // namespace hpx::threads

@@ -40,11 +40,12 @@ namespace hpx { namespace threads { namespace detail {
         thread_schedule_state const old_state,
         thread_schedule_state const new_state)
     {
-        LTM_(debug).format(
-            "scheduling_loop state change: scheduler({}), worker_thread({}), "
-            "thread({}), description({}), old state({}), new state({})",
-            scheduler, num_thread, thrd, thrd->get_description(),
-            get_thread_state_name(old_state), get_thread_state_name(new_state));
+        LTM_(debug).format("scheduling_loop state change: pool({}), "
+                           "scheduler({}), worker_thread({}), thread({}), "
+                           "description({}), old state({}), new state({})",
+            *scheduler.get_parent_pool(), scheduler, num_thread, thrd,
+            thrd->get_description(), get_thread_state_name(old_state),
+            get_thread_state_name(new_state));
     }
 
     inline void write_state_log_warning(
@@ -52,11 +53,12 @@ namespace hpx { namespace threads { namespace detail {
         thread_data* const thrd, thread_schedule_state const state,
         char const* info)
     {
-        LTM_(warning).format(
-            "scheduling_loop state change failed: scheduler({}), worker thread "
-            "({}), thread({}), description({}), state({}), {}",
-            scheduler, num_thread, thrd->get_thread_id(),
-            thrd->get_description(), get_thread_state_name(state), info);
+        LTM_(warning).format("scheduling_loop state change failed: pool({}), "
+                             "scheduler({}), worker thread ({}), thread({}), "
+                             "description({}), state({}), {}",
+            *scheduler.get_parent_pool(), scheduler, num_thread,
+            thrd->get_thread_id(), thrd->get_description(),
+            get_thread_state_name(state), info);
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -825,11 +827,11 @@ namespace hpx { namespace threads { namespace detail {
                 else if (HPX_UNLIKELY(
                              thread_schedule_state::active == state_val))
                 {
-                    LTM_(warning).format(
-                        "scheduler({}), worker_thread({}), thread({}), "
-                        "description({}), rescheduling",
-                        scheduler, num_thread, thrd->get_thread_id(),
-                        thrd->get_description());
+                    LTM_(warning).format("pool({}), scheduler({}), "
+                                         "worker_thread({}), thread({}), "
+                                         "description({}), rescheduling",
+                        *scheduler.get_parent_pool(), scheduler, num_thread,
+                        thrd->get_thread_id(), thrd->get_description());
                     // re-schedule thread, if it is still marked as active
                     // this might happen, if some thread has been added to the
                     // scheduler queue already but the state has not been reset

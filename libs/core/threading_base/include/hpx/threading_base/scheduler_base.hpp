@@ -66,7 +66,7 @@ namespace hpx { namespace threads { namespace policies {
 
         virtual ~scheduler_base() = default;
 
-        threads::thread_pool_base* get_parent_pool()
+        threads::thread_pool_base* get_parent_pool() const
         {
             HPX_ASSERT(parent_pool_ != nullptr);
             return parent_pool_;

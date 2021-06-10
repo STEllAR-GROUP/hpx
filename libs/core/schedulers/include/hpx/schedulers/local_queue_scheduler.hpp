@@ -315,9 +315,11 @@ namespace hpx { namespace threads { namespace policies {
             queues_[num_thread]->create_thread(data, id, ec);
 
             LTM_(debug)
-                .format("local_queue_scheduler::create_thread: scheduler({}), "
+                .format("local_queue_scheduler::create_thread: pool({}), "
+                        "scheduler({}), "
                         "worker_thread({}), thread({})",
-                    *this, num_thread, id ? *id : invalid_thread_id)
+                    *this->get_parent_pool(), *this, num_thread,
+                    id ? *id : invalid_thread_id)
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
                 .format(", description({})", data.description)
 #endif
@@ -487,10 +489,10 @@ namespace hpx { namespace threads { namespace policies {
             HPX_ASSERT(num_thread < queues_.size());
 
             LTM_(debug).format("local_queue_scheduler::schedule_thread: "
-                               "scheduler({}), worker_thread({}), "
+                               "pool({}), scheduler({}), worker_thread({}), "
                                "thread({}), description({})",
-                *this, num_thread, thrd->get_thread_id(),
-                thrd->get_description());
+                *this->get_parent_pool(), *this, num_thread,
+                thrd->get_thread_id(), thrd->get_description());
 
             queues_[num_thread]->schedule_thread(thrd);
         }
@@ -841,18 +843,18 @@ namespace hpx { namespace threads { namespace policies {
                 {
                     if (running)
                     {
-                        LTM_(error).format(
-                            "scheduler({}), queue({}): no new work available, "
-                            "are we deadlocked?",
-                            *this, num_thread);
+                        LTM_(error).format("pool({}), scheduler({}), "
+                                           "queue({}): no new work available, "
+                                           "are we deadlocked?",
+                            *this->get_parent_pool(), *this, num_thread);
                     }
                     else
                     {
                         LHPX_CONSOLE_(hpx::util::logging::level::error)
-                            .format("  [TM] scheduler({}), queue({}): no new "
-                                    "work available, "
-                                    "are we deadlocked?\n",
-                                *this, num_thread);
+                            .format("  [TM] pool({}), scheduler({}), "
+                                    "queue({}): no new work available, are we "
+                                    "deadlocked?\n",
+                                *this->get_parent_pool(), *this, num_thread);
                     }
                 }
             }
