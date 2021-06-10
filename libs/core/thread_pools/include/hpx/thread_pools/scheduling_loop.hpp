@@ -35,30 +35,26 @@
 
 namespace hpx { namespace threads { namespace detail {
     ///////////////////////////////////////////////////////////////////////
-    inline void write_new_state_log_debug(std::size_t num_thread,
-        thread_data* thrd, thread_schedule_state state, char const* info)
+    inline void write_state_log(policies::scheduler_base* scheduler,
+        std::size_t num_thread, thread_data* thrd,
+        thread_schedule_state old_state, thread_schedule_state new_state)
     {
         LTM_(debug).format(
-            "tfunc({}): thread({}), description({}), new state({}), {}",
-            num_thread, thrd->get_thread_id(), thrd->get_description(),
-            get_thread_state_name(state), info);
+            "scheduling_loop state change: scheduler({}), worker_thread({}), "
+            "thread({}), description({}), old state({}), new state({})",
+            scheduler, num_thread, thrd, thrd->get_description(),
+            get_thread_state_name(old_state), get_thread_state_name(new_state));
     }
-    inline void write_new_state_log_warning(std::size_t num_thread,
-        thread_data* thrd, thread_schedule_state state, char const* info)
+
+    inline void write_state_log_warning(policies::scheduler_base* scheduler,
+        std::size_t num_thread, thread_data* thrd, thread_schedule_state state,
+        char const* info)
     {
-        // log this in any case
         LTM_(warning).format(
-            "tfunc({}): thread({}), description({}), new state({}), {}",
-            num_thread, thrd->get_thread_id(), thrd->get_description(),
-            get_thread_state_name(state), info);
-    }
-    inline void write_old_state_log(
-        std::size_t num_thread, thread_data* thrd, thread_schedule_state state)
-    {
-        LTM_(debug).format(
-            "tfunc({}): thread({}), description({}), old state({})", num_thread,
-            thrd->get_thread_id(), thrd->get_description(),
-            get_thread_state_name(state));
+            "scheduling_loop state change failed: scheduler({}), worker thread "
+            "({}), thread({}), description({}), state({}), {}",
+            scheduler, num_thread, thrd->get_thread_id(),
+            thrd->get_description(), get_thread_state_name(state), info);
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -650,8 +646,6 @@ namespace hpx { namespace threads { namespace detail {
                 thread_state state = thrd->get_state();
                 thread_schedule_state state_val = state.state();
 
-                detail::write_old_state_log(num_thread, thrd, state_val);
-
                 if (HPX_LIKELY(thread_schedule_state::pending == state_val))
                 {
                     // switch the state of the thread to active and back to
@@ -665,6 +659,10 @@ namespace hpx { namespace threads { namespace detail {
                                 thrd_stat.get_previous() ==
                                     thread_schedule_state::pending))
                         {
+                            detail::write_state_log(&scheduler, num_thread,
+                                thrd, thrd_stat.get_previous(),
+                                thread_schedule_state::active);
+
                             tfunc_time_wrapper tfunc_time_collector(idle_rate);
 
                             // thread returns new required state
@@ -715,6 +713,10 @@ namespace hpx { namespace threads { namespace detail {
 #endif
                             }
 
+                            detail::write_state_log(&scheduler, num_thread,
+                                thrd, thread_schedule_state::active,
+                                thrd_stat.get_previous());
+
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
                             ++counters.executed_thread_phases_;
 #endif
@@ -725,7 +727,7 @@ namespace hpx { namespace threads { namespace detail {
                             // executing this HPX-thread, we just continue with
                             // the next one
                             thrd_stat.disable_restore();
-                            detail::write_new_state_log_warning(
+                            detail::write_state_log_warning(&scheduler,
                                 num_thread, thrd, state_val, "no execution");
                             continue;
                         }
@@ -736,7 +738,7 @@ namespace hpx { namespace threads { namespace detail {
                             // some other worker-thread got in between and changed
                             // the state of this thread, we just continue with
                             // the next one
-                            detail::write_new_state_log_warning(
+                            detail::write_state_log_warning(&scheduler,
                                 num_thread, thrd, state_val, "no state change");
                             continue;
                         }
@@ -750,9 +752,6 @@ namespace hpx { namespace threads { namespace detail {
                         // this thread)
                         next_thrd = thrd_stat.get_next_thread();
                     }
-
-                    //detail::write_new_state_log_debug(num_thread, thrd,
-                    //    state_val, "normal");
 
                     // Re-add this work item to our list of work items if the HPX
                     // thread should be re-scheduled. If the HPX thread is suspended
