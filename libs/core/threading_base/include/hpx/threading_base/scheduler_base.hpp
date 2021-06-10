@@ -28,6 +28,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <iosfwd>
 #include <memory>
 #include <mutex>
 #include <utility>
@@ -426,6 +427,9 @@ namespace hpx { namespace threads { namespace policies {
         std::shared_ptr<coroutines::detail::tss_storage> thread_data_;
 #endif
     };
+
+    HPX_CORE_EXPORT std::ostream& operator<<(
+        std::ostream& os, scheduler_base const& scheduler);
 }}}    // namespace hpx::threads::policies
 
 #include <hpx/config/warnings_suffix.hpp>

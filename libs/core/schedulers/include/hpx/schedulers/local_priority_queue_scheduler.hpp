@@ -548,7 +548,7 @@ namespace hpx { namespace threads { namespace policies {
                             "high priority queue: "
                             "scheduler({}), worker_thread({}), "
                             "thread({}), priority({})",
-                        this, num, id ? *id : invalid_thread_id, data.priority)
+                        *this, num, id ? *id : invalid_thread_id, data.priority)
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
                     .format(", description({})", data.description)
 #endif
@@ -565,7 +565,7 @@ namespace hpx { namespace threads { namespace policies {
                     .format("local_priority_queue_scheduler::create_thread, "
                             "low priority queue: "
                             "scheduler({}), thread({}), priority({})",
-                        this, id ? *id : invalid_thread_id, data.priority)
+                        *this, id ? *id : invalid_thread_id, data.priority)
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
                     .format(", description({})", data.description)
 #endif
@@ -582,7 +582,7 @@ namespace hpx { namespace threads { namespace policies {
                         "priority queue: scheduler({}), "
                         "worker_thread({}), "
                         "thread({}), priority({})",
-                    this, num_thread, id ? *id : invalid_thread_id,
+                    *this, num_thread, id ? *id : invalid_thread_id,
                     data.priority)
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
                 .format(", description({})", data.description)
@@ -703,7 +703,7 @@ namespace hpx { namespace threads { namespace policies {
                     "high priority queue: "
                     "scheduler({}), worker_thread({}), "
                     "thread({}), priority({}), description({})",
-                    this, num, thrd->get_thread_id(), priority,
+                    *this, num, thrd->get_thread_id(), priority,
                     thrd->get_description());
 
                 high_priority_queues_[num].data_->schedule_thread(thrd);
@@ -715,7 +715,7 @@ namespace hpx { namespace threads { namespace policies {
                     "low priority queue: "
                     "scheduler({}), "
                     "thread({}), priority({}), description({})",
-                    this, thrd->get_thread_id(), priority,
+                    *this, thrd->get_thread_id(), priority,
                     thrd->get_description());
 
                 low_priority_queue_.schedule_thread(thrd);
@@ -729,7 +729,7 @@ namespace hpx { namespace threads { namespace policies {
                     "normal priority queue: "
                     "scheduler({}), worker_thread({}), "
                     "thread({}), priority({}), description({})",
-                    this, num_thread, thrd->get_thread_id(), priority,
+                    *this, num_thread, thrd->get_thread_id(), priority,
                     thrd->get_description());
 
                 queues_[num_thread].data_->schedule_thread(thrd);
@@ -1181,7 +1181,7 @@ namespace hpx { namespace threads { namespace policies {
                         LTM_(error).format(
                             "scheduler({}), worker_thread({}): no new work "
                             "available, are we deadlocked?",
-                            this, num_thread);
+                            *this, num_thread);
                     }
                     else
                     {
@@ -1189,7 +1189,7 @@ namespace hpx { namespace threads { namespace policies {
                             .format(
                                 "  [TM] scheduler({}), worker_thread({}): "
                                 "no new work available, are we deadlocked?\n",
-                                this, num_thread);
+                                *this, num_thread);
                     }
                 }
             }

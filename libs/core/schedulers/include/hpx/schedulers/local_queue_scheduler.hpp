@@ -316,9 +316,8 @@ namespace hpx { namespace threads { namespace policies {
 
             LTM_(debug)
                 .format("local_queue_scheduler::create_thread: scheduler({}), "
-                        "worker_thread({}), thread({}), priority({})",
-                    this, num_thread, id ? *id : invalid_thread_id,
-                    data.priority)
+                        "worker_thread({}), thread({})",
+                    *this, num_thread, id ? *id : invalid_thread_id)
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
                 .format(", description({})", data.description)
 #endif
@@ -489,8 +488,8 @@ namespace hpx { namespace threads { namespace policies {
 
             LTM_(debug).format("local_queue_scheduler::schedule_thread: "
                                "scheduler({}), worker_thread({}), "
-                               "thread({}), priority({}), description({})",
-                this, num_thread, thrd->get_thread_id(), priority,
+                               "thread({}), description({})",
+                *this, num_thread, thrd->get_thread_id(),
                 thrd->get_description());
 
             queues_[num_thread]->schedule_thread(thrd);
@@ -842,16 +841,18 @@ namespace hpx { namespace threads { namespace policies {
                 {
                     if (running)
                     {
-                        LTM_(error).format("queue({}): no new work available, "
-                                           "are we deadlocked?",
-                            num_thread);
+                        LTM_(error).format(
+                            "scheduler({}), queue({}): no new work available, "
+                            "are we deadlocked?",
+                            *this, num_thread);
                     }
                     else
                     {
                         LHPX_CONSOLE_(hpx::util::logging::level::error)
-                            .format("  [TM] queue({}): no new work available, "
+                            .format("  [TM] scheduler({}), queue({}): no new "
+                                    "work available, "
                                     "are we deadlocked?\n",
-                                num_thread);
+                                *this, num_thread);
                     }
                 }
             }

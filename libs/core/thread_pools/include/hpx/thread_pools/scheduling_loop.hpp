@@ -35,9 +35,10 @@
 
 namespace hpx { namespace threads { namespace detail {
     ///////////////////////////////////////////////////////////////////////
-    inline void write_state_log(policies::scheduler_base* scheduler,
-        std::size_t num_thread, thread_data* thrd,
-        thread_schedule_state old_state, thread_schedule_state new_state)
+    inline void write_state_log(policies::scheduler_base const& scheduler,
+        std::size_t const num_thread, thread_data* const thrd,
+        thread_schedule_state const old_state,
+        thread_schedule_state const new_state)
     {
         LTM_(debug).format(
             "scheduling_loop state change: scheduler({}), worker_thread({}), "
@@ -46,8 +47,9 @@ namespace hpx { namespace threads { namespace detail {
             get_thread_state_name(old_state), get_thread_state_name(new_state));
     }
 
-    inline void write_state_log_warning(policies::scheduler_base* scheduler,
-        std::size_t num_thread, thread_data* thrd, thread_schedule_state state,
+    inline void write_state_log_warning(
+        policies::scheduler_base const& scheduler, std::size_t const num_thread,
+        thread_data* const thrd, thread_schedule_state const state,
         char const* info)
     {
         LTM_(warning).format(
@@ -659,8 +661,8 @@ namespace hpx { namespace threads { namespace detail {
                                 thrd_stat.get_previous() ==
                                     thread_schedule_state::pending))
                         {
-                            detail::write_state_log(&scheduler, num_thread,
-                                thrd, thrd_stat.get_previous(),
+                            detail::write_state_log(scheduler, num_thread, thrd,
+                                thrd_stat.get_previous(),
                                 thread_schedule_state::active);
 
                             tfunc_time_wrapper tfunc_time_collector(idle_rate);
@@ -713,8 +715,8 @@ namespace hpx { namespace threads { namespace detail {
 #endif
                             }
 
-                            detail::write_state_log(&scheduler, num_thread,
-                                thrd, thread_schedule_state::active,
+                            detail::write_state_log(scheduler, num_thread, thrd,
+                                thread_schedule_state::active,
                                 thrd_stat.get_previous());
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
@@ -727,7 +729,7 @@ namespace hpx { namespace threads { namespace detail {
                             // executing this HPX-thread, we just continue with
                             // the next one
                             thrd_stat.disable_restore();
-                            detail::write_state_log_warning(&scheduler,
+                            detail::write_state_log_warning(scheduler,
                                 num_thread, thrd, state_val, "no execution");
                             continue;
                         }
@@ -738,7 +740,7 @@ namespace hpx { namespace threads { namespace detail {
                             // some other worker-thread got in between and changed
                             // the state of this thread, we just continue with
                             // the next one
-                            detail::write_state_log_warning(&scheduler,
+                            detail::write_state_log_warning(scheduler,
                                 num_thread, thrd, state_val, "no state change");
                             continue;
                         }
@@ -824,8 +826,9 @@ namespace hpx { namespace threads { namespace detail {
                              thread_schedule_state::active == state_val))
                 {
                     LTM_(warning).format(
-                        "tfunc({}): thread({}), description({}), rescheduling",
-                        num_thread, thrd->get_thread_id(),
+                        "scheduler({}), worker_thread({}), thread({}), "
+                        "description({}), rescheduling",
+                        scheduler, num_thread, thrd->get_thread_id(),
                         thrd->get_description());
                     // re-schedule thread, if it is still marked as active
                     // this might happen, if some thread has been added to the

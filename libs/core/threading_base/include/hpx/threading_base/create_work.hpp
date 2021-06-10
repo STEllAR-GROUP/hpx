@@ -44,8 +44,9 @@ namespace hpx { namespace threads { namespace detail {
 #endif
 
         LTM_(info)
-            .format("create_work: initial_state({}), thread_priority({})",
-                get_thread_state_name(data.initial_state),
+            .format("create_work: scheduler({}), initial_state({}), "
+                    "thread_priority({})",
+                *scheduler, get_thread_state_name(data.initial_state),
                 get_thread_priority_name(data.priority))
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             .format(", description({})", data.description)
