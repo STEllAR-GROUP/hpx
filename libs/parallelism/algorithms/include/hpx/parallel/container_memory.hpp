@@ -8,6 +8,8 @@
 
 #include <hpx/parallel/memory.hpp>
 
-#include <hpx/parallel/container_algorithms/uninitialized_copy.hpp>
 #include <hpx/parallel/container_algorithms/destroy.hpp>
+#include <hpx/parallel/container_algorithms/uninitialized_copy.hpp>
+#include <hpx/parallel/container_algorithms/uninitialized_default_construct.hpp>
 #include <hpx/parallel/container_algorithms/uninitialized_move.hpp>
+#include <hpx/parallel/container_algorithms/uninitialized_value_construct.hpp>

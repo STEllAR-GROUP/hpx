@@ -236,39 +236,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {
         /// \cond NOINTERNAL
 
-        // provide our own implementation of std::uninitialized_copy as some
-        // versions of MSVC horribly fail at compiling it for some types T
-        template <typename InIter1, typename Sent, typename InIter2>
-        util::in_out_result<InIter1, InIter2> std_uninitialized_copy(
-            InIter1 first, Sent last, InIter2 d_first)
-        {
-            using value_type =
-                typename std::iterator_traits<InIter2>::value_type;
-
-            InIter2 current = d_first;
-            try
-            {
-                for (/* */; first != last; (void) ++first, ++current)
-                {
-                    ::new (std::addressof(*current)) value_type(*first);
-                }
-                return util::in_out_result<InIter1, InIter2>{first, current};
-            }
-            catch (...)
-            {
-                for (/* */; d_first != current; ++d_first)
-                {
-                    (*d_first).~value_type();
-                }
-                throw;
-            }
-        }
-
         ///////////////////////////////////////////////////////////////////////
-        template <typename InIter1, typename Sent1, typename FwdIter2,
-            typename Sent2>
-        util::in_out_result<InIter1, FwdIter2> std_uninitialized_copy_sent(
-            InIter1 first, Sent1 last, FwdIter2 dest, Sent2 last_d)
+        template <typename InIter1, typename FwdIter2, typename Cond>
+        util::in_out_result<InIter1, FwdIter2> sequential_uninitialized_copy(
+            InIter1 first, FwdIter2 dest, Cond cond)
         {
             using value_type =
                 typename std::iterator_traits<FwdIter2>::value_type;
@@ -276,8 +247,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             FwdIter2 current = dest;
             try
             {
-                for (/* */; !(first == last || current == last_d);
-                     (void) ++first, ++current)
+                for (/* */; cond(first, current); (void) ++first, ++current)
                 {
                     ::new (std::addressof(*current)) value_type(*first);
                 }
@@ -381,7 +351,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static util::in_out_result<InIter1, FwdIter2> sequential(
                 ExPolicy, InIter1 first, Sent last, FwdIter2 dest)
             {
-                return std_uninitialized_copy(first, last, dest);
+                return sequential_uninitialized_copy(
+                    first, dest, [last](InIter1 first, FwdIter2) -> bool {
+                        return first != last;
+                    });
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
@@ -445,7 +418,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static util::in_out_result<InIter1, FwdIter2> sequential(ExPolicy,
                 InIter1 first, Sent1 last, FwdIter2 dest, Sent2 last_d)
             {
-                return std_uninitialized_copy_sent(first, last, dest, last_d);
+                return sequential_uninitialized_copy(first, dest,
+                    [last, last_d](InIter1 first, FwdIter2 current) -> bool {
+                        return !(first == last || current == last_d);
+                    });
             }
 
             template <typename ExPolicy, typename Iter, typename Sent1,
