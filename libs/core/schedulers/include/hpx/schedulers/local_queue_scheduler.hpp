@@ -313,6 +313,16 @@ namespace hpx { namespace threads { namespace policies {
 
             HPX_ASSERT(num_thread < queue_size);
             queues_[num_thread]->create_thread(data, id, ec);
+
+            LTM_(debug)
+                .format("local_queue_scheduler::create_thread: scheduler({}), "
+                        "worker_thread({}), thread({}), priority({})",
+                    this, num_thread, id ? *id : invalid_thread_id,
+                    data.priority)
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
+                .format(", description({})", data.description)
+#endif
+                ;
         }
 
         /// Return the next thread to be executed, return false if none is
@@ -476,6 +486,13 @@ namespace hpx { namespace threads { namespace policies {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
 
             HPX_ASSERT(num_thread < queues_.size());
+
+            LTM_(debug).format("local_queue_scheduler::schedule_thread: "
+                               "scheduler({}), worker_thread({}), "
+                               "thread({}), priority({}), description({})",
+                this, num_thread, thrd->get_thread_id(), priority,
+                thrd->get_description());
+
             queues_[num_thread]->schedule_thread(thrd);
         }
 
