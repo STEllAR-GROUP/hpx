@@ -29,7 +29,6 @@ build_dir="/dev/shm/hpx/build"
 mkdir -p "${build_dir}"
 cp -r "${orig_src_dir}" "${src_dir}"
 # Args for the pyutils suite
-logfile=${build_dir}/reports/jenkins-hpx-${configuration_name}.log
 envfile=${src_dir}/.jenkins/cscs-perftests/env-${configuration_name}.sh
 # Copy the perftest utility in the build dir
 mkdir -p ${build_dir}/tools
@@ -39,6 +38,7 @@ cp -r ${src_dir}/tools/perftests_ci ${build_dir}/tools
 perftests_dir=${build_dir}/tools/perftests_ci
 mkdir -p ${build_dir}/reports
 result=${build_dir}/reports/local-priority-fifo.json
+logfile=${build_dir}/reports/jenkins-hpx-${configuration_name}.log
 
 # Load python packages
 source /apps/daint/SSL/HPX/virtual_envs/perftests_env/bin/activate
