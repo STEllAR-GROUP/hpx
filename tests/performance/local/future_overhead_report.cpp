@@ -92,55 +92,6 @@ struct scratcher
     }
 };
 
-// Time async execution using wait each on futures vector
-template <typename Executor>
-void measure_function_futures_wait_each(
-    std::uint64_t count, Executor& exec, const std::size_t steps)
-{
-    std::vector<future<double>> futures;
-    futures.reserve(count);
-
-    hpx::util::perf_test_report("future overhead - async - WaitEach",
-        exec_name(exec), steps, [&]() -> void {
-            for (std::uint64_t i = 0; i < count; ++i)
-            {
-                futures.push_back(async(exec, &null_function));
-            }
-            wait_each(scratcher(), futures);
-        });
-}
-
-void measure_function_futures_create_thread(std::uint64_t count, const int repetitions)
-{
-
-    auto const sched = hpx::threads::get_self_id_data()->get_scheduler_base();
-    auto const desc = hpx::util::thread_description();
-    auto const prio = hpx::threads::thread_priority::normal;
-    auto const hint = hpx::threads::thread_schedule_hint();
-    auto const stack_size = hpx::threads::thread_stacksize::small_;
-    hpx::error_code ec;
-
-    hpx::util::perf_test_report("future overhead - create_thread - latch",
-        "no-executor", repetitions, [&]() -> void {
-            hpx::lcos::local::latch l(count);
-            auto func = [&l]() {
-                null_function();
-                l.count_down(1);
-            };
-            auto const thread_func =
-                hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
-            for (std::uint64_t i = 0; i < count; ++i)
-            {
-                auto init = hpx::threads::thread_init_data(
-                    hpx::threads::thread_function_type(thread_func), desc, prio, hint,
-                    stack_size, hpx::threads::thread_schedule_state::pending, false,
-                    sched);
-                sched->create_thread(init, nullptr, ec);
-            }
-            l.wait();
-        });
-}
-
 void measure_function_futures_create_thread_hierarchical_placement(
     std::uint64_t count, const int repetitions)
 {
@@ -238,8 +189,6 @@ int hpx_main(variables_map& vm)
 
         if (test_all)
         {
-            //measure_function_futures_wait_each(count, par, repetitions);
-            //measure_function_futures_create_thread(count, repetitions);
             measure_function_futures_create_thread_hierarchical_placement(
                 count, repetitions);
         }
