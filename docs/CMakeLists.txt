@@ -209,12 +209,7 @@ file(
   "${PROJECT_SOURCE_DIR}/libs/*/*/docs/*"
 )
 
-list(
-  APPEND
-  sphinx_libs_source_files
-  "index.rst"
-  "overview.rst"
-)
+list(APPEND sphinx_libs_source_files "index.rst" "overview.rst")
 
 foreach(lib ${HPX_LIBS})
   list(APPEND sphinx_libs_source_files "${lib}/modules.rst")
