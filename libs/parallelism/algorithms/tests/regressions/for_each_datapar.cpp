@@ -36,8 +36,8 @@ void test_for_each(ExPolicy&& policy)
 void for_each_test()
 {
     using namespace hpx::execution;
-    test_for_each(dataseq);
-    test_for_each(datapar);
+    test_for_each(simd);
+    test_for_each(simdpar);
 }
 
 int hpx_main()

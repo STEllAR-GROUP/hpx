@@ -19,11 +19,11 @@ void test_transform_binary2()
 {
     using namespace hpx::execution;
 
-    test_transform_binary2(dataseq, IteratorTag());
-    test_transform_binary2(datapar, IteratorTag());
+    test_transform_binary2(simd, IteratorTag());
+    test_transform_binary2(simdpar, IteratorTag());
 
-    test_transform_binary2_async(dataseq(task), IteratorTag());
-    test_transform_binary2_async(datapar(task), IteratorTag());
+    test_transform_binary2_async(simd(task), IteratorTag());
+    test_transform_binary2_async(simdpar(task), IteratorTag());
 }
 
 void transform_binary2_test()
@@ -38,11 +38,11 @@ void test_transform_binary2_exception()
 {
     using namespace hpx::execution;
 
-    test_transform_binary2_exception(dataseq, IteratorTag());
-    test_transform_binary2_exception(datapar, IteratorTag());
+    test_transform_binary2_exception(simd, IteratorTag());
+    test_transform_binary2_exception(simdpar, IteratorTag());
 
-    test_transform_binary2_exception_async(dataseq(task), IteratorTag());
-    test_transform_binary2_exception_async(datapar(task), IteratorTag());
+    test_transform_binary2_exception_async(simd(task), IteratorTag());
+    test_transform_binary2_exception_async(simdpar(task), IteratorTag());
 }
 
 void transform_binary2_exception_test()
@@ -57,11 +57,11 @@ void test_transform_binary2_bad_alloc()
 {
     using namespace hpx::execution;
 
-    test_transform_binary2_bad_alloc(dataseq, IteratorTag());
-    test_transform_binary2_bad_alloc(datapar, IteratorTag());
+    test_transform_binary2_bad_alloc(simd, IteratorTag());
+    test_transform_binary2_bad_alloc(simdpar, IteratorTag());
 
-    test_transform_binary2_bad_alloc_async(dataseq(task), IteratorTag());
-    test_transform_binary2_bad_alloc_async(datapar(task), IteratorTag());
+    test_transform_binary2_bad_alloc_async(simd(task), IteratorTag());
+    test_transform_binary2_bad_alloc_async(simdpar(task), IteratorTag());
 }
 
 void transform_binary2_bad_alloc_test()

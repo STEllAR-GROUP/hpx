@@ -46,18 +46,16 @@ namespace hpx { namespace collectives { namespace detail {
     public:
         communicator_server()    //-V730
           : num_sites_(0)
-          , site_(0)
           , needs_initialization_(false)
           , data_available_(false)
         {
             HPX_ASSERT(false);    // shouldn't ever be called
         }
 
-        communicator_server(std::size_t num_sites, std::size_t site)
+        explicit communicator_server(std::size_t num_sites)
           : data_()
           , gate_(num_sites)
           , num_sites_(num_sites)
-          , site_(site)
           , needs_initialization_(true)
           , data_available_(false)
         {
@@ -147,7 +145,6 @@ namespace hpx { namespace collectives { namespace detail {
         hpx::unique_any_nonser data_;
         lcos::local::and_gate gate_;
         std::size_t const num_sites_;
-        std::size_t const site_;
         bool needs_initialization_;
         bool data_available_;
     };

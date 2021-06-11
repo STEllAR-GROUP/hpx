@@ -18,6 +18,8 @@
 #include <utility>
 #include <vector>
 
+using namespace hpx::collectives;
+
 constexpr char const* broadcast_direct_basename = "/test/broadcast_direct/";
 
 void test_one_shot_use()
@@ -25,21 +27,25 @@ void test_one_shot_use()
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
     HPX_TEST_LTE(std::uint32_t(2), num_localities);
 
+    std::uint32_t here = hpx::get_locality_id();
+
     // test functionality based on immediate local result value
     for (std::uint32_t i = 0; i != 10; ++i)
     {
-        if (hpx::get_locality_id() == 0)
+        if (here == 0)
         {
-            hpx::future<std::uint32_t> result = hpx::collectives::broadcast_to(
-                broadcast_direct_basename, i + 42, num_localities, i);
+            hpx::future<std::uint32_t> result =
+                broadcast_to(broadcast_direct_basename, i + 42,
+                    num_sites_arg(num_localities), this_site_arg(here),
+                    generation_arg(i));
 
             HPX_TEST_EQ(i + 42, result.get());
         }
         else
         {
             hpx::future<std::uint32_t> result =
-                hpx::collectives::broadcast_from<std::uint32_t>(
-                    broadcast_direct_basename, i);
+                broadcast_from<std::uint32_t>(broadcast_direct_basename,
+                    this_site_arg(here), generation_arg(i));
 
             HPX_TEST_EQ(i + 42, result.get());
         }
@@ -51,16 +57,19 @@ void test_multiple_use()
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
     HPX_TEST_LTE(std::uint32_t(2), num_localities);
 
-    auto broadcast_direct_client = hpx::collectives::create_communicator(
-        broadcast_direct_basename, num_localities);
+    std::uint32_t here = hpx::get_locality_id();
+
+    auto broadcast_direct_client =
+        create_communicator(broadcast_direct_basename,
+            num_sites_arg(num_localities), this_site_arg(here));
 
     // test functionality based on immediate local result value
     for (std::uint32_t i = 0; i != 10; ++i)
     {
-        if (hpx::get_locality_id() == 0)
+        if (here == 0)
         {
             hpx::future<std::uint32_t> result =
-                hpx::collectives::broadcast_to(broadcast_direct_client, i + 42);
+                broadcast_to(broadcast_direct_client, i + 42);
 
             HPX_TEST_EQ(i + 42, result.get());
         }

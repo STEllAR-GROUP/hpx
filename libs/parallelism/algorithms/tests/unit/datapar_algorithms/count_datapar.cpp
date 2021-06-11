@@ -18,11 +18,11 @@ template <typename IteratorTag>
 void test_count()
 {
     using namespace hpx::execution;
-    test_count(dataseq, IteratorTag());
-    test_count(datapar, IteratorTag());
+    test_count(simd, IteratorTag());
+    test_count(simdpar, IteratorTag());
 
-    test_count_async(dataseq(task), IteratorTag());
-    test_count_async(datapar(task), IteratorTag());
+    test_count_async(simd(task), IteratorTag());
+    test_count_async(simdpar(task), IteratorTag());
 }
 
 void count_test()
@@ -37,11 +37,11 @@ void test_count_exception()
 {
     using namespace hpx::execution;
 
-    test_count_exception(dataseq, IteratorTag());
-    test_count_exception(datapar, IteratorTag());
+    test_count_exception(simd, IteratorTag());
+    test_count_exception(simdpar, IteratorTag());
 
-    test_count_exception_async(dataseq(task), IteratorTag());
-    test_count_exception_async(datapar(task), IteratorTag());
+    test_count_exception_async(simd(task), IteratorTag());
+    test_count_exception_async(simdpar(task), IteratorTag());
 }
 
 void count_exception_test()
@@ -56,11 +56,11 @@ void test_count_bad_alloc()
 {
     using namespace hpx::execution;
 
-    test_count_bad_alloc(dataseq, IteratorTag());
-    test_count_bad_alloc(datapar, IteratorTag());
+    test_count_bad_alloc(simd, IteratorTag());
+    test_count_bad_alloc(simdpar, IteratorTag());
 
-    test_count_bad_alloc_async(dataseq(task), IteratorTag());
-    test_count_bad_alloc_async(datapar(task), IteratorTag());
+    test_count_bad_alloc_async(simd(task), IteratorTag());
+    test_count_bad_alloc_async(simdpar(task), IteratorTag());
 }
 
 void count_bad_alloc_test()

@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,9 +29,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T,
-        typename RemoteType = typename traits::promise_remote_result<T>::type>
+        typename RemoteType = traits::promise_remote_result_t<T>>
     class channel;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -42,21 +43,20 @@ namespace hpx { namespace lcos { namespace server {
       , public components::component_base<channel<T, RemoteType>>
     {
     public:
-        typedef lcos::base_lco_with_value<T, RemoteType,
-            traits::detail::component_tag>
-            base_type_holder;
+        using base_type_holder = lcos::base_lco_with_value<T, RemoteType,
+            traits::detail::component_tag>;
 
     private:
-        typedef components::component_base<channel> base_type;
-        typedef typename std::conditional<std::is_void<T>::value,
-            util::unused_type, T>::type result_type;
+        using base_type = components::component_base<channel>;
+        using result_type =
+            std::conditional_t<std::is_void<T>::value, util::unused_type, T>;
 
     public:
-        channel() {}
+        channel() = default;
 
         // disambiguate base classes
         using base_type::finalize;
-        typedef typename base_type::wrapping_type wrapping_type;
+        using wrapping_type = typename base_type::wrapping_type;
 
         static components::component_type get_component_type()
         {
@@ -127,8 +127,8 @@ namespace hpx { namespace lcos { namespace server {
     HPX_REGISTER_CHANNEL_DECLARATION_2(type, type)                             \
 /**/
 #define HPX_REGISTER_CHANNEL_DECLARATION_2(type, name)                         \
-    typedef ::hpx::lcos::server::channel<type> HPX_PP_CAT(                     \
-        __channel_, HPX_PP_CAT(type, name));                                   \
+    using HPX_PP_CAT(__channel_, HPX_PP_CAT(type, name)) =                     \
+        ::hpx::lcos::server::channel<type>;                                    \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
         hpx::lcos::server::channel<type>::get_generation_action,               \
         HPX_PP_CAT(__channel_get_generation_action, HPX_PP_CAT(type, name)));  \
@@ -154,11 +154,11 @@ namespace hpx { namespace lcos { namespace server {
     HPX_REGISTER_CHANNEL_2(type, type)                                         \
 /**/
 #define HPX_REGISTER_CHANNEL_2(type, name)                                     \
-    typedef ::hpx::lcos::server::channel<type> HPX_PP_CAT(                     \
-        __channel_, HPX_PP_CAT(type, name));                                   \
-    typedef ::hpx::components::component<HPX_PP_CAT(                           \
-        __channel_, HPX_PP_CAT(type, name))>                                   \
-        HPX_PP_CAT(__channel_component_, name);                                \
+    using HPX_PP_CAT(__channel_, HPX_PP_CAT(type, name)) =                     \
+        ::hpx::lcos::server::channel<type>;                                    \
+    using HPX_PP_CAT(__channel_component_, name) =                             \
+        ::hpx::components::component<HPX_PP_CAT(                               \
+            __channel_, HPX_PP_CAT(type, name))>;                              \
     HPX_REGISTER_DERIVED_COMPONENT_FACTORY(                                    \
         HPX_PP_CAT(__channel_component_, name),                                \
         HPX_PP_CAT(__channel_component_, name),                                \

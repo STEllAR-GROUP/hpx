@@ -37,12 +37,12 @@ namespace hpx { namespace lcos { namespace local {
         template <typename T>
         struct channel_impl_base
         {
-            channel_impl_base()
+            channel_impl_base() noexcept
               : count_(0)
             {
             }
 
-            virtual ~channel_impl_base() {}
+            virtual ~channel_impl_base() = default;
 
             virtual hpx::future<T> get(
                 std::size_t generation, bool blocking = false) = 0;
@@ -51,7 +51,7 @@ namespace hpx { namespace lcos { namespace local {
             virtual hpx::future<void> set(std::size_t generation, T&& t) = 0;
             virtual std::size_t close(bool force_delete_entries = false) = 0;
 
-            virtual bool requires_delete()
+            virtual bool requires_delete() noexcept
             {
                 return 0 == release();
             }
@@ -60,15 +60,15 @@ namespace hpx { namespace lcos { namespace local {
                 delete this;
             }
 
-            long use_count() const
+            long use_count() const noexcept
             {
                 return count_;
             }
-            long addref()
+            long addref() noexcept
             {
                 return ++count_;
             }
-            long release()
+            long release() noexcept
             {
                 return --count_;
             }
@@ -79,7 +79,7 @@ namespace hpx { namespace lcos { namespace local {
 
         // support functions for hpx::intrusive_ptr
         template <typename T>
-        void intrusive_ptr_add_ref(channel_impl_base<T>* p)
+        void intrusive_ptr_add_ref(channel_impl_base<T>* p) noexcept
         {
             p->addref();
         }
@@ -88,14 +88,16 @@ namespace hpx { namespace lcos { namespace local {
         void intrusive_ptr_release(channel_impl_base<T>* p)
         {
             if (p->requires_delete())
+            {
                 p->destroy();
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         class unlimited_channel : public channel_impl_base<T>
         {
-            typedef hpx::lcos::local::spinlock mutex_type;
+            using mutex_type = hpx::lcos::local::spinlock;
 
         public:
             HPX_NON_COPYABLE(unlimited_channel);
@@ -250,14 +252,14 @@ namespace hpx { namespace lcos { namespace local {
                 empty_ = false;
                 push_active_ = false;
             }
-            void set_deferred(T&& val)
+            void set_deferred(T&& val) noexcept
             {
                 val_ = std::move(val);
                 empty_ = false;
                 push_active_ = false;
             }
 
-            T get()
+            T get() noexcept
             {
                 empty_ = true;
                 pop_active_ = false;
@@ -359,18 +361,18 @@ namespace hpx { namespace lcos { namespace local {
 
                     push_();    // trigger waiting push
                 }
-                return hpx::make_ready_future(val);
+                return hpx::make_ready_future(std::move(val));
             }
 
             template <typename Lock>
-            bool is_empty(Lock& l) const
+            bool is_empty(Lock& l) const HPX_NOEXCEPT_WITH_ASSERT
             {
                 HPX_ASSERT_OWNS_LOCK(l);
                 return empty_;
             }
 
             template <typename Lock>
-            bool has_pending_request(Lock& l) const
+            bool has_pending_request(Lock& l) const HPX_NOEXCEPT_WITH_ASSERT
             {
                 HPX_ASSERT_OWNS_LOCK(l);
                 return push_active_;
@@ -389,13 +391,13 @@ namespace hpx { namespace lcos { namespace local {
         template <typename T>
         class one_element_channel : public channel_impl_base<T>
         {
-            typedef hpx::lcos::local::spinlock mutex_type;
+            using mutex_type = hpx::lcos::local::spinlock;
 
         public:
             HPX_NON_COPYABLE(one_element_channel);
 
         public:
-            one_element_channel()
+            one_element_channel() noexcept
               : closed_(false)
             {
             }
@@ -448,7 +450,9 @@ namespace hpx { namespace lcos { namespace local {
 
                 if (buffer_.is_empty(l) && !buffer_.has_pending_request(l) &&
                     closed_)
+                {
                     return false;
+                }
 
                 if (f != nullptr)
                 {
@@ -488,7 +492,9 @@ namespace hpx { namespace lcos { namespace local {
                 closed_ = true;
 
                 if (buffer_.is_empty(l) || !buffer_.has_pending_request(l))
+                {
                     return 0;
+                }
 
                 // all pending requests which can't be satisfied have to be
                 // canceled at this point
@@ -509,7 +515,9 @@ namespace hpx { namespace lcos { namespace local {
                 closed_ = true;
 
                 if (!buffer_.is_empty(l))
+                {
                     buffer_.cancel(e, l);
+                }
             }
 
         private:
@@ -539,9 +547,8 @@ namespace hpx { namespace lcos { namespace local {
       : public hpx::util::iterator_facade<channel_iterator<T>, T const,
             std::input_iterator_tag>
     {
-        typedef hpx::util::iterator_facade<channel_iterator<T>, T const,
-            std::input_iterator_tag>
-            base_type;
+        using base_type = hpx::util::iterator_facade<channel_iterator<T>,
+            T const, std::input_iterator_tag>;
 
     public:
         channel_iterator()
@@ -597,9 +604,8 @@ namespace hpx { namespace lcos { namespace local {
       : public hpx::util::iterator_facade<channel_async_iterator<T>,
             hpx::future<T>, std::input_iterator_tag, hpx::future<T>>
     {
-        typedef hpx::util::iterator_facade<channel_async_iterator<T>,
-            hpx::future<T>, std::input_iterator_tag, hpx::future<T>>
-            base_type;
+        using base_type = hpx::util::iterator_facade<channel_async_iterator<T>,
+            hpx::future<T>, std::input_iterator_tag, hpx::future<T>>;
 
     public:
         channel_async_iterator()
@@ -737,11 +743,11 @@ namespace hpx { namespace lcos { namespace local {
                 return channel_iterator<T>();
             }
 
-            channel_base const& range() const
+            channel_base const& range() const noexcept
             {
                 return *this;
             }
-            channel_base const& range(launch::sync_policy) const
+            channel_base const& range(launch::sync_policy) const noexcept
             {
                 return *this;
             }
@@ -751,7 +757,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             ///////////////////////////////////////////////////////////////////
-            channel_impl_base<T>* get_channel_impl() const
+            channel_impl_base<T>* get_channel_impl() const noexcept
             {
                 return channel_.get();
             }
@@ -766,7 +772,7 @@ namespace hpx { namespace lcos { namespace local {
     template <typename T>
     class channel : protected detail::channel_base<T>
     {
-        typedef detail::channel_base<T> base_type;
+        using base_type = detail::channel_base<T>;
 
     private:
         friend class channel_iterator<T>;
@@ -774,7 +780,7 @@ namespace hpx { namespace lcos { namespace local {
         friend class send_channel<T>;
 
     public:
-        typedef T value_type;
+        using value_type = T;
 
         channel()
           : base_type(new detail::unlimited_channel<T>())
@@ -793,7 +799,7 @@ namespace hpx { namespace lcos { namespace local {
     template <typename T>
     class one_element_channel : protected detail::channel_base<T>
     {
-        typedef detail::channel_base<T> base_type;
+        using base_type = detail::channel_base<T>;
 
     private:
         friend class channel_iterator<T>;
@@ -801,7 +807,7 @@ namespace hpx { namespace lcos { namespace local {
         friend class send_channel<T>;
 
     public:
-        typedef T value_type;
+        using value_type = T;
 
         one_element_channel()
           : base_type(new detail::one_element_channel<T>())
@@ -820,7 +826,7 @@ namespace hpx { namespace lcos { namespace local {
     template <typename T>
     class receive_channel : protected detail::channel_base<T>
     {
-        typedef detail::channel_base<T> base_type;
+        using base_type = detail::channel_base<T>;
 
     private:
         friend class channel_iterator<T>;
@@ -846,7 +852,7 @@ namespace hpx { namespace lcos { namespace local {
     template <typename T>
     class send_channel : private detail::channel_base<T>
     {
-        typedef detail::channel_base<T> base_type;
+        using base_type = detail::channel_base<T>;
 
     public:
         send_channel(channel<T> const& c)
@@ -900,9 +906,8 @@ namespace hpx { namespace lcos { namespace local {
       : public hpx::util::iterator_facade<channel_iterator<void>,
             util::unused_type const, std::input_iterator_tag>
     {
-        typedef hpx::util::iterator_facade<channel_iterator<void>,
-            util::unused_type const, std::input_iterator_tag>
-            base_type;
+        using base_type = hpx::util::iterator_facade<channel_iterator<void>,
+            util::unused_type const, std::input_iterator_tag>;
 
     public:
         channel_iterator()
@@ -955,6 +960,7 @@ namespace hpx { namespace lcos { namespace local {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <>
         class channel_base<void>
         {
@@ -1019,11 +1025,11 @@ namespace hpx { namespace lcos { namespace local {
                 return channel_iterator<void>();
             }
 
-            channel_base const& range() const
+            channel_base const& range() const noexcept
             {
                 return *this;
             }
-            channel_base const& range(launch::sync_policy) const
+            channel_base const& range(launch::sync_policy) const noexcept
             {
                 return *this;
             }
@@ -1033,7 +1039,8 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             ///////////////////////////////////////////////////////////////////
-            channel_impl_base<util::unused_type>* get_channel_impl() const
+            constexpr channel_impl_base<util::unused_type>* get_channel_impl()
+                const noexcept
             {
                 return channel_.get();
             }
@@ -1047,7 +1054,7 @@ namespace hpx { namespace lcos { namespace local {
     template <>
     class channel<void> : protected detail::channel_base<void>
     {
-        typedef detail::channel_base<void> base_type;
+        using base_type = detail::channel_base<void>;
 
     private:
         friend class channel_iterator<void>;
@@ -1055,7 +1062,7 @@ namespace hpx { namespace lcos { namespace local {
         friend class send_channel<void>;
 
     public:
-        typedef void value_type;
+        using value_type = void;
 
         channel()
           : base_type(new detail::unlimited_channel<util::unused_type>())
@@ -1073,7 +1080,7 @@ namespace hpx { namespace lcos { namespace local {
     template <>
     class one_element_channel<void> : protected detail::channel_base<void>
     {
-        typedef detail::channel_base<void> base_type;
+        using base_type = detail::channel_base<void>;
 
     private:
         friend class channel_iterator<void>;
@@ -1081,7 +1088,7 @@ namespace hpx { namespace lcos { namespace local {
         friend class send_channel<void>;
 
     public:
-        typedef void value_type;
+        using value_type = void;
 
         one_element_channel()
           : base_type(new detail::one_element_channel<util::unused_type>())
@@ -1100,7 +1107,7 @@ namespace hpx { namespace lcos { namespace local {
     template <>
     class receive_channel<void> : protected detail::channel_base<void>
     {
-        typedef detail::channel_base<void> base_type;
+        using base_type = detail::channel_base<void>;
 
     private:
         friend class channel_iterator<void>;
@@ -1126,7 +1133,7 @@ namespace hpx { namespace lcos { namespace local {
     template <>
     class send_channel<void> : private detail::channel_base<void>
     {
-        typedef detail::channel_base<void> base_type;
+        using base_type = detail::channel_base<void>;
 
     public:
         send_channel(channel<void> const& c)

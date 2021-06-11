@@ -19,6 +19,8 @@
 #include <utility>
 #include <vector>
 
+using namespace hpx::collectives;
+
 constexpr char const* gather_direct_basename = "/test/gather_direct/";
 
 void test_one_shot_use()
@@ -32,8 +34,9 @@ void test_one_shot_use()
         if (this_locality == 0)
         {
             hpx::future<std::vector<std::uint32_t>> overall_result =
-                hpx::collectives::gather_here(gather_direct_basename,
-                    std::uint32_t(42), num_localities, i);
+                gather_here(gather_direct_basename, std::uint32_t(42),
+                    num_sites_arg(num_localities), this_site_arg(this_locality),
+                    generation_arg(i));
 
             std::vector<std::uint32_t> sol = overall_result.get();
             for (std::size_t j = 0; j != sol.size(); ++j)
@@ -43,8 +46,9 @@ void test_one_shot_use()
         }
         else
         {
-            hpx::future<void> overall_result = hpx::collectives::gather_there(
-                gather_direct_basename, this_locality + 42, i);
+            hpx::future<void> overall_result =
+                gather_there(gather_direct_basename, this_locality + 42,
+                    this_site_arg(this_locality), generation_arg(i));
             overall_result.get();
         }
     }
@@ -56,16 +60,15 @@ void test_multiple_use()
     std::uint32_t this_locality = hpx::get_locality_id();
 
     // test functionality based on immediate local result value
-    auto gather_direct_client = hpx::collectives::create_communicator(
-        gather_direct_basename, num_localities);
+    auto gather_direct_client = create_communicator(gather_direct_basename,
+        num_sites_arg(num_localities), this_site_arg(this_locality));
 
     for (std::uint32_t i = 0; i != 10; ++i)
     {
         if (this_locality == 0)
         {
             hpx::future<std::vector<std::uint32_t>> overall_result =
-                hpx::collectives::gather_here(
-                    gather_direct_client, std::uint32_t(42));
+                gather_here(gather_direct_client, std::uint32_t(42));
 
             std::vector<std::uint32_t> sol = overall_result.get();
             for (std::size_t j = 0; j != sol.size(); ++j)
@@ -75,8 +78,8 @@ void test_multiple_use()
         }
         else
         {
-            hpx::future<void> overall_result = hpx::collectives::gather_there(
-                gather_direct_client, this_locality + 42);
+            hpx::future<void> overall_result =
+                gather_there(gather_direct_client, this_locality + 42);
             overall_result.get();
         }
     }

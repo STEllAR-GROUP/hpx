@@ -246,8 +246,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         struct copy_iteration
         {
             template <typename Iter>
-            HPX_HOST_DEVICE HPX_FORCEINLINE void operator()(
-                Iter part_begin, std::size_t part_size, std::size_t)
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                Iter part_begin, std::size_t part_size, std::size_t) const
             {
                 using hpx::get;
                 auto iters = part_begin.get_iterator_tuple();
@@ -265,11 +265,26 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter, typename Sent,
                 typename OutIter>
-            static util::in_out_result<InIter, OutIter> sequential(
-                ExPolicy, InIter first, Sent last, OutIter dest)
+            static constexpr std::enable_if_t<
+                !hpx::traits::is_random_access_iterator_v<InIter>,
+                util::in_out_result<InIter, OutIter>>
+            sequential(ExPolicy, InIter first, Sent last, OutIter dest)
             {
                 util::in_out_result<InIter, OutIter> result =
                     util::copy(first, last, dest);
+                util::copy_synchronize(first, dest);
+                return result;
+            }
+
+            template <typename ExPolicy, typename InIter, typename Sent,
+                typename OutIter>
+            static constexpr std::enable_if_t<
+                hpx::traits::is_random_access_iterator_v<InIter>,
+                util::in_out_result<InIter, OutIter>>
+            sequential(ExPolicy, InIter first, Sent last, OutIter dest)
+            {
+                util::in_out_result<InIter, OutIter> result =
+                    util::copy_n(first, detail::distance(first, last), dest);
                 util::copy_synchronize(first, dest);
                 return result;
             }
@@ -323,8 +338,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         template <typename FwdIter1, typename FwdIter2>
         struct copy_iter<FwdIter1, FwdIter2,
-            typename std::enable_if<
-                iterators_are_segmented<FwdIter1, FwdIter2>::value>::type>
+            std::enable_if_t<
+                iterators_are_segmented<FwdIter1, FwdIter2>::value>>
           : public copy<util::in_out_result<
                 typename hpx::traits::segmented_iterator_traits<
                     FwdIter1>::local_iterator,
@@ -335,8 +350,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         template <typename FwdIter1, typename FwdIter2>
         struct copy_iter<FwdIter1, FwdIter2,
-            typename std::enable_if<
-                iterators_are_not_segmented<FwdIter1, FwdIter2>::value>::type>
+            std::enable_if_t<
+                iterators_are_not_segmented<FwdIter1, FwdIter2>::value>>
           : public copy<util::in_out_result<FwdIter1, FwdIter2>>
         {
         };
@@ -346,9 +361,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value)>
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2>)>
     // clang-format on
     HPX_DEPRECATED_V(
         1, 6, "hpx::parallel::copy is deprecated, use hpx::copy instead")
@@ -374,10 +389,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             template <typename ExPolicy, typename InIter, typename OutIter>
-            static util::in_out_result<InIter, OutIter> sequential(
+            static constexpr util::in_out_result<InIter, OutIter> sequential(
                 ExPolicy, InIter first, std::size_t count, OutIter dest)
             {
-                return util::copy_n(first, count, dest);
+                util::in_out_result<InIter, OutIter> result =
+                    util::copy_n(first, count, dest);
+                util::copy_synchronize(first, dest);
+                return result;
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
@@ -416,9 +434,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIter1, typename Size,
         typename FwdIter2,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value)>
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2>)>
     // clang-format on
     HPX_DEPRECATED_V(
         1, 6, "hpx::parallel::copy_n is deprecated, use hpx::copy_n instead")
@@ -426,9 +444,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             util::in_out_result<FwdIter1, FwdIter2>>::type
         copy_n(ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest)
     {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
             "Required at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
             "Requires at least forward iterator.");
 
         // if count is representing a negative value, we do nothing
@@ -593,9 +611,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value &&
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2> &&
             hpx::is_invocable_v<Pred,
                 typename std::iterator_traits<FwdIter1>::value_type
             >
@@ -608,9 +626,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
             Pred&& pred)
     {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
             "Required at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
             "Requires at least forward iterator.");
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -637,9 +655,9 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
@@ -656,8 +674,8 @@ namespace hpx {
         // clang-format off
         template <typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value&&
-                hpx::traits::is_iterator<FwdIter2>::value
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
         friend FwdIter2 tag_fallback_dispatch(
@@ -680,9 +698,9 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter1, typename Size,
             typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -690,11 +708,11 @@ namespace hpx {
         tag_fallback_dispatch(hpx::copy_n_t, ExPolicy&& policy, FwdIter1 first,
             Size count, FwdIter2 dest)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value ||
-                    (hpx::is_sequenced_execution_policy<ExPolicy>::value &&
-                        hpx::traits::is_output_iterator<FwdIter2>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2> ||
+                    (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
+                        hpx::traits::is_output_iterator_v<FwdIter2>),
                 "Requires at least forward iterator or sequential execution.");
 
             // if count is representing a negative value, we do nothing
@@ -714,16 +732,16 @@ namespace hpx {
         // clang-format off
         template <typename FwdIter1, typename Size, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
         friend FwdIter2 tag_fallback_dispatch(
             hpx::copy_n_t, FwdIter1 first, Size count, FwdIter2 dest)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
                 "Required at least forward iterator.");
-            static_assert((hpx::traits::is_output_iterator<FwdIter2>::value),
+            static_assert((hpx::traits::is_output_iterator_v<FwdIter2>),
                 "Requires at least output iterator.");
 
             // if count is representing a negative value, we do nothing
@@ -752,9 +770,9 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Pred,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type
                 >
@@ -765,11 +783,11 @@ namespace hpx {
         tag_fallback_dispatch(hpx::copy_if_t, ExPolicy&& policy, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest, Pred&& pred)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value ||
-                    (hpx::is_sequenced_execution_policy<ExPolicy>::value &&
-                        hpx::traits::is_output_iterator<FwdIter2>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2> ||
+                    (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
+                        hpx::traits::is_output_iterator_v<FwdIter2>),
                 "Requires at least forward iterator or sequential execution.");
 
             return hpx::parallel::util::get_second_element(
@@ -783,8 +801,8 @@ namespace hpx {
         // clang-format off
         template <typename FwdIter1, typename FwdIter2, typename Pred,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type
                 >
@@ -793,9 +811,9 @@ namespace hpx {
         friend FwdIter2 tag_fallback_dispatch(hpx::copy_if_t, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest, Pred&& pred)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
                 "Required at least forward iterator.");
-            static_assert((hpx::traits::is_output_iterator<FwdIter2>::value),
+            static_assert((hpx::traits::is_output_iterator_v<FwdIter2>),
                 "Requires at least output iterator.");
 
             return hpx::parallel::util::get_second_element(

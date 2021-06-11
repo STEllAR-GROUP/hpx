@@ -50,18 +50,17 @@ namespace hpx { namespace traits {
         template <typename Future, typename F>
         struct future_then_result<Future, F,
             typename hpx::util::always_void<
-                typename hpx::util::invoke_result<F&, Future>::type>::type>
+                hpx::util::invoke_result_t<F&, Future>>::type>
         {
-            typedef
-                typename hpx::util::invoke_result<F&, Future>::type cont_result;
+            using cont_result = hpx::util::invoke_result_t<F&, Future>;
 
             // perform unwrapping of future<future<R>>
-            typedef typename util::lazy_conditional<
+            using result_type = util::lazy_conditional_t<
                 hpx::traits::detail::is_unique_future<cont_result>::value,
                 hpx::traits::future_traits<cont_result>,
-                hpx::util::identity<cont_result>>::type result_type;
+                hpx::util::identity<cont_result>>;
 
-            typedef hpx::lcos::future<result_type> type;
+            using type = hpx::lcos::future<result_type>;
         };
 
     }    // namespace detail
@@ -71,5 +70,8 @@ namespace hpx { namespace traits {
     struct future_then_result : detail::future_then_result<Future, F>
     {
     };
+
+    template <typename Future, typename F>
+    using future_then_result_t = typename future_then_result<Future, F>::type;
 
 }}    // namespace hpx::traits

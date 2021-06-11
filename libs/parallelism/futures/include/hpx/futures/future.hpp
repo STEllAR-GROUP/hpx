@@ -808,20 +808,21 @@ namespace hpx { namespace lcos { namespace detail {
                         "the future has no valid shared state");
                 }
 
-                state->set_on_completed(
-                    [this, receiver = std::move(receiver_)]() mutable {
-                        if (future_.has_value())
-                        {
-                            hpx::execution::experimental::set_value(
-                                std::move(receiver));
-                        }
-                        else if (future_.has_exception())
-                        {
-                            hpx::execution::experimental::set_error(
-                                std::move(receiver),
-                                future_.get_exception_ptr());
-                        }
-                    });
+                // The operation state has to be kept alive until set_value is
+                // called, which means that we don't need to move receiver and
+                // future into the on_completed callback.
+                state->set_on_completed([this]() mutable {
+                    if (future_.has_value())
+                    {
+                        hpx::execution::experimental::set_value(
+                            std::move(receiver_));
+                    }
+                    else if (future_.has_exception())
+                    {
+                        hpx::execution::experimental::set_error(
+                            std::move(receiver_), future_.get_exception_ptr());
+                    }
+                });
             }
             catch (...)
             {
@@ -841,20 +842,22 @@ namespace hpx { namespace lcos { namespace detail {
                     HPX_THROW_EXCEPTION(no_state, "operation_state::start",
                         "the future has no valid shared state");
                 }
-                state->set_on_completed(
-                    [this, receiver = std::move(receiver_)]() mutable {
-                        if (future_.has_value())
-                        {
-                            hpx::execution::experimental::set_value(
-                                std::move(receiver), future_.get());
-                        }
-                        else if (future_.has_exception())
-                        {
-                            hpx::execution::experimental::set_error(
-                                std::move(receiver),
-                                future_.get_exception_ptr());
-                        }
-                    });
+
+                // The operation state has to be kept alive until set_value is
+                // called, which means that we don't need to move receiver and
+                // future into the on_completed callback.
+                state->set_on_completed([this]() mutable {
+                    if (future_.has_value())
+                    {
+                        hpx::execution::experimental::set_value(
+                            std::move(receiver_), future_.get());
+                    }
+                    else if (future_.has_exception())
+                    {
+                        hpx::execution::experimental::set_error(
+                            std::move(receiver_), future_.get_exception_ptr());
+                    }
+                });
             }
             catch (...)
             {

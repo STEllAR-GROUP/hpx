@@ -24,6 +24,8 @@
 #include <boost/fusion/include/define_struct.hpp>
 #include <boost/fusion/include/io.hpp>
 
+#include <unistd.h>
+
 #include <cstdint>
 #include <fstream>
 #include <iterator>

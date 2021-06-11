@@ -16,11 +16,15 @@ set(async_cuda_headers
     hpx/async_cuda/cuda_executor.hpp
     hpx/async_cuda/cuda_exception.hpp
     hpx/async_cuda/cuda_future.hpp
+    hpx/async_cuda/cuda_polling_helper.hpp
     hpx/async_cuda/cublas_executor.hpp
     hpx/async_cuda/custom_blas_api.hpp
     hpx/async_cuda/custom_gpu_api.hpp
+    hpx/async_cuda/detail/cuda_debug.hpp
+    hpx/async_cuda/detail/cuda_event_callback.hpp
     hpx/async_cuda/get_targets.hpp
     hpx/async_cuda/target.hpp
+    hpx/async_cuda/transform_stream.hpp
 )
 
 # Default location is $HPX_ROOT/libs/async_cuda/include_compatibility
@@ -31,7 +35,9 @@ set(async_cuda_compat_headers
 )
 # cmake-format: on
 
-set(async_cuda_sources cuda_future.cpp cuda_target.cpp get_targets.cpp)
+set(async_cuda_sources cuda_event_callback.cpp cuda_future.cpp cuda_target.cpp
+                       get_targets.cpp
+)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(async_cuda_extra_module_dependencies

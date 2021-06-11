@@ -14,9 +14,10 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
-#include <hpx/synchronization/mutex.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/pack.hpp>
 
+#include <atomic>
 #include <exception>
 #include <tuple>
 #include <type_traits>
@@ -81,17 +82,21 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
                     predecessor_error_types<std::variant>, std::exception_ptr>>;
 
+            // We use a spinlock here to allow taking the lock on non-HPX threads.
+            using mutex_type = hpx::lcos::local::spinlock;
+
             struct state
             {
                 hpx::lcos::local::condition_variable cv;
-                hpx::lcos::local::mutex m;
-                bool set_called = false;
+                mutex_type m;
+                std::atomic<bool> set_called = false;
                 std::variant<std::monostate, error_type, value_type> v;
 
                 void wait()
                 {
+                    if (!set_called)
                     {
-                        std::unique_lock<hpx::lcos::local::mutex> l(m);
+                        std::unique_lock<mutex_type> l(m);
                         if (!set_called)
                         {
                             cv.wait(l);
@@ -128,8 +133,9 @@ namespace hpx { namespace execution { namespace experimental {
 
             void signal_set_called() noexcept
             {
-                std::unique_lock<hpx::lcos::local::mutex> l(st.m);
+                std::unique_lock<mutex_type> l(st.m);
                 st.set_called = true;
+                hpx::util::ignore_while_checking<decltype(l)> il(&l);
                 st.cv.notify_one();
             }
 

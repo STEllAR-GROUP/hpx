@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2017 Hartmut Kaiser
+# Copyright (c) 2007-2021 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0

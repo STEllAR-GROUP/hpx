@@ -46,7 +46,7 @@ endif()
 include(HPX_AddModule)
 add_hpx_module(
   full compute_cuda
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
   CUDA
   SOURCES ${compute_cuda_sources}
   HEADERS ${compute_cuda_headers}

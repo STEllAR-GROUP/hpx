@@ -24,16 +24,16 @@ namespace hpx { namespace components {
         // construction
         client() = default;
 
-        explicit client(naming::id_type const& id) noexcept
+        explicit client(naming::id_type const& id)
           : base_type(id)
         {
         }
-        explicit client(naming::id_type&& id) noexcept
+        explicit client(naming::id_type&& id)
           : base_type(std::move(id))
         {
         }
 
-        explicit client(future_type const& f)
+        explicit client(future_type const& f) noexcept
           : base_type(f)
         {
         }
@@ -41,20 +41,20 @@ namespace hpx { namespace components {
           : base_type(std::move(f))
         {
         }
-        client(future<naming::id_type>&& f)
+        client(future<naming::id_type>&& f) noexcept
           : base_type(std::move(f))
         {
         }
-        client(future<client>&& c) noexcept
+        client(future<client>&& c)
           : base_type(std::move(c))
         {
         }
 
-        client(client const& rhs)
+        client(client const& rhs) noexcept
           : base_type(rhs.shared_state_)
         {
         }
-        client(client&& rhs)
+        client(client&& rhs) noexcept
           : base_type(std::move(rhs.shared_state_))
         {
         }
@@ -71,28 +71,28 @@ namespace hpx { namespace components {
             return *this;
         }
 
-        client& operator=(future_type const& f)
+        client& operator=(future_type const& f) noexcept
         {
             base_type::operator=(f);
             return *this;
         }
-        client& operator=(future_type&& f)
+        client& operator=(future_type&& f) noexcept
         {
             base_type::operator=(std::move(f));
             return *this;
         }
-        client& operator=(future<naming::id_type>&& f)
+        client& operator=(future<naming::id_type>&& f) noexcept
         {
             base_type::operator=(std::move(f));
             return *this;
         }
 
-        client& operator=(client const& rhs)
+        client& operator=(client const& rhs) noexcept
         {
             base_type::operator=(rhs);
             return *this;
         }
-        client& operator=(client&& rhs)
+        client& operator=(client&& rhs) noexcept
         {
             base_type::operator=(std::move(rhs));
             return *this;

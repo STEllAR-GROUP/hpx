@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -51,6 +51,12 @@
 
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
+
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+// On Windows, make sure winsock.h is not included even if windows.h is
+// included before winsock2.h
+#define _WINSOCKAPI_
+#endif
 
 // clang-format off
 

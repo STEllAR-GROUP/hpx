@@ -20,19 +20,24 @@
 #include <utility>
 #include <vector>
 
+using namespace hpx::collectives;
+
 char const* gather_basename = "/test/gather/";
 
 int hpx_main()
 {
+    std::uint32_t here = hpx::get_locality_id();
+
     for (int i = 0; i < 10; ++i)
     {
         std::uint32_t value = hpx::get_locality_id();
 
-        if (hpx::get_locality_id() == 0)
+        if (here == 0)
         {
             hpx::future<std::vector<std::uint32_t>> overall_result =
-                hpx::collectives::gather_here(gather_basename, std::move(value),
-                    hpx::get_num_localities(hpx::launch::sync), i);
+                gather_here(gather_basename, std::move(value),
+                    num_sites_arg(hpx::get_num_localities(hpx::launch::sync)),
+                    this_site_arg(here), generation_arg(i));
 
             std::vector<std::uint32_t> sol = overall_result.get();
 
@@ -43,8 +48,8 @@ int hpx_main()
         }
         else
         {
-            hpx::future<void> overall_result = hpx::collectives::gather_there(
-                gather_basename, std::move(value), i);
+            hpx::future<void> overall_result = gather_there(gather_basename,
+                std::move(value), this_site_arg(here), generation_arg(i));
 
             overall_result.get();
         }

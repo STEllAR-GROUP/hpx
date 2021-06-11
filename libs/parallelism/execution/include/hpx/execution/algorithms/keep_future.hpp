@@ -40,11 +40,13 @@ namespace hpx { namespace execution { namespace experimental {
                             "the future has no valid shared state asdasd");
                     }
 
-                    state->set_on_completed(
-                        [this, receiver = std::move(receiver)]() mutable {
-                            hpx::execution::experimental::set_value(
-                                std::move(receiver), std::move(future));
-                        });
+                    // The operation state has to be kept alive until set_value
+                    // is called, which means that we don't need to move
+                    // receiver and future into the on_completed callback.
+                    state->set_on_completed([this]() mutable {
+                        hpx::execution::experimental::set_value(
+                            std::move(receiver), std::move(future));
+                    });
                 }
                 catch (...)
                 {

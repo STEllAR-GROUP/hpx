@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,50 +21,46 @@
 #include <utility>
 
 namespace hpx { namespace lcos { namespace local {
+
     template <typename Sig>
     class packaged_task;
 
     template <typename R, typename... Ts>
     class packaged_task<R(Ts...)>
     {
-        typedef util::unique_function_nonser<R(Ts...)> function_type;
+        using function_type = util::unique_function_nonser<R(Ts...)>;
 
     public:
         // construction and destruction
-        packaged_task()
-          : function_()
-          , promise_()
-        {
-        }
+        packaged_task() = default;
 
-        template <typename F, typename FD = typename std::decay<F>::type,
-            typename Enable = typename std::enable_if<
-                !std::is_same<FD, packaged_task>::value &&
-                is_invocable_r_v<R, FD&, Ts...>>::type>
+        template <typename F, typename FD = std::decay_t<F>,
+            typename Enable =
+                std::enable_if_t<!std::is_same<FD, packaged_task>::value &&
+                    is_invocable_r_v<R, FD&, Ts...>>>
         explicit packaged_task(F&& f)
           : function_(std::forward<F>(f))
           , promise_()
         {
         }
 
-        template <typename Allocator, typename F,
-            typename FD = typename std::decay<F>::type,
-            typename Enable = typename std::enable_if<
-                !std::is_same<FD, packaged_task>::value &&
-                is_invocable_r_v<R, FD&, Ts...>>::type>
+        template <typename Allocator, typename F, typename FD = std::decay_t<F>,
+            typename Enable =
+                std::enable_if_t<!std::is_same<FD, packaged_task>::value &&
+                    is_invocable_r_v<R, FD&, Ts...>>>
         explicit packaged_task(std::allocator_arg_t, Allocator const& a, F&& f)
           : function_(std::forward<F>(f))
           , promise_(std::allocator_arg, a)
         {
         }
 
-        packaged_task(packaged_task&& rhs)
+        packaged_task(packaged_task&& rhs) noexcept
           : function_(std::move(rhs.function_))
           , promise_(std::move(rhs.promise_))
         {
         }
 
-        packaged_task& operator=(packaged_task&& rhs)
+        packaged_task& operator=(packaged_task&& rhs) noexcept
         {
             if (this != &rhs)
             {
