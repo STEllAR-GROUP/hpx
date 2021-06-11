@@ -73,6 +73,7 @@ _CSS = '''
     }
     img {
         width: 100%;
+        max-width: 50em;
     }
 
 '''
