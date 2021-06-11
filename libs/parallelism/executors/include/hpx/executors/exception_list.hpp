@@ -166,13 +166,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #if defined(HPX_HAVE_DATAPAR)
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
-        struct handle_exception_impl<hpx::execution::dataseq_task_policy,
-            Result> : handle_exception_task_impl<Result>
+        struct handle_exception_impl<hpx::execution::simd_task_policy, Result>
+          : handle_exception_task_impl<Result>
         {
         };
 
         template <typename Result>
-        struct handle_exception_impl<hpx::execution::datapar_task_policy,
+        struct handle_exception_impl<hpx::execution::simdpar_task_policy,
             Result> : handle_exception_task_impl<Result>
         {
         };

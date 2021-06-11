@@ -190,7 +190,7 @@ namespace hpx { namespace parallel { namespace util {
                 std::pair<InIter, OutIter>>::type
             call(InIter first, InIter last, OutIter dest, F&& f)
             {
-                return util::transform_loop_n<hpx::execution::dataseq_policy>(
+                return util::transform_loop_n<hpx::execution::simd_policy>(
                     first, std::distance(first, last), dest,
                     std::forward<F>(f));
             }
@@ -214,7 +214,7 @@ namespace hpx { namespace parallel { namespace util {
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_dispatch(hpx::parallel::util::transform_loop_t,
-            hpx::execution::dataseq_policy, IterB it, IterE end, OutIter dest,
+            hpx::execution::simd_policy, IterB it, IterE end, OutIter dest,
             F&& f)
     {
         auto ret = detail::datapar_transform_loop<IterB>::call(
@@ -229,8 +229,8 @@ namespace hpx { namespace parallel { namespace util {
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_dispatch(hpx::parallel::util::transform_loop_t,
-            hpx::execution::dataseq_task_policy, IterB it, IterE end,
-            OutIter dest, F&& f)
+            hpx::execution::simd_task_policy, IterB it, IterE end, OutIter dest,
+            F&& f)
     {
         auto ret = detail::datapar_transform_loop<IterB>::call(
             it, end, dest, std::forward<F>(f));
@@ -259,9 +259,9 @@ namespace hpx { namespace parallel { namespace util {
                 std::pair<InIter, OutIter>>::type
             call(InIter first, InIter last, OutIter dest, F&& f)
             {
-                return util::transform_loop_n_ind<
-                    hpx::execution::dataseq_policy>(first,
-                    std::distance(first, last), dest, std::forward<F>(f));
+                return util::transform_loop_n_ind<hpx::execution::simd_policy>(
+                    first, std::distance(first, last), dest,
+                    std::forward<F>(f));
             }
 
             template <typename InIter, typename OutIter, typename F>
@@ -283,7 +283,7 @@ namespace hpx { namespace parallel { namespace util {
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_dispatch(hpx::parallel::util::transform_loop_ind_t,
-            hpx::execution::dataseq_policy, IterB it, IterE end, OutIter dest,
+            hpx::execution::simd_policy, IterB it, IterE end, OutIter dest,
             F&& f)
     {
         auto ret = detail::datapar_transform_loop_ind<IterB>::call(
@@ -298,8 +298,8 @@ namespace hpx { namespace parallel { namespace util {
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_dispatch(hpx::parallel::util::transform_loop_ind_t,
-            hpx::execution::dataseq_task_policy, IterB it, IterE end,
-            OutIter dest, F&& f)
+            hpx::execution::simd_task_policy, IterB it, IterE end, OutIter dest,
+            F&& f)
     {
         auto ret = detail::datapar_transform_loop_ind<IterB>::call(
             it, end, dest, std::forward<F>(f));
@@ -423,7 +423,7 @@ namespace hpx { namespace parallel { namespace util {
                 F&& f)
             {
                 auto ret = util::transform_binary_loop_n<
-                    hpx::execution::datapar_policy>(first1,
+                    hpx::execution::simdpar_policy>(first1,
                     std::distance(first1, last1), first2, dest,
                     std::forward<F>(f));
 
@@ -464,7 +464,7 @@ namespace hpx { namespace parallel { namespace util {
                     std::distance(first1, last1), std::distance(first2, last2));
 
                 auto ret = util::transform_binary_loop_n<
-                    hpx::execution::datapar_policy>(
+                    hpx::execution::simdpar_policy>(
                     first1, count, first2, dest, std::forward<F>(f));
 
                 return util::in_in_out_result<InIter1, InIter2, OutIter>{

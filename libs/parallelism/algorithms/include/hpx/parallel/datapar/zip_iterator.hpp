@@ -112,7 +112,7 @@ namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         template <typename Tuple, typename... Iter, std::size_t... Is>
-        void aligned_pack(Tuple const& value,
+        void aligned_pack(Tuple& value,
             hpx::util::zip_iterator<Iter...> const& iter,
             hpx::util::index_pack<Is...>)
         {
@@ -126,7 +126,7 @@ namespace hpx { namespace parallel { namespace traits {
         }
 
         template <typename Tuple, typename... Iter, std::size_t... Is>
-        void unaligned_pack(Tuple const& value,
+        void unaligned_pack(Tuple& value,
             hpx::util::zip_iterator<Iter...> const& iter,
             hpx::util::index_pack<Is...>)
         {
@@ -145,7 +145,7 @@ namespace hpx { namespace parallel { namespace traits {
     {
         template <typename V, typename... Iter>
         static void aligned(
-            V const& value, hpx::util::zip_iterator<Iter...> const& iter)
+            V& value, hpx::util::zip_iterator<Iter...> const& iter)
         {
             traits::detail::aligned_pack(value, iter,
                 typename hpx::util::make_index_pack<sizeof...(Iter)>::type());
@@ -153,7 +153,7 @@ namespace hpx { namespace parallel { namespace traits {
 
         template <typename V, typename... Iter>
         static void unaligned(
-            V const& value, hpx::util::zip_iterator<Iter...> const& iter)
+            V& value, hpx::util::zip_iterator<Iter...> const& iter)
         {
             traits::detail::unaligned_pack(value, iter,
                 typename hpx::util::make_index_pack<sizeof...(Iter)>::type());

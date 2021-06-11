@@ -192,53 +192,53 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 #if defined(HPX_HAVE_DATAPAR)
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    struct algorithm_result_impl<hpx::execution::dataseq_task_policy, T>
+    struct algorithm_result_impl<hpx::execution::simd_task_policy, T>
       : algorithm_result_impl<hpx::execution::sequenced_task_policy, T>
     {
     };
 
     template <>
-    struct algorithm_result_impl<hpx::execution::dataseq_task_policy, void>
+    struct algorithm_result_impl<hpx::execution::simd_task_policy, void>
       : algorithm_result_impl<hpx::execution::sequenced_task_policy, void>
     {
     };
 
     template <typename Executor, typename Parameters, typename T>
     struct algorithm_result_impl<
-        hpx::execution::dataseq_task_policy_shim<Executor, Parameters>, T>
+        hpx::execution::simd_task_policy_shim<Executor, Parameters>, T>
       : algorithm_result_impl<hpx::execution::sequenced_task_policy, T>
     {
     };
 
     template <typename Executor, typename Parameters>
     struct algorithm_result_impl<
-        hpx::execution::dataseq_task_policy_shim<Executor, Parameters>, void>
+        hpx::execution::simd_task_policy_shim<Executor, Parameters>, void>
       : algorithm_result_impl<hpx::execution::sequenced_task_policy, void>
     {
     };
 
     template <typename T>
-    struct algorithm_result_impl<hpx::execution::datapar_task_policy, T>
+    struct algorithm_result_impl<hpx::execution::simdpar_task_policy, T>
       : algorithm_result_impl<hpx::execution::parallel_task_policy, T>
     {
     };
 
     template <>
-    struct algorithm_result_impl<hpx::execution::datapar_task_policy, void>
+    struct algorithm_result_impl<hpx::execution::simdpar_task_policy, void>
       : algorithm_result_impl<hpx::execution::parallel_task_policy, void>
     {
     };
 
     template <typename Executor, typename Parameters, typename T>
     struct algorithm_result_impl<
-        hpx::execution::datapar_task_policy_shim<Executor, Parameters>, T>
+        hpx::execution::simdpar_task_policy_shim<Executor, Parameters>, T>
       : algorithm_result_impl<hpx::execution::parallel_task_policy, T>
     {
     };
 
     template <typename Executor, typename Parameters>
     struct algorithm_result_impl<
-        hpx::execution::datapar_task_policy_shim<Executor, Parameters>, void>
+        hpx::execution::simdpar_task_policy_shim<Executor, Parameters>, void>
       : algorithm_result_impl<hpx::execution::parallel_task_policy, void>
     {
     };

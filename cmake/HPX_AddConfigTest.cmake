@@ -531,6 +531,15 @@ function(hpx_check_for_cxx20_lambda_capture)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_cxx20_experimental_simd)
+  add_hpx_config_test(
+    HPX_WITH_CXX20_EXPERIMENTAL_SIMD
+    SOURCE cmake/tests/cxx20_experimental_simd.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_cxx20_no_unique_address_attribute)
   add_hpx_config_test(
     HPX_WITH_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
