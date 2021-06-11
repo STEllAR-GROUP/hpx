@@ -20,10 +20,4 @@ else()
   set(PYUTILS_COMPILER "${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_VERSION}")
 endif()
 
-file(
-  COPY .
-  DESTINATION .
-  FILES_MATCHING
-  PATTERN *.py
-)
 configure_file(pyutils/buildinfo.py.in pyutils/buildinfo.py)
