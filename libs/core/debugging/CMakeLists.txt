@@ -29,7 +29,7 @@ add_hpx_module(
   HEADERS ${debugging_headers}
   COMPAT_HEADERS ${debugging_compat_headers}
   EXCLUDE_FROM_GLOBAL_HEADER "hpx/debugging/backtrace/backtrace.hpp"
-  DEPENDENCIES ASIO::standalone_asio
+  DEPENDENCIES Asio::asio
   MODULE_DEPENDENCIES hpx_config
   CMAKE_SUBDIRS examples tests
 )
