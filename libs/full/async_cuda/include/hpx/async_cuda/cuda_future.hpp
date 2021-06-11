@@ -45,18 +45,6 @@ namespace hpx { namespace cuda { namespace experimental {
         struct future_data;
 
         // -------------------------------------------------------------
-        // a callback on an NVidia cuda thread should be registered with
-        // hpx to ensure any thread local operations are valid
-        // @TODO - get rid of this
-        struct runtime_registration_wrapper
-        {
-            runtime_registration_wrapper(hpx::runtime* rt);
-            ~runtime_registration_wrapper();
-            hpx::runtime* rt_;
-            bool registered_;
-        };
-
-        // -------------------------------------------------------------
         // helper struct to delete future data in destructor
         template <typename Allocator>
         struct release_on_exit
@@ -169,7 +157,6 @@ namespace hpx { namespace cuda { namespace experimental {
             {
                 future_data* this_ = static_cast<future_data*>(user_data);
 
-                runtime_registration_wrapper wrap(this_->rt_);
                 release_on_exit<Allocator> on_exit(this_);
 
                 if (error != cudaSuccess)
