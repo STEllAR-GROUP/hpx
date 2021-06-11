@@ -33,23 +33,6 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    struct HPX_DEPRECATED_V(
-        1, 5, "result_of is deprecated, use invoke_result instead.") result_of;
-
-#if defined(HPX_GCC_VERSION)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-    template <typename F, typename... Ts>
-    struct result_of<F(Ts...)> : detail::invoke_result_impl<F(Ts...)>
-    {
-    };
-#if defined(HPX_GCC_VERSION)
-#pragma GCC diagnostic pop
-#endif
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
     struct invoke_result : detail::invoke_result_impl<F && (Ts && ...)>
     {

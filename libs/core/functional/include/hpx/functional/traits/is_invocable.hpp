@@ -52,26 +52,6 @@ namespace hpx {
         };
     }    // namespace detail
 
-    namespace traits {
-        ///////////////////////////////////////////////////////////////////////////
-        template <typename T, typename R = void>
-        struct HPX_DEPRECATED_V(1, 5,
-            "is_callable is deprecated, use is_invocable instead.") is_callable;
-
-#if defined(HPX_GCC_VERSION)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        template <typename F, typename... Ts, typename R>
-        struct is_callable<F(Ts...), R>
-          : hpx::detail::is_invocable_impl<F(Ts...), R>
-        {
-        };
-#if defined(HPX_GCC_VERSION)
-#pragma GCC diagnostic pop
-#endif
-    }    // namespace traits
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
     struct is_invocable : hpx::detail::is_invocable_impl<F && (Ts && ...), void>
