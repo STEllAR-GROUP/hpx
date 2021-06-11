@@ -21,9 +21,6 @@ status_computation_and_artifacts_storage() {
 
 trap "status_computation_and_artifacts_storage" EXIT
 
-# Args for the pyutils suite
-logfile=jenkins-hpx-${configuration_name}.log
-
 orig_src_dir="$(pwd)"
 src_dir="/dev/shm/hpx/src"
 build_dir="/dev/shm/hpx/build"
@@ -31,6 +28,8 @@ build_dir="/dev/shm/hpx/build"
 # Copy source directory to /dev/shm for faster builds
 mkdir -p "${build_dir}"
 cp -r "${orig_src_dir}" "${src_dir}"
+# Args for the pyutils suite
+logfile=${build_dir}/reports/jenkins-hpx-${configuration_name}.log
 envfile=${src_dir}/.jenkins/cscs-perftests/env-${configuration_name}.sh
 # Copy the perftest utility in the build dir
 mkdir -p ${build_dir}/tools
