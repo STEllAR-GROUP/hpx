@@ -214,9 +214,6 @@ list(
   sphinx_libs_source_files
   "index.rst"
   "overview.rst"
-  "core/modules.rst"
-  "full/modules.rst"
-  "parallelism/modules.rst"
 )
 
 foreach(lib ${HPX_LIBS})
