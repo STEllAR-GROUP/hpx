@@ -216,6 +216,7 @@ namespace hpx {
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -236,6 +237,34 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // uninitialized_move
     namespace detail {
         /// \cond NOINTERNAL
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename InIter1, typename FwdIter2, typename Cond>
+        util::in_out_result<InIter1, FwdIter2> sequential_uninitialized_move(
+            InIter1 first, FwdIter2 dest, Cond cond)
+        {
+            using value_type =
+                typename std::iterator_traits<FwdIter2>::value_type;
+
+            FwdIter2 current = dest;
+            try
+            {
+                for (/* */; cond(first, current); (void) ++first, ++current)
+                {
+                    ::new (std::addressof(*current))
+                        value_type(std::move(*first));
+                }
+                return util::in_out_result<InIter1, FwdIter2>{first, current};
+            }
+            catch (...)
+            {
+                for (/* */; dest != current; ++dest)
+                {
+                    (*dest).~value_type();
+                }
+                throw;
+            }
+        }
 
         // provide our own implementation of std::uninitialized_move as some
         // versions of MSVC horribly fail at compiling it for some types T
@@ -355,7 +384,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static util::in_out_result<InIter1, FwdIter2> sequential(
                 ExPolicy, InIter1 first, Sent last, FwdIter2 dest)
             {
-                return std_uninitialized_move(first, last, dest);
+                return sequential_uninitialized_move(first, dest,
+                    [last](InIter1 first, FwdIter2 current) -> bool {
+                        return first != last;
+                    });
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
@@ -447,6 +479,49 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic pop
 #endif
     }
+
+    /////////////////////////////////////////////////////////////////////////////
+    // uninitialized_move_sent
+    namespace detail {
+        /// \cond NOINTERNAL
+        template <typename IterPair>
+        struct uninitialized_move_sent
+          : public detail::algorithm<uninitialized_move_sent<IterPair>,
+                IterPair>
+        {
+            uninitialized_move_sent()
+              : uninitialized_move_sent::algorithm("uninitialized_move_sent")
+            {
+            }
+
+            template <typename ExPolicy, typename InIter1, typename Sent1,
+                typename FwdIter2, typename Sent2>
+            static util::in_out_result<InIter1, FwdIter2> sequential(ExPolicy,
+                InIter1 first, Sent1 last, FwdIter2 dest, Sent2 last_d)
+            {
+                return sequential_uninitialized_move(first, dest,
+                    [last, last_d](InIter1 first, FwdIter2 current) -> bool {
+                        return !(first == last || current == last_d);
+                    });
+            }
+
+            template <typename ExPolicy, typename Iter, typename Sent1,
+                typename FwdIter2, typename Sent2>
+            static typename util::detail::algorithm_result<ExPolicy,
+                util::in_out_result<Iter, FwdIter2>>::type
+            parallel(ExPolicy&& policy, Iter first, Sent1 last, FwdIter2 dest,
+                Sent2 last_d)
+            {
+                std::size_t dist1 = detail::distance(first, last);
+                std::size_t dist2 = detail::distance(dest, last_d);
+                std::size_t dist = dist1 <= dist2 ? dist1 : dist2;
+
+                return parallel_sequential_uninitialized_move_n(
+                    std::forward<ExPolicy>(policy), first, dist, dest);
+            }
+        };
+        /// \endcond
+    }    // namespace detail
 
     /////////////////////////////////////////////////////////////////////////////
     // uninitialized_move_n
