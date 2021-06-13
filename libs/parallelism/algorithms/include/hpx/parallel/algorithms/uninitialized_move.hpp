@@ -10,10 +10,10 @@
 
 #if defined(DOXYGEN)
 namespace hpx {
-
-    /// Copies the elements in the range, defined by [first, last), to an
+    /// Moves the elements in the range, defined by [first, last), to an
     /// uninitialized memory area beginning at \a dest. If an exception is
-    /// thrown during the copy operation, the function has no effects.
+    /// thrown during the initialization, some objects in [first, last) are
+    /// left in a valid but unspecified state.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
@@ -31,21 +31,22 @@ namespace hpx {
     ///                     algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     ///
-    /// The assignments in the parallel \a uninitialized_copy algorithm invoked
+    /// The assignments in the parallel \a uninitialized_move algorithm invoked
     /// without an execution policy object will execute in sequential order in
     /// the calling thread.
     ///
-    /// \returns  The \a uninitialized_copy algorithm returns \a FwdIter.
-    ///           The \a uninitialized_copy algorithm returns the output
+    /// \returns  The \a uninitialized_move algorithm returns \a FwdIter.
+    ///           The \a uninitialized_move algorithm returns the output
     ///           iterator to the element in the destination range, one past
-    ///           the last element copied.
+    ///           the last element moved.
     ///
     template <typename InIter, typename FwdIter>
-    FwdIter uninitialized_copy(InIter first, InIter last, FwdIter dest);
+    FwdIter uninitialized_move(InIter first, InIter last, FwdIter dest);
 
-    /// Copies the elements in the range, defined by [first, last), to an
+    /// Moves the elements in the range, defined by [first, last), to an
     /// uninitialized memory area beginning at \a dest. If an exception is
-    /// thrown during the copy operation, the function has no effects.
+    /// thrown during the initialization, some objects in [first, last) are
+    /// left in a valid but unspecified state.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
@@ -69,42 +70,39 @@ namespace hpx {
     ///                     algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     ///
-    /// The assignments in the parallel \a uninitialized_copy algorithm invoked
+    /// The assignments in the parallel \a uninitialized_move algorithm invoked
     /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The assignments in the parallel \a uninitialized_copy algorithm invoked
+    /// The assignments in the parallel \a uninitialized_move algorithm invoked
     /// with an execution policy object of type \a parallel_policy or
     /// \a parallel_task_policy are permitted to execute in an
     /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a uninitialized_copy algorithm returns a
+    /// \returns  The \a uninitialized_move algorithm returns a
     ///           \a hpx::future<FwdIter2>, if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns \a FwdIter2 otherwise.
-    ///           The \a uninitialized_copy algorithm returns the output
+    ///           The \a uninitialized_move algorithm returns the output
     ///           iterator to the element in the destination range, one past
-    ///           the last element copied.
+    ///           the last element moved.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-    uninitialized_copy(
+    uninitialized_move(
         ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest);
 
-    /// Copies the elements in the range [first, first + count), starting from
+    /// Moves the elements in the range [first, first + count), starting from
     /// first and proceeding to first + count - 1., to another range beginning
-    /// at dest. If an exception is thrown during the copy operation, the
-    /// function has no effects.
+    /// at dest. If an exception is
+    /// thrown during the initialization, some objects in [first, first + count)
+    /// are left in a valid but unspecified state.
     ///
-    /// \note   Complexity: Performs exactly \a count assignments, if
-    ///         count > 0, no assignments otherwise.
+    /// \note   Complexity: Performs exactly \a count movements, if
+    ///         count > 0, no move operations otherwise.
     ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
     /// \tparam FwdIter1      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
@@ -115,45 +113,34 @@ namespace hpx {
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param count        Refers to the number of elements starting at
     ///                     \a first the algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     ///
-    /// The assignments in the parallel \a uninitialized_copy_n algorithm
+    /// The assignments in the parallel \a uninitialized_move_n algorithm
     /// invoked with an execution policy object of type
     /// \a sequenced_policy execute in sequential order in the
     /// calling thread.
     ///
-    /// The assignments in the parallel \a uninitialized_copy_n algorithm
-    /// invoked with an execution policy object of type
-    /// \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an
-    /// unordered fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a uninitialized_copy_n algorithm returns a
-    ///           \a hpx::future<FwdIter2> if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a FwdIter2 otherwise.
-    ///           The \a uninitialized_copy_n algorithm returns the output
+    /// \returns  The \a uninitialized_move_n algorithm returns a
+    ///           returns \a FwdIter2.
+    ///           The \a uninitialized_move_n algorithm returns the output
     ///           iterator to the element in the destination range, one past
     ///           the last element copied.
     ///
     template <typename InIter, typename Size, typename FwdIter>
-    FwdIter uninitialized_copy_n(InIter first, Size count, FwdIter dest);
+    FwdIter uninitialized_move_n(InIter first, Size count, FwdIter dest);
 
-    /// Copies the elements in the range [first, first + count), starting from
+    /// Moves the elements in the range [first, first + count), starting from
     /// first and proceeding to first + count - 1., to another range beginning
-    /// at dest. If an exception is thrown during the copy operation, the
-    /// function has no effects.
+    /// at dest. If an exception is
+    /// thrown during the initialization, some objects in [first, first + count)
+    /// are left in a valid but unspecified state.
     ///
-    /// \note   Complexity: Performs exactly \a count assignments, if
-    ///         count > 0, no assignments otherwise.
+    /// \note   Complexity: Performs exactly \a count movements, if
+    ///         count > 0, no move operations otherwise.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -177,31 +164,31 @@ namespace hpx {
     ///                     \a first the algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     ///
-    /// The assignments in the parallel \a uninitialized_copy_n algorithm
+    /// The assignments in the parallel \a uninitialized_move_n algorithm
     /// invoked with an execution policy object of type
     /// \a sequenced_policy execute in sequential order in the
     /// calling thread.
     ///
-    /// The assignments in the parallel \a uninitialized_copy_n algorithm
+    /// The assignments in the parallel \a uninitialized_move_n algorithm
     /// invoked with an execution policy object of type
     /// \a parallel_policy or
     /// \a parallel_task_policy are permitted to execute in an
     /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a uninitialized_copy_n algorithm returns a
+    /// \returns  The \a uninitialized_move_n algorithm returns a
     ///           \a hpx::future<FwdIter2> if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns \a FwdIter2 otherwise.
-    ///           The \a uninitialized_copy_n algorithm returns the output
+    ///           The \a uninitialized_move_n algorithm returns the output
     ///           iterator to the element in the destination range, one past
     ///           the last element copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename Size,
         typename FwdIter2>
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-    uninitialized_copy_n(
+    uninitialized_move_n(
         ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest);
 }    // namespace hpx
 
@@ -586,59 +573,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Moves the elements in the range [first, first + count), starting from
-    /// first and proceeding to first + count - 1., to another range beginning
-    /// at dest. If an exception is
-    /// thrown during the initialization, some objects in [first, first + count)
-    /// are left in a valid but unspecified state.
-    ///
-    /// \note   Complexity: Performs exactly \a count movements, if
-    ///         count > 0, no move operations otherwise.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam Size        The type of the argument specifying the number of
-    ///                     elements to apply \a f to.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param count        Refers to the number of elements starting at
-    ///                     \a first the algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    ///
-    /// The assignments in the parallel \a uninitialized_move_n algorithm
-    /// invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
-    ///
-    /// The assignments in the parallel \a uninitialized_move_n algorithm
-    /// invoked with an execution policy object of type
-    /// \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an
-    /// unordered fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a uninitialized_move_n algorithm returns a
-    ///           \a hpx::future<std::pair<FwdIter1, FwdIter2>> if the execution
-    ///           policy is of type \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a std::pair<FwdIter1, FwdIter2> otherwise.
-    ///           The \a uninitialized_move_n algorithm returns the pair of
-    ///           the input iterator to the element past in the source range
-    ///           and an output iterator to the element in the destination
-    ///           range, one past the last element moved.
-    ///
     template <typename ExPolicy, typename FwdIter1, typename Size,
         typename FwdIter2,
         HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
