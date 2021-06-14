@@ -48,32 +48,6 @@ cat jenkins-hpx-${configuration_name}.err
 
 # Get build status
 status_file="jenkins-hpx-${configuration_name}-ctest-status.txt"
-if [[ -f "${status_file}" && "$(cat ${status_file})" -eq "0" ]]; then
-    github_commit_status="success"
-else
-    github_commit_status="failure"
-fi
-
-if [[ -n "${ghprbPullId:-}" ]]; then
-    # Extract just the organization and repo names "org/repo" from the full URL
-    github_commit_repo="$(echo $ghprbPullLink | sed -n 's/https:\/\/github.com\/\(.*\)\/pull\/[0-9]*/\1/p')"
-
-    # Get the CDash dashboard build id
-    cdash_build_id="$(cat jenkins-hpx-${configuration_name}-cdash-build-id.txt)"
-
-    # Extract actual token from GITHUB_TOKEN (in the form "username:token")
-    github_token=$(echo ${GITHUB_TOKEN} | cut -f2 -d':')
-
-    # Set GitHub status with CDash url
-    .jenkins/common/set_github_status.sh \
-        "${github_token}" \
-        "${github_commit_repo}" \
-        "${ghprbActualCommit}" \
-        "${github_commit_status}" \
-        "${configuration_name}" \
-        "${cdash_build_id}" \
-        "jenkins/cscs-perftests"
-fi
 
 set -e
 exit $(cat ${status_file})
