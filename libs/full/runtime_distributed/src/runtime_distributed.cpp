@@ -215,10 +215,6 @@ namespace hpx {
             threads::detail::network_background_callback_type(
                 &detail::network_background_callback));
 
-        // initialize our TLS
-        runtime::init_tss();
-        util::reinit_construct();    // call only after TLS was initialized
-
 #if defined(HPX_HAVE_NETWORKING)
         parcel_handler_notifier_ = runtime_distributed::get_notification_policy(
             "parcel-thread", runtime_local::os_thread_type::parcel_thread);
@@ -234,14 +230,8 @@ namespace hpx {
         // This needs to happen first
         runtime::init();
 
-        runtime_distributed*& runtime_distributed_ =
-            get_runtime_distributed_ptr();
-        if (nullptr == runtime_distributed_)
-        {
-            HPX_ASSERT(nullptr == threads::thread_self::get_self());
-
-            runtime_distributed_ = this;
-        }
+        init_global_data();
+        util::reinit_construct();
 
         LPROGRESS_;
 
@@ -633,6 +623,8 @@ namespace hpx {
             runtime_support_->stopped();    // re-activate shutdown HPX-thread
             thread_manager_->stop(blocking);    // wait for thread manager
 
+            deinit_global_data();
+
             // this disables all logging from the main thread
             deinit_tss_helper("main-thread", 0);
 
@@ -686,6 +678,8 @@ namespace hpx {
         // wait for thread manager to exit
         runtime_support_->stopped();        // re-activate shutdown HPX-thread
         thread_manager_->stop(blocking);    // wait for thread manager
+
+        deinit_global_data();
 
         // this disables all logging from the main thread
         deinit_tss_helper("main-thread", 0);
@@ -1356,17 +1350,6 @@ namespace hpx {
         char const* pool_name, char const* postfix, bool service_thread,
         error_code& ec)
     {
-        // initialize our TSS
-        runtime::init_tss();
-        runtime_distributed*& runtime_distributed_ =
-            get_runtime_distributed_ptr();
-        if (nullptr == runtime_distributed_)
-        {
-            HPX_ASSERT(nullptr == threads::thread_self::get_self());
-
-            runtime_distributed_ = this;
-        }
-
         // set the thread's name, if it's not already set
         HPX_ASSERT(detail::thread_name().empty());
 
@@ -1437,15 +1420,13 @@ namespace hpx {
     void runtime_distributed::deinit_tss_helper(
         char const* context, std::size_t global_thread_num)
     {
+        threads::reset_continuation_recursion_count();
+
         // call thread-specific user-supplied on_stop handler
         if (on_stop_func_)
         {
             on_stop_func_(global_thread_num, global_thread_num, "", context);
         }
-
-        // reset our TSS
-        runtime::deinit_tss();
-        get_runtime_distributed_ptr() = nullptr;
 
         // reset PAPI support
         thread_support_->unregister_thread();
@@ -1509,9 +1490,6 @@ namespace hpx {
     bool runtime_distributed::register_thread(char const* name,
         std::size_t global_thread_num, bool service_thread, error_code& ec)
     {
-        if (nullptr != get_runtime_ptr())
-            return false;    // already registered
-
         // prefix thread name with locality number, if needed
         std::string locality = locality_prefix(get_config());
 
@@ -1702,8 +1680,27 @@ namespace hpx {
 
     runtime_distributed*& get_runtime_distributed_ptr()
     {
-        static thread_local runtime_distributed* runtime_distributed_ = nullptr;
+        static runtime_distributed* runtime_distributed_ = nullptr;
         return runtime_distributed_;
+    }
+
+    void runtime_distributed::init_global_data()
+    {
+        runtime_distributed*& runtime_distributed_ =
+            get_runtime_distributed_ptr();
+        HPX_ASSERT(!runtime_distributed_);
+        HPX_ASSERT(nullptr == threads::thread_self::get_self());
+        runtime_distributed_ = this;
+    }
+
+    void runtime_distributed::deinit_global_data()
+    {
+        runtime_distributed*& runtime_distributed_ =
+            get_runtime_distributed_ptr();
+        HPX_ASSERT(runtime_distributed_);
+        runtime_distributed_ = nullptr;
+
+        runtime::deinit_global_data();
     }
 
     naming::gid_type const& get_locality()
