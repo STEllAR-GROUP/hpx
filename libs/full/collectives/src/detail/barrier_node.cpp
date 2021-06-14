@@ -266,14 +266,12 @@ namespace hpx { namespace lcos { namespace detail {
 
         // Once we notified our children, we mark ourself ready.
         hpx::intrusive_ptr<barrier_node> this_(this);
-        hpx::when_all(futures)
-            .then(hpx::launch::sync,
-                [this_ = std::move(this_)](future<void> f) {
-                    // Trigger possible errors...
-                    f.get();
-                    this_->broadcast_promise_.set_value();
-                })
-            .get();
+        hpx::when_all(futures).then(
+            hpx::launch::sync, [this_ = std::move(this_)](future<void> f) {
+                // Trigger possible errors...
+                f.get();
+                this_->broadcast_promise_.set_value();
+            });
 #else
         HPX_ASSERT(false);
 #endif
