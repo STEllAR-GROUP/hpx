@@ -429,7 +429,7 @@ namespace hpx { namespace threads { namespace detail {
                         // background_running is true. If it was false, this task
                         // was given back to the scheduler.
                         if (*background_running)
-                            idle_loop_count = callbacks.max_idle_loop_count_;
+                            idle_loop_count = 0;
                     }
                     // Force yield...
                     hpx::execution_base::this_thread::yield("background_work");
@@ -629,7 +629,7 @@ namespace hpx { namespace threads { namespace detail {
                     policies::fast_idle_mode))
             {
                 enable_stealing_staged = enable_stealing_staged &&
-                    idle_loop_count < params.max_idle_loop_count_ / 2;
+                    idle_loop_count > params.max_idle_loop_count_ / 2;
             }
 
             if (HPX_LIKELY(thrd ||
@@ -639,7 +639,7 @@ namespace hpx { namespace threads { namespace detail {
                 tfunc_time_wrapper tfunc_time_collector(idle_rate);
                 HPX_ASSERT(thrd->get_scheduler_base() == &scheduler);
 
-                idle_loop_count = params.max_idle_loop_count_;
+                idle_loop_count = 0;
                 ++busy_loop_count;
 
                 may_exit = false;
@@ -859,7 +859,7 @@ namespace hpx { namespace threads { namespace detail {
             // if nothing else has to be done either wait or terminate
             else
             {
-                --idle_loop_count;
+                ++idle_loop_count;
 
                 if (scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
                         running, idle_loop_count, enable_stealing_staged,
@@ -922,8 +922,7 @@ namespace hpx { namespace threads { namespace detail {
                             {
                                 // Otherwise, keep idling for some time
                                 if (!may_exit)
-                                    idle_loop_count =
-                                        params.max_idle_loop_count_;
+                                    idle_loop_count = 0;
                                 may_exit = true;
                             }
                         }
@@ -934,7 +933,7 @@ namespace hpx { namespace threads { namespace detail {
                         policies::fast_idle_mode)))
                 {
                     // speed up idle suspend if no work was stolen
-                    idle_loop_count -= params.max_idle_loop_count_ / 256;
+                    idle_loop_count += params.max_idle_loop_count_ / 256;
                     added = std::size_t(-1);
                 }
 
@@ -978,7 +977,7 @@ namespace hpx { namespace threads { namespace detail {
             if (scheduler.custom_polling_function() ==
                 policies::detail::polling_status::busy)
             {
-                idle_loop_count = params.max_idle_loop_count_;
+                idle_loop_count = 0;
             }
 
             // something went badly wrong, give up
@@ -1019,10 +1018,10 @@ namespace hpx { namespace threads { namespace detail {
                         idle_loop_count);
                 }
             }
-            else if (idle_loop_count < 0 || may_exit)
+            else if (idle_loop_count > params.max_idle_loop_count_ || may_exit)
             {
-                if (idle_loop_count < 0)
-                    idle_loop_count = params.max_idle_loop_count_;
+                if (idle_loop_count > params.max_idle_loop_count_)
+                    idle_loop_count = 0;
 
                 // call back into invoking context
                 if (!params.outer_.empty())
