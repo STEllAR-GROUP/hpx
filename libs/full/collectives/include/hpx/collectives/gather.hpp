@@ -252,7 +252,7 @@ namespace hpx { namespace collectives {
 
         auto gather_data_direct =
             [this_site](communicator&& c,
-                T&& local_result) -> hpx::future<std::vector<arg_type>> {
+                arg_type&& local_result) -> hpx::future<std::vector<arg_type>> {
             using action_type = typename detail::communicator_server::
                 template communication_get_action<
                     traits::communication::gather_tag,
