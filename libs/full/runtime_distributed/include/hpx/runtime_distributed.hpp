@@ -377,6 +377,9 @@ namespace hpx {
             util::function_nonser<runtime::hpx_main_function_type> const& func,
             int& result);
 
+        void init_global_data();
+        void deinit_global_data();
+
         void wait_helper(
             std::mutex& mtx, std::condition_variable& cond, bool& running);
 

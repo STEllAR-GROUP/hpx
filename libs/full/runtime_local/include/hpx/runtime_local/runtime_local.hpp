@@ -393,8 +393,8 @@ namespace hpx {
         }
 
     protected:
-        void init_tss();
-        void deinit_tss();
+        void init_global_data();
+        void deinit_global_data();
 
         threads::thread_result_type run_helper(
             util::function_nonser<runtime::hpx_main_function_type> const& func,
