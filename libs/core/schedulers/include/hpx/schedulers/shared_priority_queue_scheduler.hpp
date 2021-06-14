@@ -535,7 +535,8 @@ namespace hpx { namespace threads { namespace policies {
                         debug::dec<2>(domain), "Q", debug::dec<3>(q_index));
                     return result;
                 }
-                if (!steal_numa)
+
+                if (steal_core)
                 {
                     if (q_counts_[domain] > 1)
                     {
@@ -556,7 +557,8 @@ namespace hpx { namespace threads { namespace policies {
                         }
                     }
                 }
-                else
+
+                if (steal_numa)
                 {
                     // try other numa domains BP/HP
                     for (std::size_t d = 1; d < num_domains_; ++d)
