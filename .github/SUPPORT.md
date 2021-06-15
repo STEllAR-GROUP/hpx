@@ -17,7 +17,7 @@ get support for using HPX.
 
 ### Real-time Chat
 
-* #ste||ar on [Freenode](https://webchat.freenode.net/): this is the best option
+* #ste||ar on [Libra.Chat](https://libera.chat/): this is the best option
   to get in contact with us as most of the developers are available on this
   channel. Check out the [channel archives](http://irclog.cct.lsu.edu/ste~b~~b~ar)
   for past conversations.
