@@ -101,10 +101,6 @@ namespace hpx {
     /// \note   Complexity: Performs exactly \a count assignments, if
     ///         count > 0, no assignments otherwise.
     ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
     /// \tparam FwdIter1      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
@@ -115,8 +111,6 @@ namespace hpx {
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param count        Refers to the number of elements starting at
@@ -124,22 +118,11 @@ namespace hpx {
     /// \param dest         Refers to the beginning of the destination range.
     ///
     /// The assignments in the parallel \a uninitialized_copy_n algorithm
-    /// invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
-    ///
-    /// The assignments in the parallel \a uninitialized_copy_n algorithm
-    /// invoked with an execution policy object of type
-    /// \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an
-    /// unordered fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
+    /// invoked without an execution policy object execute in sequential order
+    /// in the calling thread.
     ///
     /// \returns  The \a uninitialized_copy_n algorithm returns a
-    ///           \a hpx::future<FwdIter2> if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a FwdIter2 otherwise.
+    ///           returns \a FwdIter2.
     ///           The \a uninitialized_copy_n algorithm returns the output
     ///           iterator to the element in the destination range, one past
     ///           the last element copied.

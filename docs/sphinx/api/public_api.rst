@@ -585,6 +585,9 @@ Functions
 - :cpp:func:`hpx::ranges::uninitialized_value_construct`
 - :cpp:func:`hpx::ranges::uninitialized_value_construct_n`
 
+- :cpp:func:`hpx::ranges::uninitialized_copy`
+- :cpp:func:`hpx::ranges::uninitialized_copy_n`
+
 Header ``hpx/numeric.hpp``
 ==========================
 
