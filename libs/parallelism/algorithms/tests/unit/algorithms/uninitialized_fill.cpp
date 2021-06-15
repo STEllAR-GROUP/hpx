@@ -19,6 +19,26 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+/*template <typename IteratorTag>
+void test_uninitialized_fill(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    hpx::parallel::uninitialized_fill(iterator(std::begin(c)), iterator(std::end(c)), 10);
+
+    // verify values
+    std::size_t count = 0;
+    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
+        HPX_TEST_EQ(v, std::size_t(10));
+        ++count;
+    });
+    HPX_TEST_EQ(count, c.size());
+}*/
+
 template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_fill(ExPolicy policy, IteratorTag)
 {
