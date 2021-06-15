@@ -128,7 +128,7 @@ namespace hpx {
     ///           returns \a FwdIter2.
     ///           The \a uninitialized_move_n algorithm returns the output
     ///           iterator to the element in the destination range, one past
-    ///           the last element copied.
+    ///           the last element moved.
     ///
     template <typename InIter, typename Size, typename FwdIter>
     FwdIter uninitialized_move_n(InIter first, Size count, FwdIter dest);
@@ -183,7 +183,7 @@ namespace hpx {
     ///           returns \a FwdIter2 otherwise.
     ///           The \a uninitialized_move_n algorithm returns the output
     ///           iterator to the element in the destination range, one past
-    ///           the last element copied.
+    ///           the last element moved.
     ///
     template <typename ExPolicy, typename FwdIter1, typename Size,
         typename FwdIter2>
@@ -248,35 +248,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 for (/* */; dest != current; ++dest)
                 {
                     (*dest).~value_type();
-                }
-                throw;
-            }
-        }
-
-        // provide our own implementation of std::uninitialized_move as some
-        // versions of MSVC horribly fail at compiling it for some types T
-        template <typename InIter1, typename Sent, typename InIter2>
-        util::in_out_result<InIter1, InIter2> std_uninitialized_move(
-            InIter1 first, Sent last, InIter2 d_first)
-        {
-            using value_type =
-                typename std::iterator_traits<InIter2>::value_type;
-
-            InIter2 current = d_first;
-            try
-            {
-                for (/* */; first != last; ++first, (void) ++current)
-                {
-                    ::new (std::addressof(*current))
-                        value_type(std::move(*first));
-                }
-                return util::in_out_result<InIter1, InIter2>{first, current};
-            }
-            catch (...)
-            {
-                for (/* */; d_first != current; ++d_first)
-                {
-                    (*d_first).~value_type();
                 }
                 throw;
             }
@@ -371,8 +342,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static util::in_out_result<InIter1, FwdIter2> sequential(
                 ExPolicy, InIter1 first, Sent last, FwdIter2 dest)
             {
-                return sequential_uninitialized_move(first, dest,
-                    [last](InIter1 first, FwdIter2 current) -> bool {
+                return sequential_uninitialized_move(
+                    first, dest, [last](InIter1 first, FwdIter2) -> bool {
                         return first != last;
                     });
             }
@@ -692,7 +663,7 @@ namespace hpx {
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::v1::detail::is_negative(count))
             {
-                return std::make_pair<InIter, FwdIter>(first, dest);
+                return std::pair<InIter, FwdIter>(first, dest);
             }
 
             return parallel::util::get_pair(

@@ -33,7 +33,7 @@ namespace hpx { namespace ranges {
     ///                     sentinel type must be a sentinel for InIter2.
     ///
     /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     that will be copied from
+    ///                     that will be moved from
     /// \param last1        Refers to sentinel value denoting the end of the
     ///                     sequence of elements the algorithm will be applied
     /// \param first2       Refers to the beginning of the destination range.
@@ -47,9 +47,9 @@ namespace hpx { namespace ranges {
     /// \returns  The \a uninitialized_move algorithm returns an
     ///           \a in_out_result<InIter, FwdIter>.
     ///           The \a uninitialized_move algorithm returns an input iterator
-    ///           to one past the last element copied from and the output
+    ///           to one past the last element moved from and the output
     ///           iterator to the element in the destination range, one past
-    ///           the last element copied.
+    ///           the last element moved.
     ///
     template <typename InIter, typename Sent1, typename FwdIter, typename Sent2>
     hpx::parallel::util::in_out_result<InIter, FwdIter> uninitialized_move(
@@ -81,7 +81,7 @@ namespace hpx { namespace ranges {
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     that will be copied from
+    ///                     that will be moved from
     /// \param last1        Refers to sentinel value denoting the end of the
     ///                     sequence of elements the algorithm will be applied.
     /// \param first2       Refers to the beginning of the destination range.
@@ -104,9 +104,9 @@ namespace hpx { namespace ranges {
     ///           or \a parallel_task_policy and
     ///           returns \a in_out_result<InIter, FwdIter> otherwise.
     ///           The \a uninitialized_move algorithm returns an input iterator
-    ///           to one past the last element copied from and the output
+    ///           to one past the last element moved from and the output
     ///           iterator to the element in the destination range, one past
-    ///           the last element copied.
+    ///           the last element moved.
     ///
     template <typename ExPolicy, typename FwdIter1, typename Sent1,
         typename FwdIter2, typename Sent2>
@@ -130,9 +130,9 @@ namespace hpx { namespace ranges {
     ///                     meet the requirements of an forward iterator.
     ///
     /// \param rng1         Refers to the range from which the elements
-    ///                     will be copied from
+    ///                     will be moved from
     /// \param rng2         Refers to the range to which the elements
-    ///                     will be copied to
+    ///                     will be moved to
     ///
     /// The assignments in the parallel \a uninitialized_move algorithm invoked
     /// without an execution policy object will execute in sequential order in
@@ -143,9 +143,9 @@ namespace hpx { namespace ranges {
     ///           ::iterator_type, typename hpx::traits::range_traits<Rng2>
     ///           ::iterator_type>.
     ///           The \a uninitialized_move algorithm returns an input iterator
-    ///           to one past the last element copied from and the output
+    ///           to one past the last element moved from and the output
     ///           iterator to the element in the destination range, one past
-    ///           the last element copied.
+    ///           the last element moved.
     ///
     template <typename Rng1, typename Rng2>
     hpx::parallel::util::in_out_result<
@@ -174,9 +174,9 @@ namespace hpx { namespace ranges {
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param rng1         Refers to the range from which the elements
-    ///                     will be copied from
+    ///                     will be moved from
     /// \param rng2         Refers to the range to which the elements
-    ///                     will be copied to
+    ///                     will be moved to
     ///
     /// The assignments in the parallel \a uninitialized_move algorithm invoked
     /// with an execution policy object of type \a sequenced_policy
@@ -196,9 +196,9 @@ namespace hpx { namespace ranges {
     ///             typename hpx::traits::range_traits<Rng1>::iterator_type
     ///           , typename hpx::traits::range_traits<Rng2>::iterator_type>
     ///           otherwise. The \a uninitialized_move algorithm returns the
-    ///           input iterator to one past the last element copied from and
+    ///           input iterator to one past the last element moved from and
     ///           the output iterator to the element in the destination range,
-    ///           one past the last element copied.
+    ///           one past the last element moved.
     ///
     template <typename ExPolicy, typename Rng1, typename Rng2>
     typename parallel::util::detail::algorithm_result<ExPolicy,
@@ -229,7 +229,7 @@ namespace hpx { namespace ranges {
     ///                     sentinel type must be a sentinel for FwdIter.
     ///
     /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     that will be copied from
+    ///                     that will be moved from
     /// \param count        Refers to the number of elements starting at
     ///                     \a first the algorithm will be applied to.
     /// \param first2       Refers to the beginning of the destination range.
@@ -245,7 +245,7 @@ namespace hpx { namespace ranges {
     ///           \a in_out_result<InIter, FwdIter>.
     ///           The \a uninitialized_move_n algorithm returns the output
     ///           iterator to the element in the destination range, one past
-    ///           the last element copied.
+    ///           the last element moved.
     ///
     template <typename InIter, typename Size, typename FwdIter, typename Sent2>
     hpx::parallel::util::in_out_result<InIter, FwdIter> uninitialized_move_n(
@@ -279,7 +279,7 @@ namespace hpx { namespace ranges {
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     that will be copied from
+    ///                     that will be moved from
     /// \param count        Refers to the number of elements starting at
     ///                     \a first the algorithm will be applied to.
     /// \param first2       Refers to the beginning of the destination range.
@@ -305,7 +305,7 @@ namespace hpx { namespace ranges {
     ///           returns \a FwdIter2 otherwise.
     ///           The \a uninitialized_move_n algorithm returns the output
     ///           iterator to the element in the destination range, one past
-    ///           the last element copied.
+    ///           the last element moved.
     ///
     template <typename ExPolicy, typename FwdIter1, typename Size,
         typename FwdIter2, typename Sent2>

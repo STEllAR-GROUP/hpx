@@ -19,6 +19,28 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_uninitialized_move_n(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    hpx::uninitialized_move_n(iterator(std::begin(c)), c.size(), std::begin(d));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_move_n(ExPolicy policy, IteratorTag)
 {
@@ -72,6 +94,7 @@ void test_uninitialized_move_n_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_uninitialized_move_n()
 {
+    test_uninitialized_move_n(IteratorTag());
     test_uninitialized_move_n(hpx::execution::seq, IteratorTag());
     test_uninitialized_move_n(hpx::execution::par, IteratorTag());
     test_uninitialized_move_n(hpx::execution::par_unseq, IteratorTag());
