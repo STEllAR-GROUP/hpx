@@ -17,12 +17,11 @@ get support for using HPX.
 
 ### Real-time Chat
 
-* #ste||ar on [Libra.Chat](https://libera.chat/): this is the best option
+* #ste||ar on [Libera.Chat](https://libera.chat/): this is the best option
   to get in contact with us as most of the developers are available on this
   channel. Check out the [channel archives](http://irclog.cct.lsu.edu/ste~b~~b~ar)
-  for past conversations.
-* #hpx on [matrix.org](https://matrix.to/#/#hpx:matrix.org): this channel
-  is bridged to the IRC channel.
+  for past conversations. The channel can also be accessed through
+  [Matrix](https://matrix.to/#/#ste||ar:libera.chat).
 * Slack ([registration](https://cpplang.now.sh/)): The
   [`#hpx`](https://cpplang.slack.com/messages/C68QLPZB3) channel is another
   place where people usually offer support.
