@@ -30,7 +30,8 @@ void test_uninitialized_move(IteratorTag)
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
-    hpx::uninitialized_move(iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
+    hpx::uninitialized_move(
+        iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),

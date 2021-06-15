@@ -576,6 +576,9 @@ Functions
 - :cpp:func:`hpx::parallel::v1::uninitialized_value_construct`
 - :cpp:func:`hpx::parallel::v1::uninitialized_value_construct_n`
 
+- :cpp:func:`hpx::ranges::uninitialized_move`
+- :cpp:func:`hpx::ranges::uninitialized_move_n`
+
 Header ``hpx/numeric.hpp``
 ==========================
 

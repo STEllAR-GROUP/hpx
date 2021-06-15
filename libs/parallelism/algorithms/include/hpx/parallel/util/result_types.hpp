@@ -103,7 +103,8 @@ namespace hpx { namespace parallel { namespace util {
     hpx::future<std::pair<I, O>> get_pair(
         hpx::future<util::in_out_result<I, O>>&& f)
     {
-        return hpx::make_future<std::pair<I, O>>(std::move(f), [](util::in_out_result<I, O>&& p) {
+        return hpx::make_future<std::pair<I, O>>(
+            std::move(f), [](util::in_out_result<I, O>&& p) {
                 return std::pair<I, O>{p.in, p.out};
             });
     }
