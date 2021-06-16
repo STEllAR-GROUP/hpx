@@ -110,6 +110,10 @@ namespace hpx { namespace agas { namespace server {
             // increase reference count
             if (raw_gid == gid)
             {
+                // REVIEW: do we need to add the credit of the argument to the table?
+                naming::detail::add_credit_to_gid(*(it->second), credits);
+
+                l.unlock();
                 LAGAS_(info).format(
                     "symbol_namespace::bind, key({1}), gid({2}), "
                     "old_credit({3}), new_credit({4})",
@@ -118,15 +122,14 @@ namespace hpx { namespace agas { namespace server {
                     naming::detail::get_credit_from_gid(*(it->second)) +
                         credits);
 
-                // REVIEW: do we need to add the credit of the argument to the table?
-                naming::detail::add_credit_to_gid(*(it->second), credits);
-
                 return true;
             }
 
             if (LAGAS_ENABLED(info))
             {
                 naming::detail::add_credit_to_gid(gid, credits);
+
+                l.unlock();
                 LAGAS_(info).format(
                     "symbol_namespace::bind, key({1}), gid({2}), "
                     "response(no_success)",
@@ -190,7 +193,12 @@ namespace hpx { namespace agas { namespace server {
                         naming::detail::split_gid_if_needed(*current_gid).get();
 
                     // trigger the lco
-                    set_lco_value(id, std::move(new_gid));
+                    set_lco_value(id, new_gid);
+
+                    LAGAS_(info).format(
+                        "symbol_namespace::bind, notify: key({1}), "
+                        "stored_gid({2}), new_gid({3})",
+                        key, *current_gid, new_gid);
                 }
             }
         }
@@ -228,11 +236,13 @@ namespace hpx { namespace agas { namespace server {
         std::shared_ptr<naming::gid_type> current_gid(it->second);
 
         l.unlock();
+
         naming::gid_type gid =
             naming::detail::split_gid_if_needed(*current_gid).get();
 
         LAGAS_(info).format(
-            "symbol_namespace::resolve, key({1}), gid({2})", key, gid);
+            "symbol_namespace::resolve, key({1}), stored_gid({2}), gid({3})",
+            key, *current_gid, gid);
 
         return gid;
     }    // }}}
@@ -243,7 +253,7 @@ namespace hpx { namespace agas { namespace server {
             counter_data_.unbind_.time_, counter_data_.unbind_.enabled_);
         counter_data_.increment_unbind_count();
 
-        std::lock_guard<mutex_type> l(mutex_);
+        std::unique_lock<mutex_type> l(mutex_);
 
         gid_table_type::iterator it = gids_.find(key);
         gid_table_type::iterator end = gids_.end();
@@ -260,6 +270,8 @@ namespace hpx { namespace agas { namespace server {
         naming::gid_type const gid = *(it->second);
 
         gids_.erase(it);
+
+        l.unlock();
 
         LAGAS_(info).format(
             "symbol_namespace::unbind, key({1}), gid({2})", key, gid);
@@ -331,6 +343,8 @@ namespace hpx { namespace agas { namespace server {
         std::unique_lock<mutex_type> l(mutex_);
 
         bool handled = false;
+        naming::gid_type new_gid;
+
         if (call_for_past_events)
         {
             gid_table_type::iterator it = gids_.find(name);
@@ -343,14 +357,19 @@ namespace hpx { namespace agas { namespace server {
                 // object alive
                 {
                     util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
-                    naming::gid_type new_gid =
+                    new_gid =
                         naming::detail::split_gid_if_needed(*current_gid).get();
 
                     // trigger the lco
                     handled = true;
 
                     // trigger LCO as name is already bound to an id
-                    set_lco_value(lco, std::move(new_gid));
+                    set_lco_value(lco, new_gid);
+
+                    LAGAS_(info).format(
+                        "symbol_namespace::on_event, notify: key({1}), "
+                        "stored_gid({2}), new_gid({3})",
+                        name, *current_gid, new_gid);
                 }
             }
         }
@@ -358,7 +377,7 @@ namespace hpx { namespace agas { namespace server {
         if (!handled)
         {
             on_event_data_map_type::iterator it = on_event_data_.insert(
-                on_event_data_map_type::value_type(std::move(name), lco));
+                on_event_data_map_type::value_type(name, lco));
 
             // This overload of insert always returns the iterator pointing
             // to the inserted value. It should never point to end
@@ -367,7 +386,7 @@ namespace hpx { namespace agas { namespace server {
         }
         l.unlock();
 
-        LAGAS_(info).format("symbol_namespace::on_event");
+        LAGAS_(info).format("symbol_namespace::on_event: name({1})", name);
 
         return true;
     }    // }}}
