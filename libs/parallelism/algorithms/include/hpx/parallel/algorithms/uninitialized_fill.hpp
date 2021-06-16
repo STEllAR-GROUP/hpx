@@ -8,8 +8,193 @@
 
 #pragma once
 
+#if defined(DOXYGEN)
+namespace hpx {
+
+    /// Copies the elements in the range, defined by [first, last), to an
+    /// uninitialized memory area beginning at \a dest. If an exception is
+    /// thrown during the copy operation, the function has no effects.
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    ///
+    /// \tparam InIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// The assignments in the parallel \a uninitialized_copy algorithm invoked
+    /// without an execution policy object will execute in sequential order in
+    /// the calling thread.
+    ///
+    /// \returns  The \a uninitialized_copy algorithm returns \a FwdIter.
+    ///           The \a uninitialized_copy algorithm returns the output
+    ///           iterator to the element in the destination range, one past
+    ///           the last element copied.
+    ///
+    template <typename InIter, typename FwdIter>
+    FwdIter uninitialized_copy(InIter first, InIter last, FwdIter dest);
+
+    /// Copies the elements in the range, defined by [first, last), to an
+    /// uninitialized memory area beginning at \a dest. If an exception is
+    /// thrown during the copy operation, the function has no effects.
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// The assignments in the parallel \a uninitialized_copy algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a uninitialized_copy algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an
+    /// unordered fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a uninitialized_copy algorithm returns a
+    ///           \a hpx::future<FwdIter2>, if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a FwdIter2 otherwise.
+    ///           The \a uninitialized_copy algorithm returns the output
+    ///           iterator to the element in the destination range, one past
+    ///           the last element copied.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    uninitialized_copy(
+        ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest);
+
+    /// Copies the elements in the range [first, first + count), starting from
+    /// first and proceeding to first + count - 1., to another range beginning
+    /// at dest. If an exception is thrown during the copy operation, the
+    /// function has no effects.
+    ///
+    /// \note   Complexity: Performs exactly \a count assignments, if
+    ///         count > 0, no assignments otherwise.
+    ///
+    /// \tparam FwdIter1      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     elements to apply \a f to.
+    /// \tparam FwdIter2     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param count        Refers to the number of elements starting at
+    ///                     \a first the algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// The assignments in the parallel \a uninitialized_copy_n algorithm
+    /// invoked without an execution policy object execute in sequential order
+    /// in the calling thread.
+    ///
+    /// \returns  The \a uninitialized_copy_n algorithm returns a
+    ///           returns \a FwdIter2.
+    ///           The \a uninitialized_copy_n algorithm returns the output
+    ///           iterator to the element in the destination range, one past
+    ///           the last element copied.
+    ///
+    template <typename InIter, typename Size, typename FwdIter>
+    FwdIter uninitialized_copy_n(InIter first, Size count, FwdIter dest);
+
+    /// Copies the elements in the range [first, first + count), starting from
+    /// first and proceeding to first + count - 1., to another range beginning
+    /// at dest. If an exception is thrown during the copy operation, the
+    /// function has no effects.
+    ///
+    /// \note   Complexity: Performs exactly \a count assignments, if
+    ///         count > 0, no assignments otherwise.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     elements to apply \a f to.
+    /// \tparam FwdIter2     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param count        Refers to the number of elements starting at
+    ///                     \a first the algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// The assignments in the parallel \a uninitialized_copy_n algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequenced_policy execute in sequential order in the
+    /// calling thread.
+    ///
+    /// The assignments in the parallel \a uninitialized_copy_n algorithm
+    /// invoked with an execution policy object of type
+    /// \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an
+    /// unordered fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a uninitialized_copy_n algorithm returns a
+    ///           \a hpx::future<FwdIter2> if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a FwdIter2 otherwise.
+    ///           The \a uninitialized_copy_n algorithm returns the output
+    ///           iterator to the element in the destination range, one past
+    ///           the last element copied.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename Size,
+        typename FwdIter2>
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    uninitialized_copy_n(
+        ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest);
+}    // namespace hpx
+
+#else    // DOXYGEN
+
 #include <hpx/config.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/type_support/void_guard.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -192,18 +377,32 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           otherwise.
     ///
     template <typename ExPolicy, typename FwdIter, typename T>
+    HPX_DEPRECATED_V(1, 7,
+        "hpx::parallel::uninitialized_fill is deprecated, use "
+        "hpx::uninitialized_fill "
+        "instead")
     inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy>::type>::type
-    uninitialized_fill(
-        ExPolicy&& policy, FwdIter first, FwdIter last, T const& value)
+        uninitialized_fill(
+            ExPolicy&& policy, FwdIter first, FwdIter last, T const& value)
     {
         static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
             "Required at least forward iterator.");
 
-        detail::uninitialized_fill<FwdIter>().call(
-            std::forward<ExPolicy>(policy), first, last, value);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+        using result_type =
+            typename hpx::parallel::util::detail::algorithm_result<
+                ExPolicy>::type;
 
-        return util::detail::algorithm_result<ExPolicy>::get();
+        return hpx::util::void_guard<result_type>(),
+               hpx::parallel::v1::detail::uninitialized_fill<FwdIter>().call(
+                   std::forward<ExPolicy>(policy), first, last, value);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -312,22 +511,140 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           otherwise.
     ///
     template <typename ExPolicy, typename FwdIter, typename Size, typename T>
+    HPX_DEPRECATED_V(1, 7,
+        "hpx::parallel::uninitialized_fill_n is deprecated, use "
+        "hpx::uninitialized_fill_n "
+        "instead")
     inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type>::type
-    uninitialized_fill_n(
-        ExPolicy&& policy, FwdIter first, Size count, T const& value)
+        uninitialized_fill_n(
+            ExPolicy&& policy, FwdIter first, Size count, T const& value)
     {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+        static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
             "Required at least forward iterator.");
 
         // if count is representing a negative value, we do nothing
         if (detail::is_negative(count))
         {
             return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
-                first);
+                std::move(first));
         }
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::uninitialized_fill_n<FwdIter>().call(
             std::forward<ExPolicy>(policy), first, std::size_t(count), value);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
+
+namespace hpx {
+    ///////////////////////////////////////////////////////////////////////////
+    // DPO for hpx::uninitialized_fill
+    HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_fill_t final
+      : hpx::functional::tag_fallback<uninitialized_fill_t>
+    {
+        // clang-format off
+        template <typename FwdIter, typename T,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_forward_iterator<FwdIter>::value
+            )>
+        // clang-format on
+        friend void tag_fallback_dispatch(hpx::uninitialized_fill_t,
+            FwdIter first, FwdIter last, T const& value)
+        {
+            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+                "Requires at least forward iterator.");
+
+            hpx::parallel::v1::detail::uninitialized_fill<FwdIter>().call(
+                hpx::execution::seq, first, last, value);
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter, typename T,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_forward_iterator<FwdIter>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
+        tag_fallback_dispatch(hpx::uninitialized_fill_t, ExPolicy&& policy,
+            FwdIter first, FwdIter last, T const& value)
+        {
+            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+                "Requires at least forward iterator.");
+
+            using result_type =
+                typename hpx::parallel::util::detail::algorithm_result<
+                    ExPolicy>::type;
+
+            return hpx::util::void_guard<result_type>(),
+                   hpx::parallel::v1::detail::uninitialized_fill<FwdIter>()
+                       .call(
+                           std::forward<ExPolicy>(policy), first, last, value);
+        }
+
+    } uninitialized_fill{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // DPO for hpx::uninitialized_fill_n
+    HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_fill_n_t final
+      : hpx::functional::tag_fallback<uninitialized_fill_n_t>
+    {
+        // clang-format off
+        template <typename FwdIter, typename Size, typename T,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_forward_iterator<FwdIter>::value
+            )>
+        // clang-format on
+        friend FwdIter tag_fallback_dispatch(
+            hpx::uninitialized_fill_n_t, FwdIter first, Size count, T const& value)
+        {
+            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+                "Requires at least forward iterator.");
+
+            // if count is representing a negative value, we do nothing
+            if (hpx::parallel::v1::detail::is_negative(count))
+            {
+                return first;
+            }
+
+            return hpx::parallel::v1::detail::uninitialized_fill_n<FwdIter>()
+                .call(hpx::execution::seq, first, std::size_t(count), value);
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter, typename Size, typename T,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_forward_iterator<FwdIter>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter>::type
+        tag_fallback_dispatch(hpx::uninitialized_fill_n_t, ExPolicy&& policy,
+            FwdIter first, Size count, T const& value)
+        {
+            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+                "Requires at least forward iterator.");
+
+            // if count is representing a negative value, we do nothing
+            if (hpx::parallel::v1::detail::is_negative(count))
+            {
+                return parallel::util::detail::algorithm_result<ExPolicy,
+                    FwdIter>::get(std::move(first));
+            }
+
+            return hpx::parallel::v1::detail::uninitialized_fill_n<FwdIter>()
+                .call(std::forward<ExPolicy>(policy), first, std::size_t(count),
+                    value);
+        }
+
+    } uninitialized_fill_n{};
+}    // namespace hpx
+
+#endif    // DOXYGEN

@@ -19,7 +19,7 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
-/*template <typename IteratorTag>
+template <typename IteratorTag>
 void test_uninitialized_fill(IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -28,7 +28,7 @@ void test_uninitialized_fill(IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    hpx::parallel::uninitialized_fill(iterator(std::begin(c)), iterator(std::end(c)), 10);
+    hpx::uninitialized_fill(iterator(std::begin(c)), iterator(std::end(c)), 10);
 
     // verify values
     std::size_t count = 0;
@@ -37,7 +37,7 @@ void test_uninitialized_fill(IteratorTag)
         ++count;
     });
     HPX_TEST_EQ(count, c.size());
-}*/
+}
 
 template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_fill(ExPolicy policy, IteratorTag)
@@ -51,7 +51,7 @@ void test_uninitialized_fill(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    hpx::parallel::uninitialized_fill(
+    hpx::uninitialized_fill(
         policy, iterator(std::begin(c)), iterator(std::end(c)), 10);
 
     // verify values
@@ -72,7 +72,7 @@ void test_uninitialized_fill_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    hpx::future<void> f = hpx::parallel::uninitialized_fill(
+    hpx::future<void> f = hpx::uninitialized_fill(
         p, iterator(std::begin(c)), iterator(std::end(c)), 10);
     f.wait();
 
@@ -88,6 +88,7 @@ template <typename IteratorTag>
 void test_uninitialized_fill()
 {
     using namespace hpx::execution;
+    test_uninitialized_fill(IteratorTag());
     test_uninitialized_fill(seq, IteratorTag());
     test_uninitialized_fill(par, IteratorTag());
     test_uninitialized_fill(par_unseq, IteratorTag());
@@ -122,7 +123,7 @@ void test_uninitialized_fill_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::uninitialized_fill(policy,
+        hpx::uninitialized_fill(policy,
             decorated_iterator(std::begin(c),
                 [&throw_after]() {
                     if (throw_after-- == 0)
@@ -163,7 +164,7 @@ void test_uninitialized_fill_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::uninitialized_fill(p,
+        hpx::future<void> f = hpx::uninitialized_fill(p,
             decorated_iterator(std::begin(c),
                 [&throw_after]() {
                     if (throw_after-- == 0)
@@ -232,7 +233,7 @@ void test_uninitialized_fill_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::uninitialized_fill(policy,
+        hpx::uninitialized_fill(policy,
             decorated_iterator(std::begin(c),
                 [&throw_after]() {
                     if (throw_after-- == 0)
@@ -272,7 +273,7 @@ void test_uninitialized_fill_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::uninitialized_fill(p,
+        hpx::future<void> f = hpx::uninitialized_fill(p,
             decorated_iterator(std::begin(c),
                 [&throw_after]() {
                     if (throw_after-- == 0)

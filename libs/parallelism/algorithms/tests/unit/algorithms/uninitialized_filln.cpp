@@ -19,6 +19,26 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_uninitialized_fill_n(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    hpx::uninitialized_fill_n(iterator(std::begin(c)), c.size(), 10);
+
+    // verify values
+    std::size_t count = 0;
+    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
+        HPX_TEST_EQ(v, std::size_t(10));
+        ++count;
+    });
+    HPX_TEST_EQ(count, c.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_fill_n(ExPolicy policy, IteratorTag)
 {
@@ -31,8 +51,7 @@ void test_uninitialized_fill_n(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    hpx::parallel::uninitialized_fill_n(
-        policy, iterator(std::begin(c)), c.size(), 10);
+    hpx::uninitialized_fill_n(policy, iterator(std::begin(c)), c.size(), 10);
 
     // verify values
     std::size_t count = 0;
@@ -52,8 +71,8 @@ void test_uninitialized_fill_n_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    hpx::future<void> f = hpx::parallel::uninitialized_fill_n(
-        p, iterator(std::begin(c)), c.size(), 10);
+    hpx::future<void> f =
+        hpx::uninitialized_fill_n(p, iterator(std::begin(c)), c.size(), 10);
     f.wait();
 
     std::size_t count = 0;
@@ -68,6 +87,7 @@ template <typename IteratorTag>
 void test_uninitialized_fill_n()
 {
     using namespace hpx::execution;
+    test_uninitialized_fill_n(IteratorTag());
     test_uninitialized_fill_n(seq, IteratorTag());
     test_uninitialized_fill_n(par, IteratorTag());
     test_uninitialized_fill_n(par_unseq, IteratorTag());
@@ -102,7 +122,7 @@ void test_uninitialized_fill_n_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::uninitialized_fill_n(policy,
+        hpx::uninitialized_fill_n(policy,
             decorated_iterator(std::begin(c),
                 [&throw_after]() {
                     if (throw_after-- == 0)
@@ -143,7 +163,7 @@ void test_uninitialized_fill_n_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::uninitialized_fill_n(p,
+        hpx::future<void> f = hpx::uninitialized_fill_n(p,
             decorated_iterator(std::begin(c),
                 [&throw_after]() {
                     if (throw_after-- == 0)
@@ -212,7 +232,7 @@ void test_uninitialized_fill_n_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::uninitialized_fill_n(policy,
+        hpx::uninitialized_fill_n(policy,
             decorated_iterator(std::begin(c),
                 [&throw_after]() {
                     if (throw_after-- == 0)
@@ -252,7 +272,7 @@ void test_uninitialized_fill_n_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::uninitialized_fill_n(p,
+        hpx::future<void> f = hpx::uninitialized_fill_n(p,
             decorated_iterator(std::begin(c),
                 [&throw_after]() {
                     if (throw_after-- == 0)
