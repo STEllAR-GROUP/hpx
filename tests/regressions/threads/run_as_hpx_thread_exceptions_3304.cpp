@@ -4,10 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_start.hpp>
-#include <hpx/hpx.hpp>
-#include <hpx/runtime_local/run_as_hpx_thread.hpp>
+#include <hpx/init.hpp>
+#include <hpx/local/condition_variable.hpp>
+#include <hpx/local/exception.hpp>
+#include <hpx/local/functional.hpp>
+#include <hpx/local/mutex.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/runtime_local/run_as_hpx_thread.hpp>
 
 #include <functional>
 #include <mutex>
@@ -43,7 +46,7 @@ void hpx_thread_func()
     HPX_THROW_EXCEPTION(hpx::invalid_status, "hpx_thread_func", "test");
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     hpx::lcos::local::spinlock mtx;
     hpx::lcos::local::condition_variable_any cond;
@@ -81,4 +84,3 @@ int main(int argc, char **argv)
 
     return hpx::stop();
 }
-

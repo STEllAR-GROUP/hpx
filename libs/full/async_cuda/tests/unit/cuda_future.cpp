@@ -4,13 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/parallel_copy.hpp>
-#include <hpx/include/parallel_executor_parameters.hpp>
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/parallel_for_each.hpp>
-#include <hpx/include/parallel_for_loop.hpp>
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/async_cuda.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -174,7 +171,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // test a full kernel example
     HPX_TEST(test_saxpy(cudaexec));
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 // -------------------------------------------------------------------------
@@ -191,9 +188,9 @@ int main(int argc, char** argv)
         "iterations")("seed,s", hpx::program_options::value<unsigned int>(),
         "the random number generator seed to use for this run");
 
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
 
-    auto result = hpx::init(argc, argv, init_args);
+    auto result = hpx::local::init(hpx_main, argc, argv, init_args);
     return result || hpx::util::report_errors();
 }

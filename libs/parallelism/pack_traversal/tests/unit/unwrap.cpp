@@ -25,12 +25,12 @@
 using hpx::get;
 using hpx::make_tuple;
 using hpx::tuple;
-using hpx::util::unwrap;
-using hpx::util::unwrap_all;
-using hpx::util::unwrap_n;
-using hpx::util::unwrapping;
-using hpx::util::unwrapping_all;
-using hpx::util::unwrapping_n;
+using hpx::unwrap;
+using hpx::unwrap_all;
+using hpx::unwrap_n;
+using hpx::unwrapping;
+using hpx::unwrapping_all;
+using hpx::unwrapping_n;
 
 /// Since the mapping functionality is provided by the `map_pack`
 /// API, we only need to test here for the specific behaviour of `unwrap`

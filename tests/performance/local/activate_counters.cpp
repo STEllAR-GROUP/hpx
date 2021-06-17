@@ -249,6 +249,6 @@ namespace hpx { namespace util {
         std::vector<future<performance_counters::counter_value>> futures =
             evaluate_counters(launch::async, reset, ec);
 
-        return util::unwrap(futures);
+        return unwrap(futures);
     }
 }}    // namespace hpx::util

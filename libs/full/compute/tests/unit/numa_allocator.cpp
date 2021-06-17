@@ -12,27 +12,24 @@
 #define NUMA_BINDING_ALLOCATOR_DEBUG true
 #define NUMA_BINDING_ALLOCATOR_INIT_MEMORY true
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-//
-#include <hpx/modules/executors.hpp>
-#include <hpx/parallel/algorithms/for_loop.hpp>
-//
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/runtime.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>
 #include <hpx/topology/cpu_mask.hpp>
-//
-#include <hpx/include/runtime.hpp>
-//
-#include <hpx/modules/testing.hpp>
-//
+
 #include <cmath>
 #include <cstddef>
 #include <iostream>
 #include <memory>
 #include <set>
+#include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
+
 // The allocator that binds pages to numa domains
 #include <hpx/compute/host/numa_binding_allocator.hpp>
 // Example binder functions for different page binding mappings
@@ -204,7 +201,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::threads::hpx_hwloc_membind_policy::membind_user, 0);
     test_binding(numa_binder_2D, allocator_2D);
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 // ------------------------------------------------------------------------
@@ -283,11 +280,11 @@ int main(int argc, char* argv[])
         vm);
 
     // Setup the init parameters
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_cmdline;
     // Set the callback to init the thread_pools
     init_args.rp_callback = &init_resource_partitioner_handler;
 
-    hpx::init(argc, argv, init_args);
+    hpx::local::init(hpx_main, argc, argv, init_args);
     return hpx::util::report_errors();
 }

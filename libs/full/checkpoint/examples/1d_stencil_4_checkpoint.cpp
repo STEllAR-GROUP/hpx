@@ -275,7 +275,7 @@ struct stepper
         std::uint64_t nd, std::uint64_t cp, std::string rsf, std::string fn)
     {
         using hpx::dataflow;
-        using hpx::util::unwrapping;
+        using hpx::unwrapping;
 
         // Set up Check-pointing
         std::size_t num_c = nt / cp;    // Number of checkpoints to be made

@@ -8,9 +8,9 @@
 
 #include <hpx/local/future.hpp>
 #include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/synchronization/channel_spsc.hpp>
-#include <hpx/thread.hpp>
 
 #include <cstddef>
 #include <functional>

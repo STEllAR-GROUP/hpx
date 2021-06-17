@@ -38,7 +38,7 @@ struct mul
 
 int main()
 {
-    auto functor = hpx::util::unwrapping(mul<double>(0.5));
+    auto functor = hpx::unwrapping(mul<double>(0.5));
     future_type f1 = hpx::make_ready_future(1.0);
 
     future_type f2 = dataflow(hpx::launch::sync, functor, f1, f1);

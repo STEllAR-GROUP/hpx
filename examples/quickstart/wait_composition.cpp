@@ -6,22 +6,20 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
+#include <hpx/init.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/tuple.hpp>
 
 #include <iostream>
 
 ///////////////////////////////////////////////////////////////////////////////
 struct cout_continuation
 {
-    typedef hpx::tuple<
-            hpx::lcos::future<int>
-          , hpx::lcos::future<int>
-          , hpx::lcos::future<int> > data_type;
+    typedef hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
+        hpx::lcos::future<int>>
+        data_type;
 
-    void operator()(
-        hpx::lcos::future<data_type> data
-    ) const
+    void operator()(hpx::lcos::future<data_type> data) const
     {
         data_type v = data.get();
         std::cout << hpx::get<0>(v).get() << "\n";
@@ -46,5 +44,5 @@ int hpx_main()
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    return hpx::init(argc, argv); // Initialize and run HPX.
+    return hpx::init(argc, argv);    // Initialize and run HPX.
 }

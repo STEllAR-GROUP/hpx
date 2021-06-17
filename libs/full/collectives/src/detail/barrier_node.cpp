@@ -72,8 +72,7 @@ namespace hpx { namespace lcos { namespace detail {
                 ids.push_back(id);
             }
 
-            children_ =
-                hpx::util::unwrap(hpx::find_from_basename(base_name_, ids));
+            children_ = hpx::unwrap(hpx::find_from_basename(base_name_, ids));
 
             return;
         }

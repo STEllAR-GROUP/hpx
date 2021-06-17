@@ -254,7 +254,7 @@ struct stepper
 #endif
     {
         using hpx::dataflow;
-        using hpx::util::unwrapping;
+        using hpx::unwrapping;
 
         // U[t][i] is the state of position i at time t.
         std::vector<space> U(2);

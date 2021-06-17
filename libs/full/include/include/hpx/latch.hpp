@@ -6,8 +6,9 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/collectives/latch.hpp>
 #include <hpx/local/latch.hpp>
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/distributed/latch.hpp>
-#endif
+
+namespace hpx { namespace distributed {
+    using hpx::lcos::latch;
+}}    // namespace hpx::distributed

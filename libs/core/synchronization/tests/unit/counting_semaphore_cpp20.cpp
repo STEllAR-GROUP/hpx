@@ -6,9 +6,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/local/init.hpp>
-#include <hpx/modules/synchronization.hpp>
+#include <hpx/local/semaphore.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/threading.hpp>
 
 #include <chrono>
 

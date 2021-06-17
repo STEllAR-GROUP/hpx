@@ -171,11 +171,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
             }
 
-            return result::get(dataflow(
-                hpx::util::unwrapping([=](std::vector<value_type>&& r) {
+            return result::get(
+                dataflow(hpx::unwrapping([=](std::vector<value_type>&& r) {
                     return detail::accumulate(r.begin(), r.end(), value_type());
                 }),
-                segments));
+                    segments));
         }
         /// \endcond
     }    // namespace detail

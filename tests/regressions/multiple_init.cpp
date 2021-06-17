@@ -6,8 +6,7 @@
 //
 // Demonstrating #565
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 int invoked_init = 0;
@@ -18,7 +17,7 @@ int hpx_main()
     return hpx::finalize();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     // Everything is fine on the first call
     hpx::init(argc, argv);

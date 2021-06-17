@@ -13,10 +13,10 @@
 
 #include <hpx/local/execution.hpp>
 #include <hpx/local/future.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/thread_pools.hpp>
-#include <hpx/thread.hpp>
 
 #include <algorithm>
 #include <cstddef>

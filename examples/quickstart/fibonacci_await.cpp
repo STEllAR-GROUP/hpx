@@ -9,9 +9,10 @@
 // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3564.pdf). The
 // necessary transformations are performed by hand.
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/util.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/functional.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -28,7 +29,7 @@ HPX_NOINLINE std::uint64_t fibonacci_serial(std::uint64_t n)
 {
     if (n < 2)
         return n;
-    return fibonacci_serial(n-1) + fibonacci_serial(n-2);
+    return fibonacci_serial(n - 1) + fibonacci_serial(n - 2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,9 +55,12 @@ struct _fibonacci_frame
     hpx::lcos::local::promise<std::uint64_t> result_promise_;
 
     _fibonacci_frame(std::uint64_t n)
-      : state_(0),
-        n_(n), lhs_result_(0), rhs_result_(0)
-    {}
+      : state_(0)
+      , n_(n)
+      , lhs_result_(0)
+      , rhs_result_(0)
+    {
+    }
 
     // local variables
     std::uint64_t n_;
@@ -95,17 +99,18 @@ void _fibonacci(std::shared_ptr<_fibonacci_frame> const& frame_)
     {
         if (state == 0)
             // never paused
-            frame->result_ = hpx::make_ready_future(fibonacci_serial(frame->n_));
+            frame->result_ =
+                hpx::make_ready_future(fibonacci_serial(frame->n_));
         else
             frame->result_promise_.set_value(fibonacci_serial(frame->n_));
         return;
     }
 
     // hpx::future<std::uint64_t> lhs = hpx::async(&fibonacci, n-1);
-    frame->lhs_ = hpx::async(&fibonacci, frame->n_-1);
+    frame->lhs_ = hpx::async(&fibonacci, frame->n_ - 1);
 
     // hpx::future<std::uint64_t> rhs = fibonacci(n-2);
-    frame->rhs_ = fibonacci(frame->n_-2);
+    frame->rhs_ = fibonacci(frame->n_ - 2);
 
     if (!frame->lhs_.is_ready())
     {
@@ -119,7 +124,7 @@ void _fibonacci(std::shared_ptr<_fibonacci_frame> const& frame_)
 L1:
     frame->lhs_result_ = frame->lhs_.get();
 
-    if ( !frame->rhs_.is_ready())
+    if (!frame->rhs_.is_ready())
     {
         frame->state_ = 2;
         if (!frame->result_.valid())
@@ -133,9 +138,11 @@ L2:
 
     if (state == 0)
         // never paused
-        frame->result_ = hpx::make_ready_future(frame->lhs_result_ + frame->rhs_result_);
+        frame->result_ =
+            hpx::make_ready_future(frame->lhs_result_ + frame->rhs_result_);
     else
-        frame->result_promise_.set_value(frame->lhs_result_ + frame->rhs_result_);
+        frame->result_promise_.set_value(
+            frame->lhs_result_ + frame->rhs_result_);
     return;
 }
 
@@ -157,18 +164,22 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::string test = vm["test"].as<std::string>();
     std::uint64_t max_runs = vm["n-runs"].as<std::uint64_t>();
 
-    if (max_runs == 0) {
+    if (max_runs == 0)
+    {
         std::cerr << "fibonacci_await: wrong command line argument value for "
-            "option 'n-runs', should not be zero" << std::endl;
-        return hpx::finalize(); // Handles HPX shutdown
+                     "option 'n-runs', should not be zero"
+                  << std::endl;
+        return hpx::local::finalize();    // Handles HPX shutdown
     }
 
     threshold = vm["threshold"].as<unsigned int>();
-    if (threshold < 2 || threshold > n) {
+    if (threshold < 2 || threshold > n)
+    {
         std::cerr << "fibonacci_await: wrong command line argument value for "
-            "option 'threshold', should be in between 2 and n-value"
-            ", value specified: " << threshold << std::endl;
-        return hpx::finalize(); // Handles HPX shutdown
+                     "option 'threshold', should be in between 2 and n-value"
+                     ", value specified: "
+                  << threshold << std::endl;
+        return hpx::local::finalize();    // Handles HPX shutdown
     }
 
     bool executed_one = false;
@@ -185,10 +196,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
             r = fibonacci_serial(n);
         }
 
-//      double d = double(hpx::chrono::high_resolution_clock::now() - start) / 1.e9;
+        // double d = double(hpx::chrono::high_resolution_clock::now() - start) / 1.e9;
         std::uint64_t d = hpx::chrono::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_serial({1}) == {2},"
-            "elapsed time:,{3},[s]\n";
+                          "elapsed time:,{3},[s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, d / max_runs);
 
         executed_one = true;
@@ -206,10 +217,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
             r = fibonacci(n).get();
         }
 
-//      double d = double(hpx::chrono::high_resolution_clock::now() - start) / 1.e9;
+        // double d = double(hpx::chrono::high_resolution_clock::now() - start) / 1.e9;
         std::uint64_t d = hpx::chrono::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_await({1}) == {2},"
-            "elapsed time:,{3},[s]\n";
+                          "elapsed time:,{3},[s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, d / max_runs);
 
         executed_one = true;
@@ -218,35 +229,38 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (!executed_one)
     {
         std::cerr << "fibonacci_await: wrong command line argument value for "
-            "option 'tests', should be either 'all' or a number between zero "
-            "and 1, value specified: " << test << std::endl;
+                     "option 'tests', should be either 'all' or a number "
+                     "between zero "
+                     "and 1, value specified: "
+                  << test << std::endl;
     }
 
-    return hpx::finalize(); // Handles HPX shutdown
+    return hpx::local::finalize();    // Handles HPX shutdown
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    hpx::program_options::options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    hpx::program_options::options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
     using hpx::program_options::value;
+    // clang-format off
     desc_commandline.add_options()
-        ( "n-value", value<std::uint64_t>()->default_value(10),
-          "n value for the Fibonacci function")
-        ( "n-runs", value<std::uint64_t>()->default_value(1),
-          "number of runs to perform")
-        ( "threshold", value<unsigned int>()->default_value(2),
-          "threshold for switching to serial code")
-        ( "test", value<std::string>()->default_value("all"),
-          "select tests to execute (0-1, default: all)")
-    ;
+        ("n-value", value<std::uint64_t>()->default_value(10),
+         "n value for the Fibonacci function")
+        ("n-runs", value<std::uint64_t>()->default_value(1),
+         "number of runs to perform")
+        ("threshold", value<unsigned int>()->default_value(2),
+         "threshold for switching to serial code")
+        ("test", value<std::string>()->default_value("all"),
+        "select tests to execute (0-1, default: all)");
+    // clang-format on
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }

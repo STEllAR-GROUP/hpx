@@ -146,7 +146,7 @@ struct stepper
         for (std::size_t i = 0; i != np; ++i)
             U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
 
-        auto Op = hpx::util::unwrapping(&stepper::heat_part);
+        auto Op = hpx::unwrapping(&stepper::heat_part);
 
         // Actual time step loop
         for (std::size_t t = 0; t != nt; ++t)

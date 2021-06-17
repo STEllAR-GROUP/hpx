@@ -103,7 +103,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         }
                         return ret;
                     },
-                    hpx::util::unwrapping([op](std::vector<T>&& results) -> T {
+                    hpx::unwrapping([op](std::vector<T>&& results) -> T {
                         T ret = *results.begin();
                         if (results.size() > 1)
                         {
@@ -630,8 +630,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // wait for 1. step of current partition to prevent race condition
                 // when used in place
                 finalitems.push_back(hpx::dataflow(policy.executor(),
-                    hpx::util::unwrapping([=, &op, &conv](
-                                              T last_value, T) -> void {
+                    hpx::unwrapping([=, &op, &conv](T last_value, T) -> void {
                         dispatch(traits_out::get_id(out_it),
                             segmented_scan_void<Algo>(), hpx::execution::seq,
                             std::true_type(), get<0>(in_tuple),
@@ -642,7 +641,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // 3. Step: compute new init value for the next segment
                 // performed as soon as the needed results are ready
                 workitems.push_back(hpx::dataflow(policy.executor(),
-                    hpx::util::unwrapping(op), workitems.back(), res));
+                    hpx::unwrapping(op), workitems.back(), res));
                 ++i;
             }
 
@@ -763,11 +762,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 // collect all results with updated init values
                 finalitems.push_back(hpx::dataflow(policy.executor(),
-                    hpx::util::unwrapping(
-                        [&, dest](T last_value, vector_type r) {
-                            // merge function
-                            f1(r.begin(), r.end(), dest, last_value, op);
-                        }),
+                    hpx::unwrapping([&, dest](T last_value, vector_type r) {
+                        // merge function
+                        f1(r.begin(), r.end(), dest, last_value, op);
+                    }),
                     workitems.back(), res));
 
                 std::advance(dest, segment_sizes[segment_index++]);
@@ -775,9 +773,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // propagate results from left to right
                 // new init value is most right value combined with old init
                 workitems.push_back(hpx::dataflow(policy.executor(),
-                    hpx::util::unwrapping(op), workitems.back(),
+                    hpx::unwrapping(op), workitems.back(),
                     execution::async_execute(
-                        policy.executor(), hpx::util::unwrapping(f2), res)));
+                        policy.executor(), hpx::unwrapping(f2), res)));
             }
 
             // wait for all tasks to finish

@@ -5,7 +5,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests local_promise_allocator use_allocator)
+set(tests local_promise_allocator local_use_allocator)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(tests
@@ -16,6 +16,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       promise
       promise_allocator
       promise_emplace
+      use_allocator
   )
 endif()
 

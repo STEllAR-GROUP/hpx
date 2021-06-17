@@ -39,13 +39,12 @@ struct mul
 
 int main()
 {
-    auto functor = hpx::util::unwrapping(mul<double>(0.5));
+    auto functor = hpx::unwrapping(mul<double>(0.5));
     future_type f1 = hpx::make_ready_future(1.0);
 
     // compile error even when using full namespace
     future_type f2 = hpx::dataflow(functor, f1, f1);
-    future_type f3 =
-        hpx::dataflow(hpx::util::unwrapping(mul<double>(2.0)), f1, f1);
+    future_type f3 = hpx::dataflow(hpx::unwrapping(mul<double>(2.0)), f1, f1);
 
     hpx::wait_all(f1, f2, f3);
 

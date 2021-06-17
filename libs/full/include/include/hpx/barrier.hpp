@@ -6,8 +6,9 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/collectives/barrier.hpp>
 #include <hpx/local/barrier.hpp>
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/distributed/barrier.hpp>
-#endif
+
+namespace hpx { namespace distributed {
+    using hpx::lcos::barrier;
+}}    // namespace hpx::distributed

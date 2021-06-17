@@ -10,11 +10,10 @@
 // to associate custom thread data with the tasks that are created by the
 // underlying executor.
 
-#include <hpx/hpx_main.hpp>
-
-#include <hpx/algorithm.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution.hpp>
+#include <hpx/hpx_main.hpp>
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/execution.hpp>
 
 #include <algorithm>
 #include <atomic>

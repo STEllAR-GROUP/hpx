@@ -229,7 +229,7 @@ namespace hpx { namespace util { namespace detail {
     }
 
     /// Implements the callable object which is returned by n invocation
-    /// to hpx::util::unwrap and similar functions.
+    /// to hpx::unwrap and similar functions.
     template <typename T, std::size_t Depth>
     class functional_unwrap_impl
     {

@@ -6,9 +6,9 @@
 
 // Demonstrate the use of hpx::lcos::local::latch
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/components.hpp>
-#include <hpx/include/lcos.hpp>
+#include <hpx/init.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/latch.hpp>
 
 #include <cstddef>
 #include <functional>
@@ -28,9 +28,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
 {
     num_threads = vm["num-threads"].as<std::ptrdiff_t>();
 
-    hpx::lcos::local::latch l(num_threads+1);
+    hpx::lcos::local::latch l(num_threads + 1);
 
-    std::vector<hpx::future<void> > results;
+    std::vector<hpx::future<void>> results;
     for (std::ptrdiff_t i = 0; i != num_threads; ++i)
         results.push_back(hpx::async(&wait_for_latch, std::ref(l)));
 
@@ -48,13 +48,12 @@ int main(int argc, char* argv[])
     using hpx::program_options::value;
 
     // Configure application-specific options
-    options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ( "num-threads,n", value<std::ptrdiff_t>()->default_value(16),
-          "number of threads to synchronize at a local latch (default: 16)")
-        ;
+    desc_commandline.add_options()("num-threads,n",
+        value<std::ptrdiff_t>()->default_value(16),
+        "number of threads to synchronize at a local latch (default: 16)");
 
     hpx::init_params init_args;
     init_args.desc_cmdline = desc_commandline;

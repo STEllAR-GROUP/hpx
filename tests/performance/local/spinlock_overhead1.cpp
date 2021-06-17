@@ -219,8 +219,8 @@ int hpx_main(
                 for (std::uint64_t i = 0; i < count; ++i)
                     futures.push_back(async<null_action>(here, i));
 
-                wait_each(hpx::util::unwrapping(
-                    [] (double r) { global_scratch += r; }),
+                wait_each(
+                    hpx::unwrapping([](double r) { global_scratch += r; }),
                     futures);
 
                 // stop the clock

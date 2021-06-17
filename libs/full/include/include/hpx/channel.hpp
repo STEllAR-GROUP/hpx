@@ -6,8 +6,9 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/lcos_distributed/channel.hpp>
 #include <hpx/local/channel.hpp>
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/distributed/channel.hpp>
-#endif
+
+namespace hpx { namespace distributed {
+    using hpx::lcos::channel;
+}}    // namespace hpx::distributed

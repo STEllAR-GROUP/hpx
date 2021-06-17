@@ -4,8 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/async_cuda.hpp>
 #include <hpx/modules/compute_cuda.hpp>
 
@@ -419,7 +420,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             << elapsed << '\n';
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -430,8 +431,8 @@ int main(int argc, char* argv[])
     cmdline.add_options()("iterations",
         hpx::program_options::value<std::size_t>()->default_value(1024),
         "number of iterations (default: 1024)");
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }

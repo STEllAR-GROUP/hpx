@@ -4,6 +4,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(include_headers
@@ -12,8 +16,8 @@ set(include_headers
     hpx/barrier.hpp
     hpx/channel.hpp
     hpx/chrono.hpp
-    hpx/distributed/future.hpp
-    hpx/distributed/runtime.hpp
+    hpx/condition_variable.hpp
+    hpx/exception.hpp
     hpx/execution.hpp
     hpx/functional.hpp
     hpx/future.hpp
@@ -103,12 +107,20 @@ set(include_headers
     hpx/include/util.hpp
     hpx/latch.hpp
     hpx/memory.hpp
+    hpx/mutex.hpp
     hpx/numeric.hpp
+    hpx/object_semaphore.hpp
     hpx/optional.hpp
     hpx/runtime.hpp
+    hpx/semaphore.hpp
+    hpx/shared_mutex.hpp
+    hpx/stop_token.hpp
+    hpx/system_error.hpp
     hpx/task_block.hpp
+    hpx/thread.hpp
     hpx/tuple.hpp
     hpx/type_traits.hpp
+    hpx/unwrap.hpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
