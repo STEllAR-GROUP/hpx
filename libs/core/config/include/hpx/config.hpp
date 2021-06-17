@@ -417,7 +417,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Minimum number of staged tasks required to steal tasks.
 #if !defined(HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED)
-#  define HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED 10
+#  define HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED 0
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

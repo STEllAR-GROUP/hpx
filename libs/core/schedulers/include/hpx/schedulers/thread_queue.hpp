@@ -1004,11 +1004,24 @@ namespace hpx { namespace threads { namespace policies {
 
                 // don't try to steal if there are only a few tasks left on
                 // this queue
-                if (running &&
-                    parameters_.min_tasks_to_steal_staged_ >
-                        addfrom->new_tasks_count_.data_.load(
-                            std::memory_order_relaxed))
+                std::int64_t new_tasks_count =
+                    addfrom->new_tasks_count_.data_.load(
+                        std::memory_order_relaxed);
+                bool enough_threads =
+                    new_tasks_count >= parameters_.min_tasks_to_steal_staged_;
+
+                if (running && !enough_threads)
                 {
+                    if (new_tasks_count != 0)
+                    {
+                        LTM_(debug).format(
+                            "thread_queue::wait_or_add_new: not enough threads "
+                            "to steal from queue {} to queue {}, have {} but "
+                            "need at least {}",
+                            addfrom, this, new_tasks_count,
+                            parameters_.min_tasks_to_steal_staged_);
+                    }
+
                     return false;
                 }
 

@@ -88,7 +88,9 @@ namespace hpx { namespace threads { namespace detail {
 
         // NOLINTNEXTLINE(bugprone-branch-clone)
         LTM_(info)
-            .format("register_thread({}): initial_state({}), run_now({})", id,
+            .format("create_thread: pool({}), scheduler({}), thread({}), "
+                    "initial_state({}), run_now({})",
+                *scheduler->get_parent_pool(), *scheduler, id,
                 get_thread_state_name(data.initial_state), data.run_now)
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             .format(", description({})", data.description)

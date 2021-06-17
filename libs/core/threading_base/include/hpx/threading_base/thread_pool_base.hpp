@@ -183,7 +183,7 @@ namespace hpx { namespace threads {
 
         virtual void print_pool(std::ostream&) = 0;
 
-        pool_id_type get_pool_id()
+        pool_id_type get_pool_id() const
         {
             return id_;
         }
@@ -553,6 +553,9 @@ namespace hpx { namespace threads {
         threads::policies::callback_notifier& notifier_;
         /// \endcond
     };
+
+    HPX_CORE_EXPORT std::ostream& operator<<(
+        std::ostream& os, thread_pool_base const& thread_pool);
 }}    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>
