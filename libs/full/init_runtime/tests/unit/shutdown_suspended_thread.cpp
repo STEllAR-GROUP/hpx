@@ -8,10 +8,10 @@
 // initiating full shutdown.
 
 #include <hpx/config.hpp>
-#include <hpx/future.hpp>
-#include <hpx/init.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/thread.hpp>
 
 #include <chrono>
 
@@ -20,12 +20,12 @@ int hpx_main()
     hpx::apply(
         [] { hpx::this_thread::sleep_for(std::chrono::milliseconds(500)); });
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char** argv)
 {
-    HPX_TEST_EQ(hpx::init(argc, argv), 0);
+    HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv), 0);
 
     return hpx::util::report_errors();
 }

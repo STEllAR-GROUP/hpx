@@ -166,7 +166,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 future_type&& predecessor) mutable -> vector_result_type {
                 // use unwrap directly (instead of lazily) to avoid
                 // having to pull in dataflow
-                return hpx::util::unwrap(func(std::move(predecessor)));
+                return hpx::unwrap(func(std::move(predecessor)));
             });
 
         return hpx::traits::future_access<result_future_type>::create(

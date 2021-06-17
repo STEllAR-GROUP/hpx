@@ -313,6 +313,17 @@ namespace hpx { namespace threads { namespace policies {
 
             HPX_ASSERT(num_thread < queue_size);
             queues_[num_thread]->create_thread(data, id, ec);
+
+            LTM_(debug)
+                .format("local_queue_scheduler::create_thread: pool({}), "
+                        "scheduler({}), "
+                        "worker_thread({}), thread({})",
+                    *this->get_parent_pool(), *this, num_thread,
+                    id ? *id : invalid_thread_id)
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
+                .format(", description({})", data.description)
+#endif
+                ;
         }
 
         /// Return the next thread to be executed, return false if none is
@@ -476,6 +487,13 @@ namespace hpx { namespace threads { namespace policies {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
 
             HPX_ASSERT(num_thread < queues_.size());
+
+            LTM_(debug).format("local_queue_scheduler::schedule_thread: "
+                               "pool({}), scheduler({}), worker_thread({}), "
+                               "thread({}), description({})",
+                *this->get_parent_pool(), *this, num_thread,
+                thrd->get_thread_id(), thrd->get_description());
+
             queues_[num_thread]->schedule_thread(thrd);
         }
 
@@ -825,16 +843,18 @@ namespace hpx { namespace threads { namespace policies {
                 {
                     if (running)
                     {
-                        LTM_(error).format("queue({}): no new work available, "
+                        LTM_(error).format("pool({}), scheduler({}), "
+                                           "queue({}): no new work available, "
                                            "are we deadlocked?",
-                            num_thread);
+                            *this->get_parent_pool(), *this, num_thread);
                     }
                     else
                     {
                         LHPX_CONSOLE_(hpx::util::logging::level::error)
-                            .format("  [TM] queue({}): no new work available, "
-                                    "are we deadlocked?\n",
-                                num_thread);
+                            .format("  [TM] pool({}), scheduler({}), "
+                                    "queue({}): no new work available, are we "
+                                    "deadlocked?\n",
+                                *this->get_parent_pool(), *this, num_thread);
                     }
                 }
             }

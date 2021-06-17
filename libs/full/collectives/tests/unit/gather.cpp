@@ -33,8 +33,9 @@ void test_one_shot_use()
     {
         if (this_locality == 0)
         {
+            std::uint32_t value = 42;
             hpx::future<std::vector<std::uint32_t>> overall_result =
-                gather_here(gather_direct_basename, std::uint32_t(42),
+                gather_here(gather_direct_basename, value,
                     num_sites_arg(num_localities), this_site_arg(this_locality),
                     generation_arg(i));
 

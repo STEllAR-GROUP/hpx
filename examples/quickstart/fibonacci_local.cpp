@@ -11,9 +11,10 @@
 // fibonacci_futures.cpp. This example is mainly intended to demonstrate async,
 // futures and get for the documentation.
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/async.hpp>
-#include <hpx/include/util.hpp>
+#include <hpx/init.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <cstdint>
 #include <iostream>
@@ -32,7 +33,8 @@ std::uint64_t fibonacci(std::uint64_t n)
     hpx::future<std::uint64_t> n1 = hpx::async(fibonacci, n - 1);
     hpx::future<std::uint64_t> n2 = hpx::async(fibonacci, n - 2);
 
-    return n1.get() + n2.get();   // wait for the Futures to return their values
+    return n1.get() +
+        n2.get();    // wait for the Futures to return their values
 }
 //fibonacci]
 
@@ -53,7 +55,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::util::format_to(std::cout, fmt, n, r, t.elapsed());
     }
 
-    return hpx::finalize(); // Handles HPX shutdown
+    return hpx::finalize();    // Handles HPX shutdown
 }
 //hpx_main]
 
@@ -62,14 +64,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    hpx::program_options::options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    hpx::program_options::options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ( "n-value",
-          hpx::program_options::value<std::uint64_t>()->default_value(10),
-          "n value for the Fibonacci function")
-        ;
+    desc_commandline.add_options()("n-value",
+        hpx::program_options::value<std::uint64_t>()->default_value(10),
+        "n value for the Fibonacci function");
 
     // Initialize and run HPX
     hpx::init_params init_args;

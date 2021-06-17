@@ -42,6 +42,40 @@ namespace apex {
 #endif
 
 namespace hpx {
+    namespace detail {
+        inline bool start_impl(
+            util::function_nonser<int(
+                hpx::program_options::variables_map&)> const& f,
+            int argc, char** argv, init_params const& params)
+        {
+            if (argc == 0 || argv == nullptr)
+            {
+                argc = dummy_argc;
+                argv = dummy_argv;
+            }
+
+#if defined(HPX_WINDOWS)
+            detail::init_winsocket();
+#if defined(HPX_HAVE_APEX)
+            // artificially force the apex shared library to be loaded by the
+            // application
+            apex::version();
+#endif
+#endif
+            util::set_hpx_prefix(HPX_PREFIX);
+#if defined(__FreeBSD__)
+            freebsd_environ = environ;
+#endif
+            // set a handler for std::abort, std::at_quick_exit, and std::atexit
+            std::signal(SIGABRT, detail::on_abort);
+            std::atexit(detail::on_exit);
+#if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
+            std::at_quick_exit(detail::on_exit);
+#endif
+            return 0 == detail::run_or_start(f, argc, argv, params, false);
+        }
+    }    // namespace detail
+
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
     /// This is the main, non-blocking entry point for any HPX application.
@@ -51,29 +85,10 @@ namespace hpx {
     /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
     inline bool start(
-        util::function_nonser<int(hpx::program_options::variables_map&)> const&
-            f,
-        int argc, char** argv, init_params const& params)
+        std::function<int(hpx::program_options::variables_map&)> f, int argc,
+        char** argv, init_params const& params)
     {
-#if defined(HPX_WINDOWS)
-        detail::init_winsocket();
-#if defined(HPX_HAVE_APEX)
-        // artificially force the apex shared library to be loaded by the
-        // application
-        apex::version();
-#endif
-#endif
-        util::set_hpx_prefix(HPX_PREFIX);
-#if defined(__FreeBSD__)
-        freebsd_environ = environ;
-#endif
-        // set a handler for std::abort, std::at_quick_exit, and std::atexit
-        std::signal(SIGABRT, detail::on_abort);
-        std::atexit(detail::on_exit);
-#if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
-        std::at_quick_exit(detail::on_exit);
-#endif
-        return 0 == detail::run_or_start(f, argc, argv, params, false);
+        return detail::start_impl(std::move(f), argc, argv, params);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -84,17 +99,12 @@ namespace hpx {
     /// schedule the function given by \p f as an HPX thread. It will return
     /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
-    inline bool start(util::function_nonser<int(int, char**)> const& f,
-        int argc, char** argv, init_params const& params)
+    inline bool start(std::function<int(int, char**)> f, int argc, char** argv,
+        init_params const& params)
     {
         util::function_nonser<int(hpx::program_options::variables_map&)>
-            main_f = util::bind_back(detail::init_helper, f);
-        if (argc == 0 || argv == nullptr)
-        {
-            return start(
-                main_f, detail::dummy_argc, detail::dummy_argv, params);
-        }
-        return start(main_f, argc, argv, params);
+            main_f = util::bind_back(detail::init_helper, std::move(f));
+        return detail::start_impl(std::move(main_f), argc, argv, params);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -109,12 +119,7 @@ namespace hpx {
     {
         util::function_nonser<int(hpx::program_options::variables_map&)>
             main_f = static_cast<hpx_main_type>(::hpx_main);
-        if (argc == 0 || argv == nullptr)
-        {
-            return start(
-                main_f, detail::dummy_argc, detail::dummy_argv, params);
-        }
-        return start(main_f, argc, argv, params);
+        return detail::start_impl(std::move(main_f), argc, argv, params);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -129,12 +134,7 @@ namespace hpx {
         std::nullptr_t, int argc, char** argv, init_params const& params)
     {
         util::function_nonser<int(hpx::program_options::variables_map&)> main_f;
-        if (argc == 0 || argv == nullptr)
-        {
-            return start(
-                main_f, detail::dummy_argc, detail::dummy_argv, params);
-        }
-        return start(main_f, argc, argv, params);
+        return detail::start_impl(std::move(main_f), argc, argv, params);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -149,7 +149,8 @@ namespace hpx {
     {
         util::function_nonser<int(hpx::program_options::variables_map&)>
             main_f = static_cast<hpx_main_type>(::hpx_main);
-        return start(main_f, detail::dummy_argc, detail::dummy_argv, params);
+        return detail::start_impl(
+            std::move(main_f), detail::dummy_argc, detail::dummy_argv, params);
     }
 
 #if defined(HPX_HAVE_INIT_START_OVERLOADS_COMPATIBILITY)

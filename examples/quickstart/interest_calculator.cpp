@@ -49,10 +49,10 @@ double add(double principal, double interest)
 int hpx_main(variables_map & vm)
 {
     {
-        using hpx::shared_future;
-        using hpx::make_ready_future;
         using hpx::dataflow;
-        using hpx::util::unwrapping;
+        using hpx::make_ready_future;
+        using hpx::shared_future;
+        using hpx::unwrapping;
         hpx::naming::id_type here = hpx::find_here();
 
         double init_principal=vm["principal"].as<double>(); //Initial principal

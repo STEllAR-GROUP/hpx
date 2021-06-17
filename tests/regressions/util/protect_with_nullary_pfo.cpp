@@ -9,11 +9,9 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/protect.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/actions.hpp>
-#include <hpx/include/util.hpp>
-#include <hpx/include/lcos.hpp>
+#include <hpx/init.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/local/future.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -55,7 +53,7 @@ int hpx_main()
 
     v2.reserve(v1.size());
     iterator_type itr_o = v2.begin();
-    (void)itr_o;
+    (void) itr_o;
 
     std::size_t i = 0;
     for (std::size_t const& v : my_range)
@@ -64,7 +62,7 @@ int hpx_main()
         ++i;
     }
 
-    return hpx::finalize(); // Handles HPX shutdown
+    return hpx::finalize();    // Handles HPX shutdown
 }
 
 int main(int argc, char* argv[])

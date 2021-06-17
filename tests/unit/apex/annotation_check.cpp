@@ -144,7 +144,7 @@ hpx::future<void> test_execution(Execution& exec)
     {
         hpx::future<int> f1 = hpx::async([]() { return 5; });
         results.emplace_back(f1.then(exec,
-            hpx::util::unwrapping(hpx::util::annotated_function(
+            hpx::unwrapping(hpx::util::annotated_function(
                 [](auto&&) { dummy_task(std::size_t(1000)); }, pcsu))));
     }
     // wait for completion

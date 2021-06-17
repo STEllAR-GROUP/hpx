@@ -1173,10 +1173,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         true_count, part_size - true_count);
                 };
 
-                auto f2 = hpx::util::unwrapping(
-                    [](output_iterator_offset const& prev_sum,
-                        output_iterator_offset const& curr)
-                        -> output_iterator_offset {
+                auto f2 =
+                    hpx::unwrapping([](output_iterator_offset const& prev_sum,
+                                        output_iterator_offset const& curr)
+                                        -> output_iterator_offset {
                         return output_iterator_offset(
                             get<0>(prev_sum) + get<0>(curr),
                             get<1>(prev_sum) + get<1>(curr));

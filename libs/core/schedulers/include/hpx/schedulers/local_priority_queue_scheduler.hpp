@@ -542,17 +542,54 @@ namespace hpx { namespace threads { namespace policies {
                 std::size_t num = num_thread % num_high_priority_queues_;
 
                 high_priority_queues_[num].data_->create_thread(data, id, ec);
+
+                LTM_(debug)
+                    .format("local_priority_queue_scheduler::create_thread, "
+                            "high priority queue: "
+                            "pool({}), scheduler({}), worker_thread({}), "
+                            "thread({}), priority({})",
+                        *this->get_parent_pool(), *this, num,
+                        id ? *id : invalid_thread_id, data.priority)
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
+                    .format(", description({})", data.description)
+#endif
+                    ;
+
                 return;
             }
 
             if (data.priority == thread_priority::low)
             {
                 low_priority_queue_.create_thread(data, id, ec);
+
+                LTM_(debug)
+                    .format("local_priority_queue_scheduler::create_thread, "
+                            "low priority queue: "
+                            "pool({}), scheduler({}), thread({}), priority({})",
+                        *this->get_parent_pool(), *this,
+                        id ? *id : invalid_thread_id, data.priority)
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
+                    .format(", description({})", data.description)
+#endif
+                    ;
+
                 return;
             }
 
             HPX_ASSERT(num_thread < num_queues_);
             queues_[num_thread].data_->create_thread(data, id, ec);
+
+            LTM_(debug)
+                .format("local_priority_queue_scheduler::create_thread normal "
+                        "priority queue: pool({}), scheduler({}), "
+                        "worker_thread({}), "
+                        "thread({}), priority({})",
+                    *this->get_parent_pool(), *this, num_thread,
+                    id ? *id : invalid_thread_id, data.priority)
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
+                .format(", description({})", data.description)
+#endif
+                ;
         }
 
         /// Return the next thread to be executed, return false if none is
@@ -662,15 +699,41 @@ namespace hpx { namespace threads { namespace policies {
                 priority == thread_priority::boost)
             {
                 std::size_t num = num_thread % num_high_priority_queues_;
+
+                LTM_(debug).format(
+                    "local_priority_queue_scheduler::schedule_thread, "
+                    "high priority queue: "
+                    "pool({}), scheduler({}), worker_thread({}), "
+                    "thread({}), priority({}), description({})",
+                    *this->get_parent_pool(), *this, num, thrd->get_thread_id(),
+                    priority, thrd->get_description());
+
                 high_priority_queues_[num].data_->schedule_thread(thrd);
             }
             else if (priority == thread_priority::low)
             {
+                LTM_(debug).format(
+                    "local_priority_queue_scheduler::schedule_thread, "
+                    "low priority queue: "
+                    "pool({}), scheduler({}), "
+                    "thread({}), priority({}), description({})",
+                    *this->get_parent_pool(), *this, thrd->get_thread_id(),
+                    priority, thrd->get_description());
+
                 low_priority_queue_.schedule_thread(thrd);
             }
             else
             {
                 HPX_ASSERT(num_thread < num_queues_);
+
+                LTM_(debug).format(
+                    "local_priority_queue_scheduler::schedule_thread, "
+                    "normal priority queue: "
+                    "pool({}), scheduler({}), worker_thread({}), "
+                    "thread({}), priority({}), description({})",
+                    *this->get_parent_pool(), *this, num_thread,
+                    thrd->get_thread_id(), priority, thrd->get_description());
+
                 queues_[num_thread].data_->schedule_thread(thrd);
             }
         }
@@ -1117,16 +1180,19 @@ namespace hpx { namespace threads { namespace policies {
                 {
                     if (running)
                     {
-                        LTM_(error).format("queue({}): no new work available, "
-                                           "are we deadlocked?",
-                            num_thread);
+                        LTM_(error).format("pool({}), scheduler({}), "
+                                           "worker_thread({}): no new work "
+                                           "available, are we deadlocked?",
+                            *this->get_parent_pool(), *this, num_thread);
                     }
                     else
                     {
                         LHPX_CONSOLE_(hpx::util::logging::level::error)
-                            .format("  [TM] queue({}): no new work available, "
-                                    "are we deadlocked?\n",
-                                num_thread);
+                            .format(
+                                "  [TM] pool({}), scheduler({}), "
+                                "worker_thread({}): "
+                                "no new work available, are we deadlocked?\n",
+                                *this->get_parent_pool(), *this, num_thread);
                     }
                 }
             }

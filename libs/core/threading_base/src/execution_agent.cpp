@@ -206,8 +206,9 @@ namespace hpx { namespace threads {
                 hpx::threads::thread_schedule_state::pending)
             {
                 LTM_(warning).format(
-                    "resume: old thread state is already pending thread state, "
-                    "aborting state change, thread({}), description({})",
+                    "execution_agent::do_resume: old thread state is already "
+                    "pending thread state, aborting state change, thread({}), "
+                    "description({})",
                     id, get_thread_id_data(id)->get_description());
                 return;
             }
@@ -220,16 +221,17 @@ namespace hpx { namespace threads {
                 hpx::execution_base::this_thread::yield_k(
                     k, "hpx::threads::execution_agent::resume");
                 ++k;
-                LTM_(warning).format("resume: thread is active, retrying state "
-                                     "change, thread({}), description({})",
+                LTM_(warning).format(
+                    "execution_agent::do_resume: thread is active, retrying "
+                    "state change, thread({}), description({})",
                     id, get_thread_id_data(id)->get_description());
                 continue;
             }
             case thread_schedule_state::terminated:
             {
                 LTM_(warning).format(
-                    "resume: thread is terminated, aborting state change, "
-                    "thread({}), description({})",
+                    "execution_agent::do_resume: thread is terminated, "
+                    "aborting state change, thread({}), description({})",
                     id, get_thread_id_data(id)->get_description());
                 return;
             }
@@ -244,7 +246,8 @@ namespace hpx { namespace threads {
                 // should not happen...
                 HPX_ASSERT_MSG(false,
                     hpx::util::format(
-                        "resume: previous state was {}", previous_state_val)
+                        "execution_agent::do_resume: previous state was {}",
+                        previous_state_val)
                         .c_str());
                 break;
             }
@@ -256,9 +259,9 @@ namespace hpx { namespace threads {
             // at some point will ignore this thread by simply skipping it
             // (if it's not pending anymore).
 
-            LTM_(info).format(
-                "resume: thread({}), description({}), old state({})", id,
-                get_thread_id_data(id)->get_description(),
+            LTM_(info).format("execution_agent::do_resume: thread({}), "
+                              "description({}), old state({})",
+                id, get_thread_id_data(id)->get_description(),
                 get_thread_state_name(previous_state_val));
 
             // So all what we do here is to set the new state.
@@ -270,7 +273,8 @@ namespace hpx { namespace threads {
 
             // state has changed since we fetched it from the thread, retry
             LTM_(error).format(
-                "resume: state has been changed since it was fetched, "
+                "execution_agent::do_resume: state has been changed since it "
+                "was fetched, "
                 "retrying, thread({}), description({}), old state({})",
                 id, get_thread_id_data(id)->get_description(),
                 get_thread_state_name(previous_state_val));
@@ -281,6 +285,10 @@ namespace hpx { namespace threads {
         if (!(previous_state_val == thread_schedule_state::pending ||
                 previous_state_val == thread_schedule_state::pending_boost))
         {
+            LTM_(debug).format("execution_agent::do_resume: resuming thread, "
+                               "thread({}), description({})",
+                id, get_thread_id_data(id)->get_description());
+
             auto* data = get_thread_id_data(id);
             auto scheduler = data->get_scheduler_base();
             auto hint = thread_schedule_hint(

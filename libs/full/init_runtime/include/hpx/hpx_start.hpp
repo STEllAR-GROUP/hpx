@@ -60,9 +60,8 @@ namespace hpx {
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
     inline bool start(
-        util::function_nonser<int(hpx::program_options::variables_map&)> const&
-            f,
-        int argc, char** argv, init_params const& params = init_params());
+        std::function<int(hpx::program_options::variables_map&)> f, int argc,
+        char** argv, init_params const& params = init_params());
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
@@ -98,8 +97,8 @@ namespace hpx {
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    inline bool start(util::function_nonser<int(int, char**)> const& f,
-        int argc, char** argv, init_params const& params = init_params());
+    inline bool start(std::function<int(int, char**)> f, int argc, char** argv,
+        init_params const& params = init_params());
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///

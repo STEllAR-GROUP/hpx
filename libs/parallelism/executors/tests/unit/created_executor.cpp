@@ -47,7 +47,7 @@ struct void_parallel_executor : hpx::execution::parallel_executor
     template <typename F, typename Shape, typename... Ts>
     void bulk_sync_execute(F&& f, Shape const& shape, Ts&&... ts)
     {
-        return hpx::util::unwrap(bulk_async_execute(
+        return hpx::unwrap(bulk_async_execute(
             std::forward<F>(f), shape, std::forward<Ts>(ts)...));
     }
 };

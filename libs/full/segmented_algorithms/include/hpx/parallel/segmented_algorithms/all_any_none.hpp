@@ -167,7 +167,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::list<std::exception_ptr> errors;
                     parallel::util::detail::handle_remote_exceptions<
                         ExPolicy>::call(r, errors);
-                    std::vector<bool> res = hpx::util::unwrap(std::move(r));
+                    std::vector<bool> res = hpx::unwrap(std::move(r));
                     auto it = res.begin();
                     while (it != res.end())
                     {
@@ -317,7 +317,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::list<std::exception_ptr> errors;
                     parallel::util::detail::handle_remote_exceptions<
                         ExPolicy>::call(r, errors);
-                    std::vector<bool> res = hpx::util::unwrap(std::move(r));
+                    std::vector<bool> res = hpx::unwrap(std::move(r));
                     auto it = res.begin();
                     while (it != res.end())
                     {
@@ -467,7 +467,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::list<std::exception_ptr> errors;
                     parallel::util::detail::handle_remote_exceptions<
                         ExPolicy>::call(r, errors);
-                    std::vector<bool> res = hpx::util::unwrap(std::move(r));
+                    std::vector<bool> res = hpx::unwrap(std::move(r));
                     auto it = res.begin();
                     while (it != res.end())
                     {

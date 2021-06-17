@@ -16,9 +16,9 @@
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/async_local/dataflow.hpp>
 
-using hpx::lcos::shared_future;
+using hpx::unwrapping;
 using hpx::lcos::make_ready_future;
-using hpx::util::unwrapping;
+using hpx::lcos::shared_future;
 
 // define large action
 double func(double x1, double, double, double, double, double, double)

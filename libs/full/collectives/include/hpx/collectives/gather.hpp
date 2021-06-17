@@ -252,7 +252,7 @@ namespace hpx { namespace collectives {
 
         auto gather_data_direct =
             [this_site](communicator&& c,
-                T&& local_result) -> hpx::future<std::vector<arg_type>> {
+                arg_type&& local_result) -> hpx::future<std::vector<arg_type>> {
             using action_type = typename detail::communicator_server::
                 template communication_get_action<
                     traits::communication::gather_tag,
@@ -260,8 +260,8 @@ namespace hpx { namespace collectives {
 
             // make sure id is kept alive as long as the returned future,
             // explicitly unwrap returned future
-            hpx::future<std::vector<arg_type>> result = async(
-                action_type(), c, this_site, std::forward<T>(local_result));
+            hpx::future<std::vector<arg_type>> result =
+                async(action_type(), c, this_site, std::move(local_result));
 
             traits::detail::get_shared_state(result)->set_on_completed(
                 [client = std::move(c)]() { HPX_UNUSED(client); });
@@ -307,8 +307,8 @@ namespace hpx { namespace collectives {
 
             // make sure id is kept alive as long as the returned future,
             // explicitly unwrap returned future
-            hpx::future<void> result = async(
-                action_type(), c, this_site, std::forward<T>(local_result));
+            hpx::future<void> result =
+                async(action_type(), c, this_site, std::move(local_result));
 
             traits::detail::get_shared_state(result)->set_on_completed(
                 [client = std::move(c)]() { HPX_UNUSED(client); });

@@ -18,6 +18,7 @@
 #include <hpx/runtime/set_parcel_write_handler.hpp>
 #include <hpx/runtime_distributed/detail/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/find_all_localities.hpp>
+#include <hpx/runtime_distributed/find_here.hpp>
 #include <hpx/runtime_distributed/get_locality_name.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/runtime_local/get_num_all_localities.hpp>

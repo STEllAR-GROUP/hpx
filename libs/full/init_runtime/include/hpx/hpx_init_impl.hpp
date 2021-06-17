@@ -44,6 +44,40 @@ namespace apex {
 #endif
 
 namespace hpx {
+    namespace detail {
+        inline int init_impl(
+            util::function_nonser<int(
+                hpx::program_options::variables_map&)> const& f,
+            int argc, char** argv, init_params const& params)
+        {
+            if (argc == 0 || argv == nullptr)
+            {
+                argc = dummy_argc;
+                argv = dummy_argv;
+            }
+
+#if defined(HPX_WINDOWS)
+            detail::init_winsocket();
+#if defined(HPX_HAVE_APEX)
+            // artificially force the apex shared library to be loaded by the
+            // application
+            apex::version();
+#endif
+#endif
+            util::set_hpx_prefix(HPX_PREFIX);
+#if defined(__FreeBSD__)
+            freebsd_environ = environ;
+#endif
+            // set a handler for std::abort, std::at_quick_exit, and std::atexit
+            std::signal(SIGABRT, detail::on_abort);
+            std::atexit(detail::on_exit);
+#if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
+            std::at_quick_exit(detail::on_exit);
+#endif
+            return detail::run_or_start(f, argc, argv, params, true);
+        }
+    }    // namespace detail
+
     /// \brief Main entry point for launching the HPX runtime system.
     ///
     /// This is the main entry point for any HPX application. This function
@@ -53,25 +87,7 @@ namespace hpx {
     inline int init(std::function<int(hpx::program_options::variables_map&)> f,
         int argc, char** argv, init_params const& params)
     {
-#if defined(HPX_WINDOWS)
-        detail::init_winsocket();
-#if defined(HPX_HAVE_APEX)
-        // artificially force the apex shared library to be loaded by the
-        // application
-        apex::version();
-#endif
-#endif
-        util::set_hpx_prefix(HPX_PREFIX);
-#if defined(__FreeBSD__)
-        freebsd_environ = environ;
-#endif
-        // set a handler for std::abort
-        std::signal(SIGABRT, detail::on_abort);
-        std::atexit(detail::on_exit);
-#if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
-        std::at_quick_exit(detail::on_exit);
-#endif
-        return detail::run_or_start(f, argc, argv, params, true);
+        return detail::init_impl(std::move(f), argc, argv, params);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -84,13 +100,8 @@ namespace hpx {
         init_params const& params)
     {
         std::function<int(hpx::program_options::variables_map&)> main_f =
-            util::bind_back(detail::init_helper, f);
-        if (argc == 0 || argv == nullptr)
-        {
-            return init(std::move(main_f), detail::dummy_argc,
-                detail::dummy_argv, params);
-        }
-        return init(std::move(main_f), argc, argv, params);
+            util::bind_back(detail::init_helper, std::move(f));
+        return detail::init_impl(std::move(main_f), argc, argv, params);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -103,12 +114,7 @@ namespace hpx {
     {
         std::function<int(hpx::program_options::variables_map&)> main_f =
             static_cast<hpx_main_type>(::hpx_main);
-        if (argc == 0 || argv == nullptr)
-        {
-            return init(std::move(main_f), detail::dummy_argc,
-                detail::dummy_argv, params);
-        }
-        return init(std::move(main_f), argc, argv, params);
+        return detail::init_impl(std::move(main_f), argc, argv, params);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -120,13 +126,8 @@ namespace hpx {
     inline int init(
         std::nullptr_t, int argc, char** argv, init_params const& params)
     {
-        std::function<int(hpx::program_options::variables_map&)> main_f;
-        if (argc == 0 || argv == nullptr)
-        {
-            return init(std::move(main_f), detail::dummy_argc,
-                detail::dummy_argv, params);
-        }
-        return init(std::move(main_f), argc, argv, params);
+        util::function_nonser<int(hpx::program_options::variables_map&)> main_f;
+        return detail::init_impl(std::move(main_f), argc, argv, params);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -136,9 +137,9 @@ namespace hpx {
     /// console mode or worker mode depending on the command line settings).
     inline int init(init_params const& params)
     {
-        std::function<int(hpx::program_options::variables_map&)> main_f =
-            static_cast<hpx_main_type>(::hpx_main);
-        return init(
+        util::function_nonser<int(hpx::program_options::variables_map&)>
+            main_f = static_cast<hpx_main_type>(::hpx_main);
+        return detail::init_impl(
             std::move(main_f), detail::dummy_argc, detail::dummy_argv, params);
     }
 

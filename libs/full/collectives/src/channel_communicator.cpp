@@ -15,7 +15,7 @@
 #include <hpx/components/client.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors/exception.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/runtime_components/new.hpp>
 

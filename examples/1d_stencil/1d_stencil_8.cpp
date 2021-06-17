@@ -517,7 +517,7 @@ partition stepper_server::heat_part(
         middle.get_data(partition_server::middle_partition);
 
     hpx::future<partition_data> next_middle =
-        middle_data.then(hpx::util::unwrapping(
+        middle_data.then(hpx::unwrapping(
             [middle](partition_data const& m) -> partition_data {
                 HPX_UNUSED(middle);
 
@@ -531,7 +531,7 @@ partition stepper_server::heat_part(
             }));
 
     return hpx::dataflow(hpx::launch::async,
-        hpx::util::unwrapping(
+        hpx::unwrapping(
             [left, middle, right](partition_data next, partition_data const& l,
                 partition_data const& m, partition_data const& r) -> partition {
                 HPX_UNUSED(left);

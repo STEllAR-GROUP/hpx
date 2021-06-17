@@ -47,7 +47,7 @@ int hpx_main()
         values_futures.emplace_back(hpx::make_ready_future(i));
     }
 
-    auto f = hpx::dataflow(hpx::util::unwrapping([](const auto&& values) {
+    auto f = hpx::dataflow(hpx::unwrapping([](const auto&& values) {
         return std::accumulate(values.begin(), values.end(), 0);
     }),
         values_futures);

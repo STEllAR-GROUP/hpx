@@ -35,30 +35,30 @@
 
 namespace hpx { namespace threads { namespace detail {
     ///////////////////////////////////////////////////////////////////////
-    inline void write_new_state_log_debug(std::size_t num_thread,
-        thread_data* thrd, thread_schedule_state state, char const* info)
+    inline void write_state_log(policies::scheduler_base const& scheduler,
+        std::size_t const num_thread, thread_data* const thrd,
+        thread_schedule_state const old_state,
+        thread_schedule_state const new_state)
     {
-        LTM_(debug).format(
-            "tfunc({}): thread({}), description({}), new state({}), {}",
-            num_thread, thrd->get_thread_id(), thrd->get_description(),
-            get_thread_state_name(state), info);
+        LTM_(debug).format("scheduling_loop state change: pool({}), "
+                           "scheduler({}), worker_thread({}), thread({}), "
+                           "description({}), old state({}), new state({})",
+            *scheduler.get_parent_pool(), scheduler, num_thread, thrd,
+            thrd->get_description(), get_thread_state_name(old_state),
+            get_thread_state_name(new_state));
     }
-    inline void write_new_state_log_warning(std::size_t num_thread,
-        thread_data* thrd, thread_schedule_state state, char const* info)
+
+    inline void write_state_log_warning(
+        policies::scheduler_base const& scheduler, std::size_t const num_thread,
+        thread_data* const thrd, thread_schedule_state const state,
+        char const* info)
     {
-        // log this in any case
-        LTM_(warning).format(
-            "tfunc({}): thread({}), description({}), new state({}), {}",
-            num_thread, thrd->get_thread_id(), thrd->get_description(),
-            get_thread_state_name(state), info);
-    }
-    inline void write_old_state_log(
-        std::size_t num_thread, thread_data* thrd, thread_schedule_state state)
-    {
-        LTM_(debug).format(
-            "tfunc({}): thread({}), description({}), old state({})", num_thread,
+        LTM_(warning).format("scheduling_loop state change failed: pool({}), "
+                             "scheduler({}), worker thread ({}), thread({}), "
+                             "description({}), state({}), {}",
+            *scheduler.get_parent_pool(), scheduler, num_thread,
             thrd->get_thread_id(), thrd->get_description(),
-            get_thread_state_name(state));
+            get_thread_state_name(state), info);
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -429,7 +429,7 @@ namespace hpx { namespace threads { namespace detail {
                         // background_running is true. If it was false, this task
                         // was given back to the scheduler.
                         if (*background_running)
-                            idle_loop_count = callbacks.max_idle_loop_count_;
+                            idle_loop_count = 0;
                     }
                     // Force yield...
                     hpx::execution_base::this_thread::yield("background_work");
@@ -629,7 +629,7 @@ namespace hpx { namespace threads { namespace detail {
                     policies::fast_idle_mode))
             {
                 enable_stealing_staged = enable_stealing_staged &&
-                    idle_loop_count < params.max_idle_loop_count_ / 2;
+                    idle_loop_count > params.max_idle_loop_count_ / 2;
             }
 
             if (HPX_LIKELY(thrd ||
@@ -639,7 +639,7 @@ namespace hpx { namespace threads { namespace detail {
                 tfunc_time_wrapper tfunc_time_collector(idle_rate);
                 HPX_ASSERT(thrd->get_scheduler_base() == &scheduler);
 
-                idle_loop_count = params.max_idle_loop_count_;
+                idle_loop_count = 0;
                 ++busy_loop_count;
 
                 may_exit = false;
@@ -649,8 +649,6 @@ namespace hpx { namespace threads { namespace detail {
                 // call for a previously pending HPX thread (see comments above).
                 thread_state state = thrd->get_state();
                 thread_schedule_state state_val = state.state();
-
-                detail::write_old_state_log(num_thread, thrd, state_val);
 
                 if (HPX_LIKELY(thread_schedule_state::pending == state_val))
                 {
@@ -665,6 +663,10 @@ namespace hpx { namespace threads { namespace detail {
                                 thrd_stat.get_previous() ==
                                     thread_schedule_state::pending))
                         {
+                            detail::write_state_log(scheduler, num_thread, thrd,
+                                thrd_stat.get_previous(),
+                                thread_schedule_state::active);
+
                             tfunc_time_wrapper tfunc_time_collector(idle_rate);
 
                             // thread returns new required state
@@ -715,6 +717,10 @@ namespace hpx { namespace threads { namespace detail {
 #endif
                             }
 
+                            detail::write_state_log(scheduler, num_thread, thrd,
+                                thread_schedule_state::active,
+                                thrd_stat.get_previous());
+
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
                             ++counters.executed_thread_phases_;
 #endif
@@ -725,7 +731,7 @@ namespace hpx { namespace threads { namespace detail {
                             // executing this HPX-thread, we just continue with
                             // the next one
                             thrd_stat.disable_restore();
-                            detail::write_new_state_log_warning(
+                            detail::write_state_log_warning(scheduler,
                                 num_thread, thrd, state_val, "no execution");
                             continue;
                         }
@@ -736,7 +742,7 @@ namespace hpx { namespace threads { namespace detail {
                             // some other worker-thread got in between and changed
                             // the state of this thread, we just continue with
                             // the next one
-                            detail::write_new_state_log_warning(
+                            detail::write_state_log_warning(scheduler,
                                 num_thread, thrd, state_val, "no state change");
                             continue;
                         }
@@ -750,9 +756,6 @@ namespace hpx { namespace threads { namespace detail {
                         // this thread)
                         next_thrd = thrd_stat.get_next_thread();
                     }
-
-                    //detail::write_new_state_log_debug(num_thread, thrd,
-                    //    state_val, "normal");
 
                     // Re-add this work item to our list of work items if the HPX
                     // thread should be re-scheduled. If the HPX thread is suspended
@@ -824,10 +827,11 @@ namespace hpx { namespace threads { namespace detail {
                 else if (HPX_UNLIKELY(
                              thread_schedule_state::active == state_val))
                 {
-                    LTM_(warning).format(
-                        "tfunc({}): thread({}), description({}), rescheduling",
-                        num_thread, thrd->get_thread_id(),
-                        thrd->get_description());
+                    LTM_(warning).format("pool({}), scheduler({}), "
+                                         "worker_thread({}), thread({}), "
+                                         "description({}), rescheduling",
+                        *scheduler.get_parent_pool(), scheduler, num_thread,
+                        thrd->get_thread_id(), thrd->get_description());
                     // re-schedule thread, if it is still marked as active
                     // this might happen, if some thread has been added to the
                     // scheduler queue already but the state has not been reset
@@ -855,7 +859,7 @@ namespace hpx { namespace threads { namespace detail {
             // if nothing else has to be done either wait or terminate
             else
             {
-                --idle_loop_count;
+                ++idle_loop_count;
 
                 if (scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
                         running, idle_loop_count, enable_stealing_staged,
@@ -918,8 +922,7 @@ namespace hpx { namespace threads { namespace detail {
                             {
                                 // Otherwise, keep idling for some time
                                 if (!may_exit)
-                                    idle_loop_count =
-                                        params.max_idle_loop_count_;
+                                    idle_loop_count = 0;
                                 may_exit = true;
                             }
                         }
@@ -930,7 +933,7 @@ namespace hpx { namespace threads { namespace detail {
                         policies::fast_idle_mode)))
                 {
                     // speed up idle suspend if no work was stolen
-                    idle_loop_count -= params.max_idle_loop_count_ / 256;
+                    idle_loop_count += params.max_idle_loop_count_ / 256;
                     added = std::size_t(-1);
                 }
 
@@ -974,7 +977,7 @@ namespace hpx { namespace threads { namespace detail {
             if (scheduler.custom_polling_function() ==
                 policies::detail::polling_status::busy)
             {
-                idle_loop_count = params.max_idle_loop_count_;
+                idle_loop_count = 0;
             }
 
             // something went badly wrong, give up
@@ -1015,10 +1018,10 @@ namespace hpx { namespace threads { namespace detail {
                         idle_loop_count);
                 }
             }
-            else if (idle_loop_count < 0 || may_exit)
+            else if (idle_loop_count > params.max_idle_loop_count_ || may_exit)
             {
-                if (idle_loop_count < 0)
-                    idle_loop_count = params.max_idle_loop_count_;
+                if (idle_loop_count > params.max_idle_loop_count_)
+                    idle_loop_count = 0;
 
                 // call back into invoking context
                 if (!params.outer_.empty())

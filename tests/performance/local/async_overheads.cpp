@@ -4,8 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/init.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/future.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include "worker_timed.hpp"
@@ -30,7 +31,7 @@ void test_func()
 ///////////////////////////////////////////////////////////////////////////////
 hpx::future<void> spawn_level(std::size_t num_tasks)
 {
-    std::vector<hpx::future<void> > tasks;
+    std::vector<hpx::future<void>> tasks;
     tasks.reserve(num_tasks);
 
     // spawn sub-levels
@@ -45,7 +46,8 @@ hpx::future<void> spawn_level(std::size_t num_tasks)
 
         for (std::size_t i = 0; i != spread && spawn_hierarchically != 0; ++i)
         {
-            std::size_t sub_spawn = (std::min)(spawn_hierarchically, num_sub_tasks);
+            std::size_t sub_spawn =
+                (std::min)(spawn_hierarchically, num_sub_tasks);
             spawn_hierarchically -= sub_spawn;
             num_tasks -= sub_spawn;
 
@@ -72,7 +74,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     double seqential_time_per_task = 0;
 
     {
-        std::vector<hpx::future<void> > tasks;
+        std::vector<hpx::future<void>> tasks;
         tasks.reserve(num_tasks);
 
         std::uint64_t start = hpx::chrono::high_resolution_clock::now();
@@ -89,7 +91,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::cout << "Elapsed sequential time: "
                   << static_cast<double>(end - start) / 1e9 << " [s], ("
                   << seqential_time_per_task << " [s])" << std::endl;
-        hpx::util::print_cdash_timing("AsyncSequential", seqential_time_per_task);
+        hpx::util::print_cdash_timing(
+            "AsyncSequential", seqential_time_per_task);
     }
 
     double hierarchical_time_per_task = 0;
@@ -107,16 +110,16 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::cout << "Elapsed hierarchical time: "
                   << static_cast<double>(end - start) / 1e9 << " [s], ("
                   << hierarchical_time_per_task << " [s])" << std::endl;
-        hpx::util::print_cdash_timing("AsyncHierarchical", hierarchical_time_per_task);
+        hpx::util::print_cdash_timing(
+            "AsyncHierarchical", hierarchical_time_per_task);
     }
 
-    std::cout
-        << "Ratio (speedup): "
-        << seqential_time_per_task / hierarchical_time_per_task
-        << std::endl;
+    std::cout << "Ratio (speedup): "
+              << seqential_time_per_task / hierarchical_time_per_task
+              << std::endl;
 
-    hpx::util::print_cdash_timing("AsyncSpeedup",
-        seqential_time_per_task/hierarchical_time_per_task);
+    hpx::util::print_cdash_timing(
+        "AsyncSpeedup", seqential_time_per_task / hierarchical_time_per_task);
 
     return hpx::finalize();
 }
@@ -127,6 +130,7 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     desc_commandline.add_options()
         ("tasks,t", value<std::size_t>(),
          "number of tasks to spawn sequentially (default: 128)")
@@ -135,8 +139,8 @@ int main(int argc, char* argv[])
         ("spread,p", value<std::size_t>(&spread)->default_value(2),
          "number of sub-spawns per level (default: 2)")
         ("delay,d", value<std::uint64_t>(&delay_ns)->default_value(0),
-         "time spent in the delay loop [ns]")
-        ;
+        "time spent in the delay loop [ns]");
+    // clang-format on
 
     // Initialize and run HPX
     hpx::init_params init_args;

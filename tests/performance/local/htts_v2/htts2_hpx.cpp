@@ -7,12 +7,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/functional/bind.hpp>
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/local/barrier.hpp>
+#include <hpx/local/functional.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/synchronization/barrier.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 
 #include "htts2.hpp"
 
@@ -44,12 +43,15 @@ struct hpx_driver : htts2::driver
             f;
         hpx::program_options::options_description desc;
 
-        hpx::init_params init_args;
+        hpx::local::init_params init_args;
         init_args.cfg = cfg;
         init_args.desc_cmdline = desc;
 
         using hpx::util::placeholders::_1;
-        hpx::init(hpx::util::bind(&hpx_driver::run_impl, std::ref(*this), _1),
+
+        hpx::local::init(
+            std::function<int(hpx::program_options::variables_map&)>(
+                hpx::util::bind(&hpx_driver::run_impl, std::ref(*this), _1)),
             argc_, argv_, init_args);
     }
 
@@ -63,7 +65,7 @@ private:
         results_type results = kernel();
         print_results(results);
 
-        return hpx::finalize();
+        return hpx::local::finalize();
     }
 
     hpx::threads::thread_result_type payload_thread_function(

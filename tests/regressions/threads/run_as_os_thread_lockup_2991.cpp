@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/hpx.hpp>
+#include <hpx/init.hpp>
 #include <hpx/runtime_local/run_as_os_thread.hpp>
 
 #include <iostream>
@@ -28,7 +27,8 @@ int hpx_main()
         std::lock_guard<std::mutex> lock(mtx);
         std::cout << std::this_thread::get_id() << ": mutex locked\n";
 
-        std::cout << std::this_thread::get_id() << ": about to run on io thread\n";
+        std::cout << std::this_thread::get_id()
+                  << ": about to run on io thread\n";
         hpx::threads::run_as_os_thread(locker);
         //sleep(2);
     }
@@ -37,8 +37,7 @@ int hpx_main()
     return hpx::finalize();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     return hpx::init(argc, argv);
 }
-

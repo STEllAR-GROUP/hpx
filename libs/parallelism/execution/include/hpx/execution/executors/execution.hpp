@@ -862,7 +862,7 @@ namespace hpx { namespace parallel { namespace execution {
                         results.push_back(
                             execution::async_execute(exec, f, elem, ts...));
                     }
-                    return hpx::util::unwrap(results);
+                    return hpx::unwrap(results);
                 }
                 catch (std::bad_alloc const& ba)
                 {
@@ -1158,8 +1158,7 @@ namespace hpx { namespace parallel { namespace execution {
                         -> vector_result_type {
                             // use unwrap directly (instead of lazily) to avoid
                             // having to pull in dataflow
-                            return hpx::util::unwrap(
-                                func(std::move(predecessor)));
+                            return hpx::unwrap(func(std::move(predecessor)));
                         });
 
                 return hpx::traits::future_access<result_future_type>::create(

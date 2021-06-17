@@ -20,7 +20,7 @@
 #include <chrono>
 #include <iostream>
 
-using hpx::util::unwrapping;
+using hpx::unwrapping;
 
 typedef hpx::lcos::shared_future<double> future_type;
 

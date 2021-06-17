@@ -7,9 +7,9 @@
 
 #include <hpx/local/future.hpp>
 #include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/thread.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -104,16 +104,13 @@ void function_pointers(std::uint32_t num)
     int_f2_count.store(0);
 
     hpx::future<void> f1 =
-        hpx::dataflow(hpx::util::unwrapping(&void_f1), hpx::async(&int_f));
-    hpx::future<int> f2 = hpx::dataflow(hpx::util::unwrapping(&int_f1),
-        hpx::dataflow(
-            hpx::util::unwrapping(&int_f1), hpx::make_ready_future(42)));
+        hpx::dataflow(hpx::unwrapping(&void_f1), hpx::async(&int_f));
+    hpx::future<int> f2 = hpx::dataflow(hpx::unwrapping(&int_f1),
+        hpx::dataflow(hpx::unwrapping(&int_f1), hpx::make_ready_future(42)));
 
-    hpx::future<int> f3 = hpx::dataflow(hpx::util::unwrapping(&int_f2),
-        hpx::dataflow(
-            hpx::util::unwrapping(&int_f1), hpx::make_ready_future(42)),
-        hpx::dataflow(
-            hpx::util::unwrapping(&int_f1), hpx::make_ready_future(37)));
+    hpx::future<int> f3 = hpx::dataflow(hpx::unwrapping(&int_f2),
+        hpx::dataflow(hpx::unwrapping(&int_f1), hpx::make_ready_future(42)),
+        hpx::dataflow(hpx::unwrapping(&int_f1), hpx::make_ready_future(37)));
 
     int_f_vector_count.store(0);
 
@@ -121,17 +118,15 @@ void function_pointers(std::uint32_t num)
     vf.resize(num);
     for (std::uint32_t i = 0; i < num; ++i)
     {
-        vf[i] = hpx::dataflow(
-            hpx::util::unwrapping(&int_f1), hpx::make_ready_future(42));
+        vf[i] =
+            hpx::dataflow(hpx::unwrapping(&int_f1), hpx::make_ready_future(42));
     }
     hpx::future<int> f4 =
-        hpx::dataflow(hpx::util::unwrapping(&int_f_vector), std::move(vf));
+        hpx::dataflow(hpx::unwrapping(&int_f_vector), std::move(vf));
 
-    hpx::future<int> f5 = hpx::dataflow(hpx::util::unwrapping(&int_f1),
-        hpx::dataflow(
-            hpx::util::unwrapping(&int_f1), hpx::make_ready_future(42)),
-        hpx::dataflow(
-            hpx::util::unwrapping(&void_f), hpx::make_ready_future()));
+    hpx::future<int> f5 = hpx::dataflow(hpx::unwrapping(&int_f1),
+        hpx::dataflow(hpx::unwrapping(&int_f1), hpx::make_ready_future(42)),
+        hpx::dataflow(hpx::unwrapping(&void_f), hpx::make_ready_future()));
 
     f1.wait();
     HPX_TEST_EQ(f2.get(), 126);

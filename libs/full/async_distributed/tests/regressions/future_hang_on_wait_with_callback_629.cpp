@@ -113,8 +113,7 @@ double null_tree(std::uint64_t seed, std::uint64_t children,
 
     null_function(seed, delay_iterations);
 
-    hpx::lcos::wait_each(
-        hpx::util::unwrapping([&](double r) { d += r; }), futures);
+    hpx::lcos::wait_each(hpx::unwrapping([&](double r) { d += r; }), futures);
 
     return d;
 }

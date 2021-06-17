@@ -36,8 +36,8 @@ using hpx::make_ready_future;
 using hpx::local::finalize;
 using hpx::local::init;
 
+using hpx::unwrapping;
 using hpx::util::report_errors;
-using hpx::util::unwrapping;
 
 ///////////////////////////////////////////////////////////////////////////////
 

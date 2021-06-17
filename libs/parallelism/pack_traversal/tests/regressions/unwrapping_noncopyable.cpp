@@ -20,7 +20,7 @@ struct noncopyable
 
 int main()
 {
-    auto f = hpx::util::unwrapping([](noncopyable const&) {});
+    auto f = hpx::unwrapping([](noncopyable const&) {});
     noncopyable n{};
     f(n);
 }
