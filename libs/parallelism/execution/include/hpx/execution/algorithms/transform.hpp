@@ -28,8 +28,8 @@ namespace hpx { namespace execution { namespace experimental {
 
             template <typename R_, typename F_>
             transform_receiver(R_&& r, F_&& f)
-              : r(std::forward<R>(r))
-              , f(std::forward<F>(f))
+              : r(std::forward<R_>(r))
+              , f(std::forward<F_>(f))
             {
             }
 
