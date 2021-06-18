@@ -7,6 +7,7 @@
 set(execution_base_headers
     hpx/execution_base/agent_base.hpp
     hpx/execution_base/agent_ref.hpp
+    hpx/execution_base/any_sender.hpp
     hpx/execution_base/context_base.hpp
     hpx/execution_base/detail/spinlock_deadlock_detection.hpp
     hpx/execution_base/execution.hpp
@@ -39,7 +40,7 @@ set(execution_base_compat_headers
 )
 # cmake-format: on
 
-set(execution_base_sources agent_ref.cpp register_locks.cpp
+set(execution_base_sources agent_ref.cpp any_sender.cpp register_locks.cpp
                            spinlock_deadlock_detection.cpp this_thread.cpp
 )
 
