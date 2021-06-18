@@ -84,14 +84,28 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
-            for (hpx::future<T> const& f : workitems)
+            // first extract exception from all futures
+            std::vector<std::exception_ptr> exceptions;
+            exceptions.reserve(workitems.size());
+            for (auto const& f : workitems)
             {
                 if (f.has_exception())
-                    call(f.get_exception_ptr(), errors);
+                {
+                    exceptions.reserve(workitems.size());
+                    exceptions.push_back(f.get_exception_ptr());
+                }
+            }
+
+            // now handle exceptions as needed
+            for (auto& e : exceptions)
+            {
+                call(e, errors);
             }
 
             if (throw_errors && !errors.empty())
+            {
                 throw exception_list(std::move(errors));
+            }
 #endif
         }
 
@@ -106,14 +120,28 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
-            for (hpx::shared_future<T> const& f : workitems)
+            // first extract exception from all futures
+            std::vector<std::exception_ptr> exceptions;
+            exceptions.reserve(workitems.size());
+            for (auto const& f : workitems)
             {
                 if (f.has_exception())
-                    call(f.get_exception_ptr(), errors);
+                {
+                    exceptions.reserve(workitems.size());
+                    exceptions.push_back(f.get_exception_ptr());
+                }
+            }
+
+            // now handle exceptions as needed
+            for (auto& e : exceptions)
+            {
+                call(e, errors);
             }
 
             if (throw_errors && !errors.empty())
+            {
                 throw exception_list(std::move(errors));
+            }
 #endif
         }
 
@@ -131,7 +159,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 #else
             bool has_exception = false;
             std::exception_ptr bad_alloc_exception;
-            for (hpx::future<T>& f : workitems)
+            for (auto& f : workitems)
             {
                 if (f.has_exception())
                 {
@@ -157,18 +185,24 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             // are assumed to have already run the cleanup).
             if (has_exception)
             {
-                for (hpx::future<T>& f : workitems)
+                for (auto& f : workitems)
                 {
                     if (!f.has_exception())
+                    {
                         cleanup(f.get());
+                    }
                 }
             }
 
             if (bad_alloc_exception)
+            {
                 std::rethrow_exception(bad_alloc_exception);
+            }
 
             if (throw_errors && !errors.empty())
+            {
                 throw exception_list(std::move(errors));
+            }
 #endif
         }
     };
@@ -211,7 +245,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_UNUSED(workitems);
             HPX_ASSERT(false);
 #else
-            for (hpx::future<T> const& f : workitems)
+            for (auto const& f : workitems)
             {
                 if (f.has_exception())
                 {
@@ -229,7 +263,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_UNUSED(workitems);
             HPX_ASSERT(false);
 #else
-            for (hpx::shared_future<T> const& f : workitems)
+            for (auto const& f : workitems)
             {
                 if (f.has_exception())
                 {
@@ -248,7 +282,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_UNUSED(workitems);
             HPX_ASSERT(false);
 #else
-            for (hpx::future<T> const& f : workitems)
+            for (auto const& f : workitems)
             {
                 if (f.has_exception())
                 {
@@ -297,7 +331,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_UNUSED(workitems);
             HPX_ASSERT(false);
 #else
-            for (hpx::future<T> const& f : workitems)
+            for (auto const& f : workitems)
             {
                 if (f.has_exception())
                 {
@@ -315,7 +349,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_UNUSED(workitems);
             HPX_ASSERT(false);
 #else
-            for (hpx::shared_future<T> const& f : workitems)
+            for (auto const& f : workitems)
             {
                 if (f.has_exception())
                 {
@@ -334,7 +368,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_UNUSED(workitems);
             HPX_ASSERT(false);
 #else
-            for (hpx::future<T> const& f : workitems)
+            for (auto const& f : workitems)
             {
                 if (f.has_exception())
                 {

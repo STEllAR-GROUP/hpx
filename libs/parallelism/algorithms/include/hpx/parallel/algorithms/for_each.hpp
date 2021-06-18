@@ -350,8 +350,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void execute(
                 Iter part_begin, std::size_t part_size)
             {
-                util::detail::loop_n<execution_policy_type>(part_begin,
-                    part_size,
+                util::loop_n<execution_policy_type>(part_begin, part_size,
                     invoke_projected<fun_type, proj_type>{f_, proj_});
             }
 
@@ -403,7 +402,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void execute(
                 Iter part_begin, std::size_t part_size, std::true_type)
             {
-                util::detail::loop_n<execution_policy_type>(
+                util::loop_n<execution_policy_type>(
                     part_begin, part_size, invoke_projected<F>(f_));
             }
 
@@ -411,7 +410,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void execute(
                 Iter part_begin, std::size_t part_size, std::false_type)
             {
-                util::detail::loop_n_ind<execution_policy_type>(
+                util::loop_n_ind<execution_policy_type>(
                     part_begin, part_size, f_);
             }
 
@@ -465,8 +464,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             HPX_HOST_DEVICE static constexpr Iter sequential(
                 ExPolicy&&, InIter first, std::size_t count, F&& f, Proj&& proj)
             {
-                return util::detail::loop_n<std::decay_t<ExPolicy>>(first,
-                    count, invoke_projected<F, std::decay_t<Proj>>{f, proj});
+                return util::loop_n<std::decay_t<ExPolicy>>(first, count,
+                    invoke_projected<F, std::decay_t<Proj>>{f, proj});
             }
 
             template <typename ExPolicy, typename InIter, typename F>
@@ -474,7 +473,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 InIter first, std::size_t count, F&& f,
                 util::projection_identity)
             {
-                return util::detail::loop_n_ind<std::decay_t<ExPolicy>>(
+                return util::loop_n_ind<std::decay_t<ExPolicy>>(
                     first, count, std::forward<F>(f));
             }
 
@@ -523,7 +522,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             sequential(
                 ExPolicy&&, InIterB first, InIterE last, F&& f, Proj&& proj)
             {
-                return util::detail::loop_n<std::decay_t<ExPolicy>>(first,
+                return util::loop_n<std::decay_t<ExPolicy>>(first,
                     static_cast<std::size_t>(detail::distance(first, last)),
                     invoke_projected<F, std::decay_t<Proj>>{f, proj});
             }
@@ -548,7 +547,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             sequential(ExPolicy&&, InIterB first, InIterE last, F&& f,
                 util::projection_identity)
             {
-                return util::detail::loop_n_ind<std::decay_t<ExPolicy>>(first,
+                return util::loop_n_ind<std::decay_t<ExPolicy>>(first,
                     static_cast<std::size_t>(detail::distance(first, last)),
                     std::forward<F>(f));
             }

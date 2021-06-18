@@ -115,7 +115,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     FwdIter base = get<0>(part_begin.get_iterator_tuple());
 
                     // MSVC complains if pred or proj is captured by ref below
-                    util::detail::loop_n<std::decay_t<ExPolicy>>(++part_begin,
+                    util::loop_n<std::decay_t<ExPolicy>>(++part_begin,
                         part_size, [base, pred, proj](zip_iterator it) mutable {
                             using hpx::util::invoke;
 
@@ -150,7 +150,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     if (dest == get<0>(part_begin.get_iterator_tuple()))
                     {
                         // Self-assignment must be detected.
-                        util::detail::loop_n<execution_policy_type>(
+                        util::loop_n<execution_policy_type>(
                             part_begin, part_size, [&dest](zip_iterator it) {
                                 if (!get<1>(*it))
                                 {
@@ -164,7 +164,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     else
                     {
                         // Self-assignment can't be performed.
-                        util::detail::loop_n<execution_policy_type>(
+                        util::loop_n<execution_policy_type>(
                             part_begin, part_size, [&dest](zip_iterator it) {
                                 if (!get<1>(*it))
                                     *dest++ = std::move(get<0>(*it));
@@ -422,7 +422,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::size_t curr = 0;
 
                     // MSVC complains if pred or proj is captured by ref below
-                    util::detail::loop_n<std::decay_t<ExPolicy>>(++part_begin,
+                    util::loop_n<std::decay_t<ExPolicy>>(++part_begin,
                         part_size,
                         [base, pred, proj, &curr](zip_iterator it) mutable {
                             using hpx::util::invoke;
@@ -449,7 +449,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     next.get();    // rethrow exceptions
 
                     std::advance(dest, curr.get());
-                    util::detail::loop_n<std::decay_t<ExPolicy>>(++part_begin,
+                    util::loop_n<std::decay_t<ExPolicy>>(++part_begin,
                         part_size, [&dest](zip_iterator it) mutable {
                             if (!get<1>(*it))
                                 *dest++ = get<0>(*it);

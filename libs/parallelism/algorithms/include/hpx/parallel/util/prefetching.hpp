@@ -59,6 +59,8 @@ namespace hpx { namespace parallel { namespace util {
             std::size_t idx_;
 
         public:
+            // different version of clang-formt do different things
+            // clang-format off
             explicit prefetching_iterator(std::size_t idx, base_iterator base,
                 std::size_t chunk_size, std::size_t range_size,
                 ranges_type const& rngs)
@@ -66,9 +68,10 @@ namespace hpx { namespace parallel { namespace util {
               , base_(base)
               , chunk_size_(chunk_size)
               , range_size_(range_size)
-              , idx_((std::min)(idx, range_size))
+              , idx_((std::min) (idx, range_size))
             {
             }
+            // clang-format on
 
             ranges_type const& ranges() const
             {
@@ -94,8 +97,11 @@ namespace hpx { namespace parallel { namespace util {
 
             inline prefetching_iterator& operator+=(difference_type rhs)
             {
+                // different version of clang-formt do different things
+                // clang-format off
                 std::size_t last =
-                    (std::min)(idx_ + rhs * chunk_size_, range_size_);
+                    (std::min) (idx_ + rhs * chunk_size_, range_size_);
+                // clang-format on
 
                 std::advance(base_, last - idx_);
                 idx_ = last;
@@ -286,8 +292,11 @@ namespace hpx { namespace parallel { namespace util {
                     Itr base = it.base();
                     std::size_t j = it.index();
 
-                    std::size_t last = (std::min)(
-                        it.index() + it.chunk_size(), it.range_size());
+                    // different version of clang-formt do different things
+                    // clang-format off
+                    std::size_t last = (std::min) (it.index() + it.chunk_size(),
+                        it.range_size());
+                    // clang-format on
 
                     for (/**/; j != last; (void) ++j, ++base)
                     {
@@ -319,8 +328,11 @@ namespace hpx { namespace parallel { namespace util {
                     Itr base = it.base();
                     std::size_t j = it.index();
 
-                    std::size_t last = (std::min)(
-                        it.index() + it.chunk_size(), it.range_size());
+                    // different version of clang-formt do different things
+                    // clang-format off
+                    std::size_t last = (std::min) (it.index() + it.chunk_size(),
+                        it.range_size());
+                    // clang-format on
 
                     for (/**/; j != last; (void) ++j, ++base)
                     {
@@ -340,7 +352,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename ExPolicy, typename Itr, typename... Ts, typename F>
         HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr prefetching_iterator<Itr, Ts...>
-            tag_dispatch(hpx::parallel::util::detail::loop_n_t<ExPolicy>,
+            tag_dispatch(hpx::parallel::util::loop_n_t<ExPolicy>,
                 prefetching_iterator<Itr, Ts...> it, std::size_t count, F&& f)
         {
             return loop_n_helper::call(
@@ -363,8 +375,11 @@ namespace hpx { namespace parallel { namespace util {
                     Itr base = it.base();
                     std::size_t j = it.index();
 
-                    std::size_t last = (std::min)(
-                        it.index() + it.chunk_size(), it.range_size());
+                    // different version of clang-formt do different things
+                    // clang-format off
+                    std::size_t last = (std::min) (it.index() + it.chunk_size(),
+                        it.range_size());
+                    // clang-format on
 
                     for (/**/; j != last; (void) ++j, ++base)
                     {
@@ -396,8 +411,11 @@ namespace hpx { namespace parallel { namespace util {
                     Itr base = it.base();
                     std::size_t j = it.index();
 
-                    std::size_t last = (std::min)(
-                        it.index() + it.chunk_size(), it.range_size());
+                    // different version of clang-formt do different things
+                    // clang-format off
+                    std::size_t last = (std::min) (it.index() + it.chunk_size(),
+                        it.range_size());
+                    // clang-format on
 
                     for (/**/; j != last; (void) ++j, ++base)
                     {
@@ -417,7 +435,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename ExPolicy, typename Itr, typename... Ts, typename F>
         HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr prefetching_iterator<Itr, Ts...>
-            tag_dispatch(hpx::parallel::util::detail::loop_n_ind_t<ExPolicy>,
+            tag_dispatch(hpx::parallel::util::loop_n_ind_t<ExPolicy>,
                 prefetching_iterator<Itr, Ts...> it, std::size_t count, F&& f)
         {
             return loop_n_ind_helper::call(
@@ -461,8 +479,11 @@ namespace hpx { namespace parallel { namespace util {
                     Itr base = it.base();
                     std::size_t j = it.index();
 
-                    std::size_t last = (std::min)(
-                        it.index() + it.chunk_size(), it.range_size());
+                    // different version of clang-formt do different things
+                    // clang-format off
+                    std::size_t last = (std::min) (it.index() + it.chunk_size(),
+                        it.range_size());
+                    // clang-format on
 
                     for (/**/; j != last; (void) ++j, ++base)
                         f(base);
@@ -485,8 +506,11 @@ namespace hpx { namespace parallel { namespace util {
                     Itr base = it.base();
                     std::size_t j = it.index();
 
-                    std::size_t last = (std::min)(
-                        it.index() + it.chunk_size(), it.range_size());
+                    // different version of clang-formt do different things
+                    // clang-format off
+                    std::size_t last = (std::min) (it.index() + it.chunk_size(),
+                        it.range_size());
+                    // clang-format on
 
                     for (/**/; j != last; (void) ++j, ++base)
                         f(base);
@@ -515,8 +539,11 @@ namespace hpx { namespace parallel { namespace util {
                     Itr base = it.base();
                     std::size_t j = it.index();
 
-                    std::size_t last = (std::min)(
-                        it.index() + it.chunk_size(), it.range_size());
+                    // different version of clang-formt do different things
+                    // clang-format off
+                    std::size_t last = (std::min) (it.index() + it.chunk_size(),
+                        it.range_size());
+                    // clang-format on
 
                     for (/**/; j != last; (void) ++j, ++base)
                         f(*base);
@@ -539,8 +566,11 @@ namespace hpx { namespace parallel { namespace util {
                     Itr base = it.base();
                     std::size_t j = it.index();
 
-                    std::size_t last = (std::min)(
-                        it.index() + it.chunk_size(), it.range_size());
+                    // different version of clang-formt do different things
+                    // clang-format off
+                    std::size_t last = (std::min) (it.index() + it.chunk_size(),
+                        it.range_size());
+                    // clang-format on
 
                     for (/**/; j != last; (void) ++j, ++base)
                         f(*base);

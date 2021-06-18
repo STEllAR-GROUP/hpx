@@ -210,12 +210,18 @@ namespace hpx { namespace parallel { namespace util {
                 return hpx::future<FwdIter>();
 #else
                 // wait for all tasks to finish
+                // Note: the lambda takes the vectors by value (dataflow
+                //       moves those into the lambda) to ensure that they
+                //       will be destroyed before the lambda exists.
+                //       Otherwise the vectors stay alive in the dataflow's
+                //       shared state and may reference data that has gone
+                //       out of scope.
                 return hpx::dataflow(
                     [last, errors = std::move(errors),
                         scoped_params = std::move(scoped_params),
                         f = std::forward<F>(f)](
-                        std::vector<hpx::future<Result>>&& r1,
-                        std::vector<hpx::future<Result>>&& r2) mutable
+                        std::vector<hpx::future<Result>> r1,
+                        std::vector<hpx::future<Result>> r2) mutable
                     -> FwdIter {
                         HPX_UNUSED(scoped_params);
 

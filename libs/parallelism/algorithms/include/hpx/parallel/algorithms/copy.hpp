@@ -550,8 +550,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::size_t curr = 0;
 
                     // MSVC complains if proj is captured by ref below
-                    util::detail::loop_n<std::decay_t<ExPolicy>>(part_begin,
-                        part_size,
+                    util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_size,
                         [&pred, proj, &curr](zip_iterator it) mutable {
                             bool f = hpx::util::invoke(
                                 pred, hpx::util::invoke(proj, get<0>(*it)));
@@ -571,8 +570,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     next.get();    // rethrow exceptions
 
                     std::advance(dest, curr.get());
-                    util::detail::loop_n<std::decay_t<ExPolicy>>(part_begin,
-                        part_size, [&dest](zip_iterator it) mutable {
+                    util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_size,
+                        [&dest](zip_iterator it) mutable {
                             if (get<1>(*it))
                                 *dest++ = get<0>(*it);
                         });

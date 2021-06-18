@@ -32,14 +32,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     void add_ready_future(
         std::vector<Future>& workitems, F&& f, FwdIter first, std::size_t count)
     {
-        workitems.push_back(hpx::make_ready_future(f(first, count)));
+        workitems.push_back(
+            hpx::make_ready_future(std::forward<F>(f)(first, count)));
     }
 
     template <typename F, typename FwdIter>
     void add_ready_future(std::vector<hpx::future<void>>& workitems, F&& f,
         FwdIter first, std::size_t count)
     {
-        f(first, count);
+        std::forward<F>(f)(first, count);
         workitems.push_back(hpx::make_ready_future());
     }
 
@@ -47,7 +48,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     void add_ready_future(std::vector<hpx::shared_future<void>>& workitems,
         F&& f, FwdIter first, std::size_t count)
     {
-        f(first, count);
+        std::forward<F>(f)(first, count);
         workitems.push_back(hpx::make_ready_future());
     }
 
@@ -63,13 +64,17 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                 // try to calculate chunk-size and maximum number of chunks
                 chunk_size = (count + 4 * cores - 1) / (4 * cores);    // -V112
 
+                // different version of clang-formt do different things
+                // clang-format off
+
                 // we should not consider more chunks than we have elements
-                max_chunks = (std::min)(4 * cores, count);    // -V112
+                max_chunks = (std::min) (4 * cores, count);    // -V112
 
                 // we should not make chunks smaller than what's determined by
                 // the max chunk size
-                chunk_size = (std::max)(
-                    chunk_size, (count + max_chunks - 1) / max_chunks);
+                chunk_size = (std::max) (chunk_size,
+                    (count + max_chunks - 1) / max_chunks);
+                // clang-format on
             }
             else
             {
@@ -131,9 +136,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             if (stride != 1)
             {
+                // different version of clang-formt do different things
+                // clang-format off
+
                 // rounding up
-                test_chunk_size = (std::max)(std::size_t(stride),
+                test_chunk_size = (std::max) (std::size_t(stride),
                     ((test_chunk_size + stride - 1) / stride) * stride);
+                // clang-format on
             }
 
             add_ready_future(workitems, f1, begin, test_chunk_size);
@@ -153,8 +162,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         if (stride != 1)
         {
-            chunk_size = (std::max)(std::size_t(stride),
+            // different version of clang-formt do different things
+            // clang-format off
+            chunk_size = (std::max) (std::size_t(stride),
                 ((chunk_size + stride) / stride - 1) * stride);
+            // clang-format on
         }
 
         using iterator = parallel::util::detail::chunk_size_iterator<FwdIter>;
@@ -185,10 +197,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         std::vector<tuple_type> shape;
         Stride stride = parallel::v1::detail::abs(s);
 
+        // different version of clang-formt do different things
+        // clang-format off
+
         // we should not consider more chunks than we have elements
         if (max_chunks != 0)
         {
-            max_chunks = (std::min)(max_chunks, count);
+            max_chunks = (std::min) (max_chunks, count);
         }
 
         while (count != 0)
@@ -203,12 +218,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             if (stride != 1)
             {
-                chunk_size = (std::max)(std::size_t(stride),
+                chunk_size = (std::max) (std::size_t(stride),
                     ((chunk_size + stride) / stride - 1) * stride);
             }
 
             // in last chunk, consider only remaining number of elements
-            std::size_t chunk = (std::min)(chunk_size, count);
+            std::size_t chunk = (std::min) (chunk_size, count);
 
             shape.push_back(hpx::make_tuple(first, chunk));
 
@@ -216,6 +231,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             first = parallel::v1::detail::next(first, count, chunk);
             count -= chunk;
         }
+        // clang-format on
 
         return shape;
     }
@@ -226,14 +242,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     void add_ready_future_idx(std::vector<Future>& workitems, F&& f,
         FwdIter first, std::size_t base_idx, std::size_t count)
     {
-        workitems.push_back(hpx::make_ready_future(f(first, count, base_idx)));
+        workitems.push_back(
+            hpx::make_ready_future(std::forward<F>(f)(first, count, base_idx)));
     }
 
     template <typename F, typename FwdIter>
     void add_ready_future_idx(std::vector<hpx::future<void>>& workitems, F&& f,
         FwdIter first, std::size_t base_idx, std::size_t count)
     {
-        f(first, count, base_idx);
+        std::forward<F>(f)(first, count, base_idx);
         workitems.push_back(hpx::make_ready_future());
     }
 
@@ -241,7 +258,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     void add_ready_future_idx(std::vector<hpx::shared_future<void>>& workitems,
         F&& f, std::size_t base_idx, FwdIter first, std::size_t count)
     {
-        f(first, count, base_idx);
+        std::forward<F>(f)(first, count, base_idx);
         workitems.push_back(hpx::make_ready_future());
     }
 
@@ -270,8 +287,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             if (stride != 1)
             {
+                // different version of clang-formt do different things
+                // clang-format off
                 test_chunk_size = (std::max)(std::size_t(stride),
                     ((test_chunk_size + stride) / stride - 1) * stride);
+                // clang-format on
             }
 
             add_ready_future_idx(
@@ -294,8 +314,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         if (stride != 1)
         {
-            chunk_size = (std::max)(std::size_t(stride),
+            // different version of clang-formt do different things
+            // clang-format off
+            chunk_size = (std::max) (std::size_t(stride),
                 ((chunk_size + stride) / stride - 1) * stride);
+            // clang-format on
         }
 
         using iterator =
@@ -327,10 +350,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         Stride stride = parallel::v1::detail::abs(s);
         std::size_t base_idx = 0;
 
+        // different version of clang-formt do different things
+        // clang-format off
+
         // we should not consider more chunks than we have elements
         if (max_chunks != 0)
         {
-            max_chunks = (std::min)(max_chunks, count);
+            max_chunks = (std::min) (max_chunks, count);
         }
 
         while (count != 0)
@@ -345,12 +371,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             if (stride != 1)
             {
-                chunk_size = (std::max)(std::size_t(stride),
+                chunk_size = (std::max) (std::size_t(stride),
                     ((chunk_size + stride) / stride - 1) * stride);
             }
 
             // in last chunk, consider only remaining number of elements
-            std::size_t chunk = (std::min)(chunk_size, count);
+            std::size_t chunk = (std::min) (chunk_size, count);
 
             shape.push_back(hpx::make_tuple(first, chunk, base_idx));
 
@@ -360,6 +386,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             count -= chunk;
             base_idx += chunk;
         }
+        // clang-format on
 
         return shape;
     }

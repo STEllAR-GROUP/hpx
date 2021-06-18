@@ -475,28 +475,25 @@ namespace hpx { namespace parallel { namespace util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail {
+    template <typename ExPolicy, typename Iter, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
+        hpx::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
+    tag_dispatch(hpx::parallel::util::loop_n_t<ExPolicy>, Iter it,
+        std::size_t count, F&& f)
+    {
+        return hpx::parallel::util::detail::datapar_loop_n<Iter>::call(
+            it, count, std::forward<F>(f));
+    }
 
-        template <typename ExPolicy, typename Iter, typename F>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
-        tag_dispatch(hpx::parallel::util::detail::loop_n_t<ExPolicy>, Iter it,
-            std::size_t count, F&& f)
-        {
-            return hpx::parallel::util::detail::datapar_loop_n<Iter>::call(
-                it, count, std::forward<F>(f));
-        }
-
-        template <typename ExPolicy, typename Iter, typename F>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
-        tag_dispatch(hpx::parallel::util::detail::loop_n_ind_t<ExPolicy>,
-            Iter it, std::size_t count, F&& f)
-        {
-            return hpx::parallel::util::detail::datapar_loop_n_ind<Iter>::call(
-                it, count, std::forward<F>(f));
-        }
-    }    // namespace detail
-}}}      // namespace hpx::parallel::util
+    template <typename ExPolicy, typename Iter, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
+        hpx::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
+    tag_dispatch(hpx::parallel::util::loop_n_ind_t<ExPolicy>, Iter it,
+        std::size_t count, F&& f)
+    {
+        return hpx::parallel::util::detail::datapar_loop_n_ind<Iter>::call(
+            it, count, std::forward<F>(f));
+    }
+}}}    // namespace hpx::parallel::util
 
 #endif
