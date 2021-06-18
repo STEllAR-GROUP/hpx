@@ -15,6 +15,7 @@
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
+#include <hpx/testing/performance.hpp>
 #include <hpx/thread_support/spinlock.hpp>
 #include <hpx/util/ios_flags_saver.hpp>
 
@@ -182,6 +183,7 @@ namespace hpx { namespace util {
     HPX_CORE_EXPORT void print_cdash_timing(const char* name, double time);
     HPX_CORE_EXPORT void print_cdash_timing(
         const char* name, std::uint64_t time);
+
 }}    // namespace hpx::util
 
 ////////////////////////////////////////////////////////////////////////////////
