@@ -601,8 +601,8 @@ namespace hpx {
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
-            hpx::uninitialized_fill_n_t, FwdIter first, Size count, T const& value)
+        friend FwdIter tag_fallback_dispatch(hpx::uninitialized_fill_n_t,
+            FwdIter first, Size count, T const& value)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
                 "Requires at least forward iterator.");

@@ -123,6 +123,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/transform_reduce.hpp
     hpx/parallel/container_algorithms/uninitialized_copy.hpp
     hpx/parallel/container_algorithms/uninitialized_default_construct.hpp
+    hpx/parallel/container_algorithms/uninitialized_fill.hpp
     hpx/parallel/container_algorithms/uninitialized_move.hpp
     hpx/parallel/container_algorithms/uninitialized_value_construct.hpp
     hpx/parallel/container_algorithms/unique.hpp

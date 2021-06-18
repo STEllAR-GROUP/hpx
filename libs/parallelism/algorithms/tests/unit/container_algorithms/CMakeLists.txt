@@ -98,6 +98,8 @@ set(tests
     uninitialized_copy_n_range
     uninitialized_default_construct_range
     uninitialized_default_constructn_range
+    uninitialized_fill_range
+    uninitialized_filln_range
     uninitialized_move_range
     uninitialized_move_n_range
     uninitialized_value_construct_range
