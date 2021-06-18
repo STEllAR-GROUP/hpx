@@ -18,6 +18,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<int> count(0);
+int const initial_count = 42;
+int const num_tasks = 139;
+std::atomic<int> completed_tasks(0);
 
 void worker(hpx::lcos::local::sliding_semaphore& sem)
 {
@@ -27,15 +30,39 @@ void worker(hpx::lcos::local::sliding_semaphore& sem)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    hpx::lcos::local::sliding_semaphore sem(9);
+    std::vector<hpx::future<void>> futures;
+    futures.reserve(num_tasks);
 
-    for (std::size_t i = 0; i != 10; ++i)
-        hpx::apply(&worker, std::ref(sem));
+    hpx::lcos::local::sliding_semaphore sem(initial_count);
 
-    // Wait for all threads to finish executing.
-    sem.wait(19);
+    for (std::size_t i = 0; i != num_tasks; ++i)
+    {
+        futures.emplace_back(hpx::async(&worker, std::ref(sem)));
+    }
 
-    HPX_TEST_EQ(count, 10);
+    sem.wait(initial_count + num_tasks);
+
+    HPX_TEST_EQ(count, num_tasks);
+
+    // Since sem.signal(++count) (in worker) is not an atomic operation we wait
+    // for the tasks to finish here. The task which signals the count that
+    // releases the waiting thread is not necessarily the last one to signal the
+    // semaphore. The following can happen:
+    //
+    //   thread 0             thread 1                thread 2
+    //   -------------------  ----------------------- ---------------------
+    //   atomic<int> count(0)
+    //   semaphore sem(0)
+    //   sem.wait(2)
+    //        .               new_count = ++count
+    //        .                                       new_count = ++count
+    //        .                                       sem.signal(new_count)
+    //   sem.wait(2) returns
+    //   sem destructed
+    //                        (sem is a dangling ref)
+    //                        sem.signal(new_count)
+    //
+    hpx::wait_all(std::move(futures));
 
     return hpx::local::finalize();
 }
