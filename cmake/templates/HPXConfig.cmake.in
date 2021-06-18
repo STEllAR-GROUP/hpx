@@ -11,15 +11,22 @@ cmake_policy(VERSION 3.17)
 # Forward HPX_* cache variables
 include("${CMAKE_CURRENT_LIST_DIR}/HPXCacheVariables.cmake")
 
-# include exported targets
-if(HPX_WITH_CLONED_ASIO)
-  include("${CMAKE_CURRENT_LIST_DIR}/HPXAsioTarget.cmake")
-endif()
-include("${CMAKE_CURRENT_LIST_DIR}/HPXInternalTargets.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/HPXTargets.cmake")
-
 # include HPX cmake utilities
 include("${CMAKE_CURRENT_LIST_DIR}/HPXMacros.cmake")
+
+# include exported targets
+
+# Asio can be installed by HPX or externally installed. In the first case we use
+# exported targets, in the second we find Asio again using find_package.
+if(HPX_WITH_FETCH_ASIO)
+  include("${CMAKE_CURRENT_LIST_DIR}/HPXAsioTarget.cmake")
+else()
+  set(HPX_ASIO_ROOT "@ASIO_ROOT@")
+  include(HPX_SetupAsio)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/HPXInternalTargets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/HPXTargets.cmake")
 
 get_filename_component(
   _hpx_root_dir "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE
@@ -84,12 +91,6 @@ endif()
 include(HPX_SetupBoost)
 include(HPX_SetupBoostFilesystem)
 include(HPX_SetupBoostIostreams)
-
-# Asio
-if(NOT HPX_WITH_CLONED_ASIO)
-  set(HPX_ASIO_ROOT "@ASIO_ROOT@")
-  include(HPX_SetupAsio)
-endif()
 
 # HIP
 include(HPX_SetupHIP)

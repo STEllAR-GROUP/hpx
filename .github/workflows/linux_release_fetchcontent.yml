@@ -24,6 +24,7 @@ jobs:
               -GNinja \
               -DCMAKE_BUILD_TYPE=Release \
               -DHPX_WITH_MALLOC=system \
+              -DHPX_WITH_FETCH_ASIO=ON \
               -DHPX_WITH_APEX=ON \
               -DHPX_WITH_EXAMPLES=ON \
               -DHPX_WITH_TESTS=OFF \

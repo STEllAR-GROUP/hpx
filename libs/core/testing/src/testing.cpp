@@ -1,3 +1,4 @@
+//  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2013 Hartmut Kaiser
 //  Copyright (c) 2017 Denis Blank
 //
@@ -69,6 +70,7 @@ namespace hpx { namespace util {
         }
 
         fixture global_fixture{std::cerr};
+
     }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
@@ -108,4 +110,5 @@ namespace hpx { namespace util {
     {
         print_cdash_timing(name, time / 1e9);
     }
+
 }}    // namespace hpx::util
