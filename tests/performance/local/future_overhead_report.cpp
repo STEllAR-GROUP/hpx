@@ -7,30 +7,17 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/async_combinators/wait_each.hpp>
-#include <hpx/execution_base/this_thread.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/apply.hpp>
-#include <hpx/include/async.hpp>
-#include <hpx/include/parallel_execution.hpp>
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/threads.hpp>
-#include <hpx/modules/format.hpp>
-#include <hpx/modules/synchronization.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/timing.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
 
 #include <array>
-#include <atomic>
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
-#include <sstream>
-#include <stdexcept>
 #include <string>
 #include <type_traits>
-#include <vector>
 
 using hpx::program_options::options_description;
 using hpx::program_options::value;
@@ -48,17 +35,6 @@ static std::string queuing = "default";
 static std::size_t numa_sensitive = 0;
 static std::uint64_t num_threads = 1;
 static std::string info_string = "";
-
-const char* exec_name(hpx::execution::parallel_executor const&)
-{
-    return "parallel_executor";
-}
-
-const char* exec_name(
-    hpx::parallel::execution::parallel_executor_aggregated const&)
-{
-    return "parallel_executor_aggregated";
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
@@ -126,7 +102,8 @@ void measure_function_futures_create_thread_hierarchical_placement(
                 l.count_down(1);
             };
             auto const thread_func =
-                hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
+                hpx::threads::detail::thread_function_nullary<decltype(func)>{
+                    func};
             for (std::size_t t = 0; t < num_threads; ++t)
             {
                 auto const hint = hpx::threads::thread_schedule_hint(
@@ -194,7 +171,7 @@ int hpx_main(variables_map& vm)
         }
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -220,8 +197,8 @@ int main(int argc, char* argv[])
     // clang-format on
 
     // Initialize and run HPX.
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }
