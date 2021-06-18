@@ -25,6 +25,7 @@ spack load ninja@1.10.0
 configure_extra_options="-DCMAKE_BUILD_TYPE=Debug"
 configure_extra_options+=" -DHPX_WITH_MAX_CPU_COUNT=128"
 configure_extra_options+=" -DHPX_WITH_MALLOC=system"
+configure_extra_options+=" -DHPX_WITH_FETCH_ASIO=ON"
 configure_extra_options+=" -DHPX_WITH_CXX${CXX_STD}=ON"
 configure_extra_options+=" -DHPX_WITH_NETWORKING=OFF"
 configure_extra_options+=" -DHPX_WITH_DISTRIBUTED_RUNTIME=OFF"

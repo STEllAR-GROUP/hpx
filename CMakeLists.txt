@@ -1044,6 +1044,21 @@ if(HPX_WITH_APEX)
   )
 endif()
 
+# Options for automatically fetching Asio
+hpx_option(
+  HPX_WITH_FETCH_ASIO
+  BOOL
+  "Use FetchContent to fetch Asio. By default an installed Asio will be used. (default: OFF)"
+  OFF
+  CATEGORY "Build Targets"
+  ADVANCED
+)
+hpx_option(
+  HPX_WITH_ASIO_TAG STRING "Asio repository tag or branch" "asio-1-18-2"
+  CATEGORY "Build Targets"
+  ADVANCED
+)
+
 # cmake-format: off
 # LibCDS option
 # NOTE: The libcds option is disabled for the 1.5.0 release as it is not ready

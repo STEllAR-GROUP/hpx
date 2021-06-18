@@ -25,7 +25,7 @@ add_hpx_module(
   SOURCES ${io_service_sources}
   HEADERS ${io_service_headers}
   COMPAT_HEADERS ${io_service_compat_headers}
-  DEPENDENCIES ASIO::standalone_asio
+  DEPENDENCIES Asio::asio
   MODULE_DEPENDENCIES
     hpx_assertion
     hpx_concurrency
