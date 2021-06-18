@@ -822,7 +822,7 @@ namespace hpx { namespace execution { namespace experimental {
         private:
             // attempt to improve error messages if property is not supported
             template <typename... Args>
-            friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+            friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
                 Tag, Args&&... /*args*/)
             {
                 return property_not_supported<Tag, Args...>{};
