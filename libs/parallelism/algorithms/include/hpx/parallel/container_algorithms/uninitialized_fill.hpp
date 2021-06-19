@@ -13,166 +13,62 @@
 
 namespace hpx { namespace ranges {
 
-    /// Copies the elements in the range, defined by [first, last), to an
-    /// uninitialized memory area beginning at \a dest. If an exception is
-    /// thrown during the copy operation, the function has no effects.
+    /// Copies the given \a value to an uninitialized memory area, defined by
+    /// the range [first, last). If an exception is thrown during the
+    /// initialization, the function has no effects.
     ///
-    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    /// \note   Complexity: Linear in the distance between \a first and \a last
     ///
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam Sent1       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for InIter.
-    /// \tparam FwdIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
-    /// \tparam Sent2       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for InIter2.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for FwdIter.
+    /// \tparam T           The type of the value to be assigned (deduced).
     ///
-    /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     that will be copied from
-    /// \param last1        Refers to sentinel value denoting the end of the
-    ///                     sequence of elements the algorithm will be applied
-    /// \param first2       Refers to the beginning of the destination range.
-    /// \param last2        Refers to sentinel value denoting the end of the
-    ///                     second range the algorithm will be applied to.
-    ///
-    /// The assignments in the parallel \a uninitialized_fill algorithm invoked
-    /// without an execution policy object will execute in sequential order in
-    /// the calling thread.
-    ///
-    /// \returns  The \a uninitialized_fill algorithm returns an
-    ///           \a in_out_result<InIter, FwdIter>.
-    ///           The \a uninitialized_fill algorithm returns an input iterator
-    ///           to one past the last element copied from and the output
-    ///           iterator to the element in the destination range, one past
-    ///           the last element copied.
-    ///
-    template <typename InIter, typename Sent1, typename FwdIter, typename Sent2>
-    hpx::parallel::util::in_out_result<InIter, FwdIter> uninitialized_fill(
-        InIter first1, Sent1 last1, FwdIter first2, Sent2 last2);
-
-    /// Copies the elements in the range, defined by [first, last), to an
-    /// uninitialized memory area beginning at \a dest. If an exception is
-    /// thrown during the copy operation, the function has no effects.
-    ///
-    /// \note   Complexity: Performs exactly \a last - \a first assignments.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam Sent1       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for InIter.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
-    /// \tparam Sent2       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for InIter2.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     that will be copied from
-    /// \param last1        Refers to sentinel value denoting the end of the
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to sentinel value denoting the end of the
     ///                     sequence of elements the algorithm will be applied.
-    /// \param first2       Refers to the beginning of the destination range.
-    /// \param last2        Refers to sentinel value denoting the end of the
-    ///                     second range the algorithm will be applied to.
+    /// \param value        The value to be assigned.
     ///
-    /// The assignments in the parallel \a uninitialized_fill algorithm invoked
-    /// with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a uninitialized_fill algorithm invoked
-    /// with an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an
-    /// unordered fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a uninitialized_fill algorithm returns a
-    ///           \a hpx::future<in_out_result<InIter, FwdIter>>, if the
-    ///           execution policy is of type \a sequenced_task_policy
-    ///           or \a parallel_task_policy and
-    ///           returns \a in_out_result<InIter, FwdIter> otherwise.
-    ///           The \a uninitialized_fill algorithm returns an input iterator
-    ///           to one past the last element copied from and the output
-    ///           iterator to the element in the destination range, one past
-    ///           the last element copied.
-    ///
-    template <typename ExPolicy, typename FwdIter1, typename Sent1,
-        typename FwdIter2, typename Sent2>
-    typename parallel::util::detail::algorithm_result<ExPolicy,
-        parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
-    uninitialized_fill(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
-        FwdIter2 first2, Sent2 last2);
-
-    /// Copies the elements in the range, defined by [first, last), to an
-    /// uninitialized memory area beginning at \a dest. If an exception is
-    /// thrown during the copy operation, the function has no effects.
-    ///
-    /// \note   Complexity: Performs exactly \a last - \a first assignments.
-    ///
-    /// \tparam Rng1        The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Rng2        The type of the destination range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
-    ///
-    /// \param rng1         Refers to the range from which the elements
-    ///                     will be copied from
-    /// \param rng2         Refers to the range to which the elements
-    ///                     will be copied to
-    ///
-    /// The assignments in the parallel \a uninitialized_fill algorithm invoked
+    /// The assignments in the ranges \a uninitialized_fill algorithm invoked
     /// without an execution policy object will execute in sequential order in
     /// the calling thread.
     ///
-    /// \returns  The \a uninitialized_fill algorithm returns an
-    ///           \a in_out_result<typename hpx::traits::range_traits<Rng1>
-    ///           ::iterator_type, typename hpx::traits::range_traits<Rng2>
-    ///           ::iterator_type>.
-    ///           The \a uninitialized_fill algorithm returns an input iterator
-    ///           to one past the last element copied from and the output
-    ///           iterator to the element in the destination range, one past
+    /// \returns  The \a uninitialized_fill algorithm returns a
+    ///           returns \a FwdIter.
+    ///           The \a uninitialized_fill algorithm returns the output
+    ///           iterator to the element in the range, one past
     ///           the last element copied.
     ///
-    template <typename Rng1, typename Rng2>
-    hpx::parallel::util::in_out_result<
-        typename hpx::traits::range_traits<Rng1>::iterator_type,
-        typename hpx::traits::range_traits<Rng2>::iterator_type>
-    uninitialized_fill(Rng1&& rng1, Rng2&& rng2);
+    template <typename FwdIter, typename Sent, typename T>
+    FwdIter uninitialized_fill(FwdIter first, Sent last, T const& value);
 
-    /// Copies the elements in the range, defined by [first, last), to an
-    /// uninitialized memory area beginning at \a dest. If an exception is
-    /// thrown during the copy operation, the function has no effects.
+    /// Copies the given \a value to an uninitialized memory area, defined by
+    /// the range [first, last). If an exception is thrown during the
+    /// initialization, the function has no effects.
     ///
-    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    /// \note   Complexity: Linear in the distance between \a first and \a last
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1        The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Rng2        The type of the destination range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for FwdIter.
+    /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param rng1         Refers to the range from which the elements
-    ///                     will be copied from
-    /// \param rng2         Refers to the range to which the elements
-    ///                     will be copied to
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to sentinel value denoting the end of the
+    ///                     sequence of elements the algorithm will be applied.
+    /// \param value        The value to be assigned.
     ///
     /// The assignments in the parallel \a uninitialized_fill algorithm invoked
     /// with an execution policy object of type \a sequenced_policy
@@ -185,98 +81,150 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a uninitialized_fill algorithm returns a
-    ///           \a hpx::future<in_out_result<InIter, FwdIter>>, if the
-    ///           execution policy is of type \a sequenced_task_policy
-    ///           or \a parallel_task_policy and
-    ///           returns \a in_out_result<
-    ///             typename hpx::traits::range_traits<Rng1>::iterator_type
-    ///           , typename hpx::traits::range_traits<Rng2>::iterator_type>
-    ///           otherwise. The \a uninitialized_fill algorithm returns the
-    ///           input iterator to one past the last element copied from and
-    ///           the output iterator to the element in the destination range,
-    ///           one past the last element copied.
+    ///           returns \a FwdIter.
+    ///           The \a uninitialized_fill algorithm returns the output
+    ///           iterator to the element in the range, one past
+    ///           the last element copied.
     ///
-    template <typename ExPolicy, typename Rng1, typename Rng2>
-    typename parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::parallel::util::in_out_result<
-            typename hpx::traits::range_traits<Rng1>::iterator_type,
-            typename hpx::traits::range_traits<Rng2>::iterator_type>>::type
-    uninitialized_fill(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2);
+    template <typename ExPolicy, typename FwdIter, typename Sent>
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    uninitialized_fill(
+        ExPolicy&& policy, FwdIter first, Sent last, T const& value);
 
-    /// Copies the elements in the range [first, first + count), starting from
-    /// first and proceeding to first + count - 1., to another range beginning
-    /// at dest. If an exception is thrown during the copy operation, the
-    /// function has no effects.
+    /// Copies the given \a value to an uninitialized memory area, defined by
+    /// the range [first, last). If an exception is thrown during the
+    /// initialization, the function has no effects.
     ///
-    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    /// \note   Complexity: Linear in the distance between \a first and \a last
     ///
-    /// \tparam InIter      The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam T           The type of the value to be assigned (deduced).
+    ///
+    /// \param rng          Refers to the range to which the value
+    ///                     will be filled
+    /// \param value        The value to be assigned.
+    ///
+    /// The assignments in the parallel \a uninitialized_fill algorithm invoked
+    /// without an execution policy object will execute in sequential order in
+    /// the calling thread.
+    ///
+    /// \returns  The \a uninitialized_fill algorithm returns a
+    ///           returns \a hpx::traits::range_traits<Rng>
+    ///           ::iterator_type.
+    ///           The \a uninitialized_fill algorithm returns the output
+    ///           iterator to the element in the range, one past
+    ///           the last element copied.
+    ///
+    template <typename Rng, typename T>
+    typename hpx::traits::range_traits<Rng>::iterator_type uninitialized_fill(
+        Rng&& rng, T const& value);
+
+    /// Copies the given \a value to an uninitialized memory area, defined by
+    /// the range [first, last). If an exception is thrown during the
+    /// initialization, the function has no effects.
+    ///
+    /// \note   Complexity: Linear in the distance between \a first and \a last
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam T           The type of the value to be assigned (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param rng          Refers to the range to which the value
+    ///                     will be filled
+    /// \param value        The value to be assigned.
+    ///
+    /// The assignments in the parallel \a uninitialized_fill algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a uninitialized_fill algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an
+    /// unordered fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a uninitialized_fill algorithm returns a
+    ///           \a hpx::future<typename hpx::traits::range_traits<Rng>
+    ///           ::iterator_type>, if the
+    ///           execution policy is of type \a sequenced_task_policy
+    ///           or \a parallel_task_policy and returns \a typename
+    ///           hpx::traits::range_traits<Rng>::iterator_type otherwise.
+    ///           The \a uninitialized_fill algorithm returns the
+    ///           iterator to one past the last element filled in the range.
+    ///
+    template <typename ExPolicy, typename Rng, typename T>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_traits<Rng1>::iterator_type>::type
+    uninitialized_fill(ExPolicy&& policy, Rng&& rng, T const& value);
+
+    /// Copies the given \a value value to the first count elements in an
+    /// uninitialized memory area beginning at first. If an exception is thrown
+    /// during the initialization, the function has no effects.
+    ///
+    /// \note   Complexity: Performs exactly \a count assignments, if
+    ///         count > 0, no assignments otherwise.
+    ///
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
-    /// \tparam FwdIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
-    /// \tparam Sent2       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter.
+    /// \tparam T           The type of the value to be assigned (deduced).
     ///
-    /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     that will be copied from
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
     /// \param count        Refers to the number of elements starting at
     ///                     \a first the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the destination range.
-    /// \param last2        Refers to sentinel value denoting the end of the
-    ///                     second range the algorithm will be applied to.
+    /// \param value        The value to be assigned.
     ///
     /// The assignments in the parallel \a uninitialized_fill_n algorithm
     /// invoked with an execution policy object of type
     /// \a sequenced_policy execute in sequential order in the
     /// calling thread.
     ///
-    /// \returns  The \a uninitialized_fill_n algorithm returns
-    ///           \a in_out_result<InIter, FwdIter>.
+    /// \returns  The \a uninitialized_fill_n algorithm returns a
+    ///           returns \a FwdIter.
     ///           The \a uninitialized_fill_n algorithm returns the output
-    ///           iterator to the element in the destination range, one past
+    ///           iterator to the element in the range, one past
     ///           the last element copied.
     ///
-    template <typename InIter, typename Size, typename FwdIter, typename Sent2>
-    hpx::parallel::util::in_out_result<InIter, FwdIter> uninitialized_fill_n(
-        InIter first1, Size count, FwdIter first2, Sent2 last2);
+    template <typename FwdIter, typename Size, typename T>
+    FwdIter uninitialized_fill_n(FwdIter first, Size count, T const& value);
 
-    /// Copies the elements in the range [first, first + count), starting from
-    /// first and proceeding to first + count - 1., to another range beginning
-    /// at dest. If an exception is thrown during the copy operation, the
-    /// function has no effects.
+    /// Copies the given \a value value to the first count elements in an
+    /// uninitialized memory area beginning at first. If an exception is thrown
+    /// during the initialization, the function has no effects.
     ///
-    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    /// \note   Complexity: Performs exactly \a count assignments, if
+    ///         count > 0, no assignments otherwise.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam Size        The type of the argument specifying the number of
-    ///                     elements to apply \a f to.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
-    /// \tparam Sent2       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for InIter2.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     elements to apply \a f to.
+    /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     that will be copied from
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
     /// \param count        Refers to the number of elements starting at
     ///                     \a first the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the destination range.
-    /// \param last1        Refers to sentinel value denoting the end of the
-    ///                     second range the algorithm will be applied to.
+    /// \param value        The value to be assigned.
     ///
     /// The assignments in the parallel \a uninitialized_fill_n algorithm
     /// invoked with an execution policy object of type
@@ -291,20 +239,19 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a uninitialized_fill_n algorithm returns a
-    ///           \a hpx::future<in_out_result<FwdIter1, FwdIter2>> if the
-    ///           execution policy is of type \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a FwdIter2 otherwise.
+    ///           \a hpx::future<FwdIter>, if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns FwdIter
+    ///           otherwise.
     ///           The \a uninitialized_fill_n algorithm returns the output
-    ///           iterator to the element in the destination range, one past
+    ///           iterator to the element in the range, one past
     ///           the last element copied.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Size,
-        typename FwdIter2, typename Sent2>
-    typename parallel::util::detail::algorithm_result<ExPolicy,
-        parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
-    uninitialized_fill_n(ExPolicy&& policy, FwdIter1 first1, Size count,
-        FwdIter2 first2, Sent2 last2);
+    template <typename ExPolicy, typename FwdIter, typename Size, typename T>
+    typename typename parallel::util::detail::algorithm_result<ExPolicy,
+        FwdIter>::type
+    uninitialized_fill_n(
+        ExPolicy&& policy, FwdIter first, Size count, T const& value);
 }}    // namespace hpx::ranges
 #else
 
