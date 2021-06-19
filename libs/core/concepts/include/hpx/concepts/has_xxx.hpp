@@ -13,16 +13,6 @@
 
 #include <type_traits>
 
-#if defined(HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
-#define HPX_HAS_XXX_TRAIT_DEF_CXX17(Name)                                      \
-    template <typename T>                                                      \
-    constexpr bool HPX_PP_CAT(HPX_PP_CAT(has_, Name), _v) =                    \
-        HPX_PP_CAT(has_, Name)::value;                                         \
-    /**/
-#else
-#define HPX_HAS_XXX_TRAIT_DEF_CXX17(Name) /**/
-#endif
-
 /// This macro creates a boolean unary meta-function such that for
 /// any type X, has_name<X>::value == true if and only if X is a
 /// class type and has a nested type member x::name. The generated
@@ -46,5 +36,7 @@
     using HPX_PP_CAT(HPX_PP_CAT(has_, Name), _t) =                             \
         typename HPX_PP_CAT(has_, Name)<T>::type;                              \
                                                                                \
-    HPX_HAS_XXX_TRAIT_DEF_CXX17(Name)                                          \
+    template <typename T>                                                      \
+    HPX_INLINE_CONSTEXPR_VARIABLE bool HPX_PP_CAT(                             \
+        HPX_PP_CAT(has_, Name), _v) = HPX_PP_CAT(has_, Name)<T>::value;        \
     /**/

@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -44,85 +44,53 @@ namespace hpx { namespace parallel { namespace execution {
     }    // namespace detail
 
     template <typename T, typename Enable = void>
-    struct has_post_member : detail::has_post<typename std::decay<T>::type>
+    struct has_post_member : detail::has_post<std::decay_t<T>>
     {
     };
 
     template <typename T, typename Enable = void>
-    struct has_sync_execute_member
-      : detail::has_sync_execute<typename std::decay<T>::type>
+    struct has_sync_execute_member : detail::has_sync_execute<std::decay_t<T>>
     {
     };
 
     template <typename T, typename Enable = void>
-    struct has_async_execute_member
-      : detail::has_async_execute<typename std::decay<T>::type>
+    struct has_async_execute_member : detail::has_async_execute<std::decay_t<T>>
     {
     };
 
     template <typename T, typename Enable = void>
-    struct has_then_execute_member
-      : detail::has_then_execute<typename std::decay<T>::type>
+    struct has_then_execute_member : detail::has_then_execute<std::decay_t<T>>
     {
     };
 
     template <typename T, typename Enable = void>
     struct has_bulk_sync_execute_member
-      : detail::has_bulk_sync_execute<typename std::decay<T>::type>
+      : detail::has_bulk_sync_execute<std::decay_t<T>>
     {
     };
 
     template <typename T, typename Enable = void>
     struct has_bulk_async_execute_member
-      : detail::has_bulk_async_execute<typename std::decay<T>::type>
+      : detail::has_bulk_async_execute<std::decay_t<T>>
     {
     };
 
     template <typename T, typename Enable = void>
     struct has_bulk_then_execute_member
-      : detail::has_bulk_then_execute<typename std::decay<T>::type>
+      : detail::has_bulk_then_execute<std::decay_t<T>>
     {
     };
-
-#if defined(HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
-    template <typename T>
-    constexpr bool has_post_member_v = has_post_member<T>::value;
-
-    template <typename T>
-    constexpr bool has_sync_execute_member_v =
-        has_sync_execute_member<T>::value;
-
-    template <typename T>
-    constexpr bool has_async_execute_member_v =
-        has_async_execute_member<T>::value;
-
-    template <typename T>
-    constexpr bool has_then_execute_member_v =
-        has_then_execute_member<T>::value;
-
-    template <typename T>
-    constexpr bool has_bulk_sync_execute_member_v =
-        has_bulk_sync_execute_member<T>::value;
-
-    template <typename T>
-    constexpr bool has_bulk_async_execute_member_v =
-        has_bulk_async_execute_member<T>::value;
-
-    template <typename T>
-    constexpr bool has_bulk_then_execute_member_v =
-        has_bulk_then_execute_member<T>::value;
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Executor>
     struct executor_context
     {
-        using type = typename std::decay<decltype(
-            std::declval<Executor const&>().context())>::type;
+        using type =
+            std::decay_t<decltype(std::declval<Executor const&>().context())>;
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // Components which create groups of execution agents may use execution
+    // Components that create groups of execution agents may use execution
     // categories to communicate the forward progress and ordering guarantees
     // of these execution agents with respect to other agents within the same
     // group.
@@ -203,18 +171,16 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename Executor, typename T, typename... Ts>
         struct executor_future<Executor, T, hpx::util::pack<Ts...>,
-            typename std::enable_if<
-                hpx::traits::is_two_way_executor<Executor>::value &&
-                exposes_future_type<Executor, T>::value>::type>
+            std::enable_if_t<hpx::traits::is_two_way_executor_v<Executor> &&
+                exposes_future_type<Executor, T>::value>>
         {
             using type = typename Executor::template future_type<T>;
         };
 
         template <typename Executor, typename T, typename... Ts>
         struct executor_future<Executor, T, hpx::util::pack<Ts...>,
-            typename std::enable_if<
-                hpx::traits::is_two_way_executor<Executor>::value &&
-                !exposes_future_type<Executor, T>::value>::type>
+            std::enable_if_t<hpx::traits::is_two_way_executor_v<Executor> &&
+                !exposes_future_type<Executor, T>::value>>
         {
             using type = decltype(std::declval<Executor&&>().async_execute(
                 std::declval<T (*)(Ts...)>(), std::declval<Ts>()...));
@@ -222,8 +188,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename Executor, typename T, typename Ts>
         struct executor_future<Executor, T, Ts,
-            typename std::enable_if<
-                !hpx::traits::is_two_way_executor<Executor>::value>::type>
+            std::enable_if_t<!hpx::traits::is_two_way_executor_v<Executor>>>
         {
             using type = hpx::lcos::future<T>;
         };
@@ -231,8 +196,8 @@ namespace hpx { namespace parallel { namespace execution {
 
     template <typename Executor, typename T, typename... Ts>
     struct executor_future
-      : detail::executor_future<typename std::decay<Executor>::type, T,
-            hpx::util::pack<typename std::decay<Ts>::type...>>
+      : detail::executor_future<std::decay_t<Executor>, T,
+            hpx::util::pack<std::decay_t<Ts>...>>
     {
     };
 
@@ -246,57 +211,78 @@ namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>
     struct has_post_member
-      : parallel::execution::has_post_member<typename std::decay<T>::type>
+      : parallel::execution::has_post_member<std::decay_t<T>>
     {
     };
 
     template <typename T, typename Enable = void>
     struct has_sync_execute_member
-      : parallel::execution::has_sync_execute_member<
-            typename std::decay<T>::type>
+      : parallel::execution::has_sync_execute_member<std::decay_t<T>>
     {
     };
 
     template <typename T, typename Enable = void>
     struct has_async_execute_member
-      : parallel::execution::has_async_execute_member<
-            typename std::decay<T>::type>
+      : parallel::execution::has_async_execute_member<std::decay_t<T>>
     {
     };
 
     template <typename T, typename Enable = void>
     struct has_then_execute_member
-      : parallel::execution::has_then_execute_member<
-            typename std::decay<T>::type>
+      : parallel::execution::has_then_execute_member<std::decay_t<T>>
     {
     };
 
     template <typename T, typename Enable = void>
     struct has_bulk_sync_execute_member
-      : parallel::execution::has_bulk_sync_execute_member<
-            typename std::decay<T>::type>
+      : parallel::execution::has_bulk_sync_execute_member<std::decay_t<T>>
     {
     };
 
     template <typename T, typename Enable = void>
     struct has_bulk_async_execute_member
-      : parallel::execution::has_bulk_async_execute_member<
-            typename std::decay<T>::type>
+      : parallel::execution::has_bulk_async_execute_member<std::decay_t<T>>
     {
     };
 
     template <typename T, typename Enable = void>
     struct has_bulk_then_execute_member
-      : parallel::execution::has_bulk_then_execute_member<
-            typename std::decay<T>::type>
+      : parallel::execution::has_bulk_then_execute_member<std::decay_t<T>>
     {
     };
+
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool has_post_member_v =
+        has_post_member<T>::value;
+
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool has_sync_execute_member_v =
+        has_sync_execute_member<T>::value;
+
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool has_async_execute_member_v =
+        has_async_execute_member<T>::value;
+
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool has_then_execute_member_v =
+        has_then_execute_member<T>::value;
+
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool has_bulk_sync_execute_member_v =
+        has_bulk_sync_execute_member<T>::value;
+
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool has_bulk_async_execute_member_v =
+        has_bulk_async_execute_member<T>::value;
+
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool has_bulk_then_execute_member_v =
+        has_bulk_then_execute_member<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Executor, typename Enable = void>
     struct executor_context
-      : parallel::execution::executor_context<
-            typename std::decay<Executor>::type>
+      : parallel::execution::executor_context<std::decay_t<Executor>>
     {
     };
 
@@ -305,8 +291,7 @@ namespace hpx { namespace traits {
 
     template <typename Executor, typename Enable = void>
     struct executor_execution_category
-      : parallel::execution::executor_execution_category<
-            typename std::decay<Executor>::type>
+      : parallel::execution::executor_execution_category<std::decay_t<Executor>>
     {
     };
 
@@ -316,7 +301,7 @@ namespace hpx { namespace traits {
 
     template <typename Executor, typename Enable = void>
     struct executor_shape
-      : parallel::execution::executor_shape<typename std::decay<Executor>::type>
+      : parallel::execution::executor_shape<std::decay_t<Executor>>
     {
     };
 
@@ -325,7 +310,7 @@ namespace hpx { namespace traits {
 
     template <typename Executor, typename Enable = void>
     struct executor_index
-      : parallel::execution::executor_index<typename std::decay<Executor>::type>
+      : parallel::execution::executor_index<std::decay_t<Executor>>
     {
     };
 
@@ -334,9 +319,8 @@ namespace hpx { namespace traits {
 
     template <typename Executor, typename T, typename... Ts>
     struct executor_future
-      : parallel::execution::executor_future<
-            typename std::decay<Executor>::type, T,
-            typename std::decay<Ts>::type...>
+      : parallel::execution::executor_future<std::decay_t<Executor>, T,
+            std::decay_t<Ts>...>
     {
     };
 
@@ -348,8 +332,7 @@ namespace hpx { namespace traits {
     // extension
     template <typename Executor, typename Enable = void>
     struct executor_parameters_type
-      : parallel::execution::executor_parameters_type<
-            typename std::decay<Executor>::type>
+      : parallel::execution::executor_parameters_type<std::decay_t<Executor>>
     {
     };
 

@@ -165,7 +165,7 @@ namespace hpx { namespace functional {
             Tag, Args...>;
 
     template <typename Tag, typename... Args>
-    constexpr bool is_tag_fallback_dispatchable_v =
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_tag_fallback_dispatchable_v =
         is_tag_fallback_dispatchable<Tag, Args...>::value;
 
     namespace detail {
@@ -200,7 +200,7 @@ namespace hpx { namespace functional {
     };
 
     template <typename Tag, typename... Args>
-    constexpr bool is_nothrow_tag_fallback_dispatchable_v =
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_nothrow_tag_fallback_dispatchable_v =
         is_nothrow_tag_fallback_dispatchable<Tag, Args...>::value;
 
     template <typename Tag, typename... Args>
@@ -256,8 +256,8 @@ namespace hpx { namespace functional {
         {
             // is tag-dispatchable
             template <typename... Args,
-                typename Enable = typename std::enable_if<
-                    is_tag_dispatchable_v<Tag, Args&&...>>::type>
+                typename Enable =
+                    std::enable_if_t<is_tag_dispatchable_v<Tag, Args&&...>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
                 noexcept(is_nothrow_tag_dispatchable_v<Tag, Args...>)
@@ -269,8 +269,8 @@ namespace hpx { namespace functional {
 
             // is not tag-dispatchable
             template <typename... Args,
-                typename Enable = typename std::enable_if<
-                    !is_tag_dispatchable_v<Tag, Args&&...>>::type>
+                typename Enable =
+                    std::enable_if_t<!is_tag_dispatchable_v<Tag, Args&&...>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
                 noexcept(is_nothrow_tag_fallback_dispatchable_v<Tag, Args...>)
@@ -309,8 +309,8 @@ namespace hpx { namespace functional {
         public:
             // is nothrow tag-dispatchable
             template <typename... Args,
-                typename Enable = typename std::enable_if<
-                    is_nothrow_tag_dispatchable_v<Tag, Args&&...>>::type>
+                typename Enable = std::enable_if_t<
+                    is_nothrow_tag_dispatchable_v<Tag, Args&&...>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
                 -> tag_dispatch_result_t<Tag, Args&&...>
@@ -323,8 +323,8 @@ namespace hpx { namespace functional {
             template <typename... Args,
                 typename IsFallbackDispatchable =
                     is_nothrow_tag_fallback_dispatchable<Tag, Args&&...>,
-                typename Enable = typename std::enable_if<
-                    !is_nothrow_tag_dispatchable_v<Tag, Args&&...>>::type>
+                typename Enable = std::enable_if_t<
+                    !is_nothrow_tag_dispatchable_v<Tag, Args&&...>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
                 -> decltype(tag_fallback_dispatch_impl(

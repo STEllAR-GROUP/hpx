@@ -43,6 +43,10 @@ namespace hpx { namespace util {
         {
         };
 
+        template <typename F, typename... Ts>
+        using invoke_deferred_result_t =
+            typename invoke_deferred_result<F, Ts...>::type;
+
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Is, typename... Ts>
         class deferred;
