@@ -64,7 +64,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                 // try to calculate chunk-size and maximum number of chunks
                 chunk_size = (count + 4 * cores - 1) / (4 * cores);    // -V112
 
-                // different version of clang-formt do different things
+                // different versions of clang-format do different things
                 // clang-format off
 
                 // we should not consider more chunks than we have elements
@@ -136,7 +136,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             if (stride != 1)
             {
-                // different version of clang-formt do different things
+                // different versions of clang-format do different things
                 // clang-format off
 
                 // rounding up
@@ -162,7 +162,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         if (stride != 1)
         {
-            // different version of clang-formt do different things
+            // different versions of clang-format do different things
             // clang-format off
             chunk_size = (std::max) (std::size_t(stride),
                 ((chunk_size + stride) / stride - 1) * stride);
@@ -197,7 +197,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         std::vector<tuple_type> shape;
         Stride stride = parallel::v1::detail::abs(s);
 
-        // different version of clang-formt do different things
+        // different versions of clang-format do different things
         // clang-format off
 
         // we should not consider more chunks than we have elements
@@ -287,7 +287,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             if (stride != 1)
             {
-                // different version of clang-formt do different things
+                // different versions of clang-format do different things
                 // clang-format off
                 test_chunk_size = (std::max)(std::size_t(stride),
                     ((test_chunk_size + stride) / stride - 1) * stride);
@@ -314,7 +314,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         if (stride != 1)
         {
-            // different version of clang-formt do different things
+            // different versions of clang-format do different things
             // clang-format off
             chunk_size = (std::max) (std::size_t(stride),
                 ((chunk_size + stride) / stride - 1) * stride);
@@ -350,7 +350,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         Stride stride = parallel::v1::detail::abs(s);
         std::size_t base_idx = 0;
 
-        // different version of clang-formt do different things
+        // different versions of clang-format do different things
         // clang-format off
 
         // we should not consider more chunks than we have elements

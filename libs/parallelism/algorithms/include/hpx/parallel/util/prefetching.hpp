@@ -59,7 +59,7 @@ namespace hpx { namespace parallel { namespace util {
             std::size_t idx_;
 
         public:
-            // different version of clang-formt do different things
+            // different versions of clang-format do different things
             // clang-format off
             explicit prefetching_iterator(std::size_t idx, base_iterator base,
                 std::size_t chunk_size, std::size_t range_size,
@@ -97,7 +97,7 @@ namespace hpx { namespace parallel { namespace util {
 
             inline prefetching_iterator& operator+=(difference_type rhs)
             {
-                // different version of clang-formt do different things
+                // different versions of clang-format do different things
                 // clang-format off
                 std::size_t last =
                     (std::min) (idx_ + rhs * chunk_size_, range_size_);
@@ -292,7 +292,7 @@ namespace hpx { namespace parallel { namespace util {
                     Itr base = it.base();
                     std::size_t j = it.index();
 
-                    // different version of clang-formt do different things
+                    // different versions of clang-format do different things
                     // clang-format off
                     std::size_t last = (std::min) (it.index() + it.chunk_size(),
                         it.range_size());
@@ -328,7 +328,7 @@ namespace hpx { namespace parallel { namespace util {
                     Itr base = it.base();
                     std::size_t j = it.index();
 
-                    // different version of clang-formt do different things
+                    // different versions of clang-format do different things
                     // clang-format off
                     std::size_t last = (std::min) (it.index() + it.chunk_size(),
                         it.range_size());
@@ -375,7 +375,7 @@ namespace hpx { namespace parallel { namespace util {
                     Itr base = it.base();
                     std::size_t j = it.index();
 
-                    // different version of clang-formt do different things
+                    // different versions of clang-format do different things
                     // clang-format off
                     std::size_t last = (std::min) (it.index() + it.chunk_size(),
                         it.range_size());
@@ -411,7 +411,7 @@ namespace hpx { namespace parallel { namespace util {
                     Itr base = it.base();
                     std::size_t j = it.index();
 
-                    // different version of clang-formt do different things
+                    // different versions of clang-format do different things
                     // clang-format off
                     std::size_t last = (std::min) (it.index() + it.chunk_size(),
                         it.range_size());
@@ -479,7 +479,7 @@ namespace hpx { namespace parallel { namespace util {
                     Itr base = it.base();
                     std::size_t j = it.index();
 
-                    // different version of clang-formt do different things
+                    // different versions of clang-format do different things
                     // clang-format off
                     std::size_t last = (std::min) (it.index() + it.chunk_size(),
                         it.range_size());
@@ -506,7 +506,7 @@ namespace hpx { namespace parallel { namespace util {
                     Itr base = it.base();
                     std::size_t j = it.index();
 
-                    // different version of clang-formt do different things
+                    // different versions of clang-format do different things
                     // clang-format off
                     std::size_t last = (std::min) (it.index() + it.chunk_size(),
                         it.range_size());
@@ -539,7 +539,7 @@ namespace hpx { namespace parallel { namespace util {
                     Itr base = it.base();
                     std::size_t j = it.index();
 
-                    // different version of clang-formt do different things
+                    // different versions of clang-format do different things
                     // clang-format off
                     std::size_t last = (std::min) (it.index() + it.chunk_size(),
                         it.range_size());
@@ -566,7 +566,7 @@ namespace hpx { namespace parallel { namespace util {
                     Itr base = it.base();
                     std::size_t j = it.index();
 
-                    // different version of clang-formt do different things
+                    // different versions of clang-format do different things
                     // clang-format off
                     std::size_t last = (std::min) (it.index() + it.chunk_size(),
                         it.range_size());

@@ -184,7 +184,6 @@ namespace hpx {
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -296,8 +295,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         typename Iter::iterator_tuple_type>::type>
                 operator()(Iter part_begin, std::size_t part_size, std::size_t)
             {
-                hpx::util::annotate_function _(f_);
-
                 auto iters = part_begin.get_iterator_tuple();
                 return util::transform_loop_n<execution_policy_type>(
                     hpx::get<0>(iters), part_size, hpx::get<1>(iters),
@@ -346,8 +343,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         typename Iter::iterator_tuple_type>::type>
                 operator()(Iter part_begin, std::size_t part_size, std::size_t)
             {
-                hpx::util::annotate_function _(f_);
-
                 auto iters = part_begin.get_iterator_tuple();
                 return util::transform_loop_n_ind<execution_policy_type>(
                     hpx::get<0>(iters), part_size, hpx::get<1>(iters), f_);
@@ -371,7 +366,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             sequential(ExPolicy&& policy, InIterB first, InIterE last,
                 OutIter dest, F&& f, Proj&& proj)
             {
-                hpx::util::annotate_function _(f);
                 return util::transform_loop(std::forward<ExPolicy>(policy),
                     first, last, dest, transform_projected<F, Proj>(f, proj));
             }
@@ -383,7 +377,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             sequential(ExPolicy&& policy, InIterB first, InIterE last,
                 OutIter dest, F&& f, util::projection_identity)
             {
-                hpx::util::annotate_function _(f);
                 return util::transform_loop_ind(std::forward<ExPolicy>(policy),
                     first, last, dest, std::forward<F>(f));
             }
@@ -523,8 +516,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         typename Iter::iterator_tuple_type>::type>
                 operator()(Iter part_begin, std::size_t part_size, std::size_t)
             {
-                hpx::util::annotate_function _(f_);
-
                 auto iters = part_begin.get_iterator_tuple();
                 return util::transform_binary_loop_n<execution_policy_type>(
                     hpx::get<0>(iters), part_size, hpx::get<1>(iters),
@@ -582,8 +573,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         typename Iter::iterator_tuple_type>::type>
                 operator()(Iter part_begin, std::size_t part_size, std::size_t)
             {
-                hpx::util::annotate_function _(f_);
-
                 auto iters = part_begin.get_iterator_tuple();
                 return util::transform_binary_loop_ind_n<execution_policy_type>(
                     hpx::get<0>(iters), part_size, hpx::get<1>(iters),
@@ -608,7 +597,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy&&, InIter1 first1, InIter1 last1, InIter2 first2,
                 OutIter dest, F&& f, Proj1&& proj1, Proj2&& proj2)
             {
-                hpx::util::annotate_function _(f);
                 return util::transform_binary_loop<ExPolicy>(first1, last1,
                     first2, dest,
                     transform_binary_projected<F, Proj1, Proj2>{
@@ -623,7 +611,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 OutIter dest, F&& f, util::projection_identity,
                 util::projection_identity)
             {
-                hpx::util::annotate_function _(f);
                 return util::transform_binary_loop_ind<ExPolicy>(
                     first1, last1, first2, dest, f);
             }
@@ -731,7 +718,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 InIter2 last2, OutIter dest, F&& f, Proj1&& proj1,
                 Proj2&& proj2)
             {
-                hpx::util::annotate_function _(f);
                 return util::transform_binary_loop<ExPolicy>(first1, last1,
                     first2, last2, dest,
                     transform_binary_projected<F, Proj1, Proj2>{
@@ -746,7 +732,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 InIter2 last2, OutIter dest, F&& f, util::projection_identity,
                 util::projection_identity)
             {
-                hpx::util::annotate_function _(f);
                 return util::transform_binary_loop_ind<ExPolicy>(
                     first1, last1, first2, last2, dest, f);
             }
@@ -767,7 +752,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             std::forward<F>(f), std::forward<Proj1>(proj1),
                             std::forward<Proj2>(proj2));
 
-                    // different version of clang-formt do different things
+                    // different versions of clang-format do different things
                     // clang-format off
                     return util::detail::get_in_in_out_result(
                         util::foreach_partitioner<ExPolicy>::call(

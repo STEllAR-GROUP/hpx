@@ -460,7 +460,7 @@ namespace hpx { namespace parallel { namespace util {
             call(InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
                 OutIter dest, F&& f)
             {
-                // different version of clang-formt do different things
+                // different versions of clang-format do different things
                 // clang-format off
                 std::size_t count = (std::min) (std::distance(first1, last1),
                     std::distance(first2, last2));
