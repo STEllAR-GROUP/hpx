@@ -26,11 +26,7 @@ namespace hpx { namespace execution { namespace experimental {
     // clang-format off
     template <typename ExPolicy,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::functional::is_tag_dispatchable_v<
-                hpx::execution::experimental::with_annotation_t,
-                typename std::decay_t<ExPolicy>::executor_type,
-                char const*>
+            hpx::is_execution_policy_v<ExPolicy>
         )>
     // clang-format on
     constexpr decltype(auto) tag_dispatch(
@@ -47,11 +43,7 @@ namespace hpx { namespace execution { namespace experimental {
     // clang-format off
     template <typename ExPolicy,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::functional::is_tag_dispatchable_v<
-                hpx::execution::experimental::with_annotation_t,
-                typename std::decay_t<ExPolicy>::executor_type,
-                std::string>
+            hpx::is_execution_policy_v<ExPolicy>
         )>
     // clang-format on
     decltype(auto) tag_dispatch(hpx::execution::experimental::with_annotation_t,

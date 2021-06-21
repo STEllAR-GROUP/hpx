@@ -139,8 +139,6 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         // support with_annotation property
-        using supports_annotations = void;
-
         friend constexpr annotating_executor tag_dispatch(
             hpx::execution::experimental::with_annotation_t,
             annotating_executor const& exec, char const* annotation)
@@ -188,59 +186,32 @@ namespace hpx { namespace execution { namespace experimental {
     ///////////////////////////////////////////////////////////////////////////
     // if the given executor does not support annotations, wrap it into
     // a annotating_executor
-    namespace detail {
-
-        template <typename Executor, typename Enable = void>
-        struct supports_annotations : std::false_type
-        {
-        };
-
-        template <typename Executor>
-        struct supports_annotations<Executor,
-            hpx::util::always_void_t<typename Executor::supports_annotations>>
-          : std::true_type
-        {
-        };
-
-        template <typename Executor>
-        HPX_INLINE_CONSTEXPR_VARIABLE bool supports_annotations_v =
-            supports_annotations<Executor>::value;
-    };    // namespace detail
-
-    ///////////////////////////////////////////////////////////////////////////
+    //
     // The functions below are used for executors that do not directly support
     // annotations. Those are wrapped into an annotating_executor if passed
     // to `with_annotation`.
-
+    //
     // clang-format off
-    template <typename Executor>
+    template <typename Executor,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_executor_any_v<Executor>
+        )>
+    // clang-format on
     constexpr auto tag_dispatch(
         with_annotation_t, Executor&& exec, char const* annotation)
-        -> decltype(
-            std::enable_if_t<
-                hpx::traits::is_executor_any_v<Executor> &&
-               !detail::supports_annotations_v<std::decay_t<Executor>>
-            >(),
-            annotating_executor<std::decay_t<Executor>>(
-                std::forward<Executor>(exec), annotation))
-    // clang-format on
     {
         return annotating_executor<std::decay_t<Executor>>(
             std::forward<Executor>(exec), annotation);
     }
 
     // clang-format off
-    template <typename Executor>
+    template <typename Executor,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_executor_any_v<Executor>
+         )>
+    // clang-format on
     auto tag_dispatch(
         with_annotation_t, Executor&& exec, std::string annotation)
-        -> decltype(
-            std::enable_if_t<
-                hpx::traits::is_executor_any_v<Executor> &&
-               !detail::supports_annotations_v<std::decay_t<Executor>>
-            >(),
-            annotating_executor<std::decay_t<Executor>>(
-                std::forward<Executor>(exec), std::move(annotation)))
-    // clang-format on
     {
         return annotating_executor<std::decay_t<Executor>>(
             std::forward<Executor>(exec), std::move(annotation));
