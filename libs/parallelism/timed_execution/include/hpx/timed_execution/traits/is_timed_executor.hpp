@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -27,18 +27,16 @@ namespace hpx { namespace parallel { namespace execution {
     // Condition: T meets the syntactic requirements for OneWayExecutor
     // Precondition: T is a complete type
     template <typename T>
-    struct is_timed_executor
-      : detail::is_timed_executor<typename std::decay<T>::type>
+    struct is_timed_executor : detail::is_timed_executor<std::decay_t<T>>
     {
     };
 
     template <typename T>
     using is_timed_executor_t = typename is_timed_executor<T>::type;
 
-#if defined(HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
     template <typename T>
-    constexpr bool is_timed_executor_v = is_timed_executor<T>::value;
-#endif
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_timed_executor_v =
+        is_timed_executor<T>::value;
 }}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace traits {

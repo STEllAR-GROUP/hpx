@@ -162,7 +162,7 @@ namespace hpx { namespace functional {
             Args...>;
 
     template <typename Tag, typename... Args>
-    constexpr bool is_tag_dispatchable_v =
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_tag_dispatchable_v =
         is_tag_dispatchable<Tag, Args...>::value;
 
     namespace detail {
@@ -193,7 +193,7 @@ namespace hpx { namespace functional {
     };
 
     template <typename Tag, typename... Args>
-    constexpr bool is_nothrow_tag_dispatchable_v =
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_nothrow_tag_dispatchable_v =
         is_nothrow_tag_dispatchable<Tag, Args...>::value;
 
     template <typename Tag, typename... Args>
@@ -231,8 +231,8 @@ namespace hpx { namespace functional {
         struct tag_noexcept
         {
             template <typename... Args,
-                typename Enable = typename std::enable_if<
-                    is_nothrow_tag_dispatchable_v<Tag, Args...>>::type>
+                typename Enable = std::enable_if_t<
+                    is_nothrow_tag_dispatchable_v<Tag, Args...>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
                 -> tag_dispatch_result_t<Tag, decltype(args)...>

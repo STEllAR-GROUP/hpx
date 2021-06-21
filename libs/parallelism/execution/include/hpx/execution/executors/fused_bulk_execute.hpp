@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2019 Hartmut Kaiser
+//  Copyright (c) 2017-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,16 +20,22 @@
 #include <vector>
 
 namespace hpx { namespace parallel { namespace execution { namespace detail {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename Shape, typename Future, typename... Ts>
     struct then_bulk_function_result
     {
-        typedef
-            typename hpx::traits::range_traits<Shape>::value_type value_type;
-        typedef typename hpx::util::detail::invoke_deferred_result<F,
-            value_type, Future, Ts...>::type type;
+        using value_type =
+            typename hpx::traits::range_traits<Shape>::value_type;
+        using type = hpx::util::detail::invoke_deferred_result_t<F, value_type,
+            Future, Ts...>;
     };
 
+    template <typename F, typename Shape, typename Future, typename... Ts>
+    using then_bulk_function_result_t =
+        typename then_bulk_function_result<F, Shape, Future, Ts...>::type;
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename Shape, typename Future, bool IsVoid,
         typename... Ts>
     struct bulk_then_execute_result_impl;
@@ -37,25 +43,28 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     template <typename F, typename Shape, typename Future, typename... Ts>
     struct bulk_then_execute_result_impl<F, Shape, Future, false, Ts...>
     {
-        typedef std::vector<
-            typename then_bulk_function_result<F, Shape, Future, Ts...>::type>
-            type;
+        using type =
+            std::vector<then_bulk_function_result_t<F, Shape, Future, Ts...>>;
     };
 
     template <typename F, typename Shape, typename Future, typename... Ts>
     struct bulk_then_execute_result_impl<F, Shape, Future, true, Ts...>
     {
-        typedef void type;
+        using type = void;
     };
 
     template <typename F, typename Shape, typename Future, typename... Ts>
     struct bulk_then_execute_result
       : bulk_then_execute_result_impl<F, Shape, Future,
-            std::is_void<typename then_bulk_function_result<F, Shape, Future,
-                Ts...>::type>::value,
+            std::is_void<
+                then_bulk_function_result_t<F, Shape, Future, Ts...>>::value,
             Ts...>
     {
     };
+
+    template <typename F, typename Shape, typename Future, typename... Ts>
+    using bulk_then_execute_result_t =
+        typename bulk_then_execute_result<F, Shape, Future, Ts...>::type;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Executor, typename F, typename Shape, typename Future,
@@ -98,14 +107,13 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 
     template <typename Result, typename Executor, typename F, typename Shape,
         typename Args>
-    fused_bulk_sync_execute_helper<Result, typename std::decay<Executor>::type,
-        typename std::decay<F>::type, Shape, typename std::decay<Args>::type>
+    fused_bulk_sync_execute_helper<Result, std::decay_t<Executor>,
+        std::decay_t<F>, Shape, std::decay_t<Args>>
     make_fused_bulk_sync_execute_helper(
         Executor&& exec, F&& f, Shape const& shape, Args&& args)
     {
-        return fused_bulk_sync_execute_helper<Result,
-            typename std::decay<Executor>::type, typename std::decay<F>::type,
-            Shape, typename std::decay<Args>::type>{
+        return fused_bulk_sync_execute_helper<Result, std::decay_t<Executor>,
+            std::decay_t<F>, Shape, std::decay_t<Args>>{
             std::forward<Executor>(exec), std::forward<F>(f), shape,
             std::forward<Args>(args)};
     }
@@ -151,15 +159,13 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 
     template <typename Result, typename Executor, typename F, typename Shape,
         typename Args>
-    fused_bulk_async_execute_helper<Result, typename std::decay<Executor>::type,
-        typename std::decay<F>::type, typename std::decay<Shape>::type,
-        typename std::decay<Args>::type>
+    fused_bulk_async_execute_helper<Result, std::decay_t<Executor>,
+        std::decay_t<F>, std::decay_t<Shape>, std::decay_t<Args>>
     make_fused_bulk_async_execute_helper(
         Executor&& exec, F&& f, Shape&& shape, Args&& args)
     {
-        return fused_bulk_async_execute_helper<Result,
-            typename std::decay<Executor>::type, typename std::decay<F>::type,
-            typename std::decay<Shape>::type, typename std::decay<Args>::type>{
+        return fused_bulk_async_execute_helper<Result, std::decay_t<Executor>,
+            std::decay_t<F>, std::decay_t<Shape>, std::decay_t<Args>>{
             std::forward<Executor>(exec), std::forward<F>(f),
             std::forward<Shape>(shape), std::forward<Args>(args)};
     }

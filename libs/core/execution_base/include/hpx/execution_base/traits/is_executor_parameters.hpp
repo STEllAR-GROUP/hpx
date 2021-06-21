@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2021 Hartmut Kaiser
 //  Copyright (c) 2016 Marcin Copik
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -94,10 +94,9 @@ namespace hpx { namespace parallel { namespace execution {
     template <typename T>
     using is_executor_parameters_t = typename is_executor_parameters<T>::type;
 
-#if defined(HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
     template <typename T>
-    constexpr bool is_executor_parameters_v = is_executor_parameters<T>::value;
-#endif
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_executor_parameters_v =
+        is_executor_parameters<T>::value;
 }}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace traits {
@@ -111,8 +110,7 @@ namespace hpx { namespace traits {
     template <typename T>
     using is_executor_parameters_t = typename is_executor_parameters<T>::type;
 
-#if defined(HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
     template <typename T>
-    constexpr bool is_executor_parameters_v = is_executor_parameters<T>::value;
-#endif
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_executor_parameters_v =
+        is_executor_parameters<T>::value;
 }}    // namespace hpx::traits

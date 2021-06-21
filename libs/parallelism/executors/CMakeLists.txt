@@ -8,6 +8,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/executors/include
 set(executors_headers
+    hpx/executors/annotating_executor.hpp
     hpx/executors/current_executor.hpp
     hpx/executors/datapar/execution_policy_fwd.hpp
     hpx/executors/datapar/execution_policy.hpp
