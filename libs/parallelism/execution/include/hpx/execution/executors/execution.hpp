@@ -1117,7 +1117,7 @@ namespace hpx { namespace parallel { namespace execution {
                 HPX_UNUSED(predecessor);
                 HPX_ASSERT(false);
                 return hpx::traits::executor_future_t<Executor,
-                    bulk_then_execute_result<F, Shape, Future, Ts...>>{};
+                    bulk_then_execute_result_t<F, Shape, Future, Ts...>>{};
 #else
                 // result_of_t<F(Shape::value_type, Future)>
                 using func_result_type =
