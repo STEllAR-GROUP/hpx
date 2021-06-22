@@ -22,10 +22,8 @@ namespace hpx { namespace experimental {
         template <typename Tag, typename... Tn>
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
                 prefer_t, Tag const& tag, Tn&&... tn)
-            noexcept(noexcept(
-                tag(std::forward<Tn>(tn)...)))
-            -> decltype(
-                tag(std::forward<Tn>(tn)...))
+            noexcept(noexcept(tag(std::forward<Tn>(tn)...)))
+            -> decltype(tag(std::forward<Tn>(tn)...))
         // clang-format on
         {
             return tag(std::forward<Tn>(tn)...);
@@ -36,10 +34,11 @@ namespace hpx { namespace experimental {
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
                 prefer_t, Tag, T0&& t0, Tn&&...)
             noexcept(noexcept(std::forward<T0>(t0)))
-            -> typename std::enable_if<
-                    !hpx::functional::is_tag_dispatchable<prefer_t, Tag, T0, Tn...>::value &&
-                    !hpx::is_invocable<Tag, T0, Tn...>::value,
-                    decltype(std::forward<T0>(t0))>::type
+            -> std::enable_if_t<
+                    !hpx::functional::is_tag_dispatchable_v<
+                        prefer_t, Tag, T0, Tn...> &&
+                    !hpx::is_invocable_v<Tag, T0, Tn...>,
+                    decltype(std::forward<T0>(t0))>
         // clang-format on
         {
             return std::forward<T0>(t0);

@@ -411,11 +411,6 @@ void test_seq_policy()
             !std::is_same<std::decay_t<decltype(policy.executor())>,
                 std::decay_t<decltype(hpx::execution::seq.executor())>>::value,
             "sequenced_executor should be wrapped in annotating_executor");
-
-        static_assert(
-            !std::is_same_v<std::decay_t<decltype(policy.executor())>,
-                std::decay_t<decltype(hpx::execution::seq.executor())>>,
-            "sequenced_executor should be wrapped in annotating_executor");
     }
 
     {
@@ -426,11 +421,6 @@ void test_seq_policy()
         static_assert(
             !std::is_same<std::decay_t<decltype(policy.executor())>,
                 std::decay_t<decltype(hpx::execution::seq.executor())>>::value,
-            "sequenced_executor should be wrapped in annotating_executor");
-
-        static_assert(
-            !std::is_same_v<std::decay_t<decltype(policy.executor())>,
-                std::decay_t<decltype(hpx::execution::seq.executor())>>,
             "sequenced_executor should be wrapped in annotating_executor");
     }
 }
@@ -446,11 +436,6 @@ void test_par_policy()
             std::is_same<std::decay_t<decltype(policy.executor())>,
                 std::decay_t<decltype(hpx::execution::par.executor())>>::value,
             "parallel_executor should not be wrapped in annotating_executor");
-
-        static_assert(
-            std::is_same_v<std::decay_t<decltype(policy.executor())>,
-                std::decay_t<decltype(hpx::execution::par.executor())>>,
-            "parallel_executor should not be wrapped in annotating_executor");
     }
 
     {
@@ -461,11 +446,6 @@ void test_par_policy()
         static_assert(
             std::is_same<std::decay_t<decltype(policy.executor())>,
                 std::decay_t<decltype(hpx::execution::par.executor())>>::value,
-            "parallel_executor should not be wrapped in annotating_executor");
-
-        static_assert(
-            std::is_same_v<std::decay_t<decltype(policy.executor())>,
-                std::decay_t<decltype(hpx::execution::par.executor())>>,
             "parallel_executor should not be wrapped in annotating_executor");
     }
 }
