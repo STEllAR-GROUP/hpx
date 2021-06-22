@@ -99,6 +99,9 @@
 // Detecting CUDA compilation mode
 // Detecting NVCC
 #if defined(__NVCC__) || defined(__CUDACC__)
+// NVCC build version numbers can be high (without limit?) so we leave it out
+// from the version definition
+#  define HPX_CUDA_VERSION (__CUDACC_VER_MAJOR__*100 + __CUDACC_VER_MINOR__)
 #  define HPX_COMPUTE_CODE
 #  if defined(__CUDA_ARCH__)
      // nvcc compiling CUDA code, device mode.
