@@ -197,7 +197,7 @@ namespace hpx { namespace execution { namespace experimental {
             hpx::traits::is_executor_any_v<Executor>
         )>
     // clang-format on
-    constexpr auto tag_dispatch(
+    constexpr auto tag_fallback_dispatch(
         with_annotation_t, Executor&& exec, char const* annotation)
     {
         return annotating_executor<std::decay_t<Executor>>(
@@ -210,7 +210,7 @@ namespace hpx { namespace execution { namespace experimental {
             hpx::traits::is_executor_any_v<Executor>
          )>
     // clang-format on
-    auto tag_dispatch(
+    auto tag_fallback_dispatch(
         with_annotation_t, Executor&& exec, std::string annotation)
     {
         return annotating_executor<std::decay_t<Executor>>(
