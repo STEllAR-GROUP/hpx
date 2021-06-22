@@ -292,9 +292,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj = std::forward<Proj>(proj)](
                               FwdIter part_begin,
                               std::size_t part_count) mutable -> bool {
-                    util::detail::loop_n<std::decay_t<ExPolicy>>(part_begin,
-                        part_count, tok,
-                        [&op, &tok, &proj](FwdIter const& curr) {
+                    util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count,
+                        tok, [&op, &tok, &proj](FwdIter const& curr) {
                             if (hpx::util::invoke(
                                     op, hpx::util::invoke(proj, *curr)))
                             {
@@ -392,9 +391,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj = std::forward<Proj>(proj)](
                               FwdIter part_begin,
                               std::size_t part_count) mutable -> bool {
-                    util::detail::loop_n<std::decay_t<ExPolicy>>(part_begin,
-                        part_count, tok,
-                        [&op, &tok, &proj](FwdIter const& curr) {
+                    util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count,
+                        tok, [&op, &tok, &proj](FwdIter const& curr) {
                             if (hpx::util::invoke(
                                     op, hpx::util::invoke(proj, *curr)))
                             {
@@ -492,9 +490,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj = std::forward<Proj>(proj)](
                               FwdIter part_begin,
                               std::size_t part_count) mutable -> bool {
-                    util::detail::loop_n<std::decay_t<ExPolicy>>(part_begin,
-                        part_count, tok,
-                        [&op, &tok, &proj](FwdIter const& curr) {
+                    util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count,
+                        tok, [&op, &tok, &proj](FwdIter const& curr) {
                             if (!hpx::util::invoke(
                                     op, hpx::util::invoke(proj, *curr)))
                             {

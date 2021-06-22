@@ -803,11 +803,11 @@ namespace hpx {
             }
 
             ///////////////////////////////////////////////////////////////////////
-            template <typename F, typename S, typename Tuple>
+            template <typename ExPolicy, typename F, typename S, typename Tuple>
             struct part_iterations;
 
-            template <typename F, typename S, typename... Ts>
-            struct part_iterations<F, S, hpx::tuple<Ts...>>
+            template <typename ExPolicy, typename F, typename S, typename... Ts>
+            struct part_iterations<ExPolicy, F, S, hpx::tuple<Ts...>>
             {
                 using fun_type = std::decay_t<F>;
 
@@ -885,7 +885,7 @@ namespace hpx {
                 }
 
                 template <typename B>
-                HPX_HOST_DEVICE void operator()(B part_begin,
+                HPX_HOST_DEVICE HPX_FORCEINLINE void operator()(B part_begin,
                     std::size_t part_steps, std::size_t part_index)
                 {
                     hpx::util::annotate_function annotate(f_);
@@ -893,8 +893,8 @@ namespace hpx {
                 }
             };
 
-            template <typename F, typename S>
-            struct part_iterations<F, S, hpx::tuple<>>
+            template <typename ExPolicy, typename F, typename S>
+            struct part_iterations<ExPolicy, F, S, hpx::tuple<>>
             {
                 using fun_type = std::decay_t<F>;
 
@@ -914,12 +914,8 @@ namespace hpx {
                 {
                     if (stride_ == 1)
                     {
-                        using pred = std::integral_constant<bool,
-                            hpx::traits::is_random_access_iterator<B>::value ||
-                                std::is_integral<B>::value>;
-
-                        parallel::util::detail::loop_n_helper::call(
-                            part_begin, part_steps, f_, pred());
+                        parallel::util::loop_n<std::decay_t<ExPolicy>>(
+                            part_begin, part_steps, f_);
                     }
                     else if (stride_ > 0)
                     {
@@ -956,7 +952,7 @@ namespace hpx {
                 }
 
                 template <typename B>
-                HPX_HOST_DEVICE void operator()(
+                HPX_HOST_DEVICE HPX_FORCEINLINE void operator()(
                     B part_begin, std::size_t part_steps, std::size_t)
                 {
                     hpx::util::annotate_function annotate(f_);
@@ -980,13 +976,8 @@ namespace hpx {
                 {
                     if (stride == 1)
                     {
-                        using pred = std::integral_constant<bool,
-                            hpx::traits::is_random_access_iterator<
-                                InIter>::value ||
-                                std::is_integral<InIter>::value>;
-
-                        parallel::util::detail::loop_n_helper::call(
-                            first, count, std::forward<F>(f), pred());
+                        parallel::util::loop_n<std::decay_t<ExPolicy>>(
+                            first, count, std::forward<F>(f));
                     }
                     else if (stride > 0)
                     {
@@ -1098,7 +1089,7 @@ namespace hpx {
 
                     return util::partitioner<ExPolicy>::call_with_index(policy,
                         first, size, stride,
-                        part_iterations<F, S, args_type>{
+                        part_iterations<ExPolicy, F, S, args_type>{
                             std::forward<F>(f), stride, args},
                         [=](std::vector<hpx::future<void>>&&) mutable -> void {
                             auto pack =
@@ -1534,24 +1525,24 @@ namespace hpx {
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 namespace hpx { namespace traits {
-    template <typename F, typename S, typename Tuple>
+    template <typename ExPolicy, typename F, typename S, typename Tuple>
     struct get_function_address<
-        parallel::v2::detail::part_iterations<F, S, Tuple>>
+        parallel::v2::detail::part_iterations<ExPolicy, F, S, Tuple>>
     {
         static constexpr std::size_t call(
-            parallel::v2::detail::part_iterations<F, S, Tuple> const&
+            parallel::v2::detail::part_iterations<ExPolicy, F, S, Tuple> const&
                 f) noexcept
         {
             return get_function_address<std::decay_t<F>>::call(f.f_);
         }
     };
 
-    template <typename F, typename S, typename Tuple>
+    template <typename ExPolicy, typename F, typename S, typename Tuple>
     struct get_function_annotation<
-        parallel::v2::detail::part_iterations<F, S, Tuple>>
+        parallel::v2::detail::part_iterations<ExPolicy, F, S, Tuple>>
     {
         static constexpr char const* call(
-            parallel::v2::detail::part_iterations<F, S, Tuple> const&
+            parallel::v2::detail::part_iterations<ExPolicy, F, S, Tuple> const&
                 f) noexcept
         {
             return get_function_annotation<std::decay_t<F>>::call(f.f_);
@@ -1559,12 +1550,12 @@ namespace hpx { namespace traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename F, typename S, typename Tuple>
+    template <typename ExPolicy, typename F, typename S, typename Tuple>
     struct get_function_annotation_itt<
-        parallel::v2::detail::part_iterations<F, S, Tuple>>
+        parallel::v2::detail::part_iterations<ExPolicy, F, S, Tuple>>
     {
         static util::itt::string_handle call(
-            parallel::v2::detail::part_iterations<F, S, Tuple> const&
+            parallel::v2::detail::part_iterations<ExPolicy, F, S, Tuple> const&
                 f) noexcept
         {
             return get_function_annotation_itt<std::decay_t<F>>::call(f.f_);
