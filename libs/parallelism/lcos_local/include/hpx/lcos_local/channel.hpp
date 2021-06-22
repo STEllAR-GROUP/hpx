@@ -252,7 +252,14 @@ namespace hpx { namespace lcos { namespace local {
                 empty_ = false;
                 push_active_ = false;
             }
-            void set_deferred(T&& val) noexcept
+            void set_deferred(T&& val)
+            // CUDA versions less than 11.1 don't compile push_pt correctly if
+            // this is noexcept. hpx::util::result_of (and std::result_of)
+            // inside deferred_call does not detect that the call is valid, and
+            // compilation fails.
+#if !defined(HPX_CUDA_VERSION) || (HPX_CUDA_VERSION >= 1101)
+                noexcept
+#endif
             {
                 val_ = std::move(val);
                 empty_ = false;
