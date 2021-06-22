@@ -13,6 +13,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/io_service.hpp>

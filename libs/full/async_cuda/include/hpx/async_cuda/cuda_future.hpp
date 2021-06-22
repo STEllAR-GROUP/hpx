@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_cuda/cuda_event.hpp>
 #include <hpx/async_cuda/cuda_exception.hpp>

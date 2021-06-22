@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/threading_base.hpp>

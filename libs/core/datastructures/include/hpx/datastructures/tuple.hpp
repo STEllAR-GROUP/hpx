@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/config/defines.hpp>
 #include <hpx/datastructures/member_pack.hpp>
+#include <hpx/modules/fundamentals.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <algorithm>

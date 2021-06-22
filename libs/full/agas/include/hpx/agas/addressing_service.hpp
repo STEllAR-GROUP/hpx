@@ -10,6 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/agas/agas_fwd.hpp>
 #include <hpx/cache/lru_cache.hpp>
 #include <hpx/cache/statistics/local_full_statistics.hpp>

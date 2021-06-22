@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/apply.hpp>
 #include <hpx/components/client_base.hpp>
@@ -31,27 +32,30 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace iostreams
-{
+namespace hpx { namespace iostreams {
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         template <typename Char = char>
         struct buffer_sink;
     }
 
-    template <typename Char = char, typename Sink = detail::buffer_sink<Char> >
+    template <typename Char = char, typename Sink = detail::buffer_sink<Char>>
     struct ostream;
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         // Tag types to be used to identify standard ostream objects
-        struct cout_tag {};
-        struct cerr_tag {};
+        struct cout_tag
+        {
+        };
+        struct cerr_tag
+        {
+        };
 
-        struct consolestream_tag {};
+        struct consolestream_tag
+        {
+        };
 
         ///////////////////////////////////////////////////////////////////////
         /// This is a Boost.IoStreams Sink that can be used to create an
@@ -62,13 +66,15 @@ namespace hpx { namespace iostreams
             typedef Char char_type;
 
             struct category
-              : boost::iostreams::sink_tag,
-                boost::iostreams::flushable_tag
-            {};
+              : boost::iostreams::sink_tag
+              , boost::iostreams::flushable_tag
+            {
+            };
 
             explicit buffer_sink(ostream<Char, buffer_sink>& os)
               : os_(os)
-            {}
+            {
+            }
 
             // Write up to n characters to the underlying data sink into the
             // buffer s, returning the number of characters written.
@@ -82,10 +88,10 @@ namespace hpx { namespace iostreams
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Char = char, typename Sink = buffer_sink<Char> >
+        template <typename Char = char, typename Sink = buffer_sink<Char>>
         struct ostream_creator
         {
-            typedef std::back_insert_iterator<std::vector<Char> > iterator_type;
+            typedef std::back_insert_iterator<std::vector<Char>> iterator_type;
             typedef Sink device_type;
             typedef boost::iostreams::stream<device_type> stream_type;
         };
@@ -128,14 +134,14 @@ namespace hpx { namespace iostreams
         }
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::future<naming::id_type>
-        create_ostream(char const* name, std::ostream& strm);
+        hpx::future<naming::id_type> create_ostream(
+            char const* name, std::ostream& strm);
 
         template <typename Tag>
         hpx::future<naming::id_type> create_ostream(Tag tag)
         {
-            return create_ostream(get_outstream_name(tag),
-                detail::get_outstream(tag));
+            return create_ostream(
+                get_outstream_name(tag), detail::get_outstream(tag));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -151,26 +157,28 @@ namespace hpx { namespace iostreams
         ///////////////////////////////////////////////////////////////////////
         void register_ostreams();
         void unregister_ostreams();
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Char, typename Sink>
     struct ostream
-        : components::client_base<ostream<Char, Sink>, server::output_stream>
-        , detail::buffer
-        , detail::ostream_creator<Char, Sink>::stream_type
+      : components::client_base<ostream<Char, Sink>, server::output_stream>
+      , detail::buffer
+      , detail::ostream_creator<Char, Sink>::stream_type
     {
         HPX_NON_COPYABLE(ostream);
 
     private:
-        typedef components::client_base<ostream, server::output_stream> base_type;
+        typedef components::client_base<ostream, server::output_stream>
+            base_type;
 
         typedef detail::ostream_creator<Char, Sink> ostream_creator;
         typedef typename ostream_creator::stream_type stream_base_type;
         typedef typename ostream_creator::iterator_type iterator_type;
 
         typedef typename stream_base_type::traits_type stream_traits_type;
-        typedef BOOST_IOSTREAMS_BASIC_OSTREAM(Char, stream_traits_type) std_stream_type;
+        typedef BOOST_IOSTREAMS_BASIC_OSTREAM(
+            Char, stream_traits_type) std_stream_type;
         typedef detail::buffer::mutex_type mutex_type;
 
     private:
@@ -180,11 +188,11 @@ namespace hpx { namespace iostreams
         // Performs a lazy streaming operation.
         template <typename T>
         ostream& streaming_operator_lazy(T const& subject)
-        { // {{{
+        {    // {{{
             // apply the subject to the local stream
             *static_cast<stream_base_type*>(this) << subject;
             return *this;
-        } // }}}
+        }    // }}}
 
         // Performs an asynchronous streaming operation.
         template <typename T, typename Lock>
@@ -239,7 +247,8 @@ namespace hpx { namespace iostreams
             // stream.
             typedef server::output_stream::write_sync_action action_type;
             hpx::async<action_type>(this->get_id(), hpx::get_locality_id(),
-                generational_count_++, next).get();
+                generational_count_++, next)
+                .get();
 
 #else
             HPX_ASSERT(false);
@@ -267,7 +276,7 @@ namespace hpx { namespace iostreams
                 // since mtx_ is recursive and apply will do an AGAS lookup,
                 // we need to ignore the lock here in case we are called
                 // recursively
-                hpx::util::ignore_while_checking<std::unique_lock<mutex_type> >
+                hpx::util::ignore_while_checking<std::unique_lock<mutex_type>>
                     il(&l);
 
                 // Perform the write operation, then destroy the old buffer and
@@ -301,7 +310,7 @@ namespace hpx { namespace iostreams
             std::unique_lock<mutex_type> l(*mtx_, std::try_to_lock);
             if (l)
             {
-                streaming_operator_sync(hpx::async_flush, l);   // unlocks
+                streaming_operator_sync(hpx::async_flush, l);    // unlocks
             }
 
             // FIXME: find a later spot to invoke this
@@ -315,7 +324,8 @@ namespace hpx { namespace iostreams
           , buffer()
           , stream_base_type(*this)
           , generational_count_(0)
-        {}
+        {
+        }
 
         // hpx::flush manipulator
         ostream& operator<<(hpx::iostreams::flush_type const& m)
@@ -354,17 +364,17 @@ namespace hpx { namespace iostreams
         }
 
         ///////////////////////////////////////////////////////////////////////
-        ostream& operator<<(std_stream_type& (*manip_fun)(std_stream_type&))
+        ostream& operator<<(std_stream_type& (*manip_fun)(std_stream_type&) )
         {
             std::unique_lock<mutex_type> l(*mtx_);
-            util::ignore_while_checking<std::unique_lock<mutex_type> > ignore(&l);
+            util::ignore_while_checking<std::unique_lock<mutex_type>> ignore(
+                &l);
             return streaming_operator_lazy(manip_fun);
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         template <typename Char>
         inline std::streamsize buffer_sink<Char>::write(
             Char const* s, std::streamsize n)
@@ -377,8 +387,8 @@ namespace hpx { namespace iostreams
         {
             return os_.flush();
         }
-    }
-}}
+    }    // namespace detail
+}}       // namespace hpx::iostreams
 
 namespace hpx { namespace util {
     // TODO: This overload should not be needed. See #3175.
@@ -389,6 +399,4 @@ namespace hpx { namespace util {
     {
         return os << format(format_str, args...);
     }
-}}
-
-
+}}    // namespace hpx::util

@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS) && defined(HPX_HAVE_NETWORKING)
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/type_support/static.hpp>

@@ -10,10 +10,11 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
 
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/static.hpp>
 
 #include <cstdint>

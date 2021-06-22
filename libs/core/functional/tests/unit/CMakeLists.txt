@@ -36,7 +36,6 @@ set(function_tests
     protect_test
     stateless_test
     sum_avg
-    tag_dispatch
 )
 
 foreach(test ${function_tests})

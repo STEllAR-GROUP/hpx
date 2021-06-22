@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/allocator_support/aligned_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/io_service/io_service_pool.hpp>

@@ -11,6 +11,7 @@
 
 #if defined(HPX_HAVE_PAPI)
 
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 #include <hpx/runtime_local/interval_timer.hpp>

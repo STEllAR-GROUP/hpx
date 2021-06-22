@@ -718,8 +718,8 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/tag_dispatch.hpp>
-#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/type_support.hpp>

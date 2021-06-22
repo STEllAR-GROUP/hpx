@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components_base/get_lva.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>

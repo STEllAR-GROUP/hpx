@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>

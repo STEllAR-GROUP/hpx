@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/futures/traits/get_remote_result.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/allocator_support.hpp>

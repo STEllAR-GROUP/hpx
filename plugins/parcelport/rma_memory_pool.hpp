@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>

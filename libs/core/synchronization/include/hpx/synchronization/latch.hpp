@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <hpx/assert.hpp>
 #include <hpx/config/non_copyable.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
@@ -74,7 +74,7 @@ namespace hpx { namespace lcos { namespace local {
         ///                 supports.
         static constexpr std::ptrdiff_t(max)() noexcept
         {
-            return (std::numeric_limits<std::ptrdiff_t>::max)();
+            return (std::numeric_limits<std::ptrdiff_t>::max) ();
         }
 
         /// Decrements counter_ by n. Does not block.

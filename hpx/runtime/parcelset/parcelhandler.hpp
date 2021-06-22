@@ -13,6 +13,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/agas/agas_fwd.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>

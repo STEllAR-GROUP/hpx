@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/config/non_copyable.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/type_support/static.hpp>
 

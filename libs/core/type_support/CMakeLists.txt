@@ -5,10 +5,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(type_support_headers
-    hpx/type_support/detected.hpp
-    hpx/type_support/equality.hpp
-    hpx/type_support/identity.hpp
-    hpx/type_support/static.hpp
+    hpx/type_support/detected.hpp hpx/type_support/equality.hpp
+    hpx/type_support/identity.hpp hpx/type_support/static.hpp
     hpx/type_support/unused.hpp
 )
 

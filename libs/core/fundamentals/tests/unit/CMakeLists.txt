@@ -1,14 +1,13 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# Function tests
-set(function_tests
-)
+# Fundamentals tests
+set(fundamentals_tests tag_dispatch)
 
-foreach(test ${function_tests})
+foreach(test ${fundamentals_tests})
   set(sources ${test}.cpp)
 
   source_group("Source Files" FILES ${sources})
@@ -17,7 +16,7 @@ foreach(test ${function_tests})
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources}
     NOLIBS
-    DEPENDENCIES hpx_fundamentals hpx_testing
+    DEPENDENCIES hpx_core
     EXCLUDE_FROM_ALL
     FOLDER "Tests/Unit/Modules/Core/Fundamentals"
   )

@@ -251,7 +251,8 @@ namespace hpx { namespace serialization { namespace detail {
                         return Name;                                           \
                     }                                                          \
                 };                                                             \
-        }}                                                                     \
+            }                                                                  \
+        }                                                                      \
     }                                                                          \
     template hpx::serialization::detail::register_class<Class>                 \
         hpx::serialization::detail::register_class<Class>::instance;           \
