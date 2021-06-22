@@ -270,6 +270,7 @@ int hpx_main()
 
         auto s = ex::just(p, &p_h, sizeof(type), cudaMemcpyHostToDevice) |
             cu::transform_stream(cuda_memcpy_async{}) |
+            ex::transform(&cu::check_cuda_error) |
             ex::transform([p] { return p; }) |
             cu::transform_stream(increment{}) |
             cu::transform_stream(increment{}) |
@@ -277,6 +278,7 @@ int hpx_main()
         ex::when_all(ex::just(&p_h), std::move(s), ex::just(sizeof(type)),
             ex::just(cudaMemcpyDeviceToHost)) |
             cu::transform_stream(cuda_memcpy_async{}) |
+            ex::transform(&cu::check_cuda_error) |
             ex::transform([&p_h] { HPX_TEST_EQ(p_h, 3); }) |
             ex::on(ex::thread_pool_scheduler{}) | ex::sync_wait();
 
