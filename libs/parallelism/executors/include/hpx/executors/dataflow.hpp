@@ -13,8 +13,8 @@
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>

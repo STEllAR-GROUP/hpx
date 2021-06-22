@@ -15,6 +15,7 @@ set(errors_headers
     hpx/errors/exception_info.hpp
     hpx/errors/exception_list.hpp
     hpx/errors/throw_exception.hpp
+    hpx/errors/try_catch_exception_ptr.hpp
 )
 
 # Default location is $HPX_ROOT/libs/errors/include_compatibility
