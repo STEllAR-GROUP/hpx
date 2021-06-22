@@ -45,7 +45,12 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename O>
     struct is_operation_state;
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct start_t
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+    HPX_DEVICE static const
+#else
+    HPX_INLINE_CONSTEXPR_VARIABLE
+#endif
+     struct start_t
       : hpx::functional::tag_priority_noexcept<start_t>
     {
     private:
