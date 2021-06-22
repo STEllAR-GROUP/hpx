@@ -403,21 +403,71 @@ void test_with_annotation(ExPolicy&& policy)
 void test_seq_policy()
 {
     // make sure execution::seq is not used directly
-    auto policy = hpx::execution::experimental::with_annotation(
-        hpx::execution::seq, "seq");
+    {
+        auto policy = hpx::execution::experimental::with_annotation(
+            hpx::execution::seq, "seq");
 
-    HPX_TEST(typeid(policy.executor()).name() !=
-        typeid(hpx::execution::seq.executor()).name());
+        static_assert(
+            !std::is_same<std::decay_t<decltype(policy.executor())>,
+                std::decay_t<decltype(hpx::execution::seq.executor())>>::value,
+            "sequenced_executor should be wrapped in annotating_executor");
+
+        static_assert(
+            !std::is_same_v<std::decay_t<decltype(policy.executor())>,
+                std::decay_t<decltype(hpx::execution::seq.executor())>>,
+            "sequenced_executor should be wrapped in annotating_executor");
+    }
+
+    {
+        auto original_policy = hpx::execution::seq;
+        auto policy = hpx::execution::experimental::with_annotation(
+            std::move(original_policy), "seq");
+
+        static_assert(
+            !std::is_same<std::decay_t<decltype(policy.executor())>,
+                std::decay_t<decltype(hpx::execution::seq.executor())>>::value,
+            "sequenced_executor should be wrapped in annotating_executor");
+
+        static_assert(
+            !std::is_same_v<std::decay_t<decltype(policy.executor())>,
+                std::decay_t<decltype(hpx::execution::seq.executor())>>,
+            "sequenced_executor should be wrapped in annotating_executor");
+    }
 }
 
 void test_par_policy()
 {
     // make sure execution::par is used directly
-    auto policy = hpx::execution::experimental::with_annotation(
-        hpx::execution::par, "par");
+    {
+        auto policy = hpx::execution::experimental::with_annotation(
+            hpx::execution::par, "par");
 
-    HPX_TEST(typeid(policy.executor()).name() ==
-        typeid(hpx::execution::par.executor()).name());
+        static_assert(
+            std::is_same<std::decay_t<decltype(policy.executor())>,
+                std::decay_t<decltype(hpx::execution::par.executor())>>::value,
+            "parallel_executor should not be wrapped in annotating_executor");
+
+        static_assert(
+            std::is_same_v<std::decay_t<decltype(policy.executor())>,
+                std::decay_t<decltype(hpx::execution::par.executor())>>,
+            "parallel_executor should not be wrapped in annotating_executor");
+    }
+
+    {
+        auto original_policy = hpx::execution::par;
+        auto policy = hpx::execution::experimental::with_annotation(
+            std::move(original_policy), "par");
+
+        static_assert(
+            std::is_same<std::decay_t<decltype(policy.executor())>,
+                std::decay_t<decltype(hpx::execution::par.executor())>>::value,
+            "parallel_executor should not be wrapped in annotating_executor");
+
+        static_assert(
+            std::is_same_v<std::decay_t<decltype(policy.executor())>,
+                std::decay_t<decltype(hpx::execution::par.executor())>>,
+            "parallel_executor should not be wrapped in annotating_executor");
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
