@@ -12,7 +12,6 @@
 #include <hpx/config.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
@@ -20,10 +19,7 @@
 #include <hpx/parallel/container_algorithms/mismatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
-#include <hpx/parallel/util/loop.hpp>
-#include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
-#include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -78,7 +74,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    // starts_with
+    // ends_with
     namespace detail {
         /// \cond NOINTERNAL
         struct ends_with : public detail::algorithm<ends_with, bool>

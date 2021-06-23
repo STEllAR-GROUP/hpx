@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/container_algorithms/starts_with.hpp
+/// \file parallel/container_algorithms/ends_with.hpp
 
 #pragma once
 
@@ -14,334 +14,258 @@
 namespace hpx { namespace ranges {
     // clang-format off
 
-    /// Copies the elements in the range, defined by [first, last), to another
-    /// range beginning at \a dest.
+    /// Checks whether the second range defined by [first1, last1) matches the
+    /// suffix of the first range defined by [first2, last2)
     ///
-    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    /// \note   Complexity: Linear: at most min(N1, N2) applications of the
+    ///                     predicate and both projections.
     ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam Iter1       The type of the begin source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam Sent1       The type of the end source iterators used (deduced).
+    /// \tparam Iter1       The type of the begin source iterators used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an input iterator.
+    /// \tparam Sent1       The type of the end source iterators used(deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for Iter1.
-    /// \tparam FwdIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam Iter2       The type of the begin destination iterators used
+    ///                     deduced). This iterator type must meet the
+    ///                     requirements of a input iterator.
+    /// \tparam Sent2       The type of the end destination iterators used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an sentinel for Iter2.
+    /// \tparam Pred        The binary predicate that compares the projected
+    ///                     elements.
+    /// \tparam Proj1       The type of an optional projection function for
+    ///                     the source range. This defaults to
+    ///                     \a util::projection_identity
+    /// \tparam Proj1       The type of an optional projection function for
+    ///                     the destination range. This defaults to
+    ///                     \a util::projection_identity
     ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param iter         Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param sent         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    ///
-    /// The assignments in the parallel \a copy algorithm invoked with an
-    /// execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a copy algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a copy algorithm returns a
-    ///           \a hpx::future<ranges::copy_result<FwdIter1, FwdIter> > if
-    ///           the execution policy is of type
-    ///           \a sequenced_task_policy or \a parallel_task_policy and
-    ///           returns \a ranges::copy_result<FwdIter1, FwdIter> otherwise.
-    ///           The \a copy algorithm returns the pair of the input iterator
-    ///           \a last and the output iterator to the element in the
-    ///           destination range, one past the last element copied.
-    template <typename ExPolicy, typename Iter1, typename Sent1,
-        typename FwdIter>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::ranges::copy_result<Iter1, Iter>>::type
-    copy(ExPolicy&& policy, Iter1 iter, Sent1 sent, FwdIter dest);
-
-    /// Copies the elements in the range \a rng to another
-    /// range beginning at \a dest.
-    ///
-    /// \note   Complexity: Performs exactly
-    ///         std::distance(begin(rng), end(rng)) assignments.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam FwdIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param rng          Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    ///
-    /// The assignments in the parallel \a copy algorithm invoked with an
-    /// execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a copy algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a copy algorithm returns a
-    ///           \a hpx::future<ranges::copy_result<iterator_t<Rng>, FwdIter2>>
-    ///           if the execution policy is of type
-    ///           \a sequenced_task_policy or \a parallel_task_policy and
-    ///           returns \a ranges::copy_result<iterator_t<Rng>, FwdIter2>
-    ///           otherwise.
-    ///           The \a copy algorithm returns the pair of the input iterator
-    ///           \a last and the output iterator to the element in the
-    ///           destination range, one past the last element copied.
-    template <typename ExPolicy, typename Rng, typename FwdIter>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::ranges::copy_result<
-            typename hpx::traits::range_traits<Rng>::iterator_type,
-            FwdIter>
-        >::type
-    copy(ExPolicy&& policy, Rng&& rng, FwdIter dest);
-
-    /// Copies the elements in the range [first, first + count), starting from
-    /// first and proceeding to first + count - 1., to another range beginning
-    /// at dest.
-    ///
-    /// \note   Complexity: Performs exactly \a count assignments, if
-    ///         count > 0, no assignments otherwise.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam Size        The type of the argument specifying the number of
-    ///                     elements to apply \a f to.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param count        Refers to the number of elements starting at
-    ///                     \a first the algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    ///
-    /// The assignments in the parallel \a copy_n algorithm invoked with
-    /// an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a copy_n algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a copy_n algorithm returns a
-    ///           \a hpx::future<ranges::copy_n_result<FwdIter1, FwdIter2> >
-    ///           if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a ranges::copy_n_result<FwdIter1, FwdIter2>
-    ///           otherwise.
-    ///           The \a copy algorithm returns the pair of the input iterator
-    ///           forwarded to the first element after the last in the input
-    ///           sequence and the output iterator to the
-    ///           element in the destination range, one past the last element
-    ///           copied.
-    ///
-    template <typename ExPolicy, typename FwdIter1, typename Size,
-        typename FwdIter2>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::ranges::copy_n_result<FwdIter1, FwdIter2>>::type
-    copy_n(ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest);
-
-    /// Copies the elements in the range, defined by [first, last) to another
-    /// range beginning at \a dest. Copies only the elements for which the
-    /// predicate \a f returns true. The order of the elements that are not
-    /// removed is preserved.
-    ///
-    /// \note   Complexity: Performs not more than
-    ///         std::distance(begin(rng), end(rng)) assignments,
-    ///         exactly std::distance(begin(rng), end(rng)) applications
-    ///         of the predicate \a f.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the begin source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam Sent1       The type of the end source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for FwdIter1.
-    /// \tparam FwdIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a copy_if requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param iter         Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param sent         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    /// \param f            Specifies the function (or function object) which
+    /// \param first1       Refers to the beginning of the source range.
+    /// \param last1        Sentinel value referring to the end of the source
+    ///                     range.
+    /// \param first2       Refers to the beginning of the destination range.
+    /// \param last2        Sentinel value referring to the end of the
+    ///                     destination range.
+    /// \param pred         Specifies the binary predicate function
+    ///                     (or function object) which will be invoked for
+    ///                     comparision of the elements in the in two ranges
+    ///                     projected by proj1 and proj2 respectively.
+    /// \param proj1        Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last).This is an
-    ///                     unary predicate which returns \a true for the
-    ///                     required elements. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     bool pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a InIter can be dereferenced and then
-    ///                     implicitly converted to Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
+    ///                     source range as a projection operation before the
+    ///                     actual predicate \a is invoked.
+    /// \param proj2        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     destination range as a projection operation before
+    ///                     the actual predicate \a is invoked.
     ///
-    /// The assignments in the parallel \a copy_if algorithm invoked with
-    /// an execution policy object of type \a sequenced_policy
+    /// The assignments in the parallel \a ends_with algorithm invoked
+    /// without an execution policy object execute in sequential order
+    /// in the calling thread.
+    ///
+    /// \returns  The \a ends_with algorithm returns \a bool.
+    ///           The \a ends_with algorithm returns a boolean with the
+    ///           value true if the second range matches the suffix of the
+    ///           first range, false otherwise.
+    template <typename FwdIter1, typename Sent1, typename FwdIter2,
+        typename Sent2, typename Pred, typename Proj1, typename Proj2>
+    bool ends_with(FwdIter1 first1, Sent1 last1, FwdIter2 first2,
+        Sent2 last2, Pred&& pred, Proj1&& proj1, Proj2&& proj2);
+
+    /// Checks whether the second range defined by [first1, last1) matches the
+    /// suffix of the first range defined by [first2, last2)
+    ///
+    /// \note   Complexity: Linear: at most min(N1, N2) applications of the
+    ///                     predicate and both projections.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the begin source iterators used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an forward iterator.
+    /// \tparam Sent1       The type of the end source iterators used(deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     sentinel for Iter1.
+    /// \tparam FwdIter2    The type of the begin destination iterators used
+    ///                     deduced). This iterator type must meet the
+    ///                     requirements of a forward iterator.
+    /// \tparam Sent2       The type of the end destination iterators used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an sentinel for Iter2.
+    /// \tparam Pred        The binary predicate that compares the projected
+    ///                     elements.
+    /// \tparam Proj1       The type of an optional projection function for
+    ///                     the source range. This defaults to
+    ///                     \a util::projection_identity
+    /// \tparam Proj1       The type of an optional projection function for
+    ///                     the destination range. This defaults to
+    ///                     \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first1       Refers to the beginning of the source range.
+    /// \param last1        Sentinel value referring to the end of the source
+    ///                     range.
+    /// \param first2       Refers to the beginning of the destination range.
+    /// \param last2        Sentinel value referring to the end of the
+    ///                     destination range.
+    /// \param pred         Specifies the binary predicate function
+    ///                     (or function object) which will be invoked for
+    ///                     comparision of the elements in the in two ranges
+    ///                     projected by proj1 and proj2 respectively.
+    /// \param proj1        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     source range as a projection operation before the
+    ///                     actual predicate \a is invoked.
+    /// \param proj2        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     destination range as a projection operation before
+    ///                     the actual predicate \a is invoked.
+    ///
+    /// The assignments in the parallel \a ends_with algorithm invoked with an
+    /// execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The assignments in the parallel \a copy_if algorithm invoked with
+    /// The assignments in the parallel \a ends_with algorithm invoked with
     /// an execution policy object of type \a parallel_policy or
     /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a copy_if algorithm returns a
-    ///           \a hpx::future<ranges::copy_if_result<iterator_t<Rng>, FwdIter2>>
-    ///           if the execution policy is of type
+    /// \returns  The \a ends_with algorithm returns a
+    ///           \a hpx::future<bool> if the execution policy is of type
     ///           \a sequenced_task_policy or \a parallel_task_policy and
-    ///           returns \a ranges::copy_if_result<iterator_t<Rng>, FwdIter2>
-    ///           otherwise.
-    ///           The \a copy_if algorithm returns the pair of the input iterator
-    ///           \a last and the output iterator to the element in the
-    ///           destination range, one past the last element copied.
-    ///
+    ///           returns \a bool otherwise.
+    ///           The \a ends_with algorithm returns a boolean with the
+    ///           value true if the second range matches the suffix of the
+    ///           first range, false otherwise.
     template <typename ExPolicy, typename FwdIter1, typename Sent1,
-        typename FwdIter, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename FwdIter2, typename Sent2, typename Pred, typename Proj1,
+        typename Proj2>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::ranges::copy_if_result<
-            typename hpx::traits::range_traits<Rng>::iterator_type,
-            OutIter>>::type
-    copy_if(ExPolicy&& policy, FwdIter1 iter, Sent1 sent, FwdIter dest, F&& f,
-        Proj&& proj = Proj());
+        bool>::type
+    ends_with(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
+        FwdIter2 first2, Sent2 last2, Pred&& pred, Proj1&& proj1,
+        Proj2&& proj2);
 
-    /// Copies the elements in the range \a rng to another
-    /// range beginning at \a dest. Copies only the elements for which the
-    /// predicate \a f returns true. The order of the elements that are not
-    /// removed is preserved.
+    
+    /// Checks whether the second range \a rng2 matches the
+    /// suffix of the first range \a rng1.
     ///
-    /// \note   Complexity: Performs not more than
-    ///         std::distance(begin(rng), end(rng)) assignments,
-    ///         exactly std::distance(begin(rng), end(rng)) applications
-    ///         of the predicate \a f.
+    /// \note   Complexity: Linear: at most min(N1, N2) applications of the
+    ///                     predicate and both projections.
+    ///
+    /// \tparam Rng1        The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam Rng2        The type of the destination range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam Pred        The binary predicate that compares the projected
+    ///                     elements.
+    /// \tparam Proj1       The type of an optional projection function for
+    ///                     the source range. This defaults to
+    ///                     \a util::projection_identity
+    /// \tparam Proj1       The type of an optional projection function for
+    ///                     the destination range. This defaults to
+    ///                     \a util::projection_identity
+    ///
+    /// \param rng1         Refers to the source range.
+    /// \param rng2         Refers to the destination range.
+    /// \param pred         Specifies the binary predicate function
+    ///                     (or function object) which will be invoked for
+    ///                     comparision of the elements in the in two ranges
+    ///                     projected by proj1 and proj2 respectively.
+    /// \param proj1        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     source range as a projection operation before the
+    ///                     actual predicate \a is invoked.
+    /// \param proj2        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     destination range as a projection operation before
+    ///                     the actual predicate \a is invoked.
+    /// 
+    /// The assignments in the parallel \a ends_with algorithm invoked
+    /// without an execution policy object execute in sequential order
+    /// in the calling thread.
+    ///
+    /// \returns  The \a ends_with algorithm returns \a bool.
+    ///           The \a ends_with algorithm returns a boolean with the
+    ///           value true if the second range matches the suffix of the
+    ///           first range, false otherwise.
+    template <typename Rng1, typename Rng2, typename Pred,
+        typename Proj1, typename Proj2>
+    bool ends_with(Rng1&& rng1, Rng2&& rng2, Pred&& pred,
+        Proj1&& proj1, Proj2&& proj2);
+
+    /// Checks whether the second range \a rng2 matches the
+    /// suffix of the first range \a rng1.
+    ///
+    /// \note   Complexity: Linear: at most min(N1, N2) applications of the
+    ///                     predicate and both projections.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng1        The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam OutIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a copy_if requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam Rng2        The type of the destination range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam Pred        The binary predicate that compares the projected
+    ///                     elements.
+    /// \tparam Proj1       The type of an optional projection function for
+    ///                     the source range. This defaults to
+    ///                     \a util::projection_identity
+    /// \tparam Proj1       The type of an optional projection function for
+    ///                     the destination range. This defaults to
+    ///                     \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param rng          Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    /// \param f            Specifies the function (or function object) which
+    /// \param rng1         Refers to the source range.
+    /// \param rng2         Refers to the destination range.
+    /// \param pred         Specifies the binary predicate function
+    ///                     (or function object) which will be invoked for
+    ///                     comparision of the elements in the in two ranges
+    ///                     projected by proj1 and proj2 respectively.
+    /// \param proj1        Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last).This is an
-    ///                     unary predicate which returns \a true for the
-    ///                     required elements. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     bool pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a InIter can be dereferenced and then
-    ///                     implicitly converted to Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a copy_if algorithm invoked with
-    /// an execution policy object of type \a sequenced_policy
+    ///                     source range as a projection operation before the
+    ///                     actual predicate \a is invoked.
+    /// \param proj2        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     destination range as a projection operation before
+    ///                     the actual predicate \a is invoked.
+    /// 
+    /// The assignments in the parallel \a ends_with algorithm invoked with an
+    /// execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The assignments in the parallel \a copy_if algorithm invoked with
+    /// The assignments in the parallel \a ends_with algorithm invoked with
     /// an execution policy object of type \a parallel_policy or
     /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a copy_if algorithm returns a
-    ///           \a hpx::future<ranges::copy_if_result<iterator_t<Rng>, FwdIter2>>
-    ///           if the execution policy is of type
+    /// \returns  The \a ends_with algorithm returns a
+    ///           \a hpx::future<bool> if the execution policy is of type
     ///           \a sequenced_task_policy or \a parallel_task_policy and
-    ///           returns \a ranges::copy_if_result<iterator_t<Rng>, FwdIter2>
-    ///           otherwise.
-    ///           The \a copy_if algorithm returns the pair of the input iterator
-    ///           \a last and the output iterator to the element in the
-    ///           destination range, one past the last element copied.
-    ///
-    template <typename ExPolicy, typename Rng, typename OutIter, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
+    ///           returns \a bool otherwise.
+    ///           The \a ends_with algorithm returns a boolean with the
+    ///           value true if the second range matches the suffix of the
+    ///           first range, false otherwise.
+    template <typename ExPolicy, typename Rng1, typename Rng2,
+        typename Pred, typename Proj1, typename Proj2>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::ranges::copy_if_result<
-            typename hpx::traits::range_traits<Rng>::iterator_type, OutIter>
-    >::type
-    copy_if(
-        ExPolicy&& policy, Rng&& rng, OutIter dest, F&& f, Proj&& proj = Proj());
+        bool>::type
+    ends_with(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
+        Pred&& pred, Proj1&& proj1, Proj2&& proj2);
 
     // clang-format on
 }}    // namespace hpx::ranges

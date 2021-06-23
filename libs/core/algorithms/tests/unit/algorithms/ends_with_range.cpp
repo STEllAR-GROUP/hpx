@@ -24,11 +24,14 @@ template <typename IteratorTag>
 void test_ends_with_sent(IteratorTag)
 {
     auto end1 = std::rand() % 10007 + 1;
-    auto end2 = std::rand() % end1 + 1;
+    auto end2 = std::rand() % (end1-1) + 1;
     auto some_ints = std::vector<int>(end1);
     std::iota(some_ints.begin(), some_ints.end(), 1);
+
+    // create vector containing last end2-end1 elements
     auto some_more_ints = std::vector<int>(end1 - end2 + 1);
     std::iota(some_more_ints.begin(), some_more_ints.end(), end2);
+
     auto some_wrong_ints = std::vector<int>(end2);
     std::iota(some_wrong_ints.begin(), some_wrong_ints.end(), 1);
 
@@ -48,7 +51,7 @@ void test_ends_with_sent(ExPolicy policy, IteratorTag)
         "hpx::is_execution_policy<ExPolicy>::value");
 
     auto end1 = std::rand() % 10007 + 1;
-    auto end2 = std::rand() % end1 + 1;
+    auto end2 = std::rand() % (end1 - 1) + 1;
     auto some_ints = std::vector<int>(end1);
     std::iota(some_ints.begin(), some_ints.end(), 1);
     auto some_more_ints = std::vector<int>(end1 - end2 + 1);
@@ -70,7 +73,7 @@ template <typename IteratorTag>
 void test_ends_with(IteratorTag)
 {
     auto end1 = std::rand() % 10007 + 1;
-    auto end2 = std::rand() % end1 + 1;
+    auto end2 = std::rand() % (end1 - 1) + 1;
     auto some_ints = std::vector<int>(end1);
     std::iota(some_ints.begin(), some_ints.end(), 1);
     auto some_more_ints = std::vector<int>(end1 - end2 + 1);
@@ -92,7 +95,7 @@ void test_ends_with(ExPolicy policy, IteratorTag)
         "hpx::is_execution_policy<ExPolicy>::value");
 
     auto end1 = std::rand() % 10007 + 1;
-    auto end2 = std::rand() % end1 + 1;
+    auto end2 = std::rand() % (end1 - 1) + 1;
     auto some_ints = std::vector<int>(end1);
     std::iota(some_ints.begin(), some_ints.end(), 1);
     auto some_more_ints = std::vector<int>(end1 - end2 + 1);
@@ -111,7 +114,7 @@ template <typename ExPolicy, typename IteratorTag>
 void test_ends_with_async(ExPolicy p, IteratorTag)
 {
     auto end1 = std::rand() % 10007 + 1;
-    auto end2 = std::rand() % end1 + 1;
+    auto end2 = std::rand() % (end1 - 1) + 1;
     auto some_ints = std::vector<int>(end1);
     std::iota(some_ints.begin(), some_ints.end(), 1);
     auto some_more_ints = std::vector<int>(end1 - end2 + 1);
