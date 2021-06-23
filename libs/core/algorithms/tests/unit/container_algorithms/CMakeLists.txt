@@ -22,6 +22,7 @@ set(tests
     destroy_range
     destroyn_range
     distance
+    ends_with_range
     equal_range
     equal_binary_range
     exclusive_scan_range
@@ -91,6 +92,7 @@ set(tests
     sort_range
     stable_partition_range
     stable_sort_range
+    starts_with_range
     swap_ranges_range
     transform_range
     transform_range_binary
