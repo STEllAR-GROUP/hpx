@@ -16,12 +16,12 @@
 #include <intrin.h>
 #include <windows.h>
 
-#if defined(HPX_HAVE_CUDA)
+#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
 #include <hpx/hardware/timestamp/cuda.hpp>
 #endif
 
 namespace hpx { namespace util { namespace hardware {
-    inline std::uint64_t timestamp()
+    HPX_HOST_DEVICE inline std::uint64_t timestamp()
     {
 #if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
         return timestamp_cuda();
