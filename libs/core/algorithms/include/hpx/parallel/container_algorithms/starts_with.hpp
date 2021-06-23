@@ -1,4 +1,5 @@
 //  Copyright (c) 2015-2020 Hartmut Kaiser
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -396,8 +397,8 @@ namespace hpx { namespace ranges {
                 "Required at least input iterator.");
 
             return hpx::parallel::v1::detail::starts_with().call(
-                hpx::execution::seq, first1, last1, first2, last2, pred, proj1,
-                proj2);
+                hpx::execution::seq, first1, last1, first2, last2, std::forward<Pred>(pred), std::forward<Proj1>(proj1),
+                std::forward<Proj2>(proj2));
         }
 
         // clang-format off
@@ -428,7 +429,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::starts_with().call(
                 std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                pred, proj1, proj2);
+                std::forward<Pred>(pred), std::forward<Proj1>(proj1),
+                std::forward<Proj2>(proj2));
         }
 
         // clang-format off
@@ -462,8 +464,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::starts_with().call(
                 hpx::execution::seq, hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
-                hpx::util::end(rng2), std::move(pred), std::move(proj1),
-                std::move(proj2));
+                hpx::util::end(rng2), std::forward<Pred>(pred),
+                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
 
         // clang-format off
@@ -499,8 +501,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::starts_with().call(
                 std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
-                hpx::util::end(rng2), std::move(pred), std::move(proj1),
-                std::move(proj2));
+                hpx::util::end(rng2), std::forward<Pred>(pred),
+                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
     } starts_with{};
 
