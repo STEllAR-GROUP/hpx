@@ -14,8 +14,8 @@ namespace hpx { namespace collectives {
 
     /// Inclusive inclusive_scan a set of values from different call sites
     ///
-    /// This function receives a set of values from all call sites operating on
-    /// the given base name.
+    /// This function performs an inclusive scan operation on a set of values
+    /// received from all call sites operating on the given base name.
     ///
     /// \param  basename    The base name identifying the inclusive_scan operation
     /// \param  local_result The value to transmit to all
@@ -49,8 +49,8 @@ namespace hpx { namespace collectives {
 
     /// Inclusive inclusive_scan a set of values from different call sites
     ///
-    /// This function receives a set of values from all call sites operating on
-    /// the given base name.
+    /// This function performs an inclusive scan operation on a set of values
+    /// received from all call sites operating on the given base name.
     ///
     /// \param  comm        A communicator object returned from \a create_reducer
     /// \param  local_result The value to transmit to all
