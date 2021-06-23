@@ -45,6 +45,7 @@
 #include <hpx/parallel/container_algorithms/shift_right.hpp>
 #include <hpx/parallel/container_algorithms/sort.hpp>
 #include <hpx/parallel/container_algorithms/stable_sort.hpp>
+#include <hpx/parallel/container_algorithms/starts_with.hpp>
 #include <hpx/parallel/container_algorithms/swap_ranges.hpp>
 #include <hpx/parallel/container_algorithms/transform.hpp>
 #include <hpx/parallel/container_algorithms/unique.hpp>
