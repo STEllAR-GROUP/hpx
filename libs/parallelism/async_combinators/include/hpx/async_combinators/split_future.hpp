@@ -65,7 +65,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>

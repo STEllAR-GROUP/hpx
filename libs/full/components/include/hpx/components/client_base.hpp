@@ -16,7 +16,7 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/stub_base.hpp>
-#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_future.hpp>
 #include <hpx/futures/traits/future_access.hpp>

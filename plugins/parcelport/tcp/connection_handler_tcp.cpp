@@ -116,7 +116,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             }
         }
 
-        if (errors.size() == tried) {
+        if (errors.size() == tried)
+        {
             // all attempts failed
             HPX_THROW_EXCEPTION(network_error,
                 "tcp::parcelport::run", errors.get_message());

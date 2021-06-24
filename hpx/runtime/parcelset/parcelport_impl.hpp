@@ -161,7 +161,7 @@ namespace hpx { namespace parcelset
 
             bool success = connection_handler().do_run();
 
-            if (blocking)
+            if (success && blocking)
                 io_service_pool_.join();
 
             return success;

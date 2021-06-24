@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
@@ -16,6 +16,8 @@
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/continuation.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/format.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/deferred_call.hpp>
@@ -38,6 +40,7 @@
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
+#include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime_local/state.hpp>
 #include <hpx/synchronization/counting_semaphore.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
@@ -54,6 +57,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <iostream>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -139,30 +143,79 @@ namespace hpx { namespace parcelset
             std::string cfgkey("hpx.parcel.bootstrap");
             pports_type::const_iterator it =
                 pports_.find(get_priority(get_config_entry(cfgkey, "tcp")));
-            if(it != pports_.end() && it->first > 0) return it->second;
+            if (it != pports_.end() && it->first > 0)
+            {
+                return it->second;
+            }
         }
         for (pports_type::value_type const& pp : pports_)
         {
-            if(pp.first > 0 && pp.second->can_bootstrap())
+            if (pp.first > 0 && pp.second->can_bootstrap())
+            {
                 return pp.second;
+            }
         }
         return std::shared_ptr<parcelport>();
     }
 
-
-    void parcelhandler::initialize(naming::resolver_client &resolver,
-        applier::applier *applier)
+    void parcelhandler::initialize(
+        naming::resolver_client& resolver, applier::applier* applier)
     {
         resolver_ = &resolver;
 
+        exception_list exceptions;
+        std::vector<int> failed_pps;
         for (pports_type::value_type& pp : pports_)
         {
-            pp.second->set_applier(applier);
-            if(pp.second != get_bootstrap_parcelport())
+            // protect against exceptions thrown by a parcelport during
+            // initialization
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    pp.second->set_applier(applier);
+                    if (pp.second != get_bootstrap_parcelport())
+                    {
+                        if (pp.first > 0)
+                            pp.second->run(false);
+                    }
+                },
+                [&](std::exception_ptr&& e) {
+                    exceptions.add(std::move(e));
+                    failed_pps.push_back(pp.first);
+                });
+        }
+
+        // handle exceptions
+        if (exceptions.size() != 0)
+        {
+            if (failed_pps.size() == pports_.size())
             {
-                if(pp.first > 0)
-                    pp.second->run(false);
+                std::cerr << hpx::util::format(
+                    "all parcelports failed initializing on locality {}, "
+                    "exiting:\n{}\n",
+                    hpx::get_locality_id(), exceptions.get_message());
+                std::terminate();
             }
+            else
+            {
+                std::cerr << hpx::util::format(
+                    "warning: the following errors were detected while "
+                    "initializing parcelports on locality {}:\n{}\n",
+                    hpx::get_locality_id(), exceptions.get_message());
+            }
+
+            // clean up parcelports that have failed initializtion
+            std::cerr << "the following parcelports will be disabled:\n";
+            for (int pp : failed_pps)
+            {
+                auto it = pports_.find(pp);
+                if (it != pports_.end())
+                {
+                    std::cerr << "  " << (*it).second->type() << "\n";
+                    (*it).second->stop();
+                    pports_.erase(it);
+                }
+            }
+            std::cerr << "\n";
         }
     }
 

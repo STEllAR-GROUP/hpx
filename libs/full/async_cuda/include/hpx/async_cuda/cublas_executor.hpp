@@ -13,7 +13,7 @@
 #include <hpx/async_cuda/cuda_executor.hpp>
 #include <hpx/async_cuda/cuda_future.hpp>
 #include <hpx/async_cuda/target.hpp>
-#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/futures/future.hpp>

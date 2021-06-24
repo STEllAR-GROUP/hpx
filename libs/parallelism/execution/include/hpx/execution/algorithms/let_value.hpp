@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_CXX17_STD_VARIANT)
-#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/invoke_result.hpp>

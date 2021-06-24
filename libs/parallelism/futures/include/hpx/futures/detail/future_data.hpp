@@ -10,7 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
-#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/future_fwd.hpp>
 #include <hpx/futures/traits/future_access.hpp>
