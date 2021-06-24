@@ -60,8 +60,8 @@ namespace hpx { namespace mpi { namespace experimental {
 
         std::size_t in_flight_estimate() const
         {
-            return detail::get_mpi_info().active_futures_size_ +
-                detail::get_mpi_info().request_queue_size_;
+            return detail::get_mpi_info().requests_vector_size_ +
+                detail::get_mpi_info().requests_queue_size_;
         }
 
     private:
