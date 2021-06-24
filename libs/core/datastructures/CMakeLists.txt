@@ -21,6 +21,7 @@ endif()
 
 set(datastructures_headers
     hpx/datastructures/any.hpp
+    hpx/datastructures/detail/variant.hpp
     hpx/datastructures/member_pack.hpp
     hpx/datastructures/optional.hpp
     hpx/datastructures/tuple.hpp
@@ -29,6 +30,7 @@ set(datastructures_headers
     hpx/datastructures/tagged_tuple.hpp
     hpx/datastructures/traits/supports_streaming_with_any.hpp
     hpx/datastructures/traits/is_tuple_like.hpp
+    hpx/datastructures/variant.hpp
     hpx/datastructures/variant_helper.hpp
 )
 
