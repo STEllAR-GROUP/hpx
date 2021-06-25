@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
-#include <hpx/allocator_support/traits/is_allocator.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/allocator_support/traits/is_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>

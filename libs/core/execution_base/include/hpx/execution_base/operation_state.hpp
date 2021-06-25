@@ -50,8 +50,7 @@ namespace hpx { namespace execution { namespace experimental {
 #else
     HPX_INLINE_CONSTEXPR_VARIABLE
 #endif
-     struct start_t
-      : hpx::functional::tag_priority_noexcept<start_t>
+        struct start_t : hpx::functional::tag_priority_noexcept<start_t>
     {
     private:
         template <typename OperationState>
