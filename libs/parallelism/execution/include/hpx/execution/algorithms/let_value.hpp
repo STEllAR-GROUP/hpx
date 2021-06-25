@@ -102,8 +102,9 @@ namespace hpx { namespace execution { namespace experimental {
 
                 // Type of the operation state returned when connecting the
                 // predecessor sender to the let_value_predecessor_receiver
-                using predecessor_operation_state_type = std::decay_t<
-                    connect_result_t<PredecessorSender&&, let_value_predecessor_receiver>>;
+                using predecessor_operation_state_type =
+                    std::decay_t<connect_result_t<PredecessorSender&&,
+                        let_value_predecessor_receiver>>;
 
                 // Type of the potential operation states returned when
                 // connecting a sender in successor_sender_types to the receiver

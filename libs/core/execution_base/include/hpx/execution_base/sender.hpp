@@ -340,8 +340,7 @@ namespace hpx { namespace execution { namespace experimental {
 #else
     HPX_INLINE_CONSTEXPR_VARIABLE
 #endif
-    struct execute_t
-      : hpx::functional::tag_priority<execute_t>
+        struct execute_t : hpx::functional::tag_priority<execute_t>
     {
         template <typename Executor, typename F,
             typename =
@@ -553,8 +552,7 @@ namespace hpx { namespace execution { namespace experimental {
 #else
     HPX_INLINE_CONSTEXPR_VARIABLE
 #endif
-     struct submit_t
-      : hpx::functional::tag_priority<submit_t>
+        struct submit_t : hpx::functional::tag_priority<submit_t>
     {
         template <typename S, typename R,
             typename = std::enable_if_t<is_sender_to<S, R>::value>>
@@ -730,8 +728,7 @@ namespace hpx { namespace execution { namespace experimental {
 #else
     HPX_INLINE_CONSTEXPR_VARIABLE
 #endif
-    struct schedule_t
-      : hpx::functional::tag_priority<schedule_t>
+        struct schedule_t : hpx::functional::tag_priority<schedule_t>
     {
         template <typename S,
             typename = std::enable_if_t<is_sender_v<
