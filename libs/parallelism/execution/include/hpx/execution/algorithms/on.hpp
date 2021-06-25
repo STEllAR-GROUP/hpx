@@ -84,7 +84,7 @@ namespace hpx { namespace execution { namespace experimental {
                                          schedule_t, Scheduler>::type,
                         scheduler_sender_receiver>;
                 hpx::util::optional<scheduler_operation_state_type>
-                    scheduler_os;
+                    scheduler_op_state;
 
                 template <typename Sender_, typename Scheduler_,
                     typename Receiver_>
@@ -105,32 +105,33 @@ namespace hpx { namespace execution { namespace experimental {
 
                 struct predecessor_sender_receiver
                 {
-                    operation_state& os;
+                    operation_state& op_state;
 
-                    template <typename E>
-                        void set_error(E&& e) && noexcept
+                    template <typename Error>
+                        void set_error(Error&& error) && noexcept
                     {
-                        os.set_error_predecessor_sender(std::forward<E>(e));
+                        op_state.set_error_predecessor_sender(
+                            std::forward<Error>(error));
                     }
 
                     void set_done() && noexcept
                     {
-                        os.set_done_predecessor_sender();
+                        op_state.set_done_predecessor_sender();
                     }
 
                     template <typename... Ts>
                         void set_value(Ts&&... ts) && noexcept
                     {
-                        os.set_value_predecessor_sender(
+                        op_state.set_value_predecessor_sender(
                             std::forward<Ts>(ts)...);
                     }
                 };
 
-                template <typename E>
-                void set_error_predecessor_sender(E&& e) noexcept
+                template <typename Error>
+                void set_error_predecessor_sender(Error&& error) noexcept
                 {
                     hpx::execution::experimental::set_error(
-                        std::move(receiver), std::forward<E>(e));
+                        std::move(receiver), std::forward<Error>(error));
                 }
 
                 void set_done_predecessor_sender() noexcept
@@ -148,7 +149,7 @@ namespace hpx { namespace execution { namespace experimental {
                     // state returned from connect without any
                     // intermediate copy construction (the operation
                     // state is not required to be copyable nor movable).
-                    scheduler_os.emplace(
+                    scheduler_op_state.emplace(
                         hpx::util::detail::with_result_of([&]() {
                             return hpx::execution::experimental::connect(
                                 hpx::execution::experimental::schedule(
@@ -158,33 +159,35 @@ namespace hpx { namespace execution { namespace experimental {
 #else
                     // MSVC doesn't get copy elision quite right, the operation
                     // state must be constructed explicitly directly in place
-                    scheduler_os.emplace_f(
+                    scheduler_op_state.emplace_f(
                         hpx::execution::experimental::connect,
                         hpx::execution::experimental::schedule(
                             std::move(scheduler)),
                         scheduler_sender_receiver{*this});
 #endif
-                    hpx::execution::experimental::start(scheduler_os.value());
+                    hpx::execution::experimental::start(
+                        scheduler_op_state.value());
                 }
 
                 struct scheduler_sender_receiver
                 {
-                    operation_state& os;
+                    operation_state& op_state;
 
-                    template <typename E>
-                        void set_error(E&& e) && noexcept
+                    template <typename Error>
+                        void set_error(Error&& error) && noexcept
                     {
-                        os.set_error_scheduler_sender(std::forward<E>(e));
+                        op_state.set_error_scheduler_sender(
+                            std::forward<Error>(error));
                     }
 
                     void set_done() && noexcept
                     {
-                        os.set_done_scheduler_sender();
+                        op_state.set_done_scheduler_sender();
                     }
 
                     void set_value() && noexcept
                     {
-                        os.set_value_scheduler_sender();
+                        op_state.set_value_scheduler_sender();
                     }
                 };
 
@@ -210,23 +213,23 @@ namespace hpx { namespace execution { namespace experimental {
                     }
                 };
 
-                template <typename E>
-                void set_error_scheduler_sender(E&& e) noexcept
+                template <typename Error>
+                void set_error_scheduler_sender(Error&& error) noexcept
                 {
-                    scheduler_os.reset();
+                    scheduler_op_state.reset();
                     hpx::execution::experimental::set_error(
-                        std::move(receiver), std::forward<E>(e));
+                        std::move(receiver), std::forward<Error>(error));
                 }
 
                 void set_done_scheduler_sender() noexcept
                 {
-                    scheduler_os.reset();
+                    scheduler_op_state.reset();
                     hpx::execution::experimental::set_done(std::move(receiver));
                 }
 
                 void set_value_scheduler_sender() noexcept
                 {
-                    scheduler_os.reset();
+                    scheduler_op_state.reset();
                     hpx::visit(
                         scheduler_sender_value_visitor{std::move(receiver)},
                         std::move(ts));

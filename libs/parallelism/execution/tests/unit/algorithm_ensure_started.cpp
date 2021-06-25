@@ -128,9 +128,9 @@ int main()
         std::atomic<bool> receiver_set_value_called{false};
         auto s1 = ex::just() | ex::ensure_started();
         auto s2 = ex::ensure_started(s1);
-        HPX_TEST_EQ(s1.st, s2.st);
+        HPX_TEST_EQ(s1.state, s2.state);
         auto s3 = ex::ensure_started(std::move(s2));
-        HPX_TEST_EQ(s1.st, s3.st);
+        HPX_TEST_EQ(s1.state, s3.state);
         auto f = [] {};
         auto r = callback_receiver<decltype(f)>{f, receiver_set_value_called};
         auto os = ex::connect(std::move(s3), std::move(r));
@@ -142,9 +142,9 @@ int main()
         std::atomic<bool> receiver_set_value_called{false};
         auto s1 = ex::just(42) | ex::ensure_started();
         auto s2 = ex::ensure_started(s1);
-        HPX_TEST_EQ(s1.st, s2.st);
+        HPX_TEST_EQ(s1.state, s2.state);
         auto s3 = ex::ensure_started(std::move(s2));
-        HPX_TEST_EQ(s1.st, s3.st);
+        HPX_TEST_EQ(s1.state, s3.state);
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
         auto r = callback_receiver<decltype(f)>{f, receiver_set_value_called};
         auto os = ex::connect(std::move(s3), std::move(r));

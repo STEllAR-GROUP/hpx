@@ -31,16 +31,16 @@ namespace hpx { namespace execution { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-        template <typename R, typename Shape, typename F>
+        template <typename Receiver, typename Shape, typename F>
         struct bulk_receiver
         {
-            std::decay_t<R> r;
+            std::decay_t<Receiver> receiver;
             std::decay_t<Shape> shape;
             std::decay_t<F> f;
 
-            template <typename R_, typename Shape_, typename F_>
-            bulk_receiver(R_&& r, Shape_&& shape, F_&& f)
-              : r(std::forward<R_>(r))
+            template <typename Receiver_, typename Shape_, typename F_>
+            bulk_receiver(Receiver_&& receiver, Shape_&& shape, F_&& f)
+              : receiver(std::forward<Receiver_>(receiver))
               , shape(std::forward<Shape_>(shape))
               , f(std::forward<F_>(f))
             {
@@ -50,12 +50,12 @@ namespace hpx { namespace execution { namespace experimental {
                 void set_error(E&& e) && noexcept
             {
                 hpx::execution::experimental::set_error(
-                    std::move(r), std::forward<E>(e));
+                    std::move(receiver), std::forward<E>(e));
             }
 
             void set_done() && noexcept
             {
-                hpx::execution::experimental::set_done(std::move(r));
+                hpx::execution::experimental::set_done(std::move(receiver));
             }
 
             template <typename... Ts>
@@ -68,19 +68,19 @@ namespace hpx { namespace execution { namespace experimental {
                             HPX_INVOKE(f, s, ts...);
                         }
                         hpx::execution::experimental::set_value(
-                            std::move(r), std::forward<Ts>(ts)...);
+                            std::move(receiver), std::forward<Ts>(ts)...);
                     },
                     [&](std::exception_ptr ep) {
                         hpx::execution::experimental::set_error(
-                            std::move(r), std::move(ep));
+                            std::move(receiver), std::move(ep));
                     });
             }
         };
 
-        template <typename S, typename Shape, typename F>
+        template <typename Sender, typename Shape, typename F>
         struct bulk_sender
         {
-            std::decay_t<S> s;
+            std::decay_t<Sender> sender;
             std::decay_t<Shape> shape;
             std::decay_t<F> f;
 
@@ -88,30 +88,32 @@ namespace hpx { namespace execution { namespace experimental {
                 template <typename...> class Variant>
             using value_types =
                 typename hpx::execution::experimental::sender_traits<
-                    S>::template value_types<Tuple, Variant>;
+                    Sender>::template value_types<Tuple, Variant>;
 
             template <template <typename...> class Variant>
             using error_types =
                 hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
                     typename hpx::execution::experimental::sender_traits<
-                        S>::template error_types<Variant>,
+                        Sender>::template error_types<Variant>,
                     std::exception_ptr>>;
 
             static constexpr bool sends_done = false;
 
-            template <typename R>
-            auto connect(R&& r) &&
+            template <typename Receiver>
+            auto connect(Receiver&& receiver) &&
             {
-                return hpx::execution::experimental::connect(std::move(s),
-                    bulk_receiver<R, Shape, F>(
-                        std::forward<R>(r), std::move(shape), std::move(f)));
+                return hpx::execution::experimental::connect(std::move(sender),
+                    bulk_receiver<Receiver, Shape, F>(
+                        std::forward<Receiver>(receiver), std::move(shape),
+                        std::move(f)));
             }
 
-            template <typename R>
-            auto connect(R&& r) &
+            template <typename Receiver>
+            auto connect(Receiver&& receiver) &
             {
-                return hpx::execution::experimental::connect(s,
-                    bulk_receiver<R, Shape, F>(std::forward<R>(r), shape, f));
+                return hpx::execution::experimental::connect(sender,
+                    bulk_receiver<Receiver, Shape, F>(
+                        std::forward<Receiver>(receiver), shape, f));
             }
         };
 
@@ -136,32 +138,34 @@ namespace hpx { namespace execution { namespace experimental {
     {
     private:
         // clang-format off
-        template <typename S, typename Shape, typename F,
+        template <typename Sender, typename Shape, typename F,
             HPX_CONCEPT_REQUIRES_(
-                is_sender_v<S> &&
+                is_sender_v<Sender> &&
                 std::is_integral<Shape>::value
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
-            bulk_t, S&& s, Shape const& shape, F&& f)
+            bulk_t, Sender&& sender, Shape const& shape, F&& f)
         {
-            return detail::bulk_sender<S, detail::counting_shape_type<Shape>,
-                F>{std::forward<S>(s), detail::make_counting_shape(shape),
-                std::forward<F>(f)};
+            return detail::bulk_sender<Sender,
+                detail::counting_shape_type<Shape>, F>{
+                std::forward<Sender>(sender),
+                detail::make_counting_shape(shape), std::forward<F>(f)};
         }
 
         // clang-format off
-        template <typename S, typename Shape, typename F,
+        template <typename Sender, typename Shape, typename F,
             HPX_CONCEPT_REQUIRES_(
-                is_sender_v<S> &&
+                is_sender_v<Sender> &&
                 !std::is_integral<std::decay_t<Shape>>::value
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
-            bulk_t, S&& s, Shape&& shape, F&& f)
+            bulk_t, Sender&& sender, Shape&& shape, F&& f)
         {
-            return detail::bulk_sender<S, Shape, F>{std::forward<S>(s),
-                std::forward<Shape>(shape), std::forward<F>(f)};
+            return detail::bulk_sender<Sender, Shape, F>{
+                std::forward<Sender>(sender), std::forward<Shape>(shape),
+                std::forward<F>(f)};
         }
 
         template <typename Shape, typename F>
