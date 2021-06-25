@@ -185,8 +185,6 @@ namespace hpx { namespace execution {
             return exec.schedulehint_;
         }
 
-        using supports_annotations = void;
-
         friend constexpr parallel_policy_executor tag_dispatch(
             hpx::execution::experimental::with_annotation_t,
             parallel_policy_executor const& exec, char const* annotation)
