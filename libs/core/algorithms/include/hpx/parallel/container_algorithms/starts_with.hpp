@@ -281,12 +281,8 @@ namespace hpx { namespace ranges {
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/starts_ends_with.hpp>
+#include <hpx/parallel/algorithms/starts_with.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-
-#include <cstddef>
-#include <type_traits>
-#include <utility>
 
 namespace hpx { namespace ranges {
 

@@ -284,10 +284,6 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/algorithms/starts_ends_with.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
-#include <cstddef>
-#include <type_traits>
-#include <utility>
-
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
