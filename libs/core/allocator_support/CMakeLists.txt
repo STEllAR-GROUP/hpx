@@ -8,6 +8,7 @@ set(allocator_support_headers
     hpx/allocator_support/aligned_allocator.hpp
     hpx/allocator_support/allocator_deleter.hpp
     hpx/allocator_support/internal_allocator.hpp
+    hpx/allocator_support/traits/is_allocator.hpp
 )
 
 # cmake-format: off

@@ -66,7 +66,7 @@ struct check_context_receiver
     void set_done() noexcept
     {
         HPX_TEST(false);
-    };
+    }
 
     template <typename... Ts>
     void set_value(Ts&&...) noexcept
@@ -252,7 +252,7 @@ struct callback_receiver
     void set_done() noexcept
     {
         HPX_TEST(false);
-    };
+    }
 
     template <typename... Ts>
     void set_value(Ts&&...) noexcept
@@ -629,6 +629,7 @@ void test_when_all()
                     HPX_TEST_EQ(y, std::string("hello"));
                 }) |
                 ex::sync_wait();
+            HPX_TEST(false);
         }
         catch (std::runtime_error const& e)
         {
@@ -667,6 +668,7 @@ void test_when_all()
                     HPX_TEST_EQ(y, std::string("hello"));
                 }) |
                 ex::sync_wait();
+            HPX_TEST(false);
         }
         catch (std::runtime_error const& e)
         {
@@ -698,11 +700,12 @@ void test_future_sender()
         try
         {
             ex::sync_wait(std::move(f));
+            HPX_TEST(false);
         }
         catch (...)
         {
             exception_thrown = true;
-        };
+        }
         HPX_TEST(exception_thrown);
     }
 
@@ -723,11 +726,12 @@ void test_future_sender()
         try
         {
             ex::sync_wait(std::move(f));
+            HPX_TEST(false);
         }
         catch (...)
         {
             exception_thrown = true;
-        };
+        }
         HPX_TEST(exception_thrown);
     }
 
@@ -763,11 +767,12 @@ void test_future_sender()
         try
         {
             ex::sync_wait(sf);
+            HPX_TEST(false);
         }
         catch (...)
         {
             exception_thrown = true;
-        };
+        }
         HPX_TEST(exception_thrown);
     }
 
@@ -790,11 +795,12 @@ void test_future_sender()
         try
         {
             ex::sync_wait(sf);
+            HPX_TEST(false);
         }
         catch (...)
         {
             exception_thrown = true;
-        };
+        }
         HPX_TEST(exception_thrown);
     }
 
@@ -808,6 +814,16 @@ void test_future_sender()
     {
         auto s = ex::just_on(ex::executor{}, 3);
         auto f = ex::make_future(std::move(s));
+        HPX_TEST_EQ(f.get(), 3);
+    }
+
+    {
+        auto f = ex::just(3) | ex::make_future();
+        HPX_TEST_EQ(f.get(), 3);
+    }
+
+    {
+        auto f = ex::just_on(ex::executor{}, 3) | ex::make_future();
         HPX_TEST_EQ(f.get(), 3);
     }
 
@@ -1050,6 +1066,7 @@ void test_let_value()
                 HPX_TEST(false);
                 return ex::just(0);
             }) | ex::sync_wait();
+            HPX_TEST(false);
         }
         catch (std::runtime_error const& e)
         {
@@ -1294,11 +1311,12 @@ void test_keep_future_sender()
         try
         {
             ex::sync_wait(std::move(f) | ex::keep_future());
+            HPX_TEST(false);
         }
         catch (...)
         {
             exception_thrown = true;
-        };
+        }
         HPX_TEST(exception_thrown);
     }
 
@@ -1322,11 +1340,12 @@ void test_keep_future_sender()
         try
         {
             ex::sync_wait(std::move(f) | ex::keep_future());
+            HPX_TEST(false);
         }
         catch (...)
         {
             exception_thrown = true;
-        };
+        }
         HPX_TEST(exception_thrown);
     }
 
@@ -1357,11 +1376,12 @@ void test_keep_future_sender()
         try
         {
             ex::sync_wait(sf | ex::keep_future());
+            HPX_TEST(false);
         }
         catch (...)
         {
             exception_thrown = true;
-        };
+        }
         HPX_TEST(exception_thrown);
     }
 
@@ -1381,11 +1401,12 @@ void test_keep_future_sender()
         try
         {
             ex::sync_wait(sf | ex::keep_future());
+            HPX_TEST(false);
         }
         catch (...)
         {
             exception_thrown = true;
-        };
+        }
         HPX_TEST(exception_thrown);
     }
 

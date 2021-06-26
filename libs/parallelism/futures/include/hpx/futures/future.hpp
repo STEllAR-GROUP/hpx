@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,6 +13,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/detail/future_data.hpp>
@@ -482,6 +483,109 @@ namespace hpx { namespace lcos { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // Operation state for sender compatibility
+    template <typename Receiver, typename Future>
+    class operation_state
+    {
+    private:
+        using receiver_type = std::decay_t<Receiver>;
+        using future_type = std::decay_t<Future>;
+        using result_type = typename future_type::result_type;
+
+    public:
+        template <typename Receiver_>
+        operation_state(Receiver_&& r, future_type f)
+          : receiver_(std::forward<Receiver_>(r))
+          , future_(std::move(f))
+        {
+        }
+
+        operation_state(operation_state&&) = delete;
+        operation_state& operator=(operation_state&&) = delete;
+        operation_state(operation_state const&) = delete;
+        operation_state& operator=(operation_state const&) = delete;
+
+        void start() noexcept
+        {
+            start_helper(std::is_void<result_type>{});
+        }
+
+    private:
+        void start_helper(std::true_type) noexcept
+        {
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    auto state = traits::detail::get_shared_state(future_);
+
+                    if (!state)
+                    {
+                        HPX_THROW_EXCEPTION(no_state, "operation_state::start",
+                            "the future has no valid shared state");
+                    }
+
+                    // The operation state has to be kept alive until set_value is
+                    // called, which means that we don't need to move receiver and
+                    // future into the on_completed callback.
+                    state->set_on_completed([this]() mutable {
+                        if (future_.has_value())
+                        {
+                            hpx::execution::experimental::set_value(
+                                std::move(receiver_));
+                        }
+                        else if (future_.has_exception())
+                        {
+                            hpx::execution::experimental::set_error(
+                                std::move(receiver_),
+                                future_.get_exception_ptr());
+                        }
+                    });
+                },
+                [&](std::exception_ptr ep) {
+                    hpx::execution::experimental::set_error(
+                        std::move(receiver_), std::move(ep));
+                });
+        }
+
+        void start_helper(std::false_type) noexcept
+        {
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    auto state = traits::detail::get_shared_state(future_);
+
+                    if (!state)
+                    {
+                        HPX_THROW_EXCEPTION(no_state, "operation_state::start",
+                            "the future has no valid shared state");
+                    }
+
+                    // The operation state has to be kept alive until set_value is
+                    // called, which means that we don't need to move receiver and
+                    // future into the on_completed callback.
+                    state->set_on_completed([this]() mutable {
+                        if (future_.has_value())
+                        {
+                            hpx::execution::experimental::set_value(
+                                std::move(receiver_), future_.get());
+                        }
+                        else if (future_.has_exception())
+                        {
+                            hpx::execution::experimental::set_error(
+                                std::move(receiver_),
+                                future_.get_exception_ptr());
+                        }
+                    });
+                },
+                [&](std::exception_ptr ep) {
+                    hpx::execution::experimental::set_error(
+                        std::move(receiver_), std::move(ep));
+                });
+        }
+
+        std::decay_t<Receiver> receiver_;
+        future_type future_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Derived, typename R>
     class future_base
     {
@@ -489,6 +593,25 @@ namespace hpx { namespace lcos { namespace detail {
         using result_type = R;
         using shared_state_type = future_data_base<
             typename traits::detail::shared_state_ptr_result<R>::type>;
+
+        // Sender compatibility
+        template <template <typename...> class Tuple,
+            template <typename...> class Variant>
+        using value_types = std::conditional_t<std::is_void<result_type>::value,
+            Variant<Tuple<>>, Variant<Tuple<result_type>>>;
+
+        template <template <typename...> class Variant>
+        using error_types = Variant<std::exception_ptr>;
+
+        static constexpr bool sends_done = false;
+
+        template <typename Receiver>
+        detail::operation_state<Receiver, Derived> connect(
+            Receiver&& receiver) &&
+        {
+            return {std::forward<Receiver>(receiver),
+                std::move(static_cast<Derived&>(*this))};
+        }
 
     private:
         template <typename F>
@@ -769,106 +892,6 @@ namespace hpx { namespace lcos { namespace detail {
     protected:
         hpx::intrusive_ptr<shared_state_type> shared_state_;
     };
-
-    // Operation state for sender compatibility
-    template <typename Receiver, typename Future>
-    class operation_state
-    {
-    private:
-        using receiver_type = std::decay_t<Receiver>;
-        using future_type = std::decay_t<Future>;
-        using result_type = typename future_type::result_type;
-
-    public:
-        template <typename Receiver_>
-        operation_state(Receiver_&& r, future_type f)
-          : receiver_(std::forward<Receiver_>(r))
-          , future_(std::move(f))
-        {
-        }
-
-        operation_state(operation_state&&) = delete;
-        operation_state(operation_state const&) = delete;
-
-        void start() noexcept
-        {
-            start_helper(std::is_void<result_type>{});
-        }
-
-    private:
-        void start_helper(std::true_type) noexcept
-        {
-            try
-            {
-                auto state = traits::detail::get_shared_state(future_);
-
-                if (!state)
-                {
-                    HPX_THROW_EXCEPTION(no_state, "operation_state::start",
-                        "the future has no valid shared state");
-                }
-
-                // The operation state has to be kept alive until set_value is
-                // called, which means that we don't need to move receiver and
-                // future into the on_completed callback.
-                state->set_on_completed([this]() mutable {
-                    if (future_.has_value())
-                    {
-                        hpx::execution::experimental::set_value(
-                            std::move(receiver_));
-                    }
-                    else if (future_.has_exception())
-                    {
-                        hpx::execution::experimental::set_error(
-                            std::move(receiver_), future_.get_exception_ptr());
-                    }
-                });
-            }
-            catch (...)
-            {
-                hpx::execution::experimental::set_error(
-                    std::move(receiver_), std::current_exception());
-            }
-        }
-
-        void start_helper(std::false_type) noexcept
-        {
-            try
-            {
-                auto state = traits::detail::get_shared_state(future_);
-
-                if (!state)
-                {
-                    HPX_THROW_EXCEPTION(no_state, "operation_state::start",
-                        "the future has no valid shared state");
-                }
-
-                // The operation state has to be kept alive until set_value is
-                // called, which means that we don't need to move receiver and
-                // future into the on_completed callback.
-                state->set_on_completed([this]() mutable {
-                    if (future_.has_value())
-                    {
-                        hpx::execution::experimental::set_value(
-                            std::move(receiver_), future_.get());
-                    }
-                    else if (future_.has_exception())
-                    {
-                        hpx::execution::experimental::set_error(
-                            std::move(receiver_), future_.get_exception_ptr());
-                    }
-                });
-            }
-            catch (...)
-            {
-                hpx::execution::experimental::set_error(
-                    std::move(receiver_), std::current_exception());
-            }
-        }
-
-        std::decay_t<Receiver> receiver_;
-        future_type future_;
-    };
 }}}    // namespace hpx::lcos::detail
 
 namespace hpx { namespace lcos {
@@ -876,31 +899,18 @@ namespace hpx { namespace lcos {
     template <typename R>
     class future : public detail::future_base<future<R>, R>
     {
-        typedef detail::future_base<future<R>, R> base_type;
+    private:
+        using base_type = detail::future_base<future<R>, R>;
 
     public:
         using result_type = R;
         using shared_state_type = typename base_type::shared_state_type;
 
         // Sender compatibility
-        template <template <typename...> class Tuple,
-            template <typename...> class Variant>
-        using value_types = std::conditional_t<std::is_void<result_type>::value,
-            Variant<Tuple<>>,
-            Variant<Tuple<
-                typename hpx::traits::future_traits<future>::result_type>>>;
-
-        template <template <typename...> class Variant>
-        using error_types = Variant<std::exception_ptr>;
-
-        static constexpr bool sends_done = false;
-
-        template <typename Receiver>
-        detail::operation_state<Receiver, future> connect(
-            Receiver&& receiver) &&
-        {
-            return {std::forward<Receiver>(receiver), std::move(*this)};
-        }
+        using base_type::connect;
+        using base_type::error_types;
+        using base_type::sends_done;
+        using base_type::value_types;
 
     private:
         struct invalidate
@@ -1221,24 +1231,10 @@ namespace hpx { namespace lcos {
         using shared_state_type = typename base_type::shared_state_type;
 
         // Sender compatibility
-        template <template <typename...> class Tuple,
-            template <typename...> class Variant>
-        using value_types = std::conditional_t<std::is_void<result_type>::value,
-            Variant<Tuple<>>,
-            Variant<Tuple<typename hpx::traits::future_traits<
-                shared_future>::result_type>>>;
-
-        template <template <typename...> class Variant>
-        using error_types = Variant<std::exception_ptr>;
-
-        static constexpr bool sends_done = false;
-
-        template <typename Receiver>
-        detail::operation_state<Receiver, shared_future> connect(
-            Receiver&& receiver) &&
-        {
-            return {std::forward<Receiver>(receiver), std::move(*this)};
-        }
+        using base_type::connect;
+        using base_type::error_types;
+        using base_type::sends_done;
+        using base_type::value_types;
 
         template <typename Receiver>
         detail::operation_state<Receiver, shared_future> connect(

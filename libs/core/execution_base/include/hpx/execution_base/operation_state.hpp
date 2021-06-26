@@ -84,5 +84,6 @@ namespace hpx { namespace execution { namespace experimental {
     };
 
     template <typename O>
-    constexpr bool is_operation_state_v = is_operation_state<O>::value;
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_operation_state_v =
+        is_operation_state<O>::value;
 }}}    // namespace hpx::execution::experimental

@@ -149,7 +149,7 @@ namespace hpx { namespace execution { namespace experimental {
             void set_done() && noexcept
             {
                 signal_set_called();
-            };
+            }
 
             void set_value() && noexcept
             {

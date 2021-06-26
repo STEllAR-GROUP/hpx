@@ -31,6 +31,7 @@ namespace hpx {
           : ts(std::piecewise_construct, std::forward<Ts_>(ts)...)
         {
         }
+
         partial_algorithm_base(partial_algorithm_base&&) = default;
         partial_algorithm_base& operator=(partial_algorithm_base&&) = default;
         partial_algorithm_base(partial_algorithm_base const&) = delete;
