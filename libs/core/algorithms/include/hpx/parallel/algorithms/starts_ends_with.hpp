@@ -15,11 +15,12 @@
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/container_algorithms/equal.hpp>
-#include <hpx/parallel/container_algorithms/mismatch.hpp>
+#include <hpx/parallel/algorithms/mismatch.hpp>
+#include <hpx/parallel/algorithms/equal.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -47,11 +48,24 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Iter2 first2, Sent2 last2, Pred&& pred, Proj1&& proj1,
                 Proj2&& proj2)
             {
-                return ranges::mismatch(std::move(first1), std::move(last1),
-                           std::move(first2), last2, std::forward<Pred>(pred),
-                           std::forward<Proj1>(proj1),
-                           std::forward<Proj2>(proj2))
-                           .in2 == last2;
+                auto dist1 = detail::distance(first1, last1);
+                auto dist2 = detail::distance(first2, last2);
+
+                if (dist1 < dist2)
+                {
+                    return false;
+                }
+
+                auto end_first = std::next(first1, dist2);
+                return detail::get_starts_with_result<Iter1, Iter2, Sent2>(
+                    hpx::parallel::v1::detail::mismatch_binary<
+                        util::in_in_result<Iter1, Iter2>>()
+                        .call(hpx::execution::seq, std::move(first1),
+                            std::move(end_first), std::move(first2), last2,
+                            std::forward<Pred>(pred),
+                            std::forward<Proj1>(proj1),
+                            std::forward<Proj2>(proj2)),
+                    last2);
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent1,
@@ -62,15 +76,48 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 FwdIter2 first2, Sent2 last2, Pred&& pred, Proj1&& proj1,
                 Proj2&& proj2)
             {
-                return util::detail::algorithm_result<ExPolicy, bool>::get(
-                    parallel::util::get_second_element<FwdIter1, FwdIter2>(
-                        ranges::mismatch(std::move(first1), std::move(last1),
-                            std::move(first2), last2, std::forward<Pred>(pred),
+                auto dist1 = detail::distance(first1, last1);
+                auto dist2 = detail::distance(first2, last2);
+
+                if (dist1 < dist2)
+                {
+                    return util::detail::algorithm_result<ExPolicy, bool>::get(
+                        false);
+                }
+
+                auto end_first = std::next(first1, dist2);
+                return detail::get_starts_with_result<FwdIter1, FwdIter2,
+                    Sent2>(
+                    detail::mismatch_binary<
+                        util::in_in_result<FwdIter1, FwdIter2>>()
+                        .call(std::forward<ExPolicy>(policy), std::move(first1),
+                            std::move(end_first), std::move(first2), last2,
+                            std::forward<Pred>(pred),
                             std::forward<Proj1>(proj1),
-                            std::forward<Proj2>(proj2))) == last2);
+                            std::forward<Proj2>(proj2)),
+                    last2);
             }
         };
         /// \endcond
+
+        template <typename FwdIter1, typename FwdIter2, typename Sent2>
+        bool get_starts_with_result(
+            util::in_in_result<FwdIter1, FwdIter2>&& p, Sent2 last2)
+        {
+            return p.in2 == last2;
+        }
+
+        template <typename FwdIter1, typename FwdIter2, typename Sent2>
+        hpx::future<bool> get_starts_with_result(
+            hpx::future<util::in_in_result<FwdIter1, FwdIter2>>&& f,
+            Sent2 last2)
+        {
+            return hpx::make_future<bool>(std::move(f),
+                [last2 = std::move(last2)](
+                    util::in_in_result<FwdIter1, FwdIter2>&& p) -> bool {
+                    return p.in2 == last2;
+                });
+        }
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -97,7 +144,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (drop < 0)
                     return false;
 
-                return ranges::equal(std::next(std::move(first1), drop),
+                return hpx::parallel::v1::detail::equal_binary().call(
+                    hpx::execution::seq, std::next(std::move(first1), drop),
                     std::move(last1), std::move(first2), std::move(last2),
                     std::forward<Pred>(pred), std::forward<Proj1>(proj1),
                     std::forward<Proj2>(proj2));
@@ -120,7 +168,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         false);
                 }
 
-                return ranges::equal(std::forward<ExPolicy>(policy),
+                return hpx::parallel::v1::detail::equal_binary().call(
+                    std::forward<ExPolicy>(policy),
                     std::next(std::move(first1), drop), std::move(last1),
                     std::move(first2), std::move(last2),
                     std::forward<Pred>(pred), std::forward<Proj1>(proj1),

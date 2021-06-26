@@ -151,7 +151,6 @@ namespace hpx { namespace ranges {
         FwdIter2 first2, Sent2 last2, Pred&& pred, Proj1&& proj1,
         Proj2&& proj2);
 
-    
     /// Checks whether the second range \a rng2 matches the
     /// suffix of the first range \a rng1.
     ///
@@ -187,7 +186,7 @@ namespace hpx { namespace ranges {
     ///                     will be invoked for each of the elements in the
     ///                     destination range as a projection operation before
     ///                     the actual predicate \a is invoked.
-    /// 
+    ///
     /// The assignments in the parallel \a ends_with algorithm invoked
     /// without an execution policy object execute in sequential order
     /// in the calling thread.
@@ -242,7 +241,7 @@ namespace hpx { namespace ranges {
     ///                     will be invoked for each of the elements in the
     ///                     destination range as a projection operation before
     ///                     the actual predicate \a is invoked.
-    /// 
+    ///
     /// The assignments in the parallel \a ends_with algorithm invoked with an
     /// execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
@@ -306,7 +305,12 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<Iter1>::value &&
                 hpx::traits::is_sentinel_for<Sent1, Iter1>::value &&
                 hpx::traits::is_iterator<Iter2>::value &&
-                hpx::traits::is_sentinel_for<Sent2, Iter2>::value
+                hpx::traits::is_sentinel_for<Sent2, Iter2>::value &&
+                hpx::parallel::traits::is_indirect_callable<
+                    hpx::execution::sequenced_policy, Pred,
+                    hpx::parallel::traits::projected<Proj1, Iter1>,
+                    hpx::parallel::traits::projected<Proj2, Iter2>
+                >::value
             )>
         // clang-format on
         friend bool tag_fallback_dispatch(hpx::ranges::ends_with_t,
@@ -327,8 +331,8 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename ExPolicy, typename FwdIter1, typename Sent1, typename FwdIter2, typename Sent2,
-            typename Pred = ranges::equal_to,
+        template <typename ExPolicy, typename FwdIter1, typename Sent1, typename FwdIter2,
+            typename Sent2, typename Pred = ranges::equal_to,
             typename Proj1 = parallel::util::projection_identity,
             typename Proj2 = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
@@ -336,7 +340,12 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_sentinel_for<Sent1, FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value &&
-                hpx::traits::is_sentinel_for<Sent2, FwdIter2>::value
+                hpx::traits::is_sentinel_for<Sent2, FwdIter2>::value &&
+                hpx::parallel::traits::is_indirect_callable<
+                    ExPolicy, Pred,
+                    hpx::parallel::traits::projected<Proj1, FwdIter1>,
+                    hpx::parallel::traits::projected<Proj2, FwdIter2>
+                >::value
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
@@ -367,7 +376,14 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng1>::value &&
                 hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
                 hpx::traits::is_range<Rng2>::value &&
-                hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value
+                hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
+                hpx::parallel::traits::is_indirect_callable<
+                    hpx::execution::sequenced_policy, Pred,
+                    hpx::parallel::traits::projected<Proj1,
+                        typename hpx::traits::range_traits<Rng1>::iterator_type>,
+                    hpx::parallel::traits::projected<Proj2,
+                        typename hpx::traits::range_traits<Rng2>::iterator_type>
+                >::value
             )>
         // clang-format on
         friend bool tag_fallback_dispatch(hpx::ranges::ends_with_t, Rng1&& rng1,
@@ -402,7 +418,14 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng1>::value &&
                 hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
                 hpx::traits::is_range<Rng2>::value &&
-                hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value
+                hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
+                hpx::parallel::traits::is_indirect_callable<
+                    ExPolicy, Pred,
+                    hpx::parallel::traits::projected<Proj1,
+                        typename hpx::traits::range_traits<Rng1>::iterator_type>,
+                    hpx::parallel::traits::projected<Proj2,
+                        typename hpx::traits::range_traits<Rng2>::iterator_type>
+                >::value
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,

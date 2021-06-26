@@ -142,14 +142,13 @@ void test_starts_with()
     using namespace hpx::execution;
 
     test_starts_with(IteratorTag());
-
     test_starts_with(seq, IteratorTag());
     test_starts_with(par, IteratorTag());
     test_starts_with(par_unseq, IteratorTag());
 
     test_starts_with_async(seq(task), IteratorTag());
     test_starts_with_async(par(task), IteratorTag());
-
+    
     test_starts_with_sent(IteratorTag());
     test_starts_with_sent(seq, IteratorTag());
     test_starts_with_sent(par, IteratorTag());

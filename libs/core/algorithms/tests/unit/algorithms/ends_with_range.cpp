@@ -24,7 +24,7 @@ template <typename IteratorTag>
 void test_ends_with_sent(IteratorTag)
 {
     auto end1 = std::rand() % 10007 + 1;
-    auto end2 = std::rand() % (end1-1) + 1;
+    auto end2 = std::rand() % (end1 - 1) + 1;
     auto some_ints = std::vector<int>(end1);
     std::iota(some_ints.begin(), some_ints.end(), 1);
 
