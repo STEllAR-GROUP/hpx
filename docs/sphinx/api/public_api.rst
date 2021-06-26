@@ -47,6 +47,7 @@ Functions
 - :cpp:func:`hpx::copy_n`
 - :cpp:func:`hpx::count`
 - :cpp:func:`hpx::count_if`
+- :cpp:func:`hpx::ends_with`
 - :cpp:func:`hpx::equal`
 - :cpp:func:`hpx::fill`
 - :cpp:func:`hpx::fill_n`
@@ -100,8 +101,9 @@ Functions
 - :cpp:func:`hpx::shift_right`
 - :cpp:func:`hpx::sort`
 - :cpp:func:`hpx::stable_partition`
-- :cpp:func:`hpx::swap_ranges`
 - :cpp:func:`hpx::stable_sort`
+- :cpp:func:`hpx::starts_with`
+- :cpp:func:`hpx::swap_ranges`
 - :cpp:func:`hpx::transform`
 - :cpp:func:`hpx::unique`
 - :cpp:func:`hpx::unique_copy`

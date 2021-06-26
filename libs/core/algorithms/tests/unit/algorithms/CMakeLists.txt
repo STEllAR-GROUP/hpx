@@ -36,6 +36,7 @@ set(tests
     countif
     destroy
     destroyn
+    ends_with
     equal
     equal_binary
     exclusive_scan
@@ -124,6 +125,7 @@ set(tests
     stable_partition
     stable_sort
     stable_sort_exceptions
+    starts_with
     swapranges
     transform
     transform_binary

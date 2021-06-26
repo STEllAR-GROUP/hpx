@@ -5,11 +5,142 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/algorithms/starts_with.hpp
+/// \file parallel/algorithms/ends_with.hpp
 
 #pragma once
 
+#if defined(DOXYGEN)
+
+namespace hpx { namespace ranges {
+    // clang-format off
+
+    /// Checks whether the second range defined by [first1, last1) matches the
+    /// suffix of the first range defined by [first2, last2)
+    ///
+    /// \note   Complexity: Linear: at most min(N1, N2) applications of the
+    ///                     predicate and both projections.
+    ///
+    /// \tparam InIter1     The type of the begin source iterators used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an input iterator.
+    /// \tparam InIter2     The type of the begin destination iterators used
+    ///                     deduced). This iterator type must meet the
+    ///                     requirements of a input iterator.
+    /// \tparam Pred        The binary predicate that compares the projected
+    ///                     elements.
+    /// \tparam Proj1       The type of an optional projection function for
+    ///                     the source range. This defaults to
+    ///                     \a util::projection_identity
+    /// \tparam Proj1       The type of an optional projection function for
+    ///                     the destination range. This defaults to
+    ///                     \a util::projection_identity
+    ///
+    /// \param first1       Refers to the beginning of the source range.
+    /// \param last1        Refers to the end of the source range.
+    /// \param first2       Refers to the beginning of the destination range.
+    /// \param last2        Refers to the end of the destination range.
+    /// \param pred         Specifies the binary predicate function
+    ///                     (or function object) which will be invoked for
+    ///                     comparision of the elements in the in two ranges
+    ///                     projected by proj1 and proj2 respectively.
+    /// \param proj1        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     source range as a projection operation before the
+    ///                     actual predicate \a is invoked.
+    /// \param proj2        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     destination range as a projection operation before
+    ///                     the actual predicate \a is invoked.
+    ///
+    /// The assignments in the parallel \a ends_with algorithm invoked
+    /// without an execution policy object execute in sequential order
+    /// in the calling thread.
+    ///
+    /// \returns  The \a ends_with algorithm returns \a bool.
+    ///           The \a ends_with algorithm returns a boolean with the
+    ///           value true if the second range matches the suffix of the
+    ///           first range, false otherwise.
+    template <typename InIter1, typename InIter2, typename Pred,
+        typename Proj1, typename Proj2>
+    bool ends_with(InIter1 first1, InIter1 last1, InIter2 first2,
+        InIter2 last2, Pred&& pred, Proj1&& proj1, Proj2&& proj2);
+
+    /// Checks whether the second range defined by [first1, last1) matches the
+    /// suffix of the first range defined by [first2, last2)
+    ///
+    /// \note   Complexity: Linear: at most min(N1, N2) applications of the
+    ///                     predicate and both projections.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the begin source iterators used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an forward iterator.
+    /// \tparam FwdIter2    The type of the begin destination iterators used
+    ///                     deduced). This iterator type must meet the
+    ///                     requirements of a forward iterator.
+    /// \tparam Pred        The binary predicate that compares the projected
+    ///                     elements.
+    /// \tparam Proj1       The type of an optional projection function for
+    ///                     the source range. This defaults to
+    ///                     \a util::projection_identity
+    /// \tparam Proj1       The type of an optional projection function for
+    ///                     the destination range. This defaults to
+    ///                     \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first1       Refers to the beginning of the source range.
+    /// \param last1        Refers to the end of the source range.
+    /// \param first2       Refers to the beginning of the destination range.
+    /// \param last2        Refers to the end of the destination range.
+    /// \param pred         Specifies the binary predicate function
+    ///                     (or function object) which will be invoked for
+    ///                     comparision of the elements in the in two ranges
+    ///                     projected by proj1 and proj2 respectively.
+    /// \param proj1        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     source range as a projection operation before the
+    ///                     actual predicate \a is invoked.
+    /// \param proj2        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     destination range as a projection operation before
+    ///                     the actual predicate \a is invoked.
+    ///
+    /// The assignments in the parallel \a ends_with algorithm invoked with an
+    /// execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a ends_with algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a ends_with algorithm returns a
+    ///           \a hpx::future<bool> if the execution policy is of type
+    ///           \a sequenced_task_policy or \a parallel_task_policy and
+    ///           returns \a bool otherwise.
+    ///           The \a ends_with algorithm returns a boolean with the
+    ///           value true if the second range matches the suffix of the
+    ///           first range, false otherwise.
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename Pred, typename Proj1, typename Proj2>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        bool>::type
+    ends_with(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+        FwdIter2 first2, FwdIter2 last2, Pred&& pred, Proj1&& proj1,
+        Proj2&& proj2);
+
+    // clang-format on
+}}    // namespace hpx::ranges
+
+#else    // DOXYGEN
+
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -166,3 +297,5 @@ namespace hpx {
     } ends_with{};
 
 }    // namespace hpx
+
+#endif    // DOXYGEN
