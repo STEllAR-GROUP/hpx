@@ -49,7 +49,7 @@ namespace hpx { namespace ranges {
     ///                     destination range.
     /// \param pred         Specifies the binary predicate function
     ///                     (or function object) which will be invoked for
-    ///                     comparision of the elements in the in two ranges
+    ///                     comparison of the elements in the in two ranges
     ///                     projected by proj1 and proj2 respectively.
     /// \param proj1        Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
@@ -114,7 +114,7 @@ namespace hpx { namespace ranges {
     ///                     destination range.
     /// \param pred         Specifies the binary predicate function
     ///                     (or function object) which will be invoked for
-    ///                     comparision of the elements in the in two ranges
+    ///                     comparison of the elements in the in two ranges
     ///                     projected by proj1 and proj2 respectively.
     /// \param proj1        Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
@@ -176,7 +176,7 @@ namespace hpx { namespace ranges {
     /// \param rng2         Refers to the destination range.
     /// \param pred         Specifies the binary predicate function
     ///                     (or function object) which will be invoked for
-    ///                     comparision of the elements in the in two ranges
+    ///                     comparison of the elements in the in two ranges
     ///                     projected by proj1 and proj2 respectively.
     /// \param proj1        Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
@@ -231,7 +231,7 @@ namespace hpx { namespace ranges {
     /// \param rng2         Refers to the destination range.
     /// \param pred         Specifies the binary predicate function
     ///                     (or function object) which will be invoked for
-    ///                     comparision of the elements in the in two ranges
+    ///                     comparison of the elements in the in two ranges
     ///                     projected by proj1 and proj2 respectively.
     /// \param proj1        Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the

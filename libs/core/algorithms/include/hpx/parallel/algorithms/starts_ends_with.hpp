@@ -42,7 +42,7 @@ namespace hpx { namespace ranges {
     ///                     destination range.
     /// \param pred         Specifies the binary predicate function
     ///                     (or function object) which will be invoked for
-    ///                     comparision of the elements in the in two ranges
+    ///                     comparison of the elements in the in two ranges
     ///                     projected by proj1 and proj2 respectively.
     /// \param proj1        Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
@@ -99,7 +99,7 @@ namespace hpx { namespace ranges {
     /// \param last2        Refers to the end of the destination range.
     /// \param pred         Specifies the binary predicate function
     ///                     (or function object) which will be invoked for
-    ///                     comparision of the elements in the in two ranges
+    ///                     comparison of the elements in the in two ranges
     ///                     projected by proj1 and proj2 respectively.
     /// \param proj1        Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
@@ -165,6 +165,25 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // starts_with
     namespace detail {
         /// \cond NOINTERNAL
+        template <typename FwdIter1, typename FwdIter2, typename Sent2>
+        bool get_starts_with_result(
+            util::in_in_result<FwdIter1, FwdIter2>&& p, Sent2 last2)
+        {
+            return p.in2 == last2;
+        }
+
+        template <typename FwdIter1, typename FwdIter2, typename Sent2>
+        hpx::future<bool> get_starts_with_result(
+            hpx::future<util::in_in_result<FwdIter1, FwdIter2>>&& f,
+            Sent2 last2)
+        {
+            return hpx::make_future<bool>(std::move(f),
+                [last2 = std::move(last2)](
+                    util::in_in_result<FwdIter1, FwdIter2>&& p) -> bool {
+                    return p.in2 == last2;
+                });
+        }
+
         struct starts_with : public detail::algorithm<starts_with, bool>
         {
             starts_with()
@@ -230,25 +249,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
         /// \endcond
-
-        template <typename FwdIter1, typename FwdIter2, typename Sent2>
-        bool get_starts_with_result(
-            util::in_in_result<FwdIter1, FwdIter2>&& p, Sent2 last2)
-        {
-            return p.in2 == last2;
-        }
-
-        template <typename FwdIter1, typename FwdIter2, typename Sent2>
-        hpx::future<bool> get_starts_with_result(
-            hpx::future<util::in_in_result<FwdIter1, FwdIter2>>&& f,
-            Sent2 last2)
-        {
-            return hpx::make_future<bool>(std::move(f),
-                [last2 = std::move(last2)](
-                    util::in_in_result<FwdIter1, FwdIter2>&& p) -> bool {
-                    return p.in2 == last2;
-                });
-        }
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1
 
